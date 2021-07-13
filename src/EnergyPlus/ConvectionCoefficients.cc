@@ -5324,273 +5324,287 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
     auto &TH(state.dataHeatBalSurf->TH);
 
     // first call Hn models
-    {
-        auto const SELECT_CASE_var(NaturalConvModelEqNum);
-
-        if (SELECT_CASE_var == ConvectionConstants::HcExt_None) {
-            Hn = 0.0;
-            HnFn = KIVA_CONST_CONV(0.0);
-        } else if (SELECT_CASE_var == ConvectionConstants::HcExt_UserCurve) {
-            CalcUserDefinedOutsideHcModel(state, SurfNum, state.dataSurface->SurfOutConvHnUserCurveIndex(SurfNum), Hn);
-            if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-                HnFn = [=, &state](double Tsurf, double Tamb, double HfTerm, double Roughness, double CosTilt) -> double {
-                    // Remove Hfterm since this is only used for the natural convection portion
-                    return state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].out(Tsurf, Tamb, HfTerm, Roughness, CosTilt) - HfTerm;
-                };
-            }
-        } else if (SELECT_CASE_var == ConvectionConstants::HcExt_NaturalASHRAEVerticalWall) {
-            Hn = CalcASHRAEVerticalWall((TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)));
-            HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double { return CalcASHRAEVerticalWall(Tsurf - Tamb); };
-        } else if (SELECT_CASE_var == ConvectionConstants::HcExt_NaturalWaltonUnstableHorizontalOrTilt) {
-            Hn = CalcWaltonUnstableHorizontalOrTilt((TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)),
-                                                    Surface(SurfNum).CosTilt); // TODO verify CosTilt in vs out
-            HnFn = [=](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
-                return CalcWaltonUnstableHorizontalOrTilt(Tsurf - Tamb, cosTilt);
+    switch (NaturalConvModelEqNum) {
+    case ConvectionConstants::HcExt_None:
+        Hn = 0.0;
+        HnFn = KIVA_CONST_CONV(0.0);
+        break;
+    case ConvectionConstants::HcExt_UserCurve:
+        CalcUserDefinedOutsideHcModel(state, SurfNum, state.dataSurface->SurfOutConvHnUserCurveIndex(SurfNum), Hn);
+        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+            HnFn = [=, &state](double Tsurf, double Tamb, double HfTerm, double Roughness, double CosTilt) -> double {
+                // Remove Hfterm since this is only used for the natural convection portion
+                return state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].out(Tsurf, Tamb, HfTerm, Roughness, CosTilt) - HfTerm;
             };
-        } else if (SELECT_CASE_var == ConvectionConstants::HcExt_NaturalWaltonStableHorizontalOrTilt) {
-            Hn = CalcWaltonStableHorizontalOrTilt((TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)),
-                                                  Surface(SurfNum).CosTilt); // TODO verify CosTilt in vs out
-            HnFn = [=](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
-                return CalcWaltonStableHorizontalOrTilt(Tsurf - Tamb, cosTilt);
-            };
-        } else if (SELECT_CASE_var == ConvectionConstants::HcExt_AlamdariHammondVerticalWall) {
-            Real64 FaceHeight = state.dataSurface->SurfOutConvFaceHeight(SurfNum);
-            Hn = CalcAlamdariHammondVerticalWall(state, (TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)), FaceHeight, SurfNum);
-            HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
-                return CalcAlamdariHammondVerticalWall(Tsurf - Tamb, FaceHeight);
-            };
-        } else if (SELECT_CASE_var == ConvectionConstants::HcExt_FohannoPolidoriVerticalWall) {
-            if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-                // Not compatible with Kiva (Exterior surfaces in Kiva are not currently reported. Also need to add cell-level convection.)
-                ShowFatalError(state, "Fohanno Polidori convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
-            }
-            Hn = CallCalcFohannoPolidoriVerticalWall(state,
-                                                     (TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)),
-                                                     state.dataSurface->SurfOutConvFaceHeight(SurfNum),
-                                                     TH(1, 1, SurfNum),
-                                                     -QdotConvOutRepPerArea(SurfNum),
-                                                     SurfNum);
-        } else if (SELECT_CASE_var == ConvectionConstants::HcExt_AlamdariHammondStableHorizontal) {
-            if (state.dataSurface->SurfOutConvFacePerimeter(SurfNum) > 0.0) {
-                HydraulicDiameter = 4.0 * state.dataSurface->SurfOutConvFaceArea(SurfNum) / state.dataSurface->SurfOutConvFacePerimeter(SurfNum);
-            } else {
-                HydraulicDiameter = std::sqrt(state.dataSurface->SurfOutConvFaceArea(SurfNum));
-            }
-            Hn = CalcAlamdariHammondStableHorizontal(
-                state, (TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)), HydraulicDiameter, SurfNum);
-        } else if (SELECT_CASE_var == ConvectionConstants::HcExt_AlamdariHammondUnstableHorizontal) {
-            if (state.dataSurface->SurfOutConvFacePerimeter(SurfNum) > 0.0) {
-                HydraulicDiameter = 4.0 * state.dataSurface->SurfOutConvFaceArea(SurfNum) / state.dataSurface->SurfOutConvFacePerimeter(SurfNum);
-            } else {
-                HydraulicDiameter = std::sqrt(state.dataSurface->SurfOutConvFaceArea(SurfNum));
-            }
-            Hn = CalcAlamdariHammondUnstableHorizontal(
-                state, (TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)), HydraulicDiameter, SurfNum);
         }
+        break;
+    case ConvectionConstants::HcExt_NaturalASHRAEVerticalWall:
+        Hn = CalcASHRAEVerticalWall((TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)));
+        HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double { return CalcASHRAEVerticalWall(Tsurf - Tamb); };
+        break;
+    case ConvectionConstants::HcExt_NaturalWaltonUnstableHorizontalOrTilt:
+        Hn = CalcWaltonUnstableHorizontalOrTilt((TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)),
+                                                Surface(SurfNum).CosTilt); // TODO verify CosTilt in vs out
+        HnFn = [=](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
+            return CalcWaltonUnstableHorizontalOrTilt(Tsurf - Tamb, cosTilt);
+        };
+        break;
+    case ConvectionConstants::HcExt_NaturalWaltonStableHorizontalOrTilt:
+        Hn = CalcWaltonStableHorizontalOrTilt((TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)),
+                                              Surface(SurfNum).CosTilt); // TODO verify CosTilt in vs out
+        HnFn = [=](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
+            return CalcWaltonStableHorizontalOrTilt(Tsurf - Tamb, cosTilt);
+        };
+        break;
+    case ConvectionConstants::HcExt_AlamdariHammondVerticalWall: {
+        Real64 FaceHeight = state.dataSurface->SurfOutConvFaceHeight(SurfNum);
+        Hn = CalcAlamdariHammondVerticalWall(state, (TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)), FaceHeight, SurfNum);
+        HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double { return CalcAlamdariHammondVerticalWall(Tsurf - Tamb, FaceHeight); };
+        break;
+    }
+    case ConvectionConstants::HcExt_FohannoPolidoriVerticalWall:
+        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+            // Not compatible with Kiva (Exterior surfaces in Kiva are not currently reported. Also need to add cell-level convection.)
+            ShowFatalError(state, "Fohanno Polidori convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
+        }
+        Hn = CallCalcFohannoPolidoriVerticalWall(state,
+                                                 (TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)),
+                                                 state.dataSurface->SurfOutConvFaceHeight(SurfNum),
+                                                 TH(1, 1, SurfNum),
+                                                 -QdotConvOutRepPerArea(SurfNum),
+                                                 SurfNum);
+        break;
+    case ConvectionConstants::HcExt_AlamdariHammondStableHorizontal:
+        if (state.dataSurface->SurfOutConvFacePerimeter(SurfNum) > 0.0) {
+            HydraulicDiameter = 4.0 * state.dataSurface->SurfOutConvFaceArea(SurfNum) / state.dataSurface->SurfOutConvFacePerimeter(SurfNum);
+        } else {
+            HydraulicDiameter = std::sqrt(state.dataSurface->SurfOutConvFaceArea(SurfNum));
+        }
+        Hn = CalcAlamdariHammondStableHorizontal(
+            state, (TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)), HydraulicDiameter, SurfNum);
+        break;
+    case ConvectionConstants::HcExt_AlamdariHammondUnstableHorizontal:
+        if (state.dataSurface->SurfOutConvFacePerimeter(SurfNum) > 0.0) {
+            HydraulicDiameter = 4.0 * state.dataSurface->SurfOutConvFaceArea(SurfNum) / state.dataSurface->SurfOutConvFacePerimeter(SurfNum);
+        } else {
+            HydraulicDiameter = std::sqrt(state.dataSurface->SurfOutConvFaceArea(SurfNum));
+        }
+        Hn = CalcAlamdariHammondUnstableHorizontal(
+            state, (TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)), HydraulicDiameter, SurfNum);
+        break;
     }
 
-    {
+    if (!Surface(SurfNum).ExtWind) {
+        SurfWindSpeed = 0.0; // No wind exposure
+    } else if (Surface(SurfNum).Class == SurfaceClass::Window && state.dataSurface->SurfWinShadingFlag(SurfNum) == WinShadingType::ExtShade) {
+        SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
+    } else {
+        SurfWindSpeed = state.dataSurface->SurfOutWindSpeed(SurfNum);
+    }
 
-        if (!Surface(SurfNum).ExtWind) {
-            SurfWindSpeed = 0.0; // No wind exposure
-        } else if (Surface(SurfNum).Class == SurfaceClass::Window && state.dataSurface->SurfWinShadingFlag(SurfNum) == WinShadingType::ExtShade) {
-            SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
-        } else {
-            SurfWindSpeed = state.dataSurface->SurfOutWindSpeed(SurfNum);
+    DataSurfaces::SurfaceRoughness Roughness =
+        state.dataMaterial->Material(state.dataConstruction->Construct(Surface(SurfNum).Construction).LayerPoint(1)).Roughness;
+
+    switch (ForcedConvModelEqNum) {
+    case ConvectionConstants::HcExt_None:
+        Hf = 0.0;
+        HfTermFn = KIVA_HF_DEF;
+        HfFn = KIVA_CONST_CONV(0.0);
+        break;
+    case ConvectionConstants::HcExt_UserCurve:
+        CalcUserDefinedOutsideHcModel(state, SurfNum, state.dataSurface->SurfOutConvHfUserCurveIndex(SurfNum), Hf);
+        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+            HfTermFn = state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].f;
+            HnFn = state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].out;
         }
+        break;
+    case ConvectionConstants::HcExt_SparrowWindward:
+        Hf = CalcSparrowWindward(state,
+                                 Roughness,
+                                 state.dataSurface->SurfOutConvFacePerimeter(SurfNum),
+                                 state.dataSurface->SurfOutConvFaceArea(SurfNum),
+                                 SurfWindSpeed,
+                                 SurfNum);
 
-        DataSurfaces::SurfaceRoughness Roughness =
-            state.dataMaterial->Material(state.dataConstruction->Construct(Surface(SurfNum).Construction).LayerPoint(1)).Roughness;
-
-        auto const SELECT_CASE_var(ForcedConvModelEqNum);
-
-        if (SELECT_CASE_var == ConvectionConstants::HcExt_None) {
-            Hf = 0.0;
-            HfTermFn = KIVA_HF_DEF;
-            HfFn = KIVA_CONST_CONV(0.0);
-        } else if (SELECT_CASE_var == ConvectionConstants::HcExt_UserCurve) {
-            CalcUserDefinedOutsideHcModel(state, SurfNum, state.dataSurface->SurfOutConvHfUserCurveIndex(SurfNum), Hf);
+        if (Surface(SurfNum).Class == SurfaceClass::Floor) { // used for exterior grade
+            // Assume very large area for grade (relative to perimeter).
+            const double area = 9999999.;
+            const double perim = 1.;
+            HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcSparrowWindward(Roughness, perim, area, windSpeed); };
+        } else {
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-                HfTermFn = state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].f;
-                HnFn = state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].out;
-            }
-        } else if (SELECT_CASE_var == ConvectionConstants::HcExt_SparrowWindward) {
-            Hf = CalcSparrowWindward(state,
-                                     Roughness,
-                                     state.dataSurface->SurfOutConvFacePerimeter(SurfNum),
-                                     state.dataSurface->SurfOutConvFaceArea(SurfNum),
-                                     SurfWindSpeed,
-                                     SurfNum);
-
-            if (Surface(SurfNum).Class == SurfaceClass::Floor) { // used for exterior grade
-                // Assume very large area for grade (relative to perimeter).
-                const double area = 9999999.;
-                const double perim = 1.;
-                HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcSparrowWindward(Roughness, perim, area, windSpeed); };
-            } else {
-                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-                    auto &fnd = state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].get_instance(0).first->foundation;
-                    const double length = fnd.netPerimeter;
-                    const double height = fnd.wall.heightAboveGrade;
-                    const double area = length * height;
-                    const double perim = 2.0 * (length + height);
-                    HfTermFn = [=](double, double, double, double windSpeed) -> double {
-                        // Average windward and leeward since all walls use same algorithm
-                        double windwardHf = CalcSparrowWindward(Roughness, perim, area, windSpeed);
-                        double leewardHf = CalcSparrowLeeward(Roughness, perim, area, windSpeed);
-                        return (windwardHf + leewardHf) / 2.0;
-                    };
-                }
-            }
-            HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
-        } else if (SELECT_CASE_var == ConvectionConstants::HcExt_SparrowLeeward) {
-            Hf = CalcSparrowLeeward(state,
-                                    Roughness,
-                                    state.dataSurface->SurfOutConvFacePerimeter(SurfNum),
-                                    state.dataSurface->SurfOutConvFaceArea(SurfNum),
-                                    SurfWindSpeed,
-                                    SurfNum);
-            if (Surface(SurfNum).Class == SurfaceClass::Floor) { // used for exterior grade
-                // Assume very large area for grade (relative to perimeter).
-                const double area = 9999999.;
-                const double perim = 1.;
-                HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcSparrowLeeward(Roughness, perim, area, windSpeed); };
-            } else {
-                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-                    auto &fnd = state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].get_instance(0).first->foundation;
-                    const double length = fnd.netPerimeter;
-                    const double height = fnd.wall.heightAboveGrade;
-                    const double area = length * height;
-                    const double perim = 2.0 * (length + height);
-                    HfTermFn = [=](double, double, double, double windSpeed) -> double {
-                        // Average windward and leeward since all walls use same algorithm
-                        double windwardHf = CalcSparrowWindward(Roughness, perim, area, windSpeed);
-                        double leewardHf = CalcSparrowLeeward(Roughness, perim, area, windSpeed);
-                        return (windwardHf + leewardHf) / 2.0;
-                    };
-                }
-            }
-            HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
-        } else if (SELECT_CASE_var == ConvectionConstants::HcExt_MoWiTTWindward) {
-            Hf = CalcMoWITTWindward(TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum), SurfWindSpeed);
-            if (Surface(SurfNum).Class == SurfaceClass::Floor) { // used for exterior grade
-                HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcMoWITTForcedWindward(windSpeed); };
-            } else {
+                auto &fnd = state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].get_instance(0).first->foundation;
+                const double length = fnd.netPerimeter;
+                const double height = fnd.wall.heightAboveGrade;
+                const double area = length * height;
+                const double perim = 2.0 * (length + height);
                 HfTermFn = [=](double, double, double, double windSpeed) -> double {
                     // Average windward and leeward since all walls use same algorithm
-                    double windwardHf = CalcMoWITTForcedWindward(windSpeed);
-                    double leewardHf = CalcMoWITTForcedLeeward(windSpeed);
+                    double windwardHf = CalcSparrowWindward(Roughness, perim, area, windSpeed);
+                    double leewardHf = CalcSparrowLeeward(Roughness, perim, area, windSpeed);
                     return (windwardHf + leewardHf) / 2.0;
                 };
             }
-            HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
-        } else if (SELECT_CASE_var == ConvectionConstants::HcExt_MoWiTTLeeward) {
-            Hf = CalcMoWITTLeeward((TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)), SurfWindSpeed);
-            if (Surface(SurfNum).Class == SurfaceClass::Floor) { // used for exterior grade
-                HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcMoWITTForcedLeeward(windSpeed); };
-            } else {
+        }
+        HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
+        break;
+    case ConvectionConstants::HcExt_SparrowLeeward:
+        Hf = CalcSparrowLeeward(state,
+                                Roughness,
+                                state.dataSurface->SurfOutConvFacePerimeter(SurfNum),
+                                state.dataSurface->SurfOutConvFaceArea(SurfNum),
+                                SurfWindSpeed,
+                                SurfNum);
+        if (Surface(SurfNum).Class == SurfaceClass::Floor) { // used for exterior grade
+            // Assume very large area for grade (relative to perimeter).
+            const double area = 9999999.;
+            const double perim = 1.;
+            HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcSparrowLeeward(Roughness, perim, area, windSpeed); };
+        } else {
+            if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                auto &fnd = state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].get_instance(0).first->foundation;
+                const double length = fnd.netPerimeter;
+                const double height = fnd.wall.heightAboveGrade;
+                const double area = length * height;
+                const double perim = 2.0 * (length + height);
                 HfTermFn = [=](double, double, double, double windSpeed) -> double {
                     // Average windward and leeward since all walls use same algorithm
-                    double windwardHf = CalcMoWITTForcedWindward(windSpeed);
-                    double leewardHf = CalcMoWITTForcedLeeward(windSpeed);
+                    double windwardHf = CalcSparrowWindward(Roughness, perim, area, windSpeed);
+                    double leewardHf = CalcSparrowLeeward(Roughness, perim, area, windSpeed);
                     return (windwardHf + leewardHf) / 2.0;
                 };
             }
-            HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
-        } else if (SELECT_CASE_var == ConvectionConstants::HcExt_DOE2Windward) {
-            Hf = CalcDOE2Windward(
-                TH(1, 1, SurfNum), state.dataSurface->SurfOutDryBulbTemp(SurfNum), Surface(SurfNum).CosTilt, SurfWindSpeed, Roughness);
-            if (Surface(SurfNum).Class == SurfaceClass::Floor) { // used for exterior grade
-                HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcMoWITTForcedWindward(windSpeed); };
-            } else {
-                HfTermFn = [=](double, double, double, double windSpeed) -> double {
-                    // Average windward and leeward since all walls use same algorithm
-                    double windwardHf = CalcMoWITTForcedWindward(windSpeed);
-                    double leewardHf = CalcMoWITTForcedLeeward(windSpeed);
-                    return (windwardHf + leewardHf) / 2.0;
-                };
-            }
-            HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
-        } else if (SELECT_CASE_var == ConvectionConstants::HcExt_DOE2Leeward) {
-            Hf = CalcDOE2Leeward(
-                TH(1, 1, SurfNum), state.dataSurface->SurfOutDryBulbTemp(SurfNum), Surface(SurfNum).CosTilt, SurfWindSpeed, Roughness);
-            if (Surface(SurfNum).Class == SurfaceClass::Floor) { // used for exterior grade
-                HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcMoWITTForcedWindward(windSpeed); };
-            } else {
-                HfTermFn = [=](double, double, double, double windSpeed) -> double {
-                    // Average windward and leeward since all walls use same algorithm
-                    double windwardHf = CalcMoWITTForcedWindward(windSpeed);
-                    double leewardHf = CalcMoWITTForcedLeeward(windSpeed);
-                    return (windwardHf + leewardHf) / 2.0;
-                };
-            }
-            HfFn = [=](double Tsurf, double Tamb, double hfTerm, double, double cosTilt) -> double {
-                return CalcDOE2Forced(Tsurf, Tamb, cosTilt, hfTerm, Roughness);
+        }
+        HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
+        break;
+    case ConvectionConstants::HcExt_MoWiTTWindward:
+        Hf = CalcMoWITTWindward(TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum), SurfWindSpeed);
+        if (Surface(SurfNum).Class == SurfaceClass::Floor) { // used for exterior grade
+            HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcMoWITTForcedWindward(windSpeed); };
+        } else {
+            HfTermFn = [=](double, double, double, double windSpeed) -> double {
+                // Average windward and leeward since all walls use same algorithm
+                double windwardHf = CalcMoWITTForcedWindward(windSpeed);
+                double leewardHf = CalcMoWITTForcedLeeward(windSpeed);
+                return (windwardHf + leewardHf) / 2.0;
             };
-        } else if (SELECT_CASE_var == ConvectionConstants::HcExt_NusseltJurges) {
-            Hf = CalcNusseltJurges(SurfWindSpeed);
-            HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcNusseltJurges(windSpeed); };
-            HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
-        } else if (SELECT_CASE_var == ConvectionConstants::HcExt_McAdams) {
-            Hf = CalcMcAdams(SurfWindSpeed);
-            HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcMcAdams(windSpeed); };
-            HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
-        } else if (SELECT_CASE_var == ConvectionConstants::HcExt_Mitchell) {
-            Hf = CalcMitchell(state, SurfWindSpeed, state.dataConvectionCoefficient->CubeRootOfOverallBuildingVolume, SurfNum);
-            HfTermFn = [&](double, double, double, double windSpeed) -> double {
-                return CalcMitchell(windSpeed, state.dataConvectionCoefficient->CubeRootOfOverallBuildingVolume);
+        }
+        HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
+        break;
+    case ConvectionConstants::HcExt_MoWiTTLeeward:
+        Hf = CalcMoWITTLeeward((TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)), SurfWindSpeed);
+        if (Surface(SurfNum).Class == SurfaceClass::Floor) { // used for exterior grade
+            HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcMoWITTForcedLeeward(windSpeed); };
+        } else {
+            HfTermFn = [=](double, double, double, double windSpeed) -> double {
+                // Average windward and leeward since all walls use same algorithm
+                double windwardHf = CalcMoWITTForcedWindward(windSpeed);
+                double leewardHf = CalcMoWITTForcedLeeward(windSpeed);
+                return (windwardHf + leewardHf) / 2.0;
             };
-            HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
-        } else if (SELECT_CASE_var == ConvectionConstants::HcExt_ClearRoof) {
-            SurfWindDir = state.dataSurface->SurfOutWindDir(SurfNum);
-            Hf = CalcClearRoof(state,
-                               SurfNum,
-                               TH(1, 1, SurfNum),
-                               state.dataSurface->SurfOutDryBulbTemp(SurfNum),
-                               SurfWindSpeed,
-                               SurfWindDir,
-                               state.dataSurface->SurfOutConvFaceArea(SurfNum),
-                               state.dataSurface->SurfOutConvFacePerimeter(SurfNum));
-            HfTermFn = [=](double, double, double, double windSpeed) -> double { return windSpeed; };
-            if (Surface(SurfNum).Class == SurfaceClass::Floor) { // used for exterior grade
-                // Assume very large area for grade (relative to perimeter).
-                const double area = 9999999.;
-                const double perim = 1.;
+        }
+        HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
+        break;
+    case ConvectionConstants::HcExt_DOE2Windward:
+        Hf = CalcDOE2Windward(TH(1, 1, SurfNum), state.dataSurface->SurfOutDryBulbTemp(SurfNum), Surface(SurfNum).CosTilt, SurfWindSpeed, Roughness);
+        if (Surface(SurfNum).Class == SurfaceClass::Floor) { // used for exterior grade
+            HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcMoWITTForcedWindward(windSpeed); };
+        } else {
+            HfTermFn = [=](double, double, double, double windSpeed) -> double {
+                // Average windward and leeward since all walls use same algorithm
+                double windwardHf = CalcMoWITTForcedWindward(windSpeed);
+                double leewardHf = CalcMoWITTForcedLeeward(windSpeed);
+                return (windwardHf + leewardHf) / 2.0;
+            };
+        }
+        HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
+        break;
+    case ConvectionConstants::HcExt_DOE2Leeward:
+        Hf = CalcDOE2Leeward(TH(1, 1, SurfNum), state.dataSurface->SurfOutDryBulbTemp(SurfNum), Surface(SurfNum).CosTilt, SurfWindSpeed, Roughness);
+        if (Surface(SurfNum).Class == SurfaceClass::Floor) { // used for exterior grade
+            HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcMoWITTForcedWindward(windSpeed); };
+        } else {
+            HfTermFn = [=](double, double, double, double windSpeed) -> double {
+                // Average windward and leeward since all walls use same algorithm
+                double windwardHf = CalcMoWITTForcedWindward(windSpeed);
+                double leewardHf = CalcMoWITTForcedLeeward(windSpeed);
+                return (windwardHf + leewardHf) / 2.0;
+            };
+        }
+        HfFn = [=](double Tsurf, double Tamb, double hfTerm, double, double cosTilt) -> double {
+            return CalcDOE2Forced(Tsurf, Tamb, cosTilt, hfTerm, Roughness);
+        };
+        break;
+    case ConvectionConstants::HcExt_NusseltJurges:
+        Hf = CalcNusseltJurges(SurfWindSpeed);
+        HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcNusseltJurges(windSpeed); };
+        HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
+        break;
+    case ConvectionConstants::HcExt_McAdams:
+        Hf = CalcMcAdams(SurfWindSpeed);
+        HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcMcAdams(windSpeed); };
+        HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
+        break;
+    case ConvectionConstants::HcExt_Mitchell:
+        Hf = CalcMitchell(state, SurfWindSpeed, state.dataConvectionCoefficient->CubeRootOfOverallBuildingVolume, SurfNum);
+        HfTermFn = [&](double, double, double, double windSpeed) -> double {
+            return CalcMitchell(windSpeed, state.dataConvectionCoefficient->CubeRootOfOverallBuildingVolume);
+        };
+        HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
+        break;
+    case ConvectionConstants::HcExt_ClearRoof:
+        SurfWindDir = state.dataSurface->SurfOutWindDir(SurfNum);
+        Hf = CalcClearRoof(state,
+                           SurfNum,
+                           TH(1, 1, SurfNum),
+                           state.dataSurface->SurfOutDryBulbTemp(SurfNum),
+                           SurfWindSpeed,
+                           SurfWindDir,
+                           state.dataSurface->SurfOutConvFaceArea(SurfNum),
+                           state.dataSurface->SurfOutConvFacePerimeter(SurfNum));
+        HfTermFn = [=](double, double, double, double windSpeed) -> double { return windSpeed; };
+        if (Surface(SurfNum).Class == SurfaceClass::Floor) { // used for exterior grade
+            // Assume very large area for grade (relative to perimeter).
+            const double area = 9999999.;
+            const double perim = 1.;
+            HfFn = [=, &state](double Tsurf, double Tamb, double hfTerm, double, double) -> double {
+                return CalcClearRoof(state, Tsurf, Tamb, hfTerm, area, perim, Roughness);
+            };
+        } else {
+            if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                auto &fnd = state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].get_instance(0).first->foundation;
+                const double length = fnd.netPerimeter;
+                const double height = fnd.wall.heightAboveGrade;
+                const double area = length * height;
+                const double perim = 2.0 * (length + height);
                 HfFn = [=, &state](double Tsurf, double Tamb, double hfTerm, double, double) -> double {
                     return CalcClearRoof(state, Tsurf, Tamb, hfTerm, area, perim, Roughness);
                 };
-            } else {
-                if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-                    auto &fnd = state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].get_instance(0).first->foundation;
-                    const double length = fnd.netPerimeter;
-                    const double height = fnd.wall.heightAboveGrade;
-                    const double area = length * height;
-                    const double perim = 2.0 * (length + height);
-                    HfFn = [=, &state](double Tsurf, double Tamb, double hfTerm, double, double) -> double {
-                        return CalcClearRoof(state, Tsurf, Tamb, hfTerm, area, perim, Roughness);
-                    };
-                }
-            }
-        } else if (SELECT_CASE_var == ConvectionConstants::HcExt_BlockenWindward) {
-            Hf = CalcBlockenWindward(state.dataEnvrn->WindSpeed, state.dataEnvrn->WindDir, Surface(SurfNum).Azimuth);
-            // Not compatible with Kiva (doesn't use weather station windspeed)
-            if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-                ShowFatalError(state, "Blocken Windward convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
-            }
-        } else if (SELECT_CASE_var == ConvectionConstants::HcExt_EmmelVertical) {
-            Hf = CalcEmmelVertical(state, state.dataEnvrn->WindSpeed, state.dataEnvrn->WindDir, Surface(SurfNum).Azimuth, SurfNum);
-            // Not compatible with Kiva (doesn't use weather station windspeed)
-            if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-                ShowFatalError(state, "Emmel Vertical convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
-            }
-        } else if (SELECT_CASE_var == ConvectionConstants::HcExt_EmmelRoof) {
-            Hf = CalcEmmelRoof(
-                state, state.dataEnvrn->WindSpeed, state.dataEnvrn->WindDir, state.dataConvectionCoefficient->RoofLongAxisOutwardAzimuth, SurfNum);
-            // Not compatible with Kiva (doesn't use weather station windspeed)
-            if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-                ShowFatalError(state, "Emmel Roof convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
             }
         }
+        break;
+    case ConvectionConstants::HcExt_BlockenWindward:
+        Hf = CalcBlockenWindward(state.dataEnvrn->WindSpeed, state.dataEnvrn->WindDir, Surface(SurfNum).Azimuth);
+        // Not compatible with Kiva (doesn't use weather station windspeed)
+        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+            ShowFatalError(state, "Blocken Windward convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
+        }
+        break;
+    case ConvectionConstants::HcExt_EmmelVertical:
+        Hf = CalcEmmelVertical(state, state.dataEnvrn->WindSpeed, state.dataEnvrn->WindDir, Surface(SurfNum).Azimuth, SurfNum);
+        // Not compatible with Kiva (doesn't use weather station windspeed)
+        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+            ShowFatalError(state, "Emmel Vertical convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
+        }
+        break;
+    case ConvectionConstants::HcExt_EmmelRoof:
+        Hf = CalcEmmelRoof(
+            state, state.dataEnvrn->WindSpeed, state.dataEnvrn->WindDir, state.dataConvectionCoefficient->RoofLongAxisOutwardAzimuth, SurfNum);
+        // Not compatible with Kiva (doesn't use weather station windspeed)
+        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+            ShowFatalError(state, "Emmel Roof convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
+        }
+        break;
     }
 
     Hc = Hf + Hn;
