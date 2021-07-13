@@ -4231,7 +4231,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                     state.dataHeatBal->Zone(ZoneNum).Name);
             }
             if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment != DataHeatBalance::InfiltrationFlow::No) {
-                if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType == AllZones ||
+                if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType == DataHeatBalance::InfiltrationZone::AllZones ||
                     (state.dataHeatBal->MassConservation(ZoneNum).NumSourceZonesMixingObject > 0)) {
                     if (state.dataHeatBal->MassConservation(ZoneNum).InfiltrationPtr > 0) {
                         SetupOutputVariable(state,

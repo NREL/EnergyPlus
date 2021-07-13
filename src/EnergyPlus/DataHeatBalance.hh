@@ -238,19 +238,24 @@ namespace DataHeatBalance {
         Adjust
     };
 
+    enum class InfiltrationZone
+    {
+        Unassigned = -1,
+        MixingSourceZonesOnly,
+        AllZones
+    };
 
-    constexpr int MixingSourceZonesOnly(1);
-    constexpr int AllZones(2);
-
+    // zone air flow balancing method
     enum class AdjustmentType
     {
-        // zone air flow balancing method
+        Unassigned = -1,
         AdjustMixingOnly,
         AdjustReturnOnly,
         AdjustMixingThenReturn,
         AdjustReturnThenMixing,
         NoAdjustReturnAndMixing
     };
+
     constexpr int NumZoneIntGainDeviceTypes(54);
 
     extern Array1D_string const ZoneIntGainDeviceTypes;
@@ -1098,16 +1103,15 @@ namespace DataHeatBalance {
                                            // AdjustReturnThenMixing, None)        int InfiltrationTreatment;   // determines how infiltration is
                                            // treated for zone mass balance
         InfiltrationFlow InfiltrationTreatment; // determines how infiltration is treated for zone mass balance
-        int InfiltrationZoneType;                // specifies which types of zones allow infiltration to be changed
-        bool AdjustZoneMixingFlow;               // used to adjust zone mixing air flows to enforce air flow balance
-        bool AdjustZoneInfiltrationFlow;         // used to adjust zone infiltration air flows to enforce air flow balance
-                                                 // Note, unique global object
+        InfiltrationZone InfiltrationZoneType;  // specifies which types of zones allow infiltration to be changed
+        bool AdjustZoneMixingFlow;              // used to adjust zone mixing air flows to enforce air flow balance
+        bool AdjustZoneInfiltrationFlow;        // used to adjust zone infiltration air flows to enforce air flow balance
+                                                // Note, unique global object
 
         // Default Constructor
         ZoneAirMassFlowConservation()
-            : EnforceZoneMassBalance(false), ZoneFlowAdjustment(AdjustmentType::NoAdjustReturnAndMixing),
-              InfiltrationTreatment(InfiltrationFlow::No), InfiltrationZoneType(0), AdjustZoneMixingFlow(false),
-              AdjustZoneInfiltrationFlow(false)
+            : EnforceZoneMassBalance(false), ZoneFlowAdjustment(AdjustmentType::NoAdjustReturnAndMixing), InfiltrationTreatment(InfiltrationFlow::No),
+              InfiltrationZoneType(InfiltrationZone::Unassigned), AdjustZoneMixingFlow(false), AdjustZoneInfiltrationFlow(false)
         {
         }
     };
