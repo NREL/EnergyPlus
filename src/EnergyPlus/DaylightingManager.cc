@@ -1251,7 +1251,7 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const ZoneNum)
 
     //  In the following four variables, I=1 for clear sky, 2 for overcast.
     int IHR;       // Hour of day counter
-    int NRF;       // Number of daylighting reference points in a zone
+    int numRefPts;       // Number of daylighting reference points in a zone
     int IL;        // Reference point counter
     Real64 AZVIEW; // Azimuth of view vector in absolute coord system for
     //  glare calculation (radians)
@@ -1338,6 +1338,8 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const ZoneNum)
 
         if (state.dataDaylightingData->IllumMapCalc(MapNum).Zone != ZoneNum) continue;
 
+        numRefPts = state.dataDaylightingData->IllumMapCalc(MapNum).TotalMapRefPoints;
+
         state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllumAtMapPt = 0.0;  // Daylight illuminance at reference points (lux)
         state.dataDaylightingData->IllumMapCalc(MapNum).GlareIndexAtMapPt = 0.0; // Glare index at reference points
         state.dataDaylightingData->IllumMapCalc(MapNum).SolidAngAtMapPt = 0.0;
@@ -1359,58 +1361,54 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const ZoneNum)
             state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSky(state.dataGlobal->HourOfDay,
                                                                           {1, MaxSlatAngs + 1},
                                                                           {1, 4},
-                                                                          {1, DataDaylighting::MaxRefPoints},
+                                                                          {1, numRefPts},
                                                                           {1, state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) =
                 0.0;
             state.dataDaylightingData->IllumMapCalc(MapNum).DaylSourceFacSky(
                 state.dataGlobal->HourOfDay,
                 {1, MaxSlatAngs + 1},
                 {1, 4},
-                {1, DataDaylighting::MaxRefPoints},
+                {1, numRefPts},
                 {1, state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
             state.dataDaylightingData->IllumMapCalc(MapNum).DaylBackFacSky(state.dataGlobal->HourOfDay,
                                                                            {1, MaxSlatAngs + 1},
                                                                            {1, 4},
-                                                                           {1, DataDaylighting::MaxRefPoints},
+                                                                           {1, numRefPts},
                                                                            {1, state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) =
                 0.0;
             state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSun(state.dataGlobal->HourOfDay,
                                                                           {1, MaxSlatAngs + 1},
-                                                                          {1, DataDaylighting::MaxRefPoints},
+                                                                          {1, numRefPts},
                                                                           {1, state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) =
                 0.0;
             state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSunDisk(
                 state.dataGlobal->HourOfDay,
                 {1, MaxSlatAngs + 1},
-                {1, DataDaylighting::MaxRefPoints},
+                {1, numRefPts},
                 {1, state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
             state.dataDaylightingData->IllumMapCalc(MapNum).DaylSourceFacSun(
                 state.dataGlobal->HourOfDay,
                 {1, MaxSlatAngs + 1},
-                {1, DataDaylighting::MaxRefPoints},
+                {1, numRefPts},
                 {1, state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
             state.dataDaylightingData->IllumMapCalc(MapNum).DaylSourceFacSunDisk(
                 state.dataGlobal->HourOfDay,
                 {1, MaxSlatAngs + 1},
-                {1, DataDaylighting::MaxRefPoints},
+                {1, numRefPts},
                 {1, state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
             state.dataDaylightingData->IllumMapCalc(MapNum).DaylBackFacSun(state.dataGlobal->HourOfDay,
                                                                            {1, MaxSlatAngs + 1},
-                                                                           {1, DataDaylighting::MaxRefPoints},
+                                                                           {1, numRefPts},
                                                                            {1, state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) =
                 0.0;
             state.dataDaylightingData->IllumMapCalc(MapNum).DaylBackFacSunDisk(
                 state.dataGlobal->HourOfDay,
                 {1, MaxSlatAngs + 1},
-                {1, DataDaylighting::MaxRefPoints},
+                {1, numRefPts},
                 {1, state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
         }
-        NRF = state.dataDaylightingData->IllumMapCalc(MapNum).TotalMapRefPoints;
 
-        // MapWindowSolidAngAtRefPt.allocate( NRF, ZoneDaylight( ZoneNum ).NumOfDayltgExtWins ); //Inactive
-        // MapWindowSolidAngAtRefPtWtd.allocate( NRF, ZoneDaylight( ZoneNum ).NumOfDayltgExtWins ); // Not an array anymore
-
-        for (IL = 1; IL <= NRF; ++IL) {
+        for (IL = 1; IL <= numRefPts; ++IL) {
 
             RREF = state.dataDaylightingData->IllumMapCalc(MapNum).MapRefPtAbsCoord({1, 3}, IL); // (x, y, z)
 
@@ -9954,7 +9952,8 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
         state.dataDaylightingManager->ReportIllumMap_firstTime = false;
         FirstTimeMaps.dimension(state.dataDaylightingData->TotIllumMaps, true);
         EnvrnPrint.dimension(state.dataDaylightingData->TotIllumMaps, true);
-        RefPts.allocate(state.dataGlobal->NumOfZones, DataDaylighting::MaxRefPoints);
+        RefPts.allocate(state.dataGlobal->NumOfZones,
+                        state.dataDaylightingData->ZoneDaylight(state.dataDaylightingData->IllumMap(MapNum).Zone).TotalDaylRefPoints);
         SavedMnDy.allocate(state.dataDaylightingData->TotIllumMaps);
     }
 
