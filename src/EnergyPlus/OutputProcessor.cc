@@ -806,7 +806,7 @@ namespace OutputProcessor {
         if (timeStepType == TimeStepType::TimeStepZone) {
             StandardTimeStepTypeKey = "Zone";
         } else if (timeStepType == TimeStepType::TimeStepSystem) {
-            StandardTimeStepTypeKey = "HVAC";
+            StandardTimeStepTypeKey = "System";
         } else {
             StandardTimeStepTypeKey = "UNKW";
         }

@@ -1265,7 +1265,7 @@ namespace OutputProcessor {
     TEST_F(SQLiteFixture, OutputProcessor_standardIndexTypeKey)
     {
         EXPECT_EQ("Zone", StandardTimeStepTypeKey(OutputProcessor::TimeStepType::TimeStepZone));
-        EXPECT_EQ("HVAC", StandardTimeStepTypeKey(OutputProcessor::TimeStepType::TimeStepSystem));
+        EXPECT_EQ("System", StandardTimeStepTypeKey(OutputProcessor::TimeStepType::TimeStepSystem));
 
         // It's no longer possible to pass something that isn't part of the enum, that's kind of the point of using an enum!
         // EXPECT_EQ("UNKW", StandardTimeStepTypeKey(0));
@@ -2334,7 +2334,7 @@ namespace OutputProcessor {
              {"6", "0", "Avg", "Zone", timeStepZoneString, "keyedValue", "variableName", "HVAC System Timestep", "", "m3/s"},
              {"7", "0", "Sum", "Zone", timeStepZoneString, "keyedValue", "variableName", "HVAC System Timestep", "", "m3/s"},
              {"8", "0", "Avg", "Zone", timeStepZoneString, "keyedValue", "variableName", "HVAC System Timestep", "scheduleName", "m3/s"},
-             {"9", "0", "Avg", "HVAC", timeStepSystemString, "keyedValue", "variableName", "HVAC System Timestep", "", "m3/s"},
+             {"9", "0", "Avg", "System", timeStepSystemString, "keyedValue", "variableName", "HVAC System Timestep", "", "m3/s"},
              {"10", "0", "Avg", "Zone", aThirdTimeStepString, "keyedValue", "variableName", "HVAC System Timestep", "", "m3/s"},
              {"11", "0", "Avg", "Zone", timeStepZoneString, "keyedValue", "variableName", "Hourly", "", "m3/s"},
              {"12", "0", "Sum", "Zone", timeStepZoneString, "keyedValue", "variableName", "Hourly", "", "m3/s"},
