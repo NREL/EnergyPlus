@@ -60,7 +60,6 @@
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
-#include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/PlantChillers.hh>
@@ -929,25 +928,27 @@ namespace FaultsManager {
                         }
                     }
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "CoilSystem:Cooling:DX")) {
+                    // see else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "AirLoopHVAC:UnitarySystem")) below
+                    // UnitarySystem connects a different way. Make sure this works by testing a CoilSystem model.
                     // Read in DXCoolingSystem input if not done yet
-                    if (state.dataHVACDXSys->GetInputFlag) {
-                        HVACDXSystem::GetDXCoolingSystemInput(state);
-                        state.dataHVACDXSys->GetInputFlag = false;
-                    }
+                    // if (state.dataHVACDXSys->GetInputFlag) {
+                    //    HVACDXSystem::GetDXCoolingSystemInput(state);
+                    //    state.dataHVACDXSys->GetInputFlag = false;
+                    //}
 
-                    // Check the coil name and coil type
-                    int CoilSysNum = UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).CoilName,
-                                                                     state.dataHVACDXSys->DXCoolingSystem);
-                    if (CoilSysNum <= 0) {
-                        ShowSevereError(state,
-                                        cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
-                                            cAlphaArgs(5) + "\" not found.");
-                        state.dataFaultsMgr->ErrorsFound = true;
-                    } else {
-                        // Link the coil system with the fault model
-                        state.dataHVACDXSys->DXCoolingSystem(CoilSysNum).FaultyCoilSATFlag = true;
-                        state.dataHVACDXSys->DXCoolingSystem(CoilSysNum).FaultyCoilSATIndex = jFault_CoilSAT;
-                    }
+                    //// Check the coil name and coil type
+                    // int CoilSysNum = UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).CoilName,
+                    //                                                 state.dataHVACDXSys->DXCoolingSystem);
+                    // if (CoilSysNum <= 0) {
+                    //    ShowSevereError(state,
+                    //                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
+                    //                        cAlphaArgs(5) + "\" not found.");
+                    //    state.dataFaultsMgr->ErrorsFound = true;
+                    //} else {
+                    //    // Link the coil system with the fault model
+                    //    state.dataHVACDXSys->DXCoolingSystem(CoilSysNum).FaultyCoilSATFlag = true;
+                    //    state.dataHVACDXSys->DXCoolingSystem(CoilSysNum).FaultyCoilSATIndex = jFault_CoilSAT;
+                    //}
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "CoilSystem:Heating:DX")) {
                     // Read in DXCoolingSystem input if not done yet
                     if (state.dataHVACDXHeatPumpSys->GetInputFlag) {

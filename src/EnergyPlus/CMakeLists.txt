@@ -316,8 +316,6 @@ set(SRC
     HVACCooledBeam.hh
     HVACDXHeatPumpSystem.cc
     HVACDXHeatPumpSystem.hh
-    HVACDXSystem.cc
-    HVACDXSystem.hh
     HVACDuct.cc
     HVACDuct.hh
     HVACFan.cc

@@ -79,7 +79,6 @@
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
-#include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
@@ -426,7 +425,6 @@ void SimOAComponent(EnergyPlusData &state,
     using HeatRecovery::SimHeatRecovery;
     using Humidifiers::SimHumidifier;
     using HVACDXHeatPumpSystem::SimDXHeatPumpSystem;
-    using HVACDXSystem::SimDXCoolingSystem;
     using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
     using SimAirServingZones::SolveWaterCoilController;
     using SteamCoils::SimulateSteamCoilComponents;
@@ -565,7 +563,6 @@ void SimOAComponent(EnergyPlusData &state,
         OACoolingCoil = true;
     } else if (CompTypeNum == SimAirServingZones::CompType::DXSystem) { // CoilSystem:Cooling:DX  old 'AirLoopHVAC:UnitaryCoolOnly'
         if (Sim) {
-            // SimDXCoolingSystem(state, CompName, FirstHVACIteration, AirLoopNum, CompIndex);
             if (state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompIndex] == nullptr) {
                 UnitarySystems::UnitarySys thisSys;
                 state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompIndex] =
@@ -839,7 +836,6 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
     // Using/Aliasing
     using BranchNodeConnections::SetUpCompSets;
     using BranchNodeConnections::TestCompSet;
-    using HVACDXSystem::CheckDXCoolingCoilInOASysExists;
 
     // Locals
     // SUBROUTINE PARAMETER DEFINITIONS:

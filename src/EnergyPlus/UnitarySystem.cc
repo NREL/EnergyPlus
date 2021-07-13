@@ -1404,7 +1404,7 @@ namespace UnitarySystems {
         // air temperature. Resets the cooling setpoint based on the user specified limiting
         // temperature for frost control.
         // METHODOLOGY EMPLOYED:
-        // Based on FrostControlSetPointLimit by Bereket Nigusse in HVACDXSystem
+        // Based on FrostControlSetPointLimit by Bereket Nigusse
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -11338,15 +11338,14 @@ namespace UnitarySystems {
         Real64 FullOutput; // Sensible capacity (outlet - inlet) when the compressor is on
         Real64 ReqOutput;  // Sensible capacity (outlet - inlet) required to meet load or setpoint temperature
         // for variable speed or 2 speed compressors
-        Real64 OutletTempDXCoil;       // Actual outlet temperature of the DX cooling coil
-        Real64 OutletHumRatLS;         // Actual outlet humrat of the variable speed DX cooling coil at low speed
-        Real64 OutletHumRatHS;         // Actual outlet humrat of the variable speed DX cooling coil at high speed
-        Real64 OutletHumRatDXCoil;     // Actual outlet humidity ratio of the DX cooling coil
-        std::vector<Real64> Par(14);   // Parameter array passed to solver
-        Real64 TempMinPLR;             // Used to find latent PLR when max iterations exceeded
-        Real64 TempMaxPLR;             // Used to find latent PLR when max iterations exceeded
-        Real64 TempOutletTempDXCoil;   // Used to find latent PLR when max iterations exceeded
-        Real64 TempOutletHumRatDXCoil; // Used to find latent PLR when max iterations exceeded
+        Real64 OutletTempDXCoil;     // Actual outlet temperature of the DX cooling coil
+        Real64 OutletHumRatLS;       // Actual outlet humrat of the variable speed DX cooling coil at low speed
+        Real64 OutletHumRatHS;       // Actual outlet humrat of the variable speed DX cooling coil at high speed
+        Real64 OutletHumRatDXCoil;   // Actual outlet humidity ratio of the DX cooling coil
+        std::vector<Real64> Par(14); // Parameter array passed to solver
+        Real64 TempMinPLR;           // Used to find latent PLR when max iterations exceeded
+        Real64 TempMaxPLR;           // Used to find latent PLR when max iterations exceeded
+        Real64 TempOutletTempDXCoil; // Used to find latent PLR when max iterations exceeded
         Real64 OutletTemp;
         bool HeatingActive;     // dummy variable for UserDefined coil which are passed back indicating if coil is on or off.
         bool CoolingActive;     // dummy variable for UserDefined coil which are passed back indicating if coil is on or off.
@@ -12439,8 +12438,7 @@ namespace UnitarySystems {
                                 //                   RegulaFalsi may not find latent PLR when the latent degradation model is used.
                                 //                   IF iteration limit is exceeded, find tighter boundary of solution and repeat RegulaFalsi
                                 TempMaxPLR = -0.1;
-                                TempOutletHumRatDXCoil = DesOutHumRat;
-                                while ((OutletHumRatDXCoil - TempOutletHumRatDXCoil) >= 0.0 && TempMaxPLR <= 1.0) {
+                                while ((OutletHumRatDXCoil - DesOutHumRat) >= 0.0 && TempMaxPLR <= 1.0) {
                                     //                     find upper limit of LatentPLR
                                     TempMaxPLR += 0.1;
                                     HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
@@ -12457,7 +12455,7 @@ namespace UnitarySystems {
                                 }
                                 TempMaxPLR = min(1.0, TempMaxPLR + 0.1);
                                 TempMinPLR = TempMaxPLR;
-                                while ((OutletHumRatDXCoil - TempOutletHumRatDXCoil) <= 0.0 && TempMinPLR >= 0.0) {
+                                while ((OutletHumRatDXCoil - DesOutHumRat) <= 0.0 && TempMinPLR >= 0.0) {
                                     //                     pull upper limit of LatentPLR DOwn to last valid limit (i.e. latent output still
                                     //                     exceeds SystemMoisuterLoad)
                                     //                     find minimum limit of Latent PLR
@@ -12650,27 +12648,34 @@ namespace UnitarySystems {
                         if (OutletHumRatLS > DesOutHumRat) {
                             CycRatio = 1.0;
 
-                            VariableSpeedCoils::SimVariableSpeedCoils(state,
-                                                                      CompName,
-                                                                      this->m_CoolingCoilIndex,
-                                                                      this->m_FanOpMode,
-                                                                      this->m_MaxONOFFCyclesperHour,
-                                                                      this->m_HPTimeConstant,
-                                                                      this->m_FanDelayTime,
-                                                                      1,
-                                                                      1.0,
-                                                                      SpeedNum,
-                                                                      1.0,
-                                                                      ReqOutput,
-                                                                      dummy,
-                                                                      OnOffAirFlowRatio);
-
-                            OutletHumRatHS = state.dataLoopNodes->Node(this->CoolCoilOutletNodeNum).HumRat;
+                            for (int speedNum = SpeedNum; speedNum <= this->m_NumOfSpeedCooling; ++speedNum) {
+                                VariableSpeedCoils::SimVariableSpeedCoils(state,
+                                                                          CompName,
+                                                                          this->m_CoolingCoilIndex,
+                                                                          this->m_FanOpMode,
+                                                                          this->m_MaxONOFFCyclesperHour,
+                                                                          this->m_HPTimeConstant,
+                                                                          this->m_FanDelayTime,
+                                                                          1,
+                                                                          1.0,
+                                                                          speedNum,
+                                                                          1.0,
+                                                                          ReqOutput,
+                                                                          dummy,
+                                                                          OnOffAirFlowRatio);
+                                OutletHumRatHS = state.dataLoopNodes->Node(this->CoolCoilOutletNodeNum).HumRat;
+                                if (OutletHumRatHS < DesOutHumRat || speedNum == this->m_NumOfSpeedCooling) {
+                                    SpeedNum = speedNum;
+                                    this->m_CoolingSpeedNum = speedNum;
+                                    break;
+                                }
+                            }
 
                             if (OutletHumRatHS < DesOutHumRat) {
                                 Par[1] = double(this->m_CoolingCoilIndex);
                                 Par[2] = DesOutHumRat;
                                 Par[3] = double(this->m_UnitarySysNum);
+                                Par[5] = SpeedNum;
                                 if (SpeedNum == 1) {
                                     General::SolveRoot(state, HumRatAcc, MaxIte, SolFla, CycRatio, this->DXCoilCyclingHumRatResidual, 0.0, 1.0, Par);
                                 } else {
@@ -16610,7 +16615,7 @@ namespace UnitarySystems {
         // After making sure get input is done, checks if the Coil System DX coil is in the
         // OA System.  IF exists then the DX cooling coil is 100% DOAS DX coil.
         // METHODOLOGY EMPLOYED:
-        // Based on CheckDXCoolingCoilInOASysExists by Bereket Nigusse in HVACDXSystem
+        // Based on CheckDXCoolingCoilInOASysExists by Bereket Nigusse
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:

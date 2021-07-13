@@ -72,7 +72,6 @@
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
-#include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HeatRecovery.hh>
@@ -259,7 +258,6 @@ namespace OutdoorAirUnit {
         using Fans::GetFanDesignVolumeFlowRate;
         using Fans::GetFanIndex;
         using Fans::GetFanType;
-        using HVACDXSystem::CheckDXCoolingCoilInOASysExists;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetOutdoorAirUnitInputs: "); // include trailing blank space
@@ -869,6 +867,7 @@ namespace OutdoorAirUnit {
                             } else if (SELECT_CASE_var == "COILSYSTEM:COOLING:DX") {
                                 OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentType_Num = CompType::DXSystem;
                                 // set the data for 100% DOAS DX cooling coil
+                                // is a different function call needed here? similar to one in HVACDXSystem
                                 // CheckDXCoolingCoilInOASysExists(state, OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName);
 
                             } else if (SELECT_CASE_var == "COILSYSTEM:HEATING:DX") {
@@ -2192,7 +2191,6 @@ namespace OutdoorAirUnit {
         using DesiccantDehumidifiers::SimDesiccantDehumidifier;
         using HeatRecovery::SimHeatRecovery;
         using HVACDXHeatPumpSystem::SimDXHeatPumpSystem;
-        using HVACDXSystem::SimDXCoolingSystem;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using NodeInputManager::GetOnlySingleNode;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -2487,6 +2485,8 @@ namespace OutdoorAirUnit {
                                             OutAirUnit(OAUnitNum).OAEquip(SimCompNum).ComponentName,
                                             false,
                                             OAUnitNum);
+                        UnitarySystems::UnitarySys::checkUnitarySysCoilInOASysExists(
+                            state, OutAirUnit(OAUnitNum).OAEquip(SimCompNum).ComponentName, OAUnitNum);
                     }
                     if (((OpMode == Operation::NeutralMode) && (OutAirUnit(OAUnitNum).ControlType == Control::Temperature)) ||
                         (OpMode == Operation::HeatingMode)) {
@@ -2494,7 +2494,6 @@ namespace OutdoorAirUnit {
                     } else {
                         Dxsystemouttemp = CompAirOutTemp - FanEffect;
                     }
-                    // SimDXCoolingSystem(state, EquipName, FirstHVACIteration, -1, DXSystemIndex, UnitNum, Dxsystemouttemp);
                     Real64 sensOut = 0.0;
                     Real64 latOut = 0.0;
                     OutAirUnit(OAUnitNum)

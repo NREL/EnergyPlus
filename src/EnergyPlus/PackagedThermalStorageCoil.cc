@@ -70,7 +70,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/HVACDXSystem.hh>
+#include <EnergyPlus/HVACUnitaryBypassVAV.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -4622,23 +4622,23 @@ void CalcTESCoilDischargeOnlyMode(EnergyPlusData &state, int const TESCoilNum, R
 
 void ControlTESIceStorageTankCoil(
     EnergyPlusData &state,
-    std::string const &CoilName,               // child object coil name
-    int CoilIndex,                             // child object coil index
-    std::string SystemType,                    // parent object system type
-    int const FanOpMode,                       // parent object fan operating mode
-    Real64 const DesiredOutletTemp,            // desired outlet temperature [C]
-    Real64 const DesiredOutletHumRat,          // desired outlet humidity ratio [kg/kg]
-    Real64 &PartLoadFrac,                      // value based on coil operation, if possible, as PLR required to meet T or w set point
-    int &TESOpMode,                            // value determined in InitTESCoil and passed back to parent for use in iteration routines
-    HVACDXSystem::DehumidControl &ControlType, // parent object dehumidification control type (e.g., None, Multimode, CoolReheat)
-    int &SensPLRIter,                          // iteration number of Sensible PLR Iteration warning message
-    int &SensPLRIterIndex,                     // index to Sensible PLR Iteration warning message
-    int &SensPLRFail,                          // iteration number of Sensible PLR Iteration fail warning message
-    int &SensPLRFailIndex,                     // index to Sensible PLR Iteration fail warning message
-    int &LatPLRIter,                           // iteration number of Latent PLR Iteration warning message
-    int &LatPLRIterIndex,                      // index to Latent PLR Iteration warning message
-    int &LatPLRFail,                           // iteration number of Latent PLR Iteration fail warning message
-    int &LatPLRFailIndex                       // index to Latent PLR Iteration fail warning message
+    std::string const &CoilName,                       // child object coil name
+    int CoilIndex,                                     // child object coil index
+    std::string SystemType,                            // parent object system type
+    int const FanOpMode,                               // parent object fan operating mode
+    Real64 const DesiredOutletTemp,                    // desired outlet temperature [C]
+    Real64 const DesiredOutletHumRat,                  // desired outlet humidity ratio [kg/kg]
+    Real64 &PartLoadFrac,                              // value based on coil operation, if possible, as PLR required to meet T or w set point
+    int &TESOpMode,                                    // value determined in InitTESCoil and passed back to parent for use in iteration routines
+    HVACUnitaryBypassVAV::DehumidControl &ControlType, // parent object dehumidification control type (e.g., None, Multimode, CoolReheat)
+    int &SensPLRIter,                                  // iteration number of Sensible PLR Iteration warning message
+    int &SensPLRIterIndex,                             // index to Sensible PLR Iteration warning message
+    int &SensPLRFail,                                  // iteration number of Sensible PLR Iteration fail warning message
+    int &SensPLRFailIndex,                             // index to Sensible PLR Iteration fail warning message
+    int &LatPLRIter,                                   // iteration number of Latent PLR Iteration warning message
+    int &LatPLRIterIndex,                              // index to Latent PLR Iteration warning message
+    int &LatPLRFail,                                   // iteration number of Latent PLR Iteration fail warning message
+    int &LatPLRFailIndex                               // index to Latent PLR Iteration fail warning message
 )
 {
 
@@ -4768,7 +4768,8 @@ void ControlTESIceStorageTankCoil(
             // If humidity setpoint is not satisfied and humidity control type is CoolReheat,
             // then overcool to meet moisture load
 
-            if ((OutletHumRatDXCoil > DesiredOutletHumRat) && (PartLoadFrac < 1.0) && (ControlType == HVACDXSystem::DehumidControl::CoolReheat)) {
+            if ((OutletHumRatDXCoil > DesiredOutletHumRat) && (PartLoadFrac < 1.0) &&
+                (ControlType == HVACUnitaryBypassVAV::DehumidControl::CoolReheat)) {
                 //           IF NoLoadHumRatOut is lower than (more dehumidification than required) or very near the DesOutHumRat,
                 //           do not run the compressor
                 if ((NoLoadHumRatOut - DesiredOutletHumRat) < HumRatAcc) {

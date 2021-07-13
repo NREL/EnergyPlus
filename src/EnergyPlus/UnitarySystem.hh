@@ -55,6 +55,7 @@
 // EnergyPlus headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 
 namespace EnergyPlus {
 
