@@ -149,7 +149,7 @@ namespace BoilerSteam {
         // Get all boiler data from input file
 
         // Locals
-        static std::string const RoutineName("GetBoilerInput: ");
+        static constexpr std::string_view RoutineName("GetBoilerInput: ");
 
         // LOCAL VARIABLES
         int BoilerNum;       // boiler identifier
@@ -205,7 +205,8 @@ namespace BoilerSteam {
                 state.dataIPShortCut->cAlphaArgs(2), thisBoiler.BoilerFuelTypeForOutputVariable, thisBoiler.FuelType, FuelTypeError);
             if (FuelTypeError) {
                 ShowSevereError(state,
-                                RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
+                                std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                    "\",");
                 ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
                 // Set to Electric to avoid errors when setting up output variables
                 thisBoiler.BoilerFuelTypeForOutputVariable = "Electricity";
@@ -236,14 +237,16 @@ namespace BoilerSteam {
 
             if ((state.dataIPShortCut->rNumericArgs(8) + state.dataIPShortCut->rNumericArgs(9) + state.dataIPShortCut->rNumericArgs(10)) == 0.0) {
                 ShowSevereError(state,
-                                RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
+                                std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                    "\",");
                 ShowContinueError(state, " Sum of fuel use curve coefficients = 0.0");
                 ErrorsFound = true;
             }
 
             if (state.dataIPShortCut->rNumericArgs(5) < 0.0) {
                 ShowSevereError(state,
-                                RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
+                                std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                    "\",");
                 ShowContinueError(state,
                                   format("Invalid {}={:.3R}", state.dataIPShortCut->cNumericFieldNames(5), state.dataIPShortCut->rNumericArgs(5)));
                 ErrorsFound = true;
@@ -251,7 +254,8 @@ namespace BoilerSteam {
 
             if (state.dataIPShortCut->rNumericArgs(3) == 0.0) {
                 ShowSevereError(state,
-                                RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
+                                std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                    "\",");
                 ShowContinueError(state,
                                   format("Invalid {}={:.3R}", state.dataIPShortCut->cNumericFieldNames(3), state.dataIPShortCut->rNumericArgs(3)));
                 ErrorsFound = true;
@@ -285,7 +289,8 @@ namespace BoilerSteam {
                 SteamFluidIndex = FluidProperties::FindRefrigerant(state, fluidNameSteam);
                 if (SteamFluidIndex == 0) {
                     ShowSevereError(state,
-                                    RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
+                                    std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
+                                        state.dataIPShortCut->cAlphaArgs(1) + "\",");
                     ShowContinueError(state, "Steam Properties not found; Steam Fluid Properties must be included in the input file.");
                     ErrorsFound = true;
                 }
@@ -301,7 +306,7 @@ namespace BoilerSteam {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in processing " + state.dataIPShortCut->cCurrentModuleObject + " input.");
+            ShowFatalError(state, std::string{RoutineName} + "Errors found in processing " + state.dataIPShortCut->cCurrentModuleObject + " input.");
         }
     }
 
@@ -328,7 +333,7 @@ namespace BoilerSteam {
 
     void BoilerSpecs::initEachEnvironment(EnergyPlusData &state)
     {
-        static std::string const RoutineName("BoilerSpecs::initEachEnvironment");
+        static constexpr std::string_view RoutineName("BoilerSpecs::initEachEnvironment");
 
         int BoilerInletNode = this->BoilerInletNodeNum;
 
@@ -498,7 +503,7 @@ namespace BoilerSteam {
         // the hot water flow rate and the hot water loop design delta T.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeBoiler");
+        static constexpr std::string_view RoutineName("SizeBoiler");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false); // If errors detected in input
@@ -597,7 +602,7 @@ namespace BoilerSteam {
         // load performance
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcBoilerModel");
+        static constexpr std::string_view RoutineName("CalcBoilerModel");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 BoilerDeltaTemp(0.0); // C - boiler inlet to outlet temperature difference

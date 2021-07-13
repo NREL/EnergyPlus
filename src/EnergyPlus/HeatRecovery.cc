@@ -143,7 +143,7 @@ namespace HeatRecovery {
     // Functions
 
     void SimHeatRecovery(EnergyPlusData &state,
-                         std::string const &CompName,             // name of the heat exchanger unit
+                         std::string_view CompName,               // name of the heat exchanger unit
                          bool const FirstHVACIteration,           // TRUE if 1st HVAC simulation of system timestep
                          int &CompIndex,                          // Pointer to Component
                          int const FanOpMode,                     // Supply air fan operating mode
@@ -185,7 +185,7 @@ namespace HeatRecovery {
         if (CompIndex == 0) {
             HeatExchNum = UtilityRoutines::FindItemInList(CompName, state.dataHeatRecovery->ExchCond);
             if (HeatExchNum == 0) {
-                ShowFatalError(state, "SimHeatRecovery: Unit not found=" + CompName);
+                ShowFatalError(state, "SimHeatRecovery: Unit not found=" + std::string{CompName});
             }
             CompIndex = HeatExchNum;
         } else {
@@ -373,7 +373,7 @@ namespace HeatRecovery {
                 state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    RoutineName + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
+                                    std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
                                         " entered =" + state.dataIPShortCut->cAlphaArgs(2) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) +
                                         '=' + state.dataIPShortCut->cAlphaArgs(1));
                     ErrorsFound = true;
@@ -496,7 +496,7 @@ namespace HeatRecovery {
                 state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    RoutineName + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
+                                    std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
                                         " entered =" + state.dataIPShortCut->cAlphaArgs(2) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) +
                                         '=' + state.dataIPShortCut->cAlphaArgs(1));
                     ErrorsFound = true;
@@ -675,7 +675,7 @@ namespace HeatRecovery {
                 state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    RoutineName + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
+                                    std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
                                         " entered =" + state.dataIPShortCut->cAlphaArgs(2) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) +
                                         '=' + state.dataIPShortCut->cAlphaArgs(1));
                     ErrorsFound = true;

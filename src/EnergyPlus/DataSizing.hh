@@ -124,7 +124,7 @@ namespace DataSizing {
     constexpr Real64 AutoSize(-99999.0);
 
     // parameter for (time-of-peak) sizing format
-    static constexpr auto PeakHrMinFmt("{:02}:{:02}:00");
+    static constexpr fmt::string_view PeakHrMinFmt("{:02}:{:02}:00");
 
     // Zone Outdoor Air Method
     constexpr int ZOAM_FlowPerPerson(1); // set the outdoor air flow rate based on number of people in the zone
