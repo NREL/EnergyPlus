@@ -714,7 +714,7 @@ namespace FanCoilUnits {
             FanCoil(FanCoilNum).ControlZoneNum =
                 DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::FanCoil4Pipe_Num, FanCoil(FanCoilNum).Name);
             if (FanCoil(FanCoilNum).ControlZoneNum == 0) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\",");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\",");
                 ShowContinueError(state, "... Unable to find the controlled zone based on Object Type and Name in the ZONEHVAC:EQUIPMENTLIST.");
                 ErrorsFound = true;
             }
@@ -787,7 +787,7 @@ namespace FanCoilUnits {
                                                             state.dataZoneEquip->ZoneEquipConfig(FanCoil(FanCoilNum).ControlZoneNum).ReturnNode);
                     }
                     if (!InletNodeFound) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\"");
+                        ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\"");
                         ShowContinueError(state,
                                           "..FanCoil inlet node name must be the same as either a zone exhaust node name or an induced "
                                           "air node in ZonePlenum.");

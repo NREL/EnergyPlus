@@ -463,7 +463,8 @@ namespace UnitVentilator {
             state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr = DataZoneEquipment::GetZoneEquipControlledZoneNum(
                 state, DataZoneEquipment::UnitVentilator_Num, state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
             if (state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr == 0) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\",");
+                ShowSevereError(
+                    state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\",");
                 ShowContinueError(state, "... Unable to find the controlled zone based on Object Type and Name in the ZONEHVAC:EQUIPMENTLIST.");
                 ErrorsFound = true;
             }
@@ -1183,8 +1184,9 @@ namespace UnitVentilator {
                                     state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).ReturnNode);
                             }
                             if (!InletNodeFound) {
-                                ShowSevereError(
-                                    state, RoutineName + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\"");
+                                ShowSevereError(state,
+                                                std::string{RoutineName} + CurrentModuleObject + "=\"" +
+                                                    state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\"");
                                 ShowContinueError(
                                     state,
                                     "..UnitVentilator inlet node name must be the same as either a zone exhaust node name or an induced "

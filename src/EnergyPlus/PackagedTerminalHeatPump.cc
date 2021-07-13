@@ -1083,7 +1083,8 @@ void GetPTUnit(EnergyPlusData &state)
         state.dataPTHP->PTUnit(PTUnitNum).ZonePtr =
             DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::PkgTermHPAirToAir_Num, state.dataPTHP->PTUnit(PTUnitNum).Name);
         if (state.dataPTHP->PTUnit(PTUnitNum).ZonePtr == 0) {
-            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\",");
+            ShowSevereError(state,
+                            std::string{RoutineName} + std::string{CurrentModuleObject} + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\",");
             ShowContinueError(state, "... Unable to find the controlled zone based on Object Type and Name in the ZONEHVAC:EQUIPMENTLIST.");
             ErrorsFound = true;
         }
@@ -1118,7 +1119,8 @@ void GetPTUnit(EnergyPlusData &state)
                         state.dataZoneEquip->ZoneEquipConfig(state.dataPTHP->PTUnit(PTUnitNum).ZonePtr).ReturnNode);
                 }
                 if (!InletNodeFound) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+                    ShowSevereError(
+                        state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError(state,
                                       "..Heat Pumps air inlet node name must be the same as either a zone exhaust node name or an induced "
                                       "air node in ZonePlenum.");
@@ -2039,7 +2041,8 @@ void GetPTUnit(EnergyPlusData &state)
         state.dataPTHP->PTUnit(PTUnitNum).ZonePtr =
             DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::PkgTermACAirToAir_Num, state.dataPTHP->PTUnit(PTUnitNum).Name);
         if (state.dataPTHP->PTUnit(PTUnitNum).ZonePtr == 0) {
-            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\",");
+            ShowSevereError(state,
+                            std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\",");
             ShowContinueError(state, "... Unable to find the controlled zone based on Object Type and Name in the ZONEHVAC:EQUIPMENTLIST.");
             ErrorsFound = true;
         }
@@ -2074,7 +2077,7 @@ void GetPTUnit(EnergyPlusData &state)
                         state.dataZoneEquip->ZoneEquipConfig(state.dataPTHP->PTUnit(PTUnitNum).ZonePtr).ReturnNode);
                 }
                 if (!InletNodeFound) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError(state,
                                       "..Air-conditioners air inlet node name must be the same as either a zone exhaust node name or an induced "
                                       "air node in ZonePlenum.");

@@ -1701,7 +1701,7 @@ namespace InternalHeatGains {
                     if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
                         if (state.dataHeatBal->LightsObjects(Item).ZoneListActive) {
                             ShowSevereError(state,
-                                            RoutineName + CurrentModuleObject + "=\"" + state.dataHeatBal->Lights(Loop).Name +
+                                            std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataHeatBal->Lights(Loop).Name +
                                                 "\": " + state.dataIPShortCut->cAlphaFieldNames(8) + " must be blank when using a ZoneList.");
                             ErrorsFound = true;
                         } else {
@@ -1721,7 +1721,7 @@ namespace InternalHeatGains {
                             }
                             if (exhaustNodeError) {
                                 ShowWarningError(state,
-                                                 RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                      state.dataIPShortCut->cAlphaFieldNames(8) + " =" + AlphaName(8));
                                 ShowContinueError(state, "No matching Zone Exhaust Air Node found.");
                             } else {
@@ -1731,7 +1731,7 @@ namespace InternalHeatGains {
                                         state.dataHeatBal->Lights(Loop).ZoneExhaustNodeNum;
                                 } else {
                                     ShowWarningError(state,
-                                                     RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
                                                          state.dataIPShortCut->cAlphaFieldNames(8) + " =" + AlphaName(8) + " is not used");
                                     ShowContinueError(
                                         state, "No matching Zone Return Air Node found. The Exhaust Node requires Return Node to work together");
