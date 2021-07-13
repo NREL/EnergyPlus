@@ -6905,7 +6905,7 @@ namespace UnitarySystems {
     }
 
     void UnitarySys::getCoilWaterSystemInputData(
-        EnergyPlusData &state, std::string const &CoilSysName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound)
+        EnergyPlusData &state, std::string_view CoilSysName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound)
     {
 
         std::string cCurrentModuleObject(state.dataUnitarySystems->coilSysCoolingWaterObjectName);
