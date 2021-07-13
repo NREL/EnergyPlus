@@ -3026,6 +3026,16 @@ This numeric field contains the thermal heat capacity of the ground in J/m\(^{3}
 
 The unique name of the \hyperref[groundheatexchangerresponsefactors]{GroundHeatExchanger:ResponseFactors} object used to define the third-party response factors. If present, the GHE:Vertical:Array and GHE:Vertical:Single objects defined will be ignored.
 
+\paragraph{Field: GHE:CalculationModel name}
+
+There are two options for this input; UHFcalc or UBHWTcalc. The default is
+UHFcalc, where a g-function is computed with the uniform heat extraction rate
+boundary condition. The g-function computed with a uniform borehole wall
+temperature boundary condition is much closer to reality. The UBHWTcalc calls
+the third party tool cpgfunctionEP. The UBHWT g-function calculation of
+cpgfunctionEP is tuned using an adaptive discretization scheme that approximates
+g-functions computed by the uniform inlet fluid temperature g-function.
+
 \paragraph{Field: GHE:Vertical:Array object name}
 
 The unique name of the \hyperref[groundheatexchangerverticalarray]{GroundHeatExchanger:Vertical:Array} object used to define a rectangular borehole field. If present, the GHE:Vertical:Single objects will be ignored.
