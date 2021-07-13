@@ -758,7 +758,7 @@ void FluidCoolerspecs::oneTimeInit(EnergyPlusData &state)
 
 void FluidCoolerspecs::initEachEnvironment(EnergyPlusData &state)
 {
-    static std::string const RoutineName("FluidCoolerspecs::initEachEnvironment");
+    static constexpr std::string_view RoutineName("FluidCoolerspecs::initEachEnvironment");
     Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                          state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
                                                          DataGlobalConstants::InitConvTemp,
@@ -865,7 +865,7 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
     // SUBROUTINE PARAMETER DEFINITIONS:
     constexpr int MaxIte(500);    // Maximum number of iterations
     constexpr Real64 Acc(0.0001); // Accuracy of result
-    static std::string const CalledFrom("SizeFluidCooler");
+    static constexpr std::string_view CalledFrom("SizeFluidCooler");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int SolFla;                     // Flag of solver
@@ -1159,7 +1159,7 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
                 } else if (SolFla == -2) {
                     CalcFluidCoolerOutlet(state, int(Par[1]), Par[2], Par[3], UA0, OutWaterTempAtUA0);
                     CalcFluidCoolerOutlet(state, int(Par[1]), Par[2], Par[3], UA1, OutWaterTempAtUA1);
-                    ShowSevereError(state, CalledFrom + ": The combination of design input values did not allow the calculation of a ");
+                    ShowSevereError(state, std::string{CalledFrom} + ": The combination of design input values did not allow the calculation of a ");
                     ShowContinueError(state, "reasonable UA value. Review and revise design input values as appropriate. Specifying hard");
                     ShowContinueError(state, R"(sizes for some "autosizable" fields while autosizing other "autosizable" fields may be )");
                     ShowContinueError(state, "contributing to this problem.");
@@ -1273,7 +1273,7 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
             } else if (SolFla == -2) {
                 CalcFluidCoolerOutlet(state, int(Par[1]), Par[2], Par[3], UA0, OutWaterTempAtUA0);
                 CalcFluidCoolerOutlet(state, int(Par[1]), Par[2], Par[3], UA1, OutWaterTempAtUA1);
-                ShowSevereError(state, CalledFrom + ": The combination of design input values did not allow the calculation of a ");
+                ShowSevereError(state, std::string{CalledFrom} + ": The combination of design input values did not allow the calculation of a ");
                 ShowContinueError(state, "reasonable UA value. Review and revise design input values as appropriate. Specifying hard");
                 ShowContinueError(state, R"(sizes for some "autosizable" fields while autosizing other "autosizable" fields may be )");
                 ShowContinueError(state, "contributing to this problem.");
@@ -1426,7 +1426,7 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
             } else if (SolFla == -2) {
                 CalcFluidCoolerOutlet(state, int(Par[1]), Par[2], Par[3], UA0, OutWaterTempAtUA0);
                 CalcFluidCoolerOutlet(state, int(Par[1]), Par[2], Par[3], UA1, OutWaterTempAtUA1);
-                ShowSevereError(state, CalledFrom + ": The combination of design input values did not allow the calculation of a ");
+                ShowSevereError(state, std::string{CalledFrom} + ": The combination of design input values did not allow the calculation of a ");
                 ShowContinueError(state, "reasonable low-speed UA value. Review and revise design input values as appropriate. ");
                 ShowContinueError(state, R"(Specifying hard sizes for some "autosizable" fields while autosizing other "autosizable" )");
                 ShowContinueError(state, "fields may be contributing to this problem.");
@@ -1548,7 +1548,7 @@ void FluidCoolerspecs::calcSingleSpeed(EnergyPlusData &state)
     // Based on SingleSpeedTower subroutine by Dan Fisher ,Sept 1998.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("SingleSpeedFluidCooler");
+    static constexpr std::string_view RoutineName("SingleSpeedFluidCooler");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 TempSetPoint = 0.0;
@@ -1655,7 +1655,7 @@ void FluidCoolerspecs::calcTwoSpeed(EnergyPlusData &state)
     // Based on TwoSpeedTower by Dan Fisher ,Sept. 1998.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("TwoSpeedFluidCooler");
+    static constexpr std::string_view RoutineName("TwoSpeedFluidCooler");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 TempSetPoint = 0.0;
@@ -1750,7 +1750,7 @@ void CalcFluidCoolerOutlet(
     Real64 _Qactual; // Actual heat transfer rate between fluid cooler water and air [W]
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("CalcFluidCoolerOutlet");
+    static constexpr std::string_view RoutineName("CalcFluidCoolerOutlet");
 
     if (UAdesign == 0.0) return;
 

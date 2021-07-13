@@ -1043,7 +1043,7 @@ namespace WaterUse {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate drainwater temperature and heat and moisture gains to zone.
 
-        static std::string const RoutineName("CalcEquipmentDrainTemp");
+        static constexpr std::string_view RoutineName("CalcEquipmentDrainTemp");
 
         this->SensibleRate = 0.0;
         this->SensibleEnergy = 0.0;

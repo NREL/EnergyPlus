@@ -388,7 +388,7 @@ void CalcEQLWindowUvalue(EnergyPlusData &state,
     Real64 const Height(1.0); // window height, m
     Real64 const TOUT(-18.0); // outdoor air temperature, C
     Real64 const TIN(21.0);   // indoor air temperature, C
-    static std::string const RoutineName("CalcEQLWindowUvalue: ");
+    static constexpr std::string_view RoutineName("CalcEQLWindowUvalue: ");
 
     Real64 U;    // U-factor, W/m2-K
     Real64 UOld; // U-factor during pevious iteration step, W/m2-K
@@ -446,7 +446,7 @@ void CalcEQLWindowUvalue(EnergyPlusData &state,
         }
     }
     if (!CFSURated) {
-        ShowWarningMessage(state, RoutineName + "Fenestration U-Value calculation failed for " + FS.Name);
+        ShowWarningMessage(state, std::string{RoutineName} + "Fenestration U-Value calculation failed for " + FS.Name);
         ShowContinueError(state, format("...Calculated U-value = {:.4T}", U));
         ShowContinueError(state, "...Check consistency of inputs");
     }
@@ -482,7 +482,7 @@ void CalcEQLWindowSHGCAndTransNormal(EnergyPlusData &state,
     constexpr Real64 TIN(297.15);
     constexpr Real64 TOUT(305.15);
     constexpr Real64 BeamSolarInc(783.0);
-    static std::string const RoutineName("CalcEQLWindowSHGCAndTransNormal: ");
+    static constexpr std::string_view RoutineName("CalcEQLWindowSHGCAndTransNormal: ");
 
     Real64 HCOUT;
     Real64 TRMOUT;
@@ -558,7 +558,7 @@ void CalcEQLWindowSHGCAndTransNormal(EnergyPlusData &state,
                                     true);
 
     if (!CFSSHGC) {
-        ShowWarningMessage(state, RoutineName + "Solar heat gain coefficient calculation failed for " + FS.Name);
+        ShowWarningMessage(state, std::string{RoutineName} + "Solar heat gain coefficient calculation failed for " + FS.Name);
         ShowContinueError(state, format("...Calculated SHGC = {:.4T}", SHGC));
         ShowContinueError(state, format("...Calculated U-Value = {:.4T}", UCG));
         ShowContinueError(state, "...Check consistency of inputs.");
@@ -979,8 +979,8 @@ void OPENNESS_LW(Real64 const OPENNESS, // shade openness (=tausbb at normal inc
 }
 
 Real64 P01(EnergyPlusData &state,
-           Real64 const P,         // property
-           std::string const &WHAT // identifier for err msg
+           Real64 const P,             // property
+           std::string_view const WHAT // identifier for err msg
 )
 {
     //       AUTHOR         ASHRAE 1311-RP
@@ -995,10 +995,10 @@ Real64 P01(EnergyPlusData &state,
     // Return value
     Real64 P01;
 
-    static std::string const RoutineName("P01: ");
+    static constexpr std::string_view RoutineName("P01: ");
 
     if (P < -0.05 || P > 1.05) {
-        ShowWarningMessage(state, RoutineName + "property value should have been between 0 and 1");
+        ShowWarningMessage(state, std::string{RoutineName} + "property value should have been between 0 and 1");
         ShowContinueError(state, format("{}=:  property value is ={:.4T}", WHAT, P));
         if (P < 0.0) {
             ShowContinueError(state, "property value is reset to 0.0");
@@ -1034,7 +1034,7 @@ HEMINT(EnergyPlusData &state,
     constexpr Real64 KMAX(8); // max steps
     int const NPANMAX(std::pow(2, KMAX));
     Real64 const TOL(0.0005); // convergence tolerance
-    static std::string const RoutineName("HEMINT");
+    static constexpr std::string_view RoutineName("HEMINT");
 
     Array2D<Real64> T(KMAX, KMAX);
     Real64 FX;
@@ -1110,7 +1110,7 @@ void RB_DIFF(EnergyPlusData &state,
     // Calculates roller blind diffuse-diffuse solar optical properties by integrating
     // the corresponding properties over the hemisphere
 
-    static std::string const RoutineName("RB_DIFF: ");
+    static constexpr std::string_view RoutineName("RB_DIFF: ");
 
     Array1D<Real64> P(state.dataWindowEquivalentLayer->hipDIM);
     Real64 SumRefAndTran; // sum of the reflectance and transmittance
@@ -1124,7 +1124,7 @@ void RB_DIFF(EnergyPlusData &state,
 
     if (RHO_DD + TAU_DD > 1.0) {
         SumRefAndTran = RHO_DD + TAU_DD;
-        ShowWarningMessage(state, RoutineName + "Roller blind diffuse-diffuse properties are inconsistent");
+        ShowWarningMessage(state, std::string{RoutineName} + "Roller blind diffuse-diffuse properties are inconsistent");
         ShowContinueError(state, format("...The diffuse-diffuse reflectance = {:.4T}", RHO_DD));
         ShowContinueError(state, format("...The diffuse-diffuse tansmittance = {:.4T}", TAU_DD));
         ShowContinueError(state, format("...Sum of diffuse reflectance and tansmittance = {:.4T}", SumRefAndTran));
@@ -1190,7 +1190,7 @@ void RB_BEAM(EnergyPlusData &state,
     //   TAU_BT0 = TAU_BB0 + TAU_BD0
     //   (openness)
 
-    static std::string const ContextName("RB_BEAM TauBD");
+    static constexpr std::string_view ContextName("RB_BEAM TauBD");
 
     Real64 THETA;        // working angle of incidence (limited < 90 deg)
     Real64 TAUM0;        // apparent blind material transmittance at normal incidence
@@ -1254,7 +1254,7 @@ void IS_DIFF(EnergyPlusData &state,
     //   TAU_BT0 = TAU_BB0 + TAU_BD0
     Array1D<Real64> P(state.dataWindowEquivalentLayer->hipDIM);
 
-    static std::string const RoutineName("IS_DIFF: ");
+    static constexpr std::string_view RoutineName("IS_DIFF: ");
 
     Real64 SumRefAndTran;
 
@@ -1267,7 +1267,7 @@ void IS_DIFF(EnergyPlusData &state,
 
     if (RHO_DD + TAU_DD > 1.0) {
         SumRefAndTran = RHO_DD + TAU_DD;
-        ShowWarningMessage(state, RoutineName + "Calculated insect screen diffuse-diffuse properties are inconsistent");
+        ShowWarningMessage(state, std::string{RoutineName} + "Calculated insect screen diffuse-diffuse properties are inconsistent");
         ShowContinueError(state, format("...The diffuse-diffuse reflectance = {:.4T}", RHO_DD));
         ShowContinueError(state, format("...The diffuse-diffuse tansmittance = {:.4T}", TAU_DD));
         ShowContinueError(state, format("...Sum of diffuse reflectance and tansmittance = {:.4T}", SumRefAndTran));
@@ -1343,10 +1343,10 @@ void IS_BEAM(EnergyPlusData &state,
     // SUBROUTINE ARGUMENT DEFINITIONS:
     //   TAU_BTO = TAU_BB0 + TAU_BD0
 
-    static std::string const RhoBD_Name("IS_BEAM RhoBD");
-    static std::string const TauBB_Name("IS_BEAM TauBB");
-    static std::string const TauBT_Name("IS_BEAM TauBT");
-    static std::string const TauBD_Name("IS_BEAM TauBD");
+    static constexpr std::string_view RhoBD_Name("IS_BEAM RhoBD");
+    static constexpr std::string_view TauBB_Name("IS_BEAM TauBB");
+    static constexpr std::string_view TauBT_Name("IS_BEAM TauBT");
+    static constexpr std::string_view TauBD_Name("IS_BEAM TauBD");
 
     Real64 THETA_CUTOFF; // cutoff angle, radians (beyond which TAU_BB = 0)
     Real64 B;            // working temp
@@ -1442,7 +1442,7 @@ void FM_DIFF(EnergyPlusData &state,
     // SUBROUTINE ARGUMENT DEFINITIONS:
     //   (TAU_BT0 = TAU_BB0 + TAU_BD0)
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("FM_DIFF: ");
+    static constexpr std::string_view RoutineName("FM_DIFF: ");
 
     Real64 TAU_BD0;
     Array1D<Real64> P(state.dataWindowEquivalentLayer->hipDIM);
@@ -1459,7 +1459,7 @@ void FM_DIFF(EnergyPlusData &state,
 
     if (RHO_DD + TAU_DD > 1.0) {
         SumRefAndTran = RHO_DD + TAU_DD;
-        ShowWarningMessage(state, RoutineName + "Calculated drape fabric diffuse-diffuse properties are inconsistent");
+        ShowWarningMessage(state, std::string{RoutineName} + "Calculated drape fabric diffuse-diffuse properties are inconsistent");
         ShowContinueError(state, format("...The diffuse-diffuse reflectance = {:.4T}", RHO_DD));
         ShowContinueError(state, format("...The diffuse-diffuse tansmittance = {:.4T}", TAU_DD));
         ShowContinueError(state, format("...Sum of diffuse reflectance and tansmittance = {:.4T}", SumRefAndTran));
@@ -1596,9 +1596,9 @@ void PD_LW(EnergyPlusData &state,
     //    typical (default) = 0.92
     //    typical (default) = 0.92
     //    nearly always 0
-    static std::string const RhoLWF_Name("PD_LW RhoLWF");
-    static std::string const RhoLWB_Name("PD_LW RhoLWB");
-    static std::string const EpsLWF_Name("PD_LW EpsLWF");
+    static constexpr std::string_view RhoLWF_Name("PD_LW RhoLWF");
+    static constexpr std::string_view RhoLWB_Name("PD_LW RhoLWB");
+    static constexpr std::string_view EpsLWF_Name("PD_LW EpsLWF");
 
     Real64 RHOLWF_FABRIC;
     Real64 RHOLWB_FABRIC;
@@ -1644,8 +1644,8 @@ void PD_DIFF(EnergyPlusData &state,
     // reflectance call this routine a second time with reversed front and back properties
 
     constexpr int N(6);
-    static std::string const TauDD_Name("PD_DIFF TauDD");
-    static std::string const RhoDD_Name("PD_DIFF RhoDD");
+    static constexpr std::string_view TauDD_Name("PD_DIFF TauDD");
+    static constexpr std::string_view RhoDD_Name("PD_DIFF RhoDD");
 
     Real64 AK; // length of diagonal strings of the rectangular enclosure
     Real64 CG;
@@ -3730,8 +3730,8 @@ void VB_DIFF(EnergyPlusData &state,
     //   ltyVBVER: + = front-side slat tip is counter-
     //                 clockwise from normal (viewed from above)
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const Tau_Name("VB_DIFF Tau");
-    static std::string const RhoF_Name("VB_DIFF RhoF");
+    static constexpr std::string_view Tau_Name("VB_DIFF Tau");
+    static constexpr std::string_view RhoF_Name("VB_DIFF RhoF");
 
     Real64 CD; // lengths of the diagonal strings used in the four-surface model
     Real64 AF;
@@ -4478,7 +4478,7 @@ void ASHWAT_ThermalCalc(EnergyPlusData &state,
 
     // FUNCTION PARAMETER DEFINITIONS:
     constexpr int MaxIter(100); // maximum number of iterations allowed
-    static std::string const RoutineName("ASHWAT_ThermalCalc: ");
+    static constexpr std::string_view RoutineName("ASHWAT_ThermalCalc: ");
 
     Real64 ALPHA;
     Real64 HCOCFout;
@@ -4833,13 +4833,13 @@ void ASHWAT_ThermalCalc(EnergyPlusData &state,
         if (FS.WEQLSolverErrorIndex < 1) {
             ++FS.WEQLSolverErrorIndex;
             ShowSevereError(state, "CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"");
-            ShowContinueError(state, RoutineName + "Net radiation analysis did not converge");
+            ShowContinueError(state, std::string{RoutineName} + "Net radiation analysis did not converge");
             ShowContinueError(state, format("...Maximum error is = {:.6T}", MAXERR));
             ShowContinueError(state, format("...Convergence tolerance is = {:.6T}", TOL));
             ShowContinueErrorTimeStamp(state, "");
         } else {
             ShowRecurringWarningErrorAtEnd(state,
-                                           "CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"; " + RoutineName +
+                                           "CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"; " + std::string{RoutineName} +
                                                "Net radiation analysis did not converge error continues.",
                                            FS.WEQLSolverErrorIndex);
         }
@@ -4933,7 +4933,6 @@ bool ASHWAT_ThermalRatings(EnergyPlusData &state,
     // FUNCTION PARAMETER DEFINITIONS:
     Real64 const Height(1.0); // Window height (m) for standard ratings calculation
     int const MaxIter(100);   // maximum number of iterations allowed
-    static std::string const RoutineName("ASHWAT_ThermalRatings: ");
 
     Real64 ALPHA;
     Real64 HCOCFout;
@@ -5309,12 +5308,12 @@ bool ASHWAT_ThermalRatings(EnergyPlusData &state,
     //    if (FS.WEQLSolverErrorIndex < 1) {
     //        ++FS.WEQLSolverErrorIndex;
     //        ShowSevereError(state, "CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"");
-    //        ShowContinueError(state, RoutineName + "Net radiation analysis did not converge");
+    //        ShowContinueError(state, std::string{RoutineName} + "Net radiation analysis did not converge");
     //        ShowContinueError(state, format("...Maximum error is = {:.6T}", MAXERR));
     //        ShowContinueError(state, format("...Convergence tolerance is = {:.6T}", TOL));
     //        ShowContinueErrorTimeStamp(state, "");
     //    } else {
-    //        ShowRecurringWarningErrorAtEnd(state, "CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"; " + RoutineName +
+    //        ShowRecurringWarningErrorAtEnd(state, "CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"; " + std::string{RoutineName} +
     //                                           "Net radiation analysis did not converge error continues.",
     //                                       FS.WEQLSolverErrorIndex);
     //    }
@@ -7800,13 +7799,13 @@ void BuildGap(EnergyPlusData &state,
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     constexpr Real64 GapThickMin(0.0001); // Minimum gap thickness allowed, m
-    static std::string const RoutineName("BuildGap: ");
+    static constexpr std::string_view RoutineName("BuildGap: ");
 
     Real64 PMan;
     Real64 TMan;
 
     if (TAS < GapThickMin) {
-        ShowSevereError(state, RoutineName + G.Name);
+        ShowSevereError(state, std::string{RoutineName} + G.Name);
         ShowContinueError(state, "...specified gap thickness is < 0.0001 m.  Reset to 0.00001 m");
         TAS = GapThickMin;
     }
@@ -7957,7 +7956,7 @@ void FillDefaultsSWP(EnergyPlusData &state,
     // layers
 
     // may be within L
-    static std::string const RoutineName("FillDefaultsSWP: ");
+    static constexpr std::string_view RoutineName("FillDefaultsSWP: ");
     bool OK;
 
     // default back taus to front (often equal)
@@ -7992,7 +7991,7 @@ void FillDefaultsSWP(EnergyPlusData &state,
     } else if (L.LTYPE == LayerType::NONE || L.LTYPE == LayerType::ROOM) {
         // none or room: do nothing
     } else {
-        ShowSevereError(state, RoutineName + L.Name + '.');
+        ShowSevereError(state, std::string{RoutineName} + L.Name + '.');
         ShowContinueError(state, "...invalid layer type specified.");
     }
 }
@@ -8009,7 +8008,7 @@ void FinalizeCFS(EnergyPlusData &state, CFSTY &FS)
     // Complete CFS after BuildCFS by checking the shade type and
     // gap type
 
-    static std::string const RoutineName("FinalizeCFS: "); // include trailing blank space
+    static constexpr std::string_view RoutineName("FinalizeCFS: "); // include trailing blank space
 
     int iL;
     int gType;
@@ -8049,7 +8048,7 @@ void FinalizeCFS(EnergyPlusData &state, CFSTY &FS)
         }
     }
     if (ErrorsFound) {
-        ShowFatalError(state, RoutineName + "Program terminates for preceding reason(s).");
+        ShowFatalError(state, std::string{RoutineName} + "Program terminates for preceding reason(s).");
     }
 }
 
@@ -8361,7 +8360,7 @@ Real64 HCInWindowStandardRatings(EnergyPlusData &state,
     // Return value
     Real64 hcin; // interior surface convection coefficient
 
-    static std::string const RoutineName("HCInWindowStandardRatings");
+    static constexpr std::string_view RoutineName("HCInWindowStandardRatings");
 
     Real64 TmeanFilm;       // mean film temperature
     Real64 TmeanFilmKelvin; // mean film temperature for property evaluation
