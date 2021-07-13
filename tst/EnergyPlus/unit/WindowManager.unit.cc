@@ -3162,12 +3162,8 @@ TEST_F(EnergyPlusFixture, WindowManger_AdjRatioWindowTempNominalTest)
     // compare the adjustment ratio before and after adjustment
     EXPECT_EQ(AfaceNoAdj(2, 1), state->dataWindowManager->Aface(2, 1));
     EXPECT_EQ(AfaceNoAdj(1, 2), state->dataWindowManager->Aface(1, 2));
-    EXPECT_NEAR((state->dataWindowManager->Aface(1, 1) - AfaceNoAdj(1, 1)) / state->dataWindowManager->hcout,
-                adjRatioNonDefault - 1.0,
-                0.001);
-    EXPECT_NEAR((state->dataWindowManager->Aface(2, 2) - AfaceNoAdj(2, 2)) / state->dataWindowManager->hcin,
-                adjRatioNonDefault - 1.0,
-                0.01);
+    EXPECT_NEAR((state->dataWindowManager->Aface(1, 1) - AfaceNoAdj(1, 1)) / state->dataWindowManager->hcout, adjRatioNonDefault - 1.0, 0.001);
+    EXPECT_NEAR((state->dataWindowManager->Aface(2, 2) - AfaceNoAdj(2, 2)) / state->dataWindowManager->hcin, adjRatioNonDefault - 1.0, 0.01);
     EXPECT_NEAR((state->dataWindowManager->Bface(1) - BfaceNoAdj(1)) / (state->dataWindowManager->hcout * state->dataWindowManager->tout),
                 adjRatioNonDefault - 1.0,
                 0.001);
