@@ -468,6 +468,8 @@ namespace DataZoneEquipment {
 
     int GetZoneEquipControlledZoneNum(EnergyPlusData &state, int const ZoneEquipTypeNum, std::string const &EquipmentName);
 
+    bool VerifyLightsExhaustNodeForZone(EnergyPlusData &state, int const ZoneNum, int const ZoneExhaustNodeNum);
+
 } // namespace DataZoneEquipment
 
 struct DataZoneEquipmentData : BaseGlobalStruct

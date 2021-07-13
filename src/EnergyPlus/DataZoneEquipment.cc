@@ -1325,6 +1325,30 @@ int GetReturnNumForZone(EnergyPlusData &state,
     return ReturnIndex;
 }
 
+bool VerifyLightsExhaustNodeForZone(EnergyPlusData &state, int const ZoneNum, int const ZoneExhaustNodeNum)
+{
+    bool exhaustNodeError;
+    int ExhaustNum;
+
+    exhaustNodeError = true;
+
+    if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
+        GetZoneEquipmentData(state);
+        state.dataZoneEquip->ZoneEquipInputsFilled = true;
+    }
+
+    for (ExhaustNum = 1; ExhaustNum <= state.dataZoneEquip->ZoneEquipConfig(state.dataHeatBal->Zone(ZoneNum).ZoneEqNum).NumExhaustNodes;
+         ++ExhaustNum) {
+        if (ZoneExhaustNodeNum == state.dataZoneEquip->ZoneEquipConfig(state.dataHeatBal->Zone(ZoneNum).ZoneEqNum).ExhaustNode(ExhaustNum)) {
+            exhaustNodeError = false;
+            break;
+        }
+    }
+
+
+    return exhaustNodeError;
+}
+
 Real64 CalcDesignSpecificationOutdoorAir(EnergyPlusData &state,
                                          int const DSOAPtr,          // Pointer to DesignSpecification:OutdoorAir object
                                          int const ActualZoneNum,    // Zone index

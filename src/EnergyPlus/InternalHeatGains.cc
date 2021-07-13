@@ -1697,17 +1697,39 @@ namespace InternalHeatGains {
                                                 "\": " + state.dataIPShortCut->cAlphaFieldNames(8) + " must be blank when using a ZoneList.");
                             ErrorsFound = true;
                         } else {
-                            state.dataHeatBal->Lights(Loop).ZoneExhaustNodeNum =
-                                UtilityRoutines::FindItemInList(AlphaName(8), state.dataLoopNodes->NodeID, state.dataLoopNodes->NumOfNodes);
-                            if (state.dataHeatBal->Lights(Loop).ZoneExhaustNodeNum == 0) {
+                            bool exhaustNodeError = false;
+                            state.dataHeatBal->Lights(Loop).ZoneExhaustNodeNum = GetOnlySingleNode(state,
+                                                                                             AlphaName(8),
+                                                                                             exhaustNodeError ,
+                                                                                             CurrentModuleObject,
+                                                                                             state.dataHeatBal->Lights(Loop).Name,
+                                                                                             DataLoopNode::NodeFluidType::Air,
+                                                                                             DataLoopNode::NodeConnectionType::ZoneExhaust,
+                                                                                             NodeInputManager::compFluidStream::Primary,
+                                                                                             ObjectIsNotParent);
+                            if (!exhaustNodeError) { // GetOnlySingleNode will throw error messages if the is a NodeList Name and for other issues
+                                exhaustNodeError = DataZoneEquipment::VerifyLightsExhaustNodeForZone(
+                                    state,
+                                    state.dataHeatBal->Lights(Loop).ZonePtr,
+                                    state.dataHeatBal->Lights(Loop).ZoneExhaustNodeNum);
+                            }
+                            if (exhaustNodeError) {
                                 ShowWarningError(state,
                                                  RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                      state.dataIPShortCut->cAlphaFieldNames(8) + " =" + AlphaName(8));
                                 ShowContinueError(state, "No matching Zone Exhaust Air Node found.");
                             } else {
-                                state.dataZoneEquip->ZoneEquipConfig(state.dataHeatBal->Lights(Loop).ZonePtr)
+                                if (state.dataHeatBal->Lights(Loop).ZoneReturnNum > 0) {
+                                    state.dataZoneEquip->ZoneEquipConfig(state.dataHeatBal->Zone(state.dataHeatBal->Lights(Loop).ZonePtr).ZoneEqNum)
                                     .ReturnNodeExhaustNodeNum(state.dataHeatBal->Lights(Loop).ZoneReturnNum) =
                                     state.dataHeatBal->Lights(Loop).ZoneExhaustNodeNum;
+                                } else {
+                                    ShowWarningError(state,
+                                                 RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                     state.dataIPShortCut->cAlphaFieldNames(8) + " =" + AlphaName(8) + " is not used" );
+                                    ShowContinueError(state, "No matching Zone Return Air Node found. The Exhaust Node requires Return Node to work together");
+
+                                }
                             }
                         }
                     }
