@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,30 +52,17 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EPVector.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace BaseboardElectric {
-
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    extern std::string const cCMO_BBRadiator_Electric;
-    extern Real64 const SimpConvAirFlowSpeed; // m/s
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumBaseboards;
-    extern Array1D_bool MySizeFlag;
-    extern Array1D_bool CheckEquipName;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
-
-    // Types
 
     struct BaseboardParams
     {
@@ -93,15 +80,18 @@ namespace BaseboardElectric {
         Real64 Energy;
         Real64 ElecUseLoad;
         Real64 ElecUseRate;
-        int ZonePtr;                  // point to teh zone where the basebaord is located
+        int ZonePtr;                  // point to the zone where the basebaord is located
         int HeatingCapMethod;         // - Method for heating capacity scaledsizing calculation- (HeatingDesignCapacity, CapacityPerFloorArea,
                                       // FracOfAutosizedHeatingCapacity)
         Real64 ScaledHeatingCapacity; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
+        bool MySizeFlag;
+        bool CheckEquipName;
 
         // Default Constructor
         BaseboardParams()
             : SchedPtr(0), NominalCapacity(0.0), BaseboardEfficiency(0.0), AirInletTemp(0.0), AirInletHumRat(0.0), AirOutletTemp(0.0), Power(0.0),
-              Energy(0.0), ElecUseLoad(0.0), ElecUseRate(0.0), ZonePtr(0), HeatingCapMethod(0.0), ScaledHeatingCapacity(0.0)
+              Energy(0.0), ElecUseLoad(0.0), ElecUseRate(0.0), ZonePtr(0), HeatingCapMethod(0.0), ScaledHeatingCapacity(0.0), MySizeFlag(true),
+              CheckEquipName(true)
         {
         }
     };
@@ -112,32 +102,43 @@ namespace BaseboardElectric {
         Array1D_string FieldNames;
 
         // Default Constructor
-        BaseboardNumericFieldData()
-        {
-        }
+        BaseboardNumericFieldData() = default;
     };
 
-    // Object Data
-    extern Array1D<BaseboardParams> Baseboard;
-    extern Array1D<BaseboardNumericFieldData> BaseboardNumericFields;
+    void SimElectricBaseboard(
+        EnergyPlusData &state, std::string const &EquipName, int ActualZoneNum, int ControlledZoneNum, Real64 &PowerMet, int &CompIndex);
 
-    // Functions
+    void GetBaseboardInput(EnergyPlusData &state);
 
-    void clear_state();
+    void InitBaseboard(EnergyPlusData &state, int BaseboardNum, int ControlledZoneNum);
 
-    void SimElectricBaseboard(std::string const &EquipName, int const ActualZoneNum, int const ControlledZoneNum, Real64 &PowerMet, int &CompIndex);
+    void SizeElectricBaseboard(EnergyPlusData &state, int BaseboardNum);
 
-    void GetBaseboardInput();
-
-    void InitBaseboard(int const BaseboardNum, int const ControlledZoneNum);
-
-    void SizeElectricBaseboard(int const BaseboardNum);
-
-    void SimElectricConvective(int const BaseboardNum, Real64 const LoadMet);
-
-    void ReportBaseboard(int const BaseboardNum);
+    void SimElectricConvective(EnergyPlusData &state, int BaseboardNum, Real64 LoadMet);
 
 } // namespace BaseboardElectric
+
+struct BaseboardElectricData : BaseGlobalStruct
+{
+    int NumBaseboards = 0;
+    bool getInputFlag = true;
+    EPVector<BaseboardElectric::BaseboardParams> Baseboard;
+    EPVector<BaseboardElectric::BaseboardNumericFieldData> BaseboardNumericFields;
+    bool MyOneTimeFlag = true;
+    bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
+    Array1D_bool MyEnvrnFlag;
+
+    void clear_state() override
+    {
+        this->NumBaseboards = 0;
+        this->getInputFlag = true;
+        this->Baseboard.deallocate();
+        this->BaseboardNumericFields.deallocate();
+        this->MyOneTimeFlag = true;
+        this->ZoneEquipmentListChecked = false;
+        this->MyEnvrnFlag.clear();
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -45,18 +45,21 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+// C++ Headers
+#include <utility>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/environment.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <CommandLineInterface.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataStringGlobals.hh>
-#include <DataSystemVariables.hh>
-#include <FileSystem.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -72,68 +75,44 @@ namespace DataSystemVariables {
     // This data-only module is a repository for system (such as environment) variables that are set
     // before a run or set of runs.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataStringGlobals::altpathChar;
-    using DataStringGlobals::CurrentWorkingFolder;
     using DataStringGlobals::pathChar;
-    using DataStringGlobals::ProgramPath;
-    using namespace FileSystem;
 
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
-    int const iASCII_CR(13);   // endline value when just CR instead of CR/LF
-    int const iUnicode_end(0); // endline value when Unicode file
-    char const tabchar('\t');
-    int const GoodIOStatValue(0);         // good value for IOStat during reads/writes
-    int const MaxTimingStringLength(250); // string length for timing string array
-
-    std::string const DDOnlyEnvVar("DDONLY");       // Only run design days
-    std::string const ReverseDDEnvVar("REVERSEDD"); // Reverse DD during run
-    std::string const DisableGLHECachingEnvVar("DISABLEGLHECACHING");
-    std::string const FullAnnualSimulation("FULLANNUALRUN"); // Generate annual run
-    std::string const cDeveloperFlag("DeveloperFlag");
-    std::string const cDisplayAllWarnings("DisplayAllWarnings");
-    std::string const cDisplayExtraWarnings("DisplayExtraWarnings");
-    std::string const cDisplayAdvancedReportVariables("DisplayAdvancedReportVariables");
-    std::string const cDisplayUnusedObjects("DisplayUnusedObjects");
-    std::string const cDisplayUnusedSchedules("DisplayUnusedSchedules");
-    std::string const cDisplayZoneAirHeatBalanceOffBalance("DisplayZoneAirHeatBalanceOffBalance");
-    std::string const cSortIDD("SortIDD");
-    std::string const cReportDuringWarmup("ReportDuringWarmup");
-    std::string const cReportDuringHVACSizingSimulation("REPORTDURINGHVACSIZINGSIMULATION");
-    std::string const cIgnoreSolarRadiation("IgnoreSolarRadiation");
-    std::string const cIgnoreBeamRadiation("IgnoreBeamRadiation");
-    std::string const cIgnoreDiffuseRadiation("IgnoreDiffuseRadiation");
-    std::string const cSutherlandHodgman("SutherlandHodgman");
-    std::string const cMinimalSurfaceVariables("CreateMinimalSurfaceVariables");
-    std::string const cMinimalShadowing("MinimalShadowing");
-    std::string const cNumActiveSims("cntActv");
-    std::string const cInputPath1("epin");       // EP-Launch setting.  Full path + project name
-    std::string const cInputPath2("input_path"); // RunEplus.bat setting.  Full path
-    std::string const cProgramPath("program_path");
-    std::string const cTimingFlag("TimingFlag");
-    std::string const TrackAirLoopEnvVar("TRACK_AIRLOOP"); // To generate a file with runtime statistics
+    constexpr const char *DDOnlyEnvVar("DDONLY");       // Only run design days
+    constexpr const char *ReverseDDEnvVar("REVERSEDD"); // Reverse DD during run
+    constexpr const char *DisableGLHECachingEnvVar("DISABLEGLHECACHING");
+    constexpr const char *FullAnnualSimulation("FULLANNUALRUN"); // Generate annual run
+    constexpr const char *cDeveloperFlag("DeveloperFlag");
+    constexpr const char *cDisplayAllWarnings("DisplayAllWarnings");
+    constexpr const char *cDisplayExtraWarnings("DisplayExtraWarnings");
+    constexpr const char *cDisplayAdvancedReportVariables("DisplayAdvancedReportVariables");
+    constexpr const char *cDisplayUnusedObjects("DisplayUnusedObjects");
+    constexpr const char *cDisplayUnusedSchedules("DisplayUnusedSchedules");
+    constexpr const char *cDisplayZoneAirHeatBalanceOffBalance("DisplayZoneAirHeatBalanceOffBalance");
+    constexpr const char *cSortIDD("SortIDD");
+    constexpr const char *cReportDuringWarmup("ReportDuringWarmup");
+    constexpr const char *cReportDuringHVACSizingSimulation("REPORTDURINGHVACSIZINGSIMULATION");
+    constexpr const char *cIgnoreSolarRadiation("IgnoreSolarRadiation");
+    constexpr const char *cIgnoreBeamRadiation("IgnoreBeamRadiation");
+    constexpr const char *cIgnoreDiffuseRadiation("IgnoreDiffuseRadiation");
+    constexpr const char *cSutherlandHodgman("SutherlandHodgman");
+    constexpr const char *cSlaterBarsky("SlaterBarsky");
+    constexpr const char *cMinimalSurfaceVariables("CreateMinimalSurfaceVariables");
+    constexpr const char *cMinimalShadowing("MinimalShadowing");
+    constexpr const char *cInputPath1("epin");       // EP-Launch setting.  Full path + project name
+    constexpr const char *cInputPath2("input_path"); // RunEplus.bat setting.  Full path
+    constexpr const char *cProgramPath("program_path");
+    constexpr const char *cTimingFlag("TimingFlag");
+    constexpr const char *TrackAirLoopEnvVar("TRACK_AIRLOOP"); // To generate a file with runtime statistics
     // for each controller on each air loop
-    std::string const TraceAirLoopEnvVar("TRACE_AIRLOOP"); // To generate a trace file with the converged
+    constexpr const char *TraceAirLoopEnvVar("TRACE_AIRLOOP"); // To generate a trace file with the converged
     // solutions of all controllers on each air loop at each call to SimAirLoop()
-    std::string const TraceHVACControllerEnvVar("TRACE_HVACCONTROLLER"); // To generate a trace file for
+    constexpr const char *TraceHVACControllerEnvVar("TRACE_HVACCONTROLLER"); // To generate a trace file for
     //  each individual HVAC controller with all controller iterations
 
-    std::string const MinReportFrequencyEnvVar("MINREPORTFREQUENCY"); // environment var for reporting frequency.
-    std::string const
+    constexpr const char *MinReportFrequencyEnvVar("MINREPORTFREQUENCY"); // environment var for reporting frequency.
+    constexpr const char *
         cDisplayInputInAuditEnvVar("DISPLAYINPUTINAUDIT"); // environmental variable that enables the echoing of the input file into the audit file
 
     // DERIVED TYPE DEFINITIONS
@@ -143,62 +122,14 @@ namespace DataSystemVariables {
     // na
 
     // MODULE VARIABLE DECLARATIONS:
-    bool DDOnly(false);                           // TRUE if design days (sizingperiod:*) only are to be run.
-    bool ReverseDD(false);                        // TRUE if reverse design days (reordering sizingperiod:*) are to be run.
-    bool DisableGLHECaching(false);               // TRUE if caching is to be disabled, for example, during unit tests.
-    bool FullAnnualRun(false);                    // TRUE if full annual simulation is to be run.
-    bool DeveloperFlag(false);                    // TRUE if developer flag is turned on. (turns on more displays to console)
-    bool TimingFlag(false);                       // TRUE if timing flag is turned on. (turns on more timing displays to console)
-    bool SutherlandHodgman(true);                 // TRUE if SutherlandHodgman algorithm for polygon clipping is to be used.
-    bool DetailedSkyDiffuseAlgorithm(false);      // use detailed diffuse shading algorithm for sky (shading transmittance varies)
-    bool DetailedSolarTimestepIntegration(false); // when true, use detailed timestep integration for all solar,shading, etc.
-    bool TrackAirLoopEnvFlag(false);              // If TRUE generates a file with runtime statistics for each HVAC
-    //  controller on each air loop
-    bool TraceAirLoopEnvFlag(false); // If TRUE generates a trace file with the converged solutions of all
-    // HVAC controllers on each air loop at each call to SimAirLoop()
-    bool TraceHVACControllerEnvFlag(false); // If TRUE generates a trace file for each individual HVAC
-    // controller with all controller iterations
-    bool ReportDuringWarmup(false);                      // True when the report outputs even during warmup
-    bool ReportDuringHVACSizingSimulation(false);        // true when reporting outputs during HVAC sizing Simulation
-    bool ReportDetailedWarmupConvergence(false);         // True when the detailed warmup convergence is requested
-    bool UpdateDataDuringWarmupExternalInterface(false); // variable sets in the external interface.
-    bool UseScheduledSunlitFrac(false);                  // when true, the sunlit fraction for all surfaces are imported from schedule inputs
-    bool ReportExtShadingSunlitFrac(false);              // when true, the sunlit fraction for all surfaces are exported as a csv format output
-    bool UseImportedSunlitFrac(false);                   // when true, the sunlit fraction for all surfaces are imported altogether as a CSV/JSON file
 
-    bool DisableGroupSelfShading(false); // when true, defined shadowing surfaces group is ignored when calculating sunlit fraction
-    bool DisableAllSelfShading(false);   // when true, all external shadowing surfaces is ignored when calculating sunlit fraction
-
-    // This update the value during the warmup added for FMI
-    Real64 Elapsed_Time(0.0);       // For showing elapsed time at end of run
-    Real64 Time_Start(0.0);         // Call to CPU_Time for start time of simulation
-    Real64 Time_Finish(0.0);        // Call to CPU_Time for end time of simulation
-    std::string MinReportFrequency; // String for minimum reporting frequency
-    bool SortedIDD(true);           // after processing, use sorted IDD to obtain Defs, etc.
-    bool lMinimalShadowing(false);  // TRUE if MinimalShadowing is to override Solar Distribution flag
-    std::string TempFullFileName;
-    std::string envinputpath1;
-    std::string envinputpath2;
-    std::string envprogrampath;
-    bool TestAllPaths(false);
-    int iEnvSetThreads(0);
-    bool lEnvSetThreadsInput(false);
-    int iepEnvSetThreads(0);
-    bool lepSetThreadsInput(false);
-    int iIDFSetThreads(0);
-    bool lIDFSetThreadsInput(false);
-    int inumActiveSims(1);
-    bool lnumActiveSims(false);
-    int MaxNumberOfThreads(1);
-    int NumberIntRadThreads(1);
-    int iNominalTotSurfaces(0);
-    bool Threading(false);
+    // Shading methods
 
     // Functions
 
-    void CheckForActualFileName(std::string const &originalInputFileName, // name as input for object
-                                bool &FileFound,                          // Set to true if file found and is in CheckedFileName
-                                std::string &CheckedFileName              // Blank if not found.
+    fs::path CheckForActualFilePath(EnergyPlusData &state,
+                                    fs::path const &originalInputFilePath, // path (or filename only) as input for object
+                                    const std::string &contextString       //
     )
     {
 
@@ -213,200 +144,177 @@ namespace DataSystemVariables {
         // be accurate. This searches a few folders (CurrentWorkingFolder, Program folder) to see
         // if the file can be found. (It may have been input with full path so that is checked first.)
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const blank;
-        static gio::Fmt fmtA("(A)");
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        bool FileExist(false);    // initialize to false, then override to true if present
-        static int EchoInputFile; // found unit number for "eplusout.audit"
-        static bool firstTime(true);
-        std::string InputFileName; // save for changing out path characters
-        std::string::size_type pos;
+        fs::path foundFilePath;
 
-        if (firstTime) {
-            EchoInputFile = FindUnitNumber(DataStringGlobals::outputAuditFileName);
-            get_environment_variable(cInputPath1, envinputpath1);
-            if (envinputpath1 != blank) {
-                pos = index(envinputpath1, pathChar, true); // look backwards for pathChar
-                if (pos != std::string::npos) envinputpath1.erase(pos + 1);
+        if (state.dataSysVars->firstTime) {
+            state.files.audit.ensure_open(state, "CheckForActualFilePath", state.files.outputControl.audit);
+            std::string tmp;
+
+            get_environment_variable(cInputPath1, tmp);
+            state.dataSysVars->envinputpath1 = fs::path(tmp);
+
+            get_environment_variable(cInputPath2, tmp);
+            state.dataSysVars->envinputpath2 = fs::path(tmp);
+
+            get_environment_variable(cProgramPath, tmp);
+            state.dataStrGlobals->ProgramPath = fs::path(tmp);
+            state.dataSysVars->firstTime = false;
+        }
+
+        fs::path InputFilePath = FileSystem::makeNativePath(originalInputFilePath); // save for changing out path characters
+
+        std::vector<std::pair<fs::path, std::string>> pathsChecked;
+
+        const std::array<std::pair<fs::path, std::string>, 7> pathsToCheck = {
+            {{InputFilePath, "Current Working Directory"},
+             {state.dataStrGlobals->inputDirPath / InputFilePath, "IDF Directory"},
+             {state.dataStrGlobals->exeDirectoryPath / InputFilePath, "EnergyPlus Executable Directory"},
+             {state.dataSysVars->envinputpath1 / InputFilePath, "\"epin\" Environment Variable"},
+             {state.dataSysVars->envinputpath2 / InputFilePath, "\"input_path\" Environment Variable"},
+             {state.dataStrGlobals->CurrentWorkingFolder / InputFilePath, "INI File Directory"},
+             {state.dataStrGlobals->ProgramPath / InputFilePath, "\"program\", \"dir\" from INI File"}}};
+
+        std::size_t numPathsToNotTest = (state.dataSysVars->TestAllPaths) ? pathsToCheck.size() - 2 : pathsToCheck.size();
+
+        for (std::size_t i = 0; i < numPathsToNotTest; i++) {
+            if (FileSystem::fileExists(pathsToCheck[i].first)) {
+                foundFilePath = pathsToCheck[i].first;
+                print(state.files.audit, "{}={}\n", "found (" + pathsToCheck[i].second + ")", FileSystem::getAbsolutePath(foundFilePath).string());
+                return foundFilePath;
+            } else {
+                std::pair<fs::path, std::string> currentPath(FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(pathsToCheck[i].first)),
+                                                             pathsToCheck[i].second);
+                bool found = false;
+                for (auto path : pathsChecked) {
+                    if (path.first == currentPath.first) {
+                        found = true;
+                    }
+                }
+                if (!found) {
+                    pathsChecked.push_back(currentPath);
+                }
+                print(state.files.audit,
+                      "{}={}\n",
+                      "not found (" + pathsToCheck[i].second + ")\"",
+                      FileSystem::getAbsolutePath(pathsToCheck[i].first).string());
             }
-            get_environment_variable(cInputPath2, envinputpath2);
-            get_environment_variable(cProgramPath, ProgramPath);
-            firstTime = false;
         }
 
-        FileFound = false;
-        CheckedFileName = blank;
-        InputFileName = originalInputFileName;
-        makeNativePath(InputFileName);
-
-        {
-            IOFlags flags;
-            gio::inquire(InputFileName, flags);
-            FileExist = flags.exists();
-        }
-        if (FileExist) {
-            FileFound = true;
-            CheckedFileName = InputFileName;
-            gio::write(EchoInputFile, fmtA) << "found (user input)=" + getAbsolutePath(CheckedFileName);
-            return;
-        } else {
-            gio::write(EchoInputFile, fmtA) << "not found (user input)=" + getAbsolutePath(InputFileName);
+        // If we get here, we didn't find the file
+        ShowSevereError(state, contextString + "\"" + originalInputFilePath.string() + "\" not found.");
+        ShowContinueError(state, "  Paths searched:");
+        for (auto path : pathsChecked) {
+            ShowContinueError(state, "    " + path.second + ": \"" + path.first.string() + "\"");
         }
 
-        // Look relative to input file path
-        {
-            IOFlags flags;
-            gio::inquire(DataStringGlobals::inputDirPathName + InputFileName, flags);
-            FileExist = flags.exists();
-        }
-        if (FileExist) {
-            FileFound = true;
-            CheckedFileName = DataStringGlobals::inputDirPathName + InputFileName;
-            gio::write(EchoInputFile, fmtA) << "found (input file)=" + getAbsolutePath(CheckedFileName);
-            return;
-        } else {
-            gio::write(EchoInputFile, fmtA) << "not found (input file)=" + getAbsolutePath(DataStringGlobals::inputDirPathName + InputFileName);
-        }
-
-        // Look relative to input path
-        {
-            IOFlags flags;
-            gio::inquire(envinputpath1 + InputFileName, flags);
-            FileExist = flags.exists();
-        }
-        if (FileExist) {
-            FileFound = true;
-            CheckedFileName = envinputpath1 + InputFileName;
-            gio::write(EchoInputFile, fmtA) << "found (epin)=" + getAbsolutePath(CheckedFileName);
-            return;
-        } else {
-            gio::write(EchoInputFile, fmtA) << "not found (epin)=" + getAbsolutePath(envinputpath1 + InputFileName);
-        }
-
-        // Look relative to input path
-        {
-            IOFlags flags;
-            gio::inquire(envinputpath2 + InputFileName, flags);
-            FileExist = flags.exists();
-        }
-        if (FileExist) {
-            FileFound = true;
-            CheckedFileName = envinputpath2 + InputFileName;
-            gio::write(EchoInputFile, fmtA) << "found (input_path)=" + getAbsolutePath(CheckedFileName);
-            return;
-        } else {
-            gio::write(EchoInputFile, fmtA) << "not found (input_path)=" + getAbsolutePath(envinputpath2 + InputFileName);
-        }
-
-        // Look relative to program path
-        {
-            IOFlags flags;
-            gio::inquire(envprogrampath + InputFileName, flags);
-            FileExist = flags.exists();
-        }
-        if (FileExist) {
-            FileFound = true;
-            CheckedFileName = envprogrampath + InputFileName;
-            gio::write(EchoInputFile, fmtA) << "found (program_path)=" + getAbsolutePath(CheckedFileName);
-            return;
-        } else {
-            gio::write(EchoInputFile, fmtA) << "not found (program_path)=" + getAbsolutePath(envprogrampath + InputFileName);
-        }
-
-        if (!TestAllPaths) return;
-
-        // Look relative to current working folder
-        {
-            IOFlags flags;
-            gio::inquire(CurrentWorkingFolder + InputFileName, flags);
-            FileExist = flags.exists();
-        }
-        if (FileExist) {
-            FileFound = true;
-            CheckedFileName = CurrentWorkingFolder + InputFileName;
-            gio::write(EchoInputFile, fmtA) << "found (CWF)=" + getAbsolutePath(CheckedFileName);
-            return;
-        } else {
-            gio::write(EchoInputFile, fmtA) << "not found (CWF)=" + getAbsolutePath(CurrentWorkingFolder + InputFileName);
-        }
-
-        // Look relative to program path
-        {
-            IOFlags flags;
-            gio::inquire(ProgramPath + InputFileName, flags);
-            FileExist = flags.exists();
-        }
-        if (FileExist) {
-            FileFound = true;
-            CheckedFileName = ProgramPath + InputFileName;
-            gio::write(EchoInputFile, fmtA) << "found (program path - ini)=" + getAbsolutePath(CheckedFileName);
-            return;
-        } else {
-            gio::write(EchoInputFile, fmtA) << "not found (program path - ini)=" + getAbsolutePath(ProgramPath + InputFileName);
-        }
+        return foundFilePath;
     }
 
-    void clear_state()
+    void processEnvironmentVariables(EnergyPlusData &state)
     {
-        DDOnly = false;
-        ReverseDD = false;
-        DisableGLHECaching = false;
-        FullAnnualRun = false;
-        DeveloperFlag = false;
-        TimingFlag = false;
-        SutherlandHodgman = true;
-        DetailedSkyDiffuseAlgorithm = false;
-        DetailedSolarTimestepIntegration = false;
-        TrackAirLoopEnvFlag = false;
-        TraceAirLoopEnvFlag = false;
-        TraceHVACControllerEnvFlag = false;
-        ReportDuringWarmup = false;
-        ReportDuringHVACSizingSimulation = false;
-        ReportDetailedWarmupConvergence = false;
-        UpdateDataDuringWarmupExternalInterface = false;
-        UseScheduledSunlitFrac = false;
-        ReportExtShadingSunlitFrac = false;
-        UseImportedSunlitFrac = false;
-        DisableGroupSelfShading = false;
-        DisableAllSelfShading = false;
-        Elapsed_Time = 0.0;
-        Time_Start = 0.0;
-        Time_Finish = 0.0;
-        SortedIDD = true;
-        lMinimalShadowing = false;
-        TestAllPaths = false;
-        iEnvSetThreads = 0;
-        lEnvSetThreadsInput = false;
-        iepEnvSetThreads = 0;
-        lepSetThreadsInput = false;
-        iIDFSetThreads = 0;
-        lIDFSetThreadsInput = false;
-        inumActiveSims = 1;
-        lnumActiveSims = false;
-        MaxNumberOfThreads = 1;
-        NumberIntRadThreads = 1;
-        iNominalTotSurfaces = 0;
-        Threading = false;
+
+        std::string cEnvValue;
+
+        get_environment_variable(DDOnlyEnvVar, cEnvValue);
+        state.dataSysVars->DDOnly = env_var_on(cEnvValue); // Yes or True
+        if (state.dataGlobal->DDOnlySimulation) state.dataSysVars->DDOnly = true;
+
+        get_environment_variable(ReverseDDEnvVar, cEnvValue);
+        state.dataSysVars->ReverseDD = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(DisableGLHECachingEnvVar, cEnvValue);
+        state.dataSysVars->DisableGLHECaching = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(FullAnnualSimulation, cEnvValue);
+        state.dataSysVars->FullAnnualRun = env_var_on(cEnvValue); // Yes or True
+        if (state.dataGlobal->AnnualSimulation) state.dataSysVars->FullAnnualRun = true;
+
+        get_environment_variable(cDisplayAllWarnings, cEnvValue);
+        state.dataGlobal->DisplayAllWarnings = env_var_on(cEnvValue); // Yes or True
+        if (state.dataGlobal->DisplayAllWarnings) {
+            state.dataGlobal->DisplayAllWarnings = true;
+            state.dataGlobal->DisplayExtraWarnings = true;
+            state.dataGlobal->DisplayUnusedSchedules = true;
+            state.dataGlobal->DisplayUnusedObjects = true;
+        }
+
+        get_environment_variable(cDisplayExtraWarnings, cEnvValue);
+        if (!cEnvValue.empty()) state.dataGlobal->DisplayExtraWarnings = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cDisplayUnusedObjects, cEnvValue);
+        if (!cEnvValue.empty()) state.dataGlobal->DisplayUnusedObjects = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cDisplayUnusedSchedules, cEnvValue);
+        if (!cEnvValue.empty()) state.dataGlobal->DisplayUnusedSchedules = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cDisplayZoneAirHeatBalanceOffBalance, cEnvValue);
+        if (!cEnvValue.empty()) state.dataGlobal->DisplayZoneAirHeatBalanceOffBalance = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cDisplayAdvancedReportVariables, cEnvValue);
+        if (!cEnvValue.empty()) state.dataGlobal->DisplayAdvancedReportVariables = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cReportDuringWarmup, cEnvValue);
+        if (!cEnvValue.empty()) state.dataSysVars->ReportDuringWarmup = env_var_on(cEnvValue); // Yes or True
+        if (state.dataSysVars->ReverseDD) state.dataSysVars->ReportDuringWarmup = false;       // force to false for ReverseDD runs
+
+        get_environment_variable(cReportDuringWarmup, cEnvValue);
+        if (!cEnvValue.empty()) state.dataSysVars->ReportDuringWarmup = env_var_on(cEnvValue);   // Yes or True
+        if (state.dataSysVars->DisableGLHECaching) state.dataSysVars->ReportDuringWarmup = true; // force to true for standard runs runs
+
+        get_environment_variable(cReportDuringHVACSizingSimulation, cEnvValue);
+        if (!cEnvValue.empty()) state.dataSysVars->ReportDuringHVACSizingSimulation = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cIgnoreSolarRadiation, cEnvValue);
+        if (!cEnvValue.empty()) state.dataEnvrn->IgnoreSolarRadiation = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cMinimalSurfaceVariables, cEnvValue);
+        if (!cEnvValue.empty()) state.dataGlobal->CreateMinimalSurfaceVariables = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cSortIDD, cEnvValue);
+        if (!cEnvValue.empty()) state.dataSysVars->SortedIDD = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(MinReportFrequencyEnvVar, cEnvValue);
+        if (!cEnvValue.empty()) state.dataSysVars->MinReportFrequency = cEnvValue; // turned into value later
+
+        get_environment_variable(cDeveloperFlag, cEnvValue);
+        if (!cEnvValue.empty()) state.dataSysVars->DeveloperFlag = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cIgnoreBeamRadiation, cEnvValue);
+        if (!cEnvValue.empty()) state.dataEnvrn->IgnoreBeamRadiation = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cIgnoreDiffuseRadiation, cEnvValue);
+        if (!cEnvValue.empty()) state.dataEnvrn->IgnoreDiffuseRadiation = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cSutherlandHodgman, cEnvValue);
+        if (!cEnvValue.empty()) state.dataSysVars->SutherlandHodgman = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cSlaterBarsky, cEnvValue);
+        if (!cEnvValue.empty()) state.dataSysVars->SlaterBarsky = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cMinimalShadowing, cEnvValue);
+        if (!cEnvValue.empty()) state.dataSysVars->lMinimalShadowing = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cTimingFlag, cEnvValue);
+        if (!cEnvValue.empty()) state.dataSysVars->TimingFlag = env_var_on(cEnvValue); // Yes or True
+
+        // Initialize env flags for air loop simulation debugging
+        get_environment_variable(TrackAirLoopEnvVar, cEnvValue);
+        if (!cEnvValue.empty()) state.dataSysVars->TrackAirLoopEnvFlag = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(TraceAirLoopEnvVar, cEnvValue);
+        if (!cEnvValue.empty()) state.dataSysVars->TraceAirLoopEnvFlag = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(TraceHVACControllerEnvVar, cEnvValue);
+        if (!cEnvValue.empty()) state.dataSysVars->TraceHVACControllerEnvFlag = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cDisplayInputInAuditEnvVar, cEnvValue);
+        if (!cEnvValue.empty()) state.dataGlobal->DisplayInputInAudit = env_var_on(cEnvValue); // Yes or True
     }
 
 } // namespace DataSystemVariables

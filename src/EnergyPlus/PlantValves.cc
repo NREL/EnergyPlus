@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,20 +52,20 @@
 #include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
-#include <BranchNodeConnections.hh>
-#include <DataBranchAirLoopPlant.hh>
-#include <DataHVACGlobals.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataPrecisionGlobals.hh>
-#include <General.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutputProcessor.hh>
-#include <PlantUtilities.hh>
-#include <PlantValves.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/PlantValves.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -82,110 +82,56 @@ namespace PlantValves {
     // PURPOSE OF THIS MODULE:
     // Collect "valve" type models for Plant loops
 
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // USE STATEMENTS:
-    // <use statements for data only modules>
-    // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
-    using General::TrimSigDigits;
 
-    // <use statements for access to subroutines in other modules>
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-    int NumTemperingValves;
-    Array1D_bool CheckEquipName;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
-
-    // Object Data
-    Array1D<TemperValveData> TemperValve; // dimension to No. of TemperingValve objects
-
-    // Functions
-
-    void SimPlantValves(int const CompTypeNum,
-                        std::string const &CompName,
-                        int &CompNum,
-                        bool const EP_UNUSED(RunFlag), // unused1208
-                        bool &InitLoopEquip,
-                        Real64 &EP_UNUSED(MyLoad), // unused1208
-                        Real64 &MaxCap,
-                        Real64 &MinCap,
-                        Real64 &OptCap,
-                        bool const EP_UNUSED(FirstHVACIteration) // TRUE if First iteration of simulation
-    )
+    PlantComponent *TemperValveData::factory(EnergyPlusData &state, std::string objectName)
     {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         B. Griffith, NREL
-        //       DATE WRITTEN   Jan. 2006
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Simulation manager for Plant valves
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool GetInputFlag(true); // First time, input is "gotten"
-        int EqNum;
-
-        if (GetInputFlag) {
-            GetPlantValvesInput();
-            GetInputFlag = false;
+        // Process the input data for valves if it hasn't been done already
+        if (state.dataPlantValves->GetTemperingValves) {
+            GetPlantValvesInput(state);
+            state.dataPlantValves->GetTemperingValves = false;
         }
-
-        // Find the correct Equipment
-        if (CompNum == 0) {
-            EqNum = UtilityRoutines::FindItemInList(CompName, TemperValve);
-            if (EqNum == 0) {
-                ShowFatalError("SimPlantValves: Unit not found=" + CompName);
-            }
-            CompNum = EqNum;
-        } else {
-            EqNum = CompNum;
-            if (EqNum > NumTemperingValves || EqNum < 1) {
-                ShowFatalError("SimPlantValves:  Invalid CompNum passed=" + TrimSigDigits(EqNum) +
-                               ", Number of Units=" + TrimSigDigits(NumTemperingValves) + ", Entered Unit name=" + CompName);
-            }
-            if (CheckEquipName(EqNum)) {
-                if (CompName != TemperValve(EqNum).Name) {
-                    ShowFatalError("SimPlantValves: Invalid CompNum passed=" + TrimSigDigits(EqNum) + ", Unit name=" + CompName +
-                                   ", stored Unit Name for that index=" + TemperValve(EqNum).Name);
-                }
-                CheckEquipName(EqNum) = false;
+        // Now look for this particular pipe in the list
+        for (auto &valve : state.dataPlantValves->TemperValve) {
+            if (valve.Name == objectName) {
+                return &valve;
             }
         }
-
-        if (InitLoopEquip) {
-            MinCap = 0.0;
-            MaxCap = 0.0;
-            OptCap = 0.0;
-            return;
-        }
-
-        InitPlantValves(CompTypeNum, CompNum);
-
-        CalcPlantValves(CompTypeNum, CompNum);
-
-        UpdatePlantValves(CompTypeNum, CompNum);
-
-        ReportPlantValves(); //(Args)
+        // If we didn't find it, fatal
+        ShowFatalError(state,
+                       "TemperValveDataFactory: Error getting inputs for valve named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
     }
 
-    void GetPlantValvesInput()
+    void TemperValveData::simulate(EnergyPlusData &state,
+                                   [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                   [[maybe_unused]] bool FirstHVACIteration,
+                                   [[maybe_unused]] Real64 &CurLoad,
+                                   [[maybe_unused]] bool RunFlag)
+    {
+        this->initialize(state);
+        this->calculate(state);
+        PlantUtilities::SafeCopyPlantNode(state, this->PltInletNodeNum, this->PltOutletNodeNum);
+        Real64 mdot = this->MixedMassFlowRate * this->FlowDivFract;
+        if (this->LoopNum > 0) {
+            PlantUtilities::SetComponentFlowRate(
+                state, mdot, this->PltInletNodeNum, this->PltOutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
+        }
+    }
+
+    void TemperValveData::getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
+                                              [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                              Real64 &MaxLoad,
+                                              Real64 &MinLoad,
+                                              Real64 &OptLoad)
+    {
+        MaxLoad = 0.0;
+        MinLoad = 0.0;
+        OptLoad = 0.0;
+    }
+
+    void GetPlantValvesInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -201,7 +147,6 @@ namespace PlantValves {
         // usual method using InputProcessor
 
         // Using/Aliasing
-        using namespace DataIPShortCuts; // Data for field names, blank numerics
         using BranchNodeConnections::TestCompSet;
         using NodeInputManager::GetOnlySingleNode;
 
@@ -212,59 +157,95 @@ namespace PlantValves {
         int NumAlphas;                   // Number of Alphas for each GetObjectItem call
         int NumNumbers;                  // Number of Numbers for each GetObjectItem call
         int IOStatus;                    // Used in GetObjectItem
-        static bool ErrorsFound(false);  // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false);         // Set to true if errors in input, fatal at end of routine
         std::string CurrentModuleObject; // for ease in renaming.
 
         CurrentModuleObject = "TemperingValve";
-        NumTemperingValves = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        state.dataPlantValves->NumTemperingValves = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
-        TemperValve.allocate(NumTemperingValves);
-        CheckEquipName.dimension(NumTemperingValves, true);
+        state.dataPlantValves->TemperValve.allocate(state.dataPlantValves->NumTemperingValves);
 
-        for (Item = 1; Item <= NumTemperingValves; ++Item) {
+        for (Item = 1; Item <= state.dataPlantValves->NumTemperingValves; ++Item) {
 
-            inputProcessor->getObjectItem(CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus);
+            state.dataInputProcessing->inputProcessor->getObjectItem(
+                state, CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus);
             //  <process, noting errors>
-            TemperValve(Item).Name = Alphas(1);
+            state.dataPlantValves->TemperValve(Item).Name = Alphas(1);
             // Get Plant Inlet Node
-            TemperValve(Item).PltInletNodeNum = GetOnlySingleNode(
-                Alphas(2), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+            state.dataPlantValves->TemperValve(Item).PltInletNodeNum = GetOnlySingleNode(state,
+                                                                                         Alphas(2),
+                                                                                         ErrorsFound,
+                                                                                         CurrentModuleObject,
+                                                                                         Alphas(1),
+                                                                                         DataLoopNode::NodeFluidType::Water,
+                                                                                         DataLoopNode::NodeConnectionType::Inlet,
+                                                                                         NodeInputManager::compFluidStream::Primary,
+                                                                                         ObjectIsNotParent);
             // Get Plant Outlet Node
-            TemperValve(Item).PltOutletNodeNum = GetOnlySingleNode(
-                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+            state.dataPlantValves->TemperValve(Item).PltOutletNodeNum = GetOnlySingleNode(state,
+                                                                                          Alphas(3),
+                                                                                          ErrorsFound,
+                                                                                          CurrentModuleObject,
+                                                                                          Alphas(1),
+                                                                                          DataLoopNode::NodeFluidType::Water,
+                                                                                          DataLoopNode::NodeConnectionType::Outlet,
+                                                                                          NodeInputManager::compFluidStream::Primary,
+                                                                                          ObjectIsNotParent);
 
             // Get Stream 2 Source Node
-            TemperValve(Item).PltStream2NodeNum = GetOnlySingleNode(
-                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+            state.dataPlantValves->TemperValve(Item).PltStream2NodeNum = GetOnlySingleNode(state,
+                                                                                           Alphas(4),
+                                                                                           ErrorsFound,
+                                                                                           CurrentModuleObject,
+                                                                                           Alphas(1),
+                                                                                           DataLoopNode::NodeFluidType::Water,
+                                                                                           DataLoopNode::NodeConnectionType::Sensor,
+                                                                                           NodeInputManager::compFluidStream::Primary,
+                                                                                           ObjectIsNotParent);
             // Get Mixed water Setpoint
-            TemperValve(Item).PltSetPointNodeNum = GetOnlySingleNode(
-                Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_SetPoint, 1, ObjectIsNotParent);
+            state.dataPlantValves->TemperValve(Item).PltSetPointNodeNum = GetOnlySingleNode(state,
+                                                                                            Alphas(5),
+                                                                                            ErrorsFound,
+                                                                                            CurrentModuleObject,
+                                                                                            Alphas(1),
+                                                                                            DataLoopNode::NodeFluidType::Water,
+                                                                                            DataLoopNode::NodeConnectionType::SetPoint,
+                                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                                            ObjectIsNotParent);
 
             // Get Pump outlet
-            TemperValve(Item).PltPumpOutletNodeNum = GetOnlySingleNode(
-                Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+            state.dataPlantValves->TemperValve(Item).PltPumpOutletNodeNum = GetOnlySingleNode(state,
+                                                                                              Alphas(6),
+                                                                                              ErrorsFound,
+                                                                                              CurrentModuleObject,
+                                                                                              Alphas(1),
+                                                                                              DataLoopNode::NodeFluidType::Water,
+                                                                                              DataLoopNode::NodeConnectionType::Sensor,
+                                                                                              NodeInputManager::compFluidStream::Primary,
+                                                                                              ObjectIsNotParent);
 
             // Note most checks on user input are made in second pass thru init routine
 
-            TestCompSet(CurrentModuleObject, Alphas(1), Alphas(2), Alphas(3), "Supply Side Water Nodes");
+            TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(2), Alphas(3), "Supply Side Water Nodes");
         }
 
-        for (Item = 1; Item <= NumTemperingValves; ++Item) {
+        for (Item = 1; Item <= state.dataPlantValves->NumTemperingValves; ++Item) {
 
-            SetupOutputVariable("Tempering Valve Flow Fraction",
+            SetupOutputVariable(state,
+                                "Tempering Valve Flow Fraction",
                                 OutputProcessor::Unit::None,
-                                TemperValve(Item).FlowDivFract,
+                                state.dataPlantValves->TemperValve(Item).FlowDivFract,
                                 "System",
                                 "Average",
-                                TemperValve(Item).Name);
+                                state.dataPlantValves->TemperValve(Item).Name);
         }
 
         if (ErrorsFound) {
-            ShowFatalError("GetPlantValvesInput: " + CurrentModuleObject + " Errors found in input");
+            ShowFatalError(state, "GetPlantValvesInput: " + CurrentModuleObject + " Errors found in input");
         }
     }
 
-    void InitPlantValves(int const CompTypeNum, int const CompNum)
+    void TemperValveData::initialize(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -274,18 +255,7 @@ namespace PlantValves {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // intialize data for valve modeling
-
-        // Using/Aliasing
-        using DataBranchAirLoopPlant::ControlType_Active;
-        using DataGlobals::BeginEnvrnFlag;
-        using DataHVACGlobals::NumPlantLoops;
-        using DataLoopNode::Node;
-        using DataPlant::GenEquipTypes_Pump;
-        using DataPlant::PlantLoop;
-        using DataPlant::TypeOf_ValveTempering;
-        using PlantUtilities::InitComponentNodes;
-        using PlantUtilities::ScanPlantLoopsForObject;
+        // initialize data for valve modeling
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InletNode;   // local working variable for inlet node number
@@ -302,224 +272,187 @@ namespace PlantValves {
         bool Stream2NodeOkay;  // input data check
         bool IsBranchActive;   // input data check
 
-        int numLoopSides; // set to SIZE(PlantLoop(i)%LoopSide)
-
-        static bool MyOneTimeFlag(true);   // first pass log
-        static Array1D_bool MyTwoTimeFlag; // second pass do input check
         bool errFlag;
 
-        {
-            auto const SELECT_CASE_var(CompTypeNum);
+        if (state.dataPlantValves->OneTimeInitFlag) {
+            state.dataPlantValves->OneTimeInitFlag = false;
+        } else {
+            // delay checks one pass so more of plant data structure gets filled in
+            if (this->compDelayedInitFlag) {
+                // do some checks on input data
+                // Search thru PlantLoop Data Structure to check some things.
+                // Locate the component on the plant loops for later usage
+                errFlag = false;
+                PlantUtilities::ScanPlantLoopsForObject(state,
+                                                        this->Name,
+                                                        DataPlant::TypeOf_ValveTempering,
+                                                        this->LoopNum,
+                                                        this->LoopSideNum,
+                                                        this->BranchNum,
+                                                        this->CompNum,
+                                                        errFlag,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _);
 
-            if (SELECT_CASE_var == TypeOf_ValveTempering) {
+                if (errFlag) {
+                    ShowFatalError(state, "InitPlantValves: Program terminated due to previous condition(s).");
+                }
+                // init logical flags
+                ErrorsFound = false;
+                InNodeOnSplitter = false;
+                PumpOutNodeOkay = false;
+                TwoBranchesBetwn = false;
+                SetPointNodeOkay = false;
+                Stream2NodeOkay = false;
+                IsBranchActive = false;
 
-                if (MyOneTimeFlag) {
-                    MyOneTimeFlag = false;
-                    MyTwoTimeFlag.dimension(NumTemperingValves, true);
-                } else {
-                    // delay checks one pass so more of plant data structure gets filled in
-                    if (MyTwoTimeFlag(CompNum)) {
-                        // do some checks on input data
-                        // Search thru PlantLoop Data Structure to check some things.
-                        // Locate the component on the plant loops for later usage
-                        errFlag = false;
-                        ScanPlantLoopsForObject(TemperValve(CompNum).Name,
-                                                TypeOf_ValveTempering,
-                                                TemperValve(CompNum).LoopNum,
-                                                TemperValve(CompNum).LoopSideNum,
-                                                TemperValve(CompNum).BranchNum,
-                                                TemperValve(CompNum).CompNum,
-                                                _,
-                                                _,
-                                                _,
-                                                _,
-                                                _,
-                                                errFlag);
+                // . A) find indexes of PlantLoop, Half loop, and Branch by searching CompData
+                for (auto &thisPlantLoop : state.dataPlnt->PlantLoop) {
+                    for (auto &thisLoopSide : thisPlantLoop.LoopSide) {
+                        int branchCtr = 0;
+                        for (auto &thisBranch : thisLoopSide.Branch) {
+                            branchCtr++;
+                            for (auto &thisComp : thisBranch.Comp) {
 
-                        if (errFlag) {
-                            ShowFatalError("InitPlantValves: Program terminated due to previous condition(s).");
-                        }
-                        // init logical flags
-                        ErrorsFound = false;
-                        InNodeOnSplitter = false;
-                        PumpOutNodeOkay = false;
-                        TwoBranchesBetwn = false;
-                        SetPointNodeOkay = false;
-                        Stream2NodeOkay = false;
-                        IsBranchActive = false;
+                                if ((thisComp.TypeOf_Num == DataPlant::TypeOf_ValveTempering) && (thisComp.Name == this->Name)) { // we found it.
 
-                        // . A) find indexes of PlantLoop, Half loop, and Branch by searching CompData
-                        if (allocated(PlantLoop)) {
-                            for (int i = 1; i <= NumPlantLoops; ++i) {
-                                if (!allocated(PlantLoop(i).LoopSide)) continue;
-                                numLoopSides = size(PlantLoop(i).LoopSide);
-                                for (int j = 1; j <= numLoopSides; ++j) {
-                                    if (!allocated(PlantLoop(i).LoopSide(j).Branch)) continue;
-                                    for (int k = 1, k_end = PlantLoop(i).LoopSide(j).TotalBranches; k <= k_end; ++k) {
-                                        if (!allocated(PlantLoop(i).LoopSide(j).Branch(k).Comp)) continue;
-                                        for (int l = 1, l_end = PlantLoop(i).LoopSide(j).Branch(k).TotalComponents; l <= l_end; ++l) {
+                                    // is branch control type 'Active'
+                                    if (thisBranch.ControlType == DataBranchAirLoopPlant::ControlTypeEnum::Active) IsBranchActive = true;
 
-                                            if ((PlantLoop(i).LoopSide(j).Branch(k).Comp(l).TypeOf_Num == CompTypeNum) &&
-                                                (PlantLoop(i).LoopSide(j).Branch(k).Comp(l).CompNum == CompNum)) { // we found it.
+                                    // is Valve inlet node an outlet node of a splitter
+                                    if (thisLoopSide.Splitter.Exists) {
+                                        if (allocated(thisLoopSide.Splitter.NodeNumOut)) {
+                                            if (any_eq(thisLoopSide.Splitter.NodeNumOut, this->PltInletNodeNum)) {
+                                                InNodeOnSplitter = true;
+                                            }
+                                        } // allocated
 
-                                                if (!UtilityRoutines::SameString(PlantLoop(i).LoopSide(j).Branch(k).Comp(l).Name,
-                                                                                 TemperValve(CompNum).Name)) {
-                                                    // why not, maybe plant loop structures not completely filled with available data?
-                                                    // write(*,*) 'Temper Valve names', PlantLoop(i)%LoopSide(j)%Branch(k)%Comp(l)%Name,
-                                                    // TemperValve(CompNum)%Name
-                                                }
+                                        // are there only 2 branches between splitter and mixer?
+                                        if (thisLoopSide.Splitter.TotalOutletNodes == 2) {
+                                            TwoBranchesBetwn = true;
+                                        }
+                                    } // has splitter
 
-                                                // is branch control type 'Active'
-                                                if (PlantLoop(i).LoopSide(j).Branch(k).ControlType == ControlType_Active) IsBranchActive = true;
-
-                                                // is Valve inlet node an outlet node of a splitter
-                                                if (allocated(PlantLoop(i).LoopSide(j).Splitter)) {
-                                                    for (int m = 1, m_end = PlantLoop(i).LoopSide(j).NumSplitters; m <= m_end; ++m) {
-                                                        if (allocated(PlantLoop(i).LoopSide(j).Splitter(m).NodeNumOut)) {
-                                                            if (any_eq(PlantLoop(i).LoopSide(j).Splitter(m).NodeNumOut,
-                                                                       TemperValve(CompNum).PltInletNodeNum)) {
-                                                                InNodeOnSplitter = true;
-                                                            }
-                                                        } // allocated
-
-                                                        // are there only 2 branches between splitter and mixer?
-                                                        if (PlantLoop(i).LoopSide(j).Splitter(m).TotalOutletNodes == 2) {
-                                                            TwoBranchesBetwn = true;
-                                                        }
-                                                    } // loop over splitters
-                                                }     // allocated %splitter
-
-                                                // is stream 2 node an inlet to the mixer ?
-                                                if (allocated(PlantLoop(i).LoopSide(j).Mixer)) {
-                                                    for (int n = 1, n_end = PlantLoop(i).LoopSide(j).NumMixers; n <= n_end; ++n) {
-                                                        if (!allocated(PlantLoop(i).LoopSide(j).Mixer(n).NodeNumIn)) continue;
-                                                        if (any_eq(PlantLoop(i).LoopSide(j).Mixer(n).NodeNumIn,
-                                                                   TemperValve(CompNum).PltStream2NodeNum)) {
-
-                                                            // Check other branches component's node, current branch is k
-                                                            for (int kk = 1, kk_end = PlantLoop(i).LoopSide(j).TotalBranches; kk <= kk_end; ++kk) {
-                                                                if (k == kk) continue; // already looped into this one
-                                                                if (!allocated(PlantLoop(i).LoopSide(j).Branch(kk).Comp)) continue;
-                                                                auto const &comp(PlantLoop(i).LoopSide(j).Branch(kk).Comp);
-                                                                if (std::any_of(comp.begin(), comp.end(), [CompNum](DataPlant::CompData const &e) {
-                                                                        return e.NodeNumOut == TemperValve(CompNum).PltStream2NodeNum;
-                                                                    })) { // it is on other branch
-                                                                    Stream2NodeOkay = true;
-                                                                }
-                                                            } // kk branch nested loop
-                                                        }     // stream 2 node is inlet to mixer
-                                                    }         // mixer loop
-                                                }             // mixer allocated
-
-                                                // is pump node really the outlet of a branch with a pump?
-                                                for (int kk = 1, kk_end = PlantLoop(i).LoopSide(j).TotalBranches; kk <= kk_end; ++kk) {
-                                                    if (PlantLoop(i).LoopSide(j).Branch(kk).NodeNumOut == TemperValve(CompNum).PltPumpOutletNodeNum) {
-                                                        auto const &comp(PlantLoop(i).LoopSide(j).Branch(kk).Comp);
-                                                        if (std::any_of(comp.begin(), comp.end(), [](DataPlant::CompData const &e) {
-                                                                return e.GeneralEquipType == DataPlant::GenEquipTypes_Pump;
-                                                            })) { // it is on other branch
-                                                            // IF (PlantLoop(i)%LoopSide(j)%Branch(kk)%PumpPresent) THEN
-                                                            PumpOutNodeOkay = true;
-                                                        }
+                                    // is stream 2 node an inlet to the mixer ?
+                                    if (thisLoopSide.Mixer.Exists) {
+                                        if (any_eq(thisLoopSide.Mixer.NodeNumIn, this->PltStream2NodeNum)) {
+                                            int thisInnerBranchCtr = 0;
+                                            for (auto &thisInnerBranch : thisLoopSide.Branch) {
+                                                thisInnerBranchCtr++;
+                                                if (branchCtr == thisInnerBranchCtr) continue; // already looped into this one
+                                                for (auto &thisInnerComp : thisInnerBranch.Comp) {
+                                                    if (thisInnerComp.NodeNumOut == this->PltStream2NodeNum) {
+                                                        Stream2NodeOkay = true;
                                                     }
                                                 }
+                                            }
+                                        }
+                                    } // has mixer
 
-                                                // does sensor node agree with plant loop setpoint?
-                                                if (PlantLoop(i).TempSetPointNodeNum == TemperValve(CompNum).PltSetPointNodeNum) {
-                                                    SetPointNodeOkay = true;
+                                    // is pump node really the outlet of a branch with a pump?
+                                    for (auto &thisInnerBranch : thisLoopSide.Branch) {
+                                        if (thisInnerBranch.NodeNumOut == this->PltPumpOutletNodeNum) {
+                                            for (auto &thisInnerComp : thisInnerBranch.Comp) {
+                                                if (thisInnerComp.isPump()) {
+                                                    PumpOutNodeOkay = true;
                                                 }
+                                            }
+                                        }
+                                    }
 
-                                            } // found item
+                                    // does sensor node agree with plant loop setpoint?
+                                    if (thisPlantLoop.TempSetPointNodeNum == this->PltSetPointNodeNum) {
+                                        SetPointNodeOkay = true;
+                                    }
 
-                                        } // comps  l
-                                    }     // Branches k
-                                }         // Loop Sides j
-                            }             // Plant loops i
-                        }                 // plant loop allocated
+                                } // found item
 
-                        if (!IsBranchActive) {
-                            ShowSevereError("TemperingValve object needs to be on an ACTIVE branch");
-                            ErrorsFound = true;
-                        }
+                            } // comps
+                        }     // Branches
+                    }         // Loop Sides
+                }             // Plant loops
 
-                        if (!InNodeOnSplitter) {
-                            ShowSevereError("TemperingValve object needs to be between a Splitter and Mixer");
-                            ErrorsFound = true;
-                        }
-
-                        if (!PumpOutNodeOkay) {
-                            ShowSevereError("TemperingValve object needs to reference a node that is the outlet of a pump on its loop");
-                            ErrorsFound = true;
-                        }
-
-                        if (!TwoBranchesBetwn) {
-                            ShowSevereError("TemperingValve object needs exactly two branches between a Splitter and Mixer");
-                            ErrorsFound = true;
-                        }
-
-                        if (!SetPointNodeOkay) {
-                            ShowSevereError("TemperingValve object setpoint node not valid.  Check Setpoint manager for Plant Loop Temp Setpoint");
-                            ErrorsFound = true;
-                        }
-
-                        if (!Stream2NodeOkay) {
-                            ShowSevereError("TemperingValve object stream 2 source node not valid.");
-                            ShowContinueError("Check that node is a component outlet, enters a mixer, and on the other branch");
-                            ErrorsFound = true;
-                        }
-                        if (ErrorsFound) {
-                            ShowFatalError("Errors found in input, TemperingValve object " + TemperValve(CompNum).Name);
-                        }
-                        MyTwoTimeFlag(CompNum) = false;
-                    } // my two time flag for input checking
-
-                } // my one time flag for input checking
-
-                InletNode = TemperValve(CompNum).PltInletNodeNum;
-                OutletNode = TemperValve(CompNum).PltOutletNodeNum;
-                Strm2Node = TemperValve(CompNum).PltStream2NodeNum;
-                SetPntNode = TemperValve(CompNum).PltSetPointNodeNum;
-                PumpOutNode = TemperValve(CompNum).PltPumpOutletNodeNum;
-
-                if ((BeginEnvrnFlag) && (TemperValve(CompNum).Init)) {
-
-                    if ((InletNode > 0) && (OutletNode > 0)) {
-                        //   Node(InletNode)%Temp = 0.0
-                        InitComponentNodes(0.0,
-                                           Node(PumpOutNode).MassFlowRateMax,
-                                           TemperValve(CompNum).PltInletNodeNum,
-                                           TemperValve(CompNum).PltOutletNodeNum,
-                                           TemperValve(CompNum).LoopNum,
-                                           TemperValve(CompNum).LoopSideNum,
-                                           TemperValve(CompNum).BranchNum,
-                                           TemperValve(CompNum).CompNum);
-                    }
-                    TemperValve(CompNum).Init = false;
+                if (!IsBranchActive) {
+                    ShowSevereError(state, "TemperingValve object needs to be on an ACTIVE branch");
+                    ErrorsFound = true;
                 }
 
-                if (!BeginEnvrnFlag) TemperValve(CompNum).Init = true;
-
-                if (InletNode > 0) {
-                    TemperValve(CompNum).InletTemp = Node(InletNode).Temp;
-                }
-                if (Strm2Node > 0) {
-                    TemperValve(CompNum).Stream2SourceTemp = Node(Strm2Node).Temp;
-                }
-                if (SetPntNode > 0) {
-                    TemperValve(CompNum).SetPointTemp = Node(SetPntNode).TempSetPoint;
+                if (!InNodeOnSplitter) {
+                    ShowSevereError(state, "TemperingValve object needs to be between a Splitter and Mixer");
+                    ErrorsFound = true;
                 }
 
-                if (PumpOutNode > 0) {
-                    TemperValve(CompNum).MixedMassFlowRate = Node(PumpOutNode).MassFlowRate;
+                if (!PumpOutNodeOkay) {
+                    ShowSevereError(state, "TemperingValve object needs to reference a node that is the outlet of a pump on its loop");
+                    ErrorsFound = true;
                 }
 
-            } else {
-                // should not come here, would have been caught already
+                if (!TwoBranchesBetwn) {
+                    ShowSevereError(state, "TemperingValve object needs exactly two branches between a Splitter and Mixer");
+                    ErrorsFound = true;
+                }
+
+                if (!SetPointNodeOkay) {
+                    ShowSevereError(state, "TemperingValve object setpoint node not valid.  Check Setpoint manager for Plant Loop Temp Setpoint");
+                    ErrorsFound = true;
+                }
+
+                if (!Stream2NodeOkay) {
+                    ShowSevereError(state, "TemperingValve object stream 2 source node not valid.");
+                    ShowContinueError(state, "Check that node is a component outlet, enters a mixer, and on the other branch");
+                    ErrorsFound = true;
+                }
+                if (ErrorsFound) {
+                    ShowFatalError(state, "Errors found in input, TemperingValve object " + this->Name);
+                }
+                this->compDelayedInitFlag = false;
+            } // my two time flag for input checking
+
+        } // my one time flag for input checking
+
+        InletNode = this->PltInletNodeNum;
+        OutletNode = this->PltOutletNodeNum;
+        Strm2Node = this->PltStream2NodeNum;
+        SetPntNode = this->PltSetPointNodeNum;
+        PumpOutNode = this->PltPumpOutletNodeNum;
+
+        if (state.dataGlobal->BeginEnvrnFlag && this->environmentInit) {
+
+            if ((InletNode > 0) && (OutletNode > 0)) {
+                //   Node(InletNode)%Temp = 0.0
+                PlantUtilities::InitComponentNodes(state,
+                                                   0.0,
+                                                   state.dataLoopNodes->Node(PumpOutNode).MassFlowRateMax,
+                                                   this->PltInletNodeNum,
+                                                   this->PltOutletNodeNum,
+                                                   this->LoopNum,
+                                                   this->LoopSideNum,
+                                                   this->BranchNum,
+                                                   this->CompNum);
             }
+            this->environmentInit = false;
+        }
+
+        if (!state.dataGlobal->BeginEnvrnFlag) this->environmentInit = true;
+
+        if (InletNode > 0) {
+            this->InletTemp = state.dataLoopNodes->Node(InletNode).Temp;
+        }
+        if (Strm2Node > 0) {
+            this->Stream2SourceTemp = state.dataLoopNodes->Node(Strm2Node).Temp;
+        }
+        if (SetPntNode > 0) {
+            this->SetPointTemp = state.dataLoopNodes->Node(SetPntNode).TempSetPoint;
+        }
+        if (PumpOutNode > 0) {
+            this->MixedMassFlowRate = state.dataLoopNodes->Node(PumpOutNode).MassFlowRate;
         }
     }
 
-    void CalcPlantValves(int const CompTypeNum, int const CompNum)
+    void TemperValveData::calculate(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -536,182 +469,41 @@ namespace PlantValves {
         //   Tempering valve calculations involve computing a flow fraction
         //     that should be diverted.  See update routine for setting flow rates.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataGlobals::KickOffSimulation;
-        using DataPlant::PlantLoop;
-        using DataPlant::TypeOf_ValveTempering;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 Tin;  // local working variable for Inlet Temperature (C)
         Real64 Tset; // local working variable for Setpoint Temperature (C)
         Real64 Ts2;  // local Working Variable for Stream 2 outlet Temperature (C)
-        int LoopNum;
-        int LoopSideNum;
 
-        LoopNum = TemperValve(CompNum).LoopNum;
-        LoopSideNum = TemperValve(CompNum).LoopSideNum;
+        if (state.dataGlobal->KickOffSimulation) return;
 
-        if (KickOffSimulation) return;
+        if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::iFlowLock::Unlocked) {
+            Tin = this->InletTemp;
+            Tset = this->SetPointTemp;
+            Ts2 = this->Stream2SourceTemp;
 
-        {
-            auto const SELECT_CASE_var(CompTypeNum);
-
-            if (SELECT_CASE_var == TypeOf_ValveTempering) {
-
-                if (PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == 0) {
-                    Tin = TemperValve(CompNum).InletTemp;
-                    Tset = TemperValve(CompNum).SetPointTemp;
-                    Ts2 = TemperValve(CompNum).Stream2SourceTemp;
-
-                    if (Ts2 <= Tset) {
-                        TemperValve(CompNum).FlowDivFract = 0.0;
-                    } else { // Divert some or all flow
-                        if (Tin < Ts2) {
-                            TemperValve(CompNum).FlowDivFract = (Ts2 - Tset) / (Ts2 - Tin);
-                        } else {
-                            TemperValve(CompNum).FlowDivFract = 1.0;
-                        }
-                    }
-                } else if (PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == 1) { // don't recalc diversion, just reuse current flows
-                    if (TemperValve(CompNum).MixedMassFlowRate > 0.0) {
-                        TemperValve(CompNum).FlowDivFract =
-                            Node(TemperValve(CompNum).PltOutletNodeNum).MassFlowRate / TemperValve(CompNum).MixedMassFlowRate;
-                    } else {
-                        TemperValve(CompNum).FlowDivFract = 0.0;
-                    }
-                }
-
-                if (TemperValve(CompNum).FlowDivFract < 0.0) TemperValve(CompNum).FlowDivFract = 0.0;
-                if (TemperValve(CompNum).FlowDivFract > 1.0) TemperValve(CompNum).FlowDivFract = 1.0;
-
-            } else {
-                // should not come here. would have been caught in init routine
-            }
-        }
-    }
-
-    void UpdatePlantValves(int const CompTypeNum, int const CompNum)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         B. Griffith, NREL
-        //       DATE WRITTEN   Jan. 2006
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Propagate calculations to rest of program
-
-        // METHODOLOGY EMPLOYED:
-        // set values at nodes
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataPlant::TypeOf_ValveTempering;
-        using PlantUtilities::SafeCopyPlantNode;
-        using PlantUtilities::SetComponentFlowRate;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 mdot; // local fluid mass flow rate
-
-        {
-            auto const SELECT_CASE_var(CompTypeNum);
-
-            if (SELECT_CASE_var == TypeOf_ValveTempering) {
-
-                SafeCopyPlantNode(TemperValve(CompNum).PltInletNodeNum, TemperValve(CompNum).PltOutletNodeNum);
-
-                // set mass flows in diverter path
-                mdot = TemperValve(CompNum).MixedMassFlowRate * TemperValve(CompNum).FlowDivFract;
-
-                if (TemperValve(CompNum).LoopNum > 0) {
-                    SetComponentFlowRate(mdot,
-                                         TemperValve(CompNum).PltInletNodeNum,
-                                         TemperValve(CompNum).PltOutletNodeNum,
-                                         TemperValve(CompNum).LoopNum,
-                                         TemperValve(CompNum).LoopSideNum,
-                                         TemperValve(CompNum).BranchNum,
-                                         TemperValve(CompNum).CompNum);
-
-                    TemperValve(CompNum).DivertedFlowRate = mdot;
+            if (Ts2 <= Tset) {
+                this->FlowDivFract = 0.0;
+            } else { // Divert some or all flow
+                if (Tin < Ts2) {
+                    this->FlowDivFract = (Ts2 - Tset) / (Ts2 - Tin);
                 } else {
-                    TemperValve(CompNum).DivertedFlowRate = 0.0;
+                    this->FlowDivFract = 1.0;
                 }
+            }
+        } else if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock ==
+                   DataPlant::iFlowLock::Locked) { // don't recalc diversion, just reuse current flows
+            if (this->MixedMassFlowRate > 0.0) {
+                this->FlowDivFract = state.dataLoopNodes->Node(this->PltOutletNodeNum).MassFlowRate / this->MixedMassFlowRate;
             } else {
-
-                // should not come here
+                this->FlowDivFract = 0.0;
             }
         }
+
+        if (this->FlowDivFract < 0.0) this->FlowDivFract = 0.0;
+        if (this->FlowDivFract > 1.0) this->FlowDivFract = 1.0;
     }
-
-    void ReportPlantValves()
+    void TemperValveData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
     {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         B. Griffith, NREL
-        //       DATE WRITTEN   Jan. 2006
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        //<this routine is typically needed only for those cases where you must transform the internal data to a reportable form>
-
-        // Nothing needs to be done (yet)
     }
 
 } // namespace PlantValves

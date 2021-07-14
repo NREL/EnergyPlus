@@ -57,7 +57,7 @@
 !****** SIMULATION CONTROLS ********************************
 !***********************************************************
 
-  Version,9.0;
+  Version,9.6;
 
 !- =========== ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -66,7 +66,9 @@
     No,                      !- Do System Sizing Calculation
     NO,                      !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
 !- =========== ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -74,7 +76,7 @@
     House,                   !- Name
     0.0,                     !- North Axis {deg}
     Suburbs,                 !- Terrain
-    0.05,                    !- Loads Convergence Tolerance Value
+    0.05,                    !- Loads Convergence Tolerance Value {W}
     0.05,                    !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     35,                      !- Maximum Number of Warmup Days
@@ -191,10 +193,7 @@
     ,                        !- Multiplier
     autocalculate,           !- Ceiling Height {m}
     autocalculate,           !- Volume {m3}
-    autocalculate,           !- Floor Area {m2}
-    Simple,                  !- Zone Inside Convection Algorithm
-    SimpleCombined,          !- Zone Outside Convection Algorithm
-    Yes;                     !- Part of Total Floor Area
+    autocalculate;           !- Floor Area {m2}
 
   BuildingSurface:Detailed,
     Basement North Foundation Wall,  !- Name
@@ -521,10 +520,7 @@
     ,                        !- Multiplier
     autocalculate,           !- Ceiling Height {m}
     autocalculate,           !- Volume {m3}
-    autocalculate,           !- Floor Area {m2}
-    Simple,                  !- Zone Inside Convection Algorithm
-    SimpleCombined,          !- Zone Outside Convection Algorithm
-    Yes;                     !- Part of Total Floor Area
+    autocalculate;           !- Floor Area {m2}
 
   BuildingSurface:Detailed,
     Main Floor North Wall,   !- Name
@@ -762,6 +758,7 @@
 
   Foundation:Kiva,
     Basement Foundation,     !- Name
+    ,                        !- Initial Indoor Air Temperature {C}
     Basement Insulation,     !- Interior Horizontal Insulation Material Name
     ,                        !- Interior Horizontal Insulation Depth {m}
     1,                       !- Interior Horizontal Insulation Width {m}
@@ -856,7 +853,9 @@
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Main Floor Ideal Loads Air System,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     Main Floor Ideal Loads Air System,  !- Name

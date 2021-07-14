@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,21 +49,21 @@
 
 // Google Test Headers
 #include <gtest/gtest.h>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
+
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <DataHeatBalance.hh>
-#include <HeatBalanceManager.hh>
-//#include <OutputReportData.hh>
-//#include <UtilityRoutines.hh>
-//#include <EnergyPlus/OutputProcessor.hh>
-#include <OutputReports.hh>
-#include <SurfaceGeometry.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/OutputReports.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
-// using namespace OutputProcessor;
 
 TEST_F(EnergyPlusFixture, OutputReports_SurfaceDetailsReport)
 {
@@ -123,36 +123,37 @@ TEST_F(EnergyPlusFixture, OutputReports_SurfaceDetailsReport)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool foundErrors(false);
-    HeatBalanceManager::GetProjectControlData(foundErrors); // read project control data
-    EXPECT_FALSE(foundErrors);                              // expect no errors
+    HeatBalanceManager::GetProjectControlData(*state, foundErrors); // read project control data
+    EXPECT_FALSE(foundErrors);                                      // expect no errors
 
-    HeatBalanceManager::GetMaterialData(foundErrors); // read material data
-    EXPECT_FALSE(foundErrors);                        // expect no errors
+    HeatBalanceManager::GetMaterialData(*state, foundErrors); // read material data
+    EXPECT_FALSE(foundErrors);                                // expect no errors
 
-    HeatBalanceManager::GetConstructData(foundErrors); // read construction data
+    HeatBalanceManager::GetConstructData(*state, foundErrors); // read construction data
     compare_err_stream("");
     EXPECT_FALSE(foundErrors); // expect no errors
 
-    HeatBalanceManager::GetZoneData(foundErrors); // read zone data
-    EXPECT_FALSE(foundErrors);                    // expect no errors
+    HeatBalanceManager::GetZoneData(*state, foundErrors); // read zone data
+    EXPECT_FALSE(foundErrors);                            // expect no errors
 
-    SurfaceGeometry::CosZoneRelNorth.allocate(1);
-    SurfaceGeometry::SinZoneRelNorth.allocate(1);
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
 
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::CosBldgRelNorth = 1.0;
-    SurfaceGeometry::SinBldgRelNorth = 0.0;
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(foundErrors); // setup zone geometry and get zone data
-    EXPECT_FALSE(foundErrors);                    // expect no errors
+    SurfaceGeometry::GetSurfaceData(*state, foundErrors); // setup zone geometry and get zone data
+    EXPECT_FALSE(foundErrors);                            // expect no errors
 
     // reset eio stream
-    compare_eio_stream("", true);
+    has_eio_output(true);
 
-    DetailsForSurfaces(10); // 10 = Details Only, Surface details report
+    DetailsForSurfaces(*state, 10); // 10 = Details Only, Surface details report
     std::string const eiooutput = delimited_string(
-        {"! <Zone Surfaces>,Zone Name,# Surfaces", "! <Shading Surfaces>,Number of Shading Surfaces,# Surfaces",
+        {"! <Zone Surfaces>,Zone Name,# Surfaces",
+         "! <Shading Surfaces>,Number of Shading Surfaces,# Surfaces",
          "! <HeatTransfer Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm,Construction,Nominal U (w/o film coefs) "
          "{W/m2-K},Nominal U (with film coefs) {W/m2-K},Solar Diffusing,Area (Net) {m2},Area (Gross) {m2},Area (Sunlit Calc) {m2},Azimuth {deg},Tilt "
          "{deg},~Width {m},~Height {m},Reveal "
@@ -168,7 +169,8 @@ TEST_F(EnergyPlusFixture, OutputReports_SurfaceDetailsReport)
          "Zone Surfaces,SPACE1,1",
          "HeatTransfer Surface,FRONT-1,Wall,,CTF - "
          "ConductionTransferFunction,INT-WALL-1,2.811,1.978,,73.20,73.20,73.20,180.00,90.00,30.50,2.40,0.00,ExternalEnvironment,DOE-2,ASHRAETARP,"
-         "SunExposed,WindExposed,0.50,0.50,0.50,0.50,4"});
+         "SunExposed,WindExposed,0.50,0.50,0.50,0.50,4"},
+        "\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 }

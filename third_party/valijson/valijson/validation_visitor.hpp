@@ -1,6 +1,4 @@
 #pragma once
-#ifndef __VALIJSON_VALIDATION_VISITOR_HPP
-#define __VALIJSON_VALIDATION_VISITOR_HPP
 
 #include <cmath>
 #include <string>
@@ -242,7 +240,7 @@ public:
 
     /**
      * @brief   Validate a value against a LinearItemsConstraint
-
+     *
      * A LinearItemsConstraint represents an 'items' constraint that specifies,
      * for each item in array, an individual sub-schema that the item must
      * validate against. The LinearItemsConstraint class also captures the
@@ -876,9 +874,16 @@ public:
         if (!additionalPropertiesSubschema) {
             if (propertiesMatched.size() != target.getObjectSize()) {
                 if (results) {
-                    results->pushError(context, "Object contains properties "
+                    std::string unwanted;
+                    for (const typename AdapterType::ObjectMember m : object) {
+                        if (propertiesMatched.find(m.first) == propertiesMatched.end()) {
+                            unwanted = m.first;
+                            break;
+                        }
+                    }
+                    results->pushError(context, "Object contains a property "
                             "that could not be validated using 'properties' "
-                            "or 'additionalProperties' constraints");
+                            "or 'additionalProperties' constraints: '" + unwanted + "'.");
                 }
 
                 return false;
@@ -1028,8 +1033,37 @@ public:
             if (numValidated > 0) {
                 return true;
             } else if (results) {
-                results->pushError(context,
-                        "Value type not permitted by 'type' constraint.");
+                std::string type;
+                bool output_target = true;
+                if (target.isNumber()) {
+                    type = "number";
+                } else if(target.isString()) {
+                    type = "string";
+                } else if(target.isArray()) {
+                    type = "array";
+                    output_target = false;
+                } else if(target.isObject()) {
+                    type = "object";
+                    output_target = false;
+                } else if(target.isInteger()) {
+                    type = "integer";
+                } else if(target.isBool()) {
+                    type = "boolean";
+                } else if(target.isNull()) {
+                    type = "null";
+                } else {
+                    type = "unknown type";
+                    output_target = false;
+                }
+
+                if (output_target) {
+                    results->pushError(context,
+                                       "Value type \"" + type + "\" for input \"" + target.asString() + "\" not permitted by 'type' constraint.");
+                } else {
+                    results->pushError(context,
+                                       "Value type \"" + type + "\" not permitted by 'type' constraint.");
+                }
+
             }
         }
 
@@ -1704,5 +1738,3 @@ private:
 };
 
 }  // namespace valijson
-
-#endif

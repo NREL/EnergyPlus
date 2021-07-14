@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,11 +53,17 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
 
 using namespace EnergyPlus;
+using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::SizingManager;
 using namespace EnergyPlus::DataSizing;
 using namespace ObjexxFCL;
@@ -71,7 +77,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
 
     std::string CurrentModuleObject = "DesignSpecification:OutdoorAir";
     int NumOARequirements = 6;
-    OARequirements.allocate(NumOARequirements);
+    state->dataSize->OARequirements.allocate(NumOARequirements);
 
     Array1D_string Alphas;         // Alpha input items for object
     Array1D_string cAlphaFields;   // Alpha field names
@@ -97,16 +103,26 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
-                               cNumericFields, ErrorsFound);
+    ProcessInputOARequirements(*state,
+                               CurrentModuleObject,
+                               OAIndex,
+                               Alphas,
+                               NumAlphas,
+                               Numbers,
+                               NumNumbers,
+                               lNumericBlanks,
+                               lAlphaBlanks,
+                               cAlphaFields,
+                               cNumericFields,
+                               ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(OAFlowPerArea, OARequirements(OAIndex).OAFlowMethod);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowPerPerson);
-    EXPECT_EQ(0.2, OARequirements(OAIndex).OAFlowPerArea);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowPerZone);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowACH);
+    EXPECT_EQ(OAFlowPerArea, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerPerson);
+    EXPECT_EQ(0.2, state->dataSize->OARequirements(OAIndex).OAFlowPerArea);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerZone);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowACH);
 
     // Flow/Person
     OAIndex = 2;
@@ -118,16 +134,26 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
-                               cNumericFields, ErrorsFound);
+    ProcessInputOARequirements(*state,
+                               CurrentModuleObject,
+                               OAIndex,
+                               Alphas,
+                               NumAlphas,
+                               Numbers,
+                               NumNumbers,
+                               lNumericBlanks,
+                               lAlphaBlanks,
+                               cAlphaFields,
+                               cNumericFields,
+                               ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(OAFlowPPer, OARequirements(OAIndex).OAFlowMethod);
-    EXPECT_EQ(0.1, OARequirements(OAIndex).OAFlowPerPerson);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowPerArea);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowPerZone);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowACH);
+    EXPECT_EQ(OAFlowPPer, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
+    EXPECT_EQ(0.1, state->dataSize->OARequirements(OAIndex).OAFlowPerPerson);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerArea);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerZone);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowACH);
 
     // Flow/Zone
     OAIndex = 3;
@@ -139,16 +165,26 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
-                               cNumericFields, ErrorsFound);
+    ProcessInputOARequirements(*state,
+                               CurrentModuleObject,
+                               OAIndex,
+                               Alphas,
+                               NumAlphas,
+                               Numbers,
+                               NumNumbers,
+                               lNumericBlanks,
+                               lAlphaBlanks,
+                               cAlphaFields,
+                               cNumericFields,
+                               ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(OAFlow, OARequirements(OAIndex).OAFlowMethod);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowPerPerson);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowPerArea);
-    EXPECT_EQ(0.3, OARequirements(OAIndex).OAFlowPerZone);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowACH);
+    EXPECT_EQ(OAFlow, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerPerson);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerArea);
+    EXPECT_EQ(0.3, state->dataSize->OARequirements(OAIndex).OAFlowPerZone);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowACH);
 
     // Flow/Zone
     OAIndex = 4;
@@ -160,16 +196,26 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;              // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
-                               cNumericFields, ErrorsFound);
+    ProcessInputOARequirements(*state,
+                               CurrentModuleObject,
+                               OAIndex,
+                               Alphas,
+                               NumAlphas,
+                               Numbers,
+                               NumNumbers,
+                               lNumericBlanks,
+                               lAlphaBlanks,
+                               cAlphaFields,
+                               cNumericFields,
+                               ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(OAFlowACH, OARequirements(OAIndex).OAFlowMethod);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowPerPerson);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowPerArea);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowPerZone);
-    EXPECT_EQ(0.4, OARequirements(OAIndex).OAFlowACH);
+    EXPECT_EQ(OAFlowACH, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerPerson);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerArea);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerZone);
+    EXPECT_EQ(0.4, state->dataSize->OARequirements(OAIndex).OAFlowACH);
 
     // Sum
     OAIndex = 5;
@@ -181,16 +227,26 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
-                               cNumericFields, ErrorsFound);
+    ProcessInputOARequirements(*state,
+                               CurrentModuleObject,
+                               OAIndex,
+                               Alphas,
+                               NumAlphas,
+                               Numbers,
+                               NumNumbers,
+                               lNumericBlanks,
+                               lAlphaBlanks,
+                               cAlphaFields,
+                               cNumericFields,
+                               ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(OAFlowSum, OARequirements(OAIndex).OAFlowMethod);
-    EXPECT_EQ(0.1, OARequirements(OAIndex).OAFlowPerPerson);
-    EXPECT_EQ(0.2, OARequirements(OAIndex).OAFlowPerArea);
-    EXPECT_EQ(0.3, OARequirements(OAIndex).OAFlowPerZone);
-    EXPECT_EQ(0.4, OARequirements(OAIndex).OAFlowACH);
+    EXPECT_EQ(OAFlowSum, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
+    EXPECT_EQ(0.1, state->dataSize->OARequirements(OAIndex).OAFlowPerPerson);
+    EXPECT_EQ(0.2, state->dataSize->OARequirements(OAIndex).OAFlowPerArea);
+    EXPECT_EQ(0.3, state->dataSize->OARequirements(OAIndex).OAFlowPerZone);
+    EXPECT_EQ(0.4, state->dataSize->OARequirements(OAIndex).OAFlowACH);
 
     // Maximum
     OAIndex = 6;
@@ -202,45 +258,285 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
-                               cNumericFields, ErrorsFound);
+    ProcessInputOARequirements(*state,
+                               CurrentModuleObject,
+                               OAIndex,
+                               Alphas,
+                               NumAlphas,
+                               Numbers,
+                               NumNumbers,
+                               lNumericBlanks,
+                               lAlphaBlanks,
+                               cAlphaFields,
+                               cNumericFields,
+                               ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(OAFlowMax, OARequirements(OAIndex).OAFlowMethod);
-    EXPECT_EQ(0.1, OARequirements(OAIndex).OAFlowPerPerson);
-    EXPECT_EQ(0.2, OARequirements(OAIndex).OAFlowPerArea);
-    EXPECT_EQ(0.3, OARequirements(OAIndex).OAFlowPerZone);
-    EXPECT_EQ(0.4, OARequirements(OAIndex).OAFlowACH);
+    EXPECT_EQ(OAFlowMax, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
+    EXPECT_EQ(0.1, state->dataSize->OARequirements(OAIndex).OAFlowPerPerson);
+    EXPECT_EQ(0.2, state->dataSize->OARequirements(OAIndex).OAFlowPerArea);
+    EXPECT_EQ(0.3, state->dataSize->OARequirements(OAIndex).OAFlowPerZone);
+    EXPECT_EQ(0.4, state->dataSize->OARequirements(OAIndex).OAFlowACH);
 
     // Clean up
-    OARequirements.deallocate();
+    state->dataSize->OARequirements.deallocate();
     Alphas.deallocate();
     cAlphaFields.deallocate();
     cNumericFields.deallocate();
 }
 
-TEST(SizingManagerTest, TimeIndexToHrMinString_test)
+TEST_F(EnergyPlusFixture, SizingManagerTest_TimeIndexToHrMinString_test)
 {
-    ShowMessage("Begin Test: SizingManagerTest, TimeIndexToHrMinString_test");
+    state->dataGlobal->MinutesPerTimeStep = 15;
 
-    DataGlobals::MinutesPerTimeStep = 15;
+    EXPECT_EQ("00:00:00", TimeIndexToHrMinString(*state, 0));
+    EXPECT_EQ("00:15:00", TimeIndexToHrMinString(*state, 1));
+    EXPECT_EQ("01:45:00", TimeIndexToHrMinString(*state, 7));
+    EXPECT_EQ("07:45:00", TimeIndexToHrMinString(*state, 31));
+    EXPECT_EQ("19:45:00", TimeIndexToHrMinString(*state, 79));
+    EXPECT_EQ("24:00:00", TimeIndexToHrMinString(*state, 96));
 
-    EXPECT_EQ("00:00:00", TimeIndexToHrMinString(0));
-    EXPECT_EQ("00:15:00", TimeIndexToHrMinString(1));
-    EXPECT_EQ("01:45:00", TimeIndexToHrMinString(7));
-    EXPECT_EQ("07:45:00", TimeIndexToHrMinString(31));
-    EXPECT_EQ("19:45:00", TimeIndexToHrMinString(79));
-    EXPECT_EQ("24:00:00", TimeIndexToHrMinString(96));
+    state->dataGlobal->MinutesPerTimeStep = 3;
 
-    DataGlobals::MinutesPerTimeStep = 3;
+    EXPECT_EQ("00:00:00", TimeIndexToHrMinString(*state, 0));
+    EXPECT_EQ("00:03:00", TimeIndexToHrMinString(*state, 1));
+    EXPECT_EQ("00:21:00", TimeIndexToHrMinString(*state, 7));
+    EXPECT_EQ("01:33:00", TimeIndexToHrMinString(*state, 31));
+    EXPECT_EQ("03:57:00", TimeIndexToHrMinString(*state, 79));
+    EXPECT_EQ("04:48:00", TimeIndexToHrMinString(*state, 96));
+    EXPECT_EQ("16:39:00", TimeIndexToHrMinString(*state, 333));
+    EXPECT_EQ("24:00:00", TimeIndexToHrMinString(*state, 480));
+}
 
-    EXPECT_EQ("00:00:00", TimeIndexToHrMinString(0));
-    EXPECT_EQ("00:03:00", TimeIndexToHrMinString(1));
-    EXPECT_EQ("00:21:00", TimeIndexToHrMinString(7));
-    EXPECT_EQ("01:33:00", TimeIndexToHrMinString(31));
-    EXPECT_EQ("03:57:00", TimeIndexToHrMinString(79));
-    EXPECT_EQ("04:48:00", TimeIndexToHrMinString(96));
-    EXPECT_EQ("16:39:00", TimeIndexToHrMinString(333));
-    EXPECT_EQ("24:00:00", TimeIndexToHrMinString(480));
+TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationTest)
+{
+    // checks DOAS Control Strategy default setpoint values test
+    std::string const idf_objects = delimited_string({
+
+        " Zone,",
+        "	SPACE1-1,      !- Name",
+        "	0,             !- Direction of Relative North { deg }",
+        "	0,             !- X Origin { m }",
+        "	0,             !- Y Origin { m }",
+        "	0,             !- Z Origin { m }",
+        "	1,             !- Type",
+        "	1,             !- Multiplier",
+        "	3.0,           !- Ceiling Height {m}",
+        "	240.0;         !- Volume {m3}",
+
+        " Sizing:Zone,",
+        "	SPACE1-1,             !- Zone or ZoneList Name",
+        "	SupplyAirTemperature, !- Zone Cooling Design Supply Air Temperature Input Method",
+        "	14.,                  !- Zone Cooling Design Supply Air Temperature { C }",
+        "	,                     !- Zone Cooling Design Supply Air Temperature Difference { deltaC }",
+        "	SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method",
+        "	50.,                  !- Zone Heating Design Supply Air Temperature { C }",
+        "	,                     !- Zone Heating Design Supply Air Temperature Difference { deltaC }",
+        "	0.009,                !- Zone Cooling Design Supply Air Humidity Ratio { kgWater/kgDryAir }",
+        "	0.004,                !- Zone Heating Design Supply Air Humidity Ratio { kgWater/kgDryAir }",
+        "	SZ DSOA SPACE1-1,     !- Design Specification Outdoor Air Object Name",
+        "	0.0,                  !- Zone Heating Sizing Factor",
+        "	0.0,                  !- Zone Cooling Sizing Factor",
+        "	DesignDayWithLimit,   !- Cooling Design Air Flow Method",
+        "	,                     !- Cooling Design Air Flow Rate { m3/s }",
+        "	,                     !- Cooling Minimum Air Flow per Zone Floor Area { m3/s-m2 }",
+        "	,                     !- Cooling Minimum Air Flow { m3/s }",
+        "	,                     !- Cooling Minimum Air Flow Fraction",
+        "	DesignDay,            !- Heating Design Air Flow Method",
+        "	,                     !- Heating Design Air Flow Rate { m3/s }",
+        "	,                     !- Heating Maximum Air Flow per Zone Floor Area { m3/s-m2 }",
+        "	,                     !- Heating Maximum Air Flow { m3/s }",
+        "	,                     !- Heating Maximum Air Flow Fraction",
+        "	,                     !- Design Specification Zone Air Distribution Object Name",
+        "   Yes,                  !- Account for Dedicated Outside Air System",
+        "   NeutralSupplyAir,     !- Dedicated Outside Air System Control Strategy",
+        "   ,                     !- Dedicated Outside Air Low Setpoint for Design",
+        "   ;                     !- Dedicated Outside Air High Setpoint for Design",
+
+        " DesignSpecification:OutdoorAir,",
+        "	SZ DSOA SPACE1-1,     !- Name",
+        "	sum,                  !- Outdoor Air Method",
+        "	0.00236,              !- Outdoor Air Flow per Person { m3/s-person }",
+        "	0.000305,             !- Outdoor Air Flow per Zone Floor Area { m3/s-m2 }",
+        "	0.0;                  !- Outdoor Air Flow per Zone { m3/s }",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+    SizingManager::GetOARequirements(*state);
+    SizingManager::GetZoneSizingInput(*state);
+    ASSERT_EQ(1, state->dataSize->NumZoneSizingInput);
+    ASSERT_EQ(DOANeutralSup, state->dataSize->ZoneSizingInput(1).DOASControlStrategy);
+    ASSERT_EQ(DataSizing::AutoSize, state->dataSize->ZoneSizingInput(1).DOASLowSetpoint);
+    ASSERT_EQ(DataSizing::AutoSize, state->dataSize->ZoneSizingInput(1).DOASHighSetpoint);
+    // set default DOAS control strategy setpoint values
+    ZoneEquipmentManager::AutoCalcDOASControlStrategy(*state);
+    // check default low and high set point values
+    ASSERT_EQ(21.1, state->dataSize->ZoneSizingInput(1).DOASLowSetpoint);
+    ASSERT_EQ(23.9, state->dataSize->ZoneSizingInput(1).DOASHighSetpoint);
+}
+
+TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationTest2)
+{
+    // checks DOAS Control Strategy default setpoint values test
+    std::string const idf_objects = delimited_string({
+
+        " Zone,",
+        "	SPACE1-1,      !- Name",
+        "	0,             !- Direction of Relative North { deg }",
+        "	0,             !- X Origin { m }",
+        "	0,             !- Y Origin { m }",
+        "	0,             !- Z Origin { m }",
+        "	1,             !- Type",
+        "	1,             !- Multiplier",
+        "	3.0,           !- Ceiling Height {m}",
+        "	240.0;         !- Volume {m3}",
+
+        " Sizing:Zone,",
+        "	SPACE1-1,             !- Zone or ZoneList Name",
+        "	SupplyAirTemperature, !- Zone Cooling Design Supply Air Temperature Input Method",
+        "	14.,                  !- Zone Cooling Design Supply Air Temperature { C }",
+        "	,                     !- Zone Cooling Design Supply Air Temperature Difference { deltaC }",
+        "	SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method",
+        "	50.,                  !- Zone Heating Design Supply Air Temperature { C }",
+        "	,                     !- Zone Heating Design Supply Air Temperature Difference { deltaC }",
+        "	0.009,                !- Zone Cooling Design Supply Air Humidity Ratio { kgWater/kgDryAir }",
+        "	0.004,                !- Zone Heating Design Supply Air Humidity Ratio { kgWater/kgDryAir }",
+        "	SZ DSOA SPACE1-1,     !- Design Specification Outdoor Air Object Name",
+        "	0.0,                  !- Zone Heating Sizing Factor",
+        "	0.0,                  !- Zone Cooling Sizing Factor",
+        "	DesignDayWithLimit,   !- Cooling Design Air Flow Method",
+        "	,                     !- Cooling Design Air Flow Rate { m3/s }",
+        "	,                     !- Cooling Minimum Air Flow per Zone Floor Area { m3/s-m2 }",
+        "	,                     !- Cooling Minimum Air Flow { m3/s }",
+        "	,                     !- Cooling Minimum Air Flow Fraction",
+        "	DesignDay,            !- Heating Design Air Flow Method",
+        "	,                     !- Heating Design Air Flow Rate { m3/s }",
+        "	,                     !- Heating Maximum Air Flow per Zone Floor Area { m3/s-m2 }",
+        "	,                     !- Heating Maximum Air Flow { m3/s }",
+        "	,                     !- Heating Maximum Air Flow Fraction",
+        "	,                     !- Design Specification Zone Air Distribution Object Name",
+        "   Yes,                  !- Account for Dedicated Outside Air System",
+        "   NeutralSupplyAir;     !- Dedicated Outside Air System Control Strategy",
+
+        " DesignSpecification:OutdoorAir,",
+        "	SZ DSOA SPACE1-1,     !- Name",
+        "	sum,                  !- Outdoor Air Method",
+        "	0.00236,              !- Outdoor Air Flow per Person { m3/s-person }",
+        "	0.000305,             !- Outdoor Air Flow per Zone Floor Area { m3/s-m2 }",
+        "	0.0;                  !- Outdoor Air Flow per Zone { m3/s }",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+    SizingManager::GetOARequirements(*state);
+    SizingManager::GetZoneSizingInput(*state);
+    ASSERT_EQ(1, state->dataSize->NumZoneSizingInput);
+    ASSERT_EQ(DOANeutralSup, state->dataSize->ZoneSizingInput(1).DOASControlStrategy);
+    ASSERT_EQ(DataSizing::AutoSize, state->dataSize->ZoneSizingInput(1).DOASLowSetpoint);
+    ASSERT_EQ(DataSizing::AutoSize, state->dataSize->ZoneSizingInput(1).DOASHighSetpoint);
+    // set default DOAS control strategy setpoint values
+    ZoneEquipmentManager::AutoCalcDOASControlStrategy(*state);
+    // check default low and high set point values
+    ASSERT_EQ(21.1, state->dataSize->ZoneSizingInput(1).DOASLowSetpoint);
+    ASSERT_EQ(23.9, state->dataSize->ZoneSizingInput(1).DOASHighSetpoint);
+}
+
+TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
+{
+
+    bool Answer;
+    bool WarmupFlag;
+    bool PulseSizing;
+    int HourNum;
+    int TimeStepNum;
+
+    // Tests for when to do a pulse test for the Load Component Output Report
+
+    // Test 1a: Everything as it should be to set this to true-->result should be true
+    PulseSizing = true;
+    WarmupFlag = false;
+    HourNum = 10;
+    TimeStepNum = 1;
+    state->dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::RunPeriodDesign;
+    state->dataGlobal->DayOfSim = 2;
+    Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
+    ASSERT_TRUE(Answer);
+
+    // Test 16: Everything as it should be to set this to true-->result should be true
+    PulseSizing = true;
+    WarmupFlag = false;
+    HourNum = 10;
+    TimeStepNum = 1;
+    state->dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::DesignDay;
+    state->dataGlobal->DayOfSim = 1;
+    Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
+    ASSERT_TRUE(Answer);
+
+    // Test 2: PulseSizing is false-->result should be false
+    PulseSizing = false;
+    WarmupFlag = false;
+    HourNum = 10;
+    TimeStepNum = 1;
+    state->dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::RunPeriodDesign;
+    state->dataGlobal->DayOfSim = 1;
+    Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
+    ASSERT_FALSE(Answer);
+
+    // Test 3: Warmup is true-->result should be false
+    PulseSizing = false;
+    WarmupFlag = true;
+    HourNum = 10;
+    TimeStepNum = 1;
+    state->dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::RunPeriodDesign;
+    state->dataGlobal->DayOfSim = 1;
+    Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
+    ASSERT_FALSE(Answer);
+
+    // Test 4: HourNum not 10-->result should be false
+    PulseSizing = true;
+    WarmupFlag = false;
+    HourNum = 7;
+    TimeStepNum = 1;
+    state->dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::RunPeriodDesign;
+    state->dataGlobal->DayOfSim = 1;
+    Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
+    ASSERT_FALSE(Answer);
+
+    // Test 5: TimeStepNum not 1-->result should be false
+    PulseSizing = true;
+    WarmupFlag = false;
+    HourNum = 10;
+    TimeStepNum = 2;
+    state->dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::RunPeriodDesign;
+    state->dataGlobal->DayOfSim = 1;
+    Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
+    ASSERT_FALSE(Answer);
+
+    // Test 6: DayOfSim not 1 and KindSim not weather file period --> result should be false
+    PulseSizing = true;
+    WarmupFlag = false;
+    HourNum = 10;
+    TimeStepNum = 1;
+    state->dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::DesignDay;
+    state->dataGlobal->DayOfSim = 2;
+    Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
+    ASSERT_FALSE(Answer);
+
+    // Test 7: everything set to make the answer false
+    PulseSizing = false;
+    WarmupFlag = true;
+    HourNum = 2;
+    TimeStepNum = 7;
+    state->dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::DesignDay;
+    state->dataGlobal->DayOfSim = 2;
+    Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
+    ASSERT_FALSE(Answer);
 }

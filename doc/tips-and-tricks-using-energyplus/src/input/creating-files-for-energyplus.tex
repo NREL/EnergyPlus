@@ -1,19 +1,24 @@
 \section{Creating Files for EnergyPlus}\label{creating-files-for-energyplus}
 
-The install package includes the IDF Editor (Windows platform) for creating EnergyPlus Input Files (aka IDFs). Likewise, text editors such as NotePad or WordPad can be used to create flat ASCII files for use with EnergyPlus.
+The install package includes the IDF Editor (Windows platform) for creating EnergyPlus Input Files (aka IDFs).
+Likewise, text editors such as NotePad or WordPad can be used to create flat ASCII files for use with EnergyPlus.
 
 \subsection{dxf or dwg CAD Files}\label{dxf-or-dwg-cad-files}
 
 \emph{How can I convert dxf or dwg CAD files to EnergyPlus?}
 
-Several EnergyPlus interfaces, including DesignBuilder and OpenStudio (plug in for Google SketchUp), allow you to import the dxf drawings and trace over them to create EnergyPlus geometry. If you have the full AutoCAD 3-D dwg model (more than just dxf), then you might be able to export to EnergyPlus using one of the available utilities that work with AutoCAD, but only if the model was created in the correct way to support these tools. As of February 2009, Green Building Studio and EnergyPlugged (a plug in to AutoCAD) support export to EnergyPlus.
+Several EnergyPlus interfaces, including DesignBuilder and \href{https://www.openstudio.net/}{OpenStudio}, allow you to import the dxf drawings and trace over them to create EnergyPlus geometry. If you have the full AutoCAD 3-D dwg model (more than just dxf), then you might be able to export to EnergyPlus using one of the available utilities that work with AutoCAD, but only if the model was created in the correct way to support these tools.
 
-For more information about current tools which support EnergyPlus, see \url{https://www.buildingenergysoftwaretools.com/}.
+Click \href{https://www.buildingenergysoftwaretools.com/?keys=EnergyPlus}{here} for more information about current tools which support EnergyPlus.
 
-\subsection{OpenStudio for Google Sketchup}\label{openstudio-for-google-sketchup}
+\subsection{OpenStudio}\label{openstudio}
 
-\href{http://apps1.eere.energy.gov/buildings/energyplus/openstudio.cfm}{OpenStudio} is a free plugin for the Google SketchUp 3D drawing program. The plugin makes it easy to create and edit the building geometry in your EnergyPlus input files. The plugin also allows you to launch EnergyPlus simulations and view the results without leaving SketchUp.
+\href{https://www.openstudio.net/}{OpenStudio} is a cross-platform (Windows, Mac, and Linux) collection of software tools to support whole building energy modeling using EnergyPlus and advanced daylight analysis using Radiance. OpenStudio is an open source project to facilitate community development, extension, and private sector adoption. OpenStudio includes graphical interfaces along with a Software Development Kit (SDK).
 
-\subsection{EnergyPlus Example File Generator}\label{energyplus-example-file-generator}
+The graphical applications include the Trimble SketchUp Plug-in, RunManager, and DView.
+The Trimble SketchUp Plug-in is an extension to Trimble’s popular 3D modeling tool that adds EnergyPlus context to the SketchUp program.
+The Plug-in allows users to quickly create geometry needed for EnergyPlus using the built-in functionality of Trimble SketchUp including existing drawing tools, integration with Google Earth, Building Maker, and Photo Match.
+RunManager manages simulations and workflows and gives users access to the output files through a graphical interface.
+DView enables browsing, plotting, and comparing EnergyPlus output data, especially time series.
 
-A Web-based service is available that creates and runs EnergyPlus input files for simple models of commercial buildings. The input files (and annual results summary files) are sent to your e-mail address as attachments. You can access the service and customize the characteristics of the building you want to model on the \href{http://apps1.eere.energy.gov/buildings/energyplus/cfm/inputs/}{EnergyPlus Example File Generator Application} (pop-ups must be enabled). Learn more by viewing the \href{http://apps1.eere.energy.gov/buildings/energyplus/cfm/inputs/help.cfm}{EnergyPlus Building Data Input Forms Help} File.
+The OpenStudio SDK allows building researchers and software developers to quickly get started through its multiple entry levels, including access through C++, Ruby, and C#.

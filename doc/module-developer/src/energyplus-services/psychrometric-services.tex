@@ -42,9 +42,9 @@ The Names for the different Psychrometric Routines are based on the following se
 
 \subsection{PsyRhoAirFnPbTdbW (Pb,Tdb,W,calledfrom)}\label{psyrhoairfnpbtdbw-pbtdbwcalledfrom}
 
-Returns the density of air in kilograms per cubic meter as a function of barometric pressure {[}Pb{]} (in Pascals), dry bulb temperature {[}Tdb{]} (in Celsius), and humidity ratio {[}W{]} (kilograms of water per kilogram of dry air).
+Returns the density of air in kilograms per cubic meter as a function of barometric pressure {[}Pb{]} (in Pascals) and humidity ratio {[}W{]} (kilograms of water per kilogram of dry air).
 
-\subsection{PsyCpAirFnWTdb (W,Tdb,calledfrom)}\label{psycpairfnwtdb-wtdbcalledfrom}
+\subsection{PsyCpAirFnW (W,calledfrom)}\label{psycpairfnw-wcalledfrom}
 
 Returns the specific heat of air in Joules per kilogram degree Celsius as a function of humidity ratio {[}W{]} (kilograms of water per kilogram of dry air) and dry bulb temperature {[}Tdb{]} (Celsius).
 
@@ -143,3 +143,11 @@ Returns Specific heat capacity (Joule/kilogram/kelvin) for hot water at constant
 \subsection{RhoH2O (Temp,calledfrom)}\label{rhoh2o-tempcalledfrom}
 
 Returns density of water (kg/m3) as function of Temperature {[}T{]} (Celsius).
+
+\subsection{PsyDeltaHSenFnTdb2W2Tdb1W1 (Tdb2,W2, Tdb1, W1,calledfrom)}\label{psydeltahsenfntdb2w2tdb1w1-tdb2w2tdb1w1calledfrom}
+
+Returns sensible enthalpy difference of moist air going from state 1 to state 2 in Joules per kilogram as a function of state 2 dry bulb temperature {[}Tdb2{]} (Celsius), state 2 humidity ratio {[}W2{]} (kilograms of water per kilogram of dry air), state 1 dry bulb temperature {[}Tdb1{]} (Celsius), and state 1 humidity ratio {[}W1{]} (kilograms of water per kilogram of dry air).
+
+\subsection{PsyHfgAvgFnTdb2Tdb1 (Tdb2,Tdb1,calledfrom)}\label{psyhfgavgfntdb2tdb1-tdb2w2tdb1calledfrom}
+
+Returns average latent of vaporization of water for use in moist air calculation in Joules per kilogram of water as a function of state 2 dry bulb temperature {[}Tdb2{]} (Celsius), and state 1 dry bulb temperature {[}Tdb1{]} (Celsius).

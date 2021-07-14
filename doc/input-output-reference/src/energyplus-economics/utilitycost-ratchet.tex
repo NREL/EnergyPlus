@@ -19,7 +19,7 @@ UtilityCost:Ratchet,
     0;                ! Offset Value or Variable Name
 \end{lstlisting}
 
-The Ratchet Variable Name (the first field) should be used wherever the ratchet should be applied and is often the source variable for UtilityCost:Charge:Simple or UtilityCost:Charge:Block.
+The Ratchet Variable Name (the first field) should be used wherever the ratchet should be applied and is often the source variable for \hyperref[utilitycostchargesimple]{UtilityCost:Charge:Simple} or \hyperref[utilitycostchargeblock]{UtilityCost:Charge:Block}.
 
 The detailed steps taken for the ratchet are the following:
 
@@ -44,7 +44,7 @@ The detailed steps taken for the ratchet are the following:
 
 If multiple ratchets occur in the same tariff, multiple UtilityCost:Ratchet commands should be ``chained'' together with the Baseline Source Variable subsequent ratchets referencing the Ratchet Variable Name of the previous UtilityCost:Ratchet.
 
-Since the ratchet command can add together two variables, mutliply two variables, or take the maximum value between two variables, it may be used for other difficult to model tariffs without needing to use UtilityCost:Computation. Clever use of UtilityCost:Ratchet should be well documented with comments.
+Since the ratchet command can add together two variables, mutliply two variables, or take the maximum value between two variables, it may be used for other difficult to model tariffs without needing to use \hyperref[utilitycostcomputation]{UtilityCost:Computation}. Clever use of UtilityCost:Ratchet should be well documented with comments.
 
 \subsection{Inputs}\label{inputs-071}
 

@@ -26,18 +26,17 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#define WINDOWS 1
+#define IS_WINDOWS 1
 #else
-#define WINDOWS 0
+#define IS_WINDOWS 0
 #define HANDLE void *
 /* See http://www.yolinux.com/TUTORIALS/LibraryArchives-StaticAndDynamic.html */
 #include <sys/stat.h> // for creating dirs on Linux
 #endif
 
-#include "fmiModelTypes.h"
 #include "fmiFunctions.h"
+#include "fmiModelTypes.h"
 #include "xml_parser_cosim.h"
-
 
 FILE *f1 = NULL;
 FILE *fmuFil = NULL; /// FMU file name
@@ -48,40 +47,45 @@ FILE *fmuFil = NULL; /// FMU file name
 #define PATH_SEP "/"
 #endif
 
-#define true  1
+#define true 1
 #define false 0
 
-typedef const char* (*fGetModelTypesPlatform)();
-typedef const char* (*fGetVersion)();
+typedef const char *(*fGetModelTypesPlatform)();
+typedef const char *(*fGetVersion)();
 typedef fmiComponent (*fInstantiateModel)(fmiString instanceName, fmiString GUID, fmiCallbackFunctions functions, fmiBoolean loggingOn);
-typedef void      (*fFreeModelInstance)  (fmiComponent c);
-typedef fmiStatus (*fSetDebugLogging)    (fmiComponent c, fmiBoolean loggingOn);
-typedef fmiStatus (*fSetTime)            (fmiComponent c, fmiReal time);
+typedef void (*fFreeModelInstance)(fmiComponent c);
+typedef fmiStatus (*fSetDebugLogging)(fmiComponent c, fmiBoolean loggingOn);
+typedef fmiStatus (*fSetTime)(fmiComponent c, fmiReal time);
 typedef fmiStatus (*fSetContinuousStates)(fmiComponent c, const fmiReal x[], size_t nx);
-typedef fmiStatus (*fCompletedIntegratorStep)(fmiComponent c, fmiBoolean* callEventUpdate);
-typedef fmiStatus (*fSetReal)   (fmiComponent c, const fmiValueReference vr[], size_t nvr, const fmiReal    value[]);
+typedef fmiStatus (*fCompletedIntegratorStep)(fmiComponent c, fmiBoolean *callEventUpdate);
+typedef fmiStatus (*fSetReal)(fmiComponent c, const fmiValueReference vr[], size_t nvr, const fmiReal value[]);
 typedef fmiStatus (*fSetInteger)(fmiComponent c, const fmiValueReference vr[], size_t nvr, const fmiInteger value[]);
 typedef fmiStatus (*fSetBoolean)(fmiComponent c, const fmiValueReference vr[], size_t nvr, const fmiBoolean value[]);
-typedef fmiStatus (*fSetString) (fmiComponent c, const fmiValueReference vr[], size_t nvr, const fmiString  value[]);
-typedef fmiStatus (*fInitialize)(fmiComponent c, fmiBoolean toleranceControlled,
-                               fmiReal relativeTolerance, fmiEventInfo* eventInfo);
-typedef fmiStatus (*fGetDerivatives)    (fmiComponent c, fmiReal derivatives[]    , size_t nx);
+typedef fmiStatus (*fSetString)(fmiComponent c, const fmiValueReference vr[], size_t nvr, const fmiString value[]);
+typedef fmiStatus (*fInitialize)(fmiComponent c, fmiBoolean toleranceControlled, fmiReal relativeTolerance, fmiEventInfo *eventInfo);
+typedef fmiStatus (*fGetDerivatives)(fmiComponent c, fmiReal derivatives[], size_t nx);
 typedef fmiStatus (*fGetEventIndicators)(fmiComponent c, fmiReal eventIndicators[], size_t ni);
-typedef fmiStatus (*fGetReal)   (fmiComponent c, const fmiValueReference vr[], size_t nvr, fmiReal    value[]);
+typedef fmiStatus (*fGetReal)(fmiComponent c, const fmiValueReference vr[], size_t nvr, fmiReal value[]);
 typedef fmiStatus (*fGetInteger)(fmiComponent c, const fmiValueReference vr[], size_t nvr, fmiInteger value[]);
 typedef fmiStatus (*fGetBoolean)(fmiComponent c, const fmiValueReference vr[], size_t nvr, fmiBoolean value[]);
-typedef fmiStatus (*fGetString) (fmiComponent c, const fmiValueReference vr[], size_t nvr, fmiString  value[]);
-typedef fmiStatus (*fEventUpdate)               (fmiComponent c, fmiBoolean intermediateResults, fmiEventInfo* eventInfo);
-typedef fmiStatus (*fGetContinuousStates)       (fmiComponent c, fmiReal states[], size_t nx);
+typedef fmiStatus (*fGetString)(fmiComponent c, const fmiValueReference vr[], size_t nvr, fmiString value[]);
+typedef fmiStatus (*fEventUpdate)(fmiComponent c, fmiBoolean intermediateResults, fmiEventInfo *eventInfo);
+typedef fmiStatus (*fGetContinuousStates)(fmiComponent c, fmiReal states[], size_t nx);
 typedef fmiStatus (*fGetNominalContinuousStates)(fmiComponent c, fmiReal x_nominal[], size_t nx);
-typedef fmiStatus (*fGetStateValueReferences)   (fmiComponent c, fmiValueReference vrx[], size_t nx);
-typedef fmiStatus (*fTerminate)                 (fmiComponent c);
+typedef fmiStatus (*fGetStateValueReferences)(fmiComponent c, fmiValueReference vrx[], size_t nx);
+typedef fmiStatus (*fTerminate)(fmiComponent c);
 
-typedef enum {opt_printidf, opt_delete, opt_unpack, opt_help} option;
+typedef enum
+{
+    opt_printidf,
+    opt_delete,
+    opt_unpack,
+    opt_help
+} option;
 
-
-typedef struct {
-    ModelDescription* modelDescription;
+typedef struct
+{
+    ModelDescription *modelDescription;
     HANDLE dllHandle;
     fGetModelTypesPlatform getModelTypesPlatform;
     fGetVersion getVersion;
@@ -111,7 +115,6 @@ typedef struct {
 
 #endif // _MAIN_H_
 
-int callparser(const char* fmuFilNam, const char* tmpPat);
+int callparser(const char *fmuFilNam, const char *tmpPat);
 
 void help();
-

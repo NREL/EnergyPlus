@@ -6,7 +6,7 @@ Heating Coil Heating Rate
 Cooling Coil Total Cooling Rate
 Water Heater Runtime Fraction
 Water Heater Part Load Ratio
-Water Heater Electric Power
+Water Heater Electricity Rate
 Water Heater Source Side Inlet Temperature
 Water Heater Source Side Outlet Temperature
 Water Heater Source Side Mass Flow Rate
@@ -17,11 +17,11 @@ Water Heater Use Side Mass Flow Rate
 Water Heater Use Side Heat Transfer Rate
 Water Heater Tank Temperature
 Cooling Coil Total Water Heating Rate
-Cooling Coil Water Heating Electric Power
+Cooling Coil Water Heating Electricity Rate
 Water Heater Compressor Part Load Ratio
-Fan Electric Power
+Fan Electricity Rate
 Cooling Coil Total Cooling Rate
-Cooling Coil Crankcase Heater Electric Power
-Water Heater On Cycle Ancillary Electric Power
-Water Heater Off Cycle Ancillary Electric Power
+Cooling Coil Crankcase Heater Electricity Rate
+Water Heater On Cycle Ancillary Electricity Rate
+Water Heater Off Cycle Ancillary Electricity Rate
 0

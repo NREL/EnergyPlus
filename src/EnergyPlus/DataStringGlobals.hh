@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,111 +52,109 @@
 #include <string>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/FileSystem.hh>
 
 namespace EnergyPlus {
 
 namespace DataStringGlobals {
 
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
+#ifdef _WIN32
+    char constexpr pathChar('\\');
+    char constexpr altpathChar('/');
+#elif __linux__
+    char constexpr pathChar('/');
+    char constexpr altpathChar('\\');
+#elif __unix__
+    char constexpr pathChar('/');
+    char constexpr altpathChar('\\');
+#elif __posix__
+    char constexpr pathChar('/');
+    char constexpr altpathChar('\\');
+#elif __APPLE__
+    char constexpr pathChar('/');
+    char constexpr altpathChar('\\');
+#else
+#error "Invalid platform detection in DataStringGlobals."
+#endif
+    char constexpr CharComma(',');     // comma
+    char constexpr CharSemicolon(';'); // semicolon
+    char constexpr CharTab('\t');      // tab
+    char constexpr CharSpace(' ');     // space
 
-    extern std::string outputAuditFileName;
-    extern std::string outputBndFileName;
-    extern std::string outputDxfFileName;
-    extern std::string outputEioFileName;
-    extern std::string outputEndFileName;
-    extern std::string outputErrFileName;
-    extern std::string outputEsoFileName;
-    extern std::string outputMtdFileName;
-    extern std::string outputMddFileName;
-    extern std::string outputMtrFileName;
-    extern std::string outputRddFileName;
-    extern std::string outputShdFileName;
-    extern std::string outputTblCsvFileName;
-    extern std::string outputTblHtmFileName;
-    extern std::string outputTblTabFileName;
-    extern std::string outputTblTxtFileName;
-    extern std::string outputTblXmlFileName;
-    extern std::string inputFileName;
-    extern std::string inputIddFileName;
-    extern std::string inputEpJSONSchemaFileName;
-    extern std::string inputEpJSONSchemaFileName;
-    extern std::string inputWeatherFileName;
-    extern std::string outputAdsFileName;
-    extern std::string outputDfsFileName;
-    extern std::string outputGLHEFileName;
-    extern std::string outputDelightInFileName;
-    extern std::string outputDelightOutFileName;
-    extern std::string outputDelightEldmpFileName;
-    extern std::string outputDelightDfdmpFileName;
-    extern std::string outputMapTabFileName;
-    extern std::string outputMapCsvFileName;
-    extern std::string outputMapTxtFileName;
-    extern std::string outputEddFileName;
-    extern std::string outputIperrFileName;
-    extern std::string outputDbgFileName;
-    extern std::string outputSlnFileName;
-    extern std::string outputSciFileName;
-    extern std::string outputWrlFileName;
-    extern std::string outputZszCsvFileName;
-    extern std::string outputZszTabFileName;
-    extern std::string outputZszTxtFileName;
-    extern std::string outputSszCsvFileName;
-    extern std::string outputSszTabFileName;
-    extern std::string outputSszTxtFileName;
-    extern std::string outputScreenCsvFileName;
-    extern std::string outputSqlFileName;
-    extern std::string outputSqliteErrFileName;
-    extern std::string EnergyPlusIniFileName;
-    extern std::string inStatFileName;
-    extern std::string TarcogIterationsFileName;
-    extern std::string eplusADSFileName;
-    extern std::string outputCsvFileName;
-    extern std::string outputMtrCsvFileName;
-    extern std::string outputRvauditFileName;
-    extern std::string outputExtShdFracFileName;
-
-    extern std::string weatherFileNameOnly;
-    extern std::string idfDirPathName;
-    extern std::string outDirPathName;
-    extern std::string idfFileNameOnly;
-    extern std::string inputDirPathName;
-    extern std::string outputDirPathName;
-    extern std::string inputFileNameOnly;
-    extern std::string exeDirectory;
-
-    // MODULE PARAMETER DEFINITIONS:
-    extern std::string const UpperCase;
-    extern std::string const LowerCase;
-    extern std::string const AccentedUpperCase;
-    extern std::string const AccentedLowerCase;
-    extern std::string const AllCase;
-    extern std::string const NL; // Platform newline
-    extern char const pathChar;
-    extern char const altpathChar;
-    extern char const CharComma;     // comma
-    extern char const CharSemicolon; // semicolon
-    extern char const CharTab;       // tab
-    extern char const CharSpace;     // space
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern std::string ProgramPath;          // Path for Program from INI file
-    extern std::string CurrentWorkingFolder; // Current working directory for run
-    extern std::string FullName;             // Full name of file to open, including path
-    extern std::string IDDVerString;         // Version information from the IDD (line 1)
-    extern std::string VerString;            // String that represents version information
-    extern std::string MatchVersion;         // String to be matched by Version object
-    extern std::string CurrentDateTime;      // For printing current date and time at start of run
-
+    extern std::string const VerString;        // String that represents version information
+    extern std::string const MatchVersion;     // String to be matched by Version object
+    extern std::string const PythonAPIVersion; // API version string to be matched when using the Python API
+    extern std::string const BuildPlatformString;
 } // namespace DataStringGlobals
+
+struct DataStringGlobalsData : BaseGlobalStruct
+{
+
+    fs::path outputMddFilePath = "eplusout.mdd";
+    fs::path outputRddFilePath = "eplusout.rdd";
+    fs::path outputShdFilePath = "eplusout.shd";
+    fs::path outputTblCsvFilePath = "eplustbl.csv";
+    fs::path outputTblHtmFilePath = "eplustbl.htm";
+    fs::path outputTblTabFilePath = "eplustbl.tab";
+    fs::path outputTblTxtFilePath = "eplustbl.txt";
+    fs::path outputTblXmlFilePath = "eplustbl.xml";
+    fs::path outputAdsFilePath = "eplusADS.out";
+    fs::path outputGLHEFilePath = "eplusout.glhe";
+    fs::path outputDelightOutFilePath = "eplusout.delightout";
+    fs::path outputIperrFilePath = "eplusout.iperr";
+    fs::path outputPerfLogFilePath = "eplusout_perflog.csv";
+    fs::path outputSqlFilePath = "eplusout.sql";
+    fs::path outputSqliteErrFilePath = "eplussqlite.err";
+    fs::path outputCsvFilePath = "eplusout.csv";
+    fs::path outputMtrCsvFilePath = "eplusmtr.csv";
+    fs::path outputRvauditFilePath = "eplusout.rvaudit";
+
+    fs::path outputErrFilePath;
+    fs::path eplusADSFilePath;
+    fs::path weatherFilePathNameOnly;
+    fs::path inputFilePath;
+    fs::path inputIddFilePath;
+    fs::path inputEpJSONSchemaFilePath;
+    fs::path idfDirPath;
+    fs::path outDirPath;
+    fs::path idfFilePathNameOnly;
+    fs::path inputDirPath;
+    fs::path outputDirPath;
+    fs::path inputFilePathNameOnly;
+    fs::path exeDirectoryPath;
+    fs::path ProgramPath;          // Path for Program from INI file
+    fs::path CurrentWorkingFolder; // Current working directory for run
+    fs::path FullPath;             // Full name of file to open, including path
+
+    std::string IDDVerString;    // Version information from the IDD (line 1)
+    std::string CurrentDateTime; // For printing current date and time at start of run
+    std::string VerStringVar;
+
+    void clear_state() override
+    {
+        outputErrFilePath.clear();
+        eplusADSFilePath.clear();
+        idfFilePathNameOnly.clear();
+        idfDirPath.clear();
+        outDirPath.clear();
+        inputFilePathNameOnly.clear();
+        inputDirPath.clear();
+        outputDirPath.clear();
+        exeDirectoryPath.clear();
+        inputFilePath.clear();
+        inputIddFilePath.clear();
+        inputEpJSONSchemaFilePath.clear();
+        FullPath.clear();
+        weatherFilePathNameOnly.clear();
+        ProgramPath.clear();
+        CurrentWorkingFolder.clear();
+        CurrentDateTime.clear();
+        IDDVerString.clear();
+        VerStringVar.clear();
+    }
+};
 
 } // namespace EnergyPlus
 

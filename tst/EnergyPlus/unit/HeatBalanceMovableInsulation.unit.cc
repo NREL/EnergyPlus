@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,87 +51,260 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/HeatBalanceMovableInsulation.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
+#include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Material.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
 
-using namespace EnergyPlus::HeatBalanceMovableInsulation;
+#include "Fixtures/EnergyPlusFixture.hh"
 
 namespace EnergyPlus {
 
 TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalOutsideMovableInsulation)
 {
 
-    int SurfNum;
-    Real64 HMovInsul;
-    int RoughIndexMovInsul;
-    Real64 AbsExt;
+    int SurfNum = 1;
+    state->dataSurface->Surface.allocate(SurfNum);
+    state->dataSurface->SurfSchedMovInsulExt.allocate(SurfNum);
+    state->dataSurface->SurfMaterialMovInsulExt.allocate(SurfNum);
+    state->dataSurface->SurfSchedMovInsulExt(SurfNum) = 1;
+    state->dataSurface->SurfMaterialMovInsulExt(SurfNum) = 1;
+    state->dataHeatBalSurf->SurfMovInsulExtPresent.allocate(SurfNum);
+    state->dataHeatBalSurf->SurfMovInsulHExt.allocate(SurfNum);
+    state->dataHeatBalSurf->SurfAbsSolarExt.allocate(SurfNum);
+    state->dataHeatBalSurf->SurfAbsThermalExt.allocate(SurfNum);
+    state->dataHeatBalSurf->SurfRoughnessExt.allocate(SurfNum);
+    state->dataScheduleMgr->Schedule.allocate(1);
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
+    state->dataHeatBalSurf->SurfMovInsulExtPresent(1) = true;
+    state->dataHeatBalSurf->SurfMovInsulIndexList.push_back(1);
 
-    SurfNum = 1;
-    DataSurfaces::Surface.allocate(SurfNum);
-    DataSurfaces::Surface(SurfNum).SchedMovInsulExt = -1;
-    DataSurfaces::Surface(SurfNum).MaterialMovInsulExt = 1;
+    state->dataMaterial->Material.allocate(1);
+    state->dataMaterial->Material(1).Resistance = 1.25;
+    state->dataMaterial->Material(1).Roughness = DataSurfaces::SurfaceRoughness::VeryRough;
+    state->dataMaterial->Material(1).Group = DataHeatBalance::MaterialGroup::RegularMaterial;
+    state->dataMaterial->Material(1).AbsorpSolar = 0.75;
+    state->dataMaterial->Material(1).AbsorpThermal = 0.75;
+    state->dataMaterial->Material(1).Trans = 0.25;
+    state->dataMaterial->Material(1).ReflectSolBeamFront = 0.20;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone(1).OpaqOrIntMassSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).OpaqOrIntMassSurfaceLast = 1;
 
-    DataHeatBalance::Material.allocate(1);
-    DataHeatBalance::Material(1).Resistance = 1.25;
-    DataHeatBalance::Material(1).Roughness = 1;
-    DataHeatBalance::Material(1).Group = 0;
-    DataHeatBalance::Material(1).AbsorpSolar = 0.75;
-    DataHeatBalance::Material(1).Trans = 0.25;
-    DataHeatBalance::Material(1).ReflectSolBeamFront = 0.20;
+    state->dataHeatBalSurf->SurfAbsSolarExt(1) = 0.0;
+    HeatBalanceSurfaceManager::EvalOutsideMovableInsulation(*state);
+    EXPECT_EQ(0.75, state->dataHeatBalSurf->SurfAbsSolarExt(1));
+    EXPECT_EQ(0.8, state->dataHeatBalSurf->SurfMovInsulHExt(1));
+    EXPECT_EQ(DataSurfaces::SurfaceRoughness::VeryRough, state->dataHeatBalSurf->SurfRoughnessExt(1));
+    EXPECT_EQ(0.75, state->dataHeatBalSurf->SurfAbsThermalExt(1));
 
-    AbsExt = 0.0;
-    EvalOutsideMovableInsulation(SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
-    EXPECT_EQ(0.75, AbsExt);
+    state->dataHeatBalSurf->SurfAbsSolarExt(1) = 0.0;
+    state->dataMaterial->Material(1).Group = DataHeatBalance::MaterialGroup::WindowGlass;
+    HeatBalanceSurfaceManager::EvalOutsideMovableInsulation(*state);
+    EXPECT_EQ(0.55, state->dataHeatBalSurf->SurfAbsSolarExt(1));
 
-    AbsExt = 0.0;
-    DataHeatBalance::Material(1).Group = DataHeatBalance::WindowGlass;
-    EvalOutsideMovableInsulation(SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
-    EXPECT_EQ(0.55, AbsExt);
-
-    AbsExt = 0.0;
-    DataHeatBalance::Material(1).Group = DataHeatBalance::GlassEquivalentLayer;
-    EvalOutsideMovableInsulation(SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
-    EXPECT_EQ(0.55, AbsExt);
+    state->dataHeatBalSurf->SurfAbsSolarExt(1) = 0.0;
+    state->dataMaterial->Material(1).Group = DataHeatBalance::MaterialGroup::GlassEquivalentLayer;
+    HeatBalanceSurfaceManager::EvalOutsideMovableInsulation(*state);
+    EXPECT_EQ(0.55, state->dataHeatBalSurf->SurfAbsSolarExt(1));
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalInsideMovableInsulation)
 {
 
-    int SurfNum;
-    Real64 HMovInsul;
-    Real64 AbsExt;
+    int SurfNum = 1;
+    state->dataSurface->Surface.allocate(SurfNum);
 
-    SurfNum = 1;
-    DataSurfaces::Surface.allocate(SurfNum);
-    DataSurfaces::Surface(SurfNum).SchedMovInsulInt = -1;
-    DataSurfaces::Surface(SurfNum).MaterialMovInsulInt = 1;
+    state->dataSurface->SurfSchedMovInsulInt.allocate(SurfNum);
+    state->dataSurface->SurfMaterialMovInsulInt.allocate(SurfNum);
+    state->dataSurface->SurfSchedMovInsulInt(SurfNum) = 1;
+    state->dataSurface->SurfMaterialMovInsulInt(SurfNum) = 1;
+    state->dataHeatBalSurf->SurfMovInsulIntPresent.allocate(SurfNum);
+    state->dataHeatBalSurf->SurfMovInsulHInt.allocate(SurfNum);
+    state->dataHeatBalSurf->SurfAbsSolarInt.allocate(SurfNum);
+    state->dataHeatBalSurf->SurfAbsThermalInt.allocate(SurfNum);
+    state->dataScheduleMgr->Schedule.allocate(1);
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
+    state->dataHeatBalSurf->SurfMovInsulIndexList.push_back(1);
 
-    DataHeatBalance::Material.allocate(1);
-    DataHeatBalance::Material(1).Resistance = 1.25;
-    DataHeatBalance::Material(1).Roughness = 1;
-    DataHeatBalance::Material(1).Group = 0;
-    DataHeatBalance::Material(1).AbsorpSolar = 0.75;
-    DataHeatBalance::Material(1).Trans = 0.25;
-    DataHeatBalance::Material(1).ReflectSolBeamFront = 0.20;
+    state->dataMaterial->Material.allocate(1);
+    state->dataMaterial->Material(1).Resistance = 1.25;
+    state->dataMaterial->Material(1).Roughness = DataSurfaces::SurfaceRoughness::VeryRough;
+    state->dataMaterial->Material(1).Group = DataHeatBalance::MaterialGroup::RegularMaterial;
+    state->dataMaterial->Material(1).AbsorpSolar = 0.75;
+    state->dataMaterial->Material(1).AbsorpThermal = 0.75;
+    state->dataMaterial->Material(1).Trans = 0.25;
+    state->dataMaterial->Material(1).ReflectSolBeamFront = 0.20;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone(1).OpaqOrIntMassSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).OpaqOrIntMassSurfaceLast = 1;
 
-    AbsExt = 0.0;
-    EvalInsideMovableInsulation(SurfNum, HMovInsul, AbsExt);
-    EXPECT_EQ(0.75, AbsExt);
+    state->dataHeatBalSurf->SurfAbsSolarInt(1) = 0.0;
+    HeatBalanceSurfaceManager::EvalInsideMovableInsulation(*state);
+    EXPECT_EQ(0.75, state->dataHeatBalSurf->SurfAbsSolarInt(1));
+    EXPECT_EQ(0.8, state->dataHeatBalSurf->SurfMovInsulHInt(1));
+    EXPECT_EQ(true, state->dataHeatBalSurf->SurfMovInsulIntPresent(1));
+    EXPECT_EQ(0.75, state->dataHeatBalSurf->SurfAbsThermalInt(1));
 
-    AbsExt = 0.0;
-    DataHeatBalance::Material(1).Group = DataHeatBalance::WindowGlass;
-    EvalInsideMovableInsulation(SurfNum, HMovInsul, AbsExt);
-    EXPECT_EQ(0.55, AbsExt);
+    state->dataHeatBalSurf->SurfAbsSolarInt(1) = 0.0;
+    state->dataMaterial->Material(1).Group = DataHeatBalance::MaterialGroup::WindowGlass;
+    HeatBalanceSurfaceManager::EvalInsideMovableInsulation(*state);
+    EXPECT_EQ(0.55, state->dataHeatBalSurf->SurfAbsSolarInt(1));
 
-    AbsExt = 0.0;
-    DataHeatBalance::Material(1).Group = DataHeatBalance::GlassEquivalentLayer;
-    EvalInsideMovableInsulation(SurfNum, HMovInsul, AbsExt);
-    EXPECT_EQ(0.55, AbsExt);
+    state->dataHeatBalSurf->SurfAbsSolarInt(1) = 0.0;
+    state->dataMaterial->Material(1).Group = DataHeatBalance::MaterialGroup::GlassEquivalentLayer;
+    HeatBalanceSurfaceManager::EvalInsideMovableInsulation(*state);
+    EXPECT_EQ(0.55, state->dataHeatBalSurf->SurfAbsSolarInt(1));
 }
+TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGlazingTest)
+{
 
+    std::string const idf_objects = delimited_string({
+
+        "  Construction,",
+        "    EXTWALL80,               !- Name",
+        "    A1 - 1 IN STUCCO,        !- Outside Layer",
+        "    C4 - 4 IN COMMON BRICK,  !- Layer 2",
+        "    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3",
+
+        "  Material,",
+        "    A1 - 1 IN STUCCO,        !- Name",
+        "    Smooth,                  !- Roughness",
+        "    2.5389841E-02,           !- Thickness {m}",
+        "    0.6918309,               !- Conductivity {W/m-K}",
+        "    1858.142,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.9200000,               !- Solar Absorptance",
+        "    0.9200000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    C4 - 4 IN COMMON BRICK,  !- Name",
+        "    Rough,                   !- Roughness",
+        "    0.1014984,               !- Thickness {m}",
+        "    0.7264224,               !- Conductivity {W/m-K}",
+        "    1922.216,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7600000,               !- Solar Absorptance",
+        "    0.7600000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Name",
+        "    Smooth,                  !- Roughness",
+        "    1.9050000E-02,           !- Thickness {m}",
+        "    0.7264224,               !- Conductivity {W/m-K}",
+        "    1601.846,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.9200000,               !- Solar Absorptance",
+        "    0.9200000;               !- Visible Absorptance",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn001:Wall001,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    ZONE ONE,                !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,4.572000,            !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,0,0,                   !- X,Y,Z ==> Vertex 2 {m}",
+        "    15.24000,0,0,            !- X,Y,Z ==> Vertex 3 {m}",
+        "    15.24000,0,4.572000;     !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  WindowMaterial:SimpleGlazingSystem,",
+        "    SimpleGlazingSystem,     !- Name",
+        "    2.8,                     !- U-Factor {W/m2-K}",
+        "    0.7;                     !- Solar Heat Gain Coefficient",
+
+        "  SurfaceControl:MovableInsulation,",
+        "    Outside,                 !- Insulation Type",
+        "    Zn001:Wall001,           !- Surface Name",
+        "    SimpleGlazingSystem,     !- Material Name",
+        "    ON;                      !- Schedule Name",
+
+        "  Schedule:Compact,",
+        "    ON,                      !- Name",
+        "    FRACTION,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: Alldays,            !- Field 2",
+        "    Until: 24:00,1.00;       !- Field 3",
+
+        "  ScheduleTypeLimits,",
+        "    Fraction,                !- Name",
+        "    0.0,                     !- Lower Limit Value",
+        "    1.0,                     !- Upper Limit Value",
+        "    CONTINUOUS;              !- Numeric Type",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // set error to false
+    bool ErrorsFound(false);
+    // set zone data
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE ONE";
+    // get schedule data
+    ScheduleManager::ProcessScheduleInput(*state);
+    // get materials data
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    EXPECT_EQ(4, state->dataHeatBal->TotMaterials);
+    EXPECT_EQ(state->dataMaterial->Material(4).Group, DataHeatBalance::MaterialGroup::WindowSimpleGlazing);
+    // get construction data
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
+    EXPECT_EQ(1, state->dataHeatBal->TotConstructs);
+    EXPECT_FALSE(ErrorsFound);
+    // set relative coordinate
+    SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
+    state->dataSurfaceGeometry->CosZoneRelNorth = 1.0;
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinZoneRelNorth = 0.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
+    // set surface data
+    state->dataSurface->TotSurfaces = 1;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->SurfMaterialMovInsulExt.allocate(1);
+    state->dataSurface->SurfSchedMovInsulExt.allocate(1);
+    state->dataSurface->SurfMaterialMovInsulInt.allocate(1);
+    state->dataSurface->SurfSchedMovInsulInt.allocate(1);
+    state->dataSurface->SurfMaterialMovInsulExt = 0;
+    state->dataSurface->SurfSchedMovInsulExt = 0;
+    state->dataSurface->SurfMaterialMovInsulInt = 0;
+    state->dataSurface->SurfSchedMovInsulInt = 0;
+    state->dataSurfaceGeometry->SurfaceTmp.allocate(1);
+    int SurfNum = 0;
+    int TotHTSurfs = state->dataSurface->TotSurfaces = 1;
+    Array1D_string const BaseSurfCls(1, {"WALL"});
+    Array1D<DataSurfaces::SurfaceClass> const BaseSurfIDs(1, {DataSurfaces::SurfaceClass::Wall});
+    int NeedToAddSurfaces;
+    // get heat tranfer surface data
+    SurfaceGeometry::GetHTSurfaceData(*state, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
+    // get movable insulation object data
+    state->dataSurface->Surface(1) = state->dataSurfaceGeometry->SurfaceTmp(1);
+    SurfaceGeometry::GetMovableInsulationData(*state, ErrorsFound);
+    // check movable insulation material
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(1).BaseSurfName, "ZN001:WALL001");                     // base surface name
+    EXPECT_EQ(state->dataSurface->SurfMaterialMovInsulExt(1), 4);                                           // index to movable insulation material
+    EXPECT_EQ(state->dataMaterial->Material(4).Name, "SIMPLEGLAZINGSYSTEM");                                // name of movable insulation material
+    EXPECT_EQ(state->dataMaterial->Material(4).Group, DataHeatBalance::MaterialGroup::WindowSimpleGlazing); // invalid material group type
+    EXPECT_TRUE(ErrorsFound);                                                                               // error found due to invalid material
+}
 } // namespace EnergyPlus

@@ -21,7 +21,7 @@
 !           2 WATER HEATER:MIXED objects serve as storage tank and instantaneous water heater.
 !           1 VALVE:TEMPERING object to temper the hot storage water.
 
-  Version,9.0;
+  Version,9.6;
 
 !***SIMULATION CONTROL***
 
@@ -29,7 +29,7 @@
     Solar Collector Flat Plate Water Example,  !- Name
     0.0,                     !- North Axis {deg}
     Suburbs,                 !- Terrain
-    0.04,                    !- Loads Convergence Tolerance Value
+    0.04,                    !- Loads Convergence Tolerance Value {W}
     0.04,                    !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -60,10 +60,12 @@
     NO,                      !- Do System Sizing Calculation
     NO,                      !- Do Plant Sizing Calculation
     YES,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
@@ -78,7 +80,7 @@
     YES;                     !- Use Weather File Snow Indicators
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 2,            !- Name
     7,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
@@ -1052,9 +1054,9 @@
 
   Output:Variable,*,Water Heater Part Load Ratio,detailed;
 
-  Output:Variable,*,Water Heater Electric Power,detailed;
+  Output:Variable,*,Water Heater Electricity Rate,detailed;
 
-  Output:Variable,*,Water Heater Electric Energy,detailed;
+  Output:Variable,*,Water Heater Electricity Energy,detailed;
 
   Output:Variable,*,Water Heater Water Volume Flow Rate,detailed;
 

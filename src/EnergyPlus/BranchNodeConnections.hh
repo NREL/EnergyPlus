@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,67 +49,57 @@
 #define BranchNodeConnections_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/NodeInputManager.hh>
 
 namespace EnergyPlus {
 
 // Forward
+struct EnergyPlusData;
+
 namespace DataBranchNodeConnections {
     struct NodeConnectionDef;
 }
 
 namespace BranchNodeConnections {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
-
-    // Functions
-
-    void RegisterNodeConnection(int const NodeNumber,                    // Number for this Node
-                                std::string const &NodeName,             // Name of this Node
-                                std::string const &ObjectType,           // Type of object this Node is connected to (e.g. Chiller:Electric)
-                                std::string const &ObjectName,           // Name of object this Node is connected to (e.g. MyChiller)
-                                std::string const &ConnectionType,       // Connection Type for this Node (must be valid)
-                                int const FluidStream,                   // Count on Fluid Streams
-                                bool const IsParent,                     // True when node is a parent node
-                                bool &errFlag,                           // Will be True if errors already detected or if errors found here
-                                Optional_string_const InputFieldName = _ // Input Field Name
+    void RegisterNodeConnection(EnergyPlusData &state,
+                                int NodeNumber,                                // Number for this Node
+                                std::string_view const NodeName,               // Name of this Node
+                                std::string_view const ObjectType,             // Type of object this Node is connected to (e.g. Chiller:Electric)
+                                std::string_view const ObjectName,             // Name of object this Node is connected to (e.g. MyChiller)
+                                std::string_view const ConnectionType,         // Connection Type for this Node (must be valid)
+                                NodeInputManager::compFluidStream FluidStream, // Count on Fluid Streams
+                                bool IsParent,                                 // True when node is a parent node
+                                bool &errFlag,                                 // Will be True if errors already detected or if errors found here
+                                Optional_string_const InputFieldName = _       // Input Field Name
     );
 
-    void OverrideNodeConnectionType(int const NodeNumber,              // Number for this Node
-                                    std::string const &NodeName,       // Name of this Node
-                                    std::string const &ObjectType,     // Type of object this Node is connected to (e.g. Chiller:Electric)
-                                    std::string const &ObjectName,     // Name of object this Node is connected to (e.g. MyChiller)
-                                    std::string const &ConnectionType, // Connection Type for this Node (must be valid)
-                                    int const FluidStream,             // Count on Fluid Streams
-                                    bool const IsParent,               // True when node is a parent node
-                                    bool &errFlag                      // Will be True if errors already detected or if errors found here
+    void OverrideNodeConnectionType(EnergyPlusData &state,
+                                    int NodeNumber,                                // Number for this Node
+                                    std::string const &NodeName,                   // Name of this Node
+                                    std::string const &ObjectType,                 // Type of object this Node is connected to (e.g. Chiller:Electric)
+                                    std::string const &ObjectName,                 // Name of object this Node is connected to (e.g. MyChiller)
+                                    std::string const &ConnectionType,             // Connection Type for this Node (must be valid)
+                                    NodeInputManager::compFluidStream FluidStream, // Count on Fluid Streams
+                                    bool IsParent,                                 // True when node is a parent node
+                                    bool &errFlag                                  // Will be True if errors already detected or if errors found here
     );
 
-    bool IsValidConnectionType(std::string const &ConnectionType);
+    bool IsValidConnectionType(std::string_view ConnectionType);
 
-    void CheckNodeConnections(bool &ErrorsFound);
+    void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound);
 
-    bool IsParentObject(std::string const &ComponentType, std::string const &ComponentName);
+    bool IsParentObject(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName);
 
-    int WhichParentSet(std::string const &ComponentType, std::string const &ComponentName);
+    int WhichParentSet(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName);
 
-    void GetParentData(std::string const &ComponentType,
+    void GetParentData(EnergyPlusData &state,
+                       std::string const &ComponentType,
                        std::string const &ComponentName,
                        std::string &InletNodeName,
                        int &InletNodeNum,
@@ -117,63 +107,66 @@ namespace BranchNodeConnections {
                        int &OutletNodeNum,
                        bool &ErrorsFound);
 
-    bool IsParentObjectCompSet(std::string const &ComponentType, std::string const &ComponentName);
+    bool IsParentObjectCompSet(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName);
 
-    int WhichCompSet(std::string const &ComponentType, std::string const &ComponentName);
+    int WhichCompSet(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName);
 
-    int WhichParentCompSet(std::string const &ComponentType, std::string const &ComponentName);
+    int GetNumChildren(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName);
 
-    int GetNumChildren(std::string const &ComponentType, std::string const &ComponentName);
-
-    void GetComponentData(std::string const &ComponentType,
+    void GetComponentData(EnergyPlusData &state,
+                          std::string const &ComponentType,
                           std::string const &ComponentName,
-                          bool &IsParent,
+                          bool &IsParent, // true or false
                           int &NumInlets,
                           Array1D_string &InletNodeNames,
                           Array1D_int &InletNodeNums,
-                          Array1D_int &InletFluidStreams,
+                          Array1D<NodeInputManager::compFluidStream> &InletFluidStreams,
                           int &NumOutlets,
                           Array1D_string &OutletNodeNames,
                           Array1D_int &OutletNodeNums,
-                          Array1D_int &OutletFluidStreams,
-                          bool &ErrorsFound);
+                          Array1D<NodeInputManager::compFluidStream> &OutletFluidStreams,
+                          bool &ErrorsFound // set to true if errors found, unchanged otherwise
+    );
 
-    void GetChildrenData(std::string const &ComponentType,
+    void GetChildrenData(EnergyPlusData &state,
+                         std::string const &ComponentType,
                          std::string const &ComponentName,
                          int &NumChildren,
-                         Array1S_string ChildrenCType,
-                         Array1S_string ChildrenCName,
-                         Array1S_string InletNodeName,
-                         Array1S_int InletNodeNum,
-                         Array1S_string OutletNodeName,
-                         Array1S_int OutletNodeNum,
+                         Array1D_string &ChildrenCType,
+                         Array1D_string &ChildrenCName,
+                         Array1D_string &InletNodeName,
+                         Array1D_int &InletNodeNum,
+                         Array1D_string &OutletNodeName,
+                         Array1D_int &OutletNodeNum,
                          bool &ErrorsFound);
 
-    void SetUpCompSets(std::string const &ParentType,        // Parent Object Type
-                       std::string const &ParentName,        // Parent Object Name
-                       std::string const &CompType,          // Component Type
-                       std::string const &CompName,          // Component Name
-                       std::string const &InletNode,         // Inlet Node Name
-                       std::string const &OutletNode,        // Outlet Node Name
+    void SetUpCompSets(EnergyPlusData &state,
+                       std::string_view ParentType,          // Parent Object Type
+                       std::string_view ParentName,          // Parent Object Name
+                       std::string_view CompType,            // Component Type
+                       std::string_view CompName,            // Component Name
+                       std::string_view InletNode,           // Inlet Node Name
+                       std::string_view OutletNode,          // Outlet Node Name
                        Optional_string_const Description = _ // Description
     );
 
-    void TestInletOutletNodes(bool &ErrorsFound);
+    void TestInletOutletNodes(EnergyPlusData &state, bool &ErrorsFound);
 
-    void TestCompSet(std::string const &CompType,   // Component Type
-                     std::string const &CompName,   // Component Name
+    void TestCompSet(EnergyPlusData &state,
+                     std::string const &CompType,   // Component Type
+                     std::string_view CompName,     // Component Name
                      std::string const &InletNode,  // Inlet Node Name
                      std::string const &OutletNode, // Outlet Node Name
                      std::string const &Description // Description of Node Pair (for warning message)
     );
 
-    void TestCompSetInletOutletNodes(bool &ErrorsFound);
+    void TestCompSetInletOutletNodes(EnergyPlusData &state, bool &ErrorsFound);
 
-    void GetNodeConnectionType(int const NodeNumber, Array1D_int &NodeConnectType, bool &errFlag);
+    void GetNodeConnectionType(EnergyPlusData &state, int NodeNumber, Array1D_int &NodeConnectType, bool &errFlag);
 
-    void FindAllNodeNumbersInList(int const WhichNumber,
-                                  Array1<DataBranchNodeConnections::NodeConnectionDef> const &NodeConnections,
-                                  int const NumItems,
+    void FindAllNodeNumbersInList(int WhichNumber,
+                                  Array1D<DataBranchNodeConnections::NodeConnectionDef> const &NodeConnections,
+                                  int NumItems,
                                   int &CountOfItems,            // Number of items found
                                   Array1D_int &AllNumbersInList // Index array to all numbers found
     );

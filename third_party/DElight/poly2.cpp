@@ -29,7 +29,7 @@
 #include <vector>
 #include <cmath>
 #include <sstream>
-#include <strstream>
+#include <sstream>
 #include <iostream>
 #include <algorithm> // for min/max
 using namespace std;
@@ -316,7 +316,7 @@ ostream &operator << (ostream &s, const poly2& p2)
 istream &operator >> (istream &s, poly2 &p2)
 {
     Char	c;
-	ostrstream osstream;
+	std::ostringstream osstream;
 	point2		pt2;
     vector<point2>	VertexList;
 	

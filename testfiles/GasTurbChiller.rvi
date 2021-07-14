@@ -13,7 +13,7 @@ BIG CHILLER,Chiller Condenser Heat Transfer Rate
 BIG CHILLER,Chiller Condenser Inlet Temperature
 BIG CHILLER,Chiller Condenser Outlet Temperature
 BIG CHILLER,Chiller Condenser Mass Flow Rate
-BIG CHILLER,Chiller Gas Rate
-BIG CHILLER,Chiller Gas Energy
-BIG CHILLER,Chiller Gas Mass Flow Rate
+BIG CHILLER,Chiller NaturalGas Rate
+BIG CHILLER,Chiller NaturalGas Energy
+BIG CHILLER,Chiller NaturalGas Mass Flow Rate
 0

@@ -16,12 +16,12 @@ Cooling Coil Sensible Cooling Rate
 Plant Supply Side Outlet Temperature
 Chiller Evaporator Cooling Rate
 Chiller Condenser Heat Transfer Rate
-Chiller Electric Power
+Chiller Electricity Rate
 Chiller COP
 Boiler Heating Rate
-Boiler Gas Rate
+Boiler NaturalGas Rate
 Cooling Tower Heat Transfer Rate
-Cooling Tower Fan Electric Power
+Cooling Tower Fan Electricity Rate
 Zone Heating Setpoint Not Met While Occupied Time
 Zone Cooling Setpoint Not Met While Occupied Time
 0

@@ -1,6 +1,4 @@
 #pragma once
-#ifndef __VALIJSON_ADAPTERS_FROZEN_VALUE_HPP
-#define __VALIJSON_ADAPTERS_FROZEN_VALUE_HPP
 
 #include <valijson/adapters/adapter.hpp>
 
@@ -52,5 +50,3 @@ public:
 
 }  // namespace adapters
 }  // namespace valijson
-
-#endif

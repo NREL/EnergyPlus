@@ -1,6 +1,4 @@
 #pragma once
-#ifndef __VALIJSON_CONSTRAINTS_BASIC_CONSTRAINT_HPP
-#define __VALIJSON_CONSTRAINTS_BASIC_CONSTRAINT_HPP
 
 #include <valijson/constraints/constraint.hpp>
 #include <valijson/constraints/constraint_visitor.hpp>
@@ -65,5 +63,3 @@ protected:
 
 } // namespace constraints
 } // namespace valijson
-
-#endif

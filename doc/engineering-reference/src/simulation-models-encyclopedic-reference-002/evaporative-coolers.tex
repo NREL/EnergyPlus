@@ -411,7 +411,7 @@ The secondary air mass flow rate will either be set to \(\dot{m}_{sec}\) or solv
 ff_{sec} = \frac{\dot{m}_{sec}}{\dot{m}_{sec,design}}
 \end{equation}
 
-The secondary air mass flow rate will either be set to or solved for numerically as described below. The secondary side flow fraction, , is defined as. (Note this is another flow ratio that differs from the one used above which combined both streams into one ratio in effectiveness modifier curves.)
+And secondary air fan electric power \(p_{sec,fan}\) is calculated as.
 
 \begin{equation}
 P_{sec,fan} = P_{sec,fan,design}\cdot f_{sec,fan,mod}\left(ff_{sec}\right)
@@ -525,13 +525,13 @@ The indirect cooler has the ability to overcool the air and therefore needs some
 PLF = \frac{{{{\dot Q}_{{\mathop{\rm Re}\nolimits} quired}}}}{{{{\dot Q}_{Full}}}}
 \end{equation}
 
-where \(PLF\) is the Part Load Fraction.~ When PLF is less than 1.0, it is assumed that the cooler will deliver the desired temperature air (as long as it is less than the inlet; it doesn't need heating).~ The PLF is used to modify the auxiliary fan power when the fan power modifier curve is not specified and find when the unit will overcool.
+where \(PLF\) is the Part Load Fraction.~ When PLF is less than 1.0, it is assumed that the cooler will deliver the desired temperature air (as long as it is less than the inlet; it doesn't need heating).~ The PLF is used along with secondary side flow fraction to modify the auxiliary fan power when the fan power modifier curve is not specified and find when the unit will overcool.
 
 \begin{equation}
-{P_{fan}} = \Delta P\cdot \dot V\cdot e\cdot PLF
+{P_{fan}} = \Delta P\cdot \dot V\cdot e\cdot PLF\cdot ff_{sec}
 \end{equation}
 
-Water pump power is also derated using the PLF.
+Water pump power is also derated using the PLF and \(ff_{sec}\).
 
 A third air stream input to the cooler was implemented in order to allow mixing building exhaust air with outdoor air on the purge/secondary side of the cooler. The assumption when relief/tertiary air is used is that all of the available relief zone air is used and the remainder made up with outdoor air.~ Moisture and energy balances are drawn to compute humidity ratio and enthalpy of mixed secondary air.~ The volume is determined by the design volume flow rate (from secondary fan size).
 
@@ -658,7 +658,7 @@ where:
 
 The wetbulb temperature of air leaving a direct cooler is the same as the wetbulb temperature entering the cooler.~ The leaving humidity ratio of the air is calculated using psychrometric functions with leaving drybulb and wetbulb temperatures and outdoor air pressure as inputs.~ The leaving enthalpy of air is calculated using psychrometric functions with leaving drybulb temperature, leaving humidity ratio, and outdoor air pressure as inputs.
 
-The direct cooler sometimes has the ability to overcool the air and therefore some form of modulation is useful for analysis.~ The special research model includes a Part Load Fraction, PLF, used to model the implications of controlling the amount of cooling.~ It is assumed that through some sort of on/off cycling or wetness control that the cooling electric power can be varied to exactly meet the desired temperature when PLF is less than unity.~ The auxiliary water pump power is then varied using pump power modifier curve or linearly using a Part Load Fraction when the pump power modifier curve is not specified.
+The direct cooler sometimes has the ability to overcool the air and therefore some form of modulation is useful for analysis.~ The special research model includes a Part Load Fraction, PLF, used to model the implications of controlling the amount of cooling.~ It is assumed that through some sort of on/off cycling or wetness control that the cooling electric power can be varied to exactly meet the desired temperature when PLF is less than unity.~ The auxiliary water pump power is then derated using user specified pump power modifier curve or linearly using a Part Load Fraction and a fan flow fraction when the pump power modifier curve is not specified.
 
 \begin{equation}
 {\rm{FullOutput}} = {T_{db,out}} - {T_{db,in}}
@@ -675,7 +675,6 @@ PLF = \frac{{{\rm{RequiredOutput}}}}{{{\rm{FullOutput}}}}
 \label{eq:IECPLF}
 \end{equation}
 
-When PLF is less than 1.0 it is assumed that the cooler will deliver the desired temperature air (as long as it is less than the inlet; it doesn't need heating).~ Water pump power is also derated using the user specified pump modifier curve or using PLF when the pump modifier curve is not specified.
 
 \subsubsection{Water Consumption}\label{water-consumption-1}
 

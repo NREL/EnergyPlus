@@ -19,13 +19,13 @@ Table~\ref{table:built-in-math-functions-for-erl} lists the built-in functions f
 % table 4
 \begin{longtable}[c]{p{1.5in}p{3.0in}p{1.5in}}
 \caption{Built-in Math Functions for Erl \label{table:built-in-math-functions-for-erl}} \tabularnewline
-\toprule 
+\toprule
 Function Name & Description & Number of Arguments \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Built-in Math Functions for Erl} \tabularnewline
-\toprule 
+\toprule
 Function Name & Description & Number of Arguments \tabularnewline
 \midrule
 \endhead
@@ -54,13 +54,13 @@ Function Name & Description & Number of Arguments \tabularnewline
 % table 5
 \begin{longtable}[c]{p{1.5in}p{3.0in}p{1.5in}}
 \caption{Built-in EnergyPlus Simulation Management Functions for Erl \label{table:built-in-energyplus-simulation-management}} \tabularnewline
-\toprule 
+\toprule
 Function Name & Description & Number of Arguments \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Built-in EnergyPlus Simulation Management Functions for Erl} \tabularnewline
-\toprule 
+\toprule
 Function Name & Description & Number of Arguments \tabularnewline
 \midrule
 \endhead
@@ -78,13 +78,13 @@ For control algorithms, you often need to be able put a sensor reading into some
 % table 6
 \begin{longtable}[c]{p{1.5in}p{3.0in}p{1.5in}}
 \caption{Built-in Functions for Trend Variables in Erl \label{table:built-in-functions-for-trend-variables-in-erl}} \tabularnewline
-\toprule 
+\toprule
 Function Name & Description & Number of Arguments \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Built-in Functions for Trend Variables in Erl} \tabularnewline
-\toprule 
+\toprule
 Function Name & Description & Number of Arguments \tabularnewline
 \midrule
 \endhead
@@ -107,13 +107,13 @@ Building modeling often involves calculations related to moist air. A comprehens
 % table 7
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
 \caption{Built-in Psychrometric Functions for Erl \label{table:built-in-psychrometric-functions-for-erl}} \tabularnewline
-\toprule 
+\toprule
 Function Name & Arguments & Description & Units \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Built-in Psychrometric Functions for Erl} \tabularnewline
-\toprule 
+\toprule
 Function Name & Arguments & Description & Units \tabularnewline
 \midrule
 \endhead
@@ -122,9 +122,8 @@ Function Name & Arguments & Description & Units \tabularnewline
 Input 1 & Barometric pressure & Pa \tabularnewline
 Input 2 & Drybulb temperature & °C \tabularnewline
 Input 3 & Humidity ratio & kgWater/kgDryAir \tabularnewline
-@CpAirFnWTdb & Result & Heat capacity of moist air & J/kg-°C \tabularnewline
+@CpAirFnW & Result & Heat capacity of moist air & J/kg-°C \tabularnewline
 Input 1 & Humidity ratio & kgWater/kgDryAir \tabularnewline
-Input 2 & Drybulb temperature & °C \tabularnewline
 @HfgAirFnWTdb` & Result & Heat of vaporization for vapor & J/kg \tabularnewline
 Input 1 & Humidity ratio & kgWater/kgDryAir \tabularnewline
 Input 2 & Drybulb temperature & °C \tabularnewline
@@ -211,13 +210,13 @@ The first input argument is always an Erl variable that has been declared using 
 % table 8
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
 \caption{Built-in Function for Accessing Curves and Tables \label{table:built-in-function-for-accessing-curves}} \tabularnewline
-\toprule 
+\toprule
 Function Name & Arguments & Description & Notes \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Built-in Function for Accessing Curves and Tables} \tabularnewline
-\toprule 
+\toprule
 Function Name & Arguments & Description & Notes \tabularnewline
 \midrule
 \endhead
@@ -229,5 +228,59 @@ Input 3 & Second independent variable & Typically the "Y" value, only used if cu
 Input 4 & Third independent variable & Typically the "Z" value, only used if curve/table has three or more independent variables. \tabularnewline
 Input 5 & Fourth independent variable & Only used if table has four or more independent variables \tabularnewline
 Input 6 & Fifth independent variable & Only used if table has five independent variables \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Built-in Weather Data Functions}\label{built-in-weather-data-functions}
+
+EnergyPlus sets up 24 hours of weather data for Today and Tomorrow during DesignDay setup or based on incoming data from the weather file (epw). This data is used as the basis for setting the environment variables for a given zone timestep in WeatherManager::SetCurrentWeather. This data can be useful for predictive control or for setting Weather Data actuator overrides based on the incoming weather data using the BeginZoneTimestepBeforeSetCurrentWeather calling point.
+
+Table~\ref{table:built-in-function-for-weather-data} describes a set of built-in functions to access this weather data. For all of these functions, the first argument is the hour (from 0 to 23) and the second argument is the zone timestep number (from 1 to number of timesteps per hour). To access the current timestep use internal variables ``Hour''' and ``TimeStepNum'':
+\begin{lstlisting}
+@TodayBeamSolarRad Hour TimeStepNum,
+\end{lstlisting}
+
+% table 9
+\begin{longtable}[c]{p{2.25in}p{2.75in}p{1.0in}}
+\caption{Built-in Functions for Accessing Today and Tomorrow Weather Data \label{table:built-in-function-for-weather-data}} \tabularnewline
+\toprule
+Function Name & Description & Units \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Built-in Psychrometric Functions for Erl} \tabularnewline
+\toprule
+Function Name & Description & Units \tabularnewline
+\midrule
+\endhead
+
+@TodayIsRain & Rain indicator, 1.0 = raining &  \tabularnewline
+@TodayIsSnow & Snow indicator, 1.0 = snow on ground &  \tabularnewline
+@TodayOutDryBulbTemp & Outdoor dry-bulb temperature & \SI{}{\degreeCelsius} \tabularnewline
+@TodayOutDewPointTemp & Outdoor dewpoint temperature & \SI{}{\degreeCelsius} \tabularnewline
+@TodayOutBaroPress & Outdoor barometric pressure & \si{pascal} \tabularnewline
+@TodayOutRelHum & Outdoor relative humidity & \si{percent} \tabularnewline
+@TodayWindSpeed & Wind speed & \si{\meter\per\second} \tabularnewline
+@TodayWindDir & Wind direction (N = 0, E = 90, S = 180, W = 270) & degrees \tabularnewline
+@TodaySkyTemp & Sky temperature & \SI{}{\degreeCelsius} \tabularnewline
+@TodayHorizIRSky & Horizontal infrared radiation rate per area & \si{W\per\meter\squared} \tabularnewline
+@TodayBeamSolarRad & Direct normal solar irradiance & \si{W\per\meter\squared} \tabularnewline
+@TodayDifSolarRad & Diffuse horizontal solar irradiance & \si{W\per\meter\squared} \tabularnewline
+@TodayAlbedo & Ratio of ground reflected solar to global horizontal irradiance (unused) & dimensionless \tabularnewline
+@TodayLiquidPrecip & Liquid precipitation depth & \si{\mm} \tabularnewline
+@TomorrowIsRain & Rain indicator, 1.0 = raining &  \tabularnewline
+@TomorrowIsSnow & Snow indicator, 1.0 = snow on ground &  \tabularnewline
+@TomorrowOutDryBulbTemp & Outdoor dry-bulb temperature & \SI{}{\degreeCelsius} \tabularnewline
+@TomorrowOutDewPointTemp & Outdoor dewpoint temperature & \SI{}{\degreeCelsius} \tabularnewline
+@TomorrowOutBaroPress & Outdoor barometric pressure & \si{pascal} \tabularnewline
+@TomorrowOutRelHum & Outdoor relative humidity & \si{percent} \tabularnewline
+@TomorrowWindSpeed & Wind speed & \si{\meter\per\second} \tabularnewline
+@TomorrowWindDir & Wind direction (N = 0, E = 90, S = 180, W = 270) & degrees \tabularnewline
+@TomorrowSkyTemp & Sky temperature & \SI{}{\degreeCelsius} \tabularnewline
+@TomorrowHorizIRSky & Horizontal infrared radiation rate per area & \si{W\per\meter\squared} \tabularnewline
+@TomorrowBeamSolarRad & Direct normal solar irradiance & \si{W\per\meter\squared} \tabularnewline
+@TomorrowDifSolarRad & Diffuse horizontal solar irradiance & \si{W\per\meter\squared} \tabularnewline
+@TomorrowAlbedo & Ratio of ground reflected solar to global horizontal irradiance (unused) & dimensionless \tabularnewline
+@TomorrowLiquidPrecip & Liquid precipitation depth & \si{\mm} \tabularnewline
 \bottomrule
 \end{longtable}

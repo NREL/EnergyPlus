@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,15 +49,17 @@
 
 // Google Test Headers
 #include <gtest/gtest.h>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
+
 // EnergyPlus Headers
 #include <EnergyPlus/ChillerAbsorption.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
-#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/SimulationManager.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -71,8 +73,6 @@ using namespace ObjexxFCL;
 TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
 {
     std::string const idf_objects = delimited_string({
-        "  Version,9.0;",
-
         "  Timestep,4;",
 
         "  Building,",
@@ -93,7 +93,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
         "    No;                      !- Run Simulation for Weather File Run Periods",
 
         "  RunPeriod,",
-        "    ,                        !- Name",
+        "    Run Period 1,            !- Name",
         "    1,                       !- Begin Month",
         "    1,                       !- Begin Day of Month",
         "    ,                        !- Begin Year",
@@ -1775,52 +1775,53 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    OutputProcessor::TimeValue.allocate(2);
-    SimulationManager::ManageSimulation(); // run the design day
+    SimulationManager::ManageSimulation(*state); // run the design day
 
     // set conditions for test
     int AbsChillNum = 1;
-    int EquipFlowCtrl = 1;
-    Real64 AbsChillEvapLoad = 0.0;
+    DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
+    Real64 AbsChillEvapLoad;
     bool AbsChillRunFlag = true;
-    bool FirstIteration = true;
     // check chiller inputs
-    EXPECT_EQ(BLASTAbsorber(AbsChillNum).NomCap, 100000.0);
-    EXPECT_EQ(BLASTAbsorber(AbsChillNum).FlowMode, ChillerAbsorption::LeavingSetPointModulated);
+    auto &thisChiller = state->dataChillerAbsorber->absorptionChillers(AbsChillNum);
+    EXPECT_EQ(thisChiller.NomCap, 100000.0);
+    EXPECT_EQ(thisChiller.FlowMode, DataPlant::FlowMode::LeavingSetpointModulated);
     // define local var
-    int EvapInletNode = BLASTAbsorber(AbsChillNum).EvapInletNodeNum;
-    int EvapOutletNode = BLASTAbsorber(AbsChillNum).EvapOutletNodeNum;
-    int GeneratorInletNode = BLASTAbsorber(AbsChillNum).GeneratorInletNodeNum;
-    int GeneratorOutletNode = BLASTAbsorber(AbsChillNum).GeneratorOutletNodeNum;
+    int EvapInletNode = thisChiller.EvapInletNodeNum;
+    int EvapOutletNode = thisChiller.EvapOutletNodeNum;
+    int GeneratorInletNode = thisChiller.GeneratorInletNodeNum;
+    int GeneratorOutletNode = thisChiller.GeneratorOutletNodeNum;
     // set conditions for unit test
-    Node(EvapInletNode).MassFlowRate = 1.0;
-    Node(EvapInletNode).Temp = 15.0;
-    Node(EvapOutletNode).TempSetPoint = 5.0;
-    BLASTAbsorber(AbsChillNum).MaxPartLoadRat = 1.0;
-    BLASTAbsorber(AbsChillNum).EvapMassFlowRateMax = 2.0;
-    BLASTAbsorber(AbsChillNum).GenMassFlowRateMax = 5.0;
-    Node(GeneratorInletNode).MassFlowRate = BLASTAbsorber(AbsChillNum).GenMassFlowRateMax;
-    Node(GeneratorInletNode).MassFlowRateMax = BLASTAbsorber(AbsChillNum).GenMassFlowRateMax;
-    Node(GeneratorInletNode).MassFlowRateMaxAvail = BLASTAbsorber(AbsChillNum).GenMassFlowRateMax;
+    state->dataLoopNodes->Node(EvapInletNode).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(EvapInletNode).Temp = 15.0;
+    state->dataLoopNodes->Node(EvapOutletNode).TempSetPoint = 5.0;
+    thisChiller.MaxPartLoadRat = 1.0;
+    thisChiller.EvapMassFlowRateMax = 2.0;
+    thisChiller.GenMassFlowRateMax = 5.0;
+    state->dataLoopNodes->Node(GeneratorInletNode).MassFlowRate = thisChiller.GenMassFlowRateMax;
+    state->dataLoopNodes->Node(GeneratorInletNode).MassFlowRateMax = thisChiller.GenMassFlowRateMax;
+    state->dataLoopNodes->Node(GeneratorInletNode).MassFlowRateMaxAvail = thisChiller.GenMassFlowRateMax;
     // calc evap load
     Real64 CpFluid = 4179.0;
-    Real64 EvapMassFlowRate = DataLoopNode::Node(EvapInletNode).MassFlowRate;
-    AbsChillEvapLoad = EvapMassFlowRate * CpFluid * (DataLoopNode::Node(EvapOutletNode).TempSetPoint - DataLoopNode::Node(EvapInletNode).Temp);
-    BLASTAbsorber(AbsChillNum).NomCap = 2.0 * abs(AbsChillEvapLoad);
+    Real64 EvapMassFlowRate = state->dataLoopNodes->Node(EvapInletNode).MassFlowRate;
+    AbsChillEvapLoad =
+        EvapMassFlowRate * CpFluid * (state->dataLoopNodes->Node(EvapOutletNode).TempSetPoint - state->dataLoopNodes->Node(EvapInletNode).Temp);
+    thisChiller.NomCap = 2.0 * abs(AbsChillEvapLoad);
     // generator hot water mass flow rate is calculated proportional to evap mass flow rate for flow mode = LeavingSetPointModulated
     Real64 GenMassFlowRateTestResult =
-        (Node(EvapInletNode).MassFlowRate / BLASTAbsorber(AbsChillNum).EvapMassFlowRateMax) * BLASTAbsorber(AbsChillNum).GenMassFlowRateMax;
+        (state->dataLoopNodes->Node(EvapInletNode).MassFlowRate / thisChiller.EvapMassFlowRateMax) * thisChiller.GenMassFlowRateMax;
     // lock the evap flow at test condition specified
-    int LoopNum = BLASTAbsorber(AbsChillNum).CWLoopNum;
-    int LoopSideNum = BLASTAbsorber(AbsChillNum).CWLoopSideNum;
-    PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock = 1;
+    int LoopNum = thisChiller.CWLoopNum;
+    int LoopSideNum = thisChiller.CWLoopSideNum;
+    state->dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock = DataPlant::iFlowLock::Locked;
     // calc generator flow
-    int GenLoopNum = BLASTAbsorber(AbsChillNum).GenLoopNum;
-    int GenLoopSideNum = BLASTAbsorber(AbsChillNum).GenLoopSideNum;
-    PlantLoop(GenLoopNum).LoopSide(GenLoopSideNum).FlowLock = 0;
+    int GenLoopNum = thisChiller.GenLoopNum;
+    int GenLoopSideNum = thisChiller.GenLoopSideNum;
+    state->dataPlnt->PlantLoop(GenLoopNum).LoopSide(GenLoopSideNum).FlowLock = DataPlant::iFlowLock::Unlocked;
     // run CalcBLASTAbsorberModel
-    ChillerAbsorption::CalcBLASTAbsorberModel(AbsChillNum, AbsChillEvapLoad, AbsChillRunFlag, FirstIteration, EquipFlowCtrl);
-    // check generator hot water mass flow rate is propotional to the chilled water flow rate
-    EXPECT_EQ(DataLoopNode::Node(GeneratorInletNode).MassFlowRate, GenMassFlowRateTestResult);
-    EXPECT_EQ(DataLoopNode::Node(GeneratorOutletNode).MassFlowRate, GenMassFlowRateTestResult);
+    thisChiller.EquipFlowCtrl = EquipFlowCtrl;
+    thisChiller.calculate(*state, AbsChillEvapLoad, AbsChillRunFlag);
+    // check generator hot water mass flow rate is proportional to the chilled water flow rate
+    EXPECT_EQ(state->dataLoopNodes->Node(GeneratorInletNode).MassFlowRate, GenMassFlowRateTestResult);
+    EXPECT_EQ(state->dataLoopNodes->Node(GeneratorOutletNode).MassFlowRate, GenMassFlowRateTestResult);
 }

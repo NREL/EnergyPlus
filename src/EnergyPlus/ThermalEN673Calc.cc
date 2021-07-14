@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,14 +50,14 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <TARCOGArgs.hh>
-#include <TARCOGCommon.hh>
-#include <TARCOGGasses90.hh>
-#include <TARCOGGassesParams.hh>
-#include <TARCOGOutput.hh>
-#include <TARCOGParams.hh>
-#include <ThermalEN673Calc.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/TARCOGArgs.hh>
+#include <EnergyPlus/TARCOGCommon.hh>
+#include <EnergyPlus/TARCOGGasses90.hh>
+#include <EnergyPlus/TARCOGGassesParams.hh>
+#include <EnergyPlus/TARCOGOutput.hh>
+#include <EnergyPlus/TARCOGParams.hh>
+#include <EnergyPlus/ThermalEN673Calc.hh>
 
 namespace EnergyPlus {
 
@@ -91,27 +91,29 @@ namespace ThermalEN673Calc {
 
     // Functions
 
-    void Calc_EN673(int const standard,
+    void Calc_EN673(EnergyPlusData &state,
+                    TARCOGOutput::Files &files,
+                    TARCOGGassesParams::Stdrd const standard,
                     int const nlayer,
                     Real64 const tout,
                     Real64 const tind,
-                    Array1A<Real64> gap,
-                    Array1A<Real64> thick,
-                    Array1A<Real64> scon,
-                    Array1A<Real64> const emis,
+                    Array1D<Real64> &gap,
+                    Array1D<Real64> &thick,
+                    Array1D<Real64> &scon,
+                    const Array1D<Real64> &emis,
                     Real64 const totsol,
                     Real64 const tilt,
                     Real64 const dir,
-                    Array1A<Real64> const asol,
-                    Array1A<Real64> const presure,
+                    const Array1D<Real64> &asol,
+                    const Array1D<Real64> &presure,
                     Array2A_int const iprop,
                     Array2A<Real64> const frct,
-                    Array1A_int const nmix,
+                    const Array1D_int &nmix,
                     Array2A<Real64> const xgcon,
                     Array2A<Real64> const xgvis,
                     Array2A<Real64> const xgcp,
-                    Array1A<Real64> const xwght,
-                    Array1A<Real64> theta,
+                    const Array1D<Real64> &xwght,
+                    Array1D<Real64> &theta,
                     Real64 &ufactor,
                     Real64 &hcin,
                     Real64 &hin,
@@ -119,12 +121,12 @@ namespace ThermalEN673Calc {
                     Real64 &shgc,
                     int &nperr,
                     std::string &ErrorMessage,
-                    Array1A_int const ibc,
-                    Array1A<Real64> hg,
-                    Array1A<Real64> hr,
-                    Array1A<Real64> hs,
-                    Array1A<Real64> Ra,
-                    Array1A<Real64> Nu)
+                    const Array1D_int &ibc,
+                    Array1D<Real64> &hg,
+                    Array1D<Real64> &hr,
+                    Array1D<Real64> &hs,
+                    Array1D<Real64> &Ra,
+                    Array1D<Real64> &Nu)
     {
 
         // Using/Aliasing
@@ -138,26 +140,26 @@ namespace ThermalEN673Calc {
         /// General:
 
         // Argument array dimensioning
-        gap.dim(MaxGap);
-        thick.dim(maxlay);
-        scon.dim(maxlay);
-        emis.dim(maxlay2);
-        asol.dim(maxlay);
-        presure.dim(maxlay1);
+        EP_SIZE_CHECK(gap, MaxGap);
+        EP_SIZE_CHECK(thick, maxlay);
+        EP_SIZE_CHECK(scon, maxlay);
+        EP_SIZE_CHECK(emis, maxlay2);
+        EP_SIZE_CHECK(asol, maxlay);
+        EP_SIZE_CHECK(presure, maxlay1);
         iprop.dim(maxgas, maxlay1);
         frct.dim(maxgas, maxlay1);
-        nmix.dim(maxlay1);
+        EP_SIZE_CHECK(nmix, maxlay1);
         xgcon.dim(3, maxgas);
         xgvis.dim(3, maxgas);
         xgcp.dim(3, maxgas);
-        xwght.dim(maxgas);
-        theta.dim(maxlay2);
-        ibc.dim(2);
-        hg.dim(maxlay);
-        hr.dim(maxlay);
-        hs.dim(maxlay);
-        Ra.dim(maxlay);
-        Nu.dim(maxlay);
+        EP_SIZE_CHECK(xwght, maxgas);
+        EP_SIZE_CHECK(theta, maxlay2);
+        EP_SIZE_CHECK(ibc, 2);
+        EP_SIZE_CHECK(hg, maxlay);
+        EP_SIZE_CHECK(hr, maxlay);
+        EP_SIZE_CHECK(hs, maxlay);
+        EP_SIZE_CHECK(Ra, maxlay);
+        EP_SIZE_CHECK(Nu, maxlay);
 
         // Locals
         /// Environment related:
@@ -183,7 +185,8 @@ namespace ThermalEN673Calc {
         rtot = 0.0;
         sft = 0.0;
         if (GoAhead(nperr)) {
-            EN673ISO10292(nlayer,
+            EN673ISO10292(state,
+                          nlayer,
                           tout,
                           tind,
                           emis,
@@ -220,69 +223,68 @@ namespace ThermalEN673Calc {
                 solar_EN673(dir, totsol, rtot, rs, nlayer, asol, sft, standard, nperr, ErrorMessage);
                 if (GoAhead(nperr)) {
                     shgc = sft;
-                    if (WriteDebugOutput) WriteOutputEN673(OutArgumentsFile, DBGD, nlayer, ufactor, hout, hin, Ra, Nu, hg, hr, hs, nperr);
+                    if (files.WriteDebugOutput)
+                        WriteOutputEN673(files.DebugOutputFile, files.DBGD, nlayer, ufactor, hout, hin, Ra, Nu, hg, hr, hs, nperr);
                 } // GoAhead after solar
             }     // GoAhead after EN673ISO10292
         }         // GopAhead after propcon90
     }
 
-    void EN673ISO10292(int const nlayer,
+    void EN673ISO10292(EnergyPlusData &state,
+                       int const nlayer,
                        Real64 const tout,
                        Real64 const tind,
-                       Array1A<Real64> const emis,
-                       Array1A<Real64> const gap,
-                       Array1A<Real64> const thick,
-                       Array1A<Real64> const scon,
+                       const Array1D<Real64> &emis,
+                       const Array1D<Real64> &gap,
+                       const Array1D<Real64> &thick,
+                       const Array1D<Real64> &scon,
                        Real64 const tilt,
                        Array2A_int const iprop,
                        Array2A<Real64> const frct,
                        Array2A<Real64> const xgcon,
                        Array2A<Real64> const xgvis,
                        Array2A<Real64> const xgcp,
-                       Array1A<Real64> const xwght,
-                       Array1A<Real64> const presure,
-                       Array1A_int const nmix,
-                       Array1A<Real64> theta,
-                       int const standard,
-                       Array1A<Real64> hg,
-                       Array1A<Real64> hr,
-                       Array1A<Real64> hs,
+                       const Array1D<Real64> &xwght,
+                       const Array1D<Real64> &presure,
+                       const Array1D_int &nmix,
+                       Array1D<Real64> &theta,
+                       TARCOGGassesParams::Stdrd const standard,
+                       Array1D<Real64> &hg,
+                       Array1D<Real64> &hr,
+                       Array1D<Real64> &hs,
                        Real64 &hin,
                        Real64 const hout,
                        Real64 &hcin,
-                       Array1A_int const ibc,
-                       Array1A<Real64> rs,
+                       const Array1D_int &ibc,
+                       Array1D<Real64> &rs,
                        Real64 &ufactor,
-                       Array1A<Real64> Ra,
-                       Array1A<Real64> Nu,
+                       Array1D<Real64> &Ra,
+                       Array1D<Real64> &Nu,
                        int &nperr,
                        std::string &ErrorMessage)
     {
         // Using
-        using DataGlobals::GravityConstant;
-        using DataGlobals::StefanBoltzmann;
-
         // Argument array dimensioning
-        emis.dim(maxlay2);
-        gap.dim(MaxGap);
-        thick.dim(maxlay);
-        scon.dim(maxlay);
+        EP_SIZE_CHECK(emis, maxlay2);
+        EP_SIZE_CHECK(gap, MaxGap);
+        EP_SIZE_CHECK(thick, maxlay);
+        EP_SIZE_CHECK(scon, maxlay);
         iprop.dim(maxgas, maxlay1);
         frct.dim(maxgas, maxlay1);
         xgcon.dim(3, maxgas);
         xgvis.dim(3, maxgas);
         xgcp.dim(3, maxgas);
-        xwght.dim(maxgas);
-        presure.dim(maxlay1);
-        nmix.dim(maxlay1);
-        theta.dim(maxlay2);
-        hg.dim(maxlay);
-        hr.dim(maxlay);
-        hs.dim(maxlay);
-        ibc.dim(2);
-        rs.dim(maxlay3);
-        Ra.dim(maxlay);
-        Nu.dim(maxlay);
+        EP_SIZE_CHECK(xwght, maxgas);
+        EP_SIZE_CHECK(presure, maxlay1);
+        EP_SIZE_CHECK(nmix, maxlay1);
+        EP_SIZE_CHECK(theta, maxlay2);
+        EP_SIZE_CHECK(hg, maxlay);
+        EP_SIZE_CHECK(hr, maxlay);
+        EP_SIZE_CHECK(hs, maxlay);
+        EP_SIZE_CHECK(ibc, 2);
+        EP_SIZE_CHECK(rs, maxlay3);
+        EP_SIZE_CHECK(Ra, maxlay);
+        EP_SIZE_CHECK(Nu, maxlay);
 
         // Locals
         // dr...internal variables
@@ -389,10 +391,11 @@ namespace ThermalEN673Calc {
                     //   write(18, 22222) iprop(i+1, j), tempDens, gvis(iprop(i+1,j), 1), gcon(iprop(i+1,j), 1), gcp(iprop(i+1,j), 1)
                     dT(i) = 15.0 / (nlayer - 1); // set initial temperature distribution
                     for (j = 1; j <= nmix(i + 1); ++j) {
-                        ipropg(j) = iprop(j, i + 1);
-                        frctg(j) = frct(j, i + 1);
+                        ipropg(j) = iprop(i + 1, j);
+                        frctg(j) = frct(i + 1, j);
                     }
-                    GASSES90(Tm,
+                    GASSES90(state,
+                             Tm,
                              ipropg,
                              frctg,
                              presure(i + 1),
@@ -409,7 +412,7 @@ namespace ThermalEN673Calc {
                              standard,
                              nperr,
                              ErrorMessage);
-                    Gr(i) = (GravityConstant * pow_3(gap(i)) * dT(i) * pow_2(dens)) / (Tm * pow_2(visc));
+                    Gr(i) = (DataGlobalConstants::GravityConstant * pow_3(gap(i)) * dT(i) * pow_2(dens)) / (Tm * pow_2(visc));
                     Ra(i) = Gr(i) * pr;
                     Nu(i) = A * std::pow(Ra(i), n);
                     if (Nu(i) < 1.0) {
@@ -424,7 +427,7 @@ namespace ThermalEN673Calc {
                 }
             }
             for (i = 1; i <= nlayer - 1; ++i) {
-                hr(i) = 4.0 * StefanBoltzmann * std::pow(1.0 / emis(2 * i) + 1.0 / emis(2 * i + 1) - 1.0, -1.0) * pow_3(Tm);
+                hr(i) = 4.0 * DataGlobalConstants::StefanBoltzmann * std::pow(1.0 / emis(2 * i) + 1.0 / emis(2 * i + 1) - 1.0, -1.0) * pow_3(Tm);
                 hs(i) = hg(i) + hr(i);
                 rs(2 * i + 1) = 1.0 / hs(i); // Thermal resistance of each gap
                 sumRs += rs(2 * i + 1);
@@ -445,22 +448,23 @@ namespace ThermalEN673Calc {
                 sumRsold = sumRs;
                 sumRs = 0.0;
 
-                if ((standard == EN673) && (nlayer == 2)) {
+                if ((standard == TARCOGGassesParams::Stdrd::EN673) && (nlayer == 2)) {
                     return; // If EN673 declared values path and glazing has 2 layers, end claculations and return
                 } else {
                     if (tind > tout) {
                         for (i = 1; i <= nlayer - 1; ++i) {
                             dT(i) = 15.0 * (1.0 / hs(i)) / sumRsold; // updated temperature distribution
-                            if (standard == EN673) {
+                            if (standard == TARCOGGassesParams::Stdrd::EN673) {
                                 Tm = 283.0;
                             } else {
                                 Tm = (theta(2 * i) + theta(2 * i + 1)) / 2.0;
                             }
                             for (j = 1; j <= nmix(i + 1); ++j) {
-                                ipropg(j) = iprop(j, i + 1);
-                                frctg(j) = frct(j, i + 1);
+                                ipropg(j) = iprop(i + 1, j);
+                                frctg(j) = frct(i + 1, j);
                             } // j, gas mix
-                            GASSES90(Tm,
+                            GASSES90(state,
+                                     Tm,
                                      ipropg,
                                      frctg,
                                      presure(i + 1),
@@ -477,7 +481,7 @@ namespace ThermalEN673Calc {
                                      standard,
                                      nperr,
                                      ErrorMessage);
-                            Gr(i) = (GravityConstant * pow_3(gap(i)) * dT(i) * pow_2(dens)) / (Tm * pow_2(visc));
+                            Gr(i) = (DataGlobalConstants::GravityConstant * pow_3(gap(i)) * dT(i) * pow_2(dens)) / (Tm * pow_2(visc));
                             Ra(i) = Gr(i) * pr;
                             Nu(i) = A * std::pow(Ra(i), n);
                             if (Nu(i) < 1.0) {
@@ -525,11 +529,11 @@ namespace ThermalEN673Calc {
     void solar_EN673(Real64 const dir,
                      Real64 const totsol,
                      Real64 const rtot,
-                     Array1A<Real64> const rs,
+                     const Array1D<Real64> &rs,
                      int const nlayer,
-                     Array1A<Real64> const absol,
+                     const Array1D<Real64> &absol,
                      Real64 &sf,
-                     int const standard,
+                     TARCOGGassesParams::Stdrd const standard,
                      int &nperr,
                      std::string &ErrorMessage)
     {
@@ -546,8 +550,8 @@ namespace ThermalEN673Calc {
         //    sf        solar gain of space
 
         // Argument array dimensioning
-        rs.dim(maxlay3);
-        absol.dim(maxlay);
+        EP_SIZE_CHECK(rs, maxlay3);
+        EP_SIZE_CHECK(absol, maxlay);
 
         // Locals
         int i;
@@ -560,7 +564,7 @@ namespace ThermalEN673Calc {
         sf = 0.0;
 
         // evaluate inward flowing fraction of absorbed radiation:
-        if ((standard == EN673) || (standard == EN673Design)) {
+        if ((standard == TARCOGGassesParams::Stdrd::EN673) || (standard == TARCOGGassesParams::Stdrd::EN673Design)) {
             if (nlayer == 1) {
                 fract = dir * absol(1) * (rs(1) * rs(3)) / (rs(1) * (rs(1) + rs(3)));
             } else {

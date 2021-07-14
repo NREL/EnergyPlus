@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,46 +52,19 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace HeatPumpWaterToWaterSimple {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    extern std::string const HPEqFitHeating;
-    extern std::string const HPEqFitHeatingUC;
-    extern std::string const HPEqFitCooling;
-    extern std::string const HPEqFitCoolingUC;
-
-    // DERIVED TYPE DEFINITIONS
-
-    // Type Description of Heat Pump
-
-    // Output Variables Type definition
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumGSHPs; // Number of GSHPs specified in input
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
-
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Computational routines
-
-    // Update routine to check convergence and update nodes
-
-    // Types
-
-    struct GshpSpecs
+    struct GshpSpecs : public PlantComponent
     {
         // Members
         std::string Name;                // user identifier
@@ -114,16 +87,8 @@ namespace HeatPumpWaterToWaterSimple {
         bool ratedCapCoolWasAutoSized;           // true if RatedCapCool was autosize on input
         Real64 RatedPowerCool;                   // Rated Cooling Power Consumption[W]
         bool ratedPowerCoolWasAutoSized;         // ture if RatedPowerCool was autosize on input
-        Real64 CoolCap1;                         // 1st coefficient of the Cooling capacity performance curve
-        Real64 CoolCap2;                         // 2nd coefficient of the Cooling capacity performance curve
-        Real64 CoolCap3;                         // 3rd coefficient of the Cooling capacity performance curve
-        Real64 CoolCap4;                         // 4th coefficient of the Cooling capacity performance curve
-        Real64 CoolCap5;                         // 5th coefficient of the Cooling capacity performance curve
-        Real64 CoolPower1;                       // 1st coefficient of the Cooling power consumption curve
-        Real64 CoolPower2;                       // 2nd coefficient of the Cooling power consumption curve
-        Real64 CoolPower3;                       // 3rd coefficient of the Cooling power consumption curve
-        Real64 CoolPower4;                       // 4th coefficient of the Cooling power consumption curve
-        Real64 CoolPower5;                       // 5th coefficient of the Cooling power consumption curve
+        int CoolCapCurveIndex;                   // Index of the Cooling capacity performance curve
+        int CoolPowCurveIndex;                   // Index of the Cooling power consumption curve
         int CoolCapNegativeCounter;              // Counter for number of times cooling capacity curve is <= 0.0
         int CoolCapNegativeIndex;                // Index for recurring warning message regarding cooling capacity curve is <= 0.0
         int CoolPowerNegativeCounter;            // Counter for number of times cooling power curve is <= 0.0
@@ -136,16 +101,8 @@ namespace HeatPumpWaterToWaterSimple {
         bool ratedCapHeatWasAutoSized;           // true if RatedCapHeat was autosize on input
         Real64 RatedPowerHeat;                   // Rated Heating Compressor Power[W]
         bool ratedPowerHeatWasAutoSized;         // true if RatedPowerHeat was autosize on input
-        Real64 HeatCap1;                         // 1st coefficient of the Heating capacity performance curve
-        Real64 HeatCap2;                         // 2nd coefficient of the Heating capacity performance curve
-        Real64 HeatCap3;                         // 3rd coefficient of the Heating capacity performance curve
-        Real64 HeatCap4;                         // 4th coefficient of the Heating capacity performance curve
-        Real64 HeatCap5;                         // 5th coefficient of the Heating capacity performance curve
-        Real64 HeatPower1;                       // 1st coefficient of the Heating power consumption curve
-        Real64 HeatPower2;                       // 2nd coefficient of the Heating power consumption curve
-        Real64 HeatPower3;                       // 3rd coefficient of the Heating power consumption curve
-        Real64 HeatPower4;                       // 4th coefficient of the Heating power consumption curve
-        Real64 HeatPower5;                       // 5th coefficient of the Heating power consumption curve
+        int HeatCapCurveIndex;                   // Index of the Heating capacity performance curve
+        int HeatPowCurveIndex;                   // Index of the Heating power consumption curve
         int LoadSideInletNodeNum;                // Load Side Inlet Node
         int LoadSideOutletNodeNum;               // Load Side Outlet Node
         int SourceSideInletNodeNum;              // Source Side Inlet Node
@@ -170,95 +127,107 @@ namespace HeatPumpWaterToWaterSimple {
         int companionIndex;        // index in GSHP structure for companion heat pump
         bool companionIdentified;  // true if this GSHP has found its companion heat pump
 
+        // Report variables
+        Real64 reportPower;                  // Power Consumption [W]
+        Real64 reportEnergy;                 // Energy Consumption [J]
+        Real64 reportQLoad;                  // Load Side Heat Transfer Rate [W]
+        Real64 reportQLoadEnergy;            // Load Side Heat Transfer [J]
+        Real64 reportQSource;                // Source Side Heat Transfer Rate [W]
+        Real64 reportQSourceEnergy;          // Source Side Heat Transfer [J]
+        Real64 reportLoadSideMassFlowRate;   // Load side volumetric flow rate m3/s
+        Real64 reportLoadSideInletTemp;      // Load Side outlet temperature degC
+        Real64 reportLoadSideOutletTemp;     // Load Side outlet temperature degC
+        Real64 reportSourceSideMassFlowRate; // Source side volumetric flow rate m3/s
+        Real64 reportSourceSideInletTemp;    // Source Side outlet temperature degC
+        Real64 reportSourceSideOutletTemp;   // Source Side outlet temperature degC
+
+        // init flags
+        bool MyPlantScanFlag;
+        bool MyEnvrnFlag;
+
+        bool myCoolingSizesReported;
+        bool myHeatingSizesReported;
+
         // Default Constructor
         GshpSpecs()
             : checkEquipName(true), WWHPPlantTypeOfNum(0), Available(false), ON(false), IsOn(false), MustRun(false), SourceSideDesignMassFlow(0.0),
               LoadSideDesignMassFlow(0.0), RatedLoadVolFlowCool(0.0), ratedLoadVolFlowCoolWasAutoSized(false), RatedSourceVolFlowCool(0.0),
               ratedSourceVolFlowCoolWasAutoSized(false), RatedCapCool(0.0), ratedCapCoolWasAutoSized(false), RatedPowerCool(0.0),
-              ratedPowerCoolWasAutoSized(false), CoolCap1(0.0), CoolCap2(0.0), CoolCap3(0.0), CoolCap4(0.0), CoolCap5(0.0), CoolPower1(0.0),
-              CoolPower2(0.0), CoolPower3(0.0), CoolPower4(0.0), CoolPower5(0.0), CoolCapNegativeCounter(0), CoolCapNegativeIndex(0),
+              ratedPowerCoolWasAutoSized(false), CoolCapCurveIndex(0), CoolPowCurveIndex(0), CoolCapNegativeCounter(0), CoolCapNegativeIndex(0),
               CoolPowerNegativeCounter(0), CoolPowerNegativeIndex(0), RatedLoadVolFlowHeat(0.0), ratedLoadVolFlowHeatWasAutoSized(false),
               RatedSourceVolFlowHeat(0.0), ratedSourceVolFlowHeatWasAutoSized(false), RatedCapHeat(0.0), ratedCapHeatWasAutoSized(false),
-              RatedPowerHeat(0.0), ratedPowerHeatWasAutoSized(false), HeatCap1(0.0), HeatCap2(0.0), HeatCap3(0.0), HeatCap4(0.0), HeatCap5(0.0),
-              HeatPower1(0.0), HeatPower2(0.0), HeatPower3(0.0), HeatPower4(0.0), HeatPower5(0.0), LoadSideInletNodeNum(0), LoadSideOutletNodeNum(0),
-              SourceSideInletNodeNum(0), SourceSideOutletNodeNum(0), HeatCapNegativeCounter(0), HeatCapNegativeIndex(0), HeatPowerNegativeCounter(0),
-              HeatPowerNegativeIndex(0), SourceLoopNum(0), SourceLoopSideNum(0), SourceBranchNum(0), SourceCompNum(0), LoadLoopNum(0),
-              LoadLoopSideNum(0), LoadBranchNum(0), LoadCompNum(0), CondMassFlowIndex(0), refCOP(0.0), sizFac(0.0), companionIndex(0),
-              companionIdentified(false)
+              RatedPowerHeat(0.0), ratedPowerHeatWasAutoSized(false), HeatCapCurveIndex(0), HeatPowCurveIndex(0), LoadSideInletNodeNum(0),
+              LoadSideOutletNodeNum(0), SourceSideInletNodeNum(0), SourceSideOutletNodeNum(0), HeatCapNegativeCounter(0), HeatCapNegativeIndex(0),
+              HeatPowerNegativeCounter(0), HeatPowerNegativeIndex(0), SourceLoopNum(0), SourceLoopSideNum(0), SourceBranchNum(0), SourceCompNum(0),
+              LoadLoopNum(0), LoadLoopSideNum(0), LoadBranchNum(0), LoadCompNum(0), CondMassFlowIndex(0), refCOP(0.0), sizFac(0.0), companionIndex(0),
+              companionIdentified(false), reportPower(0.0), reportEnergy(0.0), reportQLoad(0.0), reportQLoadEnergy(0.0), reportQSource(0.0),
+              reportQSourceEnergy(0.0), reportLoadSideMassFlowRate(0.0), reportLoadSideInletTemp(0.0), reportLoadSideOutletTemp(0.0),
+              reportSourceSideMassFlowRate(0.0), reportSourceSideInletTemp(0.0), reportSourceSideOutletTemp(0.0), MyPlantScanFlag(true),
+              MyEnvrnFlag(true), myCoolingSizesReported(false), myHeatingSizesReported(false)
         {
         }
+
+        virtual ~GshpSpecs() = default;
+
+        static PlantComponent *factory(EnergyPlusData &state, int wwhp_type, std::string eir_wwhp_name);
+
+        static void GetWatertoWaterHPInput(EnergyPlusData &state);
+
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
+
+        void getDesignCapacities(
+            EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+
+        void getSizingFactor(Real64 &sizingFactor) override;
+
+        void InitWatertoWaterHP(EnergyPlusData &state,
+                                int GSHPTypeNum,             // Type of GSHP
+                                std::string const &GSHPName, // User Specified Name of GSHP
+                                bool FirstHVACIteration,
+                                Real64 MyLoad // Demand Load
+        );
+
+        void sizeCoolingWaterToWaterHP(EnergyPlusData &state);
+
+        void sizeHeatingWaterToWaterHP(EnergyPlusData &state);
+
+        void CalcWatertoWaterHPCooling(EnergyPlusData &state, Real64 MyLoad); // Operating Load
+
+        void CalcWatertoWaterHPHeating(EnergyPlusData &state, Real64 MyLoad); // Operating Load
+
+        void UpdateGSHPRecords(EnergyPlusData &state);
+
+        void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
-
-    struct ReportVars
-    {
-        // Members
-        Real64 Power;                  // Power Consumption [W]
-        Real64 Energy;                 // Energy Consumption [J]
-        Real64 QLoad;                  // Load Side Heat Transfer Rate [W]
-        Real64 QLoadEnergy;            // Load Side Heat Transfer [J]
-        Real64 QSource;                // Source Side Heat Transfer Rate [W]
-        Real64 QSourceEnergy;          // Source Side Heat Transfer [J]
-        Real64 LoadSideMassFlowRate;   // Load side volumetric flow rate m3/s
-        Real64 LoadSideInletTemp;      // Load Side outlet temperature °C
-        Real64 LoadSideOutletTemp;     // Load Side outlet temperature °C
-        Real64 SourceSideMassFlowRate; // Source side volumetric flow rate m3/s
-        Real64 SourceSideInletTemp;    // Source Side outlet temperature °C
-        Real64 SourceSideOutletTemp;   // Source Side outlet temperature °C
-
-        // Default Constructor
-        ReportVars()
-            : Power(0.0), Energy(0.0), QLoad(0.0), QLoadEnergy(0.0), QSource(0.0), QSourceEnergy(0.0), LoadSideMassFlowRate(0.0),
-              LoadSideInletTemp(0.0), LoadSideOutletTemp(0.0), SourceSideMassFlowRate(0.0), SourceSideInletTemp(0.0), SourceSideOutletTemp(0.0)
-        {
-        }
-    };
-
-    // Object Data
-    extern Array1D<GshpSpecs> GSHP;
-    extern Array1D<ReportVars> GSHPReport;
-
-    // Functions
-    void clear_state();
-
-    void SimHPWatertoWaterSimple(std::string const &GSHPType, // Type of GSHP
-                                 int const GSHPTypeNum,       // Type of GSHP in Plant equipment
-                                 std::string const &GSHPName, // User Specified Name of GSHP
-                                 int &GSHPNum,                // Index of Equipment
-                                 bool const FirstHVACIteration,
-                                 bool &InitLoopEquip,      // If not zero, calculate the max load for operating conditions
-                                 Real64 const MyLoad,      // Loop demand component will meet
-                                 Real64 &MaxCap,           // Maximum operating capacity of GSHP [W]
-                                 Real64 &MinCap,           // Minimum operating capacity of GSHP [W]
-                                 Real64 &OptCap,           // Optimal operating capacity of GSHP [W]
-                                 int const LoopNum,        // The calling loop number
-                                 bool const getCompSizFac, // true if calling to get component sizing factor
-                                 Real64 &sizingFac         // component level sizing factor
-    );
-
-    void GetWatertoWaterHPInput();
-
-    void InitWatertoWaterHP(int const GSHPTypeNum,       // Type of GSHP
-                            std::string const &GSHPName, // User Specified Name of GSHP
-                            int const GSHPNum,           // GSHP Number
-                            bool const FirstHVACIteration,
-                            Real64 const MyLoad // Demand Load
-    );
-
-    void sizeCoolingWaterToWaterHP(int const GSHPNum); // GSHP Number
-
-    void sizeHeatingWaterToWaterHP(int const GSHPNum); // GSHP Number
-
-    void CalcWatertoWaterHPCooling(int const GSHPNum,  // GSHP Number
-                                   Real64 const MyLoad // Operating Load
-    );
-
-    void CalcWatertoWaterHPHeating(int const GSHPNum,  // GSHP Number
-                                   Real64 const MyLoad // Operating Load
-    );
-
-    void UpdateGSHPRecords(int const GSHPNum); // GSHP number
 
 } // namespace HeatPumpWaterToWaterSimple
+
+struct HeatPumpWaterToWaterSimpleData : BaseGlobalStruct
+{
+
+    int NumGSHPs = 0;
+    bool GetInputFlag = true;
+    Array1D<HeatPumpWaterToWaterSimple::GshpSpecs> GSHP;
+    std::unordered_map<std::string, std::string> HeatPumpWaterUniqueNames;
+    Real64 CurrentSimTime = 0.0;
+    Real64 PrevSimTime = 0.0;
+
+    void clear_state() override
+    {
+        this->NumGSHPs = 0;
+        this->GetInputFlag = true;
+        this->GSHP.deallocate();
+        this->HeatPumpWaterUniqueNames.clear();
+        this->CurrentSimTime = 0.0;
+        this->PrevSimTime = 0.0;
+    }
+};
 
 } // namespace EnergyPlus
 

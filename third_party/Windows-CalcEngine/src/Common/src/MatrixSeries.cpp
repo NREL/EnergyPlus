@@ -1,4 +1,5 @@
 #include <cassert>
+#include <stdexcept>
 
 #include "MatrixSeries.hpp"
 #include "SquareMatrix.hpp"

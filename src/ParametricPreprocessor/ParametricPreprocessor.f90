@@ -145,7 +145,7 @@ INTEGER,PARAMETER :: oFH    = 3 !output file handle
 INTEGER,PARAMETER :: ErrFH  = 4 !error file name
 
 LOGICAL :: errorCondition = .FALSE.
-CHARACTER(len=LongString) :: errorContext
+CHARACTER(len=LongString) :: errorContext = ''
 
 ! Array that is used to hold error messages during execution so that they
 ! all get written at the end (not in the middle of any object)
@@ -351,7 +351,7 @@ IF (LEN_TRIM(InputFilePathName) .EQ. 0) THEN
 !  InputFilePathName = 'C:\Documents and Settings\Jason\My Documents\projects\EnergyPlusDev\ParametricInputs\dev 2009-06a\Debug\Shade-jg.idf'
 !  InputFilePathName = 'C:\Documents and Settings\Jason\My Documents\projects\EnergyPlusDev\ParametricInputs\dev 2009-06b\Debug\Shade-3-Changes-LogicDisablingOverhang-Try1A.idf'
 !  InputFilePathName = 'C:\Documents and Settings\Jason\My Documents\projects\EnergyPlusDev\ParametricInputs\dev 2009-08a\Debug\Cond-1-Select-Logic-jg.idf'
-  InputFilePathName = 'C:\Documents and Settings\Jason\My Documents\projects\EnergyPlusDev\ParametricInputs\dev 2009-08a\Debug\Cond-1-Parametric-LogicTestingIF.idf'
+!  InputFilePathName = 'C:\Documents and Settings\Jason\My Documents\projects\EnergyPlusDev\ParametricInputs\dev 2009-08a\Debug\Cond-1-Parametric-LogicTestingIF.idf'
   IF (verboseDebug) PRINT '(A,A)',' InputFilePathName:',TRIM(InputFilePathName)
 END IF
 FilePathOnly = PathOnly(InputFilePathName)
@@ -1241,7 +1241,7 @@ LOGICAL :: wroteErrorHeader = .FALSE.
 LOGICAL :: wroteWarningHeader = .FALSE.
 ! write errors first
 DO iError = 1,numErrMsgs
-  IF (ErrMsgs(numErrMsgs)%msgKind .EQ. msgError) THEN
+  IF (ErrMsgs(iError)%msgKind .EQ. msgError) THEN
     IF (.NOT. wroteErrorHeader) THEN
       wroteErrorHeader = .TRUE.
       WRITE(ErrFH, '(A)') '==================='
@@ -1249,14 +1249,14 @@ DO iError = 1,numErrMsgs
       WRITE(ErrFH, '(A)') '==================='
     END IF
     WRITE(ErrFH, '(A)') '-------------------------------------------------------------------------'
-    WRITE(ErrFH, '(A,A)') '      ', TRIM(ErrMsgs(numErrMsgs)%msgText)
-    WRITE(ErrFH, '(A,I4)') '      Number ',ErrMsgs(numErrMsgs)%msgErrNum
-    WRITE(ErrFH, '(A,A)') '      Context ', TRIM(ErrMsgs(numErrMsgs)%msgContext)
+    WRITE(ErrFH, '(A,A)') '      ', TRIM(ErrMsgs(iError)%msgText)
+    WRITE(ErrFH, '(A,I4)') '      Number ',ErrMsgs(iError)%msgErrNum
+    WRITE(ErrFH, '(A,A)') '      Context ', TRIM(ErrMsgs(iError)%msgContext)
   END IF
 END DO
 ! now write warnings
 DO iError = 1,numErrMsgs
-  IF (ErrMsgs(numErrMsgs)%msgKind .EQ. msgWarning) THEN
+  IF (ErrMsgs(iError)%msgKind .EQ. msgWarning) THEN
     IF (.NOT. wroteWarningHeader) THEN
       wroteWarningHeader = .TRUE.
       WRITE(ErrFH, '(A)') '==================='
@@ -1264,9 +1264,9 @@ DO iError = 1,numErrMsgs
       WRITE(ErrFH, '(A)') '==================='
     END IF
     WRITE(ErrFH, '(A)') '-------------------------------------------------------------------------'
-    WRITE(ErrFH, '(A,A)') '      ', TRIM(ErrMsgs(numErrMsgs)%msgText)
-    WRITE(ErrFH, '(A,I4)') '      Number ',ErrMsgs(numErrMsgs)%msgErrNum
-    WRITE(ErrFH, '(A,A)') '      Context ', TRIM(ErrMsgs(numErrMsgs)%msgContext)
+    WRITE(ErrFH, '(A,A)') '      ', TRIM(ErrMsgs(iError)%msgText)
+    WRITE(ErrFH, '(A,I4)') '      Number ',ErrMsgs(iError)%msgErrNum
+    WRITE(ErrFH, '(A,A)') '      Context ', TRIM(ErrMsgs(iError)%msgContext)
   END IF
 END DO
 IF (numErrMsgs .GT. 0) THEN
@@ -2752,6 +2752,7 @@ PRINT '(A,I4)','      Number ',ErrorNumber
 IF (LEN_TRIM(errorContext) .GT. 0) THEN
   PRINT '(A,A)','   CONTEXT:', TRIM(errorContext)
 END IF
+errorContext = ''
 IF (KindOfError .EQ. msgError) errorCondition = .TRUE.
 END SUBROUTINE
 

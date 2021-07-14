@@ -25,7 +25,7 @@ conv,J,MMBtu,9.4845E-10,0
 !   (1 J / 1 W-s) * (1 hr/3600 s) * (1 ton  / 3516.853 W)
 conv,J,ton-hr,7.89847E-08,0
 !   (1 Btu/1054.35 J) * (1 kBtu/1000 Btu) * (0.4535924 kg / 1 lb)
-conv,J/kg,kBtu/lb,4.302105E-07,0
+conv,J/kg,kBtu/lb,4.2986E-07,0.007686
 !   (1 Btu/1054.35 J) * (1 kBtu/1000 Btu) * (0.09290304 m2 / 1 ft2)
 conv,J/m2,kBtu/sqft,8.811404E-08,0
 !   (1 Btu/1054.35 J) * (1 kBtu/1000 Btu) * (1000 J / 1 kJ)

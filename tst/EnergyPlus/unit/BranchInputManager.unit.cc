@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 
@@ -66,7 +67,6 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.6;",
         "Branch,",
         "VAV Sys 1 Main Branch,   !- Name",
         ",                        !- Pressure Drop Curve Name",
@@ -85,9 +85,9 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    static std::string const RoutineName("GetBranchInput: ");
-    CurrentModuleObject = "Branch";
-    int NumOfBranches = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+    static constexpr std::string_view RoutineName("GetBranchInput: ");
+    std::string CurrentModuleObject = "Branch";
+    int NumOfBranches = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, CurrentModuleObject);
     int NumParams;
     int NumAlphas;           // Used to retrieve names from IDF
     int NumNumbers;          // Used to retrieve numbers from IDF
@@ -103,13 +103,12 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
     int IOStat; // Could be used in the Get Routines, not currently checked
 
     if (NumOfBranches > 0) {
-        Branch.allocate(NumOfBranches);
-        for (auto &e : Branch)
+        state->dataBranchInputManager->Branch.allocate(NumOfBranches);
+        for (auto &e : state->dataBranchInputManager->Branch)
             e.AssignedLoopName.clear();
-        bool ErrFound = false;
-        inputProcessor->getObjectDefMaxArgs("NodeList", NumParams, NumAlphas, NumNumbers);
+        state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(*state, "NodeList", NumParams, NumAlphas, NumNumbers);
         NodeNums.dimension(NumParams, 0);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
+        state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(*state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
         Alphas.allocate(NumAlphas);
         Numbers.dimension(NumNumbers, 0.0);
         cAlphaFields.allocate(NumAlphas);
@@ -119,13 +118,23 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
         int BCount = 0;
         for (int Count = 1; Count <= NumOfBranches; ++Count) {
 
-            inputProcessor->getObjectItem(CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks,
-                                          cAlphaFields, cNumericFields);
+            state->dataInputProcessing->inputProcessor->getObjectItem(*state,
+                                                                      CurrentModuleObject,
+                                                                      Count,
+                                                                      Alphas,
+                                                                      NumAlphas,
+                                                                      Numbers,
+                                                                      NumNumbers,
+                                                                      IOStat,
+                                                                      lNumericBlanks,
+                                                                      lAlphaBlanks,
+                                                                      cAlphaFields,
+                                                                      cNumericFields);
             IsNotOK = false;
             IsBlank = false;
-            UtilityRoutines::VerifyName(Alphas(1), Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
+            UtilityRoutines::VerifyName(
+                *state, Alphas(1), state->dataBranchInputManager->Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
             if (IsNotOK) {
-                ErrFound = true;
                 if (IsBlank) {
                     continue;
                 } else {
@@ -134,7 +143,7 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
             }
             ++BCount;
 
-            GetSingleBranchInput(RoutineName, BCount, Alphas, cAlphaFields, NumAlphas, NodeNums, lAlphaBlanks);
+            GetSingleBranchInput(*state, RoutineName, BCount, Alphas, cAlphaFields, NumAlphas, NodeNums, lAlphaBlanks);
         }
 
         EXPECT_EQ(NumOfBranches, 1);
@@ -146,7 +155,6 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
         EXPECT_TRUE(UtilityRoutines::SameString(Alphas(5), "VAV Sys 1 Inlet Node"));
         EXPECT_TRUE(UtilityRoutines::SameString(Alphas(6), "Mixed Air Node 1"));
 
-        NumOfBranches = BCount;
         NodeNums.deallocate();
         Alphas.deallocate();
         Numbers.deallocate();
@@ -161,7 +169,6 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.6;",
         "Branch,",
         "VAV Sys 1 Main Branch,   !- Name",
         ",                        !- Pressure Drop Curve Name",
@@ -245,9 +252,9 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    static std::string const RoutineName("GetBranchInput: ");
-    CurrentModuleObject = "Branch";
-    int NumOfBranches = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+    static constexpr std::string_view RoutineName("GetBranchInput: ");
+    std::string CurrentModuleObject = "Branch";
+    int NumOfBranches = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, CurrentModuleObject);
     int NumParams;
     int NumAlphas;           // Used to retrieve names from IDF
     int NumNumbers;          // Used to retrieve numbers from IDF
@@ -263,13 +270,12 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
     int IOStat; // Could be used in the Get Routines, not currently checked
 
     if (NumOfBranches > 0) {
-        Branch.allocate(NumOfBranches);
-        for (auto &e : Branch)
+        state->dataBranchInputManager->Branch.allocate(NumOfBranches);
+        for (auto &e : state->dataBranchInputManager->Branch)
             e.AssignedLoopName.clear();
-        bool ErrFound = false;
-        inputProcessor->getObjectDefMaxArgs("NodeList", NumParams, NumAlphas, NumNumbers);
+        state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(*state, "NodeList", NumParams, NumAlphas, NumNumbers);
         NodeNums.dimension(NumParams, 0);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
+        state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(*state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
         Alphas.allocate(NumAlphas);
         Numbers.dimension(NumNumbers, 0.0);
         cAlphaFields.allocate(NumAlphas);
@@ -279,13 +285,23 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
         int BCount = 0;
         for (int Count = 1; Count <= NumOfBranches; ++Count) {
 
-            inputProcessor->getObjectItem(CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks,
-                                          cAlphaFields, cNumericFields);
+            state->dataInputProcessing->inputProcessor->getObjectItem(*state,
+                                                                      CurrentModuleObject,
+                                                                      Count,
+                                                                      Alphas,
+                                                                      NumAlphas,
+                                                                      Numbers,
+                                                                      NumNumbers,
+                                                                      IOStat,
+                                                                      lNumericBlanks,
+                                                                      lAlphaBlanks,
+                                                                      cAlphaFields,
+                                                                      cNumericFields);
             IsNotOK = false;
             IsBlank = false;
-            UtilityRoutines::VerifyName(Alphas(1), Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
+            UtilityRoutines::VerifyName(
+                *state, Alphas(1), state->dataBranchInputManager->Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
             if (IsNotOK) {
-                ErrFound = true;
                 if (IsBlank) {
                     continue;
                 } else {
@@ -294,7 +310,7 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
             }
             ++BCount;
 
-            GetSingleBranchInput(RoutineName, BCount, Alphas, cAlphaFields, NumAlphas, NodeNums, lAlphaBlanks);
+            GetSingleBranchInput(*state, RoutineName, BCount, Alphas, cAlphaFields, NumAlphas, NodeNums, lAlphaBlanks);
         }
 
         EXPECT_EQ(NumOfBranches, 1);
@@ -321,7 +337,6 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
         EXPECT_TRUE(UtilityRoutines::SameString(Alphas(17), "Main Heating Coil 1 Outlet Node"));
         EXPECT_TRUE(UtilityRoutines::SameString(Alphas(18), "VAV Sys 1 Outlet Node"));
 
-        NumOfBranches = BCount;
         NodeNums.deallocate();
         Alphas.deallocate();
         Numbers.deallocate();
@@ -338,7 +353,6 @@ TEST_F(EnergyPlusFixture, BranchInputManager_FindAirLoopBranchConnection)
 {
 
     std::string const idf_objects = delimited_string({
-        " Version,8.5;",
 
         "AirLoopHVAC,",
         "  DOAS,                    !- Name",
@@ -383,7 +397,7 @@ TEST_F(EnergyPlusFixture, BranchInputManager_FindAirLoopBranchConnection)
     FoundLoopVolFlowRate = 0.0;
     MatchedLoop = false;
 
-    FindAirLoopBranchConnection(BranchListName, FoundLoopName, FoundLoopNum, LoopType, FoundLoopVolFlowRate, MatchedLoop);
+    FindAirLoopBranchConnection(*state, BranchListName, FoundLoopName, FoundLoopNum, LoopType, FoundLoopVolFlowRate, MatchedLoop);
 
     EXPECT_EQ("AIR LOOP 1", FoundLoopName);
     EXPECT_EQ(2, FoundLoopNum);
@@ -399,7 +413,7 @@ TEST_F(EnergyPlusFixture, BranchInputManager_FindAirLoopBranchConnection)
     FoundLoopVolFlowRate = 0.0;
     MatchedLoop = false;
 
-    FindAirLoopBranchConnection(BranchListName, FoundLoopName, FoundLoopNum, LoopType, FoundLoopVolFlowRate, MatchedLoop);
+    FindAirLoopBranchConnection(*state, BranchListName, FoundLoopName, FoundLoopNum, LoopType, FoundLoopVolFlowRate, MatchedLoop);
 
     EXPECT_EQ("DOAS", FoundLoopName);
     EXPECT_EQ(1, FoundLoopNum);
@@ -415,7 +429,7 @@ TEST_F(EnergyPlusFixture, BranchInputManager_FindAirLoopBranchConnection)
     FoundLoopVolFlowRate = 0.0;
     MatchedLoop = false;
 
-    FindAirLoopBranchConnection(BranchListName, FoundLoopName, FoundLoopNum, LoopType, FoundLoopVolFlowRate, MatchedLoop);
+    FindAirLoopBranchConnection(*state, BranchListName, FoundLoopName, FoundLoopNum, LoopType, FoundLoopVolFlowRate, MatchedLoop);
 
     EXPECT_EQ("None", FoundLoopName);
     EXPECT_EQ(0, FoundLoopNum);
@@ -428,7 +442,6 @@ TEST_F(EnergyPlusFixture, BranchInputManager_GetAirBranchIndex)
 {
 
     std::string const idf_objects = delimited_string({
-        " Version,8.5;",
 
         "Branch,",
         "  DOAS Main Branch,        !- Name",
@@ -469,27 +482,24 @@ TEST_F(EnergyPlusFixture, BranchInputManager_GetAirBranchIndex)
     // Note the strings need to be uppercase at this point
     CompType = "AIRLOOPHVAC:OUTDOORAIRSYSTEM";
     CompName = "DOAS OA SYSTEM";
-    BranchIndex = 0;
 
-    BranchIndex = GetAirBranchIndex(CompType, CompName);
+    BranchIndex = GetAirBranchIndex(*state, CompType, CompName);
 
     EXPECT_EQ(1, BranchIndex);
 
     // Case 3 Find pipe
     CompType = "PIPE:ADIABATIC";
     CompName = "TOWERWATERSYS DEMAND BYPASS PIPE";
-    BranchIndex = 0;
 
-    BranchIndex = GetAirBranchIndex(CompType, CompName);
+    BranchIndex = GetAirBranchIndex(*state, CompType, CompName);
 
     EXPECT_EQ(2, BranchIndex);
 
     // Case 4 Not found
     CompType = "PIPE:ADIABATIC";
     CompName = "TOWERWATERSYS DEMAND BYPASS PIPE NOT THERE";
-    BranchIndex = 0;
 
-    BranchIndex = GetAirBranchIndex(CompType, CompName);
+    BranchIndex = GetAirBranchIndex(*state, CompType, CompName);
 
     EXPECT_EQ(0, BranchIndex);
 }

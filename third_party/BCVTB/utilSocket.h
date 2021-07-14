@@ -155,7 +155,7 @@ extern int SERVER_VERSION;
 ///\param bufLen The length of the character array \c buffer. This parameter will
 ///              be set to the new size of \c buffer if memory was reallocated.
 ///\return 0 if no error occurred.
-int save_append(char* *buffer, const char *toAdd, int *bufLen);
+int save_append(char* *buffer, const char *toAdd, size_t *bufLen);
 
 ////////////////////////////////////////////////////////////////
 /// Assembles the buffer that will be exchanged through the IPC.
@@ -174,7 +174,7 @@ int assembleBuffer(int flag,
 		   int nDbl, int nInt, int nBoo,
 		   double curSimTim,
 		   double dblVal[], int intVal[], int booVal[],
-		   char* *buffer, int *bufLen);
+		   char* *buffer, size_t *bufLen);
 
 /////////////////////////////////////////////////////////////////
 /// Gets an integer and does the required error checking.

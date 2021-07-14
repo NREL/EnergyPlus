@@ -8,7 +8,7 @@
 ! Plant:    None.
 ! SolDis=FullExterior, Aniso, Detailed Interior and Exterior Convection
 
-  Version,9.0;
+  Version,9.6;
 
   Timestep,4;
 
@@ -16,7 +16,7 @@
     CTF TEST ZONES,          !- Name
     0.0000000E+00,           !- North Axis {deg}
     Suburbs,                 !- Terrain
-    3.9999999E-02,           !- Loads Convergence Tolerance Value
+    3.9999999E-02,           !- Loads Convergence Tolerance Value {W}
     3.9999999E-02,           !- Temperature Convergence Tolerance Value {deltaC}
     FullExterior,            !- Solar Distribution
     35,                      !- Maximum Number of Warmup Days
@@ -33,10 +33,12 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year

@@ -103,6 +103,32 @@ derivative works thereof, in binary and source code form.
 
 #include "utilXml.h"
 
+
+
+Stack2 expStk; ///< Variables for getxmlvalue function
+
+char * att; ///< Local global variable for function \c getxmlvalue
+char * vals;  ///< Local global variable for function \c getxmlvalue
+size_t * numVals; ///< Local global variable for function \c getxmlvalue
+int PARSEVALUE; ///< flag for parsing xml values 1 if parse, 0 if not parse
+int ERROR_STATUS; ///< flag for xml element handler error status settings
+
+////////////////////////////////////////////////////////////////
+/// local global variables for function \c getepvariables
+////////////////////////////////////////////////////////////////
+char *  outputVarsName; ///< the string pointer to the parsed output variable names
+char *  outputVarsType; ///< the string pointer to the parsed output variable types
+int *   numOutputVars;  ///< the integer pointer to the number of output variables
+char *  inputVars;      ///< the string pointer to the input variables
+int *   numInputVars;   ///< the integer pointer to the number of input variables
+int *   inputVarsType;  ///< the integer array to store the types of each input variables
+char ** inputKeys;      ///< the string array to store the types of input variable types
+int     numInputKeys;   ///< the number of input variable types
+int     source;         ///< flag for function /c getepvariables 0=EnergyPlus, 1=Ptolemy
+size_t const * strLen;     ///< the length of string parsed to this function
+
+
+
 ////////////////////////////////////////////////////////////////
 /// Call back functions that will be used by the expat xml parser.
 ///
@@ -114,7 +140,8 @@ derivative works thereof, in binary and source code form.
 static void XMLCALL
 EPstart(void * data, char const * el, char const ** attr)
 {
-  int i, j, k;
+  (void)data;
+  int i, j;
   if(ERROR_STATUS == 1) return;
   if( 0 == strcmp(el, "BCVTB-variables") )
     return;
@@ -145,17 +172,17 @@ EPstart(void * data, char const * el, char const ** attr)
         ERROR_STATUS = 1; return;
       }
 
-      if( (strlen(outputVarsName)+strlen(attr[(i+1)%4])+2) > (*strLen) ){
+      if( (strlen(outputVarsName)+strlen(attr[(i+1)%4])+2u) > (*strLen) ){
         fprintf(stderr, "Error: Not enough memory allocated for EnergyPlus output.\n"
-                        "       Allocated: %d.\n", *strLen);
+                        "       Allocated: %d.\n", (int)*strLen);
         ERROR_STATUS = 1; return;
       }
       strcat(outputVarsName,(char *) attr[(i+1)%4]);
       strcat(outputVarsName, (char *) ";");
 
-      if( (strlen(outputVarsType)+strlen(attr[(i+3)%4])+2) > *strLen ){
+      if( (strlen(outputVarsType)+strlen(attr[(i+3)%4])+2u) > *strLen ){
         fprintf(stderr, "Error: Not enough memory allocated for EnergyPlus output.\n"
-                        "       Allocated: %d.\n", *strLen);
+                        "       Allocated: %d.\n", (int)*strLen);
         ERROR_STATUS = 1; return;
       }
       strcat(outputVarsType, (char *) attr[(i+3)%4]);
@@ -172,10 +199,10 @@ EPstart(void * data, char const * el, char const ** attr)
       }
       for( j=0; j< numInputKeys; j++) {
         if( 0 == strcmp((char *)inputKeys[j], (char *)attr[0]) ){
-          if( (strlen(inputVars)+strlen(attr[1])+2) > *strLen){
+          if( (strlen(inputVars)+strlen(attr[1])+2u) > *strLen){
             fprintf(stderr, "Error: Memory allocated for parsed E+ input\n"
                             "       variables name is not enough,\n"
-                            "       allocated: %d.\n", *strLen);
+                            "       allocated: %d.\n", (int)*strLen);
             ERROR_STATUS = 1; return;
           }
           inputVarsType[*numInputVars] = j+1;
@@ -203,6 +230,8 @@ EPstart(void * data, char const * el, char const ** attr)
 static void XMLCALL
 EPend(void * data, char const * el)
 {
+  (void)data;
+  (void)el;
   source = -1;
 }
 
@@ -250,10 +279,11 @@ getepvariables(
  char *	const myInputVars,
  int *	const myNumInputVars,
  int *	const myInputVarsType,
- int const *	const myStrLen
+ size_t const *	const myStrLen
 )
 {
 
+  char Buff[BUFFSIZE]; ///< Local buffer for reading in the xml file
   FILE * fd;
   XML_Parser p;
   int i, j, count, ret;
@@ -391,13 +421,14 @@ getepvariablesFMU(
  char *	const myInputVars,
  int *	const myNumInputVars,
  int *	const myInputVarsType,
- int const *	const myStrLen
+ size_t const *	const myStrLen
 )
 {
 
+  char Buff[BUFFSIZE]; ///< Local buffer for reading in the xml file
   FILE * fd;
   XML_Parser p;
-  int i, j, count, ret;
+  int i, j, count;
 
   //ret = check_variable_cfg_Validate(fileName);
   //if(-1 == ret)
@@ -554,6 +585,7 @@ stackPushBCVTB(char const * str)
 static void XMLCALL
 start(void * data, char const * el, char const ** attr)
 {
+  (void)data;
   int i;
   if(0 == strcmp(el, expStk.head[expStk.cur]) && expStk.cur < expStk.top )
     expStk.cur++;
@@ -564,7 +596,7 @@ start(void * data, char const * el, char const ** attr)
           if( (strlen(vals)+strlen(attr[i+1])+2) > *strLen){
             fprintf(stderr, "Error: Memory allocated for parsed attribute\n"
                              "      values is not enough, allocated: %d.\n",
-                             *strLen);
+                             (int)*strLen);
             *numVals = strlen(vals) + strlen(attr[i+1])+2;
             return;
           }
@@ -586,6 +618,7 @@ start(void * data, char const * el, char const ** attr)
 static void XMLCALL
 end(void * data, char const * el)
 {
+  (void)data;
   if(!strcmp(el, expStk.head[expStk.cur])&& expStk.cur>0)
     expStk.cur--;
 }
@@ -613,10 +646,11 @@ getxmlvalues(
  char const * const fileName,
  char const * const exp,
  char * const myVals,
- int * const myNumVals,
- int const myStrLen
+ size_t * const myNumVals,
+ size_t const myStrLen
 )
 {
+  char Buff[BUFFSIZE]; ///< Local buffer for reading in the xml file
   char * temp;
   int i,j;
   FILE * fd;
@@ -684,7 +718,7 @@ getxmlvalues(
 	  free(temp);
       return -1;
     }
-    for(i=1; i<strlen(temp); i++)
+    for(i=1; i<(int)strlen(temp); i++)
       att[i-1] = temp[i];
     att[i-1]='\0';
     free(temp);
@@ -752,13 +786,14 @@ getxmlvalues(
 ///\param fileName the name of the xml file
 ///\param exp the xPath expression
 ////////////////////////////////////////////////////////////////
-int
+size_t
 getnumberofxmlvalues(
  char const * const fileName,
  char const * const exp
 )
 {
-  int n, ret;
+  size_t n;
+  int ret;
   char * str;
   int strLen = 0;
   n=0;
@@ -807,14 +842,15 @@ getxmlvaluesf(
  char const * const fileName,
  char const * const exp,
  char const * const atrName,
- int * const nVal,
+ size_t * const nVal,
  char * str,
- int * const strLen
+ size_t * const strLen
 )
 {
   ///////////////////////////////////////////////
   /// This part of the code is for compatibility
   /// with the BCVTB version 0.2 and earlier
+  (void)atrName;
   int ret = check_variable_cfg_Validate(fileName);
   if(-1 == ret)
     return -1;
@@ -864,7 +900,7 @@ getxmlvalue(
  char const * const fileName,
  char const * const exp,
  char * const str,
- int * const nVals,
+ size_t * const nVals,
  int const strLen
 )
 {
@@ -889,7 +925,7 @@ getxmlvalue(
                     "       while expecting one value. \n"
                     "       number of xml values parsed is: %d\n"
                     "       xPath: '%s'\n",
-                    *nVals, exp);
+                    (int)*nVals, exp);
     return -1;
   }
   return 0;

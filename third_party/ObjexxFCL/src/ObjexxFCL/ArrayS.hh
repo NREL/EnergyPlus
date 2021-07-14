@@ -16,7 +16,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/ArrayS.fwd.hh>
 #include <ObjexxFCL/BArray.hh>
-#include <ObjexxFCL/fmt.hh>
 #include <ObjexxFCL/TypeTraits.hh>
 
 // C++ Headers
@@ -108,8 +107,7 @@ public: // Creation
 
 	// Destructor
 	virtual
-	~ArrayS()
-	{}
+	~ArrayS() = default;
 
 public: // Predicate
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,8 +54,10 @@
 #include <ObjexxFCL/Array3D.hh>
 
 // EnergyPlus Headers
-#include <DataVectorTypes.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/EPVector.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -64,42 +66,30 @@ namespace DataBSDFWindow {
     // Using/Aliasing
     using DataVectorTypes::Vector;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
+    enum class Basis
+    {
+        Unassigned = -1,
+        WINDOW,
+        Custom
+    };
 
-    extern int const BasisType_WINDOW;
-    extern int const BasisType_Custom;
-
-    extern int const BasisSymmetry_Axisymmetric;
-    extern int const BasisSymmetry_None;
+    enum class BasisSymmetry
+    {
+        Unassigned = -1,
+        Axisymmetric,
+        None
+    };
 
     // Thermal calculations for complex fenestration can be used to generate reports for standard cases
     // noCondition is used when performing timestep calculations
-    // summerCondtion will override certain parameters so that produced results are matching standard summer WINDOW (software) results
-    // winterCondition will override certain parameters so that produced resuls are matching standard winter WINDOW (software) results
-    extern int const noCondition;
-    extern int const summerCondition;
-    extern int const winterCondition;
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // Structure to keep reference points coefficients for different reference points and illuminance maps
-
-    // Allocation of complex fenestration data:  SurfaceWindow(:)%ComplexFen is a structure of type BSDFWindowDescript
-    // defined in DataSurfaces.  ComplexWind(:) is an array of type BSDF WindowGeomDescr defined as a module
-    // variable in WindowComplexManager
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    extern int TotComplexFenStates; // Number of complex fenestration construction definitions
-    extern int FirstBSDF;           // Location of first complex fenestration construction definition in Constr array
-    extern int MaxBkSurf;           // was 20    Maximum number of back surfaces in solar overlap & interior solar distribution
-    extern int TotThermalModels;    // Number of thermal models
-    // calculation
-    extern Array3D<Real64> SUNCOSTS;     // Timestep values of solar direction cosines
-    extern Array2D<Real64> BSDFTempMtrx; // Temporary matrix for holding axisymmetric input
-
-    // Types
+    // summerCondtion will override certain parameters so that produced results are matching standard summer WINDOW  = software results
+    // winterCondition will override certain parameters so that produced results are matching standard winter WINDOW  = software results
+    enum class Condition
+    {
+        Unassigned = -1,
+        summerCondition,
+        winterCondition
+    };
 
     struct BasisElemDescr
     {
@@ -126,6 +116,8 @@ namespace DataBSDFWindow {
 
         // Default Constructor
         BasisElemDescr()
+            : Theta(0.0), Phi(0.0), dTheta(0.0), dPhi(0.0), UpprTheta(0.0), LwrTheta(0.0), UpprPhi(0.0), LwrPhi(0.0), INNbInL(0), INNbInH(0),
+              INNbOutL(0), INNbOutH(0), INNbLft(0), INNbRt(0)
         {
         }
     };
@@ -137,7 +129,7 @@ namespace DataBSDFWindow {
         Real64 Azimuth;  // Azimuth is measured from positive x counter clockwise. Its range is from -pi to pi
 
         // Default Constructor
-        BSDFDaylghtPosition()
+        BSDFDaylghtPosition() : Altitude(0.0), Azimuth(0.0)
         {
         }
 
@@ -153,21 +145,21 @@ namespace DataBSDFWindow {
     struct BasisStruct
     {
         // Members
-        int BasisType;                // BasisType_WINDOW or BasisType_Custom  (see HeatBalanceManager)
-        int BasisSymmetryType;        // BasisSymmetry_Axisymmetric or BasisSymmetry_None  (see HeatBalanceManager)
-        int BasisMatIndex;            // pointer to matrix for basis
-        int NBasis;                   // No. elements in basis
-        Array1D<Real64> Lamda;        // Vector of diagonal Lamda matrix elems for grid
-        Array1D<Real64> SolAng;       // Vector of basis element solid angles for grid
-        int NThetas;                  // No. Theta values in basis
-        Array1D<Real64> Thetas;       // List of basis theta values
-        Array1D_int NPhis;            // No. basis phi values for each theta
-        Array2D<Real64> Phis;         // List of basis phi values for each theta
-        Array2D_int BasisIndex;       // Index of basis element for theta, phi
-        Array1D<BasisElemDescr> Grid; // actual basis (to be constructed from matrix)
+        Basis BasisType;                 // BasisType_WINDOW or BasisType_Custom  (see HeatBalanceManager)
+        BasisSymmetry BasisSymmetryType; // BasisSymmetry_Axisymmetric or BasisSymmetry_None  (see HeatBalanceManager)
+        int BasisMatIndex;               // pointer to matrix for basis
+        int NBasis;                      // No. elements in basis
+        Array1D<Real64> Lamda;           // Vector of diagonal Lamda matrix elems for grid
+        Array1D<Real64> SolAng;          // Vector of basis element solid angles for grid
+        int NThetas;                     // No. Theta values in basis
+        Array1D<Real64> Thetas;          // List of basis theta values
+        Array1D_int NPhis;               // No. basis phi values for each theta
+        Array2D<Real64> Phis;            // List of basis phi values for each theta
+        Array2D_int BasisIndex;          // Index of basis element for theta, phi
+        Array1D<BasisElemDescr> Grid;    // actual basis (to be constructed from matrix)
 
         // Default Constructor
-        BasisStruct() : BasisType(0), BasisSymmetryType(0), BasisMatIndex(0), NBasis(0), NThetas(0)
+        BasisStruct() : BasisType(Basis::Unassigned), BasisSymmetryType(BasisSymmetry::Unassigned), BasisMatIndex(0), NBasis(0), NThetas(0)
         {
         }
     };
@@ -215,10 +207,10 @@ namespace DataBSDFWindow {
         Array2D<Real64>
             ARhoVisOverlap; // Overlap areas multiplied with surface reflectance for each outgoing direction (Trn) (no of outgoing dir, NBKSurf)
         Array1D<Real64> AveRhoVisOverlap; // Average visible reflectance from overlap surface which originates from one outgoing direction
-        bool InitState;                   // Flag for marking that state needs to be initalized
+        bool InitState;                   // Flag for marking that state needs to be initialized
 
         // Default Constructor
-        BSDFGeomDescr() : InitState(true)
+        BSDFGeomDescr() : NSkyUnobs(0), NGndUnobs(0), NSky(0), NGnd(0), NReflSurf(0), InitState(true)
         {
         }
     };
@@ -244,9 +236,7 @@ namespace DataBSDFWindow {
         Array1D<Real64> RefPtIntPosFac; // position factors for intersections from reference point to window for each outgoing direction (NTrnBasis)
 
         // Default Constructor
-        BSDFRefPoints()
-        {
-        }
+        BSDFRefPoints() = default;
     };
 
     struct BSDFDaylghtGeomDescr
@@ -257,9 +247,7 @@ namespace DataBSDFWindow {
         Array1D<BSDFRefPoints> RefPoint; // keep reference points daylight coefficients (# of reference points)
 
         // Default Constructor
-        BSDFDaylghtGeomDescr()
-        {
-        }
+        BSDFDaylghtGeomDescr() = default;
     };
 
     struct BSDFBkSurfDescr
@@ -275,9 +263,7 @@ namespace DataBSDFWindow {
         // Complex Fenestration; they depend on the sun direction if the back surface window is a regular window
 
         // Default Constructor
-        BSDFBkSurfDescr()
-        {
-        }
+        BSDFBkSurfDescr() = default;
     };
 
     struct BSDFStateDescr
@@ -322,7 +308,9 @@ namespace DataBSDFWindow {
         Array1D<Real64> IntegratedBkTrans; // Integrated back layer transmittance (for each back direction)
 
         // Default Constructor
-        BSDFStateDescr() : Konst(0), WinSkyTrans(0.0), WinSkyGndTrans(0.0), WinBkHemRefl(0.0), WinBkHemVisRefl(0.0), NLayers(0)
+        BSDFStateDescr()
+            : Konst(0), WinDiffTrans(0.0), WinDiffVisTrans(0.0), WinSkyTrans(0.0), WinSkyGndTrans(0.0), WinBkHemRefl(0.0), WinBkHemVisRefl(0.0),
+              NLayers(0)
         {
         }
     };
@@ -334,9 +322,7 @@ namespace DataBSDFWindow {
         Array1D<Vector> SolidAngleVec; // unit vector from reference point towards center of window element (# window el)
 
         // Default Constructor
-        BSDFRefPointsGeomDescr()
-        {
-        }
+        BSDFRefPointsGeomDescr() = default;
     };
 
     struct BSDFWindowGeomDescr
@@ -354,13 +340,12 @@ namespace DataBSDFWindow {
         Array1D<Real64> sdotN;                     // Dot product of unit vector s with back surface normal
         // here s is vector from center of window to center of back surface
         // Function of the following subsumed by using an index of 0 if no beam incidence
-        // REAL(r64), DIMENSION(: , : ), ALLOCATABLE  ::  SolBmWt  !Intensity wt for beam radiation (Hour, timestep)
         Array2D<BSDFRefPointsGeomDescr>
             IlluminanceMap; // array to keep bsdf coefficients for different illuminance maps (# of illuminance maps, # of reference points)
         Array1D<BSDFRefPointsGeomDescr> RefPoint; // keep reference points daylight coefficients (# of reference points)
 
         // Default Constructor
-        BSDFWindowGeomDescr() : DaylightingInitialized(false), NBkSurf(0)
+        BSDFWindowGeomDescr() : NumStates(0), DaylightingInitialized(false), NBkSurf(0)
         {
         }
     };
@@ -384,7 +369,7 @@ namespace DataBSDFWindow {
         Array1D<BSDFStateDescr> State; // State description, dimensioned with number of states
 
         // Default Constructor
-        BSDFWindowDescript() : CurrentState(1)
+        BSDFWindowDescript() : NumStates(0), CurrentState(1)
         {
         }
     };
@@ -409,8 +394,8 @@ namespace DataBSDFWindow {
     {
         // Members
         // nested data for Construction
-        int BasisType;
-        int BasisSymmetryType;
+        Basis BasisType;
+        BasisSymmetry BasisSymmetryType;
         int ThermalModel;            // Pointer to thermal model
         int BasisMatIndex;           // pointer to matrix for basis
         int BasisMatNrows;           // No. rows in matrix
@@ -433,24 +418,45 @@ namespace DataBSDFWindow {
         int VisBkReflNrows;          // No. rows in matrix
         int VisBkReflNcols;          // No. columns in matrix
         Array2D<Real64> VisBkRefl;   // Back visible reflectance matrix
-        // INTEGER   :: ThermalConstruction  !Pointer to location in Construct array of thermal construction for the state
-        // (to be implemented)
         int NumLayers;
         Array1D<BSDFLayerAbsorpStruct> Layer;
 
         // Default Constructor
         BSDFWindowInputStruct()
-            : BasisType(0), BasisSymmetryType(0), ThermalModel(0), BasisMatIndex(0), BasisMatNrows(0), BasisMatNcols(0), NBasis(0),
-              SolFrtTransIndex(0), SolFrtTransNrows(0), SolFrtTransNcols(0), SolBkReflIndex(0), SolBkReflNrows(0), SolBkReflNcols(0),
-              VisFrtTransIndex(0), VisFrtTransNrows(0), VisFrtTransNcols(0), VisBkReflIndex(0), VisBkReflNrows(0), VisBkReflNcols(0), NumLayers(0)
+            : BasisType(Basis::Unassigned), BasisSymmetryType(BasisSymmetry::Unassigned), ThermalModel(0), BasisMatIndex(0), BasisMatNrows(0),
+              BasisMatNcols(0), NBasis(0), SolFrtTransIndex(0), SolFrtTransNrows(0), SolFrtTransNcols(0), SolBkReflIndex(0), SolBkReflNrows(0),
+              SolBkReflNcols(0), VisFrtTransIndex(0), VisFrtTransNrows(0), VisFrtTransNcols(0), VisBkReflIndex(0), VisBkReflNrows(0),
+              VisBkReflNcols(0), NumLayers(0)
         {
         }
     };
 
-    // Object Data
-    extern Array1D<BSDFWindowGeomDescr> ComplexWind; // Window geometry structure: set in CalcPerSolarBeam/SolarShading
-
 } // namespace DataBSDFWindow
+
+struct BSDFWindowData : BaseGlobalStruct
+{
+
+    int TotComplexFenStates = 0; // Number of complex fenestration construction definitions
+    int FirstBSDF = 0;           // Location of first complex fenestration construction definition in Constr array
+    int MaxBkSurf = 20;          // was 20    Maximum number of back surfaces in solar overlap & interior solar distribution
+    int TotThermalModels = 0;    // Number of thermal models
+
+    // calculation
+    Array2D<Vector3<Real64>> SUNCOSTS = Array2D<Vector3<Real64>>(60, 24); // Timestep values of solar direction cosines
+    Array2D<Real64> BSDFTempMtrx;                                         // Temporary matrix for holding axisymmetric input
+    EPVector<DataBSDFWindow::BSDFWindowGeomDescr> ComplexWind;            // Window geometry structure: set in CalcPerSolarBeam/SolarShading
+
+    void clear_state() override
+    {
+        this->TotComplexFenStates = 0;
+        this->FirstBSDF = 0;
+        this->MaxBkSurf = 20;
+        this->TotThermalModels = 0;
+        this->SUNCOSTS = Array2D<Vector3<Real64>>(60, 24);
+        this->BSDFTempMtrx.deallocate();
+        this->ComplexWind.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

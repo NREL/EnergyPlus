@@ -7,23 +7,23 @@
 //           Building Technologies Department
 //           Lawrence Berkeley National Laboratory
 
-// This work was supported by the Assistant Secretary for Energy Efficiency 
-// and Renewable Energy, Office of Building Technologies, 
-// Building Systems and Materials Division of the 
+// This work was supported by the Assistant Secretary for Energy Efficiency
+// and Renewable Energy, Office of Building Technologies,
+// Building Systems and Materials Division of the
 // U.S. Department of Energy under Contract No. DE-AC03-76SF00098.
 
-// NOTICE: The Government is granted for itself and others acting on its behalf 
-// a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce, 
-// prepare derivative works, and perform publicly and display publicly. 
+// NOTICE: The Government is granted for itself and others acting on its behalf
+// a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce,
+// prepare derivative works, and perform publicly and display publicly.
 // Beginning five (5) years after (date permission to assert copyright was obtained),
-// subject to two possible five year renewals, the Government is granted for itself 
+// subject to two possible five year renewals, the Government is granted for itself
 // and others acting on its behalf a paid-up, nonexclusive, irrevocable worldwide
-// license in this data to reproduce, prepare derivative works, distribute copies to 
-// the public, perform publicly and display publicly, and to permit others to do so. 
+// license in this data to reproduce, prepare derivative works, distribute copies to
+// the public, perform publicly and display publicly, and to permit others to do so.
 // NEITHER THE UNITED STATES NOR THE UNITED STATES DEPARTMENT OF ENERGY, NOR ANY OF
-// THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL 
-// LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY 
-// INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE 
+// THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL
+// LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY
+// INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE
 // WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 // =================================================================================
 
@@ -31,7 +31,7 @@ namespace BldgGeomLib {
 
 class DirGen;
 class RHCoordSys3;
- 
+
 class plane3
 {
 public:
@@ -40,7 +40,7 @@ public:
 	plane3();
 	plane3(const point3& p0, const vector3& normal);
 	plane3(const point3& p0, const RHCoordSys3& cs);
-	plane3(const point3& p0, const point3& p1, const point3& p2);	
+	plane3(const point3& p0, const point3& p1, const point3& p2);
 //	plane3(const plane3 &p);			// Copy constructor
 
 	~plane3();
@@ -50,9 +50,9 @@ public:
 	vector3	normVec() const;	//	ics zAxis
 	vector3	icsAxis(int ii) const;
 	RHCoordSys3 internalCS();
-	const Double	phi() const;
-	const Double	theta() const;
-	const Double	zeta() const;
+	Double	phi() const;
+	Double	theta() const;
+	Double	zeta() const;
 
 	// Other Methods
 	Double	DistTo(const point3& pExt) const;
@@ -68,12 +68,12 @@ protected:
 };
 
 
-class surf3 : public plane3 
+class surf3 : public plane3
 {
 public:
 
 	// Constructors
-	
+
 	surf3();
 	surf3(const string name, const vector<point3>& vp3);
 	surf3(const string name, const point3& p0, const RHCoordSys3& cs, const vector<point2>& vp2);
@@ -102,7 +102,7 @@ public:
 	Double	FFtoPoint(point3& p0, vector3& dir) const;
 
 	// Private...
-	
+
 protected:
 	string	name;
 	poly2	vert2;

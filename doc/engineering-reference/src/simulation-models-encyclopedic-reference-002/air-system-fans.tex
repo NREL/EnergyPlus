@@ -479,6 +479,7 @@ The following equation describes the sigmoidal functional form for normalized \(
 
 \begin{equation}
 \frac{{\varphi \left( {{x_{fan}}} \right)}}{{{\varphi_{\max }}}} = ({A_{spd}} + {B_{spd}}/({(1 + {e^{\left[ {{{({C_{spd}} - {x_{spd}})} \mathord{\left/ {\vphantom {{({C_{spd}} - {x_{spd}})} {{D_{spd}}}}} \right. } {{D_{spd}}}}} \right]}})^{{E_{spd}}}})
+\label{eq:SigmoidalFunctionalFormForNormalized}
 \end{equation}
 
 where \emph{A\(_{spd}\)}, \emph{B\(_{spd}\)}, \emph{C\(_{spd}\)}, \emph{D\(_{spd}\)}, and \emph{E\(_{spd}\)} are coefficients for the fan. Separate sets of coefficients for the normal operation and stall regions can be specified. For the curve shown in Figure~\ref{fig:example-normalized-dimensionless-flow-data}, these coefficients are:
@@ -523,7 +524,7 @@ Stall & 0.000608 & 0.586366 & 0.021775 & -0.063218 & 0.072827 \tabularnewline
 \bottomrule
 \end{longtable}
 
-For any operating point of flow (\emph{Q\(_{fan}\)}) and fan pressure rise (\(\Delta {P_{fan}}\)), one can calculate the corresponding Euler number (\emph{Eu}) for the given fan, and then determine the corresponding normalized dimensionless flow (\(\varphi {x_{fan}} / \varphi_{max}\)) from the sigmoidal dimensionless flow function (Equation ). With \(\varphi {x_{fan}} / \varphi_{max}\) determined and knowing \(\varphi_{max}\) for the fan, the dimensionless flow is:
+For any operating point of flow (\emph{Q\(_{fan}\)}) and fan pressure rise (\(\Delta {P_{fan}}\)), one can calculate the corresponding Euler number (\emph{Eu}) for the given fan, and then determine the corresponding normalized dimensionless flow (\(\varphi {x_{fan}} / \varphi_{max}\)) from the sigmoidal dimensionless flow function (Equation~\ref{eq:SigmoidalFunctionalFormForNormalized}). With \(\varphi {x_{fan}} / \varphi_{max}\) determined and knowing \(\varphi_{max}\) for the fan, the dimensionless flow is:
 
 \begin{equation}
 \varphi \left( {{x_{fan}}} \right) = {\varphi_{\max }}\left[ {\frac{{\varphi \left( {{x_{fan}}} \right)}}{{{\varphi_{\max }}}}} \right]
@@ -707,7 +708,7 @@ Low-Efficiency & 0.395895 & 3.065240 & 0.674321 \tabularnewline
 \bottomrule
 \end{longtable}
 
-The normalized \emph{part-load} motor efficiency model is provided to modify the maximum efficiency of the motor. This model is based on part-load data for motors from DOE's MotorMaster+ database (2003). To determine the normalized motor efficiency at part-load (\(\eta_{motor}(x_{motor}) / \eta_{motor,max}\)), use the motor fractional power output (x\(_{motor}\) = H\(_{belt}\) / \emph{H\(_{belt,max}\)}) as the fraction of motor output power in Equation and use coefficients from Table~\ref{table:example-motor-normalized-efficiency-curve}, or for a specific motor, determined from DOE MotorMaster+ data or from manufacturer's data. Figure~\ref{fig:motor-normalized-efficiency-vs.-motor-load} shows a graphical representation of eight example curves defined by these equations and coefficients.
+The normalized \emph{part-load} motor efficiency model is provided to modify the maximum efficiency of the motor. This model is based on part-load data for motors from DOE's MotorMaster+ database (2003). To determine the normalized motor efficiency at part-load (\(\eta_{motor}(x_{motor}) / \eta_{motor,max}\)), use the motor fractional power output (x\(_{motor}\) = H\(_{belt}\) / \emph{H\(_{belt,max}\)}) as the fraction of motor output power in Equation~\ref{eq:etamotormaxPartLoad} and use coefficients from Table~\ref{table:example-motor-normalized-efficiency-curve}, or for a specific motor, determined from DOE MotorMaster+ data or from manufacturer's data. Figure~\ref{fig:motor-normalized-efficiency-vs.-motor-load} shows a graphical representation of eight example curves defined by these equations and coefficients.
 
 \begin{figure}[hbtp] % fig 215
 \centering
@@ -719,6 +720,7 @@ The example motor normalized efficiency curves (single rectangular hyperbola typ
 
 \begin{equation}
 \frac{{{\eta_{motor}}({x_{motor}})}}{{{\eta_{motor,max}}}} = \left[ {\frac{{{a_{PLmotor}} \cdot {x_{motor}}}}{{{b_{PLmotor}} + {x_{motor}}}}} \right] + {c_{PLmotor}} \cdot {x_{motor}}
+\label{eq:etamotormaxPartLoad}
 \end{equation}
 
 % table 71

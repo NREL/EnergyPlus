@@ -1,0 +1,456 @@
+# This file includes the list of commits to exclude from `git blame`.
+# These are chores, like upgrading copyrights, or running any kind of automated tools like clang-format.
+#
+# How-to:
+# * Use only full 40-character hashes
+# * Here's an example of a way to grep the commit history to find commits to exclude:
+# ```
+# git log --all --reverse --grep='copyright' --grep='license' --grep='\[chore\]' --shortstat --pretty='format:# %C(auto)%s [%an, %as]%n%H%n' >> .git-blame-ignore-revs
+# Add commits from the style bot
+# git log --all --reverse --shortstat --pretty='format:# %C(auto)%s [%an, %as]%n%H%n' --author='energyplus-style-bot' >> .git-blame-ignore-revs
+# ```
+# You can add `--shortstat` to it to see the number of files changes, then do a replace `:%s/\n \(files\? changed.*\)/#    \1/g`
+
+# Note: On older git (like 2.17 which is default in 18.04, without `sudo add-apt-repository ppa:git-core/ppa`),
+# '%as' (date in YYYY-MM-DD)  doesn't work, use '%ai' instead
+
+# * Locally, you can do `$ git config blame.ignoreRevsFile .git-blame-ignore-revs`
+# * Add to the bottom of the list, so we keep everything in chronological order (oldest to newest)
+
+
+# Made deeper src directory inside ObjexxFCL to make it closer to the gtest structure.  Copied license file into ObjexxFCL root.  Updated CMakeLists to account for the src directory. [Edwin Lee, 2014-04-15]
+271e3902e7f13dd395a22ebc0eb235048e7c53f3
+#    290 files changed, 436 insertions(+), 283 deletions(-)
+
+# Updated testfiles after running transition. [Edwin Lee, 2014-06-10]
+2ec7418753f4d37d83129e02f405f5a181ff0213
+#    487 files changed, 4143 insertions(+), 3629 deletions(-)
+
+# Merge pull request #4271 from NREL/65569034-TransitionWorkOnTeam [Edwin Lee, 2014-07-07]
+c22ccfd5fee09b490febfaa06a7be5c708d6f0ff
+
+# Update all idfs and imfs to 8.3 [Edwin Lee, 2015-03-24]
+beefd170db5f8426bccfe877f532189c4266a9db
+#    525 files changed, 525 insertions(+), 525 deletions(-)
+
+# Update copyrights and remove some stray trailing space [Edwin Lee, 2015-07-17]
+beefb5cb83a098a63ea1e0069b9912faff2a9bc3
+#    421 files changed, 623 insertions(+), 621 deletions(-)
+
+# Merge pull request #5035 from NREL/FixCopyrights [Jason DeGraw, 2015-07-20]
+ce4212b2c53fe2c667909927668bd645c6a9579c
+
+# merging in develop with copyrights changes [Noel Merket, 2015-07-21]
+ae08e63e2125942217fd7f46f8d0497a69272b58
+
+# Update copyright year... [Edwin Lee, 2015-08-10]
+beef6d5e3ebe1f8410aad6b2b62eecc23e6360d0
+#    420 files changed, 421 insertions(+), 421 deletions(-)
+
+# Merge pull request #5085 from NREL/ActuallyUpdateCopyrightYears [Edwin Lee, 2015-08-10]
+bc463b16f9ecaecd6c9ace48676400f05e0aa64f
+
+# Update most or all idfs to 8.4; CI will report failures for any remaining 8.3 files [Edwin Lee, 2015-09-24]
+818a4cc51367ed7bb33b7012e917a7f17e567328
+#   540 files changed, 540 insertions(+), 540 deletions(-)
+
+# Clean up existing license text [Jason W. DeGraw, 2015-11-02]
+b5b8b2ec4b4589f1cf07a7f9d8b3530ad4e78f65
+#    20 files changed, 65 insertions(+), 71 deletions(-)
+
+# Remove old license text [Jason W. DeGraw, 2015-11-03]
+d54c10c0bab5ef2376d085368602c7dd579c12de
+#    446 files changed, 10138 deletions(-)
+
+# Insert new license text [Jason W. DeGraw, 2015-11-03]
+6f53d4aa98d70e6e1e7eb33693a1f9a775bc2076
+#    554 files changed, 38226 insertions(+)
+
+# Merge remote-tracking branch 'upstream/develop' into 107310700-change-license-text [Jason W. DeGraw, 2015-11-17]
+d03a1bdbab07b051445ff4c9f087b0f47e380310
+
+# Add license text to unit test files [Jason W. DeGraw, 2015-11-18]
+daaa492bad4b2fbe5bf2614cf734f366c4b0668c
+#    85 files changed, 5865 insertions(+)
+
+# Merge remote-tracking branch 'upstream/develop' into 107310700-change-license-text [Jason W. DeGraw, 2015-11-18]
+c06548e6598e344b3bb7e7e72cd81ed2ebf4626f
+
+# Merge remote-tracking branch 'upstream/develop' into 107310700-change-license-text [Jason W. DeGraw, 2015-12-03]
+78aeeda11cfb3dfad07ccde39d4c2fc636e6edb1
+
+# Make the license lines longer [Jason W. DeGraw, 2015-12-04]
+7f204b7ea6c5854f7586d0ad1edefc327fcb8ed2
+#    554 files changed, 25492 insertions(+), 31586 deletions(-)
+
+# Fix license text in unit tests [Jason W. DeGraw, 2015-12-07]
+3491246ac933f936c633231ba5d2237cf46432fd
+#    89 files changed, 4142 insertions(+), 4845 deletions(-)
+
+# Merge remote-tracking branch 'upstream/develop' into 107310700-change-license-text [Jason W. DeGraw, 2015-12-28]
+76f16c8e71fc2348eafd8b9e0e8d0cb8bafeba3d
+
+# Merge pull request #5329 from NREL/107310700-change-license-text [Edwin Lee, 2016-01-04]
+61dd5ef880a6c831808923e505c7f51ae86fb36c
+
+# Update the copyright year to 2016 [Jason W. DeGraw, 2016-01-08]
+e76933966cb06e267272c887981d7913ab9fb206
+#    644 files changed, 645 insertions(+), 644 deletions(-)
+
+# Merge remote-tracking branch 'upstream/develop' into update-copyright-year [Jason W. DeGraw, 2016-01-08]
+c4e0b51a20075722b915a3536a52fd8f2e3235ba
+
+# Merge pull request #5403 from NREL/update-copyright-year [Edwin Lee, 2016-01-08]
+da43757921bbf1606cd38230b5972b4b8396d692
+
+# change copyright date [Fred Buhl, 2016-01-12]
+4adb0fd48302b89bc486a4ebbe49102f070c3da3
+#    535 files changed, 535 insertions(+), 535 deletions(-)
+
+# Update version number in CMakeLists and idfs and imfs [Edwin Lee, 2016-02-19]
+3fca4f5d0b214a0d60f23756480c821d3b4ba11c
+#    551 files changed, 588 insertions(+), 550 deletions(-)
+
+# Update test files for 8.6 [Edwin Lee, 2016-07-17]
+e8e5f93665a85bff354a05cc8fd84b63745031fa
+#    555 files changed, 555 insertions(+), 555 deletions(-)
+
+# Update to new license text [Jason W. DeGraw, 2016-12-01]
+f1c0e4232660d3deae0953074c960c5d451a111a
+#    702 files changed, 702 insertions(+), 9106 deletions(-)
+
+# Merge remote-tracking branch 'upstream/develop' into license-updates [Jason W. DeGraw, 2016-12-29]
+448492ae00af6b56970b8d1625a7b29dc398121a
+
+# Merge pull request #5953 from NREL/license-updates [Luigi Gentile Polese, 2016-12-30]
+9db65ad2659b38f5af7caa95feed5551e857284a
+
+# Update license year [Jason W. DeGraw, 2017-01-04]
+ff1514acdb773b8a6290b6b4bfed936f86d6b2d4
+#    703 files changed, 703 insertions(+), 702 deletions(-)
+
+# Merge pull request #5972 from NREL/license-updates [Edwin Lee, 2017-01-06]
+a5b04d73ecfef706cda7d0543ccad31e7c27087a
+
+# Change version numbers in idfs [Edwin Lee, 2017-08-23]
+fa0616af4cb87d7d103899e67eaddd58b49b0b1d
+#    614 files changed, 614 insertions(+), 614 deletions(-)
+
+# Increment version numbers [Edwin Lee, 2017-03-27]
+6a98be30fbc8da5f3e195d29fef64f20d3f88f03
+#    578 files changed, 578 insertions(+), 578 deletions(-)
+
+# Merge pull request #6326 from NREL/delete_old_license [Edwin Lee, 2017-09-21]
+44aeb1931a76174459cc56b003f9e4c52db7dfc3
+
+# Update license notice [Jason W. DeGraw, 2017-09-23]
+2d37f843e19e0dd9c2ed382ebb436cf9195c0f6b
+#    734 files changed, 2934 insertions(+), 2197 deletions(-)
+
+# Merge pull request #6343 from NREL/license-notice-update [Edwin Lee, 2017-09-24]
+3a238e3aeaa9c2ad3ad6dbc7907c31da62c63bd8
+
+# Increment version forward [Edwin Lee, 2017-11-21]
+fb5631e81cc3c2f78d577298cee7d5b1e034fa9c
+#    668 files changed, 684 insertions(+), 684 deletions(-)
+
+# Update the license year to 2018 [Jason W. DeGraw, 2018-01-03]
+35ae89914cb3fa230cda1ba69202c5b2abf0b6dd
+#    735 files changed, 743 insertions(+), 738 deletions(-)
+
+# Merge pull request #6425 from NREL/update-license-year [Richard Raustad, 2018-01-04]
+973b46637653ab47301b7c9e8d29de06b8e406ad
+
+# Increment version ids for test files, datasets, and unit tests [Edwin Lee, 2018-07-13]
+17d0631fb1361e26b6e948137846b3d445a9fffe
+#    721 files changed, 740 insertions(+), 740 deletions(-)
+
+# Update the license year to 2019 [Jason W. DeGraw, 2019-01-02]
+184450e0df29f5a6c09e8d04178dd1249f75cb0f
+#    811 files changed, 888 insertions(+), 818 deletions(-)
+
+# Merge pull request #7113 from NREL/update-license-year [Edwin Lee, 2019-01-03]
+aba3d156ca13348a64e5a730b8cf2d63b78cb570
+
+# Update version numbers in files and unit tests [Edwin Lee, 2019-02-01]
+6f18d432b0b7fd536e251c77bbdb4c6678fdcce3
+#    695 files changed, 719 insertions(+), 719 deletions(-)
+
+# Merge pull request #7270 from NREL/copyright-year [Edwin Lee, 2019-04-25]
+f4c404628b9ef1d11eb0f561d326fd5cc4283c6f
+
+# Changed version ID in files and unit tests [Edwin Lee, 2019-12-09]
+a824a4585c899ae3157b91bc5f59ae171092a8f6
+#    735 files changed, 764 insertions(+), 764 deletions(-)
+
+# Update the license year [Jason W. DeGraw, 2020-01-01]
+f8026b37b1bac7a8f8a1e5c58a850cc7ae86eb04
+#    824 files changed, 825 insertions(+), 825 deletions(-)
+
+# Merge pull request #7663 from NREL/update-license-year [Edwin Lee, 2020-01-06]
+e3becf2f977340f20dc05a3b3836dc7ecd60b8ed
+
+# Change copyright years to 2020 [Edwin Lee, 2020-01-23]
+d3608dbbdce2ee659e9a6d55f4683d2f8d7b05b0
+#    13 files changed, 14 insertions(+), 14 deletions(-)
+
+# Update copyright years -- custom_check should be happy now [Edwin Lee, 2020-02-14]
+8c0b1589222d6e7009e74049c8c18f81bf304e21
+#    15 files changed, 15 insertions(+), 15 deletions(-)
+
+# `python change_version.py ../../ 9.3 9.4` [chore] [Julien Marrec, 2020-04-10]
+83e29cd9a81cd098e76bd79b0cc7ce00277c181c
+# 761 files changed, 795 insertions(+), 795 deletions(-)
+
+#######################################################################
+#                         S T Y L E    B O T                          #
+#######################################################################
+
+# Merge remote-tracking branch 'origin/Update_Style_Guides' into develop [energyplus-style-bot, 2018-03-23]
+9768414a04e06361a0c0afedcb0a8b89e5a12b10
+
+# Apply formatting with clang-format [energyplus-style-bot, 2018-03-23]
+61b09a18629a347273e5d099c3f2e3acbcbc0da4
+#    611 files changed, 737797 insertions(+), 730009 deletions(-)
+
+# Merge branch 'develop' into WindowShadingControlOrder [energyplus-style-bot, 2018-03-23]
+e7bde3f3b1aedf79a169b5bd8239b6d11c2e1fa9
+
+# Apply clang-format changes [energyplus-style-bot, 2018-03-23]
+25c9b9964000546f130ef9e784ecdad90d20a99d
+#    13 files changed, 12328 insertions(+), 12322 deletions(-)
+
+# Merge branch 'develop' into Allow-Multiple-AirLoops-in-Airflow-Netwrok-Model [energyplus-style-bot, 2018-03-23]
+406db543703fbc676578d74e9af3a6e6016543c0
+
+# Apply clang-format changes [energyplus-style-bot, 2018-03-23]
+372e53cc17c4c513b690213c544023e7506505ae
+#    11 files changed, 34 insertions(+), 26 deletions(-)
+
+# Merge branch 'develop' into add-curve-unit-tests [energyplus-style-bot, 2018-03-23]
+e38419765fa0b65c09a4bbdd26e754b73968464b
+
+# apply clang-format [energyplus-style-bot, 2018-03-23]
+2a827f6a0286b1fb1a83f16aca1edca8f4f9be1f
+#    12 files changed, 5835 insertions(+), 5827 deletions(-)
+
+# Merge branch 'develop' into FixNaNrelatedTo5160 [energyplus-style-bot, 2018-03-23]
+e9f22eb430f0e731f3da536d29503074336bf43e
+
+# apply clang-format [energyplus-style-bot, 2018-03-23]
+f13b519cd97564e68afaec495594c1da2bd7ea75
+#    14 files changed, 10936 insertions(+), 10927 deletions(-)
+
+# Merge branch 'develop' into ashrae-205-parser [energyplus-style-bot, 2018-03-23]
+cb1c74eb36ead83f9fe8a67573348b6c16b1aaa3
+
+# apply clang-format [energyplus-style-bot, 2018-03-23]
+7ce042fc6359d754c3b7f2d5e3b32cac70942419
+#    11 files changed, 34 insertions(+), 26 deletions(-)
+
+# Merge branch 'develop' into 148617889-LowTempRadiantAutoSizeSpacingIssue [energyplus-style-bot, 2018-03-23]
+dd8085385b7b90d28cbb9772e41501e4eb7f3839
+
+# apply clang-format [energyplus-style-bot, 2018-03-23]
+aa9c4535c458425cff760f84604e72e1955a8ba3
+#    11 files changed, 32 insertions(+), 26 deletions(-)
+
+# Merge branch 'develop' into 131165083-RadConv-HWBaseboard-Covergence-Issue [energyplus-style-bot, 2018-03-23]
+f3eb3446435be647dbf745694a45dfda233e112f
+
+# apply clang-format [energyplus-style-bot, 2018-03-23]
+116602b6acb2b844499ec4a4219f8141ea80c34b
+#    13 files changed, 3002 insertions(+), 2995 deletions(-)
+
+# Merge commit '9768414a04e06361a0c0afedcb0a8b89e5a12b10' into #2520943-WindowsCalc-Engine_Integration [energyplus-style-bot, 2018-03-23]
+2c358bb9ec10af3899669820c1e8aabb24a6d644
+
+# Merge commit '61b09a18629a347273e5d099c3f2e3acbcbc0da4' into #2520943-WindowsCalc-Engine_Integration [energyplus-style-bot, 2018-03-23]
+0e47396ec2137be5667ea30bf9fcd219234d4c86
+
+# apply clang-format [energyplus-style-bot, 2018-03-23]
+c3201778426e3f7efaa1f97fbac2393ae22b45df
+#    28 files changed, 50148 insertions(+), 50289 deletions(-)
+
+# Merge commit '9768414a04e06361a0c0afedcb0a8b89e5a12b10' into expanded-runperiod [energyplus-style-bot, 2018-03-23]
+fd9d360cb62673f44f1eb92d0c4f3d2be22e85ed
+
+# Merge commit '61b09a18629a347273e5d099c3f2e3acbcbc0da4' into expanded-runperiod [energyplus-style-bot, 2018-03-23]
+29b65013d951752b08a6d0efe661d229a48ff783
+
+# apply clang-format [energyplus-style-bot, 2018-03-23]
+ada781c42c5ed8af42ba87b3f109b4b7b6763a9b
+#    14 files changed, 10157 insertions(+), 10124 deletions(-)
+
+# Merge commit '9768414a04e06361a0c0afedcb0a8b89e5a12b10' into output_processor_json [energyplus-style-bot, 2018-03-23]
+6e2bcc09222c263be34342dd81f71acdcafaf124
+
+# Merge commit '61b09a18629a347273e5d099c3f2e3acbcbc0da4' into output_processor_json [energyplus-style-bot, 2018-03-23]
+9621230586193ff3ba3f811fba18bec56cc62119
+
+# apply clang-format [energyplus-style-bot, 2018-03-23]
+585b7d08bdc5ad79ac61b76c1d5617d76e0267fb
+#    26 files changed, 35528 insertions(+), 35386 deletions(-)
+
+# Merge commit '9768414a04e06361a0c0afedcb0a8b89e5a12b10' into afn-alternate [energyplus-style-bot, 2018-03-23]
+6f28370b792c8bae47f812233d0a2f646c15c6a1
+
+# Merge commit '61b09a18629a347273e5d099c3f2e3acbcbc0da4' into afn-alternate [energyplus-style-bot, 2018-03-23]
+eb12ff75ab3d76c22ee4cae0896a06eb2a75c26f
+
+# apply clang-format [energyplus-style-bot, 2018-03-23]
+8cf2baa22f0b0348067fd0b0505944044d2412c6
+#    19 files changed, 20559 insertions(+), 20577 deletions(-)
+
+# Merge commit '9768414a04e06361a0c0afedcb0a8b89e5a12b10' into afexxx-refactor [energyplus-style-bot, 2018-03-23]
+3dd450cf357bcb4ff51067e89e783164dc73b95b
+
+# Merge commit '61b09a18629a347273e5d099c3f2e3acbcbc0da4' into afexxx-refactor [energyplus-style-bot, 2018-03-23]
+b2ba52852db98b28034b36d09f36f513539740e1
+
+# apply clang-format [energyplus-style-bot, 2018-03-23]
+8fda060227b37e94ade907a71c5b21aade1c7191
+#    19 files changed, 20615 insertions(+), 20634 deletions(-)
+
+# Merge commit '9768414a04e06361a0c0afedcb0a8b89e5a12b10' into error-enhancement-prep [energyplus-style-bot, 2018-03-23]
+917d529335431f16a7780f57ad08ab695b5fea91
+
+# Merge commit '61b09a18629a347273e5d099c3f2e3acbcbc0da4' into error-enhancement-prep [energyplus-style-bot, 2018-03-23]
+9e89b2b17b383e061d05bc928cae933aa122e36b
+
+# apply clang-format [energyplus-style-bot, 2018-03-23]
+c10dfe6f644e89542bbca332ed79528c5ba99ebe
+#    29 files changed, 74203 insertions(+), 74210 deletions(-)
+
+# Fix header includes found by reordering [energyplus-style-bot, 2018-03-24]
+73eb0356ba28c869b7fa2bdc5a79128013921b57
+#    2 files changed, 2 insertions(+)
+
+# Merge branch 'develop' into add-curve-unit-tests [energyplus-style-bot, 2018-03-24]
+d01b3f26edf0896307205467b4d13d4e9dfdb569
+
+# Merge branch 'develop' into 131165083-RadConv-HWBaseboard-Covergence-Issue [energyplus-style-bot, 2018-03-24]
+10705e3c26abe74516125bc9f2b88e4f5a1ec678
+
+# Apply formatting to tst folder [energyplus-style-bot, 2018-03-24]
+b6f573e2e9a42174cad2383d458fefad5b62a211
+#    195 files changed, 153500 insertions(+), 154872 deletions(-)
+
+# Merge commit 'b6f573e2e9a42174cad2383d458fefad5b62a211' into 131165083-RadConv-HWBaseboard-Covergence-Issue [energyplus-style-bot, 2018-03-24]
+82d2f09b9c801b039672502f22d6a01ee91f3c0a
+
+# apply clang-tidy [energyplus-style-bot, 2018-03-24]
+f300a45acc6087832e810ee6ae792e5dd2c66b32
+#    8 files changed, 147 insertions(+), 144 deletions(-)
+
+# Merge commit 'b6f573e2e9a42174cad2383d458fefad5b62a211' into 148617889-LowTempRadiantAutoSizeSpacingIssue [energyplus-style-bot, 2018-03-24]
+a9bf4248ee65c2bc10b916b593c5bfcdc133e6bc
+
+# apply clang-tidy [energyplus-style-bot, 2018-03-24]
+5f87c2a7298a8c73a34e2aa8b6fbc18ac0b3f4e7
+#    7 files changed, 13 insertions(+), 11 deletions(-)
+
+# Merge commit 'b6f573e2e9a42174cad2383d458fefad5b62a211' into #2520943-WindowsCalc-Engine_Integration [energyplus-style-bot, 2018-03-24]
+c96f3fffe12efefa598499f315970ed7ec420c60
+
+# apply clang-tidy [energyplus-style-bot, 2018-03-24]
+dcdc7f850b0aef060f4af9c10851d490290c9485
+#    3 files changed, 5 insertions(+), 4 deletions(-)
+
+# Merge commit 'b6f573e2e9a42174cad2383d458fefad5b62a211' into WindowShadingControlOrder [energyplus-style-bot, 2018-03-24]
+d5515b17f664094e0e804df55675a0e622582462
+
+# apply clang-tidy [energyplus-style-bot, 2018-03-24]
+baa6dc90377670d62dd1ad4f2ebd38ae3cc5d1ca
+#    16 files changed, 40147 insertions(+), 40758 deletions(-)
+
+# Merge commit 'b6f573e2e9a42174cad2383d458fefad5b62a211' into expanded-runperiod [energyplus-style-bot, 2018-03-24]
+3b8bb8af97402de714a75fd96a81199da3b04f4a
+
+# apply clang-tidy [energyplus-style-bot, 2018-03-24]
+6cfc50cceb98ed90fc191d1ff90818d07bef559a
+#    20 files changed, 33216 insertions(+), 33218 deletions(-)
+
+# Merge commit 'b6f573e2e9a42174cad2383d458fefad5b62a211' into output_processor_json [energyplus-style-bot, 2018-03-24]
+e4fc6dc3d1562af93050d968dabbb6fda51db93b
+
+# apply clang-tidy [energyplus-style-bot, 2018-03-24]
+a0d58eea1507aaf170e4348648d4c0e6d0b1d883
+#    7 files changed, 1971 insertions(+), 1964 deletions(-)
+
+# Merge commit 'b6f573e2e9a42174cad2383d458fefad5b62a211' into Allow-Multiple-AirLoops-in-Airflow-Netwrok-Model [energyplus-style-bot, 2018-03-24]
+1cf06ff53068cf2500e06750ebce3ecd3643f47b
+
+# apply clang-tidy [energyplus-style-bot, 2018-03-24]
+75f68b8b06d2caceeaf20ff2c2ef40e9b10a9d79
+#    3 files changed, 5 insertions(+), 4 deletions(-)
+
+# apply clang-tidy [energyplus-style-bot, 2018-03-24]
+9c03907f73939a7de1cd24876b9d1700a0444705
+#    1 file changed, 1 insertion(+), 1 deletion(-)
+
+# Merge commit 'b6f573e2e9a42174cad2383d458fefad5b62a211' into add-curve-unit-tests [energyplus-style-bot, 2018-03-24]
+5f13f4ca8f2976b00168af8ee38adb2b51942e7c
+
+# apply clang-tidy [energyplus-style-bot, 2018-03-24]
+ef636cf4a4c9acc94f0b2ed2cae0b74f8178affb
+#    5 files changed, 5968 insertions(+), 6018 deletions(-)
+
+# Merge commit 'b6f573e2e9a42174cad2383d458fefad5b62a211' into FixNaNrelatedTo5160 [energyplus-style-bot, 2018-03-24]
+7865e60cd3c5bbbc22a5722df4d14b795057d337
+
+# apply clang-tidy [energyplus-style-bot, 2018-03-24]
+2149d26bf86d4950e407a0e76d110cdb0d8b78b6
+#    3 files changed, 5 insertions(+), 4 deletions(-)
+
+# Merge commit 'b6f573e2e9a42174cad2383d458fefad5b62a211' into afn-alternate [energyplus-style-bot, 2018-03-24]
+0918eb01a44065bb22b678856ebb5d9fbb8d1306
+
+# apply clang-tidy [energyplus-style-bot, 2018-03-24]
+901eee19621a1c587e690cbbb63f7dbd39ff1740
+#    6 files changed, 7350 insertions(+), 7350 deletions(-)
+
+# Merge commit 'b6f573e2e9a42174cad2383d458fefad5b62a211' into ashrae-205-parser [energyplus-style-bot, 2018-03-24]
+3cb67575699ab5c2e6e8a0643b95aded2c71544d
+
+# apply clang-tidy [energyplus-style-bot, 2018-03-24]
+1182b42efeddd6b659f03d9400d8863e2c25f161
+#    3 files changed, 5 insertions(+), 4 deletions(-)
+
+# Merge commit 'b6f573e2e9a42174cad2383d458fefad5b62a211' into afexxx-refactor [energyplus-style-bot, 2018-03-24]
+8340edbc06a09d40c36fb8450a121f26e549eaa3
+
+# apply clang-tidy [energyplus-style-bot, 2018-03-24]
+2bc7931e8089fe28f91a7a8ace27345886e482dd
+#    10 files changed, 7358 insertions(+), 7357 deletions(-)
+
+# Merge commit 'b6f573e2e9a42174cad2383d458fefad5b62a211' into error-enhancement-prep [energyplus-style-bot, 2018-03-24]
+c7e7f429b39ab4fecd82b58087a9ef498aa9138c
+
+# apply clang-tidy [energyplus-style-bot, 2018-03-24]
+22d320cd8b16e6b08448ef30050541f9ebc59349
+#    9 files changed, 998 insertions(+), 996 deletions(-)
+
+# Merge commit 'b6f573e2e9a42174cad2383d458fefad5b62a211' into table-refactor [energyplus-style-bot, 2018-03-24]
+9db591eae5e02e1e5185c2149b5bfb7eca09f6de
+
+# Fix rearranged using declaration [energyplus-style-bot, 2018-03-26]
+3a59bb16001afefa5bd357311d412232060c5441
+#    1 file changed, 12 insertions(+), 1 deletion(-)
+
+# Fix rearranged using declarations [energyplus-style-bot, 2018-03-26]
+deb313430ea9b1cc2c0bb679c376689db32eeb17
+#    1 file changed, 13 insertions(+), 1 deletion(-)
+
+# Fix issue from reformatting with DataSurfaces [energyplus-style-bot, 2018-03-26]
+1666a15639ac8634184a4a6bd6d2ab9d09b9c45c
+#    1 file changed, 2 insertions(+)
+
+# Specify BinPackArguments: false [energyplus-style-bot, 2018-03-26]
+c8f9fbba47a5425fbb4220285f70d0017f6f65b4
+#    2 files changed, 2 insertions(+)
+
+# Apply clang-format to src/EnergyPlus and tst/EnergyPlus/unit [Edwin Lee, 2021-03-30]
+33b71ed598f37c10e9bfb6492e2a2103ba24e3dd
+# 762 files changed, 397748 insertions(+), 351788 deletions(-)
+

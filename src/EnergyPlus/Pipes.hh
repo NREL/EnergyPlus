@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,39 +52,23 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
-#include <PlantComponent.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EPVector.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
-// Forward Declarations
+// Forward declarations
+struct EnergyPlusData;
 struct PlantLocation;
 
 namespace Pipes {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    extern int NumLocalPipes;
-    extern bool GetPipeInputFlag;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE Pipe
-
-    // Types
-
     struct LocalPipeData : public PlantComponent
     {
-        virtual ~LocalPipeData()
-        {
-        }
+        virtual ~LocalPipeData() = default;
 
         // Members
         std::string Name;
@@ -106,22 +90,33 @@ namespace Pipes {
         {
         }
 
-    public:
-        static PlantComponent *factory(int objectType, std::string objectName);
-
-    public:
-        void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string const &objectName);
+        void simulate([[maybe_unused]] EnergyPlusData &states,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
+        void oneTimeInit(EnergyPlusData &state) override;
+        void initEachEnvironment(EnergyPlusData &state) const;
     };
 
-    // Object Data
-    extern Array1D<LocalPipeData> LocalPipe; // dimension to number of pipes
-
-    // Functions
-    void clear_state();
-
-    void GetPipeInput();
+    void GetPipeInput(EnergyPlusData &state);
 
 } // namespace Pipes
+
+struct PipesData : BaseGlobalStruct
+{
+    bool GetPipeInputFlag = true;
+    EPVector<Pipes::LocalPipeData> LocalPipe;
+    std::unordered_map<std::string, std::string> LocalPipeUniqueNames;
+
+    void clear_state() override
+    {
+        this->GetPipeInputFlag = true;
+        this->LocalPipe.deallocate();
+        this->LocalPipeUniqueNames.clear();
+    }
+};
 
 } // namespace EnergyPlus
 

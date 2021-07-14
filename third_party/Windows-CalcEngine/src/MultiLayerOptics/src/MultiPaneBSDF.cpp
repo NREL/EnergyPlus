@@ -2,6 +2,7 @@
 #include <numeric>
 #include <algorithm>
 #include <cassert>
+#include <stdexcept>
 
 #include "MultiPaneBSDF.hpp"
 #include "EquivalentBSDFLayer.hpp"

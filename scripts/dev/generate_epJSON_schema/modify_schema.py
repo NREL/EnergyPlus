@@ -1,3 +1,58 @@
+# EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University
+# of Illinois, The Regents of the University of California, through Lawrence
+# Berkeley National Laboratory (subject to receipt of any required approvals
+# from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
+# Battelle, Alliance for Sustainable Energy, LLC, and other contributors. All
+# rights reserved.
+#
+# NOTICE: This Software was developed under funding from the U.S. Department of
+# Energy and the U.S. Government consequently retains certain rights. As such,
+# the U.S. Government has been granted for itself and others acting on its
+# behalf a paid-up, nonexclusive, irrevocable, worldwide license in the
+# Software to reproduce, distribute copies to the public, prepare derivative
+# works, and perform publicly and display publicly, and to permit others to do
+# so.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# (1) Redistributions of source code must retain the above copyright notice,
+#     this list of conditions and the following disclaimer.
+#
+# (2) Redistributions in binary form must reproduce the above copyright notice,
+#     this list of conditions and the following disclaimer in the documentation
+#     and/or other materials provided with the distribution.
+#
+# (3) Neither the name of the University of California, Lawrence Berkeley
+#     National Laboratory, the University of Illinois, U.S. Dept. of Energy nor
+#     the names of its contributors may be used to endorse or promote products
+#     derived from this software without specific prior written permission.
+#
+# (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in
+#     stand-alone form without changes from the version obtained under this
+#     License, or (ii) Licensee makes a reference solely to the software
+#     portion of its product, Licensee must refer to the software as
+#     "EnergyPlus version X" software, where "X" is the version number Licensee
+#     obtained under this License and may not use a different name for the
+#     software. Except as specifically required in this Section (4), Licensee
+#     shall not use in a company name, a product name, in advertising,
+#     publicity, or other promotional activities any name, trade name,
+#     trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or
+#     confusingly similar designation, without the U.S. Department of Energy's
+#     prior written consent.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
 def anyOf():
     return [
         {
@@ -56,7 +111,7 @@ extension_renaming = {
     'Meter:Custom': 'variable_details',
     'UnitarySystemPerformance:Multispeed': 'flow_ratios',
     'SurfaceProperty:ExteriorNaturalVentedCavity': 'surface',
-    'ZoneProperty:UserViewFactors:bySurfaceName': 'view_factors',
+    'ZoneProperty:UserViewFactors:BySurfaceName': 'view_factors',
     'SurfaceProperty:HeatTransferAlgorithm:SurfaceList': 'surface',
     'AirLoopHVAC:ZoneSplitter': 'nodes',
     'AirLoopHVAC:SupplyPath': 'components',
@@ -80,9 +135,9 @@ extension_renaming = {
     'Parametric:RunControl': 'runs',
     'ZoneHVAC:EquipmentList': 'equipment',
     'AvailabilityManagerAssignmentList': 'managers',
-    'Table:MultiVariableLookup': 'values',
-    'Table:OneIndependentVariable': 'values',
-    'Table:TwoIndependentVariables': 'values',
+    'Table:IndependentVariable': 'values',
+    'Table:IndependentVariableList': 'independent_variables',
+    'Table:Lookup': 'values',
     'Matrix:TwoDimension': 'values',
     'WindowMaterial:GlazingGroup:Thermochromic': 'temperature_data',
     'Schedule:Compact': 'data',
@@ -115,30 +170,47 @@ extension_renaming = {
     'ZoneHVAC:HybridUnitaryHVAC': 'modes',
     'ShadowCalculation': 'shading_zone_groups',
     'Schedule:Year': 'schedule_weeks',
-    'WindowShadingControl': 'fenestration_surfaces'
+    'WindowShadingControl': 'fenestration_surfaces',
+    'PlantEquipmentList': 'equipment',
+    'CondenserEquipmentList': 'equipment',
+    'AirLoopHVAC:Mixer': 'nodes',
+    'AirLoopHVAC:Splitter': 'nodes',
+    'AirLoopHVAC:DedicatedOutdoorAirSystem': 'airloophvacs',
+    'PythonPlugin:Variables': 'global_py_vars',
+    'PythonPlugin:SearchPaths': 'py_search_paths',
+    'Output:Diagnostics': 'diagnostics',
 }
 remaining_objects = [
     'Site:SpectrumData',
     'Schedule:Day:List',
-    'MaterialProperty:GlazingSpectralData'
+    'MaterialProperty:GlazingSpectralData',
 ]
+
+
+def get_schema_object(schema, object_key):
+    if '.*' in schema['properties'][object_key]['patternProperties']:
+        return schema['properties'][object_key]['patternProperties']['.*']
+    if R'^.*\S.*$' in schema['properties'][object_key]['patternProperties']:
+        return schema['properties'][object_key]['patternProperties'][R'^.*\S.*$']
+    raise KeyError(R'The patternProperties value is not a valid choice (".*", "^.*\S.*$")')
+
 
 def change_version(schema):
     schema["epJSON_schema_version"] = "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}"
     schema["epJSON_schema_build"] = "${CMAKE_VERSION_BUILD}"
-    loc = schema['properties']['Version']['patternProperties']['.*']['properties']['version_identifier']
+    loc = get_schema_object(schema, 'Version')['properties']['version_identifier']
     loc['default'] = "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}"
     loc['type'] = "string"
 
 
 def change_schedule_compact(schema):
-    loc = schema['properties']['Schedule:Compact']['patternProperties']['.*']['properties']['extensions']['items']['properties']['field']
+    loc = get_schema_object(schema, 'Schedule:Compact')['properties']['extensions']['items']['properties']['field']
     loc.pop('type')
     loc['anyOf'] = anyOf()
 
 
 def change_special_cased_enums(schema):
-    loc = schema['properties']['GroundHeatTransfer:Slab:Insulation']['patternProperties']['.*']['properties']['ivins_flag_is_there_vertical_insulation']
+    loc = get_schema_object(schema, 'GroundHeatTransfer:Slab:Insulation')['properties']['ivins_flag_is_there_vertical_insulation']
     loc.pop('type')
     newAnyOf = anyOf()
     newAnyOf[0]['enum'] = [int(i) for i in loc['enum'][:] if isInt(i)]
@@ -146,7 +218,7 @@ def change_special_cased_enums(schema):
     loc['anyOf'] = newAnyOf
     loc.pop('enum')
 
-    loc = schema['properties']['WindowMaterial:Screen']['patternProperties']['.*']['properties']['angle_of_resolution_for_screen_transmittance_output_map']
+    loc = get_schema_object(schema, 'WindowMaterial:Screen')['properties']['angle_of_resolution_for_screen_transmittance_output_map']
     loc.pop('type')
     newAnyOf = anyOf()
     newAnyOf[0]['enum'] = [int(i) for i in loc['enum'][:] if isInt(i)]
@@ -154,7 +226,7 @@ def change_special_cased_enums(schema):
     loc['anyOf'] = newAnyOf
     loc.pop('enum')
 
-    loc = schema['properties']['Refrigeration:System']['patternProperties']['.*']['properties']['number_of_compressor_stages']
+    loc = get_schema_object(schema, 'Refrigeration:System')['properties']['number_of_compressor_stages']
     loc.pop('type')
     newAnyOf = anyOf()
     newAnyOf[0]['enum'] = [int(i) for i in loc['enum'][:] if isInt(i)]
@@ -162,7 +234,7 @@ def change_special_cased_enums(schema):
     loc['anyOf'] = newAnyOf
     loc.pop('enum')
 
-    loc = schema['properties']['ElectricLoadCenter:Transformer']['patternProperties']['.*']['properties']['phase']
+    loc = get_schema_object(schema, 'ElectricLoadCenter:Transformer')['properties']['phase']
     loc.pop('type')
     newAnyOf = anyOf()
     newAnyOf[0]['enum'] = [int(i) for i in loc['enum'][:] if isInt(i)]
@@ -170,37 +242,36 @@ def change_special_cased_enums(schema):
     loc['anyOf'] = newAnyOf
     loc.pop('enum')
 
-    loc = schema['properties']['Zone']['patternProperties']['.*']['properties']['zone_outside_convection_algorithm']['enum']
+    loc = get_schema_object(schema, 'Zone')['properties']['zone_outside_convection_algorithm']['enum']
     loc.insert(0, '')
 
-    loc = schema['properties']['Zone']['patternProperties']['.*']['properties']['zone_inside_convection_algorithm']['enum']
+    loc = get_schema_object(schema, 'Zone')['properties']['zone_inside_convection_algorithm']['enum']
     loc.insert(0, '')
 
 
 def change_utility_cost(schema):
-    loc = schema['properties']['UtilityCost:Charge:Block']
-    legacy_idd = loc['legacy_idd']['fields']
-    loc = loc['patternProperties']['.*']['properties']
+    legacy_idd = schema['properties']['UtilityCost:Charge:Block']['legacy_idd']['fields']
+    loc = get_schema_object(schema, 'UtilityCost:Charge:Block')['properties']
     for i in range(6, len(legacy_idd)):
         field = legacy_idd[i]
         loc[field].pop('type')
         loc[field]['anyOf'] = anyOf()
 
-    loc = schema['properties']['UtilityCost:Ratchet']['patternProperties']['.*']['properties']
+    loc = get_schema_object(schema, 'UtilityCost:Ratchet')['properties']
     loc['offset_value_or_variable_name'].pop('type')
     loc['offset_value_or_variable_name']['anyOf'] = anyOf()
     loc['multiplier_value_or_variable_name'].pop('type')
     loc['multiplier_value_or_variable_name']['anyOf'] = anyOf()
 
-    loc = schema['properties']['UtilityCost:Charge:Simple']['patternProperties']['.*']['properties']
+    loc = get_schema_object(schema, 'UtilityCost:Charge:Simple')['properties']
     loc['cost_per_unit_value_or_variable_name'].pop('type')
     loc['cost_per_unit_value_or_variable_name']['anyOf'] = anyOf()
 
-    loc = schema['properties']['UtilityCost:Qualify']['patternProperties']['.*']['properties']
+    loc = get_schema_object(schema, 'UtilityCost:Qualify')['properties']
     loc['threshold_value_or_variable_name'].pop('type')
     loc['threshold_value_or_variable_name']['anyOf'] = anyOf()
 
-    loc = schema['properties']['UtilityCost:Tariff']['patternProperties']['.*']['properties']
+    loc = get_schema_object(schema, 'UtilityCost:Tariff')['properties']
     loc['minimum_monthly_charge_or_variable_name'].pop('type')
     loc['minimum_monthly_charge_or_variable_name']['anyOf'] = anyOf()
     loc['monthly_charge_or_variable_name'].pop('type')
@@ -209,12 +280,12 @@ def change_utility_cost(schema):
 
 def add_explicit_extensible_bounds(schema):
     # Schedule:Year
-    loc = schema['properties']['Schedule:Year']['patternProperties']['.*']['properties']['schedule_weeks']
+    loc = get_schema_object(schema, 'Schedule:Year')['properties']['schedule_weeks']
     loc['minItems'] = 1
     loc['maxItems'] = 53
 
     # EnergyManagementSystem:Program
-    loc = schema['properties']['EnergyManagementSystem:Program']['patternProperties']['.*']
+    loc = get_schema_object(schema, 'EnergyManagementSystem:Program')
     if 'required' in loc and 'lines' not in loc['required']:
         loc['required'].append('lines')
     if 'required' not in loc:
@@ -227,38 +298,39 @@ def change_special_cased_name_fields(schema):
     schema['properties']['ZoneHVAC:TerminalUnit:VariableRefrigerantFlow']['legacy_idd']['field_info']['name'] = original_name
     schema['properties']['ZoneHVAC:TerminalUnit:VariableRefrigerantFlow']['legacy_idd']['fields'][0] = 'name'
     schema['properties']['ZoneHVAC:TerminalUnit:VariableRefrigerantFlow']['legacy_idd']['alphas']['fields'][0] = 'name'
-    del schema['properties']['ZoneHVAC:TerminalUnit:VariableRefrigerantFlow']['patternProperties']['.*']['required'][0]
+    del get_schema_object(schema, 'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow')['required'][0]
     schema['properties']['ZoneHVAC:TerminalUnit:VariableRefrigerantFlow']['name'] = \
-         schema['properties']['ZoneHVAC:TerminalUnit:VariableRefrigerantFlow']['patternProperties']['.*']['properties'].pop('zone_terminal_unit_name')
+        get_schema_object(schema, 'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow')['properties'].pop('zone_terminal_unit_name')
 
     original_name = schema['properties']['AirConditioner:VariableRefrigerantFlow']['legacy_idd']['field_info'].pop('heat_pump_name')
     schema['properties']['AirConditioner:VariableRefrigerantFlow']['legacy_idd']['field_info']['name'] = original_name
     schema['properties']['AirConditioner:VariableRefrigerantFlow']['legacy_idd']['fields'][0] = 'name'
     schema['properties']['AirConditioner:VariableRefrigerantFlow']['legacy_idd']['alphas']['fields'][0] = 'name'
-    del schema['properties']['AirConditioner:VariableRefrigerantFlow']['patternProperties']['.*']['required'][0]
+    del get_schema_object(schema, 'AirConditioner:VariableRefrigerantFlow')['required'][0]
     schema['properties']['AirConditioner:VariableRefrigerantFlow']['name'] = \
-        schema['properties']['AirConditioner:VariableRefrigerantFlow']['patternProperties']['.*']['properties'].pop('heat_pump_name')
+        get_schema_object(schema, 'AirConditioner:VariableRefrigerantFlow')['properties'].pop('heat_pump_name')
 
 
 def change_extensions_name(schema):
     for key, value in extension_renaming.items():
-        schema['properties'][key]['patternProperties']['.*']['properties'][value] = schema['properties'][key]['patternProperties']['.*']['properties']['extensions']
-        loc = schema['properties'][key]['patternProperties']['.*']['properties']
+        get_schema_object(schema, key)['properties'][value] = get_schema_object(schema, key)['properties']['extensions']
+        loc = get_schema_object(schema, key)['properties']
         del loc['extensions']
         schema['properties'][key]['legacy_idd']['extension'] = value
 
     for key in remaining_objects:
         schema['properties'][key]['legacy_idd']['extension'] = 'extensions'
 
+
 def change_89_release_issues(schema):
     curves = [
         'Curve:Linear', 'Curve:Quadratic', 'Curve:Cubic', 'Curve:Quartic', 'Curve:Exponent',
         'Curve:Bicubic', 'Curve:Biquadratic', 'Curve:QuadraticLinear', 'Curve:CubicLinear', 'Curve:Triquadratic',
         'Curve:ExponentialSkewNormal', 'Curve:Sigmoid', 'Curve:RectangularHyperbola1', 'Curve:RectangularHyperbola2', 'Curve:ExponentialDecay',
-        'Curve:DoubleExponentialDecay', 'Curve:ChillerPartLoadWithLift', 'Table:OneIndependentVariable', 'Table:TwoIndependentVariables', 'Table:MultiVariableLookup'
+        'Curve:DoubleExponentialDecay', 'Curve:ChillerPartLoadWithLift', 'Table:Lookup'
     ]
     for curve in curves:
-        schema['properties'][curve]['patternProperties']['.*']['properties']['output_unit_type']['enum'] = [
+        get_schema_object(schema, curve)['properties']['output_unit_type']['enum'] = [
             '',
             'Capacity',
             'Dimensionless',
@@ -266,20 +338,7 @@ def change_89_release_issues(schema):
             'Pressure',
             'Temperature'
         ]
-    schema['properties']['OtherEquipment']['patternProperties']['.*']['properties']['fuel_type']['enum'].append('Water')
-    schema['properties']['WindowMaterial:Glazing:EquivalentLayer']['patternProperties']['.*']['properties']['optical_data_type']['enum'].append('SpectralAverage')
-    schema['properties']['ZoneHVAC:CoolingPanel:RadiantConvective:Water']['patternProperties']['.*']['properties']['control_type']['enum'].append('ZoneTotalLoad')
-    schema['properties']['ZoneHVAC:CoolingPanel:RadiantConvective:Water']['patternProperties']['.*']['properties']['control_type']['enum'].append('ZoneConvectiveLoad')
 
-    schema['properties']['FuelFactors']['patternProperties']['.*']['properties']['existing_fuel_resource_name'].pop('enum')
-    schema['properties']['LifeCycleCost:UsePriceEscalation']['patternProperties']['.*']['properties']['resource'].pop('enum')
-    schema['properties']['AirConditioner:VariableRefrigerantFlow']['patternProperties']['.*']['properties']['fuel_type'].pop('enum')
-    schema['properties']['GlobalGeometryRules']['patternProperties']['.*']['properties']['starting_vertex_position'].pop('enum')
-    schema['properties']['GlobalGeometryRules']['patternProperties']['.*']['properties']['vertex_entry_direction'].pop('enum')
-    schema['properties']['GlobalGeometryRules']['patternProperties']['.*']['properties']['coordinate_system'].pop('enum')
-    schema['properties']['WaterHeater:Mixed']['patternProperties']['.*']['properties']['heater_fuel_type'].pop('enum')
-    schema['properties']['Boiler:HotWater']['patternProperties']['.*']['properties']['fuel_type'].pop('enum')
-    schema['properties']['Schedule:Week:Compact']['patternProperties']['.*']['properties']['data']['items']['properties']['daytype_list'].pop('enum')
-    schema['properties']['Output:Table:SummaryReports']['patternProperties']['.*']['properties']['reports']['items']['properties']['report_name'].pop('enum')
+    get_schema_object(schema, 'Schedule:Week:Compact')['properties']['data']['items']['properties']['daytype_list'].pop('enum')
 
 

@@ -86,7 +86,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.0;
+  Version,9.6;
 
   Timestep,4;
 
@@ -94,7 +94,7 @@
     Simple One Zone (Wireframe DXF),  !- Name
     0.0000000E+00,           !- North Axis {deg}
     Suburbs,                 !- Terrain
-    .04,                     !- Loads Convergence Tolerance Value
+    .04,                     !- Loads Convergence Tolerance Value {W}
     .004,                    !- Temperature Convergence Tolerance Value {deltaC}
     MinimalShadowing,        !- Solar Distribution
     30,                      !- Maximum Number of Warmup Days
@@ -111,7 +111,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   RunPeriod,
     annual,                  !- Name
@@ -260,7 +262,7 @@
   AirLoopHVAC:ZoneSplitter,
     Zone Supply Air Splitter,!- Name
     Zone Equipment Inlet Node,  !- Inlet Node Name
-    Zone 1 OA Inlet Node;    !- Outlet 1 Node Name
+    Zone 1 OA Inlet Node ATInlet;  !- Outlet 1 Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONE MIXER ===========
 
@@ -365,12 +367,23 @@
     Mixed Air Node,          !- Air Inlet Node Name
     Air Loop Outlet Node;    !- Air Outlet Node Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Zone1DirectAir,          !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    Zone 1 OA Inlet Node,    !- Zone Supply Air Node Name
+    Zone 1 OA Inlet Node ATInlet,  !- Air Inlet Node Name
+    Zone 1 OA Inlet Node,    !- Air Outlet Node Name
     0.0625,                  !- Maximum Air Flow Rate {m3/s}
-    SZ DSOA SPACE1-1;        !- Design Specification Outdoor Air Object Name
+    SZ DSOA SPACE1-1,        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    Zone1DirectAir ADU,      !- Name
+    Zone 1 OA Inlet Node,    !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Zone1DirectAir,          !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   Schedule:Compact,
     OAFractionSched,         !- Name
@@ -425,7 +438,12 @@
     0,                       !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE1-1,        !- Name
@@ -653,14 +671,18 @@
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Zone1DirectAir,          !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Zone1DirectAir ADU,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:WaterToAirHeatPump,  !- Zone Equipment 2 Object Type
     Zone1WTAHP,              !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    2;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    2,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:WaterToAirHeatPump,
     Zone1WTAHP,              !- Name
@@ -720,6 +742,99 @@
     For: AllDays,            !- Field 2
     Until: 24:00,0.0;        !- Field 3
 
+  Curve:QuadLinear,
+    TotCoolCapCurve,     ! Curve Name
+    -9.149069561,        !- CoefficientC1
+    10.87814026,         !- CoefficientC2
+    -1.718780157,        !- CoefficientC3
+    0.746414818,         !- CoefficientC4
+    0.0,                 !- CoefficientC5
+    -100,                ! Minimum Value of w
+    100,                 ! Maximum Value of w
+    -100,                ! Minimum Value of x
+    100,                 ! Maximum Value of x
+    0,                   ! Minimum Value of y
+    100,                 ! Maximum Value of y
+    0,                   ! Minimum Value of z
+    100,                 ! Maximum Value of z
+    0,                   ! Minimum Curve Output
+    38;                  ! Maximum Curve Output
+
+  Curve:QuadLinear,
+    CoolPowCurve,        ! Curve Name
+    -3.205409884,        !- CoefficientC1
+    -0.976409399,        !- CoefficientC2
+    3.97892546,          !- CoefficientC3
+    0.938181818,         !- CoefficientC4
+    0.0,                 !- CoefficientC5
+    -100,                ! Minimum Value of w
+    100,                 ! Maximum Value of w
+    -100,                ! Minimum Value of x
+    100,                 ! Maximum Value of x
+    0,                   ! Minimum Value of y
+    100,                 ! Maximum Value of y
+    0,                   ! Minimum Value of z
+    100,                 ! Maximum Value of z
+    0,                   ! Minimum Curve Output
+    38;                  ! Maximum Curve Output
+
+  Curve:QuadLinear,
+    HeatCapCurve,        ! Curve Name
+    -1.361311959,        !- CoefficientC1
+    -2.471798046,        !- CoefficientC2
+    4.173164514,         !- CoefficientC3
+    0.640757401,         !- CoefficientC4
+    0.0,                 !- CoefficientC5
+    -100,                ! Minimum Value of w
+    100,                 ! Maximum Value of w
+    -100,                ! Minimum Value of x
+    100,                 ! Maximum Value of x
+    0,                   ! Minimum Value of y
+    100,                 ! Maximum Value of y
+    0,                   ! Minimum Value of z
+    100,                 ! Maximum Value of z
+    0,                   ! Minimum Curve Output
+    38;                  ! Maximum Curve Output
+
+  Curve:QuadLinear,
+    HeatPowCurve,        ! Curve Name
+    -2.176941116,        !- CoefficientC1
+    0.832114286,         !- CoefficientC2
+    1.570743399,         !- CoefficientC3
+    0.690793651,         !- CoefficientC4
+    0.0,                 !- CoefficientC5
+    -100,                ! Minimum Value of w
+    100,                 ! Maximum Value of w
+    -100,                ! Minimum Value of x
+    100,                 ! Maximum Value of x
+    0,                   ! Minimum Value of y
+    100,                 ! Maximum Value of y
+    0,                   ! Minimum Value of z
+    100,                 ! Maximum Value of z
+    0,                   ! Minimum Curve Output
+    38;                  ! Maximum Curve Output
+
+  Curve:QuintLinear,
+    CoolSensCapCurve,    ! Curve Name
+    -5.462690012,        !- CoefficientC1
+    17.95968138,         !- CoefficientC2
+    -11.87818402,        !- CoefficientC3
+    -0.980163419,        !- CoefficientC4
+    0.767285761,         !- CoefficientC5
+    0.0,                 !- CoefficientC6
+    -100,                ! Minimum Value of v
+    100,                 ! Maximum Value of v
+    -100,                ! Minimum Value of w
+    100,                 ! Maximum Value of w
+    -100,                ! Minimum Value of x
+    100,                 ! Maximum Value of x
+    0,                   ! Minimum Value of y
+    100,                 ! Maximum Value of y
+    0,                   ! Minimum Value of z
+    100,                 ! Maximum Value of z
+    0,                   ! Minimum Curve Output
+    38;                  ! Maximum Curve Output
+    
   Coil:Cooling:WaterToAirHeatPump:EquationFit,
     Sys 1 Heat Pump Cooling Mode,  !- Name
     Sys 1 Water to Air Heat Pump Source Side1 Inlet Node,  !- Water Inlet Node Name
@@ -730,23 +845,10 @@
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Total Cooling Capacity {W}
     Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    5.12,                    !- Gross Rated Cooling COP
-    -9.149069561,            !- Total Cooling Capacity Coefficient 1
-    10.87814026,             !- Total Cooling Capacity Coefficient 2
-    -1.718780157,            !- Total Cooling Capacity Coefficient 3
-    0.746414818,             !- Total Cooling Capacity Coefficient 4
-    0.0,                     !- Total Cooling Capacity Coefficient 5
-    -5.462690012,            !- Sensible Cooling Capacity Coefficient 1
-    17.95968138,             !- Sensible Cooling Capacity Coefficient 2
-    -11.87818402,            !- Sensible Cooling Capacity Coefficient 3
-    -0.980163419,            !- Sensible Cooling Capacity Coefficient 4
-    0.767285761,             !- Sensible Cooling Capacity Coefficient 5
-    0.0,                     !- Sensible Cooling Capacity Coefficient 6
-    -3.205409884,            !- Cooling Power Consumption Coefficient 1
-    -0.976409399,            !- Cooling Power Consumption Coefficient 2
-    3.97892546,              !- Cooling Power Consumption Coefficient 3
-    0.938181818,             !- Cooling Power Consumption Coefficient 4
-    0.0,                     !- Cooling Power Consumption Coefficient 5
+    5.12,                    !- Gross Rated Cooling COP {W/W}
+    TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
+    CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
+    CoolPowCurve,            !- Cooling Power Consumption Curve Name
     0,                       !- Nominal Time for Condensate Removal to Begin {s}
     0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
 
@@ -759,17 +861,9 @@
     Autosize,                !- Rated Air Flow Rate {m3/s}
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Heating Capacity {W}
-    4.75,                    !- Gross Rated Heating COP
-    -1.361311959,            !- Heating Capacity Coefficient 1
-    -2.471798046,            !- Heating Capacity Coefficient 2
-    4.173164514,             !- Heating Capacity Coefficient 3
-    0.640757401,             !- Heating Capacity Coefficient 4
-    0.0,                     !- Heating Capacity Coefficient 5
-    -2.176941116,            !- Heating Power Consumption Coefficient 1
-    0.832114286,             !- Heating Power Consumption Coefficient 2
-    1.570743399,             !- Heating Power Consumption Coefficient 3
-    0.690793651,             !- Heating Power Consumption Coefficient 4
-    0.0;                     !- Heating Power Consumption Coefficient 5
+    4.75,                    !- Gross Rated Heating COP {W/W}
+    HeatCapCurve,            !- Heating Capacity Curve Name
+    HeatPowCurve;            !- Heating Power Consumption Curve Name
 
   Fan:SystemModel,
     Zone 1 Fan,              !- Name
@@ -1157,9 +1251,9 @@
 
   Output:Variable,*,Zone Air Humidity Ratio,timestep;
 
-  Output:Variable,*,Fan Electric Power,timestep;
+  Output:Variable,*,Fan Electricity Rate,timestep;
 
-  Output:Variable,*,Heating Coil Electric Power,timestep;
+  Output:Variable,*,Heating Coil Electricity Rate,timestep;
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,timestep;
 
@@ -1187,7 +1281,7 @@
 
   Output:Variable,*,Cooling Coil Source Side Mass Flow Rate,timestep;
 
-  Output:Variable,*,Cooling Coil Electric Energy,timestep;
+  Output:Variable,*,Cooling Coil Electricity Energy,timestep;
 
   Output:Variable,*,Cooling Coil Total Cooling Energy,timestep;
 
@@ -1197,7 +1291,7 @@
 
   Output:Variable,*,Cooling Coil Source Side Heat Transfer Energy,timestep;
 
-  Output:Variable,*,Heating Coil Electric Energy,timestep;
+  Output:Variable,*,Heating Coil Electricity Energy,timestep;
 
   Output:Variable,*,Heating Coil Heating Energy,timestep;
 
@@ -1207,9 +1301,9 @@
 
   Output:Variable,*,Heating Coil Heating Rate,timestep;
 
-  Output:Variable,*,Heating Coil Gas Rate,timestep;
+  Output:Variable,*,Heating Coil NaturalGas Rate,timestep;
 
-  Output:Variable,*,Fan Electric Power,timestep;
+  Output:Variable,*,Fan Electricity Rate,timestep;
 
   Output:Variable,*,Ground Heat Exchanger Average Borehole Temperature,timestep;
 
@@ -1247,9 +1341,9 @@
 
   Output:Variable,*,Zone Water to Air Heat Pump Latent Cooling Energy,timestep;
 
-  Output:Variable,*,Zone Water to Air Heat Pump Electric Power,timestep;
+  Output:Variable,*,Zone Water to Air Heat Pump Electricity Rate,timestep;
 
-  Output:Variable,*,Zone Water to Air Heat Pump Electric Energy,timestep;
+  Output:Variable,*,Zone Water to Air Heat Pump Electricity Energy,timestep;
 
   Output:Variable,*,Zone Water to Air Heat Pump Fan Part Load Ratio,timestep;
 
@@ -1301,7 +1395,7 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -1311,7 +1405,7 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
   Material:NoMass,
     R19LAYER,                !- Name

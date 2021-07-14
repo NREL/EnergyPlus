@@ -152,7 +152,7 @@
     ,                        !- Nuclear High Level Emission Factor Schedule Name
     0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
 
-!NOTE:  EnergyPlus does not yet include LPG as a fuel.  Included here for future use.
+!NOTE:  EnergyPlus does not include LPG as a fuel type, use Propane as the resource name.
 !
 ! USEPA Compilation of Air Pollutant Emission Factors, AP-42, Fifth Edition
 ! Volume I: Stationary Point and Area Sources
@@ -162,7 +162,7 @@
 !
 
   FuelFactors,
-    LPG,                     !- Existing Fuel Resource Name
+    Propane,                 !- Existing Fuel Resource Name
     kg,                      !- Units of Measure
     ,                        !- Energy per Unit Factor
     1,                       !- Source Energy Factor {J/J}
@@ -252,7 +252,7 @@
 !
 
   FuelFactors,
-    FuelOil#1,               !- Existing Fuel Resource Name
+    FuelOilNo1,                !- Existing Fuel Resource Name
     kg,                      !- Units of Measure
     ,                        !- Energy per Unit Factor
     1,                       !- Source Energy Factor {J/J}
@@ -297,7 +297,7 @@
 !
 
   FuelFactors,
-    FuelOil#2,               !- Existing Fuel Resource Name
+    FuelOilNo2,                !- Existing Fuel Resource Name
     kg,                      !- Units of Measure
     ,                        !- Energy per Unit Factor
     1,                       !- Source Energy Factor {J/J}
@@ -334,7 +334,7 @@
     ,                        !- Nuclear High Level Emission Factor Schedule Name
     0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
 
-!NOTE:  EnergyPlus does not yet include FuelOil#4 as a fuel.  Included here for future use.
+!NOTE:  EnergyPlus does not include FuelOil#4 as a fuel, use OtherFuel1 as the resource name
 !
 ! USEPA Compilation of Air Pollutant Emission Factors, AP-42, Fifth Edition
 ! Volume I: Stationary Point and Area Sources
@@ -344,7 +344,7 @@
 !
 
   FuelFactors,
-    FuelOil#4,               !- Existing Fuel Resource Name
+    OtherFuel1,               !- Existing Fuel Resource Name
     kg,                      !- Units of Measure
     ,                        !- Energy per Unit Factor
     1,                       !- Source Energy Factor {J/J}
@@ -381,7 +381,7 @@
     ,                        !- Nuclear High Level Emission Factor Schedule Name
     0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
 
-!NOTE:  EnergyPlus does not yet include FuelOil#6 as a fuel.  Included here for future use.
+!NOTE:  EnergyPlus does not include FuelOil#6 as a fuel, use OtherFuel1 as the resource name
 !
 ! USEPA Compilation of Air Pollutant Emission Factors, AP-42, Fifth Edition
 ! Volume I: Stationary Point and Area Sources
@@ -391,7 +391,7 @@
 !
 
   FuelFactors,
-    FuelOil#6,               !- Existing Fuel Resource Name
+    OtherFuel1,               !- Existing Fuel Resource Name
     kg,                      !- Units of Measure
     ,                        !- Energy per Unit Factor
     1,                       !- Source Energy Factor {J/J}

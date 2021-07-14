@@ -54,18 +54,18 @@ Several levels of actuators are available for on/off supervisory control of Plan
 \item
   Each plant (and condenser) loop has a series of actuators called ``Supply Side Branch'' and ``Demand Side Branch'' that are available with the control type ``On/Off Supervisory.''~ These are available for each individual branch in a loop. Setting the value of this actuator to 1.0 directs the plant's branch to run normally based on other controls. Setting the value of this actuator to 0.0 directs the plant's branch to shut down regardless of what other controls indicate.
 \item
-  Each plant (and condenser) loop has a series of actuators called ``Plant Component *'' that are available with the control type ``On/Off Supervisory.''~ These are available for each individual component on a loop. Setting the value of this actuator to 0.0 directs the component's water flow rate to shut down regardless of what other controls indicate. Any other component on the same branch will also be shut down. Setting the value of this actuator to any other value directs this component and any other component on the same branch to run normally based on other controls. 
+  Each plant (and condenser) loop has a series of actuators called ``Plant Component *'' that are available with the control type ``On/Off Supervisory.''~ These are available for each individual component on a loop. Setting the value of this actuator to 0.0 directs the component's water flow rate to shut down regardless of what other controls indicate. Any other component on the same branch will also be shut down. Setting the value of this actuator to any value <=1.0 sets the current load for this component to the actuator value times the component maximum operating capacity which is the nominal capacity multiplied by the maximum part load ratio.
 \end{itemize}
 
 \subsection{Outdoor Air System Node Conditions}\label{outdoor-air-system-node-conditions}
 
-Actuators called ``Outdoor Air System Node'' are available with control types called ``Drybulb Temperature'' and ``Wetbulb Temperature.''~ The units are degrees Celsius. These actuators are available for all system nodes that are listed in either an OutdoorAir:Node or OutdoorAir:NodeList input object. You should probably set both the drybulb and wetbulb temperatures to ensure a full description of the moist air conditions.
+Actuators called ``Outdoor Air System Node'' are available with control types called ``Drybulb Temperature'' and ``Wetbulb Temperature.''~ The units are degrees Celsius. These actuators are available for all system nodes that are listed in either an OutdoorAir:Node or OutdoorAir:NodeList input object. You should probably set both the drybulb and wetbulb temperatures to ensure a full description of the moist air conditions.  In addition, there are also actuators for "Wind Speed" and "Wind Direction" with the units of meters/second and degrees, respectively.
 
 The air system and many component models require you to specify a node as an outdoor air node to obtain values for the outdoor conditions. For example, outdoor air nodes are used at the inlet to an outdoor air mixer or at the inlet of the heat rejection side of a component model. Typically this is the weather data value for outdoor conditions. But local variations in microclimate may shift the local outdoor air temperature to differ slightly from the weather data. (Currently the only local variation model for this effect in EnergyPlus varies the outdoor air conditions as a function of height.)~ If you want to experiment with other models for local variations in outdoor air conditions, this EMS actuator allows you to override the outdoor temperature at a particular system node with any model that can be implemented in an Erl program. For example (although better models for the changes in conditions may need be developed), this actuator could be used to examine the energy impacts of warmer outdoor air temperatures experienced by a rooftop packaged HVAC system sitting on a black roof or the cooler conditions experienced by a unit that is located on the shaded side of a building.~ Another example is to make use of a separate model, outside of EnergyPlus, for some unique type of component (such as a labyrinth or earth-tube) that preconditions outdoor air; the results of that model could be fed into the air system model in EnergyPlus using these actuators.
 
 \subsection{AirLoopHVAC Availability Status}\label{airloophvac-availability-status}
 
-This actuator is available in all models with central, or primary, air systems that are entered with the object ``AirLoopHVAC.''~ Various availability managers use the air loop's availability status to override control of the central air system fan. The fan may be scheduled to be unavailable during certain times to shut down the system when it is not needed. However, there may be times when the air system should be started to protect from freezing, for example. This actuator can force an air system to start up or shut down.
+This actuator is available in all models with central, or primary, air systems that are entered with the object ``AirLoopHVAC'' using the control type called ``Availability Status.''~ Various availability managers use the air loop's availability status to override control of the central air system fan. The fan may be scheduled to be unavailable during certain times to shut down the system when it is not needed. However, there may be times when the air system should be started to protect from freezing, for example. This actuator can force an air system to start up or shut down.
 
 The control is actuated by setting values for the availability status. The settings are numeric, but represent discrete states the status can take. The following settings are valid:
 
@@ -84,7 +84,7 @@ The control is actuated by setting values for the availability status. The setti
 
 An actuator called ``Ideal Loads Air System'' is available with control types called ``Air Mass Flow Rate'' (supply air), ``Outdoor Air Mass Flow Rate,'' ``Air Temperature,'' and ``Air Humidity Ratio.'' ~These are available in models that use the ideal loads air system, formerly known as purchased air. The units are kg/s for mass flow rate, C for temperature and kgWater/kgDryAir for humidity ratio. The unique identifier is the user-defined name of the ZoneHVAC:IdealLoadsAirSystem input object.
 
-For Air Temperature and Air Humidity Ratio, the overrides are absolute. They are applied after all other limits have been checked. For mass flow rate, the overrides are not absolute, in that the model has additional internal controls that may not always be overridden. The internal controls will still apply the capacity and flow rate limits if defined in the input object. The EMS override affects the flow rate only if the air system is on. If the air system is ``off,'' the mass flow is zero regardless of the actuator setting. The internal model controls will turn off the air system if the zone is in the dead band or if it is scheduled ``off'' by availability managers. This behavior allows you to use the internal controls to determine when the air should cycle on, as for a constant volume system that cycles to achieve control. If both the Air Mass Flow Rate and Outdoor Air Mass Flow Rate are overridden, the Outdoor Air Mass Flow Rate will not be allowed to be greater than the override value for Air Mass Flow Rate.
+For Air Temperature and Air Humidity Ratio, the overrides are absolute. They are applied after all other limits have been checked. For mass flow rate, the overrides are not absolute,the internal controls will still apply the capacity and flow rate limits if defined in the input object. The EMS override will be ignored if the ideal loads system is off (the availability schedule value is zero or it has  been forced ``off'' by an availability manager). If both the Air Mass Flow Rate and Outdoor Air Mass Flow Rate are overridden, the Outdoor Air Mass Flow Rate will not be allowed to be greater than the override value for Air Mass Flow Rate.
 
 \subsection{Fan}\label{fan}
 
@@ -94,7 +94,26 @@ An actuator is also available for overriding the autosize value for the fan's de
 
 \subsection{DX Cooling Coils}\label{dx-cooling-coils}
 
-Actuators are available for overriding the autosize values related to the size of single speed DX coils.~ Actuators called ``Coil:Cooling:DX:SingleSpeed'' are available with control types ``Autosized Rated Air Flow Rate'' (in m3/s), ``Autosized Rated Sensible Heat Ratio'' (in W/W), and ``Autosized Rated Total Cooling Capacity'' (in W).~ These are only useful from the calling point named AfterComponentInputReadIn.
+Actuators are available for overriding the autosize rated airflow rate and total cooling capacity of the Coil:Cooling:DX object.~ Actuators called ``Coil:Cooling:DX:SingleSpeed'' are available with control types ``Autosized Rated Air Flow Rate'' (in m3/s), ``Autosized Rated Total Cooling Capacity'' (in W), and ``Autosized Rated Sensible Heat Ratio'' (in W/W).~ These are only useful from the calling point named AfterComponentInputReadIn.
+
+\subsection{DX Thermal Storage Coils}\label{dx-cooling-coils}
+
+There is an actuator that is available for overriding the operating mode of the DX thermal storage coil object.~ The actuator is called ``Coil:Cooling:DX:SingleSpeed:ThermalStorage'' and is available with the control type ``Operating Mode.''  The operating mode has the following states/values:
+
+\begin{itemize}
+\item
+0 = Off Mode
+\item
+1 = Cooling Only Mode
+\item
+2 = Cooling and Charge Mode
+\item
+3 = Cooling and Discharge Mode
+\item
+4 = Charge Only Mode
+\item
+5 = Discharge Only Mode
+\end{itemize}
 
 \subsection{Unitary Equipment}\label{unitary-equipment}
 
@@ -108,16 +127,12 @@ Actuators are available for overriding the autosize values related to supply air
 \item
   An actuator called ``AirLoopHVAC:UnitaryHeatOnly'' is available with control type ``Autosized Supply Air Flow Rate.''
 \item
-  Actuators called ``AirLoopHVAC:Unitary:Furnace:HeatCool'' and ``AirLoopHVAC:UnitaryHeatCool''are available with control types ``Autosized Supply Air Flow Rate,''~ ``Autosized Supply Air Flow Rate During Cooling Operation,'' ``Autosized Supply Air Flow Rate During Heating Operation,'' and ``Autosized Supply Air Flow Rate During No Heating or Cooling Operation.''
+  Actuators called ``AirLoopHVAC:Unitary:Furnace:HeatCool,''  ``AirLoopHVAC:UnitaryHeatCool,'' and ``UnitarySystem'' are available with control types ``Autosized Supply Air Flow Rate,''~ ``Autosized Supply Air Flow Rate During Cooling Operation,'' ``Autosized Supply Air Flow Rate During Heating Operation,'' and ``Autosized Supply Air Flow Rate During No Heating or Cooling Operation.''
 \item
   An actuator called ``AirLoopHVAC:UnitaryHeatPump:AirToAir'' is available with control type ``Autosized Supply Air Flow Rate.''
 \item
   An actuator called ``AirLoopHVAC:UnitaryHeatPump:WaterToAir'' is available with control type ``Autosized Supply Air Flow Rate.''
 \end{itemize}
-
-\subsection{AirTerminal:SingleDuct:Uncontrolled}\label{airterminalsingleductuncontrolled}
-
-An actuator called ``AirTerminal:SingleDuct:Uncontrolled'' is available with a control type called ``Mass Flow Rate.''~ This actuator is available in models that use the direct air terminal. The units are kg/s. This actuator is used to control the flow rate. Normally, the flow rate of direct air terminals is fixed by the input or sizing results, but this actuator provides a way to override the flow with Erl programs.
 
 \subsection{AirTerminal:SingleDuct:ConstantVolume:NoReheat}\label{airTerminalsingleductconstantvolumenoreheat}
 
@@ -127,13 +142,28 @@ An actuator called ``AirTerminal:SingleDuct:ConstantVolume:NoReheat'' is availab
 
 An actuator called ``Outdoor Air Controller'' is available with the control type called ``Air Mass Flow Rate.'' ~This provides override control over the rate of outdoor air. The units are kg/s. The unique identifier is the name of the Controller:OutdoorAir input object. The actuated mass flow rate is not allowed to be greater than the current system mixed air flow rate.
 
+\subsection{Plant Equipment Operation}\label{plant-equipment-operation}
+
+An actuator called ``Plant Equipment Operation'' is available with a control type called ``Distributed Load Rate.''~ The units are Watts.  This allows the override of the assigned distributed load for plant equipment.
+
 \subsection{Plant Load Profile}\label{plant-load-profile}
 
-Actuators called ``Plant Load Profile'' are available with the control types called ``Mass Flow Rate'' (in kg/s) and ``Power'' (in W). The unique identifier is the name of the LoadProfile:Plant input object. These actuators provide override control over the loads placed on a plant system by a plant load profile.
+Actuators called ``Plant Load Profile'' are available with the control types called ``Mass Flow Rate'' (in \si{\massFlowRate}) and ``Power'' (in W). The unique identifier is the name of the LoadProfile:Plant input object. These actuators provide override control over the loads placed on a plant system by a plant load profile.
 
 \subsection{Pump}\label{pump}
 
-An actuator called ``Pump'' is available with the control type ``Pump Mass Flow Rate'' (in kg/s). This allows you to override the flow rate produced by a pump. The unique identifier is the name of Pump Input object.
+An actuator called ``Pump'' is available with the control type ``Pump Mass Flow Rate'' (in \si{\massFlowRate}). This allows you to override the flow rate produced by a pump.
+
+Another actuator called ``Pump'' is available with the control type ``Pump Pressure Rise'' (in \si{\pascal}). This allows you to override the pump pressurise rise and therefore the power consumption of the pump, which is calculated as:
+
+\begin{equation}
+    P = \frac{\dot{Q} \cdot \Delta P_{override}}{\eta_{total}}
+\end{equation}
+
+where $P$ is the pump power (\si{\watt}), $\dot{Q}$ is the volume flow rate (\si{\volumeFlowRate}), $\eta_{total}$ is the pump total efficiency (\%)
+and $\Delta P_{override}$ is your EMS-overriden pressure rise (\si{\pascal}).
+
+The unique identifier in both these actuator is the name of Pump Input object.
 
 \subsection{Window Air Conditioner}\label{window-air-conditioner}
 
@@ -141,7 +171,7 @@ An actuator called ``Window Air Conditioner'' is available with a control type c
 
 \subsection{Low Temperature Radiant Hydronic}\label{low-temperature-radiant-hydronic}
 
-Actuators called ``Hydronic Low Temp Radiant'' and ``Constant Flow Low Temp Radiant'' are available with the control type ``Water Mass Flow Rate'' (in kg/s). This allows you to override the flow of water through hydronic radiant systems. The unique identifier is the name of either the ZoneHVAC:LowTemperatureRadiant:VariableFlow or ZoneHVAC:LowTemperature\\
+Actuators called ``Hydronic Low Temp Radiant'' and ``Constant Flow Low Temp Radiant'' are available with the control type ``Water Mass Flow Rate'' (in \si{\massFlowRate}). This allows you to override the flow of water through hydronic radiant systems. The unique identifier is the name of either the ZoneHVAC:LowTemperatureRadiant:VariableFlow or ZoneHVAC:LowTemperature\\
 Radiant:ConstantFlow input objects.
 
 \subsection{Variable Refrigerant Flow Heat Pump Air Conditioner}\label{variable-refrigerant-flow-heat-pump-air-conditioner}

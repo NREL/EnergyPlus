@@ -1,3 +1,58 @@
+# EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University
+# of Illinois, The Regents of the University of California, through Lawrence
+# Berkeley National Laboratory (subject to receipt of any required approvals
+# from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
+# Battelle, Alliance for Sustainable Energy, LLC, and other contributors. All
+# rights reserved.
+#
+# NOTICE: This Software was developed under funding from the U.S. Department of
+# Energy and the U.S. Government consequently retains certain rights. As such,
+# the U.S. Government has been granted for itself and others acting on its
+# behalf a paid-up, nonexclusive, irrevocable, worldwide license in the
+# Software to reproduce, distribute copies to the public, prepare derivative
+# works, and perform publicly and display publicly, and to permit others to do
+# so.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# (1) Redistributions of source code must retain the above copyright notice,
+#     this list of conditions and the following disclaimer.
+#
+# (2) Redistributions in binary form must reproduce the above copyright notice,
+#     this list of conditions and the following disclaimer in the documentation
+#     and/or other materials provided with the distribution.
+#
+# (3) Neither the name of the University of California, Lawrence Berkeley
+#     National Laboratory, the University of Illinois, U.S. Dept. of Energy nor
+#     the names of its contributors may be used to endorse or promote products
+#     derived from this software without specific prior written permission.
+#
+# (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in
+#     stand-alone form without changes from the version obtained under this
+#     License, or (ii) Licensee makes a reference solely to the software
+#     portion of its product, Licensee must refer to the software as
+#     "EnergyPlus version X" software, where "X" is the version number Licensee
+#     obtained under this License and may not use a different name for the
+#     software. Except as specifically required in this Section (4), Licensee
+#     shall not use in a company name, a product name, in advertising,
+#     publicity, or other promotional activities any name, trade name,
+#     trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or
+#     confusingly similar designation, without the U.S. Department of Energy's
+#     prior written consent.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
 import os
 import shutil
 import subprocess
@@ -74,16 +129,13 @@ class TransitionWorkflow(BaseEPLaunchWorkflow1):
         return transition_dict
 
     def get_start_end_version_from_exe(self, exe_file_name):
-        if '\\' in exe_file_name:
-            parts = exe_file_name.split('\\')
-            filename = parts[-1]
-        else:
-            filename = exe_file_name
-        # Transition-V8-8-0-to-V8-9-0.exe
-        # 01234567890123456789012345678901234567890
+        filename = os.path.basename(exe_file_name)
         if filename[:11] == 'Transition-':
-            versions_string_with_ext = filename[11:]
-            versions_string, _ = versions_string_with_ext.split('.')
+            versions_string_with_maybe_ext = filename[11:]
+            if '.' in versions_string_with_maybe_ext:
+                versions_string, _ = versions_string_with_maybe_ext.split('.')
+            else:
+                versions_string = versions_string_with_maybe_ext
             start_version, end_version = versions_string.split('-to-')
             start_number = self.versionclass.numeric_version_from_dash_string(start_version)
             end_number = self.versionclass.numeric_version_from_dash_string(end_version)
@@ -101,7 +153,9 @@ class TransitionWorkflow(BaseEPLaunchWorkflow1):
             while current_version_number in self.transition_executable_files:
                 current_version_string = v.string_version_from_number(current_version_number)
                 next_version_number, specific_transition_exe = self.transition_executable_files[current_version_number]
-                self.run_single_transition(specific_transition_exe, path_to_old_file, current_version_string)
+                ok, msg = self.run_single_transition(specific_transition_exe, path_to_old_file, current_version_string)
+                if not ok:
+                    return False, 'Transition Failed!'
                 current_version_number = next_version_number
             final_version_string = v.string_version_from_number(current_version_number)
             return True, 'Version update successful for IDF file {} originally version {} and now version {}'.format(
@@ -118,63 +172,62 @@ class TransitionWorkflow(BaseEPLaunchWorkflow1):
         # make temporary copy that preserve file date
         shutil.copy2(file_to_update, idf_copy_of_old_file_temp)
         # see if rvi file is used
+        rvi_copy_of_old_file_temp = ''
         orig_rvi_file = file_no_extension + '.rvi'
         if os.path.exists(orig_rvi_file):
             rvi_copy_of_old_file_temp = file_no_extension + '.rvi_tempcopy'
             shutil.copy2(orig_rvi_file, rvi_copy_of_old_file_temp)
         # see if mvi file is used
+        mvi_copy_of_old_file_temp = ''
         orig_mvi_file = file_no_extension + '.mvi'
         if os.path.exists(orig_mvi_file):
             mvi_copy_of_old_file_temp = file_no_extension + '.mvi_tempcopy'
             shutil.copy2(orig_mvi_file, mvi_copy_of_old_file_temp)
         # perform transition
-        process = subprocess.run(
-            command_line_args,
-            creationflags=subprocess.CREATE_NEW_CONSOLE,
-            cwd=run_directory
-        )
-        if process.returncode == 0:
-            print('convertion complete')
-            # delete the extra outputs that are not needed
-            idfnew_path = file_no_extension + '.idfnew'
-            if os.path.exists(idfnew_path):
-                os.remove(idfnew_path)
-                idfold_path = file_no_extension + '.idfold'
-                if os.path.exists(idfold_path):
-                    os.remove(idfold_path)
-                # rename the previously copied file to preserve the old version
-                idf_revised_old_path = file_no_extension + '_' + old_verson_string + '.idf'
-                if os.path.exists(idf_copy_of_old_file_temp):
-                    os.rename(idf_copy_of_old_file_temp, idf_revised_old_path)
-                # work on the rvi update
-                rvinew_path = file_no_extension + '.rvinew'
-                if os.path.exists(rvinew_path):
-                    os.remove(rvinew_path)
-                rviold_path = file_no_extension + '.rviold'
-                if os.path.exists(rviold_path):
-                    os.remove(rviold_path)
-                rvi_revised_old_path = file_no_extension + '_' + old_verson_string + '.rvi'
-                if os.path.exists(orig_rvi_file):
-                    os.rename(rvi_copy_of_old_file_temp, rvi_revised_old_path)
-                # work on the rvi update
-                mvinew_path = file_no_extension + '.mvinew'
-                if os.path.exists(mvinew_path):
-                    os.remove(mvinew_path)
-                mviold_path = file_no_extension + '.mviold'
-                if os.path.exists(mviold_path):
-                    os.remove(mviold_path)
-                mvi_revised_old_path = file_no_extension + '_' + old_verson_string + '.mvi'
-                if os.path.exists(orig_mvi_file):
-                    os.rename(mvi_copy_of_old_file_temp, mvi_revised_old_path)
-                # process any error file
-                vcperr_file = file_no_extension + '.vcperr'
-                if os.path.exists(vcperr_file):
-                    vcperr_revised_file = file_no_extension + '_' + old_verson_string + '.vcperr'
-                    os.rename(vcperr_file, vcperr_revised_file)
-                return True
-            else:
-                print('convertion problem-2', transition_exe_path, file_to_update)
-                return False
+        try:
+            for message in self.execute_for_callback(command_line_args, run_directory):
+                self.callback(message)
+        except subprocess.CalledProcessError:
+            self.callback("Transition Failed for this file")
+            return False, 'Transition failed for file ' + file_to_update
+        self.callback('Conversion using %s complete! Copying files' % os.path.basename(transition_exe_path)) 
+        # delete the extra outputs that are not needed
+        idfnew_path = file_no_extension + '.idfnew'
+        if os.path.exists(idfnew_path):
+            os.remove(idfnew_path)
+            idfold_path = file_no_extension + '.idfold'
+            if os.path.exists(idfold_path):
+                os.remove(idfold_path)
+            # rename the previously copied file to preserve the old version
+            idf_revised_old_path = file_no_extension + '_' + old_verson_string + '.idf'
+            if os.path.exists(idf_copy_of_old_file_temp):
+                os.rename(idf_copy_of_old_file_temp, idf_revised_old_path)
+            # work on the rvi update
+            rvinew_path = file_no_extension + '.rvinew'
+            if os.path.exists(rvinew_path):
+                os.remove(rvinew_path)
+            rviold_path = file_no_extension + '.rviold'
+            if os.path.exists(rviold_path):
+                os.remove(rviold_path)
+            rvi_revised_old_path = file_no_extension + '_' + old_verson_string + '.rvi'
+            if os.path.exists(orig_rvi_file):
+                os.rename(rvi_copy_of_old_file_temp, rvi_revised_old_path)
+            # work on the rvi update
+            mvinew_path = file_no_extension + '.mvinew'
+            if os.path.exists(mvinew_path):
+                os.remove(mvinew_path)
+            mviold_path = file_no_extension + '.mviold'
+            if os.path.exists(mviold_path):
+                os.remove(mviold_path)
+            mvi_revised_old_path = file_no_extension + '_' + old_verson_string + '.mvi'
+            if os.path.exists(orig_mvi_file):
+                os.rename(mvi_copy_of_old_file_temp, mvi_revised_old_path)
+            # process any error file
+            vcperr_file = file_no_extension + '.vcperr'
+            if os.path.exists(vcperr_file):
+                vcperr_revised_file = file_no_extension + '_' + old_verson_string + '.vcperr'
+                os.rename(vcperr_file, vcperr_revised_file)
+            return True, 'Successfully converted file: ' + file_to_update
         else:
-            print('convertion problem-1', transition_exe_path, file_to_update)
-            return False
+            return False, 'Conversion problem for file: ' + file_to_update
+

@@ -5,6 +5,6 @@ Electricity:Building
 Electricity:HVAC
 Electricity:Plant
 Electricity:Facility
-Gas:Plant
-Gas:Facility
+NaturalGas:Plant
+NaturalGas:Facility
 0

@@ -31,6 +31,7 @@ introduced in new field A3.
 
 
 # Transitioning "AirTerminal:SingleDuct:Uncontrolled" to "AirTerminal:SingleDuct:ConstantVolume:NoReheat". Require five steps:
+*Note: these rules were not implemented in Transition8-8-0-to-8-9-0. AirTerminal:SingleDuct:Uncontrolled was simply tagged as obsolete.*
 
 # (1) Object Change: ZoneHVAC:EquipmentList
 
@@ -111,3 +112,167 @@ Field F4(A4): Inlet Node Name, no change
     use the new Air Inlet Node Name created in Step 3 above for "AirTerminal:SingleDuct:ConstantVolume:NoReheat" object. 
 
 Field >=FX(AX): Outlet X Node Name, modify the matching Outlet X Node Name, should be the same node name as the new Air Inlet Node Name of "AirTerminal:SingleDuct:ConstantVolume:NoReheat" object, old name + 2AT -> example, "SPACE3-1 Supply Inlet 2AT"
+
+# Object Change: Boiler and Chiller flow mode synonyms
+For all Boiler:HotWater and all Chiller:\*
+
+Field: Flow Mode, change VariableFlow to LeavingSetpointModulated.
+
+# Object Change: HeatBalanceAlgorithm
+Field 1, Algorithm:
+
+a) change "DEFAULT" or "CTF" to "ConductionTransferFunction"
+
+b) change "EMPD" to "MoisturePenetrationDepthConductionTransferFunction"
+
+c) change "CONDFD" or "CONDUCTIONFINITEDIFFERENCEDETAILED" to "ConductionFiniteDifference"
+
+d) change "HAMT" to "CombinedHeatAndMoistureFiniteElement"
+
+# Object Change: ZoneAirHeatBalanceAlgorithm
+Field 1, Algorithm, change "3RDORDERBACKWARDDIFFERENCE" to "ThirdOrderBackwardDifference"
+
+# Object Change: Zone
+Field 12 Zone Outside Convection Algorithm, change "DOE2" to "DOE-2"
+
+# Object Change: Generator:WindTurbine
+Field 3 Rotor Type:
+
+a) change "HAWT" or "None" to "HorizontalAxisWindTurbine"
+
+b) change "VAWT" to "VerticalAxisWindTurbine"
+
+Field 4 Control Type:
+
+a) change "FSFP" to "FixedSpeedFixedPitch"
+
+b) change "FSVP" to "FixedSpeedVariablePitch"
+
+c) change "VSFP" to "VariableSpeedFixedPitch"
+
+d) change "VSVP" or "None" to "VariableSpeedVariablePitch"
+
+# Object Change: SizingPeriod:DesignDay
+Field 18, Rain Indicator
+Field 19, Snow Indicator
+Field 20, Daylight Saving Time Indicator
+
+a) change "0" to "No"
+
+b) change "1" to "Yes"
+
+# Object Change: Output:Constructions
+Fields 1 and 2
+
+a) change "Construc\*" to "Constructions"
+
+b) change "Mat\*" to "Materials"
+
+# Object Change: Fuel type synonyms
+For Boiler:Steam, WaterHeater:\* , Generator:\* , FuelFactors, ChillerHeater:Absorption:DirectFired, AirConditioner:VariableRefrigerantFlow,
+LifeCycleCost:UsePriceEscalation and other objects with a fuel type field
+
+Field: Fuel Type (or similar)
+
+
+a) change "Gas" or "Natural Gas" to "NaturalGas"
+
+b) change "Electric" or "Elec" to "Electricity"
+
+c) change "Fuel Oil #1" or "Fuel Oil" or "Distillate Oil" to "FuelOil#1"
+
+d) change "Fuel Oil #2" or "Residual Oil" to "FuelOil#2"
+
+e) change "Propane" or "LPG" or "Propane Gas" to "PropaneGas"
+
+*Note for some objects, these synonyms for fuel types remained valid thru v9.2 due to modifications to the JSON schema, this includes: FuelFactors, AirConditioner:VariableRefrigerantFlow, 
+WaterHeater:Mixed (Heater Fuel Type only), and Boiler:HotWater. So these transition rules appear again for v9.3 along with additional rules to standardize fule types across all objects.*
+
+# Object Change: GroundHeatExchanger:Vertical
+
+Old GroundHeatExchanger:Vertical becomes four new objects:
+GroundHeatExchanger:System
+GroundHeatExchanger:Vertical:Properties
+Site:GroundTemperature:Undisturbed:KusudaAchenbach
+GroundHeatExchanger:ResponseFactors
+
+*All OLD fields below are incoming from the original GroundHeatExchanger:Vertical object.*
+
+## 1. New GroundHeatExchanger:System object
+
+Fields F1:F4, no change (from 
+
+Insert new F5 = "Site:GroundTemperature:Undisturbed:KusudaAchenbach"
+
+New field F6 = <object-name old F1> + " Ground Temps"
+	
+New fields F7:F8 = old F8:F9
+
+New field F9 = <object-name old F1> + " Response Factors"
+
+*End of new GroundHeatExchanger:System object.*
+
+## 2. New GroundHeatExchanger:Vertical:Properties object
+
+*Old F fields are still incoming from old GroundHeatExchanger:Vertical object.*
+
+New field F1 = <object-name old F1> + " Properties"
+	
+New F2 = "1"
+
+New F3 = old F6
+
+New F4 = old F7 * 2.0
+
+New F5 = old F11
+
+New F6 = "3.90E+06"
+
+New F7 = old F12
+
+New F8 = "1.77E+06"
+
+New F9 = old F13
+
+New F10 = old F15
+
+New F11 = old F14
+
+*End of new GroundHeatExchanger:Vertical:Properties object.*
+
+## 3. New Site:GroundTemperature:Undisturbed:KusudaAchenbach object
+
+*Old F fields are still incoming from old GroundHeatExchanger:Vertical object.*
+
+New field F1 = <object-name old F1> + " Ground Temps"
+
+New F2 = old F8
+
+New F3 = 920
+
+New F4 = old F9 / 920
+
+New F5 = old F10
+
+New F6 = 3.2
+
+New F7 = 8
+
+*End of new Site:GroundTemperature:Undisturbed:KusudaAchenbach object.*
+
+## 4. New Site:GroundHeatExchanger:ResponseFactors object
+
+*Old F fields are still incoming from old GroundHeatExchanger:Vertical object.*
+
+New field F1 = <object-name old F1> + " Response Factors"
+
+New F2 = <object-name old F1> + " Properties"
+
+New F3 = old F5
+
+New F4 = old F17
+
+New F5:end = old F19:end
+
+*End of new Site:GroundHeatExchanger:ResponseFactors object.*
+

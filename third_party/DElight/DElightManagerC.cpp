@@ -19,24 +19,24 @@
  * under contract with Lawrence Berkeley National Laboratory.
  **************************************************************/
 
-// This work was supported by the Assistant Secretary for Energy Efficiency 
-// and Renewable Energy, Office of Building Technologies, 
-// Building Systems and Materials Division of the 
+// This work was supported by the Assistant Secretary for Energy Efficiency
+// and Renewable Energy, Office of Building Technologies,
+// Building Systems and Materials Division of the
 // U.S. Department of Energy under Contract No. DE-AC03-76SF00098.
 
 /*
-NOTICE: The Government is granted for itself and others acting on its behalf 
-a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce, 
-prepare derivative works, and perform publicly and display publicly. 
+NOTICE: The Government is granted for itself and others acting on its behalf
+a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce,
+prepare derivative works, and perform publicly and display publicly.
 Beginning five (5) years after (date permission to assert copyright was obtained),
-subject to two possible five year renewals, the Government is granted for itself 
+subject to two possible five year renewals, the Government is granted for itself
 and others acting on its behalf a paid-up, nonexclusive, irrevocable worldwide
-license in this data to reproduce, prepare derivative works, distribute copies to 
-the public, perform publicly and display publicly, and to permit others to do so. 
+license in this data to reproduce, prepare derivative works, distribute copies to
+the public, perform publicly and display publicly, and to permit others to do so.
 NEITHER THE UNITED STATES NOR THE UNITED STATES DEPARTMENT OF ENERGY, NOR ANY OF
-THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL 
-LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY 
-INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE 
+THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL
+LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY
+INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE
 WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 */
 
@@ -88,7 +88,7 @@ int iErrorOccurred = 0; // Error/Warning occurred flag
 /******************************** subroutine writewndo *******************************/
 /* Error/Warning handling routine for WLC code modules. */
 /******************************** subroutine writewndo *******************************/
-void writewndo(const char* instring, string sfpflg)
+void writewndo(const std::string instring, string sfpflg)
 {
 	// Check for open Error message dump file.
 	if(!ofdmpfile)
@@ -99,7 +99,7 @@ void writewndo(const char* instring, string sfpflg)
         // Throw an appropriate message to highest level calling routine
 		throw "ERROR: DElight - No open Error Message file\n";
 	}
-	
+
     // Check Flag type (e=Error, w=Warning)
     if (sfpflg.size() == 0) return;
     if (sfpflg[0] == 'e') {
@@ -135,7 +135,7 @@ void writewndo(const char* instring, string sfpflg)
 /* Exported subroutine for EnergyPlus preprocessing call to DElight. */
 /* See corresponding Interface Subroutine in DElightManagerF.cc EnergyPlus module. */
 /******************************** subroutine delightdaylightcoefficients *******************************/
-extern "C" DllExport void delightdaylightcoefficients(double dBldgLat, 
+extern "C" DllExport void delightdaylightcoefficients(double dBldgLat,
                                                       int* piErrorFlag)  // return Error Flag from DElight to EPlus
 {
     // Open Error message dump file
@@ -263,13 +263,13 @@ return;
 /* See corresponding Interface Subroutine in DElightManagerF.cc EnergyPlus module. */
 /******************************** subroutine delightelecltgctrl *******************************/
 extern "C" DllExport void delightelecltgctrl(int iNameLength,
-                                    char* cZoneName, 
-                                    double dBldgLat, 
-                                    double dHISKF, 
-                                    double dHISUNF, 
-                                    double dCloudFraction, 
-                                    double dSOLCOSX, 
-                                    double dSOLCOSY, 
+                                    char* cZoneName,
+                                    double dBldgLat,
+                                    double dHISKF,
+                                    double dHISUNF,
+                                    double dCloudFraction,
+                                    double dSOLCOSX,
+                                    double dSOLCOSY,
                                     double dSOLCOSZ,
                                     double* pdPowerReducFac,	// return value for calculated Zone Elec Ltg Power Reduction Factor
                                     int* piErrorFlag)  // return Error Flag from DElight to EPlus
@@ -322,7 +322,7 @@ try {
     // Now search for Zone name in DElight Bldg structure
 	int iZone;
     for (iZone=0; iZone<bldg.nzones; iZone++) {
-        if (strcmp(bldg.zone[iZone]->name, cZoneName) == 0) break; 
+        if (strcmp(bldg.zone[iZone]->name, cZoneName) == 0) break;
     }
 
     // Init ErrorFlag return value
@@ -438,6 +438,7 @@ extern "C" DllExport void delightfreememory()
 /****************************** subroutine delightoutputgenerator *****************************/
 extern "C" DllExport void delightoutputgenerator(int iOutputFlag)
 {
+    (void)iOutputFlag;
     // Call DElight Output Generation routine.
     // NOT YET IMPLEMENTED
 

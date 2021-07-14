@@ -39,8 +39,6 @@
  */
 
 #pragma once
-#ifndef __VALIJSON_ADAPTERS_RAPIDJSON_ADAPTER_HPP
-#define __VALIJSON_ADAPTERS_RAPIDJSON_ADAPTER_HPP
 
 #include <string>
 #include <iterator>
@@ -929,5 +927,3 @@ struct AdapterTraits<valijson::adapters::GenericRapidJsonAdapter<RapidJsonCrt> >
 
 }  // namespace adapters
 }  // namespace valijson
-
-#endif

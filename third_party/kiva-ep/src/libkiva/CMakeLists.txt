@@ -25,11 +25,11 @@ set(KIVA_BUILD_CONFIG ${KIVA_BUILD_CONFIG} PARENT_SCOPE)
 
 # Default version number
 set( libkiva_VERSION_MAJOR 0 )
-set( libkiva_VERSION_MINOR 5 )
-set( libkiva_VERSION_PATCH 0 )
+set( libkiva_VERSION_MINOR 6 )
+set( libkiva_VERSION_PATCH 1 )
 
 if(EXISTS "${kiva_SOURCE_DIR}/.git")
-  file(WRITE ${CMAKE_BINARY_DIR}/arch.txt ${KIVA_BUILD_CONFIG})
+  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/arch.txt ${KIVA_BUILD_CONFIG})
 
   string(TOLOWER "${TARGET_OS}-${BIT}" KIVA_PACKAGE_CONFIG)
   set(KIVA_PACKAGE_CONFIG ${KIVA_PACKAGE_CONFIG} PARENT_SCOPE)
@@ -111,6 +111,10 @@ set(VERSION_NUMBER "${kiva_version} (${KIVA_BUILD_CONFIG})")
 
 if(KIVA_EXE_BUILD)
   message("-- Building Kiva version: ${VERSION_NUMBER}")
+  set(CPACK_PACKAGE_VERSION_MAJOR "${libkiva_VERSION_MAJOR}" PARENT_SCOPE)
+  set(CPACK_PACKAGE_VERSION_MINOR "${libkiva_VERSION_MINOR}" PARENT_SCOPE)
+  set(CPACK_PACKAGE_VERSION_PATCH "${libkiva_VERSION_PATCH}" PARENT_SCOPE)
+  set(CPACK_PACKAGE_VERSION_BUILD "${libkiva_VERSION_BUILD}" PARENT_SCOPE)
 endif()
 
 string(TIMESTAMP YEAR %Y)
@@ -120,7 +124,9 @@ configure_file (
     "${PROJECT_BINARY_DIR}/Version.hpp"
 )
 
-set(kiva_src Algorithms.cpp
+set(kiva_src Aggregator.cpp
+             Aggregator.hpp
+             Algorithms.cpp
              Algorithms.hpp
              BoundaryConditions.hpp
              Cell.cpp
@@ -138,9 +144,11 @@ set(kiva_src Algorithms.cpp
              Ground.cpp
              Ground.hpp
              GroundOutput.hpp
+             Instance.cpp
+             Instance.hpp
              Mesher.cpp
              Mesher.hpp
-             Version.hpp )
+             "${PROJECT_BINARY_DIR}/Version.hpp" )
 
 include_directories("${kiva_BINARY_DIR}/src/libkiva")
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,14 +57,24 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
-#include <GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 // Derived class for Finite-Difference Model
 class FiniteDiffGroundTempsModel : public BaseGroundTempsModel
 {
+
+    static int constexpr maxYearsToIterate = 10;
+
+    Real64 rhoCp_soil_liq_1;
+    Real64 rhoCP_soil_liq;
+    Real64 rhoCP_soil_transient;
+    Real64 rhoCP_soil_ice;
 
 public:
     Real64 baseConductivity;
@@ -84,7 +94,6 @@ public:
 
     // Default constructor
     FiniteDiffGroundTempsModel() : minDailyAirTemp(100.0), maxDailyAirTemp(-100.0), dayOfMinDailyAirTemp(1)
-
     {
     }
 
@@ -128,39 +137,40 @@ public:
 
     Array1D<instanceOfWeatherData> weatherDataArray;
 
-    static std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGTMFactory(int objectType, std::string objectName);
+    static std::shared_ptr<FiniteDiffGroundTempsModel>
+    FiniteDiffGTMFactory(EnergyPlusData &state, GroundTempObjType objectType, std::string objectName);
 
-    void getWeatherData();
+    void getWeatherData(EnergyPlusData &state);
 
-    void initAndSim();
+    void initAndSim(EnergyPlusData &state);
 
     void developMesh();
 
-    void performSimulation();
+    void performSimulation(EnergyPlusData &state);
 
-    void updateSurfaceCellTemperature();
+    void updateSurfaceCellTemperature(EnergyPlusData &state);
 
     void updateGeneralDomainCellTemperature(int const cell);
 
     void updateBottomCellTemperature();
 
-    void initDomain();
+    void initDomain(EnergyPlusData &state);
 
-    bool checkFinalTemperatureConvergence();
+    bool checkFinalTemperatureConvergence(EnergyPlusData &state);
 
     bool checkIterationTemperatureConvergence();
 
     void updateIterationTemperatures();
 
-    void updateTimeStepTemperatures();
+    void updateTimeStepTemperatures(EnergyPlusData &state);
 
     void doStartOfTimeStepInits();
 
-    Real64 getGroundTemp();
+    Real64 getGroundTemp(EnergyPlusData &state) override;
 
-    Real64 getGroundTempAtTimeInSeconds(Real64 const depth, Real64 const timeInSecondsOfSim);
+    Real64 getGroundTempAtTimeInSeconds(EnergyPlusData &state, Real64 const depth, Real64 const timeInSecondsOfSim) override;
 
-    Real64 getGroundTempAtTimeInMonths(Real64 const depth, int const monthOfSim);
+    Real64 getGroundTempAtTimeInMonths(EnergyPlusData &state, Real64 const depth, int const monthOfSim) override;
 
     void evaluateSoilRhoCp(Optional<int const> cell = _, Optional_bool_const InitOnly = _);
 
@@ -176,11 +186,6 @@ public:
         surfaceCoverType_shortGrass = 2,
         surfaceCoverType_longGrass = 3
     };
-
-    // Destructor
-    ~FiniteDiffGroundTempsModel()
-    {
-    }
 };
 
 } // namespace EnergyPlus

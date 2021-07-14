@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,62 +49,68 @@
 #define SimulationManager_hh_INCLUDED
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/FileSystem.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
+
 namespace SimulationManager {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
+    void ManageSimulation(EnergyPlusData &state);
 
-    // DERIVED TYPE DEFINITIONS:
-    // na
+    void GetProjectData(EnergyPlusData &state);
 
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
+    void writeIntialPerfLogValues(EnergyPlusData &state, std::string const &currentOverrideModeValue);
 
-    // MODULE VARIABLE DECLARATIONS:
-    extern bool RunPeriodsInInput;
-    extern bool RunControlInInput;
+    std::string bool_to_string(bool logical);
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE SimulationManager
+    void CheckForMisMatchedEnvironmentSpecifications(EnergyPlusData &state);
 
-    // Functions
-    void clear_state();
+    void CheckForRequestedReporting(EnergyPlusData &state);
 
-    void ManageSimulation();
+    std::unique_ptr<std::ostream> OpenStreamFile(EnergyPlusData &state, const fs::path &fileName);
 
-    void GetProjectData();
+    void OpenOutputFiles(EnergyPlusData &state);
 
-    void CheckForMisMatchedEnvironmentSpecifications();
+    void OpenOutputJsonFiles(EnergyPlusData &state, JsonOutputStreams &jsonOutputStreams);
 
-    void CheckForRequestedReporting();
+    void CloseOutputFiles(EnergyPlusData &state);
 
-    void OpenOutputFiles();
+    void SetupSimulation(EnergyPlusData &state, bool &ErrorsFound);
 
-    void CloseOutputFiles();
+    void ReportNodeConnections(EnergyPlusData &state);
 
-    void SetupSimulation(bool &ErrorsFound);
+    void ReportLoopConnections(EnergyPlusData &state);
 
-    void ReportNodeConnections();
+    void ReportParentChildren(EnergyPlusData &state);
 
-    void ReportLoopConnections();
+    void ReportCompSetMeterVariables(EnergyPlusData &state);
 
-    void ReportParentChildren();
-
-    void ReportCompSetMeterVariables();
-
-    void PostIPProcessing();
-
-    //	void
-    //	CheckCachedIPErrors();
+    void PostIPProcessing(EnergyPlusData &state);
 
 } // namespace SimulationManager
 
-// EXTERNAL SUBROUTINES:
+struct SimulationManagerData : BaseGlobalStruct
+{
+    bool RunPeriodsInInput = false;
+    bool RunControlInInput = false;
+    bool PreP_Fatal = false;
+    bool WarningOut = true;
+    void clear_state() override
+    {
+        this->RunPeriodsInInput = false;
+        this->RunControlInInput = false;
+        this->PreP_Fatal = false;
+        this->WarningOut = true;
+    }
+};
 
-void Resimulate(bool &ResimExt, // Flag to resimulate the exterior energy use simulation
+void Resimulate(EnergyPlusData &state,
+                bool &ResimExt, // Flag to resimulate the exterior energy use simulation
                 bool &ResimHB,  // Flag to resimulate the heat balance simulation (including HVAC)
                 bool &ResimHVAC // Flag to resimulate the HVAC simulation
 );

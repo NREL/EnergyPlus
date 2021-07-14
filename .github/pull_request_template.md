@@ -1,34 +1,32 @@
 Pull request overview
 ---------------------
-Please change this line to a description of the pull request, with useful supporting information including whether it is a new feature, or fixes a defect, a cross reference to any defects addressed in this PR, the type of changes to be made, and whether diffs are expected/justified based on this change.
+ - Fixes #ISSUENUMBERHERE (IF THIS IS A DEFECT)
+ - DESCRIBE PURPOSE OF THIS PULL REQUEST
 
-### Work Checklist
+**NOTE: ENHANCEMENTS MUST FOLLOW A SUBMISSION PROCESS INCLUDING A FEATURE PROPOSAL AND DESIGN DOCUMENT PRIOR TO SUBMITTING CODE**
+
+### Pull Request Author
 Add to this list or remove from it as applicable.  This is a simple templated set of guidelines.
  - [ ] Title of PR should be user-synopsis style (clearly understandable in a standalone changelog context)
- - [ ] At least one of the following appropriate labels must be added to this PR to be consumed into the changelog:
-   - Defect: This pull request repairs a github defect issue.  The github issue should be referenced in the PR description
-   - Refactoring: This pull request includes code changes that don't change the functionality of the program, just perform refactoring
-   - NewFeature: This pull request includes code to add a new feature to EnergyPlus
-   - Performance: This pull request includes code changes that are directed at improving the runtime performance of EnergyPlus
-   - DoNoPublish: This pull request includes changes that shouldn't be included in the changelog
+ - [ ] Label the PR with at least one of: Defect, Refactoring, NewFeature, Performance, and/or DoNoPublish
+ - [ ] Pull requests that impact EnergyPlus code must also include unit tests to cover enhancement or defect repair
+ - [ ] Author should provide a "walkthrough" of relevant code changes using a GitHub code review comment process
+ - [ ] If any diffs are expected, author must demonstrate they are justified using plots and descriptions
+ - [ ] If changes fix a defect, the fix should be demonstrated in plots and descriptions
+ - [ ] If any defect files are updated to a more recent version, upload new versions here or on DevSupport
+ - [ ] If IDD requires transition, transition source, rules, ExpandObjects, and IDFs must be updated, and add IDDChange label
+ - [ ] If structural output changes, add to output rules file and add OutputChange label
+ - [ ] If adding/removing any LaTeX docs or figures, update that document's CMakeLists file dependencies
 
-### Review Checklist
+### Reviewer
 This will not be exhaustively relevant to every PR.
- - [ ] Functional code review (it has to work!)
- - [ ] If defect, results of running current develop vs this branch should exhibit the fix
+ - [ ] Perform a Code Review on GitHub
+ - [ ] If branch is behind develop, merge develop and build locally to check for side effects of the merge
+ - [ ] If defect, verify by running develop branch and reproducing defect, then running PR and reproducing fix
+ - [ ] If feature, test running new feature, try creative ways to break it
  - [ ] CI status: all green or justified
- - [ ] Performance: CI Linux results include performance check
- - [ ] Unit Test(s)
- - C++ checks:
-   - [ ] Argument types
-   - [ ] If any virtual classes, ensure virtual destructor included, other things
- - IDD changes:
-   - [ ] Verify naming conventions and styles, memos and notes and defaults
-   - [ ] Open windows IDF Editor with modified IDD to check for errors
-   - [ ] If transition, add to input rules file for interfaces
-   - [ ] If transition, add transition source
-   - [ ] If transition, update idfs
+ - [ ] Check that performance is not impacted (CI Linux results include performance check)
+ - [ ] Run Unit Test(s) locally
+ - [ ] Check any new function arguments for performance impacts
+ - [ ] Verify IDF naming conventions and styles, memos and notes and defaults
  - [ ] If new idf included, locally check the err file and other outputs
- - [ ] Required documentation updates?
- - [ ] ExpandObjects changes?
- - [ ] If output changes, including tabular output structure, add to output rules file for interfaces

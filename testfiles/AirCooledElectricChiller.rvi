@@ -3,7 +3,7 @@ eplusout.csv
 Zone Air Temperature
 Plant Supply Side Cooling Demand Rate
 Plant Supply Side Heating Demand Rate
-BIG CHILLER,Chiller Electric Power
+BIG CHILLER,Chiller Electricity Rate
 BIG CHILLER,Chiller Evaporator Cooling Rate
 BIG CHILLER,Chiller Evaporator Inlet Temperature
 BIG CHILLER,Chiller Evaporator Outlet Temperature

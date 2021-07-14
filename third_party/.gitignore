@@ -27,3 +27,11 @@ kiva-ep/.travis.yml
 kiva-ep/appveyor.yml
 kiva-ep/ChangeLog.md
 kiva-ep/README.md
+
+# submodules
+penumbra/.gitmodules
+btwxt/.gitmodules
+
+# unused repo directories/files
+btwxt/vendor/googletest
+penumbra/vendor/googletest

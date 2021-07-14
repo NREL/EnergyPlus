@@ -34,7 +34,7 @@ Attribute VB_Name = "IDFMain"
 ' command line argument /idd:iddfilename
 '
 
-Public Const ver = "1.50" 'current version of IDFEditor - less than 1 is a beta
+Public Const ver = "1.51" 'current version of IDFEditor - less than 1 is a beta
 Option Explicit
 Option Base 1
 
@@ -1847,6 +1847,7 @@ Call resizeClassGroupArray(2)
 IDDClassGroup(maxUsedClassGroup + 1).classStart = maxUsedIDDClass + 1
 'Stop
 Call associateUnits
+Call checkMinFields
 If extraObjListWarning <> "" Then
   MsgBox "The following fields have more than one \object-list slash codes. Only one is allowed per field." & vbCrLf & vbCrLf & extraObjListWarning, vbInformation, "Reading IDD"
 End If
@@ -1974,6 +1975,27 @@ End Sub
 
 
 '-----------------------------------------------------------------------------
+' Make sure the IDD \min-fields is less than or equal to the number of
+' fields in each object
+'-----------------------------------------------------------------------------
+Sub checkMinFields()
+Dim numfields As Integer
+Dim errMessage As String
+Dim i As Integer
+errMessage = ""
+For i = 1 To maxUsedIDDClass
+    numfields = 1 + IDDClassDat(i).fieldEnd - IDDClassDat(i).fieldStart
+    If IDDClassDat(i).minFields > numfields Then
+        errMessage = errMessage & vbCrLf & IDDClassDat(i).name
+    End If
+Next i
+If errMessage <> "" Then
+    Call MsgBox("\min-fields is greater than the number of fields in: " & vbCrLf & errMessage, vbInformation, "Warning")
+End If
+End Sub
+
+
+'-----------------------------------------------------------------------------
 ' Removes the last slash and what ever is right of it
 ' This effectively is like moving up one directory for a string
 ' that does not end in a slash.  If it does end in a slash it simply
@@ -1992,6 +2014,7 @@ Else
   upDirectory = p
 End If
 End Function
+
 
 '-----------------------------------------------------------------------------
 'This displays errors in a pop up dialog box

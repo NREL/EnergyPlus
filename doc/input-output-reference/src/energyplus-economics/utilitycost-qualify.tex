@@ -1,6 +1,6 @@
 \section{UtilityCost:Qualify}\label{utilitycostqualify}
 
-Many utilities provide a large number of tariffs and separate their customers by the amount of energy use they have or by the amount of demand. The qualify object allows only certain tariffs that are modeled to be used. If the results of the simulation fall outside of the range of qualifications, that tariff is still calculated but the ``Qualified'' entry will say ``No'' and the UtilityCost:Qualify that caused its exclusion is shown. When multiple tariffs from the same utility are modeled and only one of them should be used, make sure that the qualifiers are consistent especially within the same GroupName (see UtilityCost:Tariff). Multiple UtilityCost:Qualify objects can appear for a specific rate and they can be based on any variable.
+Many utilities provide a large number of tariffs and separate their customers by the amount of energy use they have or by the amount of demand. The qualify object allows only certain tariffs that are modeled to be used. If the results of the simulation fall outside of the range of qualifications, that tariff is still calculated but the ``Qualified'' entry will say ``No'' and the UtilityCost:Qualify that caused its exclusion is shown. When multiple tariffs from the same utility are modeled and only one of them should be used, make sure that the qualifiers are consistent especially within the same GroupName (see \hyperref[utilitycosttariff]{UtilityCost:Tariff}). Multiple UtilityCost:Qualify objects can appear for a specific rate and they can be based on any variable.
 
 The energy used and demands for each month vary. Since it is possible that they vary across the minimum and maximum values defined by this object, a choice in how to treat the thresholds is necessary. Say that a utility has two tariffs, a small tariff that has a maximum demand requirement of 50kW and a large tariff that has a minimum demand requirement of 50kW. If the use for a building goes above the 50kW threshold during some summer months and the rest of the time is below 50kW, then how does the utility choose which rate would qualify. The utility probably has very specific requirements about which months or consecutive months can be above or below a threshold to qualify for the rate.
 
@@ -21,7 +21,7 @@ The name used for the UtilityCost:Qualify and displayed if the tariff does not q
 
 \paragraph{Field: Tariff Name}\label{field-tariff-name-002}
 
-The name of the UtilityCost:Tariff object that is associated with this UtilityCost:Qualify object.
+The name of the \hyperref[utilitycosttariff]{UtilityCost:Tariff} object that is associated with this UtilityCost:Qualify object.
 
 \paragraph{Field: Variable Name}\label{field-variable-name-001}
 

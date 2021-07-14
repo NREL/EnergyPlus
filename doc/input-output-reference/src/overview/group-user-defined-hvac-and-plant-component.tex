@@ -18,11 +18,11 @@ This field defines a unique user-assigned name for an instance of a custom, forc
 
 \paragraph{Field: Overall Model Simulation Program Calling Manager Name}\label{field-overall-model-simulation-program-calling-manager-name}
 
-This field specifies the Erl programs that are used to model the custom zone unit. This field should contain the name of an EnergyManagementSystem:ProgramCallingManager that is defined elsewhere. The program manager referenced here should include all the Erl programs that are to be run each time the component is simulated and use the calling point called UserDefinedComponentModel.
+This field specifies the Erl programs that are used to model the custom zone unit. This field should contain the name of an \hyperref[energymanagementsystemprogramcallingmanager]{EnergyManagementSystem:ProgramCallingManager} that is defined elsewhere. The program manager referenced here should include all the Erl programs that are to be run each time the component is simulated and use the calling point called UserDefinedComponentModel.
 
 \paragraph{Field: Model Setup and Sizing Program Calling Manager Name}\label{field-model-setup-and-sizing-program-calling-manager-name}
 
-This field specifies the Erl programs that are used to initialize and size the custom zone unit. This field should contain the name of an EnergyManagementSystem:ProgramCallingManager that is defined elsewhere and uses the calling point called UserDefinedComponentModel. The program manager referenced here should include all the Erl programs that are needed to do any initial setup that should occur before the main modeling programs are run. These include calculating and setting values for things that do not vary over time such as component sizes, control parameters, modeling constants etc. The user defined component will trigger this calling manager at the beginning of each new environment period.
+This field specifies the Erl programs that are used to initialize and size the custom zone unit. This field should contain the name of an \hyperref[energymanagementsystemprogramcallingmanager]{EnergyManagementSystem:ProgramCallingManager} that is defined elsewhere and uses the calling point called UserDefinedComponentModel. The program manager referenced here should include all the Erl programs that are needed to do any initial setup that should occur before the main modeling programs are run. These include calculating and setting values for things that do not vary over time such as component sizes, control parameters, modeling constants etc. The user defined component will trigger this calling manager at the beginning of each new environment period.
 
 \paragraph{Field: Primary Air Inlet Node Name}\label{field-primary-air-inlet-node-name-001}
 
@@ -70,11 +70,11 @@ This field defines the name of a plant system node to which the zone unit can se
 
 \paragraph{Field: Supply Inlet Water Storage Tank Name}\label{field-supply-inlet-water-storage-tank-name}
 
-This field is used to describe where the zone unit obtains water if it is to be connected to a water storage tank. This water could be used for evaporative cooling. If a name of a WaterUse:Storage object is used here, then the unit can obtain its water from that tank. This field is optional.
+This field is used to describe where the zone unit obtains water if it is to be connected to a water storage tank. This water could be used for evaporative cooling. If a name of a \hyperref[waterusestorage]{WaterUse:Storage} object is used here, then the unit can obtain its water from that tank. This field is optional.
 
 \paragraph{Field: Collection Outlet Water Storage Tank Name}\label{field-collection-outlet-water-storage-tank-name}
 
-This field is used to describe where the zone unit sends water it has collected if is to be stored in a tank. This water could be collected from coil condensate. If a name of a WaterUse:Storage object is used here, then the unit can send water to that tank. This field is optional.
+This field is used to describe where the zone unit sends water it has collected if is to be stored in a tank. This water could be collected from coil condensate. If a name of a \hyperref[waterusestorage]{WaterUse:Storage} object is used here, then the unit can send water to that tank. This field is optional.
 
 \paragraph{Field: Ambient Zone Name}\label{field-ambient-zone-name}
 
@@ -105,15 +105,15 @@ This field defines a unique user-assigned name for an instance of a custom, air 
 
 \subsubsection{Field: Overall Model Simulation Program Calling Manager Name}\label{field-overall-model-simulation-program-calling-manager-name-1}
 
-This field specifies the Erl programs that are used to model the custom air terminal unit. This field should contain the name of an EnergyManagementSystem:ProgramCallingManager that is defined elsewhere. The program manager referenced here should include all the Erl programs that are to be run each time the component is simulated and use the calling point called UserDefinedComponentModel.
+This field specifies the Erl programs that are used to model the custom air terminal unit. This field should contain the name of an \hyperref[energymanagementsystemprogramcallingmanager]{EnergyManagementSystem:ProgramCallingManager} that is defined elsewhere. The program manager referenced here should include all the Erl programs that are to be run each time the component is simulated and use the calling point called UserDefinedComponentModel.
 
 \subsubsection{Field: Model Setup and Sizing Program Calling Manager Name}\label{field-model-setup-and-sizing-program-calling-manager-name-1}
 
-This field specifies the Erl programs that are used to initialize and size the custom air terminal unit. This field should contain the name of an EnergyManagementSystem:ProgramCallingManager that is defined elsewhere and uses the calling point called UserDefinedComponentModel. The program manager referenced here should include all the Erl programs that are needed to do any initial setup that should occur before the main modeling programs are run. These include calculating and setting values for things that do not vary over time such as component sizes, control parameters, modeling constants etc. The user defined component will trigger this calling manager at the beginning of each new environment period.
+This field specifies the Erl programs that are used to initialize and size the custom air terminal unit. This field should contain the name of an \hyperref[energymanagementsystemprogramcallingmanager]{EnergyManagementSystem:ProgramCallingManager} that is defined elsewhere and uses the calling point called UserDefinedComponentModel. The program manager referenced here should include all the Erl programs that are needed to do any initial setup that should occur before the main modeling programs are run. These include calculating and setting values for things that do not vary over time such as component sizes, control parameters, modeling constants etc. The user defined component will trigger this calling manager at the beginning of each new environment period.
 
 \subsubsection{Field: Primary Air Inlet Node Name}\label{field-primary-air-inlet-node-name-1-000}
 
-This field defines the name of the HVAC system node from which the air terminal unit draws its inlet air. This node must be the name of a HVAC system node that is listed in a zone splitter (ref. AirLoopHVAC:ZoneSplitter). This field is required.
+This field defines the name of the HVAC system node from which the air terminal unit draws its inlet air. This node must be the name of a HVAC system node that is listed in a zone splitter (ref. \hyperref[airloophvaczonesplitter]{AirLoopHVAC:ZoneSplitter}). This field is required.
 
 \subsubsection{Field: Primary Air Outlet Node Name}\label{field-primary-air-outlet-node-name-1-000}
 
@@ -149,11 +149,11 @@ This field defines the name of a plant system node to which the air terminal uni
 
 \subsubsection{Field: Supply Inlet Water Storage Tank Name}\label{field-supply-inlet-water-storage-tank-name-1}
 
-This field is used to describe where the air terminal unit obtains water if it is to be connected to a water storage tank. This water could be used for evaporative cooling. If a name of a WaterUse:Storage object is used here, then the unit can obtain its water from that tank. This field is optional.
+This field is used to describe where the air terminal unit obtains water if it is to be connected to a water storage tank. This water could be used for evaporative cooling. If a name of a \hyperref[waterusestorage]{WaterUse:Storage} object is used here, then the unit can obtain its water from that tank. This field is optional.
 
 \subsubsection{Field: Collection Outlet Water Storage Tank Name}\label{field-collection-outlet-water-storage-tank-name-1}
 
-This field is used to describe where the air terminal unit sends water it has collected if is to be stored in a tank. This water could be collected from coil condensate. If a name of a WaterUse:Storage object is used here, then the unit can send water to that tank. This field is optional.
+This field is used to describe where the air terminal unit sends water it has collected if is to be stored in a tank. This water could be collected from coil condensate. If a name of a \hyperref[waterusestorage]{WaterUse:Storage} object is used here, then the unit can send water to that tank. This field is optional.
 
 \subsubsection{Field: Ambient Zone Name}\label{field-ambient-zone-name-1}
 
@@ -178,7 +178,7 @@ AirTerminal:SingleDuct:UserDefined,
 
 \subsection{Coil:UserDefined}\label{coiluserdefined}
 
-This object is used to define a generic coil for custom component modeling of a device that processes air as part of an air handeler. The Coil:UserDefined object appears directly on a Branch object used to define the supply side of an air handler, or in the AirLoopHVAC:OutdoorAirSystem:EquipmentList object used to define outdoor air systems. This object has one or two air connections and an optional plant connection. Water storage tanks can be connected for supply or collection. An ambient zone can be connected for skin losses to be treated as separate internal gains.
+This object is used to define a generic coil for custom component modeling of a device that processes air as part of an air handeler. The Coil:UserDefined object appears directly on a \hyperref[branch]{Branch} object used to define the supply side of an air handler, or in the \hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList} object used to define outdoor air systems. This object has one or two air connections and an optional plant connection. Water storage tanks can be connected for supply or collection. An ambient zone can be connected for skin losses to be treated as separate internal gains.
 
 \subsubsection{Field: Name}\label{field-name-2-041}
 
@@ -186,11 +186,11 @@ This field defines a unique user-assigned name for an instance of a custom air c
 
 \subsubsection{Field: Overall Model Simulation Program Calling Manager Name}\label{field-overall-model-simulation-program-calling-manager-name-2}
 
-This field specifies the Erl programs that are used to model the custom coil. This field should contain the name of an EnergyManagementSystem:ProgramCallingManager that is defined elsewhere. The program manager referenced here should include all the Erl programs that are to be run each time the component is simulated and use the calling point called UserDefinedComponentModel.
+This field specifies the Erl programs that are used to model the custom coil. This field should contain the name of an \hyperref[energymanagementsystemprogramcallingmanager]{EnergyManagementSystem:ProgramCallingManager} that is defined elsewhere. The program manager referenced here should include all the Erl programs that are to be run each time the component is simulated and use the calling point called UserDefinedComponentModel.
 
 \subsubsection{Field: Model Setup and Sizing Program Calling Manager Name}\label{field-model-setup-and-sizing-program-calling-manager-name-2}
 
-This field specifies the Erl programs that are used to initialize and size the custom coil. This field should contain the name of an EnergyManagementSystem:ProgramCallingManager that is defined elsewhere and uses the calling point called UserDefinedComponentModel. The program manager referenced here should include all the Erl programs that are needed to do any initial setup that should occur before the main modeling programs are run. These include calculating and setting values for things that do not vary over time such as component sizes, control parameters, modeling constants etc. The user defined component will trigger this calling manager at the beginning of each new environment period.
+This field specifies the Erl programs that are used to initialize and size the custom coil. This field should contain the name of an \hyperref[energymanagementsystemprogramcallingmanager]{EnergyManagementSystem:ProgramCallingManager} that is defined elsewhere and uses the calling point called UserDefinedComponentModel. The program manager referenced here should include all the Erl programs that are needed to do any initial setup that should occur before the main modeling programs are run. These include calculating and setting values for things that do not vary over time such as component sizes, control parameters, modeling constants etc. The user defined component will trigger this calling manager at the beginning of each new environment period.
 
 \subsubsection{Field: Number of Air Connections}\label{field-number-of-air-connections}
 
@@ -226,11 +226,11 @@ This field defines the name of a plant system node to which the coil can send fl
 
 \subsubsection{Field: Supply Inlet Water Storage Tank Name}\label{field-supply-inlet-water-storage-tank-name-2}
 
-This field is used to describe where the coil obtains water if it is to be connected to a water storage tank. This water could be used for evaporative cooling. If a name of a WaterUse:Storage object is used here, then the unit can obtain its water from that tank. This field is optional.
+This field is used to describe where the coil obtains water if it is to be connected to a water storage tank. This water could be used for evaporative cooling. If a name of a \hyperref[waterusestorage]{WaterUse:Storage} object is used here, then the unit can obtain its water from that tank. This field is optional.
 
 \subsubsection{Field: Collection Outlet Water Storage Tank Name}\label{field-collection-outlet-water-storage-tank-name-2}
 
-This field is used to describe where the coil sends water it has collected if is to be stored in a tank. This water could be collected from coil condensate. If a name of a WaterUse:Storage object is used here, then the unit can send water to that tank. This field is optional.
+This field is used to describe where the coil sends water it has collected if is to be stored in a tank. This water could be collected from coil condensate. If a name of a \hyperref[waterusestorage]{WaterUse:Storage} object is used here, then the unit can send water to that tank. This field is optional.
 
 \subsubsection{Field: Ambient Zone Name}\label{field-ambient-zone-name-2}
 
@@ -254,7 +254,7 @@ Coil:UserDefined,
   Main Cooling Coil 1 Water Outlet Node; !- Plant Connection Outlet Node Name
 \end{lstlisting}
 
-Note that the Coil:UserDefined needs to be specifically configured in EnergyManagementSystem:MeteredOutputVariable, in order to be included in the meters such as HeatingCoils:EnergyTransfer.
+Note that the Coil:UserDefined needs to be specifically configured in \hyperref[energymanagementsystemmeteredoutputvariable]{EnergyManagementSystem:MeteredOutputVariable}, in order to be included in the meters such as HeatingCoils:EnergyTransfer.
 
 An example of this input object follows.
 
@@ -284,37 +284,41 @@ EnergyManagementSystem:Program,
 
 \subsection{PlantComponent:UserDefined}\label{plantcomponentuserdefined}
 
-This object is used to define a generic plant component for custom component models. This object can connect to up to four different plant loops. There is an optional air connection that can be used as an air-based source or heat rejection connection. Water storage tanks can be connected for supply or collection. An ambient zone can be connected for skin losses to be treated as separate internal gains.
+This object is used to define a generic plant component for custom component models. This object can connect to up to four different plant loops.
+There is an optional air connection that can be used as an air-based source or heat rejection connection.
+Water storage tanks can be connected for supply or collection. An ambient zone can be connected for skin losses to be treated as separate internal gains.
 
-The PlantComponent:UserDefined object appears directly on the Branch object used to describe the plant.
+The PlantComponent:UserDefined object appears directly on the \hyperref[branch]{Branch} object used to describe the plant.
 
-\subsubsection{Field: Name}\label{field-name-3-035}
+\subsubsection{Inputs}\label{plantcomponentuserdefined-inputs}
+
+\paragraph{Field: Name}\label{field-name-3-035}
 
 This field defines a unique user-assigned name for an instance of a custom plant component. Any reference to this component by another object will use this name.
 
-\subsubsection{Field: Main Model Program Calling Manager Name}\label{field-main-model-program-calling-manager-name}
+\paragraph{Field: Main Model Program Calling Manager Name}\label{field-main-model-program-calling-manager-name}
 
-This field specifies the Erl programs that are used to model the plant component any time that the device is called to simulate. This field should contain the name of an EnergyManagementSystem:ProgramCallingManager that is defined elsewhere. The program manager referenced here should include all the Erl programs that are to be run each time the component is simulated and use the calling point called UserDefinedComponentModel.
+This field specifies the Erl programs that are used to model the plant component any time that the device is called to simulate. This field should contain the name of an \hyperref[energymanagementsystemprogramcallingmanager]{EnergyManagementSystem:ProgramCallingManager} that is defined elsewhere. The program manager referenced here should include all the Erl programs that are to be run each time the component is simulated and use the calling point called UserDefinedComponentModel.
 
-\subsubsection{Field: Number of Plant Loop Connections}\label{field-number-of-plant-loop-connections-2}
+\paragraph{Field: Number of Plant Loop Connections}\label{field-number-of-plant-loop-connections-2}
 
 This fields defines the number of different plant loop connections that the component will use. Up to four separate loops can be connected if desired. This field is required.
 
-\subsubsection{FeildSet: \{inlet node name, outlet node name, loading mode, flow request mode, initialization program calling manager, simulation program calling manager.\}}\label{feildset-inlet-node-name-outlet-node-name-loading-mode-flow-request-mode-initialization-program-calling-manager-simulation-program-calling-manager.}
+\paragraph{Field Set: (inlet node name, outlet node name, loading mode, flow request mode, initialization program calling manager, simulation program calling manager)}\label{feildset-inlet-node-name-outlet-node-name-loading-mode-flow-request-mode-initialization-program-calling-manager-simulation-program-calling-manager.}
 
 Each of the plant loop connections used is defined by a set of 6 input fields that contain and inlet node, and outlet node, a loading mode, a flow request mode, a program calling manager for setup and sizing, and a program calling manager for model calculations that should run when this loop is being simulated.
 
-\subsubsection{Field: Plant Connection X Inlet Node Name}\label{field-plant-connection-x-inlet-node-name}
+\paragraph{Field: Plant Connection \textless{}\#\textgreater{} Inlet Node Name}\label{field-plant-connection-x-inlet-node-name}
 
 This field defines the name of a plant system node from which the component can draw fluid. This is the inlet to the component model from the x plant loop that is connected to the component.
 
-\subsubsection{Field: Plant Connection X Outlet Node Name}\label{field-plant-connection-x-outlet-node-name}
+\paragraph{Field: Plant Connection \textless{}\#\textgreater{} Outlet Node Name}\label{field-plant-connection-x-outlet-node-name}
 
 This field defines the name of a plant system node to which the component can send fluid. This is the outlet from the component model to the first plant loop that is connected to the component.
 
-\subsubsection{Field: Plant Connection X Loading Mode}\label{field-plant-connection-x-loading-mode}
+\paragraph{Field: Plant Connection \textless{}\#\textgreater{} Loading Mode}\label{field-plant-connection-x-loading-mode}
 
-This field defines the nature of the plant component with respect to how it affects the loads experienced by the X plant loop connection. One of the following choices must be selected depending on the purpose of the component model and this particular plant loop connection.
+This field defines the nature of the plant component with respect to how it affects the loads experienced by the \textless{}\#\textgreater{} plant loop connection. One of the following choices must be selected depending on the purpose of the component model and this particular plant loop connection.
 
 \begin{itemize}
 \item
@@ -329,7 +333,7 @@ This field defines the nature of the plant component with respect to how it affe
   \textbf{MeetsLoadWithNominalCapacityHiOutLimit}. This type of loading is used for plant connections where the component has controllable capacity to meet loads but with an upper limit on the fluid temperature at the outlet node.
 \end{itemize}
 
-\subsubsection{Field: Plant Connection X Loop Flow Request Mode}\label{field-plant-connection-x-loop-flow-request-mode}
+\paragraph{Field: Plant Connection \textless{}\#\textgreater{} Loop Flow Request Mode}\label{field-plant-connection-x-loop-flow-request-mode}
 
 This field defines the nature of the plant component with respect to how it affects the overall flow rate for the loop. One of the following three choices must be made depending on the nature of the plant component and this particular loop connection.
 
@@ -342,31 +346,31 @@ This field defines the nature of the plant component with respect to how it affe
   \textbf{ReceivesWhateverFlowAvailable}. Devices with this flow request mode will not contribute to the overall loop flow rate and do not initiate flow themselves.
 \end{itemize}
 
-\subsubsection{Field: Plant Connection X Initialization Program Calling Manager Name}\label{field-plant-connection-x-initialization-program-calling-manager-name}
+\paragraph{Field: Plant Connection \textless{}\#\textgreater{} Initialization Program Calling Manager Name}\label{field-plant-connection-x-initialization-program-calling-manager-name}
 
-This field specifies the Erl programs that are used to initialize and size the plant component with regard to this particular plant connection. This field should contain the name of an EnergyManagementSystem:ProgramCallingManager that is defined elsewhere and uses the calling point called UserDefinedComponentModel. The program manager referenced here should include all the Erl programs that are needed to do any initial setup that should occur before the main modeling programs are run. These include calculating and setting values for things that do not vary over time such as component sizes, control parameters, modeling constants etc. The user defined component will trigger this calling manager during the intitial setup routines for plant systems.
+This field specifies the Erl programs that are used to initialize and size the plant component with regard to this particular plant connection. This field should contain the name of an \hyperref[energymanagementsystemprogramcallingmanager]{EnergyManagementSystem:ProgramCallingManager} that is defined elsewhere and uses the calling point called UserDefinedComponentModel. The program manager referenced here should include all the Erl programs that are needed to do any initial setup that should occur before the main modeling programs are run. These include calculating and setting values for things that do not vary over time such as component sizes, control parameters, modeling constants etc. The user defined component will trigger this calling manager during the intitial setup routines for plant systems.
 
-\subsubsection{Field: Plant Connection X Simulation Program Calling Manager Name}\label{field-plant-connection-x-simulation-program-calling-manager-name}
+\paragraph{Field: Plant Connection \textless{}\#\textgreater{} Simulation Program Calling Manager Name}\label{field-plant-connection-x-simulation-program-calling-manager-name}
 
-This field specifies the Erl programs that are used to model the plant component and should execute when the component is called to simulate by this particular loop connection. This field should contain the name of an EnergyManagementSystem:ProgramCallingManager that is defined elsewhere. The program manager referenced here should include all the Erl programs that are to be run for this X plant loop connection and use the calling point called UserDefinedComponentModel.
+This field specifies the Erl programs that are used to model the plant component and should execute when the component is called to simulate by this particular loop connection. This field should contain the name of an \hyperref[energymanagementsystemprogramcallingmanager]{EnergyManagementSystem:ProgramCallingManager} that is defined elsewhere. The program manager referenced here should include all the Erl programs that are to be run for this plant loop connection and use the calling point called UserDefinedComponentModel.
 
-\subsubsection{Field: Air Connection Inlet Node Name}\label{field-air-connection-inlet-node-name}
+\paragraph{Field: Air Connection Inlet Node Name}\label{field-air-connection-inlet-node-name}
 
 This field defines the name of the HVAC system node from which the plant component draws its inlet air for its air loop connection. This field is optional.
 
-\subsubsection{Field: Air Connection Outlet Node Name}\label{field-air-connection-outlet-node-name}
+\paragraph{Field: Air Connection Outlet Node Name}\label{field-air-connection-outlet-node-name}
 
 This field defines the name of the HVAC system node to which the plant component sends its outlet air for its air loop connection. This field is optional.
 
-\subsubsection{Field: Supply Inlet Water Storage Tank Name}\label{field-supply-inlet-water-storage-tank-name-3}
+\paragraph{Field: Supply Inlet Water Storage Tank Name}\label{field-supply-inlet-water-storage-tank-name-3}
 
-This field is used to describe where the plant component obtains water if it is to be connected to a water storage tank. This water could be used for evaporative cooling. If a name of a WaterUse:Storage object is used here, then the component can obtain its water from that tank. This field is optional.
+This field is used to describe where the plant component obtains water if it is to be connected to a water storage tank. This water could be used for evaporative cooling. If a name of a \hyperref[waterusestorage]{WaterUse:Storage} object is used here, then the component can obtain its water from that tank. This field is optional.
 
-\subsubsection{Field: Collection Outlet Water Storage Tank Name}\label{field-collection-outlet-water-storage-tank-name-3}
+\paragraph{Field: Collection Outlet Water Storage Tank Name}\label{field-collection-outlet-water-storage-tank-name-3}
 
-This field is used to describe where the plant component sends water it has collected if is to be stored in a tank. This water could be collected from coil condensate. If a name of a WaterUse:Storage object is used here, then the unit can send water to that tank. This field is optional.
+This field is used to describe where the plant component sends water it has collected if is to be stored in a tank. This water could be collected from coil condensate. If a name of a \hyperref[waterusestorage]{WaterUse:Storage} object is used here, then the unit can send water to that tank. This field is optional.
 
-\subsubsection{Field: Ambient Zone Name}\label{field-ambient-zone-name-3}
+\paragraph{Field: Ambient Zone Name}\label{field-ambient-zone-name-3}
 
 This field is used to connect ancillary losses from the plant component to a thermal zone. The component may have inefficiencies, leaks, or other non-ideal operation that results in some untended impact on the space surrounding the device. These skin losses can be assigned to a thermal zone and appear as internal gains for the zone named here. For example, this would be the mechanical room where the plant component is located.
 
@@ -411,7 +415,7 @@ PlantComponent:UserDefined,
 
 \subsection{PlantEquipmentOperation:UserDefined}\label{plantequipmentoperationuserdefined}
 
-This object is used to define a generic plant equipment operation scheme. The PlantEquipmentOperation:UserDefined object appears directly in either a PlantEquipmentOperationSchemes or a CondenserEquipmentOperationSchemes object. The user can configure exactly how supply side equipment is dispatched to meet loads by writing EnergyPlus Runtime Language programs and using the EMS features. There are no output variables specifically associated with this object but the outcome of load distribution actuators can be examined using the output variable called Plant Component Distributed Demand Rate.
+This object is used to define a generic plant equipment operation scheme. The PlantEquipmentOperation:UserDefined object appears directly in either a \hyperref[plantequipmentoperationschemes]{PlantEquipmentOperationSchemes} or a \hyperref[condenserequipmentoperationschemes]{CondenserEquipmentOperationSchemes} object. The user can configure exactly how supply side equipment is dispatched to meet loads by writing EnergyPlus Runtime Language programs and using the EMS features. There are no output variables specifically associated with this object but the outcome of load distribution actuators can be examined using the output variable called Plant Component Distributed Demand Rate.
 
 \subsubsection{Inputs}\label{inputs-1-047}
 
@@ -421,11 +425,11 @@ This field specifies the unique user-assigned name of the custom operation schem
 
 \paragraph{Field: Main Model Program Calling Manager Name}\label{field-main-model-program-calling-manager-name-1}
 
-This field specifies the Erl programs that are used to model the custom plant operation scheme. The field should contain the name of an EnergyManagementSystem:ProgramCallingManager that is defined elsewhere. The program manager referenced here should include all the Erl programs that are to be run each time the operation scheme is simulated and use the calling point called UserDefinedComponentModel.
+This field specifies the Erl programs that are used to model the custom plant operation scheme. The field should contain the name of an \hyperref[energymanagementsystemprogramcallingmanager]{EnergyManagementSystem:ProgramCallingManager} that is defined elsewhere. The program manager referenced here should include all the Erl programs that are to be run each time the operation scheme is simulated and use the calling point called UserDefinedComponentModel.
 
 \paragraph{Field: Initialization Program Calling Manager Name}\label{field-initialization-program-calling-manager-name}
 
-This field specifies the Erl programs that are used to initialize and do an one-time setup needed for the custom operation scheme. This field should contain the name of an EnergyManagementSystem:ProgramCallingManager that is defined elsewhere and uses the calling point called UserDefinedComponentModel. The program manager referenced here should include all the Erl programs that are needed to do any initial setup that should occur before the main programs are run. These include calculating and setting values for things that do not vary over time such as component capacities, control range parameters, various constants etc. The user defined operation scheme will trigger this calling manager at the beginning of each new environment period.
+This field specifies the Erl programs that are used to initialize and do an one-time setup needed for the custom operation scheme. This field should contain the name of an \hyperref[energymanagementsystemprogramcallingmanager]{EnergyManagementSystem:ProgramCallingManager} that is defined elsewhere and uses the calling point called UserDefinedComponentModel. The program manager referenced here should include all the Erl programs that are needed to do any initial setup that should occur before the main programs are run. These include calculating and setting values for things that do not vary over time such as component capacities, control range parameters, various constants etc. The user defined operation scheme will trigger this calling manager at the beginning of each new environment period.
 
 \paragraph{Field Set: (Equipment Object Type, Equipment Name)}\label{field-set-equipment-object-type-equipment-name}
 

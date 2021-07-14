@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,24 +48,31 @@
 #ifndef SQLiteProcedures_hh_INCLUDED
 #define SQLiteProcedures_hh_INCLUDED
 
+// C++ Headers
+#include <fstream>
+#include <iosfwd>
+#include <map>
+#include <memory>
+#include <sqlite3.h>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include "DataHeatBalance.hh"
-#include "DataRoomAirModel.hh"
-#include <EnergyPlus.hh>
-
-#include <sqlite3.h>
-
-#include <fstream>
-#include <iosfwd>
-#include <map>
-#include <memory>
+#include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataRoomAirModel.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/Material.hh>
 
 namespace EnergyPlus {
+
+// Forward
+struct EnergyPlusData;
 
 class SQLiteProcedures
 {
@@ -73,13 +80,13 @@ protected:
     SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStream, std::shared_ptr<sqlite3> const &db);
     SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStream,
                      bool writeOutputToSQLite,
-                     std::string const &dbName,
-                     std::string const &errorFileName);
+                     fs::path const &dbName,
+                     fs::path const &errorFilePath);
 
     int sqliteExecuteCommand(const std::string &commandBuffer);
     int sqlitePrepareStatement(sqlite3_stmt *&stmt, const std::string &stmtBuffer);
 
-    int sqliteBindText(sqlite3_stmt *stmt, const int stmtInsertLocationIndex, const std::string &textBuffer);
+    int sqliteBindText(sqlite3_stmt *stmt, const int stmtInsertLocationIndex, std::string_view textBuffer);
     int sqliteBindInteger(sqlite3_stmt *stmt, const int stmtInsertLocationIndex, const int intToInsert);
     int sqliteBindDouble(sqlite3_stmt *stmt, const int stmtInsertLocationIndex, const double doubleToInsert);
     int sqliteBindNULL(sqlite3_stmt *stmt, const int stmtInsertLocationIndex);
@@ -113,8 +120,8 @@ public:
     void addZoneListData(int const number, DataHeatBalance::ZoneListData const &zoneListData);
     void addSurfaceData(int const number, DataSurfaces::SurfaceData const &surfaceData, std::string const &surfaceClass);
     void addZoneGroupData(int const number, DataHeatBalance::ZoneGroupData const &zoneGroupData);
-    void addMaterialData(int const number, DataHeatBalance::MaterialProperties const &materialData);
-    void addConstructionData(int const number, DataHeatBalance::ConstructionData const &constructionData, double const &constructionUValue);
+    void addMaterialData(int const number, Material::MaterialProperties const &materialData);
+    void addConstructionData(int const number, Construction::ConstructionProps const &constructionData, double const &constructionUValue);
     void addNominalLightingData(int const number, DataHeatBalance::LightsData const &nominalLightingData);
     void addNominalPeopleData(int const number, DataHeatBalance::PeopleData const &nominalPeopleData);
     void addNominalElectricEquipmentData(int const number, DataHeatBalance::ZoneEquipData const &nominalElectricEquipmentData);
@@ -130,8 +137,8 @@ public:
     // Open the DB and prepare for writing data
     // Create all of the tables on construction
     SQLite(std::shared_ptr<std::ostream> errorStream,
-           std::string const &dbName,
-           std::string const &errorFileName,
+           fs::path const &dbName,
+           fs::path const &errorFilePath,
            bool writeOutputToSQLite = false,
            bool writeTabularDataToSQLite = false);
 
@@ -147,13 +154,16 @@ public:
     // Commit a transaction
     void sqliteCommit();
 
+    // Rollback a transaction (cancel)
+    void sqliteRollback();
+
     // Within a current transaction
     bool sqliteWithinTransaction();
 
     void createSQLiteReportDictionaryRecord(int const reportVariableReportID,
                                             int const storeTypeIndex,
                                             std::string const &indexGroup,
-                                            std::string const &keyedValueString,
+                                            std::string_view keyedValueString,
                                             std::string const &variableName,
                                             int const indexType,
                                             std::string const &units,
@@ -210,10 +220,10 @@ public:
                                      std::string const &PeakHrMin     // time stamp of the peak
     );
 
-    void addSQLiteComponentSizingRecord(std::string const &CompType, // the type of the component
-                                        std::string const &CompName, // the name of the component
-                                        std::string const &VarDesc,  // the description of the input variable
-                                        Real64 const VarValue        // the value from the sizing calculation
+    void addSQLiteComponentSizingRecord(std::string_view CompType, // the type of the component
+                                        std::string_view CompName, // the name of the component
+                                        std::string_view VarDesc,  // the description of the input variable
+                                        Real64 const VarValue      // the value from the sizing calculation
     );
 
     void createSQLiteDaylightMapTitle(int const mapNum,
@@ -225,13 +235,14 @@ public:
                                       Real64 const zCoord);
 
     void createSQLiteDaylightMap(int const mapNum,
+                                 int const year,
                                  int const month,
                                  int const dayOfMonth,
                                  int const hourOfDay,
                                  int const nX,
-                                 Array1<Real64> const &x,
+                                 Array1D<Real64> const &x,
                                  int const nY,
-                                 Array1<Real64> const &y,
+                                 Array1D<Real64> const &y,
                                  Array2<Real64> const &illuminance);
 
     void createSQLiteTabularDataRecords(Array2D_string const &body, // row,column
@@ -253,7 +264,7 @@ public:
 
     void createSQLiteEnvironmentPeriodRecord(const int curEnvirNum,
                                              const std::string &environmentName,
-                                             const int kindOfSim,
+                                             const DataGlobalConstants::KindOfSim kindOfSim,
                                              const int simulationIndex = 1);
 
     void sqliteWriteMessage(const std::string &message);
@@ -273,7 +284,7 @@ private:
     // Given combinedString, parse out units and description.
     // Example: Given combinedString "Total Energy [GJ]", return "Total Energy"
     // in description and "GJ" in units.
-    static void parseUnitsAndDescription(const std::string &combinedString, std::string &units, std::string &description);
+    static void parseUnitsAndDescription(std::string_view combinedString, std::string &units, std::string &description);
 
     static int logicalToInteger(const bool value);
 
@@ -552,7 +563,7 @@ private:
         Material(std::shared_ptr<std::ostream> const &errorStream,
                  std::shared_ptr<sqlite3> const &db,
                  int const materialNumber,
-                 DataHeatBalance::MaterialProperties const &materialData)
+                 EnergyPlus::Material::MaterialProperties const &materialData)
             : SQLiteData(errorStream, db), number(materialNumber), name(materialData.Name), group(materialData.Group),
               roughness(materialData.Roughness), conductivity(materialData.Conductivity), density(materialData.Density),
               isoMoistCap(materialData.IsoMoistCap), porosity(materialData.Porosity), resistance(materialData.Resistance), rOnly(materialData.ROnly),
@@ -566,8 +577,8 @@ private:
     private:
         int const number;
         std::string const &name;
-        int const &group;
-        int const &roughness;
+        DataHeatBalance::MaterialGroup const &group;
+        DataSurfaces::SurfaceRoughness const &roughness;
         double const &conductivity;
         double const &density;
         double const &isoMoistCap;
@@ -586,7 +597,7 @@ private:
         Construction(std::shared_ptr<std::ostream> const &errorStream,
                      std::shared_ptr<sqlite3> const &db,
                      int const constructionNumber,
-                     DataHeatBalance::ConstructionData const &constructionData,
+                     EnergyPlus::Construction::ConstructionProps const &constructionData,
                      double const &constructionUValue)
             : SQLiteData(errorStream, db), number(constructionNumber), name(constructionData.Name), totLayers(constructionData.TotLayers),
               totSolidLayers(constructionData.TotSolidLayers), totGlassLayers(constructionData.TotGlassLayers),
@@ -618,7 +629,7 @@ private:
         double const &outsideAbsorpSolar;
         double const &insideAbsorpThermal;
         double const &outsideAbsorpThermal;
-        int const &outsideRoughness;
+        DataSurfaces::SurfaceRoughness const &outsideRoughness;
         bool const &typeIsWindow;
         double const &uValue;
 
@@ -712,7 +723,7 @@ private:
         bool const &fanger;
         bool const &pierce;
         bool const &ksu;
-        int const &mrtCalcType;
+        DataHeatBalance::CalcMRT const &mrtCalcType;
         int const &surfacePtr;
         std::string const &angleFactorListName;
         int const &angleFactorListPtr;
@@ -964,8 +975,8 @@ private:
     private:
         int const number;
         std::string const &airModelName;
-        int const &airModelType;
-        int const &tempCoupleScheme;
+        DataRoomAirModel::RoomAirModel const &airModelType;
+        DataRoomAirModel::CouplingScheme const &tempCoupleScheme;
         bool const &simAirModel;
     };
 
@@ -989,11 +1000,18 @@ private:
     std::vector<std::unique_ptr<SQLite::RoomAirModel>> roomAirModels;
 };
 
-extern std::unique_ptr<SQLite> sqlite;
+std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state);
 
-std::unique_ptr<SQLite> CreateSQLiteDatabase();
+void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state);
 
-void CreateSQLiteZoneExtendedOutput();
+struct SQLiteProceduresData : BaseGlobalStruct
+{
+    std::unique_ptr<SQLite> sqlite;
+    void clear_state() override
+    {
+        sqlite.reset(); // probably not necessary, as it is recreated in ManageSimulation, but it should be fine to delete it here
+    }
+};
 
 } // namespace EnergyPlus
 

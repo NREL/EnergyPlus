@@ -30,7 +30,7 @@
 #include <cctype>
 #include <iomanip>
 #include <iostream>
-#include <strstream>
+#include <sstream>
 using namespace std;
 
 // writewndo() Error handler include
@@ -373,12 +373,12 @@ istream &operator >> (istream &s, matrix3 &m)	//	WLC 06/06/2003 major rewrite
 {
     matrix3	result;
     Char	c;
-	ostrstream osstream;
+    std::ostringstream osstream;
 	
 	// Expected format: [[1 2 3] [4 5 6] [7 8 9]]
 	// Each vector is a column of the matrix.
 	
-    while (s >> c && isspace(c));
+    while (s >> c && isspace(c)) {;} // skip through spaces
 	if (s.eof()) return(s);
 	if (s.fail()) {
 //		cerr << "matrix3:ReadError1: unrecoverable failbit\n";

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,8 +51,6 @@
 #include <gtest/gtest.h>
 
 // C++ Headers
-#include <cassert>
-#include <cmath>
 #include <string>
 
 // ObjexxFCL Headers
@@ -60,42 +58,45 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <BranchInputManager.hh>
-#include <CurveManager.hh>
-#include <DXCoils.hh>
-#include <DataAirLoop.hh>
-#include <DataAirSystems.hh>
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalance.hh>
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataSizing.hh>
-#include <DataZoneEnergyDemands.hh>
-#include <DataZoneEquipment.hh>
-#include <Fans.hh>
-#include <FluidProperties.hh>
-#include <GlobalNames.hh>
-#include <HVACFan.hh>
-#include <HVACVariableRefrigerantFlow.hh>
-#include <HeatBalanceManager.hh>
-#include <OutputReportPredefined.hh>
-#include <Plant/PlantManager.hh>
-#include <Psychrometrics.hh>
-#include <ScheduleManager.hh>
-#include <SizingManager.hh>
+#include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/HVACFan.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
+#include <EnergyPlus/Plant/PlantManager.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SizingManager.hh>
+#include <EnergyPlus/SteamCoils.hh>
+#include <EnergyPlus/WaterCoils.hh>
 
 using namespace EnergyPlus;
 using namespace DXCoils;
 using namespace EnergyPlus::BranchInputManager;
 using namespace EnergyPlus::CurveManager;
-using namespace EnergyPlus::DataAirLoop;
-using namespace EnergyPlus::DataAirSystems;
 using namespace EnergyPlus::DataEnvironment;
-using namespace EnergyPlus::DataGlobals;
-using namespace EnergyPlus::DataHeatBalance;
+using namespace EnergyPlus::DataGlobalConstants;
 using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
@@ -109,14 +110,661 @@ using namespace EnergyPlus::Fans;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::HVACFan;
 using namespace EnergyPlus::HVACVariableRefrigerantFlow;
+using namespace EnergyPlus::HeatingCoils;
 using namespace EnergyPlus::GlobalNames;
-using namespace EnergyPlus::OutputReportPredefined;
 using namespace EnergyPlus::PlantManager;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::ScheduleManager;
+using namespace EnergyPlus::SimulationManager;
 using namespace EnergyPlus::SizingManager;
 
 namespace EnergyPlus {
+
+class AirLoopFixture : public EnergyPlusFixture
+{
+
+public:
+    int NumAirloops = 1;
+    int NumZoneInletNodes = 1;   // number of zone inlet nodes
+    int NumZoneExhaustNodes = 1; // number of zone exhaust nodes
+    bool ErrorsFound = false;
+    Real64 const CpWater = 4180.0;  // For estimating the expected result
+    Real64 const RhoWater = 1000.0; // For estimating the expected result
+
+protected:
+    virtual void SetUp()
+    {
+        EnergyPlusFixture::SetUp(); // Sets up the base fixture first.
+
+        state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0); // initialize StdRhoAir
+        state->dataEnvrn->OutBaroPress = 101325.0;
+        state->dataSize->DesDayWeath.allocate(1);
+        state->dataSize->DesDayWeath(1).Temp.allocate(1);
+        state->dataSize->DesDayWeath(1).Temp(1) = 35.0;
+        state->dataGlobal->BeginEnvrnFlag = true;
+        state->dataEnvrn->OutDryBulbTemp = 35.0;
+        state->dataEnvrn->OutHumRat = 0.012;
+        state->dataEnvrn->OutWetBulbTemp = Psychrometrics::PsyTwbFnTdbWPb(
+            *state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat, DataEnvironment::StdPressureSeaLevel);
+        state->dataEnvrn->OutBaroPress = 101325;            // sea level
+        state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
+
+        int numZones = state->dataGlobal->NumOfZones = 5;
+        int numAirloops = 5;
+        state->dataLoopNodes->Node.allocate(50);
+        state->dataLoopNodes->NodeID.allocate(50);
+
+        state->dataHeatBalFanSys->TempControlType.allocate(numZones);
+        state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+        state->dataHeatBal->Zone.allocate(numZones);
+        state->dataZoneEquip->ZoneEquipConfig.allocate(numZones);
+        state->dataZoneEquip->ZoneEquipList.allocate(numZones);
+        state->dataZoneEquip->ZoneEquipAvail.dimension(numZones, DataHVACGlobals::NoAction);
+        state->dataZoneEquip->NumOfZoneEquipLists = numZones;
+        state->dataSize->FinalZoneSizing.allocate(numZones);
+        state->dataSize->FinalSysSizing.allocate(numAirloops);
+        state->dataSize->OASysEqSizing.allocate(numAirloops);
+        state->dataSize->OASysEqSizing(1).SizingMethod.allocate(30);
+        state->dataSize->ZoneEqSizing.allocate(numZones);
+        state->dataSize->ZoneEqSizing(1).SizingMethod.allocate(30);
+        state->dataSize->UnitarySysEqSizing.allocate(numZones);
+        state->dataSize->UnitarySysEqSizing(1).SizingMethod.allocate(30);
+        state->dataSize->ZoneHVACSizing.allocate(50);
+        state->dataSize->ZoneHVACSizing(1).MaxCoolAirVolFlow = DataSizing::AutoSize;
+        state->dataSize->ZoneHVACSizing(1).MaxHeatAirVolFlow = DataSizing::AutoSize;
+        state->dataDXCoils->DXCoil.allocate(10);
+        state->dataDXCoils->DXCoilOutletTemp.allocate(10);
+        state->dataDXCoils->DXCoilOutletHumRat.allocate(10);
+        state->dataDXCoils->DXCoilFullLoadOutAirTemp.allocate(10);
+        state->dataDXCoils->DXCoilFullLoadOutAirHumRat.allocate(10);
+        state->dataDXCoils->DXCoilPartLoadRatio.allocate(10);
+        state->dataDXCoils->DXCoilFanOpMode.allocate(10);
+        state->dataDXCoils->DXCoilTotalCooling.allocate(10);
+        state->dataDXCoils->DXCoilCoolInletAirWBTemp.allocate(10);
+        state->dataDXCoils->DXCoilTotalHeating.allocate(10);
+        state->dataDXCoils->DXCoilHeatInletAirDBTemp.allocate(10);
+        state->dataDXCoils->DXCoilHeatInletAirWBTemp.allocate(10);
+
+        state->dataDXCoils->CheckEquipName.allocate(10);
+        state->dataDXCoils->DXCoilNumericFields.allocate(10);
+        state->dataHeatBal->HeatReclaimDXCoil.allocate(10);
+        state->dataDXCoils->NumDXCoils = 10;
+        state->dataMixedAir->OAMixer.allocate(5);
+        state->dataSize->NumSysSizInput = 1;
+        state->dataSize->SysSizInput.allocate(1);
+        state->dataSize->SysSizInput(1).AirLoopNum = 1;
+        state->dataCurveManager->NumCurves = 10;
+        state->dataCurveManager->PerfCurve.allocate(10);
+        state->dataCurveManager->PerfCurve(1).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+        state->dataCurveManager->PerfCurve(1).CurveType = CurveTypeEnum::Linear;
+        state->dataCurveManager->PerfCurve(1).Coeff1 = 1.0;
+        state->dataCurveManager->PerfCurve(1).CurveMax = 1.0;
+        state->dataCurveManager->PerfCurve(2).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+        state->dataCurveManager->PerfCurve(2).CurveType = CurveTypeEnum::Linear;
+        state->dataCurveManager->PerfCurve(2).Coeff1 = 1.0;
+        state->dataCurveManager->PerfCurve(2).CurveMax = 1.0;
+
+        int NumAirLoops = state->dataHVACGlobal->NumPrimaryAirSys = 1; // allocate to 1 air loop and adjust/resize as needed
+        state->dataAirSystemsData->PrimaryAirSystems.allocate(NumAirLoops);
+        int thisAirLoop = 1;
+        state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch.allocate(1);
+        state->dataAirLoop->AirLoopControlInfo.allocate(1);
+
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(numZones);
+
+        state->dataSize->ZoneSizingRunDone = true;
+        state->dataSize->SysSizingRunDone = true;
+
+        // set up zone 1
+
+        int zoneNum = 1;
+        // zone nodes
+        int zoneNode = 1;
+        int zoneRetNode1 = 2;
+        int zoneInletNode1 = 3;
+        int zoneExhNode1 = 4;
+
+        state->dataSize->ZoneEqSizing(zoneNum).SizingMethod.allocate(25);
+        state->dataSize->ZoneEqSizing(zoneNum).SizingMethod.allocate(25);
+        state->dataSize->ZoneEqSizing(zoneNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+
+        auto &thisZoneEqConfig(state->dataZoneEquip->ZoneEquipConfig(zoneNum));
+        thisZoneEqConfig.IsControlled = true;
+        thisZoneEqConfig.ActualZoneNum = 1;
+        thisZoneEqConfig.ZoneName = "ZONE1";
+        thisZoneEqConfig.EquipListName = "ZONE1EQUIPMENT";
+        thisZoneEqConfig.ZoneNode = zoneNode;
+        thisZoneEqConfig.NumReturnNodes = 1;
+        thisZoneEqConfig.ReturnNode.allocate(1);
+        thisZoneEqConfig.ReturnNode(1) = zoneRetNode1;
+        thisZoneEqConfig.FixedReturnFlow.allocate(1);
+        thisZoneEqConfig.NumInletNodes = NumZoneInletNodes;
+        thisZoneEqConfig.InletNode.allocate(NumZoneInletNodes);
+        thisZoneEqConfig.AirDistUnitCool.allocate(NumZoneInletNodes);
+        thisZoneEqConfig.AirDistUnitHeat.allocate(NumZoneInletNodes);
+        thisZoneEqConfig.InletNode(1) = zoneInletNode1;
+        thisZoneEqConfig.NumExhaustNodes = NumZoneExhaustNodes;
+        thisZoneEqConfig.ExhaustNode.allocate(NumZoneExhaustNodes);
+        thisZoneEqConfig.ExhaustNode(1) = zoneExhNode1;
+        thisZoneEqConfig.EquipListIndex = zoneNum;
+        thisZoneEqConfig.ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
+
+        auto &thisZone(state->dataHeatBal->Zone(zoneNum));
+        thisZone.Name = "ZONE1";
+        thisZone.IsControlled = true;
+        thisZone.SystemZoneNodeNumber = zoneNode;
+
+        auto &thisZoneEqList(state->dataZoneEquip->ZoneEquipList(zoneNum));
+        thisZoneEqList.Name = "ZONE1EQUIPMENT";
+        int maxEquipCount1 = 1;
+        thisZoneEqList.NumOfEquipTypes = maxEquipCount1;
+        thisZoneEqList.EquipType.allocate(maxEquipCount1);
+        thisZoneEqList.EquipType_Num.allocate(maxEquipCount1);
+        thisZoneEqList.EquipName.allocate(maxEquipCount1);
+        thisZoneEqList.EquipIndex.allocate(maxEquipCount1);
+        thisZoneEqList.EquipIndex = 1;
+        thisZoneEqList.EquipData.allocate(maxEquipCount1);
+        thisZoneEqList.CoolingPriority.allocate(maxEquipCount1);
+        thisZoneEqList.HeatingPriority.allocate(maxEquipCount1);
+        thisZoneEqList.EquipType(1) = "NOT A VRF TU";
+        thisZoneEqList.EquipName(1) = "NO NAME";
+        thisZoneEqList.CoolingPriority(1) = 1;
+        thisZoneEqList.HeatingPriority(1) = 1;
+        thisZoneEqList.EquipType_Num(1) = DataZoneEquipment::ZoneUnitarySys_Num;
+
+        auto &finalZoneSizing(state->dataSize->FinalZoneSizing(zoneNum));
+        finalZoneSizing.DesCoolVolFlow = 1.5;
+        finalZoneSizing.DesHeatVolFlow = 1.2;
+        finalZoneSizing.DesCoolCoilInTemp = 25.0;
+        finalZoneSizing.ZoneTempAtCoolPeak = 25.0;
+        finalZoneSizing.DesCoolCoilInHumRat = 0.009;
+        finalZoneSizing.ZoneHumRatAtCoolPeak = 0.009;
+        finalZoneSizing.CoolDesTemp = 15.0;
+        finalZoneSizing.CoolDesHumRat = 0.006;
+        finalZoneSizing.DesHeatCoilInTemp = 20.0;
+        finalZoneSizing.ZoneTempAtHeatPeak = 20.0;
+        finalZoneSizing.HeatDesTemp = 30.0;
+        finalZoneSizing.HeatDesHumRat = 0.007;
+        finalZoneSizing.DesHeatMassFlow = finalZoneSizing.DesHeatVolFlow * state->dataEnvrn->StdRhoAir;
+        finalZoneSizing.TimeStepNumAtCoolMax = 1;
+        finalZoneSizing.CoolDDNum = 1;
+
+        auto &finalSysSizing(state->dataSize->FinalSysSizing(thisAirLoop));
+        finalSysSizing.DesCoolVolFlow = 0.566337; // 400 cfm * 3 tons = 1200 cfm
+        finalSysSizing.DesHeatVolFlow = 0.566337;
+        finalSysSizing.CoolSupTemp = 12.7;
+        finalSysSizing.CoolSupHumRat = 0.008;
+        finalSysSizing.HeatSupTemp = 35.0;
+        finalSysSizing.HeatSupHumRat = 0.006;
+        finalSysSizing.DesMainVolFlow = 0.566337;
+        finalSysSizing.OutTempAtCoolPeak = 35.0;
+        finalSysSizing.HeatOutTemp = 5.0;
+        finalSysSizing.HeatRetTemp = 21.0;
+        finalSysSizing.HeatMixTemp = 15.0;
+        finalSysSizing.MixTempAtCoolPeak = 26.0;
+        finalSysSizing.MixHumRatAtCoolPeak = 0.009;
+
+        // set up air loop
+        state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).NumBranches = 1;
+        state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).NumInletBranches = 1;
+        state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).InletBranchNum.allocate(1);
+        state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).InletBranchNum(1) = 1;
+        state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).NumOutletBranches = 1;
+        state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).OutletBranchNum.allocate(1);
+        state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).OutletBranchNum(1) = 1;
+        state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch.allocate(1);
+        state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch(1).TotalComponents = 1;
+        state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch(1).Comp.allocate(1);
+        state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch(1).Comp(1).Name = "VRFTU1";
+        state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch(1).Comp(1).TypeOf = "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW";
+
+        // set up plant loop for water equipment
+        state->dataPlnt->TotNumLoops = 2;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+        state->dataSize->PlantSizData.allocate(state->dataPlnt->TotNumLoops);
+        // int NumPltSizInput = DataPlant::TotNumLoops;
+        state->dataSize->NumPltSizInput = 2;
+
+        for (int loopindex = 1; loopindex <= state->dataPlnt->TotNumLoops; ++loopindex) {
+            auto &loop(state->dataPlnt->PlantLoop(loopindex));
+            loop.LoopSide.allocate(2);
+            auto &loopside(state->dataPlnt->PlantLoop(loopindex).LoopSide(1));
+            loopside.TotalBranches = 1;
+            loopside.Branch.allocate(1);
+            auto &loopsidebranch(state->dataPlnt->PlantLoop(loopindex).LoopSide(1).Branch(1));
+            loopsidebranch.TotalComponents = 2;
+            loopsidebranch.Comp.allocate(2);
+        }
+        state->dataPlnt->PlantLoop(1).Name = "Hot Water Loop";
+        state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+
+        state->dataPlnt->PlantLoop(2).Name = "Chilled Water Loop";
+        state->dataPlnt->PlantLoop(2).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(2).FluidIndex = 1;
+
+        state->dataSize->PlantSizData(1).PlantLoopName = "Hot Water Loop";
+        state->dataSize->PlantSizData(1).ExitTemp = 80.0;
+        state->dataSize->PlantSizData(1).DeltaT = 10.0;
+
+        state->dataSize->PlantSizData(2).PlantLoopName = "Chilled Water Loop";
+        state->dataSize->PlantSizData(2).ExitTemp = 6.0;
+        state->dataSize->PlantSizData(2).DeltaT = 5.0;
+
+        // set up VRF system
+        int numVRFCond = state->dataHVACVarRefFlow->NumVRFCond = 1; // total number of condenser units
+        state->dataHVACVarRefFlow->VRF.allocate(numVRFCond);
+        state->dataHVACVarRefFlow->CoolCombinationRatio.allocate(1);
+        state->dataHVACVarRefFlow->HeatCombinationRatio.allocate(1);
+
+        int condNum = 1;
+        auto &VRFCond(state->dataHVACVarRefFlow->VRF(condNum));
+
+        int condNodeNum = 1;
+
+        VRFCond.VRFSystemTypeNum = 1;
+        VRFCond.VRFAlgorithmTypeNum = iAlgorithmType::SysCurve;
+        VRFCond.SchedPtr = 1;
+        VRFCond.CoolingCapacity = 10000.0;
+        VRFCond.CoolingCOP = 3.0;
+        VRFCond.CoolingCombinationRatio = 1.0;
+        VRFCond.HeatingCapacity = 10000.0;
+        VRFCond.HeatingCOP = 3.0;
+        VRFCond.CondenserNodeNum = condNodeNum;
+        VRFCond.ZoneTUListPtr = 1;
+        VRFCond.MaxOATCooling = 40.0;
+        VRFCond.MaxOATHeating = 30.0;
+        VRFCond.ThermostatPriority = iThermostatCtrlType::LoadPriority;
+        state->dataHVACVarRefFlow->MaxCoolingCapacity.allocate(1);
+        state->dataHVACVarRefFlow->MaxCoolingCapacity(1) = 1.0E20;
+        state->dataHVACVarRefFlow->MaxHeatingCapacity.allocate(1);
+        state->dataHVACVarRefFlow->MaxHeatingCapacity(1) = 1.0E20;
+
+        int Sch1 = 1;
+        int Sch2 = 2;
+
+        int numTU = 1; // total number of TUs
+        state->dataHVACVarRefFlow->VRFTUNumericFields.allocate(numTU);
+        state->dataHVACVarRefFlow->VRFTUNumericFields(1).FieldNames.allocate(25);
+        state->dataHVACVarRefFlow->VRFTUNumericFields(1).FieldNames = " ";
+        state->dataHVACVarRefFlow->NumVRFTU = numTU;
+        state->dataHVACVarRefFlow->VRFTU.allocate(numTU);
+        state->dataHVACVarRefFlow->NumVRFTULists = numTU;
+        state->dataHVACVarRefFlow->TerminalUnitList.allocate(numTU);
+        state->dataHVACVarRefFlow->CheckEquipName.allocate(numTU);
+        state->dataHVACVarRefFlow->CheckEquipName = true;
+
+        // set up terminal unit list
+        int thisTUList = 1;
+        auto &terminalUnitList(state->dataHVACVarRefFlow->TerminalUnitList(thisTUList));
+        terminalUnitList.NumTUInList = 1;
+        terminalUnitList.ZoneTUPtr.allocate(1);
+        terminalUnitList.ZoneTUPtr(thisTUList) = 1;
+        terminalUnitList.TerminalUnitNotSizedYet.allocate(1);
+        terminalUnitList.HRCoolRequest.allocate(1);
+        terminalUnitList.HRHeatRequest.allocate(1);
+        terminalUnitList.CoolingCoilPresent.allocate(1);
+        terminalUnitList.CoolingCoilPresent = true;
+        terminalUnitList.HeatingCoilPresent.allocate(1);
+        terminalUnitList.HeatingCoilPresent = true;
+        terminalUnitList.CoolingCoilAvailSchPtr.allocate(1);
+        terminalUnitList.CoolingCoilAvailSchPtr = Sch1;
+        terminalUnitList.HeatingCoilAvailSchPtr.allocate(1);
+        terminalUnitList.HeatingCoilAvailSchPtr = Sch1;
+        terminalUnitList.CoolingCoilAvailable.allocate(1);
+        terminalUnitList.HeatingCoilAvailable.allocate(1);
+
+        // set up VRF Terminal Unit
+        int TUNum = 1; // index to this TU
+        auto &VRFTU(state->dataHVACVarRefFlow->VRFTU(TUNum));
+
+        int coolCoilIndex = 1;
+        int heatCoilIndex = 2;
+        int VRFTUInletNodeNum = 30;
+        int VRFTUOutletNodeNum = 31;
+        int VRFTUOAMixerOANodeNum = 32;
+        int VRFTUOAMixerRelNodeNum = 33;
+        int VRFTUOAMixerRetNodeNum = VRFTUInletNodeNum;
+        int VRFTUOAMixerMixNodeNum = 35;
+        int coolCoilAirInNode = VRFTUOAMixerMixNodeNum;
+        int coolCoilAirOutNode = 36;
+        int heatCoilAirInNode = coolCoilAirOutNode;
+        int heatCoilAirOutNode = VRFTUOutletNodeNum;
+
+        state->dataMixedAir->OAMixer(1).RetNode = VRFTUOAMixerRetNodeNum;
+        state->dataMixedAir->OAMixer(1).InletNode = VRFTUOAMixerOANodeNum;
+        state->dataMixedAir->OAMixer(1).RelNode = VRFTUOAMixerRelNodeNum;
+        state->dataMixedAir->OAMixer(1).MixNode = VRFTUOAMixerMixNodeNum;
+
+        VRFTU.Name = "VRFTU1";
+        VRFTU.VRFTUType_Num = DataHVACGlobals::VRFTUType_ConstVolume;
+        VRFTU.SchedPtr = Sch1;
+        VRFTU.VRFSysNum = numVRFCond;
+        VRFTU.TUListIndex = TUNum;
+        VRFTU.IndexToTUInTUList = TUNum;
+        VRFTU.VRFTUInletNodeNum = VRFTUInletNodeNum;
+        VRFTU.VRFTUOutletNodeNum = VRFTUOutletNodeNum;
+        VRFTU.VRFTUOAMixerOANodeNum = VRFTUOAMixerOANodeNum;
+        VRFTU.VRFTUOAMixerRelNodeNum = VRFTUOAMixerRelNodeNum;
+        VRFTU.VRFTUOAMixerRetNodeNum = VRFTUOAMixerRetNodeNum;
+        VRFTU.VRFTUOAMixerMixedNodeNum = VRFTUOAMixerMixNodeNum;
+        VRFTU.MaxCoolAirVolFlow = DataSizing::AutoSize;
+        VRFTU.MaxHeatAirVolFlow = DataSizing::AutoSize;
+        VRFTU.MaxNoCoolAirVolFlow = DataSizing::AutoSize;
+        VRFTU.MaxNoHeatAirVolFlow = DataSizing::AutoSize;
+        VRFTU.MaxCoolAirMassFlow = DataSizing::AutoSize;
+        VRFTU.MaxHeatAirMassFlow = DataSizing::AutoSize;
+        VRFTU.MaxNoCoolAirMassFlow = DataSizing::AutoSize;
+        VRFTU.MaxNoHeatAirMassFlow = DataSizing::AutoSize;
+        VRFTU.CoolOutAirVolFlow = DataSizing::AutoSize;
+        VRFTU.HeatOutAirVolFlow = DataSizing::AutoSize;
+        VRFTU.NoCoolHeatOutAirVolFlow = DataSizing::AutoSize;
+        VRFTU.MinOperatingPLR = 0.1;
+        VRFTU.fanType_Num = 0;
+        VRFTU.FanOpModeSchedPtr = Sch2;
+        VRFTU.FanAvailSchedPtr = Sch1;
+        VRFTU.FanIndex = 0;
+        VRFTU.FanPlace = 0;
+        VRFTU.OAMixerName = "OAMixer1";
+        VRFTU.OAMixerIndex = 1;
+        VRFTU.OAMixerUsed = true;
+        VRFTU.CoolCoilIndex = coolCoilIndex;
+        VRFTU.coolCoilAirInNode = coolCoilAirInNode;
+        VRFTU.coolCoilAirOutNode = coolCoilAirOutNode;
+        VRFTU.HeatCoilIndex = heatCoilIndex;
+        VRFTU.heatCoilAirInNode = heatCoilAirInNode;
+        VRFTU.heatCoilAirOutNode = heatCoilAirOutNode;
+        VRFTU.DXCoolCoilType_Num = DataHVACGlobals::CoilVRF_Cooling;
+        VRFTU.DXHeatCoilType_Num = DataHVACGlobals::CoilVRF_Heating;
+        VRFTU.CoolingCoilPresent = true;
+        VRFTU.HeatingCoilPresent = true;
+        VRFTU.HVACSizingIndex = 0;
+
+        // DX coil set up
+        state->dataDXCoils->DXCoilNumericFields(1).PerfMode.allocate(5);
+        state->dataDXCoils->DXCoilNumericFields(1).PerfMode(1).FieldNames.allocate(30);
+        state->dataDXCoils->DXCoil(1).Name = "VRFTUDXCOOLCOIL";
+        state->dataDXCoils->DXCoil(1).DXCoilType = "Coil:Cooling:DX:VariableRefrigerantFlow";
+        state->dataDXCoils->DXCoil(1).AirInNode = coolCoilAirInNode;
+        state->dataDXCoils->DXCoil(1).AirOutNode = coolCoilAirOutNode;
+        state->dataDXCoils->DXCoil(1).DXCoilType_Num = CoilVRF_Cooling;
+        state->dataDXCoils->DXCoil(1).RatedAirVolFlowRate = DataSizing::AutoSize;
+        state->dataDXCoils->DXCoil(1).RatedTotCap = DataSizing::AutoSize;
+        state->dataDXCoils->DXCoil(1).RatedSHR = DataSizing::AutoSize;
+        state->dataDXCoils->DXCoil(1).SchedPtr = Sch1;
+        state->dataDXCoils->DXCoil(1).CCapFTemp.allocate(1);
+        state->dataDXCoils->DXCoil(1).CCapFTemp(1) = Sch1;
+        state->dataDXCoils->DXCoil(1).CCapFFlow.allocate(1);
+        state->dataDXCoils->DXCoil(1).CCapFFlow(1) = Sch1;
+        state->dataDXCoils->DXCoil(1).PLFFPLR.allocate(1);
+        state->dataDXCoils->DXCoil(1).PLFFPLR(1) = Sch1;
+
+        state->dataDXCoils->DXCoilNumericFields(2).PerfMode.allocate(5);
+        state->dataDXCoils->DXCoilNumericFields(2).PerfMode(1).FieldNames.allocate(30);
+        state->dataDXCoils->DXCoil(2).Name = "VRFTUDXHEATCOIL";
+        state->dataDXCoils->DXCoil(2).DXCoilType = "Coil:Heating:DX:VariableRefrigerantFlow";
+        state->dataDXCoils->DXCoil(2).AirInNode = heatCoilAirInNode;
+        state->dataDXCoils->DXCoil(2).AirOutNode = heatCoilAirOutNode;
+        state->dataDXCoils->DXCoil(2).DXCoilType_Num = CoilVRF_Heating;
+        state->dataDXCoils->DXCoil(2).RatedAirVolFlowRate = DataSizing::AutoSize;
+        state->dataDXCoils->DXCoil(2).RatedTotCap = DataSizing::AutoSize;
+        state->dataDXCoils->DXCoil(2).RatedSHR = DataSizing::AutoSize;
+        state->dataDXCoils->DXCoil(2).SchedPtr = Sch1;
+        state->dataDXCoils->DXCoil(2).CCapFTemp.allocate(1);
+        state->dataDXCoils->DXCoil(2).CCapFTemp(1) = Sch1;
+        state->dataDXCoils->DXCoil(2).CCapFFlow.allocate(1);
+        state->dataDXCoils->DXCoil(2).CCapFFlow(1) = Sch1;
+        state->dataDXCoils->DXCoil(2).PLFFPLR.allocate(1);
+        state->dataDXCoils->DXCoil(2).PLFFPLR(1) = Sch1;
+
+        // set up schedules
+        state->dataScheduleMgr->Schedule.allocate(10);
+    }
+
+    virtual void TearDown()
+    {
+        EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
+    }
+};
+
+TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
+{
+    state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
+    int curSysNum = state->dataSize->CurSysNum = 1;
+    int curZoneNum = 1;
+    int curTUNum = 1;
+
+    // turn off GetInput for AirLoopFixture unit tests, everything is set up in fixture
+    state->dataHVACVarRefFlow->GetVRFInputFlag = false;
+    state->dataDXCoils->GetCoilsInputFlag = false;
+    // trigger a mining function (will bypass GetInput)
+    int ZoneInletAirNode = GetVRFTUZoneInletAirNode(*state, 1);
+    auto &thisTU(state->dataHVACVarRefFlow->VRFTU(curTUNum));
+    // node number set up in fixture
+    EXPECT_EQ(ZoneInletAirNode, thisTU.VRFTUOutletNodeNum);
+
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRF(curSysNum).SchedPtr).CurrentValue = 1.0; // enable the VRF condenser
+    state->dataScheduleMgr->Schedule(thisTU.SchedPtr).CurrentValue = 1.0;                                    // enable the terminal unit
+    state->dataScheduleMgr->Schedule(thisTU.FanAvailSchedPtr).CurrentValue = 1.0;                            // turn on fan
+    state->dataScheduleMgr->Schedule(thisTU.FanOpModeSchedPtr).CurrentValue = 1.0;                           // set constant fan operating mode
+
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(curZoneNum).RemainingOutputRequired = 0.0; // set load = 0
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(curZoneNum).RemainingOutputReqToCoolSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(curZoneNum).RemainingOutputReqToHeatSP = 0.0;
+
+    state->dataAirLoop->AirLoopInputsFilled = true;
+
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(curSysNum).CondenserNodeNum).Temp = 35.0;
+    // primary air loop has OA system, TU OA flow rate will size to 0
+    state->dataAirSystemsData->PrimaryAirSystems(1).OASysExists = true;
+
+    int VRFTUOAMixerOANodeNum = thisTU.VRFTUOAMixerOANodeNum;
+    int VRFTUOAMixerRetNodeNum = thisTU.VRFTUOAMixerRetNodeNum;
+    // set mixer OA node conditions
+    state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Temp = 35.0;
+    state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).HumRat = 0.01;
+    state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Enthalpy =
+        PsyHFnTdbW(state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Temp, state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).HumRat);
+    state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Press = state->dataEnvrn->OutBaroPress;
+    // set mixer return node conditions (needed for mixer mixing calculation)
+    state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).Temp = 24.0;
+    state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).HumRat = 0.01;
+    state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).Enthalpy =
+        PsyHFnTdbW(state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).Temp, state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).HumRat);
+    state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).Press = state->dataEnvrn->OutBaroPress;
+
+    bool FirstHVACIteration = true;
+    Real64 SysOutputProvided = 0.0;
+    Real64 LatOutputProvided = 0.0;
+    Real64 OnOffAirFlowRatio = 1.0;
+    Real64 QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(curZoneNum).RemainingOutputRequired;
+
+    auto &tuInletNode(state->dataLoopNodes->Node(thisTU.VRFTUInletNodeNum));
+    tuInletNode.Temp = 24.0;
+    tuInletNode.HumRat = 0.01;
+    tuInletNode.Enthalpy = PsyHFnTdbW(tuInletNode.Temp, tuInletNode.HumRat);
+
+    state->dataLoopNodes->Node(thisTU.VRFTUOutletNodeNum).TempSetPoint = 20.0; // select 20 C as TU outlet set point temperature
+
+    InitVRF(*state, curTUNum, curZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq); // Initialize all VRFTU related parameters
+
+    ASSERT_EQ(1, state->dataHVACVarRefFlow->NumVRFCond);
+    EXPECT_TRUE(thisTU.isInAirLoop);          // initialization found TU in main air loop
+    EXPECT_TRUE(thisTU.isSetPointControlled); // initialization found TU is set point controlled
+    EXPECT_EQ(20.0, thisTU.coilTempSetPoint); // set point is initialized
+
+    SimVRF(*state, curTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
+
+    EXPECT_EQ(0.0, QZnReq);
+
+    tuInletNode.MassFlowRate = thisTU.MaxCoolAirMassFlow; // set mass flow rate at TU inlet
+
+    InitVRF(*state, curTUNum, curZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
+    EXPECT_LT(QZnReq, 0.0);                                                              // cooling load exists
+    EXPECT_TRUE(thisTU.coolSPActive);                                                    // cooling set point control active
+    EXPECT_NEAR(state->dataLoopNodes->Node(thisTU.coolCoilAirInNode).Temp, 24.0, 0.001); // verify coil inlet node is not at set point = 20
+
+    SimVRF(*state, curTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
+    EXPECT_LT(SysOutputProvided, 0.0);
+    // TU outlet is at set point = 20
+    EXPECT_NEAR(state->dataLoopNodes->Node(thisTU.VRFTUOutletNodeNum).Temp, thisTU.coilTempSetPoint, 0.01);
+    EXPECT_NEAR(state->dataLoopNodes->Node(thisTU.VRFTUOutletNodeNum).Temp, 20.0, 0.01);
+
+    // outdoor unit operation is within min/max operating limits
+    EXPECT_TRUE(state->dataHVACVarRefFlow->CoolingLoad(state->dataHVACVarRefFlow->NumVRFCond));
+    EXPECT_FALSE(state->dataHVACVarRefFlow->HeatingLoad(state->dataHVACVarRefFlow->NumVRFCond));
+    EXPECT_LE(state->dataHVACVarRefFlow->VRF(curSysNum).MinOATCooling,
+              state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(curSysNum).CondenserNodeNum).Temp);
+    EXPECT_GE(state->dataHVACVarRefFlow->VRF(curSysNum).MaxOATCooling,
+              state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(curSysNum).CondenserNodeNum).Temp);
+
+    // save and adjust operating limit to disable outdoor unit. Output should be 0.
+    Real64 saveMaxOATCooling = state->dataHVACVarRefFlow->VRF(curSysNum).MaxOATCooling;
+    state->dataHVACVarRefFlow->VRF(curSysNum).MaxOATCooling =
+        -1.0 + state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(curSysNum).CondenserNodeNum).Temp;
+    InitVRF(*state, curTUNum, curZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
+    SimVRF(*state, curTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
+    EXPECT_NEAR(SysOutputProvided, 0.0, 0.00000001);
+    // reset max operating limit
+    state->dataHVACVarRefFlow->VRF(curSysNum).MaxOATCooling = saveMaxOATCooling;
+
+    Real64 saveMinOATCooling = state->dataHVACVarRefFlow->VRF(curSysNum).MinOATCooling;
+    state->dataHVACVarRefFlow->VRF(curSysNum).MinOATCooling =
+        1.0 + state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(curSysNum).CondenserNodeNum).Temp;
+    InitVRF(*state, curTUNum, curZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
+    SimVRF(*state, curTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
+    EXPECT_NEAR(SysOutputProvided, 0.0, 0.00000001);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->CoolingLoad(state->dataHVACVarRefFlow->NumVRFCond));
+    EXPECT_FALSE(state->dataHVACVarRefFlow->HeatingLoad(state->dataHVACVarRefFlow->NumVRFCond));
+    // reset min operating limit
+    state->dataHVACVarRefFlow->VRF(curSysNum).MinOATCooling = saveMinOATCooling;
+
+    tuInletNode.Temp = 18.0;
+    tuInletNode.HumRat = 0.007;
+    tuInletNode.Enthalpy = PsyHFnTdbW(tuInletNode.Temp, tuInletNode.HumRat);
+    state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Temp = 15.0;
+    state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).HumRat = 0.01;
+    state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Enthalpy =
+        PsyHFnTdbW(state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Temp, state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).HumRat);
+    state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).Temp = 18.0;
+    state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).HumRat = 0.007;
+    state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).Enthalpy =
+        PsyHFnTdbW(state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).Temp, state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).HumRat);
+    state->dataEnvrn->OutDryBulbTemp = 10.0;
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(curSysNum).CondenserNodeNum).Temp = 10.0;
+    state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Temp = 10.0;
+
+    InitVRF(*state, curTUNum, curZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
+    EXPECT_GT(QZnReq, 0.0);                                                              // heating load exists
+    EXPECT_FALSE(thisTU.coolSPActive);                                                   // verify cooling set point control is not active
+    EXPECT_TRUE(thisTU.heatSPActive);                                                    // verify heating set point control is active
+    EXPECT_NEAR(18.0, tuInletNode.Temp, 0.001);                                          // verify TU inlet node = 18
+    EXPECT_NEAR(18.0, state->dataLoopNodes->Node(thisTU.coolCoilAirInNode).Temp, 0.001); // verify cooling coil inlet node = 18
+    SimVRF(*state, curTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
+    EXPECT_GT(SysOutputProvided, 0.0);                                                                      // TU provides heating
+    EXPECT_NEAR(state->dataLoopNodes->Node(thisTU.VRFTUOutletNodeNum).Temp, thisTU.coilTempSetPoint, 0.01); // TU outlet is at SP target
+    EXPECT_NEAR(state->dataLoopNodes->Node(thisTU.VRFTUOutletNodeNum).Temp, 20.0, 0.01);
+
+    // outdoor unit operation is within min/max operating limits
+    EXPECT_TRUE(state->dataHVACVarRefFlow->HeatingLoad(state->dataHVACVarRefFlow->NumVRFCond));
+    EXPECT_FALSE(state->dataHVACVarRefFlow->CoolingLoad(state->dataHVACVarRefFlow->NumVRFCond));
+    EXPECT_LE(state->dataHVACVarRefFlow->VRF(curSysNum).MinOATHeating,
+              state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(curSysNum).CondenserNodeNum).Temp);
+    EXPECT_GE(state->dataHVACVarRefFlow->VRF(curSysNum).MaxOATHeating,
+              state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(curSysNum).CondenserNodeNum).Temp);
+
+    // save and adjust operating limit to disable outdoor unit. Output should be 0.
+    Real64 saveMaxOATHeating = state->dataHVACVarRefFlow->VRF(curSysNum).MaxOATHeating;
+    state->dataHVACVarRefFlow->VRF(curSysNum).MaxOATHeating =
+        -1.0 + state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(curSysNum).CondenserNodeNum).Temp;
+    InitVRF(*state, curTUNum, curZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
+    SimVRF(*state, curTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
+    EXPECT_NEAR(SysOutputProvided, 0.0, 0.00000001);
+    // reset max operating limit
+    state->dataHVACVarRefFlow->VRF(curSysNum).MaxOATHeating = saveMaxOATHeating;
+
+    Real64 saveMinOATHeating = state->dataHVACVarRefFlow->VRF(curSysNum).MinOATHeating;
+    state->dataHVACVarRefFlow->VRF(curSysNum).MinOATHeating =
+        1.0 + state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(curSysNum).CondenserNodeNum).Temp;
+    InitVRF(*state, curTUNum, curZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
+    SimVRF(*state, curTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
+    EXPECT_NEAR(SysOutputProvided, 0.0, 0.00000001);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->CoolingLoad(state->dataHVACVarRefFlow->NumVRFCond));
+    EXPECT_FALSE(state->dataHVACVarRefFlow->HeatingLoad(state->dataHVACVarRefFlow->NumVRFCond));
+    // reset min operating limit
+    state->dataHVACVarRefFlow->VRF(curSysNum).MinOATHeating = saveMinOATHeating;
+
+    // switch to load based control
+    state->dataLoopNodes->Node(curZoneNum).Temp = 20.0; // set zone temp in heating mode
+    thisTU.isSetPointControlled = false;
+    thisTU.ZoneAirNode = 1;
+    thisTU.ZoneNum = 1;
+    InitVRF(*state, curTUNum, curZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq); // Initialize all VRFTU related parameters
+    EXPECT_EQ(0.0, QZnReq);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->CoolingLoad(curSysNum)); // verify no load on TU
+    EXPECT_FALSE(state->dataHVACVarRefFlow->HeatingLoad(curSysNum));
+
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(curZoneNum).RemainingOutputRequired = 1000.0; // set heating load
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(curZoneNum).RemainingOutputReqToCoolSP = 2000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(curZoneNum).RemainingOutputReqToHeatSP = 1000.0;
+    InitVRF(*state, curTUNum, curZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq); // Initialize all VRFTU related parameters
+    EXPECT_GT(QZnReq, 0.0);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->CoolingLoad(curSysNum));
+    EXPECT_TRUE(state->dataHVACVarRefFlow->HeatingLoad(curSysNum));
+    SimVRF(*state, curTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
+    EXPECT_NEAR(SysOutputProvided, QZnReq, 1.0);
+
+    state->dataEnvrn->OutDryBulbTemp = 30.0;
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(curSysNum).CondenserNodeNum).Temp = 30.0;
+    state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).Temp = 24.0;
+    state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).HumRat = 0.007;
+    state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).Enthalpy =
+        PsyHFnTdbW(state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).Temp, state->dataLoopNodes->Node(VRFTUOAMixerRetNodeNum).HumRat);
+    state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Temp = 30.0;
+    state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).HumRat = 0.01;
+    state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Enthalpy =
+        PsyHFnTdbW(state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).Temp, state->dataLoopNodes->Node(VRFTUOAMixerOANodeNum).HumRat);
+    state->dataLoopNodes->Node(curZoneNum).Temp = 24.0;                                             // set zone temp in cooling mode
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(curZoneNum).RemainingOutputRequired = -1000.0; // set cooling load
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(curZoneNum).RemainingOutputReqToCoolSP = -1000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(curZoneNum).RemainingOutputReqToHeatSP = -2000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(curZoneNum).OutputRequiredToCoolingSP = -1000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(curZoneNum).OutputRequiredToHeatingSP = -2000.0;
+    InitVRF(*state, curTUNum, curZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq); // Initialize all VRFTU related parameters
+    EXPECT_LT(QZnReq, 0.0);
+    EXPECT_TRUE(state->dataHVACVarRefFlow->CoolingLoad(curSysNum));
+    EXPECT_FALSE(state->dataHVACVarRefFlow->HeatingLoad(curSysNum));
+    SimVRF(*state, curTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
+    EXPECT_NEAR(SysOutputProvided, QZnReq, 1.0);
+
+    // Test node connection function
+    EXPECT_FALSE(ErrorsFound);
+    CheckVRFTUNodeConnections(*state, curTUNum, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);     // nodes are connected correctly
+    thisTU.VRFTUInletNodeNum += 1; // change index of comp node
+    CheckVRFTUNodeConnections(*state, curTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
+    ErrorsFound = false;
+    thisTU.VRFTUOutletNodeNum -= 1; // revert previous change
+    thisTU.coolCoilAirInNode += 1;  // change index of comp node
+    CheckVRFTUNodeConnections(*state, curTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
+    ErrorsFound = false;
+    thisTU.coolCoilAirInNode -= 1;  // revert previous change
+    thisTU.coolCoilAirOutNode -= 1; // change index of comp node (watch for array bounds)
+    CheckVRFTUNodeConnections(*state, curTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
+    ErrorsFound = false;
+    thisTU.coolCoilAirOutNode += 1; // revert previous change
+    thisTU.heatCoilAirInNode -= 1;  // change index of comp node (watch for array bounds)
+    CheckVRFTUNodeConnections(*state, curTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
+    ErrorsFound = false;
+    thisTU.heatCoilAirInNode += 1;  // revert previous change
+    thisTU.heatCoilAirOutNode -= 1; // change index of comp node (watch for array bounds)
+    CheckVRFTUNodeConnections(*state, curTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
+}
 
 //*****************VRF-FluidTCtrl Model
 TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
@@ -125,14 +773,10 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     //   Test a group of methods related with the outdoor unit compressor calculations in the VRF_FluidTCtrl model.
 
     // Inputs_general
-    int const FlagCondMode(0); // Flag for running as condenser [-]
-    int const FlagEvapMode(1); // Flag for running as evaporator [-]
-    bool ErrorsFound(false);   // function returns true on error
-    int VRFCond(1);            // index to VRF condenser
+    bool ErrorsFound(false); // function returns true on error
+    int VRFCond(1);          // index to VRF condenser
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
-        " ",
         "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR,                         ",
         " VRF Heat Pump,           !- Name                                                          ",
         " ,                        !- Availability Schedule Name                                    ",
@@ -1708,37 +2352,37 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::BeginEnvrnFlag = true;
-    DataSizing::CurZoneEqNum = 1;
-    DataEnvironment::OutBaroPress = 101325;          // sea level
-    DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
-    StdRhoAir = PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, 20.0, 0.0);
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataSize->CurZoneEqNum = 1;
+    state->dataEnvrn->OutBaroPress = 101325;            // sea level
+    state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
+    state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
 
     // Read in IDF
-    ProcessScheduleInput();                    // read schedules
-    CurveManager::GetCurveInput();             // read curves
-    FluidProperties::GetFluidPropertiesData(); // read refrigerant properties
+    ProcessScheduleInput(*state);                    // read schedules
+    CurveManager::GetCurveInput(*state);             // read curves
+    FluidProperties::GetFluidPropertiesData(*state); // read refrigerant properties
 
     // set up ZoneEquipConfig data
-    DataGlobals::NumOfZones = 1;
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
-    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 1;
-    DataZoneEquipment::ZoneEquipConfig(1).NumExhaustNodes = 1;
-    DataZoneEquipment::ZoneEquipConfig(1).InletNode.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).ExhaustNode.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).InletNode(1) = 2;
-    DataZoneEquipment::ZoneEquipConfig(1).ExhaustNode(1) = 1;
+    state->dataGlobal->NumOfZones = 1;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 1;
 
-    GetVRFInputData(ErrorsFound); // read VRF
+    GetVRFInputData(*state, ErrorsFound); // read VRF
     EXPECT_FALSE(ErrorsFound);
 
     // Check expected result from GetInput
 
     // #6218 Fan:SystemModel is used and DX coil RatedVolAirFlowRate was not set equal to system fan designAirVolFlowRate
-    EXPECT_EQ(DXCoil(1).RatedAirVolFlowRate(1), 1.0);
-    EXPECT_EQ(DXCoil(2).RatedAirVolFlowRate(1), 1.0);
-    EXPECT_EQ(HVACFan::fanObjs[VRFTU(1).FanIndex]->designAirVolFlowRate, 1.0);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(1).RatedAirVolFlowRate(1), 1.0);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(2).RatedAirVolFlowRate(1), 1.0);
+    EXPECT_EQ(state->dataHVACFan->fanObjs[state->dataHVACVarRefFlow->VRFTU(1).FanIndex]->designAirVolFlowRate, 1.0);
 
     // Run and Check: GetSupHeatTempRefrig
     {
@@ -1755,10 +2399,10 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
         Real64 Temperature = 44;      // temperature to be returned [C]
         std::string CalledFrom = "EnergyPlusFixture:VRF_FluidTCtrl_VRFOU_Compressor";
 
-        DataEnvironment::OutDryBulbTemp = 10.35;
+        state->dataEnvrn->OutDryBulbTemp = 10.35;
 
         // Run
-        Temperature = GetSupHeatTempRefrig(Refrigerant, Pressure, Enthalpy, TempLow, TempUp, RefrigIndex, CalledFrom);
+        Temperature = GetSupHeatTempRefrig(*state, Refrigerant, Pressure, Enthalpy, TempLow, TempUp, RefrigIndex, CalledFrom);
 
         // Test
         EXPECT_NEAR(Temperature, 44.5, 0.5);
@@ -1789,27 +2433,28 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
         Real64 CompSpdActual;               // Actual compressor running speed [rps]
         Real64 Ncomp;                       // compressor power [W]
 
-        DataEnvironment::OutDryBulbTemp = 10.35;
+        state->dataEnvrn->OutDryBulbTemp = 10.35;
 
         // Run
-        VRF(VRFCond).VRFHR_OU_HR_Mode(h_IU_evap_in,
-                                      h_comp_out,
-                                      Q_c_TU_PL,
-                                      Q_h_TU_PL,
-                                      Tdischarge,
-                                      Tsuction,
-                                      Te_update,
-                                      h_comp_in,
-                                      h_IU_PLc_out,
-                                      Pipe_Q_c,
-                                      Q_c_OU,
-                                      Q_h_OU,
-                                      m_ref_IU_evap,
-                                      m_ref_OU_evap,
-                                      m_ref_OU_cond,
-                                      N_fan_OU,
-                                      CompSpdActual,
-                                      Ncomp);
+        state->dataHVACVarRefFlow->VRF(VRFCond).VRFHR_OU_HR_Mode(*state,
+                                                                 h_IU_evap_in,
+                                                                 h_comp_out,
+                                                                 Q_c_TU_PL,
+                                                                 Q_h_TU_PL,
+                                                                 Tdischarge,
+                                                                 Tsuction,
+                                                                 Te_update,
+                                                                 h_comp_in,
+                                                                 h_IU_PLc_out,
+                                                                 Pipe_Q_c,
+                                                                 Q_c_OU,
+                                                                 Q_h_OU,
+                                                                 m_ref_IU_evap,
+                                                                 m_ref_OU_evap,
+                                                                 m_ref_OU_cond,
+                                                                 N_fan_OU,
+                                                                 CompSpdActual,
+                                                                 Ncomp);
 
         // Test
         EXPECT_NEAR(756, CompSpdActual, 1);
@@ -1833,12 +2478,12 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
         Real64 const P_evap_real = 509784;    // Evaporative pressure at real conditions [Pa]
         Real64 const T_comp_in_real = 0.65;   // Temperature of the refrigerant at the compressor inlet at real conditions [C]
         Real64 const T_comp_in_rate = -5.35;  // Temperature of the refrigerant at the compressor inlet at rated conditions [C]
-        Real64 const T_cond_out_rate = 31.38; // Temperature of the refrigerant at the condensor outlet at rated conditions [C]
+        Real64 const T_cond_out_rate = 31.38; // Temperature of the refrigerant at the condenser outlet at rated conditions [C]
         Real64 C_cap_operation;
 
         // Run
-        C_cap_operation =
-            VRF(VRFCond).VRFOU_CapModFactor(h_comp_in_real, h_evap_in_real, P_evap_real, T_comp_in_real, T_comp_in_rate, T_cond_out_rate);
+        C_cap_operation = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CapModFactor(
+            *state, h_comp_in_real, h_evap_in_real, P_evap_real, T_comp_in_real, T_comp_in_rate, T_cond_out_rate);
 
         // Test
         EXPECT_NEAR(0.879, C_cap_operation, 0.005);
@@ -1859,7 +2504,8 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     Real64 CompSpdActual;               // Actual compressor running speed [rps]
 
     // Run
-    VRF(VRFCond).VRFOU_CompSpd(Q_req, FlagEvapMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual);
+    state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CompSpd(
+        *state, Q_req, iHXOpMode::EvapMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual);
 
     // Test
     EXPECT_NEAR(1295, CompSpdActual, 5);
@@ -1877,7 +2523,8 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     Real64 CompSpdActual;               // Actual compressor running speed [rps]
 
     // Run
-    VRF(VRFCond).VRFOU_CompSpd(Q_req, FlagCondMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual);
+    state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CompSpd(
+        *state, Q_req, iHXOpMode::CondMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual);
 
     // Test
     EXPECT_NEAR(950, CompSpdActual, 5);
@@ -1899,7 +2546,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     Real64 Ncomp;                       // Compressor power [W]
 
     // Run
-    VRF(VRFCond).VRFOU_CompCap(CompSpdActual, T_suction, T_discharge, h_IU_evap_in, h_comp_in, Q_c_tot, Ncomp);
+    state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CompCap(*state, CompSpdActual, T_suction, T_discharge, h_IU_evap_in, h_comp_in, Q_c_tot, Ncomp);
 
     // Test
     EXPECT_NEAR(6990, Q_c_tot, 10);
@@ -1927,14 +2574,24 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     Real64 CompSpdActual;               // Actual compressor running speed [rps]
 
     // Run
-    VRF(VRFCond).VRFOU_CalcCompH(
-        TU_load, T_suction, T_discharge, Pipe_h_out_ave, IUMaxCondTemp, MinOutdoorUnitTe, Tfs, Pipe_Q, OUEvapHeatExtract, CompSpdActual, Ncomp);
+    state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CalcCompH(*state,
+                                                            TU_load,
+                                                            T_suction,
+                                                            T_discharge,
+                                                            Pipe_h_out_ave,
+                                                            IUMaxCondTemp,
+                                                            MinOutdoorUnitTe,
+                                                            Tfs,
+                                                            Pipe_Q,
+                                                            OUEvapHeatExtract,
+                                                            CompSpdActual,
+                                                            Ncomp);
 
     // Test
     EXPECT_NEAR(5110, OUEvapHeatExtract, 1);
     EXPECT_NEAR(1500, CompSpdActual, 1);
     EXPECT_NEAR(2080, Ncomp, 1);
-    EXPECT_EQ(Node(VRFTU(1).VRFTUInletNodeNum).MassFlowRate, 0.0);
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(1).VRFTUInletNodeNum).MassFlowRate, 0.0);
 }
 }
 
@@ -1948,11 +2605,9 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Coil)
     // Allocate
     int NumVRFCondenser = 1;
     int VRFCond = 1;
-    VRF.allocate(NumVRFCondenser);
+    state->dataHVACVarRefFlow->VRF.allocate(NumVRFCondenser);
 
     // Inputs_general
-    int const FlagCondMode(0);   // Flag for running as condenser [-]
-    int const FlagEvapMode(1);   // Flag for running as evaporator [-]
     Real64 OutDryBulbTemp;       // Temperature of outdoor air [C]
     Real64 OutHumRat;            // Humidity ratio of outdoor air [kg/kg]
     Real64 OutBaroPress(101325); // Outdoor air pressure [Pa]
@@ -1966,18 +2621,18 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Coil)
     Real64 temp;                 // OU coil air mass flow rate [kg/s]
 
     // Inputs_VRF configurations
-    VRF(VRFCond).RateBFOUCond = 0.05;
-    VRF(VRFCond).RateBFOUEvap = 0.281;
-    VRF(VRFCond).C1Te = 0;
-    VRF(VRFCond).C2Te = 6.05E-1;
-    VRF(VRFCond).C3Te = 2.50E-2;
-    VRF(VRFCond).C1Tc = 0;
-    VRF(VRFCond).C2Tc = -0.091;
-    VRF(VRFCond).C3Tc = 0.075;
+    state->dataHVACVarRefFlow->VRF(VRFCond).RateBFOUCond = 0.05;
+    state->dataHVACVarRefFlow->VRF(VRFCond).RateBFOUEvap = 0.281;
+    state->dataHVACVarRefFlow->VRF(VRFCond).C1Te = 0;
+    state->dataHVACVarRefFlow->VRF(VRFCond).C2Te = 6.05E-1;
+    state->dataHVACVarRefFlow->VRF(VRFCond).C3Te = 2.50E-2;
+    state->dataHVACVarRefFlow->VRF(VRFCond).C1Tc = 0;
+    state->dataHVACVarRefFlow->VRF(VRFCond).C2Tc = -0.091;
+    state->dataHVACVarRefFlow->VRF(VRFCond).C3Tc = 0.075;
 
     // Pre-process
-    DataEnvironment::OutBaroPress = OutBaroPress;
-    InitializePsychRoutines();
+    state->dataEnvrn->OutBaroPress = OutBaroPress;
+    InitializePsychRoutines(*state);
 
     // Run and Check: VRFOU_Cap
     { //   Test the method VRFOU_Cap, which determines the VRF OU heat transfer rate, given refrigerant side temperature,
@@ -1992,7 +2647,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Coil)
     Tdischarge = 36;
 
     // Run
-    Q_h_OU = VRF(VRFCond).VRFOU_Cap(FlagCondMode, Tdischarge, SC, m_air, OutDryBulbTemp, OutHumRat);
+    Q_h_OU = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_Cap(*state, iHXOpMode::CondMode, Tdischarge, SC, m_air, OutDryBulbTemp, OutHumRat);
 
     // Test
     EXPECT_NEAR(27551, Q_h_OU, 10);
@@ -2009,7 +2664,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Coil)
     Tsuction = -3;
 
     // Run
-    Q_c_OU = VRF(VRFCond).VRFOU_Cap(FlagEvapMode, Tsuction, SH, m_air, OutDryBulbTemp, OutHumRat);
+    Q_c_OU = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_Cap(*state, iHXOpMode::EvapMode, Tsuction, SH, m_air, OutDryBulbTemp, OutHumRat);
 
     // Test
     EXPECT_NEAR(24456, Q_c_OU, 10);
@@ -2029,7 +2684,7 @@ SC = 1;
 Tdischarge = 36;
 
 // Run
-m_air = VRF(VRFCond).VRFOU_FlowRate(FlagCondMode, Tdischarge, SC, Q_h_OU, OutDryBulbTemp, OutHumRat);
+m_air = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_FlowRate(*state, iHXOpMode::CondMode, Tdischarge, SC, Q_h_OU, OutDryBulbTemp, OutHumRat);
 
 // Test
 EXPECT_NEAR(3.6, m_air, 0.01);
@@ -2046,7 +2701,7 @@ EXPECT_NEAR(3.6, m_air, 0.01);
     Tsuction = -3;
 
     // Run
-    m_air = VRF(VRFCond).VRFOU_FlowRate(FlagEvapMode, Tsuction, SH, Q_c_OU, OutDryBulbTemp, OutHumRat);
+    m_air = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_FlowRate(*state, iHXOpMode::EvapMode, Tsuction, SH, Q_c_OU, OutDryBulbTemp, OutHumRat);
 
     // Test
     EXPECT_NEAR(3.6, m_air, 0.01);
@@ -2067,7 +2722,8 @@ OutHumRat = 0.0146;
 SC = 1;
 
 // Run
-VRF(VRFCond).VRFOU_TeTc(FlagCondMode, Q_h_OU, SC, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress, temp, Tdischarge);
+state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_TeTc(
+    *state, iHXOpMode::CondMode, Q_h_OU, SC, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress, temp, Tdischarge);
 
 // Test
 EXPECT_NEAR(36, Tdischarge, 0.05);
@@ -2085,7 +2741,8 @@ EXPECT_NEAR(36, Tdischarge, 0.05);
     Tsuction = -3;
 
     // Run
-    VRF(VRFCond).VRFOU_TeTc(FlagEvapMode, Q_c_OU, SH, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress, temp, Tsuction);
+    state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_TeTc(
+        *state, iHXOpMode::EvapMode, Q_c_OU, SH, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress, temp, Tsuction);
 
     // Test
     EXPECT_NEAR(-3, Tsuction, 0.05);
@@ -2108,7 +2765,8 @@ EXPECT_NEAR(36, Tdischarge, 0.05);
         Tdischarge = 36;
 
         // Run
-        SC = VRF(VRFCond).VRFOU_SCSH(FlagCondMode, Q_h_OU, Tdischarge, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress);
+        SC = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_SCSH(
+            *state, iHXOpMode::CondMode, Q_h_OU, Tdischarge, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress);
 
         // Test
         EXPECT_NEAR(1, SC, 0.01);
@@ -2125,14 +2783,15 @@ EXPECT_NEAR(36, Tdischarge, 0.05);
         Tsuction = -3;
 
         // Run
-        SH = VRF(VRFCond).VRFOU_SCSH(FlagEvapMode, Q_c_OU, Tsuction, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress);
+        SH = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_SCSH(
+            *state, iHXOpMode::EvapMode, Q_c_OU, Tsuction, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress);
 
         // Test
         EXPECT_NEAR(1, SH, 0.01);
     }
 }
 // Clean up
-VRF.deallocate();
+state->dataHVACVarRefFlow->VRF.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_GetCoilInput)
@@ -2143,7 +2802,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_GetCoilInput)
     std::string const idf_objects =
         delimited_string({" Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl,  ",
                           " 	 TU1 VRF DX Cooling Coil, !- Name							   ",
-                          " 	 VRFAvailSched,           !- Availability Schedule Name		   ",
+                          " 	 ,                        !- Availability Schedule Name		   ",
                           " 	 TU1 VRF DX CCoil Inlet Node,  !- Coil Air Inlet Node		   ",
                           " 	 TU1 VRF DX CCoil Outlet Node, !- Coil Air Outlet Node		   ",
                           " 	 2200,                    !- Rated Total Cooling Capacity {W}   ",
@@ -2166,17 +2825,17 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_GetCoilInput)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Run the method
-    GetDXCoils();
+    GetDXCoils(*state);
 
     // Check the results
-    ASSERT_EQ(1, NumDXCoils);
-    EXPECT_EQ(DXCoil(1).DXCoilType_Num, 33);
-    EXPECT_EQ(DXCoil(1).RatedTotCap(1), 2200);
-    EXPECT_EQ(DXCoil(1).RatedSHR(1), 0.865);
-    EXPECT_EQ(DXCoil(1).C1Te, 0);
-    EXPECT_EQ(DXCoil(1).C2Te, 0.80404);
-    EXPECT_EQ(DXCoil(1).C3Te, 0);
-    EXPECT_EQ(DXCoil(1).SH, 3);
+    ASSERT_EQ(1, state->dataDXCoils->NumDXCoils);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(1).DXCoilType_Num, 33);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(1).RatedTotCap(1), 2200);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(1).RatedSHR(1), 0.865);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(1).C1Te, 0);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(1).C2Te, 0.80404);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(1).C3Te, 0);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(1).SH, 3);
 }
 
 TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CompResidual)
@@ -2194,8 +2853,8 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CompResidual)
     Array1D<Real64> Par;
 
     // Allocate
-    NumCurves = 1; // CurveManager::NumCurves
-    PerfCurve.allocate(NumCurves);
+    state->dataCurveManager->NumCurves = 1; // CurveManager::NumCurves
+    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
 
     NumPar = 3;
     Par.allocate(NumPar);
@@ -2206,26 +2865,26 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CompResidual)
     Par(3) = CurveNum;
 
     // Inputs: parameters
-    PerfCurve(CurveNum).CurveType = CurveManager::BiQuadratic;
-    PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-    PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
-    PerfCurve(CurveNum).Coeff1 = 724.71125;  // Coefficient1 Constant
-    PerfCurve(CurveNum).Coeff2 = -21.867868; // Coefficient2 x
-    PerfCurve(CurveNum).Coeff3 = 0.52480042; // Coefficient3 x**2
-    PerfCurve(CurveNum).Coeff4 = -17.043566; // Coefficient4 y
-    PerfCurve(CurveNum).Coeff5 = -.40346383; // Coefficient5 y**2
-    PerfCurve(CurveNum).Coeff6 = 0.29573589; // Coefficient6 x*y
-    PerfCurve(CurveNum).Var1Min = 15;        // Minimum Value of x
-    PerfCurve(CurveNum).Var1Max = 65;        // Maximum Value of x
-    PerfCurve(CurveNum).Var2Min = -30;       // Minimum Value of y
-    PerfCurve(CurveNum).Var2Max = 15;        // Maximum Value of y
+    state->dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
+    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 724.71125;  // Coefficient1 Constant
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = -21.867868; // Coefficient2 x
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.52480042; // Coefficient3 x**2
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff4 = -17.043566; // Coefficient4 y
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff5 = -.40346383; // Coefficient5 y**2
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff6 = 0.29573589; // Coefficient6 x*y
+    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 15;        // Minimum Value of x
+    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 65;        // Maximum Value of x
+    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = -30;       // Minimum Value of y
+    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 15;        // Maximum Value of y
 
     // Run and Check
-    double CompResidual = HVACVariableRefrigerantFlow::CompResidual_FluidTCtrl(Te, Par);
+    double CompResidual = HVACVariableRefrigerantFlow::CompResidual_FluidTCtrl(*state, Te, Par);
     EXPECT_NEAR(1.652, CompResidual, 0.005);
 
     // Clean up
-    PerfCurve.deallocate();
+    state->dataCurveManager->PerfCurve.deallocate();
     Par.deallocate();
 }
 
@@ -2236,18 +2895,12 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_FanSpdResidualCool)
 
     using namespace DXCoils;
 
-    int NumPar;
     double FanSpdRto;
     double ZnSenLoad;
     double Th2;
     double TairInlet;
     double Garate;
     double BF;
-    Array1D<Real64> Par;
-
-    // Allocate
-    NumPar = 6;
-    Par.allocate(6);
 
     // Inputs:
     FanSpdRto = 0.5;
@@ -2256,18 +2909,10 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_FanSpdResidualCool)
     TairInlet = 25.55534;
     Garate = 0.20664;
     BF = 0.0592;
-    Par(1) = ZnSenLoad;
-    Par(2) = Th2;
-    Par(3) = TairInlet;
-    Par(4) = Garate;
-    Par(5) = BF;
-
+    std::array<Real64, 5> Par = {ZnSenLoad, Th2, TairInlet, Garate, BF};
     // Run and Check
-    double FanSpdResidual = FanSpdResidualCool(FanSpdRto, Par);
+    double FanSpdResidual = FanSpdResidualCool(*state, FanSpdRto, Par);
     EXPECT_NEAR(-0.707, FanSpdResidual, 0.0005);
-
-    // Clean up
-    Par.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_FanSpdResidualHeat)
@@ -2277,18 +2922,12 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_FanSpdResidualHeat)
 
     using namespace DXCoils;
 
-    int NumPar;
     double FanSpdRto;
     double ZnSenLoad;
     double Th2;
     double TairInlet;
     double Garate;
     double BF;
-    Array1D<Real64> Par;
-
-    // Allocate
-    NumPar = 6;
-    Par.allocate(6);
 
     // Inputs:
     FanSpdRto = 0.5;
@@ -2297,18 +2936,11 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_FanSpdResidualHeat)
     TairInlet = 20.236;
     Garate = 0.21136;
     BF = 0.1360;
-    Par(1) = ZnSenLoad;
-    Par(2) = Th2;
-    Par(3) = TairInlet;
-    Par(4) = Garate;
-    Par(5) = BF;
+    std::array<Real64, 5> Par = {ZnSenLoad, Th2, TairInlet, Garate, BF};
 
     // Run and Check
-    double FanSpdResidual = FanSpdResidualHeat(FanSpdRto, Par);
+    double FanSpdResidual = FanSpdResidualHeat(*state, FanSpdRto, Par);
     EXPECT_NEAR(-0.5459, FanSpdResidual, 0.0005);
-
-    // Clean up
-    Par.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CalcVRFIUAirFlow)
@@ -2320,8 +2952,6 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CalcVRFIUAirFlow)
     using namespace DXCoils;
     using namespace DataZoneEnergyDemands;
     using namespace EnergyPlus::Psychrometrics;
-    using DataEnvironment::OutBaroPress;
-
     int ZoneIndex;      // index to zone where the VRF Terminal Unit resides
     int CoolCoilIndex;  // index to VRFTU cooling coil
     int HeatCoilIndex;  // index to VRFTU heating coil
@@ -2336,44 +2966,45 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CalcVRFIUAirFlow)
 
     // Allocate
     int NumCoils = 2;
-    DXCoil.allocate(NumCoils);
+    state->dataDXCoils->DXCoil.allocate(NumCoils);
     int NumZones = 2;
-    ZoneSysEnergyDemand.allocate(NumZones);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(NumZones);
 
     // Common Inputs
     CoolCoilIndex = 1;
     HeatCoilIndex = 2;
     FanSpdRatio = 0;
     Wout = 1;
-    OutBaroPress = 101570;
-    InitializePsychRoutines();
+    state->dataEnvrn->OutBaroPress = 101570;
+    InitializePsychRoutines(*state);
 
-    DXCoil(CoolCoilIndex).C1Te = 0;
-    DXCoil(CoolCoilIndex).C2Te = 0.804;
-    DXCoil(CoolCoilIndex).C3Te = 0;
-    DXCoil(CoolCoilIndex).SH = 3.00;
-    DXCoil(CoolCoilIndex).SupplyFanIndex = 0;
-    DXCoil(HeatCoilIndex).C1Tc = -1.905;
-    DXCoil(HeatCoilIndex).C2Tc = 0.4333;
-    DXCoil(HeatCoilIndex).C3Tc = 0.0207;
-    DXCoil(HeatCoilIndex).SC = 5.00;
-    DXCoil(HeatCoilIndex).SupplyFanIndex = 0;
+    state->dataDXCoils->DXCoil(CoolCoilIndex).C1Te = 0;
+    state->dataDXCoils->DXCoil(CoolCoilIndex).C2Te = 0.804;
+    state->dataDXCoils->DXCoil(CoolCoilIndex).C3Te = 0;
+    state->dataDXCoils->DXCoil(CoolCoilIndex).SH = 3.00;
+    state->dataDXCoils->DXCoil(CoolCoilIndex).SupplyFanIndex = 0;
+    state->dataDXCoils->DXCoil(HeatCoilIndex).C1Tc = -1.905;
+    state->dataDXCoils->DXCoil(HeatCoilIndex).C2Tc = 0.4333;
+    state->dataDXCoils->DXCoil(HeatCoilIndex).C3Tc = 0.0207;
+    state->dataDXCoils->DXCoil(HeatCoilIndex).SC = 5.00;
+    state->dataDXCoils->DXCoil(HeatCoilIndex).SupplyFanIndex = 0;
 
     // Run and Check for Cooling Mode
     Mode = 0;
     Temp = 15;
     ZoneIndex = 1;
 
-    ZoneSysEnergyDemand(ZoneIndex).OutputRequiredToCoolingSP = -2716.6229;
-    ZoneSysEnergyDemand(ZoneIndex).OutputRequiredToHeatingSP = -45507.8487;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneIndex).OutputRequiredToCoolingSP = -2716.6229;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneIndex).OutputRequiredToHeatingSP = -45507.8487;
 
-    DXCoil(CoolCoilIndex).RatedAirMassFlowRate(1) = 0.2066;
-    DXCoil(CoolCoilIndex).InletAirTemp = 25.5553;
-    DXCoil(CoolCoilIndex).InletAirHumRat = 8.4682e-3;
-    DXCoil(CoolCoilIndex).InletAirEnthalpy = 47259.78;
+    state->dataDXCoils->DXCoil(CoolCoilIndex).RatedAirMassFlowRate(1) = 0.2066;
+    state->dataDXCoils->DXCoil(CoolCoilIndex).InletAirTemp = 25.5553;
+    state->dataDXCoils->DXCoil(CoolCoilIndex).InletAirHumRat = 8.4682e-3;
+    state->dataDXCoils->DXCoil(CoolCoilIndex).InletAirEnthalpy = 47259.78;
 
-    ControlVRFIUCoil(CoolCoilIndex,
-                     ZoneSysEnergyDemand(ZoneIndex).OutputRequiredToCoolingSP,
+    ControlVRFIUCoil(*state,
+                     CoolCoilIndex,
+                     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneIndex).OutputRequiredToCoolingSP,
                      25.5553,
                      8.4682e-3,
                      Temp,
@@ -2393,16 +3024,17 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CalcVRFIUAirFlow)
     Temp = 42;
     ZoneIndex = 2;
 
-    ZoneSysEnergyDemand(ZoneIndex).OutputRequiredToCoolingSP = 43167.2628;
-    ZoneSysEnergyDemand(ZoneIndex).OutputRequiredToHeatingSP = 4241.66099;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneIndex).OutputRequiredToCoolingSP = 43167.2628;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneIndex).OutputRequiredToHeatingSP = 4241.66099;
 
-    DXCoil(HeatCoilIndex).RatedAirMassFlowRate(1) = 0.21136;
-    DXCoil(HeatCoilIndex).InletAirTemp = 20.2362;
-    DXCoil(HeatCoilIndex).InletAirHumRat = 4.1053e-3;
-    DXCoil(HeatCoilIndex).InletAirEnthalpy = 30755.6253;
+    state->dataDXCoils->DXCoil(HeatCoilIndex).RatedAirMassFlowRate(1) = 0.21136;
+    state->dataDXCoils->DXCoil(HeatCoilIndex).InletAirTemp = 20.2362;
+    state->dataDXCoils->DXCoil(HeatCoilIndex).InletAirHumRat = 4.1053e-3;
+    state->dataDXCoils->DXCoil(HeatCoilIndex).InletAirEnthalpy = 30755.6253;
 
-    ControlVRFIUCoil(HeatCoilIndex,
-                     ZoneSysEnergyDemand(ZoneIndex).OutputRequiredToHeatingSP,
+    ControlVRFIUCoil(*state,
+                     HeatCoilIndex,
+                     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneIndex).OutputRequiredToHeatingSP,
                      20.2362,
                      4.1053e-3,
                      Temp,
@@ -2416,9 +3048,6 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CalcVRFIUAirFlow)
     EXPECT_NEAR(Toutlet, 38.37, 0.01);
     EXPECT_NEAR(Houtlet, 49113, 1);
     EXPECT_NEAR(SCact, 5.00, 0.01);
-
-    // Clean up
-    ZoneSysEnergyDemand.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CalcVRFIUTeTc)
@@ -2431,30 +3060,157 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CalcVRFIUTeTc)
 
     // Allocate
     int NumVRFCondenser = 1;
-    VRF.allocate(NumVRFCondenser);
+    state->dataHVACVarRefFlow->VRF.allocate(NumVRFCondenser);
     int NumTUList = 1;
-    TerminalUnitList.allocate(NumTUList);
+    state->dataHVACVarRefFlow->TerminalUnitList.allocate(NumTUList);
 
     // Common Inputs
     int IndexVRFCondenser = 1;
     int IndexTUList = 1;
 
-    TerminalUnitList(IndexTUList).NumTUInList = 2;
+    state->dataHVACVarRefFlow->TerminalUnitList(IndexTUList).NumTUInList = 2;
 
-    VRF(IndexVRFCondenser).ZoneTUListPtr = 1;
-    VRF(IndexVRFCondenser).AlgorithmIUCtrl = 0;
-    VRF(IndexVRFCondenser).EvapTempFixed = 3;
-    VRF(IndexVRFCondenser).CondTempFixed = 5;
+    state->dataHVACVarRefFlow->VRF(IndexVRFCondenser).ZoneTUListPtr = 1;
+    state->dataHVACVarRefFlow->VRF(IndexVRFCondenser).EvapTempFixed = 3;
+    state->dataHVACVarRefFlow->VRF(IndexVRFCondenser).CondTempFixed = 5;
 
+    // test fixed evap/cond temp method
+    state->dataHVACVarRefFlow->VRF(IndexVRFCondenser).AlgorithmIUCtrl = 0;
     // Run and Check
-    VRF(IndexVRFCondenser).CalcVRFIUTeTc_FluidTCtrl();
+    state->dataHVACVarRefFlow->VRF(IndexVRFCondenser).CalcVRFIUTeTc_FluidTCtrl(*state);
 
-    EXPECT_EQ(VRF(IndexVRFCondenser).IUEvaporatingTemp, 3);
-    EXPECT_EQ(VRF(IndexVRFCondenser).IUCondensingTemp, 5);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(IndexVRFCondenser).IUEvaporatingTemp, 3);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(IndexVRFCondenser).IUCondensingTemp, 5);
+
+    // test variable evap/cond temp method
+    state->dataHVACVarRefFlow->VRF(IndexVRFCondenser).AlgorithmIUCtrl = 1;
+    state->dataHVACVarRefFlow->VRF(IndexVRFCondenser).HeatRecoveryUsed = false;
+    state->dataHVACVarRefFlow->VRFTU.allocate(state->dataHVACVarRefFlow->TerminalUnitList(IndexTUList).NumTUInList);
+    state->dataHVACVarRefFlow->VRFTU(1).CoolCoilIndex = 1;
+    state->dataHVACVarRefFlow->VRFTU(1).HeatCoilIndex = 2;
+    state->dataHVACVarRefFlow->VRFTU(2).CoolCoilIndex = 3;
+    state->dataHVACVarRefFlow->VRFTU(2).HeatCoilIndex = 4;
+    state->dataHVACVarRefFlow->VRFTU(1).ZoneNum = 1;
+    state->dataHVACVarRefFlow->VRFTU(1).VRFSysNum = 1;
+    state->dataHVACVarRefFlow->VRFTU(2).ZoneNum = 2;
+    state->dataHVACVarRefFlow->VRFTU(2).VRFSysNum = 1;
+    state->dataHVACVarRefFlow->VRFTU(1).IndexToTUInTUList = 1;
+    state->dataHVACVarRefFlow->VRFTU(2).IndexToTUInTUList = 2;
+    state->dataHVACVarRefFlow->VRFTU(1).VRFTUInletNodeNum = 1;
+    state->dataHVACVarRefFlow->VRFTU(2).VRFTUInletNodeNum = 2;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).ZoneTUPtr.allocate(2);
+    state->dataHVACVarRefFlow->TerminalUnitList(1).ZoneTUPtr(1) = 1;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).ZoneTUPtr(2) = 2;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRCoolRequest.allocate(2);
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRCoolRequest = false;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRHeatRequest.allocate(2);
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRHeatRequest = false;
+    state->dataDXCoils->DXCoil.allocate(4); // 2 TUs each with a cooling and heating coil
+    for (int i = 1; i <= 2; ++i) {
+        state->dataDXCoils->DXCoil((i - 1) * 2 + 1).SH = 8.0 + double(i);
+        state->dataDXCoils->DXCoil((i - 1) * 2 + 1).C1Te = 1.0;
+        state->dataDXCoils->DXCoil((i - 1) * 2 + 1).C2Te = 0.0;
+        state->dataDXCoils->DXCoil((i - 1) * 2 + 1).C3Te = 0.0;
+        state->dataDXCoils->DXCoil((i - 1) * 2 + 2).SC = 6.0 + double(i);
+        state->dataDXCoils->DXCoil((i - 1) * 2 + 2).C1Tc = 1.0;
+        state->dataDXCoils->DXCoil((i - 1) * 2 + 2).C2Tc = 0.0;
+        state->dataDXCoils->DXCoil((i - 1) * 2 + 2).C3Tc = 0.0;
+    }
+    state->dataLoopNodes->Node.allocate(5);
+    state->dataLoopNodes->Node(1).Temp = 21.0; // TU 1 inlet node
+    state->dataLoopNodes->Node(1).HumRat = 0.011;
+    state->dataLoopNodes->Node(2).Temp = 21.0; // TU 2 inlet node
+    state->dataLoopNodes->Node(2).HumRat = 0.011;
+    state->dataHVACVarRefFlow->VRFTU(1).fanOutletNode = 3;
+    state->dataLoopNodes->Node(3).Temp = 23.0;    // TU 1 fan outlet node
+    state->dataLoopNodes->Node(3).HumRat = 0.011; // TU 1 fan outlet node
+    state->dataHVACVarRefFlow->VRFTU(2).fanOutletNode = 4;
+    state->dataLoopNodes->Node(4).Temp = 23.0;    // TU 2 fan outlet node
+    state->dataLoopNodes->Node(4).HumRat = 0.011; // TU 2 fan outlet node
+    state->dataHVACVarRefFlow->VRFTU(1).coilInNodeT = state->dataLoopNodes->Node(1).Temp;
+    state->dataHVACVarRefFlow->VRFTU(1).coilInNodeW = state->dataLoopNodes->Node(1).HumRat;
+    state->dataHVACVarRefFlow->VRFTU(2).coilInNodeT = state->dataLoopNodes->Node(2).Temp;
+    state->dataHVACVarRefFlow->VRFTU(2).coilInNodeW = state->dataLoopNodes->Node(2).HumRat;
+
+    state->dataHVACVarRefFlow->CoolingLoad.allocate(1);
+    state->dataHVACVarRefFlow->HeatingLoad.allocate(1);
+    state->dataHVACVarRefFlow->CoolingLoad(1) = true;
+    state->dataHVACVarRefFlow->HeatingLoad(1) = false;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(2);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -100.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -200.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).RemainingOutputReqToCoolSP = -1100.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).RemainingOutputReqToHeatSP = -1200.0;
+
+    state->dataHVACVarRefFlow->CompOnMassFlow = 0.0; // system is off
+    // Run and Check
+    state->dataHVACVarRefFlow->VRF(IndexVRFCondenser).CalcVRFIUTeTc_FluidTCtrl(*state);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(IndexVRFCondenser).IUEvaporatingTemp, 15); // default value, coil inlet temps higher than default
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(IndexVRFCondenser).IUCondensingTemp, 42);  // default value, coil inlet temps lower than default
+
+    state->dataHVACVarRefFlow->CompOnMassFlow = 0.1;
+    // system is on in cooling mode
+    state->dataHVACVarRefFlow->VRF(IndexVRFCondenser).CalcVRFIUTeTc_FluidTCtrl(*state);
+    // minimum coil surface temp of both cooling coils below default
+    EXPECT_LT(state->dataHVACVarRefFlow->VRF(IndexVRFCondenser).IUEvaporatingTemp, 15);
+    // default value, coil inlet temps lower than default
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(IndexVRFCondenser).IUCondensingTemp, 42);
+    Real64 saveCoolingEvapTemp = state->dataHVACVarRefFlow->VRF(IndexVRFCondenser).IUEvaporatingTemp;
+
+    // test blow thru fan
+    // adjust coil inlet temps for fan heat
+    state->dataHVACVarRefFlow->VRFTU(1).coilInNodeT = state->dataLoopNodes->Node(3).Temp;
+    state->dataHVACVarRefFlow->VRFTU(1).coilInNodeW = state->dataLoopNodes->Node(3).HumRat;
+    state->dataHVACVarRefFlow->VRFTU(2).coilInNodeT = state->dataLoopNodes->Node(3).Temp;
+    state->dataHVACVarRefFlow->VRFTU(2).coilInNodeW = state->dataLoopNodes->Node(3).HumRat;
+    state->dataHVACVarRefFlow->VRFTU(1).FanPlace = DataHVACGlobals::BlowThru;
+    state->dataHVACVarRefFlow->VRFTU(2).FanPlace = DataHVACGlobals::BlowThru;
+    // system is on in cooling mode
+    state->dataHVACVarRefFlow->VRF(IndexVRFCondenser).CalcVRFIUTeTc_FluidTCtrl(*state);
+    // fan heat added to coil inlet temp, coil surface temp should also be lower to overcome additional heat tranfer
+    EXPECT_LT(state->dataHVACVarRefFlow->VRF(IndexVRFCondenser).IUEvaporatingTemp, saveCoolingEvapTemp);
+    // default value, coil inlet temps lower than default
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(IndexVRFCondenser).IUCondensingTemp, 42);
+
+    state->dataHVACVarRefFlow->VRFTU(1).FanPlace = DataHVACGlobals::DrawThru;
+    state->dataHVACVarRefFlow->VRFTU(2).FanPlace = DataHVACGlobals::DrawThru;
+    // rest coil inlet temps
+    state->dataHVACVarRefFlow->VRFTU(1).coilInNodeT = state->dataLoopNodes->Node(1).Temp;
+    state->dataHVACVarRefFlow->VRFTU(1).coilInNodeW = state->dataLoopNodes->Node(1).HumRat;
+    state->dataHVACVarRefFlow->VRFTU(2).coilInNodeT = state->dataLoopNodes->Node(2).Temp;
+    state->dataHVACVarRefFlow->VRFTU(2).coilInNodeW = state->dataLoopNodes->Node(2).HumRat;
+    state->dataHVACVarRefFlow->CoolingLoad(1) = false;
+    state->dataHVACVarRefFlow->HeatingLoad(1) = true;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 300.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 200.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).RemainingOutputReqToCoolSP = 2000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).RemainingOutputReqToHeatSP = 1900.0;
+    // system is on in heating mode
+    state->dataHVACVarRefFlow->VRF(IndexVRFCondenser).CalcVRFIUTeTc_FluidTCtrl(*state);
+    // default value, coil inlet temps higher than default
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(IndexVRFCondenser).IUEvaporatingTemp, 15);
+    // maximum coil surface temp of both heating coils above default
+    EXPECT_GT(state->dataHVACVarRefFlow->VRF(IndexVRFCondenser).IUCondensingTemp, 42);
+    Real64 saveHeatingCondTemp = state->dataHVACVarRefFlow->VRF(IndexVRFCondenser).IUCondensingTemp;
+
+    // test blow thru fan
+    state->dataHVACVarRefFlow->VRFTU(1).FanPlace = DataHVACGlobals::BlowThru;
+    state->dataHVACVarRefFlow->VRFTU(2).FanPlace = DataHVACGlobals::BlowThru;
+    // adjust coil inlet temps for fan heat
+    state->dataHVACVarRefFlow->VRFTU(1).coilInNodeT = state->dataLoopNodes->Node(3).Temp;
+    state->dataHVACVarRefFlow->VRFTU(1).coilInNodeW = state->dataLoopNodes->Node(3).HumRat;
+    state->dataHVACVarRefFlow->VRFTU(2).coilInNodeT = state->dataLoopNodes->Node(3).Temp;
+    state->dataHVACVarRefFlow->VRFTU(2).coilInNodeW = state->dataLoopNodes->Node(3).HumRat;
+    // system is on in heating mode
+    state->dataHVACVarRefFlow->VRF(IndexVRFCondenser).CalcVRFIUTeTc_FluidTCtrl(*state);
+    // default value, coil inlet temps higher than default
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(IndexVRFCondenser).IUEvaporatingTemp, 15);
+    // fan heat added to coil inlet temp, coil surface temp should also be lower to account for less heat tranfer
+    EXPECT_LT(state->dataHVACVarRefFlow->VRF(IndexVRFCondenser).IUCondensingTemp, saveHeatingCondTemp);
 
     // Clean up
-    VRF.deallocate();
-    TerminalUnitList.deallocate();
+    state->dataHVACVarRefFlow->VRF.deallocate();
+    state->dataHVACVarRefFlow->TerminalUnitList.deallocate();
 }
 
 //*****************VRF-SysCurve Model
@@ -2473,8 +3229,6 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     Real64 LatOutputProvided(0.0); // function returns latent capacity [W]
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
-        " ",
         "AirConditioner:VariableRefrigerantFlow,",
         "  VRF Heat Pump,           !- Heat Pump Name",
         "  VRFCondAvailSched,       !- Availability Schedule Name",
@@ -3041,150 +3795,527 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::BeginEnvrnFlag = true;
-    DataSizing::CurZoneEqNum = 1;
-    DataEnvironment::OutBaroPress = 101325;          // sea level
-    DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
-    StdRhoAir = PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, 20.0, 0.0);
-    ZoneEqSizing.allocate(1);
-    ZoneSizingRunDone = true;
-    ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
-    ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(25);
-    ZoneEqSizing(CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataSize->CurZoneEqNum = 1;
+    state->dataEnvrn->OutBaroPress = 101325;            // sea level
+    state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
+    state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneSizingRunDone = true;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
 
-    FinalZoneSizing.allocate(1);
-    FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 0.566337; // 400 cfm * 3 tons = 1200 cfm
-    FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.566337;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337; // 400 cfm * 3 tons = 1200 cfm
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
 
-    ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
 
-    ProcessScheduleInput();   // read schedules
-    GetCurveInput();          // read curves
-    GetZoneData(ErrorsFound); // read zone data
+    ProcessScheduleInput(*state);     // read schedules
+    GetCurveInput(*state);            // read curves
+    GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
-    DXCoils::GetCoilsInputFlag = true; // remove this when clear_state gets added to DXCoils
-    GlobalNames::NumCoils = 0;         // remove this when clear_state gets added to GlobalNames
-    GlobalNames::CoilNames.clear();    // remove this when clear_state gets added to GlobalNames
+    GetZoneEquipmentData(*state);                                  // read equipment list and connections
+    ZoneInletAirNode = GetVRFTUZoneInletAirNode(*state, VRFTUNum); // trigger GetVRFInput by calling a mining function
 
-    GetZoneEquipmentData();                                // read equipment list and connections
-    ZoneInletAirNode = GetVRFTUZoneInletAirNode(VRFTUNum); // trigger GetVRFInput by calling a mining function
-
-    Schedule(VRF(VRFCond).SchedPtr).CurrentValue = 1.0;             // enable the VRF condenser
-    Schedule(VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;          // enable the terminal unit
-    Schedule(VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0;  // turn on fan
-    Schedule(VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 0.0; // set cycling fan operating mode
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRF(VRFCond).SchedPtr).CurrentValue = 1.0;            // enable the VRF condenser
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;         // enable the terminal unit
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0; // turn on fan
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue =
+        0.0; // set cycling fan operating mode
 
     // Test coil sizing
 
-    ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = 0.0; // set load = 0
-    ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = 0.0;
-    ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = 0.0; // set load = 0
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0;
+    state->dataAirLoop->AirLoopInputsFilled = true;
 
-    FinalZoneSizing(CurZoneEqNum).ZoneRetTempAtCoolPeak = 26.66667;
-    FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtCoolPeak = 0.01117049470250416; // AHRI condition at 80 F db / 67 F wb
-    Node(VRF(VRFCond).CondenserNodeNum).Temp = 35.0;                          // AHRI condition at 95 F db
-    Node(VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 35.0;                  // AHRI condition at 95 F db
-    Node(VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).HumRat = 0.01;                // don't care
-    FinalZoneSizing(CurZoneEqNum).CoolDDNum = 1;
-    FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax = 1;
-    DesDayWeath.allocate(1);
-    DesDayWeath(1).Temp.allocate(1);
-    DesDayWeath(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Temp(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax) = 35.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak = 26.66667;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak = 0.01117049470250416; // AHRI condition at 80 F db / 67 F wb
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp = 35.0;           // AHRI condition at 95 F db
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 35.0;   // AHRI condition at 95 F db
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).HumRat = 0.01; // don't care
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum = 1;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax = 1;
+    state->dataSize->DesDayWeath.allocate(1);
+    state->dataSize->DesDayWeath(1).Temp.allocate(1);
+    state->dataSize->DesDayWeath(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum)
+        .Temp(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax) = 35.0;
 
-    FinalZoneSizing(CurZoneEqNum).CoolDesTemp = 13.1;                   // 55.58 F
-    FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.009297628698818194; // humrat at 12.77777 C db / 12.6 C wb
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.1;                   // 55.58 F
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.009297628698818194; // humrat at 12.77777 C db / 12.6 C wb
 
-    SimulateVRF(
-        VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+    bool HeatingActive = false;
+    bool CoolingActive = false;
+    int OAUnitNum = 0;
+    Real64 OAUCoilOutTemp = 0.0;
+    bool ZoneEquipment = true;
+    state->dataAirLoop->AirLoopInputsFilled = true;
 
-    ASSERT_EQ(1, NumVRFCond);
+    SimulateVRF(*state,
+                state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
+                FirstHVACIteration,
+                CurZoneNum,
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
+                HeatingActive,
+                CoolingActive,
+                OAUnitNum,
+                OAUCoilOutTemp,
+                ZoneEquipment,
+                SysOutputProvided,
+                LatOutputProvided);
+
+    ASSERT_EQ(1, state->dataHVACVarRefFlow->NumVRFCond);
     ASSERT_EQ(ZoneInletAirNode,
-              ZoneEquipConfig(VRFTU(VRFTUNum).ZoneNum).InletNode(1)); // only 1 inlet node specified above in ZoneHVAC:EquipmentConnections
-    ASSERT_EQ(1.0, VRF(VRFCond).CoolingCombinationRatio);
-    EXPECT_NEAR(11176.29, VRF(VRFCond).CoolingCapacity, 0.01);
-    EXPECT_NEAR(11176.29, VRF(VRFCond).HeatingCapacity, 0.01);
-    EXPECT_EQ(0.0, VRF(VRFCond).DefrostPower);
+              state->dataZoneEquip->ZoneEquipConfig(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum)
+                  .InletNode(1)); // only 1 inlet node specified above in ZoneHVAC:EquipmentConnections
+    ASSERT_EQ(1.0, state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCombinationRatio);
+    EXPECT_NEAR(11170.869, state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity, 0.001);
+    EXPECT_NEAR(11170.869, state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity, 0.001);
+    EXPECT_EQ(0.0, state->dataHVACVarRefFlow->VRF(VRFCond).DefrostPower);
 
     // test defrost operation Issue #4950 - Reverse cycle with timed defrost = 0
 
     // set OA node temperatures for heating where defrost should be active
-    Node(VRF(VRFCond).CondenserNodeNum).Temp = VRF(VRFCond).MaxOATDefrost - 1.0;
-    Node(VRF(VRFCond).CondenserNodeNum).HumRat = 0.005;
-    Node(VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = Node(VRF(VRFCond).CondenserNodeNum).Temp;
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp =
+        state->dataHVACVarRefFlow->VRF(VRFCond).MaxOATDefrost - 1.0;
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).HumRat = 0.005;
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp =
+        state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp;
 
     // set zone load to heating
-    ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = VRF(VRFCond).HeatingCapacity; // set load equal to the VRF heating capacity
-    ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP =
-        VRF(VRFCond).HeatingCapacity + 1000.0; // simulates a dual Tstat with load to cooling SP > load to heating SP
-    ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = VRF(VRFCond).HeatingCapacity;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired =
+        state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity; // set load equal to the VRF heating capacity
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP =
+        state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity + 1000.0; // simulates a dual Tstat with load to cooling SP > load to heating SP
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity;
 
-    SimulateVRF(
-        VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+    SimulateVRF(*state,
+                state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
+                FirstHVACIteration,
+                CurZoneNum,
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
+                HeatingActive,
+                CoolingActive,
+                OAUnitNum,
+                OAUCoilOutTemp,
+                ZoneEquipment,
+                SysOutputProvided,
+                LatOutputProvided);
 
-    ASSERT_TRUE(VRF(VRFCond).DefrostPower > 0.0); // defrost power should be greater than 0
-    DefrostWatts = VRF(VRFCond).VRFCondRTF * (VRF(VRFCond).HeatingCapacity / 1.01667) * VRF(VRFCond).DefrostFraction;
-    ASSERT_EQ(DefrostWatts, VRF(VRFCond).DefrostPower); // defrost power calculation check
+    ASSERT_TRUE(state->dataHVACVarRefFlow->VRF(VRFCond).DefrostPower > 0.0); // defrost power should be greater than 0
+    DefrostWatts = state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondRTF * (state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity / 1.01667) *
+                   state->dataHVACVarRefFlow->VRF(VRFCond).DefrostFraction;
+    ASSERT_EQ(DefrostWatts, state->dataHVACVarRefFlow->VRF(VRFCond).DefrostPower); // defrost power calculation check
+
+    // test that correct performance curve is used (i.e., lo or hi performance curves based on OAT)
+    int DXHeatingCoilIndex = 2;
+    Real64 outWB = state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).OutAirWetBulb;
+    Real64 outHR = state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).HumRat;
+    // adjust for defrost factors
+    Real64 outT = 0.82 * state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp - 8.589;
+    Real64 OutdoorCoildw = max(1.0e-6, (outHR - PsyWFnTdpPb(*state, outT, state->dataEnvrn->OutBaroPress)));
+    Real64 FractionalDefrostTime = state->dataHVACVarRefFlow->VRF(VRFCond).DefrostFraction;
+    Real64 LoadDueToDefrost = (0.01 * FractionalDefrostTime) *
+                              (7.222 - state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp) *
+                              (state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity / 1.01667);
+    Real64 HeatingCapacityMultiplier = 0.909 - 107.33 * OutdoorCoildw;
+    Real64 InputPowerMultiplier = 0.90 - 36.45 * OutdoorCoildw;
+    // setup curve results
+    Real64 InletAirDryBulbC = state->dataDXCoils->DXCoilHeatInletAirDBTemp(DXHeatingCoilIndex); // load weighted average but only 1 coil here
+    Real64 OATatHeatCapBoundary = CurveValue(*state, state->dataHVACVarRefFlow->VRF(VRFCond).HeatBoundaryCurvePtr, InletAirDryBulbC);
+    Real64 OATatHeatEIRBoundary = CurveValue(*state, state->dataHVACVarRefFlow->VRF(VRFCond).EIRHeatBoundaryCurvePtr, InletAirDryBulbC);
+    Real64 TotHeatCapTempModFacLo = CurveValue(*state, state->dataHVACVarRefFlow->VRF(VRFCond).HeatCapFT, InletAirDryBulbC, outWB);
+    Real64 TotHeatEIRTempModFacLo = CurveValue(*state, state->dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFT, InletAirDryBulbC, outWB);
+    Real64 TotHeatCapTempModFacHi = CurveValue(*state, state->dataHVACVarRefFlow->VRF(VRFCond).HeatCapFTHi, InletAirDryBulbC, outWB);
+    Real64 TotHeatEIRTempModFacHi = CurveValue(*state, state->dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFTHi, InletAirDryBulbC, outWB);
+    Real64 EIRFPLRModFac = CurveValue(*state,
+                                      state->dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFPLR1,
+                                      max(state->dataHVACVarRefFlow->VRF(VRFCond).MinPLR, state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR));
+    Real64 TotalCondHeatingCapacityLo = state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity *
+                                        state->dataHVACVarRefFlow->HeatCombinationRatio(VRFCond) * TotHeatCapTempModFacLo * HeatingCapacityMultiplier;
+    Real64 ElecHeatingPowerLo = state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * TotHeatCapTempModFacLo * TotHeatEIRTempModFacLo *
+                                EIRFPLRModFac * InputPowerMultiplier;
+    Real64 TotalCondHeatingCapacityHi = state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity *
+                                        state->dataHVACVarRefFlow->HeatCombinationRatio(VRFCond) * TotHeatCapTempModFacHi * HeatingCapacityMultiplier;
+    Real64 ElecHeatingPowerHi = state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * TotHeatCapTempModFacHi * TotHeatEIRTempModFacHi *
+                                EIRFPLRModFac * InputPowerMultiplier;
+    Real64 HeatingPLRLo = (state->dataHVACVarRefFlow->VRF(VRFCond).TUHeatingLoad / state->dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionHeating) /
+                          TotalCondHeatingCapacityLo;
+    HeatingPLRLo += (LoadDueToDefrost * HeatingPLRLo) / TotalCondHeatingCapacityLo; // account for defrost
+    Real64 OperatingCondHeatCapLo =
+        TotalCondHeatingCapacityLo * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR; // = VRF(VRFCond).TotalHeatingCapacity
+    Real64 HeatingPLRHi = (state->dataHVACVarRefFlow->VRF(VRFCond).TUHeatingLoad / state->dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionHeating) /
+                          TotalCondHeatingCapacityHi;
+    HeatingPLRHi += (LoadDueToDefrost * HeatingPLRHi) / TotalCondHeatingCapacityHi; // account for defrost
+    Real64 OperatingCondHeatCapHi =
+        TotalCondHeatingCapacityHi * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR; // = VRF(VRFCond).TotalHeatingCapacity
+
+    // check that the performance curves yield different results (i.e., different curves are used)
+    EXPECT_NE(TotHeatCapTempModFacLo, TotHeatCapTempModFacHi);
+    EXPECT_NE(TotHeatEIRTempModFacLo, TotHeatEIRTempModFacHi);
+    EXPECT_NE(HeatingPLRLo, HeatingPLRHi);
+    EXPECT_NE(OperatingCondHeatCapLo, OperatingCondHeatCapHi);
+    EXPECT_NE(ElecHeatingPowerLo, ElecHeatingPowerHi);
+
+    // now test OAT versus boundary curve result and compare results
+    if (state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp > OATatHeatCapBoundary) { // use Hi curves
+        EXPECT_NEAR(HeatingPLRHi, state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR, 0.000000001);
+        EXPECT_NEAR(OperatingCondHeatCapHi, state->dataHVACVarRefFlow->VRF(VRFCond).TotalHeatingCapacity, 0.000000001);
+        ASSERT_TRUE(false);
+    } else { // use Lo curves
+        EXPECT_NEAR(HeatingPLRLo, state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR, 0.000000001);
+        EXPECT_NEAR(OperatingCondHeatCapLo, state->dataHVACVarRefFlow->VRF(VRFCond).TotalHeatingCapacity, 0.000000001);
+        ASSERT_TRUE(true);
+    }
+    if (state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp > OATatHeatEIRBoundary) { // use Hi curves
+        EXPECT_NEAR(ElecHeatingPowerHi, state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower, 0.000000001);
+        ASSERT_TRUE(false);
+    } else { // use Lo curves
+        EXPECT_NEAR(ElecHeatingPowerLo, state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower, 0.000000001);
+        ASSERT_TRUE(true);
+    }
+
+    // test that Hi curves are used for higher OAT
+    HeatingCapacityMultiplier = 1.0; // no defrost operation
+    InputPowerMultiplier = 1.0;      // no defrost operation
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp = 15;
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).OutAirWetBulb = 7.0;
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp =
+        state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp;
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFCond).VRFTUInletNodeNum).Temp =
+        20; // 20 C at 13 C WB (44.5 % RH) for indoor heating condition
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFCond).VRFTUInletNodeNum).HumRat =
+        0.0064516; // need to set these so OA mixer will get proper mixed air condition
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFCond).VRFTUInletNodeNum).Enthalpy = 36485.3142;
+    SimulateVRF(*state,
+                state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
+                FirstHVACIteration,
+                CurZoneNum,
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
+                HeatingActive,
+                CoolingActive,
+                OAUnitNum,
+                OAUCoilOutTemp,
+                ZoneEquipment,
+                SysOutputProvided,
+                LatOutputProvided);
+
+    outWB = state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).OutAirWetBulb; // no defrost adjustment to OA WB
+    InletAirDryBulbC = state->dataDXCoils->DXCoilHeatInletAirDBTemp(DXHeatingCoilIndex); // load weighted average but only 1 coil here
+    OATatHeatCapBoundary = CurveValue(*state, state->dataHVACVarRefFlow->VRF(VRFCond).HeatBoundaryCurvePtr, InletAirDryBulbC);
+    OATatHeatEIRBoundary = CurveValue(*state, state->dataHVACVarRefFlow->VRF(VRFCond).EIRHeatBoundaryCurvePtr, InletAirDryBulbC);
+    TotHeatCapTempModFacLo = CurveValue(*state, state->dataHVACVarRefFlow->VRF(VRFCond).HeatCapFT, InletAirDryBulbC, outWB);
+    TotHeatEIRTempModFacLo = CurveValue(*state, state->dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFT, InletAirDryBulbC, outWB);
+    TotHeatCapTempModFacHi = CurveValue(*state, state->dataHVACVarRefFlow->VRF(VRFCond).HeatCapFTHi, InletAirDryBulbC, outWB);
+    TotHeatEIRTempModFacHi = CurveValue(*state, state->dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFTHi, InletAirDryBulbC, outWB);
+    EIRFPLRModFac = CurveValue(
+        *state,
+        state->dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFPLR1,
+        max(state->dataHVACVarRefFlow->VRF(VRFCond).MinPLR, state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR)); // EIRFPLR1 is used when PLR <= 1
+    TotalCondHeatingCapacityLo = state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity * state->dataHVACVarRefFlow->HeatCombinationRatio(VRFCond) *
+                                 TotHeatCapTempModFacLo * HeatingCapacityMultiplier;
+    ElecHeatingPowerLo = state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * TotHeatCapTempModFacLo * TotHeatEIRTempModFacLo * EIRFPLRModFac *
+                         InputPowerMultiplier;
+    TotalCondHeatingCapacityHi = state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity * state->dataHVACVarRefFlow->HeatCombinationRatio(VRFCond) *
+                                 TotHeatCapTempModFacHi * HeatingCapacityMultiplier;
+    ElecHeatingPowerHi = state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * TotHeatCapTempModFacHi * TotHeatEIRTempModFacHi * EIRFPLRModFac *
+                         InputPowerMultiplier;
+    HeatingPLRLo = (state->dataHVACVarRefFlow->VRF(VRFCond).TUHeatingLoad / state->dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionHeating) /
+                   TotalCondHeatingCapacityLo;
+    OperatingCondHeatCapLo = TotalCondHeatingCapacityLo * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR; // = VRF(VRFCond).TotalHeatingCapacity
+    HeatingPLRHi = (state->dataHVACVarRefFlow->VRF(VRFCond).TUHeatingLoad / state->dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionHeating) /
+                   TotalCondHeatingCapacityHi;
+    OperatingCondHeatCapHi = TotalCondHeatingCapacityHi * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR; // = VRF(VRFCond).TotalHeatingCapacity
+
+    // check that the performance curves yield different results (i.e., different curves are used)
+    EXPECT_NE(TotHeatCapTempModFacLo, TotHeatCapTempModFacHi);
+    EXPECT_NE(TotHeatEIRTempModFacLo, TotHeatEIRTempModFacHi);
+    EXPECT_NE(HeatingPLRLo, HeatingPLRHi);
+    EXPECT_NE(OperatingCondHeatCapLo, OperatingCondHeatCapHi);
+    EXPECT_NE(ElecHeatingPowerLo, ElecHeatingPowerHi);
+
+    // now test OAT versus boundary curve result and compare results
+    if (state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp > OATatHeatCapBoundary) { // use Hi curves
+        EXPECT_NEAR(HeatingPLRHi, state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR, 0.000000001);
+        EXPECT_NEAR(OperatingCondHeatCapHi, state->dataHVACVarRefFlow->VRF(VRFCond).TotalHeatingCapacity, 0.000000001);
+        ASSERT_TRUE(true);
+    } else { // use Lo curves
+        EXPECT_NEAR(HeatingPLRLo, state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR, 0.000000001);
+        EXPECT_NEAR(OperatingCondHeatCapLo, state->dataHVACVarRefFlow->VRF(VRFCond).TotalHeatingCapacity, 0.000000001);
+        ASSERT_TRUE(false);
+    }
+    if (state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp > OATatHeatEIRBoundary) { // use Hi curves
+        EXPECT_NEAR(ElecHeatingPowerHi, state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower, 0.000000001);
+        EXPECT_LE(HeatingPLRHi, 1.0); // make sure correct EIRfPLR curve is used
+        ASSERT_TRUE(true);
+    } else { // use Lo curves
+        EXPECT_NEAR(ElecHeatingPowerLo, state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower, 0.000000001);
+        ASSERT_TRUE(false);
+    }
 
     // test other ThermostatPriority control types
-    ZoneThermostatSetPointHi.allocate(1);
-    ZoneThermostatSetPointHi = 24.0;
-    ZoneThermostatSetPointLo.allocate(1);
-    ZoneThermostatSetPointLo = 21.0;
-    TempControlType.allocate(1);
-    TempControlType = 4;
-    ZT.allocate(1);
-    ZT = 25.0;
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHi.allocate(1);
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHi = 24.0;
+    state->dataHeatBalFanSys->ZoneThermostatSetPointLo.allocate(1);
+    state->dataHeatBalFanSys->ZoneThermostatSetPointLo = 21.0;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType = 4;
+    state->dataHeatBalFanSys->ZT.allocate(1);
+    state->dataHeatBalFanSys->ZT = 25.0;
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode).Temp = 27.0;
 
-    ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired =
-        -VRF(VRFCond).CoolingCapacity * 0.75; // set load equal to the VRF cooling capacity adjusted for SHR
-    ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = -VRF(VRFCond).CoolingCapacity * 0.75;
-    ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = -VRF(VRFCond).CoolingCapacity * 0.75 - 1000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired =
+        -state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity * 0.75; // set load equal to the VRF cooling capacity adjusted for SHR
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP =
+        -state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity * 0.75;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP =
+        -state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity * 0.75 - 1000.0;
 
-    Node(VRF(VRFCond).CondenserNodeNum).Temp = 35.0;     // AHRI condition at 95 F db
-    Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).Temp = 27.0; // some zone return condition
-    Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).HumRat = 0.011;
-    Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).Enthalpy = 55194.0; // VRF DX coil model uses node enthalpy
-    Node(VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 35.0;    // AHRI condition at 95 F db
-    Node(VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).HumRat = 0.008; // don't care
-    Node(VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Enthalpy = 55698.0;
-    Node(VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).OutAirWetBulb = 19.652;
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp = 35.0;     // AHRI condition at 95 F db
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).Temp = 27.0; // some zone return condition
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).HumRat = 0.011;
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).Enthalpy =
+        55194.0;                                                                                              // VRF DX coil model uses node enthalpy
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 35.0; // AHRI condition at 95 F db
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).HumRat = 0.008; // don't care
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Enthalpy = 55698.0;
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).OutAirWetBulb = 19.652;
 
-    VRF(VRFCond).MasterZonePtr = 0;
-    VRF(VRFCond).MasterZoneTUIndex = 0;
-    VRF(VRFCond).ThermostatPriority = ThermostatOffsetPriority;
-    SimulateVRF(
-        VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+    state->dataHVACVarRefFlow->VRF(VRFCond).MasterZonePtr = 0;
+    state->dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex = 0;
+    state->dataHVACVarRefFlow->VRF(VRFCond).ThermostatPriority = iThermostatCtrlType::ThermostatOffsetPriority;
+
+    SimulateVRF(*state,
+                state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
+                FirstHVACIteration,
+                CurZoneNum,
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
+                HeatingActive,
+                CoolingActive,
+                OAUnitNum,
+                OAUCoilOutTemp,
+                ZoneEquipment,
+                SysOutputProvided,
+                LatOutputProvided);
     EXPECT_NEAR(SysOutputProvided,
-                ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired,
+                state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired,
                 5.0); // system output should be less than 0 and approx = to VRF capacity * SHR
 
+    // test that correct performance curve is used (i.e., lo or hi performance curves based on OAT)
+    int DXCoolingCoilIndex = 1;
+    Real64 InletAirWetBulbC = state->dataDXCoils->DXCoilCoolInletAirWBTemp(DXCoolingCoilIndex); // load weighted average but only 1 coil here
+    Real64 OATatCoolCapBoundary = CurveValue(*state, state->dataHVACVarRefFlow->VRF(VRFCond).CoolBoundaryCurvePtr, InletAirWetBulbC);
+    Real64 OATatCoolEIRBoundary = CurveValue(*state, state->dataHVACVarRefFlow->VRF(VRFCond).EIRCoolBoundaryCurvePtr, InletAirWetBulbC);
+    Real64 TotCoolCapTempModFacLo = CurveValue(*state,
+                                               state->dataHVACVarRefFlow->VRF(VRFCond).CoolCapFT,
+                                               InletAirWetBulbC,
+                                               state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp);
+    Real64 TotCoolEIRTempModFacLo = CurveValue(*state,
+                                               state->dataHVACVarRefFlow->VRF(VRFCond).CoolEIRFT,
+                                               InletAirWetBulbC,
+                                               state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp);
+    Real64 TotCoolCapTempModFacHi = CurveValue(*state,
+                                               state->dataHVACVarRefFlow->VRF(VRFCond).CoolCapFTHi,
+                                               InletAirWetBulbC,
+                                               state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp);
+    Real64 TotCoolEIRTempModFacHi = CurveValue(*state,
+                                               state->dataHVACVarRefFlow->VRF(VRFCond).CoolEIRFTHi,
+                                               InletAirWetBulbC,
+                                               state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp);
+    Real64 TotalCondCoolingCapacityLo =
+        state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity * state->dataHVACVarRefFlow->CoolCombinationRatio(VRFCond) * TotCoolCapTempModFacLo;
+    Real64 ElecCoolingPowerLo = state->dataHVACVarRefFlow->VRF(VRFCond).RatedCoolingPower * TotCoolCapTempModFacLo * TotCoolEIRTempModFacLo;
+    Real64 TotalCondCoolingCapacityHi =
+        state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity * state->dataHVACVarRefFlow->CoolCombinationRatio(VRFCond) * TotCoolCapTempModFacHi;
+    Real64 ElecCoolingPowerHi = state->dataHVACVarRefFlow->VRF(VRFCond).RatedCoolingPower * TotCoolCapTempModFacHi * TotCoolEIRTempModFacHi;
+    Real64 CoolingPLRLo = (state->dataHVACVarRefFlow->VRF(VRFCond).TUCoolingLoad / state->dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionCooling) /
+                          TotalCondCoolingCapacityLo;
+    Real64 OperatingCondCoolCapLo =
+        TotalCondCoolingCapacityLo * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR; // = VRF(VRFCond).TotalCoolingCapacity
+    Real64 CoolingPLRHi = (state->dataHVACVarRefFlow->VRF(VRFCond).TUCoolingLoad / state->dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionCooling) /
+                          TotalCondCoolingCapacityHi;
+    Real64 OperatingCondCoolCapHi =
+        TotalCondCoolingCapacityHi * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR; // = VRF(VRFCond).TotalCoolingCapacity
+
+    // check that the performance curves yield different results (i.e., different curves are used)
+    EXPECT_NE(TotCoolCapTempModFacLo, TotCoolCapTempModFacHi);
+    EXPECT_NE(TotCoolEIRTempModFacLo, TotCoolEIRTempModFacHi);
+    EXPECT_NE(CoolingPLRLo, CoolingPLRHi);
+    EXPECT_NE(OperatingCondCoolCapLo, OperatingCondCoolCapHi);
+    EXPECT_NE(ElecCoolingPowerLo, ElecCoolingPowerHi);
+
+    // now test OAT versus boundary curve result and compare results
+    if (state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp > OATatCoolCapBoundary) { // use Hi curves
+        EXPECT_NEAR(CoolingPLRHi, state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR, 0.000000001);
+        EXPECT_GT(CoolingPLRHi, 1.0);
+        EXPECT_NEAR(OperatingCondCoolCapHi, state->dataHVACVarRefFlow->VRF(VRFCond).TotalCoolingCapacity, 0.000000001);
+        ASSERT_TRUE(true);
+    } else { // use Lo curves
+        EXPECT_NEAR(CoolingPLRLo, state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR, 0.000000001);
+        EXPECT_NEAR(OperatingCondCoolCapLo, state->dataHVACVarRefFlow->VRF(VRFCond).TotalCoolingCapacity, 0.000000001);
+        ASSERT_TRUE(false);
+    }
+    if (state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp > OATatCoolEIRBoundary) { // use Hi curves
+        EXPECT_NEAR(ElecCoolingPowerHi, state->dataHVACVarRefFlow->VRF(VRFCond).ElecCoolingPower, 0.000000001);
+        ASSERT_TRUE(true);
+    } else { // use Lo curves
+        EXPECT_NEAR(ElecCoolingPowerLo, state->dataHVACVarRefFlow->VRF(VRFCond).ElecCoolingPower, 0.000000001);
+        ASSERT_TRUE(false);
+    }
+
     // ensure that TU turns off when fan heat exceeds the heating load
-    ZT = 20.0;                                       // set zone temp below heating SP (SP=21) to ensure heating mode
-    Node(VRF(VRFCond).CondenserNodeNum).Temp = 19.0; // within the heating temperature range of VRF outdoor unit
-    Node(VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 19.0;
-    ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = 400.0; // set load equal to small value less than expected fan heat
-    ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = 500.0;
-    ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 400.0;
-    Schedule(VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 1.0; // set constant fan operating mode
-    SimulateVRF(
-        VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+    state->dataHeatBalFanSys->ZT = 20.0; // set zone temp below heating SP (SP=21) to ensure heating mode
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode).Temp = 20.0;
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).Temp =
+        20; // 20 C at 13 C WB (44.5 % RH) for indoor heating condition
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).HumRat =
+        0.0064516; // need to set these so OA mixer will get proper mixed air condition
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).Enthalpy = 36485.3142;
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp =
+        20.0; // within the heating temperature range of VRF outdoor unit
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 19.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired =
+        400.0; // set load equal to small value less than expected fan heat
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = 500.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 400.0;
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue =
+        1.0; // set constant fan operating mode
+    SimulateVRF(*state,
+                state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
+                FirstHVACIteration,
+                CurZoneNum,
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
+                HeatingActive,
+                CoolingActive,
+                OAUnitNum,
+                OAUCoilOutTemp,
+                ZoneEquipment,
+                SysOutputProvided,
+                LatOutputProvided);
     EXPECT_EQ(SysOutputProvided,
               0.0); // for this system with 0 no load flow rate output should be = 0 when fan heat at very low TU PLR (1E-20) is greater than load
-    EXPECT_EQ(VRF(VRFCond).VRFCondPLR, 0.0); // system should be off
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR, 0.0); // system should be off
 
     // ensure that TU operates when fan heat does not exceed the heating load
-    ZT = 20.0;                                       // set zone temp below heating SP (SP=21) to ensure heating mode
-    Node(VRF(VRFCond).CondenserNodeNum).Temp = 19.0; // within the heating temperature range of VRF outdoor unit
-    Node(VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 19.0;
-    ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = 800.0; // set load equal to small value less than expected fan heat
-    ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = 900.0;
-    ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 800.0;
-    Schedule(VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 1.0; // set constant fan operating mode
-    SimulateVRF(
-        VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
-    EXPECT_NEAR(SysOutputProvided, ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired, 5.0); // system should meet the heating load
-    EXPECT_GT(VRF(VRFCond).VRFCondPLR, 0.0);                                                      // system should be on
+    state->dataHeatBalFanSys->ZT = 20.0; // set zone temp below heating SP (SP=21) to ensure heating mode
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp =
+        19.0; // within the heating temperature range of VRF outdoor unit
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 19.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired =
+        800.0; // set load equal to small value less than expected fan heat
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = 900.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 800.0;
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue =
+        1.0; // set constant fan operating mode
+    SimulateVRF(*state,
+                state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
+                FirstHVACIteration,
+                CurZoneNum,
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
+                HeatingActive,
+                CoolingActive,
+                OAUnitNum,
+                OAUCoilOutTemp,
+                ZoneEquipment,
+                SysOutputProvided,
+                LatOutputProvided);
+    EXPECT_NEAR(SysOutputProvided,
+                state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired,
+                5.0);                                                   // system should meet the heating load
+    EXPECT_GT(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR, 0.0); // system should be on
+
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp =
+        21.0; // outside the heating temperature range (-20 to 20) of VRF outdoor unit
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 21.0;
+    SimulateVRF(*state,
+                state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
+                FirstHVACIteration,
+                CurZoneNum,
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
+                HeatingActive,
+                CoolingActive,
+                OAUnitNum,
+                OAUCoilOutTemp,
+                ZoneEquipment,
+                SysOutputProvided,
+                LatOutputProvided);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR, 0.0); // system should be off
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate,
+              0.0); // flow should be = 0 at no load flow rate for constant fan mode in this example
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum).MassFlowRate,
+              0.0); // flow should be = 0 at no load flow rate for constant fan mode in this example
+
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue =
+        0.0; // set cycling fan operating mode
+    SimulateVRF(*state,
+                state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
+                FirstHVACIteration,
+                CurZoneNum,
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
+                HeatingActive,
+                CoolingActive,
+                OAUnitNum,
+                OAUCoilOutTemp,
+                ZoneEquipment,
+                SysOutputProvided,
+                LatOutputProvided);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR, 0.0); // system should also be off
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate,
+              0.0); // flow should be = 0 for cycling fan mode
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum).MassFlowRate,
+              0.0); // flow should be = 0 for cycling fan mode
+
+    // Test node connection function
+    auto &thisTU = state->dataHVACVarRefFlow->VRFTU(VRFTUNum);
+    // current configuration is draw through fan
+    EXPECT_EQ(thisTU.FanPlace, DataHVACGlobals::DrawThru);
+    EXPECT_FALSE(ErrorsFound);
+    CheckVRFTUNodeConnections(*state, VRFTUNum, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);      // nodes are connected correctly
+    thisTU.VRFTUOutletNodeNum += 1; // change index of comp node
+    CheckVRFTUNodeConnections(*state, VRFTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
+    ErrorsFound = false;
+    thisTU.VRFTUOutletNodeNum -= 1; // revert previous change
+    thisTU.coolCoilAirInNode += 1;  // change index of comp node
+    CheckVRFTUNodeConnections(*state, VRFTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
+    ErrorsFound = false;
+    thisTU.coolCoilAirInNode -= 1;  // revert previous change
+    thisTU.coolCoilAirOutNode -= 1; // change index of comp node (watch for array bounds)
+    CheckVRFTUNodeConnections(*state, VRFTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
+    ErrorsFound = false;
+    thisTU.coolCoilAirOutNode += 1; // revert previous change
+    thisTU.heatCoilAirInNode -= 1;  // change index of comp node (watch for array bounds)
+    CheckVRFTUNodeConnections(*state, VRFTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
+    ErrorsFound = false;
+    thisTU.heatCoilAirInNode += 1;  // revert previous change
+    thisTU.heatCoilAirOutNode -= 1; // change index of comp node (watch for array bounds)
+    CheckVRFTUNodeConnections(*state, VRFTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound);       // nodes are not connected correctly
+    thisTU.heatCoilAirOutNode += 1; // revert previous change
+
+    // switch fan placement
+    thisTU.FanPlace = DataHVACGlobals::BlowThru;
+    EXPECT_TRUE(thisTU.OAMixerUsed);
+    // correct node connections
+    thisTU.fanInletNode = thisTU.VRFTUOAMixerMixedNodeNum;
+    thisTU.fanOutletNode = thisTU.coolCoilAirInNode;
+    thisTU.heatCoilAirOutNode = thisTU.VRFTUOutletNodeNum;
+    ErrorsFound = false;
+    CheckVRFTUNodeConnections(*state, VRFTUNum, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound); // nodes are connected correctly
+
+    // change OA mixer return node
+    thisTU.VRFTUOAMixerRetNodeNum += 1;
+    CheckVRFTUNodeConnections(*state, VRFTUNum, ErrorsFound);
+    EXPECT_TRUE(ErrorsFound); // nodes are not connected correctly
 }
 
 TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
@@ -3195,8 +4326,6 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
     int VRFTUNum(1);         // index to VRF terminal unit
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
-        " ",
         "AirConditioner:VariableRefrigerantFlow,",
         "  VRF Heat Pump,           !- Heat Pump Name",
         "  VRFCondAvailSched,       !- Availability Schedule Name",
@@ -3764,44 +4893,45 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::BeginEnvrnFlag = true;
-    DataSizing::CurZoneEqNum = 1;
-    DataEnvironment::OutBaroPress = 101325;          // sea level
-    DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
-    StdRhoAir = PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, 20.0, 0.0);
-    ZoneEqSizing.allocate(1);
-    ZoneSizingRunDone = true;
-    ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
-    ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(25);
-    ZoneEqSizing(CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataSize->CurZoneEqNum = 1;
+    state->dataEnvrn->OutBaroPress = 101325;            // sea level
+    state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
+    state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneSizingRunDone = true;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
 
-    FinalZoneSizing.allocate(1);
-    FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 0.566337; // 400 cfm * 3 tons = 1200 cfm
-    FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.566337;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337; // 400 cfm * 3 tons = 1200 cfm
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
 
-    ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
 
-    ProcessScheduleInput();   // read schedules
-    GetCurveInput();          // read curves
-    GetZoneData(ErrorsFound); // read zone data
+    ProcessScheduleInput(*state);     // read schedules
+    GetCurveInput(*state);            // read curves
+    GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData(); // read equipment list and connections
-    GetVRFInputData(ErrorsFound);
+    GetZoneEquipmentData(*state); // read equipment list and connections
+    GetVRFInputData(*state, ErrorsFound);
     EXPECT_TRUE(ErrorsFound);
-    EXPECT_EQ(0, VRFTU(VRFTUNum).VRFSysNum);
-    EXPECT_EQ(0, VRFTU(VRFTUNum).ZoneNum);
-    EXPECT_EQ(0, VRFTU(VRFTUNum).TUListIndex);
-    EXPECT_EQ(0, VRFTU(VRFTUNum).IndexToTUInTUList);
+    EXPECT_EQ(0, state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum);
+    EXPECT_EQ(1, state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum);
+    EXPECT_EQ(0, state->dataHVACVarRefFlow->VRFTU(VRFTUNum).TUListIndex);
+    EXPECT_EQ(0, state->dataHVACVarRefFlow->VRFTU(VRFTUNum).IndexToTUInTUList);
 
-    // clean up
-    ZoneSysEnergyDemand.deallocate();
+    // Additional tests for fuel type input
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFTUNum).FuelType, "Electricity");
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFTUNum).FuelTypeNum, DataGlobalConstants::ResourceType::Electricity);
 }
 
 TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
 {
 
-    static std::string const RoutineName("VRFTest_WaterCooled");
+    static constexpr std::string_view RoutineName("VRFTest_WaterCooled");
     bool ErrorsFound(false);       // function returns true on error
     bool FirstHVACIteration(true); // simulate the first pass through HVAC simulation, use false for next iteration
     int VRFCond(1);                // index to VRF condenser
@@ -3811,17 +4941,11 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     int ZoneInletAirNode(0);       // zone inlet node number
     Real64 SysOutputProvided(0.0); // function returns sensible capacity [W]
     Real64 LatOutputProvided(0.0); // function returns latent capacity [W]
-    Real64 CurLoad(0.0);
-    Real64 MaxLoad(0.0);
-    Real64 MinLoad(0.0);
-    Real64 OptLoad(0.0);
-    int LoopNum(0);
     Real64 rho(0.0);
     Real64 Cp(0.0);
     Real64 CondVolFlowRate(0.0);
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         " BUILDING, VRFTest_SysCurve_WaterCooled, 0.0, Suburbs, .04, .4, FullExterior, 25, 6;",
         " ",
         "AirConditioner:VariableRefrigerantFlow,",
@@ -4619,151 +5743,244 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::BeginEnvrnFlag = true;
-    DataSizing::CurZoneEqNum = 1;
-    DataEnvironment::OutBaroPress = 101325;          // sea level
-    DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
-    DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, 20.0, 0.0);
-    DataSizing::ZoneEqSizing.allocate(1);
-    DataSizing::ZoneSizingRunDone = true;
-    DataSizing::ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
-    DataSizing::ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(25);
-    DataSizing::ZoneEqSizing(CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataSize->CurZoneEqNum = 1;
+    state->dataEnvrn->OutBaroPress = 101325;            // sea level
+    state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
+    state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneSizingRunDone = true;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
 
-    DataSizing::FinalZoneSizing.allocate(1);
-    DataSizing::FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 0.566337; // 400 cfm * 3 tons = 1200 cfm
-    DataSizing::FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.566337;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337; // 400 cfm * 3 tons = 1200 cfm
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
 
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
 
     Array2D<Real64> DummyArray; // Sky temperature
-    DataGlobals::NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
-    DummyArray.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+    state->dataGlobal->NumOfTimeStepInHour = 4;
+    state->dataGlobal->MinutesPerTimeStep = 60 / state->dataGlobal->NumOfTimeStepInHour;
+    DummyArray.allocate(state->dataGlobal->NumOfTimeStepInHour, 24);
     DummyArray = 0.0;
-    ScheduleManager::GetScheduleValuesForDay(1, DummyArray, 58, 3);
+    ScheduleManager::GetScheduleValuesForDay(*state, 1, DummyArray, 58, 3);
 
-    CurveManager::GetCurveInput();                // read curves
-    HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
+    CurveManager::GetCurveInput(*state);                  // read curves
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
-    DataZoneEquipment::GetZoneEquipmentData(); // read equipment list and connections
+    DataZoneEquipment::GetZoneEquipmentData(*state); // read equipment list and connections
 
-    BranchInputManager::ManageBranchInput();
+    BranchInputManager::ManageBranchInput(*state);
     // Get plant loop data
-    PlantManager::GetPlantLoopData();
-    PlantManager::GetPlantInput();
+    PlantManager::GetPlantLoopData(*state);
+    PlantManager::GetPlantInput(*state);
 
-    HVACVariableRefrigerantFlow::MyEnvrnFlag = true;
-    ZoneInletAirNode = GetVRFTUZoneInletAirNode(VRFTUNum); // trigger GetVRFInput by calling a mining function
+    state->dataHVACVarRefFlow->MyEnvrnFlag = true;
+    ZoneInletAirNode = GetVRFTUZoneInletAirNode(*state, VRFTUNum); // trigger GetVRFInput by calling a mining function
+    state->dataAirLoop->AirLoopInputsFilled = true;
 
-    Schedule(VRF(VRFCond).SchedPtr).CurrentValue = 1.0;             // enable the VRF condenser
-    Schedule(VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;          // enable the terminal unit
-    Schedule(VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0;  // turn on fan
-    Schedule(VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 0.0; // set cycling fan operating mode
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRF(VRFCond).SchedPtr).CurrentValue = 1.0;            // enable the VRF condenser
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;         // enable the terminal unit
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0; // turn on fan
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue =
+        0.0; // set cycling fan operating mode
 
     // Test coil sizing
 
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = 0.0; // set load = 0
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = 0.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = 0.0; // set load = 0
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0;
 
-    DataSizing::FinalZoneSizing(CurZoneEqNum).ZoneRetTempAtCoolPeak = 26.66667;
-    DataSizing::FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtCoolPeak = 0.01117049470250416; // AHRI condition at 80 F db / 67 F wb
-    DataLoopNode::Node(VRF(VRFCond).CondenserNodeNum).Temp = 35.0;                        // AHRI condition at 95 F db
-    DataLoopNode::Node(VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 35.0;                // AHRI condition at 95 F db
-    DataLoopNode::Node(VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).HumRat = 0.01;              // don't care
-    DataSizing::FinalZoneSizing(CurZoneEqNum).CoolDDNum = 1;
-    DataSizing::FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax = 1;
-    DataSizing::DesDayWeath.allocate(1);
-    DataSizing::DesDayWeath(1).Temp.allocate(1);
-    DataSizing::DesDayWeath(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Temp(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax) = 35.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak = 26.66667;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak = 0.01117049470250416; // AHRI condition at 80 F db / 67 F wb
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp = 35.0;           // AHRI condition at 95 F db
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 35.0;   // AHRI condition at 95 F db
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).HumRat = 0.01; // don't care
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum = 1;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax = 1;
+    state->dataSize->DesDayWeath.allocate(1);
+    state->dataSize->DesDayWeath(1).Temp.allocate(1);
+    state->dataSize->DesDayWeath(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum)
+        .Temp(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax) = 35.0;
 
-    DataSizing::FinalZoneSizing(CurZoneEqNum).CoolDesTemp = 13.1;                   // 55.58 F
-    DataSizing::FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.009297628698818194; // humrat at 12.77777 C db / 12.6 C wb
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.1;                   // 55.58 F
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.009297628698818194; // humrat at 12.77777 C db / 12.6 C wb
 
-    SizingManager::GetPlantSizingInput();
-    PlantManager::InitOneTimePlantSizingInfo(1);
-    PlantManager::SizePlantLoop(1, true);
-    PlantManager::InitLoopEquip = true;
+    SizingManager::GetPlantSizingInput(*state);
+    PlantManager::InitOneTimePlantSizingInfo(*state, 1);
+    PlantManager::SizePlantLoop(*state, 1, true);
     // call air-side VRF
-    SimulateVRF(
-        VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+    bool HeatingActive = false;
+    bool CoolingActive = false;
+    int OAUnitNum = 0;
+    Real64 OAUCoilOutTemp = 0.0;
+    bool ZoneEquipment = true;
+
+    SimulateVRF(*state,
+                state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
+                FirstHVACIteration,
+                CurZoneNum,
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
+                HeatingActive,
+                CoolingActive,
+                OAUnitNum,
+                OAUCoilOutTemp,
+                ZoneEquipment,
+                SysOutputProvided,
+                LatOutputProvided);
+
     // call plant-side VRF
-    SimVRFCondenserPlant(SimPlantEquipTypes(VRF(VRFCond).VRFPlantTypeOfNum),
-                         VRF(VRFCond).VRFPlantTypeOfNum,
-                         VRF(VRFCond).Name,
-                         VRFCond,
-                         FirstHVACIteration,
-                         InitLoopEquip,
-                         CurLoad,
-                         MaxLoad,
-                         MinLoad,
-                         OptLoad,
-                         LoopNum);
+    auto vrfCondPtr = HVACVariableRefrigerantFlow::VRFCondenserEquipment::factory(*state, state->dataHVACVarRefFlow->VRF(VRFCond).Name);
+    PlantLocation dummyLoc;
+    dummyLoc.loopNum = dynamic_cast<HVACVariableRefrigerantFlow::VRFCondenserEquipment *>(vrfCondPtr)->SourceLoopNum;
+    vrfCondPtr->onInitLoopEquip(*state, dummyLoc);
 
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = -1000.0; // set cooling load
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = -1000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = -2000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = -1000.0; // set cooling load
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = -1000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = -2000.0;
 
-    BeginEnvrnFlag = true;
-    DataLoopNode::Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).Temp = 24.0;
-    DataLoopNode::Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).HumRat = 0.0093;
-    DataLoopNode::Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).Enthalpy = 47794.1;
-    DataEnvironment::OutDryBulbTemp = 35.0;
-    DataEnvironment::OutHumRat = 0.017767; // 50% RH
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutWetBulbTemp = 26.045;
-    SimulateVRF(
-        VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
-    EXPECT_TRUE(VRF(VRFCond).VRFCondPLR > 0.0);
-    EXPECT_NEAR(SysOutputProvided, ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP, 1.0);
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode).Temp = 24.0;
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode).HumRat = 0.0093;
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode).Enthalpy = 47794.1;
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).Temp = 24.0;
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).HumRat = 0.0093;
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).Enthalpy = 47794.1;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutHumRat = 0.017767; // 50% RH
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutWetBulbTemp = 26.045;
+    SimulateVRF(*state,
+                state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
+                FirstHVACIteration,
+                CurZoneNum,
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
+                HeatingActive,
+                CoolingActive,
+                OAUnitNum,
+                OAUCoilOutTemp,
+                ZoneEquipment,
+                SysOutputProvided,
+                LatOutputProvided);
+    EXPECT_TRUE(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR > 0.0);
+    EXPECT_NEAR(SysOutputProvided, state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP, 1.0);
 
-    rho = GetDensityGlycol(
-        PlantLoop(VRF(VRFCond).SourceLoopNum).FluidName, PlantSizData(1).ExitTemp, PlantLoop(VRF(VRFCond).SourceLoopNum).FluidIndex, RoutineName);
-    Cp = GetSpecificHeatGlycol(
-        PlantLoop(VRF(VRFCond).SourceLoopNum).FluidName, PlantSizData(1).ExitTemp, PlantLoop(VRF(VRFCond).SourceLoopNum).FluidIndex, RoutineName);
-    CondVolFlowRate = max(VRF(VRFCond).CoolingCapacity, VRF(VRFCond).HeatingCapacity) / (PlantSizData(1).DeltaT * Cp * rho);
+    rho = GetDensityGlycol(*state,
+                           state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidName,
+                           state->dataSize->PlantSizData(1).ExitTemp,
+                           state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidIndex,
+                           RoutineName);
+    Cp = GetSpecificHeatGlycol(*state,
+                               state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidName,
+                               state->dataSize->PlantSizData(1).ExitTemp,
+                               state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidIndex,
+                               RoutineName);
+    CondVolFlowRate = max(state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity, state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity) /
+                      (state->dataSize->PlantSizData(1).DeltaT * Cp * rho);
 
-    EXPECT_DOUBLE_EQ(CondVolFlowRate, VRF(VRFCond).WaterCondVolFlowRate);
+    EXPECT_DOUBLE_EQ(CondVolFlowRate, state->dataHVACVarRefFlow->VRF(VRFCond).WaterCondVolFlowRate);
 
-    rho = GetDensityGlycol(
-        PlantLoop(VRF(VRFCond).SourceLoopNum).FluidName, InitConvTemp, PlantLoop(VRF(VRFCond).SourceLoopNum).FluidIndex, RoutineName);
-    EXPECT_DOUBLE_EQ(VRF(VRFCond).WaterCondenserDesignMassFlow, (VRF(VRFCond).WaterCondVolFlowRate * rho));
+    rho = GetDensityGlycol(*state,
+                           state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidName,
+                           DataGlobalConstants::InitConvTemp,
+                           state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidIndex,
+                           RoutineName);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).WaterCondenserDesignMassFlow,
+                     (state->dataHVACVarRefFlow->VRF(VRFCond).WaterCondVolFlowRate * rho));
 
     // set zone load to heating
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired =
-        VRF(VRFCond).HeatingCapacity; // set load equal to the VRF heating capacity
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP =
-        VRF(VRFCond).HeatingCapacity + 1000.0; // simulates a dual Tstat with load to cooling SP > load to heating SP
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = VRF(VRFCond).HeatingCapacity;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired =
+        state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity; // set load equal to the VRF heating capacity
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP =
+        state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity + 1000.0; // simulates a dual Tstat with load to cooling SP > load to heating SP
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity;
 
-    DataLoopNode::Node(VRF(VRFCond).CondenserNodeNum).Temp = 7.0;             // water inlet temperature
-    DataLoopNode::Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).Temp = 20.0;        // TU inlet air temp
-    DataLoopNode::Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).HumRat = 0.0056;    // TU inlet air humrat
-    DataLoopNode::Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).Enthalpy = 34823.5; // TU inlet air enthalpy
-    DataEnvironment::OutDryBulbTemp = 5.0;
-    DataEnvironment::OutHumRat = 0.00269; // 50% RH
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutWetBulbTemp = 1.34678;
-    SimulateVRF(
-        VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp = 7.0;             // water inlet temperature
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).Temp = 20.0;        // TU inlet air temp
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).HumRat = 0.0056;    // TU inlet air humrat
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).Enthalpy = 34823.5; // TU inlet air enthalpy
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode).Temp = 20.0;              // also set zone conditions
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode).HumRat = 0.0056;
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode).Enthalpy = 34823.5;
+    state->dataEnvrn->OutDryBulbTemp = 5.0;
+    state->dataEnvrn->OutHumRat = 0.00269; // 50% RH
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutWetBulbTemp = 1.34678;
+    SimulateVRF(*state,
+                state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
+                FirstHVACIteration,
+                CurZoneNum,
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
+                HeatingActive,
+                CoolingActive,
+                OAUnitNum,
+                OAUCoilOutTemp,
+                ZoneEquipment,
+                SysOutputProvided,
+                LatOutputProvided);
 
-    EXPECT_TRUE(VRF(VRFCond).VRFCondPLR > 0.0);
-    EXPECT_NEAR(SysOutputProvided, ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP, 1.0);
+    EXPECT_TRUE(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR > 0.0);
+    EXPECT_NEAR(SysOutputProvided, state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP, 1.0);
 
-    ASSERT_EQ(VRF(VRFCond).WaterCondenserDesignMassFlow,
-              Node(VRF(VRFCond).CondenserNodeNum).MassFlowRate); // Condenser flow rate should be set for active cooling
-    ASSERT_EQ(VRF(VRFCond).WaterCondenserDesignMassFlow, Node(VRF(VRFCond).CondenserOutletNodeNum).MassFlowRate); // outlet node should also be set
+    ASSERT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).WaterCondenserDesignMassFlow,
+              state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum)
+                  .MassFlowRate); // Condenser flow rate should be set for active cooling
+    ASSERT_EQ(
+        state->dataHVACVarRefFlow->VRF(VRFCond).WaterCondenserDesignMassFlow,
+        state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserOutletNodeNum).MassFlowRate); // outlet node should also be set
 
-    // clean up
-    ZoneSysEnergyDemand.deallocate();
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp =
+        21.0; // outside the heating temperature range (-20 to 20) of VRF outdoor unit
+    state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 21.0;
+    SimulateVRF(*state,
+                state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
+                FirstHVACIteration,
+                CurZoneNum,
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
+                HeatingActive,
+                CoolingActive,
+                OAUnitNum,
+                OAUCoilOutTemp,
+                ZoneEquipment,
+                SysOutputProvided,
+                LatOutputProvided);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR, 0.0); // system should be off
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate,
+              0.0); // flow should be = 0 for cycling fan mode
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum).MassFlowRate,
+              0.0); // flow should be = 0 for cycling fan mode
+
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue =
+        1.0; // set constant fan operating mode
+    SimulateVRF(*state,
+                state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
+                FirstHVACIteration,
+                CurZoneNum,
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
+                HeatingActive,
+                CoolingActive,
+                OAUnitNum,
+                OAUCoilOutTemp,
+                ZoneEquipment,
+                SysOutputProvided,
+                LatOutputProvided);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR, 0.0); // system should also be off
+    EXPECT_GT(state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate,
+              0.0); // flow should be > 0 at no load flow rate for constant fan mode in this example
+    EXPECT_GT(state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum).MassFlowRate,
+              0.0); // flow should be > 0 at no load flow rate for constant fan mode in this example
 }
 
 TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
 {
 
-    // static std::string const RoutineName( "VRFTest_NoLoadOAFlowTest" );
+    // static constexpr std::string_view RoutineName( "VRFTest_NoLoadOAFlowTest" );
     bool ErrorsFound(false);       // function returns true on error
     bool FirstHVACIteration(true); // simulate the first pass through HVAC simulation, use false for next iteration
     int VRFTUNum(1);               // index to VRF terminal unit
@@ -4778,7 +5995,8556 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
 
     std::string const idf_objects = delimited_string({
 
-        "  Version,8.4;",
+        "  ScheduleTypeLimits,",
+        "    Fraction,                !- Name",
+        "    0.0,                     !- Lower Limit Value",
+        "    1.0,                     !- Upper Limit Value",
+        "    CONTINUOUS;              !- Numeric Type",
+
+        "  Schedule:Compact,",
+        "    AlwaysOn,                !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,1;          !- Field 3",
+
+        "  Schedule:Compact,",
+        "    FanAvailSch,             !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,1;          !- Field 3",
+
+        "  ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,",
+        "    Level1:Office1 VRF Indoor Unit,  !- Zone Terminal Unit Name",
+        "    AlwaysOn,                !- Terminal Unit Availability Schedule",
+        "    Level1:Office1 VRF Indoor Unit Return,  !- Terminal Unit Air Inlet Node Name",
+        "    Level1:Office1 VRF Indoor Unit Supply Inlet,  !- Terminal Unit Air Outlet Node Name",
+        "    0.111000,                !- Cooling Supply Air Flow Rate {m3/s}",
+        "    0.056000,                !- No Cooling Supply Air Flow Rate {m3/s}",
+        "    0.111000,                !- Heating Supply Air Flow Rate {m3/s}",
+        "    0.056000,                !- No Heating Supply Air Flow Rate {m3/s}",
+        "    0.028000,                !- Cooling Outdoor Air Flow Rate {m3/s}",
+        "    0.028000,                !- Heating Outdoor Air Flow Rate {m3/s}",
+        "    0.014000,                !- No Load Outdoor Air Flow Rate {m3/s}",
+        "    AlwaysOn,                !- Supply Air Fan Operating Mode Schedule Name",
+        "    BlowThrough,             !- Supply Air Fan Placement",
+        "    Fan:ConstantVolume,      !- Supply Air Fan Object Type",
+        "    Level1:Office1 VRF Indoor Unit Supply Fan,  !- Supply Air Fan Object Name",
+        "    OutdoorAir:Mixer,        !- Outside Air Mixer Object Type",
+        "    Level1:Office1 VRF Indoor Unit Outdoor Air Mixer,  !- Outside Air Mixer Object Name",
+        "    Coil:Cooling:DX:VariableRefrigerantFlow,  !- Cooling Coil Object Type",
+        "    Level1:Office1 VRF Indoor Unit DX Cooling Coil,  !- Cooling Coil Object Name",
+        "    Coil:Heating:DX:VariableRefrigerantFlow,  !- Heating Coil Object Type",
+        "    Level1:Office1 VRF Indoor Unit DX Heating Coil,  !- Heating Coil Object Name",
+        "    30.0000,                 !- Zone Terminal Unit On Parasitic Electric Energy Use {W}",
+        "    20.0000;                 !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}",
+
+        "  ZoneHVAC:EquipmentList,",
+        "    Level1:Office1 Equipment,!- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type",
+        "    Level1:Office1 VRF Indoor Unit,  !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+
+        "  ZoneHVAC:EquipmentConnections,",
+        "    Level1:Office1,          !- Zone Name",
+        "    Level1:Office1 Equipment,!- Zone Conditioning Equipment List Name",
+        "    Level1:Office1 Air Inlet Node List,  !- Zone Air Inlet Node or NodeList Name",
+        "    Level1:Office1 Air Exhaust Node List,  !- Zone Air Exhaust Node or NodeList Name",
+        "    Level1:Office1 Zone Air Node,  !- Zone Air Node Name",
+        "    Level1:Office1 Return Outlet;  !- Zone Return Air Node Name",
+
+        "  Zone,",
+        "    Level1:Office1,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    ,                        !- Ceiling Height {m}",
+        "    68.2413,                 !- Volume {m3}",
+        "    19.4975,                 !- Floor Area {m2}",
+        "    TARP;                    !- Zone Inside Convection Algorithm",
+
+        "  Fan:ConstantVolume,",
+        "    Level1:Office1 VRF Indoor Unit Supply Fan,  !- Name",
+        "    FanAvailSch,             !- Availability Schedule Name",
+        "    0.70,                    !- Fan Total Efficiency",
+        "    100.00,                  !- Pressure Rise {Pa}",
+        "    0.111000,                !- Maximum Flow Rate {m3/s}",
+        "    0.90,                    !- Motor Efficiency",
+        "    1.00,                    !- Motor In Airstream Fraction",
+        "    Level1:Office1 VRF Indoor Unit Mixed Air Outlet,  !- Air Inlet Node Name",
+        "    Level1:Office1 VRF Indoor Unit Supply Fan Outlet,  !- Air Outlet Node Name",
+        "    General;                 !- End-Use Subcategory",
+
+        "  Coil:Cooling:DX:VariableRefrigerantFlow,",
+        "    Level1:Office1 VRF Indoor Unit DX Cooling Coil,  !- Name",
+        "    AlwaysOn,                 !- Availability Schedule Name",
+        "    4000.0,                  !- Gross Rated Total Cooling Capacity {W}",
+        "    0.75,                    !- Gross Rated Sensible Heat Ratio",
+        "    0.111000,                !- Rated Air Flow Rate {m3/s}",
+        "    VRFTUCoolCapFT,          !- Cooling Capacity Ratio Modifier Function of Temperature Curve Name",
+        "    VRFACCoolCapFFF,         !- Cooling Capacity Modifier Curve Function of Flow Fraction Name",
+        "    Level1:Office1 VRF Indoor Unit Supply Fan Outlet,  !- Coil Air Inlet Node",
+        "    Level1:Office1 VRF Indoor Unit DX Cooling Coil Outlet;  !- Coil Air Outlet Node",
+
+        "  Coil:Heating:DX:VariableRefrigerantFlow,",
+        "    Level1:Office1 VRF Indoor Unit DX Heating Coil,  !- Name",
+        "    AlwaysOn,                !- Availability Schedule",
+        "    4000.0,                  !- Gross Rated Heating Capacity {W}",
+        "    0.111000,                !- Rated Air Flow Rate {m3/s}",
+        "    Level1:Office1 VRF Indoor Unit DX Cooling Coil Outlet,  !- Coil Air Inlet Node",
+        "    Level1:Office1 VRF Indoor Unit Supply Inlet,  !- Coil Air Outlet Node",
+        "    VRFTUHeatCapFT,          !- Heating Capacity Ratio Modifier Function of Temperature Curve Name",
+        "    VRFACCoolCapFFF;         !- Heating Capacity Modifier Function of Flow Fraction Curve Name",
+
+        "  AirConditioner:VariableRefrigerantFlow,",
+        "    VRF Outdoor Unit,        !- Heat Pump Name",
+        "    AlwaysOn,                !- Availability Schedule Name",
+        "    7040.0,                  !- Gross Rated Total Cooling Capacity {W}",
+        "    3.3,                     !- Gross Rated Cooling COP {W/W}",
+        "    -6,                      !- Minimum Outdoor Temperature in Cooling Mode {C}",
+        "    43,                      !- Maximum Outdoor Temperature in Cooling Mode {C}",
+        "    VRFCoolCapFT,            !- Cooling Capacity Ratio Modifier Function of Low Temperature Curve Name",
+        "    VRFCoolCapFTBoundary,    !- Cooling Capacity Ratio Boundary Curve Name",
+        "    VRFCoolCapFTHi,          !- Cooling Capacity Ratio Modifier Function of High Temperature Curve Name",
+        "    VRFCoolEIRFT,            !- Cooling Energy Input Ratio Modifier Function of Low Temperature Curve Name",
+        "    VRFCoolEIRFTBoundary,    !- Cooling Energy Input Ratio Boundary Curve Name",
+        "    VRFCoolEIRFTHi,          !- Cooling Energy Input Ratio Modifier Function of High Temperature Curve Name",
+        "    CoolingEIRLowPLR,        !- Cooling Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name",
+        "    CoolingEIRHiPLR,         !- Cooling Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name",
+        "    CoolingCombRatio,        !- Cooling Combination Ratio Correction Factor Curve Name",
+        "    VRFCPLFFPLR,             !- Cooling Part-Load Fraction Correlation Curve Name",
+        "    autosize,                !- Gross Rated Heating Capacity {W}",
+        "    1,                       !- Rated Heating Capacity Sizing Ratio {W/W}",
+        "    3.4,                     !- Gross Rated Heating COP {W/W}",
+        "    -20,                     !- Minimum Outdoor Temperature in Heating Mode {C}",
+        "    40,                      !- Maximum Outdoor Temperature in Heating Mode {C}",
+        "    VRFHeatCapFT,            !- Heating Capacity Ratio Modifier Function of Low Temperature Curve Name",
+        "    VRFHeatCapFTBoundary,    !- Heating Capacity Ratio Boundary Curve Name",
+        "    VRFHeatCapFTHi,          !- Heating Capacity Ratio Modifier Function of High Temperature Curve Name",
+        "    VRFHeatEIRFT,            !- Heating Energy Input Ratio Modifier Function of Low Temperature Curve Name",
+        "    VRFHeatEIRFTBoundary,    !- Heating Energy Input Ratio Boundary Curve Name",
+        "    VRFHeatEIRFTHi,          !- Heating Energy Input Ratio Modifier Function of High Temperature Curve Name",
+        "    WetBulbTemperature,      !- Heating Performance Curve Outdoor Temperature Type",
+        "    HeatingEIRLowPLR,        !- Heating Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name",
+        "    HeatingEIRHiPLR,         !- Heating Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name",
+        "    HeatingCombRatio,        !- Heating Combination Ratio Correction Factor Curve Name",
+        "    VRFCPLFFPLR,             !- Heating Part-Load Fraction Correlation Curve Name",
+        "    0.15,                    !- Minimum Heat Pump Part-Load Ratio {dimensionless}",
+        "    <Select zone>,           !- Zone Name for Master Thermostat Location",
+        "    LoadPriority,            !- Master Thermostat Priority Control Type",
+        "    ,                        !- Thermostat Priority Schedule Name",
+        "    VRF Outdoor Unit Zone List,  !- Zone Terminal Unit List Name",
+        "    No,                      !- Heat Pump Waste Heat Recovery",
+        "    50,                      !- Equivalent Piping Length used for Piping Correction Factor in Cooling Mode {m}",
+        "    15,                      !- Vertical Height used for Piping Correction Factor {m}",
+        "    CoolingLengthCorrectionFactor,  !- Piping Correction Factor for Length in Cooling Mode Curve Name",
+        "    -.000386,                !- Piping Correction Factor for Height in Cooling Mode Coefficient {1/m}",
+        "    50,                      !- Equivalent Piping Length used for Piping Correction Factor in Heating Mode {m}",
+        "    VRF Piping Correction Factor for Length in Heating Mode,  !- Piping Correction Factor for Length in Heating Mode Curve Name",
+        "    0,                       !- Piping Correction Factor for Height in Heating Mode Coefficient {1/m}",
+        "    15,                      !- Crankcase Heater Power per Compressor {W}",
+        "    2,                       !- Number of Compressors {dimensionless}",
+        "    0.5,                     !- Ratio of Compressor Size to Total Compressor Capacity {W/W}",
+        "    5,                       !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater {C}",
+        "    Resistive,               !- Defrost Strategy",
+        "    Timed,                   !- Defrost Control",
+        "    DXHtgCoilDefrostEIRFT,   !- Defrost Energy Input Ratio Modifier Function of Temperature Curve Name",
+        "    0.058333,                !- Defrost Time Period Fraction {dimensionless}",
+        "    autosize,                !- Resistive Defrost Heater Capacity {W}",
+        "    5,                       !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}",
+        "    AirCooled,               !- Condenser Type",
+        "    VRF Outdoor Unit Outdoor Air Node,  !- Condenser Inlet Node Name",
+        "    ,                        !- Condenser Outlet Node Name",
+        "    autosize,                !- Water Condenser Volume Flow Rate {m3/s}",
+        "    0.9,                     !- Evaporative Condenser Effectiveness {dimensionless}",
+        "    autosize,                !- Evaporative Condenser Air Flow Rate {m3/s}",
+        "    autosize,                !- Evaporative Condenser Pump Rated Power Consumption {W}",
+        "    ,                        !- Supply Water Storage Tank Name",
+        "    0,                       !- Basin Heater Capacity {W/K}",
+        "    2,                       !- Basin Heater Setpoint Temperature {C}",
+        "    AlwaysOn,                 !- Basin Heater Operating Schedule Name",
+        "    Electricity,             !- Fuel Type",
+        "    -10,                     !- Minimum Outdoor Temperature in Heat Recovery Mode {C}",
+        "    40,                      !- Maximum Outdoor Temperature in Heat Recovery Mode {C}",
+        "    VRF Heat Recovery Cooling Capacity Modifier,  !- Heat Recovery Cooling Capacity Modifier Curve Name",
+        "    0.5,                     !- Initial Heat Recovery Cooling Capacity Fraction {W/W}",
+        "    0.15,                    !- Heat Recovery Cooling Capacity Time Constant {hr}",
+        "    VRF Heat Recovery Cooling Energy Modifier,  !- Heat Recovery Cooling Energy Modifier Curve Name",
+        "    1,                       !- Initial Heat Recovery Cooling Energy Fraction {W/W}",
+        "    0,                       !- Heat Recovery Cooling Energy Time Constant {hr}",
+        "    VRF Heat Recovery Heating Capacity Modifier,  !- Heat Recovery Heating Capacity Modifier Curve Name",
+        "    1,                       !- Initial Heat Recovery Heating Capacity Fraction {W/W}",
+        "    0.15,                    !- Heat Recovery Heating Capacity Time Constant {hr}",
+        "    VRF Heat Recovery Heating Energy Modifier,  !- Heat Recovery Heating Energy Modifier Curve Name",
+        "    1,                       !- Initial Heat Recovery Heating Energy Fraction {W/W}",
+        "    0;                       !- Heat Recovery Heating Energy Time Constant {hr}",
+
+        "  ZoneTerminalUnitList,",
+        "    VRF Outdoor Unit Zone List,  !- Zone Terminal Unit List Name",
+        "    Level1:Office1 VRF Indoor Unit;  !- Zone Terminal Unit Name 1",
+
+        "  OutdoorAir:Mixer,",
+        "    Level1:Office1 VRF Indoor Unit Outdoor Air Mixer,  !- Name",
+        "    Level1:Office1 VRF Indoor Unit Mixed Air Outlet,  !- Mixed Air Node Name",
+        "    Level1:Office1 VRF Indoor Unit Outdoor Air Node Name,  !- Outdoor Air Stream Node Name",
+        "    Level1:Office1 VRF Indoor Unit Air Relief Node Name,  !- Relief Air Stream Node Name",
+        "    Level1:Office1 VRF Indoor Unit Return;  !- Return Air Stream Node Name",
+
+        "  NodeList,",
+        "    Level1:Office1 Air Inlet Node List,  !- Name",
+        "    Level1:Office1 VRF Indoor Unit Supply Inlet;  !- Node 1 Name",
+
+        "  NodeList,",
+        "    Level1:Office1 Air Exhaust Node List,  !- Name",
+        "    Level1:Office1 VRF Indoor Unit Return;  !- Node 1 Name",
+
+        "  OutdoorAir:NodeList,",
+        "    VRF Outdoor Unit Outdoor Air Node;  !- Node or NodeList Name 1",
+
+        "  OutdoorAir:NodeList,",
+        "    Level1:Office1 VRF Indoor Unit Outdoor Air Node Name;  !- Node or NodeList Name 1",
+
+        "  Curve:Linear,",
+        "    CoolingCombRatio,        !- Name",
+        "    0.618055,                !- Coefficient1 Constant",
+        "    0.381945,                !- Coefficient2 x",
+        "    1.0,                     !- Minimum Value of x",
+        "    1.5;                     !- Maximum Value of x",
+
+        "  Curve:Linear,",
+        "    HeatingCombRatio,        !- Name",
+        "    0.96034,                 !- Coefficient1 Constant",
+        "    0.03966,                 !- Coefficient2 x",
+        "    1.0,                     !- Minimum Value of x",
+        "    1.5;                     !- Maximum Value of x",
+
+        "  Curve:Quadratic,",
+        "    VRFACCoolCapFFF,         !- Name",
+        "    0.8,                     !- Coefficient1 Constant",
+        "    0.2,                     !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.5,                     !- Minimum Value of x",
+        "    1.5;                     !- Maximum Value of x",
+
+        "  Curve:Quadratic,",
+        "    CoolingEIRHiPLR,         !- Name",
+        "    1.0,                     !- Coefficient1 Constant",
+        "    0.0,                     !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    1.0,                     !- Minimum Value of x",
+        "    1.5;                     !- Maximum Value of x",
+
+        "  Curve:Quadratic,",
+        "    VRFCPLFFPLR,             !- Name",
+        "    0.85,                    !- Coefficient1 Constant",
+        "    0.15,                    !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.0,                     !- Minimum Value of x",
+        "    1.0;                     !- Maximum Value of x",
+
+        "  Curve:Quadratic,",
+        "    HeatingEIRHiPLR,         !- Name",
+        "    2.4294355,               !- Coefficient1 Constant",
+        "    -2.235887,               !- Coefficient2 x",
+        "    0.8064516,               !- Coefficient3 x**2",
+        "    1.0,                     !- Minimum Value of x",
+        "    1.5;                     !- Maximum Value of x",
+
+        "  Curve:Cubic,",
+        "    DefaultFanEffRatioCurve, !- Name",
+        "    0.33856828,              !- Coefficient1 Constant",
+        "    1.72644131,              !- Coefficient2 x",
+        "    -1.49280132,             !- Coefficient3 x**2",
+        "    0.42776208,              !- Coefficient4 x**3",
+        "    0.5,                     !- Minimum Value of x",
+        "    1.5,                     !- Maximum Value of x",
+        "    0.3,                     !- Minimum Curve Output",
+        "    1.0;                     !- Maximum Curve Output",
+
+        "  Curve:Cubic,",
+        "    VRFTUCoolCapFT,          !- Name",
+        "    0.504547273506488,       !- Coefficient1 Constant",
+        "    0.0288891279198444,      !- Coefficient2 x",
+        "    -0.000010819418650677,   !- Coefficient3 x**2",
+        "    0.0000101359395177008,   !- Coefficient4 x**3",
+        "    0.0,                     !- Minimum Value of x",
+        "    50.0,                    !- Maximum Value of x",
+        "    0.5,                     !- Minimum Curve Output",
+        "    1.5,                     !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Cubic,",
+        "    VRFTUHeatCapFT,          !- Name",
+        "    -0.390708928227928,      !- Coefficient1 Constant",
+        "    0.261815023760162,       !- Coefficient2 x",
+        "    -0.0130431603151873,     !- Coefficient3 x**2",
+        "    0.000178131745997821,    !- Coefficient4 x**3",
+        "    0.0,                     !- Minimum Value of x",
+        "    50.0,                    !- Maximum Value of x",
+        "    0.5,                     !- Minimum Curve Output",
+        "    1.5,                     !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Cubic,",
+        "    VRFCoolCapFTBoundary,    !- Name",
+        "    25.73473775,             !- Coefficient1 Constant",
+        "    -0.03150043,             !- Coefficient2 x",
+        "    -0.01416595,             !- Coefficient3 x**2",
+        "    0,                       !- Coefficient4 x**3",
+        "    11,                      !- Minimum Value of x",
+        "    30,                      !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature;             !- Output Unit Type",
+
+        "  Curve:Cubic,",
+        "    VRFCoolEIRFTBoundary,    !- Name",
+        "    25.73473775,             !- Coefficient1 Constant",
+        "    -0.03150043,             !- Coefficient2 x",
+        "    -0.01416595,             !- Coefficient3 x**2",
+        "    0,                       !- Coefficient4 x**3",
+        "    15,                      !- Minimum Value of x",
+        "    24,                      !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature;             !- Output Unit Type",
+
+        "  Curve:Cubic,",
+        "    CoolingEIRLowPLR,        !- Name",
+        "    0.4628123,               !- Coefficient1 Constant",
+        "    -1.0402406,              !- Coefficient2 x",
+        "    2.17490997,              !- Coefficient3 x**2",
+        "    -0.5974817,              !- Coefficient4 x**3",
+        "    0,                       !- Minimum Value of x",
+        "    1,                       !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature;             !- Output Unit Type",
+
+        "  Curve:Cubic,",
+        "    VRFHeatCapFTBoundary,    !- Name",
+        "    -7.6000882,              !- Coefficient1 Constant",
+        "    3.05090016,              !- Coefficient2 x",
+        "    -0.1162844,              !- Coefficient3 x**2",
+        "    0.0,                     !- Coefficient4 x**3",
+        "    15,                      !- Minimum Value of x",
+        "    27,                      !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature;             !- Output Unit Type",
+
+        "  Curve:Cubic,",
+        "    VRFHeatEIRFTBoundary,    !- Name",
+        "    -7.6000882,              !- Coefficient1 Constant",
+        "    3.05090016,              !- Coefficient2 x",
+        "    -0.1162844,              !- Coefficient3 x**2",
+        "    0.0,                     !- Coefficient4 x**3",
+        "    15,                      !- Minimum Value of x",
+        "    27,                      !- Maximum Value of x",
+        "    -20,                     !- Minimum Curve Output",
+        "    15,                      !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature;             !- Output Unit Type",
+
+        "  Curve:Cubic,",
+        "    HeatingEIRLowPLR,        !- Name",
+        "    0.1400093,               !- Coefficient1 Constant",
+        "    0.6415002,               !- Coefficient2 x",
+        "    0.1339047,               !- Coefficient3 x**2",
+        "    0.0845859,               !- Coefficient4 x**3",
+        "    0,                       !- Minimum Value of x",
+        "    1,                       !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Exponent,",
+        "    DefaultFanPowerRatioCurve,  !- Name",
+        "    0,                       !- Coefficient1 Constant",
+        "    1,                       !- Coefficient2 Constant",
+        "    3,                       !- Coefficient3 Constant",
+        "    0,                       !- Minimum Value of x",
+        "    1.5,                     !- Maximum Value of x",
+        "    0.01,                    !- Minimum Curve Output",
+        "    1.5;                     !- Maximum Curve Output",
+
+        "  Curve:Biquadratic,",
+        "    DXHtgCoilDefrostEIRFT,   !- Name",
+        "    1.0,                     !- Coefficient1 Constant",
+        "    0.0,                     !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.0,                     !- Coefficient4 y",
+        "    0,                       !- Coefficient5 y**2",
+        "    0,                       !- Coefficient6 x*y",
+        "    0.0,                     !- Minimum Value of x",
+        "    50.0,                    !- Maximum Value of x",
+        "    0.0,                     !- Minimum Value of y",
+        "    50.0,                    !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "    VRFCoolCapFT,            !- Name",
+        "    0.576882692,             !- Coefficient1 Constant",
+        "    0.017447952,             !- Coefficient2 x",
+        "    0.000583269,             !- Coefficient3 x**2",
+        "    -1.76324E-06,            !- Coefficient4 y",
+        "    -7.474E-09,              !- Coefficient5 y**2",
+        "    -1.30413E-07,            !- Coefficient6 x*y",
+        "    15,                      !- Minimum Value of x",
+        "    24,                      !- Maximum Value of x",
+        "    -5,                      !- Minimum Value of y",
+        "    23,                      !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "    VRFCoolCapFTHi,          !- Name",
+        "    0.6867358,               !- Coefficient1 Constant",
+        "    0.0207631,               !- Coefficient2 x",
+        "    0.0005447,               !- Coefficient3 x**2",
+        "    -0.0016218,              !- Coefficient4 y",
+        "    -4.259E-07,              !- Coefficient5 y**2",
+        "    -0.0003392,              !- Coefficient6 x*y",
+        "    15,                      !- Minimum Value of x",
+        "    24,                      !- Maximum Value of x",
+        "    16,                      !- Minimum Value of y",
+        "    43,                      !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "    VRFCoolEIRFT,            !- Name",
+        "    0.989010541,             !- Coefficient1 Constant",
+        "    -0.02347967,             !- Coefficient2 x",
+        "    0.000199711,             !- Coefficient3 x**2",
+        "    0.005968336,             !- Coefficient4 y",
+        "    -1.0289E-07,             !- Coefficient5 y**2",
+        "    -0.00015686,             !- Coefficient6 x*y",
+        "    15,                      !- Minimum Value of x",
+        "    24,                      !- Maximum Value of x",
+        "    -5,                      !- Minimum Value of y",
+        "    23,                      !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "    VRFCoolEIRFTHi,          !- Name",
+        "    0.14351470,              !- Coefficient1 Constant",
+        "    0.01860035,              !- Coefficient2 x",
+        "    -0.0003954,              !- Coefficient3 x**2",
+        "    0.02485219,              !- Coefficient4 y",
+        "    0.00016329,              !- Coefficient5 y**2",
+        "    -0.0006244,              !- Coefficient6 x*y",
+        "    15,                      !- Minimum Value of x",
+        "    24,                      !- Maximum Value of x",
+        "    16,                      !- Minimum Value of y",
+        "    43,                      !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "    VRFHeatCapFT,            !- Name",
+        "    1.014599599,             !- Coefficient1 Constant",
+        "    -0.002506703,            !- Coefficient2 x",
+        "    -0.000141599,            !- Coefficient3 x**2",
+        "    0.026931595,             !- Coefficient4 y",
+        "    1.83538E-06,             !- Coefficient5 y**2",
+        "    -0.000358147,            !- Coefficient6 x*y",
+        "    15,                      !- Minimum Value of x",
+        "    27,                      !- Maximum Value of x",
+        "    -20,                     !- Minimum Value of y",
+        "    15,                      !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "    VRFHeatCapFTHi,          !- Name",
+        "    1.161134821,             !- Coefficient1 Constant",
+        "    0.027478868,             !- Coefficient2 x",
+        "    -0.00168795,             !- Coefficient3 x**2",
+        "    0.001783378,             !- Coefficient4 y",
+        "    2.03208E-06,             !- Coefficient5 y**2",
+        "    -6.8969E-05,             !- Coefficient6 x*y",
+        "    15,                      !- Minimum Value of x",
+        "    27,                      !- Maximum Value of x",
+        "    -10,                     !- Minimum Value of y",
+        "    15,                      !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "    VRFHeatEIRFT,            !- Name",
+        "    0.87465501,              !- Coefficient1 Constant",
+        "    -0.01319754,             !- Coefficient2 x",
+        "    0.00110307,              !- Coefficient3 x**2",
+        "    -0.0133118,              !- Coefficient4 y",
+        "    0.00089017,              !- Coefficient5 y**2",
+        "    -0.00012766,             !- Coefficient6 x*y",
+        "    15,                      !- Minimum Value of x",
+        "    27,                      !- Maximum Value of x",
+        "    -20,                     !- Minimum Value of y",
+        "    12,                      !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "    VRFHeatEIRFTHi,          !- Name",
+        "    2.504005146,             !- Coefficient1 Constant",
+        "    -0.05736767,             !- Coefficient2 x",
+        "    4.07336E-05,             !- Coefficient3 x**2",
+        "    -0.12959669,             !- Coefficient4 y",
+        "    0.00135839,              !- Coefficient5 y**2",
+        "    0.00317047,              !- Coefficient6 x*y",
+        "    15,                      !- Minimum Value of x",
+        "    27,                      !- Maximum Value of x",
+        "    -10,                     !- Minimum Value of y",
+        "    15,                      !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "    CoolingLengthCorrectionFactor,  !- Name",
+        "    1.0693794,               !- Coefficient1 Constant",
+        "    -0.0014951,              !- Coefficient2 x",
+        "    2.56E-06,                !- Coefficient3 x**2",
+        "    -0.1151104,              !- Coefficient4 y",
+        "    0.0511169,               !- Coefficient5 y**2",
+        "    -0.0004369,              !- Coefficient6 x*y",
+        "    8,                       !- Minimum Value of x",
+        "    175,                     !- Maximum Value of x",
+        "    0.5,                     !- Minimum Value of y",
+        "    1.5,                     !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "    VRF Piping Correction Factor for Length in Heating Mode,  !- Name",
+        "    0.989916,                !- Coefficient1 Constant",
+        "    0.001961,                !- Coefficient2 x",
+        "    -.000036,                !- Coefficient3 x**2",
+        "    0,                       !- Coefficient4 y",
+        "    0,                       !- Coefficient5 y**2",
+        "    0,                       !- Coefficient6 x*y",
+        "    7,                       !- Minimum Value of x",
+        "    106.5,                   !- Maximum Value of x",
+        "    1,                       !- Minimum Value of y",
+        "    1,                       !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Distance,                !- Input Unit Type for X",
+        "    Dimensionless,           !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "    VRF Heat Recovery Cooling Capacity Modifier,  !- Name",
+        "    0.9,                     !- Coefficient1 Constant",
+        "    0,                       !- Coefficient2 x",
+        "    0,                       !- Coefficient3 x**2",
+        "    0,                       !- Coefficient4 y",
+        "    0,                       !- Coefficient5 y**2",
+        "    0,                       !- Coefficient6 x*y",
+        "    -100,                    !- Minimum Value of x",
+        "    100,                     !- Maximum Value of x",
+        "    -100,                    !- Minimum Value of y",
+        "    100,                     !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "    VRF Heat Recovery Cooling Energy Modifier,  !- Name",
+        "    1.1,                     !- Coefficient1 Constant",
+        "    0,                       !- Coefficient2 x",
+        "    0,                       !- Coefficient3 x**2",
+        "    0,                       !- Coefficient4 y",
+        "    0,                       !- Coefficient5 y**2",
+        "    0,                       !- Coefficient6 x*y",
+        "    -100,                    !- Minimum Value of x",
+        "    100,                     !- Maximum Value of x",
+        "    -100,                    !- Minimum Value of y",
+        "    100,                     !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "    VRF Heat Recovery Heating Capacity Modifier,  !- Name",
+        "    0.9,                     !- Coefficient1 Constant",
+        "    0,                       !- Coefficient2 x",
+        "    0,                       !- Coefficient3 x**2",
+        "    0,                       !- Coefficient4 y",
+        "    0,                       !- Coefficient5 y**2",
+        "    0,                       !- Coefficient6 x*y",
+        "    -100,                    !- Minimum Value of x",
+        "    100,                     !- Maximum Value of x",
+        "    -100,                    !- Minimum Value of y",
+        "    100,                     !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "    VRF Heat Recovery Heating Energy Modifier,  !- Name",
+        "    1.1,                     !- Coefficient1 Constant",
+        "    0,                       !- Coefficient2 x",
+        "    0,                       !- Coefficient3 x**2",
+        "    0,                       !- Coefficient4 y",
+        "    0,                       !- Coefficient5 y**2",
+        "    0,                       !- Coefficient6 x*y",
+        "    -100,                    !- Minimum Value of x",
+        "    100,                     !- Maximum Value of x",
+        "    -100,                    !- Minimum Value of y",
+        "    100,                     !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataSize->CurZoneEqNum = 1;
+    state->dataEnvrn->OutBaroPress = 101325;            // sea level
+    state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
+    state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
+    state->dataGlobal->SysSizingCalc = true;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    state->dataSize->ZoneEqSizing.allocate(1);
+
+    CurveManager::GetCurveInput(*state);                  // read curves
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);
+
+    DataZoneEquipment::GetZoneEquipmentData(*state); // read equipment list and connections
+    state->dataAirLoop->AirLoopInputsFilled = true;
+    state->dataHVACVarRefFlow->MyEnvrnFlag = true;
+    ZoneInletAirNode = GetVRFTUZoneInletAirNode(*state, VRFTUNum);                     // trigger GetVRFInput by calling a mining function
+    OutsideAirNode = state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum; // outside air air inlet node num
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = 0.0;    // No load
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = 0.0; // No load
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0; // No load
+    QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired; // No load
+    // Initialize terminal unit
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;         // turn on TU
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0; // turn on fan
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue =
+        1.0;                                                                                       // set continuous fan operating mode
+    InitVRF(*state, VRFTUNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);             // Initialize all VRFTU related parameters
+    ASSERT_EQ(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).OpMode, DataHVACGlobals::ContFanCycCoil); // continuous fan cycling coil operating mode
+    // Set average OA flow rate when there in no load for cont. fan cyc. coil operating mode
+    SetAverageAirFlow(*state, VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
+    AverageOAMassFlow = state->dataEnvrn->StdRhoAir * state->dataHVACVarRefFlow->VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow;
+    EXPECT_EQ(AverageOAMassFlow, state->dataLoopNodes->Node(OutsideAirNode).MassFlowRate);
+
+    // test availability manager operation
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 0.0; // turn off fan
+    SetAverageAirFlow(*state, VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
+    EXPECT_EQ(0.0, state->dataLoopNodes->Node(OutsideAirNode).MassFlowRate);
+    EXPECT_FALSE(state->dataHVACGlobal->ZoneCompTurnFansOn);
+    EXPECT_FALSE(state->dataHVACGlobal->ZoneCompTurnFansOff);
+    EXPECT_EQ(0.0, state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue);
+
+    // turn on "Turn Fan On" flag for availability manager, result should be the same as previous non-zero result
+    state->dataHVACGlobal->ZoneCompTurnFansOn = true;
+    SetAverageAirFlow(*state, VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
+    EXPECT_EQ(AverageOAMassFlow, state->dataLoopNodes->Node(OutsideAirNode).MassFlowRate);
+    EXPECT_TRUE(state->dataHVACGlobal->ZoneCompTurnFansOn);
+    EXPECT_FALSE(state->dataHVACGlobal->ZoneCompTurnFansOff);
+
+    // turn on "Turn Fan Off" flag for availability manager, result should be 0
+    state->dataHVACGlobal->ZoneCompTurnFansOff = true;
+    SetAverageAirFlow(*state, VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
+    EXPECT_EQ(0.0, state->dataLoopNodes->Node(OutsideAirNode).MassFlowRate);
+    EXPECT_TRUE(state->dataHVACGlobal->ZoneCompTurnFansOn);
+    EXPECT_TRUE(state->dataHVACGlobal->ZoneCompTurnFansOff);
+}
+
+TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
+{
+
+    std::string const idf_objects = delimited_string({
+
+        "  Curve:Biquadratic,",
+        "    BiquadraticCurve,        !- Name",
+        "    1.0,                     !- Coefficient1 Constant",
+        "    0,                       !- Coefficient2 x",
+        "    0,                       !- Coefficient3 x**2",
+        "    0,                       !- Coefficient4 y",
+        "    0,                       !- Coefficient5 y**2",
+        "    0,                       !- Coefficient6 x*y",
+        "    -100,                    !- Minimum Value of x",
+        "    100,                     !- Maximum Value of x",
+        "    -100,                    !- Minimum Value of y",
+        "    100,                     !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Cubic,",
+        "    EIRfPLR,                 !- Name",
+        "    0.0,                     !- Coefficient1 Constant",
+        "    1.0,                     !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.0,                     !- Coefficient4 x**3",
+        "    0,                       !- Minimum Value of x",
+        "    1,                       !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    CurveManager::GetCurveInput(*state);
+
+    int VRFCond = 1;
+    state->dataHVACVarRefFlow->VRF.allocate(1);
+    state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum = 0;
+    state->dataHVACVarRefFlow->VRF(VRFCond).CondenserType = DataHeatBalance::RefrigCondenserType::Air;
+    state->dataHVACVarRefFlow->VRF(VRFCond).ZoneTUListPtr = 1;
+    state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity = 20000.0;
+    state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity = 20000.0;
+    state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCOP = 3.0;
+    state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCOP = 3.0;
+    state->dataHVACVarRefFlow->VRF(VRFCond).RatedCoolingPower =
+        state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity / state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCOP;
+    state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower =
+        state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity / state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCOP;
+    state->dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionCooling = 1.0;
+    state->dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionHeating = 1.0;
+    state->dataHVACVarRefFlow->VRF(VRFCond).CoolCapFT = 1;
+    state->dataHVACVarRefFlow->VRF(VRFCond).CoolEIRFT = 1;
+    state->dataHVACVarRefFlow->VRF(VRFCond).CoolEIRFPLR1 = 2;
+    state->dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFPLR1 = 2;
+    state->dataHVACVarRefFlow->CoolCombinationRatio.allocate(1);
+    state->dataHVACVarRefFlow->CoolCombinationRatio(VRFCond) = 1.0;
+    state->dataHVACVarRefFlow->HeatCombinationRatio.allocate(1);
+    state->dataHVACVarRefFlow->HeatCombinationRatio(VRFCond) = 1.0;
+    state->dataHVACVarRefFlow->LastModeCooling.allocate(1);
+    state->dataHVACVarRefFlow->LastModeHeating.allocate(1);
+
+    state->dataHVACVarRefFlow->TerminalUnitList.allocate(1);
+    state->dataHVACVarRefFlow->TerminalUnitList(1).NumTUInList = 5;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad.allocate(5);
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad.allocate(5);
+    state->dataHVACVarRefFlow->TerminalUnitList(1).ZoneTUPtr.allocate(5);
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRCoolRequest.allocate(5);
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRHeatRequest.allocate(5);
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRCoolRequest = false;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRHeatRequest = false;
+
+    state->dataHVACVarRefFlow->TerminalUnitList(1).CoolingCoilAvailable.allocate(5);
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HeatingCoilAvailable.allocate(5);
+    // all TU coils are available
+    state->dataHVACVarRefFlow->TerminalUnitList(1).CoolingCoilAvailable = true;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HeatingCoilAvailable = true;
+
+    state->dataHVACVarRefFlow->CoolingLoad.allocate(1);
+    state->dataHVACVarRefFlow->HeatingLoad.allocate(1);
+    state->dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
+    state->dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
+    state->dataHVACVarRefFlow->LastModeCooling(VRFCond) = false;
+    state->dataHVACVarRefFlow->LastModeHeating(VRFCond) = false;
+
+    state->dataDXCoils->DXCoilCoolInletAirWBTemp.allocate(10);
+    state->dataDXCoils->DXCoilHeatInletAirDBTemp.allocate(10);
+    state->dataDXCoils->DXCoilHeatInletAirWBTemp.allocate(10);
+
+    state->dataHVACVarRefFlow->VRFTU.allocate(5);
+    for (int NumTU = 1; NumTU <= state->dataHVACVarRefFlow->TerminalUnitList(1).NumTUInList; ++NumTU) {
+        state->dataHVACVarRefFlow->VRFTU(NumTU).CoolCoilIndex = NumTU;
+        state->dataHVACVarRefFlow->VRFTU(NumTU).HeatCoilIndex = state->dataHVACVarRefFlow->TerminalUnitList(1).NumTUInList + NumTU;
+        state->dataHVACVarRefFlow->TerminalUnitList(1).ZoneTUPtr(NumTU) = NumTU;
+        // initialize DX coil inlet conditions
+        state->dataDXCoils->DXCoilCoolInletAirWBTemp(NumTU) = 19.4;
+        state->dataDXCoils->DXCoilHeatInletAirDBTemp(state->dataHVACVarRefFlow->TerminalUnitList(1).NumTUInList + NumTU) = 20.0;
+        state->dataDXCoils->DXCoilHeatInletAirWBTemp(state->dataHVACVarRefFlow->TerminalUnitList(1).NumTUInList + NumTU) = 17.0;
+    }
+
+    // set up environment
+    state->dataGlobal->DayOfSim = 1;
+    state->dataGlobal->CurrentTime = 0.25;
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataHVACGlobal->SysTimeElapsed = 0.0;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutHumRat = 0.01;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutWetBulbTemp = 21.1340575;
+
+    // TU's are off
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(1) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(2) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(3) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(4) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(5) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(1) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(2) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(3) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(4) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(5) = 0.0;
+
+    CalcVRFCondenser(*state, VRFCond);
+
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecCoolingPower, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).CrankCaseHeaterPower, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).EvapCondPumpElecPower, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).EvapWaterConsumpRate, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).DefrostPower, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).OperatingCoolingCOP, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).OperatingHeatingCOP, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).OperatingCOP, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).SCHE, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).BasinHeaterPower, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondRTF, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondCyclingRatio, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).QCondEnergy, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TotalCoolingCapacity, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TotalHeatingCapacity, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).OperatingMode, 0.0);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).HRHeatingActive);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).HRCoolingActive);
+
+    // TU's are in cooling mode only
+    state->dataHVACVarRefFlow->CoolingLoad(VRFCond) = true;
+    state->dataHVACVarRefFlow->LastModeCooling(VRFCond) = true;
+    state->dataHVACVarRefFlow->LastModeHeating(VRFCond) = false;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(1) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(2) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(3) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(4) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(5) = 1000.0;
+
+    CalcVRFCondenser(*state, VRFCond);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).HRHeatingActive);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).HRCoolingActive);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TotalCoolingCapacity, 5000.0);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TUCoolingLoad, 5000.0);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TotalHeatingCapacity, 0.0);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TUHeatingLoad, 0.0);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR, 0.25);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondRTF, 1.0); // unit is not cycling below min PLR
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier, 1.0);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).ModeChange);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).HRModeChange);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecCoolingPower,
+              state->dataHVACVarRefFlow->VRF(VRFCond).RatedCoolingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower, 0.0);
+
+    // TU's are in heating mode only
+    state->dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
+    state->dataHVACVarRefFlow->HeatingLoad(VRFCond) = true;
+    state->dataHVACVarRefFlow->LastModeCooling(VRFCond) = false;
+    state->dataHVACVarRefFlow->LastModeHeating(VRFCond) = true;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(1) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(2) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(3) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(4) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(5) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(1) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(2) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(3) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(4) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(5) = 1000.0;
+
+    CalcVRFCondenser(*state, VRFCond);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).HRHeatingActive);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).HRCoolingActive);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TotalCoolingCapacity, 0.0);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TUCoolingLoad, 0.0);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TotalHeatingCapacity, 5000.0);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TUHeatingLoad, 5000.0);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR, 0.25);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondRTF, 1.0); // unit is not cycling below min PLR
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier, 1.0);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).ModeChange);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).HRModeChange);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecCoolingPower, 0.0);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower,
+              state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR);
+
+    // increment time step
+    state->dataGlobal->CurrentTime += state->dataGlobal->TimeStepZone; // 0.5
+    // set TU's to request both cooling and heating
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(1) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRCoolRequest(1) = false;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(2) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRCoolRequest(2) = true;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(3) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRCoolRequest(3) = false;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(4) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRCoolRequest(4) = true;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(5) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRCoolRequest(5) = false;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(1) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRHeatRequest(1) = true;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(2) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRHeatRequest(2) = false;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(3) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRHeatRequest(3) = true;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(4) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRHeatRequest(4) = false;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(5) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRHeatRequest(5) = true;
+    state->dataHVACVarRefFlow->VRF(VRFCond).HeatRecoveryUsed = true;
+
+    // set heat recovery time constant to non-zero value (means mode change will degrade performance)
+    state->dataHVACVarRefFlow->VRF(VRFCond).HRHeatCapTC = 0.25; // 15 min exponential rise
+    // last operating mode was heating
+    CalcVRFCondenser(*state, VRFCond);
+    EXPECT_TRUE(state->dataHVACVarRefFlow->VRF(VRFCond).HRHeatingActive);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).HRCoolingActive);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TotalCoolingCapacity, 0.0);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TUCoolingLoad, 2000.0);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TotalHeatingCapacity, 3000.0);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TUHeatingLoad, 3000.0);
+    EXPECT_NEAR(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR, 0.13636, 0.00001);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondRTF, 1.0); // unit is not cycling below min PLR
+    EXPECT_NEAR(state->dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier, 0.63212, 0.00001);
+    EXPECT_TRUE(state->dataHVACVarRefFlow->VRF(VRFCond).ModeChange);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).HRModeChange);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecCoolingPower, 0.0);
+
+    // make adjustment for heat recovery startup degradation
+    Real64 HREIRFTConst = state->dataHVACVarRefFlow->VRF(VRFCond).HREIRFTHeatConst;
+    Real64 HRInitialEIRFrac = state->dataHVACVarRefFlow->VRF(VRFCond).HRInitialHeatEIRFrac;
+    Real64 HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * state->dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier;
+
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower,
+              state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
+
+    // last operating mode was cooling should give same answer since TU heating request > TU cooling request * ( 1 + 1/COP)
+    state->dataHVACVarRefFlow->CoolingLoad(VRFCond) = true;
+    state->dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
+    state->dataHVACVarRefFlow->LastModeCooling(VRFCond) = true;
+    state->dataHVACVarRefFlow->LastModeHeating(VRFCond) = false;
+
+    state->dataGlobal->CurrentTime += state->dataGlobal->TimeStepZone; // 0.75 - CalcVRFCondenser saves last time stamp for use in exponential curve,
+                                                                       // increment by 1 time step to get same answer
+    CalcVRFCondenser(*state, VRFCond);
+    EXPECT_TRUE(state->dataHVACVarRefFlow->VRF(VRFCond).HRHeatingActive);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).HRCoolingActive);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TotalCoolingCapacity, 0.0);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TUCoolingLoad, 2000.0);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TotalHeatingCapacity, 3000.0);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TUHeatingLoad, 3000.0);
+    EXPECT_NEAR(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR, 0.13636, 0.00001);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondRTF, 1.0); // unit is not cycling below min PLR
+    EXPECT_NEAR(state->dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier, 0.63212, 0.00001);
+    EXPECT_TRUE(state->dataHVACVarRefFlow->VRF(VRFCond).ModeChange);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).HRModeChange);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecCoolingPower, 0.0);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower,
+              state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
+    EXPECT_NEAR(HREIRAdjustment, 1.06321, 0.00001);
+
+    // simulate again and see that power has exponential changed from previous time step
+    state->dataGlobal->CurrentTime += state->dataGlobal->TimeStepZone; // 1.0
+    state->dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
+    state->dataHVACVarRefFlow->HeatingLoad(VRFCond) = true;
+    state->dataHVACVarRefFlow->LastModeCooling(VRFCond) = false;
+    state->dataHVACVarRefFlow->LastModeHeating(VRFCond) = true;
+
+    CalcVRFCondenser(*state, VRFCond);
+
+    HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * state->dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier;
+
+    EXPECT_NEAR(state->dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier, 0.86466, 0.00001); // will exponentially rise towards 1.0
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower,
+              state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
+    EXPECT_NEAR(HREIRAdjustment, 1.08646, 0.00001); // will exponentially rise towards VRF( VRFCond ).HREIRFTHeatConst = 1.1
+
+    // simulate again and see that power has exponential changed from previous time step
+    state->dataGlobal->CurrentTime += state->dataGlobal->TimeStepZone; // 1.25
+    CalcVRFCondenser(*state, VRFCond);
+    HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * state->dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier;
+    EXPECT_NEAR(state->dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier, 0.95021, 0.00001); // will exponentially rise towards 1.0
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower,
+              state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
+    EXPECT_NEAR(HREIRAdjustment, 1.09502, 0.00001); // will exponentially rise towards VRF( VRFCond ).HREIRFTHeatConst = 1.1
+
+    // simulate again and see that power has exponential changed from previous time step
+    state->dataGlobal->CurrentTime += state->dataGlobal->TimeStepZone; // 1.5
+    CalcVRFCondenser(*state, VRFCond);
+    HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * state->dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier;
+    EXPECT_NEAR(state->dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier, 0.98168, 0.00001); // will exponentially rise towards 1.0
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower,
+              state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
+    EXPECT_NEAR(HREIRAdjustment, 1.09817, 0.00001); // will exponentially rise towards VRF( VRFCond ).HREIRFTHeatConst = 1.1
+
+    // simulate again and see that power has exponential changed from previous time step
+    state->dataGlobal->CurrentTime += state->dataGlobal->TimeStepZone; // 1.75
+    CalcVRFCondenser(*state, VRFCond);
+    HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * state->dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier;
+    EXPECT_NEAR(state->dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier, 1.0, 0.00001); // will exponentially rise towards 1.0
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower,
+              state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
+    EXPECT_NEAR(HREIRAdjustment, 1.1, 0.00001); // will exponentially rise towards VRF( VRFCond ).HREIRFTHeatConst = 1.1
+
+    // at end of exponential decay (when SUMultiplier = 1), HREIRAdjustment = VRF( VRFCond ).HREIRFTHeatConst
+    EXPECT_EQ(HREIRAdjustment, state->dataHVACVarRefFlow->VRF(VRFCond).HREIRFTHeatConst);
+}
+
+TEST_F(EnergyPlusFixture, VRFTU_SupplementalHeatingCoilGetInput)
+{
+    // PURPOSE OF THE TEST:
+    // IDF Read in for the VRF terminal unit "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow"
+    // verify if the supplemental heating coils are read correctly
+
+    std::string const idf_objects = delimited_string({
+
+        "  Zone,",
+        "    SPACE1-1,                !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    2.438400269,             !- Ceiling Height {m}",
+        "    239.247360229;           !- Volume {m3}",
+
+        "  Zone,",
+        "    SPACE2-1,                !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    2.438400269,             !- Ceiling Height {m}",
+        "    103.311355591;           !- Volume {m3}",
+
+        "  Zone,",
+        "    SPACE3-1,                !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    2.438400269,             !- Ceiling Height {m}",
+        "    239.247360229;           !- Volume {m3}",
+
+        "  Zone,",
+        "    SPACE4-1,                !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    2.438400269,             !- Ceiling Height {m}",
+        "    103.311355591;           !- Volume {m3}",
+
+        "  Zone,",
+        "    SPACE5-1,                !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    2.438400269,             !- Ceiling Height {m}",
+        "    447.682556152;           !- Volume {m3}",
+
+        "  NodeList,",
+        "    SPACE1-1 In Nodes,       !- Name",
+        "    TU1 Outlet Node;         !- Node 1 Name",
+
+        "  NodeList,",
+        "    SPACE1-1 Out Nodes,      !- Name",
+        "    TU1 Inlet Node;          !- Node 1 Name",
+
+        "  NodeList,",
+        "    SPACE2-1 In Nodes,       !- Name",
+        "    TU2 Outlet Node;         !- Node 1 Name",
+
+        "  NodeList,",
+        "    SPACE2-1 Out Nodes,      !- Name",
+        "    TU2 Inlet Node;          !- Node 1 Name",
+
+        "  NodeList,",
+        "    SPACE3-1 In Nodes,       !- Name",
+        "    TU3 Outlet Node;         !- Node 1 Name",
+
+        "  NodeList,",
+        "    SPACE3-1 Out Nodes,      !- Name",
+        "    TU3 Inlet Node;          !- Node 1 Name",
+
+        "  NodeList,",
+        "    SPACE4-1 In Nodes,       !- Name",
+        "    TU4 Outlet Node;         !- Node 1 Name",
+
+        "  NodeList,",
+        "    SPACE4-1 Out Nodes,      !- Name",
+        "    TU4 Inlet Node;          !- Node 1 Name",
+
+        "  NodeList,",
+        "    SPACE5-1 In Nodes,       !- Name",
+        "    TU5 Outlet Node;         !- Node 1 Name",
+
+        "  NodeList,",
+        "    SPACE5-1 Out Nodes,      !- Name",
+        "    TU5 Inlet Node;          !- Node 1 Name",
+
+        "  ZoneHVAC:EquipmentConnections,",
+        "    SPACE1-1,                !- Zone Name",
+        "    SPACE1-1 Eq,             !- Zone Conditioning Equipment List Name",
+        "    SPACE1-1 In Nodes,       !- Zone Air Inlet Node or NodeList Name",
+        "    SPACE1-1 Out Nodes,      !- Zone Air Exhaust Node or NodeList Name",
+        "    SPACE1-1 Node,           !- Zone Air Node Name",
+        "    SPACE1-1 Out Node;       !- Zone Return Air Node or NodeList Name",
+
+        "  ZoneHVAC:EquipmentConnections,",
+        "    SPACE2-1,                !- Zone Name",
+        "    SPACE2-1 Eq,             !- Zone Conditioning Equipment List Name",
+        "    SPACE2-1 In Nodes,       !- Zone Air Inlet Node or NodeList Name",
+        "    SPACE2-1 Out Nodes,      !- Zone Air Exhaust Node or NodeList Name",
+        "    SPACE2-1 Node,           !- Zone Air Node Name",
+        "    SPACE2-1 Out Node;       !- Zone Return Air Node or NodeList Name",
+
+        "  ZoneHVAC:EquipmentConnections,",
+        "    SPACE3-1,                !- Zone Name",
+        "    SPACE3-1 Eq,             !- Zone Conditioning Equipment List Name",
+        "    SPACE3-1 In Nodes,       !- Zone Air Inlet Node or NodeList Name",
+        "    SPACE3-1 Out Nodes,      !- Zone Air Exhaust Node or NodeList Name",
+        "    SPACE3-1 Node,           !- Zone Air Node Name",
+        "    SPACE3-1 Out Node;       !- Zone Return Air Node or NodeList Name",
+
+        "  ZoneHVAC:EquipmentConnections,",
+        "    SPACE4-1,                !- Zone Name",
+        "    SPACE4-1 Eq,             !- Zone Conditioning Equipment List Name",
+        "    SPACE4-1 In Nodes,       !- Zone Air Inlet Node or NodeList Name",
+        "    SPACE4-1 Out Nodes,      !- Zone Air Exhaust Node or NodeList Name",
+        "    SPACE4-1 Node,           !- Zone Air Node Name",
+        "    SPACE4-1 Out Node;       !- Zone Return Air Node or NodeList Name",
+
+        "  ZoneHVAC:EquipmentConnections,",
+        "    SPACE5-1,                !- Zone Name",
+        "    SPACE5-1 Eq,             !- Zone Conditioning Equipment List Name",
+        "    SPACE5-1 In Nodes,       !- Zone Air Inlet Node or NodeList Name",
+        "    SPACE5-1 Out Nodes,      !- Zone Air Exhaust Node or NodeList Name",
+        "    SPACE5-1 Node,           !- Zone Air Node Name",
+        "    SPACE5-1 Out Node;       !- Zone Return Air Node or NodeList Name",
+
+        "  ZoneHVAC:EquipmentList,",
+        "    SPACE1-1 Eq,             !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type",
+        "    TU1,                     !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction",
+        "    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction",
+
+        "  ZoneHVAC:EquipmentList,",
+        "    SPACE2-1 Eq,             !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type",
+        "    TU2,                     !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction",
+        "    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction",
+
+        "  ZoneHVAC:EquipmentList,",
+        "    SPACE3-1 Eq,             !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type",
+        "    TU3,                     !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction",
+        "    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction",
+
+        "  ZoneHVAC:EquipmentList,",
+        "    SPACE4-1 Eq,             !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type",
+        "    TU4,                     !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction",
+        "    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction",
+
+        "  ZoneHVAC:EquipmentList,",
+        "    SPACE5-1 Eq,             !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type",
+        "    TU5,                     !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction",
+        "    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction",
+
+        "  AirConditioner:VariableRefrigerantFlow,",
+        "    VRF Heat Pump,           !- Heat Pump Name",
+        "    ,                        !- Availability Schedule Name",
+        "    autosize,                !- Gross Rated Total Cooling Capacity {W}",
+        "    3.2917,                  !- Gross Rated Cooling COP {W/W}",
+        "    -5,                      !- Minimum Outdoor Temperature in Cooling Mode {C}",
+        "    43,                      !- Maximum Outdoor Temperature in Cooling Mode {C}",
+        "    VRFCoolCapFT,            !- Cooling Capacity Ratio Modifier Function of Low Temperature Curve Name",
+        "    VRFCoolCapFTBoundary,    !- Cooling Capacity Ratio Boundary Curve Name",
+        "    VRFCoolCapFTHi,          !- Cooling Capacity Ratio Modifier Function of High Temperature Curve Name",
+        "    VRFCoolEIRFT,            !- Cooling Energy Input Ratio Modifier Function of Low Temperature Curve Name",
+        "    VRFCoolEIRFTBoundary,    !- Cooling Energy Input Ratio Boundary Curve Name",
+        "    VRFCoolEIRFTHi,          !- Cooling Energy Input Ratio Modifier Function of High Temperature Curve Name",
+        "    CoolingEIRLowPLR,        !- Cooling Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name",
+        "    CoolingEIRHiPLR,         !- Cooling Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name",
+        "    CoolingCombRatio,        !- Cooling Combination Ratio Correction Factor Curve Name",
+        "    VRFCPLFFPLR,             !- Cooling Part-Load Fraction Correlation Curve Name",
+        "    autosize,                !- Gross Rated Heating Capacity {W}",
+        "    ,                        !- Rated Heating Capacity Sizing Ratio {W/W}",
+        "    3.5484,                  !- Gross Rated Heating COP {W/W}",
+        "    -20,                     !- Minimum Outdoor Temperature in Heating Mode {C}",
+        "    20,                      !- Maximum Outdoor Temperature in Heating Mode {C}",
+        "    VRFHeatCapFT,            !- Heating Capacity Ratio Modifier Function of Low Temperature Curve Name",
+        "    VRFHeatCapFTBoundary,    !- Heating Capacity Ratio Boundary Curve Name",
+        "    VRFHeatCapFTHi,          !- Heating Capacity Ratio Modifier Function of High Temperature Curve Name",
+        "    VRFHeatEIRFT,            !- Heating Energy Input Ratio Modifier Function of Low Temperature Curve Name",
+        "    VRFHeatEIRFTBoundary,    !- Heating Energy Input Ratio Boundary Curve Name",
+        "    VRFHeatEIRFTHi,          !- Heating Energy Input Ratio Modifier Function of High Temperature Curve Name",
+        "    WetBulbTemperature,      !- Heating Performance Curve Outdoor Temperature Type",
+        "    HeatingEIRLowPLR,        !- Heating Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name",
+        "    HeatingEIRHiPLR,         !- Heating Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name",
+        "    HeatingCombRatio,        !- Heating Combination Ratio Correction Factor Curve Name",
+        "    VRFCPLFFPLR,             !- Heating Part-Load Fraction Correlation Curve Name",
+        "    0.25,                    !- Minimum Heat Pump Part-Load Ratio {dimensionless}",
+        "    SPACE1-1,                !- Zone Name for Master Thermostat Location",
+        "    LoadPriority,            !- Master Thermostat Priority Control Type",
+        "    ,                        !- Thermostat Priority Schedule Name",
+        "    VRF Heat Pump TU List,   !- Zone Terminal Unit List Name",
+        "    No,                      !- Heat Pump Waste Heat Recovery",
+        "    30,                      !- Equivalent Piping Length used for Piping Correction Factor in Cooling Mode {m}",
+        "    10,                      !- Vertical Height used for Piping Correction Factor {m}",
+        "    CoolingLengthCorrectionFactor,  !- Piping Correction Factor for Length in Cooling Mode Curve Name",
+        "    -0.000386,               !- Piping Correction Factor for Height in Cooling Mode Coefficient {1/m}",
+        "    30,                      !- Equivalent Piping Length used for Piping Correction Factor in Heating Mode {m}",
+        "    ,                        !- Piping Correction Factor for Length in Heating Mode Curve Name",
+        "    ,                        !- Piping Correction Factor for Height in Heating Mode Coefficient {1/m}",
+        "    15,                      !- Crankcase Heater Power per Compressor {W}",
+        "    3,                       !- Number of Compressors {dimensionless}",
+        "    0.33,                    !- Ratio of Compressor Size to Total Compressor Capacity {W/W}",
+        "    7,                       !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater {C}",
+        "    Resistive,               !- Defrost Strategy",
+        "    Timed,                   !- Defrost Control",
+        "    ,                        !- Defrost Energy Input Ratio Modifier Function of Temperature Curve Name",
+        "    ,                        !- Defrost Time Period Fraction {dimensionless}",
+        "    autosize,                !- Resistive Defrost Heater Capacity {W}",
+        "    7,                       !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}",
+        "    AirCooled,               !- Condenser Type",
+        "    MyVRFOANode,             !- Condenser Inlet Node Name",
+        "    ,                        !- Condenser Outlet Node Name",
+        "    ,                        !- Water Condenser Volume Flow Rate {m3/s}",
+        "    ,                        !- Evaporative Condenser Effectiveness {dimensionless}",
+        "    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}",
+        "    0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}",
+        "    ,                        !- Supply Water Storage Tank Name",
+        "    0,                       !- Basin Heater Capacity {W/K}",
+        "    ,                        !- Basin Heater Setpoint Temperature {C}",
+        "    ,                        !- Basin Heater Operating Schedule Name",
+        "    Electricity;             !- Fuel Type",
+
+        "  Curve:Biquadratic,",
+        "    VRFCoolCapFT,            !- Name",
+        "    0.576882692,             !- Coefficient1 Constant",
+        "    0.017447952,             !- Coefficient2 x",
+        "    0.000583269,             !- Coefficient3 x**2",
+        "    -1.76324E-06,            !- Coefficient4 y",
+        "    -7.474E-09,              !- Coefficient5 y**2",
+        "    -1.30413E-07,            !- Coefficient6 x*y",
+        "    15,                      !- Minimum Value of x",
+        "    24,                      !- Maximum Value of x",
+        "    -5,                      !- Minimum Value of y",
+        "    23,                      !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Cubic,",
+        "    VRFCoolCapFTBoundary,    !- Name",
+        "    25.73473775,             !- Coefficient1 Constant",
+        "    -0.03150043,             !- Coefficient2 x",
+        "    -0.01416595,             !- Coefficient3 x**2",
+        "    0,                       !- Coefficient4 x**3",
+        "    11,                      !- Minimum Value of x",
+        "    30,                      !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature;             !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "    VRFCoolCapFTHi,          !- Name",
+        "    0.6867358,               !- Coefficient1 Constant",
+        "    0.0207631,               !- Coefficient2 x",
+        "    0.0005447,               !- Coefficient3 x**2",
+        "    -0.0016218,              !- Coefficient4 y",
+        "    -4.259E-07,              !- Coefficient5 y**2",
+        "    -0.0003392,              !- Coefficient6 x*y",
+        "    15,                      !- Minimum Value of x",
+        "    24,                      !- Maximum Value of x",
+        "    16,                      !- Minimum Value of y",
+        "    43,                      !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "    VRFCoolEIRFT,            !- Name",
+        "    0.989010541,             !- Coefficient1 Constant",
+        "    -0.02347967,             !- Coefficient2 x",
+        "    0.000199711,             !- Coefficient3 x**2",
+        "    0.005968336,             !- Coefficient4 y",
+        "    -1.0289E-07,             !- Coefficient5 y**2",
+        "    -0.00015686,             !- Coefficient6 x*y",
+        "    15,                      !- Minimum Value of x",
+        "    24,                      !- Maximum Value of x",
+        "    -5,                      !- Minimum Value of y",
+        "    23,                      !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Cubic,",
+        "    VRFCoolEIRFTBoundary,    !- Name",
+        "    25.73473775,             !- Coefficient1 Constant",
+        "    -0.03150043,             !- Coefficient2 x",
+        "    -0.01416595,             !- Coefficient3 x**2",
+        "    0,                       !- Coefficient4 x**3",
+        "    15,                      !- Minimum Value of x",
+        "    24,                      !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature;             !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "    VRFCoolEIRFTHi,          !- Name",
+        "    0.14351470,              !- Coefficient1 Constant",
+        "    0.01860035,              !- Coefficient2 x",
+        "    -0.0003954,              !- Coefficient3 x**2",
+        "    0.02485219,              !- Coefficient4 y",
+        "    0.00016329,              !- Coefficient5 y**2",
+        "    -0.0006244,              !- Coefficient6 x*y",
+        "    15,                      !- Minimum Value of x",
+        "    24,                      !- Maximum Value of x",
+        "    16,                      !- Minimum Value of y",
+        "    43,                      !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Cubic,",
+        "    CoolingEIRLowPLR,        !- Name",
+        "    0.4628123,               !- Coefficient1 Constant",
+        "    -1.0402406,              !- Coefficient2 x",
+        "    2.17490997,              !- Coefficient3 x**2",
+        "    -0.5974817,              !- Coefficient4 x**3",
+        "    0,                       !- Minimum Value of x",
+        "    1,                       !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature;             !- Output Unit Type",
+
+        "  Curve:Quadratic,",
+        "    CoolingEIRHiPLR,         !- Name",
+        "    1.0,                     !- Coefficient1 Constant",
+        "    0.0,                     !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    1.0,                     !- Minimum Value of x",
+        "    1.5,                     !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Linear,",
+        "    CoolingCombRatio,        !- Name",
+        "    0.618055,                !- Coefficient1 Constant",
+        "    0.381945,                !- Coefficient2 x",
+        "    1.0,                     !- Minimum Value of x",
+        "    1.5,                     !- Maximum Value of x",
+        "    1.0,                     !- Minimum Curve Output",
+        "    1.2,                     !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  CURVE:QUADRATIC,",
+        "    VRFCPLFFPLR,             !- Name",
+        "    0.85,                    !- Coefficient1 Constant",
+        "    0.15,                    !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.0,                     !- Minimum Value of x",
+        "    1.0,                     !- Maximum Value of x",
+        "    0.85,                    !- Minimum Curve Output",
+        "    1.0,                     !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "    VRFHeatCapFT,            !- Name",
+        "    1.014599599,             !- Coefficient1 Constant",
+        "    -0.002506703,            !- Coefficient2 x",
+        "    -0.000141599,            !- Coefficient3 x**2",
+        "    0.026931595,             !- Coefficient4 y",
+        "    1.83538E-06,             !- Coefficient5 y**2",
+        "    -0.000358147,            !- Coefficient6 x*y",
+        "    15,                      !- Minimum Value of x",
+        "    27,                      !- Maximum Value of x",
+        "    -20,                     !- Minimum Value of y",
+        "    15,                      !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Cubic,",
+        "    VRFHeatCapFTBoundary,    !- Name",
+        "    -7.6000882,              !- Coefficient1 Constant",
+        "    3.05090016,              !- Coefficient2 x",
+        "    -0.1162844,              !- Coefficient3 x**2",
+        "    0.0,                     !- Coefficient4 x**3",
+        "    15,                      !- Minimum Value of x",
+        "    27,                      !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature;             !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "    VRFHeatCapFTHi,          !- Name",
+        "    1.161134821,             !- Coefficient1 Constant",
+        "    0.027478868,             !- Coefficient2 x",
+        "    -0.00168795,             !- Coefficient3 x**2",
+        "    0.001783378,             !- Coefficient4 y",
+        "    2.03208E-06,             !- Coefficient5 y**2",
+        "    -6.8969E-05,             !- Coefficient6 x*y",
+        "    15,                      !- Minimum Value of x",
+        "    27,                      !- Maximum Value of x",
+        "    -10,                     !- Minimum Value of y",
+        "    15,                      !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "    VRFHeatEIRFT,            !- Name",
+        "    0.87465501,              !- Coefficient1 Constant",
+        "    -0.01319754,             !- Coefficient2 x",
+        "    0.00110307,              !- Coefficient3 x**2",
+        "    -0.0133118,              !- Coefficient4 y",
+        "    0.00089017,              !- Coefficient5 y**2",
+        "    -0.00012766,             !- Coefficient6 x*y",
+        "    15,                      !- Minimum Value of x",
+        "    27,                      !- Maximum Value of x",
+        "    -20,                     !- Minimum Value of y",
+        "    12,                      !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Cubic,",
+        "    VRFHeatEIRFTBoundary,    !- Name",
+        "    -7.6000882,              !- Coefficient1 Constant",
+        "    3.05090016,              !- Coefficient2 x",
+        "    -0.1162844,              !- Coefficient3 x**2",
+        "    0.0,                     !- Coefficient4 x**3",
+        "    15,                      !- Minimum Value of x",
+        "    27,                      !- Maximum Value of x",
+        "    -20,                     !- Minimum Curve Output",
+        "    15,                      !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature;             !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "    VRFHeatEIRFTHi,          !- Name",
+        "    2.504005146,             !- Coefficient1 Constant",
+        "    -0.05736767,             !- Coefficient2 x",
+        "    4.07336E-05,             !- Coefficient3 x**2",
+        "    -0.12959669,             !- Coefficient4 y",
+        "    0.00135839,              !- Coefficient5 y**2",
+        "    0.00317047,              !- Coefficient6 x*y",
+        "    15,                      !- Minimum Value of x",
+        "    27,                      !- Maximum Value of x",
+        "    -10,                     !- Minimum Value of y",
+        "    15,                      !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Cubic,",
+        "    HeatingEIRLowPLR,        !- Name",
+        "    0.1400093,               !- Coefficient1 Constant",
+        "    0.6415002,               !- Coefficient2 x",
+        "    0.1339047,               !- Coefficient3 x**2",
+        "    0.0845859,               !- Coefficient4 x**3",
+        "    0,                       !- Minimum Value of x",
+        "    1,                       !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Quadratic,",
+        "    HeatingEIRHiPLR,         !- Name",
+        "    2.4294355,               !- Coefficient1 Constant",
+        "    -2.235887,               !- Coefficient2 x",
+        "    0.8064516,               !- Coefficient3 x**2",
+        "    1.0,                     !- Minimum Value of x",
+        "    1.5,                     !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Linear,",
+        "    HeatingCombRatio,        !- Name",
+        "    0.96034,                 !- Coefficient1 Constant",
+        "    0.03966,                 !- Coefficient2 x",
+        "    1.0,                     !- Minimum Value of x",
+        "    1.5,                     !- Maximum Value of x",
+        "    1.0,                     !- Minimum Curve Output",
+        "    1.023,                   !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "    CoolingLengthCorrectionFactor,  !- Name",
+        "    1.0693794,               !- Coefficient1 Constant",
+        "    -0.0014951,              !- Coefficient2 x",
+        "    2.56E-06,                !- Coefficient3 x**2",
+        "    -0.1151104,              !- Coefficient4 y",
+        "    0.0511169,               !- Coefficient5 y**2",
+        "    -0.0004369,              !- Coefficient6 x*y",
+        "    8,                       !- Minimum Value of x",
+        "    175,                     !- Maximum Value of x",
+        "    0.5,                     !- Minimum Value of y",
+        "    1.5,                     !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  OutdoorAir:NodeList,",
+        "    OutsideAirInletNodes;    !- Node or NodeList Name 1",
+
+        "  NodeList,",
+        "    OutsideAirInletNodes,    !- Name",
+        "    Outside Air Inlet Node 1,!- Node 1 Name",
+        "    Outside Air Inlet Node 2,!- Node 2 Name",
+        "    Outside Air Inlet Node 3,!- Node 3 Name",
+        "    Outside Air Inlet Node 4,!- Node 4 Name",
+        "    Outside Air Inlet Node 5,!- Node 5 Name",
+        "    MyVRFOANode;             !- Node 6 Name",
+
+        "  ZoneTerminalUnitList,",
+        "    VRF Heat Pump TU List,   !- Zone Terminal Unit List Name",
+        "    TU3,                     !- Zone Terminal Unit Name 1",
+        "    TU4,                     !- Zone Terminal Unit Name 2",
+        "    TU1,                     !- Zone Terminal Unit Name 3",
+        "    TU2,                     !- Zone Terminal Unit Name 4",
+        "    TU5;                     !- Zone Terminal Unit Name 5",
+
+        "  ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,",
+        "    TU1,                     !- Zone Terminal Unit Name",
+        "    VRFAvailSched,           !- Terminal Unit Availability Schedule",
+        "    TU1 Inlet Node,          !- Terminal Unit Air Inlet Node Name",
+        "    TU1 Outlet Node,         !- Terminal Unit Air Outlet Node Name",
+        "    autosize,                !- Cooling Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- No Cooling Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- Heating Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- No Heating Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}",
+        "    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}",
+        "    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}",
+        "    VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name",
+        "    drawthrough,             !- Supply Air Fan Placement",
+        "    Fan:SystemModel,         !- Supply Air Fan Object Type",
+        "    TU1 VRF Supply Fan,      !- Supply Air Fan Object Name",
+        "    OutdoorAir:Mixer,        !- Outside Air Mixer Object Type",
+        "    TU1 OA Mixer,            !- Outside Air Mixer Object Name",
+        "    COIL:Cooling:DX:VariableRefrigerantFlow,  !- Cooling Coil Object Type",
+        "    TU1 VRF DX Cooling Coil, !- Cooling Coil Object Name",
+        "    COIL:Heating:DX:VariableRefrigerantFlow,  !- Heating Coil Object Type",
+        "    TU1 VRF DX Heating Coil, !- Heating Coil Object Name",
+        "    30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}",
+        "    20,                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}",
+        "    ,                        !- Rated Heating Capacity Sizing Ratio",
+        "    ,                        !- Availability Manager List Name",
+        "    ,                        !- Design Specification ZoneHVAC Sizing Object Name",
+        "    Coil:Heating:Electric,   !- Supplemental Heating Coil Object Type",
+        "    TU1 Supp Heating Coil,   !- Supplemental Heating Coil Name",
+        "    autosize,                !- Maximum Supply Air Temperature from Supplemental Heater",
+        "    ;                        !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation",
+
+        "  ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,",
+        "    TU2,                     !- Zone Terminal Unit Name",
+        "    VRFAvailSched,           !- Terminal Unit Availability Schedule",
+        "    TU2 Inlet Node,          !- Terminal Unit Air Inlet Node Name",
+        "    TU2 Outlet Node,         !- Terminal Unit Air Outlet Node Name",
+        "    autosize,                !- Cooling Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- No Cooling Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- Heating Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- No Heating Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}",
+        "    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}",
+        "    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}",
+        "    VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name",
+        "    drawthrough,             !- Supply Air Fan Placement",
+        "    Fan:SystemModel,         !- Supply Air Fan Object Type",
+        "    TU2 VRF Supply Fan,      !- Supply Air Fan Object Name",
+        "    OutdoorAir:Mixer,        !- Outside Air Mixer Object Type",
+        "    TU2 OA Mixer,            !- Outside Air Mixer Object Name",
+        "    COIL:Cooling:DX:VariableRefrigerantFlow,  !- Cooling Coil Object Type",
+        "    TU2 VRF DX Cooling Coil, !- Cooling Coil Object Name",
+        "    COIL:Heating:DX:VariableRefrigerantFlow,  !- Heating Coil Object Type",
+        "    TU2 VRF DX Heating Coil, !- Heating Coil Object Name",
+        "    30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}",
+        "    20,                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}",
+        "    ,                        !- Rated Heating Capacity Sizing Ratio",
+        "    ,                        !- Availability Manager List Name",
+        "    ,                        !- Design Specification ZoneHVAC Sizing Object Name",
+        "    Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type",
+        "    TU2 Supp Heating Coil,   !- Supplemental Heating Coil Name",
+        "    autosize,                !- Maximum Supply Air Temperature from Supplemental Heater",
+        "    ;                        !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation",
+
+        "  ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,",
+        "    TU3,                     !- Zone Terminal Unit Name",
+        "    VRFAvailSched,           !- Terminal Unit Availability Schedule",
+        "    TU3 Inlet Node,          !- Terminal Unit Air Inlet Node Name",
+        "    TU3 Outlet Node,         !- Terminal Unit Air Outlet Node Name",
+        "    autosize,                !- Cooling Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- No Cooling Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- Heating Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- No Heating Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}",
+        "    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}",
+        "    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}",
+        "    VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name",
+        "    drawthrough,             !- Supply Air Fan Placement",
+        "    Fan:SystemModel,         !- Supply Air Fan Object Type",
+        "    TU3 VRF Supply Fan,      !- Supply Air Fan Object Name",
+        "    OutdoorAir:Mixer,        !- Outside Air Mixer Object Type",
+        "    TU3 OA Mixer,            !- Outside Air Mixer Object Name",
+        "    COIL:Cooling:DX:VariableRefrigerantFlow,  !- Cooling Coil Object Type",
+        "    TU3 VRF DX Cooling Coil, !- Cooling Coil Object Name",
+        "    COIL:Heating:DX:VariableRefrigerantFlow,  !- Heating Coil Object Type",
+        "    TU3 VRF DX Heating Coil, !- Heating Coil Object Name",
+        "    30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}",
+        "    20,                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}",
+        "    ,                        !- Rated Heating Capacity Sizing Ratio",
+        "    ,                        !- Availability Manager List Name",
+        "    ,                        !- Design Specification ZoneHVAC Sizing Object Name",
+        "    Coil:Heating:Water,      !- Supplemental Heating Coil Object Type",
+        "    TU3 Supp Heating Coil,   !- Supplemental Heating Coil Name",
+        "    autosize,                !- Maximum Supply Air Temperature from Supplemental Heater",
+        "    ;                        !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation",
+
+        "  ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,",
+        "    TU4,                     !- Zone Terminal Unit Name",
+        "    VRFAvailSched,           !- Terminal Unit Availability Schedule",
+        "    TU4 Inlet Node,          !- Terminal Unit Air Inlet Node Name",
+        "    TU4 Outlet Node,         !- Terminal Unit Air Outlet Node Name",
+        "    autosize,                !- Cooling Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- No Cooling Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- Heating Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- No Heating Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}",
+        "    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}",
+        "    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}",
+        "    VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name",
+        "    drawthrough,             !- Supply Air Fan Placement",
+        "    Fan:SystemModel,         !- Supply Air Fan Object Type",
+        "    TU4 VRF Supply Fan,      !- Supply Air Fan Object Name",
+        "    OutdoorAir:Mixer,        !- Outside Air Mixer Object Type",
+        "    TU4 OA Mixer,            !- Outside Air Mixer Object Name",
+        "    COIL:Cooling:DX:VariableRefrigerantFlow,  !- Cooling Coil Object Type",
+        "    TU4 VRF DX Cooling Coil, !- Cooling Coil Object Name",
+        "    COIL:Heating:DX:VariableRefrigerantFlow,  !- Heating Coil Object Type",
+        "    TU4 VRF DX Heating Coil, !- Heating Coil Object Name",
+        "    30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}",
+        "    20,                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}",
+        "    ,                        !- Rated Heating Capacity Sizing Ratio",
+        "    ,                        !- Availability Manager List Name",
+        "    ,                        !- Design Specification ZoneHVAC Sizing Object Name",
+        "    Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type",
+        "    TU4 Supp Heating Coil,   !- Supplemental Heating Coil Name",
+        "    autosize,                !- Maximum Supply Air Temperature from Supplemental Heater",
+        "    ;                        !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation",
+
+        "  ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,",
+        "    TU5,                     !- Zone Terminal Unit Name",
+        "    VRFAvailSched,           !- Terminal Unit Availability Schedule",
+        "    TU5 Inlet Node,          !- Terminal Unit Air Inlet Node Name",
+        "    TU5 Outlet Node,         !- Terminal Unit Air Outlet Node Name",
+        "    autosize,                !- Cooling Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- No Cooling Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- Heating Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- No Heating Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}",
+        "    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}",
+        "    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}",
+        "    VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name",
+        "    drawthrough,             !- Supply Air Fan Placement",
+        "    Fan:SystemModel,         !- Supply Air Fan Object Type",
+        "    TU5 VRF Supply Fan,      !- Supply Air Fan Object Name",
+        "    OutdoorAir:Mixer,        !- Outside Air Mixer Object Type",
+        "    TU5 OA Mixer,            !- Outside Air Mixer Object Name",
+        "    COIL:Cooling:DX:VariableRefrigerantFlow,  !- Cooling Coil Object Type",
+        "    TU5 VRF DX Cooling Coil, !- Cooling Coil Object Name",
+        "    COIL:Heating:DX:VariableRefrigerantFlow,  !- Heating Coil Object Type",
+        "    TU5 VRF DX Heating Coil, !- Heating Coil Object Name",
+        "    30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}",
+        "    20,                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}",
+        "    ,                        !- Rated Heating Capacity Sizing Ratio",
+        "    ,                        !- Availability Manager List Name",
+        "    ,                        !- Design Specification ZoneHVAC Sizing Object Name",
+        "    Coil:Heating:Steam,      !- Supplemental Heating Coil Object Type",
+        "    TU5 Supp Heating Coil,   !- Supplemental Heating Coil Name",
+        "    autosize,                !- Maximum Supply Air Temperature from Supplemental Heater",
+        "    ;                        !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation",
+
+        "  Schedule:Compact,",
+        "    VRFAvailSched,           !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,1.0;        !- Field 3",
+
+        "  Fan:SystemModel,",
+        "    TU1 VRF Supply Fan,      !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    TU1 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name",
+        "    TU1 VRF Fan Outlet Node, !- Air Outlet Node Name",
+        "    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}",
+        "    Discrete,                !- Speed Control Method",
+        "    0.0,                     !- Electric Power Minimum Flow Rate Fraction",
+        "    600.0,                   !- Design Pressure Rise {Pa}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Air Stream Fraction",
+        "    AUTOSIZE,                !- Design Electric Power Consumption {W}",
+        "    TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+        "    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "    0.70;                    !- Fan Total Efficiency",
+
+        "  Fan:SystemModel,",
+        "    TU2 VRF Supply Fan,      !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    TU2 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name",
+        "    TU2 VRF Fan Outlet Node, !- Air Outlet Node Name",
+        "    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}",
+        "    Discrete,                !- Speed Control Method",
+        "    0.0,                     !- Electric Power Minimum Flow Rate Fraction",
+        "    600.0,                   !- Design Pressure Rise {Pa}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Air Stream Fraction",
+        "    AUTOSIZE,                !- Design Electric Power Consumption {W}",
+        "    TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+        "    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "    0.70;                    !- Fan Total Efficiency",
+
+        "  Fan:SystemModel,",
+        "    TU3 VRF Supply Fan,      !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    TU3 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name",
+        "    TU3 VRF Fan Outlet Node, !- Air Outlet Node Name",
+        "    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}",
+        "    Discrete,                !- Speed Control Method",
+        "    0.0,                     !- Electric Power Minimum Flow Rate Fraction",
+        "    600.0,                   !- Design Pressure Rise {Pa}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Air Stream Fraction",
+        "    AUTOSIZE,                !- Design Electric Power Consumption {W}",
+        "    TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+        "    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "    0.70;                    !- Fan Total Efficiency",
+
+        "  Fan:SystemModel,",
+        "    TU4 VRF Supply Fan,      !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    TU4 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name",
+        "    TU4 VRF Fan Outlet Node, !- Air Outlet Node Name",
+        "    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}",
+        "    Discrete,                !- Speed Control Method",
+        "    0.0,                     !- Electric Power Minimum Flow Rate Fraction",
+        "    600.0,                   !- Design Pressure Rise {Pa}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Air Stream Fraction",
+        "    AUTOSIZE,                !- Design Electric Power Consumption {W}",
+        "    TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+        "    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "    0.70;                    !- Fan Total Efficiency",
+
+        "  Fan:SystemModel,",
+        "    TU5 VRF Supply Fan,      !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    TU5 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name",
+        "    TU5 VRF Fan Outlet Node, !- Air Outlet Node Name",
+        "    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}",
+        "    Discrete,                !- Speed Control Method",
+        "    0.0,                     !- Electric Power Minimum Flow Rate Fraction",
+        "    600.0,                   !- Design Pressure Rise {Pa}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Air Stream Fraction",
+        "    AUTOSIZE,                !- Design Electric Power Consumption {W}",
+        "    TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+        "    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "    0.70;                    !- Fan Total Efficiency",
+
+        "  OutdoorAir:Mixer,",
+        "    TU1 OA Mixer,            !- Name",
+        "    TU1 VRF DX CCoil Inlet Node,  !- Mixed Air Node Name",
+        "    Outside Air Inlet Node 1,!- Outdoor Air Stream Node Name",
+        "    Relief Air Outlet Node 1,!- Relief Air Stream Node Name",
+        "    TU1 Inlet Node;          !- Return Air Stream Node Name",
+
+        "  OutdoorAir:Mixer,",
+        "    TU2 OA Mixer,            !- Name",
+        "    TU2 VRF DX CCoil Inlet Node,  !- Mixed Air Node Name",
+        "    Outside Air Inlet Node 2,!- Outdoor Air Stream Node Name",
+        "    Relief Air Outlet Node 2,!- Relief Air Stream Node Name",
+        "    TU2 Inlet Node;          !- Return Air Stream Node Name",
+
+        "  OutdoorAir:Mixer,",
+        "    TU3 OA Mixer,            !- Name",
+        "    TU3 VRF DX CCoil Inlet Node,  !- Mixed Air Node Name",
+        "    Outside Air Inlet Node 3,!- Outdoor Air Stream Node Name",
+        "    Relief Air Outlet Node 3,!- Relief Air Stream Node Name",
+        "    TU3 Inlet Node;          !- Return Air Stream Node Name",
+
+        "  OutdoorAir:Mixer,",
+        "    TU4 OA Mixer,            !- Name",
+        "    TU4 VRF DX CCoil Inlet Node,  !- Mixed Air Node Name",
+        "    Outside Air Inlet Node 4,!- Outdoor Air Stream Node Name",
+        "    Relief Air Outlet Node 4,!- Relief Air Stream Node Name",
+        "    TU4 Inlet Node;          !- Return Air Stream Node Name",
+
+        "  OutdoorAir:Mixer,",
+        "    TU5 OA Mixer,            !- Name",
+        "    TU5 VRF DX CCoil Inlet Node,  !- Mixed Air Node Name",
+        "    Outside Air Inlet Node 5,!- Outdoor Air Stream Node Name",
+        "    Relief Air Outlet Node 5,!- Relief Air Stream Node Name",
+        "    TU5 Inlet Node;          !- Return Air Stream Node Name",
+
+        "  COIL:Cooling:DX:VariableRefrigerantFlow,",
+        "    TU1 VRF DX Cooling Coil, !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    autosize,                !- Gross Rated Total Cooling Capacity {W}",
+        "    autosize,                !- Gross Rated Sensible Heat Ratio",
+        "    autosize,                !- Rated Air Flow Rate {m3/s}",
+        "    VRFTUCoolCapFT,          !- Cooling Capacity Ratio Modifier Function of Temperature Curve Name",
+        "    VRFACCoolCapFFF,         !- Cooling Capacity Modifier Curve Function of Flow Fraction Name",
+        "    TU1 VRF DX CCoil Inlet Node,  !- Coil Air Inlet Node",
+        "    TU1 VRF DX CCoil Outlet Node,  !- Coil Air Outlet Node",
+        "    ;                        !- Name of Water Storage Tank for Condensate Collection",
+
+        "  COIL:Cooling:DX:VariableRefrigerantFlow,",
+        "    TU2 VRF DX Cooling Coil, !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    autosize,                !- Gross Rated Total Cooling Capacity {W}",
+        "    autosize,                !- Gross Rated Sensible Heat Ratio",
+        "    autosize,                !- Rated Air Flow Rate {m3/s}",
+        "    VRFTUCoolCapFT,          !- Cooling Capacity Ratio Modifier Function of Temperature Curve Name",
+        "    VRFACCoolCapFFF,         !- Cooling Capacity Modifier Curve Function of Flow Fraction Name",
+        "    TU2 VRF DX CCoil Inlet Node,  !- Coil Air Inlet Node",
+        "    TU2 VRF DX CCoil Outlet Node,  !- Coil Air Outlet Node",
+        "    ;                        !- Name of Water Storage Tank for Condensate Collection",
+
+        "  COIL:Cooling:DX:VariableRefrigerantFlow,",
+        "    TU3 VRF DX Cooling Coil, !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    autosize,                !- Gross Rated Total Cooling Capacity {W}",
+        "    autosize,                !- Gross Rated Sensible Heat Ratio",
+        "    autosize,                !- Rated Air Flow Rate {m3/s}",
+        "    VRFTUCoolCapFT,          !- Cooling Capacity Ratio Modifier Function of Temperature Curve Name",
+        "    VRFACCoolCapFFF,         !- Cooling Capacity Modifier Curve Function of Flow Fraction Name",
+        "    TU3 VRF DX CCoil Inlet Node,  !- Coil Air Inlet Node",
+        "    TU3 VRF DX CCoil Outlet Node,  !- Coil Air Outlet Node",
+        "    ;                        !- Name of Water Storage Tank for Condensate Collection",
+
+        "  COIL:Cooling:DX:VariableRefrigerantFlow,",
+        "    TU4 VRF DX Cooling Coil, !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    autosize,                !- Gross Rated Total Cooling Capacity {W}",
+        "    autosize,                !- Gross Rated Sensible Heat Ratio",
+        "    autosize,                !- Rated Air Flow Rate {m3/s}",
+        "    VRFTUCoolCapFT,          !- Cooling Capacity Ratio Modifier Function of Temperature Curve Name",
+        "    VRFACCoolCapFFF,         !- Cooling Capacity Modifier Curve Function of Flow Fraction Name",
+        "    TU4 VRF DX CCoil Inlet Node,  !- Coil Air Inlet Node",
+        "    TU4 VRF DX CCoil Outlet Node,  !- Coil Air Outlet Node",
+        "    ;                        !- Name of Water Storage Tank for Condensate Collection",
+
+        "  COIL:Cooling:DX:VariableRefrigerantFlow,",
+        "    TU5 VRF DX Cooling Coil, !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    autosize,                !- Gross Rated Total Cooling Capacity {W}",
+        "    autosize,                !- Gross Rated Sensible Heat Ratio",
+        "    autosize,                !- Rated Air Flow Rate {m3/s}",
+        "    VRFTUCoolCapFT,          !- Cooling Capacity Ratio Modifier Function of Temperature Curve Name",
+        "    VRFACCoolCapFFF,         !- Cooling Capacity Modifier Curve Function of Flow Fraction Name",
+        "    TU5 VRF DX CCoil Inlet Node,  !- Coil Air Inlet Node",
+        "    TU5 VRF DX CCoil Outlet Node,  !- Coil Air Outlet Node",
+        "    ;                        !- Name of Water Storage Tank for Condensate Collection",
+
+        "  COIL:Heating:DX:VariableRefrigerantFlow,",
+        "    TU1 VRF DX Heating Coil, !- Name",
+        "    VRFAvailSched,           !- Availability Schedule",
+        "    autosize,                !- Gross Rated Heating Capacity {W}",
+        "    autosize,                !- Rated Air Flow Rate {m3/s}",
+        "    TU1 VRF DX CCoil Outlet Node,  !- Coil Air Inlet Node",
+        "    TU1 VRF DX HCoil Outlet Node,  !- Coil Air Outlet Node",
+        "    VRFTUHeatCapFT,          !- Heating Capacity Ratio Modifier Function of Temperature Curve Name",
+        "    VRFACCoolCapFFF;         !- Heating Capacity Modifier Function of Flow Fraction Curve Name",
+
+        "  COIL:Heating:DX:VariableRefrigerantFlow,",
+        "    TU2 VRF DX Heating Coil, !- Name",
+        "    VRFAvailSched,           !- Availability Schedule",
+        "    autosize,                !- Gross Rated Heating Capacity {W}",
+        "    autosize,                !- Rated Air Flow Rate {m3/s}",
+        "    TU2 VRF DX CCoil Outlet Node,  !- Coil Air Inlet Node",
+        "    TU2 VRF DX HCoil Outlet Node,  !- Coil Air Outlet Node",
+        "    VRFTUHeatCapFT,          !- Heating Capacity Ratio Modifier Function of Temperature Curve Name",
+        "    VRFACCoolCapFFF;         !- Heating Capacity Modifier Function of Flow Fraction Curve Name",
+
+        "  COIL:Heating:DX:VariableRefrigerantFlow,",
+        "    TU3 VRF DX Heating Coil, !- Name",
+        "    VRFAvailSched,           !- Availability Schedule",
+        "    autosize,                !- Gross Rated Heating Capacity {W}",
+        "    autosize,                !- Rated Air Flow Rate {m3/s}",
+        "    TU3 VRF DX CCoil Outlet Node,  !- Coil Air Inlet Node",
+        "    TU3 VRF DX HCoil Outlet Node,  !- Coil Air Outlet Node",
+        "    VRFTUHeatCapFT,          !- Heating Capacity Ratio Modifier Function of Temperature Curve Name",
+        "    VRFACCoolCapFFF;         !- Heating Capacity Modifier Function of Flow Fraction Curve Name",
+
+        "  COIL:Heating:DX:VariableRefrigerantFlow,",
+        "    TU4 VRF DX Heating Coil, !- Name",
+        "    VRFAvailSched,           !- Availability Schedule",
+        "    autosize,                !- Gross Rated Heating Capacity {W}",
+        "    autosize,                !- Rated Air Flow Rate {m3/s}",
+        "    TU4 VRF DX CCoil Outlet Node,  !- Coil Air Inlet Node",
+        "    TU4 VRF DX HCoil Outlet Node,  !- Coil Air Outlet Node",
+        "    VRFTUHeatCapFT,          !- Heating Capacity Ratio Modifier Function of Temperature Curve Name",
+        "    VRFACCoolCapFFF;         !- Heating Capacity Modifier Function of Flow Fraction Curve Name",
+
+        "  COIL:Heating:DX:VariableRefrigerantFlow,",
+        "    TU5 VRF DX Heating Coil, !- Name",
+        "    VRFAvailSched,           !- Availability Schedule",
+        "    autosize,                !- Gross Rated Heating Capacity {W}",
+        "    autosize,                !- Rated Air Flow Rate {m3/s}",
+        "    TU5 VRF DX CCoil Outlet Node,  !- Coil Air Inlet Node",
+        "    TU5 VRF DX HCoil Outlet Node,  !- Coil Air Outlet Node",
+        "    VRFTUHeatCapFT,          !- Heating Capacity Ratio Modifier Function of Temperature Curve Name",
+        "    VRFACCoolCapFFF;         !- Heating Capacity Modifier Function of Flow Fraction Curve Name",
+
+        "  Curve:Cubic,",
+        "    VRFTUCoolCapFT,          !- Name",
+        "    0.504547273506488,       !- Coefficient1 Constant",
+        "    0.0288891279198444,      !- Coefficient2 x",
+        "    -0.000010819418650677,   !- Coefficient3 x**2",
+        "    0.0000101359395177008,   !- Coefficient4 x**3",
+        "    0.0,                     !- Minimum Value of x",
+        "    50.0,                    !- Maximum Value of x",
+        "    0.5,                     !- Minimum Curve Output",
+        "    1.5,                     !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Cubic,",
+        "    VRFTUHeatCapFT,          !- Name",
+        "    -0.390708928227928,      !- Coefficient1 Constant",
+        "    0.261815023760162,       !- Coefficient2 x",
+        "    -0.0130431603151873,     !- Coefficient3 x**2",
+        "    0.000178131745997821,    !- Coefficient4 x**3",
+        "    0.0,                     !- Minimum Value of x",
+        "    50.0,                    !- Maximum Value of x",
+        "    0.5,                     !- Minimum Curve Output",
+        "    1.5,                     !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Quadratic,",
+        "    VRFACCoolCapFFF,         !- Name",
+        "    0.8,                     !- Coefficient1 Constant",
+        "    0.2,                     !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.5,                     !- Minimum Value of x",
+        "    1.5;                     !- Maximum Value of x",
+
+        "  Coil:Heating:Electric,",
+        "    TU1 Supp Heating Coil,   !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    0.99,                    !- Efficiency",
+        "    autosize,                !- Nominal Capacity {W}",
+        "    TU1 VRF Fan Outlet Node, !- Air Inlet Node Name",
+        "    TU1 Outlet Node;         !- Air Outlet Node Name",
+
+        "  Coil:Heating:Fuel,",
+        "    TU2 Supp Heating Coil,   !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    NaturalGas,              !- Fuel Type",
+        "    0.8,                     !- Burner Efficiency",
+        "    autosize,                !- Nominal Capacity {W}",
+        "    TU2 VRF Fan Outlet Node, !- Air Inlet Node Name",
+        "    TU2 Outlet Node;         !- Air Outlet Node Name",
+
+        "  Coil:Heating:Water,",
+        "    TU3 Supp Heating Coil,   !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    autosize,                !- U-Factor Times Area Value {W/K}",
+        "    autosize,                !- Maximum Water Flow Rate {m3/s}",
+        "    TU3HWHeatCoilInletNode,  !- Water Inlet Node Name",
+        "    TU3HWHeatCoilOutletNode, !- Water Outlet Node Name",
+        "    TU3 VRF Fan Outlet Node, !- Air Inlet Node Name",
+        "    TU3 Outlet Node,         !- Air Outlet Node Name",
+        "    UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method",
+        "    autosize,                !- Rated Capacity {W}",
+        "    82.2,                    !- Rated Inlet Water Temperature {C}",
+        "    16.6,                    !- Rated Inlet Air Temperature {C}",
+        "    71.1,                    !- Rated Outlet Water Temperature {C}",
+        "    32.2,                    !- Rated Outlet Air Temperature {C}",
+        "    ;                        !- Rated Ratio for Air and Water Convection",
+
+        "  Coil:Heating:Fuel,",
+        "    TU4 Supp Heating Coil,   !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    NaturalGas,              !- Fuel Type",
+        "    0.8,                     !- Burner Efficiency",
+        "    autosize,                !- Nominal Capacity {W}",
+        "    TU4 VRF Fan Outlet Node, !- Air Inlet Node Name",
+        "    TU4 Outlet Node;         !- Air Outlet Node Name",
+
+        "  Coil:Heating:Steam,",
+        "    TU5 Supp Heating Coil,   !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    autosize,                !- Maximum Steam Flow Rate {m3/s}",
+        "    5.0,                     !- Degree of SubCooling {C}",
+        "    15.0,                    !- Degree of Loop SubCooling {C}",
+        "    TU5 Steam Coil Inlet Node,  !- Water Inlet Node Name",
+        "    TU5 Steam Coil Outlet Node,  !- Water Outlet Node Name",
+        "    TU5 VRF Fan Outlet Node, !- Air Inlet Node Name",
+        "    TU5 Outlet Node,         !- Air Outlet Node Name",
+        "    ZoneLoadControl;         !- Coil Control Type",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // get zone data
+    bool ErrorsFound(false);
+    GetZoneData(*state, ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+
+    // read equip list and connections
+    GetZoneEquipmentData(*state);
+    // get VRF terminal unit
+    GetVRFInput(*state);
+
+    auto &VRFTU_1(state->dataHVACVarRefFlow->VRFTU(1));
+    // Check the results
+    EXPECT_EQ(VRFTU_1.Name, "TU1");
+    EXPECT_EQ(VRFTU_1.SuppHeatCoilType, "COIL:HEATING:ELECTRIC");
+    EXPECT_EQ(VRFTU_1.SuppHeatCoilName, "TU1 SUPP HEATING COIL");
+
+    auto &VRFTU_2(state->dataHVACVarRefFlow->VRFTU(2));
+    // Check the results
+    EXPECT_EQ(VRFTU_2.Name, "TU2");
+    EXPECT_EQ(VRFTU_2.SuppHeatCoilType, "COIL:HEATING:FUEL");
+    EXPECT_EQ(VRFTU_2.SuppHeatCoilName, "TU2 SUPP HEATING COIL");
+
+    auto &VRFTU_3(state->dataHVACVarRefFlow->VRFTU(3));
+    // Check the results
+    EXPECT_EQ(VRFTU_3.Name, "TU3");
+    EXPECT_EQ(VRFTU_3.SuppHeatCoilType, "COIL:HEATING:WATER");
+    EXPECT_EQ(VRFTU_3.SuppHeatCoilName, "TU3 SUPP HEATING COIL");
+
+    auto &VRFTU_4(state->dataHVACVarRefFlow->VRFTU(4));
+    // Check the results
+    EXPECT_EQ(VRFTU_4.Name, "TU4");
+    EXPECT_EQ(VRFTU_4.SuppHeatCoilType, "COIL:HEATING:FUEL");
+    EXPECT_EQ(VRFTU_4.SuppHeatCoilName, "TU4 SUPP HEATING COIL");
+
+    auto &VRFTU_5(state->dataHVACVarRefFlow->VRFTU(5));
+    // Check the results
+    EXPECT_EQ(VRFTU_5.Name, "TU5");
+    EXPECT_EQ(VRFTU_5.SuppHeatCoilType, "COIL:HEATING:STEAM");
+    EXPECT_EQ(VRFTU_5.SuppHeatCoilName, "TU5 SUPP HEATING COIL");
+}
+
+TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilElectric)
+{
+    // PURPOSE OF THE TEST:
+    // checks VRF terminal units supplemental electric heating coil calculation
+
+    VRFTerminalUnitEquipment thisVRFTU;
+
+    int VRFTUNum(1);
+    thisVRFTU.Name = "TU1";
+    thisVRFTU.SuppHeatCoilType = "COIL:HEATING:ELECTRIC";
+    thisVRFTU.SuppHeatCoilName = "TU1 SUPP HEATING COIL";
+    thisVRFTU.SuppHeatCoilType_Num = DataHVACGlobals::Coil_HeatingElectric;
+    thisVRFTU.OpMode = DataHVACGlobals::ContFanCycCoil;
+    thisVRFTU.VRFTUType_Num = VRFTUType_ConstVolume;
+    thisVRFTU.SuppHeatCoilAirInletNode = 1;
+    thisVRFTU.SuppHeatCoilAirOutletNode = 2;
+    thisVRFTU.SuppHeatCoilIndex = 1;
+    thisVRFTU.MaxOATSuppHeatingCoil = 21.0;
+    thisVRFTU.MaxSATFromSuppHeatCoil = 50.0;
+    thisVRFTU.SuppHeatPartLoadRatio = 1.0;
+
+    int CoilNum(1);
+    state->dataLoopNodes->Node.allocate(2);
+    state->dataHeatingCoils->NumHeatingCoils = 1;
+    state->dataHeatingCoils->GetCoilsInputFlag = false;
+    state->dataHeatingCoils->HeatingCoil.allocate(state->dataHeatingCoils->NumHeatingCoils);
+    state->dataHeatingCoils->CoilIsSuppHeater = true;
+    state->dataHeatingCoils->HeatingCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
+    state->dataHeatingCoils->HeatingCoil(CoilNum).HeatingCoilType = thisVRFTU.SuppHeatCoilType;
+    state->dataHeatingCoils->HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Electricity;
+    state->dataHeatingCoils->HeatingCoil(CoilNum).HCoilType_Num = thisVRFTU.SuppHeatCoilType_Num;
+    state->dataHeatingCoils->HeatingCoil(CoilNum).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
+    state->dataHeatingCoils->HeatingCoil(CoilNum).AirOutletNodeNum = thisVRFTU.SuppHeatCoilAirOutletNode;
+    state->dataHeatingCoils->HeatingCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn; // fan is always on
+    state->dataHeatingCoils->HeatingCoil(CoilNum).NominalCapacity = 10000.0;
+    state->dataHeatingCoils->HeatingCoil(CoilNum).Efficiency = 1.0;
+    state->dataHeatingCoils->CheckEquipName.dimension(state->dataHeatingCoils->NumHeatingCoils, true);
+    state->dataHeatingCoils->ValidSourceType.dimension(state->dataHeatingCoils->NumHeatingCoils, true);
+
+    state->dataGlobal->SysSizingCalc = true;
+    state->dataEnvrn->OutDryBulbTemp = 5.0;
+    // init coil inlet condition
+    state->dataLoopNodes->Node(state->dataHeatingCoils->HeatingCoil(CoilNum).AirInletNodeNum).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(state->dataHeatingCoils->HeatingCoil(CoilNum).AirInletNodeNum).Temp = 15.0;
+    state->dataLoopNodes->Node(state->dataHeatingCoils->HeatingCoil(CoilNum).AirInletNodeNum).HumRat = 0.0070;
+    state->dataLoopNodes->Node(state->dataHeatingCoils->HeatingCoil(CoilNum).AirInletNodeNum).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataHeatingCoils->HeatingCoil(CoilNum).AirInletNodeNum).Temp,
+                                   state->dataLoopNodes->Node(state->dataHeatingCoils->HeatingCoil(CoilNum).AirInletNodeNum).HumRat);
+
+    bool FirstHVACIteration(false);
+    Real64 SuppHeatCoilLoad = 10000.0;
+    // run supplemental heating coil
+    thisVRFTU.CalcVRFSuppHeatingCoil(*state, VRFTUNum, FirstHVACIteration, thisVRFTU.SuppHeatPartLoadRatio, SuppHeatCoilLoad);
+    // check the coil load delivered
+    EXPECT_EQ(10000.0, SuppHeatCoilLoad);
+    EXPECT_EQ(10000.0, state->dataHeatingCoils->HeatingCoil(CoilNum).ElecUseRate);
+    // test heating load larger than coil nominal capacity
+    state->dataLoopNodes->Node(state->dataHeatingCoils->HeatingCoil(CoilNum).AirInletNodeNum).MassFlowRate = 1.0;
+    SuppHeatCoilLoad = 12000.0;
+    thisVRFTU.CalcVRFSuppHeatingCoil(*state, VRFTUNum, FirstHVACIteration, thisVRFTU.SuppHeatPartLoadRatio, SuppHeatCoilLoad);
+    // delivered heat cannot exceed coil capacity
+    EXPECT_EQ(10000.0, SuppHeatCoilLoad);
+    EXPECT_EQ(10000.0, state->dataHeatingCoils->HeatingCoil(CoilNum).ElecUseRate);
+}
+
+TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilFuel)
+{
+    // PURPOSE OF THE TEST:
+    // checks VRF terminal units supplemental natural gas heating coil calculation
+
+    VRFTerminalUnitEquipment thisVRFTU;
+
+    int VRFTUNum(1);
+    thisVRFTU.Name = "TU2";
+    thisVRFTU.SuppHeatCoilType = "COIL:HEATING:FUEL";
+    thisVRFTU.SuppHeatCoilName = "TU2 SUPP HEATING COIL";
+    thisVRFTU.SuppHeatCoilType_Num = DataHVACGlobals::Coil_HeatingGasOrOtherFuel;
+    thisVRFTU.OpMode = DataHVACGlobals::ContFanCycCoil;
+    thisVRFTU.VRFTUType_Num = VRFTUType_ConstVolume;
+    thisVRFTU.SuppHeatCoilAirInletNode = 1;
+    thisVRFTU.SuppHeatCoilAirOutletNode = 2;
+    thisVRFTU.SuppHeatCoilIndex = 1;
+    thisVRFTU.MaxOATSuppHeatingCoil = 21.0;
+    thisVRFTU.MaxSATFromSuppHeatCoil = 50.0;
+    thisVRFTU.SuppHeatPartLoadRatio = 1.0;
+
+    int CoilNum(1);
+    state->dataLoopNodes->Node.allocate(2);
+    state->dataHeatingCoils->NumHeatingCoils = 1;
+    state->dataHeatingCoils->GetCoilsInputFlag = false;
+    state->dataHeatingCoils->HeatingCoil.allocate(state->dataHeatingCoils->NumHeatingCoils);
+    state->dataHeatingCoils->CoilIsSuppHeater = true;
+    state->dataHeatingCoils->HeatingCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
+    state->dataHeatingCoils->HeatingCoil(CoilNum).HeatingCoilType = thisVRFTU.SuppHeatCoilType;
+    state->dataHeatingCoils->HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Natural_Gas;
+    state->dataHeatingCoils->HeatingCoil(CoilNum).HCoilType_Num = thisVRFTU.SuppHeatCoilType_Num;
+    state->dataHeatingCoils->HeatingCoil(CoilNum).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
+    state->dataHeatingCoils->HeatingCoil(CoilNum).AirOutletNodeNum = thisVRFTU.SuppHeatCoilAirOutletNode;
+    state->dataHeatingCoils->HeatingCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn; // fan is always on
+    state->dataHeatingCoils->HeatingCoil(CoilNum).NominalCapacity = 10000.0;
+    state->dataHeatingCoils->HeatingCoil(CoilNum).Efficiency = 1.0;
+    state->dataHeatingCoils->CheckEquipName.dimension(state->dataHeatingCoils->NumHeatingCoils, true);
+    state->dataHeatingCoils->ValidSourceType.dimension(state->dataHeatingCoils->NumHeatingCoils, true);
+
+    state->dataGlobal->SysSizingCalc = true;
+    state->dataEnvrn->OutDryBulbTemp = 5.0;
+    // init coil inlet condition
+    state->dataLoopNodes->Node(state->dataHeatingCoils->HeatingCoil(CoilNum).AirInletNodeNum).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(state->dataHeatingCoils->HeatingCoil(CoilNum).AirInletNodeNum).Temp = 15.0;
+    state->dataLoopNodes->Node(state->dataHeatingCoils->HeatingCoil(CoilNum).AirInletNodeNum).HumRat = 0.0070;
+    state->dataLoopNodes->Node(state->dataHeatingCoils->HeatingCoil(CoilNum).AirInletNodeNum).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataHeatingCoils->HeatingCoil(CoilNum).AirInletNodeNum).Temp,
+                                   state->dataLoopNodes->Node(state->dataHeatingCoils->HeatingCoil(CoilNum).AirInletNodeNum).HumRat);
+
+    bool FirstHVACIteration(false);
+    Real64 SuppHeatCoilLoad = 10000.0;
+    // run supplemental heating coil
+    thisVRFTU.CalcVRFSuppHeatingCoil(*state, VRFTUNum, FirstHVACIteration, thisVRFTU.SuppHeatPartLoadRatio, SuppHeatCoilLoad);
+    // check the coil load delivered
+    EXPECT_EQ(10000.0, SuppHeatCoilLoad);
+    EXPECT_EQ(10000.0, state->dataHeatingCoils->HeatingCoil(CoilNum).FuelUseRate);
+    // test heating load larger than coil nominal capacity
+    state->dataLoopNodes->Node(state->dataHeatingCoils->HeatingCoil(CoilNum).AirInletNodeNum).MassFlowRate = 1.0;
+    SuppHeatCoilLoad = 12000.0;
+    thisVRFTU.CalcVRFSuppHeatingCoil(*state, VRFTUNum, FirstHVACIteration, thisVRFTU.SuppHeatPartLoadRatio, SuppHeatCoilLoad);
+    // delivered heat cannot exceed coil capacity
+    EXPECT_EQ(10000.0, SuppHeatCoilLoad);
+    EXPECT_EQ(10000.0, state->dataHeatingCoils->HeatingCoil(CoilNum).FuelUseRate);
+}
+
+TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
+{
+    // PURPOSE OF THE TEST:
+    // checks VRF terminal units supplemental hot water heating coil calculation
+
+    VRFTerminalUnitEquipment thisVRFTU;
+
+    int VRFTUNum(1);
+    thisVRFTU.Name = "TU3";
+    thisVRFTU.SuppHeatCoilType = "COIL:HEATING:WATER";
+    thisVRFTU.SuppHeatCoilName = "TU3 SUPP HEATING COIL";
+    thisVRFTU.SuppHeatCoilType_Num = DataHVACGlobals::Coil_HeatingWater;
+    thisVRFTU.OpMode = DataHVACGlobals::ContFanCycCoil;
+    thisVRFTU.VRFTUType_Num = VRFTUType_ConstVolume;
+    thisVRFTU.SuppHeatCoilAirInletNode = 1;
+    thisVRFTU.SuppHeatCoilAirOutletNode = 2;
+    thisVRFTU.SuppHeatCoilIndex = 1;
+    thisVRFTU.MaxOATSuppHeatingCoil = 21.0;
+    thisVRFTU.MaxSATFromSuppHeatCoil = 50.0;
+    thisVRFTU.SuppHeatPartLoadRatio = 1.0;
+    thisVRFTU.SuppHeatCoilFluidInletNode = 3;
+    thisVRFTU.SuppHeatCoilFluidOutletNode = 4;
+    thisVRFTU.SuppHeatCoilFluidMaxFlow = 1.0;
+
+    int CoilNum(1);
+    state->dataLoopNodes->Node.allocate(4);
+    state->dataWaterCoils->NumWaterCoils = 1;
+    state->dataWaterCoils->WaterCoil.allocate(state->dataWaterCoils->NumWaterCoils);
+    state->dataWaterCoils->WaterCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = WaterCoils::iCoilModel::HeatingSimple;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = DataPlant::TypeOf_CoilWaterSimpleHeating;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilTypeA = "Heating";
+    state->dataWaterCoils->WaterCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum = 1;
+
+    // state->dataWaterCoils->WaterCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Natural_Gas;
+    state->dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
+    state->dataWaterCoils->WaterCoil(CoilNum).AirOutletNodeNum = thisVRFTU.SuppHeatCoilAirOutletNode;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum = thisVRFTU.SuppHeatCoilFluidInletNode;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum = thisVRFTU.SuppHeatCoilFluidOutletNode;
+
+    state->dataWaterCoils->WaterCoil(CoilNum).UACoil = 1000;
+    state->dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate = 0.001;
+
+    state->dataWaterCoils->GetWaterCoilsInputFlag = false;
+
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum = 1;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopSide = 1;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopBranchNum = 1;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopCompNum = 1;
+
+    state->dataSize->NumPltSizInput = 1;
+    state->dataSize->PlantSizData.allocate(state->dataSize->NumPltSizInput);
+    state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).PlantLoopName = "HotWaterLoop";
+    state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).ExitTemp = 60.0; // hot water coil inlet water temp
+    state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).DeltaT = 10.0;   // loop temperature difference
+
+    // set up plant loop
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+        auto &loop(state->dataPlnt->PlantLoop(l));
+        loop.LoopSide.allocate(2);
+        auto &loopside(state->dataPlnt->PlantLoop(1).LoopSide(1));
+        loopside.TotalBranches = 1;
+        loopside.Branch.allocate(1);
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1));
+        loopsidebranch.TotalComponents = 1;
+        loopsidebranch.Comp.allocate(1);
+    }
+
+    state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(CoilNum).Name;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterSimpleHeating;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+    state->dataWaterCoils->CheckEquipName.dimension(state->dataWaterCoils->NumWaterCoils, true);
+
+    state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(CoilNum);
+    state->dataWaterCoils->MyUAAndFlowCalcFlag(CoilNum) = true;
+    state->dataWaterCoils->MySizeFlag.allocate(CoilNum);
+    state->dataWaterCoils->MySizeFlag(CoilNum) = true;
+
+    state->dataGlobal->DoingSizing = true;
+    state->dataGlobal->SysSizingCalc = true;
+    state->dataEnvrn->OutDryBulbTemp = 5.0;
+    // init coil inlet condition
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum).Temp = 15.0;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum).HumRat = 0.0070;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum).Temp,
+                                   state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum).HumRat);
+
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum).MassFlowRate = thisVRFTU.SuppHeatCoilFluidMaxFlow;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum).MassFlowRateMax = thisVRFTU.SuppHeatCoilFluidMaxFlow;
+    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum).Temp = 60.0;
+
+    bool FirstHVACIteration(false);
+    Real64 SuppHeatCoilLoad = 10000.0;
+
+    state->dataHVACVarRefFlow->VRFTU.allocate(VRFTUNum);
+    state->dataHVACVarRefFlow->VRFTU(VRFTUNum) = thisVRFTU;
+
+    // run supplemental heating coil
+    thisVRFTU.CalcVRFSuppHeatingCoil(*state, VRFTUNum, FirstHVACIteration, thisVRFTU.SuppHeatPartLoadRatio, SuppHeatCoilLoad);
+    // check the coil load delivered
+    EXPECT_NEAR(10000.0, SuppHeatCoilLoad, 5.0);
+    EXPECT_NEAR(10000.0, state->dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilRate, 5.0);
+    // test larger heating load
+    SuppHeatCoilLoad = 12000.0;
+    thisVRFTU.CalcVRFSuppHeatingCoil(*state, VRFTUNum, FirstHVACIteration, thisVRFTU.SuppHeatPartLoadRatio, SuppHeatCoilLoad);
+    // delivered heating capacity
+    EXPECT_NEAR(12000.0, SuppHeatCoilLoad, 5.0);
+    EXPECT_NEAR(12000.0, state->dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilRate, 5.0);
+}
+
+TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
+{
+    // PURPOSE OF THE TEST:
+    // checks VRF terminal units supplemental steam heating coil calculation
+
+    VRFTerminalUnitEquipment thisVRFTU;
+
+    int VRFTUNum(1);
+    thisVRFTU.Name = "TU4";
+    thisVRFTU.SuppHeatCoilType = "COIL:HEATING:STEAM";
+    thisVRFTU.SuppHeatCoilName = "TU4 SUPP HEATING COIL";
+    thisVRFTU.SuppHeatCoilType_Num = DataHVACGlobals::Coil_HeatingSteam;
+    thisVRFTU.OpMode = DataHVACGlobals::ContFanCycCoil;
+    thisVRFTU.SuppHeatCoilAirInletNode = 1;
+    thisVRFTU.SuppHeatCoilAirOutletNode = 2;
+    thisVRFTU.SuppHeatCoilIndex = 1;
+    thisVRFTU.MaxOATSuppHeatingCoil = 21.0;
+    thisVRFTU.MaxSATFromSuppHeatCoil = 50.0;
+    thisVRFTU.SuppHeatPartLoadRatio = 1.0;
+    thisVRFTU.SuppHeatCoilFluidMaxFlow = 0.001;
+    thisVRFTU.SuppHeatCoilFluidInletNode = 3;
+    thisVRFTU.SuppHeatCoilFluidOutletNode = 4;
+
+    int CoilNum(1);
+    state->dataLoopNodes->Node.allocate(4);
+    state->dataSteamCoils->NumSteamCoils = 1;
+    state->dataSteamCoils->SteamCoil.allocate(state->dataSteamCoils->NumSteamCoils);
+    state->dataSteamCoils->SteamCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
+    state->dataSteamCoils->SteamCoil(CoilNum).SteamCoilType_Num = state->dataSteamCoils->SteamCoil_AirHeating;
+    state->dataSteamCoils->SteamCoil(CoilNum).LoopNum = 1;
+    state->dataSteamCoils->SteamCoil(CoilNum).SteamCoilTypeA = "Heating";
+    state->dataSteamCoils->SteamCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    state->dataSteamCoils->SteamCoil(CoilNum).InletSteamTemp = 100.0;
+    state->dataSteamCoils->SteamCoil(CoilNum).InletSteamPress = 101325.0;
+    state->dataSteamCoils->SteamCoil(CoilNum).DegOfSubcooling = 0.0;
+
+    state->dataSteamCoils->SteamCoil(CoilNum).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
+    state->dataSteamCoils->SteamCoil(CoilNum).AirOutletNodeNum = thisVRFTU.SuppHeatCoilAirOutletNode;
+    state->dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum = thisVRFTU.SuppHeatCoilFluidInletNode;
+    state->dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum = thisVRFTU.SuppHeatCoilFluidOutletNode;
+    state->dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate = 0.015;
+    state->dataSteamCoils->SteamCoil(CoilNum).LoopNum = 1;
+    state->dataSteamCoils->SteamCoil(CoilNum).LoopSide = 1;
+    state->dataSteamCoils->SteamCoil(CoilNum).BranchNum = 1;
+    state->dataSteamCoils->SteamCoil(CoilNum).CompNum = 1;
+    state->dataSteamCoils->SteamCoil(CoilNum).Coil_PlantTypeNum = DataPlant::TypeOf_CoilSteamAirHeating;
+    state->dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil = state->dataSteamCoils->ZoneLoadControl;
+    state->dataSteamCoils->GetSteamCoilsInputFlag = false;
+    state->dataSteamCoils->CheckEquipName.dimension(state->dataSteamCoils->NumSteamCoils, true);
+    state->dataSteamCoils->MySizeFlag.allocate(CoilNum);
+    state->dataSteamCoils->MySizeFlag(CoilNum) = true;
+
+    state->dataSize->NumPltSizInput = 1;
+    state->dataSize->PlantSizData.allocate(state->dataSize->NumPltSizInput);
+    state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).PlantLoopName = "SteamLoop";
+    // set up plant loop
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+        auto &loop(state->dataPlnt->PlantLoop(l));
+        loop.LoopSide.allocate(2);
+        auto &loopside(state->dataPlnt->PlantLoop(1).LoopSide(1));
+        loopside.TotalBranches = 1;
+        loopside.Branch.allocate(1);
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1));
+        loopsidebranch.TotalComponents = 1;
+        loopsidebranch.Comp.allocate(1);
+    }
+
+    state->dataPlnt->PlantLoop(1).Name = "SteamLoop";
+    state->dataPlnt->PlantLoop(1).FluidName = "STEAM";
+    state->dataPlnt->PlantLoop(1).FluidIndex = state->dataSteamCoils->SteamIndex;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataSteamCoils->SteamCoil(CoilNum).Name;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilSteamAirHeating;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum;
+
+    state->dataGlobal->SysSizingCalc = true;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataEnvrn->OutDryBulbTemp = 5.0;
+    // init coil inlet condition
+    state->dataLoopNodes->Node(state->dataSteamCoils->SteamCoil(CoilNum).AirInletNodeNum).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(state->dataSteamCoils->SteamCoil(CoilNum).AirInletNodeNum).Temp = 15.0;
+    state->dataLoopNodes->Node(state->dataSteamCoils->SteamCoil(CoilNum).AirInletNodeNum).HumRat = 0.0070;
+    state->dataLoopNodes->Node(state->dataSteamCoils->SteamCoil(CoilNum).AirInletNodeNum).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataSteamCoils->SteamCoil(CoilNum).AirInletNodeNum).Temp,
+                                   state->dataLoopNodes->Node(state->dataSteamCoils->SteamCoil(CoilNum).AirInletNodeNum).HumRat);
+
+    state->dataLoopNodes->Node(state->dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum).MassFlowRate = thisVRFTU.SuppHeatCoilFluidMaxFlow;
+    state->dataLoopNodes->Node(state->dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum).MassFlowRateMax = thisVRFTU.SuppHeatCoilFluidMaxFlow;
+
+    bool FirstHVACIteration(true);
+    Real64 SuppHeatCoilLoad = 20000.0;
+    // run supplemental heating coil
+    thisVRFTU.CalcVRFSuppHeatingCoil(*state, VRFTUNum, FirstHVACIteration, thisVRFTU.SuppHeatPartLoadRatio, SuppHeatCoilLoad);
+    // check heating load delivered
+    EXPECT_DOUBLE_EQ(20000.0, SuppHeatCoilLoad);
+    EXPECT_DOUBLE_EQ(20000.0, state->dataSteamCoils->SteamCoil(CoilNum).TotSteamHeatingCoilRate);
+    EXPECT_DOUBLE_EQ(20311.199999999997, state->dataSteamCoils->SteamCoil(CoilNum).OperatingCapacity);
+
+    // testing heating load larger than available capacity
+    SuppHeatCoilLoad = 24000.0;
+    thisVRFTU.CalcVRFSuppHeatingCoil(*state, VRFTUNum, FirstHVACIteration, thisVRFTU.SuppHeatPartLoadRatio, SuppHeatCoilLoad);
+    // delivered heating load can not exceed available operating capacity
+    EXPECT_DOUBLE_EQ(state->dataSteamCoils->SteamCoil(CoilNum).OperatingCapacity, SuppHeatCoilLoad);
+    EXPECT_DOUBLE_EQ(state->dataSteamCoils->SteamCoil(CoilNum).OperatingCapacity, state->dataSteamCoils->SteamCoil(CoilNum).TotSteamHeatingCoilRate);
+}
+
+TEST_F(EnergyPlusFixture, VRFTU_SupplementalHeatingCoilCapacityLimitTest)
+{
+    // PURPOSE OF THE TEST:
+    // heating capacity limit calculation based on maximum supply air temperature
+
+    VRFTerminalUnitEquipment thisVRFTU;
+
+    thisVRFTU.Name = "TU1";
+    thisVRFTU.SuppHeatCoilType = "COIL:HEATING:ELECTRIC";
+    thisVRFTU.SuppHeatCoilName = "TU1 SUPP HEATING COIL";
+
+    thisVRFTU.SuppHeatCoilAirInletNode = 1;
+    thisVRFTU.SuppHeatCoilAirOutletNode = 2;
+
+    state->dataLoopNodes->Node.allocate(2);
+    state->dataHeatingCoils->HeatingCoil.allocate(1);
+    state->dataHeatingCoils->HeatingCoil(1).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
+    state->dataHeatingCoils->HeatingCoil(1).AirOutletNodeNum = thisVRFTU.SuppHeatCoilAirOutletNode;
+
+    state->dataLoopNodes->Node(thisVRFTU.SuppHeatCoilAirInletNode).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(thisVRFTU.SuppHeatCoilAirInletNode).Temp = 20.0;
+    state->dataLoopNodes->Node(thisVRFTU.SuppHeatCoilAirInletNode).HumRat = 0.0070;
+    state->dataLoopNodes->Node(thisVRFTU.SuppHeatCoilAirInletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(
+        state->dataLoopNodes->Node(thisVRFTU.SuppHeatCoilAirInletNode).Temp, state->dataLoopNodes->Node(thisVRFTU.SuppHeatCoilAirInletNode).HumRat);
+
+    thisVRFTU.MaxSATFromSuppHeatCoil = 50.0;
+    Real64 ExpectedResult = 1.0 * 1017.8526499999862 * 30.0; // m_dot * Cp_avg * DeltaT
+
+    Real64 SuppHeatCoilCapMax = thisVRFTU.HeatingCoilCapacityLimit(*state, thisVRFTU.SuppHeatCoilAirInletNode, thisVRFTU.MaxSATFromSuppHeatCoil);
+
+    EXPECT_NEAR(ExpectedResult, SuppHeatCoilCapMax, 0.0001);
+}
+
+TEST_F(EnergyPlusFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
+{
+
+    std::string const idf_objects = delimited_string({
+
+        " !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========",
+
+        " Building,",
+        "     Building 1,              !- Name",
+        "     ,                        !- North Axis {deg}",
+        "     ,                        !- Terrain",
+        "     ,                        !- Loads Convergence Tolerance Value",
+        "     ,                        !- Temperature Convergence Tolerance Value {deltaC}",
+        "     MinimalShadowing,        !- Solar Distribution",
+        "     ,                        !- Maximum Number of Warmup Days",
+        "     ;                        !- Minimum Number of Warmup Days",
+
+        " !-   ===========  ALL OBJECTS IN CLASS: SHADOWCALCULATION ===========",
+
+        " ShadowCalculation,",
+        "    PolygonClipping,         !- Shading Calculation Method",
+        "    Periodic,                !- Shading Calculation Update Frequency Method",
+        "    20,                      !- Shading Calculation Update Frequency",
+        "    15000;                   !- Maximum Figures in Shadow Overlap Calculations",
+
+        " !-   ===========  ALL OBJECTS IN CLASS: ZONEAIRHEATBALANCEALGORITHM ===========",
+
+        " ZoneAirHeatBalanceAlgorithm,",
+        "     AnalyticalSolution;      !- Algorithm",
+
+        " !-   ===========  ALL OBJECTS IN CLASS: TIMESTEP ===========",
+
+        " Timestep,",
+        "     6;                       !- Number of Timesteps per Hour",
+
+        " !-   ===========  ALL OBJECTS IN CLASS: CONVERGENCELIMITS ===========",
+
+        " ConvergenceLimits,",
+        "     1;                       !- Minimum System Timestep {minutes}",
+
+        " !-   ===========  ALL OBJECTS IN CLASS: SITE:GROUNDTEMPERATURE:BUILDINGSURFACE ===========",
+
+        " Site:GroundTemperature:BuildingSurface,",
+        "     19.195,                  !- January Ground Temperature {C}",
+        "     19.191,                  !- February Ground Temperature {C}",
+        "     19.215,                  !- March Ground Temperature {C}",
+        "     19.250,                  !- April Ground Temperature {C}",
+        "     19.367,                  !- May Ground Temperature {C}",
+        "     20.429,                  !- June Ground Temperature {C}",
+        "     21.511,                  !- July Ground Temperature {C}",
+        "     21.776,                  !- August Ground Temperature {C}",
+        "     20.440,                  !- September Ground Temperature {C}",
+        "     19.538,                  !- October Ground Temperature {C}",
+        "     19.333,                  !- November Ground Temperature {C}",
+        "     19.237;                  !- December Ground Temperature {C}",
+
+        " !-   ===========  ALL OBJECTS IN CLASS: SITE:WATERMAINSTEMPERATURE ===========",
+
+        " Site:WaterMainsTemperature,",
+        "     CORRELATION,             !- Calculation Method",
+        "     ,                        !- Temperature Schedule Name",
+        "     9.84,                    !- Annual Average Outdoor Air Temperature {C}",
+        "     24.70;                   !- Maximum Difference In Monthly Average Outdoor Air Temperatures {deltaC}",
+
+        "   SimulationControl,",
+        "     Yes,                     !- Do Zone Sizing Calculation",
+        "     Yes,                     !- Do System Sizing Calculation",
+        "     No,                      !- Do Plant Sizing Calculation",
+        "     Yes,                     !- Run Simulation for Sizing Periods",
+        "     No;                      !- Run Simulation for Weather File Run Periods",
+
+        "   Site:Location,",
+        "     Miami Intl Ap FL USA TMY3 WMO=722020,  !- Name",
+        "     25.82,                   !- Latitude {deg}",
+        "     -80.30,                  !- Longitude {deg}",
+        "     -5.00,                   !- Time Zone {hr}",
+        "     11.00;                   !- Elevation {m}",
+
+        "   SizingPeriod:DesignDay,",
+        "     Miami Intl Ap Ann Htg 99.6% Condns DB,  !- Name",
+        "     1,                       !- Month",
+        "     21,                      !- Day of Month",
+        "     WinterDesignDay,         !- Day Type",
+        "     8.7,                     !- Maximum Dry-Bulb Temperature {C}",
+        "     0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "     ,                        !- Dry-Bulb Temperature Range Modifier Type",
+        "     ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "     Wetbulb,                 !- Humidity Condition Type",
+        "     8.7,                     !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "     ,                        !- Humidity Condition Day Schedule Name",
+        "     ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "     ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "     ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "     101217.,                 !- Barometric Pressure {Pa}",
+        "     3.8,                     !- Wind Speed {m/s}",
+        "     340,                     !- Wind Direction {deg}",
+        "     No,                      !- Rain Indicator",
+        "     No,                      !- Snow Indicator",
+        "     No,                      !- Daylight Saving Time Indicator",
+        "     ASHRAEClearSky,          !- Solar Model Indicator",
+        "     ,                        !- Beam Solar Day Schedule Name",
+        "     ,                        !- Diffuse Solar Day Schedule Name",
+        "     ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+        "     0.00;                    !- Sky Clearness",
+
+        "   SizingPeriod:DesignDay,",
+        "     Miami Intl Ap Ann Clg .4% Condns DB=>MWB,  !- Name",
+        "     7,                       !- Month",
+        "     21,                      !- Day of Month",
+        "     SummerDesignDay,         !- Day Type",
+        "     33.2,                    !- Maximum Dry-Bulb Temperature {C}",
+        "     6.7,                     !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "     ,                        !- Dry-Bulb Temperature Range Modifier Type",
+        "     ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "     Wetbulb,                 !- Humidity Condition Type",
+        "     25.3,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "     ,                        !- Humidity Condition Day Schedule Name",
+        "     ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "     ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "     ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "     101217.,                 !- Barometric Pressure {Pa}",
+        "     4.5,                     !- Wind Speed {m/s}",
+        "     140,                     !- Wind Direction {deg}",
+        "     No,                      !- Rain Indicator",
+        "     No,                      !- Snow Indicator",
+        "     No,                      !- Daylight Saving Time Indicator",
+        "     ASHRAEClearSky,          !- Solar Model Indicator",
+        "     ,                        !- Beam Solar Day Schedule Name",
+        "     ,                        !- Diffuse Solar Day Schedule Name",
+        "     ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+        "     1.00;                    !- Sky Clearness",
+
+        " !-   ===========  ALL OBJECTS IN CLASS: SCHEDULETYPELIMITS ===========",
+
+        " ScheduleTypeLimits,",
+        "     Any Number;              !- Name",
+
+        " ScheduleTypeLimits,",
+        "     Temperature,             !- Name",
+        "     -60,                     !- Lower Limit Value",
+        "     200,                     !- Upper Limit Value",
+        "     CONTINUOUS;              !- Numeric Type",
+
+        " ScheduleTypeLimits,",
+        "     Control Type,            !- Name",
+        "     0,                       !- Lower Limit Value",
+        "     4,                       !- Upper Limit Value",
+        "     DISCRETE;                !- Numeric Type",
+
+        " !-   ===========  ALL OBJECTS IN CLASS: MATERIAL ===========",
+
+        " Material,",
+        "     1/2IN Gypsum,            !- Name",
+        "     Smooth,                  !- Roughness",
+        "     0.0127,                  !- Thickness {m}",
+        "     0.16,                    !- Conductivity {W/m-K}",
+        "     784.9,                   !- Density {kg/m3}",
+        "     830.000000000001,        !- Specific Heat {J/kg-K}",
+        "     0.9,                     !- Thermal Absorptance",
+        "     0.4,                     !- Solar Absorptance",
+        "     0.4;                     !- Visible Absorptance",
+
+        " Material,",
+        "     8IN Concrete HW,         !- Name",
+        "     MediumRough,             !- Roughness",
+        "     0.2033,                  !- Thickness {m}",
+        "     1.72959999999999,        !- Conductivity {W/m-K}",
+        "     2242.99999999999,        !- Density {kg/m3}",
+        "     836.999999999999,        !- Specific Heat {J/kg-K}",
+        "     0.9,                     !- Thermal Absorptance",
+        "     0.65,                    !- Solar Absorptance",
+        "     0.65;                    !- Visible Absorptance",
+
+        " Material,",
+        "     F08 Metal surface,       !- Name",
+        "     Smooth,                  !- Roughness",
+        "     0.0008,                  !- Thickness {m}",
+        "     45.2800000000001,        !- Conductivity {W/m-K}",
+        "     7823.99999999999,        !- Density {kg/m3}",
+        "     500,                     !- Specific Heat {J/kg-K}",
+        "     0.9,                     !- Thermal Absorptance",
+        "     0.7,                     !- Solar Absorptance",
+        "     0.7;                     !- Visible Absorptance",
+
+        " Material,",
+        "     F16 Acoustic tile,       !- Name",
+        "     MediumSmooth,            !- Roughness",
+        "     0.0191,                  !- Thickness {m}",
+        "     0.06,                    !- Conductivity {W/m-K}",
+        "     368,                     !- Density {kg/m3}",
+        "     590.000000000002,        !- Specific Heat {J/kg-K}",
+        "     0.9,                     !- Thermal Absorptance",
+        "     0.3,                     !- Solar Absorptance",
+        "     0.3;                     !- Visible Absorptance",
+
+        " Material,",
+        "     I01 25mm insulation board,  !- Name",
+        "     MediumRough,             !- Roughness",
+        "     0.0254,                  !- Thickness {m}",
+        "     0.03,                    !- Conductivity {W/m-K}",
+        "     43,                      !- Density {kg/m3}",
+        "     1210,                    !- Specific Heat {J/kg-K}",
+        "     0.9,                     !- Thermal Absorptance",
+        "     0.6,                     !- Solar Absorptance",
+        "     0.6;                     !- Visible Absorptance",
+
+        " Material,",
+        "     M11 100mm lightweight concrete,  !- Name",
+        "     MediumRough,             !- Roughness",
+        "     0.1016,                  !- Thickness {m}",
+        "     0.53,                    !- Conductivity {W/m-K}",
+        "     1280,                    !- Density {kg/m3}",
+        "     840.000000000002,        !- Specific Heat {J/kg-K}",
+        "     0.9,                     !- Thermal Absorptance",
+        "     0.5,                     !- Solar Absorptance",
+        "     0.5;                     !- Visible Absorptance",
+
+        " Material,",
+        "     MAT-CC05 4 HW CONCRETE,  !- Name",
+        "     Rough,                   !- Roughness",
+        "     0.1016,                  !- Thickness {m}",
+        "     1.311,                   !- Conductivity {W/m-K}",
+        "     2240,                    !- Density {kg/m3}",
+        "     836.800000000001,        !- Specific Heat {J/kg-K}",
+        "     0.9,                     !- Thermal Absorptance",
+        "     0.85,                    !- Solar Absorptance",
+        "     0.85;                    !- Visible Absorptance",
+
+        " Material,",
+        "     Metal Decking,           !- Name",
+        "     MediumSmooth,            !- Roughness",
+        "     0.0015,                  !- Thickness {m}",
+        "     45.006,                  !- Conductivity {W/m-K}",
+        "     7680,                    !- Density {kg/m3}",
+        "     418.4,                   !- Specific Heat {J/kg-K}",
+        "     0.9,                     !- Thermal Absorptance",
+        "     0.6,                     !- Solar Absorptance",
+        "     0.6;                     !- Visible Absorptance",
+
+        " Material,",
+        "     Roof Insulation [18],    !- Name",
+        "     MediumRough,             !- Roughness",
+        "     0.1693,                  !- Thickness {m}",
+        "     0.049,                   !- Conductivity {W/m-K}",
+        "     265,                     !- Density {kg/m3}",
+        "     836.800000000001,        !- Specific Heat {J/kg-K}",
+        "     0.9,                     !- Thermal Absorptance",
+        "     0.7,                     !- Solar Absorptance",
+        "     0.7;                     !- Visible Absorptance",
+
+        " Material,",
+        "     Roof Membrane,           !- Name",
+        "     VeryRough,               !- Roughness",
+        "     0.0095,                  !- Thickness {m}",
+        "     0.16,                    !- Conductivity {W/m-K}",
+        "     1121.29,                 !- Density {kg/m3}",
+        "     1460,                    !- Specific Heat {J/kg-K}",
+        "     0.9,                     !- Thermal Absorptance",
+        "     0.7,                     !- Solar Absorptance",
+        "     0.7;                     !- Visible Absorptance",
+
+        " Material,",
+        "     Air Wall Material,       !- Name",
+        "     MediumSmooth,            !- Roughness",
+        "     0.01,                    !- Thickness {m}",
+        "     0.6,                     !- Conductivity {W/m-K}",
+        "     800,                     !- Density {kg/m3}",
+        "     1000,                    !- Specific Heat {J/kg-K}",
+        "     0.95,                    !- Thermal Absorptance",
+        "     0.7,                     !- Solar Absorptance",
+        "     0.7;                     !- Visible Absorptance",
+
+        " !-   ===========  ALL OBJECTS IN CLASS: MATERIAL:NOMASS ===========",
+
+        " Material:NoMass,",
+        "     CP02 CARPET PAD,         !- Name",
+        "     Smooth,                  !- Roughness",
+        "     0.1,                     !- Thermal Resistance {m2-K/W}",
+        "     0.9,                     !- Thermal Absorptance",
+        "     0.8,                     !- Solar Absorptance",
+        "     0.8;                     !- Visible Absorptance",
+
+        " !-   ===========  ALL OBJECTS IN CLASS: CONSTRUCTION ===========",
+
+        " Construction,",
+        "     ExtRoof IEAD ClimateZone 1,  !- Name",
+        "     Roof Membrane,           !- Outside Layer",
+        "     Roof Insulation [18],    !- Layer 2",
+        "     Metal Decking;           !- Layer 3",
+
+        " Construction,",
+        "     ExtSlabCarpet 4in ClimateZone 1-8 1,  !- Name",
+        "     MAT-CC05 4 HW CONCRETE,  !- Outside Layer",
+        "     CP02 CARPET PAD;         !- Layer 2",
+
+        " Construction,",
+        "     ExtWall Mass ClimateZone 1,  !- Name",
+        "     8IN Concrete HW,         !- Outside Layer",
+        "     1/2IN Gypsum;            !- Layer 2",
+
+        " !-   ===========  ALL OBJECTS IN CLASS: GLOBALGEOMETRYRULES ===========",
+
+        " GlobalGeometryRules,",
+        "     UpperLeftCorner,         !- Starting Vertex Position",
+        "     Counterclockwise,        !- Vertex Entry Direction",
+        "     Relative,                !- Coordinate System",
+        "     Relative,                !- Daylighting Reference Point Coordinate System",
+        "     Relative;                !- Rectangular Surface Coordinate System",
+
+        " !-   ===========  ALL OBJECTS IN CLASS: ZONE ===========",
+
+        " Zone,",
+        "     Zone 1,          !- Name",
+        "     ,                        !- Direction of Relative North {deg}",
+        "     0,                       !- X Origin {m}",
+        "     10,                      !- Y Origin {m}",
+        "     0;                       !- Z Origin {m}",
+
+        " !-   ===========  ALL OBJECTS IN CLASS: BUILDINGSURFACE:DETAILED ===========",
+
+        " BuildingSurface:Detailed,",
+        "     Surface 1,               !- Name",
+        "     Floor,                   !- Surface Type",
+        "     ExtSlabCarpet 4in ClimateZone 1-8 1,  !- Construction Name",
+        "     Zone 1,          !- Zone Name",
+        "     Adiabatic,               !- Outside Boundary Condition",
+        "     ,                        !- Outside Boundary Condition Object",
+        "     NoSun,                   !- Sun Exposure",
+        "     NoWind,                  !- Wind Exposure",
+        "     ,                        !- View Factor to Ground",
+        "     ,                        !- Number of Vertices",
+        "     10,                      !- Vertex 1 X-coordinate {m}",
+        "     0,                       !- Vertex 1 Y-coordinate {m}",
+        "     0,                       !- Vertex 1 Z-coordinate {m}",
+        "     10,                      !- Vertex 2 X-coordinate {m}",
+        "     -10,                     !- Vertex 2 Y-coordinate {m}",
+        "     0,                       !- Vertex 2 Z-coordinate {m}",
+        "     0,                       !- Vertex 3 X-coordinate {m}",
+        "     -10,                     !- Vertex 3 Y-coordinate {m}",
+        "     0,                       !- Vertex 3 Z-coordinate {m}",
+        "     0,                       !- Vertex 4 X-coordinate {m}",
+        "     0,                       !- Vertex 4 Y-coordinate {m}",
+        "     0;                       !- Vertex 4 Z-coordinate {m}",
+
+        " BuildingSurface:Detailed,",
+        "     Surface 2,               !- Name",
+        "     Wall,                    !- Surface Type",
+        "     ExtWall Mass ClimateZone 1,  !- Construction Name",
+        "     Zone 1,          !- Zone Name",
+        "     Outdoors,                !- Outside Boundary Condition",
+        "     ,                        !- Outside Boundary Condition Object",
+        "     SunExposed,              !- Sun Exposure",
+        "     WindExposed,             !- Wind Exposure",
+        "     ,                        !- View Factor to Ground",
+        "     ,                        !- Number of Vertices",
+        "     10,                      !- Vertex 1 X-coordinate {m}",
+        "     0,                       !- Vertex 1 Y-coordinate {m}",
+        "     3.048,                   !- Vertex 1 Z-coordinate {m}",
+        "     10,                      !- Vertex 2 X-coordinate {m}",
+        "     0,                       !- Vertex 2 Y-coordinate {m}",
+        "     0,                       !- Vertex 2 Z-coordinate {m}",
+        "     0,                       !- Vertex 3 X-coordinate {m}",
+        "     0,                       !- Vertex 3 Y-coordinate {m}",
+        "     0,                       !- Vertex 3 Z-coordinate {m}",
+        "     0,                       !- Vertex 4 X-coordinate {m}",
+        "     0,                       !- Vertex 4 Y-coordinate {m}",
+        "     3.048;                   !- Vertex 4 Z-coordinate {m}",
+
+        " BuildingSurface:Detailed,",
+        "     Surface 3,               !- Name",
+        "     Wall,                    !- Surface Type",
+        "     ExtWall Mass ClimateZone 1,  !- Construction Name",
+        "     Zone 1,          !- Zone Name",
+        "     Outdoors,                !- Outside Boundary Condition",
+        "     ,                        !- Outside Boundary Condition Object",
+        "     SunExposed,              !- Sun Exposure",
+        "     WindExposed,             !- Wind Exposure",
+        "     ,                        !- View Factor to Ground",
+        "     ,                        !- Number of Vertices",
+        "     10,                      !- Vertex 1 X-coordinate {m}",
+        "     -10,                     !- Vertex 1 Y-coordinate {m}",
+        "     3.048,                   !- Vertex 1 Z-coordinate {m}",
+        "     10,                      !- Vertex 2 X-coordinate {m}",
+        "     -10,                     !- Vertex 2 Y-coordinate {m}",
+        "     0,                       !- Vertex 2 Z-coordinate {m}",
+        "     10,                      !- Vertex 3 X-coordinate {m}",
+        "     0,                       !- Vertex 3 Y-coordinate {m}",
+        "     0,                       !- Vertex 3 Z-coordinate {m}",
+        "     10,                      !- Vertex 4 X-coordinate {m}",
+        "     0,                       !- Vertex 4 Y-coordinate {m}",
+        "     3.048;                   !- Vertex 4 Z-coordinate {m}",
+
+        " BuildingSurface:Detailed,",
+        "     Surface 4,               !- Name",
+        "     Wall,                    !- Surface Type",
+        "     ExtWall Mass ClimateZone 1,  !- Construction Name",
+        "     Zone 1,          !- Zone Name",
+        "     Outdoors,                !- Outside Boundary Condition",
+        "     ,                        !- Outside Boundary Condition Object",
+        "     SunExposed,              !- Sun Exposure",
+        "     WindExposed,             !- Wind Exposure",
+        "     ,                        !- View Factor to Ground",
+        "     ,                        !- Number of Vertices",
+        "     0,                       !- Vertex 1 X-coordinate {m}",
+        "     -10,                     !- Vertex 1 Y-coordinate {m}",
+        "     3.048,                   !- Vertex 1 Z-coordinate {m}",
+        "     0,                       !- Vertex 2 X-coordinate {m}",
+        "     -10,                     !- Vertex 2 Y-coordinate {m}",
+        "     0,                       !- Vertex 2 Z-coordinate {m}",
+        "     10,                      !- Vertex 3 X-coordinate {m}",
+        "     -10,                     !- Vertex 3 Y-coordinate {m}",
+        "     0,                       !- Vertex 3 Z-coordinate {m}",
+        "     10,                      !- Vertex 4 X-coordinate {m}",
+        "     -10,                     !- Vertex 4 Y-coordinate {m}",
+        "     3.048;                   !- Vertex 4 Z-coordinate {m}",
+
+        " BuildingSurface:Detailed,",
+        "     Surface 5,               !- Name",
+        "     Wall,                    !- Surface Type",
+        "     ExtWall Mass ClimateZone 1,  !- Construction Name",
+        "     Zone 1,          !- Zone Name",
+        "     Outdoors,                !- Outside Boundary Condition",
+        "     ,                        !- Outside Boundary Condition Object",
+        "     SunExposed,              !- Sun Exposure",
+        "     WindExposed,             !- Wind Exposure",
+        "     ,                        !- View Factor to Ground",
+        "     ,                        !- Number of Vertices",
+        "     0,                       !- Vertex 1 X-coordinate {m}",
+        "     0,                       !- Vertex 1 Y-coordinate {m}",
+        "     3.048,                   !- Vertex 1 Z-coordinate {m}",
+        "     0,                       !- Vertex 2 X-coordinate {m}",
+        "     0,                       !- Vertex 2 Y-coordinate {m}",
+        "     0,                       !- Vertex 2 Z-coordinate {m}",
+        "     0,                       !- Vertex 3 X-coordinate {m}",
+        "     -10,                     !- Vertex 3 Y-coordinate {m}",
+        "     0,                       !- Vertex 3 Z-coordinate {m}",
+        "     0,                       !- Vertex 4 X-coordinate {m}",
+        "     -10,                     !- Vertex 4 Y-coordinate {m}",
+        "     3.048;                   !- Vertex 4 Z-coordinate {m}",
+
+        " BuildingSurface:Detailed,",
+        "     Surface 6,               !- Name",
+        "     Roof,                    !- Surface Type",
+        "     ExtRoof IEAD ClimateZone 1,  !- Construction Name",
+        "     Zone 1,          !- Zone Name",
+        "     Outdoors,                !- Outside Boundary Condition",
+        "     ,                        !- Outside Boundary Condition Object",
+        "     SunExposed,              !- Sun Exposure",
+        "     WindExposed,             !- Wind Exposure",
+        "     ,                        !- View Factor to Ground",
+        "     ,                        !- Number of Vertices",
+        "     10,                      !- Vertex 1 X-coordinate {m}",
+        "     -10,                     !- Vertex 1 Y-coordinate {m}",
+        "     3.048,                   !- Vertex 1 Z-coordinate {m}",
+        "     10,                      !- Vertex 2 X-coordinate {m}",
+        "     0,                       !- Vertex 2 Y-coordinate {m}",
+        "     3.048,                   !- Vertex 2 Z-coordinate {m}",
+        "     0,                       !- Vertex 3 X-coordinate {m}",
+        "     0,                       !- Vertex 3 Y-coordinate {m}",
+        "     3.048,                   !- Vertex 3 Z-coordinate {m}",
+        "     0,                       !- Vertex 4 X-coordinate {m}",
+        "     -10,                     !- Vertex 4 Y-coordinate {m}",
+        "     3.048;                   !- Vertex 4 Z-coordinate {m}",
+
+        " !-   ===========  ALL OBJECTS IN CLASS: AIRCONDITIONER:VARIABLEREFRIGERANTFLOW ===========",
+
+        "   AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,",
+        "     VRF Heat Pump,           !- Heat Pump Name",
+        "     ,                        !- Availability Schedule Name",
+        "     VRF Heat Pump TU List,   !- Zone Terminal Unit List Name",
+        "     R410A,                   !- Refrigerant Type",
+        "     6000.0,                  !- Rated Evaporative Capacity {W}",
+        "     0.344,                   !- Rated Compressor Power Per Unit of Rated Evaporative Capacity {dimensionless}",
+        "     -5,                      !- Minimum Outdoor Air Temperature in Cooling Mode {C}",
+        "     43,                      !- Maximum Outdoor Air Temperature in Cooling Mode {C}",
+        "     -20,                     !- Minimum Outdoor Air Temperature in Heating Mode {C}",
+        "     22,                      !- Maximum Outdoor Air Temperature in Heating Mode {C}",
+        "     3,                       !- Reference Outdoor Unit Superheating {deltaC}",
+        "     3,                       !- Reference Outdoor Unit Subcooling {deltaC}",
+        "     ConstantTemp,            !- Refrigerant Temperature Control Algorithm for Indoor Unit",
+        "     6,                       !- Reference Evaporating Temperature for Indoor Unit {C}",
+        "     44,                      !- Reference Condensing Temperature for Indoor Unit {C}",
+        "     6,                       !- Variable Evaporating Temperature Minimum for Indoor Unit {C}",
+        "     13,                      !- Variable Evaporating Temperature Maximum for Indoor Unit {C}",
+        "     42,                      !- Variable Condensing Temperature Minimum for Indoor Unit {C}",
+        "     46,                      !- Variable Condensing Temperature Maximum for Indoor Unit {C}",
+        "     4.12E-3,                 !- Outdoor Unit Fan Power Per Unit of Rated Evaporative Capacity {dimensionless}",
+        "     7.26E-5,                 !- Outdoor Unit Fan Flow Rate Per Unit of Rated Evaporative Capacity {m3/s-W}",
+        "     OUEvapTempCurve,         !- Outdoor Unit Evaporating Temperature Function of Superheating Curve Name",
+        "     OUCondTempCurve,         !- Outdoor Unit Condensing Temperature Function of Subcooling Curve Name",
+        "     0.0508,                  !- Diameter of Main Pipe Connecting Outdoor Unit to the First Branch Joint {m}",
+        "     30,                      !- Length of Main Pipe Connecting Outdoor Unit to the First Branch Joint {m}",
+        "     36,                      !- Equivalent Length of Main Pipe Connecting Outdoor Unit to the First Branch Joint {m}",
+        "     5,                       !- Height Difference Between Outdoor Unit and Indoor Units {m}",
+        "     0.02,                    !- Main Pipe Insulation Thickness {m}",
+        "     0.032,                   !- Main Pipe Insulation Thermal Conductivity {W/m-K}",
+        "     33,                      !- Crankcase Heater Power per Compressor {W}",
+        "     1,                       !- Number of Compressors {dimensionless}",
+        "     0.33,                    !- Ratio of Compressor Size to Total Compressor Capacity {W/W}",
+        "     7,                       !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater {C}",
+        "     ,                        !- Defrost Strategy",
+        "     ,                        !- Defrost Control",
+        "     ,                        !- Defrost Energy Input Ratio Modifier Function of Temperature Curve Name",
+        "     ,                        !- Defrost Time Period Fraction",
+        "     ,                        !- Resistive Defrost Heater Capacity {W}",
+        "     ,                        !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}",
+        "     4500000,                 !- Compressor maximum delta Pressure {Pa}",
+        "     3,                       !- Number of Compressor Loading Index Entries",
+        "     1500,                    !- Compressor Speed at Loading Index 1 {rev/min}",
+        "     MinSpdCooling,           !- Loading Index 1 Evaporative Capacity Multiplier Function of Temperature Curve Name",
+        "     MinSpdPower,             !- Loading Index 1 Compressor Power Multiplier Function of Temperature Curve Name",
+        "     3600,                    !- Compressor Speed at Loading Index 2 {rev/min}",
+        "     Spd1Cooling,             !- Loading Index 2 Evaporative Capacity Multiplier Function of Temperature Curve Name",
+        "     Spd1Power,               !- Loading Index 2 Compressor Power Multiplier Function of Temperature Curve Name",
+        "     6000,                    !- Compressor Speed at Loading Index 3 {rev/min}",
+        "     Spd2Cooling,             !- Loading Index 3 Evaporative Capacity Multiplier Function of Temperature Curve Name",
+        "     Spd2Power;               !- Loading Index 3 Compressor Power Multiplier Function of Temperature Curve Name",
+
+        "   Curve:Quadratic,",
+        "     OUEvapTempCurve,         !- Name",
+        "     0,                       !- Coefficient1 Constant",
+        "     6.05E-1,                 !- Coefficient2 x",
+        "     2.50E-2,                 !- Coefficient3 x**2",
+        "     0,                       !- Minimum Value of x",
+        "     15,                      !- Maximum Value of x",
+        "     ,                        !- Minimum Curve Output",
+        "     ,                        !- Maximum Curve Output",
+        "     Temperature,             !- Input Unit Type for X",
+        "     Temperature;             !- Output Unit Type",
+
+        "   Curve:Quadratic,",
+        "     OUCondTempCurve,         !- Name",
+        "     0,                       !- Coefficient1 Constant",
+        "     -2.91,                   !- Coefficient2 x",
+        "     1.180,                   !- Coefficient3 x**2",
+        "     0,                       !- Minimum Value of x",
+        "     20,                      !- Maximum Value of x",
+        "     ,                        !- Minimum Curve Output",
+        "     ,                        !- Maximum Curve Output",
+        "     Temperature,             !- Input Unit Type for X",
+        "     Temperature;             !- Output Unit Type",
+
+        "   Curve:Biquadratic,",
+        "     MinSpdCooling,           !- Name",
+        "     3.19E-01,                !- Coefficient1 Constant",
+        "     -1.26E-03,               !- Coefficient2 x",
+        "     -2.15E-05,               !- Coefficient3 x**2",
+        "     1.20E-02,                !- Coefficient4 y",
+        "     1.05E-04,                !- Coefficient5 y**2",
+        "     -8.66E-05,               !- Coefficient6 x*y",
+        "     15,                      !- Minimum Value of x",
+        "     65,                      !- Maximum Value of x",
+        "     -30,                     !- Minimum Value of y",
+        "     15,                      !- Maximum Value of y",
+        "     ,                        !- Minimum Curve Output",
+        "     ,                        !- Maximum Curve Output",
+        "     Temperature,             !- Input Unit Type for X",
+        "     Temperature,             !- Input Unit Type for Y",
+        "     Dimensionless;           !- Output Unit Type",
+
+        "   Curve:Biquadratic,",
+        "     MinSpdPower,             !- Name",
+        "     8.79E-02,                !- Coefficient1 Constant",
+        "     -1.72E-04,               !- Coefficient2 x",
+        "     6.93E-05,                !- Coefficient3 x**2",
+        "     -3.38E-05,               !- Coefficient4 y",
+        "     -8.10E-06,               !- Coefficient5 y**2",
+        "     -1.04E-05,               !- Coefficient6 x*y",
+        "     15,                      !- Minimum Value of x",
+        "     65,                      !- Maximum Value of x",
+        "     -30,                     !- Minimum Value of y",
+        "     15,                      !- Maximum Value of y",
+        "     ,                        !- Minimum Curve Output",
+        "     ,                        !- Maximum Curve Output",
+        "     Temperature,             !- Input Unit Type for X",
+        "     Temperature,             !- Input Unit Type for Y",
+        "     Dimensionless;           !- Output Unit Type",
+
+        "   Curve:Biquadratic,",
+        "     Spd1Cooling,             !- Name",
+        "     8.12E-01,                !- Coefficient1 Constant",
+        "     -4.23E-03,               !- Coefficient2 x",
+        "     -4.11E-05,               !- Coefficient3 x**2",
+        "     2.97E-02,                !- Coefficient4 y",
+        "     2.67E-04,                !- Coefficient5 y**2",
+        "     -2.23E-04,               !- Coefficient6 x*y",
+        "     15,                      !- Minimum Value of x",
+        "     65,                      !- Maximum Value of x",
+        "     -30,                     !- Minimum Value of y",
+        "     15,                      !- Maximum Value of y",
+        "     ,                        !- Minimum Curve Output",
+        "     ,                        !- Maximum Curve Output",
+        "     Temperature,             !- Input Unit Type for X",
+        "     Temperature,             !- Input Unit Type for Y",
+        "     Dimensionless;           !- Output Unit Type",
+
+        "   Curve:Biquadratic,",
+        "     Spd1Power,               !- Name",
+        "     3.26E-01,                !- Coefficient1 Constant",
+        "     -2.20E-03,               !- Coefficient2 x",
+        "     1.42E-04,                !- Coefficient3 x**2",
+        "     2.82E-03,                !- Coefficient4 y",
+        "     2.86E-05,                !- Coefficient5 y**2",
+        "     -3.50E-05,               !- Coefficient6 x*y",
+        "     15,                      !- Minimum Value of x",
+        "     65,                      !- Maximum Value of x",
+        "     -30,                     !- Minimum Value of y",
+        "     15,                      !- Maximum Value of y",
+        "     ,                        !- Minimum Curve Output",
+        "     ,                        !- Maximum Curve Output",
+        "     Temperature,             !- Input Unit Type for X",
+        "     Temperature,             !- Input Unit Type for Y",
+        "     Dimensionless;           !- Output Unit Type",
+
+        "   Curve:Biquadratic,",
+        "     Spd2Cooling,             !- Name",
+        "     1.32E+00,                !- Coefficient1 Constant",
+        "     -6.20E-03,               !- Coefficient2 x",
+        "     -7.10E-05,               !- Coefficient3 x**2",
+        "     4.89E-02,                !- Coefficient4 y",
+        "     4.59E-04,                !- Coefficient5 y**2",
+        "     -3.67E-04,               !- Coefficient6 x*y",
+        "     15,                      !- Minimum Value of x",
+        "     65,                      !- Maximum Value of x",
+        "     -30,                     !- Minimum Value of y",
+        "     15,                      !- Maximum Value of y",
+        "     ,                        !- Minimum Curve Output",
+        "     ,                        !- Maximum Curve Output",
+        "     Temperature,             !- Input Unit Type for X",
+        "     Temperature,             !- Input Unit Type for Y",
+        "     Dimensionless;           !- Output Unit Type",
+
+        "   Curve:Biquadratic,",
+        "     Spd2Power,               !- Name",
+        "     6.56E-01,                !- Coefficient1 Constant",
+        "     -3.71E-03,               !- Coefficient2 x",
+        "     2.07E-04,                !- Coefficient3 x**2",
+        "     1.05E-02,                !- Coefficient4 y",
+        "     7.36E-05,                !- Coefficient5 y**2",
+        "     -1.57E-04,               !- Coefficient6 x*y",
+        "     15,                      !- Minimum Value of x",
+        "     65,                      !- Maximum Value of x",
+        "     -30,                     !- Minimum Value of y",
+        "     15,                      !- Maximum Value of y",
+        "     ,                        !- Minimum Curve Output",
+        "     ,                        !- Maximum Curve Output",
+        "     Temperature,             !- Input Unit Type for X",
+        "     Temperature,             !- Input Unit Type for Y",
+        "     Dimensionless;           !- Output Unit Type",
+
+        " !-   ===========  ALL OBJECTS IN CLASS: ZONETERMINALUNITLIST ===========",
+
+        "   ZoneTerminalUnitList,",
+        "     VRF Heat Pump TU List,   !- Zone Terminal Unit List Name",
+        "      TU1;                    !- Zone Terminal Unit Name 5",
+
+        " !-   ===========  ALL OBJECTS IN CLASS: ZoneHVAC:TerminalUnit:VariableRefrigerantFlow ===========",
+
+        "   ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,",
+        "     TU1,                     !- Zone Terminal Unit Name",
+        "     ,           !- Terminal Unit Availability Schedule",
+        "     TU1 Inlet Node,          !- Terminal Unit Air Inlet Node Name",
+        "     TU1 Outlet Node,         !- Terminal Unit Air Outlet Node Name",
+        "     autosize,                !- Cooling Supply Air Flow Rate {m3/s}",
+        "     autosize,                !- No Cooling Supply Air Flow Rate {m3/s}",
+        "     autosize,                !- Heating Supply Air Flow Rate {m3/s}",
+        "     autosize,                !- No Heating Supply Air Flow Rate {m3/s}",
+        "     autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}",
+        "     autosize,                !- Heating Outdoor Air Flow Rate {m3/s}",
+        "     autosize,                !- No Load Outdoor Air Flow Rate {m3/s}",
+        "     VRFFanScheduleCycle,     !- Supply Air Fan Operating Mode Schedule Name",
+        "     drawthrough,             !- Supply Air Fan Placement",
+        "     Fan:SystemModel,         !- Supply Air Fan Object Type",
+        "     TU1 VRF Supply Fan,      !- Supply Air Fan Object Name",
+        "     OutdoorAir:Mixer,        !- Outside Air Mixer Object Type",
+        "     TU1 OA Mixer,            !- Outside Air Mixer Object Name",
+        "     Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl,  !- Cooling Coil Object Type",
+        "     TU1 VRF DX Cooling Coil, !- Cooling Coil Object Name",
+        "     COIL:HEATING:DX:VARIABLEREFRIGERANTFLOW:FluidTemperatureControl,  !- Heating Coil Object Type",
+        "     TU1 VRF DX Heating Coil, !- Heating Coil Object Name",
+        "     30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}",
+        "     20;                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}",
+
+        "   Schedule:Compact,",
+        "     VRFFanScheduleCycle,     !- Name",
+        "     Any Number,              !- Schedule Type Limits Name",
+        "     Through: 12/31,          !- Field 1",
+        "     For: AllDays,            !- Field 2",
+        "     Until: 24:00,0;          !- Field 3",
+
+        "   OutdoorAir:Mixer,",
+        "     TU1 OA Mixer,            !- Name",
+        "     TU1 VRF DX CCoil Inlet Node,  !- Mixed Air Node Name",
+        "     Outside Air Inlet Node 1,!- Outdoor Air Stream Node Name",
+        "     Relief Air Outlet Node 1,!- Relief Air Stream Node Name",
+        "     TU1 Inlet Node;          !- Return Air Stream Node Name",
+
+        "   Fan:SystemModel,",
+        "     TU1 VRF Supply Fan,      !- Name",
+        "     ,           !- Availability Schedule Name",
+        "     TU1 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name",
+        "     TU1 Outlet Node,         !- Air Outlet Node Name",
+        "     autosize,                !- Design Maximum Air Flow Rate {m3/s}",
+        "     Discrete,                !- Speed Control Method",
+        "     1.0,                     !- Electric Power Minimum Flow Rate Fraction",
+        "     100.0,                   !- Design Pressure Rise {Pa}",
+        "     0.9,                     !- Motor Efficiency",
+        "     1,                       !- Motor In Air Stream Fraction",
+        "     autosize,                !- Design Electric Power Consumption {W}",
+        "     TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+        "     ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "     ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "     0.70,                    !- Fan Total Efficiency",
+        "     ,                        !- Electric Power Function of Flow Fraction Curve Name",
+        "     ,                        !- Night Ventilation Mode Pressure Rise {Pa}",
+        "     ,                        !- Night Ventilation Mode Flow Fraction",
+        "     ,                        !- Motor Loss Zone Name",
+        "     ,                        !- Motor Loss Radiative Fraction",
+        "     General,                 !- End-Use Subcategory",
+        "     1,                       !- Number of Speeds",
+        "     1,                       !- Speed 1 Flow Fraction",
+        "     1;                       !- Speed 1 Electric Power Fraction",
+
+        " !-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:VARIABLEREFRIGERANTFLOW:FLUIDTEMPERATURECONTROL ===========",
+
+        "   Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl,",
+        "     TU1 VRF DX Cooling Coil, !- Name",
+        "     ,           !- Availability Schedule Name",
+        "     TU1 VRF DX CCoil Inlet Node,  !- Coil Air Inlet Node",
+        "     TU1 VRF DX CCoil Outlet Node,  !- Coil Air Outlet Node",
+        "     autosize,                !- Rated Total Cooling Capacity {W}",
+        "     autosize,                !- Rated Sensible Heat Ratio",
+        "     3,                       !- Indoor Unit Reference Superheating {deltaC}",
+        "     IUEvapTempCurve,         !- Indoor Unit Evaporating Temperature Function of Superheating Curve Name",
+        "     ;                        !- Name of Water Storage Tank for Condensate Collection",
+
+        "   Curve:Quadratic,",
+        "     IUEvapTempCurve,         !- Name",
+        "     0,                       !- Coefficient1 Constant",
+        "     0.843,                   !- Coefficient2 x",
+        "     0,                       !- Coefficient3 x**2",
+        "     0,                       !- Minimum Value of x",
+        "     15,                      !- Maximum Value of x",
+        "     ,                        !- Minimum Curve Output",
+        "     ,                        !- Maximum Curve Output",
+        "     Temperature,             !- Input Unit Type for X",
+        "     Temperature;             !- Output Unit Type",
+
+        " !-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:DX:VARIABLEREFRIGERANTFLOW ===========",
+
+        "   Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl,",
+        "     TU1 VRF DX Heating Coil, !- Name",
+        "     ,           !- Availability Schedule",
+        "     TU1 VRF DX CCoil Outlet Node,  !- Coil Air Inlet Node",
+        "     TU1 VRF DX HCoil Outlet Node,  !- Coil Air Outlet Node",
+        "     autosize,                !- Rated Total Heating Capacity {W}",
+        "     5,                       !- Indoor Unit Reference Subcooling {deltaC}",
+        "     IUCondTempCurve;         !- Indoor Unit Condensing Temperature Function of Subcooling Curve Name",
+
+        "   Curve:Quadratic,",
+        "     IUCondTempCurve,         !- Name",
+        "     -1.85,                   !- Coefficient1 Constant",
+        "     0.411,                   !- Coefficient2 x",
+        "     0.0196,                  !- Coefficient3 x**2",
+        "     0,                       !- Minimum Value of x",
+        "     20,                      !- Maximum Value of x",
+        "     ,                        !- Minimum Curve Output",
+        "     ,                        !- Maximum Curve Output",
+        "     Temperature,             !- Input Unit Type for X",
+        "     Temperature;             !- Output Unit Type",
+
+        " !-   ===========  ALL OBJECTS IN CLASS: FLUIDPROPERTIES:NAME ===========",
+
+        "   FluidProperties:Name,",
+        "     R410a,                   !- Fluid Name",
+        "     Refrigerant;             !- Fluid Type",
+
+        " !-   ===========  ALL OBJECTS IN CLASS: FLUIDPROPERTIES:TEMPERATURES ===========",
+
+        "   FluidProperties:Temperatures,",
+        "     R410aSaturatedTemperatures,  !- Name",
+        "     -72.000,-69.000,-66.000,-63.000,-60.000,-57.000,-54.000,",
+        "     -51.000,-48.000,-45.000,-42.000,-39.000,-36.000,-33.000,",
+        "     -30.000,-27.000,-24.000,-21.000,-18.000,-15.000,-12.000,",
+        "     -9.000,-6.000,-3.000,0.000,3.000,6.000,9.000,",
+        "     12.000,15.000,18.000,21.000,24.000,27.000,30.000,",
+        "     33.000,36.000,39.000,42.000,45.000,48.000,51.000,",
+        "     54.000,57.000,60.000,63.000,66.000,69.000;",
+
+        "   FluidProperties:Temperatures,",
+        "     R410aSuperHeatTemperatures,  !- Name",
+        "     -72.000,-66.000,-60.000,-54.000,-48.000,-45.000,-42.000,",
+        "     -39.000,-36.000,-33.000,-30.000,-27.000,-24.000,-21.000,",
+        "     -18.000,-15.000,-12.000,-9.000,-6.000,-3.000,0.000,",
+        "     3.000,6.000,9.000,12.000,15.000,18.000,21.000,",
+        "     24.000,27.000,30.000,33.000,36.000,39.000,42.000,",
+        "     45.000,48.000,51.000,54.000,57.000,60.000,63.000,",
+        "     66.000,69.000;",
+
+        " !-   ===========  ALL OBJECTS IN CLASS: FLUIDPROPERTIES:SATURATED ===========",
+
+        "   FluidProperties:Saturated,",
+        "     R410a,                   !- Fluid Name",
+        "     Pressure,                !- Fluid Property Type",
+        "     FluidGas,                !- Fluid Phase",
+        "     R410aSaturatedTemperatures,  !- Temperature Values Name",
+        "     3.1238E+04,3.7717E+04,4.5248E+04,5.3954E+04,6.3963E+04,7.5412E+04,8.8445E+04,",
+        "     1.0321E+05,1.1988E+05,1.3860E+05,1.5955E+05,1.8292E+05,2.0888E+05,2.3762E+05,",
+        "     2.6935E+05,3.0426E+05,3.4257E+05,3.8449E+05,4.3024E+05,4.8004E+05,5.3412E+05,",
+        "     5.9273E+05,6.5609E+05,7.2446E+05,7.9808E+05,8.7722E+05,9.6214E+05,1.0531E+06,",
+        "     1.1504E+06,1.2543E+06,1.3651E+06,1.4831E+06,1.6086E+06,1.7419E+06,1.8834E+06,",
+        "     2.0334E+06,2.1923E+06,2.3604E+06,2.5382E+06,2.7261E+06,2.9246E+06,3.1341E+06,",
+        "     3.3552E+06,3.5886E+06,3.8348E+06,4.0949E+06,4.3697E+06,4.6607E+06;",
+
+        "   FluidProperties:Saturated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     Fluid,                   !- Fluid Phase",
+        "     R410aSaturatedTemperatures,  !- Temperature Values Name",
+        "     9.8535E+04,1.0259E+05,1.0665E+05,1.1072E+05,1.1479E+05,1.1888E+05,1.2297E+05,",
+        "     1.2707E+05,1.3119E+05,1.3532E+05,1.3947E+05,1.4363E+05,1.4782E+05,1.5202E+05,",
+        "     1.5624E+05,1.6048E+05,1.6475E+05,1.6904E+05,1.7337E+05,1.7772E+05,1.8210E+05,",
+        "     1.8652E+05,1.9097E+05,1.9547E+05,2.0000E+05,2.0458E+05,2.0920E+05,2.1388E+05,",
+        "     2.1861E+05,2.2340E+05,2.2825E+05,2.3316E+05,2.3815E+05,2.4322E+05,2.4838E+05,",
+        "     2.5363E+05,2.5899E+05,2.6447E+05,2.7008E+05,2.7585E+05,2.8180E+05,2.8797E+05,",
+        "     2.9441E+05,3.0120E+05,3.0848E+05,3.1650E+05,3.2578E+05,3.3815E+05;",
+
+        "   FluidProperties:Saturated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     FluidGas,                !- Fluid Phase",
+        "     R410aSaturatedTemperatures,  !- Temperature Values Name",
+        "     3.8813E+05,3.8981E+05,3.9148E+05,3.9313E+05,3.9476E+05,3.9637E+05,3.9796E+05,",
+        "     3.9953E+05,4.0108E+05,4.0260E+05,4.0410E+05,4.0557E+05,4.0701E+05,4.0842E+05,",
+        "     4.0980E+05,4.1114E+05,4.1245E+05,4.1373E+05,4.1496E+05,4.1615E+05,4.1730E+05,",
+        "     4.1840E+05,4.1945E+05,4.2045E+05,4.2139E+05,4.2227E+05,4.2308E+05,4.2382E+05,",
+        "     4.2448E+05,4.2507E+05,4.2556E+05,4.2595E+05,4.2624E+05,4.2641E+05,4.2646E+05,",
+        "     4.2635E+05,4.2609E+05,4.2564E+05,4.2498E+05,4.2408E+05,4.2290E+05,4.2137E+05,",
+        "     4.1941E+05,4.1692E+05,4.1370E+05,4.0942E+05,4.0343E+05,3.9373E+05;",
+
+        "   FluidProperties:Saturated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     Fluid,                   !- Fluid Phase",
+        "     R410aSaturatedTemperatures,  !- Temperature Values Name",
+        "     1.4127E+03,1.4036E+03,1.3946E+03,1.3854E+03,1.3762E+03,1.3669E+03,1.3576E+03,",
+        "     1.3482E+03,1.3387E+03,1.3291E+03,1.3194E+03,1.3097E+03,1.2998E+03,1.2898E+03,",
+        "     1.2797E+03,1.2694E+03,1.2591E+03,1.2486E+03,1.2379E+03,1.2271E+03,1.2160E+03,",
+        "     1.2048E+03,1.1934E+03,1.1818E+03,1.1699E+03,1.1578E+03,1.1454E+03,1.1328E+03,",
+        "     1.1197E+03,1.1064E+03,1.0927E+03,1.0785E+03,1.0639E+03,1.0488E+03,1.0331E+03,",
+        "     1.0167E+03,9.9971E+02,9.8187E+02,9.6308E+02,9.4319E+02,9.2198E+02,8.9916E+02,",
+        "     8.7429E+02,8.4672E+02,8.1537E+02,7.7825E+02,7.3095E+02,6.5903E+02;",
+
+        "   FluidProperties:Saturated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     FluidGas,                !- Fluid Phase",
+        "     R410aSaturatedTemperatures,  !- Temperature Values Name",
+        "     1.3845E+00,1.6517E+00,1.9588E+00,2.3100E+00,2.7097E+00,3.1627E+00,3.6737E+00,",
+        "     4.2482E+00,4.8916E+00,5.6098E+00,6.4088E+00,7.2952E+00,8.2758E+00,9.3578E+00,",
+        "     1.0549E+01,1.1857E+01,1.3292E+01,1.4861E+01,1.6576E+01,1.8447E+01,2.0485E+01,",
+        "     2.2702E+01,2.5113E+01,2.7732E+01,3.0575E+01,3.3659E+01,3.7005E+01,4.0634E+01,",
+        "     4.4571E+01,4.8844E+01,5.3483E+01,5.8525E+01,6.4012E+01,6.9991E+01,7.6520E+01,",
+        "     8.3666E+01,9.1511E+01,1.0016E+02,1.0973E+02,1.2038E+02,1.3233E+02,1.4585E+02,",
+        "     1.6135E+02,1.7940E+02,2.0095E+02,2.2766E+02,2.6301E+02,3.1759E+02;",
+
+        "   FluidProperties:Saturated,",
+        "     R410a,                   !- Fluid Name",
+        "     SpecificHeat,            !- Fluid Property Type",
+        "     Fluid,                   !- Fluid Phase",
+        "     R410aSaturatedTemperatures,  !- Temperature Values Name",
+        "     1.3499E+03,1.3515E+03,1.3534E+03,1.3557E+03,1.3584E+03,1.3614E+03,1.3648E+03,",
+        "     1.3686E+03,1.3728E+03,1.3774E+03,1.3825E+03,1.3881E+03,1.3941E+03,1.4007E+03,",
+        "     1.4078E+03,1.4155E+03,1.4238E+03,1.4327E+03,1.4424E+03,1.4527E+03,1.4639E+03,",
+        "     1.4759E+03,1.4888E+03,1.5027E+03,1.5177E+03,1.5340E+03,1.5515E+03,1.5706E+03,",
+        "     1.5914E+03,1.6141E+03,1.6390E+03,1.6664E+03,1.6968E+03,1.7307E+03,1.7689E+03,",
+        "     1.8123E+03,1.8622E+03,1.9204E+03,1.9895E+03,2.0732E+03,2.1774E+03,2.3116E+03,",
+        "     2.4924E+03,2.7507E+03,3.1534E+03,3.8723E+03,5.5190E+03,1.2701E+04;",
+
+        "   FluidProperties:Saturated,",
+        "     R410a,                   !- Fluid Name",
+        "     SpecificHeat,            !- Fluid Property Type",
+        "     FluidGas,                !- Fluid Phase",
+        "     R410aSaturatedTemperatures,  !- Temperature Values Name",
+        "     7.2387E+02,7.3519E+02,7.4693E+02,7.5910E+02,7.7167E+02,7.8465E+02,7.9802E+02,",
+        "     8.1178E+02,8.2594E+02,8.4050E+02,8.5546E+02,8.7085E+02,8.8668E+02,9.0298E+02,",
+        "     9.1979E+02,9.3715E+02,9.5511E+02,9.7372E+02,9.9307E+02,1.0132E+03,1.0343E+03,",
+        "     1.0564E+03,1.0796E+03,1.1042E+03,1.1302E+03,1.1580E+03,1.1877E+03,1.2196E+03,",
+        "     1.2541E+03,1.2917E+03,1.3329E+03,1.3783E+03,1.4287E+03,1.4853E+03,1.5494E+03,",
+        "     1.6228E+03,1.7078E+03,1.8078E+03,1.9274E+03,2.0735E+03,2.2562E+03,2.4922E+03,",
+        "     2.8094E+03,3.2596E+03,3.9504E+03,5.1465E+03,7.7185E+03,1.7076E+04;",
+
+        " !-   ===========  ALL OBJECTS IN CLASS: FLUIDPROPERTIES:SUPERHEATED ===========",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     3.1238E+04,              !- Pressure {Pa}",
+        "     3.8813E+05,3.9245E+05,3.9675E+05,4.0105E+05,4.0536E+05,4.0753E+05,4.0970E+05,",
+        "     4.1189E+05,4.1408E+05,4.1628E+05,4.1849E+05,4.2071E+05,4.2294E+05,4.2518E+05,",
+        "     4.2743E+05,4.2969E+05,4.3196E+05,4.3425E+05,4.3655E+05,4.3885E+05,4.4118E+05,",
+        "     4.4351E+05,4.4586E+05,4.4821E+05,4.5058E+05,4.5297E+05,4.5536E+05,4.5777E+05,",
+        "     4.6020E+05,4.6263E+05,4.6508E+05,4.6754E+05,4.7002E+05,4.7251E+05,4.7501E+05,",
+        "     4.7752E+05,4.8005E+05,4.8259E+05,4.8515E+05,4.8772E+05,4.9030E+05,4.9290E+05,",
+        "     4.9551E+05,4.9813E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     3.1238E+04,              !- Pressure {Pa}",
+        "     1.3845E+00,1.3404E+00,1.2997E+00,1.2617E+00,1.2262E+00,1.2092E+00,1.1928E+00,",
+        "     1.1768E+00,1.1613E+00,1.1462E+00,1.1316E+00,1.1173E+00,1.1034E+00,1.0898E+00,",
+        "     1.0766E+00,1.0638E+00,1.0512E+00,1.0390E+00,1.0271E+00,1.0154E+00,1.0040E+00,",
+        "     9.9285E-01,9.8197E-01,9.7133E-01,9.6093E-01,9.5075E-01,9.4079E-01,9.3104E-01,",
+        "     9.2150E-01,9.1215E-01,9.0299E-01,8.9403E-01,8.8524E-01,8.7662E-01,8.6817E-01,",
+        "     8.5989E-01,8.5177E-01,8.4380E-01,8.3598E-01,8.2831E-01,8.2077E-01,8.1338E-01,",
+        "     8.0612E-01,7.9899E-01;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     4.5248E+04,              !- Pressure {Pa}",
+        "     0.0000E+00,3.9148E+05,3.9593E+05,4.0034E+05,4.0474E+05,4.0694E+05,4.0915E+05,",
+        "     4.1136E+05,4.1358E+05,4.1580E+05,4.1803E+05,4.2027E+05,4.2252E+05,4.2478E+05,",
+        "     4.2705E+05,4.2933E+05,4.3161E+05,4.3391E+05,4.3622E+05,4.3854E+05,4.4088E+05,",
+        "     4.4322E+05,4.4558E+05,4.4794E+05,4.5032E+05,4.5272E+05,4.5512E+05,4.5754E+05,",
+        "     4.5997E+05,4.6241E+05,4.6486E+05,4.6733E+05,4.6981E+05,4.7231E+05,4.7481E+05,",
+        "     4.7733E+05,4.7987E+05,4.8241E+05,4.8497E+05,4.8755E+05,4.9013E+05,4.9273E+05,",
+        "     4.9535E+05,4.9797E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     4.5248E+04,              !- Pressure {Pa}",
+        "     0.0000E+00,1.9588E+00,1.8968E+00,1.8395E+00,1.7863E+00,1.7610E+00,1.7365E+00,",
+        "     1.7128E+00,1.6898E+00,1.6674E+00,1.6457E+00,1.6246E+00,1.6041E+00,1.5842E+00,",
+        "     1.5647E+00,1.5458E+00,1.5273E+00,1.5093E+00,1.4918E+00,1.4747E+00,1.4580E+00,",
+        "     1.4416E+00,1.4257E+00,1.4101E+00,1.3949E+00,1.3800E+00,1.3654E+00,1.3512E+00,",
+        "     1.3372E+00,1.3236E+00,1.3102E+00,1.2971E+00,1.2843E+00,1.2717E+00,1.2594E+00,",
+        "     1.2473E+00,1.2355E+00,1.2239E+00,1.2125E+00,1.2013E+00,1.1903E+00,1.1796E+00,",
+        "     1.1690E+00,1.1586E+00;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     6.3963E+04,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,3.9476E+05,3.9935E+05,4.0388E+05,4.0614E+05,4.0839E+05,",
+        "     4.1064E+05,4.1290E+05,4.1516E+05,4.1742E+05,4.1969E+05,4.2196E+05,4.2425E+05,",
+        "     4.2654E+05,4.2884E+05,4.3114E+05,4.3346E+05,4.3579E+05,4.3813E+05,4.4047E+05,",
+        "     4.4283E+05,4.4520E+05,4.4758E+05,4.4997E+05,4.5238E+05,4.5479E+05,4.5722E+05,",
+        "     4.5966E+05,4.6211E+05,4.6457E+05,4.6705E+05,4.6954E+05,4.7204E+05,4.7455E+05,",
+        "     4.7708E+05,4.7962E+05,4.8217E+05,4.8474E+05,4.8732E+05,4.8991E+05,4.9252E+05,",
+        "     4.9513E+05,4.9777E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     6.3963E+04,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,2.7097E+00,2.6240E+00,2.5451E+00,2.5078E+00,2.4718E+00,",
+        "     2.4370E+00,2.4034E+00,2.3708E+00,2.3393E+00,2.3086E+00,2.2789E+00,2.2500E+00,",
+        "     2.2219E+00,2.1945E+00,2.1679E+00,2.1420E+00,2.1167E+00,2.0921E+00,2.0681E+00,",
+        "     2.0446E+00,2.0217E+00,1.9994E+00,1.9776E+00,1.9562E+00,1.9354E+00,1.9150E+00,",
+        "     1.8950E+00,1.8755E+00,1.8564E+00,1.8377E+00,1.8194E+00,1.8014E+00,1.7839E+00,",
+        "     1.7666E+00,1.7497E+00,1.7332E+00,1.7169E+00,1.7010E+00,1.6854E+00,1.6700E+00,",
+        "     1.6550E+00,1.6402E+00;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     8.8445E+04,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,3.9796E+05,4.0270E+05,4.0503E+05,4.0736E+05,",
+        "     4.0967E+05,4.1198E+05,4.1429E+05,4.1660E+05,4.1891E+05,4.2122E+05,4.2354E+05,",
+        "     4.2586E+05,4.2819E+05,4.3052E+05,4.3286E+05,4.3521E+05,4.3757E+05,4.3994E+05,",
+        "     4.4232E+05,4.4470E+05,4.4710E+05,4.4951E+05,4.5193E+05,4.5436E+05,4.5680E+05,",
+        "     4.5925E+05,4.6171E+05,4.6419E+05,4.6668E+05,4.6918E+05,4.7169E+05,4.7421E+05,",
+        "     4.7675E+05,4.7930E+05,4.8186E+05,4.8443E+05,4.8702E+05,4.8962E+05,4.9223E+05,",
+        "     4.9486E+05,4.9749E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     8.8445E+04,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,3.6737E+00,3.5570E+00,3.5024E+00,3.4500E+00,",
+        "     3.3995E+00,3.3509E+00,3.3039E+00,3.2585E+00,3.2146E+00,3.1720E+00,3.1308E+00,",
+        "     3.0907E+00,3.0518E+00,3.0140E+00,2.9772E+00,2.9414E+00,2.9065E+00,2.8726E+00,",
+        "     2.8395E+00,2.8072E+00,2.7757E+00,2.7449E+00,2.7149E+00,2.6856E+00,2.6569E+00,",
+        "     2.6289E+00,2.6015E+00,2.5747E+00,2.5485E+00,2.5228E+00,2.4977E+00,2.4731E+00,",
+        "     2.4490E+00,2.4254E+00,2.4022E+00,2.3795E+00,2.3573E+00,2.3354E+00,2.3140E+00,",
+        "     2.2930E+00,2.2724E+00;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     1.1988E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.0108E+05,4.0354E+05,4.0597E+05,",
+        "     4.0838E+05,4.1077E+05,4.1315E+05,4.1552E+05,4.1788E+05,4.2025E+05,4.2261E+05,",
+        "     4.2497E+05,4.2734E+05,4.2971E+05,4.3209E+05,4.3447E+05,4.3685E+05,4.3925E+05,",
+        "     4.4165E+05,4.4406E+05,4.4648E+05,4.4891E+05,4.5135E+05,4.5380E+05,4.5626E+05,",
+        "     4.5873E+05,4.6121E+05,4.6370E+05,4.6620E+05,4.6871E+05,4.7124E+05,4.7377E+05,",
+        "     4.7632E+05,4.7888E+05,4.8145E+05,4.8404E+05,4.8663E+05,4.8924E+05,4.9186E+05,",
+        "     4.9450E+05,4.9715E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     1.1988E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.8918E+00,4.8116E+00,4.7352E+00,",
+        "     4.6621E+00,4.5920E+00,4.5247E+00,4.4599E+00,4.3974E+00,4.3370E+00,4.2787E+00,",
+        "     4.2221E+00,4.1674E+00,4.1143E+00,4.0627E+00,4.0126E+00,3.9639E+00,3.9165E+00,",
+        "     3.8704E+00,3.8255E+00,3.7817E+00,3.7390E+00,3.6974E+00,3.6567E+00,3.6171E+00,",
+        "     3.5783E+00,3.5405E+00,3.5035E+00,3.4673E+00,3.4319E+00,3.3973E+00,3.3634E+00,",
+        "     3.3302E+00,3.2977E+00,3.2659E+00,3.2347E+00,3.2041E+00,3.1742E+00,3.1448E+00,",
+        "     3.1160E+00,3.0877E+00;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     1.3860E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.0260E+05,4.0510E+05,",
+        "     4.0757E+05,4.1002E+05,4.1244E+05,4.1485E+05,4.1726E+05,4.1965E+05,4.2204E+05,",
+        "     4.2444E+05,4.2683E+05,4.2922E+05,4.3162E+05,4.3402E+05,4.3642E+05,4.3883E+05,",
+        "     4.4125E+05,4.4368E+05,4.4611E+05,4.4855E+05,4.5100E+05,4.5346E+05,4.5593E+05,",
+        "     4.5841E+05,4.6090E+05,4.6340E+05,4.6591E+05,4.6843E+05,4.7097E+05,4.7351E+05,",
+        "     4.7606E+05,4.7863E+05,4.8121E+05,4.8380E+05,4.8640E+05,4.8902E+05,4.9165E+05,",
+        "     4.9428E+05,4.9694E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     1.3860E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,5.6098E+00,5.5173E+00,",
+        "     5.4293E+00,5.3451E+00,5.2645E+00,5.1871E+00,5.1127E+00,5.0409E+00,4.9717E+00,",
+        "     4.9047E+00,4.8399E+00,4.7772E+00,4.7163E+00,4.6573E+00,4.5999E+00,4.5442E+00,",
+        "     4.4900E+00,4.4372E+00,4.3859E+00,4.3358E+00,4.2870E+00,4.2394E+00,4.1930E+00,",
+        "     4.1476E+00,4.1033E+00,4.0601E+00,4.0178E+00,3.9765E+00,3.9360E+00,3.8965E+00,",
+        "     3.8578E+00,3.8199E+00,3.7828E+00,3.7464E+00,3.7108E+00,3.6759E+00,3.6417E+00,",
+        "     3.6081E+00,3.5752E+00;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     1.5955E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.0410E+05,",
+        "     4.0664E+05,4.0915E+05,4.1163E+05,4.1409E+05,4.1654E+05,4.1898E+05,4.2140E+05,",
+        "     4.2383E+05,4.2625E+05,4.2867E+05,4.3109E+05,4.3351E+05,4.3593E+05,4.3836E+05,",
+        "     4.4080E+05,4.4324E+05,4.4569E+05,4.4815E+05,4.5061E+05,4.5309E+05,4.5557E+05,",
+        "     4.5806E+05,4.6056E+05,4.6307E+05,4.6559E+05,4.6812E+05,4.7066E+05,4.7321E+05,",
+        "     4.7578E+05,4.7835E+05,4.8094E+05,4.8354E+05,4.8615E+05,4.8877E+05,4.9140E+05,",
+        "     4.9404E+05,4.9670E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     1.5955E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,6.4087E+00,",
+        "     6.3023E+00,6.2010E+00,6.1045E+00,6.0120E+00,5.9233E+00,5.8380E+00,5.7559E+00,",
+        "     5.6767E+00,5.6001E+00,5.5261E+00,5.4544E+00,5.3850E+00,5.3176E+00,5.2521E+00,",
+        "     5.1885E+00,5.1267E+00,5.0666E+00,5.0080E+00,4.9509E+00,4.8953E+00,4.8411E+00,",
+        "     4.7882E+00,4.7366E+00,4.6862E+00,4.6369E+00,4.5888E+00,4.5417E+00,4.4957E+00,",
+        "     4.4507E+00,4.4066E+00,4.3635E+00,4.3212E+00,4.2799E+00,4.2393E+00,4.1996E+00,",
+        "     4.1607E+00,4.1225E+00;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     1.8292E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     4.0557E+05,4.0816E+05,4.1071E+05,4.1323E+05,4.1573E+05,4.1821E+05,4.2068E+05,",
+        "     4.2313E+05,4.2559E+05,4.2804E+05,4.3049E+05,4.3293E+05,4.3538E+05,4.3784E+05,",
+        "     4.4029E+05,4.4275E+05,4.4522E+05,4.4769E+05,4.5017E+05,4.5266E+05,4.5516E+05,",
+        "     4.5766E+05,4.6017E+05,4.6270E+05,4.6523E+05,4.6777E+05,4.7032E+05,4.7288E+05,",
+        "     4.7546E+05,4.7804E+05,4.8063E+05,4.8324E+05,4.8586E+05,4.8848E+05,4.9112E+05,",
+        "     4.9378E+05,4.9644E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     1.8292E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     7.2953E+00,7.1732E+00,7.0571E+00,6.9465E+00,6.8408E+00,6.7394E+00,6.6420E+00,",
+        "     6.5482E+00,6.4578E+00,6.3706E+00,6.2862E+00,6.2046E+00,6.1255E+00,6.0488E+00,",
+        "     5.9743E+00,5.9020E+00,5.8317E+00,5.7633E+00,5.6968E+00,5.6320E+00,5.5688E+00,",
+        "     5.5072E+00,5.4472E+00,5.3885E+00,5.3313E+00,5.2754E+00,5.2208E+00,5.1674E+00,",
+        "     5.1152E+00,5.0641E+00,5.0141E+00,4.9652E+00,4.9173E+00,4.8703E+00,4.8244E+00,",
+        "     4.7793E+00,4.7352E+00;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     2.0888E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,4.0701E+05,4.0964E+05,4.1224E+05,4.1480E+05,4.1733E+05,4.1985E+05,",
+        "     4.2235E+05,4.2485E+05,4.2733E+05,4.2981E+05,4.3229E+05,4.3477E+05,4.3724E+05,",
+        "     4.3972E+05,4.4221E+05,4.4469E+05,4.4719E+05,4.4968E+05,4.5219E+05,4.5470E+05,",
+        "     4.5722E+05,4.5974E+05,4.6228E+05,4.6482E+05,4.6738E+05,4.6994E+05,4.7251E+05,",
+        "     4.7510E+05,4.7769E+05,4.8029E+05,4.8291E+05,4.8553E+05,4.8817E+05,4.9082E+05,",
+        "     4.9348E+05,4.9615E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     2.0888E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,8.2759E+00,8.1361E+00,8.0034E+00,7.8770E+00,7.7563E+00,7.6407E+00,",
+        "     7.5297E+00,7.4230E+00,7.3201E+00,7.2209E+00,7.1251E+00,7.0323E+00,6.9425E+00,",
+        "     6.8555E+00,6.7710E+00,6.6890E+00,6.6093E+00,6.5318E+00,6.4564E+00,6.3830E+00,",
+        "     6.3115E+00,6.2417E+00,6.1738E+00,6.1074E+00,6.0426E+00,5.9794E+00,5.9176E+00,",
+        "     5.8572E+00,5.7981E+00,5.7404E+00,5.6839E+00,5.6286E+00,5.5744E+00,5.5214E+00,",
+        "     5.4694E+00,5.4185E+00;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     2.3762E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,4.0842E+05,4.1110E+05,4.1374E+05,4.1634E+05,4.1892E+05,",
+        "     4.2147E+05,4.2401E+05,4.2654E+05,4.2905E+05,4.3157E+05,4.3407E+05,4.3658E+05,",
+        "     4.3909E+05,4.4159E+05,4.4410E+05,4.4662E+05,4.4914E+05,4.5166E+05,4.5419E+05,",
+        "     4.5672E+05,4.5927E+05,4.6182E+05,4.6437E+05,4.6694E+05,4.6952E+05,4.7210E+05,",
+        "     4.7470E+05,4.7730E+05,4.7992E+05,4.8254E+05,4.8517E+05,4.8782E+05,4.9048E+05,",
+        "     4.9315E+05,4.9582E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     2.3762E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,9.3578E+00,9.1979E+00,9.0465E+00,8.9024E+00,8.7650E+00,",
+        "     8.6335E+00,8.5073E+00,8.3861E+00,8.2694E+00,8.1569E+00,8.0482E+00,7.9431E+00,",
+        "     7.8414E+00,7.7429E+00,7.6473E+00,7.5546E+00,7.4645E+00,7.3769E+00,7.2917E+00,",
+        "     7.2088E+00,7.1280E+00,7.0493E+00,6.9726E+00,6.8977E+00,6.8246E+00,6.7533E+00,",
+        "     6.6836E+00,6.6155E+00,6.5489E+00,6.4838E+00,6.4200E+00,6.3577E+00,6.2967E+00,",
+        "     6.2369E+00,6.1783E+00;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     2.6935E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,4.0980E+05,4.1253E+05,4.1521E+05,4.1786E+05,",
+        "     4.2047E+05,4.2307E+05,4.2564E+05,4.2820E+05,4.3075E+05,4.3330E+05,4.3584E+05,",
+        "     4.3837E+05,4.4091E+05,4.4345E+05,4.4599E+05,4.4853E+05,4.5107E+05,4.5362E+05,",
+        "     4.5617E+05,4.5873E+05,4.6130E+05,4.6388E+05,4.6646E+05,4.6905E+05,4.7165E+05,",
+        "     4.7425E+05,4.7687E+05,4.7950E+05,4.8213E+05,4.8478E+05,4.8743E+05,4.9010E+05,",
+        "     4.9278E+05,4.9546E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     2.6935E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,1.0549E+01,1.0367E+01,1.0194E+01,1.0030E+01,",
+        "     9.8741E+00,9.7248E+00,9.5817E+00,9.4443E+00,9.3122E+00,9.1848E+00,9.0619E+00,",
+        "     8.9431E+00,8.8282E+00,8.7170E+00,8.6091E+00,8.5045E+00,8.4029E+00,8.3042E+00,",
+        "     8.2081E+00,8.1147E+00,8.0237E+00,7.9351E+00,7.8487E+00,7.7644E+00,7.6822E+00,",
+        "     7.6019E+00,7.5235E+00,7.4469E+00,7.3721E+00,7.2989E+00,7.2273E+00,7.1572E+00,",
+        "     7.0886E+00,7.0214E+00;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     3.0426E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.1114E+05,4.1392E+05,4.1665E+05,",
+        "     4.1934E+05,4.2200E+05,4.2463E+05,4.2725E+05,4.2984E+05,4.3243E+05,4.3501E+05,",
+        "     4.3758E+05,4.4015E+05,4.4272E+05,4.4528E+05,4.4785E+05,4.5042E+05,4.5299E+05,",
+        "     4.5556E+05,4.5814E+05,4.6073E+05,4.6332E+05,4.6592E+05,4.6853E+05,4.7114E+05,",
+        "     4.7376E+05,4.7639E+05,4.7903E+05,4.8168E+05,4.8434E+05,4.8701E+05,4.8968E+05,",
+        "     4.9237E+05,4.9507E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     3.0426E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,1.1857E+01,1.1650E+01,1.1453E+01,",
+        "     1.1267E+01,1.1090E+01,1.0921E+01,1.0759E+01,1.0604E+01,1.0454E+01,1.0310E+01,",
+        "     1.0172E+01,1.0038E+01,9.9083E+00,9.7830E+00,9.6615E+00,9.5438E+00,9.4294E+00,",
+        "     9.3184E+00,9.2104E+00,9.1054E+00,9.0032E+00,8.9037E+00,8.8067E+00,8.7121E+00,",
+        "     8.6198E+00,8.5297E+00,8.4418E+00,8.3559E+00,8.2719E+00,8.1898E+00,8.1095E+00,",
+        "     8.0310E+00,7.9541E+00;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     3.4257E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.1245E+05,4.1529E+05,",
+        "     4.1807E+05,4.2080E+05,4.2350E+05,4.2617E+05,4.2883E+05,4.3146E+05,4.3408E+05,",
+        "     4.3670E+05,4.3930E+05,4.4190E+05,4.4450E+05,4.4709E+05,4.4969E+05,4.5229E+05,",
+        "     4.5489E+05,4.5749E+05,4.6010E+05,4.6271E+05,4.6533E+05,4.6795E+05,4.7058E+05,",
+        "     4.7322E+05,4.7587E+05,4.7852E+05,4.8118E+05,4.8385E+05,4.8653E+05,4.8922E+05,",
+        "     4.9192E+05,4.9463E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     3.4257E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,1.3292E+01,1.3056E+01,",
+        "     1.2833E+01,1.2622E+01,1.2421E+01,1.2230E+01,1.2047E+01,1.1871E+01,1.1703E+01,",
+        "     1.1541E+01,1.1385E+01,1.1234E+01,1.1088E+01,1.0947E+01,1.0811E+01,1.0678E+01,",
+        "     1.0550E+01,1.0425E+01,1.0304E+01,1.0187E+01,1.0072E+01,9.9605E+00,9.8518E+00,",
+        "     9.7459E+00,9.6426E+00,9.5417E+00,9.4433E+00,9.3472E+00,9.2533E+00,9.1615E+00,",
+        "     9.0717E+00,8.9839E+00;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     3.8449E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.1373E+05,",
+        "     4.1661E+05,4.1944E+05,4.2222E+05,4.2497E+05,4.2768E+05,4.3038E+05,4.3305E+05,",
+        "     4.3571E+05,4.3836E+05,4.4100E+05,4.4363E+05,4.4626E+05,4.4889E+05,4.5151E+05,",
+        "     4.5414E+05,4.5677E+05,4.5940E+05,4.6203E+05,4.6467E+05,4.6732E+05,4.6997E+05,",
+        "     4.7262E+05,4.7529E+05,4.7796E+05,4.8063E+05,4.8332E+05,4.8601E+05,4.8872E+05,",
+        "     4.9143E+05,4.9415E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     3.8449E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,1.4861E+01,",
+        "     1.4593E+01,1.4341E+01,1.4102E+01,1.3875E+01,1.3659E+01,1.3452E+01,1.3255E+01,",
+        "     1.3065E+01,1.2882E+01,1.2707E+01,1.2537E+01,1.2374E+01,1.2216E+01,1.2063E+01,",
+        "     1.1914E+01,1.1771E+01,1.1631E+01,1.1495E+01,1.1364E+01,1.1236E+01,1.1111E+01,",
+        "     1.0989E+01,1.0871E+01,1.0755E+01,1.0643E+01,1.0533E+01,1.0426E+01,1.0321E+01,",
+        "     1.0218E+01,1.0118E+01;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     4.3024E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     4.1496E+05,4.1790E+05,4.2078E+05,4.2361E+05,4.2641E+05,4.2916E+05,4.3190E+05,",
+        "     4.3461E+05,4.3731E+05,4.3999E+05,4.4267E+05,4.4533E+05,4.4800E+05,4.5066E+05,",
+        "     4.5331E+05,4.5597E+05,4.5863E+05,4.6129E+05,4.6395E+05,4.6662E+05,4.6929E+05,",
+        "     4.7197E+05,4.7465E+05,4.7734E+05,4.8003E+05,4.8273E+05,4.8544E+05,4.8816E+05,",
+        "     4.9089E+05,4.9362E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     4.3024E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     1.6576E+01,1.6272E+01,1.5986E+01,1.5716E+01,1.5460E+01,1.5216E+01,1.4983E+01,",
+        "     1.4761E+01,1.4547E+01,1.4343E+01,1.4145E+01,1.3955E+01,1.3772E+01,1.3595E+01,",
+        "     1.3424E+01,1.3258E+01,1.3097E+01,1.2941E+01,1.2789E+01,1.2642E+01,1.2499E+01,",
+        "     1.2360E+01,1.2224E+01,1.2092E+01,1.1964E+01,1.1838E+01,1.1716E+01,1.1596E+01,",
+        "     1.1480E+01,1.1365E+01;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     4.8004E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,4.1615E+05,4.1915E+05,4.2209E+05,4.2497E+05,4.2781E+05,4.3061E+05,",
+        "     4.3339E+05,4.3614E+05,4.3888E+05,4.4160E+05,4.4431E+05,4.4701E+05,4.4971E+05,",
+        "     4.5240E+05,4.5509E+05,4.5778E+05,4.6047E+05,4.6316E+05,4.6585E+05,4.6855E+05,",
+        "     4.7124E+05,4.7395E+05,4.7666E+05,4.7937E+05,4.8209E+05,4.8482E+05,4.8755E+05,",
+        "     4.9029E+05,4.9304E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     4.8004E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,1.8447E+01,1.8102E+01,1.7778E+01,1.7473E+01,1.7184E+01,1.6910E+01,",
+        "     1.6648E+01,1.6398E+01,1.6158E+01,1.5928E+01,1.5707E+01,1.5495E+01,1.5289E+01,",
+        "     1.5091E+01,1.4900E+01,1.4715E+01,1.4535E+01,1.4361E+01,1.4192E+01,1.4028E+01,",
+        "     1.3869E+01,1.3714E+01,1.3563E+01,1.3416E+01,1.3273E+01,1.3133E+01,1.2997E+01,",
+        "     1.2864E+01,1.2734E+01;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     5.3412E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,4.1730E+05,4.2036E+05,4.2335E+05,4.2629E+05,4.2917E+05,",
+        "     4.3202E+05,4.3485E+05,4.3764E+05,4.4042E+05,4.4318E+05,4.4593E+05,4.4867E+05,",
+        "     4.5140E+05,4.5413E+05,4.5685E+05,4.5957E+05,4.6229E+05,4.6501E+05,4.6773E+05,",
+        "     4.7045E+05,4.7318E+05,4.7591E+05,4.7865E+05,4.8139E+05,4.8413E+05,4.8689E+05,",
+        "     4.8965E+05,4.9241E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     5.3412E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,2.0485E+01,2.0094E+01,1.9728E+01,1.9383E+01,1.9058E+01,",
+        "     1.8749E+01,1.8455E+01,1.8174E+01,1.7905E+01,1.7648E+01,1.7400E+01,1.7162E+01,",
+        "     1.6933E+01,1.6712E+01,1.6498E+01,1.6292E+01,1.6092E+01,1.5898E+01,1.5710E+01,",
+        "     1.5527E+01,1.5350E+01,1.5178E+01,1.5010E+01,1.4847E+01,1.4688E+01,1.4533E+01,",
+        "     1.4382E+01,1.4234E+01;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     5.9273E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,4.1840E+05,4.2153E+05,4.2458E+05,4.2756E+05,",
+        "     4.3050E+05,4.3340E+05,4.3627E+05,4.3911E+05,4.4193E+05,4.4473E+05,4.4752E+05,",
+        "     4.5029E+05,4.5306E+05,4.5582E+05,4.5858E+05,4.6133E+05,4.6408E+05,4.6683E+05,",
+        "     4.6959E+05,4.7234E+05,4.7509E+05,4.7785E+05,4.8062E+05,4.8338E+05,4.8616E+05,",
+        "     4.8894E+05,4.9172E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     5.9273E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,2.2703E+01,2.2260E+01,2.1846E+01,2.1458E+01,",
+        "     2.1091E+01,2.0744E+01,2.0413E+01,2.0098E+01,1.9798E+01,1.9509E+01,1.9233E+01,",
+        "     1.8967E+01,1.8711E+01,1.8465E+01,1.8227E+01,1.7996E+01,1.7774E+01,1.7558E+01,",
+        "     1.7349E+01,1.7146E+01,1.6950E+01,1.6758E+01,1.6572E+01,1.6391E+01,1.6215E+01,",
+        "     1.6043E+01,1.5876E+01;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     6.5609E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.1945E+05,4.2264E+05,4.2575E+05,",
+        "     4.2880E+05,4.3179E+05,4.3474E+05,4.3765E+05,4.4054E+05,4.4340E+05,4.4625E+05,",
+        "     4.4907E+05,4.5189E+05,4.5469E+05,4.5749E+05,4.6028E+05,4.6307E+05,4.6585E+05,",
+        "     4.6864E+05,4.7142E+05,4.7420E+05,4.7699E+05,4.7978E+05,4.8257E+05,4.8536E+05,",
+        "     4.8816E+05,4.9097E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     6.5609E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,2.5113E+01,2.4612E+01,2.4145E+01,",
+        "     2.3707E+01,2.3294E+01,2.2904E+01,2.2533E+01,2.2180E+01,2.1844E+01,2.1522E+01,",
+        "     2.1213E+01,2.0916E+01,2.0631E+01,2.0356E+01,2.0091E+01,1.9836E+01,1.9588E+01,",
+        "     1.9349E+01,1.9117E+01,1.8892E+01,1.8673E+01,1.8461E+01,1.8255E+01,1.8055E+01,",
+        "     1.7860E+01,1.7670E+01;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     7.2446E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.2045E+05,4.2371E+05,",
+        "     4.2688E+05,4.2999E+05,4.3304E+05,4.3604E+05,4.3900E+05,4.4194E+05,4.4484E+05,",
+        "     4.4773E+05,4.5060E+05,4.5345E+05,4.5630E+05,4.5913E+05,4.6196E+05,4.6478E+05,",
+        "     4.6760E+05,4.7041E+05,4.7323E+05,4.7604E+05,4.7886E+05,4.8168E+05,4.8450E+05,",
+        "     4.8732E+05,4.9015E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     7.2446E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,2.7732E+01,2.7164E+01,",
+        "     2.6636E+01,2.6143E+01,2.5678E+01,2.5240E+01,2.4825E+01,2.4430E+01,2.4053E+01,",
+        "     2.3694E+01,2.3349E+01,2.3019E+01,2.2701E+01,2.2396E+01,2.2101E+01,2.1817E+01,",
+        "     2.1542E+01,2.1277E+01,2.1019E+01,2.0770E+01,2.0529E+01,2.0294E+01,2.0066E+01,",
+        "     1.9844E+01,1.9629E+01;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     7.9808E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.2139E+05,",
+        "     4.2472E+05,4.2797E+05,4.3113E+05,4.3424E+05,4.3730E+05,4.4031E+05,4.4329E+05,",
+        "     4.4625E+05,4.4918E+05,4.5209E+05,4.5499E+05,4.5787E+05,4.6074E+05,4.6361E+05,",
+        "     4.6646E+05,4.6932E+05,4.7217E+05,4.7502E+05,4.7786E+05,4.8071E+05,4.8356E+05,",
+        "     4.8641E+05,4.8926E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     7.9808E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,3.0574E+01,",
+        "     2.9931E+01,2.9335E+01,2.8779E+01,2.8257E+01,2.7765E+01,2.7299E+01,2.6857E+01,",
+        "     2.6436E+01,2.6035E+01,2.5651E+01,2.5283E+01,2.4930E+01,2.4590E+01,2.4263E+01,",
+        "     2.3948E+01,2.3644E+01,2.3349E+01,2.3065E+01,2.2789E+01,2.2521E+01,2.2262E+01,",
+        "     2.2010E+01,2.1766E+01;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     8.7722E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     4.2227E+05,4.2568E+05,4.2899E+05,4.3223E+05,4.3540E+05,4.3851E+05,4.4158E+05,",
+        "     4.4461E+05,4.4761E+05,4.5059E+05,4.5355E+05,4.5649E+05,4.5941E+05,4.6232E+05,",
+        "     4.6523E+05,4.6812E+05,4.7101E+05,4.7389E+05,4.7678E+05,4.7966E+05,4.8254E+05,",
+        "     4.8542E+05,4.8830E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     8.7722E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     3.3659E+01,3.2930E+01,3.2256E+01,3.1629E+01,3.1042E+01,3.0490E+01,2.9968E+01,",
+        "     2.9474E+01,2.9004E+01,2.8557E+01,2.8129E+01,2.7720E+01,2.7327E+01,2.6950E+01,",
+        "     2.6587E+01,2.6238E+01,2.5900E+01,2.5575E+01,2.5260E+01,2.4955E+01,2.4660E+01,",
+        "     2.4374E+01,2.4096E+01;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     9.6214E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,4.2308E+05,4.2658E+05,4.2997E+05,4.3327E+05,4.3650E+05,4.3968E+05,",
+        "     4.4280E+05,4.4589E+05,4.4894E+05,4.5197E+05,4.5497E+05,4.5795E+05,4.6092E+05,",
+        "     4.6387E+05,4.6681E+05,4.6975E+05,4.7267E+05,4.7559E+05,4.7851E+05,4.8142E+05,",
+        "     4.8434E+05,4.8725E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     9.6214E+05,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,3.7005E+01,3.6178E+01,3.5416E+01,3.4709E+01,3.4049E+01,3.3429E+01,",
+        "     3.2845E+01,3.2292E+01,3.1768E+01,3.1269E+01,3.0793E+01,3.0338E+01,2.9902E+01,",
+        "     2.9484E+01,2.9082E+01,2.8694E+01,2.8321E+01,2.7961E+01,2.7613E+01,2.7277E+01,",
+        "     2.6951E+01,2.6636E+01;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     1.0531E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,4.2382E+05,4.2741E+05,4.3088E+05,4.3426E+05,4.3756E+05,",
+        "     4.4079E+05,4.4398E+05,4.4712E+05,4.5023E+05,4.5330E+05,4.5635E+05,4.5938E+05,",
+        "     4.6239E+05,4.6539E+05,4.6837E+05,4.7134E+05,4.7430E+05,4.7726E+05,4.8021E+05,",
+        "     4.8316E+05,4.8611E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     1.0531E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,4.0634E+01,3.9695E+01,3.8832E+01,3.8035E+01,3.7292E+01,",
+        "     3.6597E+01,3.5943E+01,3.5325E+01,3.4740E+01,3.4184E+01,3.3654E+01,3.3149E+01,",
+        "     3.2665E+01,3.2201E+01,3.1755E+01,3.1327E+01,3.0915E+01,3.0517E+01,3.0133E+01,",
+        "     2.9762E+01,2.9403E+01;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     1.1504E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,4.2448E+05,4.2817E+05,4.3173E+05,4.3518E+05,",
+        "     4.3855E+05,4.4186E+05,4.4511E+05,4.4831E+05,4.5147E+05,4.5459E+05,4.5769E+05,",
+        "     4.6077E+05,4.6383E+05,4.6686E+05,4.6989E+05,4.7290E+05,4.7591E+05,4.7890E+05,",
+        "     4.8189E+05,4.8488E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     1.1504E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,4.4572E+01,4.3503E+01,4.2527E+01,4.1626E+01,",
+        "     4.0790E+01,4.0010E+01,3.9277E+01,3.8587E+01,3.7934E+01,3.7314E+01,3.6725E+01,",
+        "     3.6164E+01,3.5627E+01,3.5113E+01,3.4620E+01,3.4146E+01,3.3691E+01,3.3252E+01,",
+        "     3.2828E+01,3.2419E+01;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     1.2543E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.2507E+05,4.2886E+05,4.3251E+05,",
+        "     4.3605E+05,4.3949E+05,4.4287E+05,4.4618E+05,4.4944E+05,4.5266E+05,4.5584E+05,",
+        "     4.5899E+05,4.6212E+05,4.6522E+05,4.6831E+05,4.7138E+05,4.7443E+05,4.7748E+05,",
+        "     4.8051E+05,4.8354E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     1.2543E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.8844E+01,4.7627E+01,4.6519E+01,",
+        "     4.5502E+01,4.4560E+01,4.3684E+01,4.2863E+01,4.2091E+01,4.1363E+01,4.0673E+01,",
+        "     4.0018E+01,3.9394E+01,3.8799E+01,3.8230E+01,3.7685E+01,3.7161E+01,3.6658E+01,",
+        "     3.6174E+01,3.5708E+01;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     1.3651E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.2556E+05,4.2947E+05,",
+        "     4.3322E+05,4.3684E+05,4.4037E+05,4.4382E+05,4.4720E+05,4.5053E+05,4.5381E+05,",
+        "     4.5705E+05,4.6025E+05,4.6343E+05,4.6658E+05,4.6971E+05,4.7283E+05,4.7592E+05,",
+        "     4.7901E+05,4.8209E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     1.3651E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,5.3484E+01,5.2094E+01,",
+        "     5.0835E+01,4.9684E+01,4.8623E+01,4.7638E+01,4.6718E+01,4.5855E+01,4.5042E+01,",
+        "     4.4274E+01,4.3546E+01,4.2854E+01,4.2194E+01,4.1564E+01,4.0961E+01,4.0383E+01,",
+        "     3.9828E+01,3.9294E+01;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     1.4831E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.2595E+05,",
+        "     4.2999E+05,4.3385E+05,4.3757E+05,4.4119E+05,4.4471E+05,4.4817E+05,4.5156E+05,",
+        "     4.5490E+05,4.5820E+05,4.6146E+05,4.6469E+05,4.6790E+05,4.7108E+05,4.7424E+05,",
+        "     4.7738E+05,4.8051E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     1.4831E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,5.8526E+01,",
+        "     5.6935E+01,5.5502E+01,5.4199E+01,5.3001E+01,5.1893E+01,5.0861E+01,4.9896E+01,",
+        "     4.8989E+01,4.8133E+01,4.7324E+01,4.6555E+01,4.5824E+01,4.5127E+01,4.4461E+01,",
+        "     4.3823E+01,4.3211E+01;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     1.6086E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     4.2624E+05,4.3041E+05,4.3439E+05,4.3822E+05,4.4193E+05,4.4554E+05,4.4907E+05,",
+        "     4.5254E+05,4.5595E+05,4.5931E+05,4.6263E+05,4.6591E+05,4.6917E+05,4.7240E+05,",
+        "     4.7561E+05,4.7880E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     1.6086E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     6.4013E+01,6.2185E+01,6.0551E+01,5.9071E+01,5.7718E+01,5.6470E+01,5.5313E+01,",
+        "     5.4232E+01,5.3220E+01,5.2267E+01,5.1367E+01,5.0514E+01,4.9704E+01,4.8933E+01,",
+        "     4.8196E+01,4.7492E+01;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     1.7419E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,4.2642E+05,4.3074E+05,4.3485E+05,4.3879E+05,4.4260E+05,4.4630E+05,",
+        "     4.4991E+05,4.5345E+05,4.5693E+05,4.6036E+05,4.6374E+05,4.6709E+05,4.7040E+05,",
+        "     4.7368E+05,4.7694E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     1.7419E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,6.9990E+01,6.7883E+01,6.6014E+01,6.4331E+01,6.2800E+01,6.1394E+01,",
+        "     6.0094E+01,5.8884E+01,5.7753E+01,5.6691E+01,5.5691E+01,5.4744E+01,5.3847E+01,",
+        "     5.2994E+01,5.2181E+01;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     1.8834E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,4.2646E+05,4.3096E+05,4.3521E+05,4.3927E+05,4.4319E+05,",
+        "     4.4699E+05,4.5069E+05,4.5431E+05,4.5786E+05,4.6136E+05,4.6481E+05,4.6821E+05,",
+        "     4.7158E+05,4.7492E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     1.8834E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,7.6519E+01,7.4080E+01,7.1935E+01,7.0017E+01,6.8281E+01,",
+        "     6.6694E+01,6.5232E+01,6.3876E+01,6.2613E+01,6.1429E+01,6.0316E+01,5.9266E+01,",
+        "     5.8272E+01,5.7328E+01;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     2.0334E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,4.2635E+05,4.3105E+05,4.3546E+05,4.3966E+05,",
+        "     4.4369E+05,4.4760E+05,4.5139E+05,4.5510E+05,4.5873E+05,4.6230E+05,4.6582E+05,",
+        "     4.6929E+05,4.7272E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     2.0334E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,8.3665E+01,8.0827E+01,7.8356E+01,7.6164E+01,",
+        "     7.4192E+01,7.2398E+01,7.0753E+01,6.9232E+01,6.7819E+01,6.6499E+01,6.5261E+01,",
+        "     6.4095E+01,6.2993E+01;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     2.1923E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.2609E+05,4.3101E+05,4.3560E+05,",
+        "     4.3995E+05,4.4411E+05,4.4812E+05,4.5202E+05,4.5582E+05,4.5953E+05,4.6318E+05,",
+        "     4.6677E+05,4.7030E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     2.1923E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,9.1511E+01,8.8190E+01,8.5332E+01,",
+        "     8.2819E+01,8.0573E+01,7.8542E+01,7.6687E+01,7.4980E+01,7.3398E+01,7.1925E+01,",
+        "     7.0547E+01,6.9252E+01;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     2.3604E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.2564E+05,4.3082E+05,",
+        "     4.3561E+05,4.4013E+05,4.4443E+05,4.4856E+05,4.5257E+05,4.5646E+05,4.6027E+05,",
+        "     4.6400E+05,4.6766E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     2.3604E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,1.0015E+02,9.6239E+01,",
+        "     9.2918E+01,9.0027E+01,8.7463E+01,8.5159E+01,8.3065E+01,8.1145E+01,7.9374E+01,",
+        "     7.7729E+01,7.6195E+01;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     2.5382E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.2498E+05,",
+        "     4.3047E+05,4.3549E+05,4.4019E+05,4.4464E+05,4.4891E+05,4.5303E+05,4.5703E+05,",
+        "     4.6093E+05,4.6475E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     2.5382E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,1.0972E+02,",
+        "     1.0507E+02,1.0119E+02,9.7851E+01,9.4915E+01,9.2295E+01,8.9926E+01,8.7766E+01,",
+        "     8.5780E+01,8.3942E+01;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     2.7261E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     4.2408E+05,4.2993E+05,4.3522E+05,4.4012E+05,4.4475E+05,4.4916E+05,4.5341E+05,",
+        "     4.5752E+05,4.6152E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     2.7261E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     1.2038E+02,1.1479E+02,1.1023E+02,1.0635E+02,1.0298E+02,9.9995E+01,9.7312E+01,",
+        "     9.4877E+01,9.2647E+01;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     2.9246E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,4.2290E+05,4.2918E+05,4.3478E+05,4.3992E+05,4.4473E+05,4.4931E+05,",
+        "     4.5369E+05,4.5792E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     2.9246E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,1.3233E+02,1.2554E+02,1.2013E+02,1.1562E+02,1.1173E+02,1.0831E+02,",
+        "     1.0527E+02,1.0252E+02;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     3.1341E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,4.2137E+05,4.2820E+05,4.3416E+05,4.3957E+05,4.4459E+05,",
+        "     4.4934E+05,4.5387E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     3.1341E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,1.4585E+02,1.3748E+02,1.3102E+02,1.2572E+02,1.2122E+02,",
+        "     1.1731E+02,1.1384E+02;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     3.3552E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,4.1941E+05,4.2695E+05,4.3334E+05,4.3905E+05,",
+        "     4.4432E+05,4.4926E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     3.3552E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,1.6135E+02,1.5082E+02,1.4302E+02,1.3677E+02,",
+        "     1.3154E+02,1.2704E+02;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     3.5886E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.1692E+05,4.2539E+05,4.3229E+05,",
+        "     4.3836E+05,4.4389E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     3.5886E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,1.7941E+02,1.6585E+02,1.5632E+02,",
+        "     1.4890E+02,1.4279E+02;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     3.8348E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.1370E+05,4.2346E+05,",
+        "     4.3100E+05,4.3748E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     3.8348E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,2.0095E+02,1.8289E+02,",
+        "     1.7111E+02,1.6223E+02;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     4.0949E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.0942E+05,",
+        "     4.2109E+05,4.2943E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     4.0949E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,2.2766E+02,",
+        "     2.0246E+02,1.8765E+02;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     4.3697E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     4.0343E+05,4.1823E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     4.3697E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     2.6302E+02,2.2513E+02;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Enthalpy,                !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     4.6607E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,3.9373E+05;",
+
+        "   FluidProperties:Superheated,",
+        "     R410a,                   !- Fluid Name",
+        "     Density,                 !- Fluid Property Type",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name",
+        "     4.6607E+06,              !- Pressure {Pa}",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,",
+        "     0.0000E+00,3.1758E+02;",
+
+        "   Sizing:Zone,",
+        "     Zone 1,          !- Zone or ZoneList Name",
+        "     SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method",
+        "     13.5,                    !- Zone Cooling Design Supply Air Temperature {C}",
+        "     ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}",
+        "     SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method",
+        "     50.,                     !- Zone Heating Design Supply Air Temperature {C}",
+        "     ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}",
+        "     0.009,                   !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}",
+        "     0.004,                   !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}",
+        "     SZ DSOA SPACE1-1,        !- Design Specification Outdoor Air Object Name",
+        "     0.0,                     !- Zone Heating Sizing Factor",
+        "     0.0,                     !- Zone Cooling Sizing Factor",
+        "     DesignDay,               !- Cooling Design Air Flow Method",
+        "     0,                       !- Cooling Design Air Flow Rate {m3/s}",
+        "     ,                        !- Cooling Minimum Air Flow per Zone Floor Area {m3/s-m2}",
+        "     ,                        !- Cooling Minimum Air Flow {m3/s}",
+        "     ,                        !- Cooling Minimum Air Flow Fraction",
+        "     DesignDay,               !- Heating Design Air Flow Method",
+        "     0,                       !- Heating Design Air Flow Rate {m3/s}",
+        "     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}",
+        "     ,                        !- Heating Maximum Air Flow {m3/s}",
+        "     ;                        !- Heating Maximum Air Flow Fraction",
+
+        "   DesignSpecification:OutdoorAir,",
+        "     SZ DSOA SPACE1-1,        !- Name",
+        "     Sum,                     !- Outdoor Air Method",
+        "     0.00472,                 !- Outdoor Air Flow per Person {m3/s-person}",
+        "     0.000508,                !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}",
+        "     0.0;                     !- Outdoor Air Flow per Zone {m3/s}",
+
+        "   Schedule:Compact,",
+        "     Htg-SetP-Sch,            !- Name",
+        "     Temperature,             !- Schedule Type Limits Name",
+        "     Through: 12/31,          !- Field 1",
+        "     For: AllDays,            !- Field 2",
+        "     Until: 24:00,21.1;       !- Field 27",
+
+        "   Schedule:Compact,",
+        "     Clg-SetP-Sch,            !- Name",
+        "     Temperature,             !- Schedule Type Limits Name",
+        "     Through: 12/31,          !- Field 1",
+        "     For: AllDays,    !- Field 2",
+        "     Until: 24:00,23.9;       !- Field 3",
+
+        "   Schedule:Compact,",
+        "     Zone Control Type Sched, !- Name",
+        "     Control Type,            !- Schedule Type Limits Name",
+        "     Through: 12/31,          !- Field 1",
+        "     For: SummerDesignDay,    !- Field 2",
+        "     Until: 24:00,4,          !- Field 3",
+        "     For: WinterDesignDay,    !- Field 5",
+        "     Until: 24:00,4,          !- Field 6",
+        "     For: AllOtherDays,       !- Field 8",
+        "     Until: 24:00,4;          !- Field 9",
+
+        "   Curve:Biquadratic,",
+        "     VarSpeedCoolCapFT,       !- Name",
+        "     0.476428E+00,            !- Coefficient1 Constant",
+        "     0.401147E-01,            !- Coefficient2 x",
+        "     0.226411E-03,            !- Coefficient3 x**2",
+        "     -0.827136E-03,           !- Coefficient4 y",
+        "     -0.732240E-05,           !- Coefficient5 y**2",
+        "     -0.446278E-03,           !- Coefficient6 x*y",
+        "     12.77778,                !- Minimum Value of x",
+        "     23.88889,                !- Maximum Value of x",
+        "     23.88889,                !- Minimum Value of y",
+        "     46.11111,                !- Maximum Value of y",
+        "     ,                        !- Minimum Curve Output",
+        "     ,                        !- Maximum Curve Output",
+        "     Temperature,             !- Input Unit Type for X",
+        "     Temperature,             !- Input Unit Type for Y",
+        "     Dimensionless;           !- Output Unit Type",
+
+        "   Curve:Biquadratic,",
+        "     VarSpeedCoolEIRFT,       !- Name",
+        "     0.632475E+00,            !- Coefficient1 Constant",
+        "     -0.121321E-01,           !- Coefficient2 x",
+        "     0.507773E-03,            !- Coefficient3 x**2",
+        "     0.155377E-01,            !- Coefficient4 y",
+        "     0.272840E-03,            !- Coefficient5 y**2",
+        "     -0.679201E-03,           !- Coefficient6 x*y",
+        "     12.77778,                !- Minimum Value of x",
+        "     23.88889,                !- Maximum Value of x",
+        "     23.88889,                !- Minimum Value of y",
+        "     46.11111,                !- Maximum Value of y",
+        "     ,                        !- Minimum Curve Output",
+        "     ,                        !- Maximum Curve Output",
+        "     Temperature,             !- Input Unit Type for X",
+        "     Temperature,             !- Input Unit Type for Y",
+        "     Dimensionless;           !- Output Unit Type",
+
+        "   Curve:Biquadratic,",
+        "     VarSpeedCoolCapLSFT,     !- Name",
+        "     0.476428E+00,            !- Coefficient1 Constant",
+        "     0.401147E-01,            !- Coefficient2 x",
+        "     0.226411E-03,            !- Coefficient3 x**2",
+        "     -0.827136E-03,           !- Coefficient4 y",
+        "     -0.732240E-05,           !- Coefficient5 y**2",
+        "     -0.446278E-03,           !- Coefficient6 x*y",
+        "     12.77778,                !- Minimum Value of x",
+        "     23.88889,                !- Maximum Value of x",
+        "     23.88889,                !- Minimum Value of y",
+        "     46.11111,                !- Maximum Value of y",
+        "     ,                        !- Minimum Curve Output",
+        "     ,                        !- Maximum Curve Output",
+        "     Temperature,             !- Input Unit Type for X",
+        "     Temperature,             !- Input Unit Type for Y",
+        "     Dimensionless;           !- Output Unit Type",
+
+        "   Curve:Biquadratic,",
+        "     VarSpeedCoolEIRLSFT,     !- Name",
+        "     0.774645E+00,            !- Coefficient1 Constant",
+        "     -0.343731E-01,           !- Coefficient2 x",
+        "     0.783173E-03,            !- Coefficient3 x**2",
+        "     0.146596E-01,            !- Coefficient4 y",
+        "     0.488851E-03,            !- Coefficient5 y**2",
+        "     -0.752036E-03,           !- Coefficient6 x*y",
+        "     12.77778,                !- Minimum Value of x",
+        "     23.88889,                !- Maximum Value of x",
+        "     23.88889,                !- Minimum Value of y",
+        "     46.11111,                !- Maximum Value of y",
+        "     ,                        !- Minimum Curve Output",
+        "     ,                        !- Maximum Curve Output",
+        "     Temperature,             !- Input Unit Type for X",
+        "     Temperature,             !- Input Unit Type for Y",
+        "     Dimensionless;           !- Output Unit Type",
+
+        " ! same as Doe-2 SDL-C78",
+
+        "   Curve:Cubic,",
+        "     PackagedRatedCoolCapFFlow,  !- Name",
+        "     0.47278589,              !- Coefficient1 Constant",
+        "     1.2433415,               !- Coefficient2 x",
+        "     -1.0387055,              !- Coefficient3 x**2",
+        "     0.32257813,              !- Coefficient4 x**3",
+        "     0.5,                     !- Minimum Value of x",
+        "     1.5,                     !- Maximum Value of x",
+        "     ,                        !- Minimum Curve Output",
+        "     ,                        !- Maximum Curve Output",
+        "     Dimensionless,           !- Input Unit Type for X",
+        "     Dimensionless;           !- Output Unit Type",
+
+        "   Curve:Cubic,",
+        "     PackagedRatedCoolEIRFFlow,  !- Name",
+        "     1.0079484,               !- Coefficient1 Constant",
+        "     0.34544129,              !- Coefficient2 x",
+        "     -.6922891,               !- Coefficient3 x**2",
+        "     0.33889943,              !- Coefficient4 x**3",
+        "     0.5,                     !- Minimum Value of x",
+        "     1.5,                     !- Maximum Value of x",
+        "     ,                        !- Minimum Curve Output",
+        "     ,                        !- Maximum Curve Output",
+        "     Dimensionless,           !- Input Unit Type for X",
+        "     Dimensionless;           !- Output Unit Type",
+
+        "   Curve:Quadratic,",
+        "     VarSpeedCyclingPLFFPLR,  !- Name",
+        "     0.85,                    !- Coefficient1 Constant",
+        "     0.15,                    !- Coefficient2 x",
+        "     0.0,                     !- Coefficient3 x**2",
+        "     0.0,                     !- Minimum Value of x",
+        "     1.0;                     !- Maximum Value of x",
+
+        "   OutdoorAir:NodeList,",
+        "     OutsideAirInletNodes;    !- Node or NodeList Name 1",
+
+        "   NodeList,",
+        "     OutsideAirInletNodes,    !- Name",
+        "     Outside Air Inlet Node 1,!- Node 1 Name",
+        "     VRFOUInletNode;          !- Node 6 Name",
+
+        "   NodeList,",
+        "     SPACE1-1 In Nodes,       !- Name",
+        "     TU1 Outlet Node;         !- Node 1 Name",
+
+        "   NodeList,",
+        "     SPACE1-1 Out Nodes,      !- Name",
+        "     TU1 Inlet Node;          !- Node 1 Name",
+
+        "   ZoneHVAC:EquipmentConnections,",
+        "     Zone 1,                  !- Zone Name",
+        "     SPACE1-1 Eq,             !- Zone Conditioning Equipment List Name",
+        "     SPACE1-1 In Nodes,       !- Zone Air Inlet Node or NodeList Name",
+        "     SPACE1-1 Out Nodes,      !- Zone Air Exhaust Node or NodeList Name",
+        "     SPACE1-1 Node,           !- Zone Air Node Name",
+        "     SPACE1-1 Out Node;       !- Zone Return Air Node or NodeList Name",
+
+        "   ZoneControl:Thermostat,",
+        "     SPACE1-1 Control,        !- Name",
+        "     Zone 1,                  !- Zone or ZoneList Name",
+        "     Zone Control Type Sched, !- Control Type Schedule Name",
+        "     ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type",
+        "     DualSetPoint;            !- Control 1 Name",
+
+        "   ThermostatSetpoint:SingleHeating,",
+        "     HeatingSetpoint,         !- Name",
+        "     Htg-SetP-Sch;            !- Setpoint Temperature Schedule Name",
+
+        "   ThermostatSetpoint:SingleCooling,",
+        "     CoolingSetpoint,         !- Name",
+        "     Clg-SetP-Sch;            !- Setpoint Temperature Schedule Name",
+
+        "   ThermostatSetpoint:DualSetpoint,",
+        "     DualSetPoint,            !- Name",
+        "     Htg-SetP-Sch,            !- Heating Setpoint Temperature Schedule Name",
+        "     Clg-SetP-Sch;            !- Cooling Setpoint Temperature Schedule Name",
+
+        "   ZoneHVAC:EquipmentList,",
+        "     SPACE1-1 Eq,             !- Name",
+        "     SequentialLoad,          !- Load Distribution Scheme",
+        "     ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type",
+        "     TU1,                     !- Zone Equipment 1 Name",
+        "     1,                       !- Zone Equipment 1 Cooling Sequence",
+        "     1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "     ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction",
+        "     ;                        !- Zone Equipment 1 Sequential Heating Load Fraction",
+
+    });
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    SimulationManager::ManageSimulation(*state);
+
+    int VRFCond(1);
+    int ZoneNum(1);
+    int VRFTUNum(1);
+    bool FirstHVACIteration(true);
+    Real64 OnOffAirFlowRatio = 1.0;
+    Real64 SysOutputProvided = 0.0;
+    Real64 LatOutputProvided = 0.0;
+    Real64 QZnReq = 0.0;
+
+    // set to cooling mode
+    state->dataHVACVarRefFlow->CoolingLoad(VRFCond) = true;
+    state->dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
+    state->dataHVACVarRefFlow->LastModeCooling(VRFCond) = true;
+    state->dataHVACVarRefFlow->LastModeHeating(VRFCond) = false;
+
+    // test cooling mode fan operation
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = -5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -7000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -7000.0;
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataAirLoop->AirLoopInputsFilled = true;
+    InitVRF(*state, VRFTUNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
+    EXPECT_EQ(QZnReq, -5000.0);
+    SimVRF(*state, VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
+    // check fan operation for cooling mode
+    Real64 Result_AirMassFlowRateDesign = state->dataHVACFan->fanObjs[0]->maxAirMassFlowRate();
+    EXPECT_NEAR(Result_AirMassFlowRateDesign, 0.347052, 0.000001);
+    Real64 Result_AirMassFlowRate = state->dataLoopNodes->Node(state->dataHVACFan->fanObjs[0]->outletNodeNum).MassFlowRate;
+    EXPECT_NEAR(Result_AirMassFlowRate, state->dataDXCoils->DXCoil(1).RatedAirMassFlowRate(1), 0.000001);
+    Real64 Result_FanPower = state->dataHVACFan->fanObjs[0]->fanPower();
+    EXPECT_NEAR(Result_FanPower, 39.593, 0.001);
+
+    // test no load mode fan operation
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 0.0;
+    QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP;
+    InitVRF(*state, VRFTUNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
+    EXPECT_EQ(QZnReq, 0.0);
+    SimVRF(*state, VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
+    // check no load fan operation
+    Result_AirMassFlowRateDesign = state->dataHVACFan->fanObjs[0]->maxAirMassFlowRate();
+    EXPECT_NEAR(Result_AirMassFlowRateDesign, 0.34706, 0.00001);
+    Result_AirMassFlowRate = state->dataLoopNodes->Node(state->dataHVACFan->fanObjs[0]->outletNodeNum).MassFlowRate;
+    EXPECT_EQ(Result_AirMassFlowRate, 0.0);
+    Result_FanPower = state->dataHVACFan->fanObjs[0]->fanPower();
+    EXPECT_EQ(Result_FanPower, 0.0);
+}
+
+TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
+{
+
+    bool ErrorsFound(false);       // function returns true on error
+    bool FirstHVACIteration(true); // simulate the first pass through HVAC simulation, use false for next iteration
+    int VRFCond(1);                // index to VRF condenser
+    int VRFTUNum(1);               // index to VRF terminal unit
+    int EquipPtr(1);               // index to equipment list
+    int CurZoneNum(1);             // index to zone
+    int ZoneInletAirNode(0);       // zone inlet node number
+    Real64 SysOutputProvided(0.0); // function returns sensible capacity [W]
+    Real64 LatOutputProvided(0.0); // function returns latent capacity [W]
+
+    std::string const idf_objects = delimited_string({
+        "AirConditioner:VariableRefrigerantFlow,",
+        "  VRF Heat Pump,           !- Heat Pump Name",
+        "  VRFCondAvailSched,       !- Availability Schedule Name",
+        "  autosize,                !- Gross Rated Total Cooling Capacity {W}",
+        "  3.2917,                  !- Gross Rated Cooling COP {W/W}",
+        "  -5,                      !- Minimum Outdoor Temperature in Cooling Mode {C}",
+        "  43,                      !- Maximum Outdoor Temperature in Cooling Mode {C}",
+        "  VRFCoolCapFT,            !- Cooling Capacity Ratio Modifier Function of Low Temperature Curve Name",
+        "  VRFCoolCapFTBoundary,    !- Cooling Capacity Ratio Boundary Curve Name",
+        "  VRFCoolCapFTHi,          !- Cooling Capacity Ratio Modifier Function of High Temperature Curve Name",
+        "  VRFCoolEIRFT,            !- Cooling Energy Input Ratio Modifier Function of Low Temperature Curve Name",
+        "  VRFCoolEIRFTBoundary,    !- Cooling Energy Input Ratio Boundary Curve Name",
+        "  VRFCoolEIRFTHi,          !- Cooling Energy Input Ratio Modifier Function of High Temperature Curve Name",
+        "  CoolingEIRLowPLR,        !- Cooling Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name",
+        "  CoolingEIRHiPLR,         !- Cooling Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name",
+        "  CoolingCombRatio,        !- Cooling Combination Ratio Correction Factor Curve Name",
+        "  VRFCPLFFPLR,             !- Cooling Part-Load Fraction Correlation Curve Name",
+        "  autosize,                !- Gross Rated Heating Capacity {W}",
+        "  ,                        !- Rated Heating Capacity Sizing Ratio {W/W}",
+        "  3.5484,                  !- Gross Rated Heating COP {W/W}",
+        "  -20,                     !- Minimum Outdoor Temperature in Heating Mode {C}",
+        "  20,                      !- Maximum Outdoor Temperature in Heating Mode {C}",
+        "  VRFHeatCapFT,            !- Heating Capacity Ratio Modifier Function of Low Temperature Curve Name",
+        "  VRFHeatCapFTBoundary,    !- Heating Capacity Ratio Boundary Curve Name",
+        "  VRFHeatCapFTHi,          !- Heating Capacity Ratio Modifier Function of High Temperature Curve Name",
+        "  VRFHeatEIRFT,            !- Heating Energy Input Ratio Modifier Function of Low Temperature Curve Name",
+        "  VRFHeatEIRFTBoundary,    !- Heating Energy Input Ratio Boundary Curve Name",
+        "  VRFHeatEIRFTHi,          !- Heating Energy Input Ratio Modifier Function of High Temperature Curve Name",
+        "  WetBulbTemperature,      !- Heating Performance Curve Outdoor Temperature Type",
+        "  HeatingEIRLowPLR,        !- Heating Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name",
+        "  HeatingEIRHiPLR,         !- Heating Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name",
+        "  HeatingCombRatio,        !- Heating Combination Ratio Correction Factor Curve Name",
+        "  VRFCPLFFPLR,             !- Heating Part-Load Fraction Correlation Curve Name",
+        "  0.25,                    !- Minimum Heat Pump Part-Load Ratio {dimensionless}",
+        "  SPACE1-1,                !- Zone Name for Master Thermostat Location",
+        "  LoadPriority,            !- Master Thermostat Priority Control Type",
+        "  ,                        !- Thermostat Priority Schedule Name",
+        "  VRF Heat Pump TU List,   !- Zone Terminal Unit List Name",
+        "  No,                      !- Heat Pump Waste Heat Recovery",
+        "  30,                      !- Equivalent Piping Length used for Piping Correction Factor in Cooling Mode {m}",
+        "  10,                      !- Vertical Height used for Piping Correction Factor {m}",
+        "  CoolingLengthCorrectionFactor,  !- Piping Correction Factor for Length in Cooling Mode Curve Name",
+        "  -0.000386,               !- Piping Correction Factor for Height in Cooling Mode Coefficient {1/m}",
+        "  30,                      !- Equivalent Piping Length used for Piping Correction Factor in Heating Mode {m}",
+        "  ,                        !- Piping Correction Factor for Length in Heating Mode Curve Name",
+        "  ,                        !- Piping Correction Factor for Height in Heating Mode Coefficient {1/m}",
+        "  15,                      !- Crankcase Heater Power per Compressor {W}",
+        "  3,                       !- Number of Compressors {dimensionless}",
+        "  0.33,                    !- Ratio of Compressor Size to Total Compressor Capacity {W/W}",
+        "  7,                       !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater {C}",
+        "  Resistive,               !- Defrost Strategy",
+        "  Timed,                   !- Defrost Control",
+        "  ,                        !- Defrost Energy Input Ratio Modifier Function of Temperature Curve Name",
+        "  ,                        !- Defrost Time Period Fraction {dimensionless}",
+        "  autosize,                !- Resistive Defrost Heater Capacity {W}",
+        "  7,                       !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}",
+        "  AirCooled,               !- Condenser Type",
+        "  MyVRFOANode,             !- Condenser Inlet Node Name",
+        "  ,                        !- Condenser Outlet Node Name",
+        "  ,                        !- Water Condenser Volume Flow Rate {m3/s}",
+        "  ,                        !- Evaporative Condenser Effectiveness {dimensionless}",
+        "  ,                        !- Evaporative Condenser Air Flow Rate {m3/s}",
+        "  0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}",
+        "  ,                        !- Supply Water Storage Tank Name",
+        "  0,                       !- Basin Heater Capacity {W/K}",
+        "  ,                        !- Basin Heater Setpoint Temperature {C}",
+        "  ,                        !- Basin Heater Operating Schedule Name",
+        "  Electricity;             !- Fuel Type",
+
+        "Zone,",
+        "  SPACE1-1,                !- Name",
+        "  0,                       !- Direction of Relative North {deg}",
+        "  0,                       !- X Origin {m}",
+        "  0,                       !- Y Origin {m}",
+        "  0,                       !- Z Origin {m}",
+        "  1,                       !- Type",
+        "  1,                       !- Multiplier",
+        "  2.438400269,             !- Ceiling Height {m}",
+        "  239.247360229;           !- Volume {m3}",
+
+        "ZoneHVAC:EquipmentConnections,",
+        "  SPACE1-1,                !- Zone Name",
+        "  SPACE1-1 Eq,             !- Zone Conditioning Equipment List Name",
+        "  TU1 Outlet Node,         !- Zone Air Inlet Node or NodeList Name",
+        "  TU1 Inlet Node,          !- Zone Air Exhaust Node or NodeList Name",
+        "  SPACE1-1 Node,           !- Zone Air Node Name",
+        "  SPACE1-1 Out Node;       !- Zone Return Air Node Name", // not used anywhere else in the example file
+
+        "ZoneHVAC:EquipmentList,",
+        "  SPACE1-1 Eq,             !- Name",
+        "  SequentialLoad,          !- Load Distribution Scheme",
+        "  ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type",
+        "  TU1,                     !- Zone Equipment 1 Name",
+        "  1,                       !- Zone Equipment 1 Cooling Sequence",
+        "  1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+
+        "ZoneTerminalUnitList,",
+        "  VRF Heat Pump TU List,    !- Zone Terminal Unit List Name",
+        "  TU1;                      !- Zone Terminal Unit Name 1",
+
+        "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,",
+        "  TU1,                      !- Zone Terminal Unit Name",
+        "  VRFAvailSched,            !- Terminal Unit Availability Schedule",
+        "  TU1 Inlet Node,           !- Terminal Unit Air Inlet Node Name",
+        "  TU1 Outlet Node,          !- Terminal Unit Air Outlet Node Name",
+        "  autosize,                 !- Supply Air Flow Rate During Cooling Operation {m3/s}",
+        "  0,                        !- Supply Air Flow Rate When No Cooling is Needed {m3/s}",
+        "  autosize,                 !- Supply Air Flow Rate During Heating Operation {m3/s}",
+        "  0,                        !- Supply Air Flow Rate When No Heating is Needed {m3/s}",
+        "  0,                        !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
+        "  0,                        !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
+        "  0,                        !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+        "  VRFFanSchedule,           !- Supply Air Fan Operating Mode Schedule Name",
+        "  drawthrough,              !- Supply Air Fan Placement",
+        "  Fan:OnOff,                !- Supply Air Fan Object Type",
+        "  TU1 VRF Supply Fan,       !- Supply Air Fan Object Name",
+        "  OutdoorAir:Mixer,         !- Outside Air Mixer Object Type",
+        "  TU1 OA Mixer,             !- Outside Air Mixer Object Name",
+        "  COIL:Cooling:DX:VariableRefrigerantFlow,  !- Cooling Coil Object Type",
+        "  TU1 VRF DX Cooling Coil,  !- Cooling Coil Object Name",
+        "  COIL:Heating:DX:VariableRefrigerantFlow,  !- Heating Coil Object Type",
+        "  TU1 VRF DX Heating Coil,  !- Heating Coil Object Name",
+        "  30,                       !- Zone Terminal Unit On Parasitic Electric Energy Use {W}",
+        "  20;                       !- Zone Terminal Unit Off Parasitic Electric Energy Use{ W }",
+
+        "Fan:OnOff,",
+        "  TU1 VRF Supply Fan,       !- Name",
+        "  VRFAvailSched,            !- Availability Schedule Name",
+        "  0.7,                      !- Fan Total Efficiency",
+        "  600.0,                    !- Pressure Rise{ Pa }",
+        "  autosize,                 !- Maximum Flow Rate{ m3 / s }",
+        "  0.9,                      !- Motor Efficiency",
+        "  1.0,                      !- Motor In Airstream Fraction",
+        "  TU1 VRF DX HCoil Outlet Node, !- Air Inlet Node Name",
+        "  TU1 Outlet Node;          !- Air Outlet Node Name",
+
+        "OutdoorAir:Mixer,",
+        "  TU1 OA Mixer,             !- Name",
+        "  TU1 VRF DX CCoil Inlet Node, !- Mixed Air Node Name",
+        "  Outside Air Inlet Node 1, !- Outdoor Air Stream Node Name",
+        "  Relief Air Outlet Node 1, !- Relief Air Stream Node Name",
+        "  TU1 Inlet Node;           !- Return Air Stream Node Name",
+
+        "OutdoorAir:NodeList,",
+        "  OutsideAirInletNodes;     !- Node or NodeList Name 1",
+
+        "NodeList,",
+        "  OutsideAirInletNodes, !- Name",
+        "  Outside Air Inlet Node 1, !- Node 1 Name",
+        "  MyVRFOANode;  !- Node 1 Name",
+
+        "COIL:Cooling:DX:VariableRefrigerantFlow,",
+        "  TU1 VRF DX Cooling Coil, !- Name",
+        "  VRFAvailSched,           !- Availability Schedule Name",
+        "  autosize,                !- Gross Rated Total Cooling Capacity {W}",
+        "  autosize,                !- Gross Rated Sensible Heat Ratio",
+        "  autosize,                !- Rated Air Flow Rate {m3/s}",
+        "  VRFTUCoolCapFT,          !- Cooling Capacity Ratio Modifier Function of Temperature Curve Name",
+        "  VRFACCoolCapFFF,         !- Cooling Capacity Modifier Curve Function of Flow Fraction Name",
+        "  TU1 VRF DX CCoil Inlet Node,  !- Coil Air Inlet Node",
+        "  TU1 VRF DX CCoil Outlet Node,  !- Coil Air Outlet Node",
+        "  ;                        !- Name of Water Storage Tank for Condensate Collection",
+
+        "COIL:Heating:DX:VariableRefrigerantFlow,",
+        "  TU1 VRF DX Heating Coil, !- Name",
+        "  VRFAvailSched,           !- Availability Schedule",
+        "  autosize,                !- Gross Rated Heating Capacity {W}",
+        "  autosize,                !- Rated Air Flow Rate {m3/s}",
+        "  TU1 VRF DX CCoil Outlet Node,  !- Coil Air Inlet Node",
+        "  TU1 VRF DX HCoil Outlet Node,  !- Coil Air Outlet Node",
+        "  VRFTUHeatCapFT,          !- Heating Capacity Ratio Modifier Function of Temperature Curve Name",
+        "  VRFACCoolCapFFF;         !- Heating Capacity Modifier Function of Flow Fraction Curve Name",
+
+        "ScheduleTypeLimits,",
+        "  Any Number;              !- Name",
+
+        "Schedule:Compact,",
+        "  VRFAvailSched,           !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        "  Through: 12/31,           !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,1.0;        !- Field 3",
+
+        "Schedule:Compact,",
+        "  VRFCondAvailSched,       !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,1.0;        !- Field 3",
+
+        "Schedule:Compact,",
+        "  VRFFanSchedule,          !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,1.0;        !- Field 3",
+
+        "Curve:Biquadratic,",
+        "  VRFCoolCapFT,            !- Name",
+        "  0.576882692,             !- Coefficient1 Constant",
+        "  0.017447952,             !- Coefficient2 x",
+        "  0.000583269,             !- Coefficient3 x**2",
+        "  -1.76324E-06,            !- Coefficient4 y",
+        "  -7.474E-09,              !- Coefficient5 y**2",
+        "  -1.30413E-07,            !- Coefficient6 x*y",
+        "  15,                      !- Minimum Value of x",
+        "  24,                      !- Maximum Value of x",
+        "  -5,                      !- Minimum Value of y",
+        "  23,                      !- Maximum Value of y",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature,             !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Cubic,",
+        "  VRFCoolCapFTBoundary,    !- Name",
+        "  25.73473775,             !- Coefficient1 Constant",
+        "  -0.03150043,             !- Coefficient2 x",
+        "  -0.01416595,             !- Coefficient3 x**2",
+        "  0,                       !- Coefficient4 x**3",
+        "  11,                      !- Minimum Value of x",
+        "  30,                      !- Maximum Value of x",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature;             !- Output Unit Type",
+
+        "Curve:Biquadratic,",
+        "  VRFCoolCapFTHi,          !- Name",
+        "  0.6867358,               !- Coefficient1 Constant",
+        "  0.0207631,               !- Coefficient2 x",
+        "  0.0005447,               !- Coefficient3 x**2",
+        "  -0.0016218,              !- Coefficient4 y",
+        "  -4.259E-07,              !- Coefficient5 y**2",
+        "  -0.0003392,              !- Coefficient6 x*y",
+        "  15,                      !- Minimum Value of x",
+        "  24,                      !- Maximum Value of x",
+        "  16,                      !- Minimum Value of y",
+        "  43,                      !- Maximum Value of y",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature,             !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Biquadratic,",
+        "  VRFCoolEIRFT,            !- Name",
+        "  0.989010541,             !- Coefficient1 Constant",
+        "  -0.02347967,             !- Coefficient2 x",
+        "  0.000199711,             !- Coefficient3 x**2",
+        "  0.005968336,             !- Coefficient4 y",
+        "  -1.0289E-07,             !- Coefficient5 y**2",
+        "  -0.00015686,             !- Coefficient6 x*y",
+        "  15,                      !- Minimum Value of x",
+        "  24,                      !- Maximum Value of x",
+        "  -5,                      !- Minimum Value of y",
+        "  23,                      !- Maximum Value of y",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature,             !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Cubic,",
+        "  VRFCoolEIRFTBoundary,    !- Name",
+        "  25.73473775,             !- Coefficient1 Constant",
+        "  -0.03150043,             !- Coefficient2 x",
+        "  -0.01416595,             !- Coefficient3 x**2",
+        "  0,                       !- Coefficient4 x**3",
+        "  15,                      !- Minimum Value of x",
+        "  24,                      !- Maximum Value of x",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature;             !- Output Unit Type",
+
+        "Curve:Biquadratic,",
+        "  VRFCoolEIRFTHi,          !- Name",
+        "  0.14351470,              !- Coefficient1 Constant",
+        "  0.01860035,              !- Coefficient2 x",
+        "  -0.0003954,              !- Coefficient3 x**2",
+        "  0.02485219,              !- Coefficient4 y",
+        "  0.00016329,              !- Coefficient5 y**2",
+        "  -0.0006244,              !- Coefficient6 x*y",
+        "  15,                      !- Minimum Value of x",
+        "  24,                      !- Maximum Value of x",
+        "  16,                      !- Minimum Value of y",
+        "  43,                      !- Maximum Value of y",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature,             !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Cubic,",
+        "  CoolingEIRLowPLR,        !- Name",
+        "  0.4628123,               !- Coefficient1 Constant",
+        "  -1.0402406,              !- Coefficient2 x",
+        "  2.17490997,              !- Coefficient3 x**2",
+        "  -0.5974817,              !- Coefficient4 x**3",
+        "  0,                       !- Minimum Value of x",
+        "  1,                       !- Maximum Value of x",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature;             !- Output Unit Type",
+
+        "Curve:Quadratic,",
+        "  CoolingEIRHiPLR,         !- Name",
+        "  1.0,                     !- Coefficient1 Constant",
+        "  0.0,                     !- Coefficient2 x",
+        "  0.0,                     !- Coefficient3 x**2",
+        "  1.0,                     !- Minimum Value of x",
+        "  1.5,                     !- Maximum Value of x",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Dimensionless,           !- Input Unit Type for X",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Linear,",
+        "  CoolingCombRatio,        !- Name",
+        "  0.618055,                !- Coefficient1 Constant",
+        "  0.381945,                !- Coefficient2 x",
+        "  1.0,                     !- Minimum Value of x",
+        "  1.5,                     !- Maximum Value of x",
+        "  1.0,                     !- Minimum Curve Output",
+        "  1.2,                     !- Maximum Curve Output",
+        "  Dimensionless,           !- Input Unit Type for X",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "CURVE:QUADRATIC,",
+        "  VRFCPLFFPLR,             !- Name",
+        "  0.85,                    !- Coefficient1 Constant",
+        "  0.15,                    !- Coefficient2 x",
+        "  0.0,                     !- Coefficient3 x**2",
+        "  0.0,                     !- Minimum Value of x",
+        "  1.0,                     !- Maximum Value of x",
+        "  0.85,                    !- Minimum Curve Output",
+        "  1.0,                     !- Maximum Curve Output",
+        "  Dimensionless,           !- Input Unit Type for X",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Biquadratic,",
+        "  VRFHeatCapFT,            !- Name",
+        "  1.014599599,             !- Coefficient1 Constant",
+        "  -0.002506703,            !- Coefficient2 x",
+        "  -0.000141599,            !- Coefficient3 x**2",
+        "  0.026931595,             !- Coefficient4 y",
+        "  1.83538E-06,             !- Coefficient5 y**2",
+        "  -0.000358147,            !- Coefficient6 x*y",
+        "  15,                      !- Minimum Value of x",
+        "  27,                      !- Maximum Value of x",
+        "  -20,                     !- Minimum Value of y",
+        "  15,                      !- Maximum Value of y",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature,             !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Cubic,",
+        "  VRFHeatCapFTBoundary,    !- Name",
+        "  -7.6000882,              !- Coefficient1 Constant",
+        "  3.05090016,              !- Coefficient2 x",
+        "  -0.1162844,              !- Coefficient3 x**2",
+        "  0.0,                     !- Coefficient4 x**3",
+        "  15,                      !- Minimum Value of x",
+        "  27,                      !- Maximum Value of x",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature;             !- Output Unit Type",
+
+        "Curve:Biquadratic,",
+        "  VRFHeatCapFTHi,          !- Name",
+        "  1.161134821,             !- Coefficient1 Constant",
+        "  0.027478868,             !- Coefficient2 x",
+        "  -0.00168795,             !- Coefficient3 x**2",
+        "  0.001783378,             !- Coefficient4 y",
+        "  2.03208E-06,             !- Coefficient5 y**2",
+        "  -6.8969E-05,             !- Coefficient6 x*y",
+        "  15,                      !- Minimum Value of x",
+        "  27,                      !- Maximum Value of x",
+        "  -10,                     !- Minimum Value of y",
+        "  15,                      !- Maximum Value of y",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature,             !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Biquadratic,",
+        "  VRFHeatEIRFT,            !- Name",
+        "  0.87465501,              !- Coefficient1 Constant",
+        "  -0.01319754,             !- Coefficient2 x",
+        "  0.00110307,              !- Coefficient3 x**2",
+        "  -0.0133118,              !- Coefficient4 y",
+        "  0.00089017,              !- Coefficient5 y**2",
+        "  -0.00012766,             !- Coefficient6 x*y",
+        "  15,                      !- Minimum Value of x",
+        "  27,                      !- Maximum Value of x",
+        "  -20,                     !- Minimum Value of y",
+        "  12,                      !- Maximum Value of y",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature,             !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Cubic,",
+        "  VRFHeatEIRFTBoundary,    !- Name",
+        "  -7.6000882,              !- Coefficient1 Constant",
+        "  3.05090016,              !- Coefficient2 x",
+        "  -0.1162844,              !- Coefficient3 x**2",
+        "  0.0,                     !- Coefficient4 x**3",
+        "  15,                      !- Minimum Value of x",
+        "  27,                      !- Maximum Value of x",
+        "  -20,                     !- Minimum Curve Output",
+        "  15,                      !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature;             !- Output Unit Type",
+
+        "Curve:Biquadratic,",
+        "  VRFHeatEIRFTHi,          !- Name",
+        "  2.504005146,             !- Coefficient1 Constant",
+        "  -0.05736767,             !- Coefficient2 x",
+        "  4.07336E-05,             !- Coefficient3 x**2",
+        "  -0.12959669,             !- Coefficient4 y",
+        "  0.00135839,              !- Coefficient5 y**2",
+        "  0.00317047,              !- Coefficient6 x*y",
+        "  15,                      !- Minimum Value of x",
+        "  27,                      !- Maximum Value of x",
+        "  -10,                     !- Minimum Value of y",
+        "  15,                      !- Maximum Value of y",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature,             !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Cubic,",
+        "  HeatingEIRLowPLR,        !- Name",
+        "  0.1400093,               !- Coefficient1 Constant",
+        "  0.6415002,               !- Coefficient2 x",
+        "  0.1339047,               !- Coefficient3 x**2",
+        "  0.0845859,               !- Coefficient4 x**3",
+        "  0,                       !- Minimum Value of x",
+        "  1,                       !- Maximum Value of x",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Dimensionless,           !- Input Unit Type for X",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Quadratic,",
+        "  HeatingEIRHiPLR,         !- Name",
+        "  2.4294355,               !- Coefficient1 Constant",
+        "  -2.235887,               !- Coefficient2 x",
+        "  0.8064516,               !- Coefficient3 x**2",
+        "  1.0,                     !- Minimum Value of x",
+        "  1.5,                     !- Maximum Value of x",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Dimensionless,           !- Input Unit Type for X",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Linear,",
+        "  HeatingCombRatio,        !- Name",
+        "  0.96034,                 !- Coefficient1 Constant",
+        "  0.03966,                 !- Coefficient2 x",
+        "  1.0,                     !- Minimum Value of x",
+        "  1.5,                     !- Maximum Value of x",
+        "  1.0,                     !- Minimum Curve Output",
+        "  1.023,                   !- Maximum Curve Output",
+        "  Dimensionless,           !- Input Unit Type for X",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Biquadratic,",
+        "  CoolingLengthCorrectionFactor,  !- Name",
+        "  1.0693794,               !- Coefficient1 Constant",
+        "  -0.0014951,              !- Coefficient2 x",
+        "  2.56E-06,                !- Coefficient3 x**2",
+        "  -0.1151104,              !- Coefficient4 y",
+        "  0.0511169,               !- Coefficient5 y**2",
+        "  -0.0004369,              !- Coefficient6 x*y",
+        "  8,                       !- Minimum Value of x",
+        "  175,                     !- Maximum Value of x",
+        "  0.5,                     !- Minimum Value of y",
+        "  1.5,                     !- Maximum Value of y",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature,             !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Cubic,",
+        "  VRFTUCoolCapFT,          !- Name",
+        "  0.504547273506488,       !- Coefficient1 Constant",
+        "  0.0288891279198444,      !- Coefficient2 x",
+        "  -0.000010819418650677,   !- Coefficient3 x**2",
+        "  0.0000101359395177008,   !- Coefficient4 x**3",
+        "  0.0,                     !- Minimum Value of x",
+        "  50.0,                    !- Maximum Value of x",
+        "  0.5,                     !- Minimum Curve Output",
+        "  1.5,                     !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Quadratic,",
+        "  VRFACCoolCapFFF,         !- Name",
+        "  0.8,                     !- Coefficient1 Constant",
+        "  0.2,                     !- Coefficient2 x",
+        "  0.0,                     !- Coefficient3 x**2",
+        "  0.5,                     !- Minimum Value of x",
+        "  1.5;                     !- Maximum Value of x",
+
+        "Curve:Cubic,",
+        "  VRFTUHeatCapFT,          !- Name",
+        "  -0.390708928227928,      !- Coefficient1 Constant",
+        "  0.261815023760162,       !- Coefficient2 x",
+        "  -0.0130431603151873,     !- Coefficient3 x**2",
+        "  0.000178131745997821,    !- Coefficient4 x**3",
+        "  0.0,                     !- Minimum Value of x",
+        "  50.0,                    !- Maximum Value of x",
+        "  0.5,                     !- Minimum Curve Output",
+        "  1.5,                     !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Dimensionless;           !- Output Unit Type",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataSize->CurZoneEqNum = 1;
+    state->dataEnvrn->OutBaroPress = 101325;            // sea level
+    state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
+    state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataAirLoop->AirLoopInputsFilled = true;
+    state->dataSize->ZoneSizingRunDone = true;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
+
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    ProcessScheduleInput(*state);
+    GetCurveInput(*state);
+    GetZoneData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    // get zone input and connections
+    GetZoneEquipmentData(*state);
+    ZoneInletAirNode = GetVRFTUZoneInletAirNode(*state, VRFTUNum);
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRF(VRFCond).SchedPtr).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 0.0;
+    // set the zone cooling and heat requirements
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = -5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = -5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0;
+
+    auto &thisZoneEquip(state->dataZoneEquip->ZoneEquipConfig(state->dataGlobal->NumOfZones));
+    // set zone air node properties
+    state->dataLoopNodes->Node(thisZoneEquip.ZoneNode).Temp = 24.0;
+    state->dataLoopNodes->Node(thisZoneEquip.ZoneNode).HumRat = 0.0075;
+    state->dataLoopNodes->Node(thisZoneEquip.ZoneNode).Enthalpy = Psychrometrics::PsyHFnTdbW(
+        state->dataLoopNodes->Node(thisZoneEquip.ZoneNode).Temp, state->dataLoopNodes->Node(thisZoneEquip.ZoneNode).HumRat);
+
+    auto &thisVRFTU(state->dataHVACVarRefFlow->VRFTU(1));
+    state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Temp = 24.0;
+    state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).HumRat = 0.0075;
+    state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(
+        state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Temp, state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).HumRat);
+    state->dataLoopNodes->Node(thisVRFTU.ZoneAirNode).Temp = 24.0;
+    state->dataLoopNodes->Node(thisVRFTU.ZoneAirNode).HumRat = 0.0075;
+    state->dataLoopNodes->Node(thisVRFTU.ZoneAirNode).Enthalpy = Psychrometrics::PsyHFnTdbW(
+        state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Temp, state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).HumRat);
+
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutHumRat = 0.0100;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->WindSpeed = 5.0;
+    state->dataEnvrn->WindDir = 0.0;
+
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak =
+        state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Temp;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak =
+        state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).HumRat;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum = 1;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax = 1;
+    state->dataSize->DesDayWeath.allocate(1);
+    state->dataSize->DesDayWeath(1).Temp.allocate(1);
+    state->dataSize->DesDayWeath(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum)
+        .Temp(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax) = state->dataEnvrn->OutDryBulbTemp;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.1;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0095;
+    // set pointer to components
+    auto &thisFan(state->dataFans->Fan(1));
+    auto &thisDXCoolingCoil(state->dataDXCoils->DXCoil(1));
+    auto &thisDXHeatingCoil(state->dataDXCoils->DXCoil(2));
+    // run the model
+    bool HeatingActive = false;
+    bool CoolingActive = false;
+    int OAUnitNum = 0;
+    Real64 OAUCoilOutTemp = 0.0;
+    bool ZoneEquipment = true;
+
+    SimulateVRF(*state,
+                state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
+                FirstHVACIteration,
+                CurZoneNum,
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
+                HeatingActive,
+                CoolingActive,
+                OAUnitNum,
+                OAUCoilOutTemp,
+                ZoneEquipment,
+                SysOutputProvided,
+                LatOutputProvided);
+
+    // check model inputs
+    ASSERT_EQ(1, state->dataHVACVarRefFlow->NumVRFCond);
+    ASSERT_EQ(1, state->dataHVACVarRefFlow->NumVRFTU);
+    ASSERT_EQ(1, state->dataFans->NumFans);
+    ASSERT_EQ(2, state->dataDXCoils->NumDXCoils);
+    ASSERT_EQ("TU1 VRF DX COOLING COIL", thisDXCoolingCoil.Name);
+    ASSERT_EQ("TU1 VRF DX HEATING COIL", thisDXHeatingCoil.Name);
+    // check if total cooling rate provided by the cooling coil matches
+    // sum of the cooling delivered by VRF ATU and fan power when no OA
+    EXPECT_EQ(0.0, thisVRFTU.CoolOutAirMassFlow);
+    EXPECT_EQ(0.0, thisVRFTU.HeatOutAirMassFlow);
+    EXPECT_EQ(0.0, thisVRFTU.NoCoolHeatOutAirMassFlow);
+    EXPECT_NEAR(5367.7328, thisDXCoolingCoil.TotalCoolingEnergyRate, 0.0001);
+    EXPECT_NEAR(4999.6942, thisVRFTU.TotalCoolingRate, 0.0001);
+    EXPECT_NEAR(368.0386, thisFan.FanPower, 0.0001);
+    EXPECT_NEAR(thisDXCoolingCoil.TotalCoolingEnergyRate, (thisVRFTU.TotalCoolingRate + thisFan.FanPower), 0.0001);
+}
+
+TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
+{
+    //   PURPOSE OF THIS TEST:
+    //   Test a group of methods related with the outdoor unit compressor calculations in the VRF_FluidTCtrl model.
+
+    // Inputs_general
+    bool ErrorsFound(false);       // function returns true on error
+    bool FirstHVACIteration(true); // simulate the first pass through HVAC simulation, use false for next iteration
+    int VRFCond(1);                // index to VRF condenser
+    int VRFTUNum(1);               // index to VRF terminal unit
+    int EquipPtr(1);               // index to equipment list
+    int CurZoneNum(1);             // index to zone
+    Real64 SysOutputProvided(0.0); // function returns sensible capacity [W]
+    Real64 LatOutputProvided(0.0); // function returns latent capacity [W]
+
+    std::string const idf_objects = delimited_string({
+        "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR,                         ",
+        " VRF Heat Pump,           !- Name                                                          ",
+        " VRFAvailSched,           !- Availability Schedule Name                                    ",
+        " VRF Heat Pump TU List,   !- Zone Terminal Unit List Name                                  ",
+        " R410A,                   !- Refrigerant Type                                              ",
+        " 48757,                   !- Rated Evaporative Capacity {W}                                ",
+        " 0.214,                   !- Rated Compressor Power Per Unit of Rated Evaporative Capacity ",
+        " -6,                      !- Minimum Outdoor Air Temperature in Cooling Only Mode {C}      ",
+        " 43,                      !- Maximum Outdoor Air Temperature in Cooling Only Mode {C}      ",
+        " -20,                     !- Minimum Outdoor Air Temperature in Heating Only Mode {C}      ",
+        " 26,                      !- Maximum Outdoor Air Temperature in Heating Only Mode {C}      ",
+        " -20,                     !- Minimum Outdoor Air Temperature in Heat Recovery Mode {C}     ",
+        " 26,                      !- Maximum Outdoor Air Temperature in Heat Recovery Mode {C}     ",
+        " ConstantTemp,            !- Refrigerant Temperature Control Algorithm for Indoor Unit     ",
+        " 6,                       !- Reference Evaporating Temperature for Indoor Unit {C}         ",
+        " 44,                      !- Reference Condensing Temperature for Indoor Unit {C}          ",
+        " 5,                       !- Variable Evaporating Temperature Minimum for Indoor Unit {C}  ",
+        " 14,                      !- Variable Evaporating Temperature Maximum for Indoor Unit {C}  ",
+        " 36,                      !- Variable Condensing Temperature Minimum for Indoor Unit {C}   ",
+        " 46,                      !- Variable Condensing Temperature Maximum for Indoor Unit {C}   ",
+        " 3,                       !- Outdoor Unit Evaporator Reference Superheating {C}            ",
+        " 3,                       !- Outdoor Unit Condenser Reference Subcooling {C}               ",
+        " 0.28,                    !- Outdoor Unit Evaporator Rated Bypass Factor                   ",
+        " 0.05,                    !- Outdoor Unit Condenser Rated Bypass Factor                    ",
+        " 5,                       !- Difference between Outdoor Unit Evaporating Temperature and Ou",
+        " 0.3,                     !- Outdoor Unit Heat Exchanger Capacity Ratio                    ",
+        " 2.67E-2,                 !- Outdoor Unit Fan Power Per Unit of Rated Evaporative Capacity ",
+        " 1.13E-4,                 !- Outdoor Unit Fan Flow Rate Per Unit of Rated Evaporative Capac",
+        " OUEvapTempCurve,         !- Outdoor Unit Evaporating Temperature Function of Superheating ",
+        " OUCondTempCurve,         !- Outdoor Unit Condensing Temperature Function of Subcooling Cur",
+        " 0.0349,                  !- Diameter of Main Pipe for Suction Gas {m}                     ",
+        " 0.0286,                  !- Diameter of Main Pipe for Discharge Gas {m}                   ",
+        " 30,                      !- Length of main pipe connecting outdoor unit to indoor units {m",
+        " 36,                      !- Equivalent length of main pipe connecting outdoor unit to indo",
+        " 5,                       !- Height difference between the outdoor unit node and indoor uni",
+        " 0.02,                    !- Insulation thickness of the main pipe {m}                     ",
+        " 0.032,                   !- Thermal conductivity of the main pipe insulation material {W/m",
+        " 33,                      !- Crankcase Heater Power per Compressor {W}                     ",
+        " 3,                       !- Number of Compressors                                         ",
+        " 0.33,                    !- Ratio of Compressor Size to Total Compressor Capacity         ",
+        " 7,                       !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater {C} ",
+        " ,                        !- Defrost Strategy                                              ",
+        " ,                        !- Defrost Control                                               ",
+        " ,                        !- Defrost Energy Input Ratio Modifier Function of Temperature Cu",
+        " ,                        !- Defrost Time Period Fraction                                  ",
+        " ,                        !- Resistive Defrost Heater Capacity {W}                         ",
+        " ,                        !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}",
+        " ,                        !- Initial Heat Recovery Cooling Capacity Fraction {W/W}         ",
+        " ,                        !- Heat Recovery Cooling Capacity Time Constant {hr}             ",
+        " ,                        !- Initial Heat Recovery Cooling Energy Fraction {W/W}           ",
+        " ,                        !- Heat Recovery Cooling Energy Time Constant {hr}               ",
+        " ,                        !- Initial Heat Recovery Heating Capacity Fraction {W/W}         ",
+        " ,                        !- Heat Recovery Heating Capacity Time Constant {hr}             ",
+        " ,                        !- Initial Heat Recovery Heating Energy Fraction {W/W}           ",
+        " ,                        !- Heat Recovery Heating Energy Time Constant {hr}               ",
+        " 4500000,                 !- Compressor maximum delta Pressure {Pa}                        ",
+        " 0.95,                    !- Compressor Inverter Efficiency                                ",
+        " ,                        !- Compressor Evaporative Capacity Correction Factor             ",
+        " 3,                       !- Number of Compressor Loading Index Entries                    ",
+        " 1500,                    !- Compressor Speed at Loading Index 1 {rev/min}                 ",
+        " MinSpdCooling,           !- Loading Index 1 Evaporative Capacity Multiplier Function of Te",
+        " MinSpdPower,             !- Loading Index 1 Compressor Power Multiplier Function of Temper",
+        " 3600,                    !- Compressor Speed at Loading Index 2 {rev/min}                 ",
+        " Spd1Cooling,             !- Loading Index 2 Evaporative Capacity Multiplier Function of Te",
+        " Spd1Power,               !- Loading Index 2 Compressor Power Multiplier Function of Temper",
+        " 6000,                    !- Compressor Speed at Loading Index 3 {rev/min}                 ",
+        " Spd2Cooling,             !- Loading Index 3 Evaporative Capacity Multiplier Function of Te",
+        " Spd2Power;               !- Loading Index 3 Compressor Power Multiplier Function of Temper",
+        "                                                                                           ",
+        "Curve:Quadratic,                                     ",
+        " OUEvapTempCurve,         !- Name                    ",
+        " 0,                       !- Coefficient1 Constant   ",
+        " 6.05E-1,                 !- Coefficient2 x          ",
+        " 2.50E-2,                 !- Coefficient3 x**2       ",
+        " 0,                       !- Minimum Value of x      ",
+        " 15,                      !- Maximum Value of x      ",
+        " ,                        !- Minimum Curve Output    ",
+        " ,                        !- Maximum Curve Output    ",
+        " Temperature,             !- Input Unit Type for X   ",
+        " Temperature;             !- Output Unit Type        ",
+        "                                                     ",
+        "Curve:Quadratic,                                     ",
+        " OUCondTempCurve,         !- Name                    ",
+        " 0,                       !- Coefficient1 Constant   ",
+        " -2.91,                   !- Coefficient2 x          ",
+        " 1.180,                   !- Coefficient3 x**2       ",
+        " 0,                       !- Minimum Value of x      ",
+        " 20,                      !- Maximum Value of x      ",
+        " ,                        !- Minimum Curve Output    ",
+        " ,                        !- Maximum Curve Output    ",
+        " Temperature,             !- Input Unit Type for X   ",
+        " Temperature;             !- Output Unit Type        ",
+        "                                                     ",
+        "Curve:Biquadratic,                                   ",
+        " MinSpdCooling,           !- Name                    ",
+        " 3.19E-01,                !- Coefficient1 Constant   ",
+        " -1.26E-03,               !- Coefficient2 x          ",
+        " -2.15E-05,               !- Coefficient3 x**2       ",
+        " 1.20E-02,                !- Coefficient4 y          ",
+        " 1.05E-04,                !- Coefficient5 y**2       ",
+        " -8.66E-05,               !- Coefficient6 x*y        ",
+        " 15,                      !- Minimum Value of x      ",
+        " 65,                      !- Maximum Value of x      ",
+        " -30,                     !- Minimum Value of y      ",
+        " 15,                      !- Maximum Value of y      ",
+        " ,                        !- Minimum Curve Output    ",
+        " ,                        !- Maximum Curve Output    ",
+        " Temperature,             !- Input Unit Type for X   ",
+        " Temperature,             !- Input Unit Type for Y   ",
+        " Dimensionless;           !- Output Unit Type        ",
+        "                                                     ",
+        "Curve:Biquadratic,                                   ",
+        " MinSpdPower,             !- Name                    ",
+        " 8.79E-02 ,               !- Coefficient1 Constant   ",
+        " -1.72E-04,               !- Coefficient2 x          ",
+        " 6.93E-05 ,               !- Coefficient3 x**2       ",
+        " -3.38E-05,               !- Coefficient4 y          ",
+        " -8.10E-06,               !- Coefficient5 y**2       ",
+        " -1.04E-05,               !- Coefficient6 x*y        ",
+        " 15,                      !- Minimum Value of x      ",
+        " 65,                      !- Maximum Value of x      ",
+        " -30,                     !- Minimum Value of y      ",
+        " 15,                      !- Maximum Value of y      ",
+        " ,                        !- Minimum Curve Output    ",
+        " ,                        !- Maximum Curve Output    ",
+        " Temperature,             !- Input Unit Type for X   ",
+        " Temperature,             !- Input Unit Type for Y   ",
+        " Dimensionless;           !- Output Unit Type        ",
+        "                                                     ",
+        "Curve:Biquadratic,                                   ",
+        " Spd1Cooling,             !- Name                    ",
+        " 8.12E-01 ,               !- Coefficient1 Constant   ",
+        " -4.23E-03,               !- Coefficient2 x          ",
+        " -4.11E-05,               !- Coefficient3 x**2       ",
+        " 2.97E-02 ,               !- Coefficient4 y          ",
+        " 2.67E-04 ,               !- Coefficient5 y**2       ",
+        " -2.23E-04,               !- Coefficient6 x*y        ",
+        " 15,                      !- Minimum Value of x      ",
+        " 65,                      !- Maximum Value of x      ",
+        " -30,                     !- Minimum Value of y      ",
+        " 15,                      !- Maximum Value of y      ",
+        " ,                        !- Minimum Curve Output    ",
+        " ,                        !- Maximum Curve Output    ",
+        " Temperature,             !- Input Unit Type for X   ",
+        " Temperature,             !- Input Unit Type for Y   ",
+        " Dimensionless;           !- Output Unit Type        ",
+        "                                                     ",
+        "Curve:Biquadratic,                                   ",
+        " Spd1Power,               !- Name                    ",
+        " 3.26E-01 ,               !- Coefficient1 Constant   ",
+        " -2.20E-03,               !- Coefficient2 x          ",
+        " 1.42E-04 ,               !- Coefficient3 x**2       ",
+        " 2.82E-03 ,               !- Coefficient4 y          ",
+        " 2.86E-05 ,               !- Coefficient5 y**2       ",
+        " -3.50E-05,               !- Coefficient6 x*y        ",
+        " 15,                      !- Minimum Value of x      ",
+        " 65,                      !- Maximum Value of x      ",
+        " -30,                     !- Minimum Value of y      ",
+        " 15,                      !- Maximum Value of y      ",
+        " ,                        !- Minimum Curve Output    ",
+        " ,                        !- Maximum Curve Output    ",
+        " Temperature,             !- Input Unit Type for X   ",
+        " Temperature,             !- Input Unit Type for Y   ",
+        " Dimensionless;           !- Output Unit Type        ",
+        "                                                     ",
+        "Curve:Biquadratic,                                   ",
+        " Spd2Cooling,             !- Name                    ",
+        " 1.32E+00 ,               !- Coefficient1 Constant   ",
+        " -6.20E-03,               !- Coefficient2 x          ",
+        " -7.10E-05,               !- Coefficient3 x**2       ",
+        " 4.89E-02 ,               !- Coefficient4 y          ",
+        " 4.59E-04 ,               !- Coefficient5 y**2       ",
+        " -3.67E-04,               !- Coefficient6 x*y        ",
+        " 15,                      !- Minimum Value of x      ",
+        " 65,                      !- Maximum Value of x      ",
+        " -30,                     !- Minimum Value of y      ",
+        " 15,                      !- Maximum Value of y      ",
+        " ,                        !- Minimum Curve Output    ",
+        " ,                        !- Maximum Curve Output    ",
+        " Temperature,             !- Input Unit Type for X   ",
+        " Temperature,             !- Input Unit Type for Y   ",
+        " Dimensionless;           !- Output Unit Type        ",
+        "                                                     ",
+        "Curve:Biquadratic,                                   ",
+        " Spd2Power,               !- Name                    ",
+        " 6.56E-01 ,               !- Coefficient1 Constant   ",
+        " -3.71E-03,               !- Coefficient2 x          ",
+        " 2.07E-04 ,               !- Coefficient3 x**2       ",
+        " 1.05E-02 ,               !- Coefficient4 y          ",
+        " 7.36E-05 ,               !- Coefficient5 y**2       ",
+        " -1.57E-04,               !- Coefficient6 x*y        ",
+        " 15,                      !- Minimum Value of x      ",
+        " 65,                      !- Maximum Value of x      ",
+        " -30,                     !- Minimum Value of y      ",
+        " 15,                      !- Maximum Value of y      ",
+        " ,                        !- Minimum Curve Output    ",
+        " ,                        !- Maximum Curve Output    ",
+        " Temperature,             !- Input Unit Type for X   ",
+        " Temperature,             !- Input Unit Type for Y   ",
+        " Dimensionless;           !- Output Unit Type        ",
+
+        "Zone,",
+        "  SPACE1-1,                !- Name",
+        "  0,                       !- Direction of Relative North {deg}",
+        "  0,                       !- X Origin {m}",
+        "  0,                       !- Y Origin {m}",
+        "  0,                       !- Z Origin {m}",
+        "  1,                       !- Type",
+        "  1,                       !- Multiplier",
+        "  2.438400269,             !- Ceiling Height {m}",
+        "  239.247360229;           !- Volume {m3}",
+
+        "ZoneHVAC:EquipmentConnections,",
+        "  SPACE1-1,                !- Zone Name",
+        "  SPACE1-1 Eq,             !- Zone Conditioning Equipment List Name",
+        "  TU1 Outlet Node,         !- Zone Air Inlet Node or NodeList Name",
+        "  TU1 Inlet Node,          !- Zone Air Exhaust Node or NodeList Name",
+        "  SPACE1-1 Node,           !- Zone Air Node Name",
+        "  SPACE1-1 Out Node;       !- Zone Return Air Node Name", // not used anywhere else in the example file
+
+        "ZoneHVAC:EquipmentList,",
+        "  SPACE1-1 Eq,             !- Name",
+        "  SequentialLoad,          !- Load Distribution Scheme",
+        "  ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type",
+        "  TU1,                     !- Zone Equipment 1 Name",
+        "  1,                       !- Zone Equipment 1 Cooling Sequence",
+        "  1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+
+        "ZoneTerminalUnitList,",
+        "  VRF Heat Pump TU List,    !- Zone Terminal Unit List Name",
+        "  TU1;                      !- Zone Terminal Unit Name 1",
+
+        "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,",
+        "  TU1,                      !- Zone Terminal Unit Name",
+        "  VRFAvailSched,            !- Terminal Unit Availability Schedule",
+        "  TU1 Inlet Node,           !- Terminal Unit Air Inlet Node Name",
+        "  TU1 Outlet Node,          !- Terminal Unit Air Outlet Node Name",
+        "  autosize,                 !- Supply Air Flow Rate During Cooling Operation {m3/s}",
+        "  0,                        !- Supply Air Flow Rate When No Cooling is Needed {m3/s}",
+        "  autosize,                 !- Supply Air Flow Rate During Heating Operation {m3/s}",
+        "  0,                        !- Supply Air Flow Rate When No Heating is Needed {m3/s}",
+        "  0,                        !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
+        "  0,                        !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
+        "  0,                        !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+        "  VRFFanSchedule,           !- Supply Air Fan Operating Mode Schedule Name",
+        "  drawthrough,              !- Supply Air Fan Placement",
+        "  Fan:VariableVolume,       !- Supply Air Fan Object Type",
+        "  TU1 VRF Supply Fan,       !- Supply Air Fan Object Name",
+        "  ,                         !- Outside Air Mixer Object Type",
+        "  ,                         !- Outside Air Mixer Object Name",
+        "  COIL:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl,  !- Cooling Coil Object Type",
+        "  TU1 VRF DX Cooling Coil,  !- Cooling Coil Object Name",
+        "  COIL:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl,  !- Heating Coil Object Type",
+        "  TU1 VRF DX Heating Coil,  !- Heating Coil Object Name",
+        "  30,                       !- Zone Terminal Unit On Parasitic Electric Energy Use {W}",
+        "  20;                       !- Zone Terminal Unit Off Parasitic Electric Energy Use{ W }",
+
+        "Schedule:Compact,",
+        "  VRFAvailSched,           !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        "  Through: 12/31,           !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,1.0;        !- Field 3",
+
+        "Schedule:Compact,",
+        "  VRFFanSchedule,          !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,1.0;        !- Field 3",
+
+        "ScheduleTypeLimits,",
+        "  Any Number;              !- Name",
+
+        " Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl,  ",
+        " 	 TU1 VRF DX Cooling Coil, !- Name							   ",
+        " 	 VRFAvailSched,           !- Availability Schedule Name		   ",
+        " 	 TU1 Inlet Node,          !- Coil Air Inlet Node		   ",
+        " 	 TU1 VRF DX CCoil Outlet Node, !- Coil Air Outlet Node		   ",
+        " 	 5500,                    !- Rated Total Cooling Capacity {W}   ",
+        " 	 0.865,                   !- Rated Sensible Heat Ratio		   ",
+        " 	 3,                       !- Indoor Unit Reference Superheating ",
+        " 	 IUEvapTempCurve,         !- Indoor Unit Evaporating Temperature",
+        " 	 ;                        !- Name of Water Storage Tank for Cond",
+
+        " Curve:Quadratic,												   ",
+        "     IUEvapTempCurve,         !- Name							   ",
+        "     0,                       !- Coefficient1 Const				   ",
+        "     0.80404,                 !- Coefficient2 x					   ",
+        "     0,                       !- Coefficient3 x**2				   ",
+        "     0,                       !- Minimum Value of x				   ",
+        "     15,                      !- Maximum Value of x				   ",
+        "     ,                        !- Minimum Curve Outp				   ",
+        "     ,                        !- Maximum Curve Outp				   ",
+        "     Dimensionless,           !- Input Unit Type fo				   ",
+        "     Dimensionless;           !- Output Unit Type				   ",
+
+        "  Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl,",
+        "    TU1 VRF DX Heating Coil, !- Name",
+        "    VRFAvailSched,           !- Availability Schedule",
+        "    TU1 VRF DX CCoil Outlet Node,  !- Coil Air Inlet Node",
+        "    TU1 VRF DX HCoil Outlet Node,  !- Coil Air Outlet Node",
+        "    6500.0,                  !- Rated Total Heating Capacity {W}",
+        "    5,                       !- Indoor Unit Reference Subcooling Degrees Setpoint {C}    ",
+        "    IUCondTempCurve;         !- Indoor Unit Condensing Temperature Function of Subcooling Curve Name",
+
+        "  Curve:Quadratic,",
+        "    IUCondTempCurve,         !- Name",
+        "    -1.85,                   !- Coefficient1 Constant",
+        "    0.411,                   !- Coefficient2 x",
+        "    0.0196,                  !- Coefficient3 x**2",
+        "    0,                       !- Minimum Value of x    ",
+        "    20,                      !- Maximum Value of x    ",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature;             !- Output Unit Type",
+
+        "  Fan:VariableVolume,",
+        "    TU1 VRF Supply Fan,      !- Name",
+        "    VRFAvailSched,           !- Availability Schedule Name",
+        "    0.7,                     !- Fan Total Efficiency",
+        "    600,                     !- Pressure Rise {Pa}",
+        "    autosize,                !- Maximum Flow Rate {m3/s}",
+        "    Fraction,                !- Fan Power Minimum Flow Rate Input Method",
+        "    0,                       !- Fan Power Minimum Flow Fraction",
+        "    0,                       !- Fan Power Minimum Air Flow Rate {m3/s}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1,                       !- Motor In Airstream Fraction",
+        "    0.059,                   !- Fan Power Coefficient 1",
+        "    0,                       !- Fan Power Coefficient 2",
+        "    0,                       !- Fan Power Coefficient 3",
+        "    0.928,                   !- Fan Power Coefficient 4",
+        "    0,                       !- Fan Power Coefficient 5",
+        "    TU1 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name",
+        "    TU1 Outlet Node,         !- Air Outlet Node Name",
+        "    General;                 !- End-Use Subcategory",
+
+        " !-   ===========  ALL OBJECTS IN CLASS: FLUIDPROPERTIES:NAME ===========            ",
+        "                                                                                     ",
+        "   FluidProperties:Name,                                                             ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Refrigerant;             !- Fluid Type                                          ",
+        "                                                                                     ",
+        " !-   ===========  ALL OBJECTS IN CLASS: FLUIDPROPERTIES:TEMPERATURES ===========    ",
+        "                                                                                     ",
+        "   FluidProperties:Temperatures,                                                     ",
+        "     R410aSaturatedTemperatures,  !- Name                                            ",
+        "     -72.000,-69.000,-66.000,-63.000,-60.000,-57.000,-54.000,                        ",
+        "     -51.000,-48.000,-45.000,-42.000,-39.000,-36.000,-33.000,                        ",
+        "     -30.000,-27.000,-24.000,-21.000,-18.000,-15.000,-12.000,                        ",
+        "     -9.000,-6.000,-3.000,0.000,3.000,6.000,9.000,                                   ",
+        "     12.000,15.000,18.000,21.000,24.000,27.000,30.000,                               ",
+        "     33.000,36.000,39.000,42.000,45.000,48.000,51.000,                               ",
+        "     54.000,57.000,60.000,63.000,66.000,69.000;                                      ",
+        "                                                                                     ",
+        "   FluidProperties:Temperatures,                                                     ",
+        "     R410aSuperHeatTemperatures,  !- Name                                            ",
+        "     -72.000,-66.000,-60.000,-54.000,-48.000,-45.000,-42.000,                        ",
+        "     -39.000,-36.000,-33.000,-30.000,-27.000,-24.000,-21.000,                        ",
+        "     -18.000,-15.000,-12.000,-9.000,-6.000,-3.000,0.000,                             ",
+        "     3.000,6.000,9.000,12.000,15.000,18.000,21.000,                                  ",
+        "     24.000,27.000,30.000,33.000,36.000,39.000,42.000,                               ",
+        "     45.000,48.000,51.000,54.000,57.000,60.000,63.000,                               ",
+        "     66.000,69.000;                                                                  ",
+        "                                                                                     ",
+        " !-   ===========  ALL OBJECTS IN CLASS: FLUIDPROPERTIES:SATURATED ===========       ",
+        "                                                                                     ",
+        "   FluidProperties:Saturated,                                                        ",
+        "     R410a,                   !- Name                                                ",
+        "     Pressure,                !- Fluid Property Type                                 ",
+        "     FluidGas,                !- Fluid Phase                                         ",
+        "     R410aSaturatedTemperatures,  !- Temperature Values Name                         ",
+        "     3.1238E+04,3.7717E+04,4.5248E+04,5.3954E+04,6.3963E+04,7.5412E+04,8.8445E+04,   ",
+        "     1.0321E+05,1.1988E+05,1.3860E+05,1.5955E+05,1.8292E+05,2.0888E+05,2.3762E+05,   ",
+        "     2.6935E+05,3.0426E+05,3.4257E+05,3.8449E+05,4.3024E+05,4.8004E+05,5.3412E+05,   ",
+        "     5.9273E+05,6.5609E+05,7.2446E+05,7.9808E+05,8.7722E+05,9.6214E+05,1.0531E+06,   ",
+        "     1.1504E+06,1.2543E+06,1.3651E+06,1.4831E+06,1.6086E+06,1.7419E+06,1.8834E+06,   ",
+        "     2.0334E+06,2.1923E+06,2.3604E+06,2.5382E+06,2.7261E+06,2.9246E+06,3.1341E+06,   ",
+        "     3.3552E+06,3.5886E+06,3.8348E+06,4.0949E+06,4.3697E+06,4.6607E+06;              ",
+        "                                                                                     ",
+        "   FluidProperties:Saturated,                                                        ",
+        "     R410a,                   !- Name                                                ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     Fluid,                   !- Fluid Phase                                         ",
+        "     R410aSaturatedTemperatures,  !- Temperature Values Name                         ",
+        "     9.8535E+04,1.0259E+05,1.0665E+05,1.1072E+05,1.1479E+05,1.1888E+05,1.2297E+05,   ",
+        "     1.2707E+05,1.3119E+05,1.3532E+05,1.3947E+05,1.4363E+05,1.4782E+05,1.5202E+05,   ",
+        "     1.5624E+05,1.6048E+05,1.6475E+05,1.6904E+05,1.7337E+05,1.7772E+05,1.8210E+05,   ",
+        "     1.8652E+05,1.9097E+05,1.9547E+05,2.0000E+05,2.0458E+05,2.0920E+05,2.1388E+05,   ",
+        "     2.1861E+05,2.2340E+05,2.2825E+05,2.3316E+05,2.3815E+05,2.4322E+05,2.4838E+05,   ",
+        "     2.5363E+05,2.5899E+05,2.6447E+05,2.7008E+05,2.7585E+05,2.8180E+05,2.8797E+05,   ",
+        "     2.9441E+05,3.0120E+05,3.0848E+05,3.1650E+05,3.2578E+05,3.3815E+05;              ",
+        "                                                                                     ",
+        "   FluidProperties:Saturated,                                                        ",
+        "     R410a,                   !- Name                                                ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     FluidGas,                !- Fluid Phase                                         ",
+        "     R410aSaturatedTemperatures,  !- Temperature Values Name                         ",
+        "     3.8813E+05,3.8981E+05,3.9148E+05,3.9313E+05,3.9476E+05,3.9637E+05,3.9796E+05,   ",
+        "     3.9953E+05,4.0108E+05,4.0260E+05,4.0410E+05,4.0557E+05,4.0701E+05,4.0842E+05,   ",
+        "     4.0980E+05,4.1114E+05,4.1245E+05,4.1373E+05,4.1496E+05,4.1615E+05,4.1730E+05,   ",
+        "     4.1840E+05,4.1945E+05,4.2045E+05,4.2139E+05,4.2227E+05,4.2308E+05,4.2382E+05,   ",
+        "     4.2448E+05,4.2507E+05,4.2556E+05,4.2595E+05,4.2624E+05,4.2641E+05,4.2646E+05,   ",
+        "     4.2635E+05,4.2609E+05,4.2564E+05,4.2498E+05,4.2408E+05,4.2290E+05,4.2137E+05,   ",
+        "     4.1941E+05,4.1692E+05,4.1370E+05,4.0942E+05,4.0343E+05,3.9373E+05;              ",
+        "                                                                                     ",
+        "   FluidProperties:Saturated,                                                        ",
+        "     R410a,                   !- Name                                                ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     Fluid,                   !- Fluid Phase                                         ",
+        "     R410aSaturatedTemperatures,  !- Temperature Values Name                         ",
+        "     1.4127E+03,1.4036E+03,1.3946E+03,1.3854E+03,1.3762E+03,1.3669E+03,1.3576E+03,   ",
+        "     1.3482E+03,1.3387E+03,1.3291E+03,1.3194E+03,1.3097E+03,1.2998E+03,1.2898E+03,   ",
+        "     1.2797E+03,1.2694E+03,1.2591E+03,1.2486E+03,1.2379E+03,1.2271E+03,1.2160E+03,   ",
+        "     1.2048E+03,1.1934E+03,1.1818E+03,1.1699E+03,1.1578E+03,1.1454E+03,1.1328E+03,   ",
+        "     1.1197E+03,1.1064E+03,1.0927E+03,1.0785E+03,1.0639E+03,1.0488E+03,1.0331E+03,   ",
+        "     1.0167E+03,9.9971E+02,9.8187E+02,9.6308E+02,9.4319E+02,9.2198E+02,8.9916E+02,   ",
+        "     8.7429E+02,8.4672E+02,8.1537E+02,7.7825E+02,7.3095E+02,6.5903E+02;              ",
+        "                                                                                     ",
+        "   FluidProperties:Saturated,                                                        ",
+        "     R410a,                   !- Name                                                ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     FluidGas,                !- Fluid Phase                                         ",
+        "     R410aSaturatedTemperatures,  !- Temperature Values Name                         ",
+        "     1.3845E+00,1.6517E+00,1.9588E+00,2.3100E+00,2.7097E+00,3.1627E+00,3.6737E+00,   ",
+        "     4.2482E+00,4.8916E+00,5.6098E+00,6.4088E+00,7.2952E+00,8.2758E+00,9.3578E+00,   ",
+        "     1.0549E+01,1.1857E+01,1.3292E+01,1.4861E+01,1.6576E+01,1.8447E+01,2.0485E+01,   ",
+        "     2.2702E+01,2.5113E+01,2.7732E+01,3.0575E+01,3.3659E+01,3.7005E+01,4.0634E+01,   ",
+        "     4.4571E+01,4.8844E+01,5.3483E+01,5.8525E+01,6.4012E+01,6.9991E+01,7.6520E+01,   ",
+        "     8.3666E+01,9.1511E+01,1.0016E+02,1.0973E+02,1.2038E+02,1.3233E+02,1.4585E+02,   ",
+        "     1.6135E+02,1.7940E+02,2.0095E+02,2.2766E+02,2.6301E+02,3.1759E+02;              ",
+        "                                                                                     ",
+        "   FluidProperties:Saturated,                                                        ",
+        "     R410a,                   !- Name                                                ",
+        "     SpecificHeat,            !- Fluid Property Type                                 ",
+        "     Fluid,                   !- Fluid Phase                                         ",
+        "     R410aSaturatedTemperatures,  !- Temperature Values Name                         ",
+        "     1.3499E+03,1.3515E+03,1.3534E+03,1.3557E+03,1.3584E+03,1.3614E+03,1.3648E+03,   ",
+        "     1.3686E+03,1.3728E+03,1.3774E+03,1.3825E+03,1.3881E+03,1.3941E+03,1.4007E+03,   ",
+        "     1.4078E+03,1.4155E+03,1.4238E+03,1.4327E+03,1.4424E+03,1.4527E+03,1.4639E+03,   ",
+        "     1.4759E+03,1.4888E+03,1.5027E+03,1.5177E+03,1.5340E+03,1.5515E+03,1.5706E+03,   ",
+        "     1.5914E+03,1.6141E+03,1.6390E+03,1.6664E+03,1.6968E+03,1.7307E+03,1.7689E+03,   ",
+        "     1.8123E+03,1.8622E+03,1.9204E+03,1.9895E+03,2.0732E+03,2.1774E+03,2.3116E+03,   ",
+        "     2.4924E+03,2.7507E+03,3.1534E+03,3.8723E+03,5.5190E+03,1.2701E+04;              ",
+        "                                                                                     ",
+        "   FluidProperties:Saturated,                                                        ",
+        "     R410a,                   !- Name                                                ",
+        "     SpecificHeat,            !- Fluid Property Type                                 ",
+        "     FluidGas,                !- Fluid Phase                                         ",
+        "     R410aSaturatedTemperatures,  !- Temperature Values Name                         ",
+        "     7.2387E+02,7.3519E+02,7.4693E+02,7.5910E+02,7.7167E+02,7.8465E+02,7.9802E+02,   ",
+        "     8.1178E+02,8.2594E+02,8.4050E+02,8.5546E+02,8.7085E+02,8.8668E+02,9.0298E+02,   ",
+        "     9.1979E+02,9.3715E+02,9.5511E+02,9.7372E+02,9.9307E+02,1.0132E+03,1.0343E+03,   ",
+        "     1.0564E+03,1.0796E+03,1.1042E+03,1.1302E+03,1.1580E+03,1.1877E+03,1.2196E+03,   ",
+        "     1.2541E+03,1.2917E+03,1.3329E+03,1.3783E+03,1.4287E+03,1.4853E+03,1.5494E+03,   ",
+        "     1.6228E+03,1.7078E+03,1.8078E+03,1.9274E+03,2.0735E+03,2.2562E+03,2.4922E+03,   ",
+        "     2.8094E+03,3.2596E+03,3.9504E+03,5.1465E+03,7.7185E+03,1.7076E+04;              ",
+        "                                                                                     ",
+        " !-   ===========  ALL OBJECTS IN CLASS: FLUIDPROPERTIES:SUPERHEATED ===========     ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     3.1238E+04,              !- Pressure {Pa}                                       ",
+        "     3.8813E+05,3.9245E+05,3.9675E+05,4.0105E+05,4.0536E+05,4.0753E+05,4.0970E+05,   ",
+        "     4.1189E+05,4.1408E+05,4.1628E+05,4.1849E+05,4.2071E+05,4.2294E+05,4.2518E+05,   ",
+        "     4.2743E+05,4.2969E+05,4.3196E+05,4.3425E+05,4.3655E+05,4.3885E+05,4.4118E+05,   ",
+        "     4.4351E+05,4.4586E+05,4.4821E+05,4.5058E+05,4.5297E+05,4.5536E+05,4.5777E+05,   ",
+        "     4.6020E+05,4.6263E+05,4.6508E+05,4.6754E+05,4.7002E+05,4.7251E+05,4.7501E+05,   ",
+        "     4.7752E+05,4.8005E+05,4.8259E+05,4.8515E+05,4.8772E+05,4.9030E+05,4.9290E+05,   ",
+        "     4.9551E+05,4.9813E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     3.1238E+04,              !- Pressure {Pa}                                       ",
+        "     1.3845E+00,1.3404E+00,1.2997E+00,1.2617E+00,1.2262E+00,1.2092E+00,1.1928E+00,   ",
+        "     1.1768E+00,1.1613E+00,1.1462E+00,1.1316E+00,1.1173E+00,1.1034E+00,1.0898E+00,   ",
+        "     1.0766E+00,1.0638E+00,1.0512E+00,1.0390E+00,1.0271E+00,1.0154E+00,1.0040E+00,   ",
+        "     9.9285E-01,9.8197E-01,9.7133E-01,9.6093E-01,9.5075E-01,9.4079E-01,9.3104E-01,   ",
+        "     9.2150E-01,9.1215E-01,9.0299E-01,8.9403E-01,8.8524E-01,8.7662E-01,8.6817E-01,   ",
+        "     8.5989E-01,8.5177E-01,8.4380E-01,8.3598E-01,8.2831E-01,8.2077E-01,8.1338E-01,   ",
+        "     8.0612E-01,7.9899E-01;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     4.5248E+04,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,3.9148E+05,3.9593E+05,4.0034E+05,4.0474E+05,4.0694E+05,4.0915E+05,   ",
+        "     4.1136E+05,4.1358E+05,4.1580E+05,4.1803E+05,4.2027E+05,4.2252E+05,4.2478E+05,   ",
+        "     4.2705E+05,4.2933E+05,4.3161E+05,4.3391E+05,4.3622E+05,4.3854E+05,4.4088E+05,   ",
+        "     4.4322E+05,4.4558E+05,4.4794E+05,4.5032E+05,4.5272E+05,4.5512E+05,4.5754E+05,   ",
+        "     4.5997E+05,4.6241E+05,4.6486E+05,4.6733E+05,4.6981E+05,4.7231E+05,4.7481E+05,   ",
+        "     4.7733E+05,4.7987E+05,4.8241E+05,4.8497E+05,4.8755E+05,4.9013E+05,4.9273E+05,   ",
+        "     4.9535E+05,4.9797E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     4.5248E+04,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,1.9588E+00,1.8968E+00,1.8395E+00,1.7863E+00,1.7610E+00,1.7365E+00,   ",
+        "     1.7128E+00,1.6898E+00,1.6674E+00,1.6457E+00,1.6246E+00,1.6041E+00,1.5842E+00,   ",
+        "     1.5647E+00,1.5458E+00,1.5273E+00,1.5093E+00,1.4918E+00,1.4747E+00,1.4580E+00,   ",
+        "     1.4416E+00,1.4257E+00,1.4101E+00,1.3949E+00,1.3800E+00,1.3654E+00,1.3512E+00,   ",
+        "     1.3372E+00,1.3236E+00,1.3102E+00,1.2971E+00,1.2843E+00,1.2717E+00,1.2594E+00,   ",
+        "     1.2473E+00,1.2355E+00,1.2239E+00,1.2125E+00,1.2013E+00,1.1903E+00,1.1796E+00,   ",
+        "     1.1690E+00,1.1586E+00;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     6.3963E+04,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,3.9476E+05,3.9935E+05,4.0388E+05,4.0614E+05,4.0839E+05,   ",
+        "     4.1064E+05,4.1290E+05,4.1516E+05,4.1742E+05,4.1969E+05,4.2196E+05,4.2425E+05,   ",
+        "     4.2654E+05,4.2884E+05,4.3114E+05,4.3346E+05,4.3579E+05,4.3813E+05,4.4047E+05,   ",
+        "     4.4283E+05,4.4520E+05,4.4758E+05,4.4997E+05,4.5238E+05,4.5479E+05,4.5722E+05,   ",
+        "     4.5966E+05,4.6211E+05,4.6457E+05,4.6705E+05,4.6954E+05,4.7204E+05,4.7455E+05,   ",
+        "     4.7708E+05,4.7962E+05,4.8217E+05,4.8474E+05,4.8732E+05,4.8991E+05,4.9252E+05,   ",
+        "     4.9513E+05,4.9777E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     6.3963E+04,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,2.7097E+00,2.6240E+00,2.5451E+00,2.5078E+00,2.4718E+00,   ",
+        "     2.4370E+00,2.4034E+00,2.3708E+00,2.3393E+00,2.3086E+00,2.2789E+00,2.2500E+00,   ",
+        "     2.2219E+00,2.1945E+00,2.1679E+00,2.1420E+00,2.1167E+00,2.0921E+00,2.0681E+00,   ",
+        "     2.0446E+00,2.0217E+00,1.9994E+00,1.9776E+00,1.9562E+00,1.9354E+00,1.9150E+00,   ",
+        "     1.8950E+00,1.8755E+00,1.8564E+00,1.8377E+00,1.8194E+00,1.8014E+00,1.7839E+00,   ",
+        "     1.7666E+00,1.7497E+00,1.7332E+00,1.7169E+00,1.7010E+00,1.6854E+00,1.6700E+00,   ",
+        "     1.6550E+00,1.6402E+00;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     8.8445E+04,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,3.9796E+05,4.0270E+05,4.0503E+05,4.0736E+05,   ",
+        "     4.0967E+05,4.1198E+05,4.1429E+05,4.1660E+05,4.1891E+05,4.2122E+05,4.2354E+05,   ",
+        "     4.2586E+05,4.2819E+05,4.3052E+05,4.3286E+05,4.3521E+05,4.3757E+05,4.3994E+05,   ",
+        "     4.4232E+05,4.4470E+05,4.4710E+05,4.4951E+05,4.5193E+05,4.5436E+05,4.5680E+05,   ",
+        "     4.5925E+05,4.6171E+05,4.6419E+05,4.6668E+05,4.6918E+05,4.7169E+05,4.7421E+05,   ",
+        "     4.7675E+05,4.7930E+05,4.8186E+05,4.8443E+05,4.8702E+05,4.8962E+05,4.9223E+05,   ",
+        "     4.9486E+05,4.9749E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     8.8445E+04,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,3.6737E+00,3.5570E+00,3.5024E+00,3.4500E+00,   ",
+        "     3.3995E+00,3.3509E+00,3.3039E+00,3.2585E+00,3.2146E+00,3.1720E+00,3.1308E+00,   ",
+        "     3.0907E+00,3.0518E+00,3.0140E+00,2.9772E+00,2.9414E+00,2.9065E+00,2.8726E+00,   ",
+        "     2.8395E+00,2.8072E+00,2.7757E+00,2.7449E+00,2.7149E+00,2.6856E+00,2.6569E+00,   ",
+        "     2.6289E+00,2.6015E+00,2.5747E+00,2.5485E+00,2.5228E+00,2.4977E+00,2.4731E+00,   ",
+        "     2.4490E+00,2.4254E+00,2.4022E+00,2.3795E+00,2.3573E+00,2.3354E+00,2.3140E+00,   ",
+        "     2.2930E+00,2.2724E+00;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     1.1988E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.0108E+05,4.0354E+05,4.0597E+05,   ",
+        "     4.0838E+05,4.1077E+05,4.1315E+05,4.1552E+05,4.1788E+05,4.2025E+05,4.2261E+05,   ",
+        "     4.2497E+05,4.2734E+05,4.2971E+05,4.3209E+05,4.3447E+05,4.3685E+05,4.3925E+05,   ",
+        "     4.4165E+05,4.4406E+05,4.4648E+05,4.4891E+05,4.5135E+05,4.5380E+05,4.5626E+05,   ",
+        "     4.5873E+05,4.6121E+05,4.6370E+05,4.6620E+05,4.6871E+05,4.7124E+05,4.7377E+05,   ",
+        "     4.7632E+05,4.7888E+05,4.8145E+05,4.8404E+05,4.8663E+05,4.8924E+05,4.9186E+05,   ",
+        "     4.9450E+05,4.9715E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     1.1988E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.8918E+00,4.8116E+00,4.7352E+00,   ",
+        "     4.6621E+00,4.5920E+00,4.5247E+00,4.4599E+00,4.3974E+00,4.3370E+00,4.2787E+00,   ",
+        "     4.2221E+00,4.1674E+00,4.1143E+00,4.0627E+00,4.0126E+00,3.9639E+00,3.9165E+00,   ",
+        "     3.8704E+00,3.8255E+00,3.7817E+00,3.7390E+00,3.6974E+00,3.6567E+00,3.6171E+00,   ",
+        "     3.5783E+00,3.5405E+00,3.5035E+00,3.4673E+00,3.4319E+00,3.3973E+00,3.3634E+00,   ",
+        "     3.3302E+00,3.2977E+00,3.2659E+00,3.2347E+00,3.2041E+00,3.1742E+00,3.1448E+00,   ",
+        "     3.1160E+00,3.0877E+00;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     1.3860E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.0260E+05,4.0510E+05,   ",
+        "     4.0757E+05,4.1002E+05,4.1244E+05,4.1485E+05,4.1726E+05,4.1965E+05,4.2204E+05,   ",
+        "     4.2444E+05,4.2683E+05,4.2922E+05,4.3162E+05,4.3402E+05,4.3642E+05,4.3883E+05,   ",
+        "     4.4125E+05,4.4368E+05,4.4611E+05,4.4855E+05,4.5100E+05,4.5346E+05,4.5593E+05,   ",
+        "     4.5841E+05,4.6090E+05,4.6340E+05,4.6591E+05,4.6843E+05,4.7097E+05,4.7351E+05,   ",
+        "     4.7606E+05,4.7863E+05,4.8121E+05,4.8380E+05,4.8640E+05,4.8902E+05,4.9165E+05,   ",
+        "     4.9428E+05,4.9694E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     1.3860E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,5.6098E+00,5.5173E+00,   ",
+        "     5.4293E+00,5.3451E+00,5.2645E+00,5.1871E+00,5.1127E+00,5.0409E+00,4.9717E+00,   ",
+        "     4.9047E+00,4.8399E+00,4.7772E+00,4.7163E+00,4.6573E+00,4.5999E+00,4.5442E+00,   ",
+        "     4.4900E+00,4.4372E+00,4.3859E+00,4.3358E+00,4.2870E+00,4.2394E+00,4.1930E+00,   ",
+        "     4.1476E+00,4.1033E+00,4.0601E+00,4.0178E+00,3.9765E+00,3.9360E+00,3.8965E+00,   ",
+        "     3.8578E+00,3.8199E+00,3.7828E+00,3.7464E+00,3.7108E+00,3.6759E+00,3.6417E+00,   ",
+        "     3.6081E+00,3.5752E+00;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     1.5955E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.0410E+05,   ",
+        "     4.0664E+05,4.0915E+05,4.1163E+05,4.1409E+05,4.1654E+05,4.1898E+05,4.2140E+05,   ",
+        "     4.2383E+05,4.2625E+05,4.2867E+05,4.3109E+05,4.3351E+05,4.3593E+05,4.3836E+05,   ",
+        "     4.4080E+05,4.4324E+05,4.4569E+05,4.4815E+05,4.5061E+05,4.5309E+05,4.5557E+05,   ",
+        "     4.5806E+05,4.6056E+05,4.6307E+05,4.6559E+05,4.6812E+05,4.7066E+05,4.7321E+05,   ",
+        "     4.7578E+05,4.7835E+05,4.8094E+05,4.8354E+05,4.8615E+05,4.8877E+05,4.9140E+05,   ",
+        "     4.9404E+05,4.9670E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     1.5955E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,6.4087E+00,   ",
+        "     6.3023E+00,6.2010E+00,6.1045E+00,6.0120E+00,5.9233E+00,5.8380E+00,5.7559E+00,   ",
+        "     5.6767E+00,5.6001E+00,5.5261E+00,5.4544E+00,5.3850E+00,5.3176E+00,5.2521E+00,   ",
+        "     5.1885E+00,5.1267E+00,5.0666E+00,5.0080E+00,4.9509E+00,4.8953E+00,4.8411E+00,   ",
+        "     4.7882E+00,4.7366E+00,4.6862E+00,4.6369E+00,4.5888E+00,4.5417E+00,4.4957E+00,   ",
+        "     4.4507E+00,4.4066E+00,4.3635E+00,4.3212E+00,4.2799E+00,4.2393E+00,4.1996E+00,   ",
+        "     4.1607E+00,4.1225E+00;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     1.8292E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     4.0557E+05,4.0816E+05,4.1071E+05,4.1323E+05,4.1573E+05,4.1821E+05,4.2068E+05,   ",
+        "     4.2313E+05,4.2559E+05,4.2804E+05,4.3049E+05,4.3293E+05,4.3538E+05,4.3784E+05,   ",
+        "     4.4029E+05,4.4275E+05,4.4522E+05,4.4769E+05,4.5017E+05,4.5266E+05,4.5516E+05,   ",
+        "     4.5766E+05,4.6017E+05,4.6270E+05,4.6523E+05,4.6777E+05,4.7032E+05,4.7288E+05,   ",
+        "     4.7546E+05,4.7804E+05,4.8063E+05,4.8324E+05,4.8586E+05,4.8848E+05,4.9112E+05,   ",
+        "     4.9378E+05,4.9644E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     1.8292E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     7.2953E+00,7.1732E+00,7.0571E+00,6.9465E+00,6.8408E+00,6.7394E+00,6.6420E+00,   ",
+        "     6.5482E+00,6.4578E+00,6.3706E+00,6.2862E+00,6.2046E+00,6.1255E+00,6.0488E+00,   ",
+        "     5.9743E+00,5.9020E+00,5.8317E+00,5.7633E+00,5.6968E+00,5.6320E+00,5.5688E+00,   ",
+        "     5.5072E+00,5.4472E+00,5.3885E+00,5.3313E+00,5.2754E+00,5.2208E+00,5.1674E+00,   ",
+        "     5.1152E+00,5.0641E+00,5.0141E+00,4.9652E+00,4.9173E+00,4.8703E+00,4.8244E+00,   ",
+        "     4.7793E+00,4.7352E+00;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     2.0888E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,4.0701E+05,4.0964E+05,4.1224E+05,4.1480E+05,4.1733E+05,4.1985E+05,   ",
+        "     4.2235E+05,4.2485E+05,4.2733E+05,4.2981E+05,4.3229E+05,4.3477E+05,4.3724E+05,   ",
+        "     4.3972E+05,4.4221E+05,4.4469E+05,4.4719E+05,4.4968E+05,4.5219E+05,4.5470E+05,   ",
+        "     4.5722E+05,4.5974E+05,4.6228E+05,4.6482E+05,4.6738E+05,4.6994E+05,4.7251E+05,   ",
+        "     4.7510E+05,4.7769E+05,4.8029E+05,4.8291E+05,4.8553E+05,4.8817E+05,4.9082E+05,   ",
+        "     4.9348E+05,4.9615E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     2.0888E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,8.2759E+00,8.1361E+00,8.0034E+00,7.8770E+00,7.7563E+00,7.6407E+00,   ",
+        "     7.5297E+00,7.4230E+00,7.3201E+00,7.2209E+00,7.1251E+00,7.0323E+00,6.9425E+00,   ",
+        "     6.8555E+00,6.7710E+00,6.6890E+00,6.6093E+00,6.5318E+00,6.4564E+00,6.3830E+00,   ",
+        "     6.3115E+00,6.2417E+00,6.1738E+00,6.1074E+00,6.0426E+00,5.9794E+00,5.9176E+00,   ",
+        "     5.8572E+00,5.7981E+00,5.7404E+00,5.6839E+00,5.6286E+00,5.5744E+00,5.5214E+00,   ",
+        "     5.4694E+00,5.4185E+00;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     2.3762E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,4.0842E+05,4.1110E+05,4.1374E+05,4.1634E+05,4.1892E+05,   ",
+        "     4.2147E+05,4.2401E+05,4.2654E+05,4.2905E+05,4.3157E+05,4.3407E+05,4.3658E+05,   ",
+        "     4.3909E+05,4.4159E+05,4.4410E+05,4.4662E+05,4.4914E+05,4.5166E+05,4.5419E+05,   ",
+        "     4.5672E+05,4.5927E+05,4.6182E+05,4.6437E+05,4.6694E+05,4.6952E+05,4.7210E+05,   ",
+        "     4.7470E+05,4.7730E+05,4.7992E+05,4.8254E+05,4.8517E+05,4.8782E+05,4.9048E+05,   ",
+        "     4.9315E+05,4.9582E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     2.3762E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,9.3578E+00,9.1979E+00,9.0465E+00,8.9024E+00,8.7650E+00,   ",
+        "     8.6335E+00,8.5073E+00,8.3861E+00,8.2694E+00,8.1569E+00,8.0482E+00,7.9431E+00,   ",
+        "     7.8414E+00,7.7429E+00,7.6473E+00,7.5546E+00,7.4645E+00,7.3769E+00,7.2917E+00,   ",
+        "     7.2088E+00,7.1280E+00,7.0493E+00,6.9726E+00,6.8977E+00,6.8246E+00,6.7533E+00,   ",
+        "     6.6836E+00,6.6155E+00,6.5489E+00,6.4838E+00,6.4200E+00,6.3577E+00,6.2967E+00,   ",
+        "     6.2369E+00,6.1783E+00;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     2.6935E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,4.0980E+05,4.1253E+05,4.1521E+05,4.1786E+05,   ",
+        "     4.2047E+05,4.2307E+05,4.2564E+05,4.2820E+05,4.3075E+05,4.3330E+05,4.3584E+05,   ",
+        "     4.3837E+05,4.4091E+05,4.4345E+05,4.4599E+05,4.4853E+05,4.5107E+05,4.5362E+05,   ",
+        "     4.5617E+05,4.5873E+05,4.6130E+05,4.6388E+05,4.6646E+05,4.6905E+05,4.7165E+05,   ",
+        "     4.7425E+05,4.7687E+05,4.7950E+05,4.8213E+05,4.8478E+05,4.8743E+05,4.9010E+05,   ",
+        "     4.9278E+05,4.9546E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     2.6935E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,1.0549E+01,1.0367E+01,1.0194E+01,1.0030E+01,   ",
+        "     9.8741E+00,9.7248E+00,9.5817E+00,9.4443E+00,9.3122E+00,9.1848E+00,9.0619E+00,   ",
+        "     8.9431E+00,8.8282E+00,8.7170E+00,8.6091E+00,8.5045E+00,8.4029E+00,8.3042E+00,   ",
+        "     8.2081E+00,8.1147E+00,8.0237E+00,7.9351E+00,7.8487E+00,7.7644E+00,7.6822E+00,   ",
+        "     7.6019E+00,7.5235E+00,7.4469E+00,7.3721E+00,7.2989E+00,7.2273E+00,7.1572E+00,   ",
+        "     7.0886E+00,7.0214E+00;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     3.0426E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.1114E+05,4.1392E+05,4.1665E+05,   ",
+        "     4.1934E+05,4.2200E+05,4.2463E+05,4.2725E+05,4.2984E+05,4.3243E+05,4.3501E+05,   ",
+        "     4.3758E+05,4.4015E+05,4.4272E+05,4.4528E+05,4.4785E+05,4.5042E+05,4.5299E+05,   ",
+        "     4.5556E+05,4.5814E+05,4.6073E+05,4.6332E+05,4.6592E+05,4.6853E+05,4.7114E+05,   ",
+        "     4.7376E+05,4.7639E+05,4.7903E+05,4.8168E+05,4.8434E+05,4.8701E+05,4.8968E+05,   ",
+        "     4.9237E+05,4.9507E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     3.0426E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,1.1857E+01,1.1650E+01,1.1453E+01,   ",
+        "     1.1267E+01,1.1090E+01,1.0921E+01,1.0759E+01,1.0604E+01,1.0454E+01,1.0310E+01,   ",
+        "     1.0172E+01,1.0038E+01,9.9083E+00,9.7830E+00,9.6615E+00,9.5438E+00,9.4294E+00,   ",
+        "     9.3184E+00,9.2104E+00,9.1054E+00,9.0032E+00,8.9037E+00,8.8067E+00,8.7121E+00,   ",
+        "     8.6198E+00,8.5297E+00,8.4418E+00,8.3559E+00,8.2719E+00,8.1898E+00,8.1095E+00,   ",
+        "     8.0310E+00,7.9541E+00;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     3.4257E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.1245E+05,4.1529E+05,   ",
+        "     4.1807E+05,4.2080E+05,4.2350E+05,4.2617E+05,4.2883E+05,4.3146E+05,4.3408E+05,   ",
+        "     4.3670E+05,4.3930E+05,4.4190E+05,4.4450E+05,4.4709E+05,4.4969E+05,4.5229E+05,   ",
+        "     4.5489E+05,4.5749E+05,4.6010E+05,4.6271E+05,4.6533E+05,4.6795E+05,4.7058E+05,   ",
+        "     4.7322E+05,4.7587E+05,4.7852E+05,4.8118E+05,4.8385E+05,4.8653E+05,4.8922E+05,   ",
+        "     4.9192E+05,4.9463E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     3.4257E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,1.3292E+01,1.3056E+01,   ",
+        "     1.2833E+01,1.2622E+01,1.2421E+01,1.2230E+01,1.2047E+01,1.1871E+01,1.1703E+01,   ",
+        "     1.1541E+01,1.1385E+01,1.1234E+01,1.1088E+01,1.0947E+01,1.0811E+01,1.0678E+01,   ",
+        "     1.0550E+01,1.0425E+01,1.0304E+01,1.0187E+01,1.0072E+01,9.9605E+00,9.8518E+00,   ",
+        "     9.7459E+00,9.6426E+00,9.5417E+00,9.4433E+00,9.3472E+00,9.2533E+00,9.1615E+00,   ",
+        "     9.0717E+00,8.9839E+00;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     3.8449E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.1373E+05,   ",
+        "     4.1661E+05,4.1944E+05,4.2222E+05,4.2497E+05,4.2768E+05,4.3038E+05,4.3305E+05,   ",
+        "     4.3571E+05,4.3836E+05,4.4100E+05,4.4363E+05,4.4626E+05,4.4889E+05,4.5151E+05,   ",
+        "     4.5414E+05,4.5677E+05,4.5940E+05,4.6203E+05,4.6467E+05,4.6732E+05,4.6997E+05,   ",
+        "     4.7262E+05,4.7529E+05,4.7796E+05,4.8063E+05,4.8332E+05,4.8601E+05,4.8872E+05,   ",
+        "     4.9143E+05,4.9415E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     3.8449E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,1.4861E+01,   ",
+        "     1.4593E+01,1.4341E+01,1.4102E+01,1.3875E+01,1.3659E+01,1.3452E+01,1.3255E+01,   ",
+        "     1.3065E+01,1.2882E+01,1.2707E+01,1.2537E+01,1.2374E+01,1.2216E+01,1.2063E+01,   ",
+        "     1.1914E+01,1.1771E+01,1.1631E+01,1.1495E+01,1.1364E+01,1.1236E+01,1.1111E+01,   ",
+        "     1.0989E+01,1.0871E+01,1.0755E+01,1.0643E+01,1.0533E+01,1.0426E+01,1.0321E+01,   ",
+        "     1.0218E+01,1.0118E+01;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     4.3024E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     4.1496E+05,4.1790E+05,4.2078E+05,4.2361E+05,4.2641E+05,4.2916E+05,4.3190E+05,   ",
+        "     4.3461E+05,4.3731E+05,4.3999E+05,4.4267E+05,4.4533E+05,4.4800E+05,4.5066E+05,   ",
+        "     4.5331E+05,4.5597E+05,4.5863E+05,4.6129E+05,4.6395E+05,4.6662E+05,4.6929E+05,   ",
+        "     4.7197E+05,4.7465E+05,4.7734E+05,4.8003E+05,4.8273E+05,4.8544E+05,4.8816E+05,   ",
+        "     4.9089E+05,4.9362E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     4.3024E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     1.6576E+01,1.6272E+01,1.5986E+01,1.5716E+01,1.5460E+01,1.5216E+01,1.4983E+01,   ",
+        "     1.4761E+01,1.4547E+01,1.4343E+01,1.4145E+01,1.3955E+01,1.3772E+01,1.3595E+01,   ",
+        "     1.3424E+01,1.3258E+01,1.3097E+01,1.2941E+01,1.2789E+01,1.2642E+01,1.2499E+01,   ",
+        "     1.2360E+01,1.2224E+01,1.2092E+01,1.1964E+01,1.1838E+01,1.1716E+01,1.1596E+01,   ",
+        "     1.1480E+01,1.1365E+01;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     4.8004E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,4.1615E+05,4.1915E+05,4.2209E+05,4.2497E+05,4.2781E+05,4.3061E+05,   ",
+        "     4.3339E+05,4.3614E+05,4.3888E+05,4.4160E+05,4.4431E+05,4.4701E+05,4.4971E+05,   ",
+        "     4.5240E+05,4.5509E+05,4.5778E+05,4.6047E+05,4.6316E+05,4.6585E+05,4.6855E+05,   ",
+        "     4.7124E+05,4.7395E+05,4.7666E+05,4.7937E+05,4.8209E+05,4.8482E+05,4.8755E+05,   ",
+        "     4.9029E+05,4.9304E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     4.8004E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,1.8447E+01,1.8102E+01,1.7778E+01,1.7473E+01,1.7184E+01,1.6910E+01,   ",
+        "     1.6648E+01,1.6398E+01,1.6158E+01,1.5928E+01,1.5707E+01,1.5495E+01,1.5289E+01,   ",
+        "     1.5091E+01,1.4900E+01,1.4715E+01,1.4535E+01,1.4361E+01,1.4192E+01,1.4028E+01,   ",
+        "     1.3869E+01,1.3714E+01,1.3563E+01,1.3416E+01,1.3273E+01,1.3133E+01,1.2997E+01,   ",
+        "     1.2864E+01,1.2734E+01;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     5.3412E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,4.1730E+05,4.2036E+05,4.2335E+05,4.2629E+05,4.2917E+05,   ",
+        "     4.3202E+05,4.3485E+05,4.3764E+05,4.4042E+05,4.4318E+05,4.4593E+05,4.4867E+05,   ",
+        "     4.5140E+05,4.5413E+05,4.5685E+05,4.5957E+05,4.6229E+05,4.6501E+05,4.6773E+05,   ",
+        "     4.7045E+05,4.7318E+05,4.7591E+05,4.7865E+05,4.8139E+05,4.8413E+05,4.8689E+05,   ",
+        "     4.8965E+05,4.9241E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     5.3412E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,2.0485E+01,2.0094E+01,1.9728E+01,1.9383E+01,1.9058E+01,   ",
+        "     1.8749E+01,1.8455E+01,1.8174E+01,1.7905E+01,1.7648E+01,1.7400E+01,1.7162E+01,   ",
+        "     1.6933E+01,1.6712E+01,1.6498E+01,1.6292E+01,1.6092E+01,1.5898E+01,1.5710E+01,   ",
+        "     1.5527E+01,1.5350E+01,1.5178E+01,1.5010E+01,1.4847E+01,1.4688E+01,1.4533E+01,   ",
+        "     1.4382E+01,1.4234E+01;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     5.9273E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,4.1840E+05,4.2153E+05,4.2458E+05,4.2756E+05,   ",
+        "     4.3050E+05,4.3340E+05,4.3627E+05,4.3911E+05,4.4193E+05,4.4473E+05,4.4752E+05,   ",
+        "     4.5029E+05,4.5306E+05,4.5582E+05,4.5858E+05,4.6133E+05,4.6408E+05,4.6683E+05,   ",
+        "     4.6959E+05,4.7234E+05,4.7509E+05,4.7785E+05,4.8062E+05,4.8338E+05,4.8616E+05,   ",
+        "     4.8894E+05,4.9172E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     5.9273E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,2.2703E+01,2.2260E+01,2.1846E+01,2.1458E+01,   ",
+        "     2.1091E+01,2.0744E+01,2.0413E+01,2.0098E+01,1.9798E+01,1.9509E+01,1.9233E+01,   ",
+        "     1.8967E+01,1.8711E+01,1.8465E+01,1.8227E+01,1.7996E+01,1.7774E+01,1.7558E+01,   ",
+        "     1.7349E+01,1.7146E+01,1.6950E+01,1.6758E+01,1.6572E+01,1.6391E+01,1.6215E+01,   ",
+        "     1.6043E+01,1.5876E+01;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     6.5609E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.1945E+05,4.2264E+05,4.2575E+05,   ",
+        "     4.2880E+05,4.3179E+05,4.3474E+05,4.3765E+05,4.4054E+05,4.4340E+05,4.4625E+05,   ",
+        "     4.4907E+05,4.5189E+05,4.5469E+05,4.5749E+05,4.6028E+05,4.6307E+05,4.6585E+05,   ",
+        "     4.6864E+05,4.7142E+05,4.7420E+05,4.7699E+05,4.7978E+05,4.8257E+05,4.8536E+05,   ",
+        "     4.8816E+05,4.9097E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     6.5609E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,2.5113E+01,2.4612E+01,2.4145E+01,   ",
+        "     2.3707E+01,2.3294E+01,2.2904E+01,2.2533E+01,2.2180E+01,2.1844E+01,2.1522E+01,   ",
+        "     2.1213E+01,2.0916E+01,2.0631E+01,2.0356E+01,2.0091E+01,1.9836E+01,1.9588E+01,   ",
+        "     1.9349E+01,1.9117E+01,1.8892E+01,1.8673E+01,1.8461E+01,1.8255E+01,1.8055E+01,   ",
+        "     1.7860E+01,1.7670E+01;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     7.2446E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.2045E+05,4.2371E+05,   ",
+        "     4.2688E+05,4.2999E+05,4.3304E+05,4.3604E+05,4.3900E+05,4.4194E+05,4.4484E+05,   ",
+        "     4.4773E+05,4.5060E+05,4.5345E+05,4.5630E+05,4.5913E+05,4.6196E+05,4.6478E+05,   ",
+        "     4.6760E+05,4.7041E+05,4.7323E+05,4.7604E+05,4.7886E+05,4.8168E+05,4.8450E+05,   ",
+        "     4.8732E+05,4.9015E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     7.2446E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,2.7732E+01,2.7164E+01,   ",
+        "     2.6636E+01,2.6143E+01,2.5678E+01,2.5240E+01,2.4825E+01,2.4430E+01,2.4053E+01,   ",
+        "     2.3694E+01,2.3349E+01,2.3019E+01,2.2701E+01,2.2396E+01,2.2101E+01,2.1817E+01,   ",
+        "     2.1542E+01,2.1277E+01,2.1019E+01,2.0770E+01,2.0529E+01,2.0294E+01,2.0066E+01,   ",
+        "     1.9844E+01,1.9629E+01;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     7.9808E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.2139E+05,   ",
+        "     4.2472E+05,4.2797E+05,4.3113E+05,4.3424E+05,4.3730E+05,4.4031E+05,4.4329E+05,   ",
+        "     4.4625E+05,4.4918E+05,4.5209E+05,4.5499E+05,4.5787E+05,4.6074E+05,4.6361E+05,   ",
+        "     4.6646E+05,4.6932E+05,4.7217E+05,4.7502E+05,4.7786E+05,4.8071E+05,4.8356E+05,   ",
+        "     4.8641E+05,4.8926E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     7.9808E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,3.0574E+01,   ",
+        "     2.9931E+01,2.9335E+01,2.8779E+01,2.8257E+01,2.7765E+01,2.7299E+01,2.6857E+01,   ",
+        "     2.6436E+01,2.6035E+01,2.5651E+01,2.5283E+01,2.4930E+01,2.4590E+01,2.4263E+01,   ",
+        "     2.3948E+01,2.3644E+01,2.3349E+01,2.3065E+01,2.2789E+01,2.2521E+01,2.2262E+01,   ",
+        "     2.2010E+01,2.1766E+01;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     8.7722E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     4.2227E+05,4.2568E+05,4.2899E+05,4.3223E+05,4.3540E+05,4.3851E+05,4.4158E+05,   ",
+        "     4.4461E+05,4.4761E+05,4.5059E+05,4.5355E+05,4.5649E+05,4.5941E+05,4.6232E+05,   ",
+        "     4.6523E+05,4.6812E+05,4.7101E+05,4.7389E+05,4.7678E+05,4.7966E+05,4.8254E+05,   ",
+        "     4.8542E+05,4.8830E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     8.7722E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     3.3659E+01,3.2930E+01,3.2256E+01,3.1629E+01,3.1042E+01,3.0490E+01,2.9968E+01,   ",
+        "     2.9474E+01,2.9004E+01,2.8557E+01,2.8129E+01,2.7720E+01,2.7327E+01,2.6950E+01,   ",
+        "     2.6587E+01,2.6238E+01,2.5900E+01,2.5575E+01,2.5260E+01,2.4955E+01,2.4660E+01,   ",
+        "     2.4374E+01,2.4096E+01;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     9.6214E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,4.2308E+05,4.2658E+05,4.2997E+05,4.3327E+05,4.3650E+05,4.3968E+05,   ",
+        "     4.4280E+05,4.4589E+05,4.4894E+05,4.5197E+05,4.5497E+05,4.5795E+05,4.6092E+05,   ",
+        "     4.6387E+05,4.6681E+05,4.6975E+05,4.7267E+05,4.7559E+05,4.7851E+05,4.8142E+05,   ",
+        "     4.8434E+05,4.8725E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     9.6214E+05,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,3.7005E+01,3.6178E+01,3.5416E+01,3.4709E+01,3.4049E+01,3.3429E+01,   ",
+        "     3.2845E+01,3.2292E+01,3.1768E+01,3.1269E+01,3.0793E+01,3.0338E+01,2.9902E+01,   ",
+        "     2.9484E+01,2.9082E+01,2.8694E+01,2.8321E+01,2.7961E+01,2.7613E+01,2.7277E+01,   ",
+        "     2.6951E+01,2.6636E+01;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     1.0531E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,4.2382E+05,4.2741E+05,4.3088E+05,4.3426E+05,4.3756E+05,   ",
+        "     4.4079E+05,4.4398E+05,4.4712E+05,4.5023E+05,4.5330E+05,4.5635E+05,4.5938E+05,   ",
+        "     4.6239E+05,4.6539E+05,4.6837E+05,4.7134E+05,4.7430E+05,4.7726E+05,4.8021E+05,   ",
+        "     4.8316E+05,4.8611E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     1.0531E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,4.0634E+01,3.9695E+01,3.8832E+01,3.8035E+01,3.7292E+01,   ",
+        "     3.6597E+01,3.5943E+01,3.5325E+01,3.4740E+01,3.4184E+01,3.3654E+01,3.3149E+01,   ",
+        "     3.2665E+01,3.2201E+01,3.1755E+01,3.1327E+01,3.0915E+01,3.0517E+01,3.0133E+01,   ",
+        "     2.9762E+01,2.9403E+01;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     1.1504E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,4.2448E+05,4.2817E+05,4.3173E+05,4.3518E+05,   ",
+        "     4.3855E+05,4.4186E+05,4.4511E+05,4.4831E+05,4.5147E+05,4.5459E+05,4.5769E+05,   ",
+        "     4.6077E+05,4.6383E+05,4.6686E+05,4.6989E+05,4.7290E+05,4.7591E+05,4.7890E+05,   ",
+        "     4.8189E+05,4.8488E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     1.1504E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,4.4572E+01,4.3503E+01,4.2527E+01,4.1626E+01,   ",
+        "     4.0790E+01,4.0010E+01,3.9277E+01,3.8587E+01,3.7934E+01,3.7314E+01,3.6725E+01,   ",
+        "     3.6164E+01,3.5627E+01,3.5113E+01,3.4620E+01,3.4146E+01,3.3691E+01,3.3252E+01,   ",
+        "     3.2828E+01,3.2419E+01;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     1.2543E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.2507E+05,4.2886E+05,4.3251E+05,   ",
+        "     4.3605E+05,4.3949E+05,4.4287E+05,4.4618E+05,4.4944E+05,4.5266E+05,4.5584E+05,   ",
+        "     4.5899E+05,4.6212E+05,4.6522E+05,4.6831E+05,4.7138E+05,4.7443E+05,4.7748E+05,   ",
+        "     4.8051E+05,4.8354E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     1.2543E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.8844E+01,4.7627E+01,4.6519E+01,   ",
+        "     4.5502E+01,4.4560E+01,4.3684E+01,4.2863E+01,4.2091E+01,4.1363E+01,4.0673E+01,   ",
+        "     4.0018E+01,3.9394E+01,3.8799E+01,3.8230E+01,3.7685E+01,3.7161E+01,3.6658E+01,   ",
+        "     3.6174E+01,3.5708E+01;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     1.3651E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.2556E+05,4.2947E+05,   ",
+        "     4.3322E+05,4.3684E+05,4.4037E+05,4.4382E+05,4.4720E+05,4.5053E+05,4.5381E+05,   ",
+        "     4.5705E+05,4.6025E+05,4.6343E+05,4.6658E+05,4.6971E+05,4.7283E+05,4.7592E+05,   ",
+        "     4.7901E+05,4.8209E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     1.3651E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,5.3484E+01,5.2094E+01,   ",
+        "     5.0835E+01,4.9684E+01,4.8623E+01,4.7638E+01,4.6718E+01,4.5855E+01,4.5042E+01,   ",
+        "     4.4274E+01,4.3546E+01,4.2854E+01,4.2194E+01,4.1564E+01,4.0961E+01,4.0383E+01,   ",
+        "     3.9828E+01,3.9294E+01;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     1.4831E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.2595E+05,   ",
+        "     4.2999E+05,4.3385E+05,4.3757E+05,4.4119E+05,4.4471E+05,4.4817E+05,4.5156E+05,   ",
+        "     4.5490E+05,4.5820E+05,4.6146E+05,4.6469E+05,4.6790E+05,4.7108E+05,4.7424E+05,   ",
+        "     4.7738E+05,4.8051E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     1.4831E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,5.8526E+01,   ",
+        "     5.6935E+01,5.5502E+01,5.4199E+01,5.3001E+01,5.1893E+01,5.0861E+01,4.9896E+01,   ",
+        "     4.8989E+01,4.8133E+01,4.7324E+01,4.6555E+01,4.5824E+01,4.5127E+01,4.4461E+01,   ",
+        "     4.3823E+01,4.3211E+01;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     1.6086E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     4.2624E+05,4.3041E+05,4.3439E+05,4.3822E+05,4.4193E+05,4.4554E+05,4.4907E+05,   ",
+        "     4.5254E+05,4.5595E+05,4.5931E+05,4.6263E+05,4.6591E+05,4.6917E+05,4.7240E+05,   ",
+        "     4.7561E+05,4.7880E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     1.6086E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     6.4013E+01,6.2185E+01,6.0551E+01,5.9071E+01,5.7718E+01,5.6470E+01,5.5313E+01,   ",
+        "     5.4232E+01,5.3220E+01,5.2267E+01,5.1367E+01,5.0514E+01,4.9704E+01,4.8933E+01,   ",
+        "     4.8196E+01,4.7492E+01;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     1.7419E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,4.2642E+05,4.3074E+05,4.3485E+05,4.3879E+05,4.4260E+05,4.4630E+05,   ",
+        "     4.4991E+05,4.5345E+05,4.5693E+05,4.6036E+05,4.6374E+05,4.6709E+05,4.7040E+05,   ",
+        "     4.7368E+05,4.7694E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     1.7419E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,6.9990E+01,6.7883E+01,6.6014E+01,6.4331E+01,6.2800E+01,6.1394E+01,   ",
+        "     6.0094E+01,5.8884E+01,5.7753E+01,5.6691E+01,5.5691E+01,5.4744E+01,5.3847E+01,   ",
+        "     5.2994E+01,5.2181E+01;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     1.8834E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,4.2646E+05,4.3096E+05,4.3521E+05,4.3927E+05,4.4319E+05,   ",
+        "     4.4699E+05,4.5069E+05,4.5431E+05,4.5786E+05,4.6136E+05,4.6481E+05,4.6821E+05,   ",
+        "     4.7158E+05,4.7492E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     1.8834E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,7.6519E+01,7.4080E+01,7.1935E+01,7.0017E+01,6.8281E+01,   ",
+        "     6.6694E+01,6.5232E+01,6.3876E+01,6.2613E+01,6.1429E+01,6.0316E+01,5.9266E+01,   ",
+        "     5.8272E+01,5.7328E+01;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     2.0334E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,4.2635E+05,4.3105E+05,4.3546E+05,4.3966E+05,   ",
+        "     4.4369E+05,4.4760E+05,4.5139E+05,4.5510E+05,4.5873E+05,4.6230E+05,4.6582E+05,   ",
+        "     4.6929E+05,4.7272E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     2.0334E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,8.3665E+01,8.0827E+01,7.8356E+01,7.6164E+01,   ",
+        "     7.4192E+01,7.2398E+01,7.0753E+01,6.9232E+01,6.7819E+01,6.6499E+01,6.5261E+01,   ",
+        "     6.4095E+01,6.2993E+01;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     2.1923E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.2609E+05,4.3101E+05,4.3560E+05,   ",
+        "     4.3995E+05,4.4411E+05,4.4812E+05,4.5202E+05,4.5582E+05,4.5953E+05,4.6318E+05,   ",
+        "     4.6677E+05,4.7030E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     2.1923E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,9.1511E+01,8.8190E+01,8.5332E+01,   ",
+        "     8.2819E+01,8.0573E+01,7.8542E+01,7.6687E+01,7.4980E+01,7.3398E+01,7.1925E+01,   ",
+        "     7.0547E+01,6.9252E+01;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     2.3604E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.2564E+05,4.3082E+05,   ",
+        "     4.3561E+05,4.4013E+05,4.4443E+05,4.4856E+05,4.5257E+05,4.5646E+05,4.6027E+05,   ",
+        "     4.6400E+05,4.6766E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     2.3604E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,1.0015E+02,9.6239E+01,   ",
+        "     9.2918E+01,9.0027E+01,8.7463E+01,8.5159E+01,8.3065E+01,8.1145E+01,7.9374E+01,   ",
+        "     7.7729E+01,7.6195E+01;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     2.5382E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.2498E+05,   ",
+        "     4.3047E+05,4.3549E+05,4.4019E+05,4.4464E+05,4.4891E+05,4.5303E+05,4.5703E+05,   ",
+        "     4.6093E+05,4.6475E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     2.5382E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,1.0972E+02,   ",
+        "     1.0507E+02,1.0119E+02,9.7851E+01,9.4915E+01,9.2295E+01,8.9926E+01,8.7766E+01,   ",
+        "     8.5780E+01,8.3942E+01;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     2.7261E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     4.2408E+05,4.2993E+05,4.3522E+05,4.4012E+05,4.4475E+05,4.4916E+05,4.5341E+05,   ",
+        "     4.5752E+05,4.6152E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     2.7261E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     1.2038E+02,1.1479E+02,1.1023E+02,1.0635E+02,1.0298E+02,9.9995E+01,9.7312E+01,   ",
+        "     9.4877E+01,9.2647E+01;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     2.9246E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,4.2290E+05,4.2918E+05,4.3478E+05,4.3992E+05,4.4473E+05,4.4931E+05,   ",
+        "     4.5369E+05,4.5792E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     2.9246E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,1.3233E+02,1.2554E+02,1.2013E+02,1.1562E+02,1.1173E+02,1.0831E+02,   ",
+        "     1.0527E+02,1.0252E+02;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     3.1341E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,4.2137E+05,4.2820E+05,4.3416E+05,4.3957E+05,4.4459E+05,   ",
+        "     4.4934E+05,4.5387E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     3.1341E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,1.4585E+02,1.3748E+02,1.3102E+02,1.2572E+02,1.2122E+02,   ",
+        "     1.1731E+02,1.1384E+02;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     3.3552E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,4.1941E+05,4.2695E+05,4.3334E+05,4.3905E+05,   ",
+        "     4.4432E+05,4.4926E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     3.3552E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,1.6135E+02,1.5082E+02,1.4302E+02,1.3677E+02,   ",
+        "     1.3154E+02,1.2704E+02;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     3.5886E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.1692E+05,4.2539E+05,4.3229E+05,   ",
+        "     4.3836E+05,4.4389E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     3.5886E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,1.7941E+02,1.6585E+02,1.5632E+02,   ",
+        "     1.4890E+02,1.4279E+02;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     3.8348E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.1370E+05,4.2346E+05,   ",
+        "     4.3100E+05,4.3748E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     3.8348E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,2.0095E+02,1.8289E+02,   ",
+        "     1.7111E+02,1.6223E+02;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     4.0949E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,4.0942E+05,   ",
+        "     4.2109E+05,4.2943E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     4.0949E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,2.2766E+02,   ",
+        "     2.0246E+02,1.8765E+02;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     4.3697E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     4.0343E+05,4.1823E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     4.3697E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     2.6302E+02,2.2513E+02;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Enthalpy,                !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     4.6607E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,3.9373E+05;                                                          ",
+        "                                                                                     ",
+        "   FluidProperties:Superheated,                                                      ",
+        "     R410a,                   !- Fluid Name                                          ",
+        "     Density,                 !- Fluid Property Type                                 ",
+        "     R410aSuperHeatTemperatures,  !- Temperature Values Name                         ",
+        "     4.6607E+06,              !- Pressure {Pa}                                       ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,   ",
+        "     0.0000E+00,3.1758E+02;                                                          ",
+        "                                                                                     ",
+        " !***************************************************************************        ",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataSize->CurZoneEqNum = 1;
+    state->dataEnvrn->OutBaroPress = 101325;            // sea level
+    state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
+    state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataAirLoop->AirLoopInputsFilled = true;
+    state->dataSize->ZoneSizingRunDone = true;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
+
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    ProcessScheduleInput(*state);
+    GetCurveInput(*state);
+    GetZoneData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    // get zone input and connections
+    GetZoneEquipmentData(*state);
+    GetVRFInput(*state);
+    state->dataHVACVarRefFlow->GetVRFInputFlag = false;
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRF(VRFCond).SchedPtr).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 0.0;
+    // set the zone cooling and heat requirements
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = -5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = -5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0;
+
+    auto &thisZoneEquip(state->dataZoneEquip->ZoneEquipConfig(state->dataGlobal->NumOfZones));
+    // set zone air node properties
+    state->dataLoopNodes->Node(thisZoneEquip.ZoneNode).Temp = 24.0;
+    state->dataLoopNodes->Node(thisZoneEquip.ZoneNode).HumRat = 0.0075;
+    state->dataLoopNodes->Node(thisZoneEquip.ZoneNode).Enthalpy = Psychrometrics::PsyHFnTdbW(
+        state->dataLoopNodes->Node(thisZoneEquip.ZoneNode).Temp, state->dataLoopNodes->Node(thisZoneEquip.ZoneNode).HumRat);
+
+    auto &thisVRFTU(state->dataHVACVarRefFlow->VRFTU(1));
+    state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Temp = 24.0;
+    state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).HumRat = 0.0075;
+    state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(
+        state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Temp, state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).HumRat);
+    state->dataLoopNodes->Node(thisVRFTU.ZoneAirNode).Temp = 24.0;
+    state->dataLoopNodes->Node(thisVRFTU.ZoneAirNode).HumRat = 0.0075;
+    state->dataLoopNodes->Node(thisVRFTU.ZoneAirNode).Enthalpy = Psychrometrics::PsyHFnTdbW(
+        state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Temp, state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).HumRat);
+
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutHumRat = 0.0100;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->WindSpeed = 5.0;
+    state->dataEnvrn->WindDir = 0.0;
+
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak =
+        state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Temp;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak =
+        state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).HumRat;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum = 1;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax = 1;
+    state->dataSize->DesDayWeath.allocate(1);
+    state->dataSize->DesDayWeath(1).Temp.allocate(1);
+    state->dataSize->DesDayWeath(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum)
+        .Temp(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax) = state->dataEnvrn->OutDryBulbTemp;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.1;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0095;
+
+    // set pointer to components
+    auto &thisFan(state->dataFans->Fan(1));
+    auto &thisDXCoolingCoil(state->dataDXCoils->DXCoil(1));
+    auto &thisDXHeatingCoil(state->dataDXCoils->DXCoil(2));
+    // run the model
+    bool HeatingActive = false;
+    bool CoolingActive = false;
+    int OAUnitNum = 0;
+    Real64 OAUCoilOutTemp = 0.0;
+    bool ZoneEquipment = true;
+
+    SimulateVRF(*state,
+                state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
+                FirstHVACIteration,
+                CurZoneNum,
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
+                HeatingActive,
+                CoolingActive,
+                OAUnitNum,
+                OAUCoilOutTemp,
+                ZoneEquipment,
+                SysOutputProvided,
+                LatOutputProvided);
+
+    // check model inputs
+    ASSERT_EQ(1, state->dataHVACVarRefFlow->NumVRFCond);
+    ASSERT_EQ(1, state->dataHVACVarRefFlow->NumVRFTU);
+    ASSERT_EQ(1, state->dataFans->NumFans);
+    ASSERT_EQ(2, state->dataDXCoils->NumDXCoils);
+    ASSERT_EQ("TU1 VRF DX COOLING COIL", thisDXCoolingCoil.Name);
+    ASSERT_EQ("TU1 VRF DX HEATING COIL", thisDXHeatingCoil.Name);
+    // check if total cooling rate provided by the DX cooling coil matches
+    // sum of the cooling delivered by VRF ATU and fan power when no OA
+    EXPECT_EQ(0.0, thisVRFTU.CoolOutAirMassFlow);
+    EXPECT_EQ(0.0, thisVRFTU.HeatOutAirMassFlow);
+    EXPECT_EQ(0.0, thisVRFTU.NoCoolHeatOutAirMassFlow);
+    EXPECT_NEAR(5125.0840, thisDXCoolingCoil.TotalCoolingEnergyRate, 0.0001);
+    EXPECT_NEAR(4999.8265, thisVRFTU.TotalCoolingRate, 0.0001);
+    EXPECT_NEAR(125.2573, thisFan.FanPower, 0.0001);
+    EXPECT_NEAR(thisDXCoolingCoil.TotalCoolingEnergyRate, (thisVRFTU.TotalCoolingRate + thisFan.FanPower), 0.0001);
+}
+
+// Test for #7648: HREIRFTHeat wrongly used HRCAPFTHeatConst. Occurs only if you have Heat Recovery
+TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
+{
+
+    std::string const idf_objects = delimited_string({
+
+        "  Curve:Biquadratic,",
+        "    EIRorCapFT,              !- Name",
+        "    1.0,                     !- Coefficient1 Constant",
+        "    0,                       !- Coefficient2 x",
+        "    0,                       !- Coefficient3 x**2",
+        "    0,                       !- Coefficient4 y",
+        "    0,                       !- Coefficient5 y**2",
+        "    0,                       !- Coefficient6 x*y",
+        "    -100,                    !- Minimum Value of x",
+        "    100,                     !- Maximum Value of x",
+        "    -100,                    !- Minimum Value of y",
+        "    100,                     !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Cubic,",
+        "    EIRorCapfPLR,            !- Name",
+        "    0.0,                     !- Coefficient1 Constant",
+        "    1.0,                     !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.0,                     !- Coefficient4 x**3",
+        "    0,                       !- Minimum Value of x",
+        "    1,                       !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Cubic,",
+        "    HRCAPFTHeat,             !- Name",
+        "    0.8,                     !- Coefficient1 Constant",
+        "    0.0,                     !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.0,                     !- Coefficient4 x**3",
+        "    0,                       !- Minimum Value of x",
+        "    1,                       !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Cubic,",
+        "    HREIRFTHeat,             !- Name",
+        "    0.9,                     !- Coefficient1 Constant",
+        "    0.0,                     !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.0,                     !- Coefficient4 x**3",
+        "    0,                       !- Minimum Value of x",
+        "    1,                       !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    CurveManager::GetCurveInput(*state);
+
+    int VRFCond = 1;
+    state->dataHVACVarRefFlow->VRF.allocate(1);
+    state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum = 0;
+    state->dataHVACVarRefFlow->VRF(VRFCond).CondenserType = DataHeatBalance::RefrigCondenserType::Air;
+    state->dataHVACVarRefFlow->VRF(VRFCond).ZoneTUListPtr = 1;
+    state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity = 20000.0;
+    state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity = 20000.0;
+    state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCOP = 3.0;
+    state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCOP = 3.0;
+    state->dataHVACVarRefFlow->VRF(VRFCond).RatedCoolingPower =
+        state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity / state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCOP;
+    state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower =
+        state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity / state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCOP;
+    state->dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionCooling = 1.0;
+    state->dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionHeating = 1.0;
+    // Curve Indices, including HR curves (3 & 4)
+    state->dataHVACVarRefFlow->VRF(VRFCond).CoolCapFT = 1;
+    state->dataHVACVarRefFlow->VRF(VRFCond).CoolEIRFT = 1;
+    state->dataHVACVarRefFlow->VRF(VRFCond).CoolEIRFPLR1 = 2;
+    state->dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFPLR1 = 2;
+    state->dataHVACVarRefFlow->VRF(VRFCond).HRCAPFTHeat = 3;
+    state->dataHVACVarRefFlow->VRF(VRFCond).HREIRFTHeat = 4;
+
+    state->dataHVACVarRefFlow->CoolCombinationRatio.allocate(1);
+    state->dataHVACVarRefFlow->CoolCombinationRatio(VRFCond) = 1.0;
+    state->dataHVACVarRefFlow->HeatCombinationRatio.allocate(1);
+    state->dataHVACVarRefFlow->HeatCombinationRatio(VRFCond) = 1.0;
+    state->dataHVACVarRefFlow->LastModeCooling.allocate(1);
+    state->dataHVACVarRefFlow->LastModeHeating.allocate(1);
+
+    state->dataHVACVarRefFlow->TerminalUnitList.allocate(1);
+    state->dataHVACVarRefFlow->TerminalUnitList(1).NumTUInList = 5;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad.allocate(5);
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad.allocate(5);
+    state->dataHVACVarRefFlow->TerminalUnitList(1).ZoneTUPtr.allocate(5);
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRCoolRequest.allocate(5);
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRHeatRequest.allocate(5);
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRCoolRequest = false;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRHeatRequest = false;
+
+    state->dataHVACVarRefFlow->TerminalUnitList(1).CoolingCoilAvailable.allocate(5);
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HeatingCoilAvailable.allocate(5);
+    // all TU coils are available
+    state->dataHVACVarRefFlow->TerminalUnitList(1).CoolingCoilAvailable = true;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HeatingCoilAvailable = true;
+
+    state->dataHVACVarRefFlow->CoolingLoad.allocate(1);
+    state->dataHVACVarRefFlow->HeatingLoad.allocate(1);
+
+    state->dataDXCoils->DXCoilCoolInletAirWBTemp.allocate(10);
+    state->dataDXCoils->DXCoilHeatInletAirDBTemp.allocate(10);
+    state->dataDXCoils->DXCoilHeatInletAirWBTemp.allocate(10);
+
+    state->dataHVACVarRefFlow->VRFTU.allocate(5);
+    for (int NumTU = 1; NumTU <= state->dataHVACVarRefFlow->TerminalUnitList(1).NumTUInList; ++NumTU) {
+        state->dataHVACVarRefFlow->VRFTU(NumTU).CoolCoilIndex = NumTU;
+        state->dataHVACVarRefFlow->VRFTU(NumTU).HeatCoilIndex = state->dataHVACVarRefFlow->TerminalUnitList(1).NumTUInList + NumTU;
+        state->dataHVACVarRefFlow->TerminalUnitList(1).ZoneTUPtr(NumTU) = NumTU;
+        // initialize DX coil inlet conditions
+        state->dataDXCoils->DXCoilCoolInletAirWBTemp(NumTU) = 19.4;
+        state->dataDXCoils->DXCoilHeatInletAirDBTemp(state->dataHVACVarRefFlow->TerminalUnitList(1).NumTUInList + NumTU) = 20.0;
+        state->dataDXCoils->DXCoilHeatInletAirWBTemp(state->dataHVACVarRefFlow->TerminalUnitList(1).NumTUInList + NumTU) = 17.0;
+    }
+
+    // set up environment
+    state->dataGlobal->DayOfSim = 2; // user a higher day than previous unit test to get around static timer variables problem
+    state->dataGlobal->CurrentTime = 0.25;
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataHVACGlobal->TimeStepSys = 0.25;
+    state->dataHVACGlobal->SysTimeElapsed = 0.0;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutHumRat = 0.01;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutWetBulbTemp = 21.1340575;
+
+    // call with zero loads to reset CurrentEndTimeLast until that's resolved
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRCoolRequest = false;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRHeatRequest = false;
+    CalcVRFCondenser(*state, VRFCond);
+
+    // increment time step
+    state->dataGlobal->CurrentTime += state->dataGlobal->TimeStepZone; // 0.5
+
+    // set TU's to request both cooling and heating
+    state->dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
+    state->dataHVACVarRefFlow->HeatingLoad(VRFCond) = true;
+    state->dataHVACVarRefFlow->LastModeCooling(VRFCond) = false;
+    state->dataHVACVarRefFlow->LastModeHeating(VRFCond) = true;
+
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(1) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRCoolRequest(1) = false;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(2) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRCoolRequest(2) = true;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(3) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRCoolRequest(3) = false;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(4) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRCoolRequest(4) = true;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(5) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRCoolRequest(5) = false;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(1) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRHeatRequest(1) = true;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(2) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRHeatRequest(2) = false;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(3) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRHeatRequest(3) = true;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(4) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRHeatRequest(4) = false;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(5) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRHeatRequest(5) = true;
+    state->dataHVACVarRefFlow->VRF(VRFCond).HeatRecoveryUsed = true;
+
+    // set heat recovery time constant to non-zero value (means mode change will degrade performance)
+    state->dataHVACVarRefFlow->VRF(VRFCond).HRHeatCapTC = 0.25; // 15 min exponential rise
+    // VRF(VRFCond).HRHeatEIRTC = 0.0; // (default)
+    // last operating mode was heating
+    CalcVRFCondenser(*state, VRFCond);
+    EXPECT_TRUE(state->dataHVACVarRefFlow->VRF(VRFCond).ModeChange);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).HRModeChange);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).OperatingMode, 2); // ModeHeatingOnly
+    EXPECT_TRUE(state->dataHVACVarRefFlow->VRF(VRFCond).HRHeatingActive);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).HRCoolingActive);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TotalCoolingCapacity, 0.0);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TUCoolingLoad, 2000.0);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TotalHeatingCapacity, 3000.0);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TUHeatingLoad, 3000.0);
+    EXPECT_NEAR(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR, 0.1875, 0.00001);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondRTF, 1.0); // unit is not cycling below min PLR
+
+    // CurrentEndTime = 0.25
+    // HRTimer = CurrentEndTimeLast = 0
+    // HRTime = (CurrentEndTime - HRTimer) = 0.25 - = 0.25
+    // SUMultiplier = min(1, 1 - exp(-HRTime / HRHeatCapTC)) = 1 - exp(-1) = 0.6321205588285577
+    EXPECT_NEAR(state->dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier, 0.63212, 0.00001);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecCoolingPower, 0.0);
+
+    // make adjustment for heat recovery startup degradation
+    // Ensure HREIRFTConst / HRCAPFTHeatConst are assigned the right curve ouput
+    Real64 HREIRFTConst = state->dataHVACVarRefFlow->VRF(VRFCond).HREIRFTHeatConst;
+    EXPECT_EQ(HREIRFTConst, 0.9); // It's normal that it works, it's the internal variable that's messed up
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).HRCAPFTHeatConst, 0.8);
+    Real64 HRInitialEIRFrac = state->dataHVACVarRefFlow->VRF(VRFCond).HRInitialHeatEIRFrac;
+    EXPECT_EQ(HRInitialEIRFrac, 1.0);
+    // Internally, it uses a local variable HREIRFTConst, which was wrongly set to HRCAPFTHeatConst = 0.9
+    Real64 HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * state->dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier;
+    // Before fix, =1 + (0.8 - 1) * 0.63212 = 0.873576
+    EXPECT_NEAR(HREIRAdjustment, 0.936788, 0.00001); // =1 + (0.9 - 1) * 0.63212
+    // InletAirDryBulbC = 20, InletAirWetBulbC = 17
+    // TotalCondHeatingCapacity = TotalTUHeatingCapacity = 20000
+    // HeatingPLR = 0.25  (TUHeatingLoad = 3000, 3000/20000 = 0.15)
+    // HeatingPLR = 0.1875
+    //
+    // VRF(VRFCond).ElecHeatingPower = (VRF(VRFCond).RatedHeatingPower * TotHeatCapTempModFac)
+    //                                  * TotHeatEIRTempModFac * EIRFPLRModFac *
+    //                                  * HREIRAdjustment * VRFRTF * InputPowerMultiplier;
+    //
+    // TotHeatCapTempModFac and TotHeatEIRTempModFac are 1 because CAPFT/EIRFT curves aren't assigned,
+    // and anyways they wouldn't be used since VRF(VRFCond).HeatingPerformanceOATType isn't specifyied
+    // VRFRTF = 1.0 because not cycling below min PLR
+    // EIRFPLRModFac is 1 because EIRFPLR curve output is constant as 1.0 above
+    // InputPowerMultiplier is 1 because no defrost
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower,
+              state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
+}
+
+TEST_F(EnergyPlusFixture, VRF_BlowthroughFanPlacement_InputTest)
+{
+    std::string const idf_objects = delimited_string({
+
+        "    Zone,",
+        "      SPACE1-1,                !- Name",
+        "      0,                       !- Direction of Relative North {deg}",
+        "      0,                       !- X Origin {m}",
+        "      0,                       !- Y Origin {m}",
+        "      0,                       !- Z Origin {m}",
+        "      1,                       !- Type",
+        "      1,                       !- Multiplier",
+        "      2.438400269,             !- Ceiling Height {m}",
+        "      239.247360229;           !- Volume {m3}",
+
+        "    ZoneTerminalUnitList,",
+        "      VRF TU List,             !- Zone Terminal Unit List Name",
+        "      TU1;                     !- Zone Terminal Unit Name 5",
+
+        "    AirConditioner:VariableRefrigerantFlow,",
+        "      VRF Heat Pump,           !- Heat Pump Name",
+        "      ,                        !- Availability Schedule Name",
+        "      autosize,                !- Gross Rated Total Cooling Capacity {W}",
+        "      3.2917,                  !- Gross Rated Cooling COP {W/W}",
+        "      -5,                      !- Minimum Outdoor Temperature in Cooling Mode {C}",
+        "      43,                      !- Maximum Outdoor Temperature in Cooling Mode {C}",
+        "      VRFCoolCapFT,            !- Cooling Capacity Ratio Modifier Function of Low Temperature Curve Name",
+        "      VRFCoolCapFTBoundary,    !- Cooling Capacity Ratio Boundary Curve Name",
+        "      VRFCoolCapFTHi,          !- Cooling Capacity Ratio Modifier Function of High Temperature Curve Name",
+        "      VRFCoolEIRFT,            !- Cooling Energy Input Ratio Modifier Function of Low Temperature Curve Name",
+        "      VRFCoolEIRFTBoundary,    !- Cooling Energy Input Ratio Boundary Curve Name",
+        "      VRFCoolEIRFTHi,          !- Cooling Energy Input Ratio Modifier Function of High Temperature Curve Name",
+        "      CoolingEIRLowPLR,        !- Cooling Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name",
+        "      CoolingEIRHiPLR,         !- Cooling Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name",
+        "      CoolingCombRatio,        !- Cooling Combination Ratio Correction Factor Curve Name",
+        "      VRFCPLFFPLR,             !- Cooling Part-Load Fraction Correlation Curve Name",
+        "      autosize,                !- Gross Rated Heating Capacity {W}",
+        "      ,                        !- Rated Heating Capacity Sizing Ratio {W/W}",
+        "      3.5484,                  !- Gross Rated Heating COP {W/W}",
+        "      -20,                     !- Minimum Outdoor Temperature in Heating Mode {C}",
+        "      20,                      !- Maximum Outdoor Temperature in Heating Mode {C}",
+        "      VRFHeatCapFT,            !- Heating Capacity Ratio Modifier Function of Low Temperature Curve Name",
+        "      VRFHeatCapFTBoundary,    !- Heating Capacity Ratio Boundary Curve Name",
+        "      VRFHeatCapFTHi,          !- Heating Capacity Ratio Modifier Function of High Temperature Curve Name",
+        "      VRFHeatEIRFT,            !- Heating Energy Input Ratio Modifier Function of Low Temperature Curve Name",
+        "      VRFHeatEIRFTBoundary,    !- Heating Energy Input Ratio Boundary Curve Name",
+        "      VRFHeatEIRFTHi,          !- Heating Energy Input Ratio Modifier Function of High Temperature Curve Name",
+        "      WetBulbTemperature,      !- Heating Performance Curve Outdoor Temperature Type",
+        "      HeatingEIRLowPLR,        !- Heating Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name",
+        "      HeatingEIRHiPLR,         !- Heating Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name",
+        "      HeatingCombRatio,        !- Heating Combination Ratio Correction Factor Curve Name",
+        "      VRFCPLFFPLR,             !- Heating Part-Load Fraction Correlation Curve Name",
+        "      0.25,                    !- Minimum Heat Pump Part-Load Ratio {dimensionless}",
+        "      SPACE1-1,                !- Zone Name for Master Thermostat Location",
+        "      LoadPriority,            !- Master Thermostat Priority Control Type",
+        "      ,                        !- Thermostat Priority Schedule Name",
+        "      VRF TU List,             !- Zone Terminal Unit List Name",
+        "      No,                      !- Heat Pump Waste Heat Recovery",
+        "      30,                      !- Equivalent Piping Length used for Piping Correction Factor in Cooling Mode {m}",
+        "      10,                      !- Vertical Height used for Piping Correction Factor {m}",
+        "      CoolingLengthCorrectionFactor,  !- Piping Correction Factor for Length in Cooling Mode Curve Name",
+        "      -0.000386,               !- Piping Correction Factor for Height in Cooling Mode Coefficient {1/m}",
+        "      30,                      !- Equivalent Piping Length used for Piping Correction Factor in Heating Mode {m}",
+        "      ,                        !- Piping Correction Factor for Length in Heating Mode Curve Name",
+        "      ,                        !- Piping Correction Factor for Height in Heating Mode Coefficient {1/m}",
+        "      15,                      !- Crankcase Heater Power per Compressor {W}",
+        "      3,                       !- Number of Compressors {dimensionless}",
+        "      0.33,                    !- Ratio of Compressor Size to Total Compressor Capacity {W/W}",
+        "      7,                       !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater {C}",
+        "      Resistive,               !- Defrost Strategy",
+        "      Timed,                   !- Defrost Control",
+        "      ,                        !- Defrost Energy Input Ratio Modifier Function of Temperature Curve Name",
+        "      ,                        !- Defrost Time Period Fraction {dimensionless}",
+        "      autosize,                !- Resistive Defrost Heater Capacity {W}",
+        "      7,                       !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}",
+        "      AirCooled,               !- Condenser Type",
+        "      MyVRFOANode,             !- Condenser Inlet Node Name",
+        "      ,                        !- Condenser Outlet Node Name",
+        "      ,                        !- Water Condenser Volume Flow Rate {m3/s}",
+        "      ,                        !- Evaporative Condenser Effectiveness {dimensionless}",
+        "      ,                        !- Evaporative Condenser Air Flow Rate {m3/s}",
+        "      0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}",
+        "      ,                        !- Supply Water Storage Tank Name",
+        "      0,                       !- Basin Heater Capacity {W/K}",
+        "      ,                        !- Basin Heater Setpoint Temperature {C}",
+        "      ,                        !- Basin Heater Operating Schedule Name",
+        "      Electricity;             !- Fuel Type",
+
+        "    OutdoorAir:NodeList,",
+        "      OutsideAirInletNodes;    !- Node or NodeList Name 1",
+
+        "    NodeList,",
+        "      OutsideAirInletNodes,    !- Name",
+        "      Outside Air Inlet Node 1,!- Node 1 Name",
+        "      MyVRFOANode;             !- Node 2 Name",
+
+        "    Curve:Biquadratic,",
+        "      VRFCoolCapFT,            !- Name",
+        "      0.576882692,             !- Coefficient1 Constant",
+        "      0.017447952,             !- Coefficient2 x",
+        "      0.000583269,             !- Coefficient3 x**2",
+        "      -1.76324E-06,            !- Coefficient4 y",
+        "      -7.474E-09,              !- Coefficient5 y**2",
+        "      -1.30413E-07,            !- Coefficient6 x*y",
+        "      15,                      !- Minimum Value of x",
+        "      24,                      !- Maximum Value of x",
+        "      -5,                      !- Minimum Value of y",
+        "      23,                      !- Maximum Value of y",
+        "      ,                        !- Minimum Curve Output",
+        "      ,                        !- Maximum Curve Output",
+        "      Temperature,             !- Input Unit Type for X",
+        "      Temperature,             !- Input Unit Type for Y",
+        "      Dimensionless;           !- Output Unit Type",
+
+        "    Curve:Biquadratic,",
+        "      VRFCoolCapFTHi,          !- Name",
+        "      0.6867358,               !- Coefficient1 Constant",
+        "      0.0207631,               !- Coefficient2 x",
+        "      0.0005447,               !- Coefficient3 x**2",
+        "      -0.0016218,              !- Coefficient4 y",
+        "      -4.259E-07,              !- Coefficient5 y**2",
+        "      -0.0003392,              !- Coefficient6 x*y",
+        "      15,                      !- Minimum Value of x",
+        "      24,                      !- Maximum Value of x",
+        "      16,                      !- Minimum Value of y",
+        "      43,                      !- Maximum Value of y",
+        "      ,                        !- Minimum Curve Output",
+        "      ,                        !- Maximum Curve Output",
+        "      Temperature,             !- Input Unit Type for X",
+        "      Temperature,             !- Input Unit Type for Y",
+        "      Dimensionless;           !- Output Unit Type",
+
+        "    Curve:Biquadratic,",
+        "      VRFCoolEIRFT,            !- Name",
+        "      0.989010541,             !- Coefficient1 Constant",
+        "      -0.02347967,             !- Coefficient2 x",
+        "      0.000199711,             !- Coefficient3 x**2",
+        "      0.005968336,             !- Coefficient4 y",
+        "      -1.0289E-07,             !- Coefficient5 y**2",
+        "      -0.00015686,             !- Coefficient6 x*y",
+        "      15,                      !- Minimum Value of x",
+        "      24,                      !- Maximum Value of x",
+        "      -5,                      !- Minimum Value of y",
+        "      23,                      !- Maximum Value of y",
+        "      ,                        !- Minimum Curve Output",
+        "      ,                        !- Maximum Curve Output",
+        "      Temperature,             !- Input Unit Type for X",
+        "      Temperature,             !- Input Unit Type for Y",
+        "      Dimensionless;           !- Output Unit Type",
+
+        "    Curve:Biquadratic,",
+        "      VRFCoolEIRFTHi,          !- Name",
+        "      0.14351470,              !- Coefficient1 Constant",
+        "      0.01860035,              !- Coefficient2 x",
+        "      -0.0003954,              !- Coefficient3 x**2",
+        "      0.02485219,              !- Coefficient4 y",
+        "      0.00016329,              !- Coefficient5 y**2",
+        "      -0.0006244,              !- Coefficient6 x*y",
+        "      15,                      !- Minimum Value of x",
+        "      24,                      !- Maximum Value of x",
+        "      16,                      !- Minimum Value of y",
+        "      43,                      !- Maximum Value of y",
+        "      ,                        !- Minimum Curve Output",
+        "      ,                        !- Maximum Curve Output",
+        "      Temperature,             !- Input Unit Type for X",
+        "      Temperature,             !- Input Unit Type for Y",
+        "      Dimensionless;           !- Output Unit Type",
+
+        "    Curve:Biquadratic,",
+        "      VRFHeatCapFT,            !- Name",
+        "      1.014599599,             !- Coefficient1 Constant",
+        "      -0.002506703,            !- Coefficient2 x",
+        "      -0.000141599,            !- Coefficient3 x**2",
+        "      0.026931595,             !- Coefficient4 y",
+        "      1.83538E-06,             !- Coefficient5 y**2",
+        "      -0.000358147,            !- Coefficient6 x*y",
+        "      15,                      !- Minimum Value of x",
+        "      27,                      !- Maximum Value of x",
+        "      -20,                     !- Minimum Value of y",
+        "      15,                      !- Maximum Value of y",
+        "      ,                        !- Minimum Curve Output",
+        "      ,                        !- Maximum Curve Output",
+        "      Temperature,             !- Input Unit Type for X",
+        "      Temperature,             !- Input Unit Type for Y",
+        "      Dimensionless;           !- Output Unit Type",
+
+        "    Curve:Biquadratic,",
+        "      VRFHeatCapFTHi,          !- Name",
+        "      1.161134821,             !- Coefficient1 Constant",
+        "      0.027478868,             !- Coefficient2 x",
+        "      -0.00168795,             !- Coefficient3 x**2",
+        "      0.001783378,             !- Coefficient4 y",
+        "      2.03208E-06,             !- Coefficient5 y**2",
+        "      -6.8969E-05,             !- Coefficient6 x*y",
+        "      15,                      !- Minimum Value of x",
+        "      27,                      !- Maximum Value of x",
+        "      -10,                     !- Minimum Value of y",
+        "      15,                      !- Maximum Value of y",
+        "      ,                        !- Minimum Curve Output",
+        "      ,                        !- Maximum Curve Output",
+        "      Temperature,             !- Input Unit Type for X",
+        "      Temperature,             !- Input Unit Type for Y",
+        "      Dimensionless;           !- Output Unit Type",
+
+        "    Curve:Biquadratic,",
+        "      VRFHeatEIRFT,            !- Name",
+        "      0.87465501,              !- Coefficient1 Constant",
+        "      -0.01319754,             !- Coefficient2 x",
+        "      0.00110307,              !- Coefficient3 x**2",
+        "      -0.0133118,              !- Coefficient4 y",
+        "      0.00089017,              !- Coefficient5 y**2",
+        "      -0.00012766,             !- Coefficient6 x*y",
+        "      15,                      !- Minimum Value of x",
+        "      27,                      !- Maximum Value of x",
+        "      -20,                     !- Minimum Value of y",
+        "      12,                      !- Maximum Value of y",
+        "      ,                        !- Minimum Curve Output",
+        "      ,                        !- Maximum Curve Output",
+        "      Temperature,             !- Input Unit Type for X",
+        "      Temperature,             !- Input Unit Type for Y",
+        "      Dimensionless;           !- Output Unit Type",
+
+        "    Curve:Biquadratic,",
+        "      VRFHeatEIRFTHi,          !- Name",
+        "      2.504005146,             !- Coefficient1 Constant",
+        "      -0.05736767,             !- Coefficient2 x",
+        "      4.07336E-05,             !- Coefficient3 x**2",
+        "      -0.12959669,             !- Coefficient4 y",
+        "      0.00135839,              !- Coefficient5 y**2",
+        "      0.00317047,              !- Coefficient6 x*y",
+        "      15,                      !- Minimum Value of x",
+        "      27,                      !- Maximum Value of x",
+        "      -10,                     !- Minimum Value of y",
+        "      15,                      !- Maximum Value of y",
+        "      ,                        !- Minimum Curve Output",
+        "      ,                        !- Maximum Curve Output",
+        "      Temperature,             !- Input Unit Type for X",
+        "      Temperature,             !- Input Unit Type for Y",
+        "      Dimensionless;           !- Output Unit Type",
+
+        "    Curve:Biquadratic,",
+        "      CoolingLengthCorrectionFactor,  !- Name",
+        "      1.0693794,               !- Coefficient1 Constant",
+        "      -0.0014951,              !- Coefficient2 x",
+        "      2.56E-06,                !- Coefficient3 x**2",
+        "      -0.1151104,              !- Coefficient4 y",
+        "      0.0511169,               !- Coefficient5 y**2",
+        "      -0.0004369,              !- Coefficient6 x*y",
+        "      8,                       !- Minimum Value of x",
+        "      175,                     !- Maximum Value of x",
+        "      0.5,                     !- Minimum Value of y",
+        "      1.5,                     !- Maximum Value of y",
+        "      ,                        !- Minimum Curve Output",
+        "      ,                        !- Maximum Curve Output",
+        "      Temperature,             !- Input Unit Type for X",
+        "      Temperature,             !- Input Unit Type for Y",
+        "      Dimensionless;           !- Output Unit Type",
+
+        "    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,",
+        "      TU1,                     !- Zone Terminal Unit Name",
+        "      VRFAvailSched,           !- Terminal Unit Availability Schedule",
+        "      TU1 Inlet Node,          !- Terminal Unit Air Inlet Node Name",
+        "      TU1 Outlet Node,         !- Terminal Unit Air Outlet Node Name",
+        "      autosize,                !- Cooling Supply Air Flow Rate {m3/s}",
+        "      autosize,                !- No Cooling Supply Air Flow Rate {m3/s}",
+        "      autosize,                !- Heating Supply Air Flow Rate {m3/s}",
+        "      autosize,                !- No Heating Supply Air Flow Rate {m3/s}",
+        "      autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}",
+        "      autosize,                !- Heating Outdoor Air Flow Rate {m3/s}",
+        "      autosize,                !- No Load Outdoor Air Flow Rate {m3/s}",
+        "      VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name",
+        "      BlowThrough,             !- Supply Air Fan Placement",
+        "      Fan:SystemModel,         !- Supply Air Fan Object Type",
+        "      TU1 VRF Supply Fan,      !- Supply Air Fan Object Name",
+        "      OutdoorAir:Mixer,        !- Outside Air Mixer Object Type",
+        "      TU1 OA Mixer,            !- Outside Air Mixer Object Name",
+        "      COIL:Cooling:DX:VariableRefrigerantFlow,  !- Cooling Coil Object Type",
+        "      TU1 VRF DX Cooling Coil, !- Cooling Coil Object Name",
+        "      COIL:Heating:DX:VariableRefrigerantFlow,  !- Heating Coil Object Type",
+        "      TU1 VRF DX Heating Coil, !- Heating Coil Object Name",
+        "      30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}",
+        "      20,                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}",
+        "      ,                        !- Rated Heating Capacity Sizing Ratio {W/W}",
+        "      ,                        !- Availability Manager List Name",
+        "      ,                        !- Design Specification ZoneHVAC Sizing Object Name",
+        "      Coil:Heating:Electric,   !- Supplemental Heating Coil Object Type",
+        "      TU1 Supp Heating Coil,   !- Supplemental Heating Coil Name",
+        "      autosize;                !- Maximum Supply Air Temperature from Supplemental Heater {C}",
+
+        "    ZoneHVAC:EquipmentList,",
+        "      SPACE1-1 Eq,             !- Name",
+        "      SequentialLoad,          !- Load Distribution Scheme",
+        "      ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type",
+        "      TU1,                     !- Zone Equipment 1 Name",
+        "      1,                       !- Zone Equipment 1 Cooling Sequence",
+        "      1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "      ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name",
+        "      ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name",
+
+        "    ZoneHVAC:EquipmentConnections,",
+        "      SPACE1-1,                !- Zone Name",
+        "      SPACE1-1 Eq,             !- Zone Conditioning Equipment List Name",
+        "      SPACE1-1 In Nodes,       !- Zone Air Inlet Node or NodeList Name",
+        "      SPACE1-1 Out Nodes,      !- Zone Air Exhaust Node or NodeList Name",
+        "      SPACE1-1 Node,           !- Zone Air Node Name",
+        "      SPACE1-1 Out Node;       !- Zone Return Air Node or NodeList Name",
+
+        "    NodeList,",
+        "      SPACE1-1 In Nodes,       !- Name",
+        "      TU1 Outlet Node;         !- Node 1 Name",
+
+        "    NodeList,",
+        "      SPACE1-1 Out Nodes,      !- Name",
+        "      TU1 Inlet Node;          !- Node 1 Name",
+
+        "    Fan:SystemModel,",
+        "      TU1 VRF Supply Fan,      !- Name",
+        "      VRFAvailSched,           !- Availability Schedule Name",
+        "      TU1 OAMixer Outlet Node, !- Air Inlet Node Name",
+        "      TU1 VRF Fan Outlet Node, !- Air Outlet Node Name",
+        "      AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}",
+        "      Discrete,                !- Speed Control Method",
+        "      0.0,                     !- Electric Power Minimum Flow Rate Fraction",
+        "      600.0,                   !- Design Pressure Rise {Pa}",
+        "      0.9,                     !- Motor Efficiency",
+        "      1.0,                     !- Motor In Air Stream Fraction",
+        "      AUTOSIZE,                !- Design Electric Power Consumption {W}",
+        "      TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+        "      ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "      ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "      0.70;                    !- Fan Total Efficiency",
+
+        "    Coil:Cooling:DX:VariableRefrigerantFlow,",
+        "      TU1 VRF DX Cooling Coil, !- Name",
+        "      VRFAvailSched,           !- Availability Schedule Name",
+        "      autosize,                !- Gross Rated Total Cooling Capacity {W}",
+        "      autosize,                !- Gross Rated Sensible Heat Ratio",
+        "      autosize,                !- Rated Air Flow Rate {m3/s}",
+        "      VRFTUCoolCapFT,          !- Cooling Capacity Ratio Modifier Function of Temperature Curve Name",
+        "      VRFACCoolCapFFF,         !- Cooling Capacity Modifier Curve Function of Flow Fraction Name",
+        "      TU1 VRF Fan Outlet Node,  !- Coil Air Inlet Node",
+        "      TU1 VRF DX CCoil Outlet Node;  !- Coil Air Outlet Node",
+
+        "    Coil:Heating:DX:VariableRefrigerantFlow,",
+        "      TU1 VRF DX Heating Coil, !- Name",
+        "      VRFAvailSched,           !- Availability Schedule",
+        "      autosize,                !- Gross Rated Heating Capacity {W}",
+        "      autosize,                !- Rated Air Flow Rate {m3/s}",
+        "      TU1 VRF DX CCoil Outlet Node,  !- Coil Air Inlet Node",
+        "      TU1 VRF DX HCoil Outlet Node,  !- Coil Air Outlet Node",
+        "      VRFTUHeatCapFT,          !- Heating Capacity Ratio Modifier Function of Temperature Curve Name",
+        "      VRFACCoolCapFFF;         !- Heating Capacity Modifier Function of Flow Fraction Curve Name",
+
+        "    Curve:Cubic,",
+        "      VRFTUCoolCapFT,          !- Name",
+        "      0.504547273506488,       !- Coefficient1 Constant",
+        "      0.0288891279198444,      !- Coefficient2 x",
+        "      -0.000010819418650677,   !- Coefficient3 x**2",
+        "      0.0000101359395177008,   !- Coefficient4 x**3",
+        "      0.0,                     !- Minimum Value of x",
+        "      50.0,                    !- Maximum Value of x",
+        "      0.5,                     !- Minimum Curve Output",
+        "      1.5,                     !- Maximum Curve Output",
+        "      Temperature,             !- Input Unit Type for X",
+        "      Dimensionless;           !- Output Unit Type",
+
+        "    Curve:Cubic,",
+        "      VRFTUHeatCapFT,          !- Name",
+        "      -0.390708928227928,      !- Coefficient1 Constant",
+        "      0.261815023760162,       !- Coefficient2 x",
+        "      -0.0130431603151873,     !- Coefficient3 x**2",
+        "      0.000178131745997821,    !- Coefficient4 x**3",
+        "      0.0,                     !- Minimum Value of x",
+        "      50.0,                    !- Maximum Value of x",
+        "      0.5,                     !- Minimum Curve Output",
+        "      1.5,                     !- Maximum Curve Output",
+        "      Temperature,             !- Input Unit Type for X",
+        "      Dimensionless;           !- Output Unit Type",
+
+        "    Curve:Quadratic,",
+        "      VRFACCoolCapFFF,         !- Name",
+        "      0.8,                     !- Coefficient1 Constant",
+        "      0.2,                     !- Coefficient2 x",
+        "      0.0,                     !- Coefficient3 x**2",
+        "      0.5,                     !- Minimum Value of x",
+        "      1.5;                     !- Maximum Value of x",
+
+        "    Coil:Heating:Electric,",
+        "      TU1 Supp Heating Coil,   !- Name",
+        "      VRFAvailSched,           !- Availability Schedule Name",
+        "      0.99,                    !- Efficiency",
+        "      autosize,                !- Nominal Capacity {W}",
+        "      TU1 VRF DX HCoil Outlet Node, !- Air Inlet Node Name",
+        "      TU1 Outlet Node;         !- Air Outlet Node Name",
+
+        "    OutdoorAir:Mixer,",
+        "      TU1 OA Mixer,            !- Name",
+        "      TU1 OAMixer Outlet Node, !- Mixed Air Node Name",
+        "      Outside Air Inlet Node 1,!- Outdoor Air Stream Node Name",
+        "      Relief Air Outlet Node 1,!- Relief Air Stream Node Name",
+        "      TU1 Inlet Node;          !- Return Air Stream Node Name",
+
+        "    Schedule:Compact,",
+        "      VRFFanSchedule,          !- Name",
+        "      Any Number,              !- Schedule Type Limits Name",
+        "      Through: 12/31,          !- Field 1",
+        "      For: AllDays,            !- Field 2",
+        "      Until: 24:00,1.0;        !- Field 3",
+
+        "    Schedule:Compact,",
+        "      VRFAvailSched,           !- Name",
+        "      Fraction,                !- Schedule Type Limits Name",
+        "      Through: 12/31,          !- Field 1",
+        "      For: AllDays,            !- Field 2",
+        "      Until: 24:00,1.0;        !- Field 3",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false);
+    ProcessScheduleInput(*state);
+    GetCurveInput(*state);
+    GetZoneData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    // get zone input and connections
+    GetZoneEquipmentData(*state);
+    GetVRFInput(*state);
+    // set pointer to components
+    auto &thisVRFTU(state->dataHVACVarRefFlow->VRFTU(1));
+    auto &thisDXCoolingCoil(state->dataDXCoils->DXCoil(1));
+    auto &thisDXHeatingCoil(state->dataDXCoils->DXCoil(2));
+    auto &thisSuppHeatingCoil(state->dataHeatingCoils->HeatingCoil(1));
+    // check model inputs
+    ASSERT_EQ(1, state->dataHVACVarRefFlow->NumVRFTU);
+    ASSERT_EQ(2, state->dataDXCoils->NumDXCoils);
+    ASSERT_EQ(1, state->dataHeatingCoils->NumHeatingCoils);
+    EXPECT_TRUE(thisVRFTU.OAMixerUsed);
+    ASSERT_EQ("TU1 OA MIXER", thisVRFTU.OAMixerName);
+    ASSERT_EQ(thisVRFTU.fanType_Num, DataHVACGlobals::FanType_SystemModelObject);
+    ASSERT_EQ("Fan:SystemModel", DataHVACGlobals::cFanTypes(thisVRFTU.fanType_Num));
+    ASSERT_EQ(DataHVACGlobals::BlowThru, thisVRFTU.FanPlace);
+    EXPECT_TRUE(thisVRFTU.CoolingCoilPresent);
+    ASSERT_EQ("TU1 VRF DX COOLING COIL", thisDXCoolingCoil.Name);
+    EXPECT_TRUE(thisVRFTU.HeatingCoilPresent);
+    ASSERT_EQ("TU1 VRF DX HEATING COIL", thisDXHeatingCoil.Name);
+    EXPECT_TRUE(thisVRFTU.SuppHeatingCoilPresent);
+    ASSERT_EQ("TU1 SUPP HEATING COIL", thisVRFTU.SuppHeatCoilName);
+    ASSERT_EQ("TU1 SUPP HEATING COIL", thisSuppHeatingCoil.Name);
+}
+
+TEST_F(EnergyPlusFixture, VRF_MinPLR_and_EIRfPLRCruveMinPLRInputsTest)
+{
+    std::string const idf_objects = delimited_string({
+
+        "    Zone,",
+        "      ZONE1-1,                 !- Name",
+        "      0,                       !- Direction of Relative North {deg}",
+        "      0,                       !- X Origin {m}",
+        "      0,                       !- Y Origin {m}",
+        "      0,                       !- Z Origin {m}",
+        "      1,                       !- Type",
+        "      1,                       !- Multiplier",
+        "      2.438400269,             !- Ceiling Height {m}",
+        "      239.247360229;           !- Volume {m3}",
+
+        "    ZoneTerminalUnitList,",
+        "      VRF TU List,             !- Zone Terminal Unit List Name",
+        "      TU1;                     !- Zone Terminal Unit Name 5",
+
+        "    AirConditioner:VariableRefrigerantFlow,",
+        "      VRF Heat Pump,           !- Heat Pump Name",
+        "      ,                        !- Availability Schedule Name",
+        "      autosize,                !- Gross Rated Total Cooling Capacity {W}",
+        "      3.2917,                  !- Gross Rated Cooling COP {W/W}",
+        "      -5,                      !- Minimum Outdoor Temperature in Cooling Mode {C}",
+        "      43,                      !- Maximum Outdoor Temperature in Cooling Mode {C}",
+        "      VRFCoolCapFT,            !- Cooling Capacity Ratio Modifier Function of Low Temperature Curve Name",
+        "      VRFCoolCapFTBoundary,    !- Cooling Capacity Ratio Boundary Curve Name",
+        "      VRFCoolCapFTHi,          !- Cooling Capacity Ratio Modifier Function of High Temperature Curve Name",
+        "      VRFCoolEIRFT,            !- Cooling Energy Input Ratio Modifier Function of Low Temperature Curve Name",
+        "      VRFCoolEIRFTBoundary,    !- Cooling Energy Input Ratio Boundary Curve Name",
+        "      VRFCoolEIRFTHi,          !- Cooling Energy Input Ratio Modifier Function of High Temperature Curve Name",
+        "      CoolingEIRLowPLR,        !- Cooling Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name",
+        "      CoolingEIRHiPLR,         !- Cooling Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name",
+        "      CoolingCombRatio,        !- Cooling Combination Ratio Correction Factor Curve Name",
+        "      VRFCPLFFPLR,             !- Cooling Part-Load Fraction Correlation Curve Name",
+        "      autosize,                !- Gross Rated Heating Capacity {W}",
+        "      ,                        !- Rated Heating Capacity Sizing Ratio {W/W}",
+        "      3.5484,                  !- Gross Rated Heating COP {W/W}",
+        "      -20,                     !- Minimum Outdoor Temperature in Heating Mode {C}",
+        "      20,                      !- Maximum Outdoor Temperature in Heating Mode {C}",
+        "      VRFHeatCapFT,            !- Heating Capacity Ratio Modifier Function of Low Temperature Curve Name",
+        "      VRFHeatCapFTBoundary,    !- Heating Capacity Ratio Boundary Curve Name",
+        "      VRFHeatCapFTHi,          !- Heating Capacity Ratio Modifier Function of High Temperature Curve Name",
+        "      VRFHeatEIRFT,            !- Heating Energy Input Ratio Modifier Function of Low Temperature Curve Name",
+        "      VRFHeatEIRFTBoundary,    !- Heating Energy Input Ratio Boundary Curve Name",
+        "      VRFHeatEIRFTHi,          !- Heating Energy Input Ratio Modifier Function of High Temperature Curve Name",
+        "      WetBulbTemperature,      !- Heating Performance Curve Outdoor Temperature Type",
+        "      HeatingEIRLowPLR,        !- Heating Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name",
+        "      HeatingEIRHiPLR,         !- Heating Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name",
+        "      HeatingCombRatio,        !- Heating Combination Ratio Correction Factor Curve Name",
+        "      VRFCPLFFPLR,             !- Heating Part-Load Fraction Correlation Curve Name",
+        "      0.15,                    !- Minimum Heat Pump Part-Load Ratio {dimensionless}",
+        "      ZONE1-1,                 !- Zone Name for Master Thermostat Location",
+        "      LoadPriority,            !- Master Thermostat Priority Control Type",
+        "      ,                        !- Thermostat Priority Schedule Name",
+        "      VRF TU List,             !- Zone Terminal Unit List Name",
+        "      No,                      !- Heat Pump Waste Heat Recovery",
+        "      30,                      !- Equivalent Piping Length used for Piping Correction Factor in Cooling Mode {m}",
+        "      10,                      !- Vertical Height used for Piping Correction Factor {m}",
+        "      CoolingLengthCorrectionFactor,  !- Piping Correction Factor for Length in Cooling Mode Curve Name",
+        "      -0.000386,               !- Piping Correction Factor for Height in Cooling Mode Coefficient {1/m}",
+        "      30,                      !- Equivalent Piping Length used for Piping Correction Factor in Heating Mode {m}",
+        "      ,                        !- Piping Correction Factor for Length in Heating Mode Curve Name",
+        "      ,                        !- Piping Correction Factor for Height in Heating Mode Coefficient {1/m}",
+        "      15,                      !- Crankcase Heater Power per Compressor {W}",
+        "      3,                       !- Number of Compressors {dimensionless}",
+        "      0.33,                    !- Ratio of Compressor Size to Total Compressor Capacity {W/W}",
+        "      7,                       !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater {C}",
+        "      Resistive,               !- Defrost Strategy",
+        "      Timed,                   !- Defrost Control",
+        "      ,                        !- Defrost Energy Input Ratio Modifier Function of Temperature Curve Name",
+        "      ,                        !- Defrost Time Period Fraction {dimensionless}",
+        "      autosize,                !- Resistive Defrost Heater Capacity {W}",
+        "      7,                       !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}",
+        "      AirCooled,               !- Condenser Type",
+        "      MyVRFOANode,             !- Condenser Inlet Node Name",
+        "      ,                        !- Condenser Outlet Node Name",
+        "      ,                        !- Water Condenser Volume Flow Rate {m3/s}",
+        "      ,                        !- Evaporative Condenser Effectiveness {dimensionless}",
+        "      ,                        !- Evaporative Condenser Air Flow Rate {m3/s}",
+        "      0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}",
+        "      ,                        !- Supply Water Storage Tank Name",
+        "      0,                       !- Basin Heater Capacity {W/K}",
+        "      ,                        !- Basin Heater Setpoint Temperature {C}",
+        "      ,                        !- Basin Heater Operating Schedule Name",
+        "      Electricity;             !- Fuel Type",
+
+        "    OutdoorAir:NodeList,",
+        "      OutsideAirInletNodes;    !- Node or NodeList Name 1",
+
+        "    NodeList,",
+        "      OutsideAirInletNodes,    !- Name",
+        "      Outside Air Inlet Node 1,!- Node 1 Name",
+        "      MyVRFOANode;             !- Node 2 Name",
+
+        "    Curve:Biquadratic,",
+        "      VRFCoolCapFT,            !- Name",
+        "      0.576882692,             !- Coefficient1 Constant",
+        "      0.017447952,             !- Coefficient2 x",
+        "      0.000583269,             !- Coefficient3 x**2",
+        "      -1.76324E-06,            !- Coefficient4 y",
+        "      -7.474E-09,              !- Coefficient5 y**2",
+        "      -1.30413E-07,            !- Coefficient6 x*y",
+        "      15,                      !- Minimum Value of x",
+        "      24,                      !- Maximum Value of x",
+        "      -5,                      !- Minimum Value of y",
+        "      23,                      !- Maximum Value of y",
+        "      ,                        !- Minimum Curve Output",
+        "      ,                        !- Maximum Curve Output",
+        "      Temperature,             !- Input Unit Type for X",
+        "      Temperature,             !- Input Unit Type for Y",
+        "      Dimensionless;           !- Output Unit Type",
+
+        "    Curve:Biquadratic,",
+        "      VRFCoolCapFTHi,          !- Name",
+        "      0.6867358,               !- Coefficient1 Constant",
+        "      0.0207631,               !- Coefficient2 x",
+        "      0.0005447,               !- Coefficient3 x**2",
+        "      -0.0016218,              !- Coefficient4 y",
+        "      -4.259E-07,              !- Coefficient5 y**2",
+        "      -0.0003392,              !- Coefficient6 x*y",
+        "      15,                      !- Minimum Value of x",
+        "      24,                      !- Maximum Value of x",
+        "      16,                      !- Minimum Value of y",
+        "      43,                      !- Maximum Value of y",
+        "      ,                        !- Minimum Curve Output",
+        "      ,                        !- Maximum Curve Output",
+        "      Temperature,             !- Input Unit Type for X",
+        "      Temperature,             !- Input Unit Type for Y",
+        "      Dimensionless;           !- Output Unit Type",
+
+        "    Curve:Biquadratic,",
+        "      VRFCoolEIRFT,            !- Name",
+        "      0.989010541,             !- Coefficient1 Constant",
+        "      -0.02347967,             !- Coefficient2 x",
+        "      0.000199711,             !- Coefficient3 x**2",
+        "      0.005968336,             !- Coefficient4 y",
+        "      -1.0289E-07,             !- Coefficient5 y**2",
+        "      -0.00015686,             !- Coefficient6 x*y",
+        "      15,                      !- Minimum Value of x",
+        "      24,                      !- Maximum Value of x",
+        "      -5,                      !- Minimum Value of y",
+        "      23,                      !- Maximum Value of y",
+        "      ,                        !- Minimum Curve Output",
+        "      ,                        !- Maximum Curve Output",
+        "      Temperature,             !- Input Unit Type for X",
+        "      Temperature,             !- Input Unit Type for Y",
+        "      Dimensionless;           !- Output Unit Type",
+
+        "    Curve:Biquadratic,",
+        "      VRFCoolEIRFTHi,          !- Name",
+        "      0.14351470,              !- Coefficient1 Constant",
+        "      0.01860035,              !- Coefficient2 x",
+        "      -0.0003954,              !- Coefficient3 x**2",
+        "      0.02485219,              !- Coefficient4 y",
+        "      0.00016329,              !- Coefficient5 y**2",
+        "      -0.0006244,              !- Coefficient6 x*y",
+        "      15,                      !- Minimum Value of x",
+        "      24,                      !- Maximum Value of x",
+        "      16,                      !- Minimum Value of y",
+        "      43,                      !- Maximum Value of y",
+        "      ,                        !- Minimum Curve Output",
+        "      ,                        !- Maximum Curve Output",
+        "      Temperature,             !- Input Unit Type for X",
+        "      Temperature,             !- Input Unit Type for Y",
+        "      Dimensionless;           !- Output Unit Type",
+
+        "    Curve:Biquadratic,",
+        "      VRFHeatCapFT,            !- Name",
+        "      1.014599599,             !- Coefficient1 Constant",
+        "      -0.002506703,            !- Coefficient2 x",
+        "      -0.000141599,            !- Coefficient3 x**2",
+        "      0.026931595,             !- Coefficient4 y",
+        "      1.83538E-06,             !- Coefficient5 y**2",
+        "      -0.000358147,            !- Coefficient6 x*y",
+        "      15,                      !- Minimum Value of x",
+        "      27,                      !- Maximum Value of x",
+        "      -20,                     !- Minimum Value of y",
+        "      15,                      !- Maximum Value of y",
+        "      ,                        !- Minimum Curve Output",
+        "      ,                        !- Maximum Curve Output",
+        "      Temperature,             !- Input Unit Type for X",
+        "      Temperature,             !- Input Unit Type for Y",
+        "      Dimensionless;           !- Output Unit Type",
+
+        "    Curve:Biquadratic,",
+        "      VRFHeatCapFTHi,          !- Name",
+        "      1.161134821,             !- Coefficient1 Constant",
+        "      0.027478868,             !- Coefficient2 x",
+        "      -0.00168795,             !- Coefficient3 x**2",
+        "      0.001783378,             !- Coefficient4 y",
+        "      2.03208E-06,             !- Coefficient5 y**2",
+        "      -6.8969E-05,             !- Coefficient6 x*y",
+        "      15,                      !- Minimum Value of x",
+        "      27,                      !- Maximum Value of x",
+        "      -10,                     !- Minimum Value of y",
+        "      15,                      !- Maximum Value of y",
+        "      ,                        !- Minimum Curve Output",
+        "      ,                        !- Maximum Curve Output",
+        "      Temperature,             !- Input Unit Type for X",
+        "      Temperature,             !- Input Unit Type for Y",
+        "      Dimensionless;           !- Output Unit Type",
+
+        "    Curve:Biquadratic,",
+        "      VRFHeatEIRFT,            !- Name",
+        "      0.87465501,              !- Coefficient1 Constant",
+        "      -0.01319754,             !- Coefficient2 x",
+        "      0.00110307,              !- Coefficient3 x**2",
+        "      -0.0133118,              !- Coefficient4 y",
+        "      0.00089017,              !- Coefficient5 y**2",
+        "      -0.00012766,             !- Coefficient6 x*y",
+        "      15,                      !- Minimum Value of x",
+        "      27,                      !- Maximum Value of x",
+        "      -20,                     !- Minimum Value of y",
+        "      12,                      !- Maximum Value of y",
+        "      ,                        !- Minimum Curve Output",
+        "      ,                        !- Maximum Curve Output",
+        "      Temperature,             !- Input Unit Type for X",
+        "      Temperature,             !- Input Unit Type for Y",
+        "      Dimensionless;           !- Output Unit Type",
+
+        "    Curve:Biquadratic,",
+        "      VRFHeatEIRFTHi,          !- Name",
+        "      2.504005146,             !- Coefficient1 Constant",
+        "      -0.05736767,             !- Coefficient2 x",
+        "      4.07336E-05,             !- Coefficient3 x**2",
+        "      -0.12959669,             !- Coefficient4 y",
+        "      0.00135839,              !- Coefficient5 y**2",
+        "      0.00317047,              !- Coefficient6 x*y",
+        "      15,                      !- Minimum Value of x",
+        "      27,                      !- Maximum Value of x",
+        "      -10,                     !- Minimum Value of y",
+        "      15,                      !- Maximum Value of y",
+        "      ,                        !- Minimum Curve Output",
+        "      ,                        !- Maximum Curve Output",
+        "      Temperature,             !- Input Unit Type for X",
+        "      Temperature,             !- Input Unit Type for Y",
+        "      Dimensionless;           !- Output Unit Type",
+
+        "    Curve:Biquadratic,",
+        "      CoolingLengthCorrectionFactor,  !- Name",
+        "      1.0693794,               !- Coefficient1 Constant",
+        "      -0.0014951,              !- Coefficient2 x",
+        "      2.56E-06,                !- Coefficient3 x**2",
+        "      -0.1151104,              !- Coefficient4 y",
+        "      0.0511169,               !- Coefficient5 y**2",
+        "      -0.0004369,              !- Coefficient6 x*y",
+        "      8,                       !- Minimum Value of x",
+        "      175,                     !- Maximum Value of x",
+        "      0.5,                     !- Minimum Value of y",
+        "      1.5,                     !- Maximum Value of y",
+        "      ,                        !- Minimum Curve Output",
+        "      ,                        !- Maximum Curve Output",
+        "      Temperature,             !- Input Unit Type for X",
+        "      Temperature,             !- Input Unit Type for Y",
+        "      Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Quadratic,",
+        "     VRFCPLFFPLR,             !- Name",
+        "     0.85,                    !- Coefficient1 Constant",
+        "     0.15,                    !- Coefficient2 x",
+        "     0.0,                     !- Coefficient3 x**2",
+        "     0.0,                     !- Minimum Value of x",
+        "     1.0,                     !- Maximum Value of x",
+        "     0.85,                    !- Minimum Curve Output",
+        "     1.0,                     !- Maximum Curve Output",
+        "     Dimensionless,           !- Input Unit Type for X",
+        "     Dimensionless;           !- Output Unit Type",
+
+        "   Curve:Linear,",
+        "     CoolingCombRatio,        !- Name",
+        "     0.618055,                !- Coefficient1 Constant",
+        "     0.381945,                !- Coefficient2 x",
+        "     1.0,                     !- Minimum Value of x",
+        "     1.5,                     !- Maximum Value of x",
+        "     1.0,                     !- Minimum Curve Output",
+        "     1.2,                     !- Maximum Curve Output",
+        "     Dimensionless,           !- Input Unit Type for X",
+        "     Dimensionless;           !- Output Unit Type",
+
+        "   Curve:Linear,",
+        "     HeatingCombRatio,        !- Name",
+        "     0.96034,                 !- Coefficient1 Constant",
+        "     0.03966,                 !- Coefficient2 x",
+        "     1.0,                     !- Minimum Value of x",
+        "     1.5,                     !- Maximum Value of x",
+        "     1.0,                     !- Minimum Curve Output",
+        "     1.023,                   !- Maximum Curve Output",
+        "     Dimensionless,           !- Input Unit Type for X",
+        "     Dimensionless;           !- Output Unit Type",
+
+        "   Curve:Quadratic,",
+        "     CoolingEIRHiPLR,         !- Name",
+        "     1.0,                     !- Coefficient1 Constant",
+        "     0.0,                     !- Coefficient2 x",
+        "     0.0,                     !- Coefficient3 x**2",
+        "     1.0,                     !- Minimum Value of x",
+        "     1.5,                     !- Maximum Value of x",
+        "     ,                        !- Minimum Curve Output",
+        "     ,                        !- Maximum Curve Output",
+        "     Dimensionless,           !- Input Unit Type for X",
+        "     Dimensionless;           !- Output Unit Type",
+
+        "   Curve:Quadratic,",
+        "     HeatingEIRHiPLR,         !- Name",
+        "     2.4294355,               !- Coefficient1 Constant",
+        "     -2.235887,               !- Coefficient2 x",
+        "     0.8064516,               !- Coefficient3 x**2",
+        "     1.0,                     !- Minimum Value of x",
+        "     1.5,                     !- Maximum Value of x",
+        "     ,                        !- Minimum Curve Output",
+        "     ,                        !- Maximum Curve Output",
+        "     Dimensionless,           !- Input Unit Type for X",
+        "     Dimensionless;           !- Output Unit Type",
+
+        "   Curve:Quadratic,",
+        "     VarSpeedCyclingPLFFPLR,  !- Name",
+        "     0.85,                    !- Coefficient1 Constant",
+        "     0.15,                    !- Coefficient2 x",
+        "     0.0,                     !- Coefficient3 x**2",
+        "     0.0,                     !- Minimum Value of x",
+        "     1.0;                     !- Maximum Value of x",
+
+        "   Curve:Cubic,",
+        "     VRFCoolCapFTBoundary,    !- Name",
+        "     25.73473775,             !- Coefficient1 Constant",
+        "     -0.03150043,             !- Coefficient2 x",
+        "     -0.01416595,             !- Coefficient3 x**2",
+        "     0,                       !- Coefficient4 x**3",
+        "     11,                      !- Minimum Value of x",
+        "     30,                      !- Maximum Value of x",
+        "     ,                        !- Minimum Curve Output",
+        "     ,                        !- Maximum Curve Output",
+        "     Temperature,             !- Input Unit Type for X",
+        "     Temperature;             !- Output Unit Type",
+
+        "   Curve:Cubic,",
+        "     VRFCoolEIRFTBoundary,    !- Name",
+        "     25.73473775,             !- Coefficient1 Constant",
+        "     -0.03150043,             !- Coefficient2 x",
+        "     -0.01416595,             !- Coefficient3 x**2",
+        "     0,                       !- Coefficient4 x**3",
+        "     15,                      !- Minimum Value of x",
+        "     24,                      !- Maximum Value of x",
+        "     ,                        !- Minimum Curve Output",
+        "     ,                        !- Maximum Curve Output",
+        "     Temperature,             !- Input Unit Type for X",
+        "     Temperature;             !- Output Unit Type",
+
+        "   Curve:Cubic,",
+        "     CoolingEIRLowPLR,        !- Name",
+        "     0.4628123,               !- Coefficient1 Constant",
+        "     -1.0402406,              !- Coefficient2 x",
+        "     2.17490997,              !- Coefficient3 x**2",
+        "     -0.5974817,              !- Coefficient4 x**3",
+        "     0.25,                    !- Minimum Value of x",
+        "     1,                       !- Maximum Value of x",
+        "     ,                        !- Minimum Curve Output",
+        "     ,                        !- Maximum Curve Output",
+        "     Temperature,             !- Input Unit Type for X",
+        "     Temperature;             !- Output Unit Type",
+
+        "   Curve:Cubic,",
+        "     VRFHeatCapFTBoundary,    !- Name",
+        "     -7.6000882,              !- Coefficient1 Constant",
+        "     3.05090016,              !- Coefficient2 x",
+        "     -0.1162844,              !- Coefficient3 x**2",
+        "     0.0,                     !- Coefficient4 x**3",
+        "     15,                      !- Minimum Value of x",
+        "     27,                      !- Maximum Value of x",
+        "     ,                        !- Minimum Curve Output",
+        "     ,                        !- Maximum Curve Output",
+        "     Temperature,             !- Input Unit Type for X",
+        "     Temperature;             !- Output Unit Type",
+
+        "   Curve:Cubic,",
+        "     VRFHeatEIRFTBoundary,    !- Name",
+        "     -7.6000882,              !- Coefficient1 Constant",
+        "     3.05090016,              !- Coefficient2 x",
+        "     -0.1162844,              !- Coefficient3 x**2",
+        "     0.0,                     !- Coefficient4 x**3",
+        "     15,                      !- Minimum Value of x",
+        "     27,                      !- Maximum Value of x",
+        "     -20,                     !- Minimum Curve Output",
+        "     15,                      !- Maximum Curve Output",
+        "     Temperature,             !- Input Unit Type for X",
+        "     Temperature;             !- Output Unit Type",
+
+        "   Curve:Cubic,",
+        "     HeatingEIRLowPLR,        !- Name",
+        "     0.1400093,               !- Coefficient1 Constant",
+        "     0.6415002,               !- Coefficient2 x",
+        "     0.1339047,               !- Coefficient3 x**2",
+        "     0.0845859,               !- Coefficient4 x**3",
+        "     0.25,                    !- Minimum Value of x",
+        "     1,                       !- Maximum Value of x",
+        "     ,                        !- Minimum Curve Output",
+        "     ,                        !- Maximum Curve Output",
+        "     Dimensionless,           !- Input Unit Type for X",
+        "     Dimensionless;           !- Output Unit Type",
+
+        "    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,",
+        "      TU1,                     !- Zone Terminal Unit Name",
+        "      VRFAvailSched,           !- Terminal Unit Availability Schedule",
+        "      TU1 Inlet Node,          !- Terminal Unit Air Inlet Node Name",
+        "      TU1 Outlet Node,         !- Terminal Unit Air Outlet Node Name",
+        "      autosize,                !- Cooling Supply Air Flow Rate {m3/s}",
+        "      autosize,                !- No Cooling Supply Air Flow Rate {m3/s}",
+        "      autosize,                !- Heating Supply Air Flow Rate {m3/s}",
+        "      autosize,                !- No Heating Supply Air Flow Rate {m3/s}",
+        "      autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}",
+        "      autosize,                !- Heating Outdoor Air Flow Rate {m3/s}",
+        "      autosize,                !- No Load Outdoor Air Flow Rate {m3/s}",
+        "      VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name",
+        "      BlowThrough,             !- Supply Air Fan Placement",
+        "      Fan:SystemModel,         !- Supply Air Fan Object Type",
+        "      TU1 VRF Supply Fan,      !- Supply Air Fan Object Name",
+        "      OutdoorAir:Mixer,        !- Outside Air Mixer Object Type",
+        "      TU1 OA Mixer,            !- Outside Air Mixer Object Name",
+        "      COIL:Cooling:DX:VariableRefrigerantFlow,  !- Cooling Coil Object Type",
+        "      TU1 VRF DX Cooling Coil, !- Cooling Coil Object Name",
+        "      COIL:Heating:DX:VariableRefrigerantFlow,  !- Heating Coil Object Type",
+        "      TU1 VRF DX Heating Coil, !- Heating Coil Object Name",
+        "      30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}",
+        "      20,                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}",
+        "      ,                        !- Rated Heating Capacity Sizing Ratio {W/W}",
+        "      ,                        !- Availability Manager List Name",
+        "      ,                        !- Design Specification ZoneHVAC Sizing Object Name",
+        "      ,                        !- Supplemental Heating Coil Object Type",
+        "      ,                        !- Supplemental Heating Coil Name",
+        "      ;                        !- Maximum Supply Air Temperature from Supplemental Heater {C}",
+
+        "    ZoneHVAC:EquipmentList,",
+        "      ZONE1-1 Eq,              !- Name",
+        "      SequentialLoad,          !- Load Distribution Scheme",
+        "      ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type",
+        "      TU1,                     !- Zone Equipment 1 Name",
+        "      1,                       !- Zone Equipment 1 Cooling Sequence",
+        "      1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "      ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name",
+        "      ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name",
+
+        "    ZoneHVAC:EquipmentConnections,",
+        "      ZONE1-1,                 !- Zone Name",
+        "      ZONE1-1 Eq,              !- Zone Conditioning Equipment List Name",
+        "      ZONE1-1 In Nodes,        !- Zone Air Inlet Node or NodeList Name",
+        "      ZONE1-1 Out Nodes,       !- Zone Air Exhaust Node or NodeList Name",
+        "      ZONE1-1 Node,            !- Zone Air Node Name",
+        "      ZONE1-1 Out Node;        !- Zone Return Air Node or NodeList Name",
+
+        "    NodeList,",
+        "      ZONE1-1 In Nodes,        !- Name",
+        "      TU1 Outlet Node;         !- Node 1 Name",
+
+        "    NodeList,",
+        "      ZONE1-1 Out Nodes,       !- Name",
+        "      TU1 Inlet Node;          !- Node 1 Name",
+
+        "    Fan:SystemModel,",
+        "      TU1 VRF Supply Fan,      !- Name",
+        "      VRFAvailSched,           !- Availability Schedule Name",
+        "      TU1 OAMixer Outlet Node, !- Air Inlet Node Name",
+        "      TU1 VRF Fan Outlet Node, !- Air Outlet Node Name",
+        "      AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}",
+        "      Discrete,                !- Speed Control Method",
+        "      0.0,                     !- Electric Power Minimum Flow Rate Fraction",
+        "      600.0,                   !- Design Pressure Rise {Pa}",
+        "      0.9,                     !- Motor Efficiency",
+        "      1.0,                     !- Motor In Air Stream Fraction",
+        "      AUTOSIZE,                !- Design Electric Power Consumption {W}",
+        "      TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+        "      ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "      ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "      0.70;                    !- Fan Total Efficiency",
+
+        "    Coil:Cooling:DX:VariableRefrigerantFlow,",
+        "      TU1 VRF DX Cooling Coil, !- Name",
+        "      VRFAvailSched,           !- Availability Schedule Name",
+        "      autosize,                !- Gross Rated Total Cooling Capacity {W}",
+        "      autosize,                !- Gross Rated Sensible Heat Ratio",
+        "      autosize,                !- Rated Air Flow Rate {m3/s}",
+        "      VRFTUCoolCapFT,          !- Cooling Capacity Ratio Modifier Function of Temperature Curve Name",
+        "      VRFACCoolCapFFF,         !- Cooling Capacity Modifier Curve Function of Flow Fraction Name",
+        "      TU1 VRF Fan Outlet Node,  !- Coil Air Inlet Node",
+        "      TU1 VRF DX CCoil Outlet Node;  !- Coil Air Outlet Node",
+
+        "    Coil:Heating:DX:VariableRefrigerantFlow,",
+        "      TU1 VRF DX Heating Coil, !- Name",
+        "      VRFAvailSched,           !- Availability Schedule",
+        "      autosize,                !- Gross Rated Heating Capacity {W}",
+        "      autosize,                !- Rated Air Flow Rate {m3/s}",
+        "      TU1 VRF DX CCoil Outlet Node,  !- Coil Air Inlet Node",
+        "      TU1 Outlet Node,         !- Coil Air Outlet Node",
+        "      VRFTUHeatCapFT,          !- Heating Capacity Ratio Modifier Function of Temperature Curve Name",
+        "      VRFACCoolCapFFF;         !- Heating Capacity Modifier Function of Flow Fraction Curve Name",
+
+        "    Curve:Cubic,",
+        "      VRFTUCoolCapFT,          !- Name",
+        "      0.504547273506488,       !- Coefficient1 Constant",
+        "      0.0288891279198444,      !- Coefficient2 x",
+        "      -0.000010819418650677,   !- Coefficient3 x**2",
+        "      0.0000101359395177008,   !- Coefficient4 x**3",
+        "      0.0,                     !- Minimum Value of x",
+        "      50.0,                    !- Maximum Value of x",
+        "      0.5,                     !- Minimum Curve Output",
+        "      1.5,                     !- Maximum Curve Output",
+        "      Temperature,             !- Input Unit Type for X",
+        "      Dimensionless;           !- Output Unit Type",
+
+        "    Curve:Cubic,",
+        "      VRFTUHeatCapFT,          !- Name",
+        "      -0.390708928227928,      !- Coefficient1 Constant",
+        "      0.261815023760162,       !- Coefficient2 x",
+        "      -0.0130431603151873,     !- Coefficient3 x**2",
+        "      0.000178131745997821,    !- Coefficient4 x**3",
+        "      0.0,                     !- Minimum Value of x",
+        "      50.0,                    !- Maximum Value of x",
+        "      0.5,                     !- Minimum Curve Output",
+        "      1.5,                     !- Maximum Curve Output",
+        "      Temperature,             !- Input Unit Type for X",
+        "      Dimensionless;           !- Output Unit Type",
+
+        "    Curve:Quadratic,",
+        "      VRFACCoolCapFFF,         !- Name",
+        "      0.8,                     !- Coefficient1 Constant",
+        "      0.2,                     !- Coefficient2 x",
+        "      0.0,                     !- Coefficient3 x**2",
+        "      0.5,                     !- Minimum Value of x",
+        "      1.5;                     !- Maximum Value of x",
+
+        "    OutdoorAir:Mixer,",
+        "      TU1 OA Mixer,            !- Name",
+        "      TU1 OAMixer Outlet Node, !- Mixed Air Node Name",
+        "      Outside Air Inlet Node 1,!- Outdoor Air Stream Node Name",
+        "      Relief Air Outlet Node 1,!- Relief Air Stream Node Name",
+        "      TU1 Inlet Node;          !- Return Air Stream Node Name",
+
+        "    Schedule:Compact,",
+        "      VRFFanSchedule,          !- Name",
+        "      Any Number,              !- Schedule Type Limits Name",
+        "      Through: 12/31,          !- Field 1",
+        "      For: AllDays,            !- Field 2",
+        "      Until: 24:00,1.0;        !- Field 3",
+
+        "    Schedule:Compact,",
+        "      VRFAvailSched,           !- Name",
+        "      Fraction,                !- Schedule Type Limits Name",
+        "      Through: 12/31,          !- Field 1",
+        "      For: AllDays,            !- Field 2",
+        "      Until: 24:00,1.0;        !- Field 3",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    Real64 minEIRfLowPLRXInput(0.0);
+    Real64 maxEIRfLowPLRXInput(0.0);
+    bool ErrorsFound(false);
+    ProcessScheduleInput(*state);
+    GetCurveInput(*state);
+    GetZoneData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    // get zone input and connections
+    GetZoneEquipmentData(*state);
+    GetVRFInputData(*state, ErrorsFound);
+    // expect error due to min PLR value
+    EXPECT_TRUE(ErrorsFound);
+    // set pointer to components
+    auto &thisVRF(state->dataHVACVarRefFlow->VRF(1));
+    auto &thisCoolEIRFPLR(state->dataCurveManager->PerfCurve(thisVRF.CoolEIRFPLR1));
+    auto &thisHeatEIRFPLR(state->dataCurveManager->PerfCurve(thisVRF.HeatEIRFPLR1));
+    // check user input VRF Minimum PLR
+    EXPECT_EQ(0.15, thisVRF.MinPLR);
+    // EIRFPLR curve minimum PLR value specified
+    CurveManager::GetCurveMinMaxValues(*state, thisVRF.CoolEIRFPLR1, minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
+    EXPECT_EQ(0.25, thisCoolEIRFPLR.Var1Min);
+    EXPECT_EQ(0.25, minEIRfLowPLRXInput); // getinput checks this
+    EXPECT_EQ(1.00, thisCoolEIRFPLR.Var1Max);
+    EXPECT_EQ(1.00, maxEIRfLowPLRXInput);               // getinput checks this
+    EXPECT_GT(thisCoolEIRFPLR.Var1Min, thisVRF.MinPLR); // expect warning message
+    minEIRfLowPLRXInput = 0.0;
+    maxEIRfLowPLRXInput = 0.0;
+    CurveManager::GetCurveMinMaxValues(*state, thisVRF.HeatEIRFPLR1, minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
+    EXPECT_EQ(0.25, thisHeatEIRFPLR.Var1Min);
+    EXPECT_EQ(0.25, minEIRfLowPLRXInput); // getinput checks this
+    EXPECT_EQ(1.00, thisHeatEIRFPLR.Var1Max);
+    EXPECT_EQ(1.00, maxEIRfLowPLRXInput);               // getinput checks this
+    EXPECT_GT(thisHeatEIRFPLR.Var1Min, thisVRF.MinPLR); // expect warning message
+    EXPECT_EQ(thisVRF.FuelType, "Electricity"); // Check fuel type input that uses UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum()
+    EXPECT_EQ(thisVRF.FuelTypeNum, DataGlobalConstants::ResourceType::Electricity); // Check fuel type input that uses
+                                                                                    // UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum()
+}
+
+TEST_F(EnergyPlusFixture, VRFTest_TU_NotOnZoneHVACEquipmentList)
+{
+    // Test for #7651
+
+    // static constexpr std::string_view RoutineName( "VRFTest_NoLoadOAFlowTest" );
+    bool ErrorsFound(false);       // function returns true on error
+    bool FirstHVACIteration(true); // simulate the first pass through HVAC simulation, use false for next iteration
+    int VRFTUNum(1);               // index to VRF terminal unit
+    int CurZoneNum(1);             // index to zone
+    int ZoneInletAirNode(0);       // zone inlet node number
+    int OutsideAirNode(0);         // VRFTU Outside air inlet node
+    int ZoneNum(1);                // current zone index
+    Real64 QZnReq(0.0);            // current zone load to set point
+    Real64 OnOffAirFlowRatio(1.0); // ratio of compressor ON airflow to average airflow over timestep
+
+    std::string const idf_objects = delimited_string({
 
         "  ScheduleTypeLimits,",
         "    Fraction,                !- Name",
@@ -4818,13 +14584,14 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
         "    30.0000,                 !- Zone Terminal Unit On Parasitic Electric Energy Use {W}",
         "    20.0000;                 !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}",
 
+        // This TU is NOT on any ZoneHVACEquipmentList
         "  ZoneHVAC:EquipmentList,",
         "    Level1:Office1 Equipment,!- Name",
-        "    SequentialLoad,          !- Load Distribution Scheme",
-        "    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type",
-        "    Level1:Office1 VRF Indoor Unit,  !- Zone Equipment 1 Name",
-        "    1,                       !- Zone Equipment 1 Cooling Sequence",
-        "    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    SequentialLoad;          !- Load Distribution Scheme",
+        // "    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type",
+        // "    Level1:Office1 VRF Indoor Unit,  !- Zone Equipment 1 Name",
+        // "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        // "    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
 
         "  ZoneHVAC:EquipmentConnections,",
         "    Level1:Office1,          !- Zone Name",
@@ -5433,359 +15200,735 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::BeginEnvrnFlag = true;
-    DataSizing::CurZoneEqNum = 1;
-    DataEnvironment::OutBaroPress = 101325;          // sea level
-    DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
-    DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, 20.0, 0.0);
-    DataGlobals::SysSizingCalc = true;
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataSize->CurZoneEqNum = 1;
+    state->dataEnvrn->OutBaroPress = 101325;            // sea level
+    state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
+    state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
+    state->dataGlobal->SysSizingCalc = true;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    state->dataSize->ZoneEqSizing.allocate(1);
 
-    CurveManager::GetCurveInput();                // read curves
-    HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
+    CurveManager::GetCurveInput(*state);                  // read curves
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
-    DataZoneEquipment::GetZoneEquipmentData(); // read equipment list and connections
-    HVACVariableRefrigerantFlow::MyEnvrnFlag = true;
-    ZoneInletAirNode = GetVRFTUZoneInletAirNode(VRFTUNum);  // trigger GetVRFInput by calling a mining function
-    OutsideAirNode = VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum; // outside air air inlet node num
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = 0.0;    // No load
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = 0.0; // No load
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0; // No load
-    QZnReq = DataZoneEnergyDemands::ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired; // No load
+    DataZoneEquipment::GetZoneEquipmentData(*state); // read equipment list and connections
+    state->dataAirLoop->AirLoopInputsFilled = true;
+    state->dataHVACVarRefFlow->MyEnvrnFlag = true;
+    ZoneInletAirNode = GetVRFTUZoneInletAirNode(*state, VRFTUNum);                     // trigger GetVRFInput by calling a mining function
+    OutsideAirNode = state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum; // outside air air inlet node num
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = 0.0;    // No load
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = 0.0; // No load
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0; // No load
+    QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired; // No load
     // Initialize terminal unit
-    Schedule(VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 1.0;            // set continuous fan operating mode
-    InitVRF(VRFTUNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq); // Initialize all VRFTU related parameters
-    ASSERT_EQ(VRFTU(VRFTUNum).OpMode, DataHVACGlobals::ContFanCycCoil);        // continuous fan cycling coil operating mode
-    // Set average OA flow rate when there in no load for cont. fan cyc. coil operating mode
-    SetAverageAirFlow(VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
-    AverageOAMassFlow = DataEnvironment::StdRhoAir * VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow;
-    EXPECT_EQ(AverageOAMassFlow, Node(OutsideAirNode).MassFlowRate);
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue =
+        1.0; // set continuous fan operating mode
 
-    // clean up
-    ZoneSysEnergyDemand.deallocate();
+    // Reset the err stream, which has warnings about curves values not equal to 1.0 (+ or - 10%) at rated conditions
+    EXPECT_TRUE(has_err_output(true));
+
+    InitVRF(*state, VRFTUNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq); // Initialize all VRFTU related parameters
+
+    std::string const error_string = delimited_string(
+        {"   ** Severe  ** InitVRF: VRF Terminal Unit = [ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,LEVEL1:OFFICE1 VRF INDOOR UNIT] is not on any "
+         "ZoneHVAC:EquipmentList, AirloopHVAC or AirLoopHVAC:OutdoorAirSystem:EquipmentList.  It will not be simulated.",
+         "   **   ~~~   ** ...The VRF AC System associated with this terminal unit may also not be simulated."});
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    ASSERT_EQ(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).OpMode, DataHVACGlobals::ContFanCycCoil); // continuous fan cycling coil operating mode
 }
 
-TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
+TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
 {
+    // Test for #8328 - Fan Power is 0 when Fan:OnOff is used in a ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
+
+    // This test is ripped off of VRFTU_SysCurve_ReportOutputVerificationTest, except I added curves for
+    // Fan Power Ratio Function of Speed Ratio Curve Name (and efficiency too) which is a needed condition to reproduce the bug
+
+    bool ErrorsFound(false);       // function returns true on error
+    bool FirstHVACIteration(true); // simulate the first pass through HVAC simulation, use false for next iteration
+    int VRFCond(1);                // index to VRF condenser
+    int VRFTUNum(1);               // index to VRF terminal unit
+    int EquipPtr(1);               // index to equipment list
+    int CurZoneNum(1);             // index to zone
+    int ZoneInletAirNode(0);       // zone inlet node number
+    Real64 SysOutputProvided(0.0); // function returns sensible capacity [W]
+    Real64 LatOutputProvided(0.0); // function returns latent capacity [W]
 
     std::string const idf_objects = delimited_string({
+        "AirConditioner:VariableRefrigerantFlow,",
+        "  VRF Heat Pump,           !- Heat Pump Name",
+        "  VRFCondAvailSched,       !- Availability Schedule Name",
+        "  autosize,                !- Gross Rated Total Cooling Capacity {W}",
+        "  3.2917,                  !- Gross Rated Cooling COP {W/W}",
+        "  -5,                      !- Minimum Outdoor Temperature in Cooling Mode {C}",
+        "  43,                      !- Maximum Outdoor Temperature in Cooling Mode {C}",
+        "  VRFCoolCapFT,            !- Cooling Capacity Ratio Modifier Function of Low Temperature Curve Name",
+        "  VRFCoolCapFTBoundary,    !- Cooling Capacity Ratio Boundary Curve Name",
+        "  VRFCoolCapFTHi,          !- Cooling Capacity Ratio Modifier Function of High Temperature Curve Name",
+        "  VRFCoolEIRFT,            !- Cooling Energy Input Ratio Modifier Function of Low Temperature Curve Name",
+        "  VRFCoolEIRFTBoundary,    !- Cooling Energy Input Ratio Boundary Curve Name",
+        "  VRFCoolEIRFTHi,          !- Cooling Energy Input Ratio Modifier Function of High Temperature Curve Name",
+        "  CoolingEIRLowPLR,        !- Cooling Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name",
+        "  CoolingEIRHiPLR,         !- Cooling Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name",
+        "  CoolingCombRatio,        !- Cooling Combination Ratio Correction Factor Curve Name",
+        "  VRFCPLFFPLR,             !- Cooling Part-Load Fraction Correlation Curve Name",
+        "  autosize,                !- Gross Rated Heating Capacity {W}",
+        "  ,                        !- Rated Heating Capacity Sizing Ratio {W/W}",
+        "  3.5484,                  !- Gross Rated Heating COP {W/W}",
+        "  -20,                     !- Minimum Outdoor Temperature in Heating Mode {C}",
+        "  20,                      !- Maximum Outdoor Temperature in Heating Mode {C}",
+        "  VRFHeatCapFT,            !- Heating Capacity Ratio Modifier Function of Low Temperature Curve Name",
+        "  VRFHeatCapFTBoundary,    !- Heating Capacity Ratio Boundary Curve Name",
+        "  VRFHeatCapFTHi,          !- Heating Capacity Ratio Modifier Function of High Temperature Curve Name",
+        "  VRFHeatEIRFT,            !- Heating Energy Input Ratio Modifier Function of Low Temperature Curve Name",
+        "  VRFHeatEIRFTBoundary,    !- Heating Energy Input Ratio Boundary Curve Name",
+        "  VRFHeatEIRFTHi,          !- Heating Energy Input Ratio Modifier Function of High Temperature Curve Name",
+        "  WetBulbTemperature,      !- Heating Performance Curve Outdoor Temperature Type",
+        "  HeatingEIRLowPLR,        !- Heating Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name",
+        "  HeatingEIRHiPLR,         !- Heating Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name",
+        "  HeatingCombRatio,        !- Heating Combination Ratio Correction Factor Curve Name",
+        "  VRFCPLFFPLR,             !- Heating Part-Load Fraction Correlation Curve Name",
+        "  0.25,                    !- Minimum Heat Pump Part-Load Ratio {dimensionless}",
+        "  SPACE1-1,                !- Zone Name for Master Thermostat Location",
+        "  LoadPriority,            !- Master Thermostat Priority Control Type",
+        "  ,                        !- Thermostat Priority Schedule Name",
+        "  VRF Heat Pump TU List,   !- Zone Terminal Unit List Name",
+        "  No,                      !- Heat Pump Waste Heat Recovery",
+        "  30,                      !- Equivalent Piping Length used for Piping Correction Factor in Cooling Mode {m}",
+        "  10,                      !- Vertical Height used for Piping Correction Factor {m}",
+        "  CoolingLengthCorrectionFactor,  !- Piping Correction Factor for Length in Cooling Mode Curve Name",
+        "  -0.000386,               !- Piping Correction Factor for Height in Cooling Mode Coefficient {1/m}",
+        "  30,                      !- Equivalent Piping Length used for Piping Correction Factor in Heating Mode {m}",
+        "  ,                        !- Piping Correction Factor for Length in Heating Mode Curve Name",
+        "  ,                        !- Piping Correction Factor for Height in Heating Mode Coefficient {1/m}",
+        "  15,                      !- Crankcase Heater Power per Compressor {W}",
+        "  3,                       !- Number of Compressors {dimensionless}",
+        "  0.33,                    !- Ratio of Compressor Size to Total Compressor Capacity {W/W}",
+        "  7,                       !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater {C}",
+        "  Resistive,               !- Defrost Strategy",
+        "  Timed,                   !- Defrost Control",
+        "  ,                        !- Defrost Energy Input Ratio Modifier Function of Temperature Curve Name",
+        "  ,                        !- Defrost Time Period Fraction {dimensionless}",
+        "  autosize,                !- Resistive Defrost Heater Capacity {W}",
+        "  7,                       !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}",
+        "  AirCooled,               !- Condenser Type",
+        "  MyVRFOANode,             !- Condenser Inlet Node Name",
+        "  ,                        !- Condenser Outlet Node Name",
+        "  ,                        !- Water Condenser Volume Flow Rate {m3/s}",
+        "  ,                        !- Evaporative Condenser Effectiveness {dimensionless}",
+        "  ,                        !- Evaporative Condenser Air Flow Rate {m3/s}",
+        "  0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}",
+        "  ,                        !- Supply Water Storage Tank Name",
+        "  0,                       !- Basin Heater Capacity {W/K}",
+        "  ,                        !- Basin Heater Setpoint Temperature {C}",
+        "  ,                        !- Basin Heater Operating Schedule Name",
+        "  Electricity;             !- Fuel Type",
 
-        "  Curve:Biquadratic,",
-        "    BiquadraticCurve,        !- Name",
-        "    1.0,                     !- Coefficient1 Constant",
-        "    0,                       !- Coefficient2 x",
-        "    0,                       !- Coefficient3 x**2",
-        "    0,                       !- Coefficient4 y",
-        "    0,                       !- Coefficient5 y**2",
-        "    0,                       !- Coefficient6 x*y",
-        "    -100,                    !- Minimum Value of x",
-        "    100,                     !- Maximum Value of x",
-        "    -100,                    !- Minimum Value of y",
-        "    100,                     !- Maximum Value of y",
-        "    ,                        !- Minimum Curve Output",
-        "    ,                        !- Maximum Curve Output",
-        "    Temperature,             !- Input Unit Type for X",
-        "    Temperature,             !- Input Unit Type for Y",
-        "    Dimensionless;           !- Output Unit Type",
+        "Zone,",
+        "  SPACE1-1,                !- Name",
+        "  0,                       !- Direction of Relative North {deg}",
+        "  0,                       !- X Origin {m}",
+        "  0,                       !- Y Origin {m}",
+        "  0,                       !- Z Origin {m}",
+        "  1,                       !- Type",
+        "  1,                       !- Multiplier",
+        "  2.438400269,             !- Ceiling Height {m}",
+        "  239.247360229;           !- Volume {m3}",
 
-        "  Curve:Cubic,",
-        "    EIRfPLR,                 !- Name",
-        "    0.0,                     !- Coefficient1 Constant",
-        "    1.0,                     !- Coefficient2 x",
-        "    0.0,                     !- Coefficient3 x**2",
-        "    0.0,                     !- Coefficient4 x**3",
-        "    0,                       !- Minimum Value of x",
-        "    1,                       !- Maximum Value of x",
-        "    ,                        !- Minimum Curve Output",
-        "    ,                        !- Maximum Curve Output",
-        "    Dimensionless,           !- Input Unit Type for X",
-        "    Dimensionless;           !- Output Unit Type",
+        "ZoneHVAC:EquipmentConnections,",
+        "  SPACE1-1,                !- Zone Name",
+        "  SPACE1-1 Eq,             !- Zone Conditioning Equipment List Name",
+        "  TU1 Outlet Node,         !- Zone Air Inlet Node or NodeList Name",
+        "  TU1 Inlet Node,          !- Zone Air Exhaust Node or NodeList Name",
+        "  SPACE1-1 Node,           !- Zone Air Node Name",
+        "  SPACE1-1 Out Node;       !- Zone Return Air Node Name", // not used anywhere else in the example file
 
+        "ZoneHVAC:EquipmentList,",
+        "  SPACE1-1 Eq,             !- Name",
+        "  SequentialLoad,          !- Load Distribution Scheme",
+        "  ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type",
+        "  TU1,                     !- Zone Equipment 1 Name",
+        "  1,                       !- Zone Equipment 1 Cooling Sequence",
+        "  1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+
+        "ZoneTerminalUnitList,",
+        "  VRF Heat Pump TU List,    !- Zone Terminal Unit List Name",
+        "  TU1;                      !- Zone Terminal Unit Name 1",
+
+        "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,",
+        "  TU1,                      !- Zone Terminal Unit Name",
+        "  VRFAvailSched,            !- Terminal Unit Availability Schedule",
+        "  TU1 Inlet Node,           !- Terminal Unit Air Inlet Node Name",
+        "  TU1 Outlet Node,          !- Terminal Unit Air Outlet Node Name",
+        "  autosize,                 !- Supply Air Flow Rate During Cooling Operation {m3/s}",
+        "  0,                        !- Supply Air Flow Rate When No Cooling is Needed {m3/s}",
+        "  autosize,                 !- Supply Air Flow Rate During Heating Operation {m3/s}",
+        "  0,                        !- Supply Air Flow Rate When No Heating is Needed {m3/s}",
+        "  0,                        !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
+        "  0,                        !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
+        "  0,                        !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+        "  VRFFanSchedule,           !- Supply Air Fan Operating Mode Schedule Name",
+        "  drawthrough,              !- Supply Air Fan Placement",
+        "  Fan:OnOff,                !- Supply Air Fan Object Type",
+        "  TU1 VRF Supply Fan,       !- Supply Air Fan Object Name",
+        "  OutdoorAir:Mixer,         !- Outside Air Mixer Object Type",
+        "  TU1 OA Mixer,             !- Outside Air Mixer Object Name",
+        "  COIL:Cooling:DX:VariableRefrigerantFlow,  !- Cooling Coil Object Type",
+        "  TU1 VRF DX Cooling Coil,  !- Cooling Coil Object Name",
+        "  COIL:Heating:DX:VariableRefrigerantFlow,  !- Heating Coil Object Type",
+        "  TU1 VRF DX Heating Coil,  !- Heating Coil Object Name",
+        "  30,                       !- Zone Terminal Unit On Parasitic Electric Energy Use {W}",
+        "  20;                       !- Zone Terminal Unit Off Parasitic Electric Energy Use{ W }",
+
+        "Fan:OnOff,",
+        "  TU1 VRF Supply Fan,       !- Name",
+        "  VRFAvailSched,            !- Availability Schedule Name",
+        "  0.7,                      !- Fan Total Efficiency",
+        "  600.0,                    !- Pressure Rise{ Pa }",
+        "  autosize,                 !- Maximum Flow Rate{ m3 / s }",
+        "  0.9,                      !- Motor Efficiency",
+        "  1.0,                      !- Motor In Airstream Fraction",
+        "  TU1 VRF DX HCoil Outlet Node, !- Air Inlet Node Name",
+        "  TU1 Outlet Node,          !- Air Outlet Node Name",
+        // Important to have curves here
+        "  Fan Power Ratio Curve,    !- Fan Power Ratio Function of Speed Ratio Curve Name",
+        "  Fan Efficiency Ratio Curve,  !- Fan Efficiency Ratio Function of Speed Ratio Curve Name",
+        "  General;                 !- End-Use Subcategory",
+
+        "Curve:Cubic,",
+        "  Fan Efficiency Ratio Curve,  !- Name",
+        "  1,                       !- Coefficient1 Constant",
+        "  0,                       !- Coefficient2 x",
+        "  0,                       !- Coefficient3 x**2",
+        "  0,                       !- Coefficient4 x**3",
+        "  0,                       !- Minimum Value of x",
+        "  1.2,                     !- Maximum Value of x",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Dimensionless,           !- Input Unit Type for X",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Exponent,",
+        "  Fan Power Ratio Curve,   !- Name",
+        "  0,                       !- Coefficient1 Constant",
+        "  1,                       !- Coefficient2 Constant",
+        "  3,                       !- Coefficient3 Constant",
+        "  0,                       !- Minimum Value of x",
+        "  1.2,                     !- Maximum Value of x",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Dimensionless,           !- Input Unit Type for X",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "OutdoorAir:Mixer,",
+        "  TU1 OA Mixer,             !- Name",
+        "  TU1 VRF DX CCoil Inlet Node, !- Mixed Air Node Name",
+        "  Outside Air Inlet Node 1, !- Outdoor Air Stream Node Name",
+        "  Relief Air Outlet Node 1, !- Relief Air Stream Node Name",
+        "  TU1 Inlet Node;           !- Return Air Stream Node Name",
+
+        "OutdoorAir:NodeList,",
+        "  OutsideAirInletNodes;     !- Node or NodeList Name 1",
+
+        "NodeList,",
+        "  OutsideAirInletNodes, !- Name",
+        "  Outside Air Inlet Node 1, !- Node 1 Name",
+        "  MyVRFOANode;  !- Node 1 Name",
+
+        "COIL:Cooling:DX:VariableRefrigerantFlow,",
+        "  TU1 VRF DX Cooling Coil, !- Name",
+        "  VRFAvailSched,           !- Availability Schedule Name",
+        "  autosize,                !- Gross Rated Total Cooling Capacity {W}",
+        "  autosize,                !- Gross Rated Sensible Heat Ratio",
+        "  autosize,                !- Rated Air Flow Rate {m3/s}",
+        "  VRFTUCoolCapFT,          !- Cooling Capacity Ratio Modifier Function of Temperature Curve Name",
+        "  VRFACCoolCapFFF,         !- Cooling Capacity Modifier Curve Function of Flow Fraction Name",
+        "  TU1 VRF DX CCoil Inlet Node,  !- Coil Air Inlet Node",
+        "  TU1 VRF DX CCoil Outlet Node,  !- Coil Air Outlet Node",
+        "  ;                        !- Name of Water Storage Tank for Condensate Collection",
+
+        "COIL:Heating:DX:VariableRefrigerantFlow,",
+        "  TU1 VRF DX Heating Coil, !- Name",
+        "  VRFAvailSched,           !- Availability Schedule",
+        "  autosize,                !- Gross Rated Heating Capacity {W}",
+        "  autosize,                !- Rated Air Flow Rate {m3/s}",
+        "  TU1 VRF DX CCoil Outlet Node,  !- Coil Air Inlet Node",
+        "  TU1 VRF DX HCoil Outlet Node,  !- Coil Air Outlet Node",
+        "  VRFTUHeatCapFT,          !- Heating Capacity Ratio Modifier Function of Temperature Curve Name",
+        "  VRFACCoolCapFFF;         !- Heating Capacity Modifier Function of Flow Fraction Curve Name",
+
+        "ScheduleTypeLimits,",
+        "  Any Number;              !- Name",
+
+        "Schedule:Compact,",
+        "  VRFAvailSched,           !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        "  Through: 12/31,           !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,1.0;        !- Field 3",
+
+        "Schedule:Compact,",
+        "  VRFCondAvailSched,       !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,1.0;        !- Field 3",
+
+        "Schedule:Compact,",
+        "  VRFFanSchedule,          !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,1.0;        !- Field 3",
+
+        "Curve:Biquadratic,",
+        "  VRFCoolCapFT,            !- Name",
+        "  0.576882692,             !- Coefficient1 Constant",
+        "  0.017447952,             !- Coefficient2 x",
+        "  0.000583269,             !- Coefficient3 x**2",
+        "  -1.76324E-06,            !- Coefficient4 y",
+        "  -7.474E-09,              !- Coefficient5 y**2",
+        "  -1.30413E-07,            !- Coefficient6 x*y",
+        "  15,                      !- Minimum Value of x",
+        "  24,                      !- Maximum Value of x",
+        "  -5,                      !- Minimum Value of y",
+        "  23,                      !- Maximum Value of y",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature,             !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Cubic,",
+        "  VRFCoolCapFTBoundary,    !- Name",
+        "  25.73473775,             !- Coefficient1 Constant",
+        "  -0.03150043,             !- Coefficient2 x",
+        "  -0.01416595,             !- Coefficient3 x**2",
+        "  0,                       !- Coefficient4 x**3",
+        "  11,                      !- Minimum Value of x",
+        "  30,                      !- Maximum Value of x",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature;             !- Output Unit Type",
+
+        "Curve:Biquadratic,",
+        "  VRFCoolCapFTHi,          !- Name",
+        "  0.6867358,               !- Coefficient1 Constant",
+        "  0.0207631,               !- Coefficient2 x",
+        "  0.0005447,               !- Coefficient3 x**2",
+        "  -0.0016218,              !- Coefficient4 y",
+        "  -4.259E-07,              !- Coefficient5 y**2",
+        "  -0.0003392,              !- Coefficient6 x*y",
+        "  15,                      !- Minimum Value of x",
+        "  24,                      !- Maximum Value of x",
+        "  16,                      !- Minimum Value of y",
+        "  43,                      !- Maximum Value of y",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature,             !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Biquadratic,",
+        "  VRFCoolEIRFT,            !- Name",
+        "  0.989010541,             !- Coefficient1 Constant",
+        "  -0.02347967,             !- Coefficient2 x",
+        "  0.000199711,             !- Coefficient3 x**2",
+        "  0.005968336,             !- Coefficient4 y",
+        "  -1.0289E-07,             !- Coefficient5 y**2",
+        "  -0.00015686,             !- Coefficient6 x*y",
+        "  15,                      !- Minimum Value of x",
+        "  24,                      !- Maximum Value of x",
+        "  -5,                      !- Minimum Value of y",
+        "  23,                      !- Maximum Value of y",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature,             !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Cubic,",
+        "  VRFCoolEIRFTBoundary,    !- Name",
+        "  25.73473775,             !- Coefficient1 Constant",
+        "  -0.03150043,             !- Coefficient2 x",
+        "  -0.01416595,             !- Coefficient3 x**2",
+        "  0,                       !- Coefficient4 x**3",
+        "  15,                      !- Minimum Value of x",
+        "  24,                      !- Maximum Value of x",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature;             !- Output Unit Type",
+
+        "Curve:Biquadratic,",
+        "  VRFCoolEIRFTHi,          !- Name",
+        "  0.14351470,              !- Coefficient1 Constant",
+        "  0.01860035,              !- Coefficient2 x",
+        "  -0.0003954,              !- Coefficient3 x**2",
+        "  0.02485219,              !- Coefficient4 y",
+        "  0.00016329,              !- Coefficient5 y**2",
+        "  -0.0006244,              !- Coefficient6 x*y",
+        "  15,                      !- Minimum Value of x",
+        "  24,                      !- Maximum Value of x",
+        "  16,                      !- Minimum Value of y",
+        "  43,                      !- Maximum Value of y",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature,             !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Cubic,",
+        "  CoolingEIRLowPLR,        !- Name",
+        "  0.4628123,               !- Coefficient1 Constant",
+        "  -1.0402406,              !- Coefficient2 x",
+        "  2.17490997,              !- Coefficient3 x**2",
+        "  -0.5974817,              !- Coefficient4 x**3",
+        "  0,                       !- Minimum Value of x",
+        "  1,                       !- Maximum Value of x",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature;             !- Output Unit Type",
+
+        "Curve:Quadratic,",
+        "  CoolingEIRHiPLR,         !- Name",
+        "  1.0,                     !- Coefficient1 Constant",
+        "  0.0,                     !- Coefficient2 x",
+        "  0.0,                     !- Coefficient3 x**2",
+        "  1.0,                     !- Minimum Value of x",
+        "  1.5,                     !- Maximum Value of x",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Dimensionless,           !- Input Unit Type for X",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Linear,",
+        "  CoolingCombRatio,        !- Name",
+        "  0.618055,                !- Coefficient1 Constant",
+        "  0.381945,                !- Coefficient2 x",
+        "  1.0,                     !- Minimum Value of x",
+        "  1.5,                     !- Maximum Value of x",
+        "  1.0,                     !- Minimum Curve Output",
+        "  1.2,                     !- Maximum Curve Output",
+        "  Dimensionless,           !- Input Unit Type for X",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "CURVE:QUADRATIC,",
+        "  VRFCPLFFPLR,             !- Name",
+        "  0.85,                    !- Coefficient1 Constant",
+        "  0.15,                    !- Coefficient2 x",
+        "  0.0,                     !- Coefficient3 x**2",
+        "  0.0,                     !- Minimum Value of x",
+        "  1.0,                     !- Maximum Value of x",
+        "  0.85,                    !- Minimum Curve Output",
+        "  1.0,                     !- Maximum Curve Output",
+        "  Dimensionless,           !- Input Unit Type for X",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Biquadratic,",
+        "  VRFHeatCapFT,            !- Name",
+        "  1.014599599,             !- Coefficient1 Constant",
+        "  -0.002506703,            !- Coefficient2 x",
+        "  -0.000141599,            !- Coefficient3 x**2",
+        "  0.026931595,             !- Coefficient4 y",
+        "  1.83538E-06,             !- Coefficient5 y**2",
+        "  -0.000358147,            !- Coefficient6 x*y",
+        "  15,                      !- Minimum Value of x",
+        "  27,                      !- Maximum Value of x",
+        "  -20,                     !- Minimum Value of y",
+        "  15,                      !- Maximum Value of y",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature,             !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Cubic,",
+        "  VRFHeatCapFTBoundary,    !- Name",
+        "  -7.6000882,              !- Coefficient1 Constant",
+        "  3.05090016,              !- Coefficient2 x",
+        "  -0.1162844,              !- Coefficient3 x**2",
+        "  0.0,                     !- Coefficient4 x**3",
+        "  15,                      !- Minimum Value of x",
+        "  27,                      !- Maximum Value of x",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature;             !- Output Unit Type",
+
+        "Curve:Biquadratic,",
+        "  VRFHeatCapFTHi,          !- Name",
+        "  1.161134821,             !- Coefficient1 Constant",
+        "  0.027478868,             !- Coefficient2 x",
+        "  -0.00168795,             !- Coefficient3 x**2",
+        "  0.001783378,             !- Coefficient4 y",
+        "  2.03208E-06,             !- Coefficient5 y**2",
+        "  -6.8969E-05,             !- Coefficient6 x*y",
+        "  15,                      !- Minimum Value of x",
+        "  27,                      !- Maximum Value of x",
+        "  -10,                     !- Minimum Value of y",
+        "  15,                      !- Maximum Value of y",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature,             !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Biquadratic,",
+        "  VRFHeatEIRFT,            !- Name",
+        "  0.87465501,              !- Coefficient1 Constant",
+        "  -0.01319754,             !- Coefficient2 x",
+        "  0.00110307,              !- Coefficient3 x**2",
+        "  -0.0133118,              !- Coefficient4 y",
+        "  0.00089017,              !- Coefficient5 y**2",
+        "  -0.00012766,             !- Coefficient6 x*y",
+        "  15,                      !- Minimum Value of x",
+        "  27,                      !- Maximum Value of x",
+        "  -20,                     !- Minimum Value of y",
+        "  12,                      !- Maximum Value of y",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature,             !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Cubic,",
+        "  VRFHeatEIRFTBoundary,    !- Name",
+        "  -7.6000882,              !- Coefficient1 Constant",
+        "  3.05090016,              !- Coefficient2 x",
+        "  -0.1162844,              !- Coefficient3 x**2",
+        "  0.0,                     !- Coefficient4 x**3",
+        "  15,                      !- Minimum Value of x",
+        "  27,                      !- Maximum Value of x",
+        "  -20,                     !- Minimum Curve Output",
+        "  15,                      !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature;             !- Output Unit Type",
+
+        "Curve:Biquadratic,",
+        "  VRFHeatEIRFTHi,          !- Name",
+        "  2.504005146,             !- Coefficient1 Constant",
+        "  -0.05736767,             !- Coefficient2 x",
+        "  4.07336E-05,             !- Coefficient3 x**2",
+        "  -0.12959669,             !- Coefficient4 y",
+        "  0.00135839,              !- Coefficient5 y**2",
+        "  0.00317047,              !- Coefficient6 x*y",
+        "  15,                      !- Minimum Value of x",
+        "  27,                      !- Maximum Value of x",
+        "  -10,                     !- Minimum Value of y",
+        "  15,                      !- Maximum Value of y",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature,             !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Cubic,",
+        "  HeatingEIRLowPLR,        !- Name",
+        "  0.1400093,               !- Coefficient1 Constant",
+        "  0.6415002,               !- Coefficient2 x",
+        "  0.1339047,               !- Coefficient3 x**2",
+        "  0.0845859,               !- Coefficient4 x**3",
+        "  0,                       !- Minimum Value of x",
+        "  1,                       !- Maximum Value of x",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Dimensionless,           !- Input Unit Type for X",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Quadratic,",
+        "  HeatingEIRHiPLR,         !- Name",
+        "  2.4294355,               !- Coefficient1 Constant",
+        "  -2.235887,               !- Coefficient2 x",
+        "  0.8064516,               !- Coefficient3 x**2",
+        "  1.0,                     !- Minimum Value of x",
+        "  1.5,                     !- Maximum Value of x",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Dimensionless,           !- Input Unit Type for X",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Linear,",
+        "  HeatingCombRatio,        !- Name",
+        "  0.96034,                 !- Coefficient1 Constant",
+        "  0.03966,                 !- Coefficient2 x",
+        "  1.0,                     !- Minimum Value of x",
+        "  1.5,                     !- Maximum Value of x",
+        "  1.0,                     !- Minimum Curve Output",
+        "  1.023,                   !- Maximum Curve Output",
+        "  Dimensionless,           !- Input Unit Type for X",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Biquadratic,",
+        "  CoolingLengthCorrectionFactor,  !- Name",
+        "  1.0693794,               !- Coefficient1 Constant",
+        "  -0.0014951,              !- Coefficient2 x",
+        "  2.56E-06,                !- Coefficient3 x**2",
+        "  -0.1151104,              !- Coefficient4 y",
+        "  0.0511169,               !- Coefficient5 y**2",
+        "  -0.0004369,              !- Coefficient6 x*y",
+        "  8,                       !- Minimum Value of x",
+        "  175,                     !- Maximum Value of x",
+        "  0.5,                     !- Minimum Value of y",
+        "  1.5,                     !- Maximum Value of y",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature,             !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Cubic,",
+        "  VRFTUCoolCapFT,          !- Name",
+        "  0.504547273506488,       !- Coefficient1 Constant",
+        "  0.0288891279198444,      !- Coefficient2 x",
+        "  -0.000010819418650677,   !- Coefficient3 x**2",
+        "  0.0000101359395177008,   !- Coefficient4 x**3",
+        "  0.0,                     !- Minimum Value of x",
+        "  50.0,                    !- Maximum Value of x",
+        "  0.5,                     !- Minimum Curve Output",
+        "  1.5,                     !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Quadratic,",
+        "  VRFACCoolCapFFF,         !- Name",
+        "  0.8,                     !- Coefficient1 Constant",
+        "  0.2,                     !- Coefficient2 x",
+        "  0.0,                     !- Coefficient3 x**2",
+        "  0.5,                     !- Minimum Value of x",
+        "  1.5;                     !- Maximum Value of x",
+
+        "Curve:Cubic,",
+        "  VRFTUHeatCapFT,          !- Name",
+        "  -0.390708928227928,      !- Coefficient1 Constant",
+        "  0.261815023760162,       !- Coefficient2 x",
+        "  -0.0130431603151873,     !- Coefficient3 x**2",
+        "  0.000178131745997821,    !- Coefficient4 x**3",
+        "  0.0,                     !- Minimum Value of x",
+        "  50.0,                    !- Maximum Value of x",
+        "  0.5,                     !- Minimum Curve Output",
+        "  1.5,                     !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Dimensionless;           !- Output Unit Type",
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    CurveManager::GetCurveInput();
 
-    int VRFCond = 1;
-    VRF.allocate(1);
-    VRF(VRFCond).CondenserNodeNum = 0;
-    VRF(VRFCond).CondenserType = 1; // DataHVACGlobals::AirCooled
-    VRF(VRFCond).ZoneTUListPtr = 1;
-    VRF(VRFCond).CoolingCapacity = 20000.0;
-    VRF(VRFCond).HeatingCapacity = 20000.0;
-    VRF(VRFCond).CoolingCOP = 3.0;
-    VRF(VRFCond).HeatingCOP = 3.0;
-    VRF(VRFCond).RatedCoolingPower = VRF(VRFCond).CoolingCapacity / VRF(VRFCond).CoolingCOP;
-    VRF(VRFCond).RatedHeatingPower = VRF(VRFCond).HeatingCapacity / VRF(VRFCond).HeatingCOP;
-    VRF(VRFCond).PipingCorrectionCooling = 1.0;
-    VRF(VRFCond).PipingCorrectionHeating = 1.0;
-    VRF(VRFCond).CoolCapFT = 1;
-    VRF(VRFCond).CoolEIRFT = 1;
-    VRF(VRFCond).CoolEIRFPLR1 = 2;
-    VRF(VRFCond).HeatEIRFPLR1 = 2;
-    CoolCombinationRatio.allocate(1);
-    CoolCombinationRatio(VRFCond) = 1.0;
-    HeatCombinationRatio.allocate(1);
-    HeatCombinationRatio(VRFCond) = 1.0;
-    LastModeCooling.allocate(1);
-    LastModeHeating.allocate(1);
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataSize->CurZoneEqNum = 1;
+    state->dataEnvrn->OutBaroPress = 101325;            // sea level
+    state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
+    state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataAirLoop->AirLoopInputsFilled = true;
+    state->dataSize->ZoneSizingRunDone = true;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
 
-    TerminalUnitList.allocate(1);
-    TerminalUnitList(1).NumTUInList = 5;
-    TerminalUnitList(1).TotalCoolLoad.allocate(5);
-    TerminalUnitList(1).TotalHeatLoad.allocate(5);
-    TerminalUnitList(1).ZoneTUPtr.allocate(5);
-    TerminalUnitList(1).HRCoolRequest.allocate(5);
-    TerminalUnitList(1).HRHeatRequest.allocate(5);
-    TerminalUnitList(1).HRCoolRequest = false;
-    TerminalUnitList(1).HRHeatRequest = false;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    ProcessScheduleInput(*state);
+    GetCurveInput(*state);
+    GetZoneData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    // get zone input and connections
+    GetZoneEquipmentData(*state);
+    ZoneInletAirNode = GetVRFTUZoneInletAirNode(*state, VRFTUNum);
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRF(VRFCond).SchedPtr).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 0.0;
+    // set the zone cooling and heat requirements
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = -5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = -5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0;
 
-    TerminalUnitList(1).CoolingCoilAvailable.allocate(5);
-    TerminalUnitList(1).HeatingCoilAvailable.allocate(5);
-    // all TU coils are available
-    TerminalUnitList(1).CoolingCoilAvailable = true;
-    TerminalUnitList(1).HeatingCoilAvailable = true;
+    auto &thisZoneEquip(state->dataZoneEquip->ZoneEquipConfig(state->dataGlobal->NumOfZones));
+    // set zone air node properties
+    state->dataLoopNodes->Node(thisZoneEquip.ZoneNode).Temp = 24.0;
+    state->dataLoopNodes->Node(thisZoneEquip.ZoneNode).HumRat = 0.0075;
+    state->dataLoopNodes->Node(thisZoneEquip.ZoneNode).Enthalpy = Psychrometrics::PsyHFnTdbW(
+        state->dataLoopNodes->Node(thisZoneEquip.ZoneNode).Temp, state->dataLoopNodes->Node(thisZoneEquip.ZoneNode).HumRat);
 
-    CoolingLoad.allocate(1);
-    HeatingLoad.allocate(1);
-    CoolingLoad(VRFCond) = false;
-    HeatingLoad(VRFCond) = false;
-    LastModeCooling(VRFCond) = false;
-    LastModeHeating(VRFCond) = false;
+    auto &thisVRFTU(state->dataHVACVarRefFlow->VRFTU(1));
+    state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Temp = 24.0;
+    state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).HumRat = 0.0075;
+    state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(
+        state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Temp, state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).HumRat);
+    state->dataLoopNodes->Node(thisVRFTU.ZoneAirNode).Temp = 24.0;
+    state->dataLoopNodes->Node(thisVRFTU.ZoneAirNode).HumRat = 0.0075;
+    state->dataLoopNodes->Node(thisVRFTU.ZoneAirNode).Enthalpy = Psychrometrics::PsyHFnTdbW(
+        state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Temp, state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).HumRat);
 
-    DXCoilCoolInletAirWBTemp.allocate(10);
-    DXCoilHeatInletAirDBTemp.allocate(10);
-    DXCoilHeatInletAirWBTemp.allocate(10);
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutHumRat = 0.0100;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->WindSpeed = 5.0;
+    state->dataEnvrn->WindDir = 0.0;
 
-    VRFTU.allocate(5);
-    for (int NumTU = 1; NumTU <= TerminalUnitList(1).NumTUInList; ++NumTU) {
-        VRFTU(NumTU).CoolCoilIndex = NumTU;
-        VRFTU(NumTU).HeatCoilIndex = TerminalUnitList(1).NumTUInList + NumTU;
-        TerminalUnitList(1).ZoneTUPtr(NumTU) = NumTU;
-        // initialize DX coil inlet conditions
-        DXCoilCoolInletAirWBTemp(NumTU) = 19.4;
-        DXCoilHeatInletAirDBTemp(TerminalUnitList(1).NumTUInList + NumTU) = 20.0;
-        DXCoilHeatInletAirWBTemp(TerminalUnitList(1).NumTUInList + NumTU) = 17.0;
-    }
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak =
+        state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).Temp;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak =
+        state->dataLoopNodes->Node(thisVRFTU.VRFTUInletNodeNum).HumRat;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum = 1;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax = 1;
+    state->dataSize->DesDayWeath.allocate(1);
+    state->dataSize->DesDayWeath(1).Temp.allocate(1);
+    state->dataSize->DesDayWeath(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum)
+        .Temp(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax) = state->dataEnvrn->OutDryBulbTemp;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.1;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0095;
+    // set pointer to components
+    auto &thisFan(state->dataFans->Fan(1));
+    auto &thisDXCoolingCoil(state->dataDXCoils->DXCoil(1));
+    auto &thisDXHeatingCoil(state->dataDXCoils->DXCoil(2));
+    // run the model
+    bool HeatingActive = false;
+    bool CoolingActive = false;
+    int OAUnitNum = 0;
+    Real64 OAUCoilOutTemp = 0.0;
+    bool ZoneEquipment = true;
 
-    // set up environment
-    DataGlobals::DayOfSim = 1;
-    DataGlobals::CurrentTime = 0.25;
-    DataGlobals::TimeStepZone = 0.25;
-    DataHVACGlobals::SysTimeElapsed = 0.0;
-    DataEnvironment::OutDryBulbTemp = 35.0;
-    DataEnvironment::OutHumRat = 0.01;
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutWetBulbTemp = 21.1340575;
+    SimulateVRF(*state,
+                state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
+                FirstHVACIteration,
+                CurZoneNum,
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
+                HeatingActive,
+                CoolingActive,
+                OAUnitNum,
+                OAUCoilOutTemp,
+                ZoneEquipment,
+                SysOutputProvided,
+                LatOutputProvided);
 
-    // TU's are off
-    TerminalUnitList(1).TotalCoolLoad(1) = 0.0;
-    TerminalUnitList(1).TotalCoolLoad(2) = 0.0;
-    TerminalUnitList(1).TotalCoolLoad(3) = 0.0;
-    TerminalUnitList(1).TotalCoolLoad(4) = 0.0;
-    TerminalUnitList(1).TotalCoolLoad(5) = 0.0;
-    TerminalUnitList(1).TotalHeatLoad(1) = 0.0;
-    TerminalUnitList(1).TotalHeatLoad(2) = 0.0;
-    TerminalUnitList(1).TotalHeatLoad(3) = 0.0;
-    TerminalUnitList(1).TotalHeatLoad(4) = 0.0;
-    TerminalUnitList(1).TotalHeatLoad(5) = 0.0;
-
-    CalcVRFCondenser(VRFCond, false);
-
-    EXPECT_DOUBLE_EQ(VRF(VRFCond).ElecCoolingPower, 0.0);
-    EXPECT_DOUBLE_EQ(VRF(VRFCond).ElecHeatingPower, 0.0);
-    EXPECT_DOUBLE_EQ(VRF(VRFCond).CrankCaseHeaterPower, 0.0);
-    EXPECT_DOUBLE_EQ(VRF(VRFCond).EvapCondPumpElecPower, 0.0);
-    EXPECT_DOUBLE_EQ(VRF(VRFCond).EvapWaterConsumpRate, 0.0);
-    EXPECT_DOUBLE_EQ(VRF(VRFCond).DefrostPower, 0.0);
-    EXPECT_DOUBLE_EQ(VRF(VRFCond).OperatingCoolingCOP, 0.0);
-    EXPECT_DOUBLE_EQ(VRF(VRFCond).OperatingHeatingCOP, 0.0);
-    EXPECT_DOUBLE_EQ(VRF(VRFCond).OperatingCOP, 0.0);
-    EXPECT_DOUBLE_EQ(VRF(VRFCond).SCHE, 0.0);
-    EXPECT_DOUBLE_EQ(VRF(VRFCond).BasinHeaterPower, 0.0);
-    EXPECT_DOUBLE_EQ(VRF(VRFCond).SUMultiplier, 0.0);
-    EXPECT_DOUBLE_EQ(VRF(VRFCond).VRFCondPLR, 0.0);
-    EXPECT_DOUBLE_EQ(VRF(VRFCond).VRFCondRTF, 0.0);
-    EXPECT_DOUBLE_EQ(VRF(VRFCond).VRFCondCyclingRatio, 0.0);
-    EXPECT_DOUBLE_EQ(VRF(VRFCond).QCondEnergy, 0.0);
-    EXPECT_DOUBLE_EQ(VRF(VRFCond).TotalCoolingCapacity, 0.0);
-    EXPECT_DOUBLE_EQ(VRF(VRFCond).TotalHeatingCapacity, 0.0);
-    EXPECT_DOUBLE_EQ(VRF(VRFCond).OperatingMode, 0.0);
-    EXPECT_FALSE(VRF(VRFCond).HRHeatingActive);
-    EXPECT_FALSE(VRF(VRFCond).HRCoolingActive);
-
-    // TU's are in cooling mode only
-    CoolingLoad(VRFCond) = true;
-    LastModeCooling(VRFCond) = true;
-    LastModeHeating(VRFCond) = false;
-    TerminalUnitList(1).TotalCoolLoad(1) = 1000.0;
-    TerminalUnitList(1).TotalCoolLoad(2) = 1000.0;
-    TerminalUnitList(1).TotalCoolLoad(3) = 1000.0;
-    TerminalUnitList(1).TotalCoolLoad(4) = 1000.0;
-    TerminalUnitList(1).TotalCoolLoad(5) = 1000.0;
-
-    CalcVRFCondenser(VRFCond, false);
-    EXPECT_FALSE(VRF(VRFCond).HRHeatingActive);
-    EXPECT_FALSE(VRF(VRFCond).HRCoolingActive);
-    EXPECT_EQ(VRF(VRFCond).TotalCoolingCapacity, 5000.0);
-    EXPECT_EQ(VRF(VRFCond).TUCoolingLoad, 5000.0);
-    EXPECT_EQ(VRF(VRFCond).TotalHeatingCapacity, 0.0);
-    EXPECT_EQ(VRF(VRFCond).TUHeatingLoad, 0.0);
-    EXPECT_EQ(VRF(VRFCond).VRFCondPLR, 0.25);
-    EXPECT_EQ(VRF(VRFCond).VRFCondRTF, 1.0); // unit is not cycling below min PLR
-    EXPECT_EQ(VRF(VRFCond).SUMultiplier, 1.0);
-    EXPECT_FALSE(VRF(VRFCond).ModeChange);
-    EXPECT_FALSE(VRF(VRFCond).HRModeChange);
-    EXPECT_EQ(VRF(VRFCond).ElecCoolingPower, VRF(VRFCond).RatedCoolingPower * VRF(VRFCond).VRFCondPLR);
-    EXPECT_EQ(VRF(VRFCond).ElecHeatingPower, 0.0);
-
-    // TU's are in heating mode only
-    CoolingLoad(VRFCond) = false;
-    HeatingLoad(VRFCond) = true;
-    LastModeCooling(VRFCond) = false;
-    LastModeHeating(VRFCond) = true;
-    TerminalUnitList(1).TotalCoolLoad(1) = 0.0;
-    TerminalUnitList(1).TotalCoolLoad(2) = 0.0;
-    TerminalUnitList(1).TotalCoolLoad(3) = 0.0;
-    TerminalUnitList(1).TotalCoolLoad(4) = 0.0;
-    TerminalUnitList(1).TotalCoolLoad(5) = 0.0;
-    TerminalUnitList(1).TotalHeatLoad(1) = 1000.0;
-    TerminalUnitList(1).TotalHeatLoad(2) = 1000.0;
-    TerminalUnitList(1).TotalHeatLoad(3) = 1000.0;
-    TerminalUnitList(1).TotalHeatLoad(4) = 1000.0;
-    TerminalUnitList(1).TotalHeatLoad(5) = 1000.0;
-
-    CalcVRFCondenser(VRFCond, false);
-    EXPECT_FALSE(VRF(VRFCond).HRHeatingActive);
-    EXPECT_FALSE(VRF(VRFCond).HRCoolingActive);
-    EXPECT_EQ(VRF(VRFCond).TotalCoolingCapacity, 0.0);
-    EXPECT_EQ(VRF(VRFCond).TUCoolingLoad, 0.0);
-    EXPECT_EQ(VRF(VRFCond).TotalHeatingCapacity, 5000.0);
-    EXPECT_EQ(VRF(VRFCond).TUHeatingLoad, 5000.0);
-    EXPECT_EQ(VRF(VRFCond).VRFCondPLR, 0.25);
-    EXPECT_EQ(VRF(VRFCond).VRFCondRTF, 1.0); // unit is not cycling below min PLR
-    EXPECT_EQ(VRF(VRFCond).SUMultiplier, 1.0);
-    EXPECT_FALSE(VRF(VRFCond).ModeChange);
-    EXPECT_FALSE(VRF(VRFCond).HRModeChange);
-    EXPECT_EQ(VRF(VRFCond).ElecCoolingPower, 0.0);
-    EXPECT_EQ(VRF(VRFCond).ElecHeatingPower, VRF(VRFCond).RatedHeatingPower * VRF(VRFCond).VRFCondPLR);
-
-    // increment time step
-    DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 0.5
-    // set TU's to request both cooling and heating
-    TerminalUnitList(1).TotalCoolLoad(1) = 0.0;
-    TerminalUnitList(1).HRCoolRequest(1) = false;
-    TerminalUnitList(1).TotalCoolLoad(2) = 1000.0;
-    TerminalUnitList(1).HRCoolRequest(2) = true;
-    TerminalUnitList(1).TotalCoolLoad(3) = 0.0;
-    TerminalUnitList(1).HRCoolRequest(3) = false;
-    TerminalUnitList(1).TotalCoolLoad(4) = 1000.0;
-    TerminalUnitList(1).HRCoolRequest(4) = true;
-    TerminalUnitList(1).TotalCoolLoad(5) = 0.0;
-    TerminalUnitList(1).HRCoolRequest(5) = false;
-    TerminalUnitList(1).TotalHeatLoad(1) = 1000.0;
-    TerminalUnitList(1).HRHeatRequest(1) = true;
-    TerminalUnitList(1).TotalHeatLoad(2) = 0.0;
-    TerminalUnitList(1).HRHeatRequest(2) = false;
-    TerminalUnitList(1).TotalHeatLoad(3) = 1000.0;
-    TerminalUnitList(1).HRHeatRequest(3) = true;
-    TerminalUnitList(1).TotalHeatLoad(4) = 0.0;
-    TerminalUnitList(1).HRHeatRequest(4) = false;
-    TerminalUnitList(1).TotalHeatLoad(5) = 1000.0;
-    TerminalUnitList(1).HRHeatRequest(5) = true;
-    VRF(VRFCond).HeatRecoveryUsed = true;
-
-    // set heat recovery time constant to non-zero value (means mode change will degrade performance)
-    VRF(VRFCond).HRHeatCapTC = 0.25; // 15 min exponential rise
-    // last operating mode was heating
-    CalcVRFCondenser(VRFCond, false);
-    EXPECT_TRUE(VRF(VRFCond).HRHeatingActive);
-    EXPECT_FALSE(VRF(VRFCond).HRCoolingActive);
-    EXPECT_EQ(VRF(VRFCond).TotalCoolingCapacity, 0.0);
-    EXPECT_EQ(VRF(VRFCond).TUCoolingLoad, 2000.0);
-    EXPECT_EQ(VRF(VRFCond).TotalHeatingCapacity, 3000.0);
-    EXPECT_EQ(VRF(VRFCond).TUHeatingLoad, 3000.0);
-    EXPECT_NEAR(VRF(VRFCond).VRFCondPLR, 0.13636, 0.00001);
-    EXPECT_EQ(VRF(VRFCond).VRFCondRTF, 1.0); // unit is not cycling below min PLR
-    EXPECT_NEAR(VRF(VRFCond).SUMultiplier, 0.63212, 0.00001);
-    EXPECT_TRUE(VRF(VRFCond).ModeChange);
-    EXPECT_FALSE(VRF(VRFCond).HRModeChange);
-    EXPECT_EQ(VRF(VRFCond).ElecCoolingPower, 0.0);
-
-    // make adjustment for heat recovery startup degradation
-    Real64 HREIRFTConst = VRF(VRFCond).HRCAPFTHeatConst;
-    Real64 HRInitialEIRFrac = VRF(VRFCond).HRInitialHeatEIRFrac;
-    Real64 HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * VRF(VRFCond).SUMultiplier;
-
-    EXPECT_EQ(VRF(VRFCond).ElecHeatingPower, VRF(VRFCond).RatedHeatingPower * VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
-
-    // last operating mode was cooling should give same answer since TU heating request > TU cooling request * ( 1 + 1/COP)
-    CoolingLoad(VRFCond) = true;
-    HeatingLoad(VRFCond) = false;
-    LastModeCooling(VRFCond) = true;
-    LastModeHeating(VRFCond) = false;
-
-    DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 0.75 - CalcVRFCondenser saves last time stamp for use in exponential curve, increment by
-                                                           // 1 time step to get same answer
-    CalcVRFCondenser(VRFCond, false);
-    EXPECT_TRUE(VRF(VRFCond).HRHeatingActive);
-    EXPECT_FALSE(VRF(VRFCond).HRCoolingActive);
-    EXPECT_EQ(VRF(VRFCond).TotalCoolingCapacity, 0.0);
-    EXPECT_EQ(VRF(VRFCond).TUCoolingLoad, 2000.0);
-    EXPECT_EQ(VRF(VRFCond).TotalHeatingCapacity, 3000.0);
-    EXPECT_EQ(VRF(VRFCond).TUHeatingLoad, 3000.0);
-    EXPECT_NEAR(VRF(VRFCond).VRFCondPLR, 0.13636, 0.00001);
-    EXPECT_EQ(VRF(VRFCond).VRFCondRTF, 1.0); // unit is not cycling below min PLR
-    EXPECT_NEAR(VRF(VRFCond).SUMultiplier, 0.63212, 0.00001);
-    EXPECT_TRUE(VRF(VRFCond).ModeChange);
-    EXPECT_FALSE(VRF(VRFCond).HRModeChange);
-    EXPECT_EQ(VRF(VRFCond).ElecCoolingPower, 0.0);
-    EXPECT_EQ(VRF(VRFCond).ElecHeatingPower, VRF(VRFCond).RatedHeatingPower * VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
-    EXPECT_NEAR(HREIRAdjustment, 1.06321, 0.00001);
-
-    // simulate again and see that power has exponential changed from previous time step
-    DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 1.0
-    CoolingLoad(VRFCond) = false;
-    HeatingLoad(VRFCond) = true;
-    LastModeCooling(VRFCond) = false;
-    LastModeHeating(VRFCond) = true;
-
-    CalcVRFCondenser(VRFCond, false);
-
-    HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * VRF(VRFCond).SUMultiplier;
-
-    EXPECT_NEAR(VRF(VRFCond).SUMultiplier, 0.86466, 0.00001); // will exponentially rise towards 1.0
-    EXPECT_EQ(VRF(VRFCond).ElecHeatingPower, VRF(VRFCond).RatedHeatingPower * VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
-    EXPECT_NEAR(HREIRAdjustment, 1.08646, 0.00001); // will exponentially rise towards VRF( VRFCond ).HRCAPFTHeatConst = 1.1
-
-    // simulate again and see that power has exponential changed from previous time step
-    DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 1.25
-    CalcVRFCondenser(VRFCond, false);
-    HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * VRF(VRFCond).SUMultiplier;
-    EXPECT_NEAR(VRF(VRFCond).SUMultiplier, 0.95021, 0.00001); // will exponentially rise towards 1.0
-    EXPECT_EQ(VRF(VRFCond).ElecHeatingPower, VRF(VRFCond).RatedHeatingPower * VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
-    EXPECT_NEAR(HREIRAdjustment, 1.09502, 0.00001); // will exponentially rise towards VRF( VRFCond ).HRCAPFTHeatConst = 1.1
-
-    // simulate again and see that power has exponential changed from previous time step
-    DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 1.5
-    CalcVRFCondenser(VRFCond, false);
-    HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * VRF(VRFCond).SUMultiplier;
-    EXPECT_NEAR(VRF(VRFCond).SUMultiplier, 0.98168, 0.00001); // will exponentially rise towards 1.0
-    EXPECT_EQ(VRF(VRFCond).ElecHeatingPower, VRF(VRFCond).RatedHeatingPower * VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
-    EXPECT_NEAR(HREIRAdjustment, 1.09817, 0.00001); // will exponentially rise towards VRF( VRFCond ).HRCAPFTHeatConst = 1.1
-
-    // simulate again and see that power has exponential changed from previous time step
-    DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 1.75
-    CalcVRFCondenser(VRFCond, false);
-    HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * VRF(VRFCond).SUMultiplier;
-    EXPECT_NEAR(VRF(VRFCond).SUMultiplier, 1.0, 0.00001); // will exponentially rise towards 1.0
-    EXPECT_EQ(VRF(VRFCond).ElecHeatingPower, VRF(VRFCond).RatedHeatingPower * VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
-    EXPECT_NEAR(HREIRAdjustment, 1.1, 0.00001); // will exponentially rise towards VRF( VRFCond ).HRCAPFTHeatConst = 1.1
-
-    // at end of exponential decay (when SUMultiplier = 1), HREIRAdjustment = VRF( VRFCond ).HRCAPFTHeatConst
-    EXPECT_EQ(HREIRAdjustment, VRF(VRFCond).HRCAPFTHeatConst);
+    // check model inputs
+    ASSERT_EQ(1, state->dataHVACVarRefFlow->NumVRFCond);
+    ASSERT_EQ(1, state->dataHVACVarRefFlow->NumVRFTU);
+    ASSERT_EQ(1, state->dataFans->NumFans);
+    ASSERT_EQ(2, state->dataDXCoils->NumDXCoils);
+    ASSERT_EQ("TU1 VRF DX COOLING COIL", thisDXCoolingCoil.Name);
+    ASSERT_EQ("TU1 VRF DX HEATING COIL", thisDXHeatingCoil.Name);
+    // check if total cooling rate provided by the cooling coil matches
+    // sum of the cooling delivered by VRF ATU and fan power when no OA
+    EXPECT_EQ(0.0, thisVRFTU.CoolOutAirMassFlow);
+    EXPECT_EQ(0.0, thisVRFTU.HeatOutAirMassFlow);
+    EXPECT_EQ(0.0, thisVRFTU.NoCoolHeatOutAirMassFlow);
+    EXPECT_NEAR(5367.7328, thisDXCoolingCoil.TotalCoolingEnergyRate, 0.0001);
+    EXPECT_NEAR(4999.6942, thisVRFTU.TotalCoolingRate, 0.0001);
+    EXPECT_NEAR(368.0386, thisFan.FanPower, 0.0001);
+    EXPECT_NEAR(thisDXCoolingCoil.TotalCoolingEnergyRate, (thisVRFTU.TotalCoolingRate + thisFan.FanPower), 0.0001);
 }
-}
+
+} // end of namespace EnergyPlus

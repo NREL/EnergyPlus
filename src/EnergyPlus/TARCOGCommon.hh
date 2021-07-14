@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,60 +49,83 @@
 #define TARCOGCommon_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array2A.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/BITF.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/TARCOGParams.hh>
 
 namespace EnergyPlus {
 
+// Fwd decl
+struct EnergyPlusData;
+
 namespace TARCOGCommon {
 
-    // Functions
+    int constexpr NMAX(500);
 
-    bool IsShadingLayer(int const layertype);
+    constexpr bool IsShadingLayer(TARCOGParams::TARCOGLayerType const layertype)
+    {
+        // Using/Aliasing
+        using namespace TARCOGParams;
 
-    Real64 LDSumMax(Real64 const Width, Real64 const Height);
+        return BITF_TEST_ANY(BITF(layertype),
+                             BITF(TARCOGLayerType::VENETBLIND_HORIZ) | BITF(TARCOGLayerType::VENETBLIND_VERT) | BITF(TARCOGLayerType::WOVSHADE) |
+                                 BITF(TARCOGLayerType::PERFORATED) | BITF(TARCOGLayerType::BSDF) | BITF(TARCOGLayerType::DIFFSHADE));
+    }
 
-    Real64 LDSumMean(Real64 const Width, Real64 const Height);
+    Real64 LDSumMax(Real64 Width, Real64 Height);
 
-    void modifyHcGap(Array1<Real64> const &hcgap, // Convective coefficient for gap
-                     Array1<Real64> const &qv,    // Heat flow from ventilation [W/m2]
-                     Array1<Real64> const &hcv,   // Convective heat flow coefficient due to ventilation
-                     Array1<Real64> &hcgapMod,    // Modified heat flow coefficient for gap
-                     int const nlayer,            // Number of layers
-                     Real64 const edgeGlCorrFac   // Edge of glass correction factor
+    Real64 LDSumMean(Real64 Width, Real64 Height);
+
+    void modifyHcGap(Array1D<Real64> const &hcgap, // Convective coefficient for gap
+                     Array1D<Real64> const &qv,    // Heat flow from ventilation [W/m2]
+                     Array1D<Real64> const &hcv,   // Convective heat flow coefficient due to ventilation
+                     Array1D<Real64> &hcgapMod,    // Modified heat flow coefficient for gap
+                     int nlayer,                   // Number of layers
+                     Real64 edgeGlCorrFac          // Edge of glass correction factor
     );
 
-    void matrixQBalance(int const nlayer,
+    void matrixQBalance(int nlayer,
                         Array2<Real64> &a,
-                        Array1<Real64> &b,
-                        Array1<Real64> const &thick,
-                        Array1<Real64> const &hcgas,
-                        Array1<Real64> &hcgapMod,
-                        Array1<Real64> const &asol,
-                        Array1<Real64> const &qv,
-                        Array1<Real64> const &hcv,
-                        Real64 const Tin,
-                        Real64 const Tout,
-                        Real64 const Gin,
-                        Real64 const Gout,
-                        Array1<Real64> const &theta,
-                        Array1<Real64> const &tir,
-                        Array1<Real64> const &rir,
-                        Array1<Real64> const &emis,
-                        Real64 const edgeGlCorrFac);
+                        Array1D<Real64> &b,
+                        Array1D<Real64> const &thick,
+                        Array1D<Real64> const &hcgas,
+                        Array1D<Real64> &hcgapMod,
+                        Array1D<Real64> const &asol,
+                        Array1D<Real64> const &qv,
+                        Array1D<Real64> const &hcv,
+                        Real64 Tin,
+                        Real64 Tout,
+                        Real64 Gin,
+                        Real64 Gout,
+                        Array1D<Real64> const &theta,
+                        Array1D<Real64> const &tir,
+                        Array1D<Real64> const &rir,
+                        Array1D<Real64> const &emis,
+                        Real64 edgeGlCorrFac);
 
-    void EquationsSolver(Array2<Real64> &a, Array1<Real64> &b, int const n, int &nperr, std::string &ErrorMessage);
+    void EquationsSolver(EnergyPlusData &state, Array2<Real64> &a, Array1D<Real64> &b, int n, int &nperr, std::string &ErrorMessage);
 
-    void ludcmp(Array2<Real64> &a, int const n, Array1_int &indx, Real64 &d, int &nperr, std::string &ErrorMessage);
+    void ludcmp(EnergyPlusData &state, Array2<Real64> &a, int n, Array1D_int &indx, Real64 &d, int &nperr, std::string &ErrorMessage);
 
-    void lubksb(Array2A<Real64> const a, int const n, Array1A_int const indx, Array1A<Real64> b);
+    void lubksb(Array2A<Real64> a, int n, const Array1D_int &indx, Array1D<Real64> &b);
 
-    Real64 pos(Real64 const x);
+    Real64 pos(Real64 x);
 
 } // namespace TARCOGCommon
+
+struct TARCOGCommonData : BaseGlobalStruct
+{
+    Array1D<Real64> vv = Array1D<Real64>(TARCOGCommon::NMAX);
+
+    void clear_state() override
+    {
+        this->vv = Array1D<Real64>(TARCOGCommon::NMAX);
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -45,17 +45,17 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include "ConfiguredFunctions.hh"
+#include <EnergyPlus/ConfiguredFunctions.hh>
 #include <string>
 
 namespace EnergyPlus {
 
-std::string configured_source_directory()
+fs::path configured_source_directory()
 {
     return ("${CMAKE_SOURCE_DIR}");
 }
 
-std::string configured_build_directory()
+fs::path configured_build_directory()
 {
     return ("${CMAKE_BUILD_DIR}");
 }

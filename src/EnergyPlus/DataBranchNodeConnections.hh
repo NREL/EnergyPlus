@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,34 +52,14 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/NodeInputManager.hh>
 
 namespace EnergyPlus {
 
 namespace DataBranchNodeConnections {
-
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumCompSets;             // Number of Component Sets found in branches
-    extern int NumNodeConnectionErrors; // Count of node connection errors
-
-    extern int NumOfNodeConnections;
-    extern int MaxNumOfNodeConnections;
-    extern int NodeConnectionAlloc;
-    extern int NumOfActualParents;
-    extern int NumOfAirTerminalNodes;
-    extern int MaxNumOfAirTerminalNodes;
-    extern int EqNodeConnectionAlloc;
-
-    // Types
 
     struct ComponentListData
     {
@@ -102,16 +82,16 @@ namespace DataBranchNodeConnections {
     struct NodeConnectionDef
     {
         // Members
-        int NodeNumber;             // Node number of this node connection
-        std::string NodeName;       // Node Name of this node connection
-        std::string ObjectType;     // Object/Component Type of this node connection
-        std::string ObjectName;     // Name of the Object/Component Type of this node connection
-        std::string ConnectionType; // Connection Type (must be valid) for this node connection
-        int FluidStream;            // Fluid Stream for this node connection
-        bool ObjectIsParent;        // Indicator whether the object is a parent or not
+        int NodeNumber;                                // Node number of this node connection
+        std::string NodeName;                          // Node Name of this node connection
+        std::string ObjectType;                        // Object/Component Type of this node connection
+        std::string ObjectName;                        // Name of the Object/Component Type of this node connection
+        std::string ConnectionType;                    // Connection Type (must be valid) for this node connection
+        NodeInputManager::compFluidStream FluidStream; // Fluid Stream for this node connection
+        bool ObjectIsParent;                           // Indicator whether the object is a parent or not
 
         // Default Constructor
-        NodeConnectionDef() : NodeNumber(0), FluidStream(0), ObjectIsParent(false)
+        NodeConnectionDef() : NodeNumber(0), FluidStream(NodeInputManager::compFluidStream::Unassigned), ObjectIsParent(false)
         {
         }
     };
@@ -142,23 +122,48 @@ namespace DataBranchNodeConnections {
         std::string ConnectionType; // Connection Type (must be valid) for this node connection
 
         // Default Constructor
-        EqNodeConnectionDef()
-        {
-        }
+        EqNodeConnectionDef() = default;
     };
 
-    // Object Data
-    extern Array1D<ComponentListData> CompSets;
-    extern Array1D<ParentListData> ParentNodeList;
-    extern Array1D<NodeConnectionDef> NodeConnections;
-    extern Array1D<EqNodeConnectionDef> AirTerminalNodeConnections;
-    extern Array1D_bool NonConnectedNodes;
-
-    // Clears the global data in DataBranchNodeConnections.
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
-
 } // namespace DataBranchNodeConnections
+
+struct BranchNodeConnectionsData : BaseGlobalStruct
+{
+
+    int NumCompSets = 0;             // Number of Component Sets found in branches
+    int NumNodeConnectionErrors = 0; // Count of node connection errors
+    int NumOfNodeConnections = 0;
+    int MaxNumOfNodeConnections = 0;
+    int NodeConnectionAlloc = 1000;
+    int NumOfActualParents = 0;
+    int NumOfAirTerminalNodes = 0;
+    int MaxNumOfAirTerminalNodes = 0;
+    int EqNodeConnectionAlloc = 100;
+
+    Array1D<DataBranchNodeConnections::ComponentListData> CompSets;
+    Array1D<DataBranchNodeConnections::ParentListData> ParentNodeList;
+    Array1D<DataBranchNodeConnections::NodeConnectionDef> NodeConnections;
+    Array1D<DataBranchNodeConnections::EqNodeConnectionDef> AirTerminalNodeConnections;
+    Array1D_bool NonConnectedNodes;
+
+    void clear_state() override
+    {
+        this->NumCompSets = 0;
+        this->NumNodeConnectionErrors = 0;
+        this->NumOfNodeConnections = 0;
+        this->MaxNumOfNodeConnections = 0;
+        this->NodeConnectionAlloc = 1000;
+        this->NumOfActualParents = 0;
+        this->NumOfAirTerminalNodes = 0;
+        this->MaxNumOfAirTerminalNodes = 0;
+        this->EqNodeConnectionAlloc = 100;
+        this->CompSets.deallocate();
+        this->ParentNodeList.deallocate();
+        this->NodeConnections.deallocate();
+        this->AirTerminalNodeConnections.deallocate();
+        this->NonConnectedNodes.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

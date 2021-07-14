@@ -1,60 +1,72 @@
-# the only thing that really needs to be set outside of here is the XELATEX variable, the path to the xelatex compiler
+project(EnergyPlusDocs LANGUAGES NONE)
 
-# the root doc build directory will be created at configure time, but lets not copy anything over until build time.
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/doc-build)
+cmake_minimum_required(VERSION 3.12)
 
-# add a configure rule to the header file though
-configure_file(${CMAKE_SOURCE_DIR}/doc/header.tex ${CMAKE_BINARY_DIR}/doc-build/header.tex COPYONLY)
-configure_file(${CMAKE_SOURCE_DIR}/doc/title.tex.in ${CMAKE_BINARY_DIR}/doc-build/title.tex)
-configure_file(${CMAKE_SOURCE_DIR}/doc/index.html ${CMAKE_BINARY_DIR}/doc-build/index.html COPYONLY)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-# add each of the documents, they have their own CMakeLists.txt files
-add_subdirectory(acknowledgments)
-add_subdirectory(auxiliary-programs)
-add_subdirectory(ems-application-guide)
-add_subdirectory(engineering-reference)
-add_subdirectory(external-interfaces-application-guide)
-add_subdirectory(getting-started)
-add_subdirectory(input-output-reference)
-add_subdirectory(interface-developer)
-add_subdirectory(module-developer)
-add_subdirectory(output-details-and-examples)
-add_subdirectory(plant-application-guide)
-add_subdirectory(tips-and-tricks-using-energyplus)
-add_subdirectory(using-energyplus-for-compliance)
+if(NOT EXISTS ${Python_EXECUTABLE})
+  # If running docs standalone, Python isn't found yet.
+  find_package(Python 3.6 COMPONENTS Interpreter REQUIRED)
+endif()
 
-# we still need to find wkhtmltopdf and pandoc for building validation reports
-if (BUILD_VALIDATION_REPORTS)
+option(DOCS_TESTING "Test the docs for issues" OFF)
 
-  # wkhtmltopdf
-  if(MSVC)
-    find_program(WKHTMLTOPDF_EXECUTABLE
-      wkhtmltopdf
-      PATHS "C:/Program Files/wkhtmltopdf/bin" "C:/Program Files (x86)/wkhtmltopdf/bin")
+# this _should_ find the xelatex compiler, but for some reason it isn't populating for me
+find_package(LATEX)
+# so we'll create a cache variable which will be available to the add_subdirectory call below
+set(XELATEX
+    "XeLaTeX Compiler"
+    CACHE INTERNAL "")
+# and we'll simply take the found pdflatex compiler path and replace pdflatex with xelatex
+string(REPLACE pdflatex xelatex XELATEX ${PDFLATEX_COMPILER})
+# and then verify it actually exists at that location...which it should pretty much every time...
+set(TEX_INTERACTION
+    "batchmode"
+    CACHE STRING "Choose the interaction mode for TeX.")
+set_property(CACHE TEX_INTERACTION PROPERTY STRINGS "nonstopmode" "batchmode")
+if(EXISTS ${XELATEX})
+  # and if it does, just add the doc/CMakeLists commands
+  # let's create a folder to drop ONLY PDFs in once they are built, this will allow easy upload to s3
+  file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/pdf)
+  file(COPY ${PROJECT_SOURCE_DIR}/index.html DESTINATION ${PROJECT_BINARY_DIR}/pdf)
+
+  include("${PROJECT_SOURCE_DIR}/../cmake/Version.cmake")
+  # add a configure rule to the header file though
+  configure_file(${PROJECT_SOURCE_DIR}/title.tex.in ${PROJECT_SOURCE_DIR}/title.tex)
+
+  # Add custom target to build only documentation, this target will depend on all individual PDFs
+  get_directory_property(hasParent PARENT_DIRECTORY)
+  if(hasParent AND BUILD_DOCS_ONLY_WITH_PACKAGE)
+    # Because we don't want to rebuild doc automatically, we do not add it to the 'ALL' rule
+    message(STATUS "The target `docs` was added, but not to the default build rule. It will be triggered by `make docs` or `make package`")
+    add_custom_target(docs)
   else()
-    find_program(WKHTMLTOPDF_EXECUTABLE
-      wkhtmltopdf
-      )
-  endif()
-  execute_process(COMMAND ${WKHTMLTOPDF_EXECUTABLE} -V
-    OUTPUT_VARIABLE wkhtmltopdfversionout)
-  string(REGEX MATCH "([0-9]+\\.?)+" WKHTMLTOPDF_VER "${wkhtmltopdfversionout}")
-  string(FIND "${wkhtmltopdfversionout}" "with patched qt" WKHTMLTOPDF_PATCHEDQT )
-  if (WKHTMLTOPDF_VER VERSION_LESS "0.12.2.1")
-    message(FATAL_ERROR "wkhtmltopdf version 0.12.2.1 or greater required")
-  endif()
-  if (WKHTMLTOPDF_PATCHEDQT LESS "0")
-    message(FATAL_ERROR "wkhtmltopdf with special patchedqt build required")
+    # Building standalone, so add to ALL
+    # message(STATUS "The target `docs` was added to the default build rule")
+    add_custom_target(docs ALL)
   endif()
 
-  # pandoc
-  find_program(PANDOC_EXECUTABLE pandoc)
-  file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Products)
-  execute_process(COMMAND ${PANDOC_EXECUTABLE} -v
-    OUTPUT_VARIABLE pandocversionout)
-  string(REGEX MATCH "([0-9]+\\.?)+" PANDOC_VER "${pandocversionout}")
-  if (PANDOC_VER VERSION_LESS "1.13.2")
-    message(FATAL_ERROR "pandoc version 1.13.2 or greater required")
-  endif()
+  set_target_properties(docs PROPERTIES FOLDER Documentation)
 
+  include(cmake/doc-targets.cmake)
+
+  # add each of the documents, they have their own CMakeLists.txt files
+  add_subdirectory(acknowledgments)
+  add_subdirectory(auxiliary-programs)
+  add_subdirectory(ems-application-guide)
+  add_subdirectory(engineering-reference)
+  add_subdirectory(essentials)
+  add_subdirectory(external-interfaces-application-guide)
+  add_subdirectory(getting-started)
+  add_subdirectory(input-output-reference)
+  add_subdirectory(interface-developer)
+  add_subdirectory(module-developer)
+  add_subdirectory(output-details-and-examples)
+  add_subdirectory(plant-application-guide)
+  add_subdirectory(tips-and-tricks-using-energyplus)
+  add_subdirectory(using-energyplus-for-compliance)
+
+else()
+  # and if it doesn't, clearly state why it fails
+  message(FATAL_ERROR "Expected to find xelatex at: ${XELATEX} ; check your LaTeX installation")
 endif()

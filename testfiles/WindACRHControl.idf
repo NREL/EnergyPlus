@@ -101,13 +101,13 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.0;
+  Version,9.6;
 
   Building,
     NONE,                    !- Name
     0,                       !- North Axis {deg}
     Suburbs,                 !- Terrain
-    3.9999999E-02,           !- Loads Convergence Tolerance Value
+    3.9999999E-02,           !- Loads Convergence Tolerance Value {W}
     0.4000000,               !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -126,10 +126,12 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     1,                       !- Begin Month
     14,                      !- Begin Day of Month
     ,                        !- Begin Year
@@ -144,7 +146,7 @@
     Yes;                     !- Use Weather File Snow Indicators
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 2,            !- Name
     7,                       !- Begin Month
     7,                       !- Begin Day of Month
     ,                        !- Begin Year
@@ -762,19 +764,19 @@
   InternalMass,
     InternalMassWest,        !- Name
     Medium Furniture,        !- Construction Name
-    West Zone,               !- Zone Name
+    West Zone,               !- Zone or ZoneList Name
     18.;                     !- Surface Area {m2}
 
   InternalMass,
     InternalMassEast,        !- Name
     Medium Furniture,        !- Construction Name
-    EAST ZONE,               !- Zone Name
+    EAST ZONE,               !- Zone or ZoneList Name
     18.;                     !- Surface Area {m2}
 
   InternalMass,
     InternalMassNorth,       !- Name
     Medium Furniture,        !- Construction Name
-    NORTH ZONE,              !- Zone Name
+    NORTH ZONE,              !- Zone or ZoneList Name
     27.;                     !- Surface Area {m2}
 
   FenestrationSurface:Detailed,
@@ -1569,10 +1571,14 @@
     Zone1WindAC,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Zone Equipment 2 Object Type
     Zone1Baseboard,          !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    2;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    2,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
@@ -1581,10 +1587,14 @@
     Zone2WindAC,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Zone Equipment 2 Object Type
     Zone2Baseboard,          !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    2;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    2,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
@@ -1593,14 +1603,20 @@
     Zone3WindAC,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Zone Equipment 2 Object Type
     Zone3Baseboard,          !- Zone Equipment 2 Name
     3,                       !- Zone Equipment 2 Cooling Sequence
     3,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
     ZoneHVAC:Dehumidifier:DX,!- Zone Equipment 3 Object Type
     North Zone Dehumidifier, !- Zone Equipment 3 Name
     2,                       !- Zone Equipment 3 Cooling Sequence
-    2;                       !- Zone Equipment 3 Heating or No-Load Sequence
+    2,                       !- Zone Equipment 3 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 3 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 3 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:WindowAirConditioner,
     Zone1WindAC,             !- Name
@@ -1909,7 +1925,7 @@
 
   Output:Variable,*,Zone Window Air Conditioner Sensible Cooling Rate,hourly;
 
-  Output:Variable,*,Zone Window Air Conditioner Electric Power,hourly;
+  Output:Variable,*,Zone Window Air Conditioner Electricity Rate,hourly;
 
   Output:Variable,*,Zone Window Air Conditioner Fan Part Load Ratio,hourly;
 
@@ -1959,13 +1975,13 @@
 
   Output:Variable,North Zone Dehumidifier,Zone Dehumidifier Removed Water Mass,hourly;
 
-  Output:Variable,North Zone Dehumidifier,Zone Dehumidifier Electric Power,hourly;
+  Output:Variable,North Zone Dehumidifier,Zone Dehumidifier Electricity Rate,hourly;
 
-  Output:Variable,North Zone Dehumidifier,Zone Dehumidifier Electric Energy,hourly;
+  Output:Variable,North Zone Dehumidifier,Zone Dehumidifier Electricity Energy,hourly;
 
-  Output:Variable,North Zone Dehumidifier,Zone Dehumidifier Off Cycle Parasitic Electric Power,hourly;
+  Output:Variable,North Zone Dehumidifier,Zone Dehumidifier Off Cycle Parasitic Electricity Rate,hourly;
 
-  Output:Variable,North Zone Dehumidifier,Zone Dehumidifier Off Cycle Parasitic Electric Energy,hourly;
+  Output:Variable,North Zone Dehumidifier,Zone Dehumidifier Off Cycle Parasitic Electricity Energy,hourly;
 
   Output:Variable,North Zone Dehumidifier,Zone Dehumidifier Part Load Ratio,hourly;
 

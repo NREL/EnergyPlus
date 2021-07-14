@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,45 +52,34 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace WaterUse {
 
-    // Using/Aliasing
+    enum struct HeatRecoveryHXEnum
+    {
+        Ideal,
+        CounterFlow,
+        CrossFlow
+    };
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    extern int const HeatRecoveryHXIdeal;
-    extern int const HeatRecoveryHXCounterFlow;
-    extern int const HeatRecoveryHXCrossFlow;
-
-    extern int const HeatRecoveryConfigPlant;
-    extern int const HeatRecoveryConfigEquipment;
-    extern int const HeatRecoveryConfigPlantAndEquip;
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE TYPE DECLARATIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumWaterEquipment;
-    extern int NumWaterConnections;
-    // INTEGER :: MaxIterationsErrorCount =0
-    extern bool GetWaterUseInputFlag;
-
-    extern Array1D_bool CheckEquipName;
-    extern Array1D_bool CheckPlantLoop;
-
-    // SUBROUTINE SPECIFICATIONS:
-
-    // Types
+    enum struct HeatRecoveryConfigEnum
+    {
+        Plant,
+        Equipment,
+        PlantAndEquip
+    };
 
     struct WaterEquipmentType
     {
-        // Members
         std::string Name; // Name of DHW
         std::string EndUseSubcatName;
         int Connections;          // Index for WATER USE CONNECTIONS object
@@ -127,15 +116,15 @@ namespace WaterUse {
         Real64 TotalVolume; // Water consumption (m3)
         Real64 Power;       // Heating rate required to meet the mixed water temperature (W)
         Real64 Energy;      // Heating energy required to meet the mixed water temperature (J)
+        bool setupMyOutputVars;
 
-        // Default Constructor
         WaterEquipmentType()
             : Connections(0), PeakVolFlowRate(0.0), FlowRateFracSchedule(0), ColdVolFlowRate(0.0), HotVolFlowRate(0.0), TotalVolFlowRate(0.0),
               ColdMassFlowRate(0.0), HotMassFlowRate(0.0), TotalMassFlowRate(0.0), DrainMassFlowRate(0.0), ColdTempSchedule(0), HotTempSchedule(0),
               TargetTempSchedule(0), ColdTemp(0.0), HotTemp(0.0), TargetTemp(0.0), MixedTemp(0.0), DrainTemp(0.0), Zone(0), SensibleFracSchedule(0),
               SensibleRate(0.0), SensibleEnergy(0.0), SensibleRateNoMultiplier(0.0), LatentFracSchedule(0), LatentRate(0.0), LatentEnergy(0.0),
               LatentRateNoMultiplier(0.0), MoistureRate(0.0), MoistureMass(0.0), ColdVolume(0.0), HotVolume(0.0), TotalVolume(0.0), Power(0.0),
-              Energy(0.0)
+              Energy(0.0), setupMyOutputVars(true)
         {
         }
 
@@ -150,11 +139,16 @@ namespace WaterUse {
             TotalMassFlowRate = 0.0;
             DrainTemp = 0.0;
         }
+
+        void CalcEquipmentFlowRates(EnergyPlusData &state);
+
+        void CalcEquipmentDrainTemp(EnergyPlusData &state);
+
+        void setupOutputVars(EnergyPlusData &state);
     };
 
-    struct WaterConnectionsType
+    struct WaterConnectionsType : PlantComponent
     {
-        // Members
         std::string Name; // Name of DHW
         bool Init;        // Flag for initialization:  TRUE means do the init
         bool InitSizing;  // Flag for initialization of plant sizing
@@ -166,8 +160,8 @@ namespace WaterUse {
         int TankDemandID; // array to request flow from supply tank
         int TankSupplyID; // array to send flow to recovery tank
         bool HeatRecovery;
-        int HeatRecoveryHX;
-        int HeatRecoveryConfig;
+        HeatRecoveryHXEnum HeatRecoveryHX;
+        HeatRecoveryConfigEnum HeatRecoveryConfig;
         Real64 HXUA;
         Real64 Effectiveness;
         Real64 RecoveryRate;
@@ -208,63 +202,91 @@ namespace WaterUse {
         Real64 Energy;      // Heating energy required to raise temperature from cold to hot (J)
         int NumWaterEquipment;
         int MaxIterationsErrorIndex; // recurring error index
-        Array1D_int WaterEquipment;
+        Array1D_int myWaterEquipArr;
         int PlantLoopNum;
         int PlantLoopSide;
         int PlantLoopBranchNum;
         int PlantLoopCompNum;
+        bool MyEnvrnFlag;
+        bool setupMyOutputVars;
+        bool plantScanFlag;
 
-        // Default Constructor
         WaterConnectionsType()
             : Init(true), InitSizing(true), StandAlone(false), InletNode(0), OutletNode(0), SupplyTankNum(0), RecoveryTankNum(0), TankDemandID(0),
-              TankSupplyID(0), HeatRecovery(false), HeatRecoveryHX(HeatRecoveryHXIdeal), HeatRecoveryConfig(HeatRecoveryConfigPlant), HXUA(0.0),
-              Effectiveness(0.0), RecoveryRate(0.0), RecoveryEnergy(0.0), MainsMassFlowRate(0.0), TankMassFlowRate(0.0), ColdMassFlowRate(0.0),
-              HotMassFlowRate(0.0), TotalMassFlowRate(0.0), DrainMassFlowRate(0.0), RecoveryMassFlowRate(0.0), PeakVolFlowRate(0.0),
-              MainsVolFlowRate(0.0), TankVolFlowRate(0.0), ColdVolFlowRate(0.0), HotVolFlowRate(0.0), TotalVolFlowRate(0.0), DrainVolFlowRate(0.0),
-              PeakMassFlowRate(0.0), ColdTempSchedule(0), HotTempSchedule(0), MainsTemp(0.0), TankTemp(0.0), ColdSupplyTemp(0.0), ColdTemp(0.0),
-              HotTemp(0.0), DrainTemp(0.0), RecoveryTemp(0.0), ReturnTemp(0.0), WasteTemp(0.0), TempError(0.0), MainsVolume(0.0), TankVolume(0.0),
-              ColdVolume(0.0), HotVolume(0.0), TotalVolume(0.0), Power(0.0), Energy(0.0), NumWaterEquipment(0), MaxIterationsErrorIndex(0),
-              PlantLoopNum(0), PlantLoopSide(0), PlantLoopBranchNum(0), PlantLoopCompNum(0)
+              TankSupplyID(0), HeatRecovery(false), HeatRecoveryHX(HeatRecoveryHXEnum::Ideal), HeatRecoveryConfig(HeatRecoveryConfigEnum::Plant),
+              HXUA(0.0), Effectiveness(0.0), RecoveryRate(0.0), RecoveryEnergy(0.0), MainsMassFlowRate(0.0), TankMassFlowRate(0.0),
+              ColdMassFlowRate(0.0), HotMassFlowRate(0.0), TotalMassFlowRate(0.0), DrainMassFlowRate(0.0), RecoveryMassFlowRate(0.0),
+              PeakVolFlowRate(0.0), MainsVolFlowRate(0.0), TankVolFlowRate(0.0), ColdVolFlowRate(0.0), HotVolFlowRate(0.0), TotalVolFlowRate(0.0),
+              DrainVolFlowRate(0.0), PeakMassFlowRate(0.0), ColdTempSchedule(0), HotTempSchedule(0), MainsTemp(0.0), TankTemp(0.0),
+              ColdSupplyTemp(0.0), ColdTemp(0.0), HotTemp(0.0), DrainTemp(0.0), RecoveryTemp(0.0), ReturnTemp(0.0), WasteTemp(0.0), TempError(0.0),
+              MainsVolume(0.0), TankVolume(0.0), ColdVolume(0.0), HotVolume(0.0), TotalVolume(0.0), Power(0.0), Energy(0.0), NumWaterEquipment(0),
+              MaxIterationsErrorIndex(0), PlantLoopNum(0), PlantLoopSide(0), PlantLoopBranchNum(0), PlantLoopCompNum(0), MyEnvrnFlag(true),
+              setupMyOutputVars(true), plantScanFlag(true)
         {
         }
+
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
+
+        void InitConnections(EnergyPlusData &state);
+
+        void CalcConnectionsFlowRates(EnergyPlusData &state, bool FirstHVACIteration);
+
+        void CalcConnectionsDrainTemp(EnergyPlusData &state);
+
+        void CalcConnectionsHeatRecovery(EnergyPlusData &state);
+
+        void UpdateWaterConnections(EnergyPlusData &state);
+
+        void ReportWaterUse(EnergyPlusData &state);
+
+        void setupOutputVars([[maybe_unused]] EnergyPlusData &state);
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
-    // Object Data
-    extern Array1D<WaterEquipmentType> WaterEquipment;
-    extern Array1D<WaterConnectionsType> WaterConnections;
+    void SimulateWaterUse(EnergyPlusData &state, bool FirstHVACIteration);
 
-    // Functions
+    void GetWaterUseInput(EnergyPlusData &state);
 
-    void clear_state();
+    void ReportStandAloneWaterUse(EnergyPlusData &state);
 
-    void SimulateWaterUse(bool const FirstHVACIteration);
-
-    void SimulateWaterUseConnection(
-        int const EquipTypeNum, std::string const &CompName, int &CompIndex, bool const InitLoopEquip, bool const FirstHVACIteration);
-
-    void GetWaterUseInput();
-
-    void CalcEquipmentFlowRates(int const WaterEquipNum);
-
-    void CalcEquipmentDrainTemp(int const WaterEquipNum);
-
-    void InitConnections(int const WaterConnNum);
-
-    void CalcConnectionsFlowRates(int const WaterConnNum, bool const FirstHVACIteration);
-
-    void CalcConnectionsDrainTemp(int const WaterConnNum);
-
-    void CalcConnectionsHeatRecovery(int const WaterConnNum);
-
-    void UpdateWaterConnections(int const WaterConnNum);
-
-    void ReportStandAloneWaterUse();
-
-    void ReportWaterUse(int const WaterConnNum);
-
-    void CalcWaterUseZoneGains();
+    void CalcWaterUseZoneGains(EnergyPlusData &state);
 
 } // namespace WaterUse
+
+struct WaterUseData : BaseGlobalStruct
+{
+
+    int numWaterEquipment;
+    int numWaterConnections;
+    bool getWaterUseInputFlag;
+    bool MyEnvrnFlagLocal;
+    Array1D_bool CheckEquipName;
+    Array1D<WaterUse::WaterEquipmentType> WaterEquipment;
+    EPVector<WaterUse::WaterConnectionsType> WaterConnections;
+
+    void clear_state() override
+    {
+        this->numWaterEquipment = 0;
+        this->numWaterConnections = 0;
+        this->getWaterUseInputFlag = true;
+        this->MyEnvrnFlagLocal = true;
+        this->CheckEquipName.deallocate();
+        this->WaterEquipment.deallocate();
+        this->WaterConnections.deallocate();
+    }
+
+    // Default Constructor
+    WaterUseData() : numWaterEquipment(0), numWaterConnections(0), getWaterUseInputFlag(true), MyEnvrnFlagLocal(true)
+    {
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -46,7 +46,7 @@ Program Version,EnergyPlus <version number indicated>
   Item 5 is produced prior to any variable reported at the end of the ``environment''.
 \end{itemize}
 
-Following these five standard lines will be the variables requested for reporting from the input file (ref. Output:Variable object). For example:
+Following these five standard lines will be the variables requested for reporting from the input file (ref. \hyperref[outputvariable]{Output:Variable} object). For example:
 
 \begin{lstlisting}
 6,1,Environment,Site Outdoor Air Drybulb Temperature [C] !Hourly
@@ -59,7 +59,7 @@ Following these five standard lines will be the variables requested for reportin
 
 This example illustrates the non-consecutive nature of the ``report codes''. Internally, EnergyPlus counts each variable that \emph{could} be reported. This is the assigned ``report code''. However, the user may not request each possible variable for reporting. Note that, currently, the requested reporting frequency is shown as a comment (!) line in the standard output file.
 
-The data is produced when the actual simulation is performed (after the warmup days unless the Output:Diagnostics requesting ReportDuringWarmup is used). Data output is simpler in format than the data dictionary lines. From the dictionary above:
+The data is produced when the actual simulation is performed (after the warmup days unless the \hyperref[outputdiagnostics]{Output:Diagnostics} requesting ReportDuringWarmup is used). Data output is simpler in format than the data dictionary lines. From the dictionary above:
 
 \begin{lstlisting}
 1,DENVER STAPLETON INTL ARPT ANN HTG 99% CONDNS DB,  39.74,-105.18,  -7.00,1829.00

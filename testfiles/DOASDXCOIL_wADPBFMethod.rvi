@@ -12,26 +12,26 @@ Zone Air Humidity Ratio
 Zone Air Relative Humidity
 Zone Heating Setpoint Not Met While Occupied Time
 Zone Cooling Setpoint Not Met While Occupied Time
-Zone VRF Air Terminal Cooling Electric Power
+Zone VRF Air Terminal Cooling Electricity Rate
 Zone VRF Air Terminal Total Cooling Rate
 Zone VRF Air Terminal Sensible Cooling Rate
 Zone VRF Air Terminal Latent Cooling Rate
-Zone VRF Air Terminal Heating Electric Power
+Zone VRF Air Terminal Heating Electricity Rate
 Zone VRF Air Terminal Total Heating Rate
 Zone VRF Air Terminal Sensible Heating Rate
 Zone VRF Air Terminal Latent Heating Rate
-VRF Heat Pump Cooling Electric Power
-VRF Heat Pump Heating Electric Power
+VRF Heat Pump Cooling Electricity Rate
+VRF Heat Pump Heating Electricity Rate
 VRF Heat Pump Part Load Ratio
 VRF Heat Pump Runtime Fraction
 VRF Heat Pump Cycling Ratio
 VRF Heat Pump Operating Mode
 Heating Coil Heating Rate
-Heating Coil Electric Power
-Heating Coil Gas Rate
+Heating Coil Electricity Rate
+Heating Coil NaturalGas Rate
 Heating Coil Runtime Fraction
 Cooling Coil Total Cooling Rate
-Cooling Coil Electric Power
+Cooling Coil Electricity Rate
 Electricity:Facility
 Electricity:Building
 InteriorLights:Electricity

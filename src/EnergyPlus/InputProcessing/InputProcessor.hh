@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,6 +50,7 @@
 
 // C++ Headers
 #include <map>
+#include <set>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -62,22 +63,25 @@
 #include <nlohmann/json.hpp>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
-#include <InputProcessing/DataStorage.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/InputProcessing/DataStorage.hh>
+#include <EnergyPlus/InputProcessing/IdfParser.hh>
+#include <EnergyPlus/InputProcessing/InputValidation.hh>
 
 class IdfParser;
 class Validation;
+struct EnergyPlusData;
 
 namespace EnergyPlus {
+
+void cleanEPJSON(nlohmann::json &epjson);
 
 class InputProcessor
 {
 public:
     using json = nlohmann::json;
-
-    friend class EnergyPlusFixture;
-    friend class InputProcessorFixture;
 
     json::parser_callback_t callback;
 
@@ -85,20 +89,20 @@ public:
 
     static std::unique_ptr<InputProcessor> factory();
 
-    template <typename T> T *objectFactory(std::string const &objectName)
+    template <typename T> T *objectFactory(EnergyPlusData &state, std::string const &objectName)
     {
         T *p = data->objectFactory<T>(objectName);
         if (p != nullptr) return p;
-        auto const &fields = getFields(T::canonicalObjectType(), objectName);
+        auto const &fields = getFields(state, T::canonicalObjectType(), objectName);
         p = data->addObject<T>(objectName, fields);
         return p;
     }
 
-    template <typename T> T *objectFactory()
+    template <typename T> T *objectFactory(EnergyPlusData &state)
     {
         T *p = data->objectFactory<T>();
         if (p != nullptr) return p;
-        auto const &fields = getFields(T::canonicalObjectType());
+        auto const &fields = getFields(state, T::canonicalObjectType());
         p = data->addObject<T>(fields);
         return p;
     }
@@ -107,23 +111,38 @@ public:
 
     void initializeMaps();
 
-    void processInput();
+    void markObjectAsUsed(const std::string &objectType, const std::string &objectName);
+
+    void processInput(EnergyPlusData &state);
 
     int getNumSectionsFound(std::string const &SectionWord);
 
-    int getNumObjectsFound(std::string const &ObjectWord);
+    int getNumObjectsFound(EnergyPlusData &state, std::string const &ObjectWord);
 
     bool findDefault(std::string &default_value, json const &schema_field_obj);
 
     bool findDefault(Real64 &default_value, json const &schema_field_obj);
 
+    bool getDefaultValue(EnergyPlusData &state, std::string const &objectWord, std::string const &fieldName, Real64 &value);
+
+    bool getDefaultValue(EnergyPlusData &state, std::string const &objectWord, std::string const &fieldName, std::string &value);
+
+    std::string getAlphaFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName);
+
+    Real64 getRealFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName);
+
+    int getIntFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName);
+
+    const json &getObjectSchemaProps(EnergyPlusData &state, std::string const &objectWord);
+
     std::pair<std::string, bool> getObjectItemValue(std::string const &field_value, json const &schema_field_obj);
 
-    void getObjectItem(std::string const &Object,
+    void getObjectItem(EnergyPlusData &state,
+                       std::string const &Object,
                        int const Number,
                        Array1S_string Alphas,
                        int &NumAlphas,
-                       Array1S<Real64> Numbers,
+                       Array1D<Real64> &Numbers,
                        int &NumNumbers,
                        int &Status,
                        Optional<Array1D_bool> NumBlank = _,
@@ -131,20 +150,23 @@ public:
                        Optional<Array1D_string> AlphaFieldNames = _,
                        Optional<Array1D_string> NumericFieldNames = _);
 
-    int getIDFObjNum(std::string const &Object, int const Number);
+    int getIDFObjNum(EnergyPlusData &state, std::string const &Object, int const Number);
 
-    int getJSONObjNum(std::string const &Object, int const Number);
+    int getJSONObjNum(EnergyPlusData &state, std::string const &Object, int const Number);
 
-    int getObjectItemNum(std::string const &ObjType, // Object Type (ref: IDD Objects)
+    int getObjectItemNum(EnergyPlusData &state,
+                         std::string const &ObjType, // Object Type (ref: IDD Objects)
                          std::string const &ObjName  // Name of the object type
     );
 
-    int getObjectItemNum(std::string const &ObjType,     // Object Type (ref: IDD Objects)
+    int getObjectItemNum(EnergyPlusData &state,
+                         std::string const &ObjType,     // Object Type (ref: IDD Objects)
                          std::string const &NameTypeVal, // Object "name" field type ( used as search key )
                          std::string const &ObjName      // Name of the object type
     );
 
-    void rangeCheck(bool &ErrorsFound,                           // Set to true if error detected
+    void rangeCheck(EnergyPlusData &state,
+                    bool &ErrorsFound,                           // Set to true if error detected
                     std::string const &WhatFieldString,          // Descriptive field for string
                     std::string const &WhatObjectString,         // Descriptive field for object, Zone Name, etc.
                     std::string const &ErrorLevel,               // 'Warning','Severe','Fatal')
@@ -158,19 +180,28 @@ public:
 
     void getMaxSchemaArgs(int &NumArgs, int &NumAlpha, int &NumNumeric);
 
-    void getObjectDefMaxArgs(std::string const &ObjectWord, // Object for definition
+    void getObjectDefMaxArgs(EnergyPlusData &state,
+                             std::string const &ObjectWord, // Object for definition
                              int &NumArgs,                  // How many arguments (max) this Object can have
                              int &NumAlpha,                 // How many Alpha arguments (max) this Object can have
                              int &NumNumeric                // How many Numeric arguments (max) this Object can have
     );
 
-    void preProcessorCheck(bool &PreP_Fatal); // True if a preprocessor flags a fatal error
+    void preProcessorCheck(EnergyPlusData &state, bool &PreP_Fatal); // True if a preprocessor flags a fatal error
 
-    void preScanReportingVariables();
+    void preScanReportingVariables(EnergyPlusData &state);
 
-    void reportOrphanRecordObjects();
+    void reportIDFRecordsStats(EnergyPlusData &state);
 
+    void reportOrphanRecordObjects(EnergyPlusData &state);
+
+    const json &getObjectInstances(std::string const &ObjType);
+
+    //    void clear_state();
 private:
+    friend class EnergyPlusFixture;
+    friend class InputProcessorFixture;
+
     struct ObjectInfo
     {
         ObjectInfo() = default;
@@ -181,6 +212,15 @@ private:
 
         ObjectInfo(std::string &&objectType, std::string &&objectName) : objectType(objectType), objectName(objectName)
         {
+        }
+
+        bool operator<(const ObjectInfo &rhs) const
+        {
+            int cmp = this->objectType.compare(rhs.objectType);
+            if (cmp == 0) {
+                return this->objectName < rhs.objectName;
+            }
+            return cmp < 0;
         }
 
         std::string objectType = "";
@@ -205,21 +245,50 @@ private:
         std::vector<json::const_iterator> inputObjectIterators;
     };
 
-    void addVariablesForMonthlyReport(std::string const &reportName);
+    struct MaxFields
+    {
+        MaxFields() = default;
+        std::size_t max_fields = 0;
+        std::size_t max_extensible_fields = 0;
+    };
 
-    void addRecordToOutputVariableStructure(std::string const &KeyValue, std::string const &VariableName);
+    MaxFields findMaxFields(
+        EnergyPlusData &state, json const &ep_object, std::string const &extension_key, json const &legacy_idd, std::size_t const min_fields);
+
+    void setObjectItemValue(EnergyPlusData &state,
+                            json const &ep_object,
+                            json const &ep_schema_object,
+                            std::string const &field,
+                            json const &legacy_field_info,
+                            int &alpha_index,
+                            int &numeric_index,
+                            bool within_max_fields,
+                            Array1S_string Alphas,
+                            int &NumAlphas,
+                            Array1D<Real64> &Numbers,
+                            int &NumNumbers,
+                            Optional<Array1D_bool> NumBlank = _,
+                            Optional<Array1D_bool> AlphaBlank = _,
+                            Optional<Array1D_string> AlphaFieldNames = _,
+                            Optional<Array1D_string> NumericFieldNames = _);
+
+    void addVariablesForMonthlyReport(EnergyPlusData &state, std::string const &reportName);
+
+    void addRecordToOutputVariableStructure(EnergyPlusData &state, std::string const &KeyValue, std::string const &VariableName);
 
     std::vector<std::string> const &validationErrors();
 
     std::vector<std::string> const &validationWarnings();
 
-    void checkVersionMatch();
+    bool checkVersionMatch(EnergyPlusData &state);
 
-    bool processErrors();
+    bool processErrors(EnergyPlusData &state);
 
-    json const &getFields(std::string const &objectType, std::string const &objectName);
+    json const &getFields(EnergyPlusData &state, std::string const &objectType, std::string const &objectName);
 
-    json const &getFields(std::string const &objectType);
+    json const &getFields(EnergyPlusData &state, std::string const &objectType);
+
+    json const &getPatternProperties(EnergyPlusData &state, json const &schema_obj);
 
     inline std::string convertToUpper(std::string s)
     {
@@ -231,27 +300,36 @@ private:
         return s;
     }
 
-    void clear_state();
-
     using UnorderedObjectTypeMap = std::unordered_map<std::string, std::string>;
     using UnorderedObjectCacheMap = std::unordered_map<std::string, ObjectCache>;
-    using UnorderedUnusedObjectMap = std::map<const json::object_t *const, ObjectInfo>;
+    using UnusedObjectSet = std::set<ObjectInfo>;
 
     std::unique_ptr<IdfParser> idf_parser;
     std::unique_ptr<Validation> validation;
     std::unique_ptr<DataStorage> data;
     json schema;
-    public:
+
+public:
     json epJSON;
-    private:
+
+private:
     UnorderedObjectTypeMap caseInsensitiveObjectMap;
     UnorderedObjectCacheMap objectCacheMap;
-    UnorderedUnusedObjectMap unusedInputs;
+    UnusedObjectSet unusedInputs;
     char s[129] = {0};
 
 }; // InputProcessor
 
-extern std::unique_ptr<InputProcessor> inputProcessor;
+struct DataInputProcessing : BaseGlobalStruct
+{
+    std::unique_ptr<InputProcessor> inputProcessor = InputProcessor::factory();
+    void clear_state() override
+    {
+        inputProcessor.reset();
+        inputProcessor = EnergyPlus::InputProcessor::factory();
+    }
+};
+
 } // namespace EnergyPlus
 
 #endif

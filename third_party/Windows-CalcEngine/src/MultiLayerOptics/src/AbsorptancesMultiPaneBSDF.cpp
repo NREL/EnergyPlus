@@ -1,4 +1,5 @@
 #include <cassert>
+#include <stdexcept>
 
 #include "AbsorptancesMultiPaneBSDF.hpp"
 #include "WCESingleLayerOptics.hpp"

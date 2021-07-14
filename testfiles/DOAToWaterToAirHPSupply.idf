@@ -102,7 +102,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.0;
+  Version,9.6;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -111,7 +111,9 @@
     Yes,                     !- Do System Sizing Calculation
     Yes,                     !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -119,7 +121,7 @@
     FPFC with DOAS to Supply Side,  !- Name
     30.,                     !- North Axis {deg}
     City,                    !- Terrain
-    0.04,                    !- Loads Convergence Tolerance Value
+    0.04,                    !- Loads Convergence Tolerance Value {W}
     0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
     FullExterior,            !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -215,7 +217,7 @@
 !-   ===========  ALL OBJECTS IN CLASS: RUNPERIOD ===========
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     1,                       !- Begin Month
     14,                      !- Begin Day of Month
     ,                        !- Begin Year
@@ -230,7 +232,7 @@
     Yes;                     !- Use Weather File Snow Indicators
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 2,            !- Name
     7,                       !- Begin Month
     7,                       !- Begin Day of Month
     ,                        !- Begin Year
@@ -736,7 +738,7 @@
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     CounterClockWise,        !- Vertex Entry Direction
-    relative;                !- Coordinate System
+    Relative;                !- Coordinate System
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONE ===========
 
@@ -2023,7 +2025,11 @@
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     0,                       !- Heating Maximum Air Flow Fraction
-    ZoneAirDistribution;     !- Design Specification Zone Air Distribution Object Name
+    ZoneAirDistribution,     !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
 !-   ===========  ALL OBJECTS IN CLASS: SIZING:SYSTEM ===========
 
@@ -2364,10 +2370,14 @@
     SPACE1-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:WaterToAirHeatPump,  !- Zone Equipment 2 Object Type
     SPACE1-1 Heat Pump,      !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    2;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    2,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SPACE2-1 Equipment,      !- Name
@@ -2376,10 +2386,14 @@
     SPACE2-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:WaterToAirHeatPump,  !- Zone Equipment 2 Object Type
     SPACE2-1 Heat Pump,      !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    2;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    2,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SPACE3-1 Equipment,      !- Name
@@ -2388,10 +2402,14 @@
     SPACE3-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:WaterToAirHeatPump,  !- Zone Equipment 2 Object Type
     SPACE3-1 Heat Pump,      !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    2;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    2,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SPACE4-1 Equipment,      !- Name
@@ -2400,10 +2418,14 @@
     SPACE4-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:WaterToAirHeatPump,  !- Zone Equipment 2 Object Type
     SPACE4-1 Heat Pump,      !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    2;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    2,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SPACE5-1 Equipment,      !- Name
@@ -2412,10 +2434,14 @@
     SPACE5-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:WaterToAirHeatPump,  !- Zone Equipment 2 Object Type
     SPACE5-1 Heat Pump,      !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
-    2;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    2,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:EQUIPMENTCONNECTIONS ===========
 
@@ -2596,23 +2622,10 @@
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Total Cooling Capacity {W}
     Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    5.12,                    !- Gross Rated Cooling COP
-    -9.149069561,            !- Total Cooling Capacity Coefficient 1
-    10.87814026,             !- Total Cooling Capacity Coefficient 2
-    -1.718780157,            !- Total Cooling Capacity Coefficient 3
-    0.746414818,             !- Total Cooling Capacity Coefficient 4
-    0.0,                     !- Total Cooling Capacity Coefficient 5
-    -5.462690012,            !- Sensible Cooling Capacity Coefficient 1
-    17.95968138,             !- Sensible Cooling Capacity Coefficient 2
-    -11.87818402,            !- Sensible Cooling Capacity Coefficient 3
-    -0.980163419,            !- Sensible Cooling Capacity Coefficient 4
-    0.767285761,             !- Sensible Cooling Capacity Coefficient 5
-    0.0,                     !- Sensible Cooling Capacity Coefficient 6
-    -3.205409884,            !- Cooling Power Consumption Coefficient 1
-    -0.976409399,            !- Cooling Power Consumption Coefficient 2
-    3.97892546,              !- Cooling Power Consumption Coefficient 3
-    0.938181818,             !- Cooling Power Consumption Coefficient 4
-    0.0,                     !- Cooling Power Consumption Coefficient 5
+    5.12,                    !- Gross Rated Cooling COP {W/W}
+    TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
+    CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
+    CoolPowCurve,            !- Cooling Power Consumption Curve Name
     0,                       !- Nominal Time for Condensate Removal to Begin {s}
     0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
 
@@ -2626,23 +2639,10 @@
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Total Cooling Capacity {W}
     Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    5.12,                    !- Gross Rated Cooling COP
-    -9.149069561,            !- Total Cooling Capacity Coefficient 1
-    10.87814026,             !- Total Cooling Capacity Coefficient 2
-    -1.718780157,            !- Total Cooling Capacity Coefficient 3
-    0.746414818,             !- Total Cooling Capacity Coefficient 4
-    0.0,                     !- Total Cooling Capacity Coefficient 5
-    -5.462690012,            !- Sensible Cooling Capacity Coefficient 1
-    17.95968138,             !- Sensible Cooling Capacity Coefficient 2
-    -11.87818402,            !- Sensible Cooling Capacity Coefficient 3
-    -0.980163419,            !- Sensible Cooling Capacity Coefficient 4
-    0.767285761,             !- Sensible Cooling Capacity Coefficient 5
-    0.0,                     !- Sensible Cooling Capacity Coefficient 6
-    -3.205409884,            !- Cooling Power Consumption Coefficient 1
-    -0.976409399,            !- Cooling Power Consumption Coefficient 2
-    3.97892546,              !- Cooling Power Consumption Coefficient 3
-    0.938181818,             !- Cooling Power Consumption Coefficient 4
-    0.0,                     !- Cooling Power Consumption Coefficient 5
+    5.12,                    !- Gross Rated Cooling COP {W/W}
+    TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
+    CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
+    CoolPowCurve,            !- Cooling Power Consumption Curve Name
     0,                       !- Nominal Time for Condensate Removal to Begin {s}
     0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
 
@@ -2656,23 +2656,10 @@
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Total Cooling Capacity {W}
     Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    5.12,                    !- Gross Rated Cooling COP
-    -9.149069561,            !- Total Cooling Capacity Coefficient 1
-    10.87814026,             !- Total Cooling Capacity Coefficient 2
-    -1.718780157,            !- Total Cooling Capacity Coefficient 3
-    0.746414818,             !- Total Cooling Capacity Coefficient 4
-    0.0,                     !- Total Cooling Capacity Coefficient 5
-    -5.462690012,            !- Sensible Cooling Capacity Coefficient 1
-    17.95968138,             !- Sensible Cooling Capacity Coefficient 2
-    -11.87818402,            !- Sensible Cooling Capacity Coefficient 3
-    -0.980163419,            !- Sensible Cooling Capacity Coefficient 4
-    0.767285761,             !- Sensible Cooling Capacity Coefficient 5
-    0.0,                     !- Sensible Cooling Capacity Coefficient 6
-    -3.205409884,            !- Cooling Power Consumption Coefficient 1
-    -0.976409399,            !- Cooling Power Consumption Coefficient 2
-    3.97892546,              !- Cooling Power Consumption Coefficient 3
-    0.938181818,             !- Cooling Power Consumption Coefficient 4
-    0.0,                     !- Cooling Power Consumption Coefficient 5
+    5.12,                    !- Gross Rated Cooling COP {W/W}
+    TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
+    CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
+    CoolPowCurve,            !- Cooling Power Consumption Curve Name
     0,                       !- Nominal Time for Condensate Removal to Begin {s}
     0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
 
@@ -2686,23 +2673,10 @@
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Total Cooling Capacity {W}
     Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    5.12,                    !- Gross Rated Cooling COP
-    -9.149069561,            !- Total Cooling Capacity Coefficient 1
-    10.87814026,             !- Total Cooling Capacity Coefficient 2
-    -1.718780157,            !- Total Cooling Capacity Coefficient 3
-    0.746414818,             !- Total Cooling Capacity Coefficient 4
-    0.0,                     !- Total Cooling Capacity Coefficient 5
-    -5.462690012,            !- Sensible Cooling Capacity Coefficient 1
-    17.95968138,             !- Sensible Cooling Capacity Coefficient 2
-    -11.87818402,            !- Sensible Cooling Capacity Coefficient 3
-    -0.980163419,            !- Sensible Cooling Capacity Coefficient 4
-    0.767285761,             !- Sensible Cooling Capacity Coefficient 5
-    0.0,                     !- Sensible Cooling Capacity Coefficient 6
-    -3.205409884,            !- Cooling Power Consumption Coefficient 1
-    -0.976409399,            !- Cooling Power Consumption Coefficient 2
-    3.97892546,              !- Cooling Power Consumption Coefficient 3
-    0.938181818,             !- Cooling Power Consumption Coefficient 4
-    0.0,                     !- Cooling Power Consumption Coefficient 5
+    5.12,                    !- Gross Rated Cooling COP {W/W}
+    TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
+    CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
+    CoolPowCurve,            !- Cooling Power Consumption Curve Name
     0,                       !- Nominal Time for Condensate Removal to Begin {s}
     0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
 
@@ -2716,23 +2690,10 @@
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Total Cooling Capacity {W}
     Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    5.12,                    !- Gross Rated Cooling COP
-    -9.149069561,            !- Total Cooling Capacity Coefficient 1
-    10.87814026,             !- Total Cooling Capacity Coefficient 2
-    -1.718780157,            !- Total Cooling Capacity Coefficient 3
-    0.746414818,             !- Total Cooling Capacity Coefficient 4
-    0.0,                     !- Total Cooling Capacity Coefficient 5
-    -5.462690012,            !- Sensible Cooling Capacity Coefficient 1
-    17.95968138,             !- Sensible Cooling Capacity Coefficient 2
-    -11.87818402,            !- Sensible Cooling Capacity Coefficient 3
-    -0.980163419,            !- Sensible Cooling Capacity Coefficient 4
-    0.767285761,             !- Sensible Cooling Capacity Coefficient 5
-    0.0,                     !- Sensible Cooling Capacity Coefficient 6
-    -3.205409884,            !- Cooling Power Consumption Coefficient 1
-    -0.976409399,            !- Cooling Power Consumption Coefficient 2
-    3.97892546,              !- Cooling Power Consumption Coefficient 3
-    0.938181818,             !- Cooling Power Consumption Coefficient 4
-    0.0,                     !- Cooling Power Consumption Coefficient 5
+    5.12,                    !- Gross Rated Cooling COP {W/W}
+    TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
+    CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
+    CoolPowCurve,            !- Cooling Power Consumption Curve Name
     0,                       !- Nominal Time for Condensate Removal to Begin {s}
     0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
 
@@ -2747,17 +2708,9 @@
     Autosize,                !- Rated Air Flow Rate {m3/s}
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Heating Capacity {W}
-    4.75,                    !- Gross Rated Heating COP
-    -1.361311959,            !- Heating Capacity Coefficient 1
-    -2.471798046,            !- Heating Capacity Coefficient 2
-    4.173164514,             !- Heating Capacity Coefficient 3
-    0.640757401,             !- Heating Capacity Coefficient 4
-    0.0,                     !- Heating Capacity Coefficient 5
-    -2.176941116,            !- Heating Power Consumption Coefficient 1
-    0.832114286,             !- Heating Power Consumption Coefficient 2
-    1.570743399,             !- Heating Power Consumption Coefficient 3
-    0.690793651,             !- Heating Power Consumption Coefficient 4
-    0.0;                     !- Heating Power Consumption Coefficient 5
+    4.75,                    !- Gross Rated Heating COP {W/W}
+    HeatCapCurve,            !- Heating Capacity Curve Name
+    HeatPowCurve;            !- Heating Power Consumption Curve Name
 
   Coil:Heating:WaterToAirHeatPump:EquationFit,
     SPACE2-1 HP Heating Mode,!- Name
@@ -2768,17 +2721,9 @@
     Autosize,                !- Rated Air Flow Rate {m3/s}
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Heating Capacity {W}
-    4.75,                    !- Gross Rated Heating COP
-    -1.361311959,            !- Heating Capacity Coefficient 1
-    -2.471798046,            !- Heating Capacity Coefficient 2
-    4.173164514,             !- Heating Capacity Coefficient 3
-    0.640757401,             !- Heating Capacity Coefficient 4
-    0.0,                     !- Heating Capacity Coefficient 5
-    -2.176941116,            !- Heating Power Consumption Coefficient 1
-    0.832114286,             !- Heating Power Consumption Coefficient 2
-    1.570743399,             !- Heating Power Consumption Coefficient 3
-    0.690793651,             !- Heating Power Consumption Coefficient 4
-    0.0;                     !- Heating Power Consumption Coefficient 5
+    4.75,                    !- Gross Rated Heating COP {W/W}
+    HeatCapCurve,            !- Heating Capacity Curve Name
+    HeatPowCurve;            !- Heating Power Consumption Curve Name
 
   Coil:Heating:WaterToAirHeatPump:EquationFit,
     SPACE3-1 HP Heating Mode,!- Name
@@ -2789,17 +2734,9 @@
     Autosize,                !- Rated Air Flow Rate {m3/s}
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Heating Capacity {W}
-    4.75,                    !- Gross Rated Heating COP
-    -1.361311959,            !- Heating Capacity Coefficient 1
-    -2.471798046,            !- Heating Capacity Coefficient 2
-    4.173164514,             !- Heating Capacity Coefficient 3
-    0.640757401,             !- Heating Capacity Coefficient 4
-    0.0,                     !- Heating Capacity Coefficient 5
-    -2.176941116,            !- Heating Power Consumption Coefficient 1
-    0.832114286,             !- Heating Power Consumption Coefficient 2
-    1.570743399,             !- Heating Power Consumption Coefficient 3
-    0.690793651,             !- Heating Power Consumption Coefficient 4
-    0.0;                     !- Heating Power Consumption Coefficient 5
+    4.75,                    !- Gross Rated Heating COP {W/W}
+    HeatCapCurve,            !- Heating Capacity Curve Name
+    HeatPowCurve;            !- Heating Power Consumption Curve Name
 
   Coil:Heating:WaterToAirHeatPump:EquationFit,
     SPACE4-1 HP Heating Mode,!- Name
@@ -2810,17 +2747,9 @@
     Autosize,                !- Rated Air Flow Rate {m3/s}
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Heating Capacity {W}
-    4.75,                    !- Gross Rated Heating COP
-    -1.361311959,            !- Heating Capacity Coefficient 1
-    -2.471798046,            !- Heating Capacity Coefficient 2
-    4.173164514,             !- Heating Capacity Coefficient 3
-    0.640757401,             !- Heating Capacity Coefficient 4
-    0.0,                     !- Heating Capacity Coefficient 5
-    -2.176941116,            !- Heating Power Consumption Coefficient 1
-    0.832114286,             !- Heating Power Consumption Coefficient 2
-    1.570743399,             !- Heating Power Consumption Coefficient 3
-    0.690793651,             !- Heating Power Consumption Coefficient 4
-    0.0;                     !- Heating Power Consumption Coefficient 5
+    4.75,                    !- Gross Rated Heating COP {W/W}
+    HeatCapCurve,            !- Heating Capacity Curve Name
+    HeatPowCurve;            !- Heating Power Consumption Curve Name
 
   Coil:Heating:WaterToAirHeatPump:EquationFit,
     SPACE5-1 HP Heating Mode,!- Name
@@ -2831,17 +2760,106 @@
     Autosize,                !- Rated Air Flow Rate {m3/s}
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Heating Capacity {W}
-    4.75,                    !- Gross Rated Heating COP
-    -1.361311959,            !- Heating Capacity Coefficient 1
-    -2.471798046,            !- Heating Capacity Coefficient 2
-    4.173164514,             !- Heating Capacity Coefficient 3
-    0.640757401,             !- Heating Capacity Coefficient 4
-    0.0,                     !- Heating Capacity Coefficient 5
-    -2.176941116,            !- Heating Power Consumption Coefficient 1
-    0.832114286,             !- Heating Power Consumption Coefficient 2
-    1.570743399,             !- Heating Power Consumption Coefficient 3
-    0.690793651,             !- Heating Power Consumption Coefficient 4
-    0.0;                     !- Heating Power Consumption Coefficient 5
+    4.75,                    !- Gross Rated Heating COP {W/W}
+    HeatCapCurve,            !- Heating Capacity Curve Name
+    HeatPowCurve;            !- Heating Power Consumption Curve Name
+
+!-   ===========  ALL OBJECTS IN CLASS: CURVE:QUADLINEAR ===========
+
+  Curve:QuadLinear,
+    TotCoolCapCurve,      ! Curve Name
+    -9.149069561,            !- CoefficientC1
+    10.87814026,             !- CoefficientC2
+    -1.718780157,            !- CoefficientC3
+    0.746414818,             !- CoefficientC4
+    0.0,                     !- CoefficientC5
+    -100,                   ! Minimum Value of w
+    100,                 ! Maximum Value of w
+    -100,                   ! Minimum Value of x
+    100,                 ! Maximum Value of x
+    0,                   ! Minimum Value of y
+    100,                 ! Maximum Value of y
+    0,                    ! Minimum Value of z
+    100,                  ! Maximum Value of z
+    0,                   ! Minimum Curve Output
+    38;                  ! Maximum Curve Output
+
+  Curve:QuadLinear,
+    CoolPowCurve,      ! Curve Name
+    -3.205409884,            !- CoefficientC1
+    -0.976409399,            !- CoefficientC2
+    3.97892546,              !- CoefficientC3
+    0.938181818,             !- CoefficientC4
+    0.0,                     !- CoefficientC5
+    -100,                   ! Minimum Value of w
+    100,                 ! Maximum Value of w
+    -100,                   ! Minimum Value of x
+    100,                 ! Maximum Value of x
+    0,                   ! Minimum Value of y
+    100,                 ! Maximum Value of y
+    0,                    ! Minimum Value of z
+    100,                  ! Maximum Value of z
+    0,                   ! Minimum Curve Output
+    38;                  ! Maximum Curve Output
+
+  Curve:QuadLinear,
+    HeatCapCurve,      ! Curve Name
+    -1.361311959,            !- CoefficientC1
+    -2.471798046,            !- CoefficientC2
+    4.173164514,             !- CoefficientC3
+    0.640757401,             !- CoefficientC4
+    0.0,                     !- CoefficientC5
+    -100,                   ! Minimum Value of w
+    100,                 ! Maximum Value of w
+    -100,                   ! Minimum Value of x
+    100,                 ! Maximum Value of x
+    0,                   ! Minimum Value of y
+    100,                 ! Maximum Value of y
+    0,                    ! Minimum Value of z
+    100,                  ! Maximum Value of z
+    0,                   ! Minimum Curve Output
+    38;                  ! Maximum Curve Output
+
+  Curve:QuadLinear,
+    HeatPowCurve,      ! Curve Name
+    -2.176941116,      !- CoefficientC1
+    0.832114286,       !- CoefficientC2
+    1.570743399,       !- CoefficientC3
+    0.690793651,       !- CoefficientC4
+    0.0,               !- CoefficientC5
+    -100,                   ! Minimum Value of w
+    100,                 ! Maximum Value of w
+    -100,                   ! Minimum Value of x
+    100,                 ! Maximum Value of x
+    0,                   ! Minimum Value of y
+    100,                 ! Maximum Value of y
+    0,                    ! Minimum Value of z
+    100,                  ! Maximum Value of z
+    0,                   ! Minimum Curve Output
+    38;                  ! Maximum Curve Output
+
+!-   ===========  ALL OBJECTS IN CLASS: CURVE:QUINTLINEAR ===========
+
+  Curve:QuintLinear,
+    CoolSensCapCurve,      ! Curve Name
+    -5.462690012,            !- CoefficientC1
+    17.95968138,             !- CoefficientC2
+    -11.87818402,            !- CoefficientC3
+    -0.980163419,            !- CoefficientC4
+    0.767285761,             !- CoefficientC5
+    0.0,                     !- CoefficientC6
+    -100,                   ! Minimum Value of v
+    100,                 ! Maximum Value of v
+    -100,                   ! Minimum Value of w
+    100,                 ! Maximum Value of w
+    -100,                   ! Minimum Value of x
+    100,                 ! Maximum Value of x
+    0,                   ! Minimum Value of y
+    100,                 ! Maximum Value of y
+    0,                    ! Minimum Value of z
+    100,                  ! Maximum Value of z
+    0,                   ! Minimum Curve Output
+    38;                  ! Maximum Curve Output
 
 !-   ===========  ALL OBJECTS IN CLASS: HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT ===========
 

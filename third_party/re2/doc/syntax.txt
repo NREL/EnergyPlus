@@ -260,9 +260,11 @@ Cypriot
 Cyrillic
 Deseret
 Devanagari
+Dogra
 Duployan
 Egyptian_Hieroglyphs
 Elbasan
+Elymaic
 Ethiopic
 Georgian
 Glagolitic
@@ -270,9 +272,11 @@ Gothic
 Grantha
 Greek
 Gujarati
+Gunjala_Gondi
 Gurmukhi
 Han
 Hangul
+Hanifi_Rohingya
 Hanunoo
 Hatran
 Hebrew
@@ -300,11 +304,13 @@ Lisu
 Lycian
 Lydian
 Mahajani
+Makasar
 Malayalam
 Mandaic
 Manichaean
 Marchen
 Masaram_Gondi
+Medefaidrin
 Meetei_Mayek
 Mende_Kikakui
 Meroitic_Cursive
@@ -316,10 +322,12 @@ Mro
 Multani
 Myanmar
 Nabataean
+Nandinagari
 New_Tai_Lue
 Newa
 Nko
 Nushu
+Nyiakeng_Puachue_Hmong
 Ogham
 Ol_Chiki
 Old_Hungarian
@@ -327,6 +335,7 @@ Old_Italic
 Old_North_Arabian
 Old_Permic
 Old_Persian
+Old_Sogdian
 Old_South_Arabian
 Old_Turkic
 Oriya
@@ -347,6 +356,7 @@ Shavian
 Siddham
 SignWriting
 Sinhala
+Sogdian
 Sora_Sompeng
 Soyombo
 Sundanese
@@ -368,6 +378,7 @@ Tifinagh
 Tirhuta
 Ugaritic
 Vai
+Wancho
 Warang_Citi
 Yi
 Zanabazar_Square

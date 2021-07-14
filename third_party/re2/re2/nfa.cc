@@ -34,6 +34,7 @@
 #include "re2/prog.h"
 #include "re2/regexp.h"
 #include "util/logging.h"
+#include "util/pod_array.h"
 #include "util/sparse_array.h"
 #include "util/sparse_set.h"
 #include "util/strutil.h"
@@ -75,13 +76,6 @@ class NFA {
   struct AddState {
     int id;     // Inst to process
     Thread* t;  // if not null, set t0 = t before processing id
-
-    AddState()
-        : id(0), t(NULL) {}
-    explicit AddState(int id)
-        : id(id), t(NULL) {}
-    AddState(int id, Thread* t)
-        : id(id), t(t) {}
   };
 
   // Threadq is a list of threads.  The list is sorted by the order
@@ -95,40 +89,38 @@ class NFA {
 
   // Follows all empty arrows from id0 and enqueues all the states reached.
   // Enqueues only the ByteRange instructions that match byte c.
-  // The bits in flag (Bol, Eol, etc.) specify whether ^, $ and \b match.
+  // context is used (with p) for evaluating empty-width specials.
   // p is the current input position, and t0 is the current thread.
-  void AddToThreadq(Threadq* q, int id0, int c, int flag,
+  void AddToThreadq(Threadq* q, int id0, int c, const StringPiece& context,
                     const char* p, Thread* t0);
 
   // Run runq on byte c, appending new states to nextq.
   // Updates matched_ and match_ as new, better matches are found.
+  // context is used (with p) for evaluating empty-width specials.
   // p is the position of byte c in the input string for AddToThreadq;
   // p-1 will be used when processing Match instructions.
-  // flag is the bitwise OR of Bol, Eol, etc., specifying whether
-  // ^, $ and \b match the current input position (after c).
   // Frees all the threads on runq.
   // If there is a shortcut to the end, returns that shortcut.
-  inline int Step(Threadq* runq, Threadq* nextq, int c, int flag, const char* p);
+  int Step(Threadq* runq, Threadq* nextq, int c, const StringPiece& context,
+           const char* p);
 
   // Returns text version of capture information, for debugging.
-  string FormatCapture(const char** capture);
+  std::string FormatCapture(const char** capture);
 
   inline void CopyCapture(const char** dst, const char** src);
 
-  Prog* prog_;          // underlying program
-  int start_;           // start instruction in program
-  int ncapture_;        // number of submatches to track
-  bool longest_;        // whether searching for longest match
-  bool endmatch_;       // whether match must end at text.end()
-  const char* btext_;   // beginning of text being matched (for FormatSubmatch)
-  const char* etext_;   // end of text being matched (for endmatch_)
-  Threadq q0_, q1_;     // pre-allocated for Search.
-  const char** match_;  // best match so far
-  bool matched_;        // any match so far?
-  AddState* astack_;    // pre-allocated for AddToThreadq
-  int nastack_;
-
-  Thread* free_threads_;  // free list
+  Prog* prog_;                // underlying program
+  int start_;                 // start instruction in program
+  int ncapture_;              // number of submatches to track
+  bool longest_;              // whether searching for longest match
+  bool endmatch_;             // whether match must end at text.end()
+  const char* btext_;         // beginning of text being matched (for FormatSubmatch)
+  const char* etext_;         // end of text being matched (for endmatch_)
+  Threadq q0_, q1_;           // pre-allocated for Search.
+  PODArray<AddState> stack_;  // pre-allocated for AddToThreadq
+  Thread* free_threads_;      // free list
+  const char** match_;        // best match so far
+  bool matched_;              // any match so far?
 
   NFA(const NFA&) = delete;
   NFA& operator=(const NFA&) = delete;
@@ -145,18 +137,17 @@ NFA::NFA(Prog* prog) {
   q0_.resize(prog_->size());
   q1_.resize(prog_->size());
   // See NFA::AddToThreadq() for why this is so.
-  nastack_ = 2*prog_->inst_count(kInstCapture) +
-             prog_->inst_count(kInstEmptyWidth) +
-             prog_->inst_count(kInstNop) + 1;  // + 1 for start inst
-  astack_ = new AddState[nastack_];
+  int nstack = 2*prog_->inst_count(kInstCapture) +
+               prog_->inst_count(kInstEmptyWidth) +
+               prog_->inst_count(kInstNop) + 1;  // + 1 for start inst
+  stack_ = PODArray<AddState>(nstack);
+  free_threads_ = NULL;
   match_ = NULL;
   matched_ = false;
-  free_threads_ = NULL;
 }
 
 NFA::~NFA() {
   delete[] match_;
-  delete[] astack_;
   Thread* next;
   for (Thread* t = free_threads_; t; t = next) {
     next = t->next;
@@ -204,26 +195,26 @@ void NFA::CopyCapture(const char** dst, const char** src) {
 
 // Follows all empty arrows from id0 and enqueues all the states reached.
 // Enqueues only the ByteRange instructions that match byte c.
-// The bits in flag (Bol, Eol, etc.) specify whether ^, $ and \b match.
+// context is used (with p) for evaluating empty-width specials.
 // p is the current input position, and t0 is the current thread.
-void NFA::AddToThreadq(Threadq* q, int id0, int c, int flag,
+void NFA::AddToThreadq(Threadq* q, int id0, int c, const StringPiece& context,
                        const char* p, Thread* t0) {
   if (id0 == 0)
     return;
 
-  // Use astack_ to hold our stack of instructions yet to process.
+  // Use stack_ to hold our stack of instructions yet to process.
   // It was preallocated as follows:
   //   two entries per Capture;
   //   one entry per EmptyWidth; and
   //   one entry per Nop.
   // This reflects the maximum number of stack pushes that each can
   // perform. (Each instruction can be processed at most once.)
-  AddState* stk = astack_;
+  AddState* stk = stack_.data();
   int nstk = 0;
 
-  stk[nstk++] = AddState(id0);
+  stk[nstk++] = {id0, NULL};
   while (nstk > 0) {
-    DCHECK_LE(nstk, nastack_);
+    DCHECK_LE(nstk, stack_.size());
     AddState a = stk[--nstk];
 
   Loop:
@@ -247,8 +238,7 @@ void NFA::AddToThreadq(Threadq* q, int id0, int c, int flag,
     // or we might not.  Even if not, it is necessary to have it,
     // so that we don't revisit id0 during the recursion.
     q->set_new(id, NULL);
-
-    Thread** tp = &q->find(id)->second;
+    Thread** tp = &q->get_existing(id);
     int j;
     Thread* t;
     Prog::Inst* ip = prog_->inst(id);
@@ -266,25 +256,25 @@ void NFA::AddToThreadq(Threadq* q, int id0, int c, int flag,
       *tp = t;
 
       DCHECK(!ip->last());
-      a = AddState(id+1);
+      a = {id+1, NULL};
       goto Loop;
 
     case kInstNop:
       if (!ip->last())
-        stk[nstk++] = AddState(id+1);
+        stk[nstk++] = {id+1, NULL};
 
       // Continue on.
-      a = AddState(ip->out());
+      a = {ip->out(), NULL};
       goto Loop;
 
     case kInstCapture:
       if (!ip->last())
-        stk[nstk++] = AddState(id+1);
+        stk[nstk++] = {id+1, NULL};
 
       if ((j=ip->cap()) < ncapture_) {
         // Push a dummy whose only job is to restore t0
         // once we finish exploring this possibility.
-        stk[nstk++] = AddState(0, t0);
+        stk[nstk++] = {0, t0};
 
         // Record capture.
         t = AllocThread();
@@ -292,35 +282,45 @@ void NFA::AddToThreadq(Threadq* q, int id0, int c, int flag,
         t->capture[j] = p;
         t0 = t;
       }
-      a = AddState(ip->out());
+      a = {ip->out(), NULL};
       goto Loop;
 
     case kInstByteRange:
       if (!ip->Matches(c))
         goto Next;
-      FALLTHROUGH_INTENDED;
 
-    case kInstMatch:
       // Save state; will pick up at next byte.
       t = Incref(t0);
       *tp = t;
       if (ExtraDebug)
         fprintf(stderr, " + %d%s\n", id, FormatCapture(t0->capture).c_str());
 
+      if (ip->hint() == 0)
+        break;
+      a = {id+ip->hint(), NULL};
+      goto Loop;
+
+    case kInstMatch:
+      // Save state; will pick up at next byte.
+      t = Incref(t0);
+      *tp = t;
+      if (ExtraDebug)
+        fprintf(stderr, " ! %d%s\n", id, FormatCapture(t0->capture).c_str());
+
     Next:
       if (ip->last())
         break;
-      a = AddState(id+1);
+      a = {id+1, NULL};
       goto Loop;
 
     case kInstEmptyWidth:
       if (!ip->last())
-        stk[nstk++] = AddState(id+1);
+        stk[nstk++] = {id+1, NULL};
 
       // Continue on if we have all the right flag bits.
-      if (ip->empty() & ~flag)
+      if (ip->empty() & ~Prog::EmptyFlags(context, p))
         break;
-      a = AddState(ip->out());
+      a = {ip->out(), NULL};
       goto Loop;
     }
   }
@@ -328,17 +328,17 @@ void NFA::AddToThreadq(Threadq* q, int id0, int c, int flag,
 
 // Run runq on byte c, appending new states to nextq.
 // Updates matched_ and match_ as new, better matches are found.
+// context is used (with p) for evaluating empty-width specials.
 // p is the position of byte c in the input string for AddToThreadq;
 // p-1 will be used when processing Match instructions.
-// flag is the bitwise OR of Bol, Eol, etc., specifying whether
-// ^, $ and \b match the current input position (after c).
 // Frees all the threads on runq.
 // If there is a shortcut to the end, returns that shortcut.
-int NFA::Step(Threadq* runq, Threadq* nextq, int c, int flag, const char* p) {
+int NFA::Step(Threadq* runq, Threadq* nextq, int c, const StringPiece& context,
+              const char* p) {
   nextq->clear();
 
   for (Threadq::iterator i = runq->begin(); i != runq->end(); ++i) {
-    Thread* t = i->second;
+    Thread* t = i->value();
     if (t == NULL)
       continue;
 
@@ -360,7 +360,7 @@ int NFA::Step(Threadq* runq, Threadq* nextq, int c, int flag, const char* p) {
         break;
 
       case kInstByteRange:
-        AddToThreadq(nextq, ip->out(), c, flag, p, t);
+        AddToThreadq(nextq, ip->out(), c, context, p, t);
         break;
 
       case kInstAltMatch:
@@ -373,7 +373,7 @@ int NFA::Step(Threadq* runq, Threadq* nextq, int c, int flag, const char* p) {
 
           Decref(t);
           for (++i; i != runq->end(); ++i)
-            Decref(i->second);
+            Decref(i->value());
           runq->clear();
           if (ip->greedy(prog_))
             return ip->out1();
@@ -412,7 +412,7 @@ int NFA::Step(Threadq* runq, Threadq* nextq, int c, int flag, const char* p) {
           // rest of the current Threadq.
           Decref(t);
           for (++i; i != runq->end(); ++i)
-            Decref(i->second);
+            Decref(i->value());
           runq->clear();
           return 0;
         }
@@ -425,18 +425,18 @@ int NFA::Step(Threadq* runq, Threadq* nextq, int c, int flag, const char* p) {
   return 0;
 }
 
-string NFA::FormatCapture(const char** capture) {
-  string s;
-
+std::string NFA::FormatCapture(const char** capture) {
+  std::string s;
   for (int i = 0; i < ncapture_; i+=2) {
     if (capture[i] == NULL)
-      StringAppendF(&s, "(?,?)");
+      s += "(?,?)";
     else if (capture[i+1] == NULL)
-      StringAppendF(&s, "(%d,?)", (int)(capture[i] - btext_));
+      s += StringPrintf("(%d,?)",
+                        (int)(capture[i] - btext_));
     else
-      StringAppendF(&s, "(%d,%d)",
-                    (int)(capture[i] - btext_),
-                    (int)(capture[i+1] - btext_));
+      s += StringPrintf("(%d,%d)",
+                        (int)(capture[i] - btext_),
+                        (int)(capture[i+1] - btext_));
   }
   return s;
 }
@@ -448,7 +448,7 @@ bool NFA::Search(const StringPiece& text, const StringPiece& const_context,
     return false;
 
   StringPiece context = const_context;
-  if (context.begin() == NULL)
+  if (context.data() == NULL)
     context = text;
 
   // Sanity check: make sure that text lies within context.
@@ -465,7 +465,6 @@ bool NFA::Search(const StringPiece& text, const StringPiece& const_context,
   if (prog_->anchor_end()) {
     longest = true;
     endmatch_ = true;
-    etext_ = text.end();
   }
 
   if (nsubmatch < 0) {
@@ -488,11 +487,13 @@ bool NFA::Search(const StringPiece& text, const StringPiece& const_context,
   matched_ = false;
 
   // For debugging prints.
-  btext_ = context.begin();
+  btext_ = context.data();
+  // For convenience.
+  etext_ = text.data() + text.size();
 
   if (ExtraDebug)
     fprintf(stderr, "NFA::Search %s (context: %s) anchored=%d longest=%d\n",
-            text.ToString().c_str(), context.ToString().c_str(), anchored,
+            std::string(text).c_str(), std::string(context).c_str(), anchored,
             longest);
 
   // Set up search.
@@ -501,50 +502,21 @@ bool NFA::Search(const StringPiece& text, const StringPiece& const_context,
   runq->clear();
   nextq->clear();
   memset(&match_[0], 0, ncapture_*sizeof match_[0]);
-  int wasword = 0;
-
-  if (text.begin() > context.begin())
-    wasword = Prog::IsWordChar(text.begin()[-1] & 0xFF);
 
   // Loop over the text, stepping the machine.
-  for (const char* p = text.begin();; p++) {
-    // Check for empty-width specials.
-    int flag = 0;
-
-    // ^ and \A
-    if (p == context.begin())
-      flag |= kEmptyBeginText | kEmptyBeginLine;
-    else if (p <= context.end() && p[-1] == '\n')
-      flag |= kEmptyBeginLine;
-
-    // $ and \z
-    if (p == context.end())
-      flag |= kEmptyEndText | kEmptyEndLine;
-    else if (p < context.end() && p[0] == '\n')
-      flag |= kEmptyEndLine;
-
-    // \b and \B
-    int isword = 0;
-    if (p < context.end())
-      isword = Prog::IsWordChar(p[0] & 0xFF);
-
-    if (isword != wasword)
-      flag |= kEmptyWordBoundary;
-    else
-      flag |= kEmptyNonWordBoundary;
-
+  for (const char* p = text.data();; p++) {
     if (ExtraDebug) {
       int c = 0;
-      if (p == context.begin())
+      if (p == btext_)
         c = '^';
-      else if (p > text.end())
+      else if (p > etext_)
         c = '$';
-      else if (p < text.end())
+      else if (p < etext_)
         c = p[0] & 0xFF;
 
-      fprintf(stderr, "%c[%#x/%d/%d]:", c, flag, isword, wasword);
+      fprintf(stderr, "%c:", c);
       for (Threadq::iterator i = runq->begin(); i != runq->end(); ++i) {
-        Thread* t = i->second;
+        Thread* t = i->value();
         if (t == NULL)
           continue;
         fprintf(stderr, " %d%s", i->index(), FormatCapture(t->capture).c_str());
@@ -553,14 +525,14 @@ bool NFA::Search(const StringPiece& text, const StringPiece& const_context,
     }
 
     // This is a no-op the first time around the loop because runq is empty.
-    int id = Step(runq, nextq, p < text.end() ? p[0] & 0xFF : -1, flag, p);
+    int id = Step(runq, nextq, p < etext_ ? p[0] & 0xFF : -1, context, p);
     DCHECK_EQ(runq->size(), 0);
     using std::swap;
     swap(nextq, runq);
     nextq->clear();
     if (id != 0) {
       // We're done: full match ahead.
-      p = text.end();
+      p = etext_;
       for (;;) {
         Prog::Inst* ip = prog_->inst(id);
         switch (ip->opcode()) {
@@ -588,34 +560,31 @@ bool NFA::Search(const StringPiece& text, const StringPiece& const_context,
       break;
     }
 
-    if (p > text.end())
+    if (p > etext_)
       break;
 
     // Start a new thread if there have not been any matches.
     // (No point in starting a new thread if there have been
     // matches, since it would be to the right of the match
     // we already found.)
-    if (!matched_ && (!anchored || p == text.begin())) {
+    if (!matched_ && (!anchored || p == text.data())) {
       // If there's a required first byte for an unanchored search
       // and we're not in the middle of any possible matches,
       // use memchr to search for the byte quickly.
       int fb = prog_->first_byte();
       if (!anchored && runq->size() == 0 &&
-          fb >= 0 && p < text.end() && (p[0] & 0xFF) != fb) {
-        p = reinterpret_cast<const char*>(memchr(p, fb, text.end() - p));
+          fb >= 0 && p < etext_ && (p[0] & 0xFF) != fb) {
+        p = reinterpret_cast<const char*>(memchr(p, fb, etext_ - p));
         if (p == NULL) {
-          p = text.end();
-          isword = 0;
-        } else {
-          isword = Prog::IsWordChar(p[0] & 0xFF);
+          p = etext_;
         }
-        flag = Prog::EmptyFlags(context, p);
       }
 
       Thread* t = AllocThread();
       CopyCapture(t->capture, match_);
       t->capture[0] = p;
-      AddToThreadq(runq, start_, p < text.end() ? p[0] & 0xFF : -1, flag, p, t);
+      AddToThreadq(runq, start_, p < etext_ ? p[0] & 0xFF : -1, context, p,
+                   t);
       Decref(t);
     }
 
@@ -625,12 +594,10 @@ bool NFA::Search(const StringPiece& text, const StringPiece& const_context,
         fprintf(stderr, "dead\n");
       break;
     }
-
-    wasword = isword;
   }
 
   for (Threadq::iterator i = runq->begin(); i != runq->end(); ++i)
-    Decref(i->second);
+    Decref(i->value());
 
   if (matched_) {
     for (int i = 0; i < nsubmatch; i++)
@@ -741,7 +708,7 @@ void Prog::Fanout(SparseArray<int>* fanout) {
   fanout->clear();
   fanout->set_new(start(), 0);
   for (SparseArray<int>::iterator i = fanout->begin(); i != fanout->end(); ++i) {
-    int* count = &i->second;
+    int* count = &i->value();
     reachable.clear();
     reachable.insert(i->index());
     for (SparseSet::iterator j = reachable.begin(); j != reachable.end(); ++j) {

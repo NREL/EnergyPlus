@@ -65,7 +65,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     NorthEast  Residential-Distillate Oil,  !- Name
-    FuelOil#1,               !- Resource
+    FuelOilNo1,                !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.9607,                  !- Year 1 Escalation
@@ -137,7 +137,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     NorthEast  Residential-LPG,  !- Name
-    PropaneGas,              !- Resource
+    Propane,                 !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.9783,                  !- Year 1 Escalation
@@ -209,7 +209,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     NorthEast  Commercial-Distillate Oil,  !- Name
-    FuelOil#1,               !- Resource
+    FuelOilNo1,                !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.9036,                  !- Year 1 Escalation
@@ -245,7 +245,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     NorthEast  Commercial-Residual Oil,  !- Name
-    FuelOil#2,               !- Resource
+    FuelOilNo2,                !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.7222,                  !- Year 1 Escalation
@@ -389,7 +389,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     NorthEast  Industrial-Distillate Oil,  !- Name
-    FuelOil#1,               !- Resource
+    FuelOilNo1,                !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.8824,                  !- Year 1 Escalation
@@ -425,7 +425,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     NorthEast  Industrial-Residual Oil,  !- Name
-    FuelOil#2,               !- Resource
+    FuelOilNo2,                !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.8034,                  !- Year 1 Escalation
@@ -569,7 +569,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     MidWest  Residential-Distillate Oil,  !- Name
-    FuelOil#1,               !- Resource
+    FuelOilNo1,                !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.9080,                  !- Year 1 Escalation
@@ -641,7 +641,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     MidWest  Residential-LPG,!- Name
-    PropaneGas,              !- Resource
+    Propane,                 !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.9783,                  !- Year 1 Escalation
@@ -713,7 +713,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     MidWest  Commercial-Distillate Oil,  !- Name
-    FuelOil#1,               !- Resource
+    FuelOilNo1,                !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.8515,                  !- Year 1 Escalation
@@ -749,7 +749,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     MidWest  Commercial-Residual Oil,  !- Name
-    FuelOil#2,               !- Resource
+    FuelOilNo2,                !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     1.0698,                  !- Year 1 Escalation
@@ -893,7 +893,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     MidWest  Industrial-Distillate Oil,  !- Name
-    FuelOil#1,               !- Resource
+    FuelOilNo1,                !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.8584,                  !- Year 1 Escalation
@@ -929,7 +929,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     MidWest  Industrial-Residual Oil,  !- Name
-    FuelOil#2,               !- Resource
+    FuelOilNo2,                !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     1.0977,                  !- Year 1 Escalation
@@ -1073,7 +1073,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     South  Residential-Distillate Oil,  !- Name
-    FuelOil#1,               !- Resource
+    FuelOilNo1,                !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.9497,                  !- Year 1 Escalation
@@ -1145,7 +1145,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     South  Residential-LPG,  !- Name
-    PropaneGas,              !- Resource
+    Propane,                 !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.9783,                  !- Year 1 Escalation
@@ -1217,7 +1217,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     South  Commercial-Distillate Oil,  !- Name
-    FuelOil#1,               !- Resource
+    FuelOilNo1,                !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.8637,                  !- Year 1 Escalation
@@ -1253,7 +1253,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     South  Commercial-Residual Oil,  !- Name
-    FuelOil#2,               !- Resource
+    FuelOilNo2,                !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.7975,                  !- Year 1 Escalation
@@ -1397,7 +1397,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     South  Industrial-Distillate Oil,  !- Name
-    FuelOil#1,               !- Resource
+    FuelOilNo1,                !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.8630,                  !- Year 1 Escalation
@@ -1433,7 +1433,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     South  Industrial-Residual Oil,  !- Name
-    FuelOil#2,               !- Resource
+    FuelOilNo2,                !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.7909,                  !- Year 1 Escalation
@@ -1577,7 +1577,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     West  Residential-Distillate Oil,  !- Name
-    FuelOil#1,               !- Resource
+    FuelOilNo1,                !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.9043,                  !- Year 1 Escalation
@@ -1649,7 +1649,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     West  Residential-LPG,   !- Name
-    PropaneGas,              !- Resource
+    Propane,                 !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.9789,                  !- Year 1 Escalation
@@ -1721,7 +1721,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     West  Commercial-Distillate Oil,  !- Name
-    FuelOil#1,               !- Resource
+    FuelOilNo1,                !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.8331,                  !- Year 1 Escalation
@@ -1757,7 +1757,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     West  Commercial-Residual Oil,  !- Name
-    FuelOil#2,               !- Resource
+    FuelOilNo2,                !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.8798,                  !- Year 1 Escalation
@@ -1901,7 +1901,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     West  Industrial-Distillate Oil,  !- Name
-    FuelOil#1,               !- Resource
+    FuelOilNo1,                !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.8569,                  !- Year 1 Escalation
@@ -1937,7 +1937,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     West  Industrial-Residual Oil,  !- Name
-    FuelOil#2,               !- Resource
+    FuelOilNo2,                !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.8853,                  !- Year 1 Escalation
@@ -2081,7 +2081,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     U.S. Avg  Residential-Distillate Oil,  !- Name
-    FuelOil#1,               !- Resource
+    FuelOilNo1,                !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.9548,                  !- Year 1 Escalation
@@ -2153,7 +2153,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     U.S. Avg  Residential-LPG,  !- Name
-    PropaneGas,              !- Resource
+    Propane,                 !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.9783,                  !- Year 1 Escalation
@@ -2225,7 +2225,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     U.S. Avg  Commercial-Distillate Oil,  !- Name
-    FuelOil#1,               !- Resource
+    FuelOilNo1,                !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.8705,                  !- Year 1 Escalation
@@ -2261,7 +2261,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     U.S. Avg  Commercial-Residual Oil,  !- Name
-    FuelOil#2,               !- Resource
+    FuelOilNo2,                !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.7342,                  !- Year 1 Escalation
@@ -2405,7 +2405,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     U.S. Avg  Industrial-Distillate Oil,  !- Name
-    FuelOil#1,               !- Resource
+    FuelOilNo1,                !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.8619,                  !- Year 1 Escalation
@@ -2441,7 +2441,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     U.S. Avg  Industrial-Residual Oil,  !- Name
-    FuelOil#2,               !- Resource
+    FuelOilNo2,                !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.8080,                  !- Year 1 Escalation

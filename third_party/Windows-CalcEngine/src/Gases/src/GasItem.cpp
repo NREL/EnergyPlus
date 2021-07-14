@@ -1,5 +1,6 @@
 #include <memory>
 #include <cmath>
+#include <stdexcept>
 
 #include "WCECommon.hpp"
 #include "GasItem.hpp"

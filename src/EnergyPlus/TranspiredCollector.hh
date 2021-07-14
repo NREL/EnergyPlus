@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,65 +52,51 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <DataVectorTypes.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace TranspiredCollector {
 
     // Using/Aliasing
     using DataVectorTypes::Vector;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    extern int const Layout_Square;
-    extern int const Layout_Triangle;
-    extern int const Correlation_Kutscher1994;
-    extern int const Correlation_VanDeckerHollandsBrunger2001;
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumUTSC; // number of transpired collectors in model
-    extern Array1D_bool CheckEquipName;
-    extern bool GetInputFlag; // First time, input is gotten
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE TranspiredCollector:
-
-    // Types
-
     struct UTSCDataStruct
     {
         // Members
         // from input data
         std::string Name;
-        std::string OSCMName;         // OtherSideConditionsModel
-        int OSCMPtr;                  // OtherSideConditionsModel index
-        int SchedPtr;                 // Availablity schedule
-        Array1D_int InletNode;        // Air system node "pointer", should be set to outdoor air
-        Array1D_int OutletNode;       // Air system node "pointer", outlet from UTSC
-        Array1D_int ControlNode;      // Air system node "pointer", should have mixed air setpoint
-        Array1D_int ZoneNode;         // Air system node "pointer", should have zone node
-        int Layout;                   // 'Square' or 'Triangle'
-        int Correlation;              // which heat exchanger effectiveness model
-        Real64 HoleDia;               // Diameter of Perforations in Collector [m]
-        Real64 Pitch;                 // Distance between Perforations in Collector [m]
-        Real64 LWEmitt;               // Thermal Emissivity of Collector Surface [dimensionless]
-        Real64 SolAbsorp;             // Solar Absorbtivity of Collector Surface [dimensionless]
-        int CollRoughness;            // surface roughness for exterior convection calcs.
-        Real64 PlenGapThick;          // Depth of Plenum Behind Collector [m]
-        Real64 PlenCrossArea;         // cross section area of plenum behind collector [m2]
-        int NumSurfs;                 // a single collector can have multiple surfaces underneath it
-        Array1D_int SurfPtrs;         // = 0  ! array of pointers for participating underlying surfaces
-        Real64 Height;                // Overall Height of Collector  [m]
-        Real64 AreaRatio;             // Ratio of actual surface are to projected surface area [dimensionless]
-        Real64 CollectThick;          // Thickness of collector absorber plate material.  [m]
-        Real64 Cv;                    // volume-based effectiveness of openings for wind-driven vent when Passive
-        Real64 Cd;                    // discharge coefficient of openings for bouyancy-driven vent when Passive
-        int NumOASysAttached;         // =1 if no splitter, other wise set by Splitter object
-        int FreeHeatSetPointSchedPtr; // used for controlling seperately from usual setpoint managers.
+        std::string OSCMName;                         // OtherSideConditionsModel
+        int OSCMPtr;                                  // OtherSideConditionsModel index
+        int SchedPtr;                                 // Availablity schedule
+        Array1D_int InletNode;                        // Air system node "pointer", should be set to outdoor air
+        Array1D_int OutletNode;                       // Air system node "pointer", outlet from UTSC
+        Array1D_int ControlNode;                      // Air system node "pointer", should have mixed air setpoint
+        Array1D_int ZoneNode;                         // Air system node "pointer", should have zone node
+        int Layout;                                   // 'Square' or 'Triangle'
+        int Correlation;                              // which heat exchanger effectiveness model
+        Real64 HoleDia;                               // Diameter of Perforations in Collector [m]
+        Real64 Pitch;                                 // Distance between Perforations in Collector [m]
+        Real64 LWEmitt;                               // Thermal Emissivity of Collector Surface [dimensionless]
+        Real64 SolAbsorp;                             // Solar Absorbtivity of Collector Surface [dimensionless]
+        DataSurfaces::SurfaceRoughness CollRoughness; // surface roughness for exterior convection calcs.
+        Real64 PlenGapThick;                          // Depth of Plenum Behind Collector [m]
+        Real64 PlenCrossArea;                         // cross section area of plenum behind collector [m2]
+        int NumSurfs;                                 // a single collector can have multiple surfaces underneath it
+        Array1D_int SurfPtrs;                         // = 0  ! array of pointers for participating underlying surfaces
+        Real64 Height;                                // Overall Height of Collector  [m]
+        Real64 AreaRatio;                             // Ratio of actual surface are to projected surface area [dimensionless]
+        Real64 CollectThick;                          // Thickness of collector absorber plate material.  [m]
+        Real64 Cv;                                    // volume-based effectiveness of openings for wind-driven vent when Passive
+        Real64 Cd;                                    // discharge coefficient of openings for bouyancy-driven vent when Passive
+        int NumOASysAttached;                         // =1 if no splitter, other wise set by Splitter object
+        int FreeHeatSetPointSchedPtr;                 // used for controlling seperately from usual setpoint managers.
         int VsucErrIndex;
         // data from elswhere and calculated
         Real64 ActualArea; // Overall Area of Collect with surface corrugations.
@@ -154,48 +140,79 @@ namespace TranspiredCollector {
 
         // Default Constructor
         UTSCDataStruct()
-            : OSCMPtr(0), SchedPtr(0), Layout(0), Correlation(0), HoleDia(0.0), Pitch(0.0), LWEmitt(0.0), SolAbsorp(0.0), CollRoughness(1),
-              PlenGapThick(0.0), PlenCrossArea(0.0), NumSurfs(0), Height(0.0), AreaRatio(0.0), CollectThick(0.0), Cv(0.0), Cd(0.0),
-              NumOASysAttached(0), FreeHeatSetPointSchedPtr(0), VsucErrIndex(0), ActualArea(0.0), ProjArea(0.0), Centroid(0.0, 0.0, 0.0),
-              Porosity(0.0), IsOn(false), Tplen(0.0), Tcoll(0.0), TplenLast(22.5), TcollLast(22.0), HrPlen(0.0), HcPlen(0.0), MdotVent(0.0),
-              HdeltaNPL(0.0), TairHX(0.0), InletMDot(0.0), InletTempDB(0.0), Tilt(0.0), Azimuth(0.0), QdotSource(0.0), Isc(0.0), HXeff(0.0),
-              Vsuction(0.0), PassiveACH(0.0), PassiveMdotVent(0.0), PassiveMdotWind(0.0), PassiveMdotTherm(0.0), PlenumVelocity(0.0), SupOutTemp(0.0),
-              SupOutHumRat(0.0), SupOutEnth(0.0), SupOutMassFlow(0.0), SensHeatingRate(0.0), SensHeatingEnergy(0.0), SensCoolingRate(0.0),
-              SensCoolingEnergy(0.0), UTSCEfficiency(0.0), UTSCCollEff(0.0)
+            : OSCMPtr(0), SchedPtr(0), Layout(0), Correlation(0), HoleDia(0.0), Pitch(0.0), LWEmitt(0.0), SolAbsorp(0.0),
+              CollRoughness(DataSurfaces::SurfaceRoughness::VeryRough), PlenGapThick(0.0), PlenCrossArea(0.0), NumSurfs(0), Height(0.0),
+              AreaRatio(0.0), CollectThick(0.0), Cv(0.0), Cd(0.0), NumOASysAttached(0), FreeHeatSetPointSchedPtr(0), VsucErrIndex(0), ActualArea(0.0),
+              ProjArea(0.0), Centroid(0.0, 0.0, 0.0), Porosity(0.0), IsOn(false), Tplen(0.0), Tcoll(0.0), TplenLast(22.5), TcollLast(22.0),
+              HrPlen(0.0), HcPlen(0.0), MdotVent(0.0), HdeltaNPL(0.0), TairHX(0.0), InletMDot(0.0), InletTempDB(0.0), Tilt(0.0), Azimuth(0.0),
+              QdotSource(0.0), Isc(0.0), HXeff(0.0), Vsuction(0.0), PassiveACH(0.0), PassiveMdotVent(0.0), PassiveMdotWind(0.0),
+              PassiveMdotTherm(0.0), PlenumVelocity(0.0), SupOutTemp(0.0), SupOutHumRat(0.0), SupOutEnth(0.0), SupOutMassFlow(0.0),
+              SensHeatingRate(0.0), SensHeatingEnergy(0.0), SensCoolingRate(0.0), SensCoolingEnergy(0.0), UTSCEfficiency(0.0), UTSCCollEff(0.0)
         {
         }
     };
 
-    // Object Data
-    extern Array1D<UTSCDataStruct> UTSC;
-
-    // Functions
-    void clear_state();
-
-    void SimTranspiredCollector(std::string const &CompName, // component name
-                                int &CompIndex               // component index (to reduce string compares during simulation)
+    void SimTranspiredCollector(EnergyPlusData &state,
+                                std::string_view CompName, // component name
+                                int &CompIndex             // component index (to reduce string compares during simulation)
     );
 
-    void GetTranspiredCollectorInput();
+    void GetTranspiredCollectorInput(EnergyPlusData &state);
 
-    void InitTranspiredCollector(int const UTSCNum); // compindex already checked in calling routine
+    void InitTranspiredCollector(EnergyPlusData &state, int const UTSCNum); // compindex already checked in calling routine
 
-    void CalcActiveTranspiredCollector(int const UTSCNum);
+    void CalcActiveTranspiredCollector(EnergyPlusData &state, int const UTSCNum);
 
-    void CalcPassiveTranspiredCollector(int const UTSCNum);
+    void CalcPassiveTranspiredCollector(EnergyPlusData &state, int const UTSCNum);
 
-    void UpdateTranspiredCollector(int const UTSCNum);
+    void UpdateTranspiredCollector(EnergyPlusData &state, int const UTSCNum);
 
-    void SetUTSCQdotSource(int const UTSCNum,
+    void SetUTSCQdotSource(EnergyPlusData &state,
+                           int const UTSCNum,
                            Real64 const QSource // source term in Watts
     );
 
-    void GetTranspiredCollectorIndex(int const SurfacePtr, int &UTSCIndex);
+    void GetTranspiredCollectorIndex(EnergyPlusData &state, int const SurfacePtr, int &UTSCIndex);
 
-    void GetUTSCTsColl(int const UTSCNum, Real64 &TsColl);
+    void GetUTSCTsColl(EnergyPlusData &state, int const UTSCNum, Real64 &TsColl);
+
+    int GetAirInletNodeNum(EnergyPlusData &state, std::string const &UTSCName, bool &ErrorsFound);
+
+    int GetAirOutletNodeNum(EnergyPlusData &state, std::string const &UTSCName, bool &ErrorsFound);
 
 } // namespace TranspiredCollector
 
+struct TranspiredCollectorData : BaseGlobalStruct
+{
+
+    int const Layout_Square = 1;
+    int const Layout_Triangle = 2;
+    int const Correlation_Kutscher1994 = 1;
+    int const Correlation_VanDeckerHollandsBrunger2001 = 2;
+
+    int NumUTSC = 0; // number of transpired collectors in model
+    Array1D_bool CheckEquipName;
+    bool GetInputFlag = true; // First time, input is gotten
+
+    EPVector<TranspiredCollector::UTSCDataStruct> UTSC;
+    bool MyOneTimeFlag = true;
+    bool MySetPointCheckFlag = true;
+
+    Array1D_bool MyEnvrnFlag;
+
+    void clear_state() override
+    {
+        this->NumUTSC = 0;
+        this->GetInputFlag = true;
+        this->UTSC.deallocate();
+        this->MyOneTimeFlag = true;
+        this->MySetPointCheckFlag = true;
+        this->MyEnvrnFlag.deallocate();
+    }
+
+    // Default Constructor
+    TranspiredCollectorData() = default;
+};
 } // namespace EnergyPlus
 
 #endif

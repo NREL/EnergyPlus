@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,15 +49,17 @@
 #define Vectors_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Array1S.hh>
 
 // EnergyPlus Headers
-#include <DataVectorTypes.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Fwd decl
+struct EnergyPlusData;
 
 namespace Vectors {
 
@@ -76,7 +78,7 @@ namespace Vectors {
 
     // Functions
 
-    Real64 AreaPolygon(int const n, Array1A<Vector> p);
+    Real64 AreaPolygon(int const n, Array1D<Vector> &p);
 
     Real64 VecSquaredLength(Vector const &vec);
 
@@ -98,10 +100,10 @@ namespace Vectors {
                                  Real64 const surfaceArea,
                                  Vector const &NewellSurfaceNormalVector);
 
-    void PlaneEquation(Array1A<Vector> verts, // Structure of the surface
-                       int const nverts,      // Number of vertices in the surface
-                       PlaneEq &plane,        // Equation of plane from inputs
-                       bool &error            // returns true for degenerate surface
+    void PlaneEquation(Array1D<Vector> &verts, // Structure of the surface
+                       int const nverts,       // Number of vertices in the surface
+                       PlaneEq &plane,         // Equation of plane from inputs
+                       bool &error             // returns true for degenerate surface
     );
 
     Real64 Pt2Plane(Vector const &pt,   // Point for determining the distance
@@ -118,13 +120,24 @@ namespace Vectors {
                            Real64 const tolerance // specified tolerance
     );
 
-    void CalcCoPlanarNess(Array1A<Vector> Surf, int const NSides, bool &IsCoPlanar, Real64 &MaxDist, int &ErrorVertex);
+    void CalcCoPlanarNess(Array1D<Vector> &Surf, int const NSides, bool &IsCoPlanar, Real64 &MaxDist, int &ErrorVertex);
 
-    std::vector<int> PointsInPlane(Array1A<Vector> BaseSurf, int const BaseSides, Array1A<Vector> QuerySurf, int const QuerySides, bool &ErrorFound);
+    std::vector<int>
+    PointsInPlane(Array1D<Vector> &BaseSurf, int const BaseSides, Array1D<Vector> &QuerySurf, int const QuerySides, bool &ErrorFound);
 
-    Real64 CalcPolyhedronVolume(Polyhedron const &Poly);
+    Real64 CalcPolyhedronVolume(EnergyPlusData &state, Polyhedron const &Poly);
 
 } // namespace Vectors
+
+struct VectorsData : BaseGlobalStruct
+{
+    Vectors::Vector p0 = Vectors::Vector(0.0, 0.0, 0.0);
+
+    void clear_state() override
+    {
+        this->p0 = Vectors::Vector(0.0, 0.0, 0.0);
+    }
+};
 
 } // namespace EnergyPlus
 

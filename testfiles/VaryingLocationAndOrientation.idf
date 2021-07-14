@@ -3,13 +3,13 @@
 !****** SIMULATION CONTROLS ********************************
 !***********************************************************
 
-  Version,9.0;
+  Version,9.6;
 
   Building,
     Shoebox,                 !- Name
     0.0,                     !- North Axis {deg}
     Suburbs,                 !- Terrain
-    0.05,                    !- Loads Convergence Tolerance Value
+    0.05,                    !- Loads Convergence Tolerance Value {W}
     0.05,                    !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     35,                      !- Maximum Number of Warmup Days
@@ -42,11 +42,14 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   ShadowCalculation,
-    AverageOverDaysInFrequency,  !- Calculation Method
-    1;                       !- Calculation Frequency
+    PolygonClipping,         !- Shading Calculation Method
+    Periodic,                !- Shading Calculation Update Frequency Method
+    1;                       !- Shading Calculation Update Frequency
 
 !***********************************************************
 !****** LOCATION SPECIFIC OBJECTS **************************

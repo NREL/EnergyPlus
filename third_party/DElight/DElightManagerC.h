@@ -30,7 +30,7 @@ WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include <string>
 #include "DElightAPI.h"
 
-void writewndo(const char* instring, std::string sfpflg);
+void writewndo(const std::string instring, std::string sfpflg);
 
 extern "C" DllExport void delightdaylightcoefficients(double dBldgLat, 
                                                       int* piErrorFlag); 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,33 +49,20 @@
 #define ThermalChimney_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2A.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace ThermalChimney {
-
-    // Using/Aliasing
-
-    // Data
-    // DERIVED TYPE DEFINITIONS
-
-    extern int TotThermalChimney; // Total ThermalChimney Statements in input
-
-    // Subroutine Specifications for the Heat Balance Module
-    // Driver Routines
-    // Get Input routines for module
-    // Algorithms for the module
-    // Reporting routines for module
-    // Utility routines for module
-
-    // Types
 
     struct ThermalChimneyData
     {
@@ -89,6 +76,8 @@ namespace ThermalChimney {
         Real64 AirOutletCrossArea;
         Real64 DischargeCoeff;
         int TotZoneToDistrib;
+        bool EMSOverrideOn;         // if true then EMS is requesting to override
+        Real64 EMSAirFlowRateValue; // value EMS is setting for air flow rate
         Array1D_int ZonePtr;
         Array1D_string ZoneName;
         Array1D<Real64> DistanceThermChimInlet;
@@ -96,7 +85,9 @@ namespace ThermalChimney {
         Array1D<Real64> EachAirInletCrossArea;
 
         // Default Constructor
-        ThermalChimneyData() : RealZonePtr(0), SchedPtr(0), AbsorberWallWidth(0.0), AirOutletCrossArea(0.0), DischargeCoeff(0.0), TotZoneToDistrib(0)
+        ThermalChimneyData()
+            : RealZonePtr(0), SchedPtr(0), AbsorberWallWidth(0.0), AirOutletCrossArea(0.0), DischargeCoeff(0.0), TotZoneToDistrib(0),
+              EMSOverrideOn(false), EMSAirFlowRateValue(0)
         {
         }
     };
@@ -129,29 +120,44 @@ namespace ThermalChimney {
         }
     };
 
-    // Object Data
-    extern Array1D<ThermalChimneyData> ThermalChimneySys;
-    extern Array1D<ThermChimZnReportVars> ZnRptThermChim;
-    extern Array1D<ThermChimReportVars> ThermalChimneyReport;
-
     // Functions
 
-    void ManageThermalChimney();
+    void ManageThermalChimney(EnergyPlusData &state);
 
-    void GetThermalChimney(bool &ErrorsFound); // If errors found in input
+    void GetThermalChimney(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
-    void CalcThermalChimney();
+    void CalcThermalChimney(EnergyPlusData &state);
 
-    void ReportThermalChimney();
+    void ReportThermalChimney(EnergyPlusData &state);
 
-    void GaussElimination(Array2A<Real64> EquaCoef, Array1A<Real64> EquaConst, Array1A<Real64> ThermChimSubTemp, int const NTC);
+    void GaussElimination(Array2A<Real64> EquaCoef, Array1D<Real64> &EquaConst, Array1D<Real64> &ThermChimSubTemp, int const NTC);
 
     //        End of Module Subroutines for ThermalChimney
 
     //*****************************************************************************************
 
 } // namespace ThermalChimney
+struct ThermalChimneysData : BaseGlobalStruct
+{
 
+    bool ThermalChimneyGetInputFlag = true;
+    int TotThermalChimney = 0; // Total ThermalChimney Statements in input
+
+    EPVector<ThermalChimney::ThermalChimneyData> ThermalChimneySys;
+    EPVector<ThermalChimney::ThermChimZnReportVars> ZnRptThermChim;
+    EPVector<ThermalChimney::ThermChimReportVars> ThermalChimneyReport;
+
+    void clear_state() override
+    {
+        ThermalChimneyGetInputFlag = true;
+        ZnRptThermChim.deallocate();
+        ThermalChimneySys.deallocate();
+        ThermalChimneyReport.deallocate();
+    }
+
+    // Default Constructor
+    ThermalChimneysData() = default;
+};
 } // namespace EnergyPlus
 
 #endif

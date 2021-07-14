@@ -131,6 +131,7 @@ IF EXIST eplusout.edd DEL eplusout.edd
 IF EXIST eplusout.dfs DEL eplusout.dfs
 IF EXIST slab.int DEL slab.int
 IF EXIST BasementGHTIn.idf DEL BasementGHTIn.idf
+IF EXIST eplusshading.csv DEL eplusshading.csv
 :if %pausing%==Y pause
 
 :  2. Clean up target directory
@@ -190,6 +191,8 @@ IF EXIST "%output_path%%~1.sql" DEL "%output_path%%~1.sql"
 IF EXIST "%output_path%%~1.edd" DEL "%output_path%%~1.edd"
 IF EXIST "%output_path%%~1DFS.csv" DEL "%output_path%%~1DFS.csv"
 IF EXIST "%output_path%%~1*.mat" DEL "%output_path%%~1*.mat"
+IF EXIST "%output_path%%~1Shading.csv" DEL "%output_path%%~1Shading.csv"
+IF EXIST "%output_path%%~1_perflog.csv" MOVE "%output_path%%~1_perflog.csv" eplusout_perflog.csv
 
 :  3. Copy input data file to working directory and run EPMacro and ExpandObjects
 IF NOT EXIST "Energy+.idd" copy "%program_path%Energy+.idd" "Energy+.idd"
@@ -357,6 +360,9 @@ IF EXIST eplusout.bnd %post_proc%HVAC-Diagram.exe
  IF EXIST eplusout.sql MOVE eplusout.sql "%output_path%%~1.sql"
  IF EXIST eplusout.edd MOVE eplusout.edd "%output_path%%~1.edd"
  IF EXIST eplusout.dfs MOVE eplusout.dfs "%output_path%%~1DFS.csv"
+ IF EXIST eplusshading.csv MOVE eplusshading.csv "%output_path%%~1Shading.csv"
+ IF EXIST eplusout_perflog.csv MOVE eplusout_perflog.csv "%output_path%%~1_perflog.csv" 
+
  :  if exist *.mat (
  :    set matp=%~n1
  :    for /f %%x IN ('dir /b *.mat') DO call :s_sub %%x

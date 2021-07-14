@@ -1,6 +1,4 @@
 #pragma once
-#ifndef __VALIJSON_UTILS_JSON11_UTILS_HPP
-#define __VALIJSON_UTILS_JSON11_UTILS_HPP
 
 #include <iostream>
 
@@ -34,6 +32,3 @@ inline bool loadDocument(const std::string &path, json11::Json &document)
 
 }  // namespace utils
 }  // namespace valijson
-
-#endif
-

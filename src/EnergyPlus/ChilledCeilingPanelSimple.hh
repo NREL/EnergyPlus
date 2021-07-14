@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,53 +52,37 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace CoolingPanelSimple {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-
-    extern std::string const cCMO_CoolingPanel_Simple;
     // Control types:
-    extern int const MATControl;                // Controls system using mean air temperature
-    extern int const MRTControl;                // Controls system using mean radiant temperature
-    extern int const OperativeControl;          // Controls system using operative temperature
-    extern int const ODBControl;                // Controls system using outside air dry-bulb temperature
-    extern int const OWBControl;                // Controls system using outside air wet-bulb temperature
-    extern int const ZoneTotalLoadControl;      // Controls system using remaining zone total load
-    extern int const ZoneConvectiveLoadControl; // Controls system using remaining zone convective load
+    enum class Control
+    {
+        Unassigned,
+        MAT,               // Controls system using mean air temperature
+        MRT,               // Controls system using mean radiant temperature
+        Operative,         // Controls system using operative temperature
+        ODB,               // Controls system using outside air dry-bulb temperature
+        OWB,               // Controls system using outside air wet-bulb temperature
+        ZoneTotalLoad,     // Controls system using zone total remaining load
+        ZoneConvectiveLoad // Controls system using zone convective remaining load
+    };
+
     // Condensation control types:
-    extern int const CondCtrlNone;      // Condensation control--none, so system never shuts down
-    extern int const CondCtrlSimpleOff; // Condensation control--simple off, system shuts off when condensation predicted
-    extern int const CondCtrlVariedOff; // Condensation control--variable off, system modulates to keep running if possible
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumCoolingPanels;
-    extern Array1D<Real64> CoolingPanelSource;   // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> CoolingPanelSrcAvg;   // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
-
-    // Record keeping variables used to calculate CoolingPanelSrcAvg locally
-    extern Array1D<Real64> LastCoolingPanelSrc; // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastSysTimeElapsed;  // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastTimeStepSys;     // Need to keep the last value in case we are still iterating
-    extern Array1D_bool CheckEquipName;
-    extern Array1D_bool SetLoopIndexFlag; // get loop number flag
-
-    // Autosizing variables
-    extern Array1D_bool MySizeFlagCoolPanel;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE Simple Chilled Ceiling Panel
-
-    // Types
+    enum class CondCtrl
+    {
+        NONE,      // Condensation control--none, so system never shuts down
+        SIMPLEOFF, // Condensation control--simple off, system shuts off when condensation predicted
+        VARIEDOFF  // Condensation control--variable off, system modulates to keep running if possible
+    };
 
     struct CoolingPanelParams
     {
@@ -115,10 +99,10 @@ namespace CoolingPanelSimple {
         int TotSurfToDistrib;
         int ControlCompTypeNum;
         int CompErrIndex;
-        int ControlType;
+        Control ControlType;
         std::string ColdSetptSched;
         int ColdSetptSchedPtr;
-        int CondCtrlType;
+        CondCtrl CondCtrlType;
         Real64 CondDewPtDeltaT;
         int CondErrIndex;
         Real64 ColdThrottlRange;
@@ -161,23 +145,23 @@ namespace CoolingPanelSimple {
         // Default Constructor
         CoolingPanelParams()
             : EquipType(0), ZonePtr(0), SchedPtr(0), WaterInletNode(0), WaterOutletNode(0), TotSurfToDistrib(0), ControlCompTypeNum(0),
-              CompErrIndex(0), ControlType(0), ColdSetptSchedPtr(0), CondCtrlType(0), CondDewPtDeltaT(0.0), CondErrIndex(0), ColdThrottlRange(0.0),
-              RatedWaterTemp(0.0), CoolingCapMethod(0), ScaledCoolingCapacity(0.0), UA(0.0), Offset(0.0), WaterMassFlowRate(0.0),
-              WaterMassFlowRateMax(0.0), RatedWaterFlowRate(0.0), WaterVolFlowRateMax(0.0), WaterInletTempStd(0.0), WaterInletTemp(0.0),
-              WaterInletEnthalpy(0.0), WaterOutletTempStd(0.0), WaterOutletTemp(0.0), WaterOutletEnthalpy(0.0), RatedZoneAirTemp(0.0),
-              FracRadiant(0.0), FracConvect(0.0), FracDistribPerson(0.0), TotPower(0.0), Power(0.0), ConvPower(0.0), RadPower(0.0), TotEnergy(0.0),
-              Energy(0.0), ConvEnergy(0.0), RadEnergy(0.0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), CoolingPanelLoadReSimIndex(0),
-              CoolingPanelMassFlowReSimIndex(0), CoolingPanelInletTempFlowReSimIndex(0)
+              CompErrIndex(0), ControlType(Control::Unassigned), ColdSetptSchedPtr(0), CondCtrlType(CondCtrl::NONE), CondDewPtDeltaT(0.0),
+              CondErrIndex(0), ColdThrottlRange(0.0), RatedWaterTemp(0.0), CoolingCapMethod(0), ScaledCoolingCapacity(0.0), UA(0.0), Offset(0.0),
+              WaterMassFlowRate(0.0), WaterMassFlowRateMax(0.0), RatedWaterFlowRate(0.0), WaterVolFlowRateMax(0.0), WaterInletTempStd(0.0),
+              WaterInletTemp(0.0), WaterInletEnthalpy(0.0), WaterOutletTempStd(0.0), WaterOutletTemp(0.0), WaterOutletEnthalpy(0.0),
+              RatedZoneAirTemp(0.0), FracRadiant(0.0), FracConvect(0.0), FracDistribPerson(0.0), TotPower(0.0), Power(0.0), ConvPower(0.0),
+              RadPower(0.0), TotEnergy(0.0), Energy(0.0), ConvEnergy(0.0), RadEnergy(0.0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0),
+              CoolingPanelLoadReSimIndex(0), CoolingPanelMassFlowReSimIndex(0), CoolingPanelInletTempFlowReSimIndex(0)
         {
         }
 
-        void CalcCoolingPanel(int const CoolingPanelNum);
+        void CalcCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum);
 
-        void SetCoolingPanelControlTemp(Real64 &ControlTemp, int const ZoneNum);
+        void SetCoolingPanelControlTemp(EnergyPlusData &state, Real64 &ControlTemp, int ZoneNum);
 
-        bool SizeCoolingPanelUA();
+        bool SizeCoolingPanelUA(EnergyPlusData &state);
 
-        void ReportCoolingPanel();
+        void ReportCoolingPanel(EnergyPlusData &state);
     };
 
     struct CoolingPanelSysNumericFieldData
@@ -186,41 +170,82 @@ namespace CoolingPanelSimple {
         Array1D_string FieldNames;
 
         // Default Constructor
-        CoolingPanelSysNumericFieldData()
-        {
-        }
+        CoolingPanelSysNumericFieldData() = default;
+
+        // Destructor
+        ~CoolingPanelSysNumericFieldData() = default;
     };
 
-    // Object Data
-    extern Array1D<CoolingPanelParams> CoolingPanel;
-    extern Array1D<CoolingPanelSysNumericFieldData> CoolingPanelSysNumericFields;
-
-    // Functions
-
-    void clear_state();
-
-    void SimCoolingPanel(std::string const &EquipName,
-                         int const ActualZoneNum,
-                         int const ControlledZoneNum,
-                         bool const FirstHVACIteration,
+    void SimCoolingPanel(EnergyPlusData &state,
+                         std::string const &EquipName,
+                         int ActualZoneNum,
+                         int ControlledZoneNum,
+                         bool FirstHVACIteration,
                          Real64 &PowerMet,
                          int &CompIndex);
 
-    void GetCoolingPanelInput();
+    void GetCoolingPanelInput(EnergyPlusData &state);
 
-    void InitCoolingPanel(int const CoolingPanelNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
+    void InitCoolingPanel(EnergyPlusData &state, int CoolingPanelNum, int ControlledZoneNumSub, bool FirstHVACIteration);
 
-    void SizeCoolingPanel(int const CoolingPanelNum);
+    void SizeCoolingPanel(EnergyPlusData &state, int CoolingPanelNum);
 
-    void UpdateCoolingPanel(int const CoolingPanelNum);
+    void UpdateCoolingPanel(EnergyPlusData &state, int CoolingPanelNum);
 
-    void UpdateCoolingPanelSourceValAvg(bool &CoolingPanelSysOn); // .TRUE. if the radiant system has run this zone time step
+    void UpdateCoolingPanelSourceValAvg(EnergyPlusData &state,
+                                        bool &CoolingPanelSysOn); // .TRUE. if the radiant system has run this zone time step
 
-    void DistributeCoolingPanelRadGains();
+    void DistributeCoolingPanelRadGains(EnergyPlusData &state);
 
-    Real64 SumHATsurf(int const ZoneNum); // Zone number
+    Real64 SumHATsurf(EnergyPlusData &state, int ZoneNum); // Zone number
 
 } // namespace CoolingPanelSimple
+
+struct ChilledCeilingPanelSimpleData : BaseGlobalStruct
+{
+
+    bool GetInputFlag = true;
+    bool MyOneTimeFlag = true;
+    int NumCoolingPanels = 0;
+    Array1D<Real64> CoolingPanelSource;   // Need to keep the last value in case we are still iterating
+    Array1D<Real64> CoolingPanelSrcAvg;   // Need to keep the last value in case we are still iterating
+    Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
+
+    // Record keeping variables used to calculate CoolingPanelSrcAvg locally
+    Array1D<Real64> LastCoolingPanelSrc; // Need to keep the last value in case we are still iterating
+    Array1D<Real64> LastSysTimeElapsed;  // Need to keep the last value in case we are still iterating
+    Array1D<Real64> LastTimeStepSys;     // Need to keep the last value in case we are still iterating
+    Array1D_bool CheckEquipName;
+    Array1D_bool SetLoopIndexFlag; // get loop number flag
+
+    // Autosizing variables
+    Array1D_bool MySizeFlagCoolPanel;
+
+    Array1D<CoolingPanelSimple::CoolingPanelParams> CoolingPanel;
+    Array1D<CoolingPanelSimple::CoolingPanelSysNumericFieldData> CoolingPanelSysNumericFields;
+
+    bool ZoneEquipmentListChecked = false;
+    Array1D_bool MyEnvrnFlag;
+    void clear_state() override
+    {
+        this->GetInputFlag = true;
+        this->MyOneTimeFlag = true;
+        this->NumCoolingPanels = 0;
+        this->CoolingPanelSource.deallocate();
+        this->CoolingPanelSrcAvg.deallocate();
+        this->ZeroSourceSumHATsurf.deallocate();
+        this->LastCoolingPanelSrc.deallocate();
+        this->LastSysTimeElapsed.deallocate();
+        this->LastTimeStepSys.deallocate();
+        this->CheckEquipName.deallocate();
+        this->SetLoopIndexFlag.deallocate();
+        this->MySizeFlagCoolPanel.deallocate();
+        this->CoolingPanel.deallocate();
+        this->CoolingPanelSysNumericFields.deallocate();
+        this->ZoneEquipmentListChecked = false;
+        this->MyEnvrnFlag.clear();
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,38 +52,16 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <UnitarySystem.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACSystems.hh>
+#include <EnergyPlus/EPVector.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
 
 namespace EnergyPlus {
 
 namespace DataAirLoop {
-
-    // Using/Aliasing
-
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    extern int NumOASystems;         // Number of Outdoor Air Systems
-    extern bool AirLoopInputsFilled; // Set to TRUE after first pass through air loop
-
-    // Variables specific to AirflowNetwork simulations.
-    // Avoid using these for other purposes since these variables are only reset to 0 within AirflowNetworkBalanceManager, line 322.
-    // Non-AFN simulations may have multiple air loops and use of these variables may yield unintended results.
-    extern Real64 LoopDXCoilRTF; // OnOff fan run time fraction in an HVAC Air Loop
-
-    // Types
 
     struct AirLoopZoneEquipConnectData
     {
@@ -219,7 +197,7 @@ namespace DataAirLoop {
         Real64 SysToZoneDesFlowRatio; // System design flow divided by the sum of the zone design flows
         Real64 ReqSupplyFrac;         // required flow (as a fraction of DesSupply) set by a manager
         Real64 MinOutAir;             // minimum outside air mass flow rate [kg/s]
-        Real64 MaxOutAir;             // maximum outside air mass flow rate [kg/s]
+        Real64 MaxOutAir;             // current maximum available outside air mass flow rate [kg/s]
         Real64 OAMinFrac;             // minimum outside air flow fraction this time step
         Real64 Previous;              // Previous mass air flow rate for this loop [kg/s]
         Real64 SupFlow;               // supply air flow rate (includes LeakFlow) [kg/s]
@@ -231,13 +209,15 @@ namespace DataAirLoop {
         Real64 ExcessZoneExhFlow;     // excess zone exhuast flows made up by reduced return flow in other zones on same airloop [kg/s]
         Real64 FanPLR;                // Operating PLR of air loop fan
         Real64 OAFrac;                // fraction of outside air to mixed air mass flow rate
+        Real64 OAFlow;                // oa flow rate this time step
         bool FlowError;               // error flag for flow error message
+        Real64 BypassMassFlow;        // air loop bypass mass flow NOT entering splitter but included in mixer or plenum
 
         // Default Constructor
         AirLoopFlowData()
             : DesSupply(0.0), DesReturnFrac(1.0), SysToZoneDesFlowRatio(0.0), ReqSupplyFrac(1.0), MinOutAir(0.0), MaxOutAir(0.0), OAMinFrac(0.0),
               Previous(0.0), SupFlow(0.0), ZoneRetFlow(0.0), ZoneRetFlowRatio(1.0), SysRetFlow(0.0), RecircFlow(0.0), LeakFlow(0.0),
-              ExcessZoneExhFlow(0.0), FanPLR(0.0), OAFrac(0.0), FlowError(false)
+              ExcessZoneExhFlow(0.0), FanPLR(1.0), OAFrac(0.0), OAFlow(0.0), FlowError(false), BypassMassFlow(0.0)
         {
         }
     };
@@ -256,16 +236,24 @@ namespace DataAirLoop {
         int OAControllerIndex;        // OA controller index in OAController
         Array1D_string ComponentName;
         Array1D_string ComponentType;
-        Array1D_int ComponentType_Num; // Parameterized (see above) Component Types this
+        Array1D<SimAirServingZones::CompType> ComponentType_Num; // Parameterized (see above) Component Types this
         // module can address
         Array1D_int ComponentIndex; // Which one in list -- updated by routines called from here
-        std::vector <UnitarySystems::UnitarySys *> compPointer;
+        std::vector<HVACSystemData *> compPointer;
         Array1D_string ControllerName;
         Array1D_string ControllerType;
         Array1D_int ControllerIndex; // Which one in list -- updated by routines called from here
+        Array1D_int InletNodeNum;    // component inlet node number
+        Array1D_int OutletNodeNum;   // component outlet node number
+        bool HeatExchangerFlag;      // True to have a heat exchanger in the equipment list
+        int AirLoopDOASNum;          // AirLoopHVAC:DedicatedOutdoorAirSystem number
+        bool DXCoolingCoilFlag;      // True with DX cooling coil
 
         // Default Constructor
-        OutsideAirSysProps() : ControllerListNum(0), NumComponents(0), NumControllers(0), NumSimpleControllers(0), OAControllerIndex(0)
+        OutsideAirSysProps()
+            : ControllerListNum(0), NumComponents(0), NumControllers(0), NumSimpleControllers(0), OAControllerIndex(0), HeatExchangerFlag(false),
+              AirLoopDOASNum(-1), DXCoolingCoilFlag(false)
+
         {
         }
     };
@@ -290,21 +278,39 @@ namespace DataAirLoop {
         }
     };
 
-    // Object Data
-    extern Array1D<AirLoopZoneEquipConnectData> AirToZoneNodeInfo;
-    extern Array1D<AirLoopOutsideAirConnectData> AirToOANodeInfo;
-    extern Array1D<DefinePriAirSysAvailMgrs> PriAirSysAvailMgr;
-    extern Array1D<AirLooptoZoneData> AirLoopZoneInfo;
-    extern Array1D<AirLoopControlData> AirLoopControlInfo;
-    extern Array1D<AirLoopFlowData> AirLoopFlow;
-    extern Array1D<OutsideAirSysProps> OutsideAirSys;
-    extern Array1D<AirLoopAFNData> AirLoopAFNInfo;
-
-    // Clears the global data in DataAirLoop.
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
-
 } // namespace DataAirLoop
+
+struct DataAirLoopData : BaseGlobalStruct
+{
+
+    int NumOASystems = 0;             // Number of Outdoor Air Systems
+    bool AirLoopInputsFilled = false; // Set to TRUE after first pass through air loop
+    Real64 LoopDXCoilRTF = 0.0;       // OnOff fan run time fraction in an HVAC Air Loop
+
+    EPVector<DataAirLoop::AirLoopZoneEquipConnectData> AirToZoneNodeInfo;
+    EPVector<DataAirLoop::AirLoopOutsideAirConnectData> AirToOANodeInfo;
+    EPVector<DataAirLoop::DefinePriAirSysAvailMgrs> PriAirSysAvailMgr;
+    EPVector<DataAirLoop::AirLooptoZoneData> AirLoopZoneInfo;
+    EPVector<DataAirLoop::AirLoopControlData> AirLoopControlInfo;
+    EPVector<DataAirLoop::AirLoopFlowData> AirLoopFlow;
+    EPVector<DataAirLoop::OutsideAirSysProps> OutsideAirSys;
+    EPVector<DataAirLoop::AirLoopAFNData> AirLoopAFNInfo;
+
+    void clear_state() override
+    {
+        this->NumOASystems = 0;
+        this->LoopDXCoilRTF = 0.0;
+        this->AirLoopInputsFilled = false;
+        this->AirLoopAFNInfo.deallocate();
+        this->AirToZoneNodeInfo.deallocate();
+        this->AirToOANodeInfo.deallocate();
+        this->PriAirSysAvailMgr.deallocate();
+        this->AirLoopZoneInfo.deallocate();
+        this->AirLoopControlInfo.deallocate();
+        this->AirLoopFlow.deallocate();
+        this->OutsideAirSys.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

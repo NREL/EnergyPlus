@@ -144,9 +144,10 @@ Calculating the boiler delta temperature difference between the inlet and outlet
 
 \begin{equation}
 \Delta {T_{inout}}\,\, = \,\,{T_{SP}}\,\, - \,\,{T_{in}}
+\label{eq:DeltaTofSteamBoiler}
 \end{equation}
 
-In case the temperature difference calculated with the previous equation equation~ is zero then the boiler just needs to supply latent heat to steam, else the boiler performs its normal load calculations by providing both sensible and latent heat to the inlet stream.
+In case the temperature difference calculated with Equation~\ref{eq:DeltaTofSteamBoiler} is zero then the boiler just needs to supply latent heat to steam, else the boiler performs its normal load calculations by providing both sensible and latent heat to the inlet stream.
 
 ~~~~IF (\(\Delta {T_{inout}}\) < 0) THEN
 

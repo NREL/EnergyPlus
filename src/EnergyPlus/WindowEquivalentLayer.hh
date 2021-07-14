@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,7 +52,6 @@
 #include <functional>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Array2A.hh>
 #include <ObjexxFCL/Array2S.hh>
@@ -60,77 +59,51 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataWindowEquivalentLayer.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataWindowEquivalentLayer.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace WindowEquivalentLayer {
 
     // Using/Aliasing
     using namespace DataWindowEquivalentLayer;
 
-    // Data
-    extern Real64 const RadiansToDeg; // Conversion for Radians to Degrees
-    extern Real64 const PAtmSeaLevel; // Standard atmospheric pressure at sea level (Pa)
-    extern int const hipRHO;          // return reflectance
-    extern int const hipTAU;          // return transmittance
-    extern Real64 const SMALL_ERROR;  // small number
-    // CFSGAP: space between layers (gap types)
-    extern int const gtySEALED;  // sealed
-    extern int const gtyOPENin;  // open to indoor air  (re Open Channel Flow (OCF))
-    extern int const gtyOPENout; // open to outdoor air (re Open Channel Flow (OCF))
-    // shade control options
-    extern int const lscNONE;   // no control
-    extern int const lscVBPROF; // VB slatA = ProfA (max gain)
-    extern int const lscVBNOBM; // VB slatA just exclude beam
-    // Constants
-    extern int const hipRHO_BT0;
-    extern int const hipTAU_BT0;
-    extern int const hipTAU_BB0;
-    extern int const hipDIM; // dimension of parameter array
+    void InitEquivalentLayerWindowCalculations(EnergyPlusData &state);
 
-    extern Array3D<Real64> CFSDiffAbsTrans;
-    extern Array1D_bool EQLDiffPropFlag;
+    void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrNum);
 
-    // MODULE SUBROUTINES:
-    // Initialization routines for module
-
-    // Standard Ratings calculation routines
-
-    // Calculation routines for the module
-
-    // Functions
-
-    void clear_state();
-
-    void InitEquivalentLayerWindowCalculations();
-
-    void SetEquivalentLayerWindowProperties(int const ConstrNum);
-
-    void CalcEQLWindowUvalue(CFSTY const &FS, // CFS to be calculated
+    void CalcEQLWindowUvalue(EnergyPlusData &state,
+                             CFSTY const &FS, // CFS to be calculated
                              Real64 &UNFRC    // NFRC U-factor, W/m2-K
     );
 
-    void CalcEQLWindowSHGCAndTransNormal(CFSTY &FS,          // fenestration system
+    void CalcEQLWindowSHGCAndTransNormal(EnergyPlusData &state,
+                                         CFSTY const &FS,    // fenestration system
                                          Real64 &SHGCSummer, // solar heat gain coefficient
                                          Real64 &TransNormal // transmittance at normal incidence
     );
 
-    void CalcEQLWindowOpticalProperty(CFSTY &FS,              // fenestration system
-                                      int const DiffBeamFlag, // isDIFF: calc diffuse properties
+    void CalcEQLWindowOpticalProperty(EnergyPlusData &state,
+                                      CFSTY &FS,                      // fenestration system
+                                      SolarArrays const DiffBeamFlag, // isDIFF: calc diffuse properties
                                       Array2A<Real64> Abs1,
                                       Real64 const IncA,   // angle of incidence, radians
                                       Real64 const VProfA, // inc solar vertical profile angle, radians
                                       Real64 const HProfA  // inc solar horizontal profile angle, radians
     );
 
-    void EQLWindowSurfaceHeatBalance(int const SurfNum,       // Surface number
+    void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
+                                     int const SurfNum,       // Surface number
                                      Real64 const HcOut,      // outside convection coeficient at this timestep, W/m2K
                                      Real64 &SurfInsideTemp,  // Inside window surface temperature (innermost face) [C]
                                      Real64 &SurfOutsideTemp, // Outside surface temperature (C)
                                      Real64 &SurfOutsideEmiss,
-                                     int const CalcCondition // Calucation condition (summer, winter or no condition)
+                                     DataBSDFWindow::Condition const CalcCondition // Calucation condition (summer, winter or no condition)
     );
 
     void OPENNESS_LW(Real64 const OPENNESS, // shade openness (=tausbb at normal incidence)
@@ -140,28 +113,34 @@ namespace WindowEquivalentLayer {
                      Real64 &TAULW          // returned: effective LW transmittance of shade
     );
 
-    Real64 P01(Real64 const P,         // property
-               std::string const &WHAT // identifier for err msg
+    Real64 P01(EnergyPlusData &state,
+               Real64 const P,             // property
+               std::string_view const WHAT // identifier for err msg
     );
 
-    Real64 HEMINT(std::function<Real64(Real64 const THETA, int const OPT, Array1A<Real64> const)> F, // property integrand function
-                  int const F_Opt,                                                                   // options passed to F() (hipRHO, hipTAU)
-                  Array1A<Real64> const F_P                                                          // parameters passed to F()
+    Real64
+    HEMINT(EnergyPlusData &state,
+           std::function<Real64(EnergyPlusData &state, Real64 const THETA, int const OPT, const Array1D<Real64> &)> F, // property integrand function
+           int const F_Opt,           // options passed to F() (hipRHO, hipTAU)
+           const Array1D<Real64> &F_P // parameters passed to F()
     );
 
-    void RB_DIFF(Real64 const RHO_BT0, // normal incidence beam-total reflectance
+    void RB_DIFF(EnergyPlusData &state,
+                 Real64 const RHO_BT0, // normal incidence beam-total reflectance
                  Real64 const TAU_BT0, // normal incidence beam-total transmittance
                  Real64 const TAU_BB0, // normal incidence beam-beam transmittance
                  Real64 &RHO_DD,       // returned: diffuse-diffuse reflectance
                  Real64 &TAU_DD        // returned: diffuse-diffuse transmittance
     );
 
-    Real64 RB_F(Real64 const THETA,     // incidence angle, radians
-                int const OPT,          // options (unused)
-                Array1A<Real64> const P // parameters
+    Real64 RB_F(EnergyPlusData &state,
+                Real64 const THETA,      // incidence angle, radians
+                int const OPT,           // options (unused)
+                const Array1D<Real64> &P // parameters
     );
 
-    void RB_BEAM(Real64 const xTHETA,  // angle of incidence, radians (0 - PI/2)
+    void RB_BEAM(EnergyPlusData &state,
+                 Real64 const xTHETA,  // angle of incidence, radians (0 - PI/2)
                  Real64 const RHO_BT0, // normal incidence beam-total front reflectance
                  Real64 const TAU_BT0, // normal incidence beam-total transmittance
                  Real64 const TAU_BB0, // normal incidence beam-beam transmittance
@@ -170,19 +149,22 @@ namespace WindowEquivalentLayer {
                  Real64 &TAU_BD        // returned: beam-diffuse transmittance
     );
 
-    void IS_DIFF(Real64 const RHO_BT0, // normal incidence beam-total reflectance
+    void IS_DIFF(EnergyPlusData &state,
+                 Real64 const RHO_BT0, // normal incidence beam-total reflectance
                  Real64 const TAU_BT0, // normal incidence beam-total transmittance
                  Real64 const TAU_BB0, // normal incidence beam-beam transmittance
                  Real64 &RHO_DD,       // returned: diffuse-diffuse reflectance
                  Real64 &TAU_DD        // returned: diffuse-diffuse transmittance
     );
 
-    Real64 IS_F(Real64 const THETA,     // incidence angle, radians
-                int const OPT,          // options (1=reflectance, 2=transmittance)
-                Array1A<Real64> const P // parameters
+    Real64 IS_F(EnergyPlusData &state,
+                Real64 const THETA,      // incidence angle, radians
+                int const OPT,           // options (1=reflectance, 2=transmittance)
+                const Array1D<Real64> &P // parameters
     );
 
-    void IS_BEAM(Real64 const xTHETA,  // incidence angle, radians (0 - PI/2)
+    void IS_BEAM(EnergyPlusData &state,
+                 Real64 const xTHETA,  // incidence angle, radians (0 - PI/2)
                  Real64 const RHO_BT0, // beam-total reflectance
                  Real64 const TAU_BT0, // beam-total transmittance at normal incidence
                  Real64 const TAU_BB0, // beam-beam transmittance at normal incidence
@@ -197,19 +179,22 @@ namespace WindowEquivalentLayer {
 
     Real64 IS_DSRATIO(Real64 const OPENNESS); // openness
 
-    void FM_DIFF(Real64 const RHO_BT0, // fabric beam-total reflectance at normal incidence
+    void FM_DIFF(EnergyPlusData &state,
+                 Real64 const RHO_BT0, // fabric beam-total reflectance at normal incidence
                  Real64 const TAU_BT0, // fabric beam-total transmittance at normal incidence
                  Real64 const TAU_BB0, // forward facing fabric beam-beam transmittance at normal incidence
                  Real64 &RHO_DD,       // returned: fabric diffuse-diffuse reflectance
                  Real64 &TAU_DD        // returned: fabric diffuse-diffuse transmittance
     );
 
-    Real64 FM_F(Real64 const THETA,     // incidence angle, radians
-                int const Opt,          // options (hipRHO, hipTAU)
-                Array1A<Real64> const P // parameters
+    Real64 FM_F(EnergyPlusData &state,
+                Real64 const THETA,      // incidence angle, radians
+                int const Opt,           // options (hipRHO, hipTAU)
+                const Array1D<Real64> &P // parameters
     );
 
-    void FM_BEAM(Real64 const xTHETA,  // incidence angle, radians (0 - PI/2)
+    void FM_BEAM(EnergyPlusData &state,
+                 Real64 const xTHETA,  // incidence angle, radians (0 - PI/2)
                  Real64 const RHO_BT0, // fabric beam-total reflectance
                  Real64 const TAU_BT0, // fabric beam-total transmittance at normal incidence
                  Real64 const TAU_BB0, // fabric beam-beam transmittance at normal incidence
@@ -218,7 +203,8 @@ namespace WindowEquivalentLayer {
                  Real64 &TAU_BD        // returned: fabric beam-diffuse transmittance
     );
 
-    void PD_LW(Real64 const S,               // pleat spacing (> 0)
+    void PD_LW(EnergyPlusData &state,
+               Real64 const S,               // pleat spacing (> 0)
                Real64 const W,               // pleat depth (>=0, same units as S)
                Real64 const OPENNESS_FABRIC, // fabric openness, 0-1 (=tausbb at normal incidence)
                Real64 const EPSLWF0_FABRIC,  // fabric LW front emittance at 0 openness
@@ -228,7 +214,8 @@ namespace WindowEquivalentLayer {
                Real64 &TAULW_PD              // returned: drape effective LW transmittance
     );
 
-    void PD_DIFF(Real64 const S,        // pleat spacing (> 0)
+    void PD_DIFF(EnergyPlusData &state,
+                 Real64 const S,        // pleat spacing (> 0)
                  Real64 const W,        // pleat depth (>=0, same units as S)
                  Real64 const RHOFF_DD, // fabric front diffuse-diffuse reflectance
                  Real64 const RHOBF_DD, // fabric back diffuse-diffuse reflectance
@@ -237,7 +224,8 @@ namespace WindowEquivalentLayer {
                  Real64 &TAUFDD         // returned: drape diffuse-diffuse transmittance
     );
 
-    void PD_BEAM(Real64 const S,         // pleat spacing (> 0)
+    void PD_BEAM(EnergyPlusData &state,
+                 Real64 const S,         // pleat spacing (> 0)
                  Real64 const W,         // pleat depth (>=0, same units as S)
                  Real64 const OHM_V_RAD, // vertical profile angle, radians +=above horiz
                  Real64 const OHM_H_RAD, // horizontal profile angle, radians=clockwise when viewed from above
@@ -406,7 +394,8 @@ namespace WindowEquivalentLayer {
                          Real64 &TAU_BB         // returned: drape front beam-beam transmittance
     );
 
-    void VB_DIFF(Real64 const S,           // slat spacing (any length units; same units as W)
+    void VB_DIFF(EnergyPlusData &state,
+                 Real64 const S,           // slat spacing (any length units; same units as W)
                  Real64 const W,           // slat tip-to-tip width (any length units; same units as S)
                  Real64 const PHI,         // slat angle, radians (-PI/2 <= PHI <= PI/2)
                  Real64 const RHODFS_SLAT, // reflectance of downward-facing slat surfaces (concave?)
@@ -420,7 +409,8 @@ namespace WindowEquivalentLayer {
                                 Real64 const C  // slat crown height (any units, same units as W) must be >= 0
     );
 
-    void VB_SOL46_CURVE(Real64 const S,           // slat spacing (any length units; same units as W)
+    void VB_SOL46_CURVE(EnergyPlusData &state,
+                        Real64 const S,           // slat spacing (any length units; same units as W)
                         Real64 const W,           // slat tip-to-tip (chord) width (any length units; same units as S)
                         Real64 const SL_WR,       // slat curvature radius ratio (= W/R)
                         Real64 const PHIx,        // slat angle, radians (-PI/2 <= PHI <= PI/2)
@@ -433,7 +423,8 @@ namespace WindowEquivalentLayer {
                         Real64 &TAU_BD            // returned: effective SW (solar) beam-to-diffuse transmittance front side
     );
 
-    void VB_SOL4(Real64 const S,           // slat spacing (any length units; same units as W)
+    void VB_SOL4(EnergyPlusData &state,
+                 Real64 const S,           // slat spacing (any length units; same units as W)
                  Real64 const W,           // slat tip-to-tip width (any length units; same units as S)
                  Real64 const OMEGA,       // incident beam profile angle (radians)
                  Real64 const DE,          // distance from front tip of any slat to shadow (caused by the adjacent slat) on
@@ -445,7 +436,8 @@ namespace WindowEquivalentLayer {
                  Real64 &TAU_BD            // returned: solar beam-to-diffuse transmittance of the venetian blind (front side)
     );
 
-    void VB_SOL6(Real64 const S,           // slat spacing (any length units; same units as W)
+    void VB_SOL6(EnergyPlusData &state,
+                 Real64 const S,           // slat spacing (any length units; same units as W)
                  Real64 const W,           // slat tip-to-tip width (any length units; same units as S)
                  Real64 const OMEGA,       // incident beam profile angle (radians)
                  Real64 const DE,          // distance from front tip of any slat to shadow (caused by the adjacent slat) on
@@ -457,31 +449,51 @@ namespace WindowEquivalentLayer {
                  Real64 &TAU_BD            // returned: solar beam-to-diffuse transmittance of the venetian blind (front side)
     );
 
-    void SOLMATS(int const N,         // # of active rows in A
-                 Array2S<Real64> A,   // matrix, minimum required dimensions: A( N, N+2)
-                 Array1S<Real64> XSOL // returned: solution vector, min req dimension: XSOL( N)
+    void SOLMATS(int const N,          // # of active rows in A
+                 Array2S<Real64> A,    // matrix, minimum required dimensions: A( N, N+2)
+                 Array1D<Real64> &XSOL // returned: solution vector, min req dimension: XSOL( N)
     );
 
-    bool ASHWAT_Thermal(CFSTY const &FS,  // fenestration system
-                        Real64 const TIN, // indoor / outdoor air temperature, K
-                        Real64 const TOUT,
-                        Real64 const HCIN, // indoor / outdoor convective heat transfer
-                        Real64 const HCOUT,
-                        Real64 const TRMOUT,
-                        Real64 const TRMIN,              // indoor / outdoor mean radiant temp, K
-                        Real64 const ISOL,               // total incident solar, W/m2 (values used for SOURCE derivation)
-                        Array1S<Real64> const SOURCE,    // absorbed solar by layer,  W/m2
-                        Real64 const TOL,                // convergence tolerance, usually
-                        Array1A<Real64> QOCF,            // returned: heat flux to layer i from gaps i-1 and i
-                        Real64 &QOCFRoom,                // returned: open channel heat gain to room, W/m2
-                        Array1A<Real64> T,               // returned: layer temperatures, 1=outside-most layer, K
-                        Array1<Real64> &Q,               // returned: heat flux at ith gap (betw layers i and i+1), W/m2
-                        Array1A<Real64> JF,              // returned: front (outside facing) radiosity of surfaces, W/m2
-                        Array1A<Real64> JB,              // returned: back (inside facing) radiosity, W/m2
-                        Array1A<Real64> HC,              // returned: gap convective heat transfer coefficient, W/m2K
-                        Real64 &UCG,                     // returned: center-glass U-factor, W/m2-K
-                        Real64 &SHGC,                    // returned: center-glass SHGC (Solar Heat Gain Coefficient)
-                        Optional_bool_const HCInFlag = _ // If true uses ISO Std 150099 routine for HCIn calc
+    void ASHWAT_ThermalCalc(EnergyPlusData &state,
+                            CFSTY &FS,          // fenestration system
+                            Real64 const TIN,   // indoor air temperature, K
+                            Real64 const TOUT,  // outdoor air temperature, K
+                            Real64 const HCIN,  // indoor convective heat transfer
+                            Real64 const HCOUT, // outdoor convective heat transfer
+                            Real64 const TRMOUT,
+                            Real64 const TRMIN,           // indoor / outdoor mean radiant temp, K
+                            Array1S<Real64> const SOURCE, // absorbed solar by layer,  W/m2
+                            Real64 const TOL,             // convergence tolerance, usually
+                            Array1D<Real64> &QOCF,        // returned: heat flux to layer i from gaps i-1 and i
+                            Real64 &QOCFRoom,             // returned: open channel heat gain to room, W/m2
+                            Array1D<Real64> &T,           // returned: layer temperatures, 1=outside-most layer, K
+                            Array1D<Real64> &Q,           // returned: heat flux at ith gap (betw layers i and i+1), W/m2
+                            Array1D<Real64> &JF,          // returned: front (outside facing) radiosity of surfaces, W/m2
+                            Array1D<Real64> &JB,          // returned: back (inside facing) radiosity, W/m2
+                            Array1D<Real64> &HC           // returned: gap convective heat transfer coefficient, W/m2K
+    );
+
+    bool ASHWAT_ThermalRatings(EnergyPlusData &state,
+                               CFSTY const &FS,    // fenestration system
+                               Real64 const TIN,   // indoor air temperature, K
+                               Real64 const TOUT,  // outdoor air temperature, K
+                               Real64 const HCIN,  // indoor convective heat transfer
+                               Real64 const HCOUT, // outdoor convective heat transfer
+                               Real64 const TRMOUT,
+                               Real64 const TRMIN,           // indoor / outdoor mean radiant temp, K
+                               Real64 const ISOL,            // total incident solar, W/m2 (values used for SOURCE derivation)
+                               Array1S<Real64> const SOURCE, // absorbed solar by layer,  W/m2
+                               Real64 const TOL,             // convergence tolerance, usually
+                               Array1D<Real64> &QOCF,        // returned: heat flux to layer i from gaps i-1 and i
+                               Real64 &QOCFRoom,             // returned: open channel heat gain to room, W/m2
+                               Array1D<Real64> &T,           // returned: layer temperatures, 1=outside-most layer, K
+                               Array1D<Real64> &Q,           // returned: heat flux at ith gap (betw layers i and i+1), W/m2
+                               Array1D<Real64> &JF,          // returned: front (outside facing) radiosity of surfaces, W/m2
+                               Array1D<Real64> &JB,          // returned: back (inside facing) radiosity, W/m2
+                               Array1D<Real64> &HC,          // returned: gap convective heat transfer coefficient, W/m2K
+                               Real64 &UCG,                  // returned: center-glass U-factor, W/m2-K
+                               Real64 &SHGC,                 // returned: center-glass SHGC (Solar Heat Gain Coefficient)
+                               bool const HCInFlag           // If true uses ISO Std 150099 routine for HCIn calc
     );
 
     void DL_RES_r2(Real64 const Tg,    // mean glass layer temperature, {K}
@@ -530,13 +542,15 @@ namespace WindowEquivalentLayer {
                       Real64 const TI  // inside air temp, C or K
     );
 
-    void SLtoGL(Real64 const breal, // distance from shade to glass (m)
+    void SLtoGL(EnergyPlusData &state,
+                Real64 const breal, // distance from shade to glass (m)
                 Real64 const Ts,    // shade temperature (K)
                 Real64 const Tg,    // glass temperature (K)
                 Real64 &hsg,        // the heat transfer coefficient, shade-to-glass, {W/m2K}
                 int const scheme);
 
-    Real64 SLtoAMB(Real64 const b,     // distance from shade to glass (m) where air flow takes place
+    Real64 SLtoAMB(EnergyPlusData &state,
+                   Real64 const b,     // distance from shade to glass (m) where air flow takes place
                    Real64 const L,     // window height, m (usually taken as 1 m)
                    Real64 const Ts,    // shade temperature, K
                    Real64 const Tamb,  // room air temperature, K
@@ -544,7 +558,8 @@ namespace WindowEquivalentLayer {
                    int const scheme    // flag to select model, scheme=2 has problems
     );
 
-    void GLtoAMB(Real64 const b,     // distance from shade to glass {m}
+    void GLtoAMB(EnergyPlusData &state,
+                 Real64 const b,     // distance from shade to glass {m}
                  Real64 const L,     // window height {m}, usually taken as 1 meter
                  Real64 const Tg,    // glass temperature {K}
                  Real64 const Tamb,  // room air temperature, {K}
@@ -554,7 +569,8 @@ namespace WindowEquivalentLayer {
 
     Real64 ConvectionFactor(CFSLAYER const &L); // window layer
 
-    bool CFSUFactor(CFSTY const &FS,    // fenestration system
+    bool CFSUFactor(EnergyPlusData &state,
+                    CFSTY const &FS,    // fenestration system
                     Real64 const TOUT,  // outdoor temperature, C (air and MRT)
                     Real64 const HCOUT, // outdoor convective coefficient, W/m2-K
                     Real64 const TIN,   // indoor air temperature, C
@@ -576,18 +592,20 @@ namespace WindowEquivalentLayer {
                 Array1S<CFSSWP> const LSWP_ON, // layer SW (solar) properties (off-normal adjusted)
                 Real64 const RHO_room,         // effective solar reflectance of room (at inside)
                 Real64 const ISOL,             // incident flux (W/m2)
-                Array1<Real64> &QPLUS,         // returned: see Edwards paper
-                Array1<Real64> &QMINUS         // returned: see Edwards paper
+                Array1D<Real64> &QPLUS,        // returned: see Edwards paper
+                Array1D<Real64> &QMINUS        // returned: see Edwards paper
     );
 
+    void TDMA_R(
+        Array1D<Real64> &X, const Array1D<Real64> &AP, const Array1D<Real64> &AE, const Array1D<Real64> &AW, const Array1D<Real64> &BP, int const N);
+
     void
-    TDMA_R(Array1S<Real64> X, Array1S<Real64> const AP, Array1S<Real64> const AE, Array1S<Real64> const AW, Array1S<Real64> const BP, int const N);
+    TDMA(Array1D<Real64> &X, const Array1D<Real64> &AP, const Array1D<Real64> &AE, const Array1D<Real64> &AW, const Array1D<Real64> &BP, int const N);
 
-    void TDMA(Array1S<Real64> X, Array1S<Real64> const AP, Array1S<Real64> const AE, Array1S<Real64> const AW, Array1S<Real64> const BP, int const N);
+    void AUTOTDMA(Array1D<Real64> &X, Array1D<Real64> &AP, const Array1D<Real64> &AE, const Array1D<Real64> &AW, const Array1D<Real64> &BP, int &N);
 
-    void AUTOTDMA(Array1S<Real64> X, Array1S<Real64> AP, Array1S<Real64> const AE, Array1S<Real64> const AW, Array1S<Real64> const BP, int &N);
-
-    void ASHWAT_OffNormalProperties(CFSLAYER const &L,    // layer for which to derive off-normal properties
+    void ASHWAT_OffNormalProperties(EnergyPlusData &state,
+                                    CFSLAYER const &L,    // layer for which to derive off-normal properties
                                     Real64 const THETA,   // solar beam angle of incidence, from normal, radians
                                     Real64 const OMEGA_V, // solar beam vertical profile angle, +=above horizontal, radians
                                     Real64 const OMEGA_H, // solar beam horizontal profile angle, +=clockwise when viewed
@@ -608,20 +626,22 @@ namespace WindowEquivalentLayer {
                          Real64 const RAT_TAU  // adjustment factors, see Specular_OffNormal()
     );
 
-    void Specular_RATDiff(Real64 &RAT_1MRDiff, Real64 &RAT_TAUDiff);
+    void Specular_RATDiff(EnergyPlusData &state, Real64 &RAT_1MRDiff, Real64 &RAT_TAUDiff);
 
-    Real64 Specular_F(Real64 const THETA,     // incidence angle, radians
-                      int const OPT,          // options (unused)
-                      Array1A<Real64> const P // parameters (none defined)
+    Real64 Specular_F(EnergyPlusData &state,
+                      Real64 const THETA,      // incidence angle, radians
+                      int const OPT,           // options (unused)
+                      const Array1D<Real64> &P // parameters (none defined)
     );
 
-    void Specular_EstimateDiffuseProps(CFSSWP &SWP); // short wave properties
+    void Specular_EstimateDiffuseProps(EnergyPlusData &state, CFSSWP &SWP); // short wave properties
 
     bool RB_LWP(CFSLAYER const &L, // RB layer
                 CFSLWP &LLWP       // returned: equivalent layer long wave properties
     );
 
-    bool RB_SWP(CFSLAYER const &L,               // RB layer
+    bool RB_SWP(EnergyPlusData &state,
+                CFSLAYER const &L,               // RB layer
                 CFSSWP &LSWP,                    // returned: equivalent layer properties set
                 Optional<Real64 const> THETA = _ // incident angle, 0 <= theta <= PI/2
     );
@@ -630,56 +650,64 @@ namespace WindowEquivalentLayer {
                 CFSLWP &LLWP       // returned: equivalent layer long wave properties
     );
 
-    bool IS_SWP(CFSLAYER const &L,               // PD layer
+    bool IS_SWP(EnergyPlusData &state,
+                CFSLAYER const &L,               // PD layer
                 CFSSWP &LSWP,                    // returned: equivalent layer properties set
                 Optional<Real64 const> THETA = _ // incident angle, 0 <= theta <= PI/2
     );
 
-    void Fabric_EstimateDiffuseProps(CFSSWP &SWP); // fabric short wave properties
+    void Fabric_EstimateDiffuseProps(EnergyPlusData &state, CFSSWP &SWP); // fabric short wave properties
 
-    bool PD_LWP(CFSLAYER const &L, // PD layer
+    bool PD_LWP(EnergyPlusData &state,
+                CFSLAYER const &L, // PD layer
                 CFSLWP &LLWP       // returned: equivalent layer long wave properties
     );
 
-    bool PD_SWP(CFSLAYER const &L,                    // PD layer
+    bool PD_SWP(EnergyPlusData &state,
+                CFSLAYER const &L,                    // PD layer
                 CFSSWP &LSWP,                         // returned: equivalent layer properties set
                 Optional<Real64 const> OHM_V_RAD = _, // vertical VB profile angles, radians
                 Optional<Real64 const> OHM_H_RAD = _  // horizonatl VB profile angles, radians
     );
 
-    bool VB_LWP(CFSLAYER const &L, // VB layer
+    bool VB_LWP(EnergyPlusData &state,
+                CFSLAYER const &L, // VB layer
                 CFSLWP &LLWP       // returned: equivalent layer long wave properties
     );
 
-    bool VB_SWP(CFSLAYER const &L,               // VB layer
+    bool VB_SWP(EnergyPlusData &state,
+                CFSLAYER const &L,               // VB layer
                 CFSSWP &LSWP,                    // returned: equivalent off-normal properties
                 Optional<Real64 const> OMEGA = _ // incident profile angle (radians)
     );
 
-    bool VB_ShadeControl(CFSLAYER &L,           // VB layer
+    bool VB_ShadeControl(EnergyPlusData &state,
+                         CFSLAYER &L,           // VB layer
                          Real64 const OMEGA_DEG // incident profile angle (degrees)
     );
 
     Real64 VB_CriticalSlatAngle(Real64 const OMEGA_DEG // incident profile angle (degrees)
     );
 
-    bool DoShadeControl(CFSLAYER &L,          // layer (returned updated)
+    bool DoShadeControl(EnergyPlusData &state,
+                        CFSLAYER &L,          // layer (returned updated)
                         Real64 const THETA,   // solar beam angle of incidence, from normal, (radians)
                         Real64 const OMEGA_V, // solar beam vertical profile angle, +=above horizontal (radians)
                         Real64 const OMEGA_H  // solar beam horizontal profile angle, +=clockwise when viewed
     );
 
-    void FinalizeCFSLAYER(CFSLAYER &L); // layer, input: LTYPE, LWP_MAT, SWP_MAT
+    void FinalizeCFSLAYER(EnergyPlusData &state, CFSLAYER &L); // layer, input: LTYPE, LWP_MAT, SWP_MAT
 
     bool IsGZSLayer(CFSLAYER const &L);
 
     bool IsGlazeLayerX(CFSLAYER const &L);
 
-    bool IsControlledShade(CFSLAYER const &L);
+    bool IsControlledShade(EnergyPlusData &state, CFSLAYER const &L);
 
     bool IsVBLayer(CFSLAYER const &L);
 
-    void BuildGap(CFSGAP &G,                        // returned
+    void BuildGap(EnergyPlusData &state,
+                  CFSGAP &G,                        // returned
                   int const GType,                  // gap type (gtyOPENin, gtyOPENout or gtySEALED)
                   Real64 &TAS,                      // gap thickness, m
                   Optional<Real64 const> xTMan = _, // re density calc -- temp (C) and pressure (Pa)
@@ -697,15 +725,16 @@ namespace WindowEquivalentLayer {
 
     int CFSNGlz(CFSTY const &FS); // CFS
 
-    int CFSHasControlledShade(CFSTY const &FS);
+    int CFSHasControlledShade(EnergyPlusData &state, CFSTY const &FS);
 
-    void CheckAndFixCFSLayer(CFSLAYER &Layer);
+    void CheckAndFixCFSLayer(EnergyPlusData &state, CFSLAYER &Layer);
 
-    void FillDefaultsSWP(CFSLAYER const &L, // CFSLayer (input properties must be set)
+    void FillDefaultsSWP(EnergyPlusData &state,
+                         CFSLAYER const &L, // CFSLayer (input properties must be set)
                          CFSSWP &SWP        // properties to fill
     );
 
-    void FinalizeCFS(CFSTY &FS);
+    void FinalizeCFS(EnergyPlusData &state, CFSTY &FS);
 
     Real64 EffectiveEPSLF(CFSTY const &FS); // Complex Fenestration
 
@@ -721,23 +750,69 @@ namespace WindowEquivalentLayer {
                  Real64 const Emiss // surface emissivity
     );
 
-    void CalcEQLOpticalProperty(int const SurfNum,
-                                int const BeamDIffFlag, // identifier index of diffuse and beam SW radiation
-                                Array2A<Real64> CFSAbs  // absorbed beam solar radiation by layers fraction
+    void CalcEQLOpticalProperty(EnergyPlusData &state,
+                                int const SurfNum,
+                                SolarArrays const BeamDIffFlag, // identifier index of diffuse and beam SW radiation
+                                Array2A<Real64> CFSAbs          // absorbed beam solar radiation by layers fraction
     );
 
-    void CalcEQLWindowStandardRatings(int const ConstrNum); // construction index
+    void CalcEQLWindowStandardRatings(EnergyPlusData &state, int const ConstrNum); // construction index
 
-    Real64 EQLWindowInsideEffectiveEmiss(int const ConstrNum);
+    Real64 EQLWindowInsideEffectiveEmiss(EnergyPlusData &state, int const ConstrNum);
 
-    Real64 EQLWindowOutsideEffectiveEmiss(int const ConstrNum);
+    Real64 EQLWindowOutsideEffectiveEmiss(EnergyPlusData &state, int const ConstrNum);
 
-    Real64 HCInWindowStandardRatings(Real64 const Height,  // Window height, 1.0 m
+    Real64 HCInWindowStandardRatings(EnergyPlusData &state,
+                                     Real64 const Height,  // Window height, 1.0 m
                                      Real64 const TSurfIn, // Inside surface temperature
                                      Real64 const TAirIn   // Zone Air Temperature
     );
 
 } // namespace WindowEquivalentLayer
+
+struct WindowEquivalentLayerData : BaseGlobalStruct
+{
+
+    // Data
+    Real64 const RadiansToDeg; // Conversion for Radians to Degrees: Not using DataGlobalConstants::Pi() to avoid initialization order bug
+    Real64 const PAtmSeaLevel; // Standard atmospheric pressure at sea level (Pa)
+    int const hipRHO;          // return reflectance
+    int const hipTAU;          // return transmittance
+    Real64 const SMALL_ERROR;  // small number
+                               // CFSGAP: space between layers (gap types)
+    int const gtySEALED;       // sealed
+    int const gtyOPENin;       // open to indoor air  (re Open Channel Flow (OCF))
+    int const gtyOPENout;      // open to outdoor air (re Open Channel Flow (OCF))
+                               // shade control options
+    int const lscNONE;         // no control
+    int const lscVBPROF;       // VB slatA = ProfA (max gain)
+    int const lscVBNOBM;       // VB slatA just exclude beam
+                               // Constants
+    int const hipRHO_BT0;
+    int const hipTAU_BT0;
+    int const hipTAU_BB0;
+    int const hipDIM; // dimension of parameter array
+
+    Array3D<Real64> CFSDiffAbsTrans;
+    Array1D_bool EQLDiffPropFlag;
+
+    Real64 X1MRDiff = -1.0;
+    Real64 XTAUDiff = -1.0;
+
+    void clear_state()
+    {
+        this->CFSDiffAbsTrans.deallocate();
+        this->EQLDiffPropFlag.deallocate();
+        this->X1MRDiff = -1.0;
+        this->XTAUDiff = -1.0;
+    }
+    // Default Constructor
+    WindowEquivalentLayerData()
+        : RadiansToDeg(180.0 / 3.141592653589793), PAtmSeaLevel(101325.0), hipRHO(1), hipTAU(2), SMALL_ERROR(0.000001), gtySEALED(1), gtyOPENin(2),
+          gtyOPENout(3), lscNONE(0), lscVBPROF(1), lscVBNOBM(2), hipRHO_BT0(1), hipTAU_BT0(2), hipTAU_BB0(3), hipDIM(3)
+    {
+    }
+};
 
 } // namespace EnergyPlus
 

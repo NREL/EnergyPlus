@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -46,11 +46,12 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NonZoneEquipmentManager.hh>
-#include <WaterThermalTanks.hh>
-#include <WaterUse.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NonZoneEquipmentManager.hh>
+#include <EnergyPlus/WaterThermalTanks.hh>
+#include <EnergyPlus/WaterUse.hh>
 
 namespace EnergyPlus {
 
@@ -80,7 +81,8 @@ namespace NonZoneEquipmentManager {
 
     // Functions
 
-    void ManageNonZoneEquipment(bool const FirstHVACIteration,
+    void ManageNonZoneEquipment(EnergyPlusData &state,
+                                bool const FirstHVACIteration,
                                 bool &SimNonZoneEquipment // Simulation convergence flag
     )
     {
@@ -91,7 +93,7 @@ namespace NonZoneEquipmentManager {
         //       RE-ENGINEERED  Richard Liesen
         //       DATE MODIFIED  February 2003
         //       MODIFIED       Hudson, ORNL July 2007
-        //       MODIFIED       B. Grifffith, NREL, April 2008,
+        //       MODIFIED       B. Griffith, NREL, April 2008,
         //                      added calls for just heat recovery part of chillers
         //       MODIFIED       Removed much for plant upgrade, 2011
 
@@ -103,29 +105,25 @@ namespace NonZoneEquipmentManager {
         // one here before it knows what to call for simulation.
 
         // Using/Aliasing
-        using DataGlobals::ZoneSizingCalc;
         using WaterThermalTanks::SimulateWaterHeaterStandAlone;
         using WaterUse::SimulateWaterUse;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WaterHeaterNum; // Water heater object number
-        static int NumOfWaterHeater;
-        static bool CountNonZoneEquip(true);
+        auto &NumOfWaterHeater = state.dataGlobal->NumOfWaterHeater;
+        auto &CountNonZoneEquip = state.dataGlobal->CountNonZoneEquip;
 
-        // FLOW:
         if (CountNonZoneEquip) {
-            NumOfWaterHeater = inputProcessor->getNumObjectsFound("WaterHeater:Mixed") + inputProcessor->getNumObjectsFound("WaterHeater:Stratified");
+            NumOfWaterHeater = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WaterHeater:Mixed") +
+                               state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WaterHeater:Stratified");
             CountNonZoneEquip = false;
         }
 
-        SimulateWaterUse(FirstHVACIteration); // simulate non-plant loop water use.
+        SimulateWaterUse(state, FirstHVACIteration); // simulate non-plant loop water use.
 
-        if (!ZoneSizingCalc) {
+        if (!state.dataGlobal->ZoneSizingCalc) {
             for (WaterHeaterNum = 1; WaterHeaterNum <= NumOfWaterHeater; ++WaterHeaterNum) {
-                SimulateWaterHeaterStandAlone(WaterHeaterNum, FirstHVACIteration);
+                SimulateWaterHeaterStandAlone(state, WaterHeaterNum, FirstHVACIteration);
             }
         }
 

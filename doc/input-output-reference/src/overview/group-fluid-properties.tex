@@ -68,7 +68,7 @@ This field refers to the substance that is being mixed with water to create the 
 
 \paragraph{Field: User Defined Glycol Name}\label{field-user-defined-glycol-name}
 
-This field is the name used elsewhere in a FluidProperties:Name object for defining your own glycol properties. This field is left blank unless you enter \textbf{UserDefinedGlycolType} in the previous field.
+This field is the name used elsewhere in a \hyperref[fluidpropertiesname]{FluidProperties:Name} object for defining your own glycol properties. This field is left blank unless you enter \textbf{UserDefinedGlycolType} in the previous field.
 
 \paragraph{Field: Glycol Concentration}\label{field-glycol-concentration}
 
@@ -94,7 +94,7 @@ It is assumed that all fluid properties vary with temperature. A common set of t
 
 \paragraph{Field: Name}\label{field-name-1-017}
 
-This field is simply an unique identifier name that is used to cross reference the list of temperatures with a specific list of fluid property data. A single temperature list can be used for more than one thermal property or fluid. For example, the same temperature list can be used for the superheated enthalpy of a refrigerant and the specific heat of a glycol if appropriate.
+This field is simply a unique identifier name that is used to cross reference the list of temperatures with a specific list of fluid property data. A single temperature list can be used for more than one thermal property or fluid. For example, the same temperature list can be used for the superheated enthalpy of a refrigerant and the specific heat of a glycol if appropriate.
 
 \paragraph{Field(s) 1-250: Temperature}\label{fields-1-250-temperature}
 
@@ -120,7 +120,7 @@ Refrigerant property data for the saturated region is entered with the following
 
 \paragraph{Field: Name}\label{field-name-2-016}
 
-This name identifies the fluid for which data follows in the remaining syntax. This fluid name must also be given in the fluid names list (ref: FluidProperties:Names object) as a \textbf{Refrigerant}.
+This name identifies the fluid for which data follows in the remaining syntax. This fluid name must also be given in the fluid names list (ref: \hyperref[fluidpropertiesname]{FluidProperties:Name}s object) as a \textbf{Refrigerant}.
 
 \paragraph{Field: Fluid Property Type}\label{field-fluid-property-type}
 
@@ -128,11 +128,11 @@ This field identifies the fluid property for which data is being entered with th
 
 \paragraph{Field: Fluid Phase}\label{field-fluid-phase}
 
-In the saturated region, each property has two values: one for the saturated liquid state and one for the saturated gaseous state. Accordingly, the phase for which the saturated property data applies is specified as either \textbf{Fluid} or \textbf{FluidGas}. Data for each phase are required and are interpolated according to quality. However, in the case of saturated pressure data values for only one phase are required (i.e.~can be specified with phase specified as either Fluid or FluidGas, as this is irrelevant).
+In the saturated region, each property has two values: one for the saturated liquid state and one for the saturated gaseous state. Accordingly, the phase for which the saturated property data applies is specified as either \textbf{Fluid} or \textbf{FluidGas}. Data for each phase are required and are interpolated according to quality. However, in the case of saturated pressure data values for only one phase are required (i.e. can be specified with phase specified as either Fluid or FluidGas, as this is irrelevant).
 
 \paragraph{Field: Temperatures Values Name}\label{field-temperatures-values-name}
 
-This name refers to the corresponding list of temperatures (ref: FluidProperties:Temperatures object). Each temperature in the temperature list corresponds to a data item found in the remaining fields of this syntax. The first temperature in the temperature list corresponds to the first fluid property value, the second temperature in the temperature list corresponds to the second fluid property value, etc.
+This name refers to the corresponding list of temperatures (ref: \hyperref[fluidpropertiestemperatures]{FluidProperties:Temperatures} object). Each temperature in the temperature list corresponds to a data item found in the remaining fields of this syntax. The first temperature in the temperature list corresponds to the first fluid property value, the second temperature in the temperature list corresponds to the second fluid property value, etc.
 
 \paragraph{Field(s) 1-250: Property Value}\label{fields-1-250-property-value}
 
@@ -161,7 +161,7 @@ The format of the data for the superheated region is similar to that of the satu
 
 \paragraph{Field: Fluid Name}\label{field-fluid-name-1}
 
-This name identifies the fluid for which data follows in the remaining syntax. This fluid name must show up in the fluid names list (ref: FluidProperties:Names object) as a \textbf{Refrigerant}.
+This name identifies the fluid for which data follows in the remaining syntax. This fluid name must show up in the fluid names list (ref: \hyperref[fluidpropertiesname]{FluidProperties:Name}s object) as a \textbf{Refrigerant}.
 
 \paragraph{Field: Fluid Property Type}\label{field-fluid-property-type-1}
 
@@ -169,7 +169,7 @@ This field identifies the fluid property for which data is being entered with th
 
 \paragraph{Field: Temperatures Values Name}\label{field-temperatures-values-name-1}
 
-This name refers to the corresponding list of temperatures (ref: FluidProperties:Temperatures object). Each temperature in the temperature list corresponds to a given property data item at each pressure. The first temperature in the temperature list corresponds to the first fluid property value, the second temperature in the temperature list corresponds to the second fluid property value, etc.
+This name refers to the corresponding list of temperatures (ref: \hyperref[fluidpropertiestemperatures]{FluidProperties:Temperatures} object). Each temperature in the temperature list corresponds to a given property data item at each pressure. The first temperature in the temperature list corresponds to the first fluid property value, the second temperature in the temperature list corresponds to the second fluid property value, etc.
 
 \paragraph{Field: Pressure}\label{field-pressure}
 
@@ -196,13 +196,13 @@ A full data set for a glycol fluid type in EnergyPlus includes: a temperature li
 
 \subsection{FluidProperties:Concentration}\label{fluidpropertiesconcentration}
 
-The format of the data for the glycols is similar to that of superheated refrigerants except that data at a number of concentrations is given, rather than pressures. The concentration is listed before the rest of the data and is normalized (i.e.~in the range 0.0 to 1.0, rather than a percentage). Note that glycol solutions are assumed to exist in liquid form only in EnergyPlus.
+The format of the data for the glycols is similar to that of superheated refrigerants except that data at a number of concentrations is given, rather than pressures. The concentration is listed before the rest of the data and is normalized (i.e. in the range 0.0 to 1.0, rather than a percentage). Note that glycol solutions are assumed to exist in liquid form only in EnergyPlus.
 
 \subsubsection{Inputs}\label{inputs-5-012}
 
 \paragraph{Field: Fluid Name}\label{field-fluid-name-2}
 
-This name identifies the fluid for which data follows in the remaining syntax. This fluid name must show up in the fluid names list (ref: FluidProperties:Names object) as a \textbf{Glycol}.. Note that users should not use Water, EthyleneGlycol, or PropyleneGlycol as names since these are default fluids.
+This name identifies the fluid for which data follows in the remaining syntax. This fluid name must show up in the fluid names list (ref: \hyperref[fluidpropertiesname]{FluidProperties:Name}s object) as a \textbf{Glycol}.. Note that users should not use Water, EthyleneGlycol, or PropyleneGlycol as names since these are default fluids.
 
 \paragraph{Field: Fluid Property Type}\label{field-fluid-property-type-2}
 
@@ -210,11 +210,11 @@ This field identifies the fluid property for which data is being entered with th
 
 \paragraph{Field: Temperatures Values Name}\label{field-temperatures-values-name-2}
 
-This name refers to the corresponding list of temperatures (ref: FluidProperties:Temperatures object). Each temperature in the temperature list corresponds to a data item found in the remaining fields of this syntax. The first temperature in the temperature list corresponds to the first fluid property value, the second temperature in the temperature list corresponds to the second fluid property value, etc.
+This name refers to the corresponding list of temperatures (ref: \hyperref[fluidpropertiestemperatures]{FluidProperties:Temperatures} object). Each temperature in the temperature list corresponds to a data item found in the remaining fields of this syntax. The first temperature in the temperature list corresponds to the first fluid property value, the second temperature in the temperature list corresponds to the second fluid property value, etc.
 
 \paragraph{Field: Concentration}\label{field-concentration}
 
-A concentration must be listed for the values of specific heat that follow. Lists of properties are various concentrations and temperatures form a two-dimensional table from which EnergyPlus interpolates to find the property value at a specified temperature and concentration. Concentrations are specified in a normalized form (i.e.~in the range 0.0 to 1.0, rather than a percentage)
+A concentration must be listed for the values of specific heat that follow. Lists of properties are various concentrations and temperatures form a two-dimensional table from which EnergyPlus interpolates to find the property value at a specified temperature and concentration. Concentrations are specified in a normalized form (i.e. in the range 0.0 to 1.0, rather than a percentage)
 
 \paragraph{Field(s) 1-250: Property Value}\label{fields-1-250-property-value-2}
 

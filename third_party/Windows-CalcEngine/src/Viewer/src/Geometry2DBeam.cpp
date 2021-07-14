@@ -1,5 +1,6 @@
 #include <cassert>
 #include <algorithm>
+#include <stdexcept>
 
 #include "Geometry2DBeam.hpp"
 #include "Geometry2D.hpp"

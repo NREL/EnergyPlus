@@ -1,0 +1,16 @@
+{
+  "problemMatcher": [
+    {
+      "owner": "latex-parser",
+      "pattern": [
+        {
+          "regexp": "^\\[LATEX(WARNING|ERROR)::(.*?):(\\d+)::(.*?)\\]$",
+          "severity": 1,
+          "file": 2,
+          "line": 3,
+          "message": 4
+        }
+      ]
+    }
+  ]
+}

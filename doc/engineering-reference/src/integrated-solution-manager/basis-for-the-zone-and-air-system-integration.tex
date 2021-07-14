@@ -128,5 +128,5 @@ In the source code below we see how the ZoneVolCapMultpSens increases the zone v
 \begin{lstlisting}
     AIRRAT(ZoneNum) = Zone(ZoneNum)%Volume\***ZoneVolCapMultpSens**\* &
                PsyRhoAirFnPbTdbW(OutBaroPress,MAT(ZoneNum),ZoneAirHumRat(ZoneNum))\* &
-               PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum),MAT(ZoneNum))/(TimeStepSys\*SecInHour)
+               PsyCpAirFnW(ZoneAirHumRat(ZoneNum))/(TimeStepSys\*SecInHour)
 \end{lstlisting}

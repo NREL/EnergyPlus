@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,10 +57,14 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
-#include <GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 // Derived class for Site:GroundTemperature:Shallow
 class SiteShallowGroundTemps : public BaseGroundTempsModel
@@ -71,22 +75,16 @@ public:
 
     // Default Constructor
     SiteShallowGroundTemps() : timeOfSimInMonths(0), surfaceGroundTemps(12, 13.0)
-
     {
     }
 
-    static std::shared_ptr<SiteShallowGroundTemps> ShallowGTMFactory(int objectType, std::string objectName);
+    static std::shared_ptr<SiteShallowGroundTemps> ShallowGTMFactory(EnergyPlusData &state, GroundTempObjType objectType, std::string objectName);
 
-    Real64 getGroundTemp();
+    Real64 getGroundTemp([[maybe_unused]] EnergyPlusData &state) override;
 
-    Real64 getGroundTempAtTimeInSeconds(Real64 const depth, Real64 const timeInSecondsOfSim);
+    Real64 getGroundTempAtTimeInSeconds(EnergyPlusData &state, Real64 const depth, Real64 const timeInSecondsOfSim) override;
 
-    Real64 getGroundTempAtTimeInMonths(Real64 const depth, int const monthOfSim);
-
-    // Destructor
-    ~SiteShallowGroundTemps()
-    {
-    }
+    Real64 getGroundTempAtTimeInMonths(EnergyPlusData &state, Real64 const depth, int const monthOfSim) override;
 };
 
 } // namespace EnergyPlus

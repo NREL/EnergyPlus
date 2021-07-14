@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,6 +48,9 @@
 #ifndef UtilityRoutines_hh_INCLUDED
 #define UtilityRoutines_hh_INCLUDED
 
+// C++ Headers
+#include <functional>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array1S.fwd.hh>
@@ -56,29 +59,37 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
-int AbortEnergyPlus();
+// Forward declarations
+class InputOutputFile;
+struct EnergyPlusData;
 
-void CloseMiscOpenFiles();
+int AbortEnergyPlus(EnergyPlusData &state);
+
+void CloseMiscOpenFiles(EnergyPlusData &state);
 
 void CloseOutOpenFiles();
 
-int EndEnergyPlus();
+int EndEnergyPlus(EnergyPlusData &state);
 
-int GetNewUnitNumber();
-
-int FindUnitNumber(std::string const &FileName); // File name to be searched.
-
-void ConvertCaseToUpper(std::string const &InputString, // Input string
-                        std::string &OutputString       // Output string (in UpperCase)
+void ConvertCaseToUpper(std::string_view InputString, // Input string
+                        std::string &OutputString     // Output string (in UpperCase)
 );
 
-void ConvertCaseToLower(std::string const &InputString, // Input string
-                        std::string &OutputString       // Output string (in LowerCase)
+void ConvertCaseToLower(std::string_view InputString, // Input string
+                        std::string &OutputString     // Output string (in LowerCase)
 );
+
+// useful for forcing a conversion to a string reference for JSON objects
+inline const std::string &AsString(const std::string &value)
+{
+    return value;
+}
 
 std::string::size_type FindNonSpace(std::string const &String); // String to be scanned
 
@@ -122,23 +133,43 @@ template <typename T> inline T pow7(T const &x)
 
 bool env_var_on(std::string const &env_var_str);
 
-void ShowFatalError(std::string const &ErrorMessage, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+class FatalError : public std::runtime_error
+{
+public:
+    FatalError(std::string const &msg) : runtime_error(msg)
+    {
+    }
+};
 
-void ShowSevereError(std::string const &ErrorMessage, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+using OptionalOutputFileRef = Optional<std::reference_wrapper<EnergyPlus::InputOutputFile>>;
 
-void ShowSevereMessage(std::string const &ErrorMessage, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+void ShowFatalError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
-void ShowContinueError(std::string const &Message, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+void ShowSevereError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
-void ShowContinueErrorTimeStamp(std::string const &Message, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+void ShowSevereMessage(EnergyPlusData &state,
+                       std::string const &ErrorMessage,
+                       OptionalOutputFileRef OutUnit1 = _,
+                       OptionalOutputFileRef OutUnit2 = _);
 
-void ShowMessage(std::string const &Message, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+void ShowContinueError(EnergyPlusData &state, std::string const &Message, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
-void ShowWarningError(std::string const &ErrorMessage, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+void ShowContinueErrorTimeStamp(EnergyPlusData &state,
+                                std::string const &Message,
+                                OptionalOutputFileRef OutUnit1 = _,
+                                OptionalOutputFileRef OutUnit2 = _);
 
-void ShowWarningMessage(std::string const &ErrorMessage, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+void ShowMessage(EnergyPlusData &state, std::string const &Message, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
-void ShowRecurringSevereErrorAtEnd(std::string const &Message,             // Message automatically written to "error file" at end of simulation
+void ShowWarningError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+
+void ShowWarningMessage(EnergyPlusData &state,
+                        std::string const &ErrorMessage,
+                        OptionalOutputFileRef OutUnit1 = _,
+                        OptionalOutputFileRef OutUnit2 = _);
+
+void ShowRecurringSevereErrorAtEnd(EnergyPlusData &state,
+                                   std::string const &Message,             // Message automatically written to "error file" at end of simulation
                                    int &MsgIndex,                          // Recurring message index, if zero, next available index is assigned
                                    Optional<Real64 const> ReportMaxOf = _, // Track and report the max of the values passed to this argument
                                    Optional<Real64 const> ReportMinOf = _, // Track and report the min of the values passed to this argument
@@ -148,7 +179,8 @@ void ShowRecurringSevereErrorAtEnd(std::string const &Message,             // Me
                                    std::string const &ReportSumUnits = ""  // optional char string (<=15 length) of units for sum value
 );
 
-void ShowRecurringWarningErrorAtEnd(std::string const &Message,             // Message automatically written to "error file" at end of simulation
+void ShowRecurringWarningErrorAtEnd(EnergyPlusData &state,
+                                    std::string const &Message,             // Message automatically written to "error file" at end of simulation
                                     int &MsgIndex,                          // Recurring message index, if zero, next available index is assigned
                                     Optional<Real64 const> ReportMaxOf = _, // Track and report the max of the values passed to this argument
                                     Optional<Real64 const> ReportMinOf = _, // Track and report the min of the values passed to this argument
@@ -158,7 +190,8 @@ void ShowRecurringWarningErrorAtEnd(std::string const &Message,             // M
                                     std::string const &ReportSumUnits = ""  // optional char string (<=15 length) of units for sum value
 );
 
-void ShowRecurringContinueErrorAtEnd(std::string const &Message,             // Message automatically written to "error file" at end of simulation
+void ShowRecurringContinueErrorAtEnd(EnergyPlusData &state,
+                                     std::string const &Message,             // Message automatically written to "error file" at end of simulation
                                      int &MsgIndex,                          // Recurring message index, if zero, next available index is assigned
                                      Optional<Real64 const> ReportMaxOf = _, // Track and report the max of the values passed to this argument
                                      Optional<Real64 const> ReportMinOf = _, // Track and report the min of the values passed to this argument
@@ -168,7 +201,8 @@ void ShowRecurringContinueErrorAtEnd(std::string const &Message,             // 
                                      std::string const &ReportSumUnits = ""  // optional char string (<=15 length) of units for sum value
 );
 
-void StoreRecurringErrorMessage(std::string const &ErrorMessage,             // Message automatically written to "error file" at end of simulation
+void StoreRecurringErrorMessage(EnergyPlusData &state,
+                                std::string const &ErrorMessage,             // Message automatically written to "error file" at end of simulation
                                 int &ErrorMsgIndex,                          // Recurring message index, if zero, next available index is assigned
                                 Optional<Real64 const> ErrorReportMaxOf = _, // Track and report the max of the values passed to this argument
                                 Optional<Real64 const> ErrorReportMinOf = _, // Track and report the min of the values passed to this argument
@@ -178,14 +212,13 @@ void StoreRecurringErrorMessage(std::string const &ErrorMessage,             // 
                                 std::string const &ErrorReportSumUnits = ""  // Units for "sum" reporting
 );
 
-void ShowErrorMessage(std::string const &ErrorMessage, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+void ShowErrorMessage(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
-void SummarizeErrors();
+void SummarizeErrors(EnergyPlusData &state);
 
-void ShowRecurringErrors();
+void ShowRecurringErrors(EnergyPlusData &state);
 
 namespace UtilityRoutines {
-    extern bool outputErrorHeader;
 
     template <class T> struct is_shared_ptr : std::false_type
     {
@@ -194,23 +227,23 @@ namespace UtilityRoutines {
     {
     };
 
-    Real64 ProcessNumber(std::string const &String, bool &ErrorFlag);
+    Real64 ProcessNumber(std::string_view const String, bool &ErrorFlag);
 
-    int FindItemInList(std::string const &String, Array1_string const &ListOfItems, int const NumItems);
+    int FindItemInList(std::string_view const String, Array1_string const &ListOfItems, int NumItems);
 
-    inline int FindItemInList(std::string const &String, Array1_string const &ListOfItems)
+    inline int FindItemInList(std::string_view const String, Array1_string const &ListOfItems)
     {
         return UtilityRoutines::FindItemInList(String, ListOfItems, ListOfItems.isize());
     }
 
-    int FindItemInList(std::string const &String, Array1S_string const ListOfItems, int const NumItems);
+    int FindItemInList(std::string_view const String, Array1S_string const ListOfItems, int NumItems);
 
-    inline int FindItemInList(std::string const &String, Array1S_string const ListOfItems)
+    inline int FindItemInList(std::string_view const String, Array1S_string const ListOfItems)
     {
         return UtilityRoutines::FindItemInList(String, ListOfItems, ListOfItems.isize());
     }
 
-    template <typename A> inline int FindItemInList(std::string const &String, MArray1<A, std::string> const &ListOfItems, int const NumItems)
+    template <typename A> inline int FindItemInList(std::string_view const String, MArray1<A, std::string> const &ListOfItems, int const NumItems)
     {
         for (int Count = 1; Count <= NumItems; ++Count) {
             if (String == ListOfItems(Count)) return Count;
@@ -218,14 +251,14 @@ namespace UtilityRoutines {
         return 0; // Not found
     }
 
-    template <typename A> inline int FindItemInList(std::string const &String, MArray1<A, std::string> const &ListOfItems)
+    template <typename A> inline int FindItemInList(std::string_view const String, MArray1<A, std::string> const &ListOfItems)
     {
         return UtilityRoutines::FindItemInList(String, ListOfItems, ListOfItems.isize());
     }
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
     // Container needs and operator[i] and elements need Name
-    inline int FindItemInList(std::string const &String, Container const &ListOfItems, int const NumItems)
+    inline int FindItemInList(std::string_view const String, Container const &ListOfItems, int const NumItems)
     {
         for (typename Container::size_type i = 0, e = NumItems; i < e; ++i) {
             if (String == ListOfItems[i].Name) return int(i + 1); // 1-based return index
@@ -235,14 +268,15 @@ namespace UtilityRoutines {
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
     // Container needs isize() and operator[i] and elements need Name
-    inline int FindItemInList(std::string const &String, Container const &ListOfItems)
+    inline int FindItemInList(std::string_view const String, Container const &ListOfItems)
     {
         return UtilityRoutines::FindItemInList(String, ListOfItems, ListOfItems.isize());
     }
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
     // Container needs operator[i] and value_type
-    inline int FindItemInList(std::string const &String, Container const &ListOfItems, std::string Container::value_type::*name_p, int const NumItems)
+    inline int
+    FindItemInList(std::string_view const String, Container const &ListOfItems, std::string Container::value_type::*name_p, int const NumItems)
     {
         for (typename Container::size_type i = 0, e = NumItems; i < e; ++i) {
             if (String == ListOfItems[i].*name_p) return int(i + 1); // 1-based return index
@@ -252,19 +286,20 @@ namespace UtilityRoutines {
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
     // Container needs isize() and operator[i] and value_type
-    inline int FindItemInList(std::string const &String, Container const &ListOfItems, std::string Container::value_type::*name_p)
+    inline int FindItemInList(std::string_view const String, Container const &ListOfItems, std::string Container::value_type::*name_p)
     {
         return UtilityRoutines::FindItemInList(String, ListOfItems, name_p, ListOfItems.isize());
     }
 
-    int FindItemInSortedList(std::string const &String, Array1S_string const ListOfItems, int const NumItems);
+    int FindItemInSortedList(std::string_view const string, Array1S_string const ListOfItems, int NumItems);
 
-    inline int FindItemInSortedList(std::string const &String, Array1S_string const ListOfItems)
+    inline int FindItemInSortedList(std::string_view const String, Array1S_string const ListOfItems)
     {
         return FindItemInSortedList(String, ListOfItems, ListOfItems.isize());
     }
 
-    template <typename A> inline int FindItemInSortedList(std::string const &String, MArray1<A, std::string> const &ListOfItems, int const NumItems)
+    template <typename A>
+    inline int FindItemInSortedList(std::string_view const String, MArray1<A, std::string> const &ListOfItems, int const NumItems)
     {
         int Probe(0);
         int LBnd(0);
@@ -286,12 +321,12 @@ namespace UtilityRoutines {
         return Probe;
     }
 
-    template <typename A> inline int FindItemInSortedList(std::string const &String, MArray1<A, std::string> const &ListOfItems)
+    template <typename A> inline int FindItemInSortedList(std::string_view const String, MArray1<A, std::string> const &ListOfItems)
     {
         return FindItemInSortedList(String, ListOfItems, ListOfItems.isize());
     }
 
-    template <typename InputIterator> inline int FindItem(InputIterator first, InputIterator last, std::string const &str, std::false_type)
+    template <typename InputIterator> inline int FindItem(InputIterator first, InputIterator last, std::string_view const str, std::false_type)
     {
         using valueType = typename std::iterator_traits<InputIterator>::value_type;
         // static_assert( std::is_convertible< decltype( std::declval< valueType >() ), Named >::value, "Iterator value must inherit from class Named"
@@ -306,7 +341,7 @@ namespace UtilityRoutines {
         return 0; // Not found
     }
 
-    template <typename InputIterator> inline int FindItem(InputIterator first, InputIterator last, std::string const &str, std::true_type)
+    template <typename InputIterator> inline int FindItem(InputIterator first, InputIterator last, std::string_view const str, std::true_type)
     {
         using valueType = typename std::iterator_traits<InputIterator>::value_type;
         // static_assert( std::is_convertible< decltype( *std::declval< valueType >() ), Named >::value, "Iterator value must inherit from class
@@ -321,26 +356,26 @@ namespace UtilityRoutines {
         return 0; // Not found
     }
 
-    template <typename InputIterator> inline int FindItem(InputIterator first, InputIterator last, std::string const &str)
+    template <typename InputIterator> inline int FindItem(InputIterator first, InputIterator last, std::string_view const &str)
     {
         return FindItem(first, last, str, is_shared_ptr<typename std::iterator_traits<InputIterator>::value_type>{});
     }
 
-    int FindItem(std::string const &String, Array1D_string const &ListOfItems, int const NumItems);
+    int FindItem(std::string_view const String, Array1D_string const &ListOfItems, int const NumItems);
 
-    inline int FindItem(std::string const &String, Array1D_string const &ListOfItems)
+    inline int FindItem(std::string_view const String, Array1D_string const &ListOfItems)
     {
         return FindItem(String, ListOfItems, ListOfItems.isize());
     }
 
-    int FindItem(std::string const &String, Array1S_string const ListOfItems, int const NumItems);
+    int FindItem(std::string_view const String, Array1S_string const ListOfItems, int const NumItems);
 
-    inline int FindItem(std::string const &String, Array1S_string const ListOfItems)
+    inline int FindItem(std::string_view const String, Array1S_string const ListOfItems)
     {
         return FindItem(String, ListOfItems, ListOfItems.isize());
     }
 
-    template <typename A> inline int FindItem(std::string const &String, MArray1<A, std::string> const &ListOfItems, int const NumItems)
+    template <typename A> inline int FindItem(std::string_view const String, MArray1<A, std::string> const &ListOfItems, int const NumItems)
     {
         int const item_number(UtilityRoutines::FindItemInList(String, ListOfItems, NumItems));
         if (item_number != 0) return item_number;
@@ -350,14 +385,14 @@ namespace UtilityRoutines {
         return 0; // Not found
     }
 
-    template <typename A> inline int FindItem(std::string const &String, MArray1<A, std::string> const &ListOfItems)
+    template <typename A> inline int FindItem(std::string_view const String, MArray1<A, std::string> const &ListOfItems)
     {
         return FindItem(String, ListOfItems, ListOfItems.isize());
     }
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
     // Container needs size() and operator[i] and elements need Name
-    inline int FindItem(std::string const &String, Container const &ListOfItems, int const NumItems)
+    inline int FindItem(std::string_view const String, Container const &ListOfItems, int const NumItems)
     {
         int const item_number(UtilityRoutines::FindItemInList(String, ListOfItems, NumItems));
         if (item_number != 0) return item_number;
@@ -369,14 +404,14 @@ namespace UtilityRoutines {
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
     // Container needs size() and operator[i] and elements need Name
-    inline int FindItem(std::string const &String, Container const &ListOfItems)
+    inline int FindItem(std::string_view const String, Container const &ListOfItems)
     {
         return FindItem(String, ListOfItems, ListOfItems.isize());
     }
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
     // Container needs size() and operator[i] and value_type
-    inline int FindItem(std::string const &String, Container const &ListOfItems, std::string Container::value_type::*name_p, int const NumItems)
+    inline int FindItem(std::string_view const String, Container const &ListOfItems, std::string Container::value_type::*name_p, int const NumItems)
     {
         int const item_number(UtilityRoutines::FindItemInList(String, ListOfItems, name_p, NumItems));
         if (item_number != 0) return item_number;
@@ -388,66 +423,53 @@ namespace UtilityRoutines {
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
     // Container needs size() and operator[i] and value_type
-    inline int FindItem(std::string const &String, Container const &ListOfItems, std::string Container::value_type::*name_p)
+    inline int FindItem(std::string_view const String, Container const &ListOfItems, std::string Container::value_type::*name_p)
     {
         return FindItem(String, ListOfItems, name_p, ListOfItems.isize());
     }
 
-    std::string MakeUPPERCase(std::string const &InputString); // Input String
+    std::string MakeUPPERCase(std::string_view const InputString); // Input String
 
-    inline bool SameString(std::string const &s, std::string const &t)
-    {
-        // case insensitive comparison
-        return equali(s, t);
-    }
-
-    typedef char const *c_cstring;
-
-    inline bool SameString(std::string const &s, c_cstring const &t)
-    {
-        // case insensitive comparison
-        return equali(s, t);
-    }
-
-    inline bool SameString(c_cstring const &s, std::string const &t)
-    {
-        // case insensitive comparison
-        return equali(s, t);
-    }
-
-    inline bool SameString(c_cstring const &s, c_cstring const &t)
+    inline bool SameString(std::string_view const s, std::string_view const t)
     {
         // case insensitive comparison
         return equali(s, t);
     }
 
     template <typename InputIterator>
-    inline void VerifyName(
-        InputIterator first, InputIterator last, std::string const &NameToVerify, bool &ErrorFound, bool &IsBlank, std::string const &StringToDisplay)
+    inline void VerifyName(EnergyPlusData &state,
+                           InputIterator first,
+                           InputIterator last,
+                           std::string const &NameToVerify,
+                           bool &ErrorFound,
+                           bool &IsBlank,
+                           std::string const &StringToDisplay)
     {
         IsBlank = false;
         ErrorFound = false;
         if (NameToVerify.empty()) {
-            ShowSevereError(StringToDisplay + ", cannot be blank");
+            ShowSevereError(state, StringToDisplay + ", cannot be blank");
             ErrorFound = true;
             IsBlank = true;
             return;
         }
         int Found = FindItem(first, last, NameToVerify);
         if (Found != 0) {
-            ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify);
+            ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify);
             ErrorFound = true;
         }
     }
 
-    void VerifyName(std::string const &NameToVerify,
+    void VerifyName(EnergyPlusData &state,
+                    std::string const &NameToVerify,
                     Array1D_string const &NamesList,
                     int const NumOfNames,
                     bool &ErrorFound,
                     bool &IsBlank,
                     std::string const &StringToDisplay);
 
-    void VerifyName(std::string const &NameToVerify,
+    void VerifyName(EnergyPlusData &state,
+                    std::string const &NameToVerify,
                     Array1S_string const NamesList,
                     int const NumOfNames,
                     bool &ErrorFound,
@@ -455,7 +477,8 @@ namespace UtilityRoutines {
                     std::string const &StringToDisplay);
 
     template <typename A>
-    inline void VerifyName(std::string const &NameToVerify,
+    inline void VerifyName(EnergyPlusData &state,
+                           std::string const &NameToVerify,
                            MArray1<A, std::string> const &NamesList,
                            int const NumOfNames,
                            bool &ErrorFound,
@@ -467,13 +490,13 @@ namespace UtilityRoutines {
             int const Found = FindItem(NameToVerify, NamesList,
                                        NumOfNames); // Calls FindItem overload that accepts member arrays
             if (Found != 0) {
-                ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify);
+                ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify);
                 ErrorFound = true;
             }
         }
 
         if (NameToVerify.empty()) {
-            ShowSevereError(StringToDisplay + ", cannot be blank");
+            ShowSevereError(state, StringToDisplay + ", cannot be blank");
             ErrorFound = true;
             IsBlank = true;
         } else {
@@ -483,7 +506,8 @@ namespace UtilityRoutines {
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
     // Container needs size() and operator[i] and elements need Name
-    inline void VerifyName(std::string const &NameToVerify,
+    inline void VerifyName(EnergyPlusData &state,
+                           std::string const &NameToVerify,
                            Container const &NamesList,
                            int const NumOfNames,
                            bool &ErrorFound,
@@ -495,13 +519,13 @@ namespace UtilityRoutines {
             int const Found = FindItem(NameToVerify, NamesList,
                                        NumOfNames); // Calls FindItem overload that accepts member arrays
             if (Found != 0) {
-                ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify);
+                ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify);
                 ErrorFound = true;
             }
         }
 
         if (NameToVerify.empty()) {
-            ShowSevereError(StringToDisplay + ", cannot be blank");
+            ShowSevereError(state, StringToDisplay + ", cannot be blank");
             ErrorFound = true;
             IsBlank = true;
         } else {
@@ -511,7 +535,8 @@ namespace UtilityRoutines {
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
     // Container needs size() and operator[i] and value_type
-    inline void VerifyName(std::string const &NameToVerify,
+    inline void VerifyName(EnergyPlusData &state,
+                           std::string const &NameToVerify,
                            Container const &NamesList,
                            std::string Container::value_type::*name_p,
                            int const NumOfNames,
@@ -523,13 +548,13 @@ namespace UtilityRoutines {
         if (NumOfNames > 0) {
             int const Found = FindItem(NameToVerify, NamesList, name_p, NumOfNames);
             if (Found != 0) {
-                ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify);
+                ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify);
                 ErrorFound = true;
             }
         }
 
         if (NameToVerify.empty()) {
-            ShowSevereError(StringToDisplay + ", cannot be blank");
+            ShowSevereError(state, StringToDisplay + ", cannot be blank");
             ErrorFound = true;
             IsBlank = true;
         } else {
@@ -537,11 +562,56 @@ namespace UtilityRoutines {
         }
     }
 
-    bool IsNameEmpty(std::string &NameToVerify, std::string const &StringToDisplay, bool &ErrorFound);
+    bool IsNameEmpty(EnergyPlusData &state, std::string &NameToVerify, std::string_view StringToDisplay, bool &ErrorFound);
 
-    std::string IPTrimSigDigits(int const IntegerValue);
+    // Two structs for case insensitive containers.
+    // Eg: for unordered_map, we need to have a case insenstive hasher and a case insensitive comparator
+    // (The default allocator for unordered_map is fine)
+    // For map, you'd only need the comparator
+    struct case_insensitive_hasher
+    {
+        size_t operator()(const std::string_view key) const noexcept;
+    };
+
+    struct case_insensitive_comparator
+    {
+        bool operator()(const std::string_view a, const std::string_view b) const noexcept;
+    };
+
+    void appendPerfLog(EnergyPlusData &state, std::string const &colHeader, std::string const &colValue, bool finalColumn = false);
+
+    bool ValidateFuelType(EnergyPlusData &state,
+                          std::string const &FuelTypeInput,
+                          std::string &FuelTypeOutput,
+                          bool &FuelTypeErrorsFound,
+                          bool const &AllowSteamAndDistrict = false);
+
+    bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput,
+                                                   std::string &FuelTypeOutput,
+                                                   DataGlobalConstants::ResourceType &FuelTypeNum,
+                                                   bool &FuelTypeErrorsFound);
+
 } // namespace UtilityRoutines
 
+struct UtilityRoutinesData : BaseGlobalStruct
+{
+
+    bool outputErrorHeader = true;
+    std::string appendPerfLog_headerRow;
+    std::string appendPerfLog_valuesRow;
+    bool GetMatrixInputFlag = true;
+
+    void clear_state() override
+    {
+        outputErrorHeader = true;
+        appendPerfLog_headerRow.clear();
+        appendPerfLog_valuesRow.clear();
+        GetMatrixInputFlag = true;
+    }
+
+    // Default Constructor
+    UtilityRoutinesData() = default;
+};
 } // namespace EnergyPlus
 
 #endif

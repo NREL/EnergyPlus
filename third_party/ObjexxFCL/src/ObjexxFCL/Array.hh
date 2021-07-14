@@ -15,17 +15,13 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.fwd.hh>
-#include <ObjexxFCL/ArrayInitializer.hh>
 #include <ObjexxFCL/BArray.hh>
 #include <ObjexxFCL/AlignedAllocator.hh>
 #include <ObjexxFCL/ArrayS.hh>
-#include <ObjexxFCL/ArrayTail.hh>
 #include <ObjexxFCL/CArrayA.hh>
-#include <ObjexxFCL/fmt.hh>
 #include <ObjexxFCL/InitializerSentinel.hh>
 #include <ObjexxFCL/MArray.hh>
 #include <ObjexxFCL/ProxySentinel.hh>
-#include <ObjexxFCL/Sticky.hh>
 #include <ObjexxFCL/TypeTraits.hh>
 #include <ObjexxFCL/Vector2.hh>
 #include <ObjexxFCL/Vector3.hh>
@@ -79,10 +75,8 @@ protected: // Types
 public: // Types
 
 	typedef  Array< T >  Base;
-	typedef  ArrayTail< T >  Tail;
 	typedef  AlignedAllocator< T >  Aligned;
 	typedef  TypeTraits< T >  Traits;
-	typedef  ArrayInitializer< T >  Initializer;
 
 	// STL style
 	typedef  T  value_type;
@@ -136,7 +130,7 @@ protected: // Creation
 	}
 
 	// Move Constructor
-	Array( Array && a ) NOEXCEPT :
+	Array( Array && a ) noexcept :
 	 BArray( std::move( a ) ),
 	 owner_( a.owner_ ),
 	 capacity_( a.capacity_ ),
@@ -218,7 +212,7 @@ protected: // Creation
 	}
 
 	// Size + InitializerSentinel Constructor
-	Array( size_type const size, InitializerSentinel const & ) :
+	Array( size_type const size, InitializerSentinel ) :
 	 owner_( true ),
 	 capacity_( size_of( size ) ),
 	 size_( capacity_ ),
@@ -345,7 +339,7 @@ protected: // Creation
 	}
 
 	// Default Proxy Constructor
-	Array( ProxySentinel const & ) :
+	Array( ProxySentinel ) :
 	 owner_( false ),
 	 capacity_( 0u ),
 	 size_( 0u ),
@@ -356,7 +350,7 @@ protected: // Creation
 	{}
 
 	// Array Proxy Constructor
-	Array( Array const & a, ProxySentinel const & ) :
+	Array( Array const & a, ProxySentinel ) :
 	 owner_( false ),
 	 capacity_( a.capacity_ ),
 	 size_( a.size_ ),
@@ -367,7 +361,7 @@ protected: // Creation
 	{}
 
 	// Slice Proxy Constructor
-	Array( ArrayS< T > const & a, ProxySentinel const & ) :
+	Array( ArrayS< T > const & a, ProxySentinel ) :
 	 owner_( false ),
 	 capacity_( a.size() ),
 	 size_( a.size() ),
@@ -379,19 +373,9 @@ protected: // Creation
 		assert( a.contiguous() );
 	}
 
-	// Tail Proxy Constructor
-	Array( Tail const & s, ProxySentinel const & ) :
-	 owner_( false ),
-	 capacity_( s.size() ),
-	 size_( capacity_ ),
-	 mem_( nullptr ),
-	 data_( s.data_ ),
-	 shift_( 0 ),
-	 sdata_( nullptr )
-	{}
 
 	// Value Proxy Constructor
-	Array( T const & t, ProxySentinel const & ) :
+	Array( T const & t, ProxySentinel ) :
 	 owner_( false ),
 	 capacity_( npos ), // Unknown
 	 size_( npos ), // Unbounded
@@ -435,7 +419,7 @@ protected: // Assignment: Array
 
 	// Move Assignment
 	void
-	operator =( Array && a ) NOEXCEPT
+	operator =( Array && a ) noexcept
 	{
 		assert( this != &a );
 		assert( owner_ == a.owner_ );
@@ -565,50 +549,6 @@ protected: // Assignment: Array
 		}
 	}
 
-	// *= Array
-	void
-	operator *=( Array const & a )
-	{
-		assert( size_bounded() );
-		assert( size_ == a.size() );
-		if ( overlap( a ) ) { // Overlap-safe
-			CArrayA< T > c( size_ );
-			for ( size_type i = 0; i < size_; ++i ) {
-				c[ i ] = a[ i ];
-			}
-			for ( size_type i = 0; i < size_; ++i ) {
-				data_[ i ] *= c[ i ];
-			}
-		} else { // Not overlap-safe
-			for ( size_type i = 0; i < size_; ++i ) {
-				data_[ i ] *= a[ i ];
-			}
-		}
-	}
-
-	// /= Array
-	void
-	operator /=( Array const & a )
-	{
-		assert( size_bounded() );
-		assert( size_ == a.size() );
-		if ( overlap( a ) ) { // Overlap-safe
-			CArrayA< T > c( size_ );
-			for ( size_type i = 0; i < size_; ++i ) {
-				assert( a[ i ] != T( 0 ) );
-				c[ i ] = a[ i ];
-			}
-			for ( size_type i = 0; i < size_; ++i ) {
-				data_[ i ] /= c[ i ];
-			}
-		} else { // Not overlap-safe
-			for ( size_type i = 0; i < size_; ++i ) {
-				assert( a[ i ] != T( 0 ) );
-				data_[ i ] /= a[ i ];
-			}
-		}
-	}
-
 	// += Array Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	void
@@ -645,67 +585,6 @@ protected: // Assignment: Array
 		}
 	}
 
-	// /= Array Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	operator /=( Array< U > const & a )
-	{
-		assert( size_bounded() );
-		assert( size_ == a.size() );
-		for ( size_type i = 0; i < size_; ++i ) {
-			assert( a[ i ] != T( 0 ) );
-			data_[ i ] /= a[ i ];
-		}
-	}
-
-	// += Initializer List Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	operator +=( std::initializer_list< U > const l )
-	{
-		assert( size_ == l.size() );
-		auto r( l.begin() );
-		for ( size_type i = 0; i < size_; ++i, ++r ) {
-			data_[ i ] += *r;
-		}
-	}
-
-	// -= Initializer List Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	operator -=( std::initializer_list< U > const l )
-	{
-		assert( size_ == l.size() );
-		auto r( l.begin() );
-		for ( size_type i = 0; i < size_; ++i, ++r ) {
-			data_[ i ] -= *r;
-		}
-	}
-
-	// *= Initializer List Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	operator *=( std::initializer_list< U > const l )
-	{
-		assert( size_ == l.size() );
-		auto r( l.begin() );
-		for ( size_type i = 0; i < size_; ++i, ++r ) {
-			data_[ i ] *= *r;
-		}
-	}
-
-	// /= Initializer List Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	operator /=( std::initializer_list< U > const l )
-	{
-		assert( size_ == l.size() );
-		auto r( l.begin() );
-		for ( size_type i = 0; i < size_; ++i, ++r ) {
-			assert( *r != T( 0 ) );
-			data_[ i ] /= *r;
-		}
-	}
 
 	// += std::array Template
 	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
@@ -729,28 +608,6 @@ protected: // Assignment: Array
 		}
 	}
 
-	// *= std::array Template
-	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	operator *=( std::array< U, s > const & a )
-	{
-		assert( size_ == s );
-		for ( size_type i = 0; i < size_; ++i ) {
-			data_[ i ] *= a[ i ];
-		}
-	}
-
-	// /= std::array Template
-	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	operator /=( std::array< U, s > const & a )
-	{
-		assert( size_ == s );
-		for ( size_type i = 0; i < size_; ++i ) {
-			assert( a[ i ] != T( 0 ) );
-			data_[ i ] /= a[ i ];
-		}
-	}
 
 	// += std::vector Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
@@ -774,169 +631,6 @@ protected: // Assignment: Array
 		}
 	}
 
-	// *= std::vector Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	operator *=( std::vector< U > const & v )
-	{
-		assert( size_ == v.size() );
-		for ( size_type i = 0; i < size_; ++i ) {
-			data_[ i ] *= v[ i ];
-		}
-	}
-
-	// /= std::vector Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	operator /=( std::vector< U > const & v )
-	{
-		assert( size_ == v.size() );
-		for ( size_type i = 0; i < size_; ++i ) {
-			assert( v[ i ] != T( 0 ) );
-			data_[ i ] /= v[ i ];
-		}
-	}
-
-	// += Vector2 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	operator +=( Vector2< U > const & v )
-	{
-		assert( size_ == 2u );
-		data_[ 0 ] += v.x;
-		data_[ 1 ] += v.y;
-	}
-
-	// -= Vector2 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	operator -=( Vector2< U > const & v )
-	{
-		assert( size_ == 2u );
-		data_[ 0 ] -= v.x;
-		data_[ 1 ] -= v.y;
-	}
-
-	// *= Vector2 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	operator *=( Vector2< U > const & v )
-	{
-		assert( size_ == 2u );
-		data_[ 0 ] *= v.x;
-		data_[ 1 ] *= v.y;
-	}
-
-	// /= Vector2 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	operator /=( Vector2< U > const & v )
-	{
-		assert( size_ == 2u );
-		assert( v.x != T( 0 ) );
-		assert( v.y != T( 0 ) );
-		data_[ 0 ] /= v.x;
-		data_[ 1 ] /= v.y;
-	}
-
-	// += Vector3 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	operator +=( Vector3< U > const & v )
-	{
-		assert( size_ == 3u );
-		data_[ 0 ] += v.x;
-		data_[ 1 ] += v.y;
-		data_[ 2 ] += v.z;
-	}
-
-	// -= Vector3 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	operator -=( Vector3< U > const & v )
-	{
-		assert( size_ == 3u );
-		data_[ 0 ] -= v.x;
-		data_[ 1 ] -= v.y;
-		data_[ 2 ] -= v.z;
-	}
-
-	// *= Vector3 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	operator *=( Vector3< U > const & v )
-	{
-		assert( size_ == 3u );
-		data_[ 0 ] *= v.x;
-		data_[ 1 ] *= v.y;
-		data_[ 2 ] *= v.z;
-	}
-
-	// /= Vector3 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	operator /=( Vector3< U > const & v )
-	{
-		assert( size_ == 3u );
-		assert( v.x != T( 0 ) );
-		assert( v.y != T( 0 ) );
-		assert( v.z != T( 0 ) );
-		data_[ 0 ] /= v.x;
-		data_[ 1 ] /= v.y;
-		data_[ 2 ] /= v.z;
-	}
-
-	// += Vector4 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	operator +=( Vector4< U > const & v )
-	{
-		assert( size_ == 4u );
-		data_[ 0 ] += v.x;
-		data_[ 1 ] += v.y;
-		data_[ 2 ] += v.z;
-		data_[ 3 ] += v.w;
-	}
-
-	// -= Vector4 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	operator -=( Vector4< U > const & v )
-	{
-		assert( size_ == 4u );
-		data_[ 0 ] -= v.x;
-		data_[ 1 ] -= v.y;
-		data_[ 2 ] -= v.z;
-		data_[ 3 ] -= v.w;
-	}
-
-	// *= Vector4 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	operator *=( Vector4< U > const & v )
-	{
-		assert( size_ == 4u );
-		data_[ 0 ] *= v.x;
-		data_[ 1 ] *= v.y;
-		data_[ 2 ] *= v.z;
-		data_[ 3 ] *= v.w;
-	}
-
-	// /= Vector4 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	operator /=( Vector4< U > const & v )
-	{
-		assert( size_ == 4u );
-		assert( v.x != T( 0 ) );
-		assert( v.y != T( 0 ) );
-		assert( v.z != T( 0 ) );
-		assert( v.w != T( 0 ) );
-		data_[ 0 ] /= v.x;
-		data_[ 1 ] /= v.y;
-		data_[ 2 ] /= v.z;
-		data_[ 3 ] /= v.w;
-	}
 
 public: // Assignment: Value
 
@@ -1009,207 +703,6 @@ public: // Assignment: Value
 		return *this;
 	}
 
-protected: // Assignment: Logical
-
-	// &&= Array
-	void
-	and_equals( Array< T > const & a )
-	{
-		assert( size_bounded() );
-		assert( size_ == a.size() );
-		if ( overlap( a ) ) { // Overlap-safe
-			CArrayA< T > c( size_ );
-			for ( size_type i = 0; i < size_; ++i ) {
-				c[ i ] = a[ i ];
-			}
-			for ( size_type i = 0; i < size_; ++i ) {
-				data_[ i ] = data_[ i ] && c[ i ];
-			}
-		} else { // Not overlap-safe
-			for ( size_type i = 0; i < size_; ++i ) {
-				data_[ i ] = data_[ i ] && a[ i ];
-			}
-		}
-	}
-
-	// ||= Array
-	void
-	or_equals( Array< T > const & a )
-	{
-		assert( size_bounded() );
-		assert( size_ == a.size() );
-		if ( overlap( a ) ) { // Overlap-safe
-			CArrayA< T > c( size_ );
-			for ( size_type i = 0; i < size_; ++i ) {
-				c[ i ] = a[ i ];
-			}
-			for ( size_type i = 0; i < size_; ++i ) {
-				data_[ i ] = data_[ i ] || c[ i ];
-			}
-		} else { // Not overlap-safe
-			for ( size_type i = 0; i < size_; ++i ) {
-				data_[ i ] = data_[ i ] || a[ i ];
-			}
-		}
-	}
-
-	// &&= Array Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	and_equals( Array< U > const & a )
-	{
-		assert( size_bounded() );
-		assert( size_ == a.size() );
-		for ( size_type i = 0; i < size_; ++i ) {
-			data_[ i ] = data_[ i ] && a[ i ];
-		}
-	}
-
-	// ||= Array Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	or_equals( Array< U > const & a )
-	{
-		assert( size_bounded() );
-		assert( size_ == a.size() );
-		for ( size_type i = 0; i < size_; ++i ) {
-			data_[ i ] = data_[ i ] || a[ i ];
-		}
-	}
-
-	// &&= Initializer List Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	and_equals( std::initializer_list< U > const l )
-	{
-		assert( size_ == l.size() );
-		auto r( l.begin() );
-		for ( size_type i = 0; i < size_; ++i, ++r ) {
-			data_[ i ] = data_[ i ] && *r;
-		}
-	}
-
-	// ||= Initializer List Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	or_equals( std::initializer_list< U > const l )
-	{
-		assert( size_ == l.size() );
-		auto r( l.begin() );
-		for ( size_type i = 0; i < size_; ++i, ++r ) {
-			data_[ i ] = data_[ i ] || *r;
-		}
-	}
-
-	// &&= std::array Template
-	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	and_equals( std::array< U, s > const & a )
-	{
-		assert( size_ == s );
-		for ( size_type i = 0; i < size_; ++i ) {
-			data_[ i ] = data_[ i ] && a[ i ];
-		}
-	}
-
-	// ||= std::array Template
-	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	or_equals( std::array< U, s > const & a )
-	{
-		assert( size_ == s );
-		for ( size_type i = 0; i < size_; ++i ) {
-			data_[ i ] = data_[ i ] || a[ i ];
-		}
-	}
-
-	// &&= std::vector Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	and_equals( std::vector< U > const & v )
-	{
-		assert( size_ == v.size() );
-		for ( size_type i = 0; i < size_; ++i ) {
-			data_[ i ] = data_[ i ] && v[ i ];
-		}
-	}
-
-	// ||= std::vector Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	or_equals( std::vector< U > const & v )
-	{
-		assert( size_ == v.size() );
-		for ( size_type i = 0; i < size_; ++i ) {
-			data_[ i ] = data_[ i ] || v[ i ];
-		}
-	}
-
-	// &&= Vector2 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	and_equals( Vector2< U > const & v )
-	{
-		assert( size_ == 2u );
-		data_[ 0 ] = data_[ 0 ] && v.x;
-		data_[ 1 ] = data_[ 1 ] && v.y;
-	}
-
-	// ||= Vector2 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	or_equals( Vector2< U > const & v )
-	{
-		assert( size_ == 2u );
-		data_[ 0 ] = data_[ 0 ] || v.x;
-		data_[ 1 ] = data_[ 1 ] || v.y;
-	}
-
-	// &&= Vector3 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	and_equals( Vector3< U > const & v )
-	{
-		assert( size_ == 3u );
-		data_[ 0 ] = data_[ 0 ] && v.x;
-		data_[ 1 ] = data_[ 1 ] && v.y;
-		data_[ 2 ] = data_[ 2 ] && v.z;
-	}
-
-	// ||= Vector3 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	or_equals( Vector3< U > const & v )
-	{
-		assert( size_ == 3u );
-		data_[ 0 ] = data_[ 0 ] || v.x;
-		data_[ 1 ] = data_[ 1 ] || v.y;
-		data_[ 2 ] = data_[ 2 ] || v.z;
-	}
-
-	// &&= Vector4 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	and_equals( Vector4< U > const & v )
-	{
-		assert( size_ == 4u );
-		data_[ 0 ] = data_[ 0 ] && v.x;
-		data_[ 1 ] = data_[ 1 ] && v.y;
-		data_[ 2 ] = data_[ 2 ] && v.z;
-		data_[ 3 ] = data_[ 3 ] && v.w;
-	}
-
-	// ||= Vector4 Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	void
-	or_equals( Vector4< U > const & v )
-	{
-		assert( size_ == 4u );
-		data_[ 0 ] = data_[ 0 ] || v.x;
-		data_[ 1 ] = data_[ 1 ] || v.y;
-		data_[ 2 ] = data_[ 2 ] || v.z;
-		data_[ 3 ] = data_[ 3 ] || v.w;
-	}
 
 public: // Subscript
 
@@ -1245,11 +738,6 @@ public: // Predicate
 		return ! owner_;
 	}
 
-	// Initializer Active?
-	virtual
-	bool
-	initializer_active() const = 0;
-
 	// Active?
 	bool
 	active() const
@@ -1264,27 +752,6 @@ public: // Predicate
 		return ( data_ != nullptr );
 	}
 
-	// Contiguous?
-	bool
-	contiguous() const
-	{
-		return true;
-	}
-
-	// Data Size Bounded?
-	bool
-	capacity_bounded() const
-	{
-		return ( capacity_ != npos );
-	}
-
-	// Data Size Unbounded?
-	bool
-	capacity_unbounded() const
-	{
-		return ( capacity_ == npos );
-	}
-
 	// Active Array Empty?
 	bool
 	empty() const
@@ -1297,56 +764,6 @@ public: // Predicate
 	size_bounded() const
 	{
 		return ( size_ != npos );
-	}
-
-	// Active Array Size Unbounded?
-	bool
-	size_unbounded() const
-	{
-		return ( size_ == npos );
-	}
-
-	// All Elements Default Valued?
-	bool
-	is_default() const
-	{
-		T const def( Traits::initial_array_value() );
-		for ( size_type i = 0; i < size_; ++i ) {
-			if ( data_[ i ] != def ) return false;
-		}
-		return true;
-	}
-
-	// All Elements Zero?
-	bool
-	is_zero() const
-	{
-		for ( size_type i = 0; i < size_; ++i ) {
-			if ( data_[ i ] != T( 0 ) ) return false;
-		}
-		return true;
-	}
-
-	// Uniform Valued?
-	bool
-	is_uniform() const
-	{
-		if ( size_ <= 1 ) return true;
-		T const & t( data_[ 0 ] );
-		for ( size_type i = 1; i < size_; ++i ) {
-			if ( data_[ i ] != t ) return false;
-		}
-		return true;
-	}
-
-	// Uniform Valued with Specified Value?
-	bool
-	is_uniform( T const & t ) const
-	{
-		for ( size_type i = 0; i < size_; ++i ) {
-			if ( data_[ i ] != t ) return false;
-		}
-		return true;
 	}
 
 	// Memory Can Overlap a Range?
@@ -1544,55 +961,6 @@ public: // Modifier
 		return *this;
 	}
 
-	// Assign Zero to all Elements
-	//  Can't be virtual (for covariant return) or will try to instantiate for all value types
-	void
-	zero()
-	{
-		if ( data_ ) std::fill_n( data_, size_, T( 0 ) );
-	}
-
-	// Assign Zero to all Elements
-	//  Can't be virtual (for covariant return) or will try to instantiate for all value types
-	void
-	to_zero()
-	{
-		if ( data_ ) std::fill_n( data_, size_, T( 0 ) );
-	}
-
-	// Invert (Elemental)
-	void
-	invert()
-	{
-		T const one( 1 );
-		for ( size_type i = 0; i < size_; ++i ) {
-			assert( data_[ i ] != T( 0 ) );
-			data_[ i ] = one / data_[ i ];
-		}
-	}
-
-	// Copy Array Data from Source
-	template< typename U >
-	void
-	data_copy_from( U const * source, size_type const size )
-	{
-		if ( data_ ) std::memcpy( data_, source, std::min( size, size_ ) );
-	}
-
-	// Swap Data of Same Size Arrays
-	void
-	data_swap( Array & v )
-	{
-		using std::swap;
-		assert( owner_ );
-		assert( v.owner_ );
-		assert( size_ == v.size_ );
-		swap( capacity_, v.capacity_ );
-		swap( mem_, v.mem_ );
-		swap( data_, v.data_ );
-		swap( shift_, v.shift_ );
-		swap( sdata_, v.sdata_ );
-	}
 
 public: // Comparison: Predicate
 
@@ -1617,105 +985,6 @@ public: // Comparison: Predicate
 		return eq( a, t );
 	}
 
-	// Array != Value
-	friend
-	bool
-	ne( Array const & a, T const & t )
-	{
-		return ! eq( a, t );
-	}
-
-	// Value != Array
-	friend
-	bool
-	ne( T const & t, Array const & a )
-	{
-		return ! eq( t, a );
-	}
-
-	// Array < Value
-	friend
-	bool
-	lt( Array const & a, T const & t )
-	{
-		assert( a.size_bounded() );
-		if ( a.empty() ) return false;
-		for ( size_type i = 0, e = a.size_; i < e; ++i ) {
-			if ( ! ( a[ i ] < t ) ) return false;
-		}
-		return true;
-	}
-
-	// Value < Array
-	friend
-	bool
-	lt( T const & t, Array const & a )
-	{
-		assert( a.size_bounded() );
-		if ( a.empty() ) return false;
-		for ( size_type i = 0, e = a.size_; i < e; ++i ) {
-			if ( ! ( t < a[ i ] ) ) return false;
-		}
-		return true;
-	}
-
-	// Array <= Value
-	friend
-	bool
-	le( Array const & a, T const & t )
-	{
-		assert( a.size_bounded() );
-		if ( a.empty() ) return true;
-		for ( size_type i = 0, e = a.size_; i < e; ++i ) {
-			if ( ! ( a[ i ] <= t ) ) return false;
-		}
-		return true;
-	}
-
-	// Value <= Array
-	friend
-	bool
-	le( T const & t, Array const & a )
-	{
-		assert( a.size_bounded() );
-		if ( a.empty() ) return true;
-		for ( size_type i = 0, e = a.size_; i < e; ++i ) {
-			if ( ! ( t <= a[ i ] ) ) return false;
-		}
-		return true;
-	}
-
-	// Array > Value
-	friend
-	bool
-	gt( Array const & a, T const & t )
-	{
-		return lt( t, a );
-	}
-
-	// Value > Array
-	friend
-	bool
-	gt( T const & t, Array const & a )
-	{
-		return lt( a, t );
-	}
-
-	// Array >= Value
-	friend
-	bool
-	ge( Array const & a, T const & t )
-	{
-		return le( t, a );
-	}
-
-	// Value >= Array
-	friend
-	bool
-	ge( T const & t, Array const & a )
-	{
-		return le( a, t );
-	}
 
 public: // Comparison: Predicate: Any
 
@@ -1842,22 +1111,6 @@ public: // Comparison: Predicate: Any
 
 public: // Comparison: Predicate: All
 
-	// All Array == Value
-	friend
-	bool
-	all_eq( Array const & a, T const & t )
-	{
-		return eq( a, t );
-	}
-
-	// All Value == Array
-	friend
-	bool
-	all_eq( T const & t, Array const & a )
-	{
-		return eq( a, t );
-	}
-
 	// All Array != Value
 	friend
 	bool
@@ -1872,22 +1125,6 @@ public: // Comparison: Predicate: All
 	all_ne( T const & t, Array const & a )
 	{
 		return ! any_eq( a, t );
-	}
-
-	// All Array < Value
-	friend
-	bool
-	all_lt( Array const & a, T const & t )
-	{
-		return lt( a, t );
-	}
-
-	// All Value < Array
-	friend
-	bool
-	all_lt( T const & t, Array const & a )
-	{
-		return lt( t, a );
 	}
 
 	// All Array <= Value
@@ -1906,28 +1143,12 @@ public: // Comparison: Predicate: All
 		return le( t, a );
 	}
 
-	// All Array > Value
-	friend
-	bool
-	all_gt( Array const & a, T const & t )
-	{
-		return gt( a, t );
-	}
-
 	// All Value > Array
 	friend
 	bool
 	all_gt( T const & t, Array const & a )
 	{
 		return gt( t, a );
-	}
-
-	// All Array >= Value
-	friend
-	bool
-	all_ge( Array const & a, T const & t )
-	{
-		return ge( a, t );
 	}
 
 	// All Value >= Array
@@ -2088,260 +1309,6 @@ protected: // Comparison: Predicate
 		return true;
 	}
 
-	// Array != Array
-	friend
-	bool
-	ne( Array const & a, Array const & b )
-	{
-		return ! eq( a, b );
-	}
-
-	// Array < Array
-	friend
-	bool
-	lt( Array const & a, Array const & b )
-	{
-		assert( a.size_bounded() );
-		assert( a.size_ == b.size_ );
-		if ( ( &a == &b ) || a.empty() ) return false;
-		for ( size_type i = 0, e = a.size_; i < e; ++i ) {
-			if ( ! ( a[ i ] < b[ i ] ) ) return false;
-		}
-		return true;
-	}
-
-	// Array <= Array
-	friend
-	bool
-	le( Array const & a, Array const & b )
-	{
-		assert( a.size_bounded() );
-		assert( a.size_ == b.size_ );
-		if ( ( &a == &b ) || a.empty() ) return true;
-		for ( size_type i = 0, e = a.size_; i < e; ++i ) {
-			if ( ! ( a[ i ] <= b[ i ] ) ) return false;
-		}
-		return true;
-	}
-
-	// Array > Array
-	friend
-	bool
-	gt( Array const & a, Array const & b )
-	{
-		return lt( b, a );
-	}
-
-	// Array >= Array
-	friend
-	bool
-	ge( Array const & a, Array const & b )
-	{
-		return le( b, a );
-	}
-
-protected: // Comparison: Predicate: Any
-
-	// Any Array == Array
-	friend
-	bool
-	any_eq( Array const & a, Array const & b )
-	{
-		assert( a.size_bounded() );
-		assert( a.size_ == b.size_ );
-		if ( a.empty() ) return false;
-		if ( &a == &b ) return true;
-		for ( size_type i = 0, e = a.size_; i < e; ++i ) {
-			if ( ! ( a[ i ] == b[ i ] ) ) return false;
-		}
-		return true;
-	}
-
-	// Any Array != Array
-	friend
-	bool
-	any_ne( Array const & a, Array const & b )
-	{
-		return ! eq( a, b );
-	}
-
-	// Any Array < Array
-	friend
-	bool
-	any_lt( Array const & a, Array const & b )
-	{
-		assert( a.size_bounded() );
-		assert( a.size_ == b.size_ );
-		if ( a.empty() ) return false;
-		if ( &a == &b ) return false;
-		for ( size_type i = 0, e = a.size_; i < e; ++i ) {
-			if ( a[ i ] < b[ i ] ) return true;
-		}
-		return false;
-	}
-
-	// Any Array <= Array
-	friend
-	bool
-	any_le( Array const & a, Array const & b )
-	{
-		assert( a.size_bounded() );
-		assert( a.size_ == b.size_ );
-		if ( a.empty() ) return false;
-		if ( &a == &b ) return true;
-		for ( size_type i = 0, e = a.size_; i < e; ++i ) {
-			if ( a[ i ] <= b[ i ] ) return true;
-		}
-		return false;
-	}
-
-	// Any Array > Array
-	friend
-	bool
-	any_gt( Array const & a, Array const & b )
-	{
-		return any_lt( b, a );
-	}
-
-	// Any Array >= Array
-	friend
-	bool
-	any_ge( Array const & a, Array const & b )
-	{
-		return any_le( b, a );
-	}
-
-protected: // Comparison: Predicate: All
-
-	// All Array == Array
-	friend
-	bool
-	all_eq( Array const & a, Array const & b )
-	{
-		return eq( a, b );
-	}
-
-	// All Array != Array
-	friend
-	bool
-	all_ne( Array const & a, Array const & b )
-	{
-		return ! any_eq( a, b );
-	}
-
-	// All Array < Array
-	friend
-	bool
-	all_lt( Array const & a, Array const & b )
-	{
-		return lt( a, b );
-	}
-
-	// All Array <= Array
-	friend
-	bool
-	all_le( Array const & a, Array const & b )
-	{
-		return le( a, b );
-	}
-
-	// All Array > Array
-	friend
-	bool
-	all_gt( Array const & a, Array const & b )
-	{
-		return gt( a, b );
-	}
-
-	// All Array >= Array
-	friend
-	bool
-	all_ge( Array const & a, Array const & b )
-	{
-		return ge( a, b );
-	}
-
-protected: // Comparison: Count
-
-	// Count Array == Array
-	friend
-	size_type
-	count_eq( Array const & a, Array const & b )
-	{
-		assert( a.size_bounded() );
-		assert( a.size_ == b.size_ );
-		if ( a.empty() ) return 0;
-		if ( &a == &b ) return a.size_;
-		size_type n( 0u );
-		for ( size_type i = 0, e = a.size_; i < e; ++i ) {
-			if ( a[ i ] == b[ i ] ) ++n;
-		}
-		return n;
-	}
-
-	// Count Array != Array
-	friend
-	size_type
-	count_ne( Array const & a, Array const & b )
-	{
-		assert( a.size_bounded() );
-		assert( a.size_ == b.size_ );
-		if ( a.empty() ) return 0;
-		if ( &a == &b ) return 0;
-		size_type n( 0u );
-		for ( size_type i = 0, e = a.size_; i < e; ++i ) {
-			if ( a[ i ] != b[ i ] ) ++n;
-		}
-		return n;
-	}
-
-	// Count Array < Array
-	friend
-	size_type
-	count_lt( Array const & a, Array const & b )
-	{
-		assert( a.size_bounded() );
-		assert( a.size_ == b.size_ );
-		if ( a.empty() ) return 0;
-		if ( &a == &b ) return 0;
-		size_type n( 0u );
-		for ( size_type i = 0, e = a.size_; i < e; ++i ) {
-			if ( a[ i ] < b[ i ] ) ++n;
-		}
-		return n;
-	}
-
-	// Count Array <= Array
-	friend
-	size_type
-	count_le( Array const & a, Array const & b )
-	{
-		assert( a.size_bounded() );
-		assert( a.size_ == b.size_ );
-		if ( a.empty() ) return 0;
-		if ( &a == &b ) return a.size_;
-		size_type n( 0u );
-		for ( size_type i = 0, e = a.size_; i < e; ++i ) {
-			if ( a[ i ] <= b[ i ] ) ++n;
-		}
-		return n;
-	}
-
-	// Count Array > Array
-	friend
-	size_type
-	count_gt( Array const & a, Array const & b )
-	{
-		return lt( b, a );
-	}
-
-	// Count Array >= Array
-	friend
-	size_type
-	count_ge( Array const & a, Array const & b )
-	{
-		return le( b, a );
-	}
 
 protected: // Comparison: Elemental
 
@@ -3005,114 +1972,6 @@ protected: // Methods
 		return start;
 	}
 
-	// Attach Proxy/Argument Array to Const Array of Same Rank
-	void
-	attach( Array const & a )
-	{
-		assert( ! owner_ );
-		capacity_ = a.capacity_;
-		size_ = a.size_;
-		data_ = a.data_;
-		shift_ = a.shift_;
-		sdata_ = data_ - shift_;
-	}
-
-	// Attach Proxy/Argument Array to Array of Same Rank
-	void
-	attach( Array & a )
-	{
-		assert( ! owner_ );
-		capacity_ = a.capacity_;
-		size_ = a.size_;
-		data_ = a.data_;
-		shift_ = a.shift_;
-		sdata_ = data_ - shift_;
-	}
-
-	// Attach Proxy/Argument Array to Const Array
-	template< int shift >
-	void
-	attach( Array const & a )
-	{
-		assert( ! owner_ );
-		capacity_ = a.capacity_;
-		size_ = a.size_;
-		data_ = a.data_;
-		shift_ = shift;
-		sdata_ = data_ - shift_;
-	}
-
-	// Attach Proxy/Argument Array to Array
-	template< int shift >
-	void
-	attach( Array & a )
-	{
-		assert( ! owner_ );
-		capacity_ = a.capacity_;
-		size_ = a.size_;
-		data_ = a.data_;
-		shift_ = shift;
-		sdata_ = data_ - shift_;
-	}
-
-	// Attach Proxy/Argument Array to Const Tail
-	template< int shift >
-	void
-	attach( Tail const & s )
-	{
-		assert( ! owner_ );
-		capacity_ = s.size();
-		size_ = capacity_;
-		data_ = s.data_;
-		shift_ = shift;
-		sdata_ = data_ - shift_;
-	}
-
-	// Attach Proxy/Argument Array to Tail
-	template< int shift >
-	void
-	attach( Tail & s )
-	{
-		assert( ! owner_ );
-		capacity_ = size_ = s.size();
-		data_ = s.data_;
-		shift_ = shift;
-		sdata_ = data_ - shift_;
-	}
-
-	// Attach Proxy/Argument Array to Const Value
-	template< int shift >
-	void
-	attach( T const & t )
-	{
-		assert( ! owner_ );
-		capacity_ = size_ = npos; // Unbounded
-		data_ = const_cast< T * >( &t );
-		shift_ = shift;
-		sdata_ = data_ - shift_;
-	}
-
-	// Attach Proxy/Argument Array to Value
-	template< int shift >
-	void
-	attach( T & t )
-	{
-		assert( ! owner_ );
-		capacity_ = size_ = npos; // Unbounded
-		data_ = &t;
-		shift_ = shift;
-		sdata_ = data_ - shift_;
-	}
-
-	// Detach Proxy/Argument Array
-	void
-	detach()
-	{
-		assert( ! owner_ );
-		capacity_ = size_ = 0u;
-		data_ = sdata_ = nullptr;
-		shift_ = 0;
-	}
 
 	// Swap
 	void
@@ -3126,26 +1985,6 @@ protected: // Methods
 		std::swap( data_, v.data_ );
 		std::swap( shift_, v.shift_ );
 		std::swap( sdata_, v.sdata_ );
-	}
-
-	// Initialize to Intializer
-	void
-	initialize( Initializer const & initializer )
-	{
-		if ( initializer.active() ) { // Sticky initialize
-			T const fill( initializer.value() );
-			for ( size_type i = 0; i < size_; ++i ) {
-				new ( data_ + i ) T( fill );
-			}
-		} else { // Default initialize
-#if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
-			std::uninitialized_fill_n( data_, size_, Traits::initial_array_value() );
-#else
-			for ( size_type i = 0; i < size_; ++i ) {
-				new ( data_ + i ) T;
-			}
-#endif
-		}
 	}
 
 	// Initialize by Uniform Value
@@ -3531,39 +2370,6 @@ operator <<( std::ostream & stream, Array< T > const & a )
 	return stream;
 }
 
-// Read an Array from a Binary File
-template< typename T >
-inline
-std::istream &
-read_binary( std::istream & stream, Array< T > & a )
-{
-	std::size_t const n( a.size() );
-	if ( stream && ( n > 0u ) ) {
-		std::size_t const type_size( sizeof( T ) / sizeof( std::istream::char_type ) );
-		for ( std::size_t i = 0; i < n; ++i ) {
-			stream.read( ( std::istream::char_type * )&a[ i ], type_size );
-			if ( ! stream ) break;
-		}
-	}
-	return stream;
-}
-
-// Write an Array to a Binary File
-template< typename T >
-inline
-std::ostream &
-write_binary( std::ostream & stream, Array< T > const & a )
-{
-	std::size_t const n( a.size() );
-	if ( stream && ( n > 0u ) ) {
-		std::size_t const type_size( sizeof( T ) / sizeof( std::ostream::char_type ) );
-		for ( std::size_t i = 0; i < n; ++i ) {
-			stream.write( ( std::ostream::char_type const * )&a[ i ], type_size );
-			if ( ! stream ) break;
-		}
-	}
-	return stream;
-}
 
 namespace fmt {
 

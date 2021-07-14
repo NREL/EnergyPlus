@@ -92,7 +92,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.0;
+  Version,9.6;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -101,7 +101,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -109,7 +111,7 @@
     Building,                !- Name
     30.,                     !- North Axis {deg}
     City,                    !- Terrain
-    0.04,                    !- Loads Convergence Tolerance Value
+    0.04,                    !- Loads Convergence Tolerance Value {W}
     0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
     FullExterior,            !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -217,7 +219,7 @@
 !    WetBulb;                 !- Humidity Indicating Type
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     7,                       !- Begin Month
     5,                       !- Begin Day of Month
     ,                        !- Begin Year
@@ -824,47 +826,62 @@
     Sgl Grey 3mm,            !- Name
     GREY 3MM;                !- Outside Layer
 
-!-   ===========  ALL OBJECTS IN CLASS: CONSTRUCTION:INTERNALSOURCE ===========
-
-  Construction:InternalSource,
+  Construction,
     Ceiling with Radiant,    !- Name
-    2,                       !- Source Present After Layer Number
-    2,                       !- Temperature Calculation Requested After Layer Number
-    1,                       !- Dimensions for the CTF Calculation
-    0.1524,                  !- Tube Spacing {m}
     CLN-INS,                 !- Outside Layer
     GYP1,                    !- Layer 2
     GYP2,                    !- Layer 3
     MAT-CLNG-1;              !- Layer 4
 
-  Construction:InternalSource,
+  Construction,
     reverseCeiling with Radiant,  !- Name
-    2,                       !- Source Present After Layer Number
-    2,                       !- Temperature Calculation Requested After Layer Number
-    1,                       !- Dimensions for the CTF Calculation
-    0.1524,                  !- Tube Spacing {m}
     MAT-CLNG-1,              !- Outside Layer
     GYP2,                    !- Layer 2
     GYP1,                    !- Layer 3
     CLN-INS;                 !- Layer 4
 
-  Construction:InternalSource,
+  Construction,
     Floor with Radiant,      !- Name
-    2,                       !- Source Present After Layer Number
-    2,                       !- Temperature Calculation Requested After Layer Number
-    1,                       !- Dimensions for the CTF Calculation
-    0.1524,                  !- Tube Spacing {m}
     INS - EXPANDED EXT POLYSTYRENE R12,  !- Outside Layer
     CONC,                    !- Layer 2
     CONC,                    !- Layer 3
     FINISH FLOORING - TILE 1 / 16 IN;  !- Layer 4
+
+!-   ===========  ALL OBJECTS IN CLASS: CONSTRUCTIONPROPERTY:INTERNALHEATSOURCE ===========
+
+  ConstructionProperty:InternalHeatSource,
+    Ceiling Source,          !- Name
+    Ceiling with Radiant,    !- Construction Name
+    2,                       !- Source Present After Layer Number
+    2,                       !- Temperature Calculation Requested After Layer Number
+    1,                       !- Dimensions for the CTF Calculation
+    0.1524,                  !- Tube Spacing {m}
+    0.0;                     !- Two-Dimensional Temperature Calculation Position {dimensionless}
+
+  ConstructionProperty:InternalHeatSource,
+    Reverse Ceiling Source,  !- Name
+    reverseCeiling with Radiant,  !- Construction Name
+    2,                       !- Source Present After Layer Number
+    2,                       !- Temperature Calculation Requested After Layer Number
+    1,                       !- Dimensions for the CTF Calculation
+    0.1524,                  !- Tube Spacing {m}
+    0.0;                     !- Two-Dimensional Temperature Calculation Position {dimensionless}
+
+  ConstructionProperty:InternalHeatSource,
+    Floor Source,            !- Name
+    Floor with Radiant,      !- Construction Name
+    2,                       !- Source Present After Layer Number
+    2,                       !- Temperature Calculation Requested After Layer Number
+    1,                       !- Dimensions for the CTF Calculation
+    0.1524,                  !- Tube Spacing {m}
+    0.0;                     !- Two-Dimensional Temperature Calculation Position {dimensionless}
 
 !-   ===========  ALL OBJECTS IN CLASS: GLOBALGEOMETRYRULES ===========
 
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     CounterClockWise,        !- Vertex Entry Direction
-    relative;                !- Coordinate System
+    Relative;                !- Coordinate System
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONE ===========
 
@@ -2091,7 +2108,9 @@
     ZoneHVAC:VentilatedSlab, !- Zone Equipment 1 Object Type
     Zone1VentSlab,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone4Equipment,          !- Name
@@ -2099,7 +2118,9 @@
     ZoneHVAC:VentilatedSlab, !- Zone Equipment 1 Object Type
     Zone4VentSlab,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:EQUIPMENTCONNECTIONS ===========
 

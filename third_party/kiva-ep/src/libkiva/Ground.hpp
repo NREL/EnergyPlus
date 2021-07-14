@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2018 Big Ladder Software LLC. All rights reserved.
+/* Copyright (c) 2012-2019 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
 #ifndef GROUND_HPP_
@@ -53,6 +53,7 @@ public:
 private:
   double timestep; // in seconds
 
+  friend class Aggregator;
   BoundaryConditions bcs;
   // Data structures
 

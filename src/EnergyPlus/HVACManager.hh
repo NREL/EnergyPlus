@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,32 +52,26 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace HVACManager {
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    extern int HVACManageIteration; // counts iterations to enforce maximum iteration limit
-    extern int RepIterAir;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
     // and zone equipment simulations
 
     // Functions
-    void clear_state();
+    void ManageHVAC(EnergyPlusData &state);
 
-    void ManageHVAC();
+    void SimHVAC(EnergyPlusData &state);
 
-    void SimHVAC();
-
-    void SimSelectedEquipment(bool &SimAirLoops,         // True when the air loops need to be (re)simulated
+    void SimSelectedEquipment(EnergyPlusData &state,
+                              bool &SimAirLoops,         // True when the air loops need to be (re)simulated
                               bool &SimZoneEquipment,    // True when zone equipment components need to be (re)simulated
                               bool &SimNonZoneEquipment, // True when non-zone equipment components need to be (re)simulated
                               bool &SimPlantLoops,       // True when the main plant loops need to be (re)simulated
@@ -85,25 +79,71 @@ namespace HVACManager {
                               bool &FirstHVACIteration,  // True when solution technique on first iteration
                               bool const LockPlantFlows);
 
-    void ResetTerminalUnitFlowLimits();
+    void ResetTerminalUnitFlowLimits(EnergyPlusData &state);
 
-    void ResolveAirLoopFlowLimits();
+    void ResolveAirLoopFlowLimits(EnergyPlusData &state);
 
-    void ResolveLockoutFlags(bool &SimAir); // TRUE means air loops must be (re)simulated
+    void ResolveLockoutFlags(EnergyPlusData &state, bool &SimAir); // TRUE means air loops must be (re)simulated
 
-    void ResetHVACControl();
+    void ResetHVACControl(EnergyPlusData &state);
 
-    void ResetNodeData();
+    void ResetNodeData(EnergyPlusData &state);
 
-    void UpdateZoneListAndGroupLoads();
+    void UpdateZoneListAndGroupLoads(EnergyPlusData &state);
 
-    void ReportAirHeatBalance();
+    void ReportAirHeatBalance(EnergyPlusData &state);
 
-    void SetHeatToReturnAirFlag();
+    void SetHeatToReturnAirFlag(EnergyPlusData &state);
 
-    void UpdateZoneInletConvergenceLog();
+    void UpdateZoneInletConvergenceLog(EnergyPlusData &state);
+
+    void CheckAirLoopFlowBalance(EnergyPlusData &state);
 
 } // namespace HVACManager
+
+struct HVACManagerData : BaseGlobalStruct
+{
+
+    int HVACManageIteration = 0; // counts iterations to enforce maximum iteration limit
+    int RepIterAir = 0;
+    bool SimHVACIterSetup = false;
+    bool TriggerGetAFN = true;
+    bool ReportAirHeatBalanceFirstTimeFlag = true;
+    bool MyOneTimeFlag = true;
+    bool PrintedWarmup = false;
+    bool MyEnvrnFlag = true;
+    bool DebugNamesReported = false;
+    bool MySetPointInit = true;
+    bool MyEnvrnFlag2 = true;
+    bool FlowMaxAvailAlreadyReset = false;
+    bool FlowResolutionNeeded = false;
+    int ErrCount = 0; // Number of times that the maximum iterations was exceeded
+    int MaxErrCount = 0;
+    std::string ErrEnvironmentName;
+    Array1D<Real64> MixSenLoad; // Mixing sensible loss or gain
+    Array1D<Real64> MixLatLoad; // Mixing latent loss or gain
+
+    void clear_state() override
+    {
+        HVACManageIteration = 0;
+        RepIterAir = 0;
+        SimHVACIterSetup = false;
+        TriggerGetAFN = true;
+        ReportAirHeatBalanceFirstTimeFlag = true;
+        MyOneTimeFlag = true;
+        PrintedWarmup = false;
+        MyEnvrnFlag = true;
+        DebugNamesReported = false;
+        MySetPointInit = true;
+        MyEnvrnFlag2 = true;
+        FlowMaxAvailAlreadyReset = false;
+        FlowResolutionNeeded = false;
+        this->ErrCount = 0;
+        this->MaxErrCount = 0;
+        this->MixSenLoad.clear();
+        this->MixLatLoad.clear();
+    }
+};
 
 } // namespace EnergyPlus
 

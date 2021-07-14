@@ -1,8 +1,10 @@
-\section{Group - Hybrid Model}\label{group---hybrid-model}
+\section{Group -- Hybrid Model}\label{group-hybrid-model}
 
-This object is to provide a hybrid model feature to enhance the accuracy of the building energy simulation for existing buildings. The hybrid model feature replaces internal thermal mass and infiltration air flow rates with zone air temperature data. The hybrid model feature calculates a temperature capacitance multiplier, equivalent to the zone internal thermal mass and infiltration air change per hour (ACH) based on the inverse modeling of the heat balance algorithms. 
+\subsection{HybridModel:Zone}\label{inputs-hm}
 
-\subsubsection{Inputs}\label{inputs-hm}
+This object provides a hybrid model feature to enhance energy simulations for existing buildings by inversely solving hard-to-measure model input parameters. More specifically, zone internal thermal mass, air infiltration rate (ACH), and people count are usually hard to be measured directly yet important in building energy simulations. The hybrid model takes measured zone air temperature, humidity ratio, or CO$_2$ concentration as inputs and inversely solve those unknown parameters based on the zone air heat, moisture, or CO$_2$ balance algorithms. The inversely solved internal thermal mass, air infiltration rate, and people count can then be used to substitute the original simplified assumptions to enhance the energy simulation.
+
+\subsubsection{Inputs}\label{inputs-hybridzone}
 
 \paragraph{Field: Name}\label{field-name-hm}
 
@@ -14,30 +16,198 @@ This field is the name of the thermal zone (ref: Zone) and attaches a particular
 
 \paragraph{Field: Calculate Zone Internal Thermal Mass}\label{field-calculate-zon-internal-thermal-mass-hm}
 
-This field is used to provide an option to calculate the temperature capacity multiplier (Ref: ZoneCapacitanceMultiplier:ResearchSpecial). The temperature capacity multiplier is represented as internal thermal mass multiplier in the hybrid model. 
+This field is used to provide an option to calculate the temperature capacity multiplier (Ref: ZoneCapacitanceMultiplier:ResearchSpecial). The temperature capacity multiplier is represented as internal thermal mass multiplier in the hybrid model.
 When YES is selected, the hybrid model calculates the multiplier based on the inverse heat balance algorithm using the measured zone air temperature.
 
-\paragraph{Field: Calculate Zone Air Infiltration Rate}\label{field-calculate-zone-air-fnfiltration-rate-hm}
+\paragraph{Field: Calculate Zone Air Infiltration Rate}\label{field-calculate-zone-air-infiltration-rate-hm}
 
-This field is used to provide an option to calculate the infiltration ACH using the hybrid modeling feature. When YES is selected, the hybrid model feature calculates the infiltration ACH based on the inverse heat balance algorithm using the measured zone air temperature.
+This field is used to provide an option to calculate the zone air infiltration rate - air change per hour (ACH).
+When YES is selected, the hybrid model calculates the zone air infiltration rate based on one of the following balance equations: 1. Heat balance equations, 2. Moisture balance equations, 3. CO$_2$ balance equations when the corresponding data requirements are met. The HybridModel will be activated with the following options:
+
+1. When Zone Measured Air Temperature Schedule Name is provided, it will calculate the zone air infiltration rate assuming the HVAC system is free-floating using the zone sensible heat balance algorithms;
+
+2. When Zone Measured Air Temperature Schedule Name, Zone Input Supply Air Mass Flow Rate Schedule Name, and Zone Input Supply Air Temperature Schedule Name are provided, it will calculate the zone air infiltration rate assuming the HVAC is on. In this case, the zone air supply air temperature and mass flow rate in the zone sensible heat balance algorithms will be overwritten by the input data;
+
+3. When Zone Measured Air Humidity Ratio Schedule Name is provided, it will calculate the zone air infiltration rate assuming the HVAC system is free-floating using the zone moisture balance algorithms;
+
+4. When Zone Measured Air Humidity Ratio Schedule Name, Zone Input Supply Air Mass Flow Rate Schedule Name, and Zone Input Supply Air Humidity Ratio Schedule Name are provided, it will calculate the zone air infiltration rate assuming the HVAC is on. In this case, the zone air supply air humidity ratio and mass flow rate in the zone moisture balance algorithms will be overwritten by the input data;
+
+5. When Zone Measured Air CO$_2$ concentration Schedule Name is provided, it will calculate the zone air infiltration rate assuming the HVAC system is free-floating using the zone CO$_2$ balance algorithms;
+
+6. When Zone Measured Air CO$_2$ concentration Schedule Name, Zone Input Supply Air Mass Flow Rate Schedule Name, and Zone Input Supply Air CO$_2$ Concentration Schedule Name are provided, it will calculate the zone air infiltration rate assuming the HVAC is on. In this case, the zone air supply air CO$_2$ concentration and mass flow rate in the zone CO$_2$ balance algorithms will be overwritten by the input data;
+
+When YES is selected for Calculate Zone Internal Thermal Mass, this field will be treated as NO.
+
+\paragraph{Field: Calculate Zone People Count}\label{field-calculate-zone-people-count-rate-hm}
+
+This field is used to provide an option to calculate the zone people count.
+When YES is selected, the hybrid model calculates the zone people count based on one of the following balance equations: 1. heat balance equations, 2. Moisture balance equations, 3. CO$_2$ balance equations when the corresponding data requirements are met. The HybridModel will be activated with the following options:
+
+1. When Zone Measured Air Temperature Schedule Name is provided, it will calculate the zone people count assuming the HVAC system is free-floating using the zone sensible heat balance algorithms. The default people activity level is 130 W. The default sensible heat fraction is 0.6.The default radiant heat fraction is 0.7. Zone Input People Activity Level Schedule Name, Zone Input People Sensible Heat Fraction Schedule Name, and Zone Input People Radiant Heat Fraction Schedule Name are optional. When provided, the default values will be overwritten.
+
+2. When Zone Measured Air Temperature Schedule Name, Zone Input Supply Air Mass Flow Rate Schedule Name, and Zone Input Supply Air Temperature Schedule Name are provided, it will calculate the zone people count assuming the HVAC is on. In this case, the zone air supply air temperature and mass flow rate in the zone sensible heat balance algorithms will be overwritten by the input data.The default people activity level is 130 W. The default sensible heat fraction is 0.6.The default radiant heat fraction is 0.7. Zone Input People Activity Level Schedule Name, Zone Input People Sensible Heat Fraction Schedule Name, and Zone Input People Radiant Heat Fraction Schedule Name are optional. When provided, the default values will be overwritten.
+
+3. When Zone Measured Air Humidity Ratio Schedule Name is provided, it will calculate the zone people count assuming the HVAC system is free-floating using the zone moisture balance algorithms.The default people activity level is 130 W. The default sensible heat fraction is 0.6.The default radiant heat fraction is 0.7. Zone Input People Activity Level Schedule Name, Zone Input People Sensible Heat Fraction Schedule Name, and Zone Input People Radiant Heat Fraction Schedule Name are optional. When provided, the default values will be overwritten.
+
+4. When Zone Measured Air Humidity Ratio Schedule Name, Zone Input Supply Air Mass Flow Rate Schedule Name, and Zone Input Supply Air Humidity Ratio Schedule Name are provided, it will calculate the zone people count assuming the HVAC is on. In this case, the zone air supply air humidity ratio and mass flow rate in the zone moisture balance algorithms will be overwritten by the input data.The default people activity level is 130 W. The default sensible heat fraction is 0.6.The default radiant heat fraction is 0.7. Zone Input People Activity Level Schedule Name, Zone Input People Sensible Heat Fraction Schedule Name, and Zone Input People Radiant Heat Fraction Schedule Name are optional. When provided, the default values will be overwritten.
+
+5. When Zone Measured Air CO$_2$ concentration Schedule Name is provided, it will calculate the zone people count assuming the HVAC system is free-floating using the zone CO$_2$ balance algorithms. The default people activity level is 130 W. The default single person CO$_2$ generation is 0.0000000382 [m$^3$/(s*W)]. Zone Input People Activity Level Schedule Name, Zone Input People CO$_2$ Generation Rate Schedule Name are optional. When provided, the default values will be overwritten.
+
+6. When Zone Measured Air CO$_2$ concentration Schedule Name, Zone Input Supply Air Mass Flow Rate Schedule Name, and Zone Input Supply Air CO$_2$ Concentration Schedule Name are provided, it will calculate the zone people count assuming the HVAC is on. In this case, the zone air supply air CO$_2$ concentration and mass flow rate in the zone CO$_2$ balance algorithms will be overwritten by the input data. The default people activity level is 130 W. The default single person CO$_2$ generation is 0.0000000382 [m$^3$/(s*W)]. Zone Input People Activity Level Schedule Name, Zone Input People CO$_2$ Generation Rate Schedule Name are optional. When provided, the default values will be overwritten.
+
+When YES is selected for Calculate Zone Internal Thermal Mass or Calculate Zone Air Infiltration Rate, this field will be treated as NO.
 
 \paragraph{Field: Zone Measured Air Temperature Schedule Name}\label{field-zone-measured-air-temperature-schedule-name-hm}
 
-This field is the name of the schedule referenced by Schedule:File which contains the zone air measurement data. 
+This field is the name of the schedule object which contains the zone air temperature measurement data. The date range of the schedule should cover the start and end date of the HybridModel. A Schedule:File object is recommended for inputing the time-series measurements. When a schedule:file object is provided, all the rows for a whole year should be in the file, the rows outside of the start and end date range of the HybridModel should be zeros.
+
+\paragraph{Field: Zone Measured Air Humidity Ratio Schedule Name}\label{field-zone-measured-air-humidity-ratio-schedule-name-hm}
+
+This field is the name of the schedule object which contains the zone air humidity ration measurement data. The date range of the schedule should cover the start and end date of the HybridModel. A Schedule:File object is recommended for inputing the time-series measurements. When a schedule:file object is provided, all the rows for a whole year should be in the file, the rows outside of the start and end date range of the HybridModel should be zeros.
+
+\paragraph{Field: Zone Measured Air CO$_2$ concentration Schedule Name}\label{field-zone-measured-air-co2-concentration-schedule-name-hm}
+
+This field is the name of the schedule object which contains the zone air CO$_2$ concentration measurement data. The date range of the schedule should cover the start and end date of the HybridModel. A Schedule:File object is recommended for inputing the time-series measurements. When a schedule:file object is provided, all the rows for a whole year should be in the file, the rows outside of the start and end date range of the HybridModel should be zeros.
+
+\paragraph{Field: Zone Input People Activity Level Schedule Name}\label{field-zone-input-people-activity-schedule-name-hm}
+
+This field is the name of the schedule referenced by a Schedule object which contains the people activity level data. The date range of the schedule should cover the start and end date of the HybridModel.
+
+\paragraph{Field: Zone Input People Sensible Heat Fraction Schedule Name}\label{field-zone-input-people-sensible-heat-fraction-schedule-name-hm}
+
+This field is the name of the schedule referenced by a Schedule object which contains the people sensible heat fraction data. The date range of the schedule should cover the start and end date of the HybridModel.
+
+\paragraph{Field: Zone Input People Radiant Heat Fraction Schedule Name}\label{field-zone-input-people-radiant-heat-fraction-schedule-name-hm}
+
+This field is the name of the schedule referenced by a Schedule object which contains the radiant heat fraction of the sensible heat data. The date range of the schedule should cover the start and end date of the HybridModel.
+
+\paragraph{Field: Zone Input People CO$_2$ Generation Rate Schedule Name}\label{field-zone-input-people-co2-generation-rate-schedule-name-hm}
+
+This field is the name of the schedule referenced by a Schedule object which contains a single person's CO$_2$ generation rate data. The date range of the schedule should cover the start and end date of the HybridModel.
+
+\paragraph{Field: Zone Input Supply Air Temperature Schedule Name}\label{field-zone-input-supply-air-temperature-schedule-name-hm}
+
+This field is the name of the schedule object which contains the measured supply air temperature data. The date range of the schedule should cover the start and end date of the HybridModel. A Schedule:File object is recommended for inputing the time-series measurements. When a schedule:file object is provided, all the rows for a whole year should be in the file, the rows outside of the start and end date range of the HybridModel should be zeros.
+
+\paragraph{Field: Zone Input Supply Air Mass Flow Rate Schedule Name}\label{field-zone-input-supply-air-mass-flow-rate-schedule-name-hm}
+
+This field is the name of the schedule object which contains the measured supply air mass flow rate data. The date range of the schedule should cover the start and end date of the HybridModel. A Schedule:File object is recommended for inputing the time-series measurements. When a schedule:file object is provided, all the rows for a whole year should be in the file, the rows outside of the start and end date range of the HybridModel should be zeros.
+
+\paragraph{Field: Zone Input Supply Air Humidity Ratio Schedule Name}\label{field-zone-input-supply-air-humidity-ratio-schedule-name-hm}
+
+This field is the name of the schedule object which contains the measured supply air humidity ratio data. The date range of the schedule should cover the start and end date of the HybridModel. A Schedule:File object is recommended for inputing the time-series measurements. When a schedule:file object is provided, all the rows for a whole year should be in the file, the rows outside of the start and end date range of the HybridModel should be zeros.
+
+\paragraph{Field: Zone Input Supply Air CO$_2$ Concentration Schedule Name}\label{field-zone-input-supply-air-co2-concentration-schedule-name-hm}
+
+This field is the name of the schedule object which contains the measured supply air CO$_2$ concentration data. The date range of the schedule should cover the start and end date of the HybridModel. A Schedule:File object is recommended for inputing the time-series measurements. When a schedule:file object is provided, all the rows for a whole year should be in the file, the rows outside of the start and end date range of the HybridModel should be zeros.
 
 \paragraph{Field: Begin Month}\label{field-begin-month-hm}
 
-This numeric field should contain the starting month number (1 = January, 2 = February, etc.) for the annual run period desired.
+This numeric field should contain the starting month number (1 = January, 2 = February, etc.) for the period of the measured data during which the hybrid model will be active.
 
 \paragraph{Field: Begin Day of Month}\label{field-begin-day-of-month-hm}
 
-This numeric field should contain the starting day of the starting month (must be valid for month) for the annual run period desired.
+This numeric field should contain the starting day of the starting month (must be valid for month) for the period of the measured data during which the hybrid model will be active.
 
 \paragraph{Field: End Month}\label{field-end-month-hm}
 
-This numeric field should contain the ending month number (1 = January, 2 = February, etc.) for the annual run period desired.
+This numeric field should contain the ending month number (1 = January, 2 = February, etc.) for the period of the measured data during which the hybrid model will be active.
 
 \paragraph{Field: End Day of Month}\label{field-end-day-of-month-hm}
 
-This numeric field should contain the ending day of the ending month (must be valid for month) for the annual run period desired.
+This numeric field should contain the ending day of the ending month (must be valid for month) for the period of the measured data during which the hybrid model will be active.
 
+Examples of the object in an IDF are:
+
+\begin{lstlisting}
+    
+    HybridModel:Zone,
+        ZONE 1 HybridModel,      !- Name
+        ZONE 1,                  !- Zone Name
+        Yes,                      !- Calculate Zone Internal Thermal Mass
+        No,                     !- Calculate Zone Air Infiltration Rate
+        No,                      !- Calculate Zone People Count
+        ,                        !- Zone Measured Air Temperature Schedule Name
+        ,                        !- Zone Measured Air Humidity Ratio Schedule Name
+        ZONE 1_MeasuredCO2Concentration,  !- Zone Measured Air CO2 Concentration Schedule Name
+        ,                        !- Zone Input People Activity Schedule Name
+        ,                        !- Zone Input People Sensible Heat Fraction Schedule Name
+        ,                        !- Zone Input People Radiant Heat Fraction Schedule Name
+        ,                        !- Zone Input People CO2 Generation Rate Schedule Name
+        ,                        !- Zone Input Supply Air Temperature Schedule Name
+        ,                        !- Zone Input Supply Air Mass Flow Rate Schedule Name
+        ,                        !- Zone Input Supply Air Humidity Ratio Schedule Name
+        ,                        !- Zone Input Supply Air CO2 Concentration Schedule Name
+        1,                       !- Begin Month
+        1,                       !- Begin Day of Month
+        12,                      !- End Month
+        31;                      !- End Day of Month
+
+
+    HybridModel:Zone,
+        ZONE 1 HybridModel,      !- Name
+        ZONE 1,                  !- Zone Name
+        No,                      !- Calculate Zone Internal Thermal Mass
+        Yes,                     !- Calculate Zone Air Infiltration Rate
+        No,                      !- Calculate Zone People Count
+        ,                        !- Zone Measured Air Temperature Schedule Name
+        ,                        !- Zone Measured Air Humidity Ratio Schedule Name
+        ZONE 1_MeasuredCO2Concentration,  !- Zone Measured Air CO2 Concentration Schedule Name
+        ,                        !- Zone Input People Activity Schedule Name
+        ,                        !- Zone Input People Sensible Heat Fraction Schedule Name
+        ,                        !- Zone Input People Radiant Heat Fraction Schedule Name
+        ,                        !- Zone Input People CO2 Generation Rate Schedule Name
+        ,                        !- Zone Input Supply Air Temperature Schedule Name
+        ,                        !- Zone Input Supply Air Mass Flow Rate Schedule Name
+        ,                        !- Zone Input Supply Air Humidity Ratio Schedule Name
+        ,                        !- Zone Input Supply Air CO2 Concentration Schedule Name
+        1,                       !- Begin Month
+        1,                       !- Begin Day of Month
+        12,                      !- End Month
+        31;                      !- End Day of Month
+
+
+    HybridModel:Zone,
+        ZONE 2 HybridModel,      !- Name
+        ZONE 2,                  !- Zone Name
+        No,                      !- Calculate Zone Internal Thermal Mass
+        No,                      !- Calculate Zone Air Infiltration Rate
+        Yes,                     !- Calculate Zone People Count
+        ,                        !- Zone Measured Air Temperature Schedule Name
+        ,                        !- Zone Measured Air Humidity Ratio Schedule Name
+        ZONE 2_MeasuredCO2Concentration,     !- Zone Measured Air CO2 Concentration Schedule Name
+        OfficeSmall ACTIVITY_SCH,            !- Zone Input People Activity Schedule Name
+        People Sensible Heat Fraction Sch,   !- Zone Input People Sensible Heat Fraction Schedule Name
+        People Radiation Heat Fraction Sch,  !- Zone Input People Radiant Heat Fraction Schedule Name
+        People CO2 Generation Rate Sch,      !- Zone Input People CO2 Generation Rate Schedule Name
+        ,                        !- Zone Input Supply Air Temperature Schedule Name
+        ZONE 2_Inlet_MassFlow,   !- Zone Input Supply Air Mass Flow Rate Schedule Name
+        ,                        !- Zone Input Supply Air Humidity Ratio Schedule Name
+        ZONE 2_Inlet_CO2,        !- Zone Input Supply Air CO2 Concentration Schedule Name
+        1,                       !- Begin Month
+        1,                       !- Begin Day of Month
+        12,                      !- End Month
+        31;                      !- End Day of Month
+
+\end{lstlisting}
+
+
+\subsubsection{Outputs}\label{outputs-030}
+
+\begin{lstlisting}
+Zone,Average,Zone Infiltration Hybrid Model Air Change Rate [ACH]
+Zone,Average,Zone Infiltration Hybrid Model Mass Flow Rate [kg/s]
+Zone,Average,Zone Hybrid Model People Count
+\end{lstlisting}
+
+\paragraph{Zone Infiltration Hybrid Model Air Change Rate {[}ACH{]}}\label{zone-infiltration-hybrid-model-air-change-rate}
+
+The zone infiltration air change rate calculated by the hybrid model.
+
+\paragraph{Zone Infiltration Hybrid Model Mass Flow Rate {[}kg/s{]}}\label{zone-infiltration-hybrid-model-air-mass-flow-rate}
+
+The zone infiltration air mass flow rate calculated by the hybrid model.
+
+\paragraph{Zone Hybrid Model People Count}\label{zone-infiltration-hybrid-model-people-count}
+
+The zone people count calculated by the hybrid model.

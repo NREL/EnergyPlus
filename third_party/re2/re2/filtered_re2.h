@@ -49,7 +49,7 @@ class FilteredRE2 {
   // the search text should be lowercased first to find matching
   // strings from the set of strings returned by Compile.  Call after
   // all Add calls are done.
-  void Compile(std::vector<string>* strings_to_match);
+  void Compile(std::vector<std::string>* strings_to_match);
 
   // Returns the index of the first matching regexp.
   // Returns -1 on no match. Can be called prior to Compile.
@@ -80,11 +80,10 @@ class FilteredRE2 {
   // The number of regexps added.
   int NumRegexps() const { return static_cast<int>(re2_vec_.size()); }
 
+  // Get the individual RE2 objects.
+  const RE2& GetRE2(int regexpid) const { return *re2_vec_[regexpid]; }
+
  private:
-
-  // Get the individual RE2 objects. Useful for testing.
-  RE2* GetRE2(int regexpid) const { return re2_vec_[regexpid]; }
-
   // Print prefilter.
   void PrintPrefilter(int regexpid);
 

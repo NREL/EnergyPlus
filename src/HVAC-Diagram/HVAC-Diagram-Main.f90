@@ -439,19 +439,17 @@ DO WHILE (status /= eof)
         bndNode(ConvertTextToInteger(words(2)))%id = words(3)
 ! <Non-Parent Node Connection>,<Node Name>,<Node ObjectType>,<Node ObjectName>,<Node ConnectionType>,<Node FluidStream>
       CASE ('NON-PARENT NODE CONNECTION')
-        IF (.not. SameString(words(3),'AirTerminal:SingleDuct:Uncontrolled')) THEN !DEBUG
-          CALL incrementNodeConnection
-          bndNodeConnect(lastBndNodeConnect)%isParent = .FALSE.
-          bndNodeConnect(lastBndNodeConnect)%NodeID = words(2)
-          bndNodeConnect(lastBndNodeConnect)%ObjectType = words(3)
-          bndNodeConnect(lastBndNodeConnect)%ObjectID = words(4)
-          bndNodeConnect(lastBndNodeConnect)%ConnectType = words(5)
-          bndNodeConnect(lastBndNodeConnect)%FluidStream = ConvertTextToInteger(words(6))
-          !set node numbers
-          bndNodeConnect(lastBndNodeConnect)%NodeNum = LookupNodeNumber(words(2))
-          !set connect type number
-          bndNodeConnect(lastBndNodeConnect)%ConnectTypeNum = LookupConnectType(words(5))
-        END IF
+        CALL incrementNodeConnection
+        bndNodeConnect(lastBndNodeConnect)%isParent = .FALSE.
+        bndNodeConnect(lastBndNodeConnect)%NodeID = words(2)
+        bndNodeConnect(lastBndNodeConnect)%ObjectType = words(3)
+        bndNodeConnect(lastBndNodeConnect)%ObjectID = words(4)
+        bndNodeConnect(lastBndNodeConnect)%ConnectType = words(5)
+        bndNodeConnect(lastBndNodeConnect)%FluidStream = ConvertTextToInteger(words(6))
+        !set node numbers
+        bndNodeConnect(lastBndNodeConnect)%NodeNum = LookupNodeNumber(words(2))
+        !set connect type number
+        bndNodeConnect(lastBndNodeConnect)%ConnectTypeNum = LookupConnectType(words(5))
 ! <Parent Node Connection>,<Node Name>,<Node ObjectType>,<Node ObjectName>,<Node ConnectionType>,<Node FluidStream>
       CASE ('PARENT NODE CONNECTION')
         CALL incrementNodeConnection
@@ -3980,7 +3978,7 @@ WRITE(UNIT=20, FMT="(A,I6,A,I6,A)") &
          '" y="',      unusedY, &
          '">', &
 !         'The following are not supported:  objects related to controls, DIRECT AIR, or  PURCHASED AIR</text>' fixed line to newer names for CR8043
-         'The following are not supported: objects related to controls, AirTerminal:SingleDuct:Uncontrolled, or ZoneHVAC:IdealLoadsAirSystem</text>'
+         'The following are not supported: objects related to controls or ZoneHVAC:IdealLoadsAirSystem</text>'
 
 WRITE(UNIT=20, FMT="(A)") '</g>'
 WRITE(UNIT=20, FMT="(A)") '</svg>'
@@ -4250,7 +4248,7 @@ toColor(88)%ObjType = 'Controller:WaterCoil' !renamed by script
 toColor(88)%ColorName = 'snow'
 toColor(89)%ObjType = 'ZoneHVAC:EnergyRecoveryVentilator:Controller' !renamed by script
 toColor(89)%ColorName = 'snow'
-toColor(90)%ObjType = 'AirTerminal:SingleDuct:Uncontrolled' !renamed by script
+toColor(90)%ObjType = 'AirTerminal:SingleDuct:ConstantVolume:NoReheat' !renamed by script
 toColor(90)%ColorName = 'snow'
 toColor(91)%ObjType = 'PlantEquipmentOperation:OutdoorDewpointDifference' !renamed by script
 toColor(91)%ColorName = 'snow'

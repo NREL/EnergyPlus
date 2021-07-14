@@ -101,7 +101,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.0;
+  Version,9.6;
 
   Timestep,4;
 
@@ -109,7 +109,7 @@
     PSI HOUSE DORM AND OFFICES,  !- Name
     36.87000,                !- North Axis {deg}
     Suburbs,                 !- Terrain
-    3.9999999E-02,           !- Loads Convergence Tolerance Value
+    3.9999999E-02,           !- Loads Convergence Tolerance Value {W}
     0.4000000,               !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -126,10 +126,12 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     5,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
@@ -914,7 +916,8 @@
     UpperLeftCorner,         !- Starting Vertex Position
     CounterClockWise,        !- Vertex Entry Direction
     World,                   !- Coordinate System
-    World;                   !- Daylighting Reference Point Coordinate System
+    World,                   !- Daylighting Reference Point Coordinate System
+    World;                   !- Rectangular Surface Coordinate System
 
   BuildingSurface:Detailed,
     Zn001:Wall001,           !- Name
@@ -1534,13 +1537,13 @@
   InternalMass,
     Zn002:IntM001,           !- Name
     INTERIOR,                !- Construction Name
-    DORM ROOMS AND COMMON AREAS,  !- Zone Name
+    DORM ROOMS AND COMMON AREAS,  !- Zone or ZoneList Name
     408.7734;                !- Surface Area {m2}
 
   InternalMass,
     Zn002:IntM002,           !- Name
     PARTITION02,             !- Construction Name
-    DORM ROOMS AND COMMON AREAS,  !- Zone Name
+    DORM ROOMS AND COMMON AREAS,  !- Zone or ZoneList Name
     371.6122;                !- Surface Area {m2}
 
   BuildingSurface:Detailed,
@@ -2205,7 +2208,9 @@
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     PSI FOYER PURCHASED AIR, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     PSI FOYER PURCHASED AIR, !- Name
@@ -2280,7 +2285,9 @@
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     DORM ROOMS AND COMMON AREAS PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     DORM ROOMS AND COMMON AREAS PURCHASED AIR,  !- Name
@@ -2355,7 +2362,9 @@
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     LEFT FORK PURCHASED AIR, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     LEFT FORK PURCHASED AIR, !- Name
@@ -2430,7 +2439,9 @@
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     MIDDLE FORK PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     MIDDLE FORK PURCHASED AIR,  !- Name
@@ -2505,7 +2516,9 @@
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     RIGHT FORK PURCHASED AIR,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     RIGHT FORK PURCHASED AIR,!- Name
@@ -2552,7 +2565,7 @@
 
   Output:Variable,*,Daylighting Lighting Power Multiplier,hourly;
 
-  Output:Variable,*,Zone Lights Electric Energy,hourly;
+  Output:Variable,*,Zone Lights Electricity Energy,hourly;
 
   Output:Meter,Electricity:Building,hourly;
 
@@ -2588,9 +2601,9 @@
 
   Output:Meter:MeterFileOnly,InteriorLights:Electricity,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Building,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Building,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -2598,9 +2611,9 @@
 
   Output:Meter:MeterFileOnly,InteriorLights:Electricity,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Building,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Building,runperiod;
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator

@@ -19,24 +19,24 @@
  * under contract with Lawrence Berkeley National Laboratory.
  **************************************************************/
 
-// This work was supported by the Assistant Secretary for Energy Efficiency 
-// and Renewable Energy, Office of Building Technologies, 
-// Building Systems and Materials Division of the 
+// This work was supported by the Assistant Secretary for Energy Efficiency
+// and Renewable Energy, Office of Building Technologies,
+// Building Systems and Materials Division of the
 // U.S. Department of Energy under Contract No. DE-AC03-76SF00098.
 
 /*
-NOTICE: The Government is granted for itself and others acting on its behalf 
-a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce, 
-prepare derivative works, and perform publicly and display publicly. 
+NOTICE: The Government is granted for itself and others acting on its behalf
+a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce,
+prepare derivative works, and perform publicly and display publicly.
 Beginning five (5) years after (date permission to assert copyright was obtained),
-subject to two possible five year renewals, the Government is granted for itself 
+subject to two possible five year renewals, the Government is granted for itself
 and others acting on its behalf a paid-up, nonexclusive, irrevocable worldwide
-license in this data to reproduce, prepare derivative works, distribute copies to 
-the public, perform publicly and display publicly, and to permit others to do so. 
+license in this data to reproduce, prepare derivative works, distribute copies to
+the public, perform publicly and display publicly, and to permit others to do so.
 NEITHER THE UNITED STATES NOR THE UNITED STATES DEPARTMENT OF ENERGY, NOR ANY OF
-THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL 
-LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY 
-INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE 
+THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL
+LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY
+INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE
 WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 */
 #pragma warning(disable:4786)
@@ -120,7 +120,6 @@ DllExport int	DElight2(
 	FILE *infile;						/* input file pointer */
 	FILE *outfile;						/* output file pointer */
 	FILE *W4libfile;					/* Window 4 library file pointer */
-	int err;						// error return value from fopen_s
 	ofstream ofdmpfile("DElight2.DMP");	/* LBLDLL debug dump file */
 	BLDG bldg;							/* bldg data structure */
 	LIB lib;							/* library data structure */
@@ -131,7 +130,7 @@ DllExport int	DElight2(
 	int wx_flag;		/* Wxfile flag */
 
     int iReturnVal = 0; // Return value
-	
+
 	// Check for successful opening of debug dump file.
 	if(!ofdmpfile)
 	{
@@ -152,7 +151,7 @@ DllExport int	DElight2(
 
 	// Read the first heading line in the input file to determine input version
 	char cInputLine[MAX_CHAR_LINE+1];	/* Input line */
-	fgets(cInputLine, MAX_CHAR_LINE, infile);
+	if (fgets(cInputLine, MAX_CHAR_LINE, infile) == NULL) return -1;
 	char cInputVersion[MAX_CHAR_UNAME+1];
 	sscanf(cInputLine,"%*s %s\n",cInputVersion);
 
@@ -184,7 +183,7 @@ DllExport int	DElight2(
 		/* Calculate geometrical values required for DF calcs. */
 		if (iSurfNodes > MAX_SURF_NODES) iSurfNodes = MAX_SURF_NODES;
 		if (iWndoNodes > MAX_WNDO_NODES) iWndoNodes = MAX_WNDO_NODES;
-		if (CalcGeomFromEPlus(&bldg,iSurfNodes,iWndoNodes,&ofdmpfile) < 0) {
+		if (CalcGeomFromEPlus(&bldg) < 0) {
 			ofdmpfile << "ERROR: DElight Bad return from CalcGeomFromEPlus()\n";
 			/* Close dump file. */
 			ofdmpfile.close();
@@ -262,7 +261,7 @@ DllExport int	DElight2(
 		}
 		else {
 			/* read header information */
-			read_wx_tmy2_hdr(&bldg,wxfile);
+			if(read_wx_tmy2_hdr(&bldg,wxfile) < 0) return(-1);
 			wx_flag = 1;
 		}
 	}
@@ -316,7 +315,7 @@ DllExport int	DElight2(
 	/* Check for no run period specified => do not perform hourly calcs. */
 	if ((iStrtMonth != 0) && (iStrtDay != 0) && (iEndMonth != 0) && (iEndDay != 0)) {
 		/* Calculate hourly illuminances, glare index and fractional electric light reductions due to daylight. */
-        int iDillumReturnVal = dillum(dCloudFraction,&bldg,&lib,&sun_data,&run_data,wx_flag,wxfile,&ofdmpfile);
+        int iDillumReturnVal = dillum(dCloudFraction,&bldg,&sun_data,&run_data,wx_flag,wxfile,&ofdmpfile);
 		if (iDillumReturnVal < 0) {
             // If Errors have been detected then return now, else ignore Warnings until return from DElight
 	        if (iDillumReturnVal != -10) {
@@ -374,15 +373,15 @@ DllExport int	DElight2(
 
 	/* Free lib malloc-ed memory */
 	free_lib(&lib);
-                        
+
 	/* Close output file. */
 	fclose(outfile);
-	
+
 	/* Close error output file. */
 	ofdmpfile.close();
 
 	/* Close wx file. */
 	if (wx_flag) fclose(wxfile);
-	
+
 	return (iReturnVal);
 }

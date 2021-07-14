@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,58 +52,27 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace HeatPumpWaterToWaterCOOLING {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    extern std::string const ModuleCompName;
-    extern std::string const ModuleCompNameUC;
-
-    // DERIVED TYPE DEFINITIONS
-
-    // Type Description of Heat Pump
-
-    // Output Variables Type definition
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern Array1D_bool CheckEquipName;
-
-    extern std::string GSHPRefrigerant; // refrigerent name and index
-    extern int GSHPRefrigIndex;
-
-    extern int NumGSHPs;                       // number of Gshps specified in input
-    extern Real64 LoadSideWaterMassFlowRate;   // Load Side mass flow rate, water side kg/s
-    extern Real64 SourceSideWaterMassFlowRate; // Source Side mass flow rate, water side kg/s
-    extern Real64 Power;                       // power consumption Watts
-    extern Real64 QLoad;                       // heat rejection from Load Side coil Watts
-    extern Real64 QSource;                     // cooling capacity Watts
-    extern Real64 SourceSideWaterOutletTemp;   // Source Side outlet temperature 캜
-    extern Real64 SourceSideWaterInletTemp;    // Source Side outlet temperature 캜
-    extern Real64 LoadSideWaterOutletTemp;     // Source Side outlet temperature 캜
-    extern Real64 LoadSideWaterInletTemp;      // Source Side outlet temperature 캜
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
-
-    // Name Public routines, optionally name Private routines within this module
-
-    // Types
-
-    struct GshpSpecs // Needs Some Modifications talk with Dr.Fisher and decide....
+    struct GshpPeCoolingSpecs : PlantComponent // Needs Some Modifications talk with Dr.Fisher and decide....
     {
         // Members
         std::string Name; // user identifier
         int WWHPPlantTypeOfNum;
         bool Available;                  // need an array of logicals--load identifiers of available equipment
         bool ON;                         // simulate the machine at it's operating part load ratio
-        Real64 COP;                      // Coefficeint of Performance of the machine
-        Real64 NomCap;                   // Nomial Capcity of the HeatPump
+        Real64 COP;                      // Coefficient of Performance of the machine
+        Real64 NomCap;                   // Nominal Capacity of the HeatPump
         Real64 MinPartLoadRat;           // Minimum operating Part Load Ratio
         Real64 MaxPartLoadRat;           // Maximum operating Part Load Ratio
         Real64 OptPartLoadRat;           // Optimal operating Part Load Ratio
@@ -126,8 +95,6 @@ namespace HeatPumpWaterToWaterCOOLING {
         //  that is supposed to be proportional to the theoretical power
         Real64 HighPressCutoff; // Maximum Design Pressure on the Load Side
         Real64 LowPressCutoff;  // Minimum Design Pressure on the Source Side
-        // Added by Arun 6-27-02
-        // to implement cycletime - removed 9/10/2013 LKL
         bool IsOn;
         bool MustRun;
         // loop topology variables
@@ -141,20 +108,6 @@ namespace HeatPumpWaterToWaterCOOLING {
         int LoadCompNum;       // load side plant loop component index
         int CondMassFlowIndex; // index for criteria in PullCompInterconnectTrigger
 
-        // Default Constructor
-        GshpSpecs()
-            : Available(false), ON(false), COP(0.0), NomCap(0.0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0),
-              LoadSideVolFlowRate(0.0), LoadSideDesignMassFlow(0.0), SourceSideVolFlowRate(0.0), SourceSideDesignMassFlow(0.0),
-              SourceSideInletNodeNum(0), SourceSideOutletNodeNum(0), LoadSideInletNodeNum(0), LoadSideOutletNodeNum(0), SourceSideUACoeff(0.0),
-              LoadSideUACoeff(0.0), CompPistonDisp(0.0), CompClearanceFactor(0.0), CompSucPressDrop(0.0), SuperheatTemp(0.0), PowerLosses(0.0),
-              LossFactor(0.0), HighPressCutoff(0.0), LowPressCutoff(0.0), IsOn(false), MustRun(false), SourceLoopNum(0), SourceLoopSideNum(0),
-              SourceBranchNum(0), SourceCompNum(0), LoadLoopNum(0), LoadLoopSideNum(0), LoadBranchNum(0), LoadCompNum(0), CondMassFlowIndex(0)
-        {
-        }
-    };
-
-    struct ReportVars
-    {
         // Members
         Real64 Power;                     // Power Consumption Watts
         Real64 Energy;                    // Energy Consumption Joules
@@ -162,53 +115,80 @@ namespace HeatPumpWaterToWaterCOOLING {
         Real64 QLoadEnergy;               // Load Side heat transfer Joules
         Real64 QSource;                   // Source Side heat transfer rate Watts
         Real64 QSourceEnergy;             // Source Side heat transfer Joules
-        Real64 LoadSideWaterInletTemp;    // Load Side outlet temperature 캜
-        Real64 SourceSideWaterInletTemp;  // Source Side outlet temperature 캜
-        Real64 LoadSideWaterOutletTemp;   // Load Side outlet temperature 캜
-        Real64 SourceSideWaterOutletTemp; // Source Side outlet temperature 캜
-        Real64 LoadSidemdot;              // Mass flow rate of the cooling water in Load Side kg/s
-        Real64 SourceSidemdot;            // Mass flow rate of chilled water in Eavporator kg/s
+        Real64 LoadSideWaterInletTemp;    // Load Side outlet temperature 째C
+        Real64 SourceSideWaterInletTemp;  // Source Side outlet temperature 째C
+        Real64 LoadSideWaterOutletTemp;   // Load Side outlet temperature 째C
+        Real64 SourceSideWaterOutletTemp; // Source Side outlet temperature 째C
         int Running;                      // On reporting Flag
 
+        Real64 LoadSideWaterMassFlowRate;
+        Real64 SourceSideWaterMassFlowRate;
+
+        bool plantScanFlag;
+        bool beginEnvironFlag;
+
         // Default Constructor
-        ReportVars()
-            : Power(0.0), Energy(0.0), QLoad(0.0), QLoadEnergy(0.0), QSource(0.0), QSourceEnergy(0.0), LoadSideWaterInletTemp(0.0),
-              SourceSideWaterInletTemp(0.0), LoadSideWaterOutletTemp(0.0), SourceSideWaterOutletTemp(0.0), LoadSidemdot(0.0), SourceSidemdot(0.0),
-              Running(0)
+        GshpPeCoolingSpecs()
+            : WWHPPlantTypeOfNum(0), Available(false), ON(false), COP(0.0), NomCap(0.0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0),
+              OptPartLoadRat(0.0), LoadSideVolFlowRate(0.0), LoadSideDesignMassFlow(0.0), SourceSideVolFlowRate(0.0), SourceSideDesignMassFlow(0.0),
+              SourceSideInletNodeNum(0), SourceSideOutletNodeNum(0), LoadSideInletNodeNum(0), LoadSideOutletNodeNum(0), SourceSideUACoeff(0.0),
+              LoadSideUACoeff(0.0), CompPistonDisp(0.0), CompClearanceFactor(0.0), CompSucPressDrop(0.0), SuperheatTemp(0.0), PowerLosses(0.0),
+              LossFactor(0.0), HighPressCutoff(0.0), LowPressCutoff(0.0), IsOn(false), MustRun(false), SourceLoopNum(0), SourceLoopSideNum(0),
+              SourceBranchNum(0), SourceCompNum(0), LoadLoopNum(0), LoadLoopSideNum(0), LoadBranchNum(0), LoadCompNum(0), CondMassFlowIndex(0),
+              Power(0.0), Energy(0.0), QLoad(0.0), QLoadEnergy(0.0), QSource(0.0), QSourceEnergy(0.0), LoadSideWaterInletTemp(0.0),
+              SourceSideWaterInletTemp(0.0), LoadSideWaterOutletTemp(0.0), SourceSideWaterOutletTemp(0.0), Running(0), LoadSideWaterMassFlowRate(0.0),
+              SourceSideWaterMassFlowRate(0.0), plantScanFlag(true), beginEnvironFlag(true)
         {
         }
+
+        virtual ~GshpPeCoolingSpecs() = default;
+
+        static PlantComponent *factory(EnergyPlusData &state, const std::string &objectName);
+
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
+
+        void getDesignCapacities(
+            EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+
+        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
+
+        void initialize(EnergyPlusData &state);
+
+        void calculate(EnergyPlusData &state, Real64 &MyLoad);
+
+        void update(EnergyPlusData &state);
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
-    // Object Data
-    extern Array1D<GshpSpecs> GSHP; // dimension to number of machines
-    extern Array1D<ReportVars> GSHPReport;
-
-    // Functions
-
-    void SimHPWatertoWaterCOOLING(std::string const &GSHPType, // type ofGSHP
-                                  std::string const &GSHPName, // user specified name ofGSHP
-                                  int &CompIndex,
-                                  bool const FirstHVACIteration,
-                                  bool &InitLoopEquip, // If not zero, calculate the max load for operating conditions
-                                  Real64 &MyLoad,      // loop demand component will meet
-                                  Real64 &MaxCap,      // W - maximum operating capacity of GSHP
-                                  Real64 &MinCap,      // W - minimum operating capacity of GSHP
-                                  Real64 &OptCap,      // W - optimal operating capacity of GSHP
-                                  int const LoopNum);
-
-    void GetGshpInput();
-
-    void InitGshp(int const GSHPNum); // GSHP number
-
-    void CalcGshpModel(std::string const &GSHPType, // type ofGSHP
-                       std::string const &GSHPName, // user specified name ofGSHP
-                       int const GSHPNum,           // GSHP Number
-                       Real64 &MyLoad,              // Operating Load
-                       bool const FirstHVACIteration);
-
-    void UpdateGSHPRecords(int const GSHPNum); // GSHP number
+    void GetGshpInput(EnergyPlusData &state);
 
 } // namespace HeatPumpWaterToWaterCOOLING
+
+struct HeatPumpWaterToWaterCOOLINGData : BaseGlobalStruct
+{
+
+    int NumGSHPs = 0;
+    int GSHPRefrigIndex = 0;
+    bool GetWWHPCoolingInput = true;
+    Array1D<HeatPumpWaterToWaterCOOLING::GshpPeCoolingSpecs> GSHP;
+    Real64 CurrentSimTime = 0.0;
+    Real64 PrevSimTime = 0.0;
+
+    void clear_state() override
+    {
+        this->NumGSHPs = 0;
+        this->GSHPRefrigIndex = 0;
+        this->GetWWHPCoolingInput = true;
+        this->GSHP.deallocate();
+        this->CurrentSimTime = 0.0;
+        this->PrevSimTime = 0.0;
+    }
+};
 
 } // namespace EnergyPlus
 

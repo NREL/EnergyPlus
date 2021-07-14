@@ -2,35 +2,35 @@
 
 This group of EnergyPlus input objects describes the configurations of Variable Refrigerant Flow (VRF, or Variable Refrigerant Volume) air-conditioning systems.
 
-A VRF system is an air-conditioning system that varies the refrigerant flow rate using variable speed compressor(s) in the outdoor unit, and the electronic expansion valves (EEVs) located in each indoor unit. The system meets the space cooling or heating load requirements by maintaining the zone air temperature at the setpoint. The ability to control the refrigerant mass flow rate according to the cooling and/or heating load enables the use of as many as 60 or more indoor units with differing capacities in conjunction with one single outdoor unit. This unlocks the possibility of having individualized comfort control, simultaneous heating and cooling in different zones, and heat recovery from one zone to another. It may also lead to more efficient operations during part-load conditions.
+A VRF system is an air-conditioning system that varies the refrigerant flow rate using variable speed compressor(s) in the outdoor unit, and the electronic expansion valves (EEVs) located in each terminal unit. For zone equipment the system meets the space cooling or heating load requirements by maintaining the zone air temperature at the setpoint or in the case of air loop equipment can meet a control zone load or maintain a terminal unit or coil outlet air temperature set point. The terminal unit may also be used in the air loop's outdoor air system where a terminal unit or coil outlet air temperature set point must be used. The ability to control the refrigerant mass flow rate according to the cooling and/or heating load enables the use of as many as 20 or more terminal units with differing capacities in conjunction with one single outdoor unit. This unlocks the possibility of having individualized comfort control, simultaneous heating and cooling in different zones, and heat recovery from one zone to another.
 
 There are two alternative VRF models in EnergyPlus:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \item
-  \textbf{System curve based model (VRF-SysCurve)}. In this model, a number of system level curves are used to describe the VRF system performance. This model corresponds to the \emph{AirConditioner:VariableRefrigerantFlow} object.
+  \textbf{System curve based model (VRF-SysCurve)}. In this model, a number of system level curves are used to describe the VRF system performance. This model corresponds to the \emph{\hyperref[airconditionervariablerefrigerantflow]{AirConditioner:VariableRefrigerantFlow}} object.
 \item
-  \textbf{Physics based model (VRF-FluidTCtrl)}. This model is able to consider the dynamics of more operational parameters and is applicable for fluid temperature control. This model corresponds to the \emph{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl} object.
+  \textbf{Physics based model (VRF-FluidTCtrl)}. This model is able to consider the dynamics of more operational parameters and is applicable for fluid temperature control. This model corresponds to the \emph{\hyperref[airconditionervariablerefrigerantflowfluidtemperaturecontrol]{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl}} object.
 \end{enumerate}
 
 (Please refer to the engineering reference for more technical details of the two models).
 
-In the VRF system model, direct-expansion cooling and/or heating coils are configured in a zone terminal unit, which is connected to a zone via the zone inlet and exhaust nodes. The zone terminal units are identified in a \emph{ZoneTerminalUnitList} object, the name of which is entered as an input to the \emph{AirConditioner:VariableRefrigerantFlow} or \emph{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl} object.
+In the VRF system model, direct-expansion cooling and/or heating coils with an optional supplemental heating coil are configured in a zone terminal unit, which is connected to a zone via the zone inlet and exhaust nodes, connected to an air loop main branch or installed in the air loop's outdoor air system. The terminal units are identified in a \emph{\hyperref[zoneterminalunitlist]{ZoneTerminalUnitList}} object, the name of which is entered as an input to the \emph{\hyperref[airconditionervariablerefrigerantflow]{AirConditioner:VariableRefrigerantFlow}} or \emph{\hyperref[airconditionervariablerefrigerantflowfluidtemperaturecontrol]{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl}} object.
 
-The Energyplus connection methodology is shown as dashed and greyed arrows in Figure~\ref{fig:variable-refrigerant-flow-schematic} according to the following rules:
+The EnergyPlus connection methodology is shown as dashed and greyed arrows in Figure~\ref{fig:variable-refrigerant-flow-schematic} according to the following rules:
 
 \begin{itemize}
 \item
-  The zone inlet and zone exhaust node names are defined in a \emph{ZoneHVAC:EquipmentConnections} object (bottom of figure).
+ For zone equipment the zone inlet and zone exhaust node names are defined in a \emph{\hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections}} object (bottom of figure) and the terminal unit type and name are specified in a \emph{\hyperref[zonehvacequipmentlist]{ZoneHVAC:EquipmentList}} object. For air loop equipment the terminal unit type and name and inlet and outlet node names are defined in the AirloopHVAC branch (top left of figure). For outside air system equipment the terminal unit type and name are defined in the \emph{\hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList}} (top right of figure) and the terminal unit inlet node will typically (but not necessarily) be an outside air node and the terminal unit outlet node will typically connect to the \emph{\hyperref[outdoorairmixer]{OutdoorAir:Mixer}} object.
 \item
-  A \emph{ZoneHVAC:TerminalUnit:VariableRefrigerantFlow} object will identify these zone exhaust and zone inlet node names as the terminal unit's air inlet and air outlet nodes, respectively.
+  A \emph{\hyperref[zonehvacterminalunitvariablerefrigerantflow]{ZoneHVAC:TerminalUnit:VariableRefrigerantFlow}} object will specify the terminal unit's air inlet and air outlet node names. For zone equipment the zone exhaust node is the terminal unit inlet node and the zone inlet node is the terminal unit outlet node. For air loop and outdoor air system equipment the terminal unit inlet and outlet node names identify the order of the equipment in the air loop.
 \item
-  All zone terminal units that are connected to the same \emph{AirConditioner:VariableRefrigerantFlow} or \emph{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl} object are listed in a \emph{ZoneTerminalUnitList} object.
+  All zone terminal units that are connected to the same \emph{\hyperref[airconditionervariablerefrigerantflow]{AirConditioner:VariableRefrigerantFlow}} or \emph{\hyperref[airconditionervariablerefrigerantflowfluidtemperaturecontrol]{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl}} object are listed in a \emph{\hyperref[zoneterminalunitlist]{ZoneTerminalUnitList}} object.
 \item
-  The name of the \emph{ZoneTerminalUnitList} object is an input to the \emph{AirConditioner:VariableRefrigerantFlow} or \emph{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl} object.
+  The name of the \emph{\hyperref[zoneterminalunitlist]{ZoneTerminalUnitList}} object is an input to the \emph{\hyperref[airconditionervariablerefrigerantflow]{AirConditioner:VariableRefrigerantFlow}} or \emph{\hyperref[airconditionervariablerefrigerantflowfluidtemperaturecontrol]{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl}} object.
 \item
-  The \emph{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl} or \emph{AirConditioner:VariableRefrigerantFlow} object is not listed in an AirloopHVAC object, and therefore, can only be simulated if the terminal units are connected to the \emph{AirConditioner:VariableRefrigerantFlow} or \emph{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl} object using the ZoneTerminalUnitList.
+  The \emph{\hyperref[airconditionervariablerefrigerantflowfluidtemperaturecontrol]{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl}} or \emph{\hyperref[airconditionervariablerefrigerantflow]{AirConditioner:Variable-RefrigerantFlow}} object is not listed in an AirloopHVAC object, and therefore, can only be simulated if the terminal units are connected to the \emph{\hyperref[airconditionervariablerefrigerantflow]{AirConditioner:VariableRefrigerantFlow}} or \emph{\hyperref[airconditionervariablerefrigerantflowfluidtemperaturecontrol]{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl}} object using the \hyperref[zoneterminalunitlist]{ZoneTerminalUnitList}.
 \item
   Secondary ZoneHVAC equipment objects may be used in the same zones as the terminal units for other purposes (e.g., code compliance)
 \end{itemize}
@@ -43,18 +43,18 @@ The following schematic demonstrates these connection rules.
 \caption{Variable Refrigerant Flow Schematic \protect \label{fig:variable-refrigerant-flow-schematic}}
 \end{figure}
 
-Energyplus object type and object name, and node name relationships are also shown in the following figure to aid in the assembly of this HVAC system type.
+EnergyPlus object type and object name, and node name relationships are also shown in the following figure to aid in the assembly of this HVAC system type.
 
-\begin{figure}[hbtp] 
+\begin{figure}[hbtp]
 \centering
-\includegraphics{media/image311.png}
+\includegraphics[width=0.5\linewidth]{media/image311.png}
 \emph{(a) VRF model based on system curves (VRF-SysCurve)}
-\includegraphics{media/image312.png}
+\includegraphics[width=0.5\linewidth]{media/image312.png}
 \emph{(b) VRF model based on physics (VRF-FluidTCtrl)}
 \caption{Variable Refrigerant Flow Object Links \protect \label{fig:variable-refrigerant-flow-object-links}}
 \end{figure}
 
-% AirConditioner:VariableRefrigerantFlow
+% \hyperref[airconditionervariablerefrigerantflow]{AirConditioner:VariableRefrigerantFlow}
 \subsection{AirConditioner:VariableRefrigerantFlow}\label{airconditionervariablerefrigerantflow}
 \subsubsection{Inputs}\label{inputs-051}
 
@@ -72,15 +72,15 @@ This numeric field defines the total cooling capacity (sensible + latent) of the
 
 \paragraph{Field: Gross Rated Cooling COP}\label{field-gross-rated-cooling-cop-001}
 
-This numeric field defines the cooling coefficient of performance at rated conditions. The cooling coefficient of performance includes compressor power and condenser fan power. This COP value does not account for impacts due to the supply air fan. The nominal heat pump cooling COP must be greater than 0. If this field is left blank, a default coefficient of performance of 3.3 is assumed.
+This numeric field defines the cooling coefficient of performance (COP) at rated conditions. The cooling COP includes compressor power and condenser fan power. This COP value does not account for impacts due to the supply air fan. The nominal heat pump cooling COP must be greater than 0. If this field is left blank, a default COP of 3.3 is assumed.
 
-\paragraph{Field: Minimum Outdoor Temperature in Cooling Mode}\label{field-minimum-outdoor-temperature-in-cooling-mode-000}
+\paragraph{Field: Minimum Condenser Inlet Node Temperature in Cooling Mode}\label{field-minimum-condenser-inlet-node-temperature-in-cooling-mode-000}
 
-This numeric field defines the minimum source temperature allowed for cooling operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Below this temperature, cooling is disabled. If this field is left blank, the default value is -6ºC.
+This numeric field defines the minimum source inlet temperature allowed for cooling operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Below this temperature, cooling is disabled. If this field is left blank, the default value is -6ºC.
 
-\paragraph{Field: Maximum Outdoor Temperature in Cooling Mode}\label{field-maximum-outdoor-temperature-in-cooling-mode-000}
+\paragraph{Field: Maximum Condenser Inlet Node Temperature in Cooling Mode}\label{field-maximum-condenser-inlet-node-temperature-in-cooling-mode-000}
 
-This numeric field defines the maximum source temperature allowed for cooling operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Above this temperature, cooling is disabled. If this field is left blank, the default value is 43ºC.
+This numeric field defines the maximum source inlet temperature allowed for cooling operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Above this temperature, cooling is disabled. If this field is left blank, the default value is 43ºC.
 
 \paragraph{Field: Cooling Capacity Ratio Modifier Function of Low Temperature Curve Name}\label{field-cooling-capacity-ratio-modifier-function-of-low-temperature-curve-name}
 
@@ -108,7 +108,7 @@ This alpha field defines the cooling energy input ratio modifier at high outdoor
 
 \paragraph{Field: Cooling Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name}\label{field-cooling-energy-input-ratio-modifier-function-of-low-part-load-ratio-curve-name}
 
-This alpha field defines the cooling energy input ratio modifier (function of part-load ratio when PLR is less than or equal to 1) curve name. This curve is a linear, quadratic or cubic equation with cooling part-load ratio used as the independent variable. The cooling energy input ratio modifier curve is normalized to 1 at a part-load ratio of 1 and is used only when the operating part-load ratio is less than or equal to 1.
+This alpha field defines the cooling energy input ratio modifier (function of part-load ratio when PLR is less than or equal to 1) curve name. This curve is a linear, quadratic or cubic equation with cooling part-load ratio used as the independent variable. The cooling energy input ratio modifier curve is normalized to 1 at a part-load ratio of 1 and is used only when the operating part-load ratio is less than or equal to 1. This curve's minimum PLR value must be less or equal to the value in the field Minimum Heat Pump Part-Load Ratio.
 
 \paragraph{Field: Cooling Energy Input Ratio Modifier Function of HIgh Part-Load Ratio Curve Name}\label{field-cooling-energy-input-ratio-modifier-function-of-high-part-load-ratio-curve-name}
 
@@ -128,19 +128,19 @@ This numeric field defines the gross total heat pump heating capacity at rated c
 
 \paragraph{Field: Rated Heating Capacity Sizing Ratio}\label{field-rated-heating-capacity-sizing-ratio-000}
 
-This numeric field defines the ratio of gross heating to gross cooling capacity. The model assumes that when used, this value will be greater than 1. A similar input is available in the ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object. When the heating capacity is autosized, if this field is non-blank, this ratio is used to scale the heating capacity to the gross rated total cooling capacity regardless of the value entered in the terminal unit objects. When the heating capacity is not autosized, the gross rated heating capacity will be equal to the value specified in the Gross Rated Heating Capacity input field and this value will be compared to the sum of the terminal unit heating coil size. If these values are more than 10\% different, a warning will be issued when Output:Diagnostics, DisplayExtraWarnings; is included in the input file. If this field is blank and the terminal unit sizing ratio input is also blank, then the heating capacity sizing ratio is assumed to be 1. If this field is not blank and the heating capacity sizing ratio in the terminal unit object(s) is blank, then this ratio also applies to each heating coil. If this field is not blank and the heating capacity sizing ratio in the terminal units is also not blank, then the terminal unit heating coil capacity sizing ratio input applies to each heating coil.
+This numeric field defines the ratio of gross heating to gross cooling capacity. The model assumes that when used, this value will be greater than 1. A similar input is available in the \hyperref[zonehvacterminalunitvariablerefrigerantflow]{ZoneHVAC:TerminalUnit:VariableRefrigerantFlow} object. When the heating capacity is autosized, if this field is non-blank, this ratio is used to scale the heating capacity to the gross rated total cooling capacity regardless of the value entered in the terminal unit objects. When the heating capacity is not autosized, the gross rated heating capacity will be equal to the value specified in the Gross Rated Heating Capacity input field and this value will be compared to the sum of the terminal unit heating coil size. If these values are more than 10\% different, a warning will be issued when \hyperref[outputdiagnostics]{Output:Diagnostics}, DisplayExtraWarnings; is included in the input file. If this field is blank and the terminal unit sizing ratio input is also blank, then the heating capacity sizing ratio is assumed to be 1. If this field is not blank and the heating capacity sizing ratio in the terminal unit object(s) is blank, then this ratio also applies to each heating coil. If this field is not blank and the heating capacity sizing ratio in the terminal units is also not blank, then the terminal unit heating coil capacity sizing ratio input applies to each heating coil.
 
 \paragraph{Field: Gross Rated Heating COP}\label{field-gross-rated-heating-cop-001}
 
-This numeric field defines the heating coefficient of performance at rated conditions. The heating coefficient of performance includes compressor power and condenser fan power. This gross COP value does NOT account for~ the supply air fan. The nominal heat pump heating COP must be greater than 0. If this field is left blank, a coefficient of performance of 3.4 is assumed.
+This numeric field defines the heating coefficient of performance (COP) at rated conditions. The heating COP includes compressor power and condenser fan power. This gross COP value does NOT account for impacts due to the supply air fan. The nominal heat pump heating COP must be greater than 0. If this field is left blank, a COP of 3.4 is assumed.
 
-\paragraph{Field: Minimum Outdoor Temperature in Heating Mode}\label{field-minimum-outdoor-temperature-in-heating-mode-000}
+\paragraph{Field: Minimum Condenser Inlet Node Temperature in Heating Mode}\label{field-minimum-condenser-inlet-node-temperature-in-heating-mode-000}
 
-This numeric field defines the minimum outdoor temperature allowed for heating operation. Below this temperature, heating is disabled. If this field is left blank, the default value is -20ºC.
+This numeric field defines the minimum source inlet temperature allowed for heating operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Below this temperature, heating is disabled. If this field is left blank, the default value is -20ºC.
 
-\paragraph{Field: Maximum Outdoor Temperature in Heating Mode}\label{field-maximum-outdoor-temperature-in-heating-mode-000}
+\paragraph{Field: Maximum Condenser Inlet Node Temperature in Heating Mode}\label{field-maximum-condenser-inlet-node-temperature-in-heating-mode-000}
 
-This numeric field defines the maximum outdoor temperature allowed for heating operation. Above this temperature, heating is disabled. If this field is left blank, the default value is 16ºC.
+This numeric field defines the maximum source inlet temperature allowed for heating operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Above this temperature, heating is disabled. If this field is left blank, the default value is 16ºC. This default temperature will likely disable water-cooled equipment and a more reasonable value should be entered.  Check manufacturers specifications.
 
 \paragraph{Field: Heating Capacity Ratio Modifier Function of Low Temperature Curve Name}\label{field-heating-capacity-ratio-modifier-function-of-low-temperature-curve-name}
 
@@ -168,11 +168,11 @@ This alpha field defines the heating energy input ratio modifier at high tempera
 
 \paragraph{Field: Heating Performance Curve Outdoor Temperature Type}\label{field-heating-performance-curve-outdoor-temperature-type}
 
-This choice field defines the outdoor temperature type used for all performance curves. The valid choices are DryBulbTemperature and WetBulbTemperature. The default value is WetBulbTemperature. Manufacturers will typically provide heating performance data as a function of outdoor air wet-bulb temperatures. This means that the performance (e.g., capacity and energy input ratio) curves will use outdoor wet-bulb temperature as one of the independent variables. At times, manufacturers will only provide performance data as a function of outdoor dry-bulb temperatures. In this case, all performance curves shall be developed using outdoor dry-bulb temperature and this field shall be selected as DryBulbTemperature.
+This choice field defines the outdoor temperature type used for all performance curves. The valid choices are DryBulbTemperature and WetBulbTemperature. The default value is WetBulbTemperature. Manufacturers will typically provide heating performance data as a function of outdoor air wet-bulb temperatures. This means that the performance (e.g., capacity and energy input ratio) curves will use outdoor wet-bulb temperature as one of the independent variables. At times, manufacturers will only provide performance data as a function of outdoor dry-bulb temperatures. In this case, all performance curves shall be developed using outdoor dry-bulb temperature and this field shall be selected as DryBulbTemperature. If the \textit{Condenser Type} specified is \textit{WaterCooled}, then the value of this field should be \textit{DryBulbTemperature}. 
 
 \paragraph{Field: Heating Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name}\label{field-heating-energy-input-ratio-modifier-function-of-low-part-load-ratio-curve-name}
 
-This alpha field defines the heating energy input ratio modifier (function of part-load ratio when PLR is less than or equal to 1) curve name. This curve is a linear, quadratic, or cubic equation with heating part-load ratio used as the independent variable. The heating energy input ratio modifier curve is normalized to 1 at a part-load ratio of 1 and is used only when the part-load ratio is less than or equal to 1.
+This alpha field defines the heating energy input ratio modifier (function of part-load ratio when PLR is less than or equal to 1) curve name. This curve is a linear, quadratic, or cubic equation with heating part-load ratio used as the independent variable. The heating energy input ratio modifier curve is normalized to 1 at a part-load ratio of 1 and is used only when the part-load ratio is less than or equal to 1. This curve's minimum PLR value must be less or equal to the value in the field Minimum Heat Pump Part-Load Ratio.
 
 \paragraph{Field: Heating Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name}\label{field-heating-energy-input-ratio-modifier-function-of-high-part-load-ratio-curve-name}
 
@@ -196,7 +196,7 @@ This alpha field defines the name of the zone where the ``master'' thermostat is
 
 \paragraph{Field: Master Thermostat Priority Control Type}\label{field-master-thermostat-priority-control-type-000}
 
-This choice field determines the logic used to simulate the ``master'' thermostat. Valid choices are LoadPriority, ZonePriority, ThermostatOffsetPriority, MasterThermostatPriority, and Scheduled. The default value is MasterThermostatPriority. When LoadPriority is selected, the total zone load is used to choose the operating mode as either cooling or heating. When ZonePriority is selected, the number of zones requiring cooling or heating determines the operating mode. When ThermostatOffsetPriority is selected, the zone farthest from the thermostat set point determines the operating mode. The MasterThermostatPriority choice operates the system according the zone load where the master thermostat is located. The heat pump can also be scheduled to operate in either cooling or heating mode. For scheduled operation, a schedule name is entered in the following field.
+This choice field determines the logic used to simulate the ``master'' thermostat. Valid choices are LoadPriority, ZonePriority, ThermostatOffsetPriority, MasterThermostatPriority, and Scheduled. The default value is MasterThermostatPriority. When LoadPriority is selected, the total zone load is used to choose the operating mode as either cooling or heating. When ZonePriority is selected, the number of zones requiring cooling or heating determines the operating mode. When ThermostatOffsetPriority is selected, the zone farthest from the thermostat set point determines the operating mode. The MasterThermostatPriority choice operates the system according the zone load where the master thermostat is located. The heat pump can also be scheduled to operate in either cooling or heating mode. For scheduled operation, a schedule name is entered in the following field. When all terminal units connected to this system are set point controlled (set point control is only allowed in air loops and outdoor air systems) this field is not used.
 
 \paragraph{Field: Thermostat Priority Schedule Name}\label{field-thermostat-priority-schedule-name-000}
 
@@ -204,7 +204,7 @@ This alpha field identifies the schedule used when the previous field is set to 
 
 \paragraph{Field: Zone Terminal Unit List Name}\label{field-zone-terminal-unit-list-name}
 
-This alpha field defines the name of the zone terminal unit list. The name specified here should match the name of a valid ZoneTerminalUnitList object. In addition, each name specified in this list should match the name of a valid ZoneHVAC:TerminalUnit: VariableRefrigerantFlow object. All terminal units connected to this heat pump must be listed in this ZoneTerminalUnitList object.
+This alpha field defines the name of the zone terminal unit list. The name specified here should match the name of a valid \hyperref[zoneterminalunitlist]{ZoneTerminalUnitList} object. In addition, each name specified in this list should match the name of a valid \hyperref[zonehvacterminalunitvariablerefrigerantflow]{ZoneHVAC:TerminalUnit:VariableRefrigerantFlow} object. All terminal units connected to this heat pump must be listed in this \hyperref[zoneterminalunitlist]{ZoneTerminalUnitList} object.
 
 Note: the previous field is designated at the last field necessary to simulate the variable refrigerant flow heat pump. The following fields do not have to be entered, however, piping loses, defrost operation, crankcase heater operation, and basin heater operation will not be modeled. Defaults for fields not entered may also not apply. These remaining fields must be entered if that portion of the model is to be simulated.
 
@@ -286,7 +286,7 @@ This choice field defines the configuration of the heat pump condenser. Valid ch
 
 \paragraph{Field: Condenser Inlet Node Name}\label{field-condenser-inlet-node-name-000}
 
-This alpha field defines the name of the condenser inlet air or water node. For Condenser type = AirCooled, this node name should also be listed in an OutdoorAir:Node or OutdoorAir:NodeList object. If this field is blank, the model assumes an air-cooled condenser and the weather file is used to define the outdoor conditions entering the condenser. If this field is not blank, the node conditions are used to define the outdoor air or inlet water conditions entering the condenser. A node name is typically entered here for air-cooled systems when conditions other than those found in the weather file should be used (ref. OutdoorAir:Node related to height above ground).
+This alpha field defines the name of the condenser inlet air or water node. For Condenser type = AirCooled, this node name should also be listed in an \hyperref[outdoorairnode]{OutdoorAir:Node} or \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object. If this field is blank, the model assumes an air-cooled condenser and the weather file is used to define the outdoor conditions entering the condenser. If this field is not blank, the node conditions are used to define the outdoor air or inlet water conditions entering the condenser. A node name is typically entered here for air-cooled systems when conditions other than those found in the weather file should be used (ref. \hyperref[outdoorairnode]{OutdoorAir:Node} related to height above ground).
 
 \paragraph{Field: Condenser Outlet Node Name}\label{field-condenser-outlet-node-name-000}
 
@@ -346,15 +346,15 @@ This alpha field contains the name of the basin heater operating schedule. This 
 
 \paragraph{Field: Fuel Type}\label{field-fuel-type-005}
 
-This alpha field determines the type of fuel that this variable refrigerant flow system uses.~ This field has seven choices: Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOil\#1, FuelOil\#2, OtherFuel1, and OtherFuel2. The default is Electricity. The use of alternate fuel types assumes an engine drives the variable speed compression system and also accounts for condenser air flow (i.e., a fan attached to the engine provides air flow through the outdoor condenser.
+This alpha field determines the type of fuel that this variable refrigerant flow system uses.~ This field has seven choices: Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1, and OtherFuel2. The default is Electricity. The use of alternate fuel types assumes an engine drives the variable speed compression system and also accounts for condenser air flow (i.e., a fan attached to the engine provides air flow through the outdoor condenser.
 
-\paragraph{Field: Minimum Outdoor Temperature in Heat Recovery Mode}\label{field-minimum-outdoor-temperature-in-heat-recovery-mode-000}
+\paragraph{Field: Minimum Condenser Inlet Node Temperature in Heat Recovery Mode}\label{field-minimum-condenser-inlet-node-temperature-in-heat-recovery-mode-000}
 
-This numeric field defines the minimum outdoor dry-bulb temperature allowed for heat recovery operation. Below this temperature, heat recovery is disabled. This input must be greater than the larger of the minimum outdoor temperature in cooling or heating mode. If this field is left blank, the default value is the higher of the Minimum Outdoor Temperature in Cooling Mode or Minimum Outdoor Temperature in Heating Mode inputs. This system may still operate in cooling or heating only mode when outdoor temperatures are below the minimum outdoor temperature in heat recovery mode. This input is only used when Heat Pump Waste Heat Recovery is selected as Yes.
+This numeric field defines the minimum source inlet temperature allowed for heat recovery operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Below this temperature, heat recovery is disabled. This input must be greater than the larger of the minimum condenser inlet node temperature in cooling or heating mode. If this field is left blank, the default value is the higher of the Minimum Condenser Inlet Node Temperature in Cooling Mode or Minimum Condenser Inlet Node Temperature in Heating Mode inputs. This system may still operate in cooling or heating only mode when source inlet temperatures are below the minimum condenser inlet node temperature in heat recovery mode. This input is only used when Heat Pump Waste Heat Recovery is selected as Yes.
 
-\paragraph{Field: Maximum Outdoor Temperature in Heat Recovery Mode}\label{field-maximum-outdoor-temperature-in-heat-recovery-mode-000}
+\paragraph{Field: Maximum Condenser Inlet Node Temperature in Heat Recovery Mode}\label{field-maximum-condenser-inlet-node-temperature-in-heat-recovery-mode-000}
 
-This numeric field defines the maximum outdoor dry-bulb temperature allowed for heat recovery operation. Above this temperature, heat recovery is disabled. This input must be less than the smaller of the maximum outdoor temperature in cooling or heating mode. If this field is left blank, the default value is the lower of the Maximum Outdoor Temperature in Cooling Mode or Maximum Outdoor Temperature in Heating Mode inputs.. This system may still operate in cooling or heating only mode when outdoor temperatures are above the maximum outdoor temperature in heat recovery mode. This input is only used when Heat Pump Waste Heat Recovery is selected as Yes.
+This numeric field defines the maximum source inlet temperature allowed for heat recovery operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Above this temperature, heat recovery is disabled. This input must be less than the smaller of the maximum condenser inlet node temperature in cooling or heating mode. If this field is left blank, the default value is the lower of the Maximum Condenser Inlet Node Temperature in Cooling Mode or Maximum Condenser Inlet Node Temperature in Heating Mode inputs.. This system may still operate in cooling or heating only mode when source inlet temperatures are above the maximum condenser inlet node temperature in heat recovery mode. This input is only used when Heat Pump Waste Heat Recovery is selected as Yes.
 
 \paragraph{Field: Heat Recovery Cooling Capacity Modifier Curve Name}\label{field-heat-recovery-cooling-capacity-modifier-curve-name}
 
@@ -412,8 +412,8 @@ AirConditioner:VariableRefrigerantFlow,
     VRFCondAvailSched,    !- Availability Schedule Name
     autosize,             !- Gross Rated Total Cooling Capacity {W}
     3.16038,              !- Gross Rated Cooling COP {W}
-    -5,                   !- Minimum Outdoor Temperature in Cooling Mode {C}
-    43,                   !- Maximum Outdoor Temperature in Cooling Mode {C}
+    -5,                   !- Minimum Condenser Inlet Node Temperature in Cooling Mode {C}
+    43,                   !- Maximum Condenser Inlet Node Temperature in Cooling Mode {C}
     VRFCoolCapFT,         !- Cooling Capacity Ratio Modifier Function of Low Temperature Curve Name
     VRFCoolCapFTBoundary, !- Cooling Capacity Ratio Boundary Curve Name
     VRFCoolCapFTHi,       !- Cooling Capacity Ratio Modifier Function of High Temperature Curve Name
@@ -427,8 +427,8 @@ AirConditioner:VariableRefrigerantFlow,
     autosize,             !- Gross Rated Heating Capacity {W}
     ,                     !- Rated Heating Capacity Sizing Ratio (W/W)
     3.40909,              !- Gross Rated Heating COP
-    -20,                  !- Minimum Outdoor Temperature in Heating Mode {C}
-    15.5,                 !- Maximum Outdoor Temperature in Heating Mode {C}
+    -20,                  !- Minimum Condenser Inlet Node Temperature in Heating Mode {C}
+    15.5,                 !- Maximum Condenser Inlet Node Temperature in Heating Mode {C}
     VRFHeatCapFT,         !- Heating Capacity Ratio Modifier Function of Low Temperature Curve Name
     VRFHeatCapFTBoundary, !- Heating Capacity Ratio Boundary Curve Name
     VRFHeatCapFTHi,       !- Heating Capacity Ratio Modifier Function of High Temperature Curve Name
@@ -475,8 +475,8 @@ AirConditioner:VariableRefrigerantFlow,
     ,                     !- Basin Heater Set Point Temperature (C)
     ,                     !- Basin Heater Operating Schedule Name
     ,                     !- Fuel Type
-    ,                     !- Minimum Outdoor Temperature in Heat Recovery Mode (C)
-    ,                     !- Maximum Outdoor Temperature in Heat Recovery Mode (C)
+    ,                     !- Minimum Condenser Inlet Node Temperature in Heat Recovery Mode (C)
+    ,                     !- Maximum Condenser Inlet Node Temperature in Heat Recovery Mode (C)
     ,                     !- Heat Recovery Cooling Capacity Modifier Function of Temperature Curve Name
     ,                     !- Initial Heat Recovery Cooling Capacity Fraction
     ,                     !- Heat Recovery Cooling Capacity Time Constant (hr)
@@ -519,9 +519,9 @@ AirConditioner:VariableRefrigerantFlow,
 \item
   HVAC,Average,VRF Heat Pump Maximum Capacity Heating Rate {[}W{]}
 \item
-  HVAC,Average,VRF Heat Pump Crankcase Heater Electric Power {[}W{]}
+  HVAC,Average,VRF Heat Pump Crankcase Heater Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,VRF Heat Pump Crankcase Heater Electric Energy {[}J{]}
+  HVAC,Sum,VRF Heat Pump Crankcase Heater Electricity Energy {[}J{]}
 \item
   HVAC,Average,VRF Heat Pump Terminal Unit Heating Load Rate {[}W{]}
 \item
@@ -535,6 +535,10 @@ Heat Recovery:
   HVAC,Average,VRF Heat Pump Heat Recovery Status Change Multiplier {[]}
 \item
   HVAC,Average,VRF Heat Pump Simultaneous Cooling and Heating Efficiency {[}Btu/h/W{]}
+\item
+  HVAC,Average,VRF Heat Pump Heat Recovery Rate {[W]}
+\item
+  HVAC,Sum,VRF Heat Pump Heat Recovery Energy {[J]}
 \end{itemize}
 
 Evap-cooled:
@@ -543,13 +547,13 @@ Evap-cooled:
 \item
   HVAC,Sum,VRF Heat Pump Evaporative Condenser Water Use Volume {[}m3{]}
 \item
-  HVAC,Average,VRF Heat Pump Evaporative Condenser Pump Electric Power {[}W{]}
+  HVAC,Average,VRF Heat Pump Evaporative Condenser Pump Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,VRF Heat Pump Evaporative Condenser Pump Electric Energy {[}J{]}
+  HVAC,Sum,VRF Heat Pump Evaporative Condenser Pump Electricity Energy {[}J{]}
 \item
-  HVAC,Average,VRF Heat Pump Basin Heater Electric Power {[}W{]}
+  HVAC,Average,VRF Heat Pump Basin Heater Electricity Rate {[}W{]}
 \item
-  HVAC,Average,VRF Heat Pump Basin Heater Electric Energy {[}J{]}
+  HVAC,Average,VRF Heat Pump Basin Heater Electricity Energy {[}J{]}
 \item
   HVAC,Average,VRF Heat Pump Heat Recovery Status Change Multiplier {[]}
 \end{itemize}
@@ -571,22 +575,22 @@ Electric Fuel type (default):
 
 \begin{itemize}
 \item
-  HVAC,Average,VRF Heat Pump Cooling Electric Power {[}W{]}
+  HVAC,Average,VRF Heat Pump Cooling Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,VRF Heat Pump Cooling Electric Energy {[}J{]}
+  HVAC,Sum,VRF Heat Pump Cooling Electricity Energy {[}J{]}
 \item
-  HVAC,Average,VRF Heat Pump Heating Electric Power {[}W{]}
+  HVAC,Average,VRF Heat Pump Heating Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,VRF Heat Pump Heating Electric Energy {[}J{]}
+  HVAC,Sum,VRF Heat Pump Heating Electricity Energy {[}J{]}
 \end{itemize}
 
 Electric defrost always used for Defrost Strategy = Resistive regardless of fuel type
 
 \begin{itemize}
 \item
-  HVAC,Average,VRF Heat Pump Defrost Electric Power {[}W{]}
+  HVAC,Average,VRF Heat Pump Defrost Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,VRF Heat Pump Defrost Electric Energy {[}J{]}
+  HVAC,Sum,VRF Heat Pump Defrost Electricity Energy {[}J{]}
 \end{itemize}
 
 Alternate Fuel types (e.g., FuelType = NaturalGas):
@@ -616,39 +620,39 @@ This output field is the operating total cooling capacity of the variable refrig
 
 This output field is the operating total heating capacity of the variable refrigerant flow heat pump in Watts. The capacity includes any degradation due to defrost mode. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported. This value should match the sum of the individual zone terminal unit output variables for Zone VRF Air Terminal Total Heating Rate.
 
-\paragraph{VRF Heat Pump Cooling Electric Power {[}W{]}}\label{vrf-heat-pump-cooling-electric-power-w}
+\paragraph{VRF Heat Pump Cooling Electricity Rate {[}W{]}}\label{vrf-heat-pump-cooling-electric-power-w}
 
 This output field is the cooling mode electricity consumption rate of the variable refrigerant flow heat pump in Watts. The consumption includes electricity used by the compressor and the condenser fan. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported. The choice of an alternate fuel type (see Fuel Type input) will result in a change in the output variable name (e.g., Variable Refrigerant Flow Heat Pump Cooling NaturalGas Consumption Rate).
 
-\paragraph{VRF Heat Pump Cooling Electric Energy {[}J{]}}\label{vrf-heat-pump-cooling-electric-energy-j}
+\paragraph{VRF Heat Pump Cooling Electricity Energy {[}J{]}}\label{vrf-heat-pump-cooling-electric-energy-j}
 
 This output field is the cooling mode electricity consumption of the variable refrigerant flow heat pump in Joules for the time period being reported. The consumption includes electricity used by the compressor and the condenser fan. This value is calculated for each HVAC system time step being simulated, and the results are summed for the time step being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Cooling, Group Key = System (Ref. Output:Meter objects). The choice of an alternate fuel type (see Fuel Type input) will result in a change in the output variable name (e.g., Variable Refrigerant Flow Heat Pump Cooling NaturalGas Consumption). The resource type meter will also be modified to reflect the chosen fuel type (e.g., Resource Type = NaturalGas).
 
-\paragraph{VRF Heat Pump Heating Electric Power {[}W{]}}\label{vrf-heat-pump-heating-electric-power-w}
+\paragraph{VRF Heat Pump Heating Electricity Rate {[}W{]}}\label{vrf-heat-pump-heating-electric-power-w}
 
 This output field is the heating mode electricity consumption rate of the variable refrigerant flow heat pump in Watts. The consumption includes electricity used by the compressor and the condenser fan. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported. The choice of an alternate fuel type (see Fuel Type input) will result in a change in the output variable name (e.g., Variable Refrigerant Flow Heat Pump Heating NaturalGas Consumption Rate).
 
-\paragraph{VRF Heat Pump Heating Electric Energy {[}J{]}}\label{vrf-heat-pump-heating-electric-energy-j}
+\paragraph{VRF Heat Pump Heating Electricity Energy {[}J{]}}\label{vrf-heat-pump-heating-electric-energy-j}
 
 This output field is the heating mode electricity consumption of the variable refrigerant flow heat pump in Joules for the time period being reported. The consumption includes electricity used by the compressor and the condenser fan. This value is calculated for each HVAC system time step being simulated, and the results are summed for the time step being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Heating, Group Key = System (Ref. Output:Meter objects). The choice of an alternate fuel type (see Fuel Type input) will result in a change in the output variable name (e.g., Variable Refrigerant Flow Heat Pump Heating NaturalGas Consumption). The resource type meter will also be modified to reflect the chosen fuel type (e.g., Resource Type = NaturalGas).
 
 \paragraph{\texorpdfstring{VRF Heat Pump Cooling COP{[]}}{VRF Heat Pump Cooling COP}}\label{vrf-heat-pump-cooling-cop}
 
-This is the operating cooling coefficient of performance for the heat pump. This value is calculated using the ratio of VRF Heat Pump Total Cooling Rate and Variable Refrigerant Flow Heat Pump Cooling Electric Consumption Rate output variables. Crankcase heater (usually 0 in cooling mode), evaporative condenser water pump, and defrost (usually 0 in cooling mode) consumption rate output variables are included in this calculation. This value is specific to outdoor unit performance in cooling mode, is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
+This is the operating cooling coefficient of performance (COP) for the heat pump. This value is calculated using the ratio of VRF Heat Pump Total Cooling Rate and Variable Refrigerant Flow Heat Pump Cooling Electric Consumption Rate output variables. Crankcase heater (usually 0 in cooling mode), evaporative condenser water pump, and defrost (usually 0 in cooling mode) consumption rate output variables are included in this calculation. This value is specific to outdoor unit performance in cooling mode, is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
 \paragraph{\texorpdfstring{VRF Heat Pump Heating COP{[]}}{VRF Heat Pump Heating COP}}\label{vrf-heat-pump-heating-cop}
 
-This is the operating heating coefficient of performance for the heat pump. This value is calculated using the ratio of VRF Heat Pump Total Heating Rate and Variable Refrigerant Flow Heat Pump Heating Electric Consumption Rate output variables. Crankcase heater, evaporative condenser water pump (usually 0 in heating mode), and defrost consumption rate output variables are included in this calculation. This value is specific to outdoor unit performance in heating mode, is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
+This is the operating heating coefficient of performance (COP) for the heat pump. This value is calculated using the ratio of VRF Heat Pump Total Heating Rate and Variable Refrigerant Flow Heat Pump Heating Electric Consumption Rate output variables. Crankcase heater, evaporative condenser water pump (usually 0 in heating mode), and defrost consumption rate output variables are included in this calculation. This value is specific to outdoor unit performance in heating mode, is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
 \paragraph{\texorpdfstring{VRF Heat Pump COP{[]}}{VRF Heat Pump COP}}\label{vrf-heat-pump-cop}
 
-This is the operating coefficient of performance for the heat pump. This value is calculated using the ratio of the total terminal unit coil capacity (cooling plus heating and accounts for piping losses) and total system electric consumption rate (compressor, crankcase heater, evaporative condenser water pump, defrost, and terminal unit parasitic electric consumption rate). This output variable does not include pump power for a water-cooled system. This value is specific to overall system performance, is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
+This is the operating coefficient of performance (COP) for the heat pump. This value is calculated using the ratio of the total terminal unit coil capacity (cooling plus heating and accounts for piping losses) and total system electric consumption rate (compressor, crankcase heater, evaporative condenser water pump, defrost, and terminal unit parasitic electric consumption rate). This output variable does not include pump power for a water-cooled system. This value is specific to overall system performance, is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
-\paragraph{VRF Heat Pump Defrost Electric Power {[}W{]}}\label{vrf-heat-pump-defrost-electric-power-w}
+\paragraph{VRF Heat Pump Defrost Electricity Rate {[}W{]}}\label{vrf-heat-pump-defrost-electric-power-w}
 
 This is the electricity consumption rate of the heat pump defrost in Watts when the unit is in defrost mode (timed, reverse-cycle). . The choice of an alternate fuel type (see Fuel Type input) will result in a change in the output variable name (e.g., Variable Refrigerant Flow Heat Pump NaturalGas Defrost Consumption Rate).
 
-\paragraph{VRF Heat Pump Defrost Electric Energy {[}J{]}}\label{vrf-heat-pump-defrost-electric-energy-j}
+\paragraph{VRF Heat Pump Defrost Electricity Energy {[}J{]}}\label{vrf-heat-pump-defrost-electric-energy-j}
 
 This is the electricity consumption of the heat pump in Joules for the time step being reported. This consumption is applicable when the unit is in defrost mode (reverse-cycle or resistive). This output is also added to a meter with Resource Type = Electricity, End Use Key = Heating, Group Key = System (Ref. Output:Meter objects). The choice of an alternate fuel type (see Fuel Type input) will result in a change in the output variable name (e.g., Variable Refrigerant Flow Heat Pump NaturalGas Defrost Consumption). The resource type meter will also be modified to reflect the chosen fuel type (e.g., Resource Type = NaturalGas).
 
@@ -704,11 +708,11 @@ This output field is the sum of the terminal unit cooling coil loads in Watts fo
 
 This output field is the sum of the terminal unit heating coil loads in Watts for the current time step being reported. This value is derived directly from the heating coils and represents the total heating load on the VRF system after piping losses have been accounted for. The total heating load will be less than the variable refrigerant flow total heating capacity reported when piping losses are modeled (i.e., when piping losses are \textless{} 1).
 
-\paragraph{VRF Heat Pump Crankcase Heater Electric Power {[}W{]}}\label{vrf-heat-pump-crankcase-heater-electric-power-w}
+\paragraph{VRF Heat Pump Crankcase Heater Electricity Rate {[}W{]}}\label{vrf-heat-pump-crankcase-heater-electric-power-w}
 
 This output field is the average electricity consumption rate of the heat pump's crankcase heaters in Watts for the time step being reported.
 
-\paragraph{VRF Heat Pump Crankcase Heater Electric Energy {[}J{]}}\label{vrf-heat-pump-crankcase-heater-electric-energy-j}
+\paragraph{VRF Heat Pump Crankcase Heater Electricity Energy {[}J{]}}\label{vrf-heat-pump-crankcase-heater-electric-energy-j}
 
 This output field is the electricity consumption rate of the heat pump's crankcase heaters in Joules for the time step being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Cooling, Group Key = System (ref. Output:Meter objects).
 
@@ -716,19 +720,19 @@ This output field is the electricity consumption rate of the heat pump's crankca
 
 This output is the amount of water used to evaporatively cool the condenser coil inlet air, in cubic meters. This output is also added to a meter with Resource Type = Water, End Use Key = Cooling, Group Key = System (ref. Output:Meter objects).
 
-\paragraph{VRF Heat Pump Evaporative Condenser Pump Electric Power {[}W{]}}\label{vrf-heat-pump-evaporative-condenser-pump-electric-power-w}
+\paragraph{VRF Heat Pump Evaporative Condenser Pump Electricity Rate {[}W{]}}\label{vrf-heat-pump-evaporative-condenser-pump-electric-power-w}
 
 This is the average electricity consumption rate of the evaporative condenser water pump in Watts for the time step being reported.
 
-\paragraph{VRF Heat Pump Evaporative Condenser Pump Electric Energy {[}J{]}}\label{vrf-heat-pump-evaporative-condenser-pump-electric-energy-j}
+\paragraph{VRF Heat Pump Evaporative Condenser Pump Electricity Energy {[}J{]}}\label{vrf-heat-pump-evaporative-condenser-pump-electric-energy-j}
 
 This is the electricity consumption rate of the evaporative condenser water pump in Joules for the time step being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Cooling, Group Key = System (ref. Output:Meter objects).
 
-\paragraph{VRF Heat Pump Basin Heater Electric Power {[}W{]}}\label{vrf-heat-pump-basin-heater-electric-power-w}
+\paragraph{VRF Heat Pump Basin Heater Electricity Rate {[}W{]}}\label{vrf-heat-pump-basin-heater-electric-power-w}
 
 This output is the electric consumption rate of the heat pump's basin heater (for evaporatively-cooled condenser type) in Watts. This basin heater only operates when the variable refrigerant flow heat pump's compressor(s) is off and therefore is reported as 0 anytime the compressor operates. If the compressor is cycling (see VRF Heat Pump Cycling Ratio output variable above), the basin heater electric power is proportional to one minus the cycling ratio of the compressor (i.e., the basin heater is on when the compressor is off).
 
-\paragraph{VRF Heat Pump Basin Heater Electric Energy {[}J{]}}\label{vrf-heat-pump-basin-heater-electric-energy-j}
+\paragraph{VRF Heat Pump Basin Heater Electricity Energy {[}J{]}}\label{vrf-heat-pump-basin-heater-electric-energy-j}
 
 This output is the electric consumption of the heat pump's basin heater (for evaporatively-cooled condenser type) in Joules. This output is also added to a meter with Resource Type = Electricity, End Use Key = Cooling, Group Key = System (Ref. Output:Meter objects).
 
@@ -744,6 +748,14 @@ The ratio of the total capacity of the system (heating and cooling capacity) to 
 \subsection{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl}\label{airconditionervariablerefrigerantflowfluidtemperaturecontrol}
 \subsubsection{Inputs}\label{inputs-1-048}
 
+\paragraph{\texorpdfstring{VRF Heat Pump Heat Recovery Rate {[}W{]}}{VRF Heat Pump Heat Recovery Rate}}\label{vrf-heat-pump-heat-recovery-rate}
+
+The rate of heat recovered by the system in watts. This value represents the amount of heat recovered at the terminal units while in heat recovery operating mode. If the VRF system is in cooling mode and recovers heat then that amount of heat was recovered from terminal units in zone(s) requiring heating. If the VRF system is in heating mode and recovers heat then that amount of heat was recovered from terminal units in zone(s) requiring cooling. The results are averaged for the time step being reported. Reports at the detailed time frequency should match the corresponding coil total cooling/heating rate since piping losses are not included.
+
+\paragraph{\texorpdfstring{VRF Heat Pump Heat Recovery Energy {[}J{]}}{VRF Heat Pump Heat Recovery Energy}}\label{vrf-heat-pump-heat-recovery-energy}
+
+The rate of heat recovered by the system in joules. This value represents the amount of heat energy recovered at the terminal units while in heat recovery operating mode. If the VRF system is in cooling mode and recovers heat then that amount of heat was recovered from terminal units in zone(s) requiring heating. If the VRF system is in heating mode and recovers heat then that amount of heat was recovered from terminal units in zone(s) requiring cooling. The results are summed for the time step being reported. Reports at the detailed time frequency should match the corresponding coil total cooling/heating energy since piping losses are not included.
+
 \paragraph{Field: Heat Pump Name}\label{field-heat-pump-name-1}
 
 This alpha field defines a unique user-assigned name for an instance of a variable refrigerant flow heat pump. Any reference to this heat pump will use this name. Since this object is not listed in an AirloopHVAC object, the most likely use of this name would be for reporting purposes.
@@ -754,11 +766,11 @@ This alpha field defines the name of the schedule (ref: Schedule) that denotes w
 
 \paragraph{Field: Zone Terminal Unit List Name}\label{field-zone-terminal-unit-list-name-1}
 
-This alpha field defines the name of the zone terminal unit list. The name specified here should match the name of a valid ZoneTerminalUnitList object. In addition, each name specified in this list should match the name of a valid ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object. All terminal units connected to this heat pump must be listed in this ZoneTerminalUnitList object.
+This alpha field defines the name of the zone terminal unit list. The name specified here should match the name of a valid \hyperref[zoneterminalunitlist]{ZoneTerminalUnitList} object. In addition, each name specified in this list should match the name of a valid \hyperref[zonehvacterminalunitvariablerefrigerantflow]{ZoneHVAC:TerminalUnit:VariableRefrigerantFlow} object. All terminal units connected to this heat pump must be listed in this \hyperref[zoneterminalunitlist]{ZoneTerminalUnitList} object.
 
 \paragraph{Field: Refrigerant Type}\label{field-refrigerant-type-000}
 
-This alpha field defines the name of the refrigerant used in the VRF system. The name specified here should match the name of a valid FluidProperties:Name object.
+This alpha field defines the name of the refrigerant used in the VRF system. The name specified here should match the name of a valid \hyperref[fluidpropertiesname]{FluidProperties:Name} object.
 
 \paragraph{Field: Rated Evaporative Capacity}\label{field-rated-evaporative-capacity}
 
@@ -1118,7 +1130,7 @@ In addition to the output variables described for the VRF-SysCurve model in Sect
 \item
   VRF Heat Pump Compressor Rotating Speed {[}rev/min{]}
 \item
-  VRF Heat Pump Compressor Electric Power {[}W{]}
+  VRF Heat Pump Compressor Electricity Rate {[}W{]}
 \item
   VRF Heat Pump Indoor Unit Evaporating Temperature {[}C{]}
 \item
@@ -1145,7 +1157,7 @@ Note: refer to the rdd file after a simulation for exact output variable names
 
 This output only applies for the VRF-FluidTCtrl model. This is the rotating speed of the compressor, which indicates the loading index.
 
-\paragraph{VRF Heat Pump Compressor Electric Power {[}W{]}}\label{vrf-heat-pump-compressor-electric-power-at-cooling-mode-w}
+\paragraph{VRF Heat Pump Compressor Electricity Rate {[}W{]}}\label{vrf-heat-pump-compressor-electric-power-at-cooling-mode-w}
 
 This output only applies for the VRF-FluidTCtrl model. This is the electric power of the compressor running. This value is related with the compressor speed as well as the operational conditions, i.e., evaporating and condensing temperatures of the system.
 
@@ -1171,11 +1183,11 @@ This output only applies for the VRF-FluidTCtrl model. This is the power consume
 
 \paragraph{VRF Heat Pump Cooling Capacity at Max Compressor Speed {[}W{]}}\label{vrf-heat-pump-cooling-capacity-at-max-compressor-speed}
 
-This output field is the maximum cooling capacity of the variable refrigerant flow system at particular operational conditions, corresponding to the maximum compressor speed. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported. This output only applies for the VRF-FluidTCtrl model. 
+This output field is the maximum cooling capacity of the variable refrigerant flow system at particular operational conditions, corresponding to the maximum compressor speed. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported. This output only applies for the VRF-FluidTCtrl model.
 
 \paragraph{VRF Heat Pump Heating Capacity at Max Compressor Speed {[}W{]}}\label{vrf-heat-pump-heating-capacity-at-max-compressor-speed}
 
-This output field is the maximum heating capacity of the variable refrigerant flow system at particular operational conditions, corresponding to the maximum compressor speed. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported. This output only applies for the VRF-FluidTCtrl model. 
+This output field is the maximum heating capacity of the variable refrigerant flow system at particular operational conditions, corresponding to the maximum compressor speed. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported. This output only applies for the VRF-FluidTCtrl model.
 
 \paragraph{VRF Heat Pump Outdoor Unit Evaporator Heat Extract Rate {[}W{]}}\label{vrf-heat-pump-outdoor-unit-evaporator-heat-extract-rate}
 
@@ -1186,9 +1198,9 @@ This output field is the heat extract rate of the VRF outdoor unit evaporator in
 This output field is the heat release rate of the VRF outdoor unit condenser in Watts. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported. This output only applies for the VRF-FluidTCtrl model. This output only applies for the VRF-FluidTCtrl model.
 
 
-% ZoneTerminalUnitList
+% \hyperref[zoneterminalunitlist]{ZoneTerminalUnitList}
 
-% AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR
+% \hyperref[airconditionervariablerefrigerantflowfluidtemperaturecontrolhr]{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR}
 \subsection{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR}\label{airconditionervariablerefrigerantflowfluidtemperaturecontrolhr}
 \subsubsection{Inputs}
 \paragraph{Field: Name}
@@ -1201,17 +1213,17 @@ This alpha field defines the name of the schedule (ref: Schedule) that denotes w
 
 \paragraph{Field: Zone Terminal Unit List Name}
 
-This alpha field defines the name of the zone terminal unit list. The name specified here should match the name of a valid ZoneTerminalUnitList object. In addition, each name specified in this list should match the name of a valid ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object. All terminal units connected to this VRF system must be listed in this ZoneTerminalUnitList object.
+This alpha field defines the name of the zone terminal unit list. The name specified here should match the name of a valid \hyperref[zoneterminalunitlist]{ZoneTerminalUnitList} object. In addition, each name specified in this list should match the name of a valid \hyperref[zonehvacterminalunitvariablerefrigerantflow]{ZoneHVAC:TerminalUnit:VariableRefrigerantFlow} object. All terminal units connected to this VRF system must be listed in this \hyperref[zoneterminalunitlist]{ZoneTerminalUnitList} object.
 
 \paragraph{Field: Refrigerant Type}
 
-This alpha field defines the name of the refrigerant used in the VRF system. The name specified here should match the name of a valid FluidProperties:Name object.
+This alpha field defines the name of the refrigerant used in the VRF system. The name specified here should match the name of a valid \hyperref[fluidpropertiesname]{FluidProperties:Name} object.
 
 \paragraph{Field: Rated Evaporative Capacity}
 
 This numeric field defines the total evaporative capacity in watts at rated conditions. This is the capacity corresponding to the max compressor speed at rated conditions. The actual evaporative capacity is obtained by multiplying the rated capacity with the modification factor calculated by Evaporative Capacity Multiplier Function of Temperature Curve. The value must be greater than 0. This filed is autosizable.
 
-\paragraph{Field: Rated Compressor Power Per Unit of Rated Evaporative Capacity} 
+\paragraph{Field: Rated Compressor Power Per Unit of Rated Evaporative Capacity}
 
 This numeric field defines the rated compressor power per Watt of rated evaporative capacity. Rated compressor power corresponds to the max compressor speed at rated conditions. The actual compressor power is obtained by multiplying the rated power with the modification factor calculated by Compressor Power Multiplier Function of Temperature Curve. The value must be greater than 0. If this field is left blank, a default value of 0.35 W/W is assumed.
 
@@ -1376,25 +1388,25 @@ This numeric field defines the capacity of the resistive defrost heating element
 This numeric field defines the outdoor air dry-bulb temperature above which outdoor coil defrosting is disabled. If this input field is left blank, the default value is 5°C. Defrost can be completely eliminated by selecting a temperature lower than the minimum expected outdoor temperature found in the weather file.
 
 
-\paragraph{Field: Initial Heat Recovery Cooling Capacity Fraction} 
+\paragraph{Field: Initial Heat Recovery Cooling Capacity Fraction}
 
-This numeric field defines the fraction of cooling capacity available when the system transitions from cooling only operation to simultaneous cooling and heating. It is common for the cooling capacity to decrease before the system recovers. The system will recovery according to the time constant entered in Heat Recovery Cooling Capacity Time Constant input field. If the transition period will not be modeled, this input field must be set to 1. 
+This numeric field defines the fraction of cooling capacity available when the system transitions from cooling only operation to simultaneous cooling and heating. It is common for the cooling capacity to decrease before the system recovers. The system will recovery according to the time constant entered in Heat Recovery Cooling Capacity Time Constant input field. If the transition period will not be modeled, this input field must be set to 1.
 
-\paragraph{Field: Heat Recovery Cooling Capacity Time Constant} 
+\paragraph{Field: Heat Recovery Cooling Capacity Time Constant}
 
 This numeric field defines the cooling capacity time constant, in hours, used to model the time it takes for the system to change from cooling only operation to simultaneous cooling and heating. Total response time is defined as 5 time constants. If this field is left blank, a default value of 0.0 is used. If the transition period will not be modeled, the Initial Heat Recovery Cooling Capacity Fraction field must be set to 1.
 
 \paragraph{Field: Initial Heat Recovery Cooling Energy Fraction}
 
-This numeric field defines the fraction of cooling energy consumed when the system transitions from cooling only operation to simultaneous cooling and heating. It is common for the cooling energy to drop before the system recovers. If the transition period will not be modeled, this input field must be set to 1. 
+This numeric field defines the fraction of cooling energy consumed when the system transitions from cooling only operation to simultaneous cooling and heating. It is common for the cooling energy to drop before the system recovers. If the transition period will not be modeled, this input field must be set to 1.
 
 \paragraph{Field: Heat Recovery Cooling Energy Time Constant}
 
-This numeric field defines the cooling energy time constant, in hours, used to model the time it takes for the system to transition from cooling only operation to simultaneous cooling and heating. Total response time is defined as 5 time constants. If this field is left blank, a default value of 0.0 is used. If the transition period will not be modeled, the Initial Heat Recovery Cooling Energy Fraction field must be set to 1. 
+This numeric field defines the cooling energy time constant, in hours, used to model the time it takes for the system to transition from cooling only operation to simultaneous cooling and heating. Total response time is defined as 5 time constants. If this field is left blank, a default value of 0.0 is used. If the transition period will not be modeled, the Initial Heat Recovery Cooling Energy Fraction field must be set to 1.
 
 \paragraph{Field: Initial Heat Recovery Heating Capacity Fraction}
 
-This numeric field defines the fraction of heating capacity available when the system changes from heating only operation to simultaneous heating and cooling. It is common for the heating capacity to decrease before the system recovers. The system will recovery according to the time constant entered in Heat Recovery Heating Capacity Time Constant input field. If the transition period will not be modeled, this input field must be set to 1. 
+This numeric field defines the fraction of heating capacity available when the system changes from heating only operation to simultaneous heating and cooling. It is common for the heating capacity to decrease before the system recovers. The system will recovery according to the time constant entered in Heat Recovery Heating Capacity Time Constant input field. If the transition period will not be modeled, this input field must be set to 1.
 
 \paragraph{Field: Heat Recovery Heating Capacity Time Constant}
 
@@ -1402,11 +1414,11 @@ This numeric field defines the heating capacity time constant, in hours, used to
 
 \paragraph{Field: Initial Heat Recovery Heating Energy Fraction}
 
-This numeric field defines the fraction of heating energy consumed when the system changes from heating only operation to simultaneous heating and cooling. It is common for the heating energy to decrease before the system recovers. If the transition period will not be modeled, this input field must be set to 1. 
+This numeric field defines the fraction of heating energy consumed when the system changes from heating only operation to simultaneous heating and cooling. It is common for the heating energy to decrease before the system recovers. If the transition period will not be modeled, this input field must be set to 1.
 
 \paragraph{Field: Heat Recovery Heating Energy Time Constant}
 
-This numeric field defines the heating energy time constant, in hours, used to model the time it takes for the system to change from cooling only operation to simultaneous cooling and heating. Total response time is defined as 5 time constants. If this field is left blank, a default value of 0.0 is used. If the transition period will not be modeled, the Initial Heat Recovery Heating Energy Fraction field must be set to 1. 
+This numeric field defines the heating energy time constant, in hours, used to model the time it takes for the system to change from cooling only operation to simultaneous cooling and heating. Total response time is defined as 5 time constants. If this field is left blank, a default value of 0.0 is used. If the transition period will not be modeled, the Initial Heat Recovery Heating Energy Fraction field must be set to 1.
 
 \paragraph{Field: Compressor maximum delta Pressure}
 
@@ -1436,7 +1448,7 @@ This alpha field defines the name of a BiQuadratic curve for the VRF operational
 
 This alpha field defines the name of a BiQuadratic curve for the VRF operational mode corresponding to the i-th loading index. It parameterizes the variation of compressor power as a function of operating conditions, i.e., evaporating and condensing temperatures. The output of this curve is a dimensionless multiplier to be applied on the rated compressor power to calculate the actual compressor power.
 
-Following is an example input for a AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl system.
+Following is an example input for a \hyperref[airconditionervariablerefrigerantflowfluidtemperaturecontrol]{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl} system.
 
 \begin{lstlisting}
 Following is an example input for a AirConditioner:VariableRefrigerantFlow system.
@@ -1645,7 +1657,7 @@ Curve:Biquadratic,
 
 \subsection{ZoneTerminalUnitList}\label{zoneterminalunitlist}
 
-The zone terminal unit list defines the names of the terminal units connected to a single variable refrigerant flow air-conditioning system. The zone terminal unit list is used exclusively in the variable refrigerant flow (VRF) air conditioner object (ref: AirConditioner:VariableRefrigerantFlow). Up to 20 terminal units may be connected to a single VRF outdoor condensing unit. This list is extensible if additional indoor terminal units are required. The name of this zone terminal unit list object is then input into the corresponding variable refrigerant flow air conditioner object. The following figure demonstrates this concept.
+The zone terminal unit list defines the names of the terminal units connected to a single variable refrigerant flow air-conditioning system. The zone terminal unit list is used exclusively in the variable refrigerant flow (VRF) air conditioner object (ref: \hyperref[airconditionervariablerefrigerantflow]{AirConditioner:VariableRefrigerantFlow}). Up to 20 terminal units may be connected to a single VRF outdoor condensing unit. This list is extensible if additional indoor terminal units are required. The name of this zone terminal unit list object is then input into the corresponding variable refrigerant flow air conditioner object. The following figure demonstrates this concept.
 
 \begin{figure}[hbtp] % fig 127
 \centering
@@ -1656,11 +1668,11 @@ The zone terminal unit list defines the names of the terminal units connected to
 
 \paragraph{Field: Zone Terminal List Name}\label{field-zone-terminal-list-name}
 
-This alpha field specifies the name of the zone terminal unit list. This name must be specified in the AirConditioner:VariableRefrigerantFlow object.
+This alpha field specifies the name of the zone terminal unit list. This name must be specified in the \hyperref[airconditionervariablerefrigerantflow]{AirConditioner:VariableRefrigerantFlow} object.
 
 \paragraph{Field: Zone Terminal Unit Name \textless{}x\textgreater{}}\label{field-zone-terminal-unit-name-x}
 
-This alpha field defines the name of the zone terminal unit used in a variable refrigerant air conditioner. The zone terminal unit must be connected to a zone using the ZoneHVAC:EquipmentConnections object. The terminal unit air inlet node is the same name as a zone exhaust node. The terminal unit air outlet node is the same name as a zone inlet node. The IDD is supplied with 20 fields for this.~ The object is extensible and you can change the IDD by adding more fields or, if you are using text editor for your input file, just add to the list of names.
+This alpha field defines the name of the zone terminal unit used in a variable refrigerant air conditioner. The zone terminal unit must be connected to a zone using the \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} object. The terminal unit air inlet node is the same name as a zone exhaust node. The terminal unit air outlet node is the same name as a zone inlet node.  This object is extensible, so additional fields of this type can be added to the end of this object.
 
 Following is an example input for a ZoneTerminalUnitList object.
 

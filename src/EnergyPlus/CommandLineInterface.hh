@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,21 +48,37 @@
 #ifndef CommandLineInterface_hh_INCLUDED
 #define CommandLineInterface_hh_INCLUDED
 
-#include <EnergyPlusAPI.hh>
+// C++ Headers
 #include <string>
+
+// EnergyPlus Headers
+#include <EnergyPlus/api/EnergyPlusAPI.h>
 
 namespace EnergyPlus {
 
+// Forward declarations
+class InputFile;
+struct EnergyPlusData;
+
 namespace CommandLineInterface {
 
-    // Process command line arguments
-    int ENERGYPLUSLIB_API ProcessArgs(int argc, const char *argv[]);
+    enum class ReturnCodes
+    {
+        Success,
+        Failure,
+        SuccessButHelper,
+    };
 
-    void ReadINIFile(int const UnitNumber,               // Unit number of the opened INI file
+    // Process command line arguments
+    int ENERGYPLUSLIB_API ProcessArgs(EnergyPlusData &state, int argc, const char *argv[]);
+
+    void ReadINIFile(InputFile &inputFile,               // Unit number of the opened INI file
                      std::string const &Heading,         // Heading for the parameters ('[heading]')
                      std::string const &KindofParameter, // Kind of parameter to be found (String)
                      std::string &DataOut                // Output from the retrieval
     );
+
+    int runReadVarsESO(EnergyPlusData &state);
 
 } // namespace CommandLineInterface
 
