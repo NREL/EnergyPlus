@@ -34,7 +34,7 @@ AirLoopHVAC:ExhaustSystem,
     Zone1 Exhaust Fan;          !- Component 3 Name
 ```
 
-The fan model allowed in modeling this object needs to be either FAN:SYSTEMMODEL or FAN:COMPONENTMODEL. The Fan:ConstantVolume or Fan:VariableVolume models could not be used with the current object. 
+The central fan model allowed in modeling this object needs to be either FAN:SYSTEMMODEL or FAN:COMPONENTMODEL. The regular fan models such as Fan:OnOff, Fan:ConstantVolume, or Fan:VariableVolume could not be used with the current object.
 
 The AirLoopHVAC:ExahaustMixer is also to be added as a new object: 
 ```
@@ -60,6 +60,7 @@ The following IDD blocks will be added to the Energy+.idd file.
 After the AirLoopHVAC:ReturnPath block and before the AirLoopHVAC:ExhaustMixer (to be added) blocks: 
 ```
 AirLoopHVAC:ExhaustSystem,
+       \extensible:2 - Just duplicate last two fields and comments (changing numbering, please)
        \memo Define dedicated exhaust systems that 
        \memo combines exhausts of multiple AirLoopHVAC systems
   A1 , \field Name
@@ -76,26 +77,40 @@ AirLoopHVAC:ExhaustSystem,
        \key Fan:SystemModel
        \key Fan:ComponentModel
        \key AirLoopHVAC:ExhaustMixer
+       \key Fan:ZoneExhaust
   A4 , \field Component 1 Name
        \required-field
        \type object-list
        \object-list FansSystemModel
        \object-list FansComponentModel
        \object-list AirLoopHVACExhaustMixerNames
+       \object-list FansZoneExhaust
   A5 , \field Component 2 Object Type
        \type choice
+       \key Fan:SystemModel
+       \key Fan:ComponentModel
        \key AirLoopHVAC:ExhaustMixer
-  A4 , \field Component 2 Name
-       \type object-list
-       \object-list AirLoopHVACExhaustMixerNames
-  A5 , \field Component 3 Object Type
-       \type choice
        \key Fan:ZoneExhaust
-  A6;  \field Component 3 Name
+  A6 , \field Component 2 Name
        \type object-list
+       \object-list FansSystemModel
+       \object-list FansComponentModel
+       \object-list AirLoopHVACExhaustMixerNames
+       \object-list FansZoneExhaust
+  A7 , \field Component 3 Object Type
+       \type choice
+       \key Fan:SystemModel
+       \key Fan:ComponentModel
+       \key AirLoopHVAC:ExhaustMixer
+       \key Fan:ZoneExhaust
+  A8;  \field Component 3 Name
+       \type object-list
+       \object-list FansSystemModel
+       \object-list FansComponentModel
+       \object-list AirLoopHVACExhaustMixerNames
        \object-list FansZoneExhaust
 ```
-   
+
 ### IDD Addition for AirLooopHVAC:ExhaustMixer ###
 
 After the AirLoopHVAC:ReturnPath block and the AirLoopHVAC:DedicatedOutdoorAirSystem blocks: 
@@ -114,10 +129,8 @@ AirLoopHVAC:ExhaustMixer,
        \type node
   A3 , \field Inlet 1 Node Name
        \begin-extensible
-       \required-field
        \type node
   N1 , \field Inlet 1 Design Flow Rate {m3/s}
-       \required-field
        \units m3/s
        \autosizable
        \default autosize
@@ -126,8 +139,6 @@ AirLoopHVAC:ExhaustMixer,
        \type object-list
        \object-list ScheduleNames
   A5 , \field Inlet 2 Node Name
-       \begin-extensible
-       \required-field
        \type node
   N2 , \field Inlet 2 Design Flow Rate {m3/s}
        \units m3/s
@@ -138,7 +149,6 @@ AirLoopHVAC:ExhaustMixer,
        \type object-list
        \object-list ScheduleNames
   A7 , \field Inlet 3 Node Name
-       \begin-extensible
        \required-field
        \type node
   N3 , \field Inlet 3 Design Flow Rate {m3/s}
@@ -150,89 +160,15 @@ AirLoopHVAC:ExhaustMixer,
        \type object-list
        \object-list ScheduleNames
   A9 , \field Inlet 4 Node Name
-       \begin-extensible
-       \required-field
        \type node
   N4 , \field Inlet 4 Design Flow Rate {m3/s}
        \units m3/s
        \autosizable
        \default autosize
-  A10, \field Inlet 4 Flow Fraction Schedule Name
+  A10; \field Inlet 4 Flow Fraction Schedule Name
        \note Flow fraction schedule name for this Inlet. Schedule value is in range [0,1].
        \type object-list
        \object-list ScheduleNames
-  A11, \field Inlet 5 Node Name
-       \begin-extensible
-       \required-field
-       \type node
-  N5 , \field Inlet 5 Design Flow Rate {m3/s}
-       \units m3/s
-       \autosizable
-       \default autosize
-  A12, \field Inlet 5 Flow Fraction Schedule Name
-       \note Flow fraction schedule name for this Inlet. Schedule value is in range [0,1].
-       \type object-list
-       \object-list ScheduleNames
-  A13, \field Inlet 6 Node Name
-       \begin-extensible
-       \required-field
-       \type node
-  N6 , \field Inlet 6 Design Flow Rate {m3/s}
-       \units m3/s
-       \autosizable
-       \default autosize
-  A14, \field Inlet 6 Flow Fraction Schedule Name
-       \note Flow fraction schedule name for this Inlet. Schedule value is in range [0,1].
-       \type object-list
-       \object-list ScheduleNames
-  A15, \field Inlet 7 Node Name
-       \begin-extensible
-       \required-field
-       \type node
-  N7 , \field Inlet 7 Design Flow Rate {m3/s}
-       \units m3/s
-       \autosizable
-       \default autosize
-  A16, \field Inlet 7 Flow Fraction Schedule Name
-       \note Flow fraction schedule name for this Inlet. Schedule value is in range [0,1].
-       \type object-list
-       \object-list ScheduleNames
-  A17, \field Inlet 8 Node Name
-       \begin-extensible
-       \required-field
-       \type node
-  N8 , \field Inlet 8 Design Flow Rate {m3/s}
-       \units m3/s
-       \autosizable
-       \default autosize
-  A18, \field Inlet 8 Flow Fraction Schedule Name
-       \note Flow fraction schedule name for this Inlet. Schedule value is in range [0,1].
-       \type object-list
-       \object-list ScheduleNames
-  A19, \field Inlet 9 Node Name
-       \begin-extensible
-       \required-field
-       \type node
-  N9 , \field Inlet 9 Design Flow Rate {m3/s}
-       \units m3/s
-       \autosizable
-       \default autosize
-  A20, \field Inlet 9 Flow Fraction Schedule Name
-       \note Flow fraction schedule name for this Inlet. Schedule value is in range [0,1].
-       \type object-list
-       \object-list ScheduleNames
-  A21, \field Inlet 10 Node Name
-       \begin-extensible
-       \required-field
-       \type node
-  N10, \field Inlet 10 Design Flow Rate {m3/s}
-       \units m3/s
-       \autosizable
-       \default autosize
-  A22; \field Inlet 10 Flow Fraction Schedule Name
-       \note Flow fraction schedule name for this Inlet. Schedule value is in range [0,1].
-       \type object-list
-       \object-list ScheduleNames 
 ```
 
 ## Testing and Validation ##
@@ -261,6 +197,7 @@ TBD.
 The AirLoopHVAC:Exhaust system has the following input fields: 
 ```
 AirLoopHVAC:ExhaustSystem,
+       \extensible:2 - Just duplicate last two fields and comments (changing numbering, please)
        \memo Define dedicated exhaust systems that 
        \memo combines exhausts of multiple AirLoopHVAC systems
   A1 , \field Name
@@ -277,24 +214,39 @@ AirLoopHVAC:ExhaustSystem,
        \key Fan:SystemModel
        \key Fan:ComponentModel
        \key AirLoopHVAC:ExhaustMixer
+       \key Fan:ZoneExhaust
   A4 , \field Component 1 Name
        \required-field
        \type object-list
        \object-list FansSystemModel
        \object-list FansComponentModel
        \object-list AirLoopHVACExhaustMixerNames
+       \object-list FansZoneExhaust
   A5 , \field Component 2 Object Type
        \type choice
+       \key Fan:SystemModel
+       \key Fan:ComponentModel
        \key AirLoopHVAC:ExhaustMixer
-  A4 , \field Component 2 Name
-       \type object-list
-       \object-list AirLoopHVACExhaustMixerNames
-  A5 , \field Component 3 Object Type
-       \type choice
        \key Fan:ZoneExhaust
-  A6;  \field Component 3 Name
+  A6 , \field Component 2 Name
        \type object-list
+       \object-list FansSystemModel
+       \object-list FansComponentModel
+       \object-list AirLoopHVACExhaustMixerNames
        \object-list FansZoneExhaust
+  A7 , \field Component 3 Object Type
+       \type choice
+       \key Fan:SystemModel
+       \key Fan:ComponentModel
+       \key AirLoopHVAC:ExhaustMixer
+       \key Fan:ZoneExhaust
+  A8 , \field Component 3 Name
+       \type object-list
+       \object-list FansSystemModel
+       \object-list FansComponentModel
+       \object-list AirLoopHVACExhaustMixerNames
+       \object-list FansZoneExhaust
+  ...
 ```
        
 ### AirLooopHVAC:ExhaustMixer Input fields ###
@@ -315,10 +267,8 @@ AirLoopHVAC:ExhaustMixer,
        \type node
   A3 , \field Inlet 1 Node Name
        \begin-extensible
-       \required-field
        \type node
   N1 , \field Inlet 1 Design Flow Rate {m3/s}
-       \required-field
        \units m3/s
        \autosizable
        \default autosize
@@ -327,8 +277,6 @@ AirLoopHVAC:ExhaustMixer,
        \type object-list
        \object-list ScheduleNames
   A5 , \field Inlet 2 Node Name
-       \begin-extensible
-       \required-field
        \type node
   N2 , \field Inlet 2 Design Flow Rate {m3/s}
        \units m3/s
@@ -339,7 +287,6 @@ AirLoopHVAC:ExhaustMixer,
        \type object-list
        \object-list ScheduleNames
   A7 , \field Inlet 3 Node Name
-       \begin-extensible
        \required-field
        \type node
   N3 , \field Inlet 3 Design Flow Rate {m3/s}
@@ -414,7 +361,7 @@ A potential proposal is like this:
     };
 ```
 
-The proposed code is simlar to the current AirLoopHVAC:Mixer. Two additional vector element will be added to accomondate the inlet fraction schedule index and the inlet design flow rate need for AirLoopHVAC:ExhaustMixer. Further, another another additional member--Real64 OutletHumRat--is added to the struct, in that this could be important information for energy and mass balance, and also for potential total heat (enthalpy) recovery procedures.
+The proposed code is simlar to the current AirLoopHVAC:Mixer. Two additional vector element will be added to accomodate the inlet fraction schedule index and the inlet design flow rate need for AirLoopHVAC:ExhaustMixer. Further, another another additional member--Real64 OutletHumRat--is added to the struct, in that this could be important information for energy and mass balance, and also for potential total heat (enthalpy) recovery procedures.
 
 ### factory method ###
 
