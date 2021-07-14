@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DaylightingDevices.hh>
 #include <EnergyPlus/DaylightingManager.hh>
@@ -2904,7 +2905,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ReportIllumMap)
     state->dataDaylightingManager->SavedMnDy.allocate(state->dataDaylightingData->TotIllumMaps);
     state->dataDaylightingData->IllumMap.allocate(state->dataGlobal->NumOfZones);
     state->dataDaylightingData->IllumMap(MapNum).Zone = 1;
-    state->dataDaylightingData->MapColSep = -9999;
+    state->dataDaylightingData->MapColSep = DataStringGlobals::CharSemicolon;
     state->dataEnvrn->CurMnDyHr = "JAN012001";
     state->dataDaylightingManager->SavedMnDy(1) = "JAN01";
     state->dataGlobal->WarmupFlag = true;

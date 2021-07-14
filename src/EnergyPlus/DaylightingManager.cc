@@ -9998,6 +9998,12 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
         SavedMnDy(MapNum) = state.dataEnvrn->CurMnDyHr.substr(0, 5);
     }
     if (EnvrnPrint(MapNum)) {
+        std::string refPt2;
+        if (state.dataDaylightingData->ZoneDaylight(state.dataDaylightingData->IllumMap(MapNum).Zone).TotalDaylRefPoints > 1) {
+            refPt2 = RefPts(state.dataDaylightingData->IllumMap(MapNum).Zone, 2);
+        } else {
+            refPt2 = format("RefPt{}=({:.2R}:{:.2R}:{:.2R})", 0, 0.00, 0.00, 0.00);
+        }
         WriteDaylightMapTitle(state,
                               MapNum,
                               *state.dataDaylightingData->IllumMap(MapNum).mapFile,
@@ -10005,7 +10011,7 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
                               state.dataEnvrn->EnvironmentName,
                               state.dataDaylightingData->IllumMap(MapNum).Zone,
                               RefPts(state.dataDaylightingData->IllumMap(MapNum).Zone, 1),
-                              RefPts(state.dataDaylightingData->IllumMap(MapNum).Zone, 2),
+                              refPt2,
                               state.dataDaylightingData->IllumMap(MapNum).Z);
         EnvrnPrint(MapNum) = false;
     }
