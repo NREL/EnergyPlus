@@ -1139,7 +1139,7 @@ namespace EvaporativeFluidCoolers {
         // REFERENCES:
         // Based on InitTower subroutine by Don Shirey Sept/Oct 2002, F Buhl Oct 2002
 
-        std::string const RoutineName("InitEvapFluidCooler");
+        static constexpr std::string_view RoutineName("InitEvapFluidCooler");
 
         this->oneTimeInit(state);
 
@@ -2014,7 +2014,7 @@ namespace EvaporativeFluidCoolers {
         // Based on SingleSpeedTower subroutine by Dan Fisher ,Sept 1998
         // Dec. 2008. BG. added RunFlag logic per original methodology
 
-        std::string const RoutineName("CalcSingleSpeedEvapFluidCooler");
+        static constexpr std::string_view RoutineName("CalcSingleSpeedEvapFluidCooler");
         int const MaxIteration(100); // Maximum fluid bypass iteration calculations
         std::string const MaxItChar("100");
         Real64 const BypassFractionThreshold(0.01); // Threshold to stop bypass iteration
@@ -2206,7 +2206,7 @@ namespace EvaporativeFluidCoolers {
         // Based on TwoSpeedTower by Dan Fisher ,Sept. 1998
         // Dec. 2008. BG. added RunFlag logic per original methodology
 
-        std::string const RoutineName("CalcTwoSpeedEvapFluidCooler");
+        static constexpr std::string_view RoutineName("CalcTwoSpeedEvapFluidCooler");
 
         this->WaterInletNode = this->WaterInletNodeNum;
         this->WaterOutletNode = this->WaterOutletNodeNum;
@@ -2302,7 +2302,7 @@ namespace EvaporativeFluidCoolers {
         int const IterMax(50);                  // Maximum number of iterations allowed
         Real64 const WetBulbTolerance(0.00001); // Maximum error for exiting wet-bulb temperature between iterations
         Real64 const DeltaTwbTolerance(0.001);  // Maximum error (tolerance) in DeltaTwb for iteration convergence [C]
-        std::string const RoutineName("SimSimpleEvapFluidCooler");
+        static constexpr std::string_view RoutineName("SimSimpleEvapFluidCooler");
 
         this->WaterInletNode = this->WaterInletNodeNum;
         this->WaterOutletNode = this->WaterOutletNodeNum;
@@ -2429,7 +2429,7 @@ namespace EvaporativeFluidCoolers {
         // REFERENCES:
         // Based on CalculateWaterUsage subroutine for cooling tower by B. Griffith, August 2006
 
-        std::string const RoutineName("CalculateWaterUsage");
+        static constexpr std::string_view RoutineName("CalculateWaterUsage");
 
         this->BlowdownVdot = 0.0;
         this->EvaporationVdot = 0.0;

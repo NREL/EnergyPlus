@@ -160,7 +160,7 @@ namespace ZonePlenum {
     // Functions
 
     void SimAirZonePlenum(EnergyPlusData &state,
-                          std::string const &CompName,
+                          std::string_view CompName,
                           int const iCompType,
                           int &CompIndex,
                           Optional_bool_const FirstHVACIteration = _, // Autodesk:OPTIONAL Used without PRESENT check

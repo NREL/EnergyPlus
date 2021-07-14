@@ -434,8 +434,8 @@ namespace DataZoneEquipment {
     void SetupZoneEquipmentForConvectionFlowRegime(EnergyPlusData &state);
 
     bool CheckZoneEquipmentList(EnergyPlusData &state,
-                                std::string const &ComponentType, // Type of component
-                                std::string const &ComponentName, // Name of component
+                                std::string_view ComponentType, // Type of component
+                                std::string_view ComponentName, // Name of component
                                 Optional_int CtrlZoneNum = _);
 
     int GetControlledZoneIndex(EnergyPlusData &state, std::string const &ZoneName); // Zone name to match into Controlled Zone structure
@@ -467,6 +467,8 @@ namespace DataZoneEquipment {
     );
 
     int GetZoneEquipControlledZoneNum(EnergyPlusData &state, int const ZoneEquipTypeNum, std::string const &EquipmentName);
+
+    bool VerifyLightsExhaustNodeForZone(EnergyPlusData &state, int const ZoneNum, int const ZoneExhaustNodeNum);
 
 } // namespace DataZoneEquipment
 
