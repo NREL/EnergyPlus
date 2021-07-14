@@ -190,11 +190,15 @@ namespace HeatBalanceIntRadExchange {
         int startEnclosure = 1;
         int endEnclosure = state.dataViewFactor->NumOfRadiantEnclosures;
         if (PartialResimulate) {
-            startEnclosure = endEnclosure = state.dataHeatBal->Zone(ZoneToResimulate).RadiantEnclosureNum;
-            auto const &enclosure(state.dataViewFactor->EnclRadInfo(startEnclosure));
-            for (int i : enclosure.SurfacePtr) {
-                NetLWRadToSurf(i) = 0.0;
-                state.dataSurface->SurfWinIRfromParentZone(i) = 0.0;
+            // ToDo: For now, use min and max enclosure numbers associated with this zone, this could include unrelated enclosures
+            startEnclosure = state.dataHeatBal->Zone(ZoneToResimulate).ZoneRadEnclosureFirst;
+            endEnclosure = state.dataHeatBal->Zone(ZoneToResimulate).ZoneRadEnclosureLast;
+            for (int enclosureNum = startEnclosure; enclosureNum <= endEnclosure; ++enclosureNum) {
+                auto const &enclosure(state.dataViewFactor->EnclRadInfo(enclosureNum));
+                for (int i : enclosure.SurfacePtr) {
+                    NetLWRadToSurf(i) = 0.0;
+                    state.dataSurface->SurfWinIRfromParentZone(i) = 0.0;
+                }
             }
         } else {
             NetLWRadToSurf = 0.0;
@@ -839,6 +843,7 @@ namespace HeatBalanceIntRadExchange {
                     // Store pointers back to here
                     state.dataSurface->Surface(surfNum).SolarEnclSurfIndex = enclosureSurfNum;
                     state.dataSurface->Surface(surfNum).SolarEnclIndex = enclosureNum;
+                    state.dataSurface->Surface(surfNum).RadEnclIndex = enclosureNum; // Radiant and Solar enclosures are parallel for now
                 }
                 // Store SurfaceReportNums to maintain original reporting order
                 for (int surfNum : state.dataHeatBal->Space(spaceNum).Surfaces) {
@@ -1155,8 +1160,8 @@ namespace HeatBalanceIntRadExchange {
             }
             if (enclMatchFound) continue; // We're done with this instance
             // Find matching SpaceList name
-            int spaceListNum = UtilityRoutines::FindItemInList(
-                UtilityRoutines::MakeUPPERCase(thisSpaceOrSpaceListName), state.dataHeatBal->SpaceList);
+            int spaceListNum =
+                UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase(thisSpaceOrSpaceListName), state.dataHeatBal->SpaceList);
             if (spaceListNum > 0) {
                 // Look for radiant enclosure with same list of spaces
                 auto &thisSpaceList(state.dataHeatBal->SpaceList(spaceListNum));
@@ -1455,17 +1460,17 @@ namespace HeatBalanceIntRadExchange {
     }
 
     void FixViewFactors(EnergyPlusData &state,
-                        int const N,                     // NUMBER OF SURFACES
-                        const Array1D<Real64> &A,        // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
-                        Array2A<Real64> F,               // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
-                        std::string &enclName,           // Name of Enclosure being fixed
+                        int const N,                      // NUMBER OF SURFACES
+                        const Array1D<Real64> &A,         // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
+                        Array2A<Real64> F,                // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
+                        std::string &enclName,            // Name of Enclosure being fixed
                         std::vector<int> const spaceNums, // Zones which are part of this enclosure
-                        Real64 &OriginalCheckValue,      // check of SUM(F) - N
-                        Real64 &FixedCheckValue,         // check after fixed of SUM(F) - N
-                        Real64 &FinalCheckValue,         // the one to go with
-                        int &NumIterations,              // number of iterations to fixed
-                        Real64 &RowSum,                  // RowSum of Fixed
-                        bool const anyIntMassInZone      // are there any internal mass surfaces in the zone
+                        Real64 &OriginalCheckValue,       // check of SUM(F) - N
+                        Real64 &FixedCheckValue,          // check after fixed of SUM(F) - N
+                        Real64 &FinalCheckValue,          // the one to go with
+                        int &NumIterations,               // number of iterations to fixed
+                        Real64 &RowSum,                   // RowSum of Fixed
+                        bool const anyIntMassInZone       // are there any internal mass surfaces in the zone
     )
     {
 
@@ -2058,24 +2063,22 @@ namespace HeatBalanceIntRadExchange {
             return surfNum;
         }
 
-        // Check if the surface and equipment are in the same zone or radiant enclosure
-        int const surfRadEnclNum = state.dataHeatBal->Zone(state.dataSurface->Surface(surfNum).Zone).RadiantEnclosureNum;
-        int const radSysEnclNum = state.dataHeatBal->Zone(RadSysZoneNum).RadiantEnclosureNum;
-        if (radSysEnclNum == 0) {
+        // Check if the surface and equipment are in the same zone
+        int const surfZoneNum = state.dataSurface->Surface(surfNum).Zone;
+        if (RadSysZoneNum == 0) {
             // This should never happen - but it does in some simple unit tests that are designed to throw errors
-            ShowSevereError(state,
-                            routineName + "Somehow the radiant system enclosure number is zero for" + cCurrentModuleObject + " = " + RadSysName);
+            ShowSevereError(state, routineName + "Somehow the radiant system zone number is zero for" + cCurrentModuleObject + " = " + RadSysName);
             ErrorsFound = true;
-        } else if (surfRadEnclNum == 0) {
+        } else if (surfZoneNum == 0) {
             // This should never happen
             ShowSevereError(state,
-                            routineName + "Somehow  the surface enclosure number is zero for" + cCurrentModuleObject + " = " + RadSysName +
+                            routineName + "Somehow  the surface zone number is zero for" + cCurrentModuleObject + " = " + RadSysName +
                                 " and Surface = " + SurfaceName); // LCOV_EXCL_LINE
             ErrorsFound = true;                                   // LCOV_EXCL_LINE
-        } else if (surfRadEnclNum != radSysEnclNum) {
-            ShowSevereError(state, routineName + "Surface = " + SurfaceName + " is not in the same zone or enclosure as the radiant equipment.");
-            ShowContinueError(state, "Surface zone or enclosure = " + state.dataViewFactor->EnclRadInfo(surfRadEnclNum).Name);
-            ShowContinueError(state, "Radiant equipment zone or enclosure = " + state.dataViewFactor->EnclRadInfo(radSysEnclNum).Name);
+        } else if (surfZoneNum != RadSysZoneNum) {
+            ShowSevereError(state, routineName + "Surface = " + SurfaceName + " is not in the same zone  as the radiant equipment.");
+            ShowContinueError(state, "Surface zone or enclosure = " + state.dataHeatBal->Zone(surfZoneNum).Name);
+            ShowContinueError(state, "Radiant equipment zone or enclosure = " + state.dataHeatBal->Zone(RadSysZoneNum).Name);
             ShowContinueError(state, "Occurs for " + cCurrentModuleObject + " = " + RadSysName);
             ErrorsFound = true;
         }

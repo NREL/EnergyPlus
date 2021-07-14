@@ -14166,8 +14166,6 @@ void GetDelaySequences(EnergyPlusData &state,
         ort->initAdjFenDone = true;
     }
 
-    int radEnclosureNum = Zone(zoneIndex).RadiantEnclosureNum;
-
     if (desDaySelected != 0) {
 
         Array2D<Real64> decayCurve;
@@ -14189,6 +14187,7 @@ void GetDelaySequences(EnergyPlusData &state,
 
             // code from ComputeDelayedComponents starts
             for (int jSurf = Zone(zoneIndex).HTSurfaceFirst; jSurf <= Zone(zoneIndex).HTSurfaceLast; ++jSurf) {
+                int radEnclosureNum = state.dataSurface->Surface(jSurf).RadEnclIndex;
 
                 // for each time step, step back through time and apply decay curve to radiant heat for each end use absorbed in each surface
                 Real64 peopleConvFromSurf = 0.0;

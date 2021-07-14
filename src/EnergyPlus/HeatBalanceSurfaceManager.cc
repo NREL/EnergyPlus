@@ -3523,33 +3523,21 @@ void InitIntSolarDistribution(EnergyPlusData &state)
     // REFERENCES:
     // (I)BLAST legacy routine QSUN
 
-    // Using/Aliasing
     using DaylightingDevices::DistributeTDDAbsorbedSolar;
     using General::InterpSw;
     using namespace DataWindowEquivalentLayer;
-    // Locals
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     auto &Surface(state.dataSurface->Surface);
 
     // COMPUTE TOTAL SHORT-WAVE RADIATION ORIGINATING IN ZONE.
     // Note: If sun is not up, QS is only internal gains
     for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
-        Real64 sumZoneQLTSW = 0.0;
-        for (int zoneNum : state.dataViewFactor->ZoneSolarInfo(enclosureNum).ZoneNums) {
-            sumZoneQLTSW += state.dataHeatBal->ZoneIntGain(zoneNum).QLTSW;
+        Real64 sumSpaceQLTSW = 0.0;
+        for (int spaceNum : state.dataViewFactor->EnclSolInfo(enclosureNum).SpaceNums) {
+            sumSpaceQLTSW += state.dataHeatBal->SpaceIntGain(spaceNum).QLTSW;
         }
-        state.dataHeatBal->EnclSolQSWRad(enclosureNum) = state.dataHeatBal->EnclSolQD(enclosureNum) + sumZoneQLTSW;
-        state.dataHeatBal->EnclSolQSWRadLights(enclosureNum) = sumZoneQLTSW;
+        state.dataHeatBal->EnclSolQSWRad(enclosureNum) = state.dataHeatBal->EnclSolQD(enclosureNum) + sumSpaceQLTSW;
+        state.dataHeatBal->EnclSolQSWRadLights(enclosureNum) = sumSpaceQLTSW;
     }
 
     if (state.dataHeatBalSurf->InterZoneWindow) { // DO INTERZONE DISTRIBUTION.
@@ -3561,13 +3549,13 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                 for (int OtherenclosureNum = 1; OtherenclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++OtherenclosureNum) {
 
                     if ((OtherenclosureNum != enclosureNum) && (state.dataHeatBalSurf->EnclSolRecDifShortFromZ(OtherenclosureNum))) {
-                        Real64 sumZoneQLTSW = 0.0;
-                        for (int zoneNum : state.dataViewFactor->ZoneSolarInfo(OtherenclosureNum).ZoneNums) {
-                            sumZoneQLTSW += state.dataHeatBal->ZoneIntGain(zoneNum).QLTSW;
+                        Real64 sumSpaceQLTSW = 0.0;
+                        for (int spaceNum : state.dataViewFactor->EnclSolInfo(OtherenclosureNum).SpaceNums) {
+                            sumSpaceQLTSW += state.dataHeatBal->SpaceIntGain(spaceNum).QLTSW;
                         }
                         state.dataHeatBal->EnclSolQSWRad(enclosureNum) +=
                             state.dataHeatBalSurf->ZoneFractDifShortZtoZ(enclosureNum, OtherenclosureNum) *
-                            (state.dataHeatBal->EnclSolQD(OtherenclosureNum) + sumZoneQLTSW);
+                            (state.dataHeatBal->EnclSolQD(OtherenclosureNum) + sumSpaceQLTSW);
                         state.dataHeatBal->ZoneDifSolFrIntWinsRep(enclosureNum) +=
                             state.dataHeatBalSurf->ZoneFractDifShortZtoZ(enclosureNum, OtherenclosureNum) *
                             state.dataHeatBal->EnclSolQD(OtherenclosureNum);
@@ -3588,7 +3576,7 @@ void InitIntSolarDistribution(EnergyPlusData &state)
             if (Surface(SurfNum).Class == SurfaceClass::Shading) continue;
             int const enclosureNum = Surface(SurfNum).SolarEnclIndex;
             state.dataHeatBal->SurfIntBmIncInsSurfIntensRep(SurfNum) =
-                state.dataHeatBal->ZoneBmSolFrIntWinsRep(enclosureNum) / state.dataViewFactor->ZoneSolarInfo(enclosureNum).TotalSurfArea;
+                state.dataHeatBal->ZoneBmSolFrIntWinsRep(enclosureNum) / state.dataViewFactor->EnclSolInfo(enclosureNum).TotalSurfArea;
             state.dataHeatBal->SurfIntBmIncInsSurfAmountRep(SurfNum) =
                 state.dataHeatBal->SurfIntBmIncInsSurfIntensRep(SurfNum) * (Surface(SurfNum).Area + state.dataSurface->SurfWinDividerArea(SurfNum));
             state.dataHeatBal->SurfIntBmIncInsSurfAmountRepEnergy(SurfNum) =
@@ -3618,9 +3606,9 @@ void InitIntSolarDistribution(EnergyPlusData &state)
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
         int const firstSurfOpaque = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
         int const lastSurfOpaque = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
-        int const radEnclosureNum = state.dataHeatBal->Zone(zoneNum).RadiantEnclosureNum;
-        int const solEnclosureNum = state.dataHeatBal->Zone(zoneNum).SolarEnclosureNum;
         for (int SurfNum = firstSurfOpaque; SurfNum <= lastSurfOpaque; ++SurfNum) {
+            int const radEnclosureNum = Surface(SurfNum).RadEnclIndex;
+            int const solEnclosureNum = Surface(SurfNum).SolarEnclIndex;
             int const ConstrNum = Surface(SurfNum).Construction;
 
             Real64 AbsIntSurf = state.dataHeatBalSurf->SurfAbsSolarInt(SurfNum);
@@ -3666,6 +3654,8 @@ void InitIntSolarDistribution(EnergyPlusData &state)
         int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
         int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
         for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) { // Window
+            int const radEnclosureNum = Surface(SurfNum).RadEnclIndex;
+            int const solEnclosureNum = Surface(SurfNum).SolarEnclIndex;
             int const ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum);
 
             if (state.dataSurface->SurfWinWindowModelType(SurfNum) != WindowEQLModel) {
@@ -3685,7 +3675,7 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                     // for the loads component report during the special sizing run increase the radiant portion
                     // a small amount to create a "pulse" of heat that is used for the
                     state.dataHeatBalSurfMgr->adjQL =
-                        state.dataHeatBalSurfMgr->curQL + state.dataViewFactor->ZoneRadiantInfo(radEnclosureNum).FloorArea * pulseMultipler;
+                        state.dataHeatBalSurfMgr->curQL + state.dataViewFactor->EnclRadInfo(radEnclosureNum).FloorArea * pulseMultipler;
                     // ITABSF is the Inside Thermal Absorptance
                     // EnclRadThermAbsMult is a multiplier for each zone/enclosure
                     // QRadThermInAbs is the thermal radiation absorbed on inside surfaces
@@ -3847,7 +3837,7 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                     // for the loads component report during the special sizing run increase the radiant portion
                     // a small amount to create a "pulse" of heat that is used for the
                     state.dataHeatBalSurfMgr->adjQL =
-                        state.dataHeatBalSurfMgr->curQL + state.dataViewFactor->ZoneRadiantInfo(radEnclosureNum).FloorArea * pulseMultipler;
+                        state.dataHeatBalSurfMgr->curQL + state.dataViewFactor->EnclRadInfo(radEnclosureNum).FloorArea * pulseMultipler;
                     // ITABSF is the Inside Thermal Absorptance
                     // EnclRadThermAbsMult is a multiplier for each zone/radiant enclosure
                     // QRadThermInAbs is the thermal radiation absorbed on inside surfaces
@@ -4064,7 +4054,7 @@ void ComputeIntThermalAbsorpFactors(EnergyPlusData &state)
     }
 
     for (int radEnclosureNum = 1; radEnclosureNum <= state.dataViewFactor->NumOfRadiantEnclosures; ++radEnclosureNum) {
-        auto &thisEnclosure(state.dataViewFactor->ZoneRadiantInfo(radEnclosureNum));
+        auto &thisEnclosure(state.dataViewFactor->EnclRadInfo(radEnclosureNum));
         if (!state.dataHeatBal->EnclRadReCalc(radEnclosureNum)) continue;
         Real64 SUM1 = 0.0;
         for (int const SurfNum : thisEnclosure.SurfacePtr) {
@@ -4176,7 +4166,7 @@ void ComputeIntSWAbsorpFactors(EnergyPlusData &state)
         if (!state.dataHeatBal->EnclRadReCalc(enclosureNum)) continue;
         Real64 SUM1 = 0.0; // Intermediate calculation value for solar absorbed and transmitted
 
-        for (int const SurfNum : state.dataViewFactor->ZoneSolarInfo(enclosureNum).SurfacePtr) {
+        for (int const SurfNum : state.dataViewFactor->EnclSolInfo(enclosureNum).SurfacePtr) {
             int const ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum);
             if (state.dataConstruction->Construct(ConstrNum).TransDiff <= 0.0) {
                 // Opaque surface
@@ -4309,7 +4299,7 @@ void ComputeIntSWAbsorpFactors(EnergyPlusData &state)
             if (state.dataHeatBal->ZoneSolAbsFirstCalc(enclosureNum)) {
                 ShowWarningError(state,
                                  "ComputeIntSWAbsorbFactors: Sum of area times inside solar absorption for all surfaces is zero in Zone: " +
-                                     state.dataViewFactor->ZoneSolarInfo(enclosureNum).Name);
+                                     state.dataViewFactor->EnclSolInfo(enclosureNum).Name);
                 state.dataHeatBal->ZoneSolAbsFirstCalc(enclosureNum) = false;
             }
             state.dataHeatBal->EnclSolVMULT(enclosureNum) = 0.0;
@@ -8240,7 +8230,7 @@ void TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state, Real64 TH12, i
                                                   "C");
                 }
             }
-            if (zone.EnforcedReciprocity) {
+            if (state.dataHeatBal->Space(state.dataSurface->Surface(SurfNum).Space).EnforcedReciprocity) {
                 if (WarmupSurfTemp > 3) {
                     ShowSevereError(state, "CalcHeatBalanceInsideSurf: Zone=\"" + zone.Name + "\" has view factor enforced reciprocity");
                     ShowContinueError(state, " and is having temperature out of bounds errors. Please correct zone geometry and rerun.");
