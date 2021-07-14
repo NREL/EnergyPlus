@@ -6935,16 +6935,16 @@ namespace UnitarySystems {
                 input_specs.name = thisObjectName;
                 input_specs.system_type = cCurrentModuleObject;
                 input_specs.control_type = "Setpoint";
-                input_specs.air_inlet_node_name = UtilityRoutines::MakeUPPERCase(fields.at("air_inlet_node_name"));
-                input_specs.air_outlet_node_name = UtilityRoutines::MakeUPPERCase(fields.at("air_outlet_node_name"));
+                input_specs.air_inlet_node_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("air_inlet_node_name")));
+                input_specs.air_outlet_node_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("air_outlet_node_name")));
                 std::string availScheduleName("");
                 if (fields.find("availability_schedule_name") != fields.end()) { // not required field, has default value of Always On
-                    availScheduleName = UtilityRoutines::MakeUPPERCase(fields.at("availability_schedule_name"));
+                    availScheduleName = UtilityRoutines::MakeUPPERCase(AsString(fields.at("availability_schedule_name")));
                 }
                 input_specs.availability_schedule_name = availScheduleName;
-                input_specs.cooling_coil_object_type = UtilityRoutines::MakeUPPERCase(fields.at("cooling_coil_object_type"));
-                input_specs.cooling_coil_name = UtilityRoutines::MakeUPPERCase(fields.at("cooling_coil_name"));
-                // why is this cooling coil does not have a field for Design Water Flow Rate
+                input_specs.cooling_coil_object_type = UtilityRoutines::MakeUPPERCase(AsString(fields.at("cooling_coil_object_type")));
+                input_specs.cooling_coil_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("cooling_coil_name")));
+                // why is this cooling coil does not have a field for Design Air Vol Flow Rate
                 // set it "SupplyAirFlowRate" to avoid blank, which lead to fatal out during get input
                 std::string loc_cooling_coil_object_type("COIL:COOLING:WATER:DETAILEDGEOMETRY");
                 if (UtilityRoutines::SameString(loc_cooling_coil_object_type, input_specs.cooling_coil_object_type)) {
@@ -6958,17 +6958,17 @@ namespace UnitarySystems {
                 }
                 std::string dehumidControlType("None");
                 if (fields.find("dehumidification_control_type") != fields.end()) {
-                    dehumidControlType = UtilityRoutines::MakeUPPERCase(fields.at("dehumidification_control_type"));
+                    dehumidControlType = UtilityRoutines::MakeUPPERCase(AsString(fields.at("dehumidification_control_type")));
                 }
                 input_specs.dehumidification_control_type = dehumidControlType;
 
                 std::string runOnSensibleLoad("Yes");
                 if (fields.find("run_on_sensible_load") != fields.end()) {
-                    runOnSensibleLoad = UtilityRoutines::MakeUPPERCase(fields.at("run_on_sensible_load"));
+                    runOnSensibleLoad = UtilityRoutines::MakeUPPERCase(AsString(fields.at("run_on_sensible_load")));
                 }
                 std::string runOnLatentLoad("No");
                 if (fields.find("run_on_latent_load") != fields.end()) {
-                    runOnLatentLoad = UtilityRoutines::MakeUPPERCase(fields.at("run_on_latent_load"));
+                    runOnLatentLoad = UtilityRoutines::MakeUPPERCase(AsString(fields.at("run_on_latent_load")));
                 }
 
                 if (runOnSensibleLoad == "YES" && runOnLatentLoad == "NO") {
