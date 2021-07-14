@@ -818,6 +818,8 @@ namespace UnitarySystems {
         static void
         getDXCoilSystemData(EnergyPlusData &state, std::string const &Name, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
 
+        static void allocateUnitarySys(EnergyPlusData &state);
+
         static HVACSystemData *
         factory(EnergyPlusData &state, int const object_type_of_num, std::string const objectName, bool const ZoneEquipment, int const ZoneOAUnitNum);
 

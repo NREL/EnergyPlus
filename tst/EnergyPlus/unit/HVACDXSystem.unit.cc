@@ -556,6 +556,9 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     bool zoneEquipment = true;
     UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
+    // call again to get the rest of the input when sysNum > -1
+    UnitarySystems::UnitarySys::getUnitarySystemInput(*state, compName, false, 0);
+
 
     EXPECT_EQ(thisSys->Name, "DX COOLING COIL SYSTEM");
     EXPECT_FALSE(thisSys->m_ISHundredPercentDOASDXCoil);
@@ -737,6 +740,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     bool zoneEquipment = true;
     UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
+    // call again to get the rest of the input when sysNum > -1
+    UnitarySystems::UnitarySys::getUnitarySystemInput(*state, compName, false, 0);
 
     // set up outdoor environment
     state->dataEnvrn->OutDryBulbTemp = 35.0;

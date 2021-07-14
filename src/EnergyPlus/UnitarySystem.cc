@@ -1435,11 +1435,14 @@ namespace UnitarySystems {
     {
 
         bool errorsFound(false);
+        UnitarySys::allocateUnitarySys(state);
 
         UnitarySys::getDXCoilSystemData(state, objectName, ZoneEquipment, ZoneOAUnitNum, errorsFound);
-        // call UnitarySystem getInput last, where all report variables will be set up, even if no UnitarySystem objects exist in input.
-        // see function setupAllOutputVars to add new system specific report variables.
         UnitarySys::getUnitarySystemInputData(state, objectName, ZoneEquipment, ZoneOAUnitNum, errorsFound);
+
+        // all systems should have been processed at this point? I think so, so don't need to if test?
+        if (state.dataUnitarySystems->unitarySys.size() == state.dataUnitarySystems->numUnitarySystems && state.dataZoneEquip->ZoneEquipInputsFilled)
+            setupAllOutputVars(state, state.dataUnitarySystems->numUnitarySystems);
 
         if (errorsFound) {
             ShowFatalError(state, "getUnitarySystemInputData: previous errors cause termination. Check inputs");
@@ -2941,6 +2944,8 @@ namespace UnitarySystems {
         std::string cCurrentModuleObject = input_data.system_type;
         std::string thisObjectName = input_data.name;
         this->Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
+        sysNum = getUnitarySystemIndex(state, thisObjectName);
+        this->m_UnitarySysNum = sysNum;
 
         std::string loc_AirInNodeName = input_data.air_inlet_node_name;
         if (state.dataUnitarySystems->getInputOnceFlag) {
@@ -2953,6 +2958,8 @@ namespace UnitarySystems {
                                                                   DataLoopNode::NodeConnectionType::Inlet,
                                                                   NodeInputManager::compFluidStream::Primary,
                                                                   DataLoopNode::ObjectIsParent);
+        } else {
+            this->AirInNode = UtilityRoutines::FindItemInList(loc_AirInNodeName, state.dataLoopNodes->NodeID);
         }
 
         std::string loc_AirOutNodeName = input_data.air_outlet_node_name;
@@ -2966,6 +2973,8 @@ namespace UnitarySystems {
                                                                    DataLoopNode::NodeConnectionType::Outlet,
                                                                    NodeInputManager::compFluidStream::Primary,
                                                                    DataLoopNode::ObjectIsParent);
+        } else {
+            this->AirOutNode = UtilityRoutines::FindItemInList(loc_AirOutNodeName, state.dataLoopNodes->NodeID);
         }
 
         // need to read in all information needed to SetupOutputVariable in setupAllOutputVars
@@ -6916,7 +6925,8 @@ namespace UnitarySystems {
                 // when UnitarySystems::getInputOnceFlag is true read all unitary systems, otherwise read just the curren object
                 if (!UtilityRoutines::SameString(objectName, thisObjectName) && !state.dataUnitarySystems->getInputOnceFlag) continue;
 
-                ++state.dataUnitarySystems->numUnitarySystems;
+                int sysNum = getUnitarySystemIndex(state, thisObjectName);
+                if (sysNum == -1) ++state.dataUnitarySystems->numUnitarySystems;
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, instance.key());
 
                 // get CoilSystem:Cooling:DX object inputs
@@ -6982,21 +6992,16 @@ namespace UnitarySystems {
                 original_input_specs.control_type = "SETPOINT";
 
                 // now translate to UnitarySystem
-                int sysNum = state.dataUnitarySystems->numUnitarySystems;
                 UnitarySys thisSys;
                 thisSys.UnitType = cCurrentModuleObject;
                 // TODO: figure out another way to set this next variable
                 // Unitary System will not turn on unless this mode is set OR a different method is used to set air flow rate
                 thisSys.m_LastMode = state.dataUnitarySystems->CoolingMode;
                 thisSys.processInputSpec(state, original_input_specs, sysNum, errorsFound, ZoneEquipment, ZoneOAUnitNum);
-                // thisSys.m_MaxHeatAirVolFlow = thisSys.m_MaxCoolAirVolFlow;
-                // thisSys.m_MaxNoCoolHeatAirVolFlow = thisSys.m_MaxCoolAirVolFlow;
-                // thisSys.m_FanOpModeSchedPtr = -1;
-
-                sysNum = getUnitarySystemIndex(state, thisObjectName);
 
                 if (sysNum == -1) {
-                    state.dataUnitarySystems->unitarySys.push_back(thisSys);
+                    int thisSysNum = state.dataUnitarySystems->numUnitarySystems - 1;
+                    state.dataUnitarySystems->unitarySys[thisSysNum] = thisSys;
                 } else {
                     state.dataUnitarySystems->unitarySys[sysNum] = thisSys;
                 }
@@ -7004,16 +7009,24 @@ namespace UnitarySystems {
         }
     }
 
+    void UnitarySys::allocateUnitarySys(EnergyPlusData &state)
+    {
+        if (state.dataUnitarySystems->unitarySys.size() > 0) return;
+        int numUnitarySystems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:UnitarySystem");
+        int numCoilSystems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "CoilSystem:Cooling:DX");
+        int numAllSystemTypes = numUnitarySystems + numCoilSystems;
+        for (int sysCount = 0; sysCount < numAllSystemTypes; ++sysCount) {
+            UnitarySys thisSys;
+            state.dataUnitarySystems->unitarySys.push_back(thisSys);
+        }
+    }
+
     void UnitarySys::getUnitarySystemInputData(
         EnergyPlusData &state, std::string const &objectName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound)
     {
 
-        static std::string const getUnitarySystemInput("getUnitarySystemInputData");
-
         std::string cCurrentModuleObject = "AirLoopHVAC:UnitarySystem";
-        int numUnitarySystems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        int numCoilSystems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "CoilSystem:Cooling:DX");
-        int numAllSystemTypes = numUnitarySystems + numCoilSystems;
+        static std::string const getUnitarySystemInput("getUnitarySystemInputData");
 
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
         if (instances == state.dataInputProcessing->inputProcessor->epJSON.end() && state.dataUnitarySystems->numUnitarySystems == 0) {
@@ -7249,14 +7262,13 @@ namespace UnitarySystems {
                 thisSys.processInputSpec(state, input_spec, sysNum, errorsFound, ZoneEquipment, ZoneOAUnitNum);
 
                 if (sysNum == -1) {
-                    state.dataUnitarySystems->unitarySys.push_back(thisSys);
+                    int thisSysNum = state.dataUnitarySystems->numUnitarySystems - 1;
+                    state.dataUnitarySystems->unitarySys[thisSysNum] = thisSys;
                 } else {
                     state.dataUnitarySystems->unitarySys[sysNum] = thisSys;
                 }
             }
         }
-        if (numAllSystemTypes == state.dataUnitarySystems->numUnitarySystems && state.dataZoneEquip->ZoneEquipInputsFilled)
-            setupAllOutputVars(state, numAllSystemTypes);
     }
 
     void UnitarySys::calcUnitarySuppSystemToSP(EnergyPlusData &state, bool const FirstHVACIteration // True when first HVAC iteration
@@ -11677,14 +11689,15 @@ namespace UnitarySystems {
                     } else if (CoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
 
                         CycRatio = 1.0;
-                        for (SpeedRatio = 0; SpeedRatio < this->m_NumOfSpeedCooling; ++SpeedRatio) {
+                        for (int speedRatio = 0; speedRatio < this->m_NumOfSpeedCooling; ++speedRatio) {
+                            SpeedRatio = Real64(speedRatio);
                             DXCoils::SimDXCoilMultiSpeed(state, CompName, SpeedRatio, CycRatio, this->m_CoolingCoilIndex);
                             OutletTemp = state.dataDXCoils->DXCoilOutletTemp(this->m_CoolingCoilIndex);
                             if (SpeedRatio == 1) {
                                 FullLoadHumRatOut = state.dataDXCoils->DXCoilOutletHumRat(this->m_CoolingCoilIndex);
                                 break;
                             }
-                            if (OutletTemp < DesOutTemp && SensibleLoad) break; // this isn't going to work IF dehumidIFying
+                            if (OutletTemp < DesOutTemp && SensibleLoad) break;
                         }
 
                     } else if (CoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
