@@ -1187,6 +1187,99 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     // setup zone-level infiltration reports
     for (Loop = 1; Loop <= state.dataHeatBal->TotInfiltration; ++Loop) {
         if (state.dataHeatBal->Infiltration(Loop).ZonePtr > 0 && !state.dataHeatBal->Infiltration(Loop).QuadratureSum) {
+            // Object report variables
+            SetupOutputVariable(state,
+                                "Infiltration Sensible Heat Loss Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->Infiltration(Loop).InfilHeatLoss,
+                                "Zone",
+                                "Sum",
+                                state.dataHeatBal->Infiltration(Loop).Name);
+            SetupOutputVariable(state,
+                                "Infiltration Sensible Heat Gain Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->Infiltration(Loop).InfilHeatGain,
+                                "Zone",
+                                "Sum",
+                                state.dataHeatBal->Infiltration(Loop).Name);
+            SetupOutputVariable(state,
+                                "Infiltration Latent Heat Loss Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->Infiltration(Loop).InfilLatentLoss,
+                                "Zone",
+                                "Sum",
+                                state.dataHeatBal->Infiltration(Loop).Name);
+            SetupOutputVariable(state,
+                                "Infiltration Latent Heat Gain Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->Infiltration(Loop).InfilLatentGain,
+                                "Zone",
+                                "Sum",
+                                state.dataHeatBal->Infiltration(Loop).Name);
+            SetupOutputVariable(state,
+                                "Infiltration Total Heat Loss Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->Infiltration(Loop).InfilTotalLoss,
+                                "Zone",
+                                "Sum",
+                                state.dataHeatBal->Infiltration(Loop).Name);
+            SetupOutputVariable(state,
+                                "Infiltration Total Heat Gain Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->Infiltration(Loop).InfilTotalGain,
+                                "Zone",
+                                "Sum",
+                                state.dataHeatBal->Infiltration(Loop).Name);
+            SetupOutputVariable(state,
+                                "Infiltration Current Density Volume Flow Rate",
+                                OutputProcessor::Unit::m3_s,
+                                state.dataHeatBal->Infiltration(Loop).InfilVdotCurDensity,
+                                "Zone",
+                                "Average",
+                                state.dataHeatBal->Infiltration(Loop).Name);
+            SetupOutputVariable(state,
+                                "Infiltration Standard Density Volume Flow Rate",
+                                OutputProcessor::Unit::m3_s,
+                                state.dataHeatBal->Infiltration(Loop).InfilVdotStdDensity,
+                                "Zone",
+                                "Average",
+                                state.dataHeatBal->Infiltration(Loop).Name);
+            SetupOutputVariable(state,
+                                "Infiltration Current Density Volume",
+                                OutputProcessor::Unit::m3,
+                                state.dataHeatBal->Infiltration(Loop).InfilVolumeCurDensity,
+                                "Zone",
+                                "Sum",
+                                state.dataHeatBal->Infiltration(Loop).Name);
+            SetupOutputVariable(state,
+                                "Infiltration Standard Density Volume",
+                                OutputProcessor::Unit::m3,
+                                state.dataHeatBal->Infiltration(Loop).InfilVolumeStdDensity,
+                                "Zone",
+                                "Sum",
+                                state.dataHeatBal->Infiltration(Loop).Name);
+            SetupOutputVariable(state,
+                                "Infiltration Mass",
+                                OutputProcessor::Unit::kg,
+                                state.dataHeatBal->Infiltration(Loop).InfilMass,
+                                "Zone",
+                                "Sum",
+                                state.dataHeatBal->Infiltration(Loop).Name);
+            SetupOutputVariable(state,
+                                "Infiltration Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                state.dataHeatBal->Infiltration(Loop).MassFlowRate,
+                                "Zone",
+                                "Average",
+                                state.dataHeatBal->Infiltration(Loop).Name);
+            SetupOutputVariable(state,
+                                "Infiltration Air Change Rate",
+                                OutputProcessor::Unit::ach,
+                                state.dataHeatBal->Infiltration(Loop).InfilAirChangeRate,
+                                "Zone",
+                                "Average",
+                                state.dataHeatBal->Infiltration(Loop).Name);
+
             if (RepVarSet(state.dataHeatBal->Infiltration(Loop).ZonePtr)) {
                 RepVarSet(state.dataHeatBal->Infiltration(Loop).ZonePtr) = false;
                 SetupOutputVariable(state,
