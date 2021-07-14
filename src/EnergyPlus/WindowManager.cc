@@ -7223,7 +7223,7 @@ namespace WindowManager {
 
         int const MaxIterations(100);  // Maximum allowed number of iterations
         Real64 const errtemptol(0.02); // Tolerance on errtemp for convergence
-        static std::string const RoutineName("WindowTempsForNominalCond");
+        static constexpr std::string_view RoutineName("WindowTempsForNominalCond");
 
         int i;                      // Counter
         Array1D<Real64> hr(10);     // Radiative conductance (W/m2-K)
@@ -7559,7 +7559,7 @@ namespace WindowManager {
                     CalcComplexWindowThermal(state, 0, i, TempVar, TempVar, TempVar, TempVar, DataBSDFWindow::Condition::winterCondition);
                     CalcComplexWindowThermal(state, 0, i, TempVar, TempVar, TempVar, TempVar, DataBSDFWindow::Condition::summerCondition);
 
-                    static constexpr auto Format_800(" WindowConstruction:Complex,{},{},{},{:.3R},{:.3R}\n");
+                    static constexpr fmt::string_view Format_800(" WindowConstruction:Complex,{},{},{},{:.3R},{:.3R}\n");
                     print(state.files.eio,
                           Format_800,
                           state.dataConstruction->Construct(ThisNum).Name,
@@ -7581,7 +7581,7 @@ namespace WindowManager {
                         // Construct(ThisNum)%SummerSHGC = SHGCSummer
                         state.dataConstruction->Construct(ThisNum).VisTransNorm = 0.0; // TODO list
 
-                        static constexpr auto Format_799(" Construction:WindowEquivalentLayer,{},{},{},{:.3R},{:.3R},{:.3R}\n");
+                        static constexpr fmt::string_view Format_799(" Construction:WindowEquivalentLayer,{},{},{},{:.3R},{:.3R},{:.3R}\n");
                         print(state.files.eio,
                               Format_799,
                               state.dataConstruction->Construct(ThisNum).Name,
@@ -7623,7 +7623,7 @@ namespace WindowManager {
                         state.dataConstruction->Construct(ThisNum).SummerSHGC = SHGCSummer;
                         state.dataConstruction->Construct(ThisNum).VisTransNorm = TransVisNorm;
 
-                        static constexpr auto Format_700(" WindowConstruction,{},{},{},{},{:.3R},{:.3R},{:.3R},{:.3R}\n");
+                        static constexpr fmt::string_view Format_700(" WindowConstruction,{},{},{},{},{:.3R},{:.3R},{:.3R},{:.3R}\n");
                         print(state.files.eio,
                               Format_700,
                               state.dataConstruction->Construct(ThisNum).Name,
@@ -7642,7 +7642,7 @@ namespace WindowManager {
                         {
                             auto const SELECT_CASE_var(state.dataMaterial->Material(Layer).Group);
                             if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::WindowGas) {
-                                static constexpr auto Format_702(" WindowMaterial:Gas,{},{},{:.3R}\n");
+                                static constexpr fmt::string_view Format_702(" WindowMaterial:Gas,{},{},{:.3R}\n");
                                 print(state.files.eio,
                                       Format_702,
                                       state.dataMaterial->Material(Layer).Name,
@@ -7652,7 +7652,7 @@ namespace WindowManager {
                                 //! fw CASE(WindowGasMixture)
 
                             } else if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::Shade) {
-                                static constexpr auto Format_703(" WindowMaterial:Shade,,{},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
+                                static constexpr fmt::string_view Format_703(" WindowMaterial:Shade,,{},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
                                 print(state.files.eio,
                                       Format_703,
                                       state.dataMaterial->Material(Layer).Name,
@@ -7665,7 +7665,8 @@ namespace WindowManager {
 
                             } else if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::WindowBlind) {
                                 BlNum = state.dataMaterial->Material(Layer).BlindDataPtr;
-                                static constexpr auto Format_704(" WindowMaterial:Blind,{},{:.4R},{:.4R},{:.4R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
+                                static constexpr fmt::string_view Format_704(
+                                    " WindowMaterial:Blind,{},{:.4R},{:.4R},{:.4R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
                                 print(state.files.eio,
                                       Format_704,
                                       state.dataMaterial->Material(Layer).Name,
@@ -7678,7 +7679,7 @@ namespace WindowManager {
                                       state.dataHeatBal->Blind(BlNum).BlindToGlassDist);
                             } else if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::Screen) {
                                 if (state.dataMaterial->Material(Layer).ScreenDataPtr > 0) {
-                                    static constexpr auto Format_706(
+                                    static constexpr fmt::string_view Format_706(
                                         " WindowMaterial:Screen,{},{:.5R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
                                     print(state.files.eio,
                                           Format_706,
@@ -7712,8 +7713,9 @@ namespace WindowManager {
                                         state.dataCurveManager->PerfCurve(state.dataMaterial->Material(Layer).GlassSpecAngFRefleDataPtr).Name + ", " +
                                         state.dataCurveManager->PerfCurve(state.dataMaterial->Material(Layer).GlassSpecAngBRefleDataPtr).Name;
                                 }
-                                static constexpr auto Format_707(" WindowMaterial:Glazing,{},{},{},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{"
-                                                                 ":.5R},{:.5R},{:.5R},{:.5R},{:.5R},{}\n");
+                                static constexpr fmt::string_view Format_707(
+                                    " WindowMaterial:Glazing,{},{},{},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{"
+                                    ":.5R},{:.5R},{:.5R},{:.5R},{:.5R},{}\n");
                                 print(state.files.eio,
                                       Format_707,
                                       state.dataMaterial->Material(Layer).Name,
@@ -7736,8 +7738,9 @@ namespace WindowManager {
                             } else if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::GlassEquivalentLayer) {
                                 OpticalDataType = "SpectralAverage";
                                 SpectralDataName = "";
-                                static constexpr auto Format_708(" WindowMaterial:Glazing:EquivalentLayer,{},{},{},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R}"
-                                                                 ",{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R}\n");
+                                static constexpr fmt::string_view Format_708(
+                                    " WindowMaterial:Glazing:EquivalentLayer,{},{},{},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R}"
+                                    ",{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R}\n");
                                 print(state.files.eio,
                                       Format_708,
                                       state.dataMaterial->Material(Layer).Name,
@@ -7759,7 +7762,7 @@ namespace WindowManager {
                                       state.dataMaterial->Material(Layer).EmissThermalBack);
 
                             } else if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::ShadeEquivalentLayer) {
-                                static constexpr auto Format_709(
+                                static constexpr fmt::string_view Format_709(
                                     " WindowMaterial:Shade:EquivalentLayer,{},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R}\n");
                                 print(state.files.eio,
                                       Format_709,
@@ -7775,8 +7778,9 @@ namespace WindowManager {
                                       state.dataMaterial->Material(Layer).EmissThermalBack);
 
                             } else if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::DrapeEquivalentLayer) {
-                                static constexpr auto Format_710(" WindowMaterial:Drape:EquivalentLayer,{},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},"
-                                                                 "{:.4R},{:.4R},{:.5R},{:.5R}\n");
+                                static constexpr fmt::string_view Format_710(
+                                    " WindowMaterial:Drape:EquivalentLayer,{},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},"
+                                    "{:.4R},{:.4R},{:.5R},{:.5R}\n");
                                 print(state.files.eio,
                                       Format_710,
                                       state.dataMaterial->Material(Layer).Name,
@@ -7792,8 +7796,9 @@ namespace WindowManager {
                                       state.dataMaterial->Material(Layer).PleatedDrapeLength);
 
                             } else if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::ScreenEquivalentLayer) {
-                                static constexpr auto Format_711(" WindowMaterial:Screen:EquivalentLayer,{},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R}"
-                                                                 ",{:.4R},{:.4R},{:.5R},{:.5R}\n");
+                                static constexpr fmt::string_view Format_711(
+                                    " WindowMaterial:Screen:EquivalentLayer,{},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R}"
+                                    ",{:.4R},{:.4R},{:.5R},{:.5R}\n");
                                 print(state.files.eio,
                                       Format_711,
                                       state.dataMaterial->Material(Layer).Name,
@@ -7814,8 +7819,9 @@ namespace WindowManager {
                                     SlateOrientation = "Vertical";
                                 }
                                 // Formats
-                                static constexpr auto Format_712(" WindowMaterial:Blind:EquivalentLayer,{},{},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:."
-                                                                 "5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R}");
+                                static constexpr fmt::string_view Format_712(
+                                    " WindowMaterial:Blind:EquivalentLayer,{},{},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:."
+                                    "5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R}");
                                 print(state.files.eio,
                                       Format_712,
                                       state.dataMaterial->Material(Layer).Name,
@@ -7842,7 +7848,7 @@ namespace WindowManager {
                                 } else if (state.dataMaterial->Material(Layer).GapVentType == 3) {
                                     GapVentType = "VentedOutdoor";
                                 }
-                                static constexpr auto Format_713(" WindowMaterial:Gap:EquivalentLayer,{},{},{:.3R},{}\n");
+                                static constexpr fmt::string_view Format_713(" WindowMaterial:Gap:EquivalentLayer,{},{},{:.3R},{}\n");
                                 print(state.files.eio,
                                       Format_713,
                                       state.dataMaterial->Material(Layer).Name,
