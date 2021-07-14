@@ -1692,7 +1692,7 @@ namespace RoomAirModelManager {
                                 ErrorsFound = true;
                                 continue;
                             }
-                            state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain(numGains).Name =
+                            state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain(gainsLoop).Name =
                                 state.dataIPShortCut->cAlphaArgs(gainsLoop * 2 + 1);
 
                             bool gainFound = false;
