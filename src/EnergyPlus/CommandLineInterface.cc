@@ -484,7 +484,13 @@ namespace CommandLineInterface {
         state.files.outputSszTxtFilePath = composePath(sszSuffix + ".txt");
         state.dataStrGlobals->outputAdsFilePath = composePath(adsSuffix + ".out");
         state.files.shade.filePath = composePath(shdSuffix + ".csv");
-        state.dataStrGlobals->outputSqliteErrFilePath = composePath(sqliteSuffix + ".err");
+        if (suffixType == "L") {
+            // out/sqlite.err
+            state.dataStrGlobals->outputSqliteErrFilePath = state.dataStrGlobals->outDirPath / fs::path{sqliteSuffix + ".err"};
+        } else {
+            // if 'D':  out/eplus-sqlite.err
+            state.dataStrGlobals->outputSqliteErrFilePath = composePath(sqliteSuffix + ".err");
+        }
 
         state.files.screenCsv.filePath = composePath(screenSuffix + ".csv");
         // TODO, why are these relative paths?
