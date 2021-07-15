@@ -88,7 +88,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     state->dataHVACFan->fanObjs[0]->simulate(*state, _, _, _, _);
 
     // this global state is what would be set up by E+ currently
-    static std::string const routineName("HeatingCapacitySizingGauntlet");
+    static constexpr std::string_view routineName("HeatingCapacitySizingGauntlet");
     state->dataSize->ZoneEqSizing.allocate(1);
 
     // create the sizer and set up the flags to specify the sizing configuration
@@ -808,7 +808,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     state->dataAirLoopHVACDOAS->airloopDOAS[0].PreheatTemp = 11.0;
     state->dataAirLoopHVACDOAS->airloopDOAS[0].m_FanIndex = 0;
     state->dataAirLoopHVACDOAS->airloopDOAS[0].FanBlowTroughFlag = true;
-    state->dataAirLoopHVACDOAS->airloopDOAS[0].m_FanTypeNum = SimAirServingZones::Fan_System_Object;
+    state->dataAirLoopHVACDOAS->airloopDOAS[0].m_FanTypeNum = SimAirServingZones::CompType::Fan_System_Object;
 
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
