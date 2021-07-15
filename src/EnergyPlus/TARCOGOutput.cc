@@ -183,89 +183,90 @@ void WriteInputArguments(EnergyPlusData &state,
     int j;
 
     // Formats
-    static constexpr auto Format_1000("TARCOG input arguments:\n");
-    static constexpr auto Format_1001("TARCOG debug output, {:4}-{:02}-{:02}, {:02}:{:02}:{:02}\n");
-    static constexpr auto Format_1002("     WindowID:{:8}  - Not specified\n");
-    static constexpr auto Format_1003("     WindowID:{:8} \n");
-    static constexpr auto Format_1006("     IGUID:   {:8}  - Not specified\n");
-    static constexpr auto Format_1007("     IGUID:   {:8} \n");
-    static constexpr auto Format_1005("Simulation parameters:\n");
-    static constexpr auto Format_1010("  Tout       =  {:10.6F} K ( {:7.3F} deg C) - Outdoor temperature\n");
-    static constexpr auto Format_1015("  Tint       =  {:10.6F} K ( {:7.3F} deg C) - Indoor temperature\n");
-    static constexpr auto Format_1020("  Trmin      =  {:10.6F} K ( {:7.3F} deg C) - Indoor mean radiant temp.\n");
-    static constexpr auto Format_1030("  wso        =  {:7.3F}    - Outdoor wind speed [m/s]\n");
-    static constexpr auto Format_1032("  iwd        =    0        - Wind direction - windward\n");
-    static constexpr auto Format_1033("  iwd        =    1        - Wind direction - leeward\n");
-    static constexpr auto Format_1035("  wsi        =  {:7.3F}    - Indoor forced air speed [m/s]\n");
-    static constexpr auto Format_1040("  dir        = {:8.3F}    - Direct solar radiation [W/m^2]\n");
-    static constexpr auto Format_1041("  outir       = {:8.3F}    - IR radiation [W/m^2]\n");
-    static constexpr auto Format_1045("  isky       =  {:3}        - Flag for handling tsky, esky\n");
-    static constexpr auto Format_1050("  tsky           =  {:10.6F} K ( {:7.3F} deg C) - Night sky temperature\n");
-    static constexpr auto Format_1055("  esky           =  {:7.3F}    - Effective night sky emmitance\n");
-    static constexpr auto Format_1060("  fclr           =  {:7.3F}    - Fraction of sky that is clear\n");
-    static constexpr auto Format_1061("  VacuumPressure =  {:7.3F}    - maximum allowed gas pressure to be considered as vacuum\n");
-    static constexpr auto Format_1062("  VacuumMaxGapThickness =  {:7.3F}    - maximum allowed vacuum gap thickness with support pillar\n");
-    static constexpr auto Format_1063("  ibc(1)         =  {:3}        - Outdoor BC switch\n");
-    static constexpr auto Format_1065("  hout           =  {:9.5F}  - Outdoor film coeff. [W/m^2-K]\n");
-    static constexpr auto Format_1066("  ibc(2)         =  {:3}        - Indoor BC switch\n");
-    static constexpr auto Format_1068("  hin            =  {:9.5F}  - Indoor film coeff. [W/m^2-K]\n");
-    static constexpr auto Format_1070("  standard   =  {:3}        - ISO 15099 calc. standard\n");
-    static constexpr auto Format_1071("  standard   =  {:3}        - EN 673/ISO 10292 Declared calc. standard\n");
-    static constexpr auto Format_1072("  standard   =  {:3}        - EN 673/ISO 10292 Design calc. standard\n");
-    static constexpr auto Format_10731("  ThermalMod =  {:3}        - ISO15099 thermal model\n");
-    static constexpr auto Format_10732("  ThermalMod =  {:3}        - Scaled Cavity Width (SCW) thermal model\n");
-    static constexpr auto Format_10733("  ThermalMod =  {:3}        - Convective Scalar Model (CSM) thermal model\n");
-    static constexpr auto Format_10740("  SDScalar =  {:7.5F}      - Factor of Venetian SD layer contribution to convection\n\n (only if "
-                                       "ThermalModel = 2, otherwise ignored)\n");
-    static constexpr auto Format_1075("IGU parameters:\n");
-    static constexpr auto Format_1076("  height     =  {:10.6F} - IGU cavity height [m]\n");
-    static constexpr auto Format_1077("  heightt    =  {:10.6F} - Total window height [m]\n");
-    static constexpr auto Format_1078("  width      =  {:10.6F} - Window width [m]\n");
-    static constexpr auto Format_1079("  tilt       =  {:7.3F}    - Window tilt [deg]\n");
-    static constexpr auto Format_1080("  totsol     =  {:10.6F} - Total solar transmittance of IGU\n");
-    static constexpr auto Format_1081("  nlayer     =  {:3}        - Number of glazing layers\n");
-    static constexpr auto Format_1089("IGU layers list:\n");
-    static constexpr auto Format_10802(" Layer{:3} : {:1}              - Specular layer - Monolyhtic Glass\n");
-    static constexpr auto Format_10803(" Layer{:3} : {:1}              - Laminated Glass\n");
-    static constexpr auto Format_10804(" Layer{:3} : {:1}              - Horizontal Venetian Blind\n");
-    static constexpr auto Format_10805(" Layer{:3} : {:1}              - Woven Shade\n");
-    static constexpr auto Format_10806(" Layer{:3} : {:1}              - Diffuse Shade\n");
-    static constexpr auto Format_10809(" Layer{:3} : {:1}              - UNKNOWN TYPE!\n");
-    static constexpr auto Format_10810(" Layer{:3} : {:1}              - Vertical Venetian Blind\n");
-    static constexpr auto Format_1085("    nslice     = {:3}          - Number of slices\n");
-    static constexpr auto Format_1090("    thick   = {:10.6F}   - Thickness [m]\n");
-    static constexpr auto Format_1091("    scon    = {:10.6F}   - Thermal conductivity [W/m-K]\n");
-    static constexpr auto Format_1092("    asol    = {:12.8F} - Absorbed solar energy [W/m^2]\n");
-    static constexpr auto Format_1093("    tir     = {:12.8F} - IR transmittance\n");
-    static constexpr auto Format_1094("    emis1   = {:10.6F}   - IR outdoor emissivity\n");
-    static constexpr auto Format_1095("    emis2   = {:10.6F}   - IR indoor emissivity\n");
-    static constexpr auto Format_1100("    Atop    = {:10.6F}   - Top opening area [m^2]\n");
-    static constexpr auto Format_1101("    Abot    = {:10.6F}   - Bottom opening area [m^2]\n");
-    static constexpr auto Format_1102("    Al      = {:10.6F}   - Left opening area [m^2]\n");
-    static constexpr auto Format_1103("    Ar      = {:10.6F}   - Right opening area [m^2]\n");
-    static constexpr auto Format_1105("    Ah      = {:10.6F}   - Total area of holes [m^2]\n");
-    static constexpr auto Format_11051("    SlatThick   = {:10.6F}   - Slat thickness [m]\n");
-    static constexpr auto Format_11052("    SlatWidth   = {:10.6F}   - Slat width [m]\n");
-    static constexpr auto Format_11053("    SlatAngle   = {:10.6F}   - Slat tilt angle [deg]\n");
-    static constexpr auto Format_11054("    SlatCond    = {:10.6F}   - Conductivity of the slat material [W/m.K]\n");
-    static constexpr auto Format_11055("    SlatSpacing = {:10.6F}   - Distance between slats [m]\n");
-    static constexpr auto Format_11056("    SlatCurve   = {:10.6F}   - Curvature radius of the slat [m]\n");
-    static constexpr auto Format_1110("IGU Gaps:\n");
-    static constexpr auto Format_1111(" Gap {:2}:\n");
-    static constexpr auto Format_11110(" Outdoor space:\n");
-    static constexpr auto Format_11111(" Indoor space:\n");
-    static constexpr auto Format_1112("    gap        = {:12.5F} - Gap width [m]\n");
-    static constexpr auto Format_1113("    presure    = {:12.5F} - Gas pressure [N/m^2]\n");
-    static constexpr auto Format_1114("    nmix       = {:6}       - Num. of gasses in a gas mix\n");
-    static constexpr auto Format_1115("      Gas {:1}:     {}     {:6.2F} %\n");
-    static constexpr auto Format_1120("    vvent      = {:12.5F} - Forced ventilation speed [m/s]\n");
-    static constexpr auto Format_1121("    tvent      = {:12.5F} - Temperature in connected gap [K]\n");
-    static constexpr auto Format_1130("      Gas mix coefficients - gas {:1}, {:6.2F} %\n");
-    static constexpr auto Format_1131("        gcon   = {:11.6F}, {:11.6F}, {:11.6F} - Conductivity\n");
-    static constexpr auto Format_1132("        gvis   = {:11.6F}, {:11.6F}, {:11.6F} - Dynamic viscosity\n");
-    static constexpr auto Format_1133("        gcp    = {:11.6F}, {:11.6F}, {:11.6F} - Spec.heat @ const.P\n");
-    static constexpr auto Format_1134("        wght   = {:11.6F}                           - Molecular weight\n");
-    static constexpr auto Format_1198("=====  =====  =====  =====  =====  =====  =====  =====  =====  =====  =====\n");
+    static constexpr fmt::string_view Format_1000("TARCOG input arguments:\n");
+    static constexpr fmt::string_view Format_1001("TARCOG debug output, {:4}-{:02}-{:02}, {:02}:{:02}:{:02}\n");
+    static constexpr fmt::string_view Format_1002("     WindowID:{:8}  - Not specified\n");
+    static constexpr fmt::string_view Format_1003("     WindowID:{:8} \n");
+    static constexpr fmt::string_view Format_1006("     IGUID:   {:8}  - Not specified\n");
+    static constexpr fmt::string_view Format_1007("     IGUID:   {:8} \n");
+    static constexpr fmt::string_view Format_1005("Simulation parameters:\n");
+    static constexpr fmt::string_view Format_1010("  Tout       =  {:10.6F} K ( {:7.3F} deg C) - Outdoor temperature\n");
+    static constexpr fmt::string_view Format_1015("  Tint       =  {:10.6F} K ( {:7.3F} deg C) - Indoor temperature\n");
+    static constexpr fmt::string_view Format_1020("  Trmin      =  {:10.6F} K ( {:7.3F} deg C) - Indoor mean radiant temp.\n");
+    static constexpr fmt::string_view Format_1030("  wso        =  {:7.3F}    - Outdoor wind speed [m/s]\n");
+    static constexpr fmt::string_view Format_1032("  iwd        =    0        - Wind direction - windward\n");
+    static constexpr fmt::string_view Format_1033("  iwd        =    1        - Wind direction - leeward\n");
+    static constexpr fmt::string_view Format_1035("  wsi        =  {:7.3F}    - Indoor forced air speed [m/s]\n");
+    static constexpr fmt::string_view Format_1040("  dir        = {:8.3F}    - Direct solar radiation [W/m^2]\n");
+    static constexpr fmt::string_view Format_1041("  outir       = {:8.3F}    - IR radiation [W/m^2]\n");
+    static constexpr fmt::string_view Format_1045("  isky       =  {:3}        - Flag for handling tsky, esky\n");
+    static constexpr fmt::string_view Format_1050("  tsky           =  {:10.6F} K ( {:7.3F} deg C) - Night sky temperature\n");
+    static constexpr fmt::string_view Format_1055("  esky           =  {:7.3F}    - Effective night sky emmitance\n");
+    static constexpr fmt::string_view Format_1060("  fclr           =  {:7.3F}    - Fraction of sky that is clear\n");
+    static constexpr fmt::string_view Format_1061("  VacuumPressure =  {:7.3F}    - maximum allowed gas pressure to be considered as vacuum\n");
+    static constexpr fmt::string_view Format_1062(
+        "  VacuumMaxGapThickness =  {:7.3F}    - maximum allowed vacuum gap thickness with support pillar\n");
+    static constexpr fmt::string_view Format_1063("  ibc(1)         =  {:3}        - Outdoor BC switch\n");
+    static constexpr fmt::string_view Format_1065("  hout           =  {:9.5F}  - Outdoor film coeff. [W/m^2-K]\n");
+    static constexpr fmt::string_view Format_1066("  ibc(2)         =  {:3}        - Indoor BC switch\n");
+    static constexpr fmt::string_view Format_1068("  hin            =  {:9.5F}  - Indoor film coeff. [W/m^2-K]\n");
+    static constexpr fmt::string_view Format_1070("  standard   =  {:3}        - ISO 15099 calc. standard\n");
+    static constexpr fmt::string_view Format_1071("  standard   =  {:3}        - EN 673/ISO 10292 Declared calc. standard\n");
+    static constexpr fmt::string_view Format_1072("  standard   =  {:3}        - EN 673/ISO 10292 Design calc. standard\n");
+    static constexpr fmt::string_view Format_10731("  ThermalMod =  {:3}        - ISO15099 thermal model\n");
+    static constexpr fmt::string_view Format_10732("  ThermalMod =  {:3}        - Scaled Cavity Width (SCW) thermal model\n");
+    static constexpr fmt::string_view Format_10733("  ThermalMod =  {:3}        - Convective Scalar Model (CSM) thermal model\n");
+    static constexpr fmt::string_view Format_10740("  SDScalar =  {:7.5F}      - Factor of Venetian SD layer contribution to convection\n\n (only if "
+                                                   "ThermalModel = 2, otherwise ignored)\n");
+    static constexpr fmt::string_view Format_1075("IGU parameters:\n");
+    static constexpr fmt::string_view Format_1076("  height     =  {:10.6F} - IGU cavity height [m]\n");
+    static constexpr fmt::string_view Format_1077("  heightt    =  {:10.6F} - Total window height [m]\n");
+    static constexpr fmt::string_view Format_1078("  width      =  {:10.6F} - Window width [m]\n");
+    static constexpr fmt::string_view Format_1079("  tilt       =  {:7.3F}    - Window tilt [deg]\n");
+    static constexpr fmt::string_view Format_1080("  totsol     =  {:10.6F} - Total solar transmittance of IGU\n");
+    static constexpr fmt::string_view Format_1081("  nlayer     =  {:3}        - Number of glazing layers\n");
+    static constexpr fmt::string_view Format_1089("IGU layers list:\n");
+    static constexpr fmt::string_view Format_10802(" Layer{:3} : {:1}              - Specular layer - Monolyhtic Glass\n");
+    static constexpr fmt::string_view Format_10803(" Layer{:3} : {:1}              - Laminated Glass\n");
+    static constexpr fmt::string_view Format_10804(" Layer{:3} : {:1}              - Horizontal Venetian Blind\n");
+    static constexpr fmt::string_view Format_10805(" Layer{:3} : {:1}              - Woven Shade\n");
+    static constexpr fmt::string_view Format_10806(" Layer{:3} : {:1}              - Diffuse Shade\n");
+    static constexpr fmt::string_view Format_10809(" Layer{:3} : {:1}              - UNKNOWN TYPE!\n");
+    static constexpr fmt::string_view Format_10810(" Layer{:3} : {:1}              - Vertical Venetian Blind\n");
+    static constexpr fmt::string_view Format_1085("    nslice     = {:3}          - Number of slices\n");
+    static constexpr fmt::string_view Format_1090("    thick   = {:10.6F}   - Thickness [m]\n");
+    static constexpr fmt::string_view Format_1091("    scon    = {:10.6F}   - Thermal conductivity [W/m-K]\n");
+    static constexpr fmt::string_view Format_1092("    asol    = {:12.8F} - Absorbed solar energy [W/m^2]\n");
+    static constexpr fmt::string_view Format_1093("    tir     = {:12.8F} - IR transmittance\n");
+    static constexpr fmt::string_view Format_1094("    emis1   = {:10.6F}   - IR outdoor emissivity\n");
+    static constexpr fmt::string_view Format_1095("    emis2   = {:10.6F}   - IR indoor emissivity\n");
+    static constexpr fmt::string_view Format_1100("    Atop    = {:10.6F}   - Top opening area [m^2]\n");
+    static constexpr fmt::string_view Format_1101("    Abot    = {:10.6F}   - Bottom opening area [m^2]\n");
+    static constexpr fmt::string_view Format_1102("    Al      = {:10.6F}   - Left opening area [m^2]\n");
+    static constexpr fmt::string_view Format_1103("    Ar      = {:10.6F}   - Right opening area [m^2]\n");
+    static constexpr fmt::string_view Format_1105("    Ah      = {:10.6F}   - Total area of holes [m^2]\n");
+    static constexpr fmt::string_view Format_11051("    SlatThick   = {:10.6F}   - Slat thickness [m]\n");
+    static constexpr fmt::string_view Format_11052("    SlatWidth   = {:10.6F}   - Slat width [m]\n");
+    static constexpr fmt::string_view Format_11053("    SlatAngle   = {:10.6F}   - Slat tilt angle [deg]\n");
+    static constexpr fmt::string_view Format_11054("    SlatCond    = {:10.6F}   - Conductivity of the slat material [W/m.K]\n");
+    static constexpr fmt::string_view Format_11055("    SlatSpacing = {:10.6F}   - Distance between slats [m]\n");
+    static constexpr fmt::string_view Format_11056("    SlatCurve   = {:10.6F}   - Curvature radius of the slat [m]\n");
+    static constexpr fmt::string_view Format_1110("IGU Gaps:\n");
+    static constexpr fmt::string_view Format_1111(" Gap {:2}:\n");
+    static constexpr fmt::string_view Format_11110(" Outdoor space:\n");
+    static constexpr fmt::string_view Format_11111(" Indoor space:\n");
+    static constexpr fmt::string_view Format_1112("    gap        = {:12.5F} - Gap width [m]\n");
+    static constexpr fmt::string_view Format_1113("    presure    = {:12.5F} - Gas pressure [N/m^2]\n");
+    static constexpr fmt::string_view Format_1114("    nmix       = {:6}       - Num. of gasses in a gas mix\n");
+    static constexpr fmt::string_view Format_1115("      Gas {:1}:     {}     {:6.2F} %\n");
+    static constexpr fmt::string_view Format_1120("    vvent      = {:12.5F} - Forced ventilation speed [m/s]\n");
+    static constexpr fmt::string_view Format_1121("    tvent      = {:12.5F} - Temperature in connected gap [K]\n");
+    static constexpr fmt::string_view Format_1130("      Gas mix coefficients - gas {:1}, {:6.2F} %\n");
+    static constexpr fmt::string_view Format_1131("        gcon   = {:11.6F}, {:11.6F}, {:11.6F} - Conductivity\n");
+    static constexpr fmt::string_view Format_1132("        gvis   = {:11.6F}, {:11.6F}, {:11.6F} - Dynamic viscosity\n");
+    static constexpr fmt::string_view Format_1133("        gcp    = {:11.6F}, {:11.6F}, {:11.6F} - Spec.heat @ const.P\n");
+    static constexpr fmt::string_view Format_1134("        wght   = {:11.6F}                           - Molecular weight\n");
+    static constexpr fmt::string_view Format_1198("=====  =====  =====  =====  =====  =====  =====  =====  =====  =====  =====\n");
 
     // bi...Create debug file w/ Tarcog's input arguments:
 
@@ -475,28 +476,28 @@ void WriteModifiedArguments(InputOutputFile &InArgumentsFile,
     int j;
 
     // Formats
-    static constexpr auto Format_1014("Adjusted input arguments:\n");
-    static constexpr auto Format_1013(" Gass coefficients:\n");
-    static constexpr auto Format_1016("  Trmout     =  {:10.6F} K ( {:7.3F} deg C) - Outdoor mean radiant temp.\n");
-    static constexpr auto Format_1017("  Gout       =  {:10.6F} \n");
-    static constexpr auto Format_1018("  Gin        =  {:10.6F} \n");
-    static constexpr auto Format_1019("  Ebsky      =  {:10.6F} \n");
-    static constexpr auto Format_10191("  Ebroom     =  {:10.6F} \n");
-    static constexpr auto Format_1020("  Trmin      =  {:10.6F} K ( {:7.3F} deg C) - Indoor mean radiant temp.\n");
-    static constexpr auto Format_1055("  esky       =  {:7.3F}    - Effective night sky emmitance\n");
-    static constexpr auto Format_1084(" Layer{:3} : {:1}              - Venetian Blind\n");
-    static constexpr auto Format_1090("    thick   = {:10.6F}   - Thickness [m]\n");
-    static constexpr auto Format_1091("    scon    = {:10.6F}   - Thermal conductivity [W/m-K]\n");
-    static constexpr auto Format_1130("      Gas mix coefficients - gas {:1}, {:6.2F} %\n");
-    static constexpr auto Format_1131("        gcon   = {:11.6F}, {:11.6F}, {:11.6F} - Conductivity\n");
-    static constexpr auto Format_1132("        gvis   = {:11.6F}, {:11.6F}, {:11.6F} - Dynamic viscosity\n");
-    static constexpr auto Format_1133("        gcp    = {:11.6F}, {:11.6F}, {:11.6F} - Spec.heat @ const.P\n");
-    static constexpr auto Format_1134("        wght   = {:11.6F}                           - Molecular weight\n");
-    static constexpr auto Format_1111(" Gap {:2}:\n");
-    static constexpr auto Format_1112(" Gap width: {:11.8F}\n");
-    static constexpr auto Format_11110(" Outdoor space:\n");
-    static constexpr auto Format_11111(" Indoor space:\n");
-    static constexpr auto Format_1198("=====  =====  =====  =====  =====  =====  =====  =====  =====  =====  =====\n");
+    static constexpr fmt::string_view Format_1014("Adjusted input arguments:\n");
+    static constexpr fmt::string_view Format_1013(" Gass coefficients:\n");
+    static constexpr fmt::string_view Format_1016("  Trmout     =  {:10.6F} K ( {:7.3F} deg C) - Outdoor mean radiant temp.\n");
+    static constexpr fmt::string_view Format_1017("  Gout       =  {:10.6F} \n");
+    static constexpr fmt::string_view Format_1018("  Gin        =  {:10.6F} \n");
+    static constexpr fmt::string_view Format_1019("  Ebsky      =  {:10.6F} \n");
+    static constexpr fmt::string_view Format_10191("  Ebroom     =  {:10.6F} \n");
+    static constexpr fmt::string_view Format_1020("  Trmin      =  {:10.6F} K ( {:7.3F} deg C) - Indoor mean radiant temp.\n");
+    static constexpr fmt::string_view Format_1055("  esky       =  {:7.3F}    - Effective night sky emmitance\n");
+    static constexpr fmt::string_view Format_1084(" Layer{:3} : {:1}              - Venetian Blind\n");
+    static constexpr fmt::string_view Format_1090("    thick   = {:10.6F}   - Thickness [m]\n");
+    static constexpr fmt::string_view Format_1091("    scon    = {:10.6F}   - Thermal conductivity [W/m-K]\n");
+    static constexpr fmt::string_view Format_1130("      Gas mix coefficients - gas {:1}, {:6.2F} %\n");
+    static constexpr fmt::string_view Format_1131("        gcon   = {:11.6F}, {:11.6F}, {:11.6F} - Conductivity\n");
+    static constexpr fmt::string_view Format_1132("        gvis   = {:11.6F}, {:11.6F}, {:11.6F} - Dynamic viscosity\n");
+    static constexpr fmt::string_view Format_1133("        gcp    = {:11.6F}, {:11.6F}, {:11.6F} - Spec.heat @ const.P\n");
+    static constexpr fmt::string_view Format_1134("        wght   = {:11.6F}                           - Molecular weight\n");
+    static constexpr fmt::string_view Format_1111(" Gap {:2}:\n");
+    static constexpr fmt::string_view Format_1112(" Gap width: {:11.8F}\n");
+    static constexpr fmt::string_view Format_11110(" Outdoor space:\n");
+    static constexpr fmt::string_view Format_11111(" Indoor space:\n");
+    static constexpr fmt::string_view Format_1198("=====  =====  =====  =====  =====  =====  =====  =====  =====  =====  =====\n");
 
     print(InArgumentsFile, "\n");
     print(InArgumentsFile, Format_1014);
@@ -612,59 +613,60 @@ void WriteOutputArguments(InputOutputFile &OutArgumentsFile,
     int i;
 
     // Formats
-    static constexpr auto Format_2000("TARCOG calculation results - {:4}-{:02}-{:02}, {:02}:{:02}:{:02}\n");
-    static constexpr auto Format_2120("  Ufactor  = {:12.6F}\n");
-    static constexpr auto Format_2130("  SHGC     = {:12.6F}\n");
-    static constexpr auto Format_2131("  SHGC_OLD = {:12.6F}\n");
-    static constexpr auto Format_2132("  SC       = {:12.6F}\n");
-    static constexpr auto Format_2140("  hcin  = {:10.6F}   hrin  = {:10.6F}   hin  = {:10.6F}\n");
-    static constexpr auto Format_2150("  hcout = {:10.6F}   hrout = {:10.6F}   hout = {:10.6F}\n");
-    static constexpr auto Format_2155("  Ra({:1}) ={:15.6F}        Nu({:1}) ={:12.6F}\n");
-    static constexpr auto Format_2160("  hcgas({:1}) ={:15.6F}      hrgas({:1}) ={:24.6F}\n");
-    static constexpr auto Format_2170("  hflux    = {:12.6F}\n");
-    static constexpr auto Format_2105("                                            Tamb ={:11.6F} K ( {:7.3F} deg C)\n");
-    static constexpr auto Format_2110("  ----------------- ------------------   Theta{:2} ={:11.6F} K ( {:7.3F} deg C)\n");
-    static constexpr auto Format_2111("  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ "
-                                      "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\   Theta{:2} ={:11.6F} K ( {:7.3F} "
-                                      "deg C)\n");
-    static constexpr auto Format_2112("  +++++++++++++++++ ++++++++++++++++++   Theta{:2} ={:11.6F} K ( {:7.3F} deg C)\n");
-    static constexpr auto Format_2115("                                           Troom ={:11.6F} K ( {:7.3F} deg C)\n");
-    static constexpr auto Format_2180("           qout ={:12.5F}\n");
-    static constexpr auto Format_2190("  |     qpane{:2} ={:12.5F}        |\n");
-    static constexpr auto Format_2195("  |     qpane{:2} ={:12.5F}        |         keffc{:2} ={:11.6F}\n");
-    static constexpr auto Format_2199("  |      qlayer{:2} ={:12.5F}       |\n");
-    static constexpr auto Format_2210("            qin ={:11.6F}\n");
-    static constexpr auto Format_2300("            q{:2} ={:12.5F}\n");
-    static constexpr auto Format_2320("           qv{:2} ={:12.5F}\n");
-    static constexpr auto Format_2321("       airspd{:2} ={:12.5F}    keff{:2} ={:12.5F}\n");
-    static constexpr auto Format_2322("           qc{:2} ={:12.5F}      qr{:2} ={:12.5F}\n");
-    static constexpr auto Format_2330("  ShadeEmisRatioIn  ={:11.6F}        ShadeEmisRatioOut ={:11.6F}\n");
-    static constexpr auto Format_2331("  ShadeHcRatioIn    ={:11.6F}        ShadeHcRatioOut   ={:11.6F}\n");
-    static constexpr auto Format_2332("  HcUnshadedIn      ={:11.6F}        HcUnshadedOut     ={:11.6F}\n");
-    static constexpr auto Format_2350("Heat Flux Flow and Temperatures of Layer Surfaces:\n");
-    static constexpr auto Format_2351("Basic IGU properties:\n");
-    static constexpr auto Format_4205("  Ebsky ={:11.6F} [W/m2], Gout ={:11.6F} [W/m2]\n");
-    static constexpr auto Format_4215("  Ebroom ={:11.6F} [W/m2], Gin  ={:11.6F} [W/m2]\n");
-    static constexpr auto Format_4110("  Ef{:2} ={:11.6F} [W/m2], Rf{:2} ={:11.6F} [W/m2]\n");
-    static constexpr auto Format_4111("  ----------------- ------------------\n");
-    static constexpr auto Format_4112("  Ef{:2} ={:11.6F} [W/m2], Rf{:2} ={:11.6F} [W/m2]\n");
-    static constexpr auto Format_4113("  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ "
-                                      "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n");
-    static constexpr auto Format_4114("  Ef{:2} ={:11.6F} [W/m2], Rf{:2} ={:11.6F} [W/m2]\n");
-    static constexpr auto Format_4115("  +++++++++++++++++ ++++++++++++++++++\n");
-    static constexpr auto Format_4116("  Ef{:2} ={:11.6F} [W/m2], Rf{:2} ={:11.6F} [W/m2]\n");
-    static constexpr auto Format_4117("  ooooooooooooooooo oooooooooooooooooo\n");
-    static constexpr auto Format_4120("  Eb{:2} ={:11.6F} [W/m2], Rb{:2} ={:11.6F} [W/m2]\n");
-    static constexpr auto Format_4121("  ----------------- ------------------\n");
-    static constexpr auto Format_4122("  Eb{:2} ={:11.6F} [W/m2], Rb{:2} ={:11.6F} [W/m2]\n");
-    static constexpr auto Format_4123("  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ "
-                                      "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n");
-    static constexpr auto Format_4124("  Eb{:2} ={:11.6F} [W/m2], Rb{:2} ={:11.6F} [W/m2]\n");
-    static constexpr auto Format_4125("  +++++++++++++++++ ++++++++++++++++++\n");
-    static constexpr auto Format_4126("  Eb{:2} ={:11.6F} [W/m2], Rb{:2} ={:11.6F} [W/m2]\n");
-    static constexpr auto Format_4127("  ooooooooooooooooo oooooooooooooooooo\n");
-    static constexpr auto Format_4190("  |                     |\n");
-    static constexpr auto Format_4350("Energy balances on Layer Surfaces:\n");
+    static constexpr fmt::string_view Format_2000("TARCOG calculation results - {:4}-{:02}-{:02}, {:02}:{:02}:{:02}\n");
+    static constexpr fmt::string_view Format_2120("  Ufactor  = {:12.6F}\n");
+    static constexpr fmt::string_view Format_2130("  SHGC     = {:12.6F}\n");
+    static constexpr fmt::string_view Format_2131("  SHGC_OLD = {:12.6F}\n");
+    static constexpr fmt::string_view Format_2132("  SC       = {:12.6F}\n");
+    static constexpr fmt::string_view Format_2140("  hcin  = {:10.6F}   hrin  = {:10.6F}   hin  = {:10.6F}\n");
+    static constexpr fmt::string_view Format_2150("  hcout = {:10.6F}   hrout = {:10.6F}   hout = {:10.6F}\n");
+    static constexpr fmt::string_view Format_2155("  Ra({:1}) ={:15.6F}        Nu({:1}) ={:12.6F}\n");
+    static constexpr fmt::string_view Format_2160("  hcgas({:1}) ={:15.6F}      hrgas({:1}) ={:24.6F}\n");
+    static constexpr fmt::string_view Format_2170("  hflux    = {:12.6F}\n");
+    static constexpr fmt::string_view Format_2105("                                            Tamb ={:11.6F} K ( {:7.3F} deg C)\n");
+    static constexpr fmt::string_view Format_2110("  ----------------- ------------------   Theta{:2} ={:11.6F} K ( {:7.3F} deg C)\n");
+    static constexpr fmt::string_view Format_2111(
+        "  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ "
+        "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\   Theta{:2} ={:11.6F} K ( {:7.3F} "
+        "deg C)\n");
+    static constexpr fmt::string_view Format_2112("  +++++++++++++++++ ++++++++++++++++++   Theta{:2} ={:11.6F} K ( {:7.3F} deg C)\n");
+    static constexpr fmt::string_view Format_2115("                                           Troom ={:11.6F} K ( {:7.3F} deg C)\n");
+    static constexpr fmt::string_view Format_2180("           qout ={:12.5F}\n");
+    static constexpr fmt::string_view Format_2190("  |     qpane{:2} ={:12.5F}        |\n");
+    static constexpr fmt::string_view Format_2195("  |     qpane{:2} ={:12.5F}        |         keffc{:2} ={:11.6F}\n");
+    static constexpr fmt::string_view Format_2199("  |      qlayer{:2} ={:12.5F}       |\n");
+    static constexpr fmt::string_view Format_2210("            qin ={:11.6F}\n");
+    static constexpr fmt::string_view Format_2300("            q{:2} ={:12.5F}\n");
+    static constexpr fmt::string_view Format_2320("           qv{:2} ={:12.5F}\n");
+    static constexpr fmt::string_view Format_2321("       airspd{:2} ={:12.5F}    keff{:2} ={:12.5F}\n");
+    static constexpr fmt::string_view Format_2322("           qc{:2} ={:12.5F}      qr{:2} ={:12.5F}\n");
+    static constexpr fmt::string_view Format_2330("  ShadeEmisRatioIn  ={:11.6F}        ShadeEmisRatioOut ={:11.6F}\n");
+    static constexpr fmt::string_view Format_2331("  ShadeHcRatioIn    ={:11.6F}        ShadeHcRatioOut   ={:11.6F}\n");
+    static constexpr fmt::string_view Format_2332("  HcUnshadedIn      ={:11.6F}        HcUnshadedOut     ={:11.6F}\n");
+    static constexpr fmt::string_view Format_2350("Heat Flux Flow and Temperatures of Layer Surfaces:\n");
+    static constexpr fmt::string_view Format_2351("Basic IGU properties:\n");
+    static constexpr fmt::string_view Format_4205("  Ebsky ={:11.6F} [W/m2], Gout ={:11.6F} [W/m2]\n");
+    static constexpr fmt::string_view Format_4215("  Ebroom ={:11.6F} [W/m2], Gin  ={:11.6F} [W/m2]\n");
+    static constexpr fmt::string_view Format_4110("  Ef{:2} ={:11.6F} [W/m2], Rf{:2} ={:11.6F} [W/m2]\n");
+    static constexpr fmt::string_view Format_4111("  ----------------- ------------------\n");
+    static constexpr fmt::string_view Format_4112("  Ef{:2} ={:11.6F} [W/m2], Rf{:2} ={:11.6F} [W/m2]\n");
+    static constexpr fmt::string_view Format_4113("  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ "
+                                                  "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n");
+    static constexpr fmt::string_view Format_4114("  Ef{:2} ={:11.6F} [W/m2], Rf{:2} ={:11.6F} [W/m2]\n");
+    static constexpr fmt::string_view Format_4115("  +++++++++++++++++ ++++++++++++++++++\n");
+    static constexpr fmt::string_view Format_4116("  Ef{:2} ={:11.6F} [W/m2], Rf{:2} ={:11.6F} [W/m2]\n");
+    static constexpr fmt::string_view Format_4117("  ooooooooooooooooo oooooooooooooooooo\n");
+    static constexpr fmt::string_view Format_4120("  Eb{:2} ={:11.6F} [W/m2], Rb{:2} ={:11.6F} [W/m2]\n");
+    static constexpr fmt::string_view Format_4121("  ----------------- ------------------\n");
+    static constexpr fmt::string_view Format_4122("  Eb{:2} ={:11.6F} [W/m2], Rb{:2} ={:11.6F} [W/m2]\n");
+    static constexpr fmt::string_view Format_4123("  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ "
+                                                  "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n");
+    static constexpr fmt::string_view Format_4124("  Eb{:2} ={:11.6F} [W/m2], Rb{:2} ={:11.6F} [W/m2]\n");
+    static constexpr fmt::string_view Format_4125("  +++++++++++++++++ ++++++++++++++++++\n");
+    static constexpr fmt::string_view Format_4126("  Eb{:2} ={:11.6F} [W/m2], Rb{:2} ={:11.6F} [W/m2]\n");
+    static constexpr fmt::string_view Format_4127("  ooooooooooooooooo oooooooooooooooooo\n");
+    static constexpr fmt::string_view Format_4190("  |                     |\n");
+    static constexpr fmt::string_view Format_4350("Energy balances on Layer Surfaces:\n");
 
     date_and_time(real_CLOCK(1), real_CLOCK(2), real_CLOCK(3), DATE_TIME);
     print(OutArgumentsFile, "\n");
@@ -834,12 +836,12 @@ void WriteOutputEN673(InputOutputFile &OutArgumentsFile,
     int i;
 
     // Formats
-    static constexpr auto Format_2000("TARCOG calculation results - {:4}-{:02}-{:02}, {:02}:{:02}:{:02}\n");
-    static constexpr auto Format_2351("Basic IGU properties:\n");
-    static constexpr auto Format_2120("  Ufactor  = {:12.6F}\n");
-    static constexpr auto Format_2220("  he = {:8.4F},   hi = {:8.4F}\n");
-    static constexpr auto Format_2155("  Ra({:1}) ={:15.6F}        Nu({:1}) ={:12.6F}\n");
-    static constexpr auto Format_2230("  hg{:2} ={:15.6E}      hr{:2} ={:15.6E}      hs{:2} ={:15.6E}\n");
+    static constexpr fmt::string_view Format_2000("TARCOG calculation results - {:4}-{:02}-{:02}, {:02}:{:02}:{:02}\n");
+    static constexpr fmt::string_view Format_2351("Basic IGU properties:\n");
+    static constexpr fmt::string_view Format_2120("  Ufactor  = {:12.6F}\n");
+    static constexpr fmt::string_view Format_2220("  he = {:8.4F},   hi = {:8.4F}\n");
+    static constexpr fmt::string_view Format_2155("  Ra({:1}) ={:15.6F}        Nu({:1}) ={:12.6F}\n");
+    static constexpr fmt::string_view Format_2230("  hg{:2} ={:15.6E}      hr{:2} ={:15.6E}      hs{:2} ={:15.6E}\n");
 
     date_and_time(real_CLOCK(1), real_CLOCK(2), real_CLOCK(3), DATE_TIME);
     print(OutArgumentsFile, "\n");
@@ -983,62 +985,66 @@ void WriteTARCOGInputFile(EnergyPlusData &state,
     Array1D_string real_CLOCK(3);
 
     // Formats
-    static constexpr auto Format_111("*\n");
-    static constexpr auto Format_112("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\n");
-    static constexpr auto Format_113("*------------------------------------------------------------\n");
-    static constexpr auto Format_200("* General options:\n");
-    static constexpr auto Format_210("* <nlayer, debug, standard, ThermalMod, CalcDeflection, SDScalar, VacuumPressure, VacuumMaxGapThickness>\n");
-    static constexpr auto Format_300("* Environmental settings:\n");
-    static constexpr auto Format_310("* <tout, tind, wso, iwd, wsi, dir, outir, isky, tsky, esky, fclr, trmin, Pa, Pini, Tini>\n");
-    static constexpr auto Format_400("* Overall IGU properties:\n");
-    static constexpr auto Format_410("* <totsol, tilt, height, heightt, width>\n");
-    static constexpr auto Format_600("* Outdoor environment:\n");
-    static constexpr auto Format_610("* <ibc(1), hout, presure(1), 1, 1, 1.0, vvent(1), tvent(1)>\n");
-    static constexpr auto Format_700("* IGU definition:\n");
-    static constexpr auto Format_800("* Indoor environment:\n");
-    static constexpr auto Format_810("* <ibc(2), hin, presure(nlayer+1), 1, 1, 1.0, vvent(nlayer+1), tvent(nlayer+1)>\n");
-    static constexpr auto Format_900("* End file\n");
-    static constexpr auto Format_10001("* created by TARCOG v. {}\n");
-    static constexpr auto Format_1001("* TARCOG debug output for WinCOG, {:4}-{:02}-{:02}, {:02}:{:02}:{:02}\n");
-    static constexpr auto Format_1002("*     WindowID:   {:8}  - Not specified\n");
-    static constexpr auto Format_1003("*     WindowID:   {:8} \n");
-    static constexpr auto Format_1006("*     IGUID:      {:8}  - Not specified\n");
-    static constexpr auto Format_1007("*     IGUID:      {:8} \n");
-    static constexpr auto Format_1008("*     Num Layers: {:8} \n");
-    static constexpr auto Format_1010("    {:1}, {:1}, {:1}, {:1}, {:1}, {:24.12F}, {:24.12F}, {:24.12F}\n");
-    static constexpr auto Format_1020("    {:24.12F}, {:24.12F}, {:24.12F}, {:1}, {:24.12F}, {:24.12F}, {:24.12F}, {:1}, {:24.12F}, {:24.12F}, "
-                                      "{:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}\n");
-    static constexpr auto Format_1030("    {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}\n");
-    // static constexpr auto Format_1031("    {:24.12F}, {:24.12F}, {:3}, {:24.12F}, {:3}, {:3}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, "
+    static constexpr fmt::string_view Format_111("*\n");
+    static constexpr fmt::string_view Format_112("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\n");
+    static constexpr fmt::string_view Format_113("*------------------------------------------------------------\n");
+    static constexpr fmt::string_view Format_200("* General options:\n");
+    static constexpr fmt::string_view Format_210(
+        "* <nlayer, debug, standard, ThermalMod, CalcDeflection, SDScalar, VacuumPressure, VacuumMaxGapThickness>\n");
+    static constexpr fmt::string_view Format_300("* Environmental settings:\n");
+    static constexpr fmt::string_view Format_310("* <tout, tind, wso, iwd, wsi, dir, outir, isky, tsky, esky, fclr, trmin, Pa, Pini, Tini>\n");
+    static constexpr fmt::string_view Format_400("* Overall IGU properties:\n");
+    static constexpr fmt::string_view Format_410("* <totsol, tilt, height, heightt, width>\n");
+    static constexpr fmt::string_view Format_600("* Outdoor environment:\n");
+    static constexpr fmt::string_view Format_610("* <ibc(1), hout, presure(1), 1, 1, 1.0, vvent(1), tvent(1)>\n");
+    static constexpr fmt::string_view Format_700("* IGU definition:\n");
+    static constexpr fmt::string_view Format_800("* Indoor environment:\n");
+    static constexpr fmt::string_view Format_810("* <ibc(2), hin, presure(nlayer+1), 1, 1, 1.0, vvent(nlayer+1), tvent(nlayer+1)>\n");
+    static constexpr fmt::string_view Format_900("* End file\n");
+    static constexpr fmt::string_view Format_10001("* created by TARCOG v. {}\n");
+    static constexpr fmt::string_view Format_1001("* TARCOG debug output for WinCOG, {:4}-{:02}-{:02}, {:02}:{:02}:{:02}\n");
+    static constexpr fmt::string_view Format_1002("*     WindowID:   {:8}  - Not specified\n");
+    static constexpr fmt::string_view Format_1003("*     WindowID:   {:8} \n");
+    static constexpr fmt::string_view Format_1006("*     IGUID:      {:8}  - Not specified\n");
+    static constexpr fmt::string_view Format_1007("*     IGUID:      {:8} \n");
+    static constexpr fmt::string_view Format_1008("*     Num Layers: {:8} \n");
+    static constexpr fmt::string_view Format_1010("    {:1}, {:1}, {:1}, {:1}, {:1}, {:24.12F}, {:24.12F}, {:24.12F}\n");
+    static constexpr fmt::string_view Format_1020(
+        "    {:24.12F}, {:24.12F}, {:24.12F}, {:1}, {:24.12F}, {:24.12F}, {:24.12F}, {:1}, {:24.12F}, {:24.12F}, "
+        "{:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}\n");
+    static constexpr fmt::string_view Format_1030("    {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}\n");
+    // static constexpr fmt::string_view Format_1031("    {:24.12F}, {:24.12F}, {:3}, {:24.12F}, {:3}, {:3}, {:24.12F}, {:24.12F}, {:24.12F},
+    // {:24.12F}, "
     //                                  "{:24.12F}, {:24.12F}, {:2}, {:2}, {:2}, {:2}\n");
-    static constexpr auto Format_1034("* <PillarSpacing(i), PillarRadius(i)\n");
-    static constexpr auto Format_1035("    {:24.12F}, {:24.12F}\n");
-    static constexpr auto Format_1040("    {:1}, {:24.12F}, {:24.12F}, {:1}, {:1}, {:24.12F}, {:24.12F}, {:24.12F}\n");
-    static constexpr auto Format_1048("* <gap(i), GapDef(i), presure(i+1), nmix(i+1), (iprop(i+1, j), j=1,nmix(i+1)), (frct(i+1, j), "
-                                      "\n\nj=1,nmix(i+1)), vvent(i), tvent(i), SupportPillar(i)>\n");
-    static constexpr auto Format_1049("* Gap {:1}:\n");
-    static constexpr auto Format_1050(
+    static constexpr fmt::string_view Format_1034("* <PillarSpacing(i), PillarRadius(i)\n");
+    static constexpr fmt::string_view Format_1035("    {:24.12F}, {:24.12F}\n");
+    static constexpr fmt::string_view Format_1040("    {:1}, {:24.12F}, {:24.12F}, {:1}, {:1}, {:24.12F}, {:24.12F}, {:24.12F}\n");
+    static constexpr fmt::string_view Format_1048("* <gap(i), GapDef(i), presure(i+1), nmix(i+1), (iprop(i+1, j), j=1,nmix(i+1)), (frct(i+1, j), "
+                                                  "\n\nj=1,nmix(i+1)), vvent(i), tvent(i), SupportPillar(i)>\n");
+    static constexpr fmt::string_view Format_1049("* Gap {:1}:\n");
+    static constexpr fmt::string_view Format_1050(
         "* <scon(i), asol(i), thick(i), emis(2*i-1), emis(2*i), tir(2*i-1), YoungsMod(i),\n\n PoissonsRat(i), LayerType(i), nslice(i)>\n");
-    static constexpr auto Format_1051("    {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:1}, {:1}\n");
-    static constexpr auto Format_1052("* <Atop(i), Abot(i), Al(i), Ar(i), Ah(i)>\n");
-    static constexpr auto Format_1053("    {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}\n");
-    static constexpr auto Format_1054("* <SlatThick(i), SlatWidth(i), SlatAngle(i), SlatCond(i), SlatSpacing(i), SlatCurve(i)>\n");
-    static constexpr auto Format_1055("    {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}\n");
-    static constexpr auto Format_1060("* Layer {:1} - specular-glass:\n");
-    static constexpr auto Format_1061("* Layer {:1} - venetian blind:\n");
-    static constexpr auto Format_1062("* Layer {:1} - woven shade:\n");
-    static constexpr auto Format_1063("* Layer {:1} - diffuse shade:\n");
-    static constexpr auto Format_1064("* Layer {:1} - ???:\n");
-    static constexpr auto Format_2000("* Gas coefficients information\n");
-    static constexpr auto Format_2010("    {:2}\n");
-    static constexpr auto Format_2011("* <NumberOfGasses>\n");
-    static constexpr auto Format_2020("    {:12.6E}\n");
-    static constexpr auto Format_2021("* <MolecularWeight>\n");
-    static constexpr auto Format_2030(", {:12.6E}");
-    static constexpr auto Format_2031("* <gconA, gconB, gconC>\n");
-    static constexpr auto Format_2032("* <gvisA, gvisB, gvisC>\n");
-    static constexpr auto Format_2033("* <gcpA, gcpB, gcpC>\n");
-    static constexpr auto Format_2034("* <Gamma>\n");
+    static constexpr fmt::string_view Format_1051(
+        "    {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:1}, {:1}\n");
+    static constexpr fmt::string_view Format_1052("* <Atop(i), Abot(i), Al(i), Ar(i), Ah(i)>\n");
+    static constexpr fmt::string_view Format_1053("    {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}\n");
+    static constexpr fmt::string_view Format_1054("* <SlatThick(i), SlatWidth(i), SlatAngle(i), SlatCond(i), SlatSpacing(i), SlatCurve(i)>\n");
+    static constexpr fmt::string_view Format_1055("    {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}\n");
+    static constexpr fmt::string_view Format_1060("* Layer {:1} - specular-glass:\n");
+    static constexpr fmt::string_view Format_1061("* Layer {:1} - venetian blind:\n");
+    static constexpr fmt::string_view Format_1062("* Layer {:1} - woven shade:\n");
+    static constexpr fmt::string_view Format_1063("* Layer {:1} - diffuse shade:\n");
+    static constexpr fmt::string_view Format_1064("* Layer {:1} - ???:\n");
+    static constexpr fmt::string_view Format_2000("* Gas coefficients information\n");
+    static constexpr fmt::string_view Format_2010("    {:2}\n");
+    static constexpr fmt::string_view Format_2011("* <NumberOfGasses>\n");
+    static constexpr fmt::string_view Format_2020("    {:12.6E}\n");
+    static constexpr fmt::string_view Format_2021("* <MolecularWeight>\n");
+    static constexpr fmt::string_view Format_2030(", {:12.6E}");
+    static constexpr fmt::string_view Format_2031("* <gconA, gconB, gconC>\n");
+    static constexpr fmt::string_view Format_2032("* <gvisA, gvisB, gvisC>\n");
+    static constexpr fmt::string_view Format_2033("* <gcpA, gcpB, gcpC>\n");
+    static constexpr fmt::string_view Format_2034("* <Gamma>\n");
 
     date_and_time(real_CLOCK(1), real_CLOCK(2), real_CLOCK(3), DATE_TIME);
 
@@ -1195,10 +1201,10 @@ void WriteTARCOGInputFile(EnergyPlusData &state,
 void FinishDebugOutputFiles(Files &files, int const nperr)
 {
 
-    static constexpr auto Format_2360("TARCOG status: {:3} - Normal termination.\n");
-    static constexpr auto Format_2361("TARCOG status: {:3} - Warning!\n");
-    static constexpr auto Format_2362("TARCOG status: {:3} - Error!\n");
-    static constexpr auto Format_1199("#####  #####  #####  #####  #####  #####  #####  #####  #####  #####  #####\n");
+    static constexpr fmt::string_view Format_2360("TARCOG status: {:3} - Normal termination.\n");
+    static constexpr fmt::string_view Format_2361("TARCOG status: {:3} - Warning!\n");
+    static constexpr fmt::string_view Format_2362("TARCOG status: {:3} - Error!\n");
+    static constexpr fmt::string_view Format_1199("#####  #####  #####  #####  #####  #####  #####  #####  #####  #####  #####\n");
 
     if (files.WriteDebugOutput) {
 

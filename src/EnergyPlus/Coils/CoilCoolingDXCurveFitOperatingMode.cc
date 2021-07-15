@@ -64,7 +64,7 @@ using namespace EnergyPlus;
 void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state,
                                                                   CoilCoolingDXCurveFitOperatingModeInputSpecification input_data)
 {
-    static const std::string routineName("CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec: ");
+    static constexpr std::string_view routineName("CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec: ");
     bool errorsFound(false);
     this->original_input_specs = input_data;
     this->name = input_data.name;
@@ -88,7 +88,7 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(EnergyPlus::En
     // Must all be greater than zero to use the latent capacity degradation model
     if ((this->maxCyclingRate > 0.0 || this->evapRateRatio > 0.0 || this->latentTimeConst > 0.0 || this->timeForCondensateRemoval > 0.0) &&
         (this->maxCyclingRate <= 0.0 || this->evapRateRatio <= 0.0 || this->latentTimeConst <= 0.0 || this->timeForCondensateRemoval <= 0.0)) {
-        ShowWarningError(state, routineName + this->object_name + "=\"" + this->name + "\":");
+        ShowWarningError(state, std::string{routineName} + this->object_name + "=\"" + this->name + "\":");
         ShowContinueError(state, "...At least one of the four input parameters for the latent capacity degradation model");
         ShowContinueError(state, "...is set to zero. Therefore, the latent degradation model will not be used for this simulation.");
         this->latentDegradationActive = false;
@@ -101,7 +101,7 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(EnergyPlus::En
     } else if (UtilityRoutines::SameString(input_data.condenser_type, "EvaporativelyCooled")) {
         this->condenserType = CondenserType::EVAPCOOLED;
     } else {
-        ShowSevereError(state, routineName + this->object_name + "=\"" + this->name + "\", invalid");
+        ShowSevereError(state, std::string{routineName} + this->object_name + "=\"" + this->name + "\", invalid");
         ShowContinueError(state, "...Condenser Type=\"" + input_data.condenser_type + "\":");
         ShowContinueError(state, "...must be AirCooled or EvaporativelyCooled.");
         errorsFound = true;
@@ -114,7 +114,8 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(EnergyPlus::En
     this->nominalSpeedIndex = input_data.nominal_speed_number - 1;
 
     if (errorsFound) {
-        ShowFatalError(state, routineName + "Errors found in getting " + this->object_name + " input. Preceding condition(s) causes termination.");
+        ShowFatalError(
+            state, std::string{routineName} + "Errors found in getting " + this->object_name + " input. Preceding condition(s) causes termination.");
     }
 }
 
@@ -195,7 +196,7 @@ void CoilCoolingDXCurveFitOperatingMode::oneTimeInit(EnergyPlus::EnergyPlusData 
 void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlus::EnergyPlusData &state)
 {
 
-    std::string RoutineName = "sizeOperatingMode";
+    static constexpr std::string_view RoutineName = "sizeOperatingMode";
     std::string CompType = this->object_name;
     std::string CompName = this->name;
     bool PrintFlag = true;
@@ -285,7 +286,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
                                                            [[maybe_unused]] bool const singleMode)
 {
 
-    std::string RoutineName = "CoilCoolingDXCurveFitOperatingMode::calcOperatingMode";
+    static constexpr std::string_view RoutineName = "CoilCoolingDXCurveFitOperatingMode::calcOperatingMode";
     // Currently speedNum is 1-based, while this->speeds are zero-based
     auto &thisspeed(this->speeds[max(speedNum - 1, 0)]);
 

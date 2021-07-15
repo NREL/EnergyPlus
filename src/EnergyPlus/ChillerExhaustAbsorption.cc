@@ -862,7 +862,7 @@ void ExhaustAbsorberSpecs::initialize(EnergyPlusData &state)
     // Uses the status flags to trigger initializations.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    std::string const RoutineName("InitExhaustAbsorber");
+    static constexpr std::string_view RoutineName("InitExhaustAbsorber");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int CondInletNode;  // node number of water inlet node to the condenser
@@ -1011,7 +1011,7 @@ void ExhaustAbsorberSpecs::size(EnergyPlusData &state)
     // is calculated from the nominal capacity, the COP, and the condenser loop design delta T.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    std::string const RoutineName("SizeExhaustAbsorber");
+    static constexpr std::string_view RoutineName("SizeExhaustAbsorber");
 
     bool ErrorsFound; // If errors detected in input
     std::string equipName;
@@ -1390,7 +1390,7 @@ void ExhaustAbsorberSpecs::calcChiller(EnergyPlusData &state, Real64 &MyLoad)
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 const AbsLeavingTemp(176.667); // C - Minimum temperature leaving the Chiller absorber (350 F)
-    std::string const RoutineName("CalcExhaustAbsorberChillerModel");
+    static constexpr std::string_view RoutineName("CalcExhaustAbsorberChillerModel");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     // Local copies of ExhaustAbsorberSpecs Type
@@ -1839,7 +1839,7 @@ void ExhaustAbsorberSpecs::calcHeater(EnergyPlusData &state, Real64 &MyLoad, boo
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 const AbsLeavingTemp(176.667); // C - Minimum temperature leaving the Chiller absorber (350 F)
-    static std::string const RoutineName("CalcExhaustAbsorberHeaterModel");
+    static constexpr std::string_view RoutineName("CalcExhaustAbsorberHeaterModel");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     // Local copies of ExhaustAbsorberSpecs Type

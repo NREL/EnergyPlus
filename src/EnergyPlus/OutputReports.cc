@@ -216,7 +216,7 @@ void LinesOut(EnergyPlusData &state, std::string const &option)
 
     // SUBROUTINE PARAMETER DEFINITIONS:
 
-    static std::string const vertexstring("X,Y,Z ==> Vertex");
+    static constexpr std::string_view vertexstring("X,Y,Z ==> Vertex");
 
     if (state.dataSurface->TotSurfaces > 0 && !allocated(state.dataSurface->Surface)) {
         // no error needed, probably in end processing, just return
@@ -240,7 +240,7 @@ void LinesOut(EnergyPlusData &state, std::string const &option)
             if (state.dataSurface->Surface(surf).Sides == 0) continue;
             print(slnfile, "{}:{}\n", state.dataSurface->Surface(surf).ZoneName, state.dataSurface->Surface(surf).Name);
             for (int vert = 1; vert <= state.dataSurface->Surface(surf).Sides; ++vert) {
-                static constexpr auto fmt700("{:10.2F},{:10.2F},{:10.2F},{:10.2F},{:10.2F},{:10.2F}\n");
+                static constexpr fmt::string_view fmt700("{:10.2F},{:10.2F},{:10.2F},{:10.2F},{:10.2F},{:10.2F}\n");
 
                 if (vert != state.dataSurface->Surface(surf).Sides) {
                     print(slnfile,
@@ -279,7 +279,7 @@ void LinesOut(EnergyPlusData &state, std::string const &option)
             for (int vert = 1; vert <= state.dataSurface->Surface(surf).Sides; ++vert) {
                 std::string optcommasemi = ",";
                 if (vert == state.dataSurface->Surface(surf).Sides) optcommasemi = ";";
-                static constexpr auto fmtcoord("  {:10.2F},{:10.2F},{:10.2F}{}  !- {} {}\n");
+                static constexpr fmt::string_view fmtcoord("  {:10.2F},{:10.2F},{:10.2F}{}  !- {} {}\n");
                 print(slnfile,
                       fmtcoord,
                       state.dataSurface->Surface(surf).Vertex(vert).x,
@@ -304,19 +304,21 @@ static void WriteDXFCommon(EnergyPlusData &state, InputOutputFile &of, const std
 {
     using namespace DataSurfaces;
     using namespace DataSurfaceColors;
-    static constexpr auto Format_800("  0\nTEXT\n  8\n1\n  6\nContinuous\n 62\n{:3}\n 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n 40\n .25\n  "
-                                     "1\nTrue North\n 41\n 0.0\n  7\nMONOTXT\n210\n0.0\n220\n0.0\n230\n1.0\n");
-    static constexpr auto Format_801("  0\nTEXT\n  8\n1\n  6\nContinuous\n 62\n{:3}\n 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n 40\n .4\n  "
-                                     "1\n{}\n 41\n 0.0\n  7\nMONOTXT\n210\n0.0\n220\n0.0\n230\n1.0\n");
+    static constexpr fmt::string_view Format_800(
+        "  0\nTEXT\n  8\n1\n  6\nContinuous\n 62\n{:3}\n 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n 40\n .25\n  "
+        "1\nTrue North\n 41\n 0.0\n  7\nMONOTXT\n210\n0.0\n220\n0.0\n230\n1.0\n");
+    static constexpr fmt::string_view Format_801(
+        "  0\nTEXT\n  8\n1\n  6\nContinuous\n 62\n{:3}\n 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n 40\n .4\n  "
+        "1\n{}\n 41\n 0.0\n  7\nMONOTXT\n210\n0.0\n220\n0.0\n230\n1.0\n");
 
-    static constexpr auto Format_703_0("  0\n3DFACE\n  8\n1\n 62\n{:3}\n");
-    static constexpr auto Format_703_1(" 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n");
-    static constexpr auto Format_703_2(" 11\n{:15.5F}\n 21\n{:15.5F}\n 31\n{:15.5F}\n");
-    static constexpr auto Format_703_3(" 12\n{:15.5F}\n 22\n{:15.5F}\n 32\n{:15.5F}\n");
-    static constexpr auto Format_703_4(" 13\n{:15.5F}\n 23\n{:15.5F}\n 33\n{:15.5F}\n");
+    static constexpr fmt::string_view Format_703_0("  0\n3DFACE\n  8\n1\n 62\n{:3}\n");
+    static constexpr fmt::string_view Format_703_1(" 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n");
+    static constexpr fmt::string_view Format_703_2(" 11\n{:15.5F}\n 21\n{:15.5F}\n 31\n{:15.5F}\n");
+    static constexpr fmt::string_view Format_703_3(" 12\n{:15.5F}\n 22\n{:15.5F}\n 32\n{:15.5F}\n");
+    static constexpr fmt::string_view Format_703_4(" 13\n{:15.5F}\n 23\n{:15.5F}\n 33\n{:15.5F}\n");
 
-    static constexpr auto Format_708{"999\n{}{}{}\n"};
-    static constexpr auto Format_710{"999\n{}\n"};
+    static constexpr fmt::string_view Format_708{"999\n{}{}{}\n"};
+    static constexpr fmt::string_view Format_710{"999\n{}\n"};
 
     Array1D<Real64> StemX(4, -10.0);
     Array1D<Real64> StemY(4, {3.0, 3.0, 0.0, 0.0});
@@ -437,7 +439,7 @@ static void DXFDaylightingReferencePoints(EnergyPlusData &state, InputOutputFile
 {
     using namespace DataSurfaceColors;
 
-    static constexpr auto Format_709("  0\nCIRCLE\n  8\n{}\n 62\n{:3}\n 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n 40\n{:15.5F}\n");
+    static constexpr fmt::string_view Format_709("  0\nCIRCLE\n  8\n{}\n 62\n{:3}\n 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n 40\n{:15.5F}\n");
 
     // Do any daylighting reference points on layer for zone
     for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
@@ -1846,7 +1848,7 @@ void CostInfoOut(EnergyPlusData &state)
         // why the heck are constructions == 0 ?
         if (state.dataSurface->Surface(surf).Construction != 0) {
             // Formats
-            static constexpr auto Format_801("{:5},{},{},{},{:14.5F},{:14.5F}\n");
+            static constexpr fmt::string_view Format_801("{:5},{},{},{},{:14.5F},{:14.5F}\n");
             print(scifile,
                   Format_801,
                   surf,
@@ -1892,14 +1894,15 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
     bool TriangulateFace(false);
 
     // Formats
-    static constexpr auto Format_702("#VRML V2.0 utf8\n");
-    static constexpr auto Format_707(
+    static constexpr fmt::string_view Format_702("#VRML V2.0 utf8\n");
+    static constexpr fmt::string_view Format_707(
         "WorldInfo {{\n   title \"Building - {}\"\n   info [\"EnergyPlus Program Version {}\"]\n   info [\"Surface Color Scheme {}\"]\n}}\n");
-    static constexpr auto Format_800("Shape {{\nappearance DEF {} Appearance {{\nmaterial Material {{ diffuseColor {} }}\n}}\n}}\n");
-    static constexpr auto Format_801("Shape {{\nappearance USE {}\ngeometry IndexedFaceSet {{\nsolid TRUE\ncoord DEF {}{} Coordinate {{\npoint [\n");
-    static constexpr auto Format_802("{:15.5F} {:15.5F} {:15.5F},\n");
-    static constexpr auto Format_803("]\n}}\ncoordIndex [\n");
-    static constexpr auto Format_805("]\nccw TRUE\nsolid TRUE\n}}\n}}\n");
+    static constexpr fmt::string_view Format_800("Shape {{\nappearance DEF {} Appearance {{\nmaterial Material {{ diffuseColor {} }}\n}}\n}}\n");
+    static constexpr fmt::string_view Format_801(
+        "Shape {{\nappearance USE {}\ngeometry IndexedFaceSet {{\nsolid TRUE\ncoord DEF {}{} Coordinate {{\npoint [\n");
+    static constexpr fmt::string_view Format_802("{:15.5F} {:15.5F} {:15.5F},\n");
+    static constexpr fmt::string_view Format_803("]\n}}\ncoordIndex [\n");
+    static constexpr fmt::string_view Format_805("]\nccw TRUE\nsolid TRUE\n}}\n}}\n");
 
     if (PolygonAction == "TRIANGULATE3DFACE" || PolygonAction == "TRIANGULATE") {
         TriangulateFace = true;
