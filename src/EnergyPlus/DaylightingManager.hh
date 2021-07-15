@@ -86,7 +86,7 @@ namespace DaylightingManager {
     constexpr int NPHMAX(10);           // Number of sky/ground integration steps in altitude
     constexpr int NTHMAX(16);           // Number of sky/ground integration steps in azimuth
 
-    void DayltgAveInteriorReflectance(EnergyPlusData &state, int &ZoneNum); // Zone number
+    void DayltgAveInteriorReflectance(EnergyPlusData &state, int &EnclNum); // Enclosure number
 
     void CalcDayltgCoefficients(EnergyPlusData &state);
 

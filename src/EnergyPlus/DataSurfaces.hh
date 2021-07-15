@@ -732,9 +732,9 @@ namespace DataSurfaces {
         Array1D<Real64> IllumFromWinAtRefPtRep; // Illuminance from window at reference point N [lux]
         Array1D<Real64> LumWinFromRefPtRep;     // Window luminance as viewed from reference point N [cd/m2]
         // for shadowing of ground by building and obstructions [W/m2]
-        Array1D<Real64> ZoneAreaMinusThisSurf; // Zone inside surface area minus this surface and its subsurfaces
+        Array1D<Real64> EnclAreaMinusThisSurf; // Enclosure inside surface area minus this surface and its subsurfaces
         // for floor/wall/ceiling (m2)
-        Array1D<Real64> ZoneAreaReflProdMinusThisSurf; // Zone product of inside surface area times vis reflectance
+        Array1D<Real64> EnclAreaReflProdMinusThisSurf; // Enclosure product of inside surface area times vis reflectance
         // minus this surface and its subsurfaces,
         // for floor/wall/ceiling (m2)
 
@@ -743,7 +743,7 @@ namespace DataSurfaces {
         // Default Constructor
         SurfaceWindowCalc()
             : WinCenter(3, 0.0), ThetaFace(10, 296.15), OutProjSLFracMult(24, 1.0), InOutProjSLFracMult(24, 1.0), EffShBlindEmiss(MaxSlatAngs, 0.0),
-              EffGlassEmiss(MaxSlatAngs, 0.0), ZoneAreaMinusThisSurf(3, 0.0), ZoneAreaReflProdMinusThisSurf(3, 0.0)
+              EffGlassEmiss(MaxSlatAngs, 0.0), EnclAreaMinusThisSurf(3, 0.0), EnclAreaReflProdMinusThisSurf(3, 0.0)
         {
         }
     };
