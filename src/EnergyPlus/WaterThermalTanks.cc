@@ -439,6 +439,9 @@ void HeatPumpWaterHeaterData::simulate(
     // reset caller loop num to 0 to mimic what plantloopequip was doing
     Tank.callerLoopNum = 0;
 }
+void HeatPumpWaterHeaterData::oneTimeInit_new([[maybe_unused]] EnergyPlusData &state)
+{
+}
 void HeatPumpWaterHeaterData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
 {
 }

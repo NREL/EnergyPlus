@@ -400,6 +400,8 @@ namespace WaterThermalTanks {
                                  Real64 &OptLoad) override;
 
         void oneTimeInit(EnergyPlusData &state) override;
+
+        void oneTimeInit_new(EnergyPlusData &state) override;
     };
 
     struct WaterThermalTankData : PlantComponent
