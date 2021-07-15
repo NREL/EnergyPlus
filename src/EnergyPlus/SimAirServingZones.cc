@@ -6392,8 +6392,8 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
 
                 // If the ventilation was autosized using the ASHRAE VRP method, then the design zone and system ventilation values
                 // must be based on the larger of the cooling or heating OA
-                if (FinalSysSizing(AirLoopNum).OAAutoSized && FinalSysSizing(AirLoopNum).SystemOAMethod == SOAM_VRP ||
-                    FinalSysSizing(AirLoopNum).SystemOAMethod == SOAM_SP) {
+                if (FinalSysSizing(AirLoopNum).OAAutoSized &&
+                    (FinalSysSizing(AirLoopNum).SystemOAMethod == SOAM_VRP || FinalSysSizing(AirLoopNum).SystemOAMethod == SOAM_SP)) {
                     Real64 VotMax = max(state.dataSize->VotClgBySys(AirLoopNum), state.dataSize->VotHtgBySys(AirLoopNum));
 
                     // Reset the system level ventilation to the larger of the system-level cooling or heating Vot

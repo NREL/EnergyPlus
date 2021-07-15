@@ -62,7 +62,7 @@ Additional discussion regarding the proposal of making `D` a user input is neede
 Following a review of the NFP, it was decided that the `VentilationRateProcedure` field value would be replaced by `Standard62.1VentilationRateProcedure` and the Simplified Procedure would be referred to as `Standard62.1SimplifiedProcedure` thus requiring a transition rule. Changes were made to this NFP to reflect this.
 
 ## Testing/Validation/Data Sources
-Unit tests covering the calculation of the SP as well as the ventilation optimization control "cap" will be added. An example file (see below) will be developed and its output checked against "manual" calculations.
+Unit tests covering the calculation of the SP as well as the ventilation optimization control "cap" will be added. Two example files (see below) will be developed and their output checked against "manual" calculations.
 
 ## Input Output Reference Documentation
 The only changes to the Input/Output Reference document will be in the description of the System Outdoor Air Method field of the `Sizing:System` object and the new Occupant Diversity, also in the `Sizing:System` object. Changes and additions are respectively strikethrough and underlined in the text below.

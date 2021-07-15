@@ -1110,6 +1110,8 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
     Real64 Cp;
     int DummyWaterIndex(1);
     bool IsAutoSize;               // Indicator to autosize
+    int AirLoopNum;                // Air loop number
+    int SysSizNum;                 // System sizing number
     Real64 MaxPriAirVolFlowDes;    // Autosized maximum primary air flow for reporting
     Real64 MaxPriAirVolFlowUser;   // Hardsized maximum primary air flow for reporting
     Real64 MaxTotAirVolFlowDes;    // Autosized maximum air flow for reporting
@@ -1144,6 +1146,8 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
     MaxVolHotWaterFlowUser = 0.0;
     MaxVolHotSteamFlowDes = 0.0;
     MaxVolHotSteamFlowUser = 0.0;
+    AirLoopNum = 0;
+    SysSizNum = 0;
 
     auto &TermUnitSizing(state.dataSize->TermUnitSizing);
     auto &CurTermUnitSizingNum(state.dataSize->CurTermUnitSizingNum);
@@ -1256,6 +1260,15 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
         }
     }
 
+    // get system sizing id if a sizing run has been done
+    if (state.dataSize->SysSizingRunDone) {
+        AirLoopNum = state.dataZoneEquip->ZoneEquipConfig(state.dataPowerInductionUnits->PIU(PIUNum).CtrlZoneNum)
+                         .InletNodeAirLoopNum(state.dataPowerInductionUnits->PIU(PIUNum).ctrlZoneInNodeIndex);
+        SysSizNum = UtilityRoutines::FindItemInList(
+            state.dataSize->FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
+        if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
+    }
+
     IsAutoSize = false;
     if (state.dataPowerInductionUnits->PIU(PIUNum).MaxSecAirVolFlow == AutoSize) {
         IsAutoSize = true;
@@ -1325,34 +1338,29 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                                              state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac);
             }
         } else {
-            int AirLoopNum = state.dataZoneEquip->ZoneEquipConfig(state.dataPowerInductionUnits->PIU(PIUNum).CtrlZoneNum)
-                                 .InletNodeAirLoopNum(state.dataPowerInductionUnits->PIU(PIUNum).ctrlZoneInNodeIndex);
-            int SysSizNum = UtilityRoutines::FindItemInList(
-                state.dataSize->FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
-            if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
-
-            if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) { // 62.1 simplified procedure
-                if (state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow > 0.0) {
-                    MinPriAirFlowFracDes = 1.5 *
-                                           max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).VozClgByZone,
-                                               state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).VozHtgByZone) /
-                                           state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow;
-                } else {
-                    MinPriAirFlowFracDes = 0.0;
-                }
+            CheckZoneSizing(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name);
+            if (state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow >= SmallAirVolFlow &&
+                state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).MinOA >= SmallAirVolFlow) {
+                MinPriAirFlowFracDes =
+                    state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).MinOA / state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow;
             } else {
-                CheckZoneSizing(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name);
-                if (state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow >= SmallAirVolFlow &&
-                    state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).MinOA >= SmallAirVolFlow) {
-                    MinPriAirFlowFracDes = state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).MinOA /
-                                           state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow;
-                } else {
-                    MinPriAirFlowFracDes = 0.0;
+                MinPriAirFlowFracDes = 0.0;
+            }
+            if (state.dataSize->SysSizingRunDone) {
+                if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) { // 62.1 simplified procedure
+                    if (state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow > 0.0) {
+                        MinPriAirFlowFracDes = 1.5 *
+                                               max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).VozClgByZone,
+                                                   state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).VozHtgByZone) /
+                                               state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow;
+                    }
                 }
             }
             if (IsAutoSize) {
-                if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) {
-                    state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).VpzMinByZoneSPSized = true;
+                if (state.dataSize->SysSizingRunDone) {
+                    if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) {
+                        state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).VpzMinByZoneSPSized = true;
+                    }
                 }
                 state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac = MinPriAirFlowFracDes;
                 BaseSizer::reportSizerOutput(state,

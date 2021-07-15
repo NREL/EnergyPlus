@@ -2180,7 +2180,7 @@ void DetermineSystemPopulationDiversity(EnergyPlusData &state)
         return; // early return to not march through schedules
     }
 
-    DisplayString(state, "Standard 62.1 Ventilation Rate Procedure: Process Concurrent People by Air System");
+    DisplayString(state, "Standard 62.1 Ventilation Rate Procedure: Determine System Occupant Diversity");
     // now march through all zone timesteps for entire year to find the concurrent max
     int DaysInYear(366);  // assume leap year
     int dayOfWeekType(1); // assume year starts on Sunday
@@ -3939,7 +3939,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
             auto const systemOAMethod(state.dataIPShortCut->cAlphaArgs(iSystemOASMethodAlphaNum));
             if (systemOAMethod == "ZONESUM") {
                 SysSizInput(SysSizIndex).SystemOAMethod = SOAM_ZoneSum;
-            } else if (systemOAMethod == "VENTILATIONRATEPROCEDURE") {
+            } else if (systemOAMethod == "STANDARD62.1VENTILATIONRATEPROCEDURE") {
                 SysSizInput(SysSizIndex).SystemOAMethod = SOAM_VRP;
                 if (SysSizInput(SysSizIndex).LoadSizeType == Ventilation) {
                     ShowWarningError(
@@ -3966,7 +3966,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
                 ShowContinueError(state,
                                   "... incorrect " + state.dataIPShortCut->cAlphaFieldNames(iSystemOASMethodAlphaNum) + "=\"" +
                                       state.dataIPShortCut->cAlphaArgs(iSystemOASMethodAlphaNum) + "\".");
-                ShowContinueError(state, "... valid values are ZoneSum or VentilationRateProcedure.");
+                ShowContinueError(state, "... valid values are ZoneSum or Standard62.1VentilationRateProcedure.");
                 ErrorsFound = true;
             }
         }
