@@ -2332,7 +2332,6 @@ void ReportAirHeatBalance(EnergyPlusData &state)
 
     // Using/Aliasing
     using AirflowNetworkBalanceManager::ReportAirflowNetwork;
-    using ZoneEquipmentManager::ReportInfiltrations;
     using DataHeatBalance::AirBalanceQuadrature;
     using DataHVACGlobals::CycleOn;
     using DataHVACGlobals::CycleOnZoneFansOnly;
@@ -2340,6 +2339,7 @@ void ReportAirHeatBalance(EnergyPlusData &state)
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHgAirFnWTdb;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
+    using ZoneEquipmentManager::ReportInfiltrations;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName3("ReportAirHeatBalance:3");
