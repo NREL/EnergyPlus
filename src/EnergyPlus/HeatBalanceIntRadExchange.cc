@@ -2067,16 +2067,15 @@ namespace HeatBalanceIntRadExchange {
         int const surfZoneNum = state.dataSurface->Surface(surfNum).Zone;
         if (RadSysZoneNum == 0) {
             // This should never happen - but it does in some simple unit tests that are designed to throw errors
-            ShowSevereError(state,
-                            std::string{routineName} + "Somehow the radiant system zone number is zero for" + cCurrentModuleObject + " = " +
-                                RadSysName);
+            ShowSevereError(
+                state, std::string{routineName} + "Somehow the radiant system zone number is zero for" + cCurrentModuleObject + " = " + RadSysName);
             ErrorsFound = true;
         } else if (surfZoneNum == 0) {
             // This should never happen
             ShowSevereError(state,
-                            std::string{routineName} + "Somehow  the surface zone number is zero for" + cCurrentModuleObject + " = " +
-                                RadSysName + " and Surface = " + SurfaceName); // LCOV_EXCL_LINE
-            ErrorsFound = true;                                                // LCOV_EXCL_LINE
+                            std::string{routineName} + "Somehow  the surface zone number is zero for" + cCurrentModuleObject + " = " + RadSysName +
+                                " and Surface = " + SurfaceName); // LCOV_EXCL_LINE
+            ErrorsFound = true;                                   // LCOV_EXCL_LINE
         } else if (surfZoneNum != RadSysZoneNum) {
             ShowSevereError(state, std::string(routineName) + "Surface = " + SurfaceName + " is not in the same zone  as the radiant equipment.");
             ShowContinueError(state, "Surface zone or enclosure = " + state.dataHeatBal->Zone(surfZoneNum).Name);

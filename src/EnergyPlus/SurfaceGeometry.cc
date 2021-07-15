@@ -1557,9 +1557,6 @@ namespace SurfaceGeometry {
 
         } // ...end of the Surface DO loop for finding BaseSurf
         //**********************************************************************************
-
-        CreateMissingSpaces(state, ErrorsFound);
-
         // The surfaces need to be hierarchical by zone.  Input is allowed to be in any order.  In
         // this section the surfaces are reordered into:
         //    All shadowing surfaces (if mirrored, Mir- surface follows immediately after original)
@@ -1812,6 +1809,8 @@ namespace SurfaceGeometry {
         }
 
         state.dataSurfaceGeometry->SurfaceTmp.deallocate(); // DeAllocate the Temp Surface derived type
+
+        CreateMissingSpaces(state, ErrorsFound);
 
         //  For each Base Surface Type (Wall, Floor, Roof)
 
@@ -2439,14 +2438,15 @@ namespace SurfaceGeometry {
                             if (diffp > 0.05) {
                                 ++ErrCount;
                                 if (ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
-                                    ShowWarningError(state, RoutineName + "Entered Space Floor Areas differ from calculated Space Floor Area(s).");
+                                    ShowWarningError(
+                                        state, std::string(RoutineName) + "Entered Space Floor Areas differ from calculated Space Floor Area(s).");
                                     ShowContinueError(state,
                                                       "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual Spaces.");
                                 }
                                 if (state.dataGlobal->DisplayExtraWarnings) {
                                     // Warn user of using specified Space Floor Area
                                     ShowWarningError(state,
-                                                     RoutineName + "Entered Floor Area entered for Space=\"" +
+                                                     std::string(RoutineName) + "Entered Floor Area entered for Space=\"" +
                                                          state.dataHeatBal->Space(spaceNum).Name +
                                                          "\" significantly different from calculated Floor Area");
                                     ShowContinueError(
@@ -14646,9 +14646,11 @@ namespace SurfaceGeometry {
         if (EnclosureType == RadiantEnclosures) {
             radiantSetup = true;
             RadiantOrSolar = "Radiant";
+            state.dataViewFactor->EnclRadInfo.allocate(state.dataGlobal->NumOfSpaces);
         } else if (EnclosureType == SolarEnclosures) {
             solarSetup = true;
             RadiantOrSolar = "Solar";
+            state.dataViewFactor->EnclSolInfo.allocate(state.dataGlobal->NumOfSpaces);
         } else {
             ShowFatalError(state,
                            std::string{RoutineName} +
@@ -14895,7 +14897,7 @@ namespace SurfaceGeometry {
             // ToDo: For now, set the max and min enclosure numbers for each zone to be used in CalcInteriorRadExchange with ZoneToResimulate
             for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
                 for (int spaceNum : state.dataHeatBal->Zone(zoneNum).Spaces) {
-                    if (state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureFirst == 0) {
+                    if (state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureFirst == -1) { // initial value
                         state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureFirst = state.dataHeatBal->Space(spaceNum).RadiantEnclosureNum;
                     } else {
                         state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureFirst =

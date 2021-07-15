@@ -10269,29 +10269,29 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
         int const thisZoneEnclNum = Zone(ZoneNum).ZoneFirstSpaceSolEnclosure;
         for (int adjEnclNum = 1; adjEnclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++adjEnclNum) {
             if (adjEnclNum == thisZoneEnclNum) continue;
-                // Require that ZoneNumAdj have a least one exterior window
-                bool AdjEnclHasExtWins = false;
-                for (int SurfNumAdj : state.dataViewFactor->EnclSolInfo(adjEnclNum).SurfacePtr) {
-                    if (state.dataSurface->Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) {
-                        AdjEnclHasExtWins = true;
+            // Require that ZoneNumAdj have a least one exterior window
+            bool AdjEnclHasExtWins = false;
+            for (int SurfNumAdj : state.dataViewFactor->EnclSolInfo(adjEnclNum).SurfacePtr) {
+                if (state.dataSurface->Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) {
+                    AdjEnclHasExtWins = true;
+                    break;
+                }
+            }
+            if (!AdjEnclHasExtWins) continue;
+            // Loop again through surfaces in ZoneNumAdj and see if any are interior windows adjacent to enclNum
+            for (int SurfNumAdj : state.dataViewFactor->EnclSolInfo(adjEnclNum).SurfacePtr) {
+                if (state.dataSurface->Surface(SurfNumAdj).ExtBoundCond >= 1) {
+                    // This is an interior window in ZoneNumAdj
+                    if (state.dataSurface->Surface(state.dataSurface->Surface(SurfNumAdj).ExtBoundCond).SolarEnclIndex == thisZoneEnclNum) {
+                        // This interior window is adjacent to ZoneNum
+                        ++NumList;
+                        int ZoneNumAdj = state.dataSurface->Surface(SurfNumAdj).Zone;
+                        state.dataDaylightingData->ZoneDaylight(ZoneNum).AdjIntWinZoneNums(NumList) = ZoneNumAdj;
+                        state.dataDaylightingData->ZoneDaylight(ZoneNumAdj).AdjZoneHasDayltgCtrl = true;
                         break;
                     }
                 }
-                if (!AdjEnclHasExtWins) continue;
-                // Loop again through surfaces in ZoneNumAdj and see if any are interior windows adjacent to enclNum
-                for (int SurfNumAdj : state.dataViewFactor->EnclSolInfo(adjEnclNum).SurfacePtr) {
-                    if (state.dataSurface->Surface(SurfNumAdj).ExtBoundCond >= 1) {
-                        // This is an interior window in ZoneNumAdj
-                        if (state.dataSurface->Surface(state.dataSurface->Surface(SurfNumAdj).ExtBoundCond).SolarEnclIndex == thisZoneEnclNum) {
-                            // This interior window is adjacent to ZoneNum
-                            ++NumList;
-                            int ZoneNumAdj = state.dataSurface->Surface(SurfNumAdj).Zone;
-                            state.dataDaylightingData->ZoneDaylight(ZoneNum).AdjIntWinZoneNums(NumList) = ZoneNumAdj;
-                            state.dataDaylightingData->ZoneDaylight(ZoneNumAdj).AdjZoneHasDayltgCtrl = true;
-                            break;
-                        }
-                    }
-                }
+            }
         }
         state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfIntWinAdjZones = NumList;
     }
