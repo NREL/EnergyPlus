@@ -891,7 +891,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     Real64 const nu(15.66e-6);      // kinematic viscosity (m**2/s) for air at 300 K (Mills 1999 Heat Transfer)
     Real64 const k(0.0267);         // thermal conductivity (W/m K) for air at 300 K (Mills 1999 Heat Transfer)
     Real64 const Sigma(5.6697e-08); // Stefan-Boltzmann constant
-    static std::string const RoutineName("CalcPassiveExteriorBaffleGap");
+    static constexpr std::string_view RoutineName("CalcPassiveExteriorBaffleGap");
     // INTERFACE BLOCK SPECIFICATIONS:
 
     // DERIVED TYPE DEFINITIONS:
@@ -1393,19 +1393,21 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
     ErrFound = false;
 
     print(state.files.bnd, "{}\n", "! ===============================================================");
-    static constexpr auto Format_700("! <#Supply Air Paths>,<Number of Supply Air Paths>");
+    static constexpr fmt::string_view Format_700("! <#Supply Air Paths>,<Number of Supply Air Paths>");
     print(state.files.bnd, "{}\n", Format_700);
     print(state.files.bnd, " #Supply Air Paths,{}\n", state.dataZoneEquip->NumSupplyAirPaths);
-    static constexpr auto Format_702("! <Supply Air Path>,<Supply Air Path Count>,<Supply Air Path Name>,<AirLoopHVAC Name>");
+    static constexpr fmt::string_view Format_702("! <Supply Air Path>,<Supply Air Path Count>,<Supply Air Path Name>,<AirLoopHVAC Name>");
     print(state.files.bnd, "{}\n", Format_702);
-    static constexpr auto Format_703("! <#Components on Supply Air Path>,<Number of Components>");
+    static constexpr fmt::string_view Format_703("! <#Components on Supply Air Path>,<Number of Components>");
     print(state.files.bnd, "{}\n", Format_703);
-    static constexpr auto Format_704("! <Supply Air Path Component>,<Component Count>,<Component Type>,<Component Name>,<AirLoopHVAC Name>");
+    static constexpr fmt::string_view Format_704(
+        "! <Supply Air Path Component>,<Component Count>,<Component Type>,<Component Name>,<AirLoopHVAC Name>");
     print(state.files.bnd, "{}\n", Format_704);
-    static constexpr auto Format_707("! <#Outlet Nodes on Supply Air Path Component>,<Number of Nodes>");
+    static constexpr fmt::string_view Format_707("! <#Outlet Nodes on Supply Air Path Component>,<Number of Nodes>");
     print(state.files.bnd, "{}\n", Format_707);
-    static constexpr auto Format_708("! <Supply Air Path Component Nodes>,<Node Count>,<Component Type>,<Component Name>,<Inlet Node Name>,<Outlet "
-                                     "Node Name>,<AirLoopHVAC Name>");
+    static constexpr fmt::string_view Format_708(
+        "! <Supply Air Path Component Nodes>,<Node Count>,<Component Type>,<Component Name>,<Inlet Node Name>,<Outlet "
+        "Node Name>,<AirLoopHVAC Name>");
     print(state.files.bnd, "{}\n", Format_708);
 
     for (BCount = 1; BCount <= state.dataZoneEquip->NumSupplyAirPaths; ++BCount) {
@@ -1513,9 +1515,9 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
         }
 
         if (state.dataZoneEquip->SupplyAirPath(BCount).NumNodes > 0) {
-            static constexpr auto Format_705("! <#Nodes on Supply Air Path>,<Number of Nodes>");
+            static constexpr fmt::string_view Format_705("! <#Nodes on Supply Air Path>,<Number of Nodes>");
             print(state.files.bnd, "{}\n", Format_705);
-            static constexpr auto Format_706("! <Supply Air Path Node>,<Node Type>,<Node Count>,<Node Name>,<AirLoopHVAC Name>");
+            static constexpr fmt::string_view Format_706("! <Supply Air Path Node>,<Node Type>,<Node Count>,<Node Name>,<AirLoopHVAC Name>");
             print(state.files.bnd, "{}\n", Format_706);
             print(state.files.bnd, "#Nodes on Supply Air Path,{}\n", state.dataZoneEquip->SupplyAirPath(BCount).NumNodes);
             for (Count2 = 1; Count2 <= state.dataZoneEquip->SupplyAirPath(BCount).NumNodes; ++Count2) {
@@ -1702,19 +1704,21 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
     NumErr = 0;
 
     print(state.files.bnd, "{}\n", "! ===============================================================");
-    static constexpr auto Format_700("! <#Return Air Paths>,<Number of Return Air Paths>");
+    static constexpr fmt::string_view Format_700("! <#Return Air Paths>,<Number of Return Air Paths>");
     print(state.files.bnd, "{}\n", Format_700);
     print(state.files.bnd, " #Return Air Paths,{}\n", state.dataZoneEquip->NumReturnAirPaths);
-    static constexpr auto Format_702("! <Return Air Path>,<Return Air Path Count>,<Return Air Path Name>,<AirLoopHVAC Name>");
+    static constexpr fmt::string_view Format_702("! <Return Air Path>,<Return Air Path Count>,<Return Air Path Name>,<AirLoopHVAC Name>");
     print(state.files.bnd, "{}\n", Format_702);
-    static constexpr auto Format_703("! <#Components on Return Air Path>,<Number of Components>");
+    static constexpr fmt::string_view Format_703("! <#Components on Return Air Path>,<Number of Components>");
     print(state.files.bnd, "{}\n", Format_703);
-    static constexpr auto Format_704("! <Return Air Path Component>,<Component Count>,<Component Type>,<Component Name>,<AirLoopHVAC Name>");
+    static constexpr fmt::string_view Format_704(
+        "! <Return Air Path Component>,<Component Count>,<Component Type>,<Component Name>,<AirLoopHVAC Name>");
     print(state.files.bnd, "{}\n", Format_704);
-    static constexpr auto Format_707("! <#Inlet Nodes on Return Air Path Component>,<Number of Nodes>");
+    static constexpr fmt::string_view Format_707("! <#Inlet Nodes on Return Air Path Component>,<Number of Nodes>");
     print(state.files.bnd, "{}\n", Format_707);
-    static constexpr auto Format_708("! <Return Air Path Component Nodes>,<Node Count>,<Component Type>,<Component Name>,<Inlet Node Name>,<Outlet "
-                                     "Node Name>,<AirLoopHVAC Name>");
+    static constexpr fmt::string_view Format_708(
+        "! <Return Air Path Component Nodes>,<Node Count>,<Component Type>,<Component Name>,<Inlet Node Name>,<Outlet "
+        "Node Name>,<AirLoopHVAC Name>");
     print(state.files.bnd, "{}\n", Format_708);
 
     AllNodes.allocate(state.dataLoopNodes->NumOfNodes);
@@ -1886,9 +1890,9 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
             }
         }
         if (CountNodes > 0) {
-            static constexpr auto Format_705("! <#Nodes on Return Air Path>,<Number of Nodes>");
+            static constexpr fmt::string_view Format_705("! <#Nodes on Return Air Path>,<Number of Nodes>");
             print(state.files.bnd, "{}\n", Format_705);
-            static constexpr auto Format_706("! <Return Air Path Node>,<Node Type>,<Node Count>,<Node Name>,<AirLoopHVAC Name>");
+            static constexpr fmt::string_view Format_706("! <Return Air Path Node>,<Node Type>,<Node Count>,<Node Name>,<AirLoopHVAC Name>");
             print(state.files.bnd, "{}\n", Format_706);
             print(state.files.bnd, "   #Nodes on Return Air Path,{}\n", CountNodes);
             for (Count2 = 1; Count2 <= CountNodes; ++Count2) {

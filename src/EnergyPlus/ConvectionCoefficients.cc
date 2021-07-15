@@ -693,8 +693,8 @@ int SetInsideAdaptiveConvectionAlgo(EnergyPlusData &state,
                                     const std::string &curveName,
                                     const std::string &sourceFieldName,
                                     const std::string &curveFieldName,
-                                    const std::string &RoutineName,
-                                    const std::string &CurrentModuleObject)
+                                    const std::string_view RoutineName,
+                                    const std::string_view CurrentModuleObject)
 {
 
     int InsideAdaptiveConvectionAlgoParam = 0;
@@ -705,13 +705,13 @@ int SetInsideAdaptiveConvectionAlgo(EnergyPlusData &state,
         if (HcInt == ConvectionConstants::HcInt_UserCurve) {
             InsideAdaptiveConvectionAlgoParam = UtilityRoutines::FindItemInList(curveName, state.dataConvectionCoefficient->HcInsideUserCurve);
             if (InsideAdaptiveConvectionAlgoParam == 0) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + equationName + ", invalid value");
+                ShowSevereError(state, std::string{RoutineName} + std::string{CurrentModuleObject} + "=\"" + equationName + ", invalid value");
                 ShowContinueError(state, "Invalid Name choice Entered, for " + curveFieldName + '=' + curveName);
                 ErrorsFound = true;
             }
         }
     } else {
-        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + equationName + ", invalid value");
+        ShowSevereError(state, std::string{RoutineName} + std::string{CurrentModuleObject} + "=\"" + equationName + ", invalid value");
         ShowContinueError(state, "Invalid Key choice Entered, for " + sourceFieldName + '=' + equationName);
         ErrorsFound = true;
     }
@@ -725,8 +725,8 @@ int SetOutsideAdaptiveConvectionAlgo(EnergyPlusData &state,
                                      const std::string &curveName,
                                      const std::string &sourceFieldName,
                                      const std::string &curveFieldName,
-                                     const std::string &RoutineName,
-                                     const std::string &CurrentModuleObject)
+                                     const std::string_view RoutineName,
+                                     const std::string_view CurrentModuleObject)
 {
 
     int OutsideAdaptiveConvectionAlgoParam = 0;
@@ -737,13 +737,13 @@ int SetOutsideAdaptiveConvectionAlgo(EnergyPlusData &state,
         if (HcInt == ConvectionConstants::HcExt_UserCurve) {
             OutsideAdaptiveConvectionAlgoParam = UtilityRoutines::FindItemInList(curveName, state.dataConvectionCoefficient->HcOutsideUserCurve);
             if (OutsideAdaptiveConvectionAlgoParam == 0) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + equationName + ", invalid value");
+                ShowSevereError(state, std::string{RoutineName} + std::string{CurrentModuleObject} + "=\"" + equationName + ", invalid value");
                 ShowContinueError(state, "Invalid Name choice Entered, for " + curveFieldName + '=' + curveName);
                 ErrorsFound = true;
             }
         }
     } else {
-        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + equationName + ", invalid value");
+        ShowSevereError(state, std::string{RoutineName} + std::string{CurrentModuleObject} + "=\"" + equationName + ", invalid value");
         ShowContinueError(state, "Invalid Key choice Entered, for " + sourceFieldName + '=' + equationName);
         ErrorsFound = true;
     }
@@ -851,7 +851,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
     using ScheduleManager::GetScheduleIndex;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("GetUserConvectionCoefficients");
+    static constexpr std::string_view RoutineName("GetUserConvectionCoefficients");
     const std::unordered_set<std::string> ValidSurfaceTypes = {"ALLEXTERIORSURFACES",
                                                                "ALLEXTERIORWINDOWS",
                                                                "ALLEXTERIORWALLS",
@@ -1330,7 +1330,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(1);
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = Found;
                             if (Numbers(NumField) < state.dataHeatBal->LowHConvLimit || Numbers(NumField) > state.dataHeatBal->HighHConvLimit) {
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
+                                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
                                 ShowContinueError(state,
                                                   format("{}={}, {}=[{:.5R}].",
                                                          state.dataIPShortCut->cAlphaFieldNames(Ptr),
@@ -1347,7 +1347,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType = ConvCoefValue;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideValue = Numbers(NumField);
                             if (!state.dataIPShortCut->lAlphaFieldBlanks(Ptr + 2)) {
-                                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
+                                ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
                                 ShowContinueError(state,
                                                   "Since VALUE is used for \"" + state.dataIPShortCut->cAlphaFieldNames(FieldNo + 2) + "\", " +
                                                       state.dataIPShortCut->cAlphaFieldNames(Ptr + 2) + '=' + Alphas(Ptr + 2) + " is ignored.");
@@ -1361,7 +1361,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).ScheduleIndex =
                                 GetScheduleIndex(state, Alphas(Ptr + 2));
                             if (state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).ScheduleIndex == 0) {
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                                 ShowContinueError(state,
                                                   " Invalid " + state.dataIPShortCut->cAlphaFieldNames(Ptr + 2) + " entered=" + Alphas(Ptr + 2));
                                 ErrorsFound = true;
@@ -1377,7 +1377,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).UserCurveIndex =
                                 UtilityRoutines::FindItemInList(Alphas(Ptr + 3), state.dataConvectionCoefficient->HcOutsideUserCurve);
                             if (state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).UserCurveIndex == 0) {
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                                 ShowContinueError(state,
                                                   " Invalid " + state.dataIPShortCut->cAlphaFieldNames(Ptr + 3) + " entered=" + Alphas(Ptr + 3));
                                 ErrorsFound = true;
@@ -1393,12 +1393,12 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             PotentialAssignedValue = state.dataSurface->TotExtConvCoeff;
 
                         } else {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", check input");
+                            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + ", check input");
                             ShowContinueError(state, "Check Input Entered :" + Alphas(Ptr + 1));
                             ErrorsFound = true;
                         }
                         if (state.dataSurface->SurfExtConvCoeffIndex(Found) != 0) {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                             ShowContinueError(state, "Duplicate (Outside) assignment attempt");
                             ErrorsFound = true;
                         } else {
@@ -1421,7 +1421,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(1);
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = Found;
                             if (Numbers(NumField) < state.dataHeatBal->LowHConvLimit || Numbers(NumField) > state.dataHeatBal->HighHConvLimit) {
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
+                                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
                                 ShowContinueError(state,
                                                   format("{}={}, {}=[{:.5R}].",
                                                          state.dataIPShortCut->cAlphaFieldNames(Ptr),
@@ -1438,7 +1438,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType = ConvCoefValue;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideValue = Numbers(NumField);
                             if (!state.dataIPShortCut->lAlphaFieldBlanks(Ptr + 2)) {
-                                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
+                                ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
                                 ShowContinueError(state,
                                                   "Since VALUE is used for \"" + state.dataIPShortCut->cAlphaFieldNames(FieldNo + 1) + "\", " +
                                                       state.dataIPShortCut->cAlphaFieldNames(Ptr + 2) + '=' + Alphas(Ptr + 2) + " is ignored.");
@@ -1452,7 +1452,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).ScheduleIndex =
                                 GetScheduleIndex(state, Alphas(Ptr + 2));
                             if (state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).ScheduleIndex == 0) {
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                                 ShowContinueError(state,
                                                   " Invalid " + state.dataIPShortCut->cAlphaFieldNames(Ptr + 2) + " entered=" + Alphas(Ptr + 2));
                                 ErrorsFound = true;
@@ -1468,7 +1468,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).UserCurveIndex =
                                 UtilityRoutines::FindItemInList(Alphas(Ptr + 3), state.dataConvectionCoefficient->HcInsideUserCurve);
                             if (state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).UserCurveIndex == 0) {
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                                 ShowContinueError(state,
                                                   " Invalid " + state.dataIPShortCut->cAlphaFieldNames(Ptr + 3) + " entered=" + Alphas(Ptr + 3));
                                 ErrorsFound = true;
@@ -1487,7 +1487,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             // treat CeilingDiffuser and TrombeWall special
                             if (UtilityRoutines::SameString(Alphas(Ptr + 1), "CEILINGDIFFUSER") ||
                                 UtilityRoutines::SameString(Alphas(Ptr + 1), "TROMBEWALL")) {
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                                 ShowContinueError(state,
                                                   "Invalid Value Entered, for " + state.dataIPShortCut->cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr));
                                 ShowContinueError(state,
@@ -1495,7 +1495,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                                       "\". This type is only applicable at a Zone level.");
                                 ErrorsFound = true;
                             } else { // really invalid
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                                 ShowContinueError(state,
                                                   "Invalid Value Entered, for " + state.dataIPShortCut->cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr));
                                 ShowContinueError(state,
@@ -1505,7 +1505,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                         }
                     }
                     if (state.dataSurface->SurfIntConvCoeffIndex(Found) != 0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate (inside)");
+                        ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate (inside)");
                         ShowContinueError(state, "Duplicate (Inside) assignment attempt.");
                         ErrorsFound = true;
                     } else {
@@ -1515,7 +1515,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                 } else if (SELECT_CASE_var.empty()) { // Blank
 
                 } else {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                     ShowContinueError(state, "Invalid Value Entered, for " + state.dataIPShortCut->cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr));
                     ErrorsFound = true;
                 }
@@ -1544,7 +1544,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                                                  state.dataIPShortCut->cNumericFieldNames);
         // Check Field 1 for validity
         if (ValidSurfaceTypes.find(Alphas(1)) == ValidSurfaceTypes.end()) {
-            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
             ShowContinueError(state, "illegal value for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' + Alphas(1));
             ErrorsFound = true;
         }
@@ -1569,7 +1569,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(Ptr);
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = -999;
                             if (Numbers(NumField) < state.dataHeatBal->LowHConvLimit || Numbers(NumField) > state.dataHeatBal->HighHConvLimit) {
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
+                                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
                                 ShowContinueError(state,
                                                   format("{}={}, {}=[{:.5R}].",
                                                          state.dataIPShortCut->cAlphaFieldNames(Ptr),
@@ -1586,7 +1586,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType = ConvCoefValue;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideValue = Numbers(NumField);
                             if (!state.dataIPShortCut->lAlphaFieldBlanks(Ptr + 2)) {
-                                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
+                                ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
                                 ShowContinueError(state,
                                                   "Since VALUE is used for \"" + state.dataIPShortCut->cAlphaFieldNames(FieldNo + 2) + "\", " +
                                                       state.dataIPShortCut->cAlphaFieldNames(Ptr + 2) + '=' + Alphas(Ptr + 2) + " is ignored.");
@@ -1600,7 +1600,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).ScheduleIndex =
                                 GetScheduleIndex(state, Alphas(Ptr + 2));
                             if (state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).ScheduleIndex == 0) {
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                                 ShowContinueError(state,
                                                   " Invalid " + state.dataIPShortCut->cAlphaFieldNames(Ptr + 2) + " entered=" + Alphas(Ptr + 2));
                                 ErrorsFound = true;
@@ -1616,7 +1616,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).UserCurveIndex =
                                 UtilityRoutines::FindItemInList(Alphas(Ptr + 3), state.dataConvectionCoefficient->HcOutsideUserCurve);
                             if (state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).UserCurveIndex == 0) {
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                                 ShowContinueError(state,
                                                   " Invalid " + state.dataIPShortCut->cAlphaFieldNames(Ptr + 3) + " entered=" + Alphas(Ptr + 3));
                                 ErrorsFound = true;
@@ -1643,7 +1643,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             ApplyConvectionValue(state, Alphas(1), "OUTSIDE", state.dataSurface->TotExtConvCoeff);
                         }
                     } else {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", check input");
+                        ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + ", check input");
                         ShowContinueError(state, "Check Input Entered :" + Alphas(Ptr + 1));
                         ErrorsFound = true;
                     }
@@ -1661,7 +1661,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(Ptr);
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = -999;
                             if (Numbers(NumField) < state.dataHeatBal->LowHConvLimit || Numbers(NumField) > state.dataHeatBal->HighHConvLimit) {
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
+                                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
                                 ShowContinueError(state,
                                                   format("{}={}, {}=[{:.5R}].",
                                                          state.dataIPShortCut->cAlphaFieldNames(Ptr),
@@ -1678,7 +1678,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType = ConvCoefValue;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideValue = Numbers(NumField);
                             if (!state.dataIPShortCut->lAlphaFieldBlanks(Ptr + 2)) {
-                                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
+                                ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
                                 ShowContinueError(state,
                                                   "Since VALUE is used for \"" + state.dataIPShortCut->cAlphaFieldNames(FieldNo + 2) + "\", " +
                                                       state.dataIPShortCut->cAlphaFieldNames(Ptr + 2) + '=' + Alphas(Ptr + 2) + " is ignored.");
@@ -1692,7 +1692,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).ScheduleIndex =
                                 GetScheduleIndex(state, Alphas(Ptr + 2));
                             if (state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).ScheduleIndex == 0) {
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                                 ShowContinueError(state,
                                                   " Invalid " + state.dataIPShortCut->cAlphaFieldNames(Ptr + 2) + " entered=" + Alphas(Ptr + 2));
                                 ErrorsFound = true;
@@ -1709,7 +1709,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                 UtilityRoutines::FindItemInList(Alphas(Ptr + 3), state.dataConvectionCoefficient->HcInsideUserCurve);
                             if (state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).UserCurveIndex == 0) {
 
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                                 ShowContinueError(state,
                                                   " Invalid " + state.dataIPShortCut->cAlphaFieldNames(Ptr + 3) + " entered=" + Alphas(Ptr + 3));
                                 ErrorsFound = true;
@@ -1730,14 +1730,14 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             // treat CeilingDiffuser and TrombeWall special
                             if (UtilityRoutines::SameString(Alphas(Ptr + 1), "CEILINGDIFFUSER") ||
                                 UtilityRoutines::SameString(Alphas(Ptr + 1), "TROMBEWALL")) {
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                                 ShowContinueError(state, " Invalid " + state.dataIPShortCut->cAlphaFieldNames(Ptr) + " entered=" + Alphas(Ptr));
                                 ShowContinueError(state,
                                                   "invalid value in " + state.dataIPShortCut->cAlphaFieldNames(Ptr + 1) + '=' + Alphas(Ptr + 1) +
                                                       "\". This type is only applicable at a Zone level.");
                                 ErrorsFound = true;
                             } else { // really invalid
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                                 ShowContinueError(state,
                                                   " Invalid " + state.dataIPShortCut->cAlphaFieldNames(Ptr + 1) + " entered=" + Alphas(Ptr + 1));
                                 ErrorsFound = true;
@@ -1747,7 +1747,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                 } else if (SELECT_CASE_var.empty()) { // Blank
 
                 } else { // Error Case
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                     ShowContinueError(state, " Invalid " + state.dataIPShortCut->cAlphaFieldNames(Ptr) + " entered=" + Alphas(Ptr));
                     ErrorsFound = true;
                 }
@@ -1770,7 +1770,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                      state.dataHeatBal->HighHConvLimit))
             continue;
         ShowSevereError(state,
-                        RoutineName + "Surface=\"" + state.dataSurface->UserIntConvectionCoeffs(Loop).SurfaceName +
+                        std::string{RoutineName} + "Surface=\"" + state.dataSurface->UserIntConvectionCoeffs(Loop).SurfaceName +
                             "\", out-of-range convection coefficient:");
         ShowContinueError(state, "Out-of-range value found in schedule=" + state.dataSurface->UserIntConvectionCoeffs(Loop).ScheduleName);
         ShowContinueError(state,
@@ -1792,7 +1792,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                      state.dataHeatBal->HighHConvLimit))
             continue;
         ShowSevereError(state,
-                        RoutineName + "Surface=\"" + state.dataSurface->UserExtConvectionCoeffs(Loop).SurfaceName +
+                        std::string{RoutineName} + "Surface=\"" + state.dataSurface->UserExtConvectionCoeffs(Loop).SurfaceName +
                             "\", out-of-range convection coefficient:");
         ShowContinueError(state, "Out-of-range value found in schedule=" + state.dataSurface->UserExtConvectionCoeffs(Loop).ScheduleName);
         ShowContinueError(state,
@@ -1819,15 +1819,17 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                  state.dataSurface->UserExtConvectionCoeffs(Loop).OverrideType != ConvCoefSpecifiedModel)) {
                 ++Count;
                 if (state.dataGlobal->DisplayExtraWarnings) {
-                    ShowSevereError(
-                        state, RoutineName + "Surface=\"" + state.dataSurface->UserExtConvectionCoeffs(Loop).SurfaceName + "\", mixed algorithms.");
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + "Surface=\"" + state.dataSurface->UserExtConvectionCoeffs(Loop).SurfaceName +
+                                        "\", mixed algorithms.");
                     ShowContinueError(
                         state, "Zone Outside Convection Algorithm specifies \"SimpleCombined\". SimpleCombined will be used for this surface.");
                 }
             }
         }
         if (Count > 0) {
-            ShowSevereMessage(state, RoutineName + format("{} surfaces had different outside convection algorithms specified when", Count));
+            ShowSevereMessage(state,
+                              std::string{RoutineName} + format("{} surfaces had different outside convection algorithms specified when", Count));
             ShowContinueError(state,
                               "the Zone Outside Convection Algorithm specifies \"SimpleCombined\". SimpleCombined will be used for these surfaces.");
             if (!state.dataGlobal->DisplayExtraWarnings) {
@@ -2488,7 +2490,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
     }
 
     if (ErrorsFound) {
-        ShowFatalError(state, RoutineName + "Errors found getting input.  Program termination.");
+        ShowFatalError(state, std::string{RoutineName} + "Errors found getting input.  Program termination.");
     }
 
     SetupAdaptiveConvectionStaticMetaData(state);
@@ -3972,7 +3974,7 @@ Real64 CalcISO15099WindowIntConvCoeff(EnergyPlusData &state,
     static Real64 const pow_5_25(0.56 * root_4(1.0E+5));
     static Real64 const pow_11_25(0.56 * root_4(1.0E+11));
     static Real64 const pow_11_2(0.58 * std::pow(1.0E+11, 0.2));
-    static std::string const RoutineName("WindowTempsForNominalCond");
+    static constexpr std::string_view RoutineName("WindowTempsForNominalCond");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 DeltaTemp;       // Temperature difference between the zone air and the surface
@@ -4635,7 +4637,7 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
     // now send to EIO if surface reporting selected
     ScanForReports(state, "Surfaces", DoReport, "Details");
     if (DoReport) { // echo out static geometry data related to convection models
-        static constexpr auto Format_900(
+        static constexpr fmt::string_view Format_900(
             "! <Surface Convection Parameters>, Surface Name, Outside Model Assignment, Outside Area [m2], Outside Perimeter [m], Outside Height "
             "[m], Inside Model Assignment, Inside Height [m], Inside Perimeter Envelope [m], Inside Hydraulic Diameter [m], Window Wall Ratio, "
             "Window Location, Near Radiant {{Yes/No}}, Has Active HVAC {{Yes/No}}\n");
@@ -4652,7 +4654,8 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
             } else {
                 YesNo2 = "No";
             }
-            static constexpr auto Format_901("Surface Convection Parameters,{},{},{:.2R},{:.2R},{:.2R},{},{:.2R},{:.2R},{:.2R},{:.2R},{},{},{}\n");
+            static constexpr fmt::string_view Format_901(
+                "Surface Convection Parameters,{},{},{:.2R},{:.2R},{:.2R},{},{:.2R},{:.2R},{:.2R},{:.2R},{},{},{}\n");
             print(state.files.eio,
                   Format_901,
                   Surface(SurfLoop).Name,
@@ -4676,10 +4679,10 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
 
         // if display advanced reports also dump meta group data used for convection geometry
         if (state.dataGlobal->DisplayAdvancedReportVariables) {
-            static constexpr auto Format_8000(
+            static constexpr fmt::string_view Format_8000(
                 "! <Building Convection Parameters:North Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
             print(state.files.eio, Format_8000); // header for north facade
-            static constexpr auto Format_8001(
+            static constexpr fmt::string_view Format_8001(
                 "Building Convection Parameters:North Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
             print(state.files.eio,
                   Format_8001,
@@ -4691,10 +4694,10 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   NorthFacade.Ymax,
                   NorthFacade.Zmin,
                   NorthFacade.Zmax);
-            static constexpr auto Format_8100(
+            static constexpr fmt::string_view Format_8100(
                 "! <Building Convection Parameters:Northeast Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
             print(state.files.eio, Format_8100); // header for northeast facade
-            static constexpr auto Format_8101(
+            static constexpr fmt::string_view Format_8101(
                 "Building Convection Parameters:Northeast Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
             print(state.files.eio,
                   Format_8101,
@@ -4706,10 +4709,10 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   NorthEastFacade.Ymax,
                   NorthEastFacade.Zmin,
                   NorthEastFacade.Zmax);
-            static constexpr auto Format_8200(
+            static constexpr fmt::string_view Format_8200(
                 "! <Building Convection Parameters:East Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
             print(state.files.eio, Format_8200); // header for east facade
-            static constexpr auto Format_8201(
+            static constexpr fmt::string_view Format_8201(
                 "Building Convection Parameters:East Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
             print(state.files.eio,
                   Format_8201,
@@ -4722,10 +4725,10 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   EastFacade.Zmin,
                   EastFacade.Zmax);
 
-            static constexpr auto Format_8300(
+            static constexpr fmt::string_view Format_8300(
                 "! <Building Convection Parameters:Southeast Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
             print(state.files.eio, Format_8300); // header for southeast facade
-            static constexpr auto Format_8301(
+            static constexpr fmt::string_view Format_8301(
                 "Building Convection Parameters:Southeast Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
             print(state.files.eio,
                   Format_8301,
@@ -4738,10 +4741,10 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   SouthEastFacade.Zmin,
                   SouthEastFacade.Zmax);
 
-            static constexpr auto Format_8400(
+            static constexpr fmt::string_view Format_8400(
                 "! <Building Convection Parameters:South Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
             print(state.files.eio, Format_8400); // header for south facade
-            static constexpr auto Format_8401(
+            static constexpr fmt::string_view Format_8401(
                 "Building Convection Parameters:South Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
             print(state.files.eio,
                   Format_8401,
@@ -4753,10 +4756,10 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   SouthFacade.Ymax,
                   SouthFacade.Zmin,
                   SouthFacade.Zmax);
-            static constexpr auto Format_8500(
+            static constexpr fmt::string_view Format_8500(
                 "! <Building Convection Parameters:Southwest Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
             print(state.files.eio, Format_8500); // header for southwest facade
-            static constexpr auto Format_8501(
+            static constexpr fmt::string_view Format_8501(
                 "Building Convection Parameters:Southwest Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
             print(state.files.eio,
                   Format_8501,
@@ -4768,10 +4771,10 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   SouthWestFacade.Ymax,
                   SouthWestFacade.Zmin,
                   SouthWestFacade.Zmax);
-            static constexpr auto Format_8600(
+            static constexpr fmt::string_view Format_8600(
                 "! <Building Convection Parameters:West Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
             print(state.files.eio, Format_8600); // header for west facade
-            static constexpr auto Format_8601(
+            static constexpr fmt::string_view Format_8601(
                 "Building Convection Parameters:West Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
             print(state.files.eio,
                   Format_8601,
@@ -4783,10 +4786,10 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   WestFacade.Ymax,
                   WestFacade.Zmin,
                   WestFacade.Zmax);
-            static constexpr auto Format_8700(
+            static constexpr fmt::string_view Format_8700(
                 "! <Building Convection Parameters:Northwest Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
             print(state.files.eio, Format_8700); // header for northwest facade
-            static constexpr auto Format_8701(
+            static constexpr fmt::string_view Format_8701(
                 "Building Convection Parameters:NorthwWest Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
             print(state.files.eio,
                   Format_8701,
@@ -4798,12 +4801,12 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   NorthWestFacade.Ymax,
                   NorthWestFacade.Zmin,
                   NorthWestFacade.Zmax);
-            static constexpr auto Format_8800(
+            static constexpr fmt::string_view Format_8800(
                 "! <Building Convection Parameters:Roof>, Area [m2], Perimeter [m], Height [m], XdYdZd:X, XdYdZd:Y, XdYdZd:Z,XdYdZu:X, XdYdZu:Y, "
                 "XdYdZu:Z,XdYuZd:X, XdYuZd:Y, XdYuZd:Z,XdYuZu:X, XdYuZu:Y, XdYuZu:Z,XuYdZd:X, XuYdZd:Y, XuYdZd:Z,XuYuZd:X, XuYuZd:Y, "
                 "XuYuZd:Z,XuYdZu:X, XuYdZu:Y, XuYdZu:Z,XuYuZu:X, XuYuZu:Y, XuYuZu:Z\n");
             print(state.files.eio, Format_8800); // header for roof
-            static constexpr auto Format_8801(
+            static constexpr fmt::string_view Format_8801(
                 "Building Convection Parameters:Roof,{:.2R},{:.2R},{:.2R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},");
             print(state.files.eio,
                   Format_8801,
@@ -4817,7 +4820,7 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   state.dataConvectionCoefficient->RoofGeo.XdYdZu.Vertex.y,
                   state.dataConvectionCoefficient->RoofGeo.XdYdZu.Vertex.z,
                   state.dataConvectionCoefficient->RoofGeo.XdYuZd.Vertex.x);
-            static constexpr auto Format_88012("{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},");
+            static constexpr fmt::string_view Format_88012("{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},");
             print(state.files.eio,
                   Format_88012,
                   state.dataConvectionCoefficient->RoofGeo.XdYuZd.Vertex.y,
@@ -4830,7 +4833,7 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   state.dataConvectionCoefficient->RoofGeo.XuYdZd.Vertex.z,
                   state.dataConvectionCoefficient->RoofGeo.XuYuZd.Vertex.x,
                   state.dataConvectionCoefficient->RoofGeo.XuYuZd.Vertex.y);
-            static constexpr auto Format_88013("{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
+            static constexpr fmt::string_view Format_88013("{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
             print(state.files.eio,
                   Format_88013,
                   state.dataConvectionCoefficient->RoofGeo.XuYuZd.Vertex.z,

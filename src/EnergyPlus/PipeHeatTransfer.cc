@@ -818,7 +818,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
 void PipeHTData::ValidatePipeConstruction(EnergyPlusData &state,
                                           std::string const &PipeType,         // module object of pipe (error messages)
                                           std::string const &ConstructionName, // construction name of pipe (error messages)
-                                          std::string const &FieldName,        // fieldname of pipe (error messages)
+                                          std::string_view FieldName,          // fieldname of pipe (error messages)
                                           int const ConstructionNum,           // pointer into construction data
                                           bool &ErrorsFound                    // set to true if errors found here
 )
@@ -945,7 +945,7 @@ void PipeHTData::InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHV
     using ScheduleManager::GetCurrentScheduleValue;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("InitPipesHeatTransfer");
+    static constexpr std::string_view RoutineName("InitPipesHeatTransfer");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -1717,7 +1717,7 @@ Real64 PipeHTData::CalcPipeHeatTransCoef(EnergyPlusData &state,
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("PipeHeatTransfer::CalcPipeHeatTransCoef: ");
+    static constexpr std::string_view RoutineName("PipeHeatTransfer::CalcPipeHeatTransCoef: ");
     Real64 const MaxLaminarRe(2300.0); // Maximum Reynolds number for laminar flow
     int const NumOfPropDivisions(13);  // intervals in property correlation
     static Array1D<Real64> const Temps(
