@@ -901,6 +901,7 @@ namespace DataHeatBalance {
         int OABalancePtr;            // A pointer to ZoneAirBalance If quadrature is true
         Real64 VolumeFlowRate;       // infiltration air volume flow rate
         Real64 MassFlowRate;         // infiltration air mass flow rate
+        Real64 MCpI_temp;            // INFILTRATION MASS FLOW * AIR SPECIFIC HEAT
         Real64 InfilHeatGain;          // Heat Gain {J} due to infiltration
         Real64 InfilHeatLoss;          // Heat Loss {J} due to infiltration
         Real64 InfilLatentGain;        // Latent Gain {J} due to infiltration

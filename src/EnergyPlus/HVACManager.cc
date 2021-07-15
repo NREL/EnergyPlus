@@ -2332,6 +2332,7 @@ void ReportAirHeatBalance(EnergyPlusData &state)
 
     // Using/Aliasing
     using AirflowNetworkBalanceManager::ReportAirflowNetwork;
+    using ZoneEquipmentManager::ReportInfiltrations;
     using DataHeatBalance::AirBalanceQuadrature;
     using DataHVACGlobals::CycleOn;
     using DataHVACGlobals::CycleOnZoneFansOnly;
@@ -2424,6 +2425,7 @@ void ReportAirHeatBalance(EnergyPlusData &state)
         state.dataHVACMgr->ReportAirHeatBalanceFirstTimeFlag = false;
     }
 
+    ReportInfiltrations(state);
     for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
 
         // Break the infiltration load into heat gain and loss components
@@ -2479,7 +2481,6 @@ void ReportAirHeatBalance(EnergyPlusData &state)
         }
 
         // first calculate mass flows using outside air heat capacity for consistency with input to heat balance
-        CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
         ZnAirRpt(ZoneLoop).InfilMass =
             (state.dataHeatBalFanSys->MCPI(ZoneLoop) / CpAir) * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
         ZnAirRpt(ZoneLoop).InfilMdot = (state.dataHeatBalFanSys->MCPI(ZoneLoop) / CpAir) * ADSCorrectionFactor;
