@@ -6949,7 +6949,7 @@ namespace UnitarySystems {
                     UtilityRoutines::MakeUPPERCase(AsString(fields.at("dx_cooling_coil_system_sensor_node_name"))); // required field
 
                 original_input_specs.cooling_coil_object_type =
-                    UtilityRoutines::MakeUPPERCase(fields.at("cooling_coil_object_type"));                                         // required field
+                    UtilityRoutines::MakeUPPERCase(AsString(fields.at("cooling_coil_object_type")));                               // required field
                 original_input_specs.cooling_coil_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("cooling_coil_name"))); // required field
                 // min-fields = 7, begin optional inputs
                 std::string loc_dehumm_ControlType("");
