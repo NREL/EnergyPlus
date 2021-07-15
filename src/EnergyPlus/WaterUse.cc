@@ -1499,7 +1499,7 @@ namespace WaterUse {
     void WaterConnectionsType::oneTimeInit_new(EnergyPlusData &state)
     {
 
-            this->setupOutputVars(state);
+        this->setupOutputVars(state);
 
         if (allocated(state.dataPlnt->PlantLoop) && !this->StandAlone) {
             bool errFlag = false;
