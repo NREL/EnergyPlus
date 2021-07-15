@@ -94,7 +94,7 @@ using namespace DataVectorTypes;
 using DataBSDFWindow::BSDFLayerAbsorpStruct;
 using DataBSDFWindow::BSDFWindowInputStruct;
 
-Array1D_string const ZoneIntGainDeviceTypes(NumZoneIntGainDeviceTypes,
+Array1D_string const ZoneIntGainDeviceTypes(static_cast<int>(IntGainTypeOf::NUM),
                                             {"PEOPLE",
                                              "LIGHTS",
                                              "ELECTRICEQUIPMENT",
@@ -150,7 +150,7 @@ Array1D_string const ZoneIntGainDeviceTypes(NumZoneIntGainDeviceTypes,
                                              "ELECTRICLOADCENTER:STORAGE:CONVERTER",
                                              "FAN:SYSTEMMODEL"});
 
-Array1D_string const ccZoneIntGainDeviceTypes(NumZoneIntGainDeviceTypes,
+Array1D_string const ccZoneIntGainDeviceTypes(static_cast<int>(IntGainTypeOf::NUM),
                                               {"People",
                                                "Lights",
                                                "ElectricEquipment",

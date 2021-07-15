@@ -94,14 +94,17 @@ enum OpSchemeType
 
 // Parameters for component character wrt how load gets met (or not)
 //  used in %HowLoadServed to facilitate load dispatch logic
-int const HowMet_Unknown(50);                              // not yet set
-int const HowMet_NoneDemand(51);                           // does not meet a load, demand component
-int const HowMet_PassiveCap(52);                           // Passive machine, does what conditions allow but
-int const HowMet_ByNominalCap(53);                         // MaxLoad, MinLoad, OptLoad should work
-int const HowMet_ByNominalCapLowOutLimit(54);              // MaxLoad, MinLoad, OptLoad but with low limit temp on outlet
-int const HowMet_ByNominalCapHiOutLimit(55);               // MaxLoad, MinLoad, OptLoad but with high limit temp on outlet
-int const HowMet_ByNominalCapFreeCoolCntrl(56);            // HowMet_ByNominalCap with free cool shutdown
-int const HowMet_ByNominalCapLowOutLimitFreeCoolCntrl(57); // HowMet_ByNominalCapLowOutLimit with free cool shutdown
+enum class HowMet
+{
+    Unknown = -1,                        // not yet set
+    NoneDemand,                          // does not meet a load, demand component
+    PassiveCap,                          // Passive machine, does what conditions allow but
+    ByNominalCap,                        // MaxLoad, MinLoad, OptLoad should work
+    ByNominalCapLowOutLimit,             // MaxLoad, MinLoad, OptLoad but with low limit temp on outlet
+    ByNominalCapHiOutLimit,              // MaxLoad, MinLoad, OptLoad but with high limit temp on outlet
+    ByNominalCapFreeCoolCntrl,           // HowMet_ByNominalCap with free cool shutdown
+    ByNominalCapLowOutLimitFreeCoolCntrl // HowMet_ByNominalCapLowOutLimit with free cool shutdown
+};
 
 enum class iLoadingScheme
 {

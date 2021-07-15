@@ -1362,7 +1362,6 @@ namespace RoomAirModelManager {
         // Use input processor to get input from idf file
 
         // Using/Aliasing
-        using DataHeatBalance::NumZoneIntGainDeviceTypes;
         using DataHeatBalance::ZoneIntGainDeviceTypes;
         using DataHVACGlobals::NumZoneHVACTerminalTypes;
         using DataHVACGlobals::ZoneHVACTerminalTypes;
@@ -1678,8 +1677,9 @@ namespace RoomAirModelManager {
                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).HasIntGainsAssigned = true;
                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).NumIntGains = numGains;
                         for (gainsLoop = 1; gainsLoop <= numGains; ++gainsLoop) {
-                            TypeNum = UtilityRoutines::FindItemInList(
-                                state.dataIPShortCut->cAlphaArgs(gainsLoop * 2), ZoneIntGainDeviceTypes, NumZoneIntGainDeviceTypes);
+                            TypeNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(gainsLoop * 2),
+                                                                      ZoneIntGainDeviceTypes,
+                                                                      static_cast<int>(DataHeatBalance::IntGainTypeOf::NUM));
                             if (TypeNum > 0) {
                                 state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain(gainsLoop).TypeOfNum = TypeNum;
                             } else {

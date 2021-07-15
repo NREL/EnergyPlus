@@ -643,16 +643,16 @@ namespace UserDefinedComponents {
                             auto const SELECT_CASE_var(cAlphaArgs(aArgCount + 2));
                             if (SELECT_CASE_var == "DEMANDSLOAD") {
                                 state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).HowLoadServed =
-                                    DataPlant::HowMet_NoneDemand;
+                                    DataPlant::HowMet::NoneDemand;
                             } else if (SELECT_CASE_var == "MEETSLOADWITHPASSIVECAPACITY") {
                                 state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).HowLoadServed =
-                                    DataPlant::HowMet_PassiveCap;
+                                    DataPlant::HowMet::PassiveCap;
                             } else if (SELECT_CASE_var == "MEETSLOADWITHNOMINALCAPACITY") {
                                 state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).HowLoadServed =
-                                    DataPlant::HowMet_ByNominalCap;
+                                    DataPlant::HowMet::ByNominalCap;
                             } else if (SELECT_CASE_var == "MEETSLOADWITHNOMINALCAPACITYLOWOUTLIMIT") {
                                 state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).HowLoadServed =
-                                    DataPlant::HowMet_ByNominalCapLowOutLimit;
+                                    DataPlant::HowMet::ByNominalCapLowOutLimit;
                                 // actuator for low out limit
                                 SetupEMSActuator(state,
                                                  "Plant Connection " + LoopStr,
@@ -663,7 +663,7 @@ namespace UserDefinedComponents {
                                                  state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).LowOutTempLimit);
                             } else if (SELECT_CASE_var == "MEETSLOADWITHNOMINALCAPACITYHIOUTLIMIT") {
                                 state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).HowLoadServed =
-                                    DataPlant::HowMet_ByNominalCapHiOutLimit;
+                                    DataPlant::HowMet::ByNominalCapHiOutLimit;
                                 // actuator for hi out limit
                                 SetupEMSActuator(state,
                                                  "Plant Connection " + LoopStr,
@@ -738,7 +738,7 @@ namespace UserDefinedComponents {
                                                  "[kg/s]",
                                                  state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).InletMassFlowRate);
                         if (state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).HowLoadServed !=
-                            DataPlant::HowMet_NoneDemand) {
+                            DataPlant::HowMet::NoneDemand) {
                             SetupEMSInternalVariable(state,
                                                      "Load Request for Plant Connection " + LoopStr,
                                                      state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
@@ -1210,7 +1210,7 @@ namespace UserDefinedComponents {
                         BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(9), cAlphaArgs(10), "Plant Nodes");
 
                         // this model is only for plant connections that are "Demand"
-                        state.dataUserDefinedComponents->UserCoil(CompLoop).Loop.HowLoadServed = DataPlant::HowMet_NoneDemand;
+                        state.dataUserDefinedComponents->UserCoil(CompLoop).Loop.HowLoadServed = DataPlant::HowMet::NoneDemand;
                         // this model is only for plant connections that are needy and turn loop on
                         state.dataUserDefinedComponents->UserCoil(CompLoop).Loop.FlowPriority = DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
 
@@ -1685,7 +1685,7 @@ namespace UserDefinedComponents {
                                                                 DataLoopNode::ObjectIsNotParent);
                         BranchNodeConnections::TestCompSet(
                             state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(aArgCount), cAlphaArgs(aArgCount + 1), "Plant Nodes");
-                        state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).HowLoadServed = DataPlant::HowMet_NoneDemand;
+                        state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).HowLoadServed = DataPlant::HowMet::NoneDemand;
                         state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).FlowPriority =
                             DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
                         // Setup Internal Variables
@@ -2190,7 +2190,7 @@ namespace UserDefinedComponents {
                                                                 cAlphaFieldNames(aArgCount + 1));
                         BranchNodeConnections::TestCompSet(
                             state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(aArgCount), cAlphaArgs(aArgCount + 1), "Plant Nodes");
-                        state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Loop(ConnectionLoop).HowLoadServed = DataPlant::HowMet_NoneDemand;
+                        state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Loop(ConnectionLoop).HowLoadServed = DataPlant::HowMet::NoneDemand;
                         state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Loop(ConnectionLoop).FlowPriority =
                             DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
                         // Setup Internal Variables
@@ -2721,7 +2721,7 @@ namespace UserDefinedComponents {
                 this->Water.CollectedVdot;
         }
 
-        if (this->Loop(LoopNum).HowLoadServed == DataPlant::HowMet_ByNominalCapLowOutLimit) {
+        if (this->Loop(LoopNum).HowLoadServed == DataPlant::HowMet::ByNominalCapLowOutLimit) {
             state.dataPlnt->PlantLoop(this->Loop(LoopNum).LoopNum)
                 .LoopSide(this->Loop(LoopNum).LoopSideNum)
                 .Branch(this->Loop(LoopNum).BranchNum)
@@ -2729,7 +2729,7 @@ namespace UserDefinedComponents {
                 .MinOutletTemp = this->Loop(LoopNum).LowOutTempLimit;
         }
 
-        if (this->Loop(LoopNum).HowLoadServed == DataPlant::HowMet_ByNominalCapHiOutLimit) {
+        if (this->Loop(LoopNum).HowLoadServed == DataPlant::HowMet::ByNominalCapHiOutLimit) {
             state.dataPlnt->PlantLoop(this->Loop(LoopNum).LoopNum)
                 .LoopSide(this->Loop(LoopNum).LoopSideNum)
                 .Branch(this->Loop(LoopNum).BranchNum)
