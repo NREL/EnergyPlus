@@ -2095,7 +2095,7 @@ namespace PlantChillers {
                     .LoopSide(this->CWLoopSideNum)
                     .Branch(this->CWBranchNum)
                     .Comp(this->CWCompNum)
-                    .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
+                    .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
             }
 
             if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
@@ -2104,7 +2104,7 @@ namespace PlantChillers {
                     .LoopSide(this->CWLoopSideNum)
                     .Branch(this->CWBranchNum)
                     .Comp(this->CWCompNum)
-                    .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
+                    .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
 
                 // check if setpoint on outlet node
                 if ((state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
@@ -4153,7 +4153,7 @@ namespace PlantChillers {
                     .LoopSide(this->CWLoopSideNum)
                     .Branch(this->CWBranchNum)
                     .Comp(this->CWCompNum)
-                    .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
+                    .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
             }
 
             if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
@@ -4162,7 +4162,7 @@ namespace PlantChillers {
                     .LoopSide(this->CWLoopSideNum)
                     .Branch(this->CWBranchNum)
                     .Comp(this->CWCompNum)
-                    .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
+                    .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
                 // check if setpoint on outlet node
                 if ((state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
                     (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
@@ -6132,7 +6132,7 @@ namespace PlantChillers {
                     .LoopSide(this->CWLoopSideNum)
                     .Branch(this->CWBranchNum)
                     .Comp(this->CWCompNum)
-                    .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
+                    .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
             }
 
             if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
@@ -6141,7 +6141,7 @@ namespace PlantChillers {
                     .LoopSide(this->CWLoopSideNum)
                     .Branch(this->CWBranchNum)
                     .Comp(this->CWCompNum)
-                    .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
+                    .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
 
                 // check if setpoint on outlet node
                 if ((state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
@@ -7596,7 +7596,7 @@ namespace PlantChillers {
                     .LoopSide(this->CWLoopSideNum)
                     .Branch(this->CWBranchNum)
                     .Comp(this->CWCompNum)
-                    .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
+                    .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
             }
 
             if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
@@ -7605,7 +7605,7 @@ namespace PlantChillers {
                     .LoopSide(this->CWLoopSideNum)
                     .Branch(this->CWBranchNum)
                     .Comp(this->CWCompNum)
-                    .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
+                    .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
 
                 // check if setpoint on outlet node
                 if ((state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&

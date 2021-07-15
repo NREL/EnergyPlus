@@ -1433,7 +1433,6 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
     // This subroutine does one-time and begin-envrn inits for the pump
 
     // Using/Aliasing
-    using DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSatDensityRefrig;
 
@@ -1593,7 +1592,7 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
                 .LoopSide(state.dataPumps->PumpEquip(PumpNum).LoopSideNum)
                 .Branch(state.dataPumps->PumpEquip(PumpNum).BranchNum)
                 .Comp(state.dataPumps->PumpEquip(PumpNum).CompNum)
-                .FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+                .FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
         }
 
         state.dataPumps->PumpEquip(PumpNum).PumpOneTimeFlag = false;

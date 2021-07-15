@@ -1432,7 +1432,7 @@ void MicroCHPDataStruct::oneTimeInit(EnergyPlusData &state)
                         .LoopSide(this->CWLoopSideNum)
                         .Branch(this->CWBranchNum)
                         .Comp(this->CWCompNum)
-                        .FlowPriority = DataPlant::LoopFlowStatus_TakesWhatGets;
+                        .FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
                 }
             }
 

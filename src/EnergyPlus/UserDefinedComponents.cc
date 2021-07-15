@@ -679,13 +679,13 @@ namespace UserDefinedComponents {
                             auto const SELECT_CASE_var(cAlphaArgs(aArgCount + 3));
                             if (SELECT_CASE_var == "NEEDSFLOWIFLOOPON") {
                                 state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).FlowPriority =
-                                    DataPlant::LoopFlowStatus_NeedyIfLoopOn;
+                                    DataPlant::LoopFlowStatus::NeedyIfLoopOn;
                             } else if (SELECT_CASE_var == "NEEDSFLOWANDTURNSLOOPON") {
                                 state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).FlowPriority =
-                                    DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
+                                    DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
                             } else if (SELECT_CASE_var == "RECEIVESWHATEVERFLOWAVAILABLE") {
                                 state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).FlowPriority =
-                                    DataPlant::LoopFlowStatus_TakesWhatGets;
+                                    DataPlant::LoopFlowStatus::TakesWhatGets;
                             }
                         }
 
@@ -1212,7 +1212,7 @@ namespace UserDefinedComponents {
                         // this model is only for plant connections that are "Demand"
                         state.dataUserDefinedComponents->UserCoil(CompLoop).Loop.HowLoadServed = DataPlant::HowMet::NoneDemand;
                         // this model is only for plant connections that are needy and turn loop on
-                        state.dataUserDefinedComponents->UserCoil(CompLoop).Loop.FlowPriority = DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
+                        state.dataUserDefinedComponents->UserCoil(CompLoop).Loop.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
 
                         // Setup Internal Variables
                         // model input related internal variables
@@ -1687,7 +1687,7 @@ namespace UserDefinedComponents {
                             state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(aArgCount), cAlphaArgs(aArgCount + 1), "Plant Nodes");
                         state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).HowLoadServed = DataPlant::HowMet::NoneDemand;
                         state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).FlowPriority =
-                            DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
+                            DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
                         // Setup Internal Variables
                         const auto LoopStr = fmt::to_string(ConnectionLoop);
                         // model input related internal variables
@@ -2192,7 +2192,7 @@ namespace UserDefinedComponents {
                             state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(aArgCount), cAlphaArgs(aArgCount + 1), "Plant Nodes");
                         state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Loop(ConnectionLoop).HowLoadServed = DataPlant::HowMet::NoneDemand;
                         state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Loop(ConnectionLoop).FlowPriority =
-                            DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
+                            DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
                         // Setup Internal Variables
                         const auto LoopStr = fmt::to_string(ConnectionLoop);
                         // model input related internal variables

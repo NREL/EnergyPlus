@@ -50,18 +50,16 @@
 
 namespace EnergyPlus::DataPlant {
 
-// Parameters for loop flow request priority,
-//     used in logic to deal with Node%MassFlowRequest for determining overall loop flow rate
-int const LoopFlowStatus_Unknown(21);             // component's status is not yet set
-int const LoopFlowStatus_NeedyAndTurnsLoopOn(22); // component is a "winner" for loop flow requests
-// active valve inside component that modulates flow
-//  gets the loop going under most conditions
-int const LoopFlowStatus_NeedyIfLoopOn(23); // component is a "winner" for loop flow requests
-// but doesn't normally get the loop going to start with
-//  once loop is going, may increase needs, non-zero minimums
-int const LoopFlowStatus_TakesWhatGets(24); // component is a "loser" for loop flow requests,
-// but if the loop is on it
-// it does make flow requests (for s/m resolution)
+// Parameters for loop flow request priority, used in logic to deal with Node%MassFlowRequest for determining overall loop flow rate
+enum class LoopFlowStatus
+{
+    Unknown = -1,        // component's status is not yet set
+    NeedyAndTurnsLoopOn, // component is a "winner" for loop flow requests active valve inside component that modulates flow gets the loop going under
+                         // most conditions
+    NeedyIfLoopOn, // component is a "winner" for loop flow requests but doesn't normally get the loop going to start with once loop is going, may
+                   // increase needs, non-zero minimums
+    TakesWhatGets  // component is a "loser" for loop flow requests, but if the loop is on it, it does make flow requests (for s/m resolution)
+};
 
 // Parameters for scheme types
 // Used in TYPE(OperationData)%OpSchemeType
