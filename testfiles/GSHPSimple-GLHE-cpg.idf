@@ -1884,8 +1884,9 @@
     Vertical Ground Heat Exchanger Ground Temps,  !- Undisturbed Ground Temperature Model Name
     0.692626E+00,            !- Ground Thermal Conductivity {W/m-K}
     0.234700E+07,            !- Ground Thermal Heat Capacity {J/m3-K}
-    UBHWTcalc,                !- g-Function Calculation Model Name
-    Vertical Ground Heat Exchanger g-functions;  !- GHE:Vertical:ResponseFactors Object Name
+    ,                        !- GHE:Vertical:ResponseFactors Object Name
+    UBHWTcalc,               !- g-Function Calculation Method
+    GHE-Array;               !- GHE:Vertical:Array Object Name
 
   GroundHeatExchanger:Vertical:Properties,
     Vertical Ground Heat Exchanger Props,  !- Name
@@ -1909,81 +1910,12 @@
     3.2,                     !- Average Amplitude of Surface Temperature {deltaC}
     8;                       !- Phase Shift of Minimum Surface Temperature {days}
 
-  GroundHeatExchanger:ResponseFactors,
-    Vertical Ground Heat Exchanger g-functions,  !- Name
+  GroundHeatExchanger:Vertical:Array,
+    GHE-Array,               !- Name
     Vertical Ground Heat Exchanger Props,  !- GHE:Vertical:Properties Object Name
-    120,                     !- Number of Boreholes
-    0.0005,                  !- G-Function Reference Ratio {dimensionless}
-    -15.2996,                !- g-Function Ln(T/Ts) Value 1
-    -0.348322,               !- g-Function g Value 1
-    -14.201,                 !- g-Function Ln(T/Ts) Value 2
-    0.022208,                !- g-Function g Value 2
-    -13.2202,                !- g-Function Ln(T/Ts) Value 3
-    0.412345,                !- g-Function g Value 3
-    -12.2086,                !- g-Function Ln(T/Ts) Value 4
-    0.867498,                !- g-Function g Value 4
-    -11.1888,                !- g-Function Ln(T/Ts) Value 5
-    1.357839,                !- g-Function g Value 5
-    -10.1816,                !- g-Function Ln(T/Ts) Value 6
-    1.852024,                !- g-Function g Value 6
-    -9.1815,                 !- g-Function Ln(T/Ts) Value 7
-    2.345656,                !- g-Function g Value 7
-    -8.6809,                 !- g-Function Ln(T/Ts) Value 8
-    2.593958,                !- g-Function g Value 8
-    -8.5,                    !- g-Function Ln(T/Ts) Value 9
-    2.679,                   !- g-Function g Value 9
-    -7.8,                    !- g-Function Ln(T/Ts) Value 10
-    3.023,                   !- g-Function g Value 10
-    -7.2,                    !- g-Function Ln(T/Ts) Value 11
-    3.32,                    !- g-Function g Value 11
-    -6.5,                    !- g-Function Ln(T/Ts) Value 12
-    3.681,                   !- g-Function g Value 12
-    -5.9,                    !- g-Function Ln(T/Ts) Value 13
-    4.071,                   !- g-Function g Value 13
-    -5.2,                    !- g-Function Ln(T/Ts) Value 14
-    4.828,                   !- g-Function g Value 14
-    -4.5,                    !- g-Function Ln(T/Ts) Value 15
-    6.253,                   !- g-Function g Value 15
-    -3.963,                  !- g-Function Ln(T/Ts) Value 16
-    7.894,                   !- g-Function g Value 16
-    -3.27,                   !- g-Function Ln(T/Ts) Value 17
-    11.82,                   !- g-Function g Value 17
-    -2.864,                  !- g-Function Ln(T/Ts) Value 18
-    15.117,                  !- g-Function g Value 18
-    -2.577,                  !- g-Function Ln(T/Ts) Value 19
-    18.006,                  !- g-Function g Value 19
-    -2.171,                  !- g-Function Ln(T/Ts) Value 20
-    22.887,                  !- g-Function g Value 20
-    -1.884,                  !- g-Function Ln(T/Ts) Value 21
-    26.924,                  !- g-Function g Value 21
-    -1.191,                  !- g-Function Ln(T/Ts) Value 22
-    38.004,                  !- g-Function g Value 22
-    -0.497,                  !- g-Function Ln(T/Ts) Value 23
-    49.919,                  !- g-Function g Value 23
-    -0.274,                  !- g-Function Ln(T/Ts) Value 24
-    53.407,                  !- g-Function g Value 24
-    -0.051,                  !- g-Function Ln(T/Ts) Value 25
-    56.632,                  !- g-Function g Value 25
-    0.196,                   !- g-Function Ln(T/Ts) Value 26
-    59.825,                  !- g-Function g Value 26
-    0.419,                   !- g-Function Ln(T/Ts) Value 27
-    62.349,                  !- g-Function g Value 27
-    0.642,                   !- g-Function Ln(T/Ts) Value 28
-    64.524,                  !- g-Function g Value 28
-    0.873,                   !- g-Function Ln(T/Ts) Value 29
-    66.412,                  !- g-Function g Value 29
-    1.112,                   !- g-Function Ln(T/Ts) Value 30
-    67.993,                  !- g-Function g Value 30
-    1.335,                   !- g-Function Ln(T/Ts) Value 31
-    69.162,                  !- g-Function g Value 31
-    1.679,                   !- g-Function Ln(T/Ts) Value 32
-    70.476,                  !- g-Function g Value 32
-    2.028,                   !- g-Function Ln(T/Ts) Value 33
-    71.361,                  !- g-Function g Value 33
-    2.275,                   !- g-Function Ln(T/Ts) Value 34
-    71.79,                   !- g-Function g Value 34
-    3.003,                   !- g-Function Ln(T/Ts) Value 35
-    72.511;                  !- g-Function g Value 35
+    2,                       !- Number of Boreholes in X-Direction
+    2,                       !- Number of Boreholes in Y-Direction
+    5;                       !- Borehole Spacing {m}
 
   Pump:ConstantSpeed,
     Cond Circ Pump,          !- Name
