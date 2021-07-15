@@ -181,9 +181,10 @@ namespace UserDefinedComponents {
         AirConnectionStruct Air;
         WaterUseTankConnectionStruct Water;
         ZoneInternalGainsStruct Zone;
+        bool myOneTimeFlag;
 
         // Default Constructor
-        UserPlantComponentStruct() : ErlSimProgramMngr(0), simPluginLocation(-1), NumPlantConnections(0)
+        UserPlantComponentStruct() : ErlSimProgramMngr(0), simPluginLocation(-1), NumPlantConnections(0), myOneTimeFlag(true)
         {
         }
 
