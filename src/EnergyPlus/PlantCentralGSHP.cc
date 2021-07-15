@@ -207,7 +207,7 @@ void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
     //  flow (or source side) rate is calculated from the reference capacity, the COP, and the condenser
     //  loop design delta T.
 
-    static std::string const RoutineName("SizeCGSHPChillerHeater");
+    static constexpr std::string_view RoutineName("SizeCGSHPChillerHeater");
 
     bool ErrorsFound; // If errors detected in input
 
@@ -759,7 +759,7 @@ void GetWrapperInput(EnergyPlusData &state)
                 int CompIndex = UtilityRoutines::FindItemInList(CompName, state.dataPlantCentralGSHP->ChillerHeater);
                 // User may enter invalid name rather than selecting one from the object list
                 if (CompIndex <= 0) {
-                    ShowSevereError(state, "GetWrapperInput: Invalid Chiller Heater Modules Performance Component Name =" + CompName);
+                    ShowSevereError(state, "GetWrapperInput: Invalid Chiller Heater Modules Performance Component Name =" + std::string{CompName});
                     ShowContinueError(state, "Select the name of ChillerHeaterPerformance:Electric:EIR object(s) from the object list.");
                     ShowFatalError(state, "Program terminates due to preceding condition.");
                 }
@@ -1502,7 +1502,7 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     //  Uses the status flags to trigger initializations.
 
-    static std::string const RoutineName("InitCGSHPHeatPump");
+    static constexpr std::string_view RoutineName("InitCGSHPHeatPump");
 
     if (this->setupOutputVarsFlag) {
         this->setupOutputVars(state);
@@ -1835,8 +1835,8 @@ void WrapperSpecs::CalcChillerModel(EnergyPlusData &state)
     // REFERENCES:
     // 1. DOE-2 Engineers Manual, Version 2.1A, November 1982, LBL-11353
 
-    static std::string const RoutineName("CalcChillerHeaterModel");
-    static std::string const RoutineNameElecEIRChiller("CalcElectricEIRChillerModel");
+    static constexpr std::string_view RoutineName("CalcChillerHeaterModel");
+    static constexpr std::string_view RoutineNameElecEIRChiller("CalcElectricEIRChillerModel");
 
     bool IsLoadCoolRemaining(true);
     bool NextCompIndicator(false);       // Component indicator when identical chiller heaters exist
@@ -2285,8 +2285,8 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
     // REFERENCES:
     // 1. DOE-2 Engineers Manual, Version 2.1A, November 1982, LBL-11353
 
-    static std::string const RoutineName("CalcChillerHeaterModel");
-    static std::string const RoutineNameElecEIRChiller("CalcElectricEIRChillerModel");
+    static constexpr std::string_view RoutineName("CalcChillerHeaterModel");
+    static constexpr std::string_view RoutineNameElecEIRChiller("CalcElectricEIRChillerModel");
 
     bool IsLoadHeatRemaining(true);     // Ture if heating load remains for this chiller heater
     bool NextCompIndicator(false);      // Component indicator when identical chiller heaters exist
