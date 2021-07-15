@@ -1442,7 +1442,8 @@ namespace UnitarySystems {
         UnitarySys::getUnitarySystemInputData(state, objectName, ZoneEquipment, ZoneOAUnitNum, errorsFound);
 
         // all systems should have been processed at this point? I think so, so don't need to if test this call?
-        if (int(state.dataUnitarySystems->unitarySys.size()) == state.dataUnitarySystems->numUnitarySystems && state.dataZoneEquip->ZoneEquipInputsFilled)
+        if (int(state.dataUnitarySystems->unitarySys.size()) == state.dataUnitarySystems->numUnitarySystems &&
+            state.dataZoneEquip->ZoneEquipInputsFilled)
             setupAllOutputVars(state, state.dataUnitarySystems->numUnitarySystems);
 
         if (errorsFound) {
@@ -6936,7 +6937,8 @@ namespace UnitarySystems {
                 original_input_specs.name = thisObjectName;
                 original_input_specs.system_type = cCurrentModuleObject;
                 if (fields.find("availability_schedule_name") != fields.end()) { // not required field
-                    original_input_specs.availability_schedule_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("availability_schedule_name")));
+                    original_input_specs.availability_schedule_name =
+                        UtilityRoutines::MakeUPPERCase(AsString(fields.at("availability_schedule_name")));
                 }
                 original_input_specs.air_inlet_node_name =
                     UtilityRoutines::MakeUPPERCase(AsString(fields.at("dx_cooling_coil_system_inlet_node_name"))); // required field
@@ -6947,7 +6949,7 @@ namespace UnitarySystems {
                     UtilityRoutines::MakeUPPERCase(AsString(fields.at("dx_cooling_coil_system_sensor_node_name"))); // required field
 
                 original_input_specs.cooling_coil_object_type =
-                    UtilityRoutines::MakeUPPERCase(fields.at("cooling_coil_object_type"));                               // required field
+                    UtilityRoutines::MakeUPPERCase(fields.at("cooling_coil_object_type"));                                         // required field
                 original_input_specs.cooling_coil_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("cooling_coil_name"))); // required field
                 // min-fields = 7, begin optional inputs
                 std::string loc_dehumm_ControlType("");
