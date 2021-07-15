@@ -2385,8 +2385,6 @@ namespace UserDefinedComponents {
 
         static std::string const RoutineName("InitPlantUserComponent");
 
-        this->oneTimeInit(state);
-
         if (LoopNum <= 0 || LoopNum > this->NumPlantConnections) return;
 
         // fill internal variable targets
@@ -2740,42 +2738,38 @@ namespace UserDefinedComponents {
     void UserPlantComponentStruct::oneTimeInit(EnergyPlusData &state)
     {
 
-        if (this->myOneTimeFlag) {
-            // locate the connections to the plant loops
-            for (int ConnectionNum = 1; ConnectionNum <= this->NumPlantConnections; ++ConnectionNum) {
-                bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        DataPlant::TypeOf_PlantComponentUserDefined,
-                                                        this->Loop(ConnectionNum).LoopNum,
-                                                        this->Loop(ConnectionNum).LoopSideNum,
-                                                        this->Loop(ConnectionNum).BranchNum,
-                                                        this->Loop(ConnectionNum).CompNum,
-                                                        errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        this->Loop(ConnectionNum).InletNodeNum);
-                if (errFlag) {
-                    ShowFatalError(state, "InitPlantUserComponent: Program terminated due to previous condition(s).");
-                }
-
-                // set user input for flow priority
-                state.dataPlnt->PlantLoop(this->Loop(ConnectionNum).LoopNum)
-                    .LoopSide(this->Loop(ConnectionNum).LoopSideNum)
-                    .Branch(this->Loop(ConnectionNum).BranchNum)
-                    .Comp(this->Loop(ConnectionNum).CompNum)
-                    .FlowPriority = this->Loop(ConnectionNum).FlowPriority;
-
-                // set user input for how loads served
-                state.dataPlnt->PlantLoop(this->Loop(ConnectionNum).LoopNum)
-                    .LoopSide(this->Loop(ConnectionNum).LoopSideNum)
-                    .Branch(this->Loop(ConnectionNum).BranchNum)
-                    .Comp(this->Loop(ConnectionNum).CompNum)
-                    .HowLoadServed = this->Loop(ConnectionNum).HowLoadServed;
+        // locate the connections to the plant loops
+        for (int ConnectionNum = 1; ConnectionNum <= this->NumPlantConnections; ++ConnectionNum) {
+            bool errFlag = false;
+            PlantUtilities::ScanPlantLoopsForObject(state,
+                                                    this->Name,
+                                                    DataPlant::TypeOf_PlantComponentUserDefined,
+                                                    this->Loop(ConnectionNum).LoopNum,
+                                                    this->Loop(ConnectionNum).LoopSideNum,
+                                                    this->Loop(ConnectionNum).BranchNum,
+                                                    this->Loop(ConnectionNum).CompNum,
+                                                    errFlag,
+                                                    _,
+                                                    _,
+                                                    _,
+                                                    this->Loop(ConnectionNum).InletNodeNum);
+            if (errFlag) {
+                ShowFatalError(state, "InitPlantUserComponent: Program terminated due to previous condition(s).");
             }
 
-            this->myOneTimeFlag = false;
+            // set user input for flow priority
+            state.dataPlnt->PlantLoop(this->Loop(ConnectionNum).LoopNum)
+                .LoopSide(this->Loop(ConnectionNum).LoopSideNum)
+                .Branch(this->Loop(ConnectionNum).BranchNum)
+                .Comp(this->Loop(ConnectionNum).CompNum)
+                .FlowPriority = this->Loop(ConnectionNum).FlowPriority;
+
+            // set user input for how loads served
+            state.dataPlnt->PlantLoop(this->Loop(ConnectionNum).LoopNum)
+                .LoopSide(this->Loop(ConnectionNum).LoopSideNum)
+                .Branch(this->Loop(ConnectionNum).BranchNum)
+                .Comp(this->Loop(ConnectionNum).CompNum)
+                .HowLoadServed = this->Loop(ConnectionNum).HowLoadServed;
         }
     }
 
