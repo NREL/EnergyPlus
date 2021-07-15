@@ -1043,7 +1043,7 @@ namespace WaterUse {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate drainwater temperature and heat and moisture gains to zone.
 
-        static std::string const RoutineName("CalcEquipmentDrainTemp");
+        static constexpr std::string_view RoutineName("CalcEquipmentDrainTemp");
 
         this->SensibleRate = 0.0;
         this->SensibleEnergy = 0.0;
@@ -1112,31 +1112,7 @@ namespace WaterUse {
         //       MODIFIED       Brent Griffith 2010, demand side update
         //       RE-ENGINEERED  na
 
-        if (this->setupMyOutputVars) {
-            this->setupOutputVars(state);
-            this->setupMyOutputVars = false;
-        }
-
-        if (this->plantScanFlag && allocated(state.dataPlnt->PlantLoop) && !this->StandAlone) {
-            bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    DataPlant::TypeOf_WaterUseConnection,
-                                                    this->PlantLoopNum,
-                                                    this->PlantLoopSide,
-                                                    this->PlantLoopBranchNum,
-                                                    this->PlantLoopCompNum,
-                                                    errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _);
-            if (errFlag) {
-                ShowFatalError(state, "InitConnections: Program terminated due to previous condition(s).");
-            }
-            this->plantScanFlag = false;
-        }
+        this->oneTimeInit(state);
 
         // Set the cold water temperature
         if (this->SupplyTankNum > 0) {
@@ -1521,6 +1497,35 @@ namespace WaterUse {
         this->Power = this->HotMassFlowRate * Psychrometrics::CPHW(DataGlobalConstants::InitConvTemp) * (this->HotTemp - this->ReturnTemp);
         this->Energy = this->Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         this->RecoveryEnergy = this->RecoveryRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    }
+    void WaterConnectionsType::oneTimeInit(EnergyPlusData &state)
+    {
+
+        if (this->setupMyOutputVars) {
+            this->setupOutputVars(state);
+            this->setupMyOutputVars = false;
+        }
+
+        if (this->plantScanFlag && allocated(state.dataPlnt->PlantLoop) && !this->StandAlone) {
+            bool errFlag = false;
+            PlantUtilities::ScanPlantLoopsForObject(state,
+                                                    this->Name,
+                                                    DataPlant::TypeOf_WaterUseConnection,
+                                                    this->PlantLoopNum,
+                                                    this->PlantLoopSide,
+                                                    this->PlantLoopBranchNum,
+                                                    this->PlantLoopCompNum,
+                                                    errFlag,
+                                                    _,
+                                                    _,
+                                                    _,
+                                                    _,
+                                                    _);
+            if (errFlag) {
+                ShowFatalError(state, "InitConnections: Program terminated due to previous condition(s).");
+            }
+            this->plantScanFlag = false;
+        }
     }
 
     void CalcWaterUseZoneGains(EnergyPlusData &state)

@@ -845,7 +845,7 @@ namespace Psychrometrics {
         // values from PsyRhFnTdbWPb
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const RoutineName("PsyRhFnTdbRhov");
+        static constexpr std::string_view RoutineName("PsyRhFnTdbRhov");
 
 #ifdef EP_psych_stats
         ++state.dataPsychCache->NumTimesCalled(iPsyRhFnTdbRhov);
@@ -896,7 +896,7 @@ namespace Psychrometrics {
         // ASHRAE HANDBOOK FUNDAMENTALS 1985, P6.12, EQN 10,21,23
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const RoutineName("PsyRhFnTdbWPb");
+        static constexpr std::string_view RoutineName("PsyRhFnTdbWPb");
 
 #ifdef EP_psych_stats
         ++state.dataPsychCache->NumTimesCalled(iPsyRhFnTdbWPb);
@@ -954,7 +954,7 @@ namespace Psychrometrics {
         // ASHRAE HANDBOOK OF FUNDAMENTALS, 1972, P99, EQN 22
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const RoutineName("PsyWFnTdpPb");
+        static constexpr std::string_view RoutineName("PsyWFnTdpPb");
 
 #ifdef EP_psych_stats
         ++state.dataPsychCache->NumTimesCalled(iPsyWFnTdpPb);
@@ -1017,7 +1017,7 @@ namespace Psychrometrics {
         // ASHRAE HANDBOOK OF FUNDAMENTALS, 1972, P99, EQN 22
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const RoutineName("PsyWFnTdbRhPb");
+        static constexpr std::string_view RoutineName("PsyWFnTdbRhPb");
 
 #ifdef EP_psych_stats
         ++state.dataPsychCache->NumTimesCalled(iPsyWFnTdbRhPb);
@@ -1083,7 +1083,7 @@ namespace Psychrometrics {
         // ASHRAE HANDBOOK OF FUNDAMENTALS, 1972, P99, EQ 22,35
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const RoutineName("PsyWFnTdbTwbPb");
+        static constexpr std::string_view RoutineName("PsyWFnTdbTwbPb");
 
 #ifdef EP_psych_stats
         ++state.dataPsychCache->NumTimesCalled(iPsyWFnTdbTwbPb);

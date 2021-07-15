@@ -75,33 +75,33 @@ namespace WaterManager {
     void CalcWaterStorageTank(EnergyPlusData &state, int const TankNum); // Index of storage tank
 
     void SetupTankSupplyComponent(EnergyPlusData &state,
-                                  std::string const &CompName,
-                                  std::string const &CompType,
-                                  std::string const &TankName,
+                                  std::string_view CompName,
+                                  std::string_view CompType,
+                                  std::string_view TankName,
                                   bool &ErrorsFound,
                                   int &TankIndex,
                                   int &WaterSupplyIndex);
 
     void InternalSetupTankSupplyComponent(EnergyPlusData &state,
-                                          std::string const &CompName,
-                                          std::string const &CompType,
-                                          std::string const &TankName,
+                                          std::string_view CompName,
+                                          std::string_view CompType,
+                                          std::string_view TankName,
                                           bool &ErrorsFound,
                                           int &TankIndex,
                                           int &WaterSupplyIndex);
 
     void SetupTankDemandComponent(EnergyPlusData &state,
-                                  std::string const &CompName,
-                                  std::string const &CompType,
-                                  std::string const &TankName,
+                                  std::string_view CompName,
+                                  std::string_view const CompType,
+                                  std::string_view TankName,
                                   bool &ErrorsFound,
                                   int &TankIndex,
                                   int &WaterDemandIndex);
 
     void InternalSetupTankDemandComponent(EnergyPlusData &state,
-                                          std::string const &CompName,
-                                          std::string const &CompType,
-                                          std::string const &TankName,
+                                          std::string_view CompName,
+                                          std::string_view const CompType,
+                                          std::string_view TankName,
                                           bool &ErrorsFound,
                                           int &TankIndex,
                                           int &WaterDemandIndex);

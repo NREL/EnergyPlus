@@ -477,9 +477,8 @@ namespace ICEngineElectricGenerator {
         // METHODOLOGY EMPLOYED:
         // curve fit of performance data:
 
-        Real64 const ExhaustCP(1.047); // Exhaust Gas Specific Heat (J/kg-K)
-        Real64 const KJtoJ(1000.0);    // convert Kjoules to joules
-        static std::string const RoutineName("CalcICEngineGeneratorModel");
+        constexpr Real64 ExhaustCP(1.047); // Exhaust Gas Specific Heat (J/kg-K)
+        constexpr Real64 KJtoJ(1000.0);    // convert Kjoules to joules
 
         // Heat Recovery Fluid Mass FlowRate (kg/s)
         Real64 HeatRecMdot;
@@ -694,7 +693,7 @@ namespace ICEngineElectricGenerator {
         // The chiller sets the flow on the loop first by the input design flow rate and then
         // performs a check to verify that
 
-        static std::string const RoutineName("CalcICEngineGeneratorModel");
+        static constexpr std::string_view RoutineName("CalcICEngineGeneratorModel");
 
         // Need to set the HeatRecRatio to 1.0 if it is not modified
         HRecRatio = 1.0;
@@ -760,61 +759,7 @@ namespace ICEngineElectricGenerator {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
 
-        static std::string const RoutineName("InitICEngineGenerators");
-
-        bool errFlag;
-
-        if (this->myFlag) {
-            this->setupOutputVars(state);
-            this->myFlag = false;
-        }
-
-        if (this->MyPlantScanFlag && allocated(state.dataPlnt->PlantLoop) && this->HeatRecActive) {
-            errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    DataPlant::TypeOf_Generator_ICEngine,
-                                                    this->HRLoopNum,
-                                                    this->HRLoopSideNum,
-                                                    this->HRBranchNum,
-                                                    this->HRCompNum,
-                                                    errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _);
-            if (errFlag) {
-                ShowFatalError(state, "InitICEngineGenerators: Program terminated due to previous condition(s).");
-            }
-
-            this->MyPlantScanFlag = false;
-        }
-
-        if (this->MySizeAndNodeInitFlag && (!this->MyPlantScanFlag) && this->HeatRecActive) {
-
-            // size mass flow rate
-            Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                           state.dataPlnt->PlantLoop(this->HRLoopNum).FluidName,
-                                                           DataGlobalConstants::InitConvTemp,
-                                                           state.dataPlnt->PlantLoop(this->HRLoopNum).FluidIndex,
-                                                           RoutineName);
-
-            this->DesignHeatRecMassFlowRate = rho * this->DesignHeatRecVolFlowRate;
-            this->HeatRecMdotDesign = this->DesignHeatRecMassFlowRate;
-
-            PlantUtilities::InitComponentNodes(state,
-                                               0.0,
-                                               this->DesignHeatRecMassFlowRate,
-                                               this->HeatRecInletNodeNum,
-                                               this->HeatRecOutletNodeNum,
-                                               this->HRLoopNum,
-                                               this->HRLoopSideNum,
-                                               this->HRBranchNum,
-                                               this->HRCompNum);
-
-            this->MySizeAndNodeInitFlag = false;
-        } // end one time inits
+        this->oneTimeInit(state); // end one time inits
 
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag && this->HeatRecActive) {
@@ -876,6 +821,64 @@ namespace ICEngineElectricGenerator {
         if (this->HeatRecActive) {
             int HeatRecOutletNode = this->HeatRecOutletNodeNum;
             state.dataLoopNodes->Node(HeatRecOutletNode).Temp = this->HeatRecOutletTemp;
+        }
+    }
+    void ICEngineGeneratorSpecs::oneTimeInit(EnergyPlusData &state)
+    {
+        static constexpr std::string_view RoutineName("InitICEngineGenerators");
+
+        bool errFlag;
+
+        if (this->myFlag) {
+            this->setupOutputVars(state);
+            this->myFlag = false;
+        }
+
+        if (this->MyPlantScanFlag && allocated(state.dataPlnt->PlantLoop) && this->HeatRecActive) {
+            errFlag = false;
+            PlantUtilities::ScanPlantLoopsForObject(state,
+                                                    this->Name,
+                                                    DataPlant::TypeOf_Generator_ICEngine,
+                                                    this->HRLoopNum,
+                                                    this->HRLoopSideNum,
+                                                    this->HRBranchNum,
+                                                    this->HRCompNum,
+                                                    errFlag,
+                                                    _,
+                                                    _,
+                                                    _,
+                                                    _,
+                                                    _);
+            if (errFlag) {
+                ShowFatalError(state, "InitICEngineGenerators: Program terminated due to previous condition(s).");
+            }
+
+            this->MyPlantScanFlag = false;
+        }
+
+        if (this->MySizeAndNodeInitFlag && (!this->MyPlantScanFlag) && this->HeatRecActive) {
+
+            // size mass flow rate
+            Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                           state.dataPlnt->PlantLoop(this->HRLoopNum).FluidName,
+                                                           DataGlobalConstants::InitConvTemp,
+                                                           state.dataPlnt->PlantLoop(this->HRLoopNum).FluidIndex,
+                                                           RoutineName);
+
+            this->DesignHeatRecMassFlowRate = rho * this->DesignHeatRecVolFlowRate;
+            this->HeatRecMdotDesign = this->DesignHeatRecMassFlowRate;
+
+            PlantUtilities::InitComponentNodes(state,
+                                               0.0,
+                                               this->DesignHeatRecMassFlowRate,
+                                               this->HeatRecInletNodeNum,
+                                               this->HeatRecOutletNodeNum,
+                                               this->HRLoopNum,
+                                               this->HRLoopSideNum,
+                                               this->HRBranchNum,
+                                               this->HRCompNum);
+
+            this->MySizeAndNodeInitFlag = false;
         }
     }
 

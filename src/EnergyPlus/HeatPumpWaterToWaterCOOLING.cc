@@ -505,7 +505,7 @@ void GshpPeCoolingSpecs::initialize(EnergyPlusData &state)
     // initialization
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("InitGshp");
+    static constexpr std::string_view RoutineName("InitGshp");
 
     // For each new environment
     if (state.dataGlobal->BeginEnvrnFlag && this->beginEnvironFlag) {
@@ -593,12 +593,12 @@ void GshpPeCoolingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
     Real64 const RelaxParam(0.6);
     Real64 const SmallNum(1.0e-20);
     int const IterationLimit(500);
-    static std::string const RoutineName("CalcGshpModel");
-    static std::string const RoutineNameLoadSideRefridgTemp("CalcGSHPModel:LoadSideRefridgTemp");
-    static std::string const RoutineNameSourceSideRefridgTemp("CalcGSHPModel:SourceSideRefridgTemp");
-    static std::string const RoutineNameCompressInletTemp("CalcGSHPModel:CompressInletTemp");
-    static std::string const RoutineNameSuctionPr("CalcGSHPModel:SuctionPr");
-    static std::string const RoutineNameCompSuctionTemp("CalcGSHPModel:CompSuctionTemp");
+    static constexpr std::string_view RoutineName("CalcGshpModel");
+    static constexpr std::string_view RoutineNameLoadSideRefridgTemp("CalcGSHPModel:LoadSideRefridgTemp");
+    static constexpr std::string_view RoutineNameSourceSideRefridgTemp("CalcGSHPModel:SourceSideRefridgTemp");
+    static constexpr std::string_view RoutineNameCompressInletTemp("CalcGSHPModel:CompressInletTemp");
+    static constexpr std::string_view RoutineNameSuctionPr("CalcGSHPModel:SuctionPr");
+    static constexpr std::string_view RoutineNameCompSuctionTemp("CalcGSHPModel:CompSuctionTemp");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 SourceSideEffect;      // Source Side effectiveness
@@ -993,6 +993,9 @@ void GshpPeCoolingSpecs::update(EnergyPlusData &state)
         this->SourceSideWaterInletTemp = state.dataLoopNodes->Node(this->SourceSideInletNodeNum).Temp;
         this->LoadSideWaterInletTemp = state.dataLoopNodes->Node(this->LoadSideInletNodeNum).Temp;
     }
+}
+void GshpPeCoolingSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
 }
 
 } // namespace EnergyPlus::HeatPumpWaterToWaterCOOLING

@@ -85,7 +85,7 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    static std::string const RoutineName("GetBranchInput: ");
+    static constexpr std::string_view RoutineName("GetBranchInput: ");
     std::string CurrentModuleObject = "Branch";
     int NumOfBranches = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, CurrentModuleObject);
     int NumParams;
@@ -252,7 +252,7 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    static std::string const RoutineName("GetBranchInput: ");
+    static constexpr std::string_view RoutineName("GetBranchInput: ");
     std::string CurrentModuleObject = "Branch";
     int NumOfBranches = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, CurrentModuleObject);
     int NumParams;
