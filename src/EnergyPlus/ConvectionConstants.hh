@@ -149,6 +149,16 @@ constexpr int OutConvClass_LeewardVertWall{102};
 constexpr int OutConvClass_RoofStable{103};
 constexpr int OutConvClass_RoofUnstable{104};
 
+enum class SurfConvOrientation
+{
+    Invalid = -1,
+    HorizontalDown,
+    TiltedDownward,
+    Vertical,
+    TiltedUpward,
+    HorizontalUp,
+};
+
 // Parameters for fenestration relative location in zone
 enum class InConvWinLoc
 {

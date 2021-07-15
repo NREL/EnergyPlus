@@ -6059,63 +6059,86 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
             DeltaTemp = TH(2, 1, SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
             if (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::Door) {
 
-                if ((Surface(SurfNum).Tilt > 85.0) && (Surface(SurfNum).Tilt < 95.0)) { // vertical wall
+                switch (Surface(SurfNum).ConvOrientation) {
+                case ConvectionConstants::SurfConvOrientation::Vertical:
                     state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_VertWalls;
-                } else if (Surface(SurfNum).Tilt >= 95.0) { // tilted upwards
+                    break;
+                case ConvectionConstants::SurfConvOrientation::TiltedUpward:
                     if (DeltaTemp > 0.0) {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_UnstableTilted;
                     } else {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_StableTilted;
                     }
-                } else if (Surface(SurfNum).Tilt <= 85.0) { // tilted downwards
+                    break;
+                case ConvectionConstants::SurfConvOrientation::TiltedDownward:
                     if (DeltaTemp < 0.0) {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_UnstableTilted;
                     } else {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_StableTilted;
                     }
+                    break;
+                default:
+                    assert(false);
                 }
 
             } else if (Surface(SurfNum).Class == SurfaceClass::Roof) {
                 if (state.dataSurface->SurfIntConvSurfHasActiveInIt(SurfNum)) {
                     state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_ChilledCeil;
-                } else if (Surface(SurfNum).Tilt < 5.0) {
-                    if (DeltaTemp < 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_UnstableHoriz;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_StableHoriz;
-                    }
-                } else if ((Surface(SurfNum).Tilt >= 5.0) && ((Surface(SurfNum).Tilt < 95.0))) { // tilted downwards
-                    if (DeltaTemp < 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_UnstableTilted;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_StableTilted;
-                    }
-                } else if ((Surface(SurfNum).Tilt > 85.0) && (Surface(SurfNum).Tilt < 95.0)) { // vertical wall
-                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_VertWalls;
-                } else if (Surface(SurfNum).Tilt >= 95.0) { // tilted upwards
-                    if (DeltaTemp > 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_UnstableTilted;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_StableTilted;
+                } else {
+                    switch (Surface(SurfNum).ConvOrientation) {
+                    case ConvectionConstants::SurfConvOrientation::HorizontalDown:
+                        if (DeltaTemp < 0.0) {
+                            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_UnstableHoriz;
+                        } else {
+                            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_StableHoriz;
+                        }
+                        break;
+                    case ConvectionConstants::SurfConvOrientation::TiltedDownward:
+                        if (DeltaTemp < 0.0) {
+                            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_UnstableTilted;
+                        } else {
+                            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_StableTilted;
+                        }
+                        break;
+                    case ConvectionConstants::SurfConvOrientation::Vertical:
+                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_VertWalls;
+                        break;
+                    case ConvectionConstants::SurfConvOrientation::TiltedUpward:
+                        if (DeltaTemp > 0.0) {
+                            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_UnstableTilted;
+                        } else {
+                            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_StableTilted;
+                        }
+                        break;
+                    default:
+                        assert(false);
                     }
                 }
 
             } else if (Surface(SurfNum).Class == SurfaceClass::Floor) {
                 if (state.dataSurface->SurfIntConvSurfHasActiveInIt(SurfNum)) {
                     state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_HeatedFloor;
-                } else if (Surface(SurfNum).Tilt > 175.0) { // floor
-                    if (DeltaTemp > 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_UnstableHoriz;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_StableHoriz;
-                    }
-                } else if ((Surface(SurfNum).Tilt <= 175.0) && (Surface(SurfNum).Tilt >= 95.0)) {
-                    if (DeltaTemp > 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_UnstableTilted;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_StableTilted;
+                } else {
+                    switch (Surface(SurfNum).ConvOrientation) {
+                    case ConvectionConstants::SurfConvOrientation::HorizontalUp:
+                        if (DeltaTemp > 0.0) {
+                            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_UnstableHoriz;
+                        } else {
+                            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_StableHoriz;
+                        }
+                        break;
+                    case ConvectionConstants::SurfConvOrientation::TiltedUpward:
+                        if (DeltaTemp > 0.0) {
+                            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_UnstableTilted;
+                        } else {
+                            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_StableTilted;
+                        }
+                        break;
+                    default:
+                        assert(false);
                     }
                 }
+
             } else if ((Surface(SurfNum).Class == SurfaceClass::Window) || (Surface(SurfNum).Class == SurfaceClass::GlassDoor) ||
                        (Surface(SurfNum).Class == SurfaceClass::TDD_Diffuser)) {
                 state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_Windows;
@@ -6139,59 +6162,73 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
 
                 if (state.dataSurface->SurfIntConvSurfHasActiveInIt(SurfNum)) {
                     state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_HeatedVerticalWall;
-                } else if ((Surface(SurfNum).Tilt > 85.0) && (Surface(SurfNum).Tilt < 95.0)) { // vertical wall
-                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_VertWallsNonHeated;
-                } else if (Surface(SurfNum).Tilt >= 95.0) { // tilted upwards
-                    if (DeltaTemp > 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_UnstableTilted;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_StableTilted;
-                    }
-                } else if (Surface(SurfNum).Tilt <= 85.0) { // tilted downwards
-                    if (DeltaTemp < 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_UnstableTilted;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_StableTilted;
+                } else {
+
+                    switch (Surface(SurfNum).ConvOrientation) {
+                    case ConvectionConstants::SurfConvOrientation::Vertical:
+                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_VertWallsNonHeated;
+                        break;
+                    case ConvectionConstants::SurfConvOrientation::TiltedUpward:
+                        if (DeltaTemp > 0.0) {
+                            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_UnstableTilted;
+                        } else {
+                            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_StableTilted;
+                        }
+                        break;
+                    case ConvectionConstants::SurfConvOrientation::TiltedDownward:
+                        if (DeltaTemp < 0.0) {
+                            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_UnstableTilted;
+                        } else {
+                            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_StableTilted;
+                        }
+                        break;
+                    default:
+                        assert(false);
                     }
                 }
 
             } else if (Surface(SurfNum).Class == SurfaceClass::Roof) {
-                if (Surface(SurfNum).Tilt < 5.0) {
+
+                switch (Surface(SurfNum).ConvOrientation) {
+                case ConvectionConstants::SurfConvOrientation::HorizontalDown:
                     if (DeltaTemp < 0.0) {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_UnstableHoriz;
                     } else {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_StableHoriz;
                     }
-                } else if ((Surface(SurfNum).Tilt >= 5.0) && ((Surface(SurfNum).Tilt < 95.0))) { // tilted downwards
+                    break;
+                case ConvectionConstants::SurfConvOrientation::TiltedDownward:
                     if (DeltaTemp < 0.0) {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_UnstableTilted;
                     } else {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_StableTilted;
                     }
-                } else if ((Surface(SurfNum).Tilt > 85.0) && (Surface(SurfNum).Tilt < 95.0)) { // vertical wall
-                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_VertWallsNonHeated;
-                } else if (Surface(SurfNum).Tilt >= 95.0) { // tilted upwards
-                    if (DeltaTemp > 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_UnstableTilted;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_StableTilted;
-                    }
+                    break;
+                default:
+                    assert(false);
                 }
 
             } else if (Surface(SurfNum).Class == SurfaceClass::Floor) {
-                if (Surface(SurfNum).Tilt > 175.0) {
+
+                switch (Surface(SurfNum).ConvOrientation) {
+                case ConvectionConstants::SurfConvOrientation::HorizontalUp:
                     if (DeltaTemp > 0.0) {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_UnstableHoriz;
                     } else {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_StableHoriz;
                     }
-                } else if ((Surface(SurfNum).Tilt <= 175.0) && (Surface(SurfNum).Tilt >= 95.0)) {
+                    break;
+                case ConvectionConstants::SurfConvOrientation::TiltedUpward:
                     if (DeltaTemp > 0.0) {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_UnstableTilted;
                     } else {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_StableTilted;
                     }
+                    break;
+                default:
+                    assert(false);
                 }
+
             } else if ((Surface(SurfNum).Class == SurfaceClass::Window) || (Surface(SurfNum).Class == SurfaceClass::GlassDoor) ||
                        (Surface(SurfNum).Class == SurfaceClass::TDD_Diffuser)) {
                 state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_Windows;
@@ -6212,59 +6249,81 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
             DeltaTemp = TH(2, 1, SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
             if (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::Door) {
 
-                if ((Surface(SurfNum).Tilt > 85.0) && (Surface(SurfNum).Tilt < 95.0)) { // vertical wall
+                switch (Surface(SurfNum).ConvOrientation) {
+                case ConvectionConstants::SurfConvOrientation::Vertical:
                     state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_VertWalls;
-                } else if (Surface(SurfNum).Tilt >= 95.0) { // tilted upwards
+                    break;
+                case ConvectionConstants::SurfConvOrientation::TiltedUpward:
+                case ConvectionConstants::SurfConvOrientation::HorizontalUp:
                     if (DeltaTemp > 0.0) {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_UnstableTilted;
                     } else {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_StableTilted;
                     }
-                } else if (Surface(SurfNum).Tilt <= 85.0) { // tilted downwards
+                    break;
+                case ConvectionConstants::SurfConvOrientation::TiltedDownward:
+                case ConvectionConstants::SurfConvOrientation::HorizontalDown:
                     if (DeltaTemp < 0.0) {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_UnstableTilted;
                     } else {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_StableTilted;
                     }
+                    break;
+                default:
+                    assert(false);
                 }
 
             } else if (Surface(SurfNum).Class == SurfaceClass::Roof) {
-                if (Surface(SurfNum).Tilt < 5.0) {
+
+                switch (Surface(SurfNum).ConvOrientation) {
+                case ConvectionConstants::SurfConvOrientation::HorizontalDown:
                     if (DeltaTemp < 0.0) {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_UnstableHoriz;
                     } else {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_StableHoriz;
                     }
-                } else if ((Surface(SurfNum).Tilt > 5.0) && ((Surface(SurfNum).Tilt < 85.0))) { // tilted downwards
+                    break;
+                case ConvectionConstants::SurfConvOrientation::TiltedDownward:
                     if (DeltaTemp < 0.0) {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_UnstableTilted;
                     } else {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_StableTilted;
                     }
-                } else if ((Surface(SurfNum).Tilt > 85.0) && (Surface(SurfNum).Tilt < 95.0)) { // vertical wall
+                    break;
+                case ConvectionConstants::SurfConvOrientation::Vertical:
                     state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_VertWalls;
-                } else if (Surface(SurfNum).Tilt >= 95.0) { // tilted upwards
+                    break;
+                case ConvectionConstants::SurfConvOrientation::TiltedUpward:
                     if (DeltaTemp > 0.0) {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_UnstableTilted;
                     } else {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_StableTilted;
                     }
+                default:
+                    assert(false);
                 }
 
             } else if (Surface(SurfNum).Class == SurfaceClass::Floor) {
-                if (Surface(SurfNum).Tilt > 175.0) {
+
+                switch (Surface(SurfNum).ConvOrientation) {
+                case ConvectionConstants::SurfConvOrientation::HorizontalUp:
                     if (DeltaTemp > 0.0) {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_UnstableHoriz;
                     } else {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_StableHoriz;
                     }
-                } else if ((Surface(SurfNum).Tilt <= 175.0) && (Surface(SurfNum).Tilt >= 95.0)) {
+                    break;
+                case ConvectionConstants::SurfConvOrientation::TiltedUpward:
                     if (DeltaTemp > 0.0) {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_UnstableTilted;
                     } else {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_StableTilted;
                     }
+                    break;
+                default:
+                    assert(false);
                 }
+
             } else if ((Surface(SurfNum).Class == SurfaceClass::Window) || (Surface(SurfNum).Class == SurfaceClass::GlassDoor) ||
                        (Surface(SurfNum).Class == SurfaceClass::TDD_Diffuser)) {
                 state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_Windows;
@@ -6285,68 +6344,90 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
             DeltaTemp = TH(2, 1, SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
             if (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::Door) {
 
-                if ((Surface(SurfNum).Tilt > 85.0) && (Surface(SurfNum).Tilt < 95.0)) { // vertical wall
+                switch (Surface(SurfNum).ConvOrientation) {
+                case ConvectionConstants::SurfConvOrientation::Vertical:
                     if (state.dataSurface->SurfIntConvSurfGetsRadiantHeat(SurfNum)) {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_VertWallsNearHeat;
                     } else {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_VertWalls;
                     }
-
-                } else if (Surface(SurfNum).Tilt >= 95.0) { // tilted upwards
+                    break;
+                case ConvectionConstants::SurfConvOrientation::TiltedUpward:
+                case ConvectionConstants::SurfConvOrientation::HorizontalUp:
                     if (DeltaTemp > 0.0) {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_UnstableTilted;
                     } else {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_StableTilted;
                     }
-                } else if (Surface(SurfNum).Tilt <= 85.0) { // tilted downwards
+                    break;
+                case ConvectionConstants::SurfConvOrientation::TiltedDownward:
+                case ConvectionConstants::SurfConvOrientation::HorizontalDown:
                     if (DeltaTemp < 0.0) {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_UnstableTilted;
                     } else {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_StableTilted;
                     }
+                    break;
+                default:
+                    assert(false);
                 }
 
             } else if (Surface(SurfNum).Class == SurfaceClass::Roof) {
-                if (Surface(SurfNum).Tilt < 5.0) {
+
+                switch (Surface(SurfNum).ConvOrientation) {
+                case ConvectionConstants::SurfConvOrientation::HorizontalDown:
                     if (DeltaTemp < 0.0) {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_UnstableHoriz;
                     } else {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_StableHoriz;
                     }
-                } else if ((Surface(SurfNum).Tilt >= 5.0) && ((Surface(SurfNum).Tilt < 85.0))) { // tilted downwards
+                    break;
+                case ConvectionConstants::SurfConvOrientation::TiltedDownward:
                     if (DeltaTemp < 0.0) {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_UnstableTilted;
                     } else {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_StableTilted;
                     }
-                } else if ((Surface(SurfNum).Tilt > 85.0) && (Surface(SurfNum).Tilt < 95.0)) { // vertical wall
+                    break;
+                case ConvectionConstants::SurfConvOrientation::Vertical:
                     if (state.dataSurface->SurfIntConvSurfGetsRadiantHeat(SurfNum)) {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_VertWallsNearHeat;
                     } else {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_VertWalls;
                     }
-                } else if (Surface(SurfNum).Tilt >= 95.0) { // tilted upwards
+                    break;
+                case ConvectionConstants::SurfConvOrientation::TiltedUpward:
                     if (DeltaTemp > 0.0) {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_UnstableTilted;
                     } else {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_StableTilted;
                     }
+                    break;
+                default:
+                    assert(false);
                 }
 
             } else if (Surface(SurfNum).Class == SurfaceClass::Floor) {
-                if (Surface(SurfNum).Tilt > 175.0) {
+
+                switch (Surface(SurfNum).ConvOrientation) {
+                case ConvectionConstants::SurfConvOrientation::HorizontalUp:
                     if (DeltaTemp > 0.0) {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_UnstableHoriz;
                     } else {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_StableHoriz;
                     }
-                } else if ((Surface(SurfNum).Tilt <= 175.0) && (Surface(SurfNum).Tilt >= 95.0)) {
+                    break;
+                case ConvectionConstants::SurfConvOrientation::TiltedUpward:
                     if (DeltaTemp > 0.0) {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_UnstableTilted;
                     } else {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_StableTilted;
                     }
+                    break;
+                default:
+                    assert(false);
                 }
+
             } else if ((Surface(SurfNum).Class == SurfaceClass::Window) || (Surface(SurfNum).Class == SurfaceClass::GlassDoor) ||
                        (Surface(SurfNum).Class == SurfaceClass::TDD_Diffuser)) {
                 state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_Windows;
@@ -6384,63 +6465,83 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
             DeltaTemp = TH(2, 1, SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
             if (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::Door) {
 
-                if ((Surface(SurfNum).Tilt > 85.0) && (Surface(SurfNum).Tilt < 95.0)) { // vertical wall
-
+                switch (Surface(SurfNum).ConvOrientation) {
+                case ConvectionConstants::SurfConvOrientation::Vertical:
                     state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_Walls;
-
-                } else if (Surface(SurfNum).Tilt >= 95.0) { // tilted upwards
+                    break;
+                case ConvectionConstants::SurfConvOrientation::HorizontalUp:
+                case ConvectionConstants::SurfConvOrientation::TiltedUpward:
                     if (DeltaTemp > 0.0) {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_UnstableTilted;
                     } else {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_StableTilted;
                     }
-                } else if (Surface(SurfNum).Tilt <= 85.0) { // tilted downwards
+                    break;
+                case ConvectionConstants::SurfConvOrientation::HorizontalDown:
+                case ConvectionConstants::SurfConvOrientation::TiltedDownward:
                     if (DeltaTemp < 0.0) {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_UnstableTilted;
                     } else {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_StableTilted;
                     }
+                    break;
+                default:
+                    assert(false);
                 }
 
             } else if (Surface(SurfNum).Class == SurfaceClass::Roof) {
-                if (Surface(SurfNum).Tilt < 5.0) {
+
+                switch (Surface(SurfNum).ConvOrientation) {
+                case ConvectionConstants::SurfConvOrientation::HorizontalDown:
                     if (DeltaTemp < 0.0) {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_UnstableHoriz;
                     } else {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_StableHoriz;
                     }
-                } else if ((Surface(SurfNum).Tilt >= 5.0) && ((Surface(SurfNum).Tilt <= 85.0))) { // tilted downwards
+                    break;
+                case ConvectionConstants::SurfConvOrientation::TiltedDownward:
                     if (DeltaTemp < 0.0) {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_UnstableTilted;
                     } else {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_StableTilted;
                     }
-                } else if ((Surface(SurfNum).Tilt > 85.0) && (Surface(SurfNum).Tilt < 95.0)) { // vertical wall
-
+                    break;
+                case ConvectionConstants::SurfConvOrientation::Vertical:
                     state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_Walls;
-
-                } else if (Surface(SurfNum).Tilt >= 95.0) { // tilted upwards
+                    break;
+                case ConvectionConstants::SurfConvOrientation::TiltedUpward:
+                case ConvectionConstants::SurfConvOrientation::HorizontalUp:
                     if (DeltaTemp > 0.0) {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_UnstableTilted;
                     } else {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_StableTilted;
                     }
+                    break;
+                default:
+                    assert(false);
                 }
 
             } else if (Surface(SurfNum).Class == SurfaceClass::Floor) {
-                if (Surface(SurfNum).Tilt > 175.0) { // floor
+
+                switch (Surface(SurfNum).ConvOrientation) {
+                case ConvectionConstants::SurfConvOrientation::HorizontalUp:
                     if (DeltaTemp > 0.0) {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_UnstableHoriz;
                     } else {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_StableHoriz;
                     }
-                } else if ((Surface(SurfNum).Tilt <= 175.0) && (Surface(SurfNum).Tilt >= 95.0)) {
+                    break;
+                case ConvectionConstants::SurfConvOrientation::TiltedUpward:
                     if (DeltaTemp > 0.0) {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_UnstableTilted;
                     } else {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_StableTilted;
                     }
+                    break;
+                default:
+                    assert(false);
                 }
+
             } else if ((Surface(SurfNum).Class == SurfaceClass::Window) || (Surface(SurfNum).Class == SurfaceClass::GlassDoor) ||
                        (Surface(SurfNum).Class == SurfaceClass::TDD_Diffuser)) {
                 state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_Windows;
@@ -9333,6 +9434,23 @@ Real64 CalcASTMC1340ConvCoeff(EnergyPlusData &state, int const SurfNum, Real64 c
     h = std::pow((std::pow(hf, 3) + std::pow(hn, 3)), ConvectionConstants::OneThird);
 
     return h;
+}
+
+ConvectionConstants::SurfConvOrientation GetSurfConvOrientation(Real64 const &Tilt)
+{
+    if (Tilt < 5.0) {
+        return ConvectionConstants::SurfConvOrientation::HorizontalDown;
+    } else if ((Tilt >= 5.0) && (Tilt < 85.0)) {
+        return ConvectionConstants::SurfConvOrientation::TiltedDownward;
+    } else if ((Tilt >= 85.0) && (Tilt < 95.0)) {
+        return ConvectionConstants::SurfConvOrientation::Vertical;
+    } else if ((Tilt >= 95.0) && (Tilt < 175.0)) {
+        return ConvectionConstants::SurfConvOrientation::TiltedUpward;
+    } else if (Tilt >= 175.0) {
+        return ConvectionConstants::SurfConvOrientation::HorizontalUp;
+    } else {
+        return ConvectionConstants::SurfConvOrientation::Invalid;
+    }
 }
 
 } // namespace EnergyPlus::ConvectionCoefficients
