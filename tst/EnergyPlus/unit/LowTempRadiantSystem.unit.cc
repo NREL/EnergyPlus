@@ -2788,13 +2788,13 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadCalcRadSysHXEffectTermTest)
 
 TEST_F(LowTempRadiantSystemTest, processRadiantSystemControlInputTest)
 {
-    static std::string const meanAirTemperature("MeanAirTemperature");
-    static std::string const meanRadiantTemperature("MeanRadiantTemperature");
-    static std::string const operativeTemperature("OperativeTemperature");
-    static std::string const outsideAirDryBulbTemperature("OutdoorDryBulbTemperature");
-    static std::string const outsideAirWetBulbTemperature("OutdoorWetBulbTemperature");
-    static std::string const surfaceFaceTemperature("SurfaceFaceTemperature");
-    static std::string const surfaceInteriorTemperature("SurfaceInteriorTemperature");
+    static constexpr std::string_view meanAirTemperature("MeanAirTemperature");
+    static constexpr std::string_view meanRadiantTemperature("MeanRadiantTemperature");
+    static constexpr std::string_view operativeTemperature("OperativeTemperature");
+    static constexpr std::string_view outsideAirDryBulbTemperature("OutdoorDryBulbTemperature");
+    static constexpr std::string_view outsideAirWetBulbTemperature("OutdoorWetBulbTemperature");
+    static constexpr std::string_view surfaceFaceTemperature("SurfaceFaceTemperature");
+    static constexpr std::string_view surfaceInteriorTemperature("SurfaceInteriorTemperature");
 
     std::string inputFunction;
     std::string textField2Pass("FieldName");

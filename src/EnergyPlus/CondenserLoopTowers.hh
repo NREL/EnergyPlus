@@ -481,7 +481,7 @@ namespace CondenserLoopTowers {
                                   std::array<Real64, 8> const &Par // par(1) = Tower number
         );
 
-        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string_view objectName);
     };
 
     void GetTowerInput(EnergyPlusData &state);

@@ -295,10 +295,10 @@ namespace HVACUnitaryBypassVAV {
     };
 
     void SimUnitaryBypassVAV(EnergyPlusData &state,
-                             std::string const &CompName, // Name of the CBVAV system
-                             bool FirstHVACIteration,     // TRUE if 1st HVAC simulation of system time step
-                             int AirLoopNum,              // air loop index
-                             int &CompIndex               // Index to changeover-bypass VAV system
+                             std::string_view CompName, // Name of the CBVAV system
+                             bool FirstHVACIteration,   // TRUE if 1st HVAC simulation of system time step
+                             int AirLoopNum,            // air loop index
+                             int &CompIndex             // Index to changeover-bypass VAV system
     );
 
     void SimCBVAV(EnergyPlusData &state,

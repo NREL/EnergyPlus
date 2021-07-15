@@ -559,7 +559,6 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     // call again to get the rest of the input when sysNum > -1
     UnitarySystems::UnitarySys::getUnitarySystemInput(*state, compName, false, 0);
 
-
     EXPECT_EQ(thisSys->Name, "DX COOLING COIL SYSTEM");
     EXPECT_FALSE(thisSys->m_ISHundredPercentDOASDXCoil);
     EXPECT_EQ(thisSys->UnitType, "CoilSystem:Cooling:DX");
