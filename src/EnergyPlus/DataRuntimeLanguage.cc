@@ -102,7 +102,7 @@ namespace DataRuntimeLanguage {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const InvalidStartCharacters("0123456789");
+        static constexpr std::string_view InvalidStartCharacters("0123456789");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -137,7 +137,7 @@ namespace DataRuntimeLanguage {
             errFlag = true;
             ErrorsFound = true;
         }
-        if ((cFieldValue.length() > 0) && (has_any_of(cFieldValue[0], InvalidStartCharacters))) {
+        if ((cFieldValue.length() > 0) && (is_any_of(cFieldValue[0], InvalidStartCharacters))) {
             ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
             ShowContinueError(state, "..." + cFieldName + "; Names used as EMS variables cannot start with numeric characters.");
             errFlag = true;
@@ -176,7 +176,6 @@ namespace DataRuntimeLanguage {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const InvalidStartCharacters("0123456789");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na

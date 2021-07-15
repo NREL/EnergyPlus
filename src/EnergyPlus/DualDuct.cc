@@ -104,7 +104,7 @@ namespace DualDuct {
     using namespace ScheduleManager;
 
     void SimulateDualDuct(
-        EnergyPlusData &state, std::string const &CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex)
+        EnergyPlusData &state, std::string_view CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex)
     {
 
         // SUBROUTINE INFORMATION:
@@ -133,7 +133,7 @@ namespace DualDuct {
         if (CompIndex == 0) {
             DDNum = UtilityRoutines::FindItemInList(CompName, state.dataDualDuct->dd_airterminal, &DualDuctAirTerminal::Name);
             if (DDNum == 0) {
-                ShowFatalError(state, "SimulateDualDuct: Damper not found=" + CompName);
+                ShowFatalError(state, "SimulateDualDuct: Damper not found=" + std::string{CompName});
             }
             CompIndex = DDNum;
         } else {
@@ -188,7 +188,7 @@ namespace DualDuct {
             // Report the current Damper
             thisDualDuct.ReportDualDuct();
         } else {
-            ShowFatalError(state, "SimulateDualDuct: Damper not found=" + CompName);
+            ShowFatalError(state, "SimulateDualDuct: Damper not found=" + std::string{CompName});
         }
     }
 
@@ -216,7 +216,7 @@ namespace DualDuct {
         using namespace DataHeatBalance;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetDualDuctInput: "); // include trailing bla
+        static constexpr std::string_view RoutineName("GetDualDuctInput: "); // include trailing bla
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -347,8 +347,8 @@ namespace DualDuct {
                         CurrentModuleObject = "*invalid*";
                     }
                     ShowSevereError(state,
-                                    RoutineName + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" + CurrentModuleObject + ',' +
-                                        state.dataDualDuct->dd_airterminal(DDNum).Name + "].");
+                                    std::string{RoutineName} + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" +
+                                        CurrentModuleObject + ',' + state.dataDualDuct->dd_airterminal(DDNum).Name + "].");
                     ShowContinueError(
                         state, "...should have outlet node=" + state.dataLoopNodes->NodeID(state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum));
                     ErrorsFound = true;
@@ -508,8 +508,8 @@ namespace DualDuct {
                         CurrentModuleObject = "*invalid*";
                     }
                     ShowSevereError(state,
-                                    RoutineName + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" + CurrentModuleObject + ',' +
-                                        state.dataDualDuct->dd_airterminal(DDNum).Name + "].");
+                                    std::string{RoutineName} + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" +
+                                        CurrentModuleObject + ',' + state.dataDualDuct->dd_airterminal(DDNum).Name + "].");
                     ShowContinueError(
                         state, "...should have outlet node=" + state.dataLoopNodes->NodeID(state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum));
                     ErrorsFound = true;
@@ -720,8 +720,8 @@ namespace DualDuct {
                         CurrentModuleObject = "*invalid*";
                     }
                     ShowSevereError(state,
-                                    RoutineName + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" + CurrentModuleObject + ',' +
-                                        state.dataDualDuct->dd_airterminal(DDNum).Name + "].");
+                                    std::string{RoutineName} + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" +
+                                        CurrentModuleObject + ',' + state.dataDualDuct->dd_airterminal(DDNum).Name + "].");
                     ShowContinueError(
                         state, "...should have outlet node=" + state.dataLoopNodes->NodeID(state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum));
                     ErrorsFound = true;
@@ -855,7 +855,7 @@ namespace DualDuct {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in input.  Preceding condition(s) cause termination.");
+            ShowFatalError(state, std::string{RoutineName} + "Errors found in input.  Preceding condition(s) cause termination.");
         }
     }
 
@@ -1947,7 +1947,6 @@ namespace DualDuct {
 
         // FUNCTION PARAMETER DEFINITIONS:
         bool const UseMinOASchFlag(true); // Always use min OA schedule in calculations.
-        static std::string const RoutineName("HVACDualDuctSystem:CalcOAOnlyMassFlow");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -2183,9 +2182,10 @@ namespace DualDuct {
         auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
         // Formats
-        static constexpr auto Format_100("! <#Dual Duct Damper Connections>,<Number of Dual Duct Damper Connections>");
-        static constexpr auto Format_102("! <Dual Duct Damper>,<Dual Duct Damper Count>,<Dual Duct Damper Name>,<Inlet Node>,<Outlet Node>,<Inlet "
-                                         "Node Type>,<AirLoopHVAC Name>");
+        static constexpr fmt::string_view Format_100("! <#Dual Duct Damper Connections>,<Number of Dual Duct Damper Connections>");
+        static constexpr fmt::string_view Format_102(
+            "! <Dual Duct Damper>,<Dual Duct Damper Count>,<Dual Duct Damper Name>,<Inlet Node>,<Outlet Node>,<Inlet "
+            "Node Type>,<AirLoopHVAC Name>");
 
         if (!allocated(state.dataDualDuct->dd_airterminal))
             return; // Autodesk Bug: Can arrive here with Damper unallocated (SimulateDualDuct not yet called) with NumDDAirTerminal either set >0 or
@@ -2306,7 +2306,7 @@ namespace DualDuct {
 
     void GetDualDuctOutdoorAirRecircUse(EnergyPlusData &state,
                                         [[maybe_unused]] std::string const &CompTypeName,
-                                        std::string const &CompName,
+                                        std::string_view CompName,
                                         bool &RecircIsUsed)
     {
 
