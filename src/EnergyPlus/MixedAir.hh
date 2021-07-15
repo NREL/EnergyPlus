@@ -61,6 +61,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
 
 namespace EnergyPlus {
 
@@ -99,37 +100,6 @@ namespace MixedAir {
     // coil operation
     constexpr int On(1);  // normal coil operation
     constexpr int Off(0); // signal coil shouldn't run
-
-    // component types addressed by this module
-    enum class ComponentType
-    {
-        Unassigned = -1,
-        None,
-        OAMixer_Num,
-        Fan_Simple_CV,
-        Fan_Simple_VAV,
-        WaterCoil_SimpleCool,
-        WaterCoil_Cooling,
-        WaterCoil_SimpleHeat,
-        SteamCoil_AirHeat,
-        WaterCoil_DetailedCool,
-        Coil_ElectricHeat,
-        Coil_GasHeat,
-        WaterCoil_CoolingHXAsst,
-        DXSystem,
-        HeatXchngr,
-        Desiccant,
-        Unglazed_SolarCollector,
-        EvapCooler,
-        PVT_AirBased,
-        Fan_ComponentModel,
-        DXHeatPumpSystem,
-        Coil_UserDefined,
-        Humidifier,
-        Fan_System_Object,
-        UnitarySystemModel,
-        VRFTerminalUnit
-    };
 
     enum class iControllerType
     {
@@ -435,9 +405,9 @@ namespace MixedAir {
     void SimOASysComponents(EnergyPlusData &state, int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum);
 
     void SimOAComponent(EnergyPlusData &state,
-                        std::string const &CompType,               // the component type
-                        std::string const &CompName,               // the component Name
-                        MixedAir::ComponentType const CompTypeNum, // Component Type -- Integerized for this module
+                        std::string const &CompType,                    // the component type
+                        std::string const &CompName,                    // the component Name
+                        SimAirServingZones::CompType const CompTypeNum, // Component Type -- Integerized for this module
                         bool const FirstHVACIteration,
                         int &CompIndex,
                         int const AirLoopNum, // air loop index for economizer lockout coordination
@@ -586,9 +556,9 @@ namespace MixedAir {
                               int const InListNum // In-list Number
     );
 
-    int GetOACompTypeNum(EnergyPlusData &state,
-                         int const OASysNum, // OA Sys Number
-                         int const InListNum // In-list Number
+    SimAirServingZones::CompType GetOACompTypeNum(EnergyPlusData &state,
+                                                  int const OASysNum, // OA Sys Number
+                                                  int const InListNum // In-list Number
     );
 
     int GetOAMixerNumber(EnergyPlusData &state, std::string const &OAMixerName); // must match OA mixer names for the OA mixer type

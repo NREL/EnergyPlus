@@ -82,9 +82,9 @@ std::vector<std::string> const &Validation::warnings()
 bool Validation::validate(json const &parsed_input)
 {
 
-    static constexpr auto nameError =
+    static constexpr std::string_view nameError =
         "Object contains a property that could not be validated using 'properties' or 'additionalProperties' constraints: ''.";
-    static constexpr auto otherError =
+    static constexpr std::string_view otherError =
         "Object contains a property that could not be validated using 'properties' or 'additionalProperties' constraints";
 
     valijson::Schema validation_schema;

@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
@@ -84,56 +85,42 @@ namespace DataHeatBalance {
 
     // Parameters to indicate material group type for use with the Material
     // derived type (see below):
-
-    constexpr int RegularMaterial(0);
-    constexpr int Air(1);
-    constexpr int Shade(2);
-    constexpr int WindowGlass(3);
-    constexpr int WindowGas(4);
-    constexpr int WindowBlind(5);
-    constexpr int WindowGasMixture(6);
-    constexpr int Screen(7);
-    constexpr int EcoRoof(8);
-    constexpr int IRTMaterial(9);
-    constexpr int WindowSimpleGlazing(10);
-    constexpr int ComplexWindowShade(11);
-    constexpr int ComplexWindowGap(12);
-
-    constexpr int GlassEquivalentLayer(13);
-    constexpr int ShadeEquivalentLayer(14);
-    constexpr int DrapeEquivalentLayer(15);
-    constexpr int BlindEquivalentLayer(16);
-    constexpr int ScreenEquivalentLayer(17);
-    constexpr int GapEquivalentLayer(18);
-
-    // Parameters to indicate surface roughness for use with the Material
-    // derived type (see below):
-
-    constexpr int VeryRough(1);
-    constexpr int Rough(2);
-    constexpr int MediumRough(3);
-    constexpr int MediumSmooth(4);
-    constexpr int Smooth(5);
-    constexpr int VerySmooth(6);
-
-    // Parameters to indicate blind orientation for use with the Material
-    // derived type (see below):
-
-    constexpr int Horizontal(1);
-    constexpr int Vertical(2);
-    constexpr int FixedSlats(1);
-    constexpr int VariableSlats(2);
+    enum class MaterialGroup
+    {
+        Unassigned = -1,
+        RegularMaterial,
+        Air,
+        Shade,
+        WindowGlass,
+        WindowGas,
+        WindowBlind,
+        WindowGasMixture,
+        Screen,
+        EcoRoof,
+        IRTMaterial,
+        WindowSimpleGlazing,
+        ComplexWindowShade,
+        ComplexWindowGap,
+        GlassEquivalentLayer,
+        ShadeEquivalentLayer,
+        DrapeEquivalentLayer,
+        BlindEquivalentLayer,
+        ScreenEquivalentLayer,
+        GapEquivalentLayer
+    };
 
     // Parameters for Interior and Exterior Solar Distribution
+    enum class Shadowing
+    {
+        Unassigned = -1,
+        MinimalShadowing,     // all incoming solar hits floor, no exterior shadowing except reveals
+        FullExterior,         // all incoming solar hits floor, full exterior shadowing
+        FullInteriorExterior, // full interior solar distribution, full exterior solar shadowing
+        FullExteriorWithRefl  // all incoming solar hits floor, full exterior shadowing and reflections
+    };
 
-    constexpr int MinimalShadowing(-1);    // all incoming solar hits floor, no exterior shadowing except reveals
-    constexpr int FullExterior(0);         // all incoming solar hits floor, full exterior shadowing
-    constexpr int FullInteriorExterior(1); // full interior solar distribution, full exterior solar shadowing
-    constexpr int FullExteriorWithRefl(2); // all incoming solar hits floor, full exterior shadowing and reflections
-    // full exterior shadowing and reflections
     // Parameters to indicate the zone type for use with the Zone derived
     // type (see below--Zone%OfType):
-
     constexpr int StandardZone(1);
 
     // Parameters to indicate the convection correlation being used for use with
@@ -155,39 +142,68 @@ namespace DataHeatBalance {
     constexpr int DefaultMinNumberOfWarmupDays(1);  // Default minimum number of warmup days allowed
 
     // Parameters for Sky Radiance Distribution
-    constexpr int Isotropic(0);
-    constexpr int Anisotropic(1);
+    enum class SkyRadDistribution
+    {
+        Unassigned = -1,
+        Isotropic,
+        Anisotropic
+    };
 
     // Parameters for ZoneAirSolutionAlgo
-    constexpr int Use3rdOrder(0);
-    constexpr int UseAnalyticalSolution(1);
-    constexpr int UseEulerMethod(2);
+    enum class SolutionAlgo
+    {
+        Unassigned = -1,
+        ThirdOrder,
+        AnalyticalSolution,
+        EulerMethod
+    };
 
     // Parameter for MRT calculation type
-    constexpr int ZoneAveraged(1);
-    constexpr int SurfaceWeighted(2);
-    constexpr int AngleFactor(3);
+    enum class CalcMRT
+    {
+        Unassigned = -1,
+        ZoneAveraged,
+        SurfaceWeighted,
+        AngleFactor
+    };
 
     // Parameters for Ventilation
-    constexpr int NaturalVentilation(0);
-    constexpr int IntakeVentilation(1);
-    constexpr int ExhaustVentilation(2);
-    constexpr int BalancedVentilation(3);
+    enum class VentilationType
+    {
+        Unassigned = -1,
+        Natural,
+        Intake,
+        Exhaust,
+        Balanced
+    };
 
     // Parameters for hybrid ventilation using Ventilation and Mixing objects
-    constexpr int HybridControlTypeIndiv(0);
-    constexpr int HybridControlTypeClose(1);
-    constexpr int HybridControlTypeGlobal(2);
+    enum class HybridCtrlType
+    {
+        Unassigned = -1,
+        Indiv,
+        Close,
+        Global
+    };
 
     // System type, detailed refrigeration or refrigerated case rack
-    constexpr int RefrigSystemTypeDetailed(1);
-    constexpr int RefrigSystemTypeRack(2);
+    enum class RefrigSystemType
+    {
+        Unassigned = -1,
+        Detailed,
+        Rack
+    };
 
     // Refrigeration condenser type
-    constexpr int RefrigCondenserTypeAir(1);
-    constexpr int RefrigCondenserTypeEvap(2);
-    constexpr int RefrigCondenserTypeWater(3);
-    constexpr int RefrigCondenserTypeCascade(4);
+    enum class RefrigCondenserType
+    {
+        Unassigned = -1,
+        Air,
+        Evap,
+        Water,
+        Cascade,
+        WaterHeater
+    };
 
     // Parameters for type of infiltration model
     constexpr int InfiltrationDesignFlowRate(1);
@@ -623,7 +639,7 @@ namespace DataHeatBalance {
         //   to be performed
         bool CoolingEffectASH55;         // True when ASHRAE Standard 55 cooling effect calculation to be performed
         bool AnkleDraftASH55;            // True when ASHRAE Standard 55 ankle draft calculation to be performed
-        int MRTCalcType;                 // MRT calculation type (See MRT Calculation type parameters)
+        CalcMRT MRTCalcType;             // MRT calculation type (See MRT Calculation type parameters)
         int SurfacePtr;                  // Pointer to the name of surface
         std::string AngleFactorListName; // Name of angle factor list
         int AngleFactorListPtr;          // Pointer to the name of angle factor list
@@ -659,11 +675,12 @@ namespace DataHeatBalance {
             : ZonePtr(0), NumberOfPeople(0.0), NumberOfPeoplePtr(-1), EMSPeopleOn(false), EMSNumberOfPeople(0.0), ActivityLevelPtr(-1),
               FractionRadiant(0.0), FractionConvected(0.0), NomMinNumberPeople(0.0), NomMaxNumberPeople(0.0), WorkEffPtr(-1), ClothingPtr(-1),
               ClothingMethodPtr(-1), ClothingType(-1), AirVelocityPtr(-1), AnkleAirVelocityPtr(-1), Fanger(false), Pierce(false), KSU(false),
-              AdaptiveASH55(false), AdaptiveCEN15251(false), CoolingEffectASH55(false), AnkleDraftASH55(false), MRTCalcType(0), SurfacePtr(-1),
-              AngleFactorListPtr(-1), UserSpecSensFrac(0.0), Show55Warning(false), CO2RateFactor(0.0), NumOcc(0.0), TemperatureInZone(0.0),
-              RelativeHumidityInZone(0.0), RadGainRate(0.0), ConGainRate(0.0), SenGainRate(0.0), LatGainRate(0.0), TotGainRate(0.0), CO2GainRate(0.0),
-              RadGainEnergy(0.0), ConGainEnergy(0.0), SenGainEnergy(0.0), LatGainEnergy(0.0), TotGainEnergy(0.0), AirVelErrIndex(0),
-              TimeNotMetASH5580(0.0), TimeNotMetASH5590(0.0), TimeNotMetCEN15251CatI(0.0), TimeNotMetCEN15251CatII(0.0), TimeNotMetCEN15251CatIII(0.0)
+              AdaptiveASH55(false), AdaptiveCEN15251(false), CoolingEffectASH55(false), AnkleDraftASH55(false),
+              MRTCalcType(DataHeatBalance::CalcMRT::Unassigned), SurfacePtr(-1), AngleFactorListPtr(-1), UserSpecSensFrac(0.0), Show55Warning(false),
+              CO2RateFactor(0.0), NumOcc(0.0), TemperatureInZone(0.0), RelativeHumidityInZone(0.0), RadGainRate(0.0), ConGainRate(0.0),
+              SenGainRate(0.0), LatGainRate(0.0), TotGainRate(0.0), CO2GainRate(0.0), RadGainEnergy(0.0), ConGainEnergy(0.0), SenGainEnergy(0.0),
+              LatGainEnergy(0.0), TotGainEnergy(0.0), AirVelErrIndex(0), TimeNotMetASH5580(0.0), TimeNotMetASH5590(0.0), TimeNotMetCEN15251CatI(0.0),
+              TimeNotMetCEN15251CatII(0.0), TimeNotMetCEN15251CatIII(0.0)
         {
         }
     };
@@ -957,7 +974,7 @@ namespace DataHeatBalance {
         Real64 EMSimpleVentFlowRate; // Value EMS is directing to use for override
         Real64 MinIndoorTemperature;
         Real64 DelTemperature;
-        int FanType;
+        VentilationType FanType;
         Real64 FanPressure;
         Real64 FanEfficiency;
         Real64 FanPower;
@@ -970,20 +987,20 @@ namespace DataHeatBalance {
         Real64 MinOutdoorTemperature;
         Real64 MaxOutdoorTemperature;
         Real64 MaxWindSpeed;
-        int MinIndoorTempSchedPtr;      // Minimum indoor temperature schedule index
-        int MaxIndoorTempSchedPtr;      // Maximum indoor temperature schedule index
-        int DeltaTempSchedPtr;          // Delta temperature schedule index
-        int MinOutdoorTempSchedPtr;     // Minimum outdoor temperature schedule index
-        int MaxOutdoorTempSchedPtr;     // Maximum outdoor temperature schedule index
-        int IndoorTempErrCount;         // Indoor temperature error count
-        int OutdoorTempErrCount;        // Outdoor temperature error count
-        int IndoorTempErrIndex;         // Indoor temperature error Index
-        int OutdoorTempErrIndex;        // Outdoor temperature error Index
-        int HybridControlType;          // Hybrid ventilation control type: 0 Individual, 1 Close, 2 Global
-        int HybridControlMasterNum;     // Hybrid ventilation control master object number
-        bool HybridControlMasterStatus; // Hybrid ventilation control master object opening status
-        bool QuadratureSum;             // If quadrature sum of zone air balance method is used
-        int OABalancePtr;               // A pointer to ZoneAirBalance
+        int MinIndoorTempSchedPtr;        // Minimum indoor temperature schedule index
+        int MaxIndoorTempSchedPtr;        // Maximum indoor temperature schedule index
+        int DeltaTempSchedPtr;            // Delta temperature schedule index
+        int MinOutdoorTempSchedPtr;       // Minimum outdoor temperature schedule index
+        int MaxOutdoorTempSchedPtr;       // Maximum outdoor temperature schedule index
+        int IndoorTempErrCount;           // Indoor temperature error count
+        int OutdoorTempErrCount;          // Outdoor temperature error count
+        int IndoorTempErrIndex;           // Indoor temperature error Index
+        int OutdoorTempErrIndex;          // Outdoor temperature error Index
+        HybridCtrlType HybridControlType; // Hybrid ventilation control type: 0 Individual, 1 Close, 2 Global
+        int HybridControlMasterNum;       // Hybrid ventilation control master object number
+        bool HybridControlMasterStatus;   // Hybrid ventilation control master object opening status
+        bool QuadratureSum;               // If quadrature sum of zone air balance method is used
+        int OABalancePtr;                 // A pointer to ZoneAirBalance
         // WindandStackOpenArea
         Real64 OpenArea;      // Opening area [m2]
         int OpenAreaSchedPtr; // Opening area fraction schedule pointer
@@ -995,12 +1012,13 @@ namespace DataHeatBalance {
         // Default Constructor
         VentilationData()
             : ZonePtr(0), SchedPtr(0), ModelType(0), DesignLevel(0.0), EMSSimpleVentOn(false), EMSimpleVentFlowRate(0.0),
-              MinIndoorTemperature(-100.0), DelTemperature(0.0), FanType(0), FanPressure(0.0), FanEfficiency(0.0), FanPower(0.0), AirTemp(0.0),
-              ConstantTermCoef(0.0), TemperatureTermCoef(0.0), VelocityTermCoef(0.0), VelocitySQTermCoef(0.0), MaxIndoorTemperature(100.0),
-              MinOutdoorTemperature(-100.0), MaxOutdoorTemperature(100.0), MaxWindSpeed(40.0), MinIndoorTempSchedPtr(0), MaxIndoorTempSchedPtr(0),
-              DeltaTempSchedPtr(0), MinOutdoorTempSchedPtr(0), MaxOutdoorTempSchedPtr(0), IndoorTempErrCount(0), OutdoorTempErrCount(0),
-              IndoorTempErrIndex(0), OutdoorTempErrIndex(0), HybridControlType(0), HybridControlMasterNum(0), HybridControlMasterStatus(false),
-              QuadratureSum(false), OABalancePtr(0), OpenArea(0.0), OpenAreaSchedPtr(0), OpenEff(0.0), EffAngle(0.0), DH(0.0), DiscCoef(0.0)
+              MinIndoorTemperature(-100.0), DelTemperature(0.0), FanType(VentilationType::Natural), FanPressure(0.0), FanEfficiency(0.0),
+              FanPower(0.0), AirTemp(0.0), ConstantTermCoef(0.0), TemperatureTermCoef(0.0), VelocityTermCoef(0.0), VelocitySQTermCoef(0.0),
+              MaxIndoorTemperature(100.0), MinOutdoorTemperature(-100.0), MaxOutdoorTemperature(100.0), MaxWindSpeed(40.0), MinIndoorTempSchedPtr(0),
+              MaxIndoorTempSchedPtr(0), DeltaTempSchedPtr(0), MinOutdoorTempSchedPtr(0), MaxOutdoorTempSchedPtr(0), IndoorTempErrCount(0),
+              OutdoorTempErrCount(0), IndoorTempErrIndex(0), OutdoorTempErrIndex(0), HybridControlType(HybridCtrlType::Indiv),
+              HybridControlMasterNum(0), HybridControlMasterStatus(false), QuadratureSum(false), OABalancePtr(0), OpenArea(0.0), OpenAreaSchedPtr(0),
+              OpenEff(0.0), EffAngle(0.0), DH(0.0), DiscCoef(0.0)
         {
         }
     };
@@ -1045,21 +1063,21 @@ namespace DataHeatBalance {
         Real64 DesiredAirFlowRate;
         Real64 DesiredAirFlowRateSaved;
         Real64 MixingMassFlowRate;
-        int DeltaTempSchedPtr;      // Delta temperature schedule index
-        int MinIndoorTempSchedPtr;  // Minimum indoor temperature schedule index
-        int MaxIndoorTempSchedPtr;  // Maximum indoor temperature schedule index
-        int MinSourceTempSchedPtr;  // Minimum source zone temperature schedule index
-        int MaxSourceTempSchedPtr;  // Maximum source zone temperature schedule index
-        int MinOutdoorTempSchedPtr; // Minimum outdoor temperature schedule index
-        int MaxOutdoorTempSchedPtr; // Maximum outdoor temperature schedule index
-        int IndoorTempErrCount;     // Indoor temperature error count
-        int SourceTempErrCount;     // Source zone temperature error count
-        int OutdoorTempErrCount;    // Outdoor temperature error count
-        int IndoorTempErrIndex;     // Indoor temperature error Index
-        int SourceTempErrIndex;     // Source zone temperature error Index
-        int OutdoorTempErrIndex;    // Outdoor temperature error Index
-        int HybridControlType;      // Hybrid ventilation control type: 0 Individual, 1 Close, 2 Global
-        int HybridControlMasterNum; // Hybrid ventilation control master ventilation object number
+        int DeltaTempSchedPtr;            // Delta temperature schedule index
+        int MinIndoorTempSchedPtr;        // Minimum indoor temperature schedule index
+        int MaxIndoorTempSchedPtr;        // Maximum indoor temperature schedule index
+        int MinSourceTempSchedPtr;        // Minimum source zone temperature schedule index
+        int MaxSourceTempSchedPtr;        // Maximum source zone temperature schedule index
+        int MinOutdoorTempSchedPtr;       // Minimum outdoor temperature schedule index
+        int MaxOutdoorTempSchedPtr;       // Maximum outdoor temperature schedule index
+        int IndoorTempErrCount;           // Indoor temperature error count
+        int SourceTempErrCount;           // Source zone temperature error count
+        int OutdoorTempErrCount;          // Outdoor temperature error count
+        int IndoorTempErrIndex;           // Indoor temperature error Index
+        int SourceTempErrIndex;           // Source zone temperature error Index
+        int OutdoorTempErrIndex;          // Outdoor temperature error Index
+        HybridCtrlType HybridControlType; // Hybrid ventilation control type: 0 Individual, 1 Close, 2 Global
+        int HybridControlMasterNum;       // Hybrid ventilation control master ventilation object number
         int NumRefDoorConnections;
         bool EMSSimpleMixingOn;        // EMS actuating ventilation flow rate if .TRUE.
         bool RefDoorMixFlag;           // Refrigeration door mixing within zone
@@ -1082,7 +1100,7 @@ namespace DataHeatBalance {
             : ZonePtr(0), SchedPtr(0), DesignLevel(0.0), FromZone(0), DeltaTemperature(0.0), DesiredAirFlowRate(0.0), DesiredAirFlowRateSaved(0.0),
               MixingMassFlowRate(0.0), DeltaTempSchedPtr(0), MinIndoorTempSchedPtr(0), MaxIndoorTempSchedPtr(0), MinSourceTempSchedPtr(0),
               MaxSourceTempSchedPtr(0), MinOutdoorTempSchedPtr(0), MaxOutdoorTempSchedPtr(0), IndoorTempErrCount(0), SourceTempErrCount(0),
-              OutdoorTempErrCount(0), IndoorTempErrIndex(0), SourceTempErrIndex(0), OutdoorTempErrIndex(0), HybridControlType(0),
+              OutdoorTempErrCount(0), IndoorTempErrIndex(0), SourceTempErrIndex(0), OutdoorTempErrIndex(0), HybridControlType(HybridCtrlType::Indiv),
               HybridControlMasterNum(0), NumRefDoorConnections(0), EMSSimpleMixingOn(false), RefDoorMixFlag(false), EMSimpleMixingFlowRate(0.0)
         {
         }
@@ -1233,16 +1251,16 @@ namespace DataHeatBalance {
         std::string Name;
         int MaterialNumber; // Material pointer for the blind
         // Input properties
-        int SlatOrientation;     // HORIZONTAL or VERTICAL
-        int SlatAngleType;       // FIXED or VARIABLE
-        Real64 SlatWidth;        // Slat width (m)
-        Real64 SlatSeparation;   // Slat separation (m)
-        Real64 SlatThickness;    // Slat thickness (m)
-        Real64 SlatCrown;        // the height of the slate (length from the chord to the curve)
-        Real64 SlatAngle;        // Slat angle (deg)
-        Real64 MinSlatAngle;     // Minimum slat angle for variable-angle slats (deg) (user input)
-        Real64 MaxSlatAngle;     // Maximum slat angle for variable-angle slats (deg) (user input)
-        Real64 SlatConductivity; // Slat conductivity (W/m-K)
+        DataWindowEquivalentLayer::Orientation SlatOrientation; // HORIZONTAL or VERTICAL
+        DataWindowEquivalentLayer::AngleType SlatAngleType;     // FIXED or VARIABLE
+        Real64 SlatWidth;                                       // Slat width (m)
+        Real64 SlatSeparation;                                  // Slat separation (m)
+        Real64 SlatThickness;                                   // Slat thickness (m)
+        Real64 SlatCrown;                                       // the height of the slate (length from the chord to the curve)
+        Real64 SlatAngle;                                       // Slat angle (deg)
+        Real64 MinSlatAngle;                                    // Minimum slat angle for variable-angle slats (deg) (user input)
+        Real64 MaxSlatAngle;                                    // Maximum slat angle for variable-angle slats (deg) (user input)
+        Real64 SlatConductivity;                                // Slat conductivity (W/m-K)
         // Solar slat properties
         Real64 SlatTransSolBeamDiff;     // Slat solar beam-diffuse transmittance
         Real64 SlatFrontReflSolBeamDiff; // Slat front solar beam-diffuse reflectance
@@ -1344,25 +1362,26 @@ namespace DataHeatBalance {
 
         // Default Constructor
         WindowBlindProperties()
-            : MaterialNumber(0), SlatOrientation(0), SlatAngleType(FixedSlats), SlatWidth(0.0), SlatSeparation(0.0), SlatThickness(0.0),
-              SlatCrown(0.0), SlatAngle(0.0), MinSlatAngle(0.0), MaxSlatAngle(0.0), SlatConductivity(0.0), SlatTransSolBeamDiff(0.0),
-              SlatFrontReflSolBeamDiff(0.0), SlatBackReflSolBeamDiff(0.0), SlatTransSolDiffDiff(0.0), SlatFrontReflSolDiffDiff(0.0),
-              SlatBackReflSolDiffDiff(0.0), SlatTransVisBeamDiff(0.0), SlatFrontReflVisBeamDiff(0.0), SlatBackReflVisBeamDiff(0.0),
-              SlatTransVisDiffDiff(0.0), SlatFrontReflVisDiffDiff(0.0), SlatBackReflVisDiffDiff(0.0), SlatTransIR(0.0), SlatFrontEmissIR(0.0),
-              SlatBackEmissIR(0.0), BlindToGlassDist(0.0), BlindTopOpeningMult(0.0), BlindBottomOpeningMult(0.0), BlindLeftOpeningMult(0.0),
-              BlindRightOpeningMult(0.0), SolFrontBeamBeamTrans(MaxSlatAngs, 37, 0.0), SolFrontBeamBeamRefl(MaxSlatAngs, 37, 0.0),
-              SolBackBeamBeamTrans(MaxSlatAngs, 37, 0.0), SolBackBeamBeamRefl(MaxSlatAngs, 37, 0.0), SolFrontBeamDiffTrans(MaxSlatAngs, 37, 0.0),
-              SolFrontBeamDiffRefl(MaxSlatAngs, 37, 0.0), SolBackBeamDiffTrans(MaxSlatAngs, 37, 0.0), SolBackBeamDiffRefl(MaxSlatAngs, 37, 0.0),
-              SolFrontDiffDiffTrans(MaxSlatAngs, 0.0), SolFrontDiffDiffTransGnd(MaxSlatAngs, 0.0), SolFrontDiffDiffTransSky(MaxSlatAngs, 0.0),
-              SolFrontDiffDiffRefl(MaxSlatAngs, 0.0), SolFrontDiffDiffReflGnd(MaxSlatAngs, 0.0), SolFrontDiffDiffReflSky(MaxSlatAngs, 0.0),
-              SolBackDiffDiffTrans(MaxSlatAngs, 0.0), SolBackDiffDiffRefl(MaxSlatAngs, 0.0), SolFrontBeamAbs(MaxSlatAngs, 37, 0.0),
-              SolBackBeamAbs(MaxSlatAngs, 37, 0.0), SolFrontDiffAbs(MaxSlatAngs, 0.0), SolFrontDiffAbsGnd(MaxSlatAngs, 0.0),
-              SolFrontDiffAbsSky(MaxSlatAngs, 0.0), SolBackDiffAbs(MaxSlatAngs, 0.0), VisFrontBeamBeamTrans(MaxSlatAngs, 37, 0.0),
-              VisFrontBeamBeamRefl(MaxSlatAngs, 37, 0.0), VisBackBeamBeamTrans(MaxSlatAngs, 37, 0.0), VisBackBeamBeamRefl(MaxSlatAngs, 37, 0.0),
-              VisFrontBeamDiffTrans(MaxSlatAngs, 37, 0.0), VisFrontBeamDiffRefl(MaxSlatAngs, 37, 0.0), VisBackBeamDiffTrans(MaxSlatAngs, 37, 0.0),
-              VisBackBeamDiffRefl(MaxSlatAngs, 37, 0.0), VisFrontDiffDiffTrans(MaxSlatAngs, 0.0), VisFrontDiffDiffRefl(MaxSlatAngs, 0.0),
-              VisBackDiffDiffTrans(MaxSlatAngs, 0.0), VisBackDiffDiffRefl(MaxSlatAngs, 0.0), IRFrontTrans(MaxSlatAngs, 0.0),
-              IRFrontEmiss(MaxSlatAngs, 0.0), IRBackTrans(MaxSlatAngs, 0.0), IRBackEmiss(MaxSlatAngs, 0.0)
+            : MaterialNumber(0), SlatOrientation(DataWindowEquivalentLayer::Orientation::Unassigned),
+              SlatAngleType(DataWindowEquivalentLayer::AngleType::Fixed), SlatWidth(0.0), SlatSeparation(0.0), SlatThickness(0.0), SlatCrown(0.0),
+              SlatAngle(0.0), MinSlatAngle(0.0), MaxSlatAngle(0.0), SlatConductivity(0.0), SlatTransSolBeamDiff(0.0), SlatFrontReflSolBeamDiff(0.0),
+              SlatBackReflSolBeamDiff(0.0), SlatTransSolDiffDiff(0.0), SlatFrontReflSolDiffDiff(0.0), SlatBackReflSolDiffDiff(0.0),
+              SlatTransVisBeamDiff(0.0), SlatFrontReflVisBeamDiff(0.0), SlatBackReflVisBeamDiff(0.0), SlatTransVisDiffDiff(0.0),
+              SlatFrontReflVisDiffDiff(0.0), SlatBackReflVisDiffDiff(0.0), SlatTransIR(0.0), SlatFrontEmissIR(0.0), SlatBackEmissIR(0.0),
+              BlindToGlassDist(0.0), BlindTopOpeningMult(0.0), BlindBottomOpeningMult(0.0), BlindLeftOpeningMult(0.0), BlindRightOpeningMult(0.0),
+              SolFrontBeamBeamTrans(MaxSlatAngs, 37, 0.0), SolFrontBeamBeamRefl(MaxSlatAngs, 37, 0.0), SolBackBeamBeamTrans(MaxSlatAngs, 37, 0.0),
+              SolBackBeamBeamRefl(MaxSlatAngs, 37, 0.0), SolFrontBeamDiffTrans(MaxSlatAngs, 37, 0.0), SolFrontBeamDiffRefl(MaxSlatAngs, 37, 0.0),
+              SolBackBeamDiffTrans(MaxSlatAngs, 37, 0.0), SolBackBeamDiffRefl(MaxSlatAngs, 37, 0.0), SolFrontDiffDiffTrans(MaxSlatAngs, 0.0),
+              SolFrontDiffDiffTransGnd(MaxSlatAngs, 0.0), SolFrontDiffDiffTransSky(MaxSlatAngs, 0.0), SolFrontDiffDiffRefl(MaxSlatAngs, 0.0),
+              SolFrontDiffDiffReflGnd(MaxSlatAngs, 0.0), SolFrontDiffDiffReflSky(MaxSlatAngs, 0.0), SolBackDiffDiffTrans(MaxSlatAngs, 0.0),
+              SolBackDiffDiffRefl(MaxSlatAngs, 0.0), SolFrontBeamAbs(MaxSlatAngs, 37, 0.0), SolBackBeamAbs(MaxSlatAngs, 37, 0.0),
+              SolFrontDiffAbs(MaxSlatAngs, 0.0), SolFrontDiffAbsGnd(MaxSlatAngs, 0.0), SolFrontDiffAbsSky(MaxSlatAngs, 0.0),
+              SolBackDiffAbs(MaxSlatAngs, 0.0), VisFrontBeamBeamTrans(MaxSlatAngs, 37, 0.0), VisFrontBeamBeamRefl(MaxSlatAngs, 37, 0.0),
+              VisBackBeamBeamTrans(MaxSlatAngs, 37, 0.0), VisBackBeamBeamRefl(MaxSlatAngs, 37, 0.0), VisFrontBeamDiffTrans(MaxSlatAngs, 37, 0.0),
+              VisFrontBeamDiffRefl(MaxSlatAngs, 37, 0.0), VisBackBeamDiffTrans(MaxSlatAngs, 37, 0.0), VisBackBeamDiffRefl(MaxSlatAngs, 37, 0.0),
+              VisFrontDiffDiffTrans(MaxSlatAngs, 0.0), VisFrontDiffDiffRefl(MaxSlatAngs, 0.0), VisBackDiffDiffTrans(MaxSlatAngs, 0.0),
+              VisBackDiffDiffRefl(MaxSlatAngs, 0.0), IRFrontTrans(MaxSlatAngs, 0.0), IRFrontEmiss(MaxSlatAngs, 0.0), IRBackTrans(MaxSlatAngs, 0.0),
+              IRBackEmiss(MaxSlatAngs, 0.0)
         {
         }
     };
@@ -1952,7 +1971,7 @@ namespace DataHeatBalance {
                                  Optional_int_const ScreenNumber = _ // Optional screen number
     );
 
-    std::string DisplayMaterialRoughness(int Roughness); // Roughness String
+    std::string DisplayMaterialRoughness(DataSurfaces::SurfaceRoughness Roughness); // Roughness String
 
     Real64 ComputeNominalUwithConvCoeffs(EnergyPlusData &state,
                                          int numSurf,  // index for Surface array.
@@ -1996,8 +2015,8 @@ struct HeatBalanceData : BaseGlobalStruct
     Real64 TempConvergTol = 0.0;            // Tolerance value for Temperature Convergence
     int DefaultInsideConvectionAlgo = 1;    // 1 = simple (ASHRAE); 2 = detailed (ASHRAE); 3 = ceiling diffuser; 4 = trombe wall
     int DefaultOutsideConvectionAlgo = 1;   // 1 = simple (ASHRAE); 2 = detailed; etc (BLAST, TARP, MOWITT, DOE-2)
-    int SolarDistribution = 0;              // Solar Distribution Algorithm
-    int InsideSurfIterations = 0;           // Counts inside surface iterations
+    DataHeatBalance::Shadowing SolarDistribution = DataHeatBalance::Shadowing::FullExterior;                  // Solar Distribution Algorithm
+    int InsideSurfIterations = 0;                                                                             // Counts inside surface iterations
     DataSurfaces::iHeatTransferModel OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CTF; // Global HeatBalanceAlgorithm setting
     // Flags for HeatTransfer Algorithms Used
     bool AllCTF = true;                  // CTF used for everything - no EMPD, no CondFD, No HAMT, No Kiva - true until flipped otherwise
@@ -2012,13 +2031,14 @@ struct HeatBalanceData : BaseGlobalStruct
     int MinNumberOfWarmupDays = 1;       // Minimum number of warmup days allowed
     Real64 CondFDRelaxFactor = 1.0;      // Relaxation factor, for looping across all the surfaces.
     Real64 CondFDRelaxFactorInput = 1.0; // Relaxation factor, for looping across all the surfaces, user input value
-    int ZoneAirSolutionAlgo = DataHeatBalance::Use3rdOrder; // ThirdOrderBackwardDifference, AnalyticalSolution, and EulerMethod
-    bool OverrideZoneAirSolutionAlgo = false;               // Override the zone air solution algorithm in PerformancePrecisionTradeoffs
-    Real64 BuildingRotationAppendixG = 0.0;                 // Building Rotation for Appendix G
-    Real64 ZoneTotalExfiltrationHeatLoss = 0.0;             // Building total heat emission through zone exfiltration;
-    Real64 ZoneTotalExhaustHeatLoss = 0.0;                  // Building total heat emission through zone air exhaust;
-    Real64 SysTotalHVACReliefHeatLoss = 0.0;                // Building total heat emission through HVAC system relief air;
-    Real64 SysTotalHVACRejectHeatLoss = 0.0;                // Building total heat emission through HVAC system heat rejection;
+    DataHeatBalance::SolutionAlgo ZoneAirSolutionAlgo =
+        DataHeatBalance::SolutionAlgo::ThirdOrder; // ThirdOrderBackwardDifference, AnalyticalSolution, and EulerMethod
+    bool OverrideZoneAirSolutionAlgo = false;      // Override the zone air solution algorithm in PerformancePrecisionTradeoffs
+    Real64 BuildingRotationAppendixG = 0.0;        // Building Rotation for Appendix G
+    Real64 ZoneTotalExfiltrationHeatLoss = 0.0;    // Building total heat emission through zone exfiltration;
+    Real64 ZoneTotalExhaustHeatLoss = 0.0;         // Building total heat emission through zone air exhaust;
+    Real64 SysTotalHVACReliefHeatLoss = 0.0;       // Building total heat emission through HVAC system relief air;
+    Real64 SysTotalHVACRejectHeatLoss = 0.0;       // Building total heat emission through HVAC system heat rejection;
     // END SiteData
     int NumOfZoneLists = 0;             // Total number of zone lists
     int NumOfZoneGroups = 0;            // Total number of zone groups
@@ -2296,7 +2316,7 @@ struct HeatBalanceData : BaseGlobalStruct
         this->TempConvergTol = 0.0;
         this->DefaultInsideConvectionAlgo = 1;
         this->DefaultOutsideConvectionAlgo = 1;
-        this->SolarDistribution = 0;
+        this->SolarDistribution = DataHeatBalance::Shadowing::FullExterior;
         this->InsideSurfIterations = 0;
         this->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CTF;
         this->AllCTF = true;
@@ -2311,7 +2331,7 @@ struct HeatBalanceData : BaseGlobalStruct
         this->MinNumberOfWarmupDays = 1;
         this->CondFDRelaxFactor = 1.0;
         this->CondFDRelaxFactorInput = 1.0;
-        this->ZoneAirSolutionAlgo = DataHeatBalance::Use3rdOrder;
+        this->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::ThirdOrder;
         this->OverrideZoneAirSolutionAlgo = false;
         this->BuildingRotationAppendixG = 0.0;
         this->ZoneTotalExfiltrationHeatLoss = 0.0;
