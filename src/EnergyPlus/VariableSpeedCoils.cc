@@ -7320,7 +7320,6 @@ namespace VariableSpeedCoils {
             CoilName = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).Name;
             CoilType = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).VarSpeedCoilType;
         }
-
     }
 
     void CalcVarSpeedCoilHeating(EnergyPlusData &state,
