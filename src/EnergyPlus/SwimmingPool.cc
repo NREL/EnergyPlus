@@ -851,8 +851,8 @@ void SwimmingPoolData::calculate(EnergyPlusData &state)
     Real64 Cp =
         FluidProperties::GetSpecificHeatGlycol(state, "WATER", this->PoolWaterTemp, this->GlycolIndex, RoutineName); // specific heat of pool water
 
-    Real64 TH22 =
-        state.dataHeatBalSurf->TH(SurfNum, 2, 2); // inside surface temperature at the previous time step equals the old pool water temperature
+    Real64 TH22 = state.dataHeatBalSurf->SurfInsideTempHist(2)(
+        SurfNum); // inside surface temperature at the previous time step equals the old pool water temperature
     Real64 TInSurf =
         this->CurSetPtTemp; // Setpoint temperature for pool which is also the goal temperature and also the inside surface face temperature
     Real64 Tmuw = this->CurMakeupWaterTemp;                                       // Inlet makeup water temperature

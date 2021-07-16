@@ -809,7 +809,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataLoopNodes->Node.deallocate();
     state->dataGlobal->KickOffSimulation = false;
     state->dataHeatBalSurf->SurfTempInTmp.deallocate();
-    state->dataHeatBalSurf->TH.deallocate();
     state->dataHeatBalSurf->SurfHConvInt.deallocate();
     state->dataMstBal->HConvInFD.deallocate();
     state->dataMstBal->RhoVaporAirIn.deallocate();
@@ -1864,7 +1863,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     state->dataLoopNodes->Node(3).MassFlowRate = 0.1;
     state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
 
-    state->dataHeatBalSurf->TH.allocate(2, 2, 6);
     state->dataHeatBalSurf->SurfHConvInt.allocate(6);
     state->dataHeatBalSurf->SurfHConvInt(1) = 0.5;
     state->dataHeatBalSurf->SurfHConvInt(2) = 0.5;
@@ -2484,7 +2482,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     state->dataGlobal->KickOffSimulation = false;
     state->dataHeatBalSurf->SurfTempInTmp.deallocate();
     state->dataHeatBal->SurfTempEffBulkAir.deallocate();
-    state->dataHeatBalSurf->TH.deallocate();
     state->dataHeatBalSurf->SurfHConvInt.deallocate();
     state->dataMstBal->HConvInFD.deallocate();
     state->dataMstBal->RhoVaporAirIn.deallocate();
@@ -3073,7 +3070,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
 
     state->dataHeatBalSurf->SurfTempInTmp.allocate(6);
 
-    state->dataHeatBalSurf->TH.allocate(2, 2, 6);
     state->dataHeatBalSurf->SurfHConvInt.allocate(6);
     state->dataMstBal->HConvInFD.allocate(6);
     state->dataMstBal->RhoVaporAirIn.allocate(6);

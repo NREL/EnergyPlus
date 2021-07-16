@@ -208,8 +208,11 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Real64> SurfWinInitialDifSolInTrans; // Initial diffuse solar transmitted out through window surface [W/m2]
 
     // REAL(r64) variables from BLDCTF.inc and only used in the Heat Balance
-    Array3D<Real64> TH; // Temperature History (SurfNum,Hist Term,In/Out) where:
+    //    Array3D<Real64> TH; // Temperature History (SurfNum,Hist Term,In/Out) where:
     // Hist Term (1 = Current Time, 2-MaxCTFTerms = previous times),  In/Out (1 = Outside, 2 = Inside)
+    Array1D<Array1D<Real64>> SurfInsideTempHist;  // Temperature History (SurfNum,Hist Term,In/Out) where:
+    Array1D<Array1D<Real64>> SurfOutsideTempHist; // Temperature History (SurfNum,Hist Term,In/Out) where:
+
     Array3D<Real64> QH;         // Flux History (TH and QH are interpolated from THM and QHM for the next user requested time step)
     Array3D<Real64> THM;        // Master Temperature History (on the time step for the construct)
     Array3D<Real64> QHM;        // Master Flux History (on the time step for the construct)
@@ -327,7 +330,8 @@ struct HeatBalSurfData : BaseGlobalStruct
         this->SurfQAdditionalHeatSourceInside.deallocate();
         this->SurfOpaqInitialDifSolInAbs.deallocate();
         this->SurfWinInitialDifSolInTrans.deallocate();
-        this->TH.deallocate();
+        this->SurfInsideTempHist.deallocate();
+        this->SurfOutsideTempHist.deallocate();
         this->QH.deallocate();
         this->THM.deallocate();
         this->QHM.deallocate();
