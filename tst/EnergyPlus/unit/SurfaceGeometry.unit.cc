@@ -4888,9 +4888,9 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     // Case 1a: Constructs with regular materials are not reverse of each other--material layers do not match in reverse (should get a "true" answer)
     state->dataConstruction->Construct(2).LayerPoint(1) = 1;
     state->dataConstruction->Construct(2).LayerPoint(3) = 3;
-    state->dataMaterial->Material(1).Group = RegularMaterial;
-    state->dataMaterial->Material(2).Group = RegularMaterial;
-    state->dataMaterial->Material(3).Group = RegularMaterial;
+    state->dataMaterial->Material(1).Group = DataHeatBalance::MaterialGroup::RegularMaterial;
+    state->dataMaterial->Material(2).Group = DataHeatBalance::MaterialGroup::RegularMaterial;
+    state->dataMaterial->Material(3).Group = DataHeatBalance::MaterialGroup::RegularMaterial;
     RevLayerDiffs = false;
     // ExpectResult = true;
     CheckForReversedLayers(*state, RevLayerDiffs, 1, 2, 3);
@@ -4905,7 +4905,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     state->dataConstruction->Construct(4).LayerPoint(1) = 4;
     state->dataConstruction->Construct(4).LayerPoint(2) = 2;
     state->dataConstruction->Construct(4).LayerPoint(3) = 5;
-    state->dataMaterial->Material(4).Group = WindowGlass;
+    state->dataMaterial->Material(4).Group = DataHeatBalance::MaterialGroup::WindowGlass;
     state->dataMaterial->Material(4).Thickness = 0.15;
     state->dataMaterial->Material(4).ReflectSolBeamFront = 0.35;
     state->dataMaterial->Material(4).ReflectSolBeamBack = 0.25;
@@ -4920,7 +4920,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     state->dataMaterial->Material(4).SolarDiffusing = true;
     state->dataMaterial->Material(4).YoungModulus = 0.89;
     state->dataMaterial->Material(4).PoissonsRatio = 1.11;
-    state->dataMaterial->Material(5).Group = WindowGlass;
+    state->dataMaterial->Material(5).Group = DataHeatBalance::MaterialGroup::WindowGlass;
     state->dataMaterial->Material(5).Thickness = 0.15;
     state->dataMaterial->Material(5).ReflectSolBeamFront = 0.25;
     state->dataMaterial->Material(5).ReflectSolBeamBack = 0.35;
@@ -4953,7 +4953,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     state->dataConstruction->Construct(5).LayerPoint(1) = 6;
     state->dataConstruction->Construct(6).TotLayers = 1;
     state->dataConstruction->Construct(6).LayerPoint(1) = 7;
-    state->dataMaterial->Material(6).Group = GlassEquivalentLayer;
+    state->dataMaterial->Material(6).Group = DataHeatBalance::MaterialGroup::GlassEquivalentLayer;
     state->dataMaterial->Material(6).TausFrontBeamBeam = 0.39;
     state->dataMaterial->Material(6).TausBackBeamBeam = 0.29;
     state->dataMaterial->Material(6).ReflFrontBeamBeam = 0.38;
@@ -4980,7 +4980,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     state->dataMaterial->Material(6).EmissThermalFront = 0.888;
     state->dataMaterial->Material(6).EmissThermalBack = 0.777;
     state->dataMaterial->Material(6).Resistance = 1.234;
-    state->dataMaterial->Material(7).Group = GlassEquivalentLayer;
+    state->dataMaterial->Material(7).Group = DataHeatBalance::MaterialGroup::GlassEquivalentLayer;
     state->dataMaterial->Material(7).TausFrontBeamBeam = 0.29;
     state->dataMaterial->Material(7).TausBackBeamBeam = 0.39;
     state->dataMaterial->Material(7).ReflFrontBeamBeam = 0.28;

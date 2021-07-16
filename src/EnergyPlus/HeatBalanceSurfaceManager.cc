@@ -163,14 +163,6 @@ using namespace FenestrationCommon;
 using namespace SingleLayerOptics;
 using namespace MultiLayerOptics;
 
-// Data
-// MODULE PARAMETER DEFINITIONS:
-static std::string const BlankString;
-
-namespace {
-
-} // namespace
-
 // These are now external subroutines
 // PUBLIC  CalcHeatBalanceOutsideSurf  ! The heat balance routines are now public because the
 // PUBLIC  CalcHeatBalanceInsideSurf   ! radiant systems need access to them in order to simulate
@@ -1504,7 +1496,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
     }
     state.dataHeatBalSurf->SurfAbsSolarExt.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfAbsThermalExt.dimension(state.dataSurface->TotSurfaces, 0.0);
-    state.dataHeatBalSurf->SurfRoughnessExt.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBalSurf->SurfRoughnessExt.dimension(state.dataSurface->TotSurfaces, DataSurfaces::SurfaceRoughness::Unassigned);
     state.dataHeatBalSurf->SurfAbsSolarInt.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfAbsThermalInt.dimension(state.dataSurface->TotSurfaces, 0.0);
 
@@ -2342,10 +2334,11 @@ void EvalOutsideMovableInsulation(EnergyPlusData &state)
             continue;
         }
         int const MaterialIndex(state.dataSurface->SurfMaterialMovInsulExt(SurfNum));
-        int const MaterialGroupNum(state.dataMaterial->Material(MaterialIndex).Group);
+        DataHeatBalance::MaterialGroup const MaterialGroupNum(state.dataMaterial->Material(MaterialIndex).Group);
         state.dataHeatBalSurf->SurfMovInsulExtPresent(SurfNum) = true;
         state.dataHeatBalSurf->SurfMovInsulHExt(SurfNum) = 1.0 / (MovInsulSchedVal * state.dataMaterial->Material(MaterialIndex).Resistance);
-        if (MaterialGroupNum == DataHeatBalance::WindowGlass || MaterialGroupNum == DataHeatBalance::GlassEquivalentLayer) {
+        if (MaterialGroupNum == DataHeatBalance::MaterialGroup::WindowGlass ||
+            MaterialGroupNum == DataHeatBalance::MaterialGroup::GlassEquivalentLayer) {
             state.dataHeatBalSurf->SurfAbsSolarExt(SurfNum) =
                 max(0.0, 1.0 - state.dataMaterial->Material(MaterialIndex).Trans - state.dataMaterial->Material(MaterialIndex).ReflectSolBeamFront);
         } else {
@@ -2369,10 +2362,11 @@ void EvalInsideMovableInsulation(EnergyPlusData &state)
             continue;
         }
         int const MaterialIndex(state.dataSurface->SurfMaterialMovInsulInt(SurfNum));
-        int const MaterialGroupNum(state.dataMaterial->Material(MaterialIndex).Group);
+        DataHeatBalance::MaterialGroup const MaterialGroupNum(state.dataMaterial->Material(MaterialIndex).Group);
         state.dataHeatBalSurf->SurfMovInsulIntPresent(SurfNum) = true;
         state.dataHeatBalSurf->SurfMovInsulHInt(SurfNum) = 1.0 / (MovInsulSchedVal * state.dataMaterial->Material(MaterialIndex).Resistance);
-        if (MaterialGroupNum == DataHeatBalance::WindowGlass || MaterialGroupNum == DataHeatBalance::GlassEquivalentLayer) {
+        if (MaterialGroupNum == DataHeatBalance::MaterialGroup::WindowGlass ||
+            MaterialGroupNum == DataHeatBalance::MaterialGroup::GlassEquivalentLayer) {
             state.dataHeatBalSurf->SurfAbsSolarInt(SurfNum) =
                 max(0.0, 1.0 - state.dataMaterial->Material(MaterialIndex).Trans - state.dataMaterial->Material(MaterialIndex).ReflectSolBeamFront);
         } else {
@@ -3047,7 +3041,8 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                 }
                                 state.dataSurface->SurfWinExtDiffAbsByShade(SurfNum) = AbsDiffBlind * (SkySolarInc + GndSolarInc);
 
-                                if (state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).SlatOrientation == Horizontal) {
+                                if (state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).SlatOrientation ==
+                                    DataWindowEquivalentLayer::Orientation::Horizontal) {
                                     Real64 ACosTlt = std::abs(Surface(SurfNum).CosTilt);
                                     Real64 AbsDiffBlindGnd;
                                     Real64 AbsDiffBlindSky;
@@ -3095,7 +3090,8 @@ void InitSolarHeatGains(EnergyPlusData &state)
                             // SurfWinA is from InteriorSolarDistribution
                             if (ANY_BLIND(ShadeFlag)) {
                                 int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
-                                if (state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).SlatOrientation == Horizontal) {
+                                if (state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).SlatOrientation ==
+                                    DataWindowEquivalentLayer::Orientation::Horizontal) {
                                     Real64 ACosTlt = std::abs(Surface(SurfNum).CosTilt); // Absolute value of cosine of surface tilt angle
                                     Real64 AbsDiffGlassLayGnd; // System glass layer ground diffuse solar absorptance with blind on
                                     Real64 AbsDiffGlassLaySky; // System glass layer sky diffuse solar absorptance with blind on
@@ -5793,7 +5789,6 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
     constexpr const char *HBSurfManRainHAMT("HBSurfMan:Rain:HAMT");
     constexpr const char *HBSurfManDrySurfCondFD("HBSurfMan:DrySurf:CondFD");
     constexpr const char *Outside("Outside");
-    static std::string const BlankString;
 
     bool MovInsulErrorFlag = false; // Movable Insulation error flag
 
@@ -6175,7 +6170,7 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                         continue;
                     }
                     // Roughness index of the exterior surface
-                    int RoughSurf = state.dataHeatBalSurf->SurfRoughnessExt(SurfNum);
+                    DataSurfaces::SurfaceRoughness RoughSurf = state.dataHeatBalSurf->SurfRoughnessExt(SurfNum);
                     // Thermal absoptance of the exterior surface
                     Real64 AbsThermSurf = state.dataHeatBalSurf->SurfAbsThermalExt(SurfNum);
                     HMovInsul = 0;
@@ -6354,7 +6349,8 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                     }
 
                 } else if (SELECT_CASE_var == KivaFoundation) {
-                    int RoughSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Roughness;
+                    DataSurfaces::SurfaceRoughness RoughSurf =
+                        state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Roughness;
                     Real64 AbsThermSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
 
                     // Set Kiva exterior convection algorithms
@@ -6610,7 +6606,6 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
     constexpr const char *wsurf("Wsurf");
     constexpr const char *HBSurfManInsideSurf("HB,SurfMan:InsideSurf");
     constexpr const char *Inside("Inside");
-    static std::string const BlankString;
 
     Real64 TempSurfOutTmp; // Local Temporary Surface temperature for the outside surface face
     Real64 SurfTempInSat;  // Local temporary surface dew point temperature
@@ -7164,7 +7159,8 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                     // (HeatBalanceSurfaceManager USEing and WindowManager and
                     // WindowManager USEing HeatBalanceSurfaceManager)
                     if (surface.ExtBoundCond == ExternalEnvironment) {
-                        int RoughSurf = state.dataMaterial->Material(construct.LayerPoint(1)).Roughness;           // Outside surface roughness
+                        DataSurfaces::SurfaceRoughness RoughSurf =
+                            state.dataMaterial->Material(construct.LayerPoint(1)).Roughness;                       // Outside surface roughness
                         Real64 EmisOut = state.dataMaterial->Material(construct.LayerPoint(1)).AbsorpThermalFront; // Glass outside surface emissivity
                         auto const shading_flag(state.dataSurface->SurfWinShadingFlag(SurfNum));
                         if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(shading_flag)) {
@@ -7910,7 +7906,8 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                         // (HeatBalanceSurfaceManager USEing and WindowManager and
                         // WindowManager USEing HeatBalanceSurfaceManager)
                         if (surface.ExtBoundCond == ExternalEnvironment) {
-                            int RoughSurf = state.dataMaterial->Material(construct.LayerPoint(1)).Roughness; // Outside surface roughness
+                            DataSurfaces::SurfaceRoughness RoughSurf =
+                                state.dataMaterial->Material(construct.LayerPoint(1)).Roughness; // Outside surface roughness
                             Real64 EmisOut =
                                 state.dataMaterial->Material(construct.LayerPoint(1)).AbsorpThermalFront; // Glass outside surface emissivity
                             auto const shading_flag(state.dataSurface->SurfWinShadingFlag(surfNum));
@@ -8655,9 +8652,6 @@ void CalcExteriorVentedCavity(EnergyPlusData &state, int const SurfNum) // index
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
     using Psychrometrics::PsyWFnTdbTwbPb;
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const BlankString;
 
     // local working variables
     Real64 AspRat; // Aspect Ratio of gap

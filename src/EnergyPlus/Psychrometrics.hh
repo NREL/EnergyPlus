@@ -843,8 +843,6 @@ namespace Psychrometrics {
         // Used values from Table 2, HOF 2005, Chapter 6, to verify that these values match (at saturation)
         // values from PsyRhFnTdbWPb
 
-        // FUNCTION PARAMETER DEFINITIONS:
-
 #ifdef EP_psych_stats
         ++state.dataPsychCache->NumTimesCalled[static_cast<int>(PsychrometricFunction::RhFnTdbRhov)];
 #endif
@@ -893,8 +891,6 @@ namespace Psychrometrics {
 
         // REFERENCES:
         // ASHRAE HANDBOOK FUNDAMENTALS 1985, P6.12, EQN 10,21,23
-
-        // FUNCTION PARAMETER DEFINITIONS:
 
 #ifdef EP_psych_stats
         ++state.dataPsychCache->NumTimesCalled[static_cast<int>(PsychrometricFunction::RhFnTdbWPb)];
@@ -953,8 +949,6 @@ namespace Psychrometrics {
 
         // REFERENCES:
         // ASHRAE HANDBOOK OF FUNDAMENTALS, 1972, P99, EQN 22
-
-        // FUNCTION PARAMETER DEFINITIONS:
 
 #ifdef EP_psych_stats
         ++state.dataPsychCache->NumTimesCalled[static_cast<int>(PsychrometricFunction::WFnTdpPb)];
@@ -1018,8 +1012,6 @@ namespace Psychrometrics {
 
         // REFERENCES:
         // ASHRAE HANDBOOK OF FUNDAMENTALS, 1972, P99, EQN 22
-
-        // FUNCTION PARAMETER DEFINITIONS:
 
 #ifdef EP_psych_stats
         ++state.dataPsychCache->NumTimesCalled[static_cast<int>(PsychrometricFunction::WFnTdbRhPb)];
@@ -1085,8 +1077,6 @@ namespace Psychrometrics {
 
         // REFERENCES:
         // ASHRAE HANDBOOK OF FUNDAMENTALS, 1972, P99, EQ 22,35
-
-        // FUNCTION PARAMETER DEFINITIONS:
 
 #ifdef EP_psych_stats
         ++state.dataPsychCache->NumTimesCalled[static_cast<int>(PsychrometricFunction::WFnTdbTwbPb)];

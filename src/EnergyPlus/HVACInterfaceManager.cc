@@ -427,7 +427,7 @@ void UpdatePlantLoopInterface(EnergyPlusData &state,
     using FluidProperties::GetSpecificHeatGlycol;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("UpdatePlantLoopInterface");
+    static constexpr std::string_view RoutineName("UpdatePlantLoopInterface");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 OldTankOutletTemp;
@@ -593,7 +593,7 @@ void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, int const
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 const FracTotLoopMass(0.5); // Fraction of total loop mass assigned to the half loop
-    static std::string const RoutineName("UpdateHalfLoopInletTemp");
+    static constexpr std::string_view RoutineName("UpdateHalfLoopInletTemp");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int TankOutletLoopSide;    // inlet loopsidenumber
@@ -736,7 +736,7 @@ void UpdateCommonPipe(
     // SUBROUTINE ARGUMENTS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("UpdateCommonPipe");
+    static constexpr std::string_view RoutineName("UpdateCommonPipe");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int TankOutletLoopSide;    // inlet loopsidenumber
