@@ -308,9 +308,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ProcessZoneData)
     EXPECT_FALSE(ErrorsFound);
 
     EXPECT_EQ("Zone One", state->dataHeatBal->Zone(1).Name);
-    EXPECT_EQ(AdaptiveConvectionAlgorithm, state->dataHeatBal->Zone(1).InsideConvectionAlgo);
+    EXPECT_EQ(ConvectionConstants::HcInt_AdaptiveConvectionAlgorithm, state->dataHeatBal->Zone(1).InsideConvectionAlgo);
     EXPECT_EQ("Zone Two", state->dataHeatBal->Zone(2).Name);
-    EXPECT_EQ(ASHRAETARP, state->dataHeatBal->Zone(2).InsideConvectionAlgo);
+    EXPECT_EQ(ConvectionConstants::HcInt_ASHRAETARP, state->dataHeatBal->Zone(2).InsideConvectionAlgo);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData)

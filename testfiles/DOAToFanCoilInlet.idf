@@ -2871,10 +2871,9 @@
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:OUTDOORAIRSYSTEM ===========
 
   AirLoopHVAC:OutdoorAirSystem,
-    DOAS OA System,          !- Name
+    DOAS OA System,              !- Name
     DOAS OA System Controllers,  !- Controller List Name
-    DOAS OA System Equipment,!- Outdoor Air Equipment List Name
-    DOAS Availability Managers;  !- Availability Manager List Name
+    DOAS OA System Equipment;    !- Outdoor Air Equipment List Name
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTDOORAIR:MIXER ===========
 

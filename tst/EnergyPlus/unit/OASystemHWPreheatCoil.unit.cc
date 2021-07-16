@@ -220,8 +220,7 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOffSim)
         "  AirLoopHVAC:OutdoorAirSystem,",
         "    OA Sys 1,                !- Name",
         "    OA Sys 1 Controllers,    !- Controller List Name",
-        "    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name",
-        "    Outdoor Air 1 Avail List;!- Availability Manager List Name",
+        "    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name",
 
         "  OutdoorAir:NodeList,",
         "    OUTSIDE AIR INLET NODE;    !- Node or NodeList Name 1",
@@ -1206,8 +1205,7 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOnSim)
         "  AirLoopHVAC:OutdoorAirSystem,",
         "    OA Sys 1,                !- Name",
         "    OA Sys 1 Controllers,    !- Controller List Name",
-        "    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name",
-        "    Outdoor Air 1 Avail List;!- Availability Manager List Name",
+        "    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name",
 
         "  OutdoorAir:NodeList,",
         "    OUTSIDE AIR INLET NODE;    !- Node or NodeList Name 1",
