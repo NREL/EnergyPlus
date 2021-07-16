@@ -74,6 +74,7 @@ extern "C" {
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -1256,6 +1257,24 @@ namespace SimulationManager {
                                 state,
                                 format("PerformancePrecisionTradeoffs using the Advanced Override Mode, MaxAllowedDelTemp set to: {:.4R}",
                                        state.dataHeatBal->MaxAllowedDelTemp));
+                            advancedModeUsed = true;
+                        }
+                        if (fields.find("iterdampconst") != fields.end()) { // not required field, has default value
+                            state.dataHeatBalSurf->IterDampConst = fields.at("iterdampconst");
+                            ShowWarningError(state,
+                                             format("PerformancePrecisionTradeoffs using the Advanced Override Mode, IterDampConst set to: {:.4R}",
+                                                    state.dataHeatBalSurf->IterDampConst));
+                            advancedModeUsed = true;
+                        }
+                        if (fields.find("inside_surface_heat_balance_convergence_check") != fields.end()) { // not required field, has default value
+                            std::string convergenceCheckInput = fields.at("inside_surface_heat_balance_convergence_check");
+                            if (convergenceCheckInput != "ALLZONES") {
+                                state.dataHeatBalSurf->insideSurfHeatBalConvergeAllZones = false;
+                            }
+                            ShowWarningError(state,
+                                             "PerformancePrecisionTradeoffs using the Advanced Override Mode, "
+                                             "inside_surface_heat_balance_convergence_check set to" +
+                                                 convergenceCheckInput);
                             advancedModeUsed = true;
                         }
                         if (advancedModeUsed) {

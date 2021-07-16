@@ -67,7 +67,6 @@ namespace DataHeatBalSurface {
     Real64 constexpr MinSurfaceTempLimit(-100.0);            // Lowest inside surface temperature allowed in Celsius
     Real64 constexpr MinSurfaceTempLimitBeforeFatal(-250.0); // 2.5 times MinSurfaceTempLimit
     Real64 constexpr DefaultSurfaceTempLimit(200.0);         // Highest inside surface temperature allowed in Celsius
-    Real64 constexpr IterDampConst(5.0);                     // Damping constant for inside surface temperature iterations
     int constexpr ItersReevalConvCoeff(30);                  // Number of iterations between inside convection coefficient reevaluations
     int constexpr MaxIterations(500);                        // Maximum number of iterations allowed for inside surface temps
     Real64 constexpr PoolIsOperatingLimit(0.0001);           // Limit to determine if swimming pool is operating or not
@@ -88,6 +87,8 @@ struct HeatBalSurfData : BaseGlobalStruct
     Real64 MaxSurfaceTempLimit = 200.0;            // Highest inside surface temperature allowed in Celsius
     Real64 MaxSurfaceTempLimitBeforeFatal = 500.0; // 2.5 times MaxSurfaceTempLimit
     int MinIterations = 1;                         // Minimum number of iterations for surface heat balance
+    Real64 IterDampConst = 5.0;                    // Damping constant for inside surface temperature iterations
+    bool insideSurfHeatBalConvergeAllZones = true; // Inside Surface Heat Balance Convergence Check: true for AllZones, false for individual zones
     bool InterZoneWindow = false;                  // True if there is an interzone window
     Real64 SumSurfaceHeatEmission = 0.0;           // Heat emission from all surfaces
 
@@ -244,6 +245,8 @@ struct HeatBalSurfData : BaseGlobalStruct
         this->MaxSurfaceTempLimit = 200.0;
         this->MaxSurfaceTempLimitBeforeFatal = 500.0;
         this->MinIterations = 1;
+        this->IterDampConst = 5.0;
+        this->insideSurfHeatBalConvergeAllZones = true;
         this->SurfCTFConstInPart.deallocate();
         this->SurfCTFConstOutPart.deallocate();
         this->SurfCTFCross0.deallocate();

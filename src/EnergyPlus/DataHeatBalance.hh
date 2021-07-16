@@ -2074,6 +2074,8 @@ struct HeatBalanceData : BaseGlobalStruct
     bool NoFfactorConstructionsUsed = true;
     bool NoCfactorConstructionsUsed = true;
     bool NoRegularMaterialsUsed = true;
+    Array1D<bool> ZoneInsideSurfConverged; // true is inside surface heat balance is converged for a given zone
+    Array1D<int> ZoneInsideSurfIterations; // inside surface heat balance iteration counter
 
     Array1D<Real64> SNLoadHeatEnergy;
     Array1D<Real64> SNLoadCoolEnergy;
@@ -2365,6 +2367,8 @@ struct HeatBalanceData : BaseGlobalStruct
         this->NoFfactorConstructionsUsed = true;
         this->NoCfactorConstructionsUsed = true;
         this->NoRegularMaterialsUsed = true;
+        this->ZoneInsideSurfConverged.deallocate();
+        this->ZoneInsideSurfIterations.deallocate();
         this->EnclRadAlwaysReCalc = false;
         this->SNLoadHeatEnergy.deallocate();
         this->SNLoadCoolEnergy.deallocate();
