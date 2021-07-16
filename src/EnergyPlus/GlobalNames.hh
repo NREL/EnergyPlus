@@ -80,15 +80,15 @@ namespace GlobalNames {
     void IntraObjUniquenessCheck(EnergyPlusData &state,
                                  std::string &NameToVerify,
                                  std::string const &CurrentModuleObject,
-                                 std::string const &FieldName,
+                                 std::string_view FieldName,
                                  std::unordered_set<std::string> &UniqueStrings,
                                  bool &ErrorsFound);
 
     bool VerifyUniqueInterObjectName(EnergyPlusData &state,
                                      std::unordered_map<std::string, std::string> &names,
                                      std::string &object_name,
-                                     std::string const &object_type,
-                                     std::string const &field_name,
+                                     std::string_view object_type,
+                                     std::string_view field_name,
                                      bool &ErrorsFound);
 
     bool VerifyUniqueInterObjectName(EnergyPlusData &state,

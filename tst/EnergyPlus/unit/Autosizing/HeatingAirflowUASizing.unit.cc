@@ -84,7 +84,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
     // this global state is what would be set up by E+ currently
     state->dataEnvrn->StdRhoAir = 1.2;
     state->dataSize->ZoneEqSizing.allocate(1);
-    static std::string const routineName("HeatingAirflowUASizingGauntlet");
+    static constexpr std::string_view routineName("HeatingAirflowUASizingGauntlet");
 
     // create the sizer and set up the flags to specify the sizing configuration
     HeatingAirflowUASizer sizer;

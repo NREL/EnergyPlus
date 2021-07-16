@@ -38,6 +38,11 @@ jobs:
         python-version: 3.7
         architecture: ${{ matrix.arch }}
 
+    - name: Setup QtIFW 4.x
+      uses: jmarrec/setup-qtifw@v1
+      with:
+        qtifw-version: '4.x'
+
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
@@ -80,19 +85,15 @@ jobs:
         mpm --find-updates
         mpm --admin --find-updates
 
-    - name: Install required packages
+    # This will install all required packages and does that in a single thread. So later in cmake we can safely run in parallel
+    - name: Install required packages by building the Test document
       shell: bash
       working-directory: ./doc/
       run: |
+        # It shaves about 1min40s to preinstall from the .lst so do it first
         mpm --verbose --admin --require=@energyplus_packages_windows.lst
-
-    - name: Install IFW
-      shell: bash
-      run: |
-        set -x
-        out_dir="C:/Qt"
-        aqt tool windows tools_ifw 4.1.1 qt.tools.ifw.41 --outputdir="$out_dir"
-        echo "$out_dir/Tools/QtInstallerFramework/4.1/bin" >> $GITHUB_PATH
+        cd test/
+        xelatex dependencies.tex
 
     - name: Create Build Directory
       run: cmake -E make_directory ./build/
