@@ -573,6 +573,7 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
             // completely effective.  If too many history terms are calculated,
             // the time step is adjusted and the CTFs end up being recalculated
             // (see later code in this routine).
+            // TODO - IF CTFTimeStep != TimeStepZone
 
             dtn = 0.0;
             this->CTFTimeStep = 0.0;

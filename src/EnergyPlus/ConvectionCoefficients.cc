@@ -4433,7 +4433,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
     Real64 tmpHc = 0.0;
 
     int const ZoneNum = Surface(SurfNum).Zone;
-    Real64 &Tsurface = state.dataHeatBalSurf->TH(2, 1, SurfNum);
+    Real64 &Tsurface = state.dataHeatBalSurf->SurfInTempHistCurr(SurfNum);
     Real64 &Tzone = state.dataHeatBalFanSys->MAT(ZoneNum);
 
     auto &HnFn = state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in;
@@ -4804,7 +4804,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
 
     auto &Surface(state.dataSurface->Surface);
     auto &QdotConvOutRepPerArea(state.dataHeatBalSurf->QdotConvOutRepPerArea);
-    auto &TH(state.dataHeatBalSurf->TH);
+    Real64 SurfOutTemp = state.dataHeatBalSurf->SurfOutTempHistCurr(SurfNum);
 
     // first call Hn models
     {
@@ -4822,23 +4822,23 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
                 };
             }
         } else if (SELECT_CASE_var == HcExt_NaturalASHRAEVerticalWall) {
-            Hn = CalcASHRAEVerticalWall((TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)));
+            Hn = CalcASHRAEVerticalWall((SurfOutTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum)));
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double { return CalcASHRAEVerticalWall(Tsurf - Tamb); };
         } else if (SELECT_CASE_var == HcExt_NaturalWaltonUnstableHorizontalOrTilt) {
-            Hn = CalcWaltonUnstableHorizontalOrTilt((TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)),
+            Hn = CalcWaltonUnstableHorizontalOrTilt((SurfOutTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum)),
                                                     Surface(SurfNum).CosTilt); // TODO verify CosTilt in vs out
             HnFn = [=](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
                 return CalcWaltonUnstableHorizontalOrTilt(Tsurf - Tamb, cosTilt);
             };
         } else if (SELECT_CASE_var == HcExt_NaturalWaltonStableHorizontalOrTilt) {
-            Hn = CalcWaltonStableHorizontalOrTilt((TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)),
+            Hn = CalcWaltonStableHorizontalOrTilt((SurfOutTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum)),
                                                   Surface(SurfNum).CosTilt); // TODO verify CosTilt in vs out
             HnFn = [=](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
                 return CalcWaltonStableHorizontalOrTilt(Tsurf - Tamb, cosTilt);
             };
         } else if (SELECT_CASE_var == HcExt_AlamdariHammondVerticalWall) {
             Real64 FaceHeight = state.dataSurface->SurfOutConvFaceHeight(SurfNum);
-            Hn = CalcAlamdariHammondVerticalWall(state, (TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)), FaceHeight, SurfNum);
+            Hn = CalcAlamdariHammondVerticalWall(state, (SurfOutTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum)), FaceHeight, SurfNum);
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
                 return CalcAlamdariHammondVerticalWall(Tsurf - Tamb, FaceHeight);
             };
@@ -4848,9 +4848,9 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
                 ShowFatalError(state, "Fohanno Polidori convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
             }
             Hn = CallCalcFohannoPolidoriVerticalWall(state,
-                                                     (TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)),
+                                                     (SurfOutTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum)),
                                                      state.dataSurface->SurfOutConvFaceHeight(SurfNum),
-                                                     TH(1, 1, SurfNum),
+                                                     SurfOutTemp,
                                                      -QdotConvOutRepPerArea(SurfNum),
                                                      SurfNum);
         } else if (SELECT_CASE_var == HcExt_AlamdariHammondStableHorizontal) {
@@ -4860,7 +4860,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
                 HydraulicDiameter = std::sqrt(state.dataSurface->SurfOutConvFaceArea(SurfNum));
             }
             Hn = CalcAlamdariHammondStableHorizontal(
-                state, (TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)), HydraulicDiameter, SurfNum);
+                state, (SurfOutTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum)), HydraulicDiameter, SurfNum);
         } else if (SELECT_CASE_var == HcExt_AlamdariHammondUnstableHorizontal) {
             if (state.dataSurface->SurfOutConvFacePerimeter(SurfNum) > 0.0) {
                 HydraulicDiameter = 4.0 * state.dataSurface->SurfOutConvFaceArea(SurfNum) / state.dataSurface->SurfOutConvFacePerimeter(SurfNum);
@@ -4868,7 +4868,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
                 HydraulicDiameter = std::sqrt(state.dataSurface->SurfOutConvFaceArea(SurfNum));
             }
             Hn = CalcAlamdariHammondUnstableHorizontal(
-                state, (TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)), HydraulicDiameter, SurfNum);
+                state, (SurfOutTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum)), HydraulicDiameter, SurfNum);
         }
     }
 
@@ -4955,7 +4955,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
             }
             HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
         } else if (SELECT_CASE_var == HcExt_MoWiTTWindward) {
-            Hf = CalcMoWITTWindward(TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum), SurfWindSpeed);
+            Hf = CalcMoWITTWindward(SurfOutTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum), SurfWindSpeed);
             if (Surface(SurfNum).Class == SurfaceClass::Floor) { // used for exterior grade
                 HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcMoWITTForcedWindward(windSpeed); };
             } else {
@@ -4968,7 +4968,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
             }
             HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
         } else if (SELECT_CASE_var == HcExt_MoWiTTLeeward) {
-            Hf = CalcMoWITTLeeward((TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)), SurfWindSpeed);
+            Hf = CalcMoWITTLeeward((SurfOutTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum)), SurfWindSpeed);
             if (Surface(SurfNum).Class == SurfaceClass::Floor) { // used for exterior grade
                 HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcMoWITTForcedLeeward(windSpeed); };
             } else {
@@ -4981,8 +4981,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
             }
             HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
         } else if (SELECT_CASE_var == HcExt_DOE2Windward) {
-            Hf = CalcDOE2Windward(
-                TH(1, 1, SurfNum), state.dataSurface->SurfOutDryBulbTemp(SurfNum), Surface(SurfNum).CosTilt, SurfWindSpeed, Roughness);
+            Hf = CalcDOE2Windward(SurfOutTemp, state.dataSurface->SurfOutDryBulbTemp(SurfNum), Surface(SurfNum).CosTilt, SurfWindSpeed, Roughness);
             if (Surface(SurfNum).Class == SurfaceClass::Floor) { // used for exterior grade
                 HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcMoWITTForcedWindward(windSpeed); };
             } else {
@@ -4995,8 +4994,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
             }
             HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
         } else if (SELECT_CASE_var == HcExt_DOE2Leeward) {
-            Hf = CalcDOE2Leeward(
-                TH(1, 1, SurfNum), state.dataSurface->SurfOutDryBulbTemp(SurfNum), Surface(SurfNum).CosTilt, SurfWindSpeed, Roughness);
+            Hf = CalcDOE2Leeward(SurfOutTemp, state.dataSurface->SurfOutDryBulbTemp(SurfNum), Surface(SurfNum).CosTilt, SurfWindSpeed, Roughness);
             if (Surface(SurfNum).Class == SurfaceClass::Floor) { // used for exterior grade
                 HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcMoWITTForcedWindward(windSpeed); };
             } else {
@@ -5028,7 +5026,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
             SurfWindDir = state.dataSurface->SurfOutWindDir(SurfNum);
             Hf = CalcClearRoof(state,
                                SurfNum,
-                               TH(1, 1, SurfNum),
+                               SurfOutTemp,
                                state.dataSurface->SurfOutDryBulbTemp(SurfNum),
                                SurfWindSpeed,
                                SurfWindDir,
@@ -5118,7 +5116,7 @@ void DynamicExtConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
         if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
             DeltaTemp = state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].results.Tconv - state.dataSurface->SurfOutDryBulbTemp(SurfNum);
         } else {
-            DeltaTemp = state.dataHeatBalSurf->TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum);
+            DeltaTemp = state.dataHeatBalSurf->SurfOutTempHistCurr(SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum);
         }
 
         if (DeltaTemp < 0.0) {
@@ -5256,7 +5254,6 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
 
     auto &Zone(state.dataHeatBal->Zone);
     auto &Surface(state.dataSurface->Surface);
-    auto &TH(state.dataHeatBalSurf->TH);
 
     EquipOnCount = 0;
     ZoneNum = Surface(SurfNum).Zone;
@@ -5379,7 +5376,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                             for (SurfLoop = Zone(ZoneNum).HTSurfaceFirst; SurfLoop <= Zone(ZoneNum).HTSurfaceLast; ++SurfLoop) {
                                 if (!state.dataSurface->SurfIntConvSurfHasActiveInIt(SurfLoop)) continue;
                                 if (Surface(SurfLoop).Class == SurfaceClass::Floor) {
-                                    DeltaTemp = TH(2, 1, SurfLoop) - state.dataHeatBalFanSys->MAT(ZoneNum);
+                                    DeltaTemp = state.dataHeatBalSurf->SurfInTempHistCurr(SurfLoop) - state.dataHeatBalFanSys->MAT(ZoneNum);
                                     if (DeltaTemp > ActiveDelTempThreshold) { // assume heating with floor
                                         // system ON is not enough because floor surfaces can continue to heat because of thermal capacity
                                         EquipOnCount = min(EquipOnCount + 1, 10);
@@ -5400,7 +5397,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                             for (SurfLoop = Zone(ZoneNum).HTSurfaceFirst; SurfLoop <= Zone(ZoneNum).HTSurfaceLast; ++SurfLoop) {
                                 if (!state.dataSurface->SurfIntConvSurfHasActiveInIt(SurfLoop)) continue;
                                 if (Surface(SurfLoop).Class == SurfaceClass::Roof) {
-                                    DeltaTemp = TH(2, 1, SurfLoop) - state.dataHeatBalFanSys->MAT(ZoneNum);
+                                    DeltaTemp = state.dataHeatBalSurf->SurfInTempHistCurr(SurfLoop) - state.dataHeatBalFanSys->MAT(ZoneNum);
                                     if (DeltaTemp < ActiveDelTempThreshold) { // assume cooling with ceiling
                                         // system ON is not enough because  surfaces can continue to cool because of thermal capacity
                                         EquipOnCount = min(EquipOnCount + 1, 10);
@@ -5421,7 +5418,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                             for (SurfLoop = Zone(ZoneNum).HTSurfaceFirst; SurfLoop <= Zone(ZoneNum).HTSurfaceLast; ++SurfLoop) {
                                 if (!state.dataSurface->SurfIntConvSurfHasActiveInIt(SurfLoop)) continue;
                                 if (Surface(SurfLoop).Class == SurfaceClass::Wall || Surface(SurfLoop).Class == SurfaceClass::Door) {
-                                    DeltaTemp = TH(2, 1, SurfLoop) - state.dataHeatBalFanSys->MAT(ZoneNum);
+                                    DeltaTemp = state.dataHeatBalSurf->SurfInTempHistCurr(SurfLoop) - state.dataHeatBalFanSys->MAT(ZoneNum);
                                     if (DeltaTemp > ActiveDelTempThreshold) { // assume heating with wall panel
                                         // system ON is not enough because  surfaces can continue to heat because of thermal capacity
                                         EquipOnCount = min(EquipOnCount + 1, 10);
@@ -5481,8 +5478,8 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
 
         // Calculate Grashof, Reynolds, and Richardson numbers for the zone
         // Grashof for zone air based on largest delta T between surfaces and zone height
-        Tmin = minval(TH(2, 1, {Zone(ZoneNum).HTSurfaceFirst, Zone(ZoneNum).HTSurfaceLast}));
-        Tmax = maxval(TH(2, 1, {Zone(ZoneNum).HTSurfaceFirst, Zone(ZoneNum).HTSurfaceLast}));
+        Tmin = minval(state.dataHeatBalSurf->SurfInTempHistCurr({Zone(ZoneNum).HTSurfaceFirst, Zone(ZoneNum).HTSurfaceLast}));
+        Tmax = maxval(state.dataHeatBalSurf->SurfInTempHistCurr({Zone(ZoneNum).HTSurfaceFirst, Zone(ZoneNum).HTSurfaceLast}));
         GrH = (g * (Tmax - Tmin) * pow_3(Zone(ZoneNum).CeilingHeight)) /
               ((state.dataHeatBalFanSys->MAT(ZoneNum) + DataGlobalConstants::KelvinConv) * pow_2(v));
 
@@ -5517,7 +5514,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
         auto const SELECT_CASE_var(FinalFlowRegime);
 
         if (SELECT_CASE_var == InConvFlowRegime_A1) {
-            DeltaTemp = TH(2, 1, SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
+            DeltaTemp = state.dataHeatBalSurf->SurfInTempHistCurr(SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
             if (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::Door) {
 
                 if ((Surface(SurfNum).Tilt > 85.0) && (Surface(SurfNum).Tilt < 95.0)) { // vertical wall
@@ -5595,7 +5592,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
             }
 
         } else if (SELECT_CASE_var == InConvFlowRegime_A2) {
-            DeltaTemp = TH(2, 1, SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
+            DeltaTemp = state.dataHeatBalSurf->SurfInTempHistCurr(SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
             if (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::Door) {
 
                 if (state.dataSurface->SurfIntConvSurfHasActiveInIt(SurfNum)) {
@@ -5670,7 +5667,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                                 "DynamicIntConvSurfaceClassification: failed to resolve Hc model for A2 surface named" + Surface(SurfNum).Name);
             }
         } else if (SELECT_CASE_var == InConvFlowRegime_A3) {
-            DeltaTemp = TH(2, 1, SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
+            DeltaTemp = state.dataHeatBalSurf->SurfInTempHistCurr(SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
             if (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::Door) {
 
                 if ((Surface(SurfNum).Tilt > 85.0) && (Surface(SurfNum).Tilt < 95.0)) { // vertical wall
@@ -5743,7 +5740,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                                 "DynamicIntConvSurfaceClassification: failed to resolve Hc model for A3 surface named" + Surface(SurfNum).Name);
             }
         } else if (SELECT_CASE_var == InConvFlowRegime_B) {
-            DeltaTemp = TH(2, 1, SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
+            DeltaTemp = state.dataHeatBalSurf->SurfInTempHistCurr(SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
             if (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::Door) {
 
                 if ((Surface(SurfNum).Tilt > 85.0) && (Surface(SurfNum).Tilt < 95.0)) { // vertical wall
@@ -5842,7 +5839,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
 
         } else if (SELECT_CASE_var == InConvFlowRegime_D) {
 
-            DeltaTemp = TH(2, 1, SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
+            DeltaTemp = state.dataHeatBalSurf->SurfInTempHistCurr(SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
             if (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::Door) {
 
                 if ((Surface(SurfNum).Tilt > 85.0) && (Surface(SurfNum).Tilt < 95.0)) { // vertical wall
@@ -5920,7 +5917,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
 
         } else if (SELECT_CASE_var == InConvFlowRegime_E) {
 
-            DeltaTemp = TH(2, 1, SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
+            DeltaTemp = state.dataHeatBalSurf->SurfInTempHistCurr(SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
             if (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::Door) {
 
                 // mixed regime, but need to know what regime it was before it was mixed
@@ -6424,17 +6421,17 @@ void CalcUserDefinedInsideHcModel(EnergyPlusData &state, int const SurfNum, int 
     Real64 HcFnTempDiff(0.0), HcFnTempDiffDivHeight(0.0), HcFnACH(0.0), HcFnACHDivPerimLength(0.0);
     Kiva::ConvectionAlgorithm HcFnTempDiffFn(KIVA_CONST_CONV(0.0)), HcFnTempDiffDivHeightFn(KIVA_CONST_CONV(0.0));
     if (UserCurve.HcFnTempDiffCurveNum > 0) {
-        HcFnTempDiff = CurveValue(state, UserCurve.HcFnTempDiffCurveNum, std::abs(state.dataHeatBalSurf->TH(2, 1, SurfNum) - tmpAirTemp));
+        HcFnTempDiff = CurveValue(state, UserCurve.HcFnTempDiffCurveNum, std::abs(state.dataHeatBalSurf->SurfInTempHistCurr(SurfNum) - tmpAirTemp));
         HcFnTempDiffFn = [&](double Tsurf, double Tamb, double, double, double) -> double {
             return CurveValue(state, UserCurve.HcFnTempDiffCurveNum, std::abs(Tsurf - Tamb));
         };
     }
 
     if (UserCurve.HcFnTempDiffDivHeightCurveNum > 0) {
-        HcFnTempDiffDivHeight =
-            CurveValue(state,
-                       UserCurve.HcFnTempDiffDivHeightCurveNum,
-                       (std::abs(state.dataHeatBalSurf->TH(2, 1, SurfNum) - tmpAirTemp) / state.dataSurface->SurfIntConvZoneWallHeight(SurfNum)));
+        HcFnTempDiffDivHeight = CurveValue(
+            state,
+            UserCurve.HcFnTempDiffDivHeightCurveNum,
+            (std::abs(state.dataHeatBalSurf->SurfInTempHistCurr(SurfNum) - tmpAirTemp) / state.dataSurface->SurfIntConvZoneWallHeight(SurfNum)));
         HcFnTempDiffDivHeightFn = [=, &state](double Tsurf, double Tamb, double, double, double) -> double {
             return CurveValue(
                 state, UserCurve.HcFnTempDiffDivHeightCurveNum, std::abs(Tsurf - Tamb) / state.dataSurface->SurfIntConvZoneWallHeight(SurfNum));
@@ -6523,7 +6520,7 @@ void CalcUserDefinedOutsideHcModel(EnergyPlusData &state, int const SurfNum, int
     if (UserCurve.HnFnTempDiffCurveNum > 0) {
         HnFnTempDiff = CurveValue(state,
                                   UserCurve.HnFnTempDiffCurveNum,
-                                  std::abs(state.dataHeatBalSurf->TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)));
+                                  std::abs(state.dataHeatBalSurf->SurfOutTempHistCurr(SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum)));
         HnFnTempDiffFn = [&](double Tsurf, double Tamb, double, double, double) -> double {
             return CurveValue(state, UserCurve.HnFnTempDiffCurveNum, std::abs(Tsurf - Tamb));
         };
@@ -6534,7 +6531,7 @@ void CalcUserDefinedOutsideHcModel(EnergyPlusData &state, int const SurfNum, int
             HnFnTempDiffDivHeight =
                 CurveValue(state,
                            UserCurve.HnFnTempDiffDivHeightCurveNum,
-                           ((std::abs(state.dataHeatBalSurf->TH(1, 1, SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum))) /
+                           ((std::abs(state.dataHeatBalSurf->SurfOutTempHistCurr(SurfNum) - state.dataSurface->SurfOutDryBulbTemp(SurfNum))) /
                             state.dataSurface->SurfOutConvFaceHeight(SurfNum)));
             HnFnTempDiffDivHeightFn = [=, &state](double Tsurf, double Tamb, double, double, double) -> double {
                 return CurveValue(

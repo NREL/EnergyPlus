@@ -753,13 +753,12 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT)
     int SurfNum(1);
     Real64 RadTemp;
 
-    state->dataHeatBalSurf->TH.deallocate();
     state->dataSurface->Surface.deallocate();
     state->dataHeatBal->Zone.deallocate();
     state->dataThermalComforts->AngleFactorList.allocate(1);
     state->dataSurface->TotSurfaces = 3;
     state->dataGlobal->NumOfZones = 1;
-    state->dataHeatBalSurf->TH.allocate(2, 2, state->dataSurface->TotSurfaces);
+    state->dataHeatBalSurf->SurfInTempHistCurr.allocate(state->dataSurface->TotSurfaces);
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
     state->dataConstruction->Construct.allocate(state->dataSurface->TotSurfaces);
     state->dataHeatBal->Zone.allocate(1);
@@ -781,9 +780,9 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT)
     state->dataSurface->Surface(3).Zone = 1;
     state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).HTSurfaceLast = 3;
-    state->dataHeatBalSurf->TH(2, 1, 1) = 20.0;
-    state->dataHeatBalSurf->TH(2, 1, 2) = 15.0;
-    state->dataHeatBalSurf->TH(2, 1, 3) = 10.0;
+    state->dataHeatBalSurf->SurfInTempHistCurr(1) = 20.0;
+    state->dataHeatBalSurf->SurfInTempHistCurr(2) = 15.0;
+    state->dataHeatBalSurf->SurfInTempHistCurr(3) = 10.0;
 
     SurfNum = 1;
     state->dataThermalComforts->clear_state();
@@ -818,17 +817,16 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcAngleFactorMRT)
     state->dataThermalComforts->AngleFactorList(1).AngleFactor(2) = 0.3;
     state->dataThermalComforts->AngleFactorList(1).AngleFactor(3) = 0.2;
 
-    state->dataHeatBalSurf->TH.deallocate();
     state->dataSurface->TotSurfaces = state->dataThermalComforts->AngleFactorList(1).TotAngleFacSurfaces;
-    state->dataHeatBalSurf->TH.allocate(2, 2, state->dataSurface->TotSurfaces);
+    state->dataHeatBalSurf->SurfInTempHistCurr.allocate(state->dataSurface->TotSurfaces);
     state->dataSurface->Surface.deallocate();
     state->dataConstruction->Construct.deallocate();
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
     state->dataConstruction->Construct.allocate(state->dataSurface->TotSurfaces);
 
-    state->dataHeatBalSurf->TH(2, 1, 1) = 20.0;
-    state->dataHeatBalSurf->TH(2, 1, 2) = 15.0;
-    state->dataHeatBalSurf->TH(2, 1, 3) = 10.0;
+    state->dataHeatBalSurf->SurfInTempHistCurr(1) = 20.0;
+    state->dataHeatBalSurf->SurfInTempHistCurr(2) = 15.0;
+    state->dataHeatBalSurf->SurfInTempHistCurr(3) = 10.0;
     state->dataSurface->Surface(1).Construction = 1;
     state->dataSurface->Surface(2).Construction = 2;
     state->dataSurface->Surface(3).Construction = 3;
