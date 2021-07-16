@@ -58,7 +58,7 @@
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Optional.hh>
 #include <ObjexxFCL/Reference.hh>
-//#include <GSL/span.h>
+#include <GSL/span.h>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
@@ -76,12 +76,12 @@ struct EnergyPlusData;
 namespace OutputProcessor {
 
     // TODO: Move this general purpose routine to UtilityRoutines or something
-    //    inline unsigned int getEnumerationIndex(std::string_view s, gsl::span<std::string_view> sList) {
-    //        for (unsigned int i; i < sList.size(); ++i) {
-    //            if (sList[i] == s) return i;
-    //        }
-    //        return -1;
-    //    }
+    inline unsigned int getEnumerationIndex(std::string_view s, gsl::span<std::string_view> sList) {
+        for (unsigned int i = 0; i < sList.size(); ++i) {
+            if (sList[i] == s) return i;
+        }
+        return -1;
+    }
 
     enum class iReportVDD
     {
@@ -250,15 +250,21 @@ namespace OutputProcessor {
 
     enum class StoreType
     {
-        Averaged = 1, // Type value for "averaged" variables
-        Summed        // Type value for "summed" variables
+        Invalid = -1,
+        Averaged, // Type value for "averaged" variables
+        Summed,        // Type value for "summed" variables
+        Num
     };
+    constexpr std::array<std::string_view, (unsigned int)StoreType::Num> storeTypeStrings = {"Average", "Sum"};
 
     enum class TimeStepType
     {
-        TimeStepZone = 1,   // Type value for "zone" timestep variables
-        TimeStepSystem = 2, // Type value for "system" timestep variables
+        Invalid = -1,
+        TimeStepZone,   // Type value for "zone" timestep variables
+        TimeStepSystem, // Type value for "system" timestep variables
+        Num
     };
+    constexpr std::array<std::string_view, (unsigned int)TimeStepType::Num> timeStepTypeStrings = {"Zone", "HVAC System"};
 
     struct TimeSteps
     {
@@ -529,17 +535,6 @@ namespace OutputProcessor {
     inline void ReallocateRVar(EnergyPlusData &state);
 
     inline void ReallocateIVar(EnergyPlusData &state);
-
-    TimeStepType ValidateTimeStepType(EnergyPlusData &state,
-                                      TimeStepType const &TimeStepTypeKey, // Index type (Zone, HVAC) for variables
-                                      std::string const &CalledFrom        // Routine called from (for error messages)
-    );
-
-    std::string StandardTimeStepTypeKey(TimeStepType timeStepType);
-
-    StoreType validateVariableType(EnergyPlusData &state, VariableType const &VariableTypeKey);
-
-    std::string standardVariableTypeKey(StoreType VariableType);
 
     void InitializeMeters(EnergyPlusData &state);
 

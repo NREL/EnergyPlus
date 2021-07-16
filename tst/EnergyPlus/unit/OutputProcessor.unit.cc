@@ -1264,8 +1264,8 @@ namespace OutputProcessor {
 
     TEST_F(SQLiteFixture, OutputProcessor_standardIndexTypeKey)
     {
-        EXPECT_EQ("Zone", StandardTimeStepTypeKey(OutputProcessor::TimeStepType::TimeStepZone));
-        EXPECT_EQ("System", StandardTimeStepTypeKey(OutputProcessor::TimeStepType::TimeStepSystem));
+        EXPECT_EQ("Zone", timeStepTypeStrings[(int)OutputProcessor::TimeStepType::TimeStepZone]);
+        EXPECT_EQ("System", timeStepTypeStrings[(int)OutputProcessor::TimeStepType::TimeStepSystem]);
 
         // It's no longer possible to pass something that isn't part of the enum, that's kind of the point of using an enum!
         // EXPECT_EQ("UNKW", StandardTimeStepTypeKey(0));
@@ -1275,9 +1275,9 @@ namespace OutputProcessor {
 
     TEST_F(SQLiteFixture, OutputProcessor_standardVariableTypeKey)
     {
-        EXPECT_EQ("Average", standardVariableTypeKey(StoreType::Averaged));
-        EXPECT_EQ("Sum", standardVariableTypeKey(StoreType::Summed));
-        EXPECT_EQ("Unknown", standardVariableTypeKey(static_cast<StoreType>(0)));
+        EXPECT_EQ("Average", storeTypeStrings[(int)StoreType::Averaged]);
+        EXPECT_EQ("Sum", storeTypeStrings[(int)StoreType::Summed]);
+        EXPECT_EQ("Unknown", storeTypeStrings[(int)static_cast<StoreType>(0)]);
     }
 
     TEST_F(SQLiteFixture, OutputProcessor_determineMeterIPUnits)

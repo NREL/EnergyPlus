@@ -262,7 +262,7 @@ namespace OutputProcessor {
         tPtr.TimeStep = &TimeStep;
         if (!state.dataOutputProcessor->TimeValue.insert(std::make_pair(TimeStepTypeKey, tPtr)).second) {
             // The element was already present... shouldn't happen
-            ShowFatalError(state, format("SetupTimePointers was already called for {}", StandardTimeStepTypeKey(TimeStepTypeKey)));
+            ShowFatalError(state, format("SetupTimePointers was already called for {}", timeStepTypeStrings[(int)TimeStepTypeKey]));
         }
     }
 
@@ -782,64 +782,6 @@ namespace OutputProcessor {
         }
 
         String = StrOut;
-    }
-
-    std::string StandardTimeStepTypeKey(TimeStepType const timeStepType)
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   December 1998
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function gives the standard string for the index type
-        // given.
-
-        // METHODOLOGY EMPLOYED:
-        // Look it up in a list of valid index types.
-
-        // Return value
-        std::string StandardTimeStepTypeKey;
-
-        if (timeStepType == TimeStepType::TimeStepZone) {
-            StandardTimeStepTypeKey = "Zone";
-        } else if (timeStepType == TimeStepType::TimeStepSystem) {
-            StandardTimeStepTypeKey = "System";
-        } else {
-            StandardTimeStepTypeKey = "UNKW";
-        }
-
-        return StandardTimeStepTypeKey;
-    }
-
-    std::string standardVariableTypeKey(StoreType const VariableType)
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   July 1999
-        //       MODIFIED       December 2017; Jason DeGraw
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function gives the standard string for the variable type
-        // given.
-
-        // METHODOLOGY EMPLOYED:
-        // From variable type value, produce proper string.
-
-        switch (VariableType) {
-        case StoreType::Averaged:
-            return "Average";
-            break;
-        case StoreType::Summed:
-            return "Sum";
-            break;
-        }
-
-        return "Unknown";
     }
 
     // *****************************************************************************
@@ -3986,7 +3928,7 @@ namespace OutputProcessor {
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(reportID,
                                                                                    static_cast<int>(storeType),
-                                                                                   StandardTimeStepTypeKey(indexGroup),
+                                                                                   std::string(timeStepTypeStrings[(int)indexGroup]),
                                                                                    keyedValue,
                                                                                    variableName,
                                                                                    static_cast<int>(timeStepType),
@@ -8349,14 +8291,12 @@ void ProduceRDDMDD(EnergyPlusData &state)
             if (!op->DDVariableTypes(ItemPtr).ReportedOnDDFile) {
                 print(state.files.rdd,
                       "{},{},{}{}{}",
-                      StandardTimeStepTypeKey(op->DDVariableTypes(ItemPtr).timeStepType),
-                      standardVariableTypeKey(op->DDVariableTypes(ItemPtr).storeType),
+                      timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).timeStepType],
+                      timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
                       VariableNames(Item),
                       unitStringFromDDitem(state, ItemPtr),
                       '\n');
-                state.dataResultsFramework->resultsFramework->RDD.push_back(StandardTimeStepTypeKey(op->DDVariableTypes(ItemPtr).timeStepType) + "," +
-                                                                            standardVariableTypeKey(op->DDVariableTypes(ItemPtr).storeType) + "," +
-                                                                            VariableNames(Item) + unitStringFromDDitem(state, ItemPtr));
+                state.dataResultsFramework->resultsFramework->RDD.push_back(format("{},{},{}{}", timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).timeStepType], timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],VariableNames(Item), unitStringFromDDitem(state, ItemPtr)));
                 op->DDVariableTypes(ItemPtr).ReportedOnDDFile = true;
                 while (op->DDVariableTypes(ItemPtr).Next != 0) {
                     if (SortByName) {
@@ -8366,15 +8306,12 @@ void ProduceRDDMDD(EnergyPlusData &state)
                     }
                     print(state.files.rdd,
                           "{},{},{}{}{}",
-                          StandardTimeStepTypeKey(op->DDVariableTypes(ItemPtr).timeStepType),
-                          standardVariableTypeKey(op->DDVariableTypes(ItemPtr).storeType),
+                          timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).timeStepType],
+                          timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
                           VariableNames(Item),
                           unitStringFromDDitem(state, ItemPtr),
                           '\n');
-                    state.dataResultsFramework->resultsFramework->RDD.push_back(StandardTimeStepTypeKey(op->DDVariableTypes(ItemPtr).timeStepType) +
-                                                                                "," +
-                                                                                standardVariableTypeKey(op->DDVariableTypes(ItemPtr).storeType) +
-                                                                                "," + VariableNames(Item) + unitStringFromDDitem(state, ItemPtr));
+                    state.dataResultsFramework->resultsFramework->RDD.push_back(format("{},{},{}{}", timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).timeStepType], timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType], VariableNames(Item), unitStringFromDDitem(state, ItemPtr)));
                     op->DDVariableTypes(ItemPtr).ReportedOnDDFile = true;
                 }
             }
@@ -8384,13 +8321,11 @@ void ProduceRDDMDD(EnergyPlusData &state)
                 print(state.files.rdd,
                       "Output:Variable,*,{},hourly; !- {} {}{}{}",
                       VariableNames(Item),
-                      StandardTimeStepTypeKey(op->DDVariableTypes(ItemPtr).timeStepType),
-                      standardVariableTypeKey(op->DDVariableTypes(ItemPtr).storeType),
+                      timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).timeStepType],
+                      timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
                       unitStringFromDDitem(state, ItemPtr),
                       '\n');
-                state.dataResultsFramework->resultsFramework->RDD.push_back(StandardTimeStepTypeKey(op->DDVariableTypes(ItemPtr).timeStepType) + "," +
-                                                                            standardVariableTypeKey(op->DDVariableTypes(ItemPtr).storeType) + "," +
-                                                                            VariableNames(Item) + unitStringFromDDitem(state, ItemPtr));
+                state.dataResultsFramework->resultsFramework->RDD.push_back(format("{},{},{}{}", timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).timeStepType], timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType], VariableNames(Item), unitStringFromDDitem(state, ItemPtr)));
                 op->DDVariableTypes(ItemPtr).ReportedOnDDFile = true;
                 while (op->DDVariableTypes(ItemPtr).Next != 0) {
                     if (SortByName) {
@@ -8401,14 +8336,11 @@ void ProduceRDDMDD(EnergyPlusData &state)
                     print(state.files.rdd,
                           "Output:Variable,*,{},hourly; !- {} {}{}{}",
                           VariableNames(Item),
-                          StandardTimeStepTypeKey(op->DDVariableTypes(ItemPtr).timeStepType),
-                          standardVariableTypeKey(op->DDVariableTypes(ItemPtr).storeType),
+                          timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).timeStepType],
+                          timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
                           unitStringFromDDitem(state, ItemPtr),
                           '\n');
-                    state.dataResultsFramework->resultsFramework->RDD.push_back(StandardTimeStepTypeKey(op->DDVariableTypes(ItemPtr).timeStepType) +
-                                                                                "," +
-                                                                                standardVariableTypeKey(op->DDVariableTypes(ItemPtr).storeType) +
-                                                                                "," + VariableNames(Item) + unitStringFromDDitem(state, ItemPtr));
+                    state.dataResultsFramework->resultsFramework->RDD.push_back(format("{},{},{}{}", timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).timeStepType], timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType], VariableNames(Item), unitStringFromDDitem(state, ItemPtr)));
                     op->DDVariableTypes(ItemPtr).ReportedOnDDFile = true;
                 }
             }
