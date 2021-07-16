@@ -885,7 +885,8 @@ void PondGroundHeatExchangerData::oneTimeInit_new(EnergyPlusData &state)
                                        this->CompNum);
     PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNodeNum, this->DesignMassFlowRate / rho);
 }
-void PondGroundHeatExchangerData::oneTimeInit(EnergyPlusData &state)
+
+void PondGroundHeatExchangerData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
 {
 }
 
