@@ -4406,3 +4406,135 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_ZoneMixingInfiltrationFlowsFlag
     EXPECT_EQ(state->dataHeatBalFanSys->ZoneReOrder(2), 2); // source and receiving zone,
     EXPECT_EQ(state->dataHeatBalFanSys->ZoneReOrder(3), 1); // source only zone
 }
+
+TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_NoLoadTest)
+{
+
+    state->dataLoopNodes->Node.allocate(10);
+    state->dataGlobal->NumOfZones = 1;
+    state->dataSize->ZoneEqSizing.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataSize->ZoneSizing.allocate(1, state->dataGlobal->NumOfZones);
+    state->dataSize->CalcZoneSizing.allocate(1, state->dataGlobal->NumOfZones);
+    state->dataSize->CalcFinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
+    state->dataSize->FinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->NonAirSystemResponse.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->SysDepZoneLoads.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->TempControlType.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->TempZoneThermostatSetPoint.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneThermostatSetPointLo.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHi.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
+    state->dataHeatBalFanSys->ZoneMassBalanceFlag.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->MassConservation.allocate(state->dataGlobal->NumOfZones);
+    HeatBalanceManager::AllocateHeatBalArrays(*state);
+    state->dataHeatBalFanSys->TempControlType(1) = 4;
+    state->dataHeatBalFanSys->TempZoneThermostatSetPoint(1) = 22.;
+    state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.;
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 24.;
+    state->dataSize->CurOverallSimDay = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataSize->CalcZoneSizing(1, 1).ActualZoneNum = 1;
+    state->dataSize->CalcZoneSizing(1, 1).AccountForDOAS = true;
+    state->dataSize->CurOverallSimDay = 1;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -3600;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 22000.;
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).TotalOutputRequired = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).OutputRequiredToHumidifyingSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).OutputRequiredToDehumidifyingSP = 0.0;
+    state->dataZoneEnergyDemand->DeadBandOrSetback(1) = true;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 4;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(2) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 3;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).DOASHighSetpoint = 14.4;
+    state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).DOASLowSetpoint = 12.2;
+    state->dataEnvrn->StdBaroPress = 101325.;
+    state->dataSize->CalcFinalZoneSizing(1).MinOA = 0.1;
+    state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).DOASControlStrategy = 3;
+    state->dataEnvrn->OutDryBulbTemp = 28.;
+    state->dataEnvrn->OutHumRat = 0.017;
+    state->dataLoopNodes->Node(4).Temp = 23;
+    state->dataLoopNodes->Node(4).HumRat = 0.008;
+    state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).ZnCoolDgnSAMethod = 1;
+    state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).ZnHeatDgnSAMethod = 1;
+    state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).CoolDesTemp = 12.5;
+    state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).CoolDesTempDiff = 11.11;
+    state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).CoolDesHumRat = 0.008;
+    state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).HeatDesHumRat = 0.008;
+    state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).HeatDesTemp = 50.0;
+    state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).HeatDesTempDiff = 30.0;
+    state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).SupplyAirAdjustFactor = 1.0;
+    state->dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = false;
+    state->dataHeatBalFanSys->ZoneMassBalanceFlag(1) = false;
+
+    state->dataZoneEquipmentManager->SizeZoneEquipmentOneTimeFlag = false;
+    SizeZoneEquipment(*state);
+    UpdateZoneSizing(*state, DataGlobalConstants::CallIndicator::BeginDay);
+    state->dataSize->ZoneSizThermSetPtHi.allocate(state->dataGlobal->NumOfZones);
+    state->dataSize->ZoneSizThermSetPtLo.allocate(state->dataGlobal->NumOfZones);
+    state->dataSize->ZoneSizThermSetPtHi(1) = 24;
+    state->dataSize->ZoneSizThermSetPtLo(1) = 22;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->TimeStep = 1;
+    state->dataSize->NumTimeStepsInAvg = 1;
+    state->dataHVACGlobal->FracTimeStepZone = 1;
+    state->dataEnvrn->TotDesDays = 1;
+    state->dataZoneEquipmentManager->NumOfTimeStepInDay = 1;
+    state->dataSize->DesDayWeath.allocate(1);
+    state->dataSize->DesDayWeath(1).Temp.allocate(1);
+    state->dataSize->DesDayWeath(1).Temp(1) = 28;
+    state->dataZoneEquipmentManager->AvgData.allocate(1);
+
+    state->dataSize->ZoneSizing(1, 1).allocateMemberArrays(1);
+    state->dataSize->CalcZoneSizing(1, 1).allocateMemberArrays(1);
+    state->dataSize->CalcFinalZoneSizing(1).allocateMemberArrays(1);
+    state->dataSize->FinalZoneSizing(1).allocateMemberArrays(1);
+
+    UpdateZoneSizing(*state, DataGlobalConstants::CallIndicator::DuringDay);
+    UpdateZoneSizing(*state, DataGlobalConstants::CallIndicator::EndDay);
+    state->dataGlobal->isPulseZoneSizing = true;
+    UpdateZoneSizing(*state, DataGlobalConstants::CallIndicator::EndZoneSizingCalc);
+
+    // verify no heating or cooling load
+    EXPECT_DOUBLE_EQ(0.0, state->dataSize->CalcZoneSizing(1, 1).HeatLoad);
+    EXPECT_DOUBLE_EQ(0.0, state->dataSize->CalcZoneSizing(1, 1).CoolLoad);
+    // check for correct TstatTemps and ZoneTempsAt*Peaks for output
+    EXPECT_DOUBLE_EQ(22.0, state->dataSize->CalcZoneSizing(1, 1).HeatTstatTemp);
+    EXPECT_DOUBLE_EQ(24.0, state->dataSize->CalcZoneSizing(1, 1).CoolTstatTemp);
+    EXPECT_DOUBLE_EQ(23.0, state->dataSize->FinalZoneSizing(1).ZoneTempAtHeatPeak);
+    EXPECT_DOUBLE_EQ(23.0, state->dataSize->FinalZoneSizing(1).ZoneTempAtCoolPeak);
+
+    state->dataLoopNodes->Node.deallocate();
+    state->dataSize->ZoneEqSizing.deallocate();
+    state->dataHeatBal->Zone.deallocate();
+    state->dataSize->CalcZoneSizing.deallocate();
+    state->dataHeatBalFanSys->NonAirSystemResponse.deallocate();
+    state->dataHeatBalFanSys->SysDepZoneLoads.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig.deallocate();
+    state->dataHeatBalFanSys->TempControlType.deallocate();
+    state->dataHeatBalFanSys->TempZoneThermostatSetPoint.deallocate();
+    state->dataHeatBalFanSys->ZoneThermostatSetPointLo.deallocate();
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHi.deallocate();
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.deallocate();
+    state->dataZoneEnergyDemand->DeadBandOrSetback.deallocate();
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.deallocate();
+    state->dataHeatBalFanSys->ZoneMassBalanceFlag.deallocate();
+    state->dataHeatBal->MassConservation.deallocate();
+}
