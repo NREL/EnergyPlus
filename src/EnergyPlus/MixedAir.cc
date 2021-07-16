@@ -1420,7 +1420,8 @@ void GetOAControllerInputs(EnergyPlusData &state)
                 auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(AlphArray(4)));
                 if (SELECT_CASE_var == "ZONESUM") { // Simplify sum the zone OA flow rates
                     thisVentilationMechanical.SystemOAMethod = SOAM_ZoneSum;
-                } else if ((SELECT_CASE_var == "VENTILATIONRATEPROCEDURE")) { // Ventilation Rate Procedure based on ASHRAE Standard 62.1-2007
+                } else if ((SELECT_CASE_var ==
+                            "STANDARD62.1VENTILATIONRATEPROCEDURE")) { // Ventilation Rate Procedure based on ASHRAE Standard 62.1-2007
                     thisVentilationMechanical.SystemOAMethod = SOAM_VRP;
                 } else if ((SELECT_CASE_var == "INDOORAIRQUALITYPROCEDURE")) { // Indoor Air Quality Procedure based on ASHRAE Standard 62.1-2007
                     thisVentilationMechanical.SystemOAMethod = SOAM_IAQP;
@@ -1942,7 +1943,7 @@ void GetOAControllerInputs(EnergyPlusData &state)
             if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ZoneSum) {
                 print(state.files.eio, "ZoneSum,");
             } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_VRP) {
-                print(state.files.eio, "VentilationRateProcedure,");
+                print(state.files.eio, "Standard62.1VentilationRateProcedure,");
             } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_IAQP) {
                 print(state.files.eio, "IndoorAirQualityProcedure,");
             } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ProportionalControlSchOcc) {
@@ -4270,7 +4271,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                                                                ZoneMinCO2));
                                                     ShowContinueError(state,
                                                                       "\"ProportionalControlBasedOnOccupancySchedule\" will not be modeled. "
-                                                                      "Default \"VentilationRateProcedure\" will be modeled. Simulation "
+                                                                      "Default \"Standard62.1VentilationRateProcedure\" will be modeled. Simulation "
                                                                       "continues...");
                                                     ShowContinueErrorTimeStamp(state, "");
                                                 } else {
@@ -4296,7 +4297,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                                                                ZoneMinCO2));
                                                     ShowContinueError(state,
                                                                       "\"ProportionalControlBasedOnDesignOccupancy\" will not be modeled. "
-                                                                      "Default \"VentilationRateProcedure\" will be modeled. Simulation "
+                                                                      "Default \"Standard62.1VentilationRateProcedure\" will be modeled. Simulation "
                                                                       "continues...");
                                                     ShowContinueErrorTimeStamp(state, "");
                                                 } else {
@@ -4320,9 +4321,10 @@ void VentilationMechanicalProps::CalcMechVentController(
                                                                "concentration ({:.2R}).",
                                                                ZoneMaxCO2,
                                                                ZoneMinCO2));
-                                                    ShowContinueError(state,
-                                                                      "\"ProportionalControlBasedOnDesignOARate\" will not be modeled. Default "
-                                                                      "\"VentilationRateProcedure\" will be modeled. Simulation continues...");
+                                                    ShowContinueError(
+                                                        state,
+                                                        "\"ProportionalControlBasedOnDesignOARate\" will not be modeled. Default "
+                                                        "\"Standard62.1VentilationRateProcedure\" will be modeled. Simulation continues...");
                                                     ShowContinueErrorTimeStamp(state, "");
                                                 } else {
                                                     ShowRecurringWarningErrorAtEnd(state,
@@ -4368,7 +4370,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                                                                           curZone.Name + "\". ");
                                                     ShowContinueError(state,
                                                                       "\"ProportionalControlBasedOnOccupancySchedule\" will not be modeled. "
-                                                                      "Default \"VentilationRateProcedure\" will be modeled. Simulation "
+                                                                      "Default \"Standard62.1VentilationRateProcedure\" will be modeled. Simulation "
                                                                       "continues...");
                                                     ShowContinueErrorTimeStamp(state, "");
                                                 } else {
@@ -4391,7 +4393,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                                                                           curZone.Name + "\". ");
                                                     ShowContinueError(state,
                                                                       "\"ProportionalControlBasedOnDesignOccupancy\" will not be modeled. "
-                                                                      "Default \"VentilationRateProcedure\" will be modeled. Simulation "
+                                                                      "Default \"Standard62.1VentilationRateProcedure\" will be modeled. Simulation "
                                                                       "continues...");
                                                     ShowContinueErrorTimeStamp(state, "");
                                                 } else {
@@ -4517,6 +4519,11 @@ void VentilationMechanicalProps::CalcMechVentController(
                 if (this->SystemOAMethod == SOAM_ProportionalControlSchOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOcc ||
                     this->SystemOAMethod == SOAM_ProportionalControlDesOARate) {
                     SysOA = SysOA / SysEv;
+                } else if (this->SystemOAMethod == SOAM_VRP) {
+                    // Limit system OA to design OA minimum flow rate, as per ASHRAE Guideline 36-2018 Section 5.16.3.1
+                    if (state.dataSize->SysSizingRunDone) { // If no system sizing run is done (i.e. no Sizing:System) the design outdoor air flow rate is not known
+                        SysOA = min(SysOAuc / SysEv, state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow);
+                    }
                 } else {
                     SysOA = SysOAuc / SysEv;
                 }
