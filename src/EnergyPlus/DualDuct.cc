@@ -319,7 +319,7 @@ namespace DualDuct {
                                                                                                   cAlphaFields(5));
 
                 state.dataDualDuct->dd_airterminal(DDNum).MaxAirVolFlowRate = NumArray(1);
-                state.dataDualDuct->dd_airterminal(DDNum).ZoneMinAirFracDes = 0.0;
+                state.dataDualDuct->dd_airterminal(DDNum).ZoneMinAirFracDes = 1.0;
 
                 // Register component set data - one for heat and one for cool
                 TestCompSet(
