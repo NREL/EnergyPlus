@@ -3933,25 +3933,6 @@ namespace OutputProcessor {
         // This subroutine writes the ESO data dictionary information to the output files
         // and the SQL database
 
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string FreqString;
         auto &op(state.dataOutputProcessor);
@@ -4005,7 +3986,7 @@ namespace OutputProcessor {
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(reportID,
                                                                                    static_cast<int>(storeType),
-                                                                                   std::string(StandardTimeStepTypeKey(indexGroup)),
+                                                                                   StandardTimeStepTypeKey(indexGroup),
                                                                                    keyedValue,
                                                                                    variableName,
                                                                                    static_cast<int>(timeStepType),
