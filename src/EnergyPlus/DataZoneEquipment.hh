@@ -263,9 +263,10 @@ namespace DataZoneEquipment {
         Array1D_int ReturnNodeAirLoopNum; // air loop number connected to this return node
         Array1D_int
             ReturnNodeInletNum; // zone supply air inlet index that matched this return node (same zone, same airloop) - not the inlet node number
-        Array1D_bool FixedReturnFlow;    // true if return node is fixed and cannot be adjusted in CalcZoneReturnFlows
-        Array1D_int ReturnNodePlenumNum; // number of the return plenum attached to this return node (zero if none)
-        Array1D_int ReturnFlowBasisNode; // return air flow basis nodes
+        Array1D_bool FixedReturnFlow;         // true if return node is fixed and cannot be adjusted in CalcZoneReturnFlows
+        Array1D_int ReturnNodePlenumNum;      // number of the return plenum attached to this return node (zero if none)
+        Array1D_int ReturnFlowBasisNode;      // return air flow basis nodes
+        Array1D_int ReturnNodeExhaustNodeNum; // Exhaust node number flow to a corrsponding return node due to light heat gain
 
         bool ZonalSystemOnly;     // TRUE if served by a zonal system (only)
         bool IsControlled;        // True when this is a controlled zone.
@@ -464,6 +465,10 @@ namespace DataZoneEquipment {
                                       Optional_bool_const PerPersonNotSet = _, // when calculation should not include occupants (e.g., dual duct)
                                       Optional_bool_const MaxOAVolFlowFlag = _ // TRUE when calculation uses occupancy schedule  (e.g., dual duct)
     );
+
+    int GetZoneEquipControlledZoneNum(EnergyPlusData &state, int const ZoneEquipTypeNum, std::string const &EquipmentName);
+
+    bool VerifyLightsExhaustNodeForZone(EnergyPlusData &state, int const ZoneNum, int const ZoneExhaustNodeNum);
 
 } // namespace DataZoneEquipment
 

@@ -1696,6 +1696,50 @@ namespace InternalHeatGains {
                         ShowContinueError(state, "No matching Zone Return Air Node found.");
                         ErrorsFound = true;
                     }
+                    // Set exhaust air node number
+                    state.dataHeatBal->Lights(Loop).ZoneExhaustNodeNum = 0;
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
+                        if (state.dataHeatBal->LightsObjects(Item).ZoneListActive) {
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataHeatBal->Lights(Loop).Name +
+                                                "\": " + state.dataIPShortCut->cAlphaFieldNames(8) + " must be blank when using a ZoneList.");
+                            ErrorsFound = true;
+                        } else {
+                            bool exhaustNodeError = false;
+                            state.dataHeatBal->Lights(Loop).ZoneExhaustNodeNum = GetOnlySingleNode(state,
+                                                                                                   AlphaName(8),
+                                                                                                   exhaustNodeError,
+                                                                                                   CurrentModuleObject,
+                                                                                                   state.dataHeatBal->Lights(Loop).Name,
+                                                                                                   DataLoopNode::NodeFluidType::Air,
+                                                                                                   DataLoopNode::NodeConnectionType::ZoneExhaust,
+                                                                                                   NodeInputManager::compFluidStream::Primary,
+                                                                                                   ObjectIsNotParent);
+                            if (!exhaustNodeError) { // GetOnlySingleNode will throw error messages if the is a NodeList Name and for other issues
+                                exhaustNodeError = DataZoneEquipment::VerifyLightsExhaustNodeForZone(
+                                    state, state.dataHeatBal->Lights(Loop).ZonePtr, state.dataHeatBal->Lights(Loop).ZoneExhaustNodeNum);
+                            }
+                            if (exhaustNodeError) {
+                                ShowWarningError(state,
+                                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                     state.dataIPShortCut->cAlphaFieldNames(8) + " =" + AlphaName(8));
+                                ShowContinueError(state, "No matching Zone Exhaust Air Node found.");
+                            } else {
+                                if (state.dataHeatBal->Lights(Loop).ZoneReturnNum > 0) {
+                                    state.dataZoneEquip->ZoneEquipConfig(state.dataHeatBal->Zone(state.dataHeatBal->Lights(Loop).ZonePtr).ZoneEqNum)
+                                        .ReturnNodeExhaustNodeNum(state.dataHeatBal->Lights(Loop).ZoneReturnNum) =
+                                        state.dataHeatBal->Lights(Loop).ZoneExhaustNodeNum;
+                                } else {
+                                    ShowWarningError(state,
+                                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                         state.dataIPShortCut->cAlphaFieldNames(8) + " =" + AlphaName(8) + " is not used");
+                                    ShowContinueError(
+                                        state, "No matching Zone Return Air Node found. The Exhaust Node requires Return Node to work together");
+                                }
+                            }
+                        }
+                    }
+
                     if (state.dataHeatBal->Lights(Loop).ZonePtr <= 0) continue; // Error, will be caught and terminated later
 
                     // Object report variables

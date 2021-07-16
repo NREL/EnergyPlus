@@ -85,6 +85,8 @@ This alpha field contains the schedule name which contains information on the av
 
 This alpha field contains the unitary system air inlet node name.
 
+When the UnitarySystem is used to serve a zone as a zone equipment unit, this node name must be either the name of a zone air exhaust node (Ref. \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections}) to draw air from a zone directly or an induced air outlet node (Ref. \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum}) to draw air from a return plenum, when the zone return node is connected to a return plenum.
+
 \paragraph{Field: Unitary System Air Outlet Node Name}\label{field-unitary-system-air-outlet-node-name}
 
 This alpha field contains the unitary system air outlet node name.

@@ -937,6 +937,10 @@ The coefficient C\(_{2}\) in the equation for (Return Air Fraction)\(_{calculate
 
 Name of the return air node for this heat gain. If left blank, it defaults to the first return air node for the zone containing this Lights object. Leave blank when using a \hyperref[zonelist]{ZoneList} name.
 
+\paragraph{Field:Exhaust Air Heat Gain Node Name}\label{field-exhaust-air-heat-gain-node-name}
+
+Name of the exhaust air node for this heat gain. If left blank, no heat gain from retun air fraction will be added to the zone exhast node. When the exhaust node name is entered, the return air heat gain will be shared by both return and exhast nodes. The equipment can draw air from the exhaust node, but the inlet air properties is combined properties with mixing mass flow rates of both nodes and added lights heat gain.
+
 \begin{figure}[hbtp] % fig 52
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image087.png}
