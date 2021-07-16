@@ -6299,6 +6299,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                     } else {
                         state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_StableTilted;
                     }
+                    break;
                 default:
                     assert(false);
                 }
