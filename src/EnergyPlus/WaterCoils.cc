@@ -599,6 +599,12 @@ void GetWaterCoilInput(EnergyPlusData &state)
         } else {
             state.dataWaterCoils->WaterCoil(CoilNum).UseDesignWaterDeltaTemp = false;
         }
+        if (!lNumericBlanks(18)) {
+            state.dataWaterCoils->WaterCoil(CoilNum).DesignInletWaterTemp = NumArray(18);
+            state.dataWaterCoils->WaterCoil(CoilNum).UseDesignInletWaterTemp = true;
+        } else {
+            state.dataWaterCoils->WaterCoil(CoilNum).UseDesignInletWaterTemp = false;
+        }
         state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum = GetOnlySingleNode(state,
                                                                                        AlphArray(3),
                                                                                        ErrorsFound,
@@ -2363,6 +2369,12 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
                 TempSize = AutoSize; // get the autosized air volume flow rate for use in other calculations
             }
 
+            if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingDetailed) { // Coil:Cooling:Water:DetailedGeometry
+                TempSize = AutoSize; // get the autosized air volume flow rate for use in other calculations
+                if (state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate == 0.0)
+                    state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate = AutoSize;
+            }
+
             bool errorsFound = false;
             CoolingAirFlowSizer sizingCoolingAirFlow;
             CompName = state.dataWaterCoils->WaterCoil(CoilNum).Name;
@@ -2460,6 +2472,10 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
             CoolingWaterDesWaterInletTempSizer sizerCWDesWaterInTemp;
             sizerCWDesWaterInTemp.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
             state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp = sizerCWDesWaterInTemp.size(state, TempSize, ErrorsFound);
+
+            if (state.dataWaterCoils->WaterCoil(CoilNum).UseDesignInletWaterTemp) {
+                state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp = state.dataWaterCoils->WaterCoil(CoilNum).DesignInletWaterTemp;
+            }
 
             if (state.dataSize->CurZoneEqNum > 0) { // zone equipment use air inlet humrat to calculate design outlet air temperature
                 if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'

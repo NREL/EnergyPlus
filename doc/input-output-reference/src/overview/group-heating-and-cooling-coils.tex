@@ -1640,7 +1640,12 @@ The name of the air outlet from the water coil, i.e. Cooling Coil Air Outlet Nod
 This field is optional. It is used to describe where condensate from the coil is collected. If blank or omitted, then any coil condensate is discarded. Enter the name of Water Storage Tank object defined elsewhere and the condensate will then be collected in that tank.
 
 \paragraph{Field: Design Water Temperature Difference}\label{field-design-water-temperature-difference}
+
 This input field is optional. If specified, it is used for sizing the \textit{Design Water Flow Rate}. If blank or omitted, the \textit{Loop Design Temperature Difference} value specified in \textit{\hyperref[sizingplant]{Sizing:Plant}} object is used for sizing the \textit{Design Water Flow Rate}.
+
+\paragraph{Field: Design Water Inlet Temperature}\label{field-design-water-inlet-temperature}
+
+This input field is optional. If specified, it is used for sizing the coil \textit{Design Geometry Parameters}. If blank or omitted, the \textit{Design Loop Exit Temperature} value specified in \textit{\hyperref[sizingplant]{Sizing:Plant}} object is used for sizing the coil \textit{Design Geometry Parameters}.
 
 Examples of these statements in an IDF are:
 

@@ -798,6 +798,8 @@ void GetAirPathData(EnergyPlusData &state)
                         PackagedUnit(AirSysNum) = true;
                     } else if (componentType == "COILSYSTEM:HEATING:DX") {
                         PackagedUnit(AirSysNum) = true;
+                    } else if (componentType == "COILSYSTEM:COOLING:WATER") {
+                        PackagedUnit(AirSysNum) = true;
                     } else if (componentType == "AIRLOOPHVAC:UNITARYSYSTEM") {
                         PackagedUnit(AirSysNum) = true;
                     } else if (componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY") {
@@ -1238,6 +1240,15 @@ void GetAirPathData(EnergyPlusData &state)
                         PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::CoilUserDefined;
                     } else if (componentType == "AIRLOOPHVAC:UNITARYSYSTEM") {
                         PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::UnitarySystemModel;
+                        UnitarySystems::UnitarySys thisSys;
+                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).compPointer =
+                            thisSys.factory(state,
+                                            DataHVACGlobals::UnitarySys_AnyCoilType,
+                                            PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name,
+                                            false,
+                                            0);
+                    } else if (componentType == "COILSYSTEM:COOLING:WATER") {
+                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::CoilSystemWater;
                         UnitarySystems::UnitarySys thisSys;
                         PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).compPointer =
                             thisSys.factory(state,
@@ -3464,7 +3475,10 @@ void SimAirLoopComponents(EnergyPlusData &state,
                                 FirstHVACIteration,
                                 AirLoopNum,
                                 PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompIndex,
-                                PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).compPointer);
+                                PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).compPointer,
+                                AirLoopNum,
+                                BranchNum,
+                                CompNum);
         } // End of component loop
 
         // Enforce continuity through the splitter
@@ -3482,7 +3496,10 @@ void SimAirLoopComponent(EnergyPlusData &state,
                          bool const FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
                          int const AirLoopNum,          // Primary air loop number
                          int &CompIndex,                // numeric pointer for CompType/CompName -- passed back from other routines
-                         HVACSystemData *CompPointer    // equipment actual pointer
+                         HVACSystemData *CompPointer,   // equipment actual pointer
+                         int const &airLoopNum,         // index to AirloopHVAC
+                         int const &branchNum,          // index to AirloopHVAC branch
+                         int const &compNum             // index to AirloopHVAC branch component
 )
 {
 
@@ -3619,7 +3636,27 @@ void SimAirLoopComponent(EnergyPlusData &state,
                                   ZoneEquipFlag,
                                   sensOut,
                                   latOut);
-
+        } else if (SELECT_CASE_var == CompType::CoilSystemWater) { // 'CoilSystemCooling:Water'
+            if (CompPointer == nullptr) {
+                UnitarySystems::UnitarySys thisSys;
+                CompPointer = thisSys.factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, CompName, false, 0);
+                // temporary fix for saving pointer, eventually apply to UnitarySystem 16 lines above
+                state.dataAirSystemsData->PrimaryAirSystems(airLoopNum).Branch(branchNum).Comp(compNum).compPointer = CompPointer;
+            }
+            Real64 sensOut = 0.0;
+            Real64 latOut = 0.0;
+            CompPointer->simulate(state,
+                                  CompName,
+                                  FirstHVACIteration,
+                                  AirLoopNum,
+                                  CompIndex,
+                                  HeatingActive,
+                                  CoolingActive,
+                                  OAUnitNum,
+                                  OAUCoilOutTemp,
+                                  ZoneEquipFlag,
+                                  sensOut,
+                                  latOut);
         } else if (SELECT_CASE_var == CompType::Furnace_UnitarySys_HeatOnly || SELECT_CASE_var == CompType::Furnace_UnitarySys_HeatCool) {
             // 'AirLoopHVAC:Unitary:Furnace:HeatOnly', 'AirLoopHVAC:Unitary:Furnace:HeatCool',
             // 'AirLoopHVAC:UnitaryHeatOnly', 'AirLoopHVAC:UnitaryHeatCool'
