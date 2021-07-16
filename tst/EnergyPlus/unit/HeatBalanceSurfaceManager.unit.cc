@@ -78,6 +78,7 @@
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/ThermalComfort.hh>
+#include <EnergyPlus/WindowManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -3126,4 +3127,5 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
     InitIntSolarDistribution(*state);
     EXPECT_NEAR(1.666667, state->dataHeatBal->SurfIntBmIncInsSurfIntensRep(1), 0.00001);
 }
+
 } // namespace EnergyPlus

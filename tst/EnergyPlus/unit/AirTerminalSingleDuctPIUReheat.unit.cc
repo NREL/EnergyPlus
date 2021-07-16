@@ -59,6 +59,7 @@
 #include <EnergyPlus/PoweredInductionUnits.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 
 // EnergyPlus Headers

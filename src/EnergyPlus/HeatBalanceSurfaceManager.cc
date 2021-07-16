@@ -783,6 +783,19 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
 
     if (state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime) DisplayString(state, "Completed Initializing Surface Heat Balance");
     state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime = false;
+
+    for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+        int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
+        int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
+        // overwrite surface convective and radiative adjustment ratio
+        for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
+            if (state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
+                int ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
+                state.dataHeatBal->SurfWinCoeffAdjRatioIn(SurfNum) = state.dataHeatBal->CoeffAdjRatio(ConstrNum);
+                state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum) = state.dataHeatBal->CoeffAdjRatio(ConstrNum);
+            }
+        }
+    }
 }
 
 void GatherForPredefinedReport(EnergyPlusData &state)
@@ -1336,6 +1349,8 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
     }
 
     state.dataHeatBal->SurfTempEffBulkAir.dimension(state.dataSurface->TotSurfaces, ZoneInitialTemp);
+    state.dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(state.dataSurface->TotSurfaces, 1.0);
+    state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(state.dataSurface->TotSurfaces, 1.0);
     state.dataHeatBalSurf->SurfHConvInt.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfHcExt.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfHAirExt.dimension(state.dataSurface->TotSurfaces, 0.0);
@@ -7354,13 +7369,14 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
 
     } // ...end of main inside heat balance DO loop (ends when Converged)
 
+    Real64 HConvIn;
     // Set various surface output variables and other record keeping - after iterations are complete
     for (int surfNum : HTSurfs) {
         if (Surface(surfNum).Class == SurfaceClass::TDD_Dome) continue; // Skip TDD:DOME objects.  Inside temp is handled by TDD:DIFFUSER.
 
         // Inside Face Convection - sign convention is positive means energy going into inside face from the air.
-        auto const HConvInTemp_fac(-state.dataHeatBalSurf->SurfHConvInt(surfNum) *
-                                   (state.dataHeatBalSurf->SurfTempIn(surfNum) - state.dataHeatBalSurfMgr->RefAirTemp(surfNum)));
+        HConvIn = state.dataHeatBalSurf->SurfHConvInt(surfNum) * state.dataHeatBal->SurfWinCoeffAdjRatioIn(surfNum);
+        auto const HConvInTemp_fac(-HConvIn * (state.dataHeatBalSurf->SurfTempIn(surfNum) - state.dataHeatBalSurfMgr->RefAirTemp(surfNum)));
         state.dataHeatBalSurf->QdotConvInRep(surfNum) = Surface(surfNum).Area * HConvInTemp_fac;
         state.dataHeatBalSurf->QdotConvInRepPerArea(surfNum) = HConvInTemp_fac;
         state.dataHeatBalSurf->QConvInReport(surfNum) = state.dataHeatBalSurf->QdotConvInRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
@@ -7963,6 +7979,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                                                                                     state.dataHeatBalSurf->SurfHGrdExt(surfNum),
                                                                                     state.dataHeatBalSurf->SurfHAirExt(surfNum));
                             }
+
                         } else { // Interior Surface
 
                             if (state.dataSurface->SurfExtConvCoeffIndex(surfNum) > 0) {
@@ -8083,14 +8100,15 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
 
     } // ...end of main inside heat balance iteration loop (ends when Converged)
 
+    Real64 HConvIn;
     // Set various surface output variables and other record keeping - after iterations are complete - all HT surfaces
     for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
         int const firstSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceFirst;
         int const lastSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceLast;
         for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
             // Inside Face Convection - sign convention is positive means energy going into inside face from the air.
-            auto const HConvInTemp_fac(-state.dataHeatBalSurf->SurfHConvInt(surfNum) *
-                                       (state.dataHeatBalSurf->SurfTempIn(surfNum) - state.dataHeatBalSurfMgr->RefAirTemp(surfNum)));
+            HConvIn = state.dataHeatBalSurf->SurfHConvInt(surfNum) * state.dataHeatBal->SurfWinCoeffAdjRatioIn(surfNum);
+            auto const HConvInTemp_fac(-HConvIn * (state.dataHeatBalSurf->SurfTempIn(surfNum) - state.dataHeatBalSurfMgr->RefAirTemp(surfNum)));
             state.dataHeatBalSurf->QdotConvInRep(surfNum) = Surface(surfNum).Area * HConvInTemp_fac;
             state.dataHeatBalSurf->QdotConvInRepPerArea(surfNum) = HConvInTemp_fac;
             state.dataHeatBalSurf->QConvInReport(surfNum) = state.dataHeatBalSurf->QdotConvInRep(surfNum) * state.dataGlobal->TimeStepZoneSec;

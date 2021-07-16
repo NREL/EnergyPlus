@@ -59,6 +59,8 @@
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HVACFan.hh>
@@ -1426,6 +1428,16 @@ TEST_F(EnergyPlusFixture, BaseSizer_SupplyAirTempLessThanZoneTStatTest)
 
     SimulationManager::ManageSimulation(*state);
 
+    EXPECT_EQ(state->dataSurface->Surface(7).Class, EnergyPlus::DataSurfaces::SurfaceClass::Window);
+    EXPECT_EQ(state->dataSurface->Surface(7).ExtBoundCond, EnergyPlus::DataSurfaces::ExternalEnvironment);
+    Real64 inputU = state->dataMaterial->Material(state->dataConstruction->Construct(state->dataSurface->Surface(7).Construction).LayerPoint(1))
+                        .SimpleWindowUfactor;
+    EXPECT_NEAR(inputU, 0.6, 0.001);
+    int ConstrNum = state->dataSurface->Surface(7).Construction;
+    EXPECT_NEAR(state->dataHeatBal->NominalU(ConstrNum), 0.6, 0.001);
+    EXPECT_NEAR(state->dataHeatBal->SurfWinCoeffAdjRatioIn(7), 1.0006045, 1E-7);
+    EXPECT_NEAR(state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(7), 1.0006045, 1E-7);
+
     int CtrlZoneNum(1);
     // design peak load conditons and design supply air temperature
     EXPECT_EQ(state->dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatTstatTemp, 21.0); // expects specified value
@@ -1440,6 +1452,8 @@ TEST_F(EnergyPlusFixture, BaseSizer_SupplyAirTempLessThanZoneTStatTest)
     EXPECT_EQ(state->dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatVolFlow, 0.0);      // expects zero
     EXPECT_EQ(state->dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatMassFlow, 0.0);     // expects zero
     // expects non-zero peak heating load
-    EXPECT_NEAR(state->dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad, 6911.42, 0.01);
-    EXPECT_NEAR(state->dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatLoad, 6911.42, 0.01);
+    // reference value changed from 6911.42 to 6911.12
+    // due to state->dataHeatBal->SurfWinCoeffAdjRatioIn(7) and state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(7)
+    EXPECT_NEAR(state->dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad, 6911.12, 0.01);
+    EXPECT_NEAR(state->dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatLoad, 6911.12, 0.01);
 }

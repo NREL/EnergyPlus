@@ -577,6 +577,11 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataSurface->SurfTAirRef(surfNum2) = DataSurfaces::ZoneSupplyAirTemp;
     state->dataSurface->SurfTAirRef(surfNum3) = DataSurfaces::AdjacentAirTemp;
 
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.allocate(3);
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn.allocate(3);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(surfNum2) = 1.0;
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn(surfNum2) = 1.0;
+
     state->dataHeatBalSurf->QdotConvOutRep.allocate(3);
     state->dataHeatBalSurf->QdotConvOutRepPerArea.allocate(3);
     state->dataHeatBalSurf->QConvOutReport.allocate(3);
@@ -2773,6 +2778,12 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(1);
     state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.011;
 
+    // initialize simple glazing adjustment ratio
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.allocate(3);
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn.allocate(3);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(surfNum2) = 1.0024;
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn(surfNum2) = 1.0024;
+
     state->dataHeatBalFanSys->MAT.allocate(1);
     state->dataHeatBalFanSys->MAT(1) = 25.0;
     state->dataHeatBalFanSys->QHTRadSysSurf.allocate(3);
@@ -2838,6 +2849,576 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
                      state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs(surfNum2));
     EXPECT_NEAR(-24.9342, state->dataHeatBalSurf->QHeatEmiReport(surfNum2), 3);
 }
+
+TEST_F(EnergyPlusFixture, WindowManager_updateQdotConvRadOutRepTest)
+{
+    state->dataHeatBalSurf->QdotConvOutRep.allocate(1);
+    state->dataHeatBalSurf->QdotConvOutRepPerArea.allocate(1);
+    state->dataHeatBalSurf->QConvOutReport.allocate(1);
+    state->dataHeatBalSurf->QdotRadOutRep.allocate(1);
+    state->dataHeatBalSurf->QdotRadOutRepPerArea.allocate(1);
+    state->dataHeatBalSurf->QRadOutReport.allocate(1);
+    state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs.allocate(1);
+    state->dataHeatBalSurf->QAirExtReport.allocate(1);
+    state->dataHeatBalSurf->QHeatEmiReport.allocate(1);
+
+    int SurfNum = 1;
+    Real64 Tsout = 255.2;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(SurfNum).Area = 10.0;
+    state->dataWindowManager->hcout = 4.7;
+    state->dataWindowManager->tout = 257.6;
+    state->dataGlobal->TimeStepZoneSec = 900.0;
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.allocate(1);
+    Real64 adjRatioDefault = 1.0;
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum) = adjRatioDefault;
+    Real64 rad_out_per_area = -11.1;
+    Real64 rad_out_air_per_area = -11.1;
+
+    // compute reporting values with the default adjustment ratio, 1.0
+    updateQdotConvOutRep(*state, SurfNum, Tsout);
+    updateQdotRadOutRepHeatEmi(*state, SurfNum, Tsout, rad_out_per_area, rad_out_air_per_area);
+
+    // gather the reporting values using the default adjustment ratio
+    Real64 QdotConvOutRepOld = state->dataHeatBalSurf->QdotConvOutRep(SurfNum);
+    Real64 QdotConvOutRepPerAreaOld = state->dataHeatBalSurf->QdotConvOutRepPerArea(SurfNum);
+    Real64 QConvOutReportOld = state->dataHeatBalSurf->QConvOutReport(SurfNum);
+    Real64 QdotRadOutRepOld = state->dataHeatBalSurf->QdotRadOutRep(SurfNum);
+    Real64 QdotRadOutRepPerAreaOld = state->dataHeatBalSurf->QdotRadOutRepPerArea(SurfNum);
+    Real64 QRadOutReportOld = state->dataHeatBalSurf->QRadOutReport(SurfNum);
+    Real64 QAirExtReportOld = state->dataHeatBalSurf->QAirExtReport(SurfNum);
+    Real64 QHeatEmiReportOld = state->dataHeatBalSurf->QHeatEmiReport(SurfNum);
+
+    // compute the reporting values with a non-default adjustment ratio, 1.3 here
+    Real64 adjRatioNonDefault = 1.3;
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum) = adjRatioNonDefault;
+    updateQdotConvOutRep(*state, SurfNum, Tsout);
+    updateQdotRadOutRepHeatEmi(*state, SurfNum, Tsout, rad_out_per_area, rad_out_air_per_area);
+
+    // compare whether the reporting values are correctly adjusted
+    EXPECT_NEAR(QdotConvOutRepOld * adjRatioNonDefault, state->dataHeatBalSurf->QdotConvOutRep(SurfNum), 0.001);
+    EXPECT_NEAR(QdotConvOutRepPerAreaOld * adjRatioNonDefault, state->dataHeatBalSurf->QdotConvOutRepPerArea(SurfNum), 0.001);
+    EXPECT_NEAR(QConvOutReportOld * adjRatioNonDefault, state->dataHeatBalSurf->QConvOutReport(SurfNum), 0.001);
+    EXPECT_NEAR(QdotRadOutRepOld * adjRatioNonDefault, state->dataHeatBalSurf->QdotRadOutRep(SurfNum), 0.001);
+    EXPECT_NEAR(QdotRadOutRepPerAreaOld * adjRatioNonDefault, state->dataHeatBalSurf->QdotRadOutRepPerArea(SurfNum), 0.001);
+    EXPECT_NEAR(QRadOutReportOld * adjRatioNonDefault, state->dataHeatBalSurf->QRadOutReport(SurfNum), 0.001);
+    EXPECT_NEAR(QAirExtReportOld * adjRatioNonDefault, state->dataHeatBalSurf->QAirExtReport(SurfNum), 0.001);
+    EXPECT_NEAR(QHeatEmiReportOld * adjRatioNonDefault, state->dataHeatBalSurf->QHeatEmiReport(SurfNum), 0.001);
+}
+
+TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest)
+{
+
+    std::string const idf_objects = delimited_string({
+        "WindowMaterial:SimpleGlazingSystem,",
+        "NonRes Fixed Assembly Window,  !- Name",
+        "9.0000,                  !- U-Factor {W/m2-K}",
+        "0.39;                    !- Solar Heat Gain Coefficient",
+        "Material:NoMass,",
+        "R13LAYER,                !- Name",
+        "Rough,                   !- Roughness",
+        "2.290965,                !- Thermal Resistance {m2-K/W}",
+        "0.9000000,               !- Thermal Absorptance",
+        "0.7500000,               !- Solar Absorptance",
+        "0.7500000;               !- Visible Absorptance",
+        "Material:NoMass,",
+        "R31LAYER,                !- Name",
+        "Rough,                   !- Roughness",
+        "5.456,                   !- Thermal Resistance {m2-K/W}",
+        "0.9000000,               !- Thermal Absorptance",
+        "0.7500000,               !- Solar Absorptance",
+        "0.7500000;               !- Visible Absorptance",
+        "Material,",
+        "C5 - 4 IN HW CONCRETE,   !- Name",
+        "MediumRough,             !- Roughness",
+        "0.1014984,               !- Thickness {m}",
+        "1.729577,                !- Conductivity {W/m-K}",
+        "2242.585,                !- Density {kg/m3}",
+        "836.8000,                !- Specific Heat {J/kg-K}",
+        "0.9000000,               !- Thermal Absorptance",
+        "0.6500000,               !- Solar Absorptance",
+        "0.6500000;               !- Visible Absorptance",
+        "Construction,",
+        "R13WALL,                 !- Name",
+        "R13LAYER;                !- Outside Layer",
+        "Construction,",
+        "FLOOR,                   !- Name",
+        "C5 - 4 IN HW CONCRETE;   !- Outside Layer",
+        "Construction,",
+        "ROOF31,                  !- Name",
+        "R31LAYER;                !- Outside Layer",
+        "Construction,",
+        "Window Non-res Fixed,    !- Name",
+        "NonRes Fixed Assembly Window;  !- Outside Layer",
+        "Zone,",
+        "ZONE ONE,                !- Name",
+        "0,                       !- Direction of Relative North {deg}",
+        "0,                       !- X Origin {m}",
+        "0,                       !- Y Origin {m}",
+        "0,                       !- Z Origin {m}",
+        "1,                       !- Type",
+        "1,                       !- Multiplier",
+        "autocalculate,           !- Ceiling Height {m}",
+        "autocalculate;           !- Volume {m3}",
+        "ScheduleTypeLimits,",
+        "Fraction,                !- Name",
+        "0.0,                     !- Lower Limit Value",
+        "1.0,                     !- Upper Limit Value",
+        "CONTINUOUS;              !- Numeric Type",
+        "GlobalGeometryRules,",
+        "UpperLeftCorner,         !- Starting Vertex Position",
+        "CounterClockWise,        !- Vertex Entry Direction",
+        "World;                   !- Coordinate System",
+        "FenestrationSurface:Detailed,",
+        "Zn001:Wall001:Win001,    !- Name",
+        "Window,                  !- Surface Type",
+        "Window Non-res Fixed,    !- Construction Name",
+        "Zn001:Wall001,           !- Building Surface Name",
+        ",                        !- Outside Boundary Condition Object",
+        "0.5000000,               !- View Factor to Ground",
+        ",                        !- Frame and Divider Name",
+        "1.0,                     !- Multiplier",
+        "4,                       !- Number of Vertices",
+        "0.548000,0,2.5000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "0.548000,0,0.5000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "5.548000,0,0.5000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "5.548000,0,2.5000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "Zn001:Wall001,           !- Name",
+        "Wall,                    !- Surface Type",
+        "R13WALL,                 !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        "Outdoors,                !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "SunExposed,              !- Sun Exposure",
+        "WindExposed,             !- Wind Exposure",
+        "0.5000000,               !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "0,0,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "0,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "15.24000,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "15.24000,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "Zn001:Wall002,           !- Name",
+        "Wall,                    !- Surface Type",
+        "R13WALL,                 !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        "Outdoors,                !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "SunExposed,              !- Sun Exposure",
+        "WindExposed,             !- Wind Exposure",
+        "0.5000000,               !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "15.24000,0,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "15.24000,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "15.24000,15.24000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "15.24000,15.24000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "Zn001:Wall003,           !- Name",
+        "Wall,                    !- Surface Type",
+        "R13WALL,                 !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        "Outdoors,                !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "SunExposed,              !- Sun Exposure",
+        "WindExposed,             !- Wind Exposure",
+        "0.5000000,               !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "15.24000,15.24000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "15.24000,15.24000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "0,15.24000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "0,15.24000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "Zn001:Wall004,           !- Name",
+        "Wall,                    !- Surface Type",
+        "R13WALL,                 !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        "Outdoors,                !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "SunExposed,              !- Sun Exposure",
+        "WindExposed,             !- Wind Exposure",
+        "0.5000000,               !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "0,15.24000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "0,15.24000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "0,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "0,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "Zn001:Flr001,            !- Name",
+        "Floor,                   !- Surface Type",
+        "FLOOR,                   !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        "Adiabatic,               !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "NoSun,                   !- Sun Exposure",
+        "NoWind,                  !- Wind Exposure",
+        "1.000000,                !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "15.24000,0.000000,0.0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "0.000000,0.000000,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "0.000000,15.24000,0.0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "15.24000,15.24000,0.0;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "Zn001:Roof001,           !- Name",
+        "Roof,                    !- Surface Type",
+        "ROOF31,                  !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        "Outdoors,                !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "SunExposed,              !- Sun Exposure",
+        "WindExposed,             !- Wind Exposure",
+        "0,                       !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "0.000000,15.24000,4.572,  !- X,Y,Z ==> Vertex 1 {m}",
+        "0.000000,0.000000,4.572,  !- X,Y,Z ==> Vertex 2 {m}",
+        "15.24000,0.000000,4.572,  !- X,Y,Z ==> Vertex 3 {m}",
+        "15.24000,15.24000,4.572;  !- X,Y,Z ==> Vertex 4 {m}",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false);
+    HeatBalanceManager::SetPreConstructionInputParameters(*state);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
+    WindowManager::InitGlassOpticalCalculations(*state);
+
+    Real64 SHGC;         // Center-of-glass solar heat gain coefficient for ASHRAE
+    Real64 TransSolNorm; // Window construction solar transmittance at normal incidence
+    Real64 TransVisNorm; // Window construction visible transmittance at normal incidence
+    int errFlag = 0;     // Error flag
+    int ConstrNum = 4;
+    int MaterNum;
+    Real64 NominalConductanceWinter;
+    Real64 NominalConductanceSummer;
+
+    MaterNum = state->dataConstruction->Construct(ConstrNum).LayerPoint(1);
+    // summer, adj ratio should stay the same, only change for winter
+    state->dataHeatBal->CoeffAdjRatio(ConstrNum) = 1.5;
+    CalcNominalWindowCond(*state, ConstrNum, 2, NominalConductanceSummer, SHGC, TransSolNorm, TransVisNorm, errFlag);
+    EXPECT_EQ(state->dataHeatBal->CoeffAdjRatio(ConstrNum), 1.5);
+
+    // winter
+    // for legal input U values, the adjusted NominalConductance should be close to input U
+    std::array<Real64, 4> legalInputUs = {3.0, 5.0, 7.0, 9.0};
+    for (auto varyInputU : legalInputUs) {
+        state->dataMaterial->Material(MaterNum).SimpleWindowUfactor = varyInputU;
+        HeatBalanceManager::SetupSimpleWindowGlazingSystem(*state, MaterNum);
+        state->dataWindowManager->scon(1) = state->dataMaterial->Material(MaterNum).Conductivity / state->dataMaterial->Material(MaterNum).Thickness;
+        CalcNominalWindowCond(*state, ConstrNum, 1, NominalConductanceWinter, SHGC, TransSolNorm, TransVisNorm, errFlag);
+        EXPECT_NEAR(NominalConductanceWinter, varyInputU, 0.001);
+    }
+
+    // winter
+    // illegal inputs, the adjustment ratio should stay as default 1.0
+    std::array<Real64, 2> illegalInputUs = {0.0, -2.0};
+    for (auto varyInputU : illegalInputUs) {
+        state->dataHeatBal->CoeffAdjRatio(ConstrNum) = 1.0;
+        state->dataMaterial->Material(MaterNum).SimpleWindowUfactor = varyInputU;
+        CalcNominalWindowCond(*state, ConstrNum, 1, NominalConductanceWinter, SHGC, TransSolNorm, TransVisNorm, errFlag);
+        // expect adjustment ratio equal to 1
+        EXPECT_EQ(state->dataHeatBal->CoeffAdjRatio(ConstrNum), 1.0);
+    }
+}
+
+TEST_F(EnergyPlusFixture, WindowManger_AdjRatioWindowTempNominalTest)
+{
+    state->dataWindowManager->ngllayer = 1;
+    state->dataWindowManager->nglface = 2 * state->dataWindowManager->ngllayer;
+
+    state->dataWindowManager->emis(1) = 0.84;
+    state->dataWindowManager->emis(2) = 0.84;
+    state->dataWindowManager->hcout = 4.7;
+    state->dataWindowManager->hcin = 0.83;
+    state->dataWindowManager->scon(1) = 142.4;
+    state->dataWindowManager->tout = 257.6;
+    state->dataWindowManager->tin = 294.0;
+    state->dataWindowManager->sigma = 0.0;
+    state->dataWindowManager->Outir = state->dataWindowManager->sigma * pow_4(state->dataWindowManager->tout);
+    state->dataWindowManager->Rmir = 424.0;
+    state->dataWindowManager->AbsRadGlassFace(1) = 0.0;
+    state->dataWindowManager->AbsRadGlassFace(2) = 0.0;
+    state->dataWindowManager->hr(1) = 0.95;
+    state->dataWindowManager->hr(2) = 0.95;
+
+    auto &Aface = state->dataWindowManager->Aface;
+    auto &Bface = state->dataWindowManager->Bface;
+    Array2D<Real64> AfaceNoAdj;
+    Array1D<Real64> BfaceNoAdj;
+    Array1D<Real64> hr = state->dataWindowManager->hr;
+    Array1A<Real64> hgap = state->dataWindowManager->hgap;
+
+    // compute heat balance equation coefficient with default adjustment ratio
+    Real64 adjRatioDefault = 1.0;
+    WindowManager::GetHeatBalanceEqCoefMatrixSimple(*state, adjRatioDefault, 1, Aface, Bface, hr, hgap);
+
+    AfaceNoAdj = Aface;
+    BfaceNoAdj = Bface;
+
+    // compute heat balance equation coefficient with non-default adjustment ratio, 1.5
+    Real64 adjRatioNonDefault = 1.5;
+    WindowManager::GetHeatBalanceEqCoefMatrixSimple(*state, adjRatioNonDefault, 1, Aface, Bface, hr, hgap);
+
+    // compare the adjustment ratio before and after adjustment
+    EXPECT_EQ(AfaceNoAdj(2, 1), state->dataWindowManager->Aface(2, 1));
+    EXPECT_EQ(AfaceNoAdj(1, 2), state->dataWindowManager->Aface(1, 2));
+    EXPECT_NEAR((state->dataWindowManager->Aface(1, 1) - AfaceNoAdj(1, 1)) / state->dataWindowManager->hcout,
+                adjRatioNonDefault - 1.0,
+                0.001);
+    EXPECT_NEAR((state->dataWindowManager->Aface(2, 2) - AfaceNoAdj(2, 2)) / state->dataWindowManager->hcin,
+                adjRatioNonDefault - 1.0,
+                0.01);
+    EXPECT_NEAR((state->dataWindowManager->Bface(1) - BfaceNoAdj(1)) / (state->dataWindowManager->hcout * state->dataWindowManager->tout),
+                adjRatioNonDefault - 1.0,
+                0.001);
+    EXPECT_NEAR((state->dataWindowManager->Bface(2) - BfaceNoAdj(2)) / (state->dataWindowManager->hcin * state->dataWindowManager->tin),
+                adjRatioNonDefault - 1.0,
+                0.001);
+    // fixme: integrate in the tests for other branches if there's already some in existing test cases for WindowTempsForNominalCond
+}
+
+TEST_F(EnergyPlusFixture, WindowManager_AdjRatioWindowTemperatureTest)
+{
+    state->dataWindowManager->ngllayer = 1;
+    state->dataWindowManager->nglface = 2 * state->dataWindowManager->ngllayer;
+
+    state->dataWindowManager->emis(1) = 0.84;
+    state->dataWindowManager->emis(2) = 0.84;
+    state->dataWindowManager->emis(3) = 0.84;
+    state->dataWindowManager->emis(4) = 0.84;
+    state->dataWindowManager->hcout = 4.7;
+    state->dataWindowManager->hcin = 0.83;
+    state->dataWindowManager->scon(1) = 142.4;
+    state->dataWindowManager->scon(2) = 142.4;
+    state->dataWindowManager->tout = 257.6;
+    state->dataWindowManager->tin = 255.0;
+    state->dataWindowManager->sigma = 5.7E-8;
+    state->dataWindowManager->Outir = state->dataWindowManager->sigma * pow_4(state->dataWindowManager->tout);
+    state->dataWindowManager->Rmir = 239.6;
+    state->dataWindowManager->AbsRadGlassFace(1) = 0.0;
+    state->dataWindowManager->AbsRadGlassFace(2) = 0.0;
+    state->dataWindowManager->AbsRadShadeFace(1) = 0.0;
+    state->dataWindowManager->AbsRadShadeFace(2) = 0.0;
+    state->dataWindowManager->thetas(1) = 255.2;
+    state->dataWindowManager->thetas(2) = 255.2;
+    state->dataWindowManager->hr(1) = 0.95;
+    state->dataWindowManager->hr(2) = 0.95;
+    state->dataWindowManager->hr(3) = 0.95;
+    state->dataWindowManager->hr(4) = 0.95;
+
+    Real64 sconsh = 0.0;
+    Real64 TauShIR = 0.0;
+    Real64 EpsShIR1 = 0.0;
+    Real64 EpsShIR2 = 0.0;
+    Real64 RhoShIR1 = 0.0;
+    Real64 RhoShIR2 = 0.0;
+    Real64 ShGlReflFacIR = 0.0;
+    Real64 RhoGlIR1 = 0.0;
+    Real64 RhoGlIR2 = 0.0;
+    Real64 hcv = 1.0;
+    Real64 TGapNew = 0.0;
+    Real64 TAirflowGapNew = 0.0;
+    Real64 hcvAirflowGap = 0.0;
+    Array1A<Real64> hcvBG = 1.0;
+    Array1A<Real64> TGapNewBG = 0.0;
+    Array1A<Real64> AbsRadShadeFace = state->dataWindowManager->AbsRadShadeFace;
+    auto &Aface = state->dataWindowManager->Aface;
+    auto &Bface = state->dataWindowManager->Bface;
+    Array2D<Real64> AfaceNoAdj;
+    Array1D<Real64> BfaceNoAdj;
+    Array1D<Real64> hr = state->dataWindowManager->hr;
+
+    DataSurfaces::WinShadingType const ShadeFlag = DataSurfaces::WinShadingType::ShadeOff;
+
+    // initialize simple glazing adjustment ratio
+    int SurfNum = 1;
+    Real64 adjRatioDefault = 1.0;
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn.allocate(1);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.allocate(1);
+
+    // compute heat balance equation matrix coefficient with default adjustment ratio, 1.0
+    // Without shading case
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum) = adjRatioDefault;
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn(SurfNum) = adjRatioDefault;
+    WindowManager::GetHeatBalanceEqCoefMatrix(*state,
+                                              SurfNum,
+                                              1,
+                                              ShadeFlag,
+                                              sconsh,
+                                              TauShIR,
+                                              EpsShIR1,
+                                              EpsShIR2,
+                                              RhoShIR1,
+                                              RhoShIR2,
+                                              ShGlReflFacIR,
+                                              RhoGlIR1,
+                                              RhoGlIR2,
+                                              hcv,
+                                              TGapNew,
+                                              TAirflowGapNew,
+                                              hcvAirflowGap,
+                                              hcvBG,
+                                              TGapNewBG,
+                                              AbsRadShadeFace,
+                                              Aface,
+                                              Bface,
+                                              hr);
+
+    AfaceNoAdj = Aface;
+    BfaceNoAdj = Bface;
+
+    // compute heat balance equation matrix coefficient with non-default adjustment ratio, 1.5
+    Real64 adjRatioNonDefault = 1.5;
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum) = adjRatioNonDefault;
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn(SurfNum) = adjRatioNonDefault;
+    WindowManager::GetHeatBalanceEqCoefMatrix(*state,
+                                              SurfNum,
+                                              1,
+                                              ShadeFlag,
+                                              sconsh,
+                                              TauShIR,
+                                              EpsShIR1,
+                                              EpsShIR2,
+                                              RhoShIR1,
+                                              RhoShIR2,
+                                              ShGlReflFacIR,
+                                              RhoGlIR1,
+                                              RhoGlIR2,
+                                              hcv,
+                                              TGapNew,
+                                              TAirflowGapNew,
+                                              hcvAirflowGap,
+                                              hcvBG,
+                                              TGapNewBG,
+                                              AbsRadShadeFace,
+                                              Aface,
+                                              Bface,
+                                              hr);
+
+    // compare the before and after adjusted coefficient matrices
+    // Without shading case
+    EXPECT_EQ(AfaceNoAdj(2, 1), state->dataWindowManager->Aface(2, 1));
+    EXPECT_EQ(AfaceNoAdj(1, 2), state->dataWindowManager->Aface(1, 2));
+    EXPECT_NEAR((state->dataWindowManager->Aface(1, 1) - AfaceNoAdj(1, 1)) / state->dataWindowManager->hcout,
+                state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum) - 1.0,
+                0.001);
+    EXPECT_NEAR((state->dataWindowManager->Aface(2, 2) - AfaceNoAdj(2, 2)) / state->dataWindowManager->hcin,
+                state->dataHeatBal->SurfWinCoeffAdjRatioIn(SurfNum) - 1.0,
+                0.01);
+    EXPECT_NEAR((state->dataWindowManager->Bface(1) - BfaceNoAdj(1)) / (state->dataWindowManager->hcout * state->dataWindowManager->tout),
+                state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum) - 1.0,
+                0.001);
+    EXPECT_NEAR((state->dataWindowManager->Bface(2) - BfaceNoAdj(2)) / (state->dataWindowManager->hcin * state->dataWindowManager->tin),
+                state->dataHeatBal->SurfWinCoeffAdjRatioIn(SurfNum) - 1.0,
+                0.001);
+
+    // With-external shading case
+    DataSurfaces::WinShadingType const ShadeFlagOn = DataSurfaces::WinShadingType::ExtShade;
+
+    if (DataSurfaces::ANY_SHADE_SCREEN(ShadeFlagOn) || DataSurfaces::ANY_BLIND(ShadeFlagOn)) {
+        state->dataWindowManager->nglfacep = state->dataWindowManager->nglface + 2;
+        AbsRadShadeFace(1) = 0.0;
+        AbsRadShadeFace(2) = 0.0;
+        sconsh = state->dataWindowManager->scon(state->dataWindowManager->ngllayer + 1);
+        TauShIR = state->dataWindowManager->tir(state->dataWindowManager->nglface + 1);
+        EpsShIR1 = state->dataWindowManager->emis(state->dataWindowManager->nglface + 1);
+        EpsShIR2 = state->dataWindowManager->emis(state->dataWindowManager->nglface + 2);
+        RhoShIR1 = max(0.0, 1.0 - TauShIR - EpsShIR1);
+        RhoShIR2 = max(0.0, 1.0 - TauShIR - EpsShIR2);
+        if (DataSurfaces::ANY_INTERIOR_SHADE_BLIND(ShadeFlagOn)) {
+            RhoGlIR2 = 1.0 - state->dataWindowManager->emis(2 * state->dataWindowManager->ngllayer);
+            ShGlReflFacIR = 1.0 - RhoGlIR2 * RhoShIR1;
+        } else if (DataSurfaces::ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadeFlagOn)) {
+            RhoGlIR1 = 1.0 - state->dataWindowManager->emis(1);
+            ShGlReflFacIR = 1.0 - RhoGlIR1 * RhoShIR2;
+        }
+    }
+
+    // compute heat balance equation matrix coefficient with default adjustment ratio, 1.0
+    // With external shading case
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum) = adjRatioDefault;
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn(SurfNum) = adjRatioDefault;
+    WindowManager::GetHeatBalanceEqCoefMatrix(*state,
+                                              SurfNum,
+                                              1,
+                                              ShadeFlagOn,
+                                              sconsh,
+                                              TauShIR,
+                                              EpsShIR1,
+                                              EpsShIR2,
+                                              RhoShIR1,
+                                              RhoShIR2,
+                                              ShGlReflFacIR,
+                                              RhoGlIR1,
+                                              RhoGlIR2,
+                                              hcv,
+                                              TGapNew,
+                                              TAirflowGapNew,
+                                              hcvAirflowGap,
+                                              hcvBG,
+                                              TGapNewBG,
+                                              AbsRadShadeFace,
+                                              Aface,
+                                              Bface,
+                                              hr);
+
+    AfaceNoAdj = Aface;
+    BfaceNoAdj = Bface;
+
+    // compute heat balance equation matrix coefficient with non-default adjustment ratio, 1.5
+    // With external shading case
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum) = adjRatioNonDefault;
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn(SurfNum) = adjRatioNonDefault;
+
+    WindowManager::GetHeatBalanceEqCoefMatrix(*state,
+                                              SurfNum,
+                                              1,
+                                              ShadeFlagOn,
+                                              sconsh,
+                                              TauShIR,
+                                              EpsShIR1,
+                                              EpsShIR2,
+                                              RhoShIR1,
+                                              RhoShIR2,
+                                              ShGlReflFacIR,
+                                              RhoGlIR1,
+                                              RhoGlIR2,
+                                              hcv,
+                                              TGapNew,
+                                              TAirflowGapNew,
+                                              hcvAirflowGap,
+                                              hcvBG,
+                                              TGapNewBG,
+                                              AbsRadShadeFace,
+                                              Aface,
+                                              Bface,
+                                              hr);
+
+    // compare the before and after adjusted coefficient matrices
+    // With external-shading case
+    EXPECT_EQ(AfaceNoAdj(1, 2), state->dataWindowManager->Aface(1, 2));
+    EXPECT_EQ(AfaceNoAdj(1, 1), state->dataWindowManager->Aface(1, 1));
+    EXPECT_EQ(AfaceNoAdj(4, 1), state->dataWindowManager->Aface(4, 1));
+    EXPECT_EQ(AfaceNoAdj(4, 3), state->dataWindowManager->Aface(4, 3));
+    EXPECT_EQ(AfaceNoAdj(1, 4), state->dataWindowManager->Aface(1, 4));
+    EXPECT_EQ(AfaceNoAdj(3, 4), state->dataWindowManager->Aface(3, 4));
+    EXPECT_EQ(AfaceNoAdj(4, 4), state->dataWindowManager->Aface(4, 4));
+    EXPECT_NEAR((state->dataWindowManager->Aface(3, 3) - AfaceNoAdj(3, 3)) / state->dataWindowManager->hcout,
+                state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum) - 1.0,
+                0.001);
+    EXPECT_NEAR((state->dataWindowManager->Aface(2, 2) - AfaceNoAdj(2, 2)) / state->dataWindowManager->hcin,
+                state->dataHeatBal->SurfWinCoeffAdjRatioIn(SurfNum) - 1.0,
+                0.01);
+    EXPECT_EQ(state->dataWindowManager->Bface(1), BfaceNoAdj(1));
+    EXPECT_EQ(state->dataWindowManager->Bface(4), BfaceNoAdj(4));
+    EXPECT_NEAR((state->dataWindowManager->Bface(3) - BfaceNoAdj(3)) / (state->dataWindowManager->hcout * state->dataWindowManager->tout),
+                state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum) - 1.0,
+                0.001);
+    EXPECT_NEAR((state->dataWindowManager->Bface(2) - BfaceNoAdj(2)) / (state->dataWindowManager->hcin * state->dataWindowManager->tin),
+                state->dataHeatBal->SurfWinCoeffAdjRatioIn(SurfNum) - 1.0,
+                0.001);
+}
+
 TEST_F(EnergyPlusFixture, WindowMaterialComplexShadeTest)
 {
 
