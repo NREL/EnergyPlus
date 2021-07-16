@@ -1265,7 +1265,7 @@ namespace OutputProcessor {
     TEST_F(SQLiteFixture, OutputProcessor_standardIndexTypeKey)
     {
         EXPECT_EQ("Zone", timeStepTypeStrings[(int)OutputProcessor::TimeStepType::TimeStepZone]);
-        EXPECT_EQ("System", timeStepTypeStrings[(int)OutputProcessor::TimeStepType::TimeStepSystem]);
+        EXPECT_EQ("HVAC System", timeStepTypeStrings[(int)OutputProcessor::TimeStepType::TimeStepSystem]);
 
         // It's no longer possible to pass something that isn't part of the enum, that's kind of the point of using an enum!
         // EXPECT_EQ("UNKW", StandardTimeStepTypeKey(0));
@@ -1277,7 +1277,7 @@ namespace OutputProcessor {
     {
         EXPECT_EQ("Average", storeTypeStrings[(int)StoreType::Averaged]);
         EXPECT_EQ("Sum", storeTypeStrings[(int)StoreType::Summed]);
-        EXPECT_EQ("Unknown", storeTypeStrings[(int)static_cast<StoreType>(0)]);
+        //EXPECT_EQ("Unknown", storeTypeStrings[(int)static_cast<StoreType>(0)]);
     }
 
     TEST_F(SQLiteFixture, OutputProcessor_determineMeterIPUnits)
@@ -2334,7 +2334,7 @@ namespace OutputProcessor {
              {"6", "0", "Avg", "Zone", timeStepZoneString, "keyedValue", "variableName", "HVAC System Timestep", "", "m3/s"},
              {"7", "0", "Sum", "Zone", timeStepZoneString, "keyedValue", "variableName", "HVAC System Timestep", "", "m3/s"},
              {"8", "0", "Avg", "Zone", timeStepZoneString, "keyedValue", "variableName", "HVAC System Timestep", "scheduleName", "m3/s"},
-             {"9", "0", "Avg", "System", timeStepSystemString, "keyedValue", "variableName", "HVAC System Timestep", "", "m3/s"},
+             {"9", "0", "Avg", "HVAC System", timeStepSystemString, "keyedValue", "variableName", "HVAC System Timestep", "", "m3/s"},
              {"10", "0", "Avg", "Zone", aThirdTimeStepString, "keyedValue", "variableName", "HVAC System Timestep", "", "m3/s"},
              {"11", "0", "Avg", "Zone", timeStepZoneString, "keyedValue", "variableName", "Hourly", "", "m3/s"},
              {"12", "0", "Sum", "Zone", timeStepZoneString, "keyedValue", "variableName", "Hourly", "", "m3/s"},
@@ -3639,9 +3639,9 @@ namespace OutputProcessor {
         auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
         std::vector<std::vector<std::string>> reportDataDictionary({
-            {"1", "0", "Avg", "System", "HVAC System", "Boiler1", "Boiler NaturalGas Rate", "Run Period", "", "W"},
-            {"2", "0", "Avg", "System", "HVAC System", "Boiler2", "Boiler NaturalGas Rate", "Run Period", "", "W"},
-            {"3", "0", "Avg", "System", "HVAC System", "Boiler3", "Boiler NaturalGas Rate", "Run Period", "", "W"},
+            {"1", "0", "Avg", "HVAC System", "HVAC System", "Boiler1", "Boiler NaturalGas Rate", "Run Period", "", "W"},
+            {"2", "0", "Avg", "HVAC System", "HVAC System", "Boiler2", "Boiler NaturalGas Rate", "Run Period", "", "W"},
+            {"3", "0", "Avg", "HVAC System", "HVAC System", "Boiler3", "Boiler NaturalGas Rate", "Run Period", "", "W"},
         });
 
         EXPECT_EQ(reportDataDictionary, reportDataDictionaryResults);
@@ -3689,8 +3689,8 @@ namespace OutputProcessor {
         auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
         std::vector<std::vector<std::string>> reportDataDictionary({
-            {"1", "0", "Avg", "System", "HVAC System", "Boiler1", "Boiler NaturalGas Rate", "Run Period", "", "W"},
-            {"2", "0", "Avg", "System", "HVAC System", "Boiler3", "Boiler NaturalGas Rate", "Run Period", "", "W"},
+            {"1", "0", "Avg", "HVAC System", "HVAC System", "Boiler1", "Boiler NaturalGas Rate", "Run Period", "", "W"},
+            {"2", "0", "Avg", "HVAC System", "HVAC System", "Boiler3", "Boiler NaturalGas Rate", "Run Period", "", "W"},
         });
 
         EXPECT_EQ(reportDataDictionary, reportDataDictionaryResults);
@@ -3737,9 +3737,9 @@ namespace OutputProcessor {
         auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
         std::vector<std::vector<std::string>> reportDataDictionary({
-            {"1", "0", "Avg", "System", "HVAC System", "Boiler1", "Boiler NaturalGas Rate", "Run Period", "", "W"},
-            {"2", "0", "Avg", "System", "HVAC System", "Boiler2", "Boiler NaturalGas Rate", "Run Period", "", "W"},
-            {"3", "0", "Avg", "System", "HVAC System", "Boiler3", "Boiler NaturalGas Rate", "Run Period", "", "W"},
+            {"1", "0", "Avg", "HVAC System", "HVAC System", "Boiler1", "Boiler NaturalGas Rate", "Run Period", "", "W"},
+            {"2", "0", "Avg", "HVAC System", "HVAC System", "Boiler2", "Boiler NaturalGas Rate", "Run Period", "", "W"},
+            {"3", "0", "Avg", "HVAC System", "HVAC System", "Boiler3", "Boiler NaturalGas Rate", "Run Period", "", "W"},
         });
 
         EXPECT_EQ(reportDataDictionary, reportDataDictionaryResults);
@@ -3794,19 +3794,19 @@ namespace OutputProcessor {
         auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
         std::vector<std::vector<std::string>> reportDataDictionary({
-            {"1", "0", "Avg", "System", "HVAC System", "Zn003:Wall001", "AFN Linkage Node 1 to Node 2 Volume Flow Rate", "Zone Timestep", "", "m3/s"},
-            {"2", "0", "Avg", "System", "HVAC System", "Zn003:Wall002", "AFN Linkage Node 1 to Node 2 Volume Flow Rate", "Zone Timestep", "", "m3/s"},
+            {"1", "0", "Avg", "HVAC System", "HVAC System", "Zn003:Wall001", "AFN Linkage Node 1 to Node 2 Volume Flow Rate", "Zone Timestep", "", "m3/s"},
+            {"2", "0", "Avg", "HVAC System", "HVAC System", "Zn003:Wall002", "AFN Linkage Node 1 to Node 2 Volume Flow Rate", "Zone Timestep", "", "m3/s"},
             {"3",
              "0",
              "Avg",
-             "System",
+             "HVAC System",
              "HVAC System",
              "Zn003:Wall002:Win001",
              "AFN Linkage Node 1 to Node 2 Volume Flow Rate",
              "Zone Timestep",
              "",
              "m3/s"},
-            {"4", "0", "Avg", "System", "HVAC System", "Zn003:Wall003", "AFN Linkage Node 1 to Node 2 Volume Flow Rate", "Zone Timestep", "", "m3/s"},
+            {"4", "0", "Avg", "HVAC System", "HVAC System", "Zn003:Wall003", "AFN Linkage Node 1 to Node 2 Volume Flow Rate", "Zone Timestep", "", "m3/s"},
         });
 
         EXPECT_EQ(reportDataDictionary, reportDataDictionaryResults);
@@ -3866,19 +3866,19 @@ namespace OutputProcessor {
         auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
         std::vector<std::vector<std::string>> reportDataDictionary({
-            {"1", "0", "Avg", "System", "HVAC System", "ZN003:WALL001", "AFN Linkage Node 1 to Node 2 Volume Flow Rate", "Zone Timestep", "", "m3/s"},
-            {"2", "0", "Avg", "System", "HVAC System", "ZN003:WALL002", "AFN Linkage Node 1 to Node 2 Volume Flow Rate", "Zone Timestep", "", "m3/s"},
+            {"1", "0", "Avg", "HVAC System", "HVAC System", "ZN003:WALL001", "AFN Linkage Node 1 to Node 2 Volume Flow Rate", "Zone Timestep", "", "m3/s"},
+            {"2", "0", "Avg", "HVAC System", "HVAC System", "ZN003:WALL002", "AFN Linkage Node 1 to Node 2 Volume Flow Rate", "Zone Timestep", "", "m3/s"},
             {"3",
              "0",
              "Avg",
-             "System",
+             "HVAC System",
              "HVAC System",
              "ZN003:WALL002:WIN001",
              "AFN Linkage Node 1 to Node 2 Volume Flow Rate",
              "Zone Timestep",
              "",
              "m3/s"},
-            {"4", "0", "Avg", "System", "HVAC System", "ZN003:WALL003", "AFN Linkage Node 1 to Node 2 Volume Flow Rate", "Zone Timestep", "", "m3/s"},
+            {"4", "0", "Avg", "HVAC System", "HVAC System", "ZN003:WALL003", "AFN Linkage Node 1 to Node 2 Volume Flow Rate", "Zone Timestep", "", "m3/s"},
         });
 
         EXPECT_EQ(reportDataDictionary, reportDataDictionaryResults);
@@ -4699,8 +4699,8 @@ namespace OutputProcessor {
             {"10", "1", "Sum", "Facility:Electricity", "Zone", "", "Electricity:Facility", "Daily", "", "J"},
             {"11", "1", "Sum", "Facility:Electricity", "Zone", "", "Electricity:Facility", "Monthly", "", "J"},
             {"13", "1", "Sum", "Facility:Electricity", "Zone", "", "Electricity:Facility", "Run Period", "", "J"},
-            {"180", "0", "Avg", "System", "HVAC System", "Boiler1", "Boiler Heating Rate", "HVAC System Timestep", "", "W"},
-            {"181", "0", "Avg", "System", "HVAC System", "Boiler1", "Boiler NaturalGas Rate", "HVAC System Timestep", "", "W"},
+            {"180", "0", "Avg", "HVAC System", "HVAC System", "Boiler1", "Boiler Heating Rate", "HVAC System Timestep", "", "W"},
+            {"181", "0", "Avg", "HVAC System", "HVAC System", "Boiler1", "Boiler NaturalGas Rate", "HVAC System Timestep", "", "W"},
         });
 
         EXPECT_EQ(reportDataDictionary, reportDataDictionaryResults);
@@ -5008,8 +5008,8 @@ namespace OutputProcessor {
             {"10", "1", "Sum", "Facility:Electricity", "Zone", "", "Electricity:Facility", "Daily", "", "J"},
             {"11", "1", "Sum", "Facility:Electricity", "Zone", "", "Electricity:Facility", "Monthly", "", "J"},
             {"13", "1", "Sum", "Facility:Electricity", "Zone", "", "Electricity:Facility", "Run Period", "", "J"},
-            {"180", "0", "Avg", "System", "HVAC System", "Boiler1", "Boiler Heating Rate", "HVAC System Timestep", "", "W"},
-            {"181", "0", "Avg", "System", "HVAC System", "Boiler1", "Boiler NaturalGas Rate", "HVAC System Timestep", "", "W"},
+            {"180", "0", "Avg", "HVAC System", "HVAC System", "Boiler1", "Boiler Heating Rate", "HVAC System Timestep", "", "W"},
+            {"181", "0", "Avg", "HVAC System", "HVAC System", "Boiler1", "Boiler NaturalGas Rate", "HVAC System Timestep", "", "W"},
         });
 
         EXPECT_EQ(reportDataDictionary, reportDataDictionaryResults);
