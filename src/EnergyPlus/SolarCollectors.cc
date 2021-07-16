@@ -2137,13 +2137,10 @@ namespace SolarCollectors {
             VentCavIndex = CavNum;
         }
     }
-    void CollectorData::oneTimeInit(EnergyPlusData &state)
+    void CollectorData::oneTimeInit_new(EnergyPlusData &state)
     {
 
-        if (this->MyOneTimeFlag) {
             this->setupOutputVars(state);
-            this->MyOneTimeFlag = false;
-        }
 
         if (this->SetLoopIndexFlag) {
             if (allocated(state.dataPlnt->PlantLoop)) {
@@ -2167,6 +2164,9 @@ namespace SolarCollectors {
                 this->SetLoopIndexFlag = false;
             }
         }
+    }
+    void CollectorData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+    {
     }
 
 } // namespace SolarCollectors
