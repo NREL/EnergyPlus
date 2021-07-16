@@ -11068,6 +11068,10 @@ void RefrigRackData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
 {
 }
 
+void RefrigRackData::oneTimeInit_new([[maybe_unused]] EnergyPlusData &state)
+{
+}
+
 void SimulateDetailedRefrigerationSystems(EnergyPlusData &state)
 {
 
