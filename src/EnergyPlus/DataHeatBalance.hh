@@ -57,6 +57,7 @@
 #include <ObjexxFCL/Reference.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/ConvectionConstants.hh>
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataComplexFenestration.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -122,20 +123,6 @@ namespace DataHeatBalance {
     // Parameters to indicate the zone type for use with the Zone derived
     // type (see below--Zone%OfType):
     constexpr int StandardZone(1);
-
-    // Parameters to indicate the convection correlation being used for use with
-    // InsideConvectionAlgo and OutsideConvectionAlgo
-
-    constexpr int ASHRAESimple(1);
-    constexpr int ASHRAETARP(2);
-    constexpr int CeilingDiffuser(3); // Only valid for inside use
-    constexpr int TrombeWall(4);      // Only valid for inside use
-    constexpr int TarpHcOutside(5);   // Only valid for outside use
-    constexpr int MoWiTTHcOutside(6); // Only valid for outside use
-    constexpr int DOE2HcOutside(7);   // Only valid for outside use
-    constexpr int BLASTHcOutside(8);  // Only valid for outside use
-    constexpr int AdaptiveConvectionAlgorithm(9);
-    constexpr int ASTMC1340(10);
 
     // Parameters for WarmupDays
     constexpr int DefaultMaxNumberOfWarmupDays(25); // Default maximum number of warmup days allowed
@@ -502,9 +489,9 @@ namespace DataHeatBalance {
               IsControlled(false), IsSupplyPlenum(false), IsReturnPlenum(false), ZoneEqNum(0), PlenumCondNum(0), TempControlledZoneIndex(0),
               AllSurfaceFirst(0), AllSurfaceLast(-1), HTSurfaceFirst(0), HTSurfaceLast(-1), OpaqOrIntMassSurfaceFirst(0),
               OpaqOrIntMassSurfaceLast(-1), WindowSurfaceFirst(0), WindowSurfaceLast(-1), OpaqOrWinSurfaceFirst(0), OpaqOrWinSurfaceLast(-1),
-              TDDDomeFirst(0), TDDDomeLast(-1), InsideConvectionAlgo(ASHRAESimple), NumSurfaces(0), NumSubSurfaces(0), NumShadingSurfaces(0),
-              OutsideConvectionAlgo(ASHRAESimple), Centroid(0.0, 0.0, 0.0), MinimumX(0.0), MaximumX(0.0), MinimumY(0.0), MaximumY(0.0), MinimumZ(0.0),
-              MaximumZ(0.0), RadiantEnclosureNum(0), SolarEnclosureNum(0),
+              TDDDomeFirst(0), TDDDomeLast(-1), InsideConvectionAlgo(ConvectionConstants::HcInt_ASHRAESimple), NumSurfaces(0), NumSubSurfaces(0),
+              NumShadingSurfaces(0), OutsideConvectionAlgo(ConvectionConstants::HcExt_ASHRAESimple), Centroid(0.0, 0.0, 0.0), MinimumX(0.0),
+              MaximumX(0.0), MinimumY(0.0), MaximumY(0.0), MinimumZ(0.0), MaximumZ(0.0), RadiantEnclosureNum(0), SolarEnclosureNum(0),
 
               OutDryBulbTemp(0.0), OutDryBulbTempEMSOverrideOn(false), OutDryBulbTempEMSOverrideValue(0.0), OutWetBulbTemp(0.0),
               OutWetBulbTempEMSOverrideOn(false), OutWetBulbTempEMSOverrideValue(0.0), WindSpeed(0.0), WindSpeedEMSOverrideOn(false),
@@ -1975,8 +1962,8 @@ struct HeatBalanceData : BaseGlobalStruct
     Real64 BuildingAzimuth = 0.0;           // North Axis of Building
     Real64 LoadsConvergTol = 0.0;           // Tolerance value for Loads Convergence
     Real64 TempConvergTol = 0.0;            // Tolerance value for Temperature Convergence
-    int DefaultInsideConvectionAlgo = 1;    // 1 = simple (ASHRAE); 2 = detailed (ASHRAE); 3 = ceiling diffuser; 4 = trombe wall
-    int DefaultOutsideConvectionAlgo = 1;   // 1 = simple (ASHRAE); 2 = detailed; etc (BLAST, TARP, MOWITT, DOE-2)
+    int DefaultInsideConvectionAlgo = ConvectionConstants::HcInt_ASHRAESimple;
+    int DefaultOutsideConvectionAlgo = ConvectionConstants::HcExt_ASHRAESimple;
     DataHeatBalance::Shadowing SolarDistribution = DataHeatBalance::Shadowing::FullExterior;                  // Solar Distribution Algorithm
     int InsideSurfIterations = 0;                                                                             // Counts inside surface iterations
     DataSurfaces::iHeatTransferModel OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CTF; // Global HeatBalanceAlgorithm setting
@@ -2271,8 +2258,8 @@ struct HeatBalanceData : BaseGlobalStruct
         this->BuildingAzimuth = 0.0;
         this->LoadsConvergTol = 0.0;
         this->TempConvergTol = 0.0;
-        this->DefaultInsideConvectionAlgo = 1;
-        this->DefaultOutsideConvectionAlgo = 1;
+        this->DefaultInsideConvectionAlgo = ConvectionConstants::HcInt_ASHRAESimple;
+        this->DefaultOutsideConvectionAlgo = ConvectionConstants::HcExt_ASHRAESimple;
         this->SolarDistribution = DataHeatBalance::Shadowing::FullExterior;
         this->InsideSurfIterations = 0;
         this->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CTF;

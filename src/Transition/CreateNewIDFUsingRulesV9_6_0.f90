@@ -384,6 +384,11 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 !                 CurArgs = CurArgs + 1
 
               ! If your original object starts with A, insert the rules here
+              CASE('AIRLOOPHVAC:OUTDOORAIRSYSTEM')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:3)=InArgs(1:3)
+                  CurArgs = CurArgs - 1
 
               ! If your original object starts with C, insert the rules here
               

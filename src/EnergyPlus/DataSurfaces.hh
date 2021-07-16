@@ -1035,11 +1035,11 @@ namespace DataSurfaces {
         Real64 PlenGapThick;              // Depth of Plenum Behind Baffle [m]
         int NumSurfs;                     // a single baffle can have multiple surfaces underneath it
         Array1D_int SurfPtrs;             // = 0  ! array of pointers for participating underlying surfaces
-        Real64 HdeltaNPL;                 // Height scale for Cavity bouyancy  [m]
+        Real64 HdeltaNPL;                 // Height scale for Cavity buoyancy  [m]
         Real64 AreaRatio;                 // Ratio of actual surface are to projected surface area [dimensionless]
         Real64 Cv;                        // volume-based effectiveness of openings for wind-driven vent when Passive
-        Real64 Cd;                        // discharge coefficient of openings for bouyancy-driven vent when Passive
-        // data from elswhere and calculated
+        Real64 Cd;                        // discharge coefficient of openings for buoyancy-driven vent when Passive
+        // data from elsewhere and calculated
         Real64 ActualArea;  // Overall Area of Collect with surface corrugations.
         Real64 ProjArea;    // Overall Area of Collector projected, as if flat [m2]
         Vector Centroid;    // computed centroid
@@ -1058,7 +1058,7 @@ namespace DataSurfaces {
         Real64 PassiveACH;       // air changes per hour when passive [1/hr]
         Real64 PassiveMdotVent;  // Total Nat Vent air change rate  [kg/s]
         Real64 PassiveMdotWind;  // Nat Vent air change rate from Wind-driven [kg/s]
-        Real64 PassiveMdotTherm; // Nat. Vent air change rate from bouyancy-driven flow [kg/s]
+        Real64 PassiveMdotTherm; // Nat. Vent air change rate from buoyancy-driven flow [kg/s]
 
         // Default Constructor
         ExtVentedCavityStruct()
