@@ -442,6 +442,7 @@ namespace DataSizing {
         Array1D<Real64> DOASSupTempSeq;     // daily sequence of zone DOAS supply temperature (zone time step) [C]
         Array1D<Real64> DOASSupHumRatSeq;   // daily sequence of zone DOAS supply humidity ratio (zone time step) [kgWater/kgDryAir]
         Array1D<Real64> DOASTotCoolLoadSeq; // daily sequence of zone DOAS total cooling load (zone time step) [W]
+        Real64 ZoneExhaustFanFlow;          // portion of flow expected to be drawn from air system by zone exhaust fan
 
         // Default Constructor
         ZoneSizingData()
@@ -469,7 +470,7 @@ namespace DataSizing {
               ZoneOAFracCooling(0.0), ZoneOAFracHeating(0.0), TotalOAFromPeople(0.0), TotalOAFromArea(0.0), TotPeopleInZone(0.0),
               TotalZoneFloorArea(0.0), ZonePeakOccupancy(0.0), SupplyAirAdjustFactor(1.0), ZpzClgByZone(0.0), ZpzHtgByZone(0.0), VozClgByZone(0.0),
               VozHtgByZone(0.0), DOASHeatLoad(0.0), DOASCoolLoad(0.0), DOASHeatAdd(0.0), DOASLatAdd(0.0), DOASSupMassFlow(0.0), DOASSupTemp(0.0),
-              DOASSupHumRat(0.0), DOASTotCoolLoad(0.0)
+              DOASSupHumRat(0.0), DOASTotCoolLoad(0.0), ZoneExhaustFanFlow(0.0)
         {
         }
 

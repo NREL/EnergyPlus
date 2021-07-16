@@ -349,6 +349,8 @@ namespace Fans {
                                  Real64 &motInPower,
                                  bool &fanCompModel);
 
+    Real64 ZoneExhaustFanBalancedAirFlow(EnergyPlusData &state, int const trialInletNode);
+
 } // namespace Fans
 
 struct FansData : BaseGlobalStruct
