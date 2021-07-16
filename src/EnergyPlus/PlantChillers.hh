@@ -372,6 +372,8 @@ namespace PlantChillers {
                     bool RunFlag   // TRUE if chiller operating
         );
 
+        void oneTimeInit_new(EnergyPlusData &state) override;
+
         void oneTimeInit(EnergyPlusData &state) override;
     };
 
