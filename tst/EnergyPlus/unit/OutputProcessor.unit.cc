@@ -1277,7 +1277,7 @@ namespace OutputProcessor {
     {
         EXPECT_EQ("Average", storeTypeStrings[(int)StoreType::Averaged]);
         EXPECT_EQ("Sum", storeTypeStrings[(int)StoreType::Summed]);
-        //EXPECT_EQ("Unknown", storeTypeStrings[(int)static_cast<StoreType>(0)]);
+        // EXPECT_EQ("Unknown", storeTypeStrings[(int)static_cast<StoreType>(0)]);
     }
 
     TEST_F(SQLiteFixture, OutputProcessor_determineMeterIPUnits)
@@ -3794,8 +3794,26 @@ namespace OutputProcessor {
         auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
         std::vector<std::vector<std::string>> reportDataDictionary({
-            {"1", "0", "Avg", "HVAC System", "HVAC System", "Zn003:Wall001", "AFN Linkage Node 1 to Node 2 Volume Flow Rate", "Zone Timestep", "", "m3/s"},
-            {"2", "0", "Avg", "HVAC System", "HVAC System", "Zn003:Wall002", "AFN Linkage Node 1 to Node 2 Volume Flow Rate", "Zone Timestep", "", "m3/s"},
+            {"1",
+             "0",
+             "Avg",
+             "HVAC System",
+             "HVAC System",
+             "Zn003:Wall001",
+             "AFN Linkage Node 1 to Node 2 Volume Flow Rate",
+             "Zone Timestep",
+             "",
+             "m3/s"},
+            {"2",
+             "0",
+             "Avg",
+             "HVAC System",
+             "HVAC System",
+             "Zn003:Wall002",
+             "AFN Linkage Node 1 to Node 2 Volume Flow Rate",
+             "Zone Timestep",
+             "",
+             "m3/s"},
             {"3",
              "0",
              "Avg",
@@ -3806,7 +3824,16 @@ namespace OutputProcessor {
              "Zone Timestep",
              "",
              "m3/s"},
-            {"4", "0", "Avg", "HVAC System", "HVAC System", "Zn003:Wall003", "AFN Linkage Node 1 to Node 2 Volume Flow Rate", "Zone Timestep", "", "m3/s"},
+            {"4",
+             "0",
+             "Avg",
+             "HVAC System",
+             "HVAC System",
+             "Zn003:Wall003",
+             "AFN Linkage Node 1 to Node 2 Volume Flow Rate",
+             "Zone Timestep",
+             "",
+             "m3/s"},
         });
 
         EXPECT_EQ(reportDataDictionary, reportDataDictionaryResults);
@@ -3866,8 +3893,26 @@ namespace OutputProcessor {
         auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
         std::vector<std::vector<std::string>> reportDataDictionary({
-            {"1", "0", "Avg", "HVAC System", "HVAC System", "ZN003:WALL001", "AFN Linkage Node 1 to Node 2 Volume Flow Rate", "Zone Timestep", "", "m3/s"},
-            {"2", "0", "Avg", "HVAC System", "HVAC System", "ZN003:WALL002", "AFN Linkage Node 1 to Node 2 Volume Flow Rate", "Zone Timestep", "", "m3/s"},
+            {"1",
+             "0",
+             "Avg",
+             "HVAC System",
+             "HVAC System",
+             "ZN003:WALL001",
+             "AFN Linkage Node 1 to Node 2 Volume Flow Rate",
+             "Zone Timestep",
+             "",
+             "m3/s"},
+            {"2",
+             "0",
+             "Avg",
+             "HVAC System",
+             "HVAC System",
+             "ZN003:WALL002",
+             "AFN Linkage Node 1 to Node 2 Volume Flow Rate",
+             "Zone Timestep",
+             "",
+             "m3/s"},
             {"3",
              "0",
              "Avg",
@@ -3878,7 +3923,16 @@ namespace OutputProcessor {
              "Zone Timestep",
              "",
              "m3/s"},
-            {"4", "0", "Avg", "HVAC System", "HVAC System", "ZN003:WALL003", "AFN Linkage Node 1 to Node 2 Volume Flow Rate", "Zone Timestep", "", "m3/s"},
+            {"4",
+             "0",
+             "Avg",
+             "HVAC System",
+             "HVAC System",
+             "ZN003:WALL003",
+             "AFN Linkage Node 1 to Node 2 Volume Flow Rate",
+             "Zone Timestep",
+             "",
+             "m3/s"},
         });
 
         EXPECT_EQ(reportDataDictionary, reportDataDictionaryResults);
