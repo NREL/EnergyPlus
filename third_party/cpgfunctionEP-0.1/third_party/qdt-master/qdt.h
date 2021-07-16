@@ -1,0 +1,8 @@
+#include "methods/adaptive.h"
+#include "methods/constant-step.h"
+#include "methods/gauss-kronrod.h"
+#include "methods/monte-carlo.h"
+#include "methods/rectangle.h"
+#include "methods/romberg.h"
+#include "methods/simpson.h"
+#include "methods/trapezoid.h"

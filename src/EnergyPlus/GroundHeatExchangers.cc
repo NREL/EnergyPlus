@@ -54,6 +54,12 @@
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
+// cpgfunction
+#ifdef BUILD_CPGFUNCTION
+// cpgfunction Headers
+#include <cpgfunction/gfunction.h>
+#endif
+
 // JSON Headers
 #include <nlohmann/json.hpp>
 
@@ -318,49 +324,69 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
             errorsFound = true;
             ShowSevereError(state, "GroundHeatExchanger:ResponseFactors object not found.");
         }
-    } else if (j.find("ghe_vertical_array_object_name") != j.end()) {
-        // Response factors come from array object
-        this->myRespFactors = BuildAndGetResponseFactorObjectFromArray(
-            state, GetVertArray(state, UtilityRoutines::MakeUPPERCase(AsString(j["ghe_vertical_array_object_name"]))));
+    }
 
-        if (!this->myRespFactors) {
-            errorsFound = true;
-            ShowSevereError(state, "GroundHeatExchanger:Vertical:Array object not found.");
-        }
-    } else {
-        if (j.find("vertical_well_locations") == j.end()) {
-            // No ResponseFactors, GHEArray, or SingleBH object are referenced
-            ShowSevereError(state, "No GHE:ResponseFactors, GHE:Vertical:Array, or GHE:Vertical:Single objects found");
-            ShowFatalError(state, "Check references to these objects for GHE:System object: " + this->name);
-        }
+    // no g-functions in the input file, so they need to be calculated
+    if (!this->gFunctionsExist) {
 
-        auto const vars = j.at("vertical_well_locations");
-
-        // Calculate response factors from individual boreholes
-        std::vector<std::shared_ptr<GLHEVertSingle>> tempVectOfBHObjects;
-
-        for (auto const &var : vars) {
-            if (!var.at("ghe_vertical_single_object_name").empty()) {
-                std::shared_ptr<GLHEVertSingle> tempBHptr =
-                    GetSingleBH(state, UtilityRoutines::MakeUPPERCase(AsString(var.at("ghe_vertical_single_object_name"))));
-                if (tempBHptr) {
-                    tempVectOfBHObjects.push_back(tempBHptr);
-                } else {
-                    errorsFound = true;
-                    std::string const tmpName = var.at("ghe_vertical_single_object_name");
-                    ShowSevereError(state, "Borehole= " + tmpName + " not found.");
-                    break;
-                }
+        // g-function calculation method
+        if (j.find("g_function_calculation_method") != j.end()) {
+            std::string gFunctionMethodStr = UtilityRoutines::MakeUPPERCase(AsString(j["g_function_calculation_method"]));
+            if (gFunctionMethodStr == "UHFCALC") {
+                this->gFuncCalcMethod = GFuncCalcMethod::UniformHeatFlux;
+            } else if (gFunctionMethodStr == "UBHWTCALC") {
+                this->gFuncCalcMethod = GFuncCalcMethod::UniformBoreholeWallTemp;
             } else {
-                break;
+                errorsFound = true;
+                ShowSevereError(state, fmt::format("g-Function Calculation Method: \"{}\" is invalid", gFunctionMethodStr));
             }
         }
 
-        this->myRespFactors = BuildAndGetResponseFactorsObjectFromSingleBHs(state, tempVectOfBHObjects);
+        // get borehole data from array or individual borehole instance objects
+        if (j.find("ghe_vertical_array_object_name") != j.end()) {
+            // Response factors come from array object
+            this->myRespFactors = BuildAndGetResponseFactorObjectFromArray(
+                state, GetVertArray(state, UtilityRoutines::MakeUPPERCase(AsString(j["ghe_vertical_array_object_name"]))));
 
-        if (!this->myRespFactors) {
-            errorsFound = true;
-            ShowSevereError(state, "GroundHeatExchanger:Vertical:Single objects not found.");
+            if (!this->myRespFactors) {
+                errorsFound = true;
+                ShowSevereError(state, "GroundHeatExchanger:Vertical:Array object not found.");
+            }
+        } else {
+            if (j.find("vertical_well_locations") == j.end()) {
+                // No ResponseFactors, GHEArray, or SingleBH object are referenced
+                ShowSevereError(state, "No GHE:ResponseFactors, GHE:Vertical:Array, or GHE:Vertical:Single objects found");
+                ShowFatalError(state, "Check references to these objects for GHE:System object: " + this->name);
+            }
+
+            auto const vars = j.at("vertical_well_locations");
+
+            // Calculate response factors from individual boreholes
+            std::vector<std::shared_ptr<GLHEVertSingle>> tempVectOfBHObjects;
+
+            for (auto const &var : vars) {
+                if (!var.at("ghe_vertical_single_object_name").empty()) {
+                    std::shared_ptr<GLHEVertSingle> tempBHptr =
+                        GetSingleBH(state, UtilityRoutines::MakeUPPERCase(AsString(var.at("ghe_vertical_single_object_name"))));
+                    if (tempBHptr) {
+                        tempVectOfBHObjects.push_back(tempBHptr);
+                    } else {
+                        errorsFound = true;
+                        std::string const tmpName = var.at("ghe_vertical_single_object_name");
+                        ShowSevereError(state, "Borehole= " + tmpName + " not found.");
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            this->myRespFactors = BuildAndGetResponseFactorsObjectFromSingleBHs(state, tempVectOfBHObjects);
+
+            if (!this->myRespFactors) {
+                errorsFound = true;
+                ShowSevereError(state, "GroundHeatExchanger:Vertical:Single objects not found.");
+            }
         }
     }
 
@@ -946,13 +972,39 @@ Real64 GLHEVert::doubleIntegral(std::shared_ptr<GLHEVertSingle> const &bh_i, std
 
 //******************************************************************************
 
+void GLHEVert::calcUniformHeatFluxGFunctions(EnergyPlusData &state)
+{
+    this->calcShortTimestepGFunctions(state);
+    this->calcLongTimestepGFunctions(state);
+    this->combineShortAndLongTimestepGFunctions();
+}
+
+//******************************************************************************
+
+void GLHEVert::calcUniformBHWallTempGFunctions([[maybe_unused]] EnergyPlusData &state)
+{
+}
+
+//******************************************************************************
+
 void GLHEVert::calcGFunctions(EnergyPlusData &state)
 {
 
     // No other choice than to calculate the g-functions here
-    calcShortTimestepGFunctions(state);
-    calcLongTimestepGFunctions(state);
-    combineShortAndLongTimestepGFunctions();
+    if (this->gFuncCalcMethod == GFuncCalcMethod::UniformHeatFlux) {
+        this->calcUniformHeatFluxGFunctions(state);
+    } else if (this->gFuncCalcMethod == GFuncCalcMethod::UniformBoreholeWallTemp) {
+#ifdef BUILD_CPGFUNCTION
+        // cpgfunction call here
+        this->calcUniformBHWallTempGFunctions(state);
+#else
+        // this version of E+ is not built with cpgfunction. revert back to UHF and warn the user
+        this->gFuncCalcMethod = GFuncCalcMethod::UniformHeatFlux;
+        std::string msg = "This version of EnergyPlus was not built with cpgfunction. UBWTcalc method cannot be used. Defaulting to UHFcalc method";
+        ShowWarningMessage(state, msg);
+        this->calcUniformHeatFluxGFunctions(state);
+#endif
+    }
 
     // save data for later
     if (!state.dataSysVars->DisableGLHECaching) {
