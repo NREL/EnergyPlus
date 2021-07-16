@@ -496,7 +496,7 @@ void GshpPeHeatingSpecs::initialize(EnergyPlusData &state)
     // initialization
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("InitGshp");
+    static constexpr std::string_view RoutineName("InitGshp");
 
     // For each new environment
     if (state.dataGlobal->BeginEnvrnFlag && this->beginEnvironFlag) {

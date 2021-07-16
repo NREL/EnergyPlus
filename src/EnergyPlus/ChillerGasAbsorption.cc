@@ -973,7 +973,7 @@ void GasAbsorberSpecs::initialize(EnergyPlusData &state)
 
     // Uses the status flags to trigger initializations.
 
-    std::string const RoutineName("InitGasAbsorber");
+    static constexpr std::string_view RoutineName("InitGasAbsorber");
 
     Real64 rho = 0.0;  // local fluid density
     Real64 mdot = 0.0; // lcoal fluid mass flow rate
@@ -1120,7 +1120,7 @@ void GasAbsorberSpecs::size(EnergyPlusData &state)
     // the evaporator flow rate and the chilled water loop design delta T. The condenser flow rate
     // is calculated from the nominal capacity, the COP, and the condenser loop design delta T.
 
-    std::string const RoutineName("SizeGasAbsorber");
+    static constexpr std::string_view RoutineName("SizeGasAbsorber");
 
     std::string equipName;
     Real64 Cp;                     // local fluid specific heat
@@ -1492,7 +1492,7 @@ void GasAbsorberSpecs::calculateChiller(EnergyPlusData &state, Real64 &MyLoad)
     // FlowLock = 0  if mass flow rates may be changed by loop components
     // FlowLock = 1  if mass flow rates may not be changed by loop components
 
-    std::string const RoutineName("CalcGasAbsorberChillerModel");
+    static constexpr std::string_view RoutineName("CalcGasAbsorberChillerModel");
 
     // Local copies of GasAbsorberSpecs Type
     // all variables that are local copies of data structure
@@ -1878,7 +1878,7 @@ void GasAbsorberSpecs::calculateHeater(EnergyPlusData &state, Real64 &MyLoad, bo
     //                 below Setpoint
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    std::string const RoutineName("CalcGasAbsorberHeaterModel");
+    static constexpr std::string_view RoutineName("CalcGasAbsorberHeaterModel");
 
     // Local copies of GasAbsorberSpecs Type
     // all variables that are local copies of data structure

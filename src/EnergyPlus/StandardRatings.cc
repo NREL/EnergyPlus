@@ -274,7 +274,7 @@ namespace StandardRatings {
         int const NumOfReducedCap(4);      // Number of reduced capacity test conditions (100%,75%,50%,and 25%)
         int const IterMax(500);            // Maximum number of iterations
         static Array1D<Real64> const IPLVWeightingFactor(4, {0.010, 0.42, 0.45, 0.12}); // EER Weighting factors (IPLV)
-        static std::string const RoutineName("CalcChillerIPLV");
+        static constexpr std::string_view RoutineName("CalcChillerIPLV");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -614,14 +614,14 @@ namespace StandardRatings {
         // Formats
 
         if (StandardRatingsMyOneTimeFlag) {
-            static constexpr auto Format_990(
+            static constexpr fmt::string_view Format_990(
                 "! <Chiller Standard Rating Information>, Component Type, Component Name, IPLV in SI Units {W/W}, IPLV in IP Units {Btu/W-h}");
             print(state.files.eio, "{}\n", Format_990);
             StandardRatingsMyOneTimeFlag = false;
         }
 
         {
-            static constexpr auto Format_991(" Chiller Standard Rating Information, {}, {}, {:.2R}, {:.2R}\n");
+            static constexpr fmt::string_view Format_991(" Chiller Standard Rating Information, {}, {}, {:.2R}, {:.2R}\n");
             auto const SELECT_CASE_var(ChillerType);
             if (SELECT_CASE_var == TypeOf_Chiller_ElectricEIR) {
 
@@ -671,8 +671,6 @@ namespace StandardRatings {
         Real64 const OAHighEDBTemp(35.0);    // Outdoor air dry-bulb temp in degrees C at full load capacity (95F)
         Real64 const OAHighEWBTemp(24.0);    // Outdoor air wet-bulb temp in degrees C at full load capacity (75F)
         Real64 const LeavingWaterTemp(6.67); // Evaporator leaving water temperature in degrees C [44 F]
-
-        static std::string const RoutineName("CheckCurveLimitsForIPLV: "); // Include trailing blank space
 
         //  Minimum and Maximum independent variable limits from Total Cooling Capacity Function of Temperature Curve
         Real64 CapacityLWTempMin(0.0);           // Capacity modifier Min value (leaving water temp), from the Curve:BiQuadratic object
@@ -2418,7 +2416,7 @@ namespace StandardRatings {
 
     void ReportDXCoilRating(EnergyPlusData &state,
                             std::string const &CompType,    // Type of component
-                            std::string const &CompName,    // Name of component
+                            std::string_view CompName,      // Name of component
                             int const CompTypeNum,          // TypeNum of component
                             Real64 const CoolCapVal,        // Standard total (net) cooling capacity for AHRI Std. 210/240 {W}
                             Real64 const SEERUserIP,        // SEER value in IP units from user PLR curve {Btu/W-h}
@@ -2482,7 +2480,7 @@ namespace StandardRatings {
 
             if (SELECT_CASE_var == CoilDX_CoolingSingleSpeed) {
                 if (MyCoolOneTimeFlag) {
-                    static constexpr auto Format_990(
+                    static constexpr fmt::string_view Format_990(
                         "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
                         "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER User {Btu/W-h}, SEER Standard {Btu/W-h}, IEER "
                         "{Btu/W-h}\n");
@@ -2490,7 +2488,7 @@ namespace StandardRatings {
                     MyCoolOneTimeFlag = false;
                 }
 
-                static constexpr auto Format_991(
+                static constexpr fmt::string_view Format_991(
                     " DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}\n");
                 print(state.files.eio, Format_991, CompType, CompName, CoolCapVal, EERValueSI, EERValueIP, SEERUserIP, SEERStandardIP, IEERValueIP);
 
@@ -2511,7 +2509,7 @@ namespace StandardRatings {
 
             } else if ((SELECT_CASE_var == CoilDX_HeatingEmpirical) || (SELECT_CASE_var == CoilDX_MultiSpeedHeating)) {
                 if (MyHeatOneTimeFlag) {
-                    static constexpr auto Format_992(
+                    static constexpr fmt::string_view Format_992(
                         "! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, High Temperature Heating "
                         "(net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W}, HSPF {Btu/W-h}, Region "
                         "Number\n");
@@ -2519,7 +2517,7 @@ namespace StandardRatings {
                     MyHeatOneTimeFlag = false;
                 }
 
-                static constexpr auto Format_993(" DX Heating Coil Standard Rating Information, {}, {}, {:.1R}, {:.1R}, {:.2R}, {}\n");
+                static constexpr fmt::string_view Format_993(" DX Heating Coil Standard Rating Information, {}, {}, {:.1R}, {:.1R}, {:.2R}, {}\n");
                 print(state.files.eio, Format_993, CompType, CompName, HighHeatingCapVal, LowHeatingCapVal, HSPFValueIP, RegionNum);
 
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXHeatCoilType, CompName, CompType);
@@ -2533,7 +2531,7 @@ namespace StandardRatings {
 
             } else if (SELECT_CASE_var == CoilDX_MultiSpeedCooling) {
                 if (MyCoolOneTimeFlag) {
-                    static constexpr auto Format_994(
+                    static constexpr fmt::string_view Format_994(
                         "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
                         "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER User {Btu/W-h}, SEER Standard {Btu/W-h}, IEER "
                         "{Btu/W-h}");
@@ -2541,7 +2539,8 @@ namespace StandardRatings {
                     MyCoolOneTimeFlag = false;
                 }
 
-                static constexpr auto Format_995(" DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {}, {}, {:.2R}, {:.2R}, {}\n");
+                static constexpr fmt::string_view Format_995(
+                    " DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {}, {}, {:.2R}, {:.2R}, {}\n");
                 print(state.files.eio, Format_995, CompType, CompName, CoolCapVal, ' ', ' ', SEERUserIP, SEERStandardIP, ' ');
 
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType, CompName, CompType);
@@ -2561,7 +2560,7 @@ namespace StandardRatings {
 
     void ReportDXCoolCoilDataCenterApplication(EnergyPlusData &state,
                                                std::string const &CompType,           // Type of component
-                                               std::string const &CompName,           // Name of component
+                                               std::string_view CompName,             // Name of component
                                                int const CompTypeNum,                 // TypeNum of component
                                                Array1D<Real64> &NetCoolingCapRated,   // net cooling capacity of single speed DX cooling coil
                                                Array1D<Real64> &TotElectricPowerRated // total electric power including supply fan
@@ -2616,7 +2615,7 @@ namespace StandardRatings {
 
             if (SELECT_CASE_var == CoilDX_CoolingSingleSpeed) {
                 if (MyCoolOneTimeFlag) {
-                    static constexpr auto Format_101(
+                    static constexpr fmt::string_view Format_101(
                         "! <DX Cooling Coil ASHRAE 127 Standard Ratings Information>, Component Type, Component Name, Standard 127 "
                         "Classification, Rated Net Cooling Capacity Test A {W}, Rated Total Electric Power Test A {W}, Rated Net "
                         "Cooling Capacity Test B {W}, Rated Total Electric Power Test B {W}, Rated Net Cooling Capacity Test C {W}, "
@@ -2629,8 +2628,9 @@ namespace StandardRatings {
                     Num = (ClassNum - 1) * 4;
                     std::string ClassName = format("Class {}", ClassNum);
                     std::string CompNameNew = fmt::format("{}({})", CompName, ClassName);
-                    static constexpr auto Format_102(" DX Cooling Coil ASHRAE 127 Standard Ratings Information, {}, {}, {}, {:.1R}, {:.1R}, {:.1R}, "
-                                                     "{:.1R}, {:.1R}, {:.1R}, {:.1R}, {:.1R}\n");
+                    static constexpr fmt::string_view Format_102(
+                        " DX Cooling Coil ASHRAE 127 Standard Ratings Information, {}, {}, {}, {:.1R}, {:.1R}, {:.1R}, "
+                        "{:.1R}, {:.1R}, {:.1R}, {:.1R}, {:.1R}\n");
                     print(state.files.eio,
                           Format_102,
                           CompType,
@@ -2713,7 +2713,7 @@ namespace StandardRatings {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
 
-        static std::string const RoutineName("CheckCurveLimitsForStandardRatings: "); // Include trailing blank space
+        static constexpr std::string_view RoutineName("CheckCurveLimitsForStandardRatings: "); // Include trailing blank space
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -2844,7 +2844,7 @@ namespace StandardRatings {
                                       "Output:Diagnostics, DisplayExtraWarnings for further guidance.");
 
                     if (state.dataGlobal->DisplayExtraWarnings) {
-                        ShowContinueError(state, RoutineName + "The max and/or min limits specified in the corresponding curve objects");
+                        ShowContinueError(state, std::string{RoutineName} + "The max and/or min limits specified in the corresponding curve objects");
                         ShowContinueError(
                             state, " do not include the AHRI test conditions required to calculate one or more of the Standard Rating values.");
                     }
@@ -3030,7 +3030,7 @@ namespace StandardRatings {
                                       " Review the Standard Ratings calculations in the Engineering Reference for this coil type. Also, use "
                                       "Output:Diagnostics, DisplayExtraWarnings for further guidance.");
                     if (state.dataGlobal->DisplayExtraWarnings) {
-                        ShowContinueError(state, RoutineName + "The max and/or min limits specified in the corresponding curve objects");
+                        ShowContinueError(state, std::string{RoutineName} + "The max and/or min limits specified in the corresponding curve objects");
                         ShowContinueError(
                             state, " do not include the AHRI test conditions required to calculate one or more of the Standard Rating values.");
                     }
@@ -3101,7 +3101,7 @@ namespace StandardRatings {
                                       "Output:Diagnostics, DisplayExtraWarnings for further guidance.");
 
                     if (state.dataGlobal->DisplayExtraWarnings) {
-                        ShowContinueError(state, RoutineName + "The max and/or min limits specified in the corresponding curve objects");
+                        ShowContinueError(state, std::string{RoutineName} + "The max and/or min limits specified in the corresponding curve objects");
                         ShowContinueError(
                             state, " do not include the AHRI test conditions required to calculate one or more of the Standard Rating values.");
                     }
@@ -3228,7 +3228,7 @@ namespace StandardRatings {
                                       "Output:Diagnostics, DisplayExtraWarnings for further guidance.");
 
                     if (state.dataGlobal->DisplayExtraWarnings) {
-                        ShowContinueError(state, RoutineName + "The max and/or min limits specified in the corresponding curve objects");
+                        ShowContinueError(state, std::string{RoutineName} + "The max and/or min limits specified in the corresponding curve objects");
                         ShowContinueError(
                             state, " do not include the AHRI test conditions required to calculate one or more of the Standard Rating values.");
                     }

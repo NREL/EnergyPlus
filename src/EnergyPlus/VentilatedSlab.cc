@@ -1484,7 +1484,7 @@ namespace VentilatedSlab {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitVentilatedSlab");
+        static constexpr std::string_view RoutineName("InitVentilatedSlab");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1853,7 +1853,7 @@ namespace VentilatedSlab {
         using SteamCoils::GetCoilSteamOutletNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeVentilatedSlab");
+        static constexpr std::string_view RoutineName("SizeVentilatedSlab");
 
         auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
         auto &CurZoneEqNum(state.dataSize->CurZoneEqNum);

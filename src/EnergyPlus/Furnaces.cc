@@ -180,7 +180,7 @@ namespace Furnaces {
 
     // Data
     // MODULE PARAMETER DEFINITIONS
-    static std::string const BlankString;
+    static constexpr std::string_view BlankString;
 
     auto constexpr fluidNameSteam("STEAM");
 
@@ -214,7 +214,7 @@ namespace Furnaces {
     // Functions
 
     void SimFurnace(EnergyPlusData &state,
-                    std::string const &FurnaceName,
+                    std::string_view FurnaceName,
                     bool const FirstHVACIteration,
                     int const AirLoopNum, // Primary air loop number
                     int &CompIndex        // Pointer to which furnace
@@ -276,7 +276,7 @@ namespace Furnaces {
         if (CompIndex == 0) {
             FurnaceNum = UtilityRoutines::FindItemInList(FurnaceName, state.dataFurnaces->Furnace);
             if (FurnaceNum == 0) {
-                ShowFatalError(state, "SimFurnace: Unit not found=" + FurnaceName);
+                ShowFatalError(state, "SimFurnace: Unit not found=" + std::string{FurnaceName});
             }
             CompIndex = FurnaceNum;
         } else {

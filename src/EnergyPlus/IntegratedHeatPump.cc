@@ -72,7 +72,7 @@ namespace EnergyPlus::IntegratedHeatPump {
 using namespace DataLoopNode;
 
 void SimIHP(EnergyPlusData &state,
-            std::string const &CompName,   // Coil Name
+            std::string_view CompName,     // Coil Name
             int &CompIndex,                // Index for Component name
             int const CyclingScheme,       // Continuous fan OR cycling compressor
             Real64 &MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
@@ -117,7 +117,7 @@ void SimIHP(EnergyPlusData &state,
     if (CompIndex == 0) {
         DXCoilNum = UtilityRoutines::FindItemInList(CompName, state.dataIntegratedHP->IntegratedHeatPumps);
         if (DXCoilNum == 0) {
-            ShowFatalError(state, "Integrated Heat Pump not found=" + CompName);
+            ShowFatalError(state, "Integrated Heat Pump not found=" + std::string{CompName});
         }
         CompIndex = DXCoilNum;
     } else {
@@ -1158,7 +1158,7 @@ void GetIHPInput(EnergyPlusData &state)
     using VariableSpeedCoils::GetCoilIndexVariableSpeed;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("GetIHPInput: "); // include trailing blank space
+    static constexpr std::string_view RoutineName("GetIHPInput: "); // include trailing blank space
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int DXCoilNum; // No of IHP DX system
@@ -1969,7 +1969,9 @@ void GetIHPInput(EnergyPlusData &state)
     }
 
     if (ErrorsFound) {
-        ShowFatalError(state, RoutineName + "Errors found in getting " + CurrentModuleObject + " input.  Preceding condition(s) causes termination.");
+        ShowFatalError(state,
+                       std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject +
+                           " input.  Preceding condition(s) causes termination.");
     } else {
         // set up output variables, not reported in the individual coil models
 

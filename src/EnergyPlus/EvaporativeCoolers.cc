@@ -116,7 +116,7 @@ using namespace ScheduleManager;
 using namespace Psychrometrics;
 using namespace DataGlobalConstants;
 
-void SimEvapCooler(EnergyPlusData &state, std::string const &CompName, int &CompIndex, Real64 const ZoneEvapCoolerPLR)
+void SimEvapCooler(EnergyPlusData &state, std::string_view CompName, int &CompIndex, Real64 const ZoneEvapCoolerPLR)
 {
 
     // SUBROUTINE INFORMATION:
@@ -145,7 +145,7 @@ void SimEvapCooler(EnergyPlusData &state, std::string const &CompName, int &Comp
     if (CompIndex == 0) {
         EvapCoolNum = UtilityRoutines::FindItemInList(CompName, EvapCond, &EvapConditions::EvapCoolerName);
         if (EvapCoolNum == 0) {
-            ShowFatalError(state, "SimEvapCooler: Unit not found=" + CompName);
+            ShowFatalError(state, "SimEvapCooler: Unit not found=" + std::string{CompName});
         }
         CompIndex = EvapCoolNum;
     } else {
@@ -3583,7 +3583,7 @@ void ReportEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
 //***************
 
 void SimZoneEvaporativeCoolerUnit(EnergyPlusData &state,
-                                  std::string const &CompName,    // name of the packaged terminal heat pump
+                                  std::string_view CompName,      // name of the packaged terminal heat pump
                                   int const ZoneNum,              // number of zone being served
                                   Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
                                   Real64 &LatentOutputProvided,   // Latent add/removal  (kg/s), dehumid = negative
@@ -3669,7 +3669,7 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
     using NodeInputManager::GetOnlySingleNode;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("GetInputZoneEvaporativeCoolerUnit: ");
+    static constexpr std::string_view RoutineName("GetInputZoneEvaporativeCoolerUnit: ");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     std::string CurrentModuleObject; // Object type for getting and error messages
@@ -4020,7 +4020,7 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
     lNumericBlanks.deallocate();
 
     if (ErrorsFound) {
-        ShowFatalError(state, RoutineName + "Errors found in getting input.");
+        ShowFatalError(state, std::string{RoutineName} + "Errors found in getting input.");
         ShowContinueError(state, "... Preceding condition causes termination.");
     }
 
@@ -4301,7 +4301,7 @@ void SizeZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) // 
     using DataSizing::AutoSize;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("SizeZoneEvaporativeCoolerUnit: "); // include trailing blank space
+    static constexpr std::string_view RoutineName("SizeZoneEvaporativeCoolerUnit: "); // include trailing blank space
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     std::string CompName;     // component name

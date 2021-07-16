@@ -54,11 +54,11 @@
 #include <unordered_map>
 
 // Third Party Headers
+#include <GSL/span.h>
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Optional.hh>
 #include <ObjexxFCL/Reference.hh>
-#include <GSL/span.h>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
@@ -76,7 +76,8 @@ struct EnergyPlusData;
 namespace OutputProcessor {
 
     // TODO: Move this general purpose routine to UtilityRoutines or something
-    inline unsigned int getEnumerationIndex(std::string_view s, gsl::span<std::string_view> sList) {
+    inline unsigned int getEnumerationIndex(std::string_view s, gsl::span<std::string_view> sList)
+    {
         for (unsigned int i = 0; i < sList.size(); ++i) {
             if (sList[i] == s) return i;
         }
@@ -250,21 +251,21 @@ namespace OutputProcessor {
 
     enum class StoreType
     {
-        Invalid = -1,
-        Averaged, // Type value for "averaged" variables
-        Summed,        // Type value for "summed" variables
-        Num
+        Invalid = 0,  // These are one based, even on some output things...sheesh
+        Averaged = 1, // Type value for "averaged" variables
+        Summed = 2,   // Type value for "summed" variables
+        Num = 3
     };
-    constexpr std::array<std::string_view, (unsigned int)StoreType::Num> storeTypeStrings = {"Average", "Sum"};
+    constexpr std::array<std::string_view, (unsigned int)StoreType::Num> storeTypeStrings = {"Invalid", "Average", "Sum"};
 
     enum class TimeStepType
     {
-        Invalid = -1,
-        TimeStepZone,   // Type value for "zone" timestep variables
-        TimeStepSystem, // Type value for "system" timestep variables
-        Num
+        Invalid = 0,        // These are one based, even on some output things...sheesh
+        TimeStepZone = 1,   // Type value for "zone" timestep variables
+        TimeStepSystem = 2, // Type value for "system" timestep variables
+        Num = 3
     };
-    constexpr std::array<std::string_view, (unsigned int)TimeStepType::Num> timeStepTypeStrings = {"Zone", "HVAC System"};
+    constexpr std::array<std::string_view, (unsigned int)TimeStepType::Num> timeStepTypeStrings = {"Invalid", "Zone", "HVAC System"};
 
     struct TimeSteps
     {

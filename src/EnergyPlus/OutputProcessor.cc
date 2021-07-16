@@ -651,8 +651,8 @@ namespace OutputProcessor {
         // First check environment variable to see of possible override for minimum reporting frequency
         if (!state.dataSysVars->MinReportFrequency.empty()) {
             // Formats
-            static constexpr auto Format_800("! <Minimum Reporting Frequency (overriding input value)>, Value, Input Value\n");
-            static constexpr auto Format_801(" Minimum Reporting Frequency, {},{}\n");
+            static constexpr fmt::string_view Format_800("! <Minimum Reporting Frequency (overriding input value)>, Value, Input Value\n");
+            static constexpr fmt::string_view Format_801(" Minimum Reporting Frequency, {},{}\n");
             op->minimumReportFrequency = determineFrequency(state, state.dataSysVars->MinReportFrequency);
             print(state.files.eio, Format_800);
             print(
@@ -746,9 +746,9 @@ namespace OutputProcessor {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr auto DayFormat("{},{:2},{:2}");
-        static constexpr auto MonthFormat("{},{:2},{:2},{:2}");
-        static constexpr auto EnvrnFormat("{},{:2},{:2},{:2},{:2}");
+        static constexpr fmt::string_view DayFormat("{},{:2},{:2}");
+        static constexpr fmt::string_view MonthFormat("{},{:2},{:2},{:2}");
+        static constexpr fmt::string_view EnvrnFormat("{},{:2},{:2},{:2},{:2}");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -783,10 +783,6 @@ namespace OutputProcessor {
 
         String = StrOut;
     }
-
-    // *****************************************************************************
-    // The following routines implement Energy Meters in EnergyPlus.
-    // *****************************************************************************
 
     void InitializeMeters(EnergyPlusData &state)
     {
@@ -3408,7 +3404,7 @@ namespace OutputProcessor {
 
         if (codedDate == 0) return "-";
 
-        static constexpr auto DateFmt("{:02}-{:3}-{:02}:{:02}");
+        static constexpr fmt::string_view DateFmt("{:02}-{:3}-{:02}:{:02}");
 
         // ((month*100 + day)*100 + hour)*100 + minute
         int Month;  // month in integer format (1-12)
@@ -3998,11 +3994,11 @@ namespace OutputProcessor {
             const auto out = [&](InputOutputFile &of) {
                 if (of.good()) {
                     if (cumulativeMeterFlag) {
-                        static constexpr auto fmt{"{},{},Cumulative {} [{}]{}\n"};
+                        static constexpr fmt::string_view fmt{"{},{},Cumulative {} [{}]{}\n"};
                         const auto lenString = index(FreqString, '[');
                         print(of, fmt, reportIDChr, 1, meterName, UnitsString, FreqString.substr(0, lenString));
                     } else {
-                        static constexpr auto fmt{"{},{},{} [{}]{}\n"};
+                        static constexpr fmt::string_view fmt{"{},{},{} [{}]{}\n"};
                         print(of, fmt, reportIDChr, frequency, meterName, UnitsString, FreqString);
                     }
                 }
@@ -4032,9 +4028,9 @@ namespace OutputProcessor {
             break;
         }
 
-        static std::string const keyedValueStringCum("Cumulative ");
-        static std::string const keyedValueStringNon;
-        std::string const &keyedValueString(cumulativeMeterFlag ? keyedValueStringCum : keyedValueStringNon);
+        static constexpr std::string_view keyedValueStringCum("Cumulative ");
+        static constexpr std::string_view keyedValueStringNon;
+        std::string_view const keyedValueString(cumulativeMeterFlag ? keyedValueStringCum : keyedValueStringNon);
 
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(reportID,
@@ -5156,7 +5152,7 @@ void SetupOutputVariable(EnergyPlusData &state,
             } else {
                 EndUseSub = "";
                 if (present(EndUseKey)) {
-                    if (std::find(endUseCategoryNames.begin(), endUseCategoryNames.end(), UtilityRoutines::MakeUPPERCase(EndUseKey)) !=
+                    if (std::find(endUseCategoryNames.begin(), endUseCategoryNames.end(), UtilityRoutines::MakeUPPERCase(AsString(EndUseKey))) !=
                         endUseCategoryNames.end()) {
                         EndUseSub = "General";
                     }
@@ -8296,7 +8292,12 @@ void ProduceRDDMDD(EnergyPlusData &state)
                       VariableNames(Item),
                       unitStringFromDDitem(state, ItemPtr),
                       '\n');
-                state.dataResultsFramework->resultsFramework->RDD.push_back(format("{},{},{}{}", timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).timeStepType], timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],VariableNames(Item), unitStringFromDDitem(state, ItemPtr)));
+                state.dataResultsFramework->resultsFramework->RDD.push_back(
+                    format("{},{},{}{}",
+                           timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).timeStepType],
+                           timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
+                           VariableNames(Item),
+                           unitStringFromDDitem(state, ItemPtr)));
                 op->DDVariableTypes(ItemPtr).ReportedOnDDFile = true;
                 while (op->DDVariableTypes(ItemPtr).Next != 0) {
                     if (SortByName) {
@@ -8311,7 +8312,12 @@ void ProduceRDDMDD(EnergyPlusData &state)
                           VariableNames(Item),
                           unitStringFromDDitem(state, ItemPtr),
                           '\n');
-                    state.dataResultsFramework->resultsFramework->RDD.push_back(format("{},{},{}{}", timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).timeStepType], timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType], VariableNames(Item), unitStringFromDDitem(state, ItemPtr)));
+                    state.dataResultsFramework->resultsFramework->RDD.push_back(
+                        format("{},{},{}{}",
+                               timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).timeStepType],
+                               timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
+                               VariableNames(Item),
+                               unitStringFromDDitem(state, ItemPtr)));
                     op->DDVariableTypes(ItemPtr).ReportedOnDDFile = true;
                 }
             }
@@ -8325,7 +8331,12 @@ void ProduceRDDMDD(EnergyPlusData &state)
                       timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
                       unitStringFromDDitem(state, ItemPtr),
                       '\n');
-                state.dataResultsFramework->resultsFramework->RDD.push_back(format("{},{},{}{}", timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).timeStepType], timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType], VariableNames(Item), unitStringFromDDitem(state, ItemPtr)));
+                state.dataResultsFramework->resultsFramework->RDD.push_back(
+                    format("{},{},{}{}",
+                           timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).timeStepType],
+                           timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
+                           VariableNames(Item),
+                           unitStringFromDDitem(state, ItemPtr)));
                 op->DDVariableTypes(ItemPtr).ReportedOnDDFile = true;
                 while (op->DDVariableTypes(ItemPtr).Next != 0) {
                     if (SortByName) {
@@ -8340,7 +8351,12 @@ void ProduceRDDMDD(EnergyPlusData &state)
                           timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
                           unitStringFromDDitem(state, ItemPtr),
                           '\n');
-                    state.dataResultsFramework->resultsFramework->RDD.push_back(format("{},{},{}{}", timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).timeStepType], timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType], VariableNames(Item), unitStringFromDDitem(state, ItemPtr)));
+                    state.dataResultsFramework->resultsFramework->RDD.push_back(
+                        format("{},{},{}{}",
+                               timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).timeStepType],
+                               timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
+                               VariableNames(Item),
+                               unitStringFromDDitem(state, ItemPtr)));
                     op->DDVariableTypes(ItemPtr).ReportedOnDDFile = true;
                 }
             }
