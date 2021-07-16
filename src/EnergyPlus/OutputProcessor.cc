@@ -8288,14 +8288,14 @@ void ProduceRDDMDD(EnergyPlusData &state)
                 print(state.files.rdd,
                       "{},{},{}{}{}",
                       timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).timeStepType],
-                      timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
+                      storeTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
                       VariableNames(Item),
                       unitStringFromDDitem(state, ItemPtr),
                       '\n');
                 state.dataResultsFramework->resultsFramework->RDD.push_back(
                     format("{},{},{}{}",
                            timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).timeStepType],
-                           timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
+                           storeTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
                            VariableNames(Item),
                            unitStringFromDDitem(state, ItemPtr)));
                 op->DDVariableTypes(ItemPtr).ReportedOnDDFile = true;
@@ -8308,14 +8308,14 @@ void ProduceRDDMDD(EnergyPlusData &state)
                     print(state.files.rdd,
                           "{},{},{}{}{}",
                           timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).timeStepType],
-                          timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
+                          storeTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
                           VariableNames(Item),
                           unitStringFromDDitem(state, ItemPtr),
                           '\n');
                     state.dataResultsFramework->resultsFramework->RDD.push_back(
                         format("{},{},{}{}",
                                timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).timeStepType],
-                               timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
+                               storeTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
                                VariableNames(Item),
                                unitStringFromDDitem(state, ItemPtr)));
                     op->DDVariableTypes(ItemPtr).ReportedOnDDFile = true;
@@ -8328,13 +8328,13 @@ void ProduceRDDMDD(EnergyPlusData &state)
                       "Output:Variable,*,{},hourly; !- {} {}{}{}",
                       VariableNames(Item),
                       timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).timeStepType],
-                      timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
+                      storeTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
                       unitStringFromDDitem(state, ItemPtr),
                       '\n');
                 state.dataResultsFramework->resultsFramework->RDD.push_back(
                     format("{},{},{}{}",
                            timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).timeStepType],
-                           timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
+                           storeTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
                            VariableNames(Item),
                            unitStringFromDDitem(state, ItemPtr)));
                 op->DDVariableTypes(ItemPtr).ReportedOnDDFile = true;
@@ -8348,13 +8348,13 @@ void ProduceRDDMDD(EnergyPlusData &state)
                           "Output:Variable,*,{},hourly; !- {} {}{}{}",
                           VariableNames(Item),
                           timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).timeStepType],
-                          timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
+                          storeTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
                           unitStringFromDDitem(state, ItemPtr),
                           '\n');
                     state.dataResultsFramework->resultsFramework->RDD.push_back(
                         format("{},{},{}{}",
                                timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).timeStepType],
-                               timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
+                               storeTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
                                VariableNames(Item),
                                unitStringFromDDitem(state, ItemPtr)));
                     op->DDVariableTypes(ItemPtr).ReportedOnDDFile = true;
