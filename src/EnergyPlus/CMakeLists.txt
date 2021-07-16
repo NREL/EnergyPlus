@@ -144,6 +144,7 @@ set(SRC
     Construction.hh
     ConvectionCoefficients.cc
     ConvectionCoefficients.hh
+    ConvectionConstants.hh
     CoolTower.cc
     CoolTower.hh
     CostEstimateManager.cc

@@ -843,7 +843,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
                                   const Array1D_int &SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
                                   Real64 const VentArea,         // Area available for venting the gap [m2]
                                   Real64 const Cv,               // Orifice coefficient for volume-based discharge, wind-driven [--]
-                                  Real64 const Cd,               // Orifice coefficient for discharge,  bouyancy-driven [--]
+                                  Real64 const Cd,               // Orifice coefficient for discharge,  buoyancy-driven [--]
                                   Real64 const HdeltaNPL,        // Height difference from neutral pressure level [m]
                                   Real64 const SolAbs,           // solar absorptivity of baffle [--]
                                   Real64 const AbsExt,           // thermal absorptance/emittance of baffle material [--]
@@ -859,7 +859,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
                                   Optional<Real64> IscRpt,
                                   Optional<Real64> MdotVentRpt,
                                   Optional<Real64> VdotWindRpt,
-                                  Optional<Real64> VdotBouyRpt)
+                                  Optional<Real64> VdotBuoyRpt)
 {
 
     // SUBROUTINE INFORMATION:
@@ -874,7 +874,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
 
     // METHODOLOGY EMPLOYED:
     // Heat balances on baffle and air space.
-    // Natural ventilation calculations use bouyancy and wind.
+    // Natural ventilation calculations use buoyancy and wind.
 
     // REFERENCES:
     // Nat. Vent. equations from ASHRAE HoF 2001 Chapt. 26
@@ -932,7 +932,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     Real64 TmeanK;                // average of surface temps , for Beta in Grashoff no.
     Real64 Gr;                    // Grasshof number for natural convection calc
     Real64 VdotWind;              // volume flow rate of nat. vent due to wind
-    Real64 VdotThermal;           // Volume flow rate of nat. vent due to bouyancy
+    Real64 VdotThermal;           // Volume flow rate of nat. vent due to buoyancy
     Real64 VdotVent;              // total volume flow rate of nat vent
     Real64 MdotVent;              // total mass flow rate of nat vent
     Real64 NuPlen;                // Nusselt No. for plenum Gap
@@ -1070,7 +1070,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
         VdotThermal = 0.0;
     } else {
         if ((std::abs(Tilt) < 5.0) || (std::abs(Tilt - 180.0) < 5.0)) {
-            VdotThermal = 0.0; // stable bouyancy situation
+            VdotThermal = 0.0; // stable buoyancy situation
         } else {
             VdotThermal = Cd * (VentArea / 2.0) * std::sqrt(2.0 * g * HdeltaNPL * (Tamb - TaGap) / (Tamb + DataGlobalConstants::KelvinConv));
         }
@@ -1097,7 +1097,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     if (present(IscRpt)) IscRpt = Isc;
     if (present(MdotVentRpt)) MdotVentRpt = MdotVent;
     if (present(VdotWindRpt)) VdotWindRpt = VdotWind;
-    if (present(VdotBouyRpt)) VdotBouyRpt = VdotThermal;
+    if (present(VdotBuoyRpt)) VdotBuoyRpt = VdotThermal;
 }
 
 //****************************************************************************
