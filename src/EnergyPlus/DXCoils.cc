@@ -9637,17 +9637,18 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
         //    NTU = A0/(m*cp). Relationship models the cooling coil as a heat exchanger with Cmin/Cmax = 0.
 
         RatedCBF = state.dataDXCoils->DXCoil(DXCoilNum).RatedCBF(Mode);
-        if (RatedCBF > 0.0) {
-            A0 = -std::log(RatedCBF) * state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(Mode);
+        // if (RatedCBF > 0.0) {
+        if (RatedCBF >= 0.0) {                                                                                  // temporary patch
+            A0 = -std::log(RatedCBF + 1e-60) * state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(Mode); // temporary patch
         } else {
             A0 = 0.0;
         }
         ADiff = -A0 / AirMassFlow;
-        if (ADiff >= DataPrecisionGlobals::EXP_LowerLimit) {
-            CBF = std::exp(ADiff);
-        } else {
-            CBF = 0.0;
-        }
+        // if (ADiff >= DataPrecisionGlobals::EXP_LowerLimit) { //temporary patch
+        CBF = std::exp(ADiff);
+        //} else {   //temporary patch
+        //    CBF = 0.0; //temporary patch
+        //}
 
         //   check boundary for low ambient temperature and post warnings to individual DX coil buffers to print at end of time step
         if (state.dataDXCoils->DXCoil(DXCoilNum).CondenserType(Mode) == DataHeatBalance::RefrigCondenserType::Air) {
@@ -12346,6 +12347,10 @@ Real64 CalcCBF(EnergyPlusData &state,
         InletAirEnthalpy = PsyHFnTdbW(InletAirTemp, InletAirHumRat);
         OutletAirEnthalpy = PsyHFnTdbW(OutletAirTemp, OutletAirHumRat);
         ADPEnthalpy = PsyHFnTdbW(ADPTemp, ADPHumRat);
+        if (ADPTemp > OutletAirTemp) {
+            OutletAirTemp = ADPTemp;
+            OutletAirEnthalpy = PsyHFnTdbW(OutletAirTemp, OutletAirHumRat);
+        } // temporary patch
         CBF = min(1.0, (OutletAirEnthalpy - ADPEnthalpy) / (InletAirEnthalpy - ADPEnthalpy));
         if (Iter > IterMax && PrintFlag) {
             ShowSevereError(state, UnitType + " \"" + UnitName + "\" -- coil bypass factor calculation did not converge after max iterations.");
@@ -17185,8 +17190,10 @@ void CalcVRFCoolingCoil_FluidTCtrl(EnergyPlusData &state,
         // New VRF_FluidTCtrl model implements VAV fan which can vary air flow rate during simulation
 
         RatedCBF = state.dataDXCoils->DXCoil(DXCoilNum).RatedCBF(Mode);
-        if (RatedCBF > 0.0) {
-            A0 = -std::log(RatedCBF) * state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(Mode);
+        // if (RatedCBF > 0.0) {
+        //    A0 = -std::log(RatedCBF) * state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(Mode);
+        if (RatedCBF >= 0.0) {
+            A0 = -std::log(RatedCBF + 1e-60) * state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(Mode);
         } else {
             A0 = 0.0;
         }
