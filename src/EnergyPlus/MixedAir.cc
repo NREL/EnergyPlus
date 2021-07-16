@@ -3666,8 +3666,9 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
     if (AirLoopNum > 0) {
         auto &curAirLoopFlow(state.dataAirLoop->AirLoopFlow(AirLoopNum));
 
-        if (curAirLoopFlow.DesSupply >= SmallAirVolFlow) {
+        if ((curAirLoopFlow.DesSupply >= SmallAirVolFlow) && (this->MinOAMassFlowRate > 0.0)) {
             OutAirMinFrac = this->MinOAMassFlowRate / curAirLoopFlow.DesSupply;
+            this->OALimitingFactor = limitFactorLimits;
         } else {
             OutAirMinFrac = 0.0;
         }
@@ -3682,7 +3683,6 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
         MinOASchedVal = GetCurrentScheduleValue(state, this->MinOASchPtr);
         MinOASchedVal = min(max(MinOASchedVal, 0.0), 1.0);
         OutAirMinFrac *= MinOASchedVal;
-        this->OALimitingFactor = limitFactorLimits;
     }
 
     // Get mechanical ventilation
