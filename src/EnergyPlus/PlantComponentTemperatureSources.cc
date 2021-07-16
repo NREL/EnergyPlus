@@ -127,8 +127,6 @@ namespace PlantComponentTemperatureSources {
 
         static std::string const RoutineName("InitWaterSource");
 
-        this->oneTimeInit(state);
-
         // Initialize critical Demand Side Variables at the beginning of each environment
         if (this->MyEnvironFlag && state.dataGlobal->BeginEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
 
@@ -428,33 +426,33 @@ namespace PlantComponentTemperatureSources {
         this->initialize(state, myLoad);
         this->autosize(state);
     }
-    void WaterSourceSpecs::oneTimeInit(EnergyPlusData &state)
+    void WaterSourceSpecs::oneTimeInit_new(EnergyPlusData &state)
     {
         static std::string const RoutineName("InitWaterSource");
 
-        if (this->MyFlag) {
-            // setup output variables once here
-            this->setupOutputVars(state);
-            // Locate the component on the plant loops for later usage
-            bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    DataPlant::TypeOf_WaterSource,
-                                                    this->Location.loopNum,
-                                                    this->Location.loopSideNum,
-                                                    this->Location.branchNum,
-                                                    this->Location.compNum,
-                                                    errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    this->InletNodeNum,
-                                                    _);
-            if (errFlag) {
-                ShowFatalError(state, RoutineName + ": Program terminated due to previous condition(s).");
-            }
-            this->MyFlag = false;
+        // setup output variables once here
+        this->setupOutputVars(state);
+        // Locate the component on the plant loops for later usage
+        bool errFlag = false;
+        PlantUtilities::ScanPlantLoopsForObject(state,
+                                                this->Name,
+                                                DataPlant::TypeOf_WaterSource,
+                                                this->Location.loopNum,
+                                                this->Location.loopSideNum,
+                                                this->Location.branchNum,
+                                                this->Location.compNum,
+                                                errFlag,
+                                                _,
+                                                _,
+                                                _,
+                                                this->InletNodeNum,
+                                                _);
+        if (errFlag) {
+            ShowFatalError(state, RoutineName + ": Program terminated due to previous condition(s).");
         }
+    }
+    void WaterSourceSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+    {
     }
 
     void GetWaterSourceInput(EnergyPlusData &state)
