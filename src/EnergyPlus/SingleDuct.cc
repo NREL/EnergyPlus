@@ -4262,7 +4262,7 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
 void SingleDuctAirTerminal::CalcOAMassFlow(EnergyPlusData &state,
                                            Real64 &SAMassFlow,   // outside air based on optional user input
                                            Real64 &AirLoopOAFrac // outside air based on optional user input
-                                           ) const
+) const
 {
 
     // FUNCTION INFORMATION:
