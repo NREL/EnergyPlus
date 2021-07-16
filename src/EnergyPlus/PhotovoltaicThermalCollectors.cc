@@ -428,16 +428,21 @@ namespace PhotovoltaicThermalCollectors {
 
     void PVTCollectorStruct::setupReportVars(EnergyPlusData &state)
     {
-        SetupOutputVariable(
-            state, "Generator Produced Thermal Rate", OutputProcessor::Unit::W, this->Report.ThermPower, "System", "Average", this->Name);
+        SetupOutputVariable(state,
+                            "Generator Produced Thermal Rate",
+                            OutputProcessor::Unit::W,
+                            this->Report.ThermPower,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Averaged,
+                            this->Name);
 
         if (this->WorkingFluidType == WorkingFluidEnum::LIQUID) {
             SetupOutputVariable(state,
                                 "Generator Produced Thermal Energy",
                                 OutputProcessor::Unit::J,
                                 this->Report.ThermEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 this->Name,
                                 _,
                                 "SolarWater",
@@ -450,8 +455,8 @@ namespace PhotovoltaicThermalCollectors {
                                 "Generator Produced Thermal Energy",
                                 OutputProcessor::Unit::J,
                                 this->Report.ThermEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 this->Name,
                                 _,
                                 "SolarAir",
@@ -459,23 +464,38 @@ namespace PhotovoltaicThermalCollectors {
                                 _,
                                 "System");
 
-            SetupOutputVariable(
-                state, "Generator PVT Fluid Bypass Status", OutputProcessor::Unit::None, this->Report.BypassStatus, "System", "Average", this->Name);
+            SetupOutputVariable(state,
+                                "Generator PVT Fluid Bypass Status",
+                                OutputProcessor::Unit::None,
+                                this->Report.BypassStatus,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Averaged,
+                                this->Name);
         }
 
-        SetupOutputVariable(
-            state, "Generator PVT Fluid Inlet Temperature", OutputProcessor::Unit::C, this->Report.TinletWorkFluid, "System", "Average", this->Name);
+        SetupOutputVariable(state,
+                            "Generator PVT Fluid Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->Report.TinletWorkFluid,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Averaged,
+                            this->Name);
 
         SetupOutputVariable(state,
                             "Generator PVT Fluid Outlet Temperature",
                             OutputProcessor::Unit::C,
                             this->Report.ToutletWorkFluid,
-                            "System",
-                            "Average",
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Averaged,
                             this->Name);
 
-        SetupOutputVariable(
-            state, "Generator PVT Fluid Mass Flow Rate", OutputProcessor::Unit::kg_s, this->Report.MdotWorkFluid, "System", "Average", this->Name);
+        SetupOutputVariable(state,
+                            "Generator PVT Fluid Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->Report.MdotWorkFluid,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Averaged,
+                            this->Name);
     }
 
     void PVTCollectorStruct::initialize(EnergyPlusData &state, bool const FirstHVACIteration)

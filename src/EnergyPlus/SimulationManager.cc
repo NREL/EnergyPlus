@@ -270,8 +270,9 @@ namespace SimulationManager {
         SetPredefinedTables(state);
         SetPreConstructionInputParameters(state); // establish array bounds for constructions early
 
-        SetupTimePointers(state, "Zone", state.dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-        SetupTimePointers(state, "HVAC", TimeStepSys);
+        SetupTimePointers(
+            state, OutputProcessor::TimeStepType::TimeStepZone, state.dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+        SetupTimePointers(state, OutputProcessor::TimeStepType::TimeStepSystem, TimeStepSys);
 
         CheckIfAnyEMS(state);
         CheckIfAnyPlant(state);

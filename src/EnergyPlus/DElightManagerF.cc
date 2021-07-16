@@ -633,8 +633,8 @@ namespace DElightManagerF {
                                                         "Daylighting Reference Point Illuminance",
                                                         OutputProcessor::Unit::lux,
                                                         znDayl.DaylIllumAtRefPt(refPt.indexToFracAndIllum),
-                                                        "Zone",
-                                                        "Average",
+                                                        OutputProcessor::TimeStepType::TimeStepZone,
+                                                        OutputProcessor::StoreType::Averaged,
                                                         refPt.Name);
                                 } else {
                                     print(delightInFile,

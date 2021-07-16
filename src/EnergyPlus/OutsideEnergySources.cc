@@ -496,23 +496,50 @@ void OutsideEnergySourceSpecs::oneTimeInit(EnergyPlusData &state)
                             reportVarPrefix + hotOrChilled + "Water Energy",
                             OutputProcessor::Unit::J,
                             this->EnergyTransfer,
-                            "System",
-                            "Sum",
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Summed,
                             this->Name,
                             _,
                             typeName,
                             heatingOrCooling,
                             _,
                             "Plant");
-        SetupOutputVariable(
-            state, reportVarPrefix + hotOrChilled + "Water Rate", OutputProcessor::Unit::W, this->EnergyRate, "System", "Average", this->Name);
+        SetupOutputVariable(state,
+                            reportVarPrefix + hotOrChilled + "Water Rate",
+                            OutputProcessor::Unit::W,
+                            this->EnergyRate,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Averaged,
+                            this->Name);
 
-        SetupOutputVariable(state, reportVarPrefix + "Rate", OutputProcessor::Unit::W, this->EnergyRate, "System", "Average", this->Name);
-        SetupOutputVariable(state, reportVarPrefix + "Inlet Temperature", OutputProcessor::Unit::C, this->InletTemp, "System", "Average", this->Name);
-        SetupOutputVariable(
-            state, reportVarPrefix + "Outlet Temperature", OutputProcessor::Unit::C, this->OutletTemp, "System", "Average", this->Name);
-        SetupOutputVariable(
-            state, reportVarPrefix + "Mass Flow Rate", OutputProcessor::Unit::kg_s, this->MassFlowRate, "System", "Average", this->Name);
+        SetupOutputVariable(state,
+                            reportVarPrefix + "Rate",
+                            OutputProcessor::Unit::W,
+                            this->EnergyRate,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Averaged,
+                            this->Name);
+        SetupOutputVariable(state,
+                            reportVarPrefix + "Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->InletTemp,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Averaged,
+                            this->Name);
+        SetupOutputVariable(state,
+                            reportVarPrefix + "Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->OutletTemp,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Averaged,
+                            this->Name);
+        SetupOutputVariable(state,
+                            reportVarPrefix + "Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->MassFlowRate,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Averaged,
+                            this->Name);
     }
 }
 

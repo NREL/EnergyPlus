@@ -4976,8 +4976,8 @@ namespace ScheduleManager {
                                     "Schedule Value",
                                     OutputProcessor::Unit::None,
                                     state.dataScheduleMgr->Schedule(ScheduleIndex).CurrentValue,
-                                    "Zone",
-                                    "Average",
+                                    OutputProcessor::TimeStepType::TimeStepZone,
+                                    OutputProcessor::StoreType::Averaged,
                                     state.dataScheduleMgr->Schedule(ScheduleIndex).Name);
             }
             state.dataScheduleMgr->DoScheduleReportingSetup = false;

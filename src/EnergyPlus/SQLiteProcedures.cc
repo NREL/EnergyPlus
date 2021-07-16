@@ -1399,7 +1399,7 @@ void SQLite::createSQLiteReportDictionaryRecord(int const reportVariableReportID
     if (m_writeOutputToSQLite) {
         sqliteBindInteger(m_reportDictionaryInsertStmt, 1, reportVariableReportID);
         sqliteBindLogical(m_reportDictionaryInsertStmt, 2, isMeter);
-        sqliteBindText(m_reportDictionaryInsertStmt, 3, storageType(storeTypeIndex));
+        sqliteBindText(m_reportDictionaryInsertStmt, 3, storageType(storeTypeIndex)); // TODO: Should just use OP::storeTypeStrings
         sqliteBindText(m_reportDictionaryInsertStmt, 4, indexGroup);
         sqliteBindText(m_reportDictionaryInsertStmt, 5, timestepTypeName(indexType));
         sqliteBindText(m_reportDictionaryInsertStmt, 6, keyedValueString);

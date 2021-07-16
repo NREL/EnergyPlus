@@ -508,68 +508,121 @@ void GetBLASTAbsorberInput(EnergyPlusData &state)
 
 void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
 {
-    SetupOutputVariable(state, "Chiller Electricity Rate", OutputProcessor::Unit::W, this->Report.PumpingPower, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Chiller Electricity Rate",
+                        OutputProcessor::Unit::W,
+                        this->Report.PumpingPower,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
+                        this->Name);
     SetupOutputVariable(state,
                         "Chiller Electricity Energy",
                         OutputProcessor::Unit::J,
                         this->Report.PumpingEnergy,
-                        "System",
-                        "Sum",
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Summed,
                         this->Name,
                         _,
                         "ELECTRICITY",
                         "Cooling",
                         _,
                         "Plant");
-    SetupOutputVariable(state, "Chiller Evaporator Cooling Rate", OutputProcessor::Unit::W, this->Report.QEvap, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Chiller Evaporator Cooling Rate",
+                        OutputProcessor::Unit::W,
+                        this->Report.QEvap,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
+                        this->Name);
     SetupOutputVariable(state,
                         "Chiller Evaporator Cooling Energy",
                         OutputProcessor::Unit::J,
                         this->Report.EvapEnergy,
-                        "System",
-                        "Sum",
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Summed,
                         this->Name,
                         _,
                         "ENERGYTRANSFER",
                         "CHILLERS",
                         _,
                         "Plant");
-    SetupOutputVariable(
-        state, "Chiller Evaporator Inlet Temperature", OutputProcessor::Unit::C, this->Report.EvapInletTemp, "System", "Average", this->Name);
-    SetupOutputVariable(
-        state, "Chiller Evaporator Outlet Temperature", OutputProcessor::Unit::C, this->Report.EvapOutletTemp, "System", "Average", this->Name);
-    SetupOutputVariable(
-        state, "Chiller Evaporator Mass Flow Rate", OutputProcessor::Unit::kg_s, this->Report.Evapmdot, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Chiller Evaporator Inlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->Report.EvapInletTemp,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Chiller Evaporator Outlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->Report.EvapOutletTemp,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Chiller Evaporator Mass Flow Rate",
+                        OutputProcessor::Unit::kg_s,
+                        this->Report.Evapmdot,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
+                        this->Name);
 
-    SetupOutputVariable(state, "Chiller Condenser Heat Transfer Rate", OutputProcessor::Unit::W, this->Report.QCond, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Chiller Condenser Heat Transfer Rate",
+                        OutputProcessor::Unit::W,
+                        this->Report.QCond,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
+                        this->Name);
     SetupOutputVariable(state,
                         "Chiller Condenser Heat Transfer Energy",
                         OutputProcessor::Unit::J,
                         this->Report.CondEnergy,
-                        "System",
-                        "Sum",
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Summed,
                         this->Name,
                         _,
                         "ENERGYTRANSFER",
                         "HEATREJECTION",
                         _,
                         "Plant");
-    SetupOutputVariable(
-        state, "Chiller Condenser Inlet Temperature", OutputProcessor::Unit::C, this->Report.CondInletTemp, "System", "Average", this->Name);
-    SetupOutputVariable(
-        state, "Chiller Condenser Outlet Temperature", OutputProcessor::Unit::C, this->Report.CondOutletTemp, "System", "Average", this->Name);
-    SetupOutputVariable(
-        state, "Chiller Condenser Mass Flow Rate", OutputProcessor::Unit::kg_s, this->Report.Condmdot, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Chiller Condenser Inlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->Report.CondInletTemp,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Chiller Condenser Outlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->Report.CondOutletTemp,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Chiller Condenser Mass Flow Rate",
+                        OutputProcessor::Unit::kg_s,
+                        this->Report.Condmdot,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
+                        this->Name);
 
     if (this->GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
-        SetupOutputVariable(
-            state, "Chiller Hot Water Consumption Rate", OutputProcessor::Unit::W, this->Report.QGenerator, "System", "Average", this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Hot Water Consumption Rate",
+                            OutputProcessor::Unit::W,
+                            this->Report.QGenerator,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Averaged,
+                            this->Name);
         SetupOutputVariable(state,
                             "Chiller Source Hot Water Energy",
                             OutputProcessor::Unit::J,
                             this->Report.GeneratorEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Summed,
                             this->Name,
                             _,
                             "PLANTLOOPHEATINGDEMAND",
@@ -578,14 +631,19 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                             "Plant");
     } else {
         if (this->GenInputOutputNodesUsed) {
-            SetupOutputVariable(
-                state, "Chiller Source Steam Rate", OutputProcessor::Unit::W, this->Report.QGenerator, "System", "Average", this->Name);
+            SetupOutputVariable(state,
+                                "Chiller Source Steam Rate",
+                                OutputProcessor::Unit::W,
+                                this->Report.QGenerator,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Averaged,
+                                this->Name);
             SetupOutputVariable(state,
                                 "Chiller Source Steam Energy",
                                 OutputProcessor::Unit::J,
                                 this->Report.GeneratorEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 this->Name,
                                 _,
                                 "PLANTLOOPHEATINGDEMAND",
@@ -593,14 +651,19 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                                 _,
                                 "Plant");
         } else {
-            SetupOutputVariable(
-                state, "Chiller Source Steam Rate", OutputProcessor::Unit::W, this->Report.QGenerator, "System", "Average", this->Name);
+            SetupOutputVariable(state,
+                                "Chiller Source Steam Rate",
+                                OutputProcessor::Unit::W,
+                                this->Report.QGenerator,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Averaged,
+                                this->Name);
             SetupOutputVariable(state,
                                 "Chiller Source Steam Energy",
                                 OutputProcessor::Unit::J,
                                 this->Report.GeneratorEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 this->Name,
                                 _,
                                 fluidNameSteam,
@@ -610,7 +673,13 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
         }
     }
 
-    SetupOutputVariable(state, "Chiller COP", OutputProcessor::Unit::W_W, this->Report.ActualCOP, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Chiller COP",
+                        OutputProcessor::Unit::W_W,
+                        this->Report.ActualCOP,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
+                        this->Name);
 
     if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
         SetupEMSInternalVariable(state, "Chiller Nominal Capacity", this->Name, "[W]", this->NomCap);

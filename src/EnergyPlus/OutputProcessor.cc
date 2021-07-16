@@ -239,8 +239,8 @@ namespace OutputProcessor {
     }
 
     void SetupTimePointers(EnergyPlusData &state,
-                           std::string const &TimeStepTypeKey, // Which timestep is being set up, 'Zone'=1, 'HVAC'=2
-                           Real64 &TimeStep                    // The timestep variable.  Used to get the address
+                           TimeStepType const &TimeStepTypeKey, // Which timestep is being set up, 'Zone'=1, 'HVAC'=2
+                           Real64 &TimeStep                     // The timestep variable.  Used to get the address
     )
     {
 
@@ -258,15 +258,11 @@ namespace OutputProcessor {
         // Indicate that the TimeStep passed in is a target for the pointer
         // attributes in the derived types.
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // ValidateTimeStepType will throw a Fatal if not valid
-        TimeStepType timeStepType = ValidateTimeStepType(state, TimeStepTypeKey, "SetupTimePointers");
-
         TimeSteps tPtr;
         tPtr.TimeStep = &TimeStep;
-        if (!state.dataOutputProcessor->TimeValue.insert(std::make_pair(timeStepType, tPtr)).second) {
+        if (!state.dataOutputProcessor->TimeValue.insert(std::make_pair(TimeStepTypeKey, tPtr)).second) {
             // The element was already present... shouldn't happen
-            ShowFatalError(state, "SetupTimePointers was already called for " + TimeStepTypeKey);
+            ShowFatalError(state, format("SetupTimePointers was already called for {}", timeStepTypeStrings[(int)TimeStepTypeKey]));
         }
     }
 
@@ -653,7 +649,7 @@ namespace OutputProcessor {
         op->GetOutputInputFlag = false;
 
         // First check environment variable to see of possible override for minimum reporting frequency
-        if (state.dataSysVars->MinReportFrequency != "") {
+        if (!state.dataSysVars->MinReportFrequency.empty()) {
             // Formats
             static constexpr fmt::string_view Format_800("! <Minimum Reporting Frequency (overriding input value)>, Value, Input Value\n");
             static constexpr fmt::string_view Format_801(" Minimum Reporting Frequency, {},{}\n");
@@ -689,7 +685,8 @@ namespace OutputProcessor {
                 op->ReqRepVars(Loop).Key = std::string();
             }
 
-            std::string::size_type const lbpos = index(cAlphaArgs(2), '['); // Remove Units designation if user put it in
+            std::string::size_type const lbpos = index(cAlphaArgs(2),
+                                                       '['); // Remove Units designation if user put it in
             if (lbpos != std::string::npos) {
                 cAlphaArgs(2).erase(lbpos);
             }
@@ -776,8 +773,6 @@ namespace OutputProcessor {
             StrOut = format(MonthFormat, strip(String), Day, Hour, Minute);
             break;
         case ReportingFrequency::Yearly:
-            StrOut = format(EnvrnFormat, strip(String), Mon, Day, Hour, Minute);
-            break;
         case ReportingFrequency::Simulation:
             StrOut = format(EnvrnFormat, strip(String), Mon, Day, Hour, Minute);
             break;
@@ -788,281 +783,6 @@ namespace OutputProcessor {
 
         String = StrOut;
     }
-
-    void ProduceMinMaxStringWStartMinute(EnergyPlusData &state,
-                                         std::string &String,                // Current value
-                                         int const DateValue,                // Date of min/max
-                                         ReportingFrequency const ReportFreq // Reporting Frequency
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   January 2001
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine produces the appropriate min/max string depending
-        // on the reporting frequency.  Used in Meter reporting.
-
-        // METHODOLOGY EMPLOYED:
-        // Prior to calling this routine, the basic value string will be
-        // produced, but DecodeMonDayHrMin will not have been called.  Uses the MinutesPerTimeStep
-        // value to set the StartMinute.
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using General::DecodeMonDayHrMin;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr fmt::string_view HrFormat("{},{:02}:{:02}");
-        static constexpr fmt::string_view DayFormat("{},{:2},{:02}:{:02}");
-        static constexpr fmt::string_view MonthFormat("{},{:2},{:2},{:02}:{:02}");
-        static constexpr fmt::string_view EnvrnFormat("{},{:2},{:2},{:2},{:02}:{:02}");
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Mon;
-        int Day;
-        int Hour;
-        int Minute;
-        int StartMinute;
-        std::string StrOut;
-
-        DecodeMonDayHrMin(DateValue, Mon, Day, Hour, Minute);
-
-        switch (ReportFreq) {
-        case ReportingFrequency::Hourly: // Hourly -- used in meters
-            StartMinute = Minute - state.dataGlobal->MinutesPerTimeStep + 1;
-            StrOut = format(HrFormat, strip(String), StartMinute, Minute);
-            break;
-
-        case ReportingFrequency::Daily: // Daily
-            StartMinute = Minute - state.dataGlobal->MinutesPerTimeStep + 1;
-            StrOut = format(DayFormat, strip(String), Hour, StartMinute, Minute);
-            break;
-
-        case ReportingFrequency::Monthly: // Monthly
-            StartMinute = Minute - state.dataGlobal->MinutesPerTimeStep + 1;
-            StrOut = format(MonthFormat, strip(String), Day, Hour, StartMinute, Minute);
-            break;
-
-        case ReportingFrequency::Yearly: // Yearly
-            StartMinute = Minute - state.dataGlobal->MinutesPerTimeStep + 1;
-            StrOut = format(EnvrnFormat, strip(String), Mon, Day, Hour, StartMinute, Minute);
-            break;
-
-        case ReportingFrequency::Simulation: // Environment
-            StartMinute = Minute - state.dataGlobal->MinutesPerTimeStep + 1;
-            StrOut = format(EnvrnFormat, strip(String), Mon, Day, Hour, StartMinute, Minute);
-            break;
-
-        default: // Each, TimeStep, Hourly dont have this
-            StrOut = std::string();
-            break;
-        }
-
-        String = StrOut;
-    }
-
-    TimeStepType ValidateTimeStepType(EnergyPlusData &state,
-                                      std::string const &TimeStepTypeKey, // Index type (Zone, HVAC) for variables
-                                      std::string_view CalledFrom         // Routine called from (for error messages)
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   December 1998
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function validates the requested "index" type and returns
-        // the proper value for use inside the OutputProcessor.
-
-        // METHODOLOGY EMPLOYED:
-        // Look it up in a list of valid index types.
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-        // TODO: , "HEATBALANCE", "HEAT BALANCE" are used nowhere aside from tests. Should we remove them?
-        std::vector<std::string> zoneIndexes({"ZONE", "HEATBALANCE", "HEAT BALANCE"});
-        std::vector<std::string> systemIndexes({"HVAC", "SYSTEM", "PLANT"});
-        std::string uppercase(UtilityRoutines::MakeUPPERCase(TimeStepTypeKey));
-
-        if (std::find(zoneIndexes.begin(), zoneIndexes.end(), uppercase) != zoneIndexes.end()) {
-            return TimeStepType::TimeStepZone;
-        }
-
-        if (std::find(systemIndexes.begin(), systemIndexes.end(), uppercase) != systemIndexes.end()) {
-            return TimeStepType::TimeStepSystem;
-        }
-
-        //  The following should never happen to a user!!!!
-        ShowSevereError(state, "OutputProcessor/ValidateTimeStepType: Invalid Index Key passed to ValidateTimeStepType=" + TimeStepTypeKey);
-        ShowContinueError(state, R"(..Should be "ZONE", "SYSTEM", "HVAC", or "PLANT"... was called from:)" + std::string{CalledFrom});
-        ShowFatalError(state, "Preceding condition causes termination.");
-
-        return TimeStepType::TimeStepZone;
-    }
-
-    std::string StandardTimeStepTypeKey(TimeStepType const timeStepType)
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   December 1998
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function gives the standard string for the index type
-        // given.
-
-        // METHODOLOGY EMPLOYED:
-        // Look it up in a list of valid index types.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        std::string StandardTimeStepTypeKey;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        if (timeStepType == TimeStepType::TimeStepZone) {
-            StandardTimeStepTypeKey = "Zone";
-        } else if (timeStepType == TimeStepType::TimeStepSystem) {
-            StandardTimeStepTypeKey = "HVAC";
-        } else {
-            StandardTimeStepTypeKey = "UNKW";
-        }
-
-        return StandardTimeStepTypeKey;
-    }
-
-    StoreType validateVariableType(EnergyPlusData &state, std::string const &VariableTypeKey)
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   December 1998
-        //       MODIFIED       December 2017; Jason DeGraw
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function validates the VariableTypeKey passed to the SetupVariable
-        // routine and assigns it the value used in the OutputProcessor.
-
-        // METHODOLOGY EMPLOYED:
-        // Look it up in a list of valid variable types.
-
-        // Return value
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        std::vector<std::string> stateVariables({"STATE", "AVERAGE", "AVERAGED"});
-        std::vector<std::string> nonStateVariables({"NON STATE", "NONSTATE", "SUM", "SUMMED"});
-        std::string uppercase(UtilityRoutines::MakeUPPERCase(VariableTypeKey));
-
-        auto iter = std::find(stateVariables.begin(), stateVariables.end(), uppercase);
-        if (iter != stateVariables.end()) {
-            return StoreType::Averaged;
-        }
-
-        iter = std::find(nonStateVariables.begin(), nonStateVariables.end(), uppercase);
-        if (iter != nonStateVariables.end()) {
-            return StoreType::Summed;
-        }
-
-        ShowSevereError(state, "Invalid variable type requested=" + VariableTypeKey);
-
-        return StoreType::Averaged;
-    }
-
-    std::string standardVariableTypeKey(StoreType const VariableType)
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   July 1999
-        //       MODIFIED       December 2017; Jason DeGraw
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function gives the standard string for the variable type
-        // given.
-
-        // METHODOLOGY EMPLOYED:
-        // From variable type value, produce proper string.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        // na
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        switch (VariableType) {
-        case StoreType::Averaged:
-            return "Average";
-            break;
-        case StoreType::Summed:
-            return "Sum";
-            break;
-        }
-
-        return "Unknown";
-    }
-
-    // *****************************************************************************
-    // The following routines implement Energy Meters in EnergyPlus.
-    // *****************************************************************************
 
     void InitializeMeters(EnergyPlusData &state)
     {
@@ -1080,27 +800,6 @@ namespace OutputProcessor {
         // METHODOLOGY EMPLOYED:
         // Allocate the static set.  Use "AddMeter" with appropriate arguments that will
         // allow expansion later.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         state.files.mtd.ensure_open(state, "InitializeMeters", state.files.outputControl.mtd);
     }
@@ -1745,7 +1444,7 @@ namespace OutputProcessor {
 
         // Basic ResourceType for Meters
         {
-            auto const meterType(UserInputResourceType);
+            auto const &meterType(UserInputResourceType);
 
             if (meterType == "ELECTRICITY") {
                 OutResourceType = "Electricity";
@@ -3093,7 +2792,7 @@ namespace OutputProcessor {
                                      state.dataOutputProcessor->rDummy2,
                                      state.dataOutputProcessor->iDummy2,
                                      op->EnergyMeters(Loop).RptHRFO); // EnergyMeters(Loop)%HRMinVal, EnergyMeters(Loop)%HRMinValDate, & |
-                                                                      // EnergyMeters(Loop)%HRMaxVal, EnergyMeters(Loop)%HRMaxValDate, &
+                // EnergyMeters(Loop)%HRMaxVal, EnergyMeters(Loop)%HRMaxValDate, &
                 state.dataResultsFramework->resultsFramework->HRMeters.pushVariableValue(op->EnergyMeters(Loop).HRRptNum,
                                                                                          op->EnergyMeters(Loop).HRValue);
                 op->EnergyMeters(Loop).HRValue = 0.0;
@@ -3439,11 +3138,12 @@ namespace OutputProcessor {
 
         PrintTimeStamp = true;
         for (Loop = 1; Loop <= op->NumEnergyMeters; ++Loop) {
-            op->EnergyMeters(Loop).LastSMValue = op->EnergyMeters(Loop).SMValue;
-            op->EnergyMeters(Loop).LastSMMinVal = op->EnergyMeters(Loop).SMMinVal;
-            op->EnergyMeters(Loop).LastSMMinValDate = op->EnergyMeters(Loop).SMMinValDate;
-            op->EnergyMeters(Loop).LastSMMaxVal = op->EnergyMeters(Loop).SMMaxVal;
-            op->EnergyMeters(Loop).LastSMMaxValDate = op->EnergyMeters(Loop).SMMaxValDate;
+            // these were assigned but never accessed
+            //            op->EnergyMeters(Loop).LastSMValue = op->EnergyMeters(Loop).SMValue;
+            //            op->EnergyMeters(Loop).LastSMMinVal = op->EnergyMeters(Loop).SMMinVal;
+            //            op->EnergyMeters(Loop).LastSMMinValDate = op->EnergyMeters(Loop).SMMinValDate;
+            //            op->EnergyMeters(Loop).LastSMMaxVal = op->EnergyMeters(Loop).SMMaxVal;
+            //            op->EnergyMeters(Loop).LastSMMaxValDate = op->EnergyMeters(Loop).SMMaxValDate;
             if (!op->EnergyMeters(Loop).RptSM && !op->EnergyMeters(Loop).RptAccSM) continue;
             if (PrintTimeStamp) {
                 WriteTimeStampFormatData(state,
@@ -3767,8 +3467,7 @@ namespace OutputProcessor {
             assert(false);
         }
 
-        const std::string StringOut = format(DateFmt, Day, monthName, Hour, Minute);
-        return StringOut;
+        return format(DateFmt, Day, monthName, Hour, Minute);
     }
 
     void ReportMeterDetails(EnergyPlusData &state)
@@ -3813,7 +3512,7 @@ namespace OutputProcessor {
 
             const std::string mtrUnitString = unitEnumToStringBrackets(op->RVariableTypes(op->VarMeterArrays(VarMeter).RepVariable).units);
 
-            std::string Multipliers = "";
+            std::string Multipliers;
             const auto ZoneMult = op->RVariableTypes(op->VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneMult;
             const auto ZoneListMult = op->RVariableTypes(op->VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneListMult;
 
@@ -3840,13 +3539,13 @@ namespace OutputProcessor {
 
         for (int Meter = 1; Meter <= op->NumEnergyMeters; ++Meter) {
             print(state.files.mtd, "\n For Meter={}{}", op->EnergyMeters(Meter).Name, unitEnumToStringBrackets(op->EnergyMeters(Meter).Units));
-            if (op->EnergyMeters(Meter).ResourceType != "") {
+            if (!op->EnergyMeters(Meter).ResourceType.empty()) {
                 print(state.files.mtd, ", ResourceType={}", op->EnergyMeters(Meter).ResourceType);
             }
-            if (op->EnergyMeters(Meter).EndUse != "") {
+            if (!op->EnergyMeters(Meter).EndUse.empty()) {
                 print(state.files.mtd, ", EndUse={}", op->EnergyMeters(Meter).EndUse);
             }
-            if (op->EnergyMeters(Meter).Group != "") {
+            if (!op->EnergyMeters(Meter).Group.empty()) {
                 print(state.files.mtd, ", Group={}", op->EnergyMeters(Meter).Group);
             }
             print(state.files.mtd, ", contents are:\n");
@@ -3859,7 +3558,7 @@ namespace OutputProcessor {
                         for (int VarMeter1 = 1; VarMeter1 <= op->VarMeterArrays(VarMeter).NumOnMeters; ++VarMeter1) {
                             if (op->VarMeterArrays(VarMeter).OnMeters(VarMeter1) != Meter) continue;
 
-                            std::string Multipliers = "";
+                            std::string Multipliers;
                             const auto ZoneMult = op->RVariableTypes(op->VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneMult;
                             const auto ZoneListMult = op->RVariableTypes(op->VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneListMult;
 
@@ -3960,6 +3659,7 @@ namespace OutputProcessor {
             ShowSevereError(state, "Nonexistent end use passed to AddEndUseSubcategory=" + EndUseName);
         }
     }
+
     void WriteTimeStampFormatData(
         EnergyPlusData &state,
         InputOutputFile &outputFile,
@@ -4151,7 +3851,7 @@ namespace OutputProcessor {
                                            StoreType const storeType,
                                            int const reportID,                       // The reporting ID for the data
                                            [[maybe_unused]] int const indexGroupKey, // The reporting group (e.g., Zone, Plant Loop, etc.)
-                                           std::string const &indexGroup,            // The reporting group (e.g., Zone, Plant Loop, etc.)
+                                           TimeStepType const &indexGroup,           // The reporting group (e.g., Zone, Plant Loop, etc.)
                                            std::string const &reportIDChr,           // The reporting ID for the data
                                            std::string const &keyedValue,            // The key name for the data
                                            std::string const &variableName,          // The variable's actual name
@@ -4170,25 +3870,6 @@ namespace OutputProcessor {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine writes the ESO data dictionary information to the output files
         // and the SQL database
-
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string FreqString;
@@ -4243,7 +3924,7 @@ namespace OutputProcessor {
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(reportID,
                                                                                    static_cast<int>(storeType),
-                                                                                   indexGroup,
+                                                                                   std::string(timeStepTypeStrings[(int)indexGroup]),
                                                                                    keyedValue,
                                                                                    variableName,
                                                                                    static_cast<int>(timeStepType),
@@ -4341,9 +4022,7 @@ namespace OutputProcessor {
         case ReportingFrequency::Monthly: //  3
             print_meter(state, 9);
             break;
-        case ReportingFrequency::Yearly: //  5
-            print_meter(state, 11);
-            break;
+        case ReportingFrequency::Yearly:     //  5
         case ReportingFrequency::Simulation: //  4
             print_meter(state, 11);
             break;
@@ -4505,7 +4184,7 @@ namespace OutputProcessor {
             }
 
         } else { // if ( ( reportingInterval == ReportingFrequency::Daily ) || ( reportingInterval == ReportingFrequency::Monthly ) || (
-                 // reportingInterval == ReportingFrequency::Simulation ) ) { //  2, 3, 4, 5
+            // reportingInterval == ReportingFrequency::Simulation ) ) { //  2, 3, 4, 5
             std::string MaxOut; // Character for Max out string
             std::string MinOut; // Character for Min out string
 
@@ -4627,7 +4306,7 @@ namespace OutputProcessor {
                 ++state.dataGlobal->StdOutputRecordCount;
             }
         } else { // if ( ( reportingInterval == ReportDaily ) || ( reportingInterval == ReportMonthly ) || ( reportingInterval == ReportSim ) ) { //
-                 // 2, 3, 4
+            // 2, 3, 4
             std::string MaxOut; // Character for Max out string
             std::string MinOut; // Character for Min out string
 
@@ -4717,38 +4396,6 @@ namespace OutputProcessor {
         // easier maintenance and writing of data to the SQL database.
 
         i32toa(repValue, state.dataOutputProcessor->s_WriteNumericData);
-
-        if (state.dataSQLiteProcedures->sqlite) {
-            state.dataSQLiteProcedures->sqlite->createSQLiteReportDataRecord(reportID, repValue);
-        }
-
-        if (state.files.eso.good()) {
-            print(state.files.eso, "{},{}\n", creportID, state.dataOutputProcessor->s_WriteNumericData);
-        }
-    }
-
-    void WriteNumericData(EnergyPlusData &state,
-                          int const reportID,           // The variable's reporting ID
-                          std::string const &creportID, // variable ID in characters
-                          int64_t const repValue        // The variable's value
-    )
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Mark Adams
-        //       DATE WRITTEN   May 2016
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE:
-        // This subroutine writes real data to the output files and
-        // SQL database.
-        // This is a refactor of WriteIntegerData.
-        //
-        // Much of the code here was an included in earlier versions
-        // of the UpdateDataandReport subroutine. The code was moved to facilitate
-        // easier maintenance and writing of data to the SQL database.
-
-        i64toa(repValue, state.dataOutputProcessor->s_WriteNumericData);
 
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteReportDataRecord(reportID, repValue);
@@ -4931,7 +4578,7 @@ namespace OutputProcessor {
                 print(state.files.eso, "{},{}\n", reportIDString, NumberOut);
             }
         } else { // if ( ( reportingInterval == ReportDaily ) || ( reportingInterval == ReportMonthly ) || ( reportingInterval == ReportSim ) ) { //
-                 // 2, 3, 4
+            // 2, 3, 4
             if (state.files.eso.good()) {
                 print(state.files.eso, "{},{},{},{}\n", reportIDString, NumberOut, MinOut, MaxOut);
             }
@@ -5299,7 +4946,7 @@ namespace OutputProcessor {
             return OutputProcessor::Unit::J;
         } else if (unitUpper == "DELTAC") {
             return OutputProcessor::Unit::deltaC;
-        } else if (unitUpper == "") {
+        } else if (unitUpper.empty()) {
             return OutputProcessor::Unit::None;
         } else if (unitUpper == "W") {
             return OutputProcessor::Unit::W;
@@ -5407,22 +5054,22 @@ namespace OutputProcessor {
 // *****************************************************************************
 
 void SetupOutputVariable(EnergyPlusData &state,
-                         std::string const &VariableName,           // String Name of variable (with units)
-                         OutputProcessor::Unit const &VariableUnit, // Actual units corresponding to the actual variable
-                         Real64 &ActualVariable,                    // Actual Variable, used to set up pointer
-                         std::string const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
-                         std::string const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
-                         std::string const &KeyedValue,             // Associated Key for this variable
-                         Optional_string_const ReportFreq,          // Internal use -- causes reporting at this frequency
-                         Optional_string_const ResourceTypeKey,     // Meter Resource Type (Electricity, Gas, etc)
-                         Optional_string_const EndUseKey,           // Meter End Use Key (Lights, Heating, Cooling, etc)
-                         Optional_string_const EndUseSubKey,        // Meter End Use Sub Key (General Lights, Task Lights, etc)
-                         Optional_string_const GroupKey,            // Meter Super Group Key (Building, System, Plant)
-                         Optional_string_const ZoneKey,             // Meter Zone Key (zone name)
-                         Optional_int_const ZoneMult,               // Zone Multiplier, defaults to 1
-                         Optional_int_const ZoneListMult,           // Zone List Multiplier, defaults to 1
-                         Optional_int_const indexGroupKey,          // Group identifier for SQL output
-                         Optional_string_const customUnitName       // the custom name for the units from EMS definition of units
+                         std::string const &VariableName,                      // String Name of variable (with units)
+                         OutputProcessor::Unit const &VariableUnit,            // Actual units corresponding to the actual variable
+                         Real64 &ActualVariable,                               // Actual Variable, used to set up pointer
+                         OutputProcessor::TimeStepType const &TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::StoreType const &VariableTypeKey,    // State, Average=1, NonState, Sum=2
+                         std::string const &KeyedValue,                        // Associated Key for this variable
+                         Optional_string_const ReportFreq,                     // Internal use -- causes reporting at this frequency
+                         Optional_string_const ResourceTypeKey,                // Meter Resource Type (Electricity, Gas, etc)
+                         Optional_string_const EndUseKey,                      // Meter End Use Key (Lights, Heating, Cooling, etc)
+                         Optional_string_const EndUseSubKey,                   // Meter End Use Sub Key (General Lights, Task Lights, etc)
+                         Optional_string_const GroupKey,                       // Meter Super Group Key (Building, System, Plant)
+                         Optional_string_const ZoneKey,                        // Meter Zone Key (zone name)
+                         Optional_int_const ZoneMult,                          // Zone Multiplier, defaults to 1
+                         Optional_int_const ZoneListMult,                      // Zone List Multiplier, defaults to 1
+                         Optional_int_const indexGroupKey,                     // Group identifier for SQL output
+                         Optional_string_const customUnitName                  // the custom name for the units from EMS definition of units
 )
 {
 
@@ -5525,8 +5172,8 @@ void SetupOutputVariable(EnergyPlusData &state,
             }
         }
 
-        TimeStepType = ValidateTimeStepType(state, TimeStepTypeKey, "SetupOutputVariable");
-        VariableType = validateVariableType(state, VariableTypeKey);
+        TimeStepType = TimeStepTypeKey;
+        VariableType = VariableTypeKey;
 
         if (present(customUnitName)) {
             AddToOutputVariableList(state, VarName, TimeStepType, VariableType, VariableType::Real, VariableUnit, customUnitName);
@@ -5551,7 +5198,7 @@ void SetupOutputVariable(EnergyPlusData &state,
         auto &thisRvar = op->RVariableTypes(CV);
         thisRvar.timeStepType = TimeStepType;
         thisRvar.storeType = VariableType;
-        thisRvar.VarName = KeyedValue + ':' + VarName;
+        thisRvar.VarName = format("{}:{}", KeyedValue, VarName);
         thisRvar.VarNameOnly = VarName;
         thisRvar.VarNameOnlyUC = UtilityRoutines::MakeUPPERCase(VarName);
         thisRvar.VarNameUC = UtilityRoutines::MakeUPPERCase(thisRvar.VarName);
@@ -5592,13 +5239,13 @@ void SetupOutputVariable(EnergyPlusData &state,
             if (OnMeter) {
                 if (VariableType == StoreType::Averaged) {
                     ShowSevereError(state, "Meters can only be \"Summed\" variables");
-                    ShowContinueError(state, "..reference variable=" + KeyedValue + ':' + VariableName);
+                    ShowContinueError(state, format("..reference variable={}:{}", KeyedValue, VariableName));
                 } else {
                     Unit mtrUnits = op->RVariableTypes(CV).units;
                     bool ErrorsFound = false;
                     AttachMeters(state, mtrUnits, ResourceType, EndUse, EndUseSub, Group, ZoneName, CV, thisVarPtr.MeterArrayPtr, ErrorsFound);
                     if (ErrorsFound) {
-                        ShowContinueError(state, "Invalid Meter spec for variable=" + KeyedValue + ':' + VariableName);
+                        ShowContinueError(state, format("Invalid Meter spec for variable={}:{}", KeyedValue, VariableName));
                         op->ErrorsLogged = true;
                     }
                 }
@@ -5657,14 +5304,14 @@ void SetupOutputVariable(EnergyPlusData &state,
 }
 
 void SetupOutputVariable(EnergyPlusData &state,
-                         std::string const &VariableName,           // String Name of variable
-                         OutputProcessor::Unit const &VariableUnit, // Actual units corresponding to the actual variable
-                         int &ActualVariable,                       // Actual Variable, used to set up pointer
-                         std::string const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
-                         std::string const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
-                         std::string const &KeyedValue,             // Associated Key for this variable
-                         Optional_string_const ReportFreq,          // Internal use -- causes reporting at this freqency
-                         Optional_int_const indexGroupKey           // Group identifier for SQL output
+                         std::string const &VariableName,                      // String Name of variable
+                         OutputProcessor::Unit const &VariableUnit,            // Actual units corresponding to the actual variable
+                         int &ActualVariable,                                  // Actual Variable, used to set up pointer
+                         OutputProcessor::TimeStepType const &TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::StoreType const &VariableTypeKey,    // State, Average=1, NonState, Sum=2
+                         std::string const &KeyedValue,                        // Associated Key for this variable
+                         Optional_string_const ReportFreq,                     // Internal use -- causes reporting at this freqency
+                         Optional_int_const indexGroupKey                      // Group identifier for SQL output
 )
 {
 
@@ -5720,8 +5367,8 @@ void SetupOutputVariable(EnergyPlusData &state,
 
         if (Loop == 1) ++op->NumOfIVariable_Setup;
 
-        TimeStepType = ValidateTimeStepType(state, TimeStepTypeKey, "SetupOutputVariable");
-        VariableType = validateVariableType(state, VariableTypeKey);
+        TimeStepType = TimeStepTypeKey;
+        VariableType = VariableTypeKey;
 
         AddToOutputVariableList(state, VarName, TimeStepType, VariableType, VariableType::Integer, VariableUnit);
         ++op->NumTotalIVariable;
@@ -5740,7 +5387,7 @@ void SetupOutputVariable(EnergyPlusData &state,
         auto &thisIVar = op->IVariableTypes(CV);
         thisIVar.timeStepType = TimeStepType;
         thisIVar.storeType = VariableType;
-        thisIVar.VarName = KeyedValue + ':' + VarName;
+        thisIVar.VarName = format("{}:{}", KeyedValue, VarName);
         thisIVar.VarNameOnly = VarName;
         thisIVar.VarNameOnlyUC = UtilityRoutines::MakeUPPERCase(VarName);
         thisIVar.VarNameUC = UtilityRoutines::MakeUPPERCase(thisIVar.VarName);
@@ -5817,76 +5464,8 @@ void SetupOutputVariable(EnergyPlusData &state,
     }
 }
 
-void SetupOutputVariable(EnergyPlusData &state,
-                         std::string const &VariableName,           // String Name of variable
-                         OutputProcessor::Unit const &VariableUnit, // Actual units corresponding to the actual variable
-                         Real64 &ActualVariable,                    // Actual Variable, used to set up pointer
-                         std::string const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
-                         std::string const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
-                         int const KeyedValue,                      // Associated Key for this variable
-                         Optional_string_const ReportFreq,          // Internal use -- causes reporting at this freqency
-                         Optional_string_const ResourceTypeKey,     // Meter Resource Type (Electricity, Gas, etc)
-                         Optional_string_const EndUseKey,           // Meter End Use Key (Lights, Heating, Cooling, etc)
-                         Optional_string_const EndUseSubKey,        // Meter End Use Sub Key (General Lights, Task Lights, etc)
-                         Optional_string_const GroupKey,            // Meter Super Group Key (Building, System, Plant)
-                         Optional_string_const ZoneKey,             // Meter Zone Key (zone name)
-                         Optional_int_const ZoneMult,               // Zone Multiplier, defaults to 1
-                         Optional_int_const ZoneListMult,           // Zone List Multiplier, defaults to 1
-                         Optional_int_const indexGroupKey           // Group identifier for SQL output
-)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   February 1999
-    //       MODIFIED       January 2001; Implement Meters
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine allows an integer key for a variable.  Changes this to a
-    // standard character variable and passes everything to SetupOutputVariable.
-
-    // METHODOLOGY EMPLOYED:
-    // Pointers (as pointers), pointers (as indices), and lots of other KEWL data stuff.
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-    // Not checking for valid number
-
-    SetupOutputVariable(state,
-                        VariableName,
-                        VariableUnit,
-                        ActualVariable,
-                        TimeStepTypeKey,
-                        VariableTypeKey,
-                        fmt::to_string(KeyedValue),
-                        ReportFreq,
-                        ResourceTypeKey,
-                        EndUseKey,
-                        EndUseSubKey,
-                        GroupKey,
-                        ZoneKey,
-                        ZoneMult,
-                        ZoneListMult,
-                        indexGroupKey);
-}
-
-void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType const t_TimeStepTypeKey) // What kind of data to update (Zone, HVAC)
+void UpdateDataandReport(EnergyPlusData &state,
+                         OutputProcessor::TimeStepType const t_TimeStepTypeKey) // What kind of data to update (Zone, HVAC)
 {
 
     // SUBROUTINE INFORMATION:
@@ -5900,28 +5479,10 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
     // This subroutine writes the actual report variable (for user requested
     // Report Variables) strings to the standard output file.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
     // Using/Aliasing
     using namespace OutputProcessor;
     using General::EncodeMonDayHrMin;
     using ScheduleManager::GetCurrentScheduleValue;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int Loop;                    // Loop Variable
@@ -6701,7 +6262,7 @@ void GenOutputVariablesAuditReport(EnergyPlusData &state)
         if (op->ReqRepVars(Loop).Key.empty()) op->ReqRepVars(Loop).Key = "*";
         if (has(op->ReqRepVars(Loop).VarName, "OPAQUE SURFACE INSIDE FACE CONDUCTION") && !state.dataGlobal->DisplayAdvancedReportVariables &&
             !state.dataOutputProcessor->OpaqSurfWarned) {
-            ShowWarningError(state, "Variables containing \"Opaque Surface Inside Face Conduction\" are now \"advanced\" variables.");
+            ShowWarningError(state, R"(Variables containing "Opaque Surface Inside Face Conduction" are now "advanced" variables.)");
             ShowContinueError(state, "You must enter the \"Output:Diagnostics,DisplayAdvancedReportVariables;\" statement to view.");
             ShowContinueError(state, "First, though, read cautionary statements in the \"InputOutputReference\" document.");
             state.dataOutputProcessor->OpaqSurfWarned = true;
@@ -7716,9 +7277,7 @@ Real64 GetInternalVariableValue(EnergyPlusData &state,
     auto &op(state.dataOutputProcessor);
 
     // Select based on variable type:  integer, real, or meter
-    if (varType == VariableType::NotFound) { // Variable not a found variable
-        resultVal = 0.0;
-    } else if (varType == VariableType::Integer) {
+    if (varType == VariableType::Integer) {
         if (keyVarIndex > op->NumOfIVariable) {
             ShowFatalError(state, "GetInternalVariableValue: Integer variable passed index beyond range of array.");
             ShowContinueError(state, format("Index = {} Number of integer variables = {}", keyVarIndex, op->NumOfIVariable));
@@ -7745,6 +7304,7 @@ Real64 GetInternalVariableValue(EnergyPlusData &state,
     } else if (varType == VariableType::Schedule) {
         resultVal = GetCurrentScheduleValue(state, keyVarIndex);
     } else {
+        // VariableType::NotFound or other...
         resultVal = 0.0;
     }
 
@@ -7800,9 +7360,7 @@ Real64 GetInternalVariableValueExternalInterface(EnergyPlusData &state,
     auto &op(state.dataOutputProcessor);
 
     // Select based on variable type:  integer, REAL(r64), or meter
-    if (varType == VariableType::NotFound) { // Variable not a found variable
-        resultVal = 0.0;
-    } else if (varType == VariableType::Integer) {
+    if (varType == VariableType::Integer) {
         if (keyVarIndex > op->NumOfIVariable) {
             ShowFatalError(state, "GetInternalVariableValueExternalInterface: passed index beyond range of array.");
         }
@@ -7827,6 +7385,7 @@ Real64 GetInternalVariableValueExternalInterface(EnergyPlusData &state,
     } else if (varType == VariableType::Schedule) {
         resultVal = GetCurrentScheduleValue(state, keyVarIndex);
     } else {
+        // VariableType::NotFound or other
         resultVal = 0.0;
     }
 
@@ -7947,7 +7506,7 @@ void GetMeteredVariables(EnergyPlusData &state,
 
         } else {
             ShowWarningError(state,
-                             "Referenced variable or meter used in the wrong context \"" + ComponentName + "\" of type \"" + ComponentType + "\"");
+                             format(R"(Referenced variable or meter used in the wrong context "{}" of type "{}")", ComponentName, ComponentType));
         }
     }
 
@@ -8031,7 +7590,7 @@ void GetMeteredVariables(EnergyPlusData &state,
 
         } else {
             ShowWarningError(state,
-                             "Referenced variable or meter used in the wrong context \"" + ComponentName + "\" of type \"" + ComponentType + "\"");
+                             format(R"(Referenced variable or meter used in the wrong context "{}" of type "{}")", ComponentName, ComponentType));
         }
     }
 }
@@ -8728,14 +8287,17 @@ void ProduceRDDMDD(EnergyPlusData &state)
             if (!op->DDVariableTypes(ItemPtr).ReportedOnDDFile) {
                 print(state.files.rdd,
                       "{},{},{}{}{}",
-                      StandardTimeStepTypeKey(op->DDVariableTypes(ItemPtr).timeStepType),
-                      standardVariableTypeKey(op->DDVariableTypes(ItemPtr).storeType),
+                      timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).timeStepType],
+                      storeTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
                       VariableNames(Item),
                       unitStringFromDDitem(state, ItemPtr),
                       '\n');
-                state.dataResultsFramework->resultsFramework->RDD.push_back(StandardTimeStepTypeKey(op->DDVariableTypes(ItemPtr).timeStepType) + "," +
-                                                                            standardVariableTypeKey(op->DDVariableTypes(ItemPtr).storeType) + "," +
-                                                                            VariableNames(Item) + unitStringFromDDitem(state, ItemPtr));
+                state.dataResultsFramework->resultsFramework->RDD.push_back(
+                    format("{},{},{}{}",
+                           timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).timeStepType],
+                           storeTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
+                           VariableNames(Item),
+                           unitStringFromDDitem(state, ItemPtr)));
                 op->DDVariableTypes(ItemPtr).ReportedOnDDFile = true;
                 while (op->DDVariableTypes(ItemPtr).Next != 0) {
                     if (SortByName) {
@@ -8745,15 +8307,17 @@ void ProduceRDDMDD(EnergyPlusData &state)
                     }
                     print(state.files.rdd,
                           "{},{},{}{}{}",
-                          StandardTimeStepTypeKey(op->DDVariableTypes(ItemPtr).timeStepType),
-                          standardVariableTypeKey(op->DDVariableTypes(ItemPtr).storeType),
+                          timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).timeStepType],
+                          storeTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
                           VariableNames(Item),
                           unitStringFromDDitem(state, ItemPtr),
                           '\n');
-                    state.dataResultsFramework->resultsFramework->RDD.push_back(StandardTimeStepTypeKey(op->DDVariableTypes(ItemPtr).timeStepType) +
-                                                                                "," +
-                                                                                standardVariableTypeKey(op->DDVariableTypes(ItemPtr).storeType) +
-                                                                                "," + VariableNames(Item) + unitStringFromDDitem(state, ItemPtr));
+                    state.dataResultsFramework->resultsFramework->RDD.push_back(
+                        format("{},{},{}{}",
+                               timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).timeStepType],
+                               storeTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
+                               VariableNames(Item),
+                               unitStringFromDDitem(state, ItemPtr)));
                     op->DDVariableTypes(ItemPtr).ReportedOnDDFile = true;
                 }
             }
@@ -8763,13 +8327,16 @@ void ProduceRDDMDD(EnergyPlusData &state)
                 print(state.files.rdd,
                       "Output:Variable,*,{},hourly; !- {} {}{}{}",
                       VariableNames(Item),
-                      StandardTimeStepTypeKey(op->DDVariableTypes(ItemPtr).timeStepType),
-                      standardVariableTypeKey(op->DDVariableTypes(ItemPtr).storeType),
+                      timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).timeStepType],
+                      storeTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
                       unitStringFromDDitem(state, ItemPtr),
                       '\n');
-                state.dataResultsFramework->resultsFramework->RDD.push_back(StandardTimeStepTypeKey(op->DDVariableTypes(ItemPtr).timeStepType) + "," +
-                                                                            standardVariableTypeKey(op->DDVariableTypes(ItemPtr).storeType) + "," +
-                                                                            VariableNames(Item) + unitStringFromDDitem(state, ItemPtr));
+                state.dataResultsFramework->resultsFramework->RDD.push_back(
+                    format("{},{},{}{}",
+                           timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).timeStepType],
+                           storeTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
+                           VariableNames(Item),
+                           unitStringFromDDitem(state, ItemPtr)));
                 op->DDVariableTypes(ItemPtr).ReportedOnDDFile = true;
                 while (op->DDVariableTypes(ItemPtr).Next != 0) {
                     if (SortByName) {
@@ -8780,14 +8347,16 @@ void ProduceRDDMDD(EnergyPlusData &state)
                     print(state.files.rdd,
                           "Output:Variable,*,{},hourly; !- {} {}{}{}",
                           VariableNames(Item),
-                          StandardTimeStepTypeKey(op->DDVariableTypes(ItemPtr).timeStepType),
-                          standardVariableTypeKey(op->DDVariableTypes(ItemPtr).storeType),
+                          timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).timeStepType],
+                          storeTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
                           unitStringFromDDitem(state, ItemPtr),
                           '\n');
-                    state.dataResultsFramework->resultsFramework->RDD.push_back(StandardTimeStepTypeKey(op->DDVariableTypes(ItemPtr).timeStepType) +
-                                                                                "," +
-                                                                                standardVariableTypeKey(op->DDVariableTypes(ItemPtr).storeType) +
-                                                                                "," + VariableNames(Item) + unitStringFromDDitem(state, ItemPtr));
+                    state.dataResultsFramework->resultsFramework->RDD.push_back(
+                        format("{},{},{}{}",
+                               timeStepTypeStrings[(int)op->DDVariableTypes(ItemPtr).timeStepType],
+                               storeTypeStrings[(int)op->DDVariableTypes(ItemPtr).storeType],
+                               VariableNames(Item),
+                               unitStringFromDDitem(state, ItemPtr)));
                     op->DDVariableTypes(ItemPtr).ReportedOnDDFile = true;
                 }
             }
