@@ -11042,6 +11042,9 @@ void RefrigCondenserData::UpdateCondenser(EnergyPlusData &state)
 void RefrigCondenserData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
 {
 }
+void RefrigCondenserData::oneTimeInit_new([[maybe_unused]] EnergyPlusData &state)
+{
+}
 
 void RefrigRackData::UpdateCondenser(EnergyPlusData &state)
 {

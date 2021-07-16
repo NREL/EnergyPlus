@@ -2140,7 +2140,7 @@ namespace SolarCollectors {
     void CollectorData::oneTimeInit_new(EnergyPlusData &state)
     {
 
-            this->setupOutputVars(state);
+        this->setupOutputVars(state);
 
         if (this->SetLoopIndexFlag) {
             if (allocated(state.dataPlnt->PlantLoop)) {
