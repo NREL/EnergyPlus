@@ -2164,6 +2164,113 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     EXPECT_DOUBLE_EQ(energy.RemainingOutputReqToCoolSP, expectedCoolLoad);
 }
 
+TEST_F(EnergyPlusFixture, ZoneEquipmentManager_InfiltrationReport)
+{
+
+    std::string const idf_objects = delimited_string({
+        "Zone,Zone1;",
+
+        "Zone,Zone2;",
+
+        "Zone,Zone3;",
+
+        "Zone,Zone4;",
+
+        "ZoneList,",
+        "  ZoneList,",
+        "  Zone1,",
+        "  Zone2;",
+
+        "ZoneInfiltration:EffectiveLeakageArea,",
+        "  Zone3 Infil,          !- Name",
+        "  Zone3,                       !- Zone or ZoneList Name",
+        "  AlwaysOn,                    !- Schedule Name",
+        "  500.0,                       !- Effective Air Leakage Area",
+        "  0.000145,                    !- Stack Coefficient",
+        "  0.000174;                    !- Wind Coefficient",
+
+        "ZoneInfiltration:FlowCoefficient,",
+        "  Zone4 Infil,          !- Name",
+        "  Zone4,                       !- Zone or ZoneList Name",
+        "  AlwaysOn,                    !- Schedule Name",
+        "  0.05,                        !- Flow Coefficient",
+        "  0.089,                       !- Stack Coefficient",
+        "  0.67,                        !- Pressure Exponent",
+        "  0.156,                       !- Wind Coefficient",
+        "  0.64;                        !- Shelter Factor",
+
+        "ZoneInfiltration:DesignFlowRate,",
+        "  Zonelist Infil,          !- Name",
+        "  ZoneList,                       !- Zone or ZoneList Name",
+        "  AlwaysOn,                    !- Schedule Name",
+        "  flow/zone,                   !- Design Flow Rate Calculation Method",
+        "  0.07,                        !- Design Flow Rate{ m3 / s }",
+        "  ,                            !- Flow per Zone Floor Area{ m3 / s - m2 }",
+        "  ,                            !- Flow per Exterior Surface Area{ m3 / s - m2 }",
+        "  ,                            !- Air Changes per Hour{ 1 / hr }",
+        "  1,                           !- Constant Term Coefficient",
+        "  0,                           !- Temperature Term Coefficient",
+        "  0,                           !- Velocity Term Coefficient",
+        "  0;                           !- Velocity Squared Term Coefficient",
+
+        "Schedule:Constant,",
+        "AlwaysOn,",
+        "Fraction,",
+        "1.0;",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    EXPECT_FALSE(has_err_output());
+
+    bool ErrorsFound(false);
+    ScheduleManager::ProcessScheduleInput(*state);
+    GetZoneData(*state, ErrorsFound);
+    AllocateHeatBalArrays(*state);
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
+    GetSimpleAirModelInputs(*state, ErrorsFound);
+
+    EXPECT_EQ(state->dataHeatBal->TotInfiltration, 4); // one per zone
+
+    state->dataHeatBalFanSys->MAT.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->MCPM.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->MCPTM.allocate(state->dataGlobal->NumOfZones);
+
+    state->dataHeatBalFanSys->MCPI.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->OAMFL.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->MCPTI.allocate(state->dataGlobal->NumOfZones);
+
+    state->dataHeatBalFanSys->MAT(1) = 21.0;
+    state->dataHeatBalFanSys->MAT(2) = 22.0;
+    state->dataHeatBalFanSys->MAT(3) = 23.0;
+    state->dataHeatBalFanSys->MAT(4) = 24.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
+    state->dataHeatBalFanSys->ZoneAirHumRat(2) = 0.001;
+    state->dataHeatBalFanSys->ZoneAirHumRat(3) = 0.001;
+    state->dataHeatBalFanSys->ZoneAirHumRat(4) = 0.001;
+
+    state->dataHeatBal->AirFlowFlag = true;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutHumRat = 0.0005;
+    state->dataEnvrn->StdRhoAir = 1.20;
+    state->dataHeatBal->Zone(1).WindSpeed = 1.0;
+    state->dataHeatBal->Zone(2).WindSpeed = 1.0;
+    state->dataHeatBal->Zone(3).WindSpeed = 1.0;
+    state->dataHeatBal->Zone(4).WindSpeed = 1.0;
+    state->dataHeatBal->Zone(1).OutDryBulbTemp = 15.0;
+    state->dataHeatBal->Zone(2).OutDryBulbTemp = 15.0;
+    state->dataHeatBal->Zone(3).OutDryBulbTemp = 15.0;
+    state->dataHeatBal->Zone(4).OutDryBulbTemp = 15.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
+
+    CalcAirFlowSimple(*state, 2);
+
+    EXPECT_EQ(state->dataHeatBalFanSys->MCPI(1), state->dataHeatBal->Infiltration(1).MCpI_temp); // one per zone
+    EXPECT_EQ(state->dataHeatBalFanSys->MCPI(2), state->dataHeatBal->Infiltration(2).MCpI_temp); // one per zone
+    EXPECT_EQ(state->dataHeatBalFanSys->MCPI(3), state->dataHeatBal->Infiltration(3).MCpI_temp); // one per zone
+    EXPECT_EQ(state->dataHeatBalFanSys->MCPI(4), state->dataHeatBal->Infiltration(4).MCpI_temp); // one per zone
+}
+
 TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays)
 {
 
