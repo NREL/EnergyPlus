@@ -3855,7 +3855,7 @@ namespace AirflowNetworkBalanceManager {
                             ->IntraZoneNodeData(state.dataAirflowNetwork->IntraZoneLinkageData(i).NodeNums[1] -
                                                 state.dataAirflowNetwork->AirflowNetworkNumOfZones -
                                                 state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode)
-                            .ZoneNum) {
+                            .AFNZoneNum) {
                         ShowSevereError(
                             state,
                             std::string{RoutineName} + CurrentModuleObject + "='" + Alphas(1) + ": Invalid zone inputs between Node and Link " +
@@ -3863,7 +3863,7 @@ namespace AirflowNetworkBalanceManager {
                                 state.dataAirflowNetwork
                                     ->MultizoneZoneData(
                                         state.dataAirflowNetwork->IntraZoneNodeData(state.dataAirflowNetwork->IntraZoneLinkageData(i).NodeNums[0])
-                                            .ZoneNum)
+                                            .AFNZoneNum)
                                     .ZoneName);
                         ErrorsFound = true;
                     }
@@ -3877,7 +3877,7 @@ namespace AirflowNetworkBalanceManager {
                             ->IntraZoneNodeData(state.dataAirflowNetwork->IntraZoneLinkageData(i).NodeNums[0] -
                                                 state.dataAirflowNetwork->AirflowNetworkNumOfZones -
                                                 state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode)
-                            .ZoneNum) {
+                            .AFNZoneNum) {
                         ShowSevereError(
                             state,
                             std::string{RoutineName} + CurrentModuleObject + "='" + Alphas(1) + ": Invalid zone inputs between Node and Link " +
@@ -3885,7 +3885,7 @@ namespace AirflowNetworkBalanceManager {
                                 state.dataAirflowNetwork
                                     ->MultizoneZoneData(
                                         state.dataAirflowNetwork->IntraZoneNodeData(state.dataAirflowNetwork->IntraZoneLinkageData(i).NodeNums[1])
-                                            .ZoneNum)
+                                            .AFNZoneNum)
                                     .ZoneName);
                         ErrorsFound = true;
                     }
