@@ -523,6 +523,55 @@ namespace UnitarySystems {
                 if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
                     DXCoils::SetCoilSystemCoolingData(state, this->m_CoolingCoilName, this->Name);
                 }
+                // open this up to include UnitarySystem on a future commit
+                if (!this->m_FanExists && this->UnitType == "CoilSystem:Cooling:DX") {
+                    if (this->m_CoolCoilExists) { // copy this block for heating coil also on future commit
+                        bool coilDataSet = false;
+                        bool errorsFound = false;
+                        std::string coilName;
+                        std::string coilType;
+                        if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+                            VariableSpeedCoils::getCoilTypeAndName(state, this->m_CoolingCoilIndex, coilType, coilName, errorsFound);
+                            if (!errorsFound) coilDataSet = true;
+                        } else if (this->m_CoolingCoilIndex == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
+                            // need to check for all other coil types
+                        }
+                        if (coilDataSet) {
+                            switch (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanModelTypeEnum) {
+                            case DataAirSystems::structArrayLegacyFanModels: {
+                                int SupFanNum = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum;
+                                if (SupFanNum > 0) {
+                                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
+                                        state,
+                                        coilName,
+                                        coilType,
+                                        state.dataFans->Fan(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum).FanName,
+                                        DataAirSystems::structArrayLegacyFanModels,
+                                        state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum);
+                                }
+
+                                break;
+                            }
+                            case DataAirSystems::objectVectorOOFanSystemModel: {
+                                if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex >= 0) {
+                                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
+                                        state,
+                                        coilName,
+                                        coilType,
+                                        state.dataHVACFan->fanObjs[state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex]->name,
+                                        DataAirSystems::objectVectorOOFanSystemModel,
+                                        state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex);
+                                }
+                                break;
+                            }
+                            case DataAirSystems::fanModelTypeNotYetSet: {
+                                // do nothing
+                                break;
+                            }
+                            }
+                        }
+                    }
+                }
             }
             this->sizeSystem(state, FirstHVACIteration, AirLoopNum);
             this->m_MySizingCheckFlag = false;
@@ -5277,7 +5326,7 @@ namespace UnitarySystems {
                 errorsFound = true;
             }
 
-            if (loc_m_SystemCoolControlNodeName.size() > 0) {
+            if (loc_m_SystemCoolControlNodeName.size() > 0) { // used by CoilSystem:Cooling:DX
                 this->m_SystemCoolControlNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                        loc_m_SystemCoolControlNodeName,
                                                                                        errFlag,

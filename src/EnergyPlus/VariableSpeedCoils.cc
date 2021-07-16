@@ -7306,6 +7306,23 @@ namespace VariableSpeedCoils {
         state.dataVariableSpeedCoils->VarSpeedCoil(dXCoilNum).SupplyFanName = fanName;
     }
 
+    void getCoilTypeAndName(EnergyPlusData &state, int const CoilIndex, std::string &CoilType, std::string &CoilName, bool &ErrorsFound)
+    {
+        if (state.dataVariableSpeedCoils->GetCoilsInputFlag) { // First time subroutine has been entered
+            GetVarSpeedCoilInput(state);
+            state.dataVariableSpeedCoils->GetCoilsInputFlag = false;
+        }
+
+        if (CoilIndex == 0) {
+            ShowSevereError(state, "getCoilTypeAndName: Could not find Coil");
+            ErrorsFound = true;
+        } else {
+            CoilName = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).Name;
+            CoilType = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).VarSpeedCoilType;
+        }
+
+    }
+
     void CalcVarSpeedCoilHeating(EnergyPlusData &state,
                                  int const DXCoilNum,                      // Heat Pump Number
                                  int const CyclingScheme,                  // Fan/Compressor cycling scheme indicator
