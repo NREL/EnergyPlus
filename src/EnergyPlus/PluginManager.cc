@@ -427,6 +427,10 @@ PluginManager::PluginManager(EnergyPlusData &state)
     // If arg 0, it skips init registration of signal handlers, which might be useful when Python is embedded.
     Py_InitializeEx(0);
 
+    // Take control of the global interpreter lock while we are here, make sure to release it...
+    PyGILState_STATE s = PyGILState_Ensure();
+
+    // call this once to allow us to add to, and report, sys.path later as needed
     PyRun_SimpleString("import sys"); // allows us to report sys.path later
 
     // we also need to set an extra import path to find some dynamic library loading stuff, again make it relative to the binary
@@ -583,6 +587,8 @@ PluginManager::PluginManager(EnergyPlusData &state)
         }
     }
 
+    // Release the global interpreter lock
+    PyGILState_Release(s);
     // setting up output variables deferred until later in the simulation setup process
 #else
     // need to alert only if a plugin instance is found
@@ -1021,6 +1027,9 @@ bool PluginInstance::run(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledF
         return false;
     }
 
+    // Get control of the global interpreter lock
+    PyGILState_STATE s = PyGILState_Ensure();
+
     // then call the main function
     // static const PyObject oneArgObjFormat = Py_BuildValue)("O");
     PyObject *pStateInstance = PyLong_FromVoidPtr((void *)&state);
@@ -1034,6 +1043,7 @@ bool PluginInstance::run(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledF
         } else {
             EnergyPlus::ShowContinueError(state, "This could happen for any number of reasons, check the plugin code.");
         }
+        PyGILState_Release(s);
         EnergyPlus::ShowFatalError(state,
                                    "Program terminates after call to " + functionNameAsString + "() on " + this->stringIdentifier + " failed!");
     }
@@ -1042,18 +1052,22 @@ bool PluginInstance::run(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledF
         if (exitCode == 0) {
             // success
         } else if (exitCode == 1) {
+            PyGILState_Release(s);
             EnergyPlus::ShowFatalError(state, "Python Plugin \"" + this->stringIdentifier + "\" returned 1 to indicate EnergyPlus should abort");
         }
     } else {
         std::string const functionNameAsString(functionName); // only convert to string if an error occurs
+        PyGILState_Release(s);
         EnergyPlus::ShowFatalError(state,
                                    "Invalid return from " + functionNameAsString + "() on class \"" + this->stringIdentifier +
                                        ", make sure it returns an integer exit code, either zero (success) or one (failure)");
     }
     Py_DECREF(pFunctionResponse); // PyObject_CallFunction returns new reference, decrement
     if (state.dataPluginManager->apiErrorFlag) {
+        PyGILState_Release(s);
         EnergyPlus::ShowFatalError(state, "API problems encountered while running plugin cause program termination.");
     }
+    PyGILState_Release(s);
     return true;
 }
 #else
