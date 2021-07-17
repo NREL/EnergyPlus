@@ -147,7 +147,12 @@ void cleanEPJSON(json &epjson)
     }
 }
 
-bool processInput(std::string const &inputFilePath, json const &schema, OutputTypes outputType, fs::path outputDirPath, std::string &outputTypeStr)
+bool processInput(std::string const &inputFilePath,
+                  json const &schema,
+                  OutputTypes outputType,
+                  fs::path outputDirPath,
+                  std::string &outputTypeStr,
+                  bool convertHVACTemplate)
 {
     auto validation(std::unique_ptr<Validation>(new Validation(&schema)));
     auto idf_parser(std::unique_ptr<IdfParser>(new IdfParser()));
@@ -220,18 +225,12 @@ bool processInput(std::string const &inputFilePath, json const &schema, OutputTy
         return false;
     }
 
-#ifdef _WIN32
-    std::string const NL("\r\n"); // Platform newline
-#else
-    std::string const NL("\n"); // Platform newline
-#endif
-
     try {
         if (!isEpJSON) {
             std::string input_file;
             std::string line;
             while (std::getline(input_stream, line)) {
-                input_file.append(line + NL);
+                input_file.append(line + "\n");
             }
             if (input_file.empty()) {
                 displayMessage("Failed to read input file: " + inputFilePath);
@@ -239,7 +238,7 @@ bool processInput(std::string const &inputFilePath, json const &schema, OutputTy
             }
 
             bool success = true;
-            epJSON = idf_parser->decode(input_file, schema, success);
+            epJSON = idf_parser->decode(input_file, schema, success, convertHVACTemplate);
             cleanEPJSON(epJSON);
         } else if (isCBOR) {
             epJSON = json::from_cbor(input_stream);
@@ -277,14 +276,14 @@ bool processInput(std::string const &inputFilePath, json const &schema, OutputTy
         auto const input_file = idf_parser->encode(epJSON, schema);
         fs::path convertedEpJSON =
             EnergyPlus::FileSystem::makeNativePath(EnergyPlus::FileSystem::replaceFileExtension(fileNameWithoutExtension, ".idf"));
-        std::ofstream convertedFS(convertedEpJSON, std::ofstream::out | std::ofstream::binary);
+        std::ofstream convertedFS(convertedEpJSON, std::ofstream::out);
         convertedFS << input_file << std::endl;
         outputTypeStr = "IDF";
     } else if ((outputType == OutputTypes::Default || outputType == OutputTypes::epJSON) && !isEpJSON) {
         auto const input_file = epJSON.dump(4, ' ', false, json::error_handler_t::replace);
         fs::path convertedIDF =
             EnergyPlus::FileSystem::makeNativePath(EnergyPlus::FileSystem::replaceFileExtension(fileNameWithoutExtension, ".epJSON"));
-        std::ofstream convertedFS(convertedIDF, std::ofstream::out | std::ofstream::binary);
+        std::ofstream convertedFS(convertedIDF, std::ofstream::out);
         convertedFS << input_file << std::endl;
         outputTypeStr = "EPJSON";
     } else if (outputType == OutputTypes::CBOR) {
@@ -377,6 +376,15 @@ int main(int argc, const char *argv[])
             "--format",                                                        // Flag token.
             outputTypeValidation);
 
+    opt.add("",                                     // Default.
+            0,                                      // Required?
+            0,                                      // Number of args expected.
+            0,                                      // Delimiter if expecting multiple args.
+            "Do not convert HVACTemplate objects.", // Help description.
+            "-n",                                   // Flag token.
+            "--noHVACTemplate"                      // Flag token.
+    );
+
     opt.add("", 0, 0, 0, "Display version information", "-v", "--version");
 
     opt.add("",                            // Default.
@@ -428,6 +436,11 @@ int main(int argc, const char *argv[])
         std::string input_paths_file;
         opt.get("-i")->getString(input_paths_file);
         files = parse_input_paths(input_paths_file);
+    }
+
+    bool convertHVACTemplate = true;
+    if (opt.isSet("-n")) {
+        convertHVACTemplate = false;
     }
 
     std::string outputTypeStr;
@@ -504,11 +517,11 @@ int main(int argc, const char *argv[])
 #endif
 
 #ifdef _OPENMP
-#pragma omp parallel default(none) shared(files, number_files, fileCount, schema, outputType, outputTypeStr, output_directory)
+#pragma omp parallel default(none) shared(files, number_files, fileCount, schema, outputType, outputTypeStr, output_directory, convertHVACTemplate)
     {
 #pragma omp for
         for (int i = 0; i < number_files; ++i) {
-            bool successful = processInput(files[i], schema, outputType, output_directory, outputTypeStr);
+            bool successful = processInput(files[i], schema, outputType, output_directory, outputTypeStr, convertHVACTemplate);
 #pragma omp atomic
             ++fileCount;
             if (successful) {
@@ -520,7 +533,7 @@ int main(int argc, const char *argv[])
     }
 #else
     for (auto const &file : files) {
-        bool successful = processInput(file, schema, outputType, output_directory, outputTypeStr);
+        bool successful = processInput(file, schema, outputType, output_directory, outputTypeStr, convertHVACTemplate);
         ++fileCount;
         if (successful) {
             displayMessage("Input file converted to ", outputTypeStr, " successfully | ", fileCount, "/", number_files, " | ", file);
