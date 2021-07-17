@@ -77,8 +77,6 @@ namespace HeatBalFiniteDiffManager {
         CrankNicholsonSecondOrder, // original CondFD scheme.  semi implicit, second order in time
         FullyImplicitFirstOrder    // fully implicit scheme, first order in time.
     };
-    constexpr int CrankNicholsonSecondOrder(1);
-    constexpr int FullyImplicitFirstOrder(2);
 
     struct ConstructionDataFD
     {
