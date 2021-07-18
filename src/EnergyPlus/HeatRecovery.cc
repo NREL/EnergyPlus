@@ -1773,8 +1773,10 @@ namespace HeatRecovery {
                     }
                 }
 
-                if ((CompanionCoilIndex > 0) || (CompanionCoilType_Num == DataHVACGlobals::CoilDX_Cooling))
-                    {
+                if ((((CompanionCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
+                      (CompanionCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed)) &&
+                     (CompanionCoilIndex > 0)) ||
+                    ((CompanionCoilType_Num == DataHVACGlobals::CoilDX_Cooling) && (CompanionCoilIndex > -1))) {
 
                     if (CompanionCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
                         CompanionCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
