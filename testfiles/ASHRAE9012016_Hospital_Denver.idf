@@ -23008,50 +23008,42 @@
   AirLoopHVAC:OutdoorAirSystem,
     VAV_1_OA,                !- Name
     VAV_1_OA_Controllers,    !- Controller List Name
-    VAV_1_OA_Equipment,      !- Outdoor Air Equipment List Name
-    VAV_1 Availability Manager List;  !- Availability Manager List Name
+    VAV_1_OA_Equipment;      !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     VAV_ER_OA,               !- Name
     VAV_ER_OA_Controllers,   !- Controller List Name
-    VAV_ER_OA_Equipment,     !- Outdoor Air Equipment List Name
-    VAV_ER Availability Manager List;  !- Availability Manager List Name
+    VAV_ER_OA_Equipment;     !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     VAV_OR_OA,               !- Name
     VAV_OR_OA_Controllers,   !- Controller List Name
-    VAV_OR_OA_Equipment,     !- Outdoor Air Equipment List Name
-    VAV_OR Availability Manager List;  !- Availability Manager List Name
+    VAV_OR_OA_Equipment;     !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     VAV_ICU_OA,              !- Name
     VAV_ICU_OA_Controllers,  !- Controller List Name
-    VAV_ICU_OA_Equipment,    !- Outdoor Air Equipment List Name
-    VAV_ICU Availability Manager List;  !- Availability Manager List Name
+    VAV_ICU_OA_Equipment;    !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     VAV_PATRMS_OA,           !- Name
     VAV_PATRMS_OA_Controllers,  !- Controller List Name
-    VAV_PATRMS_OA_Equipment, !- Outdoor Air Equipment List Name
-    VAV_PATRMS Availability Manager List;  !- Availability Manager List Name
+    VAV_PATRMS_OA_Equipment; !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     VAV_2_OA,                !- Name
     VAV_2_OA_Controllers,    !- Controller List Name
-    VAV_2_OA_Equipment,      !- Outdoor Air Equipment List Name
-    VAV_2 Availability Manager List;  !- Availability Manager List Name
+    VAV_2_OA_Equipment;      !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     VAV_LABS_OA,             !- Name
     VAV_LABS_OA_Controllers, !- Controller List Name
-    VAV_LABS_OA_Equipment,   !- Outdoor Air Equipment List Name
-    VAV_LABS Availability Manager List;  !- Availability Manager List Name
+    VAV_LABS_OA_Equipment;   !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
-    CAV_KITCHEN_OA,          !- Name
+    CAV_KITCHEN_OA,              !- Name
     CAV_KITCHEN_OA_Controllers,  !- Controller List Name
-    CAV_KITCHEN_OA_Equipment,!- Outdoor Air Equipment List Name
-    CAV_KITCHEN Availability Manager List;  !- Availability Manager List Name
+    CAV_KITCHEN_OA_Equipment;    !- Outdoor Air Equipment List Name
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTSIDE AIR NODE ===========
 

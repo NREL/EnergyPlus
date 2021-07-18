@@ -15196,12 +15196,16 @@ void GetFanIndexForTwoSpeedCoil(
                         FoundAirSysNum = AirSysNum;
                         break;
                     }
-                    // these are specified in SimAirServingZones and need to be moved to a Data* file.
+                    // these are specified in SimAirServingZones and need to be moved to a Data* file. UnitarySystem=19
                 } else if (state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num ==
-                           SimAirServingZones::CompType::Furnace_UnitarySys_HeatOnly) {
-                    FoundBranch = BranchNum;
-                    FoundAirSysNum = AirSysNum;
-                    break;
+                           SimAirServingZones::CompType::UnitarySystemModel) {
+
+                    if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name,
+                                                    state.dataDXCoils->DXCoil(CoolingCoilIndex).CoilSystemName)) {
+                        FoundBranch = BranchNum;
+                        FoundAirSysNum = AirSysNum;
+                        break;
+                    }
                 }
             }
 
@@ -15222,7 +15226,7 @@ void GetFanIndexForTwoSpeedCoil(
                         SupplyFan_TypeNum = DataHVACGlobals::FanType_SystemModelObject;
 
                     } else if (state.dataAirSystemsData->PrimaryAirSystems(FoundAirSysNum).Branch(FoundBranch).Comp(CompNum).CompType_Num ==
-                               SimAirServingZones::CompType::Furnace_UnitarySys_HeatOnly) {
+                               SimAirServingZones::CompType::UnitarySystemModel) {
                         // fan may not be specified in a unitary system object, keep looking
                         // Unitary System will "set" the fan index to the DX coil if contained within the HVAC system
                         if (state.dataDXCoils->DXCoil(CoolingCoilIndex).SupplyFanIndex > -1) break;
