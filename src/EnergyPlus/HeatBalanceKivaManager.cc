@@ -981,6 +981,10 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
                 }
 
                 Real64 initDeepGroundDepth = fnd.deepGroundDepth;
+                Real64 totalDepthOfWallBelowGrade = fnd.wall.depthBelowSlab + (fnd.foundationDepth - fnd.wall.heightAboveGrade) + fnd.slab.totalWidth();
+                if (fnd.deepGroundDepth < totalDepthOfWallBelowGrade + 1.0) {
+                    fnd.deepGroundDepth = totalDepthOfWallBelowGrade + 1.0;
+                }
                 for (auto &block : fnd.inputBlocks) {
                     // Change temporary zero depth indicators to default foundation depth
                     if (block.depth == 0.0) {
