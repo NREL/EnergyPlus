@@ -831,7 +831,7 @@ namespace LowTempRadiantSystem {
             thisRadSys.CircLength = Numbers(6);
 
             if ((thisRadSys.WaterVolFlowMaxCool == AutoSize) &&
-                (variableFlowDesignDataObject.DesignCoolingCapMethod == 0 || lAlphaBlanks(6) || lAlphaBlanks(7) ||
+                (variableFlowDesignDataObject.DesignCoolingCapMethod == 0 || lAlphaBlanks(8) || lAlphaBlanks(9) ||
                  (thisRadSys.ColdWaterInNode <= 0) || (thisRadSys.ColdWaterOutNode <= 0) || (variableFlowDesignDataObject.ColdSetptSchedPtr == 0))) {
                 ShowSevereError(state, "Hydronic radiant systems may not be autosized without specification of nodes or schedules");
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " (cooling input) =" + Alphas(1));
