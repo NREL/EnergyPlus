@@ -6050,571 +6050,343 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
         }
     }
 
+    constexpr std::array<std::array<int, ConvectionConstants::NumConvSurfDeltaT>, ConvectionConstants::NumSurfConvOrientation> A1{{
+        ConvectionConstants::InConvClass_A1_StableHoriz,    // HorizontalDown, Positive
+        ConvectionConstants::InConvClass_A1_UnstableHoriz,  // HorizontalDown, Negative
+        ConvectionConstants::InConvClass_A1_StableTilted,   // TiltedDownward, Positive
+        ConvectionConstants::InConvClass_A1_UnstableTilted, // TiltedDownward, Negative
+        ConvectionConstants::InConvClass_A1_VertWalls,      // Vertical, Positive
+        ConvectionConstants::InConvClass_A1_VertWalls,      // Vertical, Negative
+        ConvectionConstants::InConvClass_A1_UnstableTilted, // TiltedUpward, Positive
+        ConvectionConstants::InConvClass_A1_StableTilted,   // TiltedUpward, Negative
+        ConvectionConstants::InConvClass_A1_UnstableHoriz,  // HorizontalUp, Positive
+        ConvectionConstants::InConvClass_A1_StableHoriz,    // HorizontalUp, Negative
+    }};
+
+    constexpr std::array<std::array<int, ConvectionConstants::NumConvSurfDeltaT>, ConvectionConstants::NumSurfConvOrientation> A2{{
+        ConvectionConstants::InConvClass_A2_StableHoriz,        // HorizontalDown, Positive
+        ConvectionConstants::InConvClass_A2_UnstableHoriz,      // HorizontalDown, Negative
+        ConvectionConstants::InConvClass_A2_StableTilted,       // TiltedDownward, Positive
+        ConvectionConstants::InConvClass_A2_UnstableTilted,     // TiltedDownward, Negative
+        ConvectionConstants::InConvClass_A2_VertWallsNonHeated, // Vertical, Positive
+        ConvectionConstants::InConvClass_A2_VertWallsNonHeated, // Vertical, Negative
+        ConvectionConstants::InConvClass_A2_UnstableTilted,     // TiltedUpward, Positive
+        ConvectionConstants::InConvClass_A2_StableTilted,       // TiltedUpward, Negative
+        ConvectionConstants::InConvClass_A2_UnstableHoriz,      // HorizontalUp, Positive
+        ConvectionConstants::InConvClass_A2_StableHoriz,        // HorizontalUp, Negative
+    }};
+
+    constexpr std::array<std::array<int, ConvectionConstants::NumConvSurfDeltaT>, ConvectionConstants::NumSurfConvOrientation> A3{{
+        ConvectionConstants::InConvClass_A3_StableHoriz,    // HorizontalDown, Positive
+        ConvectionConstants::InConvClass_A3_UnstableHoriz,  // HorizontalDown, Negative
+        ConvectionConstants::InConvClass_A3_StableTilted,   // TiltedDownward, Positive
+        ConvectionConstants::InConvClass_A3_UnstableTilted, // TiltedDownward, Negative
+        ConvectionConstants::InConvClass_A3_VertWalls,      // Vertical, Positive
+        ConvectionConstants::InConvClass_A3_VertWalls,      // Vertical, Negative
+        ConvectionConstants::InConvClass_A3_UnstableTilted, // TiltedUpward, Positive
+        ConvectionConstants::InConvClass_A3_StableTilted,   // TiltedUpward, Negative
+        ConvectionConstants::InConvClass_A3_UnstableHoriz,  // HorizontalUp, Positive
+        ConvectionConstants::InConvClass_A3_StableHoriz,    // HorizontalUp, Negative
+    }};
+
+    constexpr std::array<std::array<int, ConvectionConstants::NumConvSurfDeltaT>, ConvectionConstants::NumSurfConvOrientation> B{{
+        ConvectionConstants::InConvClass_B_StableHoriz,    // HorizontalDown, Positive
+        ConvectionConstants::InConvClass_B_UnstableHoriz,  // HorizontalDown, Negative
+        ConvectionConstants::InConvClass_B_StableTilted,   // TiltedDownward, Positive
+        ConvectionConstants::InConvClass_B_UnstableTilted, // TiltedDownward, Negative
+        ConvectionConstants::InConvClass_B_VertWalls,      // Vertical, Positive
+        ConvectionConstants::InConvClass_B_VertWalls,      // Vertical, Negative
+        ConvectionConstants::InConvClass_B_UnstableTilted, // TiltedUpward, Positive
+        ConvectionConstants::InConvClass_B_StableTilted,   // TiltedUpward, Negative
+        ConvectionConstants::InConvClass_B_UnstableHoriz,  // HorizontalUp, Positive
+        ConvectionConstants::InConvClass_B_StableHoriz,    // HorizontalUp, Negative
+    }};
+
+    constexpr std::array<std::array<int, ConvectionConstants::NumConvSurfDeltaT>, ConvectionConstants::NumSurfConvOrientation> D{{
+        ConvectionConstants::InConvClass_D_StableHoriz,    // HorizontalDown, Positive
+        ConvectionConstants::InConvClass_D_UnstableHoriz,  // HorizontalDown, Negative
+        ConvectionConstants::InConvClass_D_StableTilted,   // TiltedDownward, Positive
+        ConvectionConstants::InConvClass_D_UnstableTilted, // TiltedDownward, Negative
+        ConvectionConstants::InConvClass_D_Walls,          // Vertical, Positive
+        ConvectionConstants::InConvClass_D_Walls,          // Vertical, Negative
+        ConvectionConstants::InConvClass_D_UnstableTilted, // TiltedUpward, Positive
+        ConvectionConstants::InConvClass_D_StableTilted,   // TiltedUpward, Negative
+        ConvectionConstants::InConvClass_D_UnstableHoriz,  // HorizontalUp, Positive
+        ConvectionConstants::InConvClass_D_StableHoriz,    // HorizontalUp, Negative
+    }};
+
+    auto DeltaTempLambda = [](Real64 surfTemp, Real64 airTemp) {
+        return (surfTemp - airTemp) > 0.0 ? int(ConvectionConstants::ConvSurfDeltaT::Positive) : int(ConvectionConstants::ConvSurfDeltaT::Negative);
+    };
+
     // now finish out specific model eq for this surface
     // Surface(SurfNum)%IntConvClassification = 0 !init/check
-    {
-        auto const SELECT_CASE_var(FinalFlowRegime);
 
-        if (SELECT_CASE_var == ConvectionConstants::InConvFlowRegime::A1) {
-            DeltaTemp = TH(2, 1, SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
-            if (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::Door) {
+    int iDeltaTemp = DeltaTempLambda(TH(2, 1, SurfNum), state.dataHeatBalFanSys->MAT(ZoneNum));
+    int iConvOrient = int(Surface(SurfNum).ConvOrientation);
 
-                switch (Surface(SurfNum).ConvOrientation) {
-                case ConvectionConstants::SurfConvOrientation::Vertical:
-                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_VertWalls;
-                    break;
-                case ConvectionConstants::SurfConvOrientation::TiltedUpward:
-                    if (DeltaTemp > 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_UnstableTilted;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_StableTilted;
-                    }
-                    break;
-                case ConvectionConstants::SurfConvOrientation::TiltedDownward:
-                    if (DeltaTemp < 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_UnstableTilted;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_StableTilted;
-                    }
-                    break;
-                default:
-                    assert(false);
-                }
+    switch (FinalFlowRegime) {
+    case ConvectionConstants::InConvFlowRegime::A1:
 
-            } else if (Surface(SurfNum).Class == SurfaceClass::Roof) {
-                if (state.dataSurface->SurfIntConvSurfHasActiveInIt(SurfNum)) {
-                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_ChilledCeil;
-                } else {
-                    switch (Surface(SurfNum).ConvOrientation) {
-                    case ConvectionConstants::SurfConvOrientation::HorizontalDown:
-                        if (DeltaTemp < 0.0) {
-                            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_UnstableHoriz;
-                        } else {
-                            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_StableHoriz;
-                        }
-                        break;
-                    case ConvectionConstants::SurfConvOrientation::TiltedDownward:
-                        if (DeltaTemp < 0.0) {
-                            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_UnstableTilted;
-                        } else {
-                            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_StableTilted;
-                        }
-                        break;
-                    case ConvectionConstants::SurfConvOrientation::Vertical:
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_VertWalls;
-                        break;
-                    case ConvectionConstants::SurfConvOrientation::TiltedUpward:
-                        if (DeltaTemp > 0.0) {
-                            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_UnstableTilted;
-                        } else {
-                            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_StableTilted;
-                        }
-                        break;
-                    default:
-                        assert(false);
-                    }
-                }
-
-            } else if (Surface(SurfNum).Class == SurfaceClass::Floor) {
-                if (state.dataSurface->SurfIntConvSurfHasActiveInIt(SurfNum)) {
-                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_HeatedFloor;
-                } else {
-                    switch (Surface(SurfNum).ConvOrientation) {
-                    case ConvectionConstants::SurfConvOrientation::HorizontalUp:
-                        if (DeltaTemp > 0.0) {
-                            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_UnstableHoriz;
-                        } else {
-                            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_StableHoriz;
-                        }
-                        break;
-                    case ConvectionConstants::SurfConvOrientation::TiltedUpward:
-                        if (DeltaTemp > 0.0) {
-                            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_UnstableTilted;
-                        } else {
-                            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_StableTilted;
-                        }
-                        break;
-                    default:
-                        assert(false);
-                    }
-                }
-
-            } else if ((Surface(SurfNum).Class == SurfaceClass::Window) || (Surface(SurfNum).Class == SurfaceClass::GlassDoor) ||
-                       (Surface(SurfNum).Class == SurfaceClass::TDD_Diffuser)) {
-                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_Windows;
-            } else if (Surface(SurfNum).Class == SurfaceClass::IntMass) {
-                // assume horizontal upwards.
-                if (DeltaTemp > 0.0) {
-                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_UnstableHoriz;
-                } else {
-                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_StableHoriz;
-                }
+        switch (Surface(SurfNum).Class) {
+        case SurfaceClass::Wall:
+        case SurfaceClass::Door:
+        case SurfaceClass::IntMass:
+            state.dataSurface->SurfIntConvClassification(SurfNum) = A1[iConvOrient][iDeltaTemp];
+            break;
+        case SurfaceClass::Roof:
+            if (state.dataSurface->SurfIntConvSurfHasActiveInIt(SurfNum)) {
+                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_ChilledCeil;
+            } else {
+                state.dataSurface->SurfIntConvClassification(SurfNum) = A1[iConvOrient][iDeltaTemp];
             }
-
-            if (state.dataSurface->SurfIntConvClassification(SurfNum) == ConvectionConstants::InConvClass_Invalid) {
-                ShowSevereError(state,
-                                "DynamicIntConvSurfaceClassification: failed to resolve Hc model for A1 surface named" + Surface(SurfNum).Name);
+            break;
+        case SurfaceClass::Floor:
+            if (state.dataSurface->SurfIntConvSurfHasActiveInIt(SurfNum)) {
+                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_HeatedFloor;
+            } else {
+                state.dataSurface->SurfIntConvClassification(SurfNum) = A1[iConvOrient][iDeltaTemp];
             }
-
-        } else if (SELECT_CASE_var == ConvectionConstants::InConvFlowRegime::A2) {
-            DeltaTemp = TH(2, 1, SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
-            if (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::Door) {
-
-                if (state.dataSurface->SurfIntConvSurfHasActiveInIt(SurfNum)) {
-                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_HeatedVerticalWall;
-                } else {
-
-                    switch (Surface(SurfNum).ConvOrientation) {
-                    case ConvectionConstants::SurfConvOrientation::Vertical:
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_VertWallsNonHeated;
-                        break;
-                    case ConvectionConstants::SurfConvOrientation::TiltedUpward:
-                        if (DeltaTemp > 0.0) {
-                            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_UnstableTilted;
-                        } else {
-                            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_StableTilted;
-                        }
-                        break;
-                    case ConvectionConstants::SurfConvOrientation::TiltedDownward:
-                        if (DeltaTemp < 0.0) {
-                            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_UnstableTilted;
-                        } else {
-                            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_StableTilted;
-                        }
-                        break;
-                    default:
-                        assert(false);
-                    }
-                }
-
-            } else if (Surface(SurfNum).Class == SurfaceClass::Roof) {
-
-                switch (Surface(SurfNum).ConvOrientation) {
-                case ConvectionConstants::SurfConvOrientation::HorizontalDown:
-                    if (DeltaTemp < 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_UnstableHoriz;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_StableHoriz;
-                    }
-                    break;
-                case ConvectionConstants::SurfConvOrientation::TiltedDownward:
-                    if (DeltaTemp < 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_UnstableTilted;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_StableTilted;
-                    }
-                    break;
-                default:
-                    assert(false);
-                }
-
-            } else if (Surface(SurfNum).Class == SurfaceClass::Floor) {
-
-                switch (Surface(SurfNum).ConvOrientation) {
-                case ConvectionConstants::SurfConvOrientation::HorizontalUp:
-                    if (DeltaTemp > 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_UnstableHoriz;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_StableHoriz;
-                    }
-                    break;
-                case ConvectionConstants::SurfConvOrientation::TiltedUpward:
-                    if (DeltaTemp > 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_UnstableTilted;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_StableTilted;
-                    }
-                    break;
-                default:
-                    assert(false);
-                }
-
-            } else if ((Surface(SurfNum).Class == SurfaceClass::Window) || (Surface(SurfNum).Class == SurfaceClass::GlassDoor) ||
-                       (Surface(SurfNum).Class == SurfaceClass::TDD_Diffuser)) {
-                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_Windows;
-            } else if (Surface(SurfNum).Class == SurfaceClass::IntMass) {
-                // assume horizontal upwards.
-                if (DeltaTemp > 0.0) {
-                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_UnstableHoriz;
-                } else {
-                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_StableHoriz;
-                }
-            }
-
-            if (state.dataSurface->SurfIntConvClassification(SurfNum) == ConvectionConstants::InConvClass_Invalid) {
-                ShowSevereError(state,
-                                "DynamicIntConvSurfaceClassification: failed to resolve Hc model for A2 surface named" + Surface(SurfNum).Name);
-            }
-        } else if (SELECT_CASE_var == ConvectionConstants::InConvFlowRegime::A3) {
-            DeltaTemp = TH(2, 1, SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
-            if (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::Door) {
-
-                switch (Surface(SurfNum).ConvOrientation) {
-                case ConvectionConstants::SurfConvOrientation::Vertical:
-                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_VertWalls;
-                    break;
-                case ConvectionConstants::SurfConvOrientation::TiltedUpward:
-                case ConvectionConstants::SurfConvOrientation::HorizontalUp:
-                    if (DeltaTemp > 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_UnstableTilted;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_StableTilted;
-                    }
-                    break;
-                case ConvectionConstants::SurfConvOrientation::TiltedDownward:
-                case ConvectionConstants::SurfConvOrientation::HorizontalDown:
-                    if (DeltaTemp < 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_UnstableTilted;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_StableTilted;
-                    }
-                    break;
-                default:
-                    assert(false);
-                }
-
-            } else if (Surface(SurfNum).Class == SurfaceClass::Roof) {
-
-                switch (Surface(SurfNum).ConvOrientation) {
-                case ConvectionConstants::SurfConvOrientation::HorizontalDown:
-                    if (DeltaTemp < 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_UnstableHoriz;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_StableHoriz;
-                    }
-                    break;
-                case ConvectionConstants::SurfConvOrientation::TiltedDownward:
-                    if (DeltaTemp < 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_UnstableTilted;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_StableTilted;
-                    }
-                    break;
-                case ConvectionConstants::SurfConvOrientation::Vertical:
-                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_VertWalls;
-                    break;
-                case ConvectionConstants::SurfConvOrientation::TiltedUpward:
-                    if (DeltaTemp > 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_UnstableTilted;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_StableTilted;
-                    }
-                    break;
-                default:
-                    assert(false);
-                }
-
-            } else if (Surface(SurfNum).Class == SurfaceClass::Floor) {
-
-                switch (Surface(SurfNum).ConvOrientation) {
-                case ConvectionConstants::SurfConvOrientation::HorizontalUp:
-                    if (DeltaTemp > 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_UnstableHoriz;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_StableHoriz;
-                    }
-                    break;
-                case ConvectionConstants::SurfConvOrientation::TiltedUpward:
-                    if (DeltaTemp > 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_UnstableTilted;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_StableTilted;
-                    }
-                    break;
-                default:
-                    assert(false);
-                }
-
-            } else if ((Surface(SurfNum).Class == SurfaceClass::Window) || (Surface(SurfNum).Class == SurfaceClass::GlassDoor) ||
-                       (Surface(SurfNum).Class == SurfaceClass::TDD_Diffuser)) {
-                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_Windows;
-            } else if (Surface(SurfNum).Class == SurfaceClass::IntMass) {
-                // assume horizontal upwards.
-                if (DeltaTemp >= 0.0) {
-                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_UnstableHoriz;
-                } else {
-                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_StableHoriz;
-                }
-            }
-
-            if (state.dataSurface->SurfIntConvClassification(SurfNum) == ConvectionConstants::InConvClass_Invalid) {
-                ShowSevereError(state,
-                                "DynamicIntConvSurfaceClassification: failed to resolve Hc model for A3 surface named" + Surface(SurfNum).Name);
-            }
-        } else if (SELECT_CASE_var == ConvectionConstants::InConvFlowRegime::B) {
-            DeltaTemp = TH(2, 1, SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
-            if (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::Door) {
-
-                switch (Surface(SurfNum).ConvOrientation) {
-                case ConvectionConstants::SurfConvOrientation::Vertical:
-                    if (state.dataSurface->SurfIntConvSurfGetsRadiantHeat(SurfNum)) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_VertWallsNearHeat;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_VertWalls;
-                    }
-                    break;
-                case ConvectionConstants::SurfConvOrientation::TiltedUpward:
-                case ConvectionConstants::SurfConvOrientation::HorizontalUp:
-                    if (DeltaTemp > 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_UnstableTilted;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_StableTilted;
-                    }
-                    break;
-                case ConvectionConstants::SurfConvOrientation::TiltedDownward:
-                case ConvectionConstants::SurfConvOrientation::HorizontalDown:
-                    if (DeltaTemp < 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_UnstableTilted;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_StableTilted;
-                    }
-                    break;
-                default:
-                    assert(false);
-                }
-
-            } else if (Surface(SurfNum).Class == SurfaceClass::Roof) {
-
-                switch (Surface(SurfNum).ConvOrientation) {
-                case ConvectionConstants::SurfConvOrientation::HorizontalDown:
-                    if (DeltaTemp < 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_UnstableHoriz;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_StableHoriz;
-                    }
-                    break;
-                case ConvectionConstants::SurfConvOrientation::TiltedDownward:
-                    if (DeltaTemp < 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_UnstableTilted;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_StableTilted;
-                    }
-                    break;
-                case ConvectionConstants::SurfConvOrientation::Vertical:
-                    if (state.dataSurface->SurfIntConvSurfGetsRadiantHeat(SurfNum)) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_VertWallsNearHeat;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_VertWalls;
-                    }
-                    break;
-                case ConvectionConstants::SurfConvOrientation::TiltedUpward:
-                    if (DeltaTemp > 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_UnstableTilted;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_StableTilted;
-                    }
-                    break;
-                default:
-                    assert(false);
-                }
-
-            } else if (Surface(SurfNum).Class == SurfaceClass::Floor) {
-
-                switch (Surface(SurfNum).ConvOrientation) {
-                case ConvectionConstants::SurfConvOrientation::HorizontalUp:
-                    if (DeltaTemp > 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_UnstableHoriz;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_StableHoriz;
-                    }
-                    break;
-                case ConvectionConstants::SurfConvOrientation::TiltedUpward:
-                    if (DeltaTemp > 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_UnstableTilted;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_StableTilted;
-                    }
-                    break;
-                default:
-                    assert(false);
-                }
-
-            } else if ((Surface(SurfNum).Class == SurfaceClass::Window) || (Surface(SurfNum).Class == SurfaceClass::GlassDoor) ||
-                       (Surface(SurfNum).Class == SurfaceClass::TDD_Diffuser)) {
-                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_Windows;
-            } else if (Surface(SurfNum).Class == SurfaceClass::IntMass) {
-                // assume horizontal upwards.
-                if (DeltaTemp > 0.0) {
-                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_UnstableHoriz;
-                } else {
-                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_StableHoriz;
-                }
-            }
-
-            if (state.dataSurface->SurfIntConvClassification(SurfNum) == ConvectionConstants::InConvClass_Invalid) {
-                ShowSevereError(state, "DynamicIntConvSurfaceClassification: failed to resolve Hc model for B surface named" + Surface(SurfNum).Name);
-            }
-        } else if (SELECT_CASE_var == ConvectionConstants::InConvFlowRegime::C) {
-            if (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::Door) {
-                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_C_Walls;
-            } else if (Surface(SurfNum).Class == SurfaceClass::Roof) {
-                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_C_Ceiling;
-            } else if (Surface(SurfNum).Class == SurfaceClass::Floor) {
-                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_C_Floor;
-            } else if ((Surface(SurfNum).Class == SurfaceClass::Window) || (Surface(SurfNum).Class == SurfaceClass::GlassDoor) ||
-                       (Surface(SurfNum).Class == SurfaceClass::TDD_Diffuser)) {
-                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_C_Windows;
-            } else if (Surface(SurfNum).Class == SurfaceClass::IntMass) {
-                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_C_Floor;
-            }
-            if (state.dataSurface->SurfIntConvClassification(SurfNum) == ConvectionConstants::InConvClass_Invalid) {
-                ShowSevereError(state, "DynamicIntConvSurfaceClassification: failed to resolve Hc model for C surface named" + Surface(SurfNum).Name);
-            }
-
-        } else if (SELECT_CASE_var == ConvectionConstants::InConvFlowRegime::D) {
-
-            DeltaTemp = TH(2, 1, SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
-            if (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::Door) {
-
-                switch (Surface(SurfNum).ConvOrientation) {
-                case ConvectionConstants::SurfConvOrientation::Vertical:
-                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_Walls;
-                    break;
-                case ConvectionConstants::SurfConvOrientation::HorizontalUp:
-                case ConvectionConstants::SurfConvOrientation::TiltedUpward:
-                    if (DeltaTemp > 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_UnstableTilted;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_StableTilted;
-                    }
-                    break;
-                case ConvectionConstants::SurfConvOrientation::HorizontalDown:
-                case ConvectionConstants::SurfConvOrientation::TiltedDownward:
-                    if (DeltaTemp < 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_UnstableTilted;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_StableTilted;
-                    }
-                    break;
-                default:
-                    assert(false);
-                }
-
-            } else if (Surface(SurfNum).Class == SurfaceClass::Roof) {
-
-                switch (Surface(SurfNum).ConvOrientation) {
-                case ConvectionConstants::SurfConvOrientation::HorizontalDown:
-                    if (DeltaTemp < 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_UnstableHoriz;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_StableHoriz;
-                    }
-                    break;
-                case ConvectionConstants::SurfConvOrientation::TiltedDownward:
-                    if (DeltaTemp < 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_UnstableTilted;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_StableTilted;
-                    }
-                    break;
-                case ConvectionConstants::SurfConvOrientation::Vertical:
-                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_Walls;
-                    break;
-                case ConvectionConstants::SurfConvOrientation::TiltedUpward:
-                case ConvectionConstants::SurfConvOrientation::HorizontalUp:
-                    if (DeltaTemp > 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_UnstableTilted;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_StableTilted;
-                    }
-                    break;
-                default:
-                    assert(false);
-                }
-
-            } else if (Surface(SurfNum).Class == SurfaceClass::Floor) {
-
-                switch (Surface(SurfNum).ConvOrientation) {
-                case ConvectionConstants::SurfConvOrientation::HorizontalUp:
-                    if (DeltaTemp > 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_UnstableHoriz;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_StableHoriz;
-                    }
-                    break;
-                case ConvectionConstants::SurfConvOrientation::TiltedUpward:
-                    if (DeltaTemp > 0.0) {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_UnstableTilted;
-                    } else {
-                        state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_StableTilted;
-                    }
-                    break;
-                default:
-                    assert(false);
-                }
-
-            } else if ((Surface(SurfNum).Class == SurfaceClass::Window) || (Surface(SurfNum).Class == SurfaceClass::GlassDoor) ||
-                       (Surface(SurfNum).Class == SurfaceClass::TDD_Diffuser)) {
-                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_Windows;
-            } else if (Surface(SurfNum).Class == SurfaceClass::IntMass) {
-                // assume horizontal upwards.
-                if (DeltaTemp > 0.0) {
-                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_UnstableHoriz;
-                } else {
-                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_StableHoriz;
-                }
-            }
-
-            if (state.dataSurface->SurfIntConvClassification(SurfNum) == ConvectionConstants::InConvClass_Invalid) {
-                ShowSevereError(state, "DynamicIntConvSurfaceClassification: failed to resolve Hc model for D surface named" + Surface(SurfNum).Name);
-            }
-
-        } else if (SELECT_CASE_var == ConvectionConstants::InConvFlowRegime::E) {
-
-            DeltaTemp = TH(2, 1, SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
-            if (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::Door) {
-
-                // mixed regime, but need to know what regime it was before it was mixed
-                {
-                    auto const SELECT_CASE_var1(FlowRegimeStack[PriorityEquipOn]);
-
-                    if (SELECT_CASE_var1 == ConvectionConstants::InConvFlowRegime::C) {
-                        // assume forced flow is down along wall (ceiling diffuser)
-                        if (DeltaTemp > 0.0) { // surface is hotter so plume upwards and forces oppose
-                            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_E_OpposFlowWalls;
-                        } else { // surface is cooler so plume down and forces assist
-                            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_E_AssistFlowWalls;
-                        }
-                    } else if (SELECT_CASE_var1 == ConvectionConstants::InConvFlowRegime::D) {
-                        // assume forced flow is upward along wall (perimeter zone HVAC with fan)
-                        if (DeltaTemp > 0.0) { // surface is hotter so plume up and forces assist
-                            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_E_AssistFlowWalls;
-                        } else { // surface is cooler so plume downward and forces oppose
-                            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_E_OpposFlowWalls;
-                        }
-                    }
-                }
-
-            } else if (Surface(SurfNum).Class == SurfaceClass::Roof) {
-                if (DeltaTemp > 0.0) { // surface is hotter so stable
-                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_E_StableCeiling;
-                } else {
-                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_E_UnstableCeiling;
-                }
-            } else if (Surface(SurfNum).Class == SurfaceClass::Floor) {
-                if (DeltaTemp > 0.0) { // surface is hotter so unstable
-                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_E_UnstableFloor;
-                } else {
-                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_E_StableFloor;
-                }
-            } else if ((Surface(SurfNum).Class == SurfaceClass::Window) || (Surface(SurfNum).Class == SurfaceClass::GlassDoor) ||
-                       (Surface(SurfNum).Class == SurfaceClass::TDD_Diffuser)) {
-                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_E_Windows;
-            } else if (Surface(SurfNum).Class == SurfaceClass::IntMass) {
-                if (DeltaTemp > 0.0) {
-                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_E_UnstableFloor;
-                } else {
-                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_E_StableFloor;
-                }
-            }
-            if (state.dataSurface->SurfIntConvClassification(SurfNum) == ConvectionConstants::InConvClass_Invalid) {
-                ShowSevereError(state,
-                                "DynamicIntConvSurfaceClassification: failed to resolve Hc model for D surface named " + Surface(SurfNum).Name);
-            }
-        } else {
-            ShowSevereError(state,
-                            "DynamicIntConvSurfaceClassification: failed to deterime zone flow regime for surface named " + Surface(SurfNum).Name);
+            break;
+        case SurfaceClass::Window:
+        case SurfaceClass::GlassDoor:
+        case SurfaceClass::TDD_Diffuser:
+            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A1_Windows;
+            break;
+        default:
+            assert(false);
         }
+
+        if (state.dataSurface->SurfIntConvClassification(SurfNum) == ConvectionConstants::InConvClass_Invalid) {
+            ShowSevereError(state, "DynamicIntConvSurfaceClassification: failed to resolve Hc model for A1 surface named" + Surface(SurfNum).Name);
+        }
+
+        break;
+
+    case ConvectionConstants::InConvFlowRegime::A2:
+
+        switch (Surface(SurfNum).Class) {
+        case SurfaceClass::Roof:
+        case SurfaceClass::Floor:
+        case SurfaceClass::IntMass:
+            state.dataSurface->SurfIntConvClassification(SurfNum) = A2[iConvOrient][iDeltaTemp];
+            break;
+        case SurfaceClass::Wall:
+        case SurfaceClass::Door:
+            if (state.dataSurface->SurfIntConvSurfHasActiveInIt(SurfNum)) {
+                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_HeatedVerticalWall;
+            } else {
+                state.dataSurface->SurfIntConvClassification(SurfNum) = A2[iConvOrient][iDeltaTemp];
+            }
+            break;
+        case SurfaceClass::Window:
+        case SurfaceClass::GlassDoor:
+        case SurfaceClass::TDD_Diffuser:
+            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_Windows;
+        default:
+            assert(false);
+        }
+
+        if (state.dataSurface->SurfIntConvClassification(SurfNum) == ConvectionConstants::InConvClass_Invalid) {
+            ShowSevereError(state, "DynamicIntConvSurfaceClassification: failed to resolve Hc model for A2 surface named" + Surface(SurfNum).Name);
+        }
+
+        break;
+
+    case ConvectionConstants::InConvFlowRegime::A3:
+
+        switch (Surface(SurfNum).Class) {
+        case SurfaceClass::Wall:
+        case SurfaceClass::Door:
+        case SurfaceClass::Roof:
+        case SurfaceClass::Floor:
+            state.dataSurface->SurfIntConvClassification(SurfNum) = A3[iConvOrient][iDeltaTemp];
+            break;
+        case SurfaceClass::IntMass:
+            // assume horizontal upwards.
+            // TODO: investigate, allows convection algorithm selected to be different from actual surface orientation
+            state.dataSurface->SurfIntConvClassification(SurfNum) = A3[int(ConvectionConstants::SurfConvOrientation::HorizontalUp)][iDeltaTemp];
+            break;
+        case SurfaceClass::Window:
+        case SurfaceClass::GlassDoor:
+        case SurfaceClass::TDD_Diffuser:
+            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A3_Windows;
+            break;
+        default:
+            assert(false);
+        }
+
+        if (state.dataSurface->SurfIntConvClassification(SurfNum) == ConvectionConstants::InConvClass_Invalid) {
+            ShowSevereError(state, "DynamicIntConvSurfaceClassification: failed to resolve Hc model for A3 surface named" + Surface(SurfNum).Name);
+        }
+
+        break;
+
+    case ConvectionConstants::InConvFlowRegime::B:
+
+        switch (Surface(SurfNum).Class) {
+        case SurfaceClass::Wall:
+        case SurfaceClass::Door:
+            if (state.dataSurface->SurfIntConvSurfGetsRadiantHeat(SurfNum)) {
+                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_VertWallsNearHeat;
+            } else {
+                state.dataSurface->SurfIntConvClassification(SurfNum) = B[iConvOrient][iDeltaTemp];
+            }
+            break;
+        case SurfaceClass::Roof:
+        case SurfaceClass::Floor:
+            state.dataSurface->SurfIntConvClassification(SurfNum) = B[iConvOrient][iDeltaTemp];
+            break;
+        case SurfaceClass::Window:
+        case SurfaceClass::GlassDoor:
+        case SurfaceClass::TDD_Diffuser:
+            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_B_Windows;
+            break;
+        case SurfaceClass::IntMass:
+            // assume horizontal upwards.
+            // TODO: investigate, allows convection algorithm selected to be different from actual surface orientation
+            state.dataSurface->SurfIntConvClassification(SurfNum) = B[int(ConvectionConstants::SurfConvOrientation::HorizontalUp)][iDeltaTemp];
+            break;
+        default:
+            assert(false);
+        }
+
+        if (state.dataSurface->SurfIntConvClassification(SurfNum) == ConvectionConstants::InConvClass_Invalid) {
+            ShowSevereError(state, "DynamicIntConvSurfaceClassification: failed to resolve Hc model for B surface named" + Surface(SurfNum).Name);
+        }
+        break;
+
+    case ConvectionConstants::InConvFlowRegime::C:
+
+        switch (Surface(SurfNum).Class) {
+        case SurfaceClass::Wall:
+        case SurfaceClass::Door:
+            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_C_Walls;
+            break;
+        case SurfaceClass::Roof:
+            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_C_Ceiling;
+            break;
+        case SurfaceClass::Floor:
+            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_C_Floor;
+            break;
+        case SurfaceClass::Window:
+        case SurfaceClass::GlassDoor:
+        case SurfaceClass::TDD_Diffuser:
+            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_C_Windows;
+            break;
+        case SurfaceClass::IntMass:
+            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_C_Floor;
+            break;
+        default:
+            assert(false);
+        }
+
+        if (state.dataSurface->SurfIntConvClassification(SurfNum) == ConvectionConstants::InConvClass_Invalid) {
+            ShowSevereError(state, "DynamicIntConvSurfaceClassification: failed to resolve Hc model for C surface named" + Surface(SurfNum).Name);
+        }
+
+        break;
+
+    case ConvectionConstants::InConvFlowRegime::D:
+
+        switch (Surface(SurfNum).Class) {
+        case SurfaceClass::Wall:
+        case SurfaceClass::Door:
+        case SurfaceClass::Roof:
+        case SurfaceClass::Floor:
+            state.dataSurface->SurfIntConvClassification(SurfNum) = D[iConvOrient][iDeltaTemp];
+            break;
+        case SurfaceClass::Window:
+        case SurfaceClass::GlassDoor:
+        case SurfaceClass::TDD_Diffuser:
+            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_D_Windows;
+            break;
+        case SurfaceClass::IntMass:
+            // assume horizontal upwards.
+            // TODO: investigate, allows convection algorithm selected to be different from actual surface orientation
+            state.dataSurface->SurfIntConvClassification(SurfNum) = D[int(ConvectionConstants::SurfConvOrientation::HorizontalUp)][iDeltaTemp];
+            break;
+        default:
+            assert(false);
+        }
+
+        if (state.dataSurface->SurfIntConvClassification(SurfNum) == ConvectionConstants::InConvClass_Invalid) {
+            ShowSevereError(state, "DynamicIntConvSurfaceClassification: failed to resolve Hc model for D surface named" + Surface(SurfNum).Name);
+        }
+
+        break;
+
+    case ConvectionConstants::InConvFlowRegime::E:
+
+    {
+        Real64 deltaTemp = TH(2, 1, SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
+
+        switch (Surface(SurfNum).Class) {
+        case SurfaceClass::Wall:
+        case SurfaceClass::Door:
+            switch (FlowRegimeStack[PriorityEquipOn]) {
+            case ConvectionConstants::InConvFlowRegime::C:
+                // assume forced flow is down along wall (ceiling diffuser)
+                if (deltaTemp > 0.0) { // surface is hotter so plume upwards and forces oppose
+                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_E_OpposFlowWalls;
+                } else { // surface is cooler so plume down and forces assist
+                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_E_AssistFlowWalls;
+                }
+                break;
+            case ConvectionConstants::InConvFlowRegime::D:
+                // assume forced flow is upward along wall (perimeter zone HVAC with fan)
+                if (deltaTemp > 0.0) { // surface is hotter so plume up and forces assist
+                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_E_AssistFlowWalls;
+                } else { // surface is cooler so plume downward and forces oppose
+                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_E_OpposFlowWalls;
+                }
+                break;
+            default:
+                assert(false);
+            }
+
+            break;
+
+        case SurfaceClass::Roof:
+            if (deltaTemp > 0.0) { // surface is hotter so stable
+                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_E_StableCeiling;
+            } else {
+                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_E_UnstableCeiling;
+            }
+            break;
+        case SurfaceClass::Floor:
+            if (deltaTemp > 0.0) { // surface is hotter so unstable
+                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_E_UnstableFloor;
+            } else {
+                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_E_StableFloor;
+            }
+            break;
+        case SurfaceClass::Window:
+        case SurfaceClass::GlassDoor:
+        case SurfaceClass::TDD_Diffuser:
+            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_E_Windows;
+            break;
+        case SurfaceClass::IntMass:
+            if (deltaTemp > 0.0) {
+                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_E_UnstableFloor;
+            } else {
+                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_E_StableFloor;
+            }
+            break;
+        default:
+            assert(false);
+        }
+
+        if (state.dataSurface->SurfIntConvClassification(SurfNum) == ConvectionConstants::InConvClass_Invalid) {
+            ShowSevereError(state, "DynamicIntConvSurfaceClassification: failed to resolve Hc model for D surface named " + Surface(SurfNum).Name);
+        }
+
+        break;
+    }
+
+    default:
+        ShowSevereError(state,
+                        "DynamicIntConvSurfaceClassification: failed to determine zone flow regime for surface named " + Surface(SurfNum).Name);
     }
 }
 
