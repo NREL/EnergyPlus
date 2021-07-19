@@ -239,7 +239,7 @@ namespace OutputProcessor {
     }
 
     void SetupTimePointers(EnergyPlusData &state,
-                           std::string const &TimeStepTypeKey, // Which timestep is being set up, 'Zone'=1, 'HVAC'=2
+                           OutputProcessor::SOVTimeStepType const &TimeStepTypeKey, // Which timestep is being set up, 'Zone'=1, 'HVAC'=2
                            Real64 &TimeStep                    // The timestep variable.  Used to get the address
     )
     {
@@ -266,7 +266,7 @@ namespace OutputProcessor {
         tPtr.TimeStep = &TimeStep;
         if (!state.dataOutputProcessor->TimeValue.insert(std::make_pair(timeStepType, tPtr)).second) {
             // The element was already present... shouldn't happen
-            ShowFatalError(state, "SetupTimePointers was already called for " + TimeStepTypeKey);
+            ShowFatalError(state, format("SetupTimePointers was already called for {}", sovTimeStepTypeStrings[(int)TimeStepTypeKey]));
         }
     }
 
@@ -877,7 +877,7 @@ namespace OutputProcessor {
     }
 
     TimeStepType ValidateTimeStepType(EnergyPlusData &state,
-                                      std::string const &TimeStepTypeKey, // Index type (Zone, HVAC) for variables
+                                      OutputProcessor::SOVTimeStepType const &TimeStepTypeKey, // Index type (Zone, HVAC) for variables
                                       std::string_view CalledFrom         // Routine called from (for error messages)
     )
     {
@@ -895,27 +895,16 @@ namespace OutputProcessor {
         // METHODOLOGY EMPLOYED:
         // Look it up in a list of valid index types.
 
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        std::vector<OutputProcessor::SOVTimeStepType> zoneIndexes({OutputProcessor::SOVTimeStepType::Zone});
+        std::vector<OutputProcessor::SOVTimeStepType> systemIndexes({OutputProcessor::SOVTimeStepType::HVAC, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVTimeStepType::Plant});
 
-        // TODO: , "HEATBALANCE", "HEAT BALANCE" are used nowhere aside from tests. Should we remove them?
-        std::vector<std::string> zoneIndexes({"ZONE", "HEATBALANCE", "HEAT BALANCE"});
-        std::vector<std::string> systemIndexes({"HVAC", "SYSTEM", "PLANT"});
-        std::string uppercase(UtilityRoutines::MakeUPPERCase(TimeStepTypeKey));
-
-        if (std::find(zoneIndexes.begin(), zoneIndexes.end(), uppercase) != zoneIndexes.end()) {
+        if (std::find(zoneIndexes.begin(), zoneIndexes.end(), TimeStepTypeKey) != zoneIndexes.end()) {
             return TimeStepType::TimeStepZone;
         }
 
-        if (std::find(systemIndexes.begin(), systemIndexes.end(), uppercase) != systemIndexes.end()) {
+        if (std::find(systemIndexes.begin(), systemIndexes.end(), TimeStepTypeKey) != systemIndexes.end()) {
             return TimeStepType::TimeStepSystem;
         }
-
-        //  The following should never happen to a user!!!!
-        ShowSevereError(state, "OutputProcessor/ValidateTimeStepType: Invalid Index Key passed to ValidateTimeStepType=" + TimeStepTypeKey);
-        ShowContinueError(state, R"(..Should be "ZONE", "SYSTEM", "HVAC", or "PLANT"... was called from:)" + std::string{CalledFrom});
-        ShowFatalError(state, "Preceding condition causes termination.");
-
-        return TimeStepType::TimeStepZone;
     }
 
     std::string StandardTimeStepTypeKey(TimeStepType const timeStepType)
@@ -969,7 +958,7 @@ namespace OutputProcessor {
         return StandardTimeStepTypeKey;
     }
 
-    StoreType validateVariableType(EnergyPlusData &state, std::string const &VariableTypeKey)
+    StoreType validateVariableType(EnergyPlusData &state, OutputProcessor::SOVStoreType const &VariableTypeKey)
     {
 
         // FUNCTION INFORMATION:
@@ -982,30 +971,15 @@ namespace OutputProcessor {
         // This function validates the VariableTypeKey passed to the SetupVariable
         // routine and assigns it the value used in the OutputProcessor.
 
-        // METHODOLOGY EMPLOYED:
-        // Look it up in a list of valid variable types.
-
-        // Return value
-        // na
-
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        std::vector<std::string> stateVariables({"STATE", "AVERAGE", "AVERAGED"});
-        std::vector<std::string> nonStateVariables({"NON STATE", "NONSTATE", "SUM", "SUMMED"});
-        std::string uppercase(UtilityRoutines::MakeUPPERCase(VariableTypeKey));
-
-        auto iter = std::find(stateVariables.begin(), stateVariables.end(), uppercase);
-        if (iter != stateVariables.end()) {
+        switch (VariableTypeKey) {
+        case OutputProcessor::SOVStoreType::State:
+        case OutputProcessor::SOVStoreType::Average:
             return StoreType::Averaged;
-        }
-
-        iter = std::find(nonStateVariables.begin(), nonStateVariables.end(), uppercase);
-        if (iter != nonStateVariables.end()) {
+        case OutputProcessor::SOVStoreType::NonState:
+        case OutputProcessor::SOVStoreType::Summed:
             return StoreType::Summed;
         }
-
-        ShowSevereError(state, "Invalid variable type requested=" + VariableTypeKey);
-
-        return StoreType::Averaged;
     }
 
     std::string standardVariableTypeKey(StoreType const VariableType)
@@ -5410,8 +5384,8 @@ void SetupOutputVariable(EnergyPlusData &state,
                          std::string const &VariableName,           // String Name of variable (with units)
                          OutputProcessor::Unit const &VariableUnit, // Actual units corresponding to the actual variable
                          Real64 &ActualVariable,                    // Actual Variable, used to set up pointer
-                         std::string const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
-                         std::string const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
+                         OutputProcessor::SOVTimeStepType const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::SOVStoreType const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
                          std::string const &KeyedValue,             // Associated Key for this variable
                          Optional_string_const ReportFreq,          // Internal use -- causes reporting at this frequency
                          Optional_string_const ResourceTypeKey,     // Meter Resource Type (Electricity, Gas, etc)
@@ -5630,7 +5604,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                                                   thisVarPtr.storeType,
                                                   thisVarPtr.ReportID,
                                                   localIndexGroupKey,
-                                                  TimeStepTypeKey,
+                                                  std::string(sovTimeStepTypeStrings[(int)TimeStepTypeKey]),
                                                   thisVarPtr.ReportIDChr,
                                                   KeyedValue,
                                                   VarName,
@@ -5644,7 +5618,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                                                   thisVarPtr.storeType,
                                                   thisVarPtr.ReportID,
                                                   localIndexGroupKey,
-                                                  TimeStepTypeKey,
+                                                  std::string(sovTimeStepTypeStrings[(int)TimeStepTypeKey]),
                                                   thisVarPtr.ReportIDChr,
                                                   KeyedValue,
                                                   VarName,
@@ -5660,8 +5634,8 @@ void SetupOutputVariable(EnergyPlusData &state,
                          std::string const &VariableName,           // String Name of variable
                          OutputProcessor::Unit const &VariableUnit, // Actual units corresponding to the actual variable
                          int &ActualVariable,                       // Actual Variable, used to set up pointer
-                         std::string const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
-                         std::string const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
+                         OutputProcessor::SOVTimeStepType const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::SOVStoreType const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
                          std::string const &KeyedValue,             // Associated Key for this variable
                          Optional_string_const ReportFreq,          // Internal use -- causes reporting at this freqency
                          Optional_int_const indexGroupKey           // Group identifier for SQL output
@@ -5793,7 +5767,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                                                   thisVarPtr.storeType,
                                                   thisVarPtr.ReportID,
                                                   localIndexGroupKey,
-                                                  TimeStepTypeKey,
+                                                  std::string(sovTimeStepTypeStrings[(int)TimeStepTypeKey]),
                                                   thisVarPtr.ReportIDChr,
                                                   KeyedValue,
                                                   VarName,
@@ -5806,7 +5780,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                                                   thisVarPtr.storeType,
                                                   thisVarPtr.ReportID,
                                                   localIndexGroupKey,
-                                                  TimeStepTypeKey,
+                                                  std::string(sovTimeStepTypeStrings[(int)TimeStepTypeKey]),
                                                   thisVarPtr.ReportIDChr,
                                                   KeyedValue,
                                                   VarName,
@@ -5821,8 +5795,8 @@ void SetupOutputVariable(EnergyPlusData &state,
                          std::string const &VariableName,           // String Name of variable
                          OutputProcessor::Unit const &VariableUnit, // Actual units corresponding to the actual variable
                          Real64 &ActualVariable,                    // Actual Variable, used to set up pointer
-                         std::string const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
-                         std::string const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
+                         OutputProcessor::SOVTimeStepType const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::SOVStoreType const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
                          int const KeyedValue,                      // Associated Key for this variable
                          Optional_string_const ReportFreq,          // Internal use -- causes reporting at this freqency
                          Optional_string_const ResourceTypeKey,     // Meter Resource Type (Electricity, Gas, etc)

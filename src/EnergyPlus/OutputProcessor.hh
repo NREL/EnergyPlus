@@ -74,6 +74,12 @@ struct EnergyPlusData;
 
 namespace OutputProcessor {
 
+    // enumerations for SetupOutputVariable calls -- for now these are direct mappings from the original strings, no change in functionality
+    enum class SOVTimeStepType {Invalid=-1, System, HVAC, Zone, Plant, Num};
+    constexpr std::array<std::string_view, (int)SOVTimeStepType::Num> sovTimeStepTypeStrings = {"System", "HVAC", "Zone", "Plant"};
+    enum class SOVStoreType {Invalid=-1, State, NonState, Summed, Average, Num};
+    constexpr std::array<std::string_view, (int)SOVStoreType::Num> sovStoreTypeStrings = {"State", "NonState", "Summed", "Average"};
+
     enum class iReportVDD
     {
         No,  // Don't report the variable dictionaries in any form
@@ -614,13 +620,13 @@ namespace OutputProcessor {
     inline void ReallocateIVar(EnergyPlusData &state);
 
     TimeStepType ValidateTimeStepType(EnergyPlusData &state,
-                                      std::string const &TimeStepTypeKey, // Index type (Zone, HVAC) for variables
+                                      OutputProcessor::SOVTimeStepType const &TimeStepTypeKey, // Index type (Zone, HVAC) for variables
                                       std::string_view CalledFrom         // Routine called from (for error messages)
     );
 
     std::string StandardTimeStepTypeKey(TimeStepType const timeStepType);
 
-    StoreType validateVariableType(EnergyPlusData &state, std::string const &VariableTypeKey);
+    StoreType validateVariableType(EnergyPlusData &state, OutputProcessor::SOVStoreType const &VariableTypeKey);
 
     std::string standardVariableTypeKey(StoreType const VariableType);
 
@@ -907,8 +913,8 @@ void SetupOutputVariable(EnergyPlusData &state,
                          std::string const &VariableName,           // String Name of variable (with units)
                          OutputProcessor::Unit const &VariableUnit, // Actual units corresponding to the actual variable
                          Real64 &ActualVariable,                    // Actual Variable, used to set up pointer
-                         std::string const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
-                         std::string const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
+                         OutputProcessor::SOVTimeStepType const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::SOVStoreType const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
                          std::string const &KeyedValue,             // Associated Key for this variable
                          Optional_string_const ReportFreq = _,      // Internal use -- causes reporting at this freqency
                          Optional_string_const ResourceTypeKey = _, // Meter Resource Type (Electricity, Gas, etc)
@@ -926,8 +932,8 @@ void SetupOutputVariable(EnergyPlusData &state,
                          std::string const &VariableName,           // String Name of variable
                          OutputProcessor::Unit const &VariableUnit, // Actual units corresponding to the actual variable
                          int &ActualVariable,                       // Actual Variable, used to set up pointer
-                         std::string const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
-                         std::string const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
+                         OutputProcessor::SOVTimeStepType const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::SOVStoreType const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
                          std::string const &KeyedValue,             // Associated Key for this variable
                          Optional_string_const ReportFreq = _,      // Internal use -- causes reporting at this freqency
                          Optional_int_const indexGroupKey = _       // Group identifier for SQL output
@@ -936,8 +942,8 @@ void SetupOutputVariable(EnergyPlusData &state,
 void SetupOutputVariable(std::string const &VariableName,           // String Name of variable
                          OutputProcessor::Unit const &VariableUnit, // Actual units corresponding to the actual variable
                          Real64 &ActualVariable,                    // Actual Variable, used to set up pointer
-                         std::string const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
-                         std::string const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
+                         OutputProcessor::SOVTimeStepType const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::SOVStoreType const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
                          int const KeyedValue,                      // Associated Key for this variable
                          Optional_string_const ReportFreq = _,      // Internal use -- causes reporting at this freqency
                          Optional_string_const ResourceTypeKey = _, // Meter Resource Type (Electricity, Gas, etc)
