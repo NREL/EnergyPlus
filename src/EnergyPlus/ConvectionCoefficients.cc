@@ -6183,6 +6183,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
         case SurfaceClass::GlassDoor:
         case SurfaceClass::TDD_Diffuser:
             state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass_A2_Windows;
+            break;
         default:
             assert(false);
         }
