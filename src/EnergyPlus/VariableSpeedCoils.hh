@@ -533,6 +533,8 @@ namespace VariableSpeedCoils {
 
     void setVarSpeedFanInfo(EnergyPlusData &state, int const dXCoilNum, std::string const fanName, int const fanIndex, int const fanTypeNum);
 
+    void getCoilTypeAndName(EnergyPlusData &state, int const dXCoilNum, std::string &CoilType, std::string &CoilName, bool &ErrorsFound);
+
 } // namespace VariableSpeedCoils
 
 struct VariableSpeedCoilsData : BaseGlobalStruct
