@@ -203,7 +203,7 @@ namespace ZoneDehumidifier {
         using WaterManager::SetupTankSupplyComponent;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetZoneDehumidifierInput");
+        static constexpr std::string_view RoutineName("GetZoneDehumidifierInput");
         static std::string const CurrentModuleObject("ZoneHVAC:Dehumidifier:DX");
         Real64 const RatedInletAirTemp(26.7);
         Real64 const RatedInletAirRH(60.0);
@@ -281,7 +281,7 @@ namespace ZoneDehumidifier {
                                                                                                           Alphas(1),
                                                                                                           DataLoopNode::NodeFluidType::Air,
                                                                                                           DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                          1,
+                                                                                                          NodeInputManager::compFluidStream::Primary,
                                                                                                           ObjectIsNotParent);
 
             // A4 , \field Air Outlet Node Name
@@ -292,7 +292,7 @@ namespace ZoneDehumidifier {
                                                                                                            Alphas(1),
                                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                                            DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                           1,
+                                                                                                           NodeInputManager::compFluidStream::Primary,
                                                                                                            ObjectIsNotParent);
 
             // N1,  \field Rated Water Removal
@@ -328,7 +328,7 @@ namespace ZoneDehumidifier {
             if (state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).WaterRemovalCurveIndex == 0) {
                 if (lAlphaBlanks(5)) {
                     ShowSevereError(state,
-                                    RoutineName + ':' + CurrentModuleObject + "=\"" + cAlphaFields(5) + "\" is required, missing for " +
+                                    std::string{RoutineName} + ':' + CurrentModuleObject + "=\"" + cAlphaFields(5) + "\" is required, missing for " +
                                         cAlphaFields(1) + " = " + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
                 } else {
                     ShowSevereError(state, cAlphaFields(5) + " not found = " + Alphas(5));
@@ -364,7 +364,7 @@ namespace ZoneDehumidifier {
             if (state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).EnergyFactorCurveIndex == 0) {
                 if (lAlphaBlanks(6)) {
                     ShowSevereError(state,
-                                    RoutineName + ':' + CurrentModuleObject + "=\"" + cAlphaFields(6) + "\" is required, missing for " +
+                                    std::string{RoutineName} + ':' + CurrentModuleObject + "=\"" + cAlphaFields(6) + "\" is required, missing for " +
                                         cAlphaFields(1) + " = " + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
                 } else {
                     ShowSevereError(state, cAlphaFields(6) + " not found = " + Alphas(6));
@@ -400,7 +400,7 @@ namespace ZoneDehumidifier {
             if (state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).PartLoadCurveIndex == 0) {
                 if (lAlphaBlanks(7)) {
                     ShowSevereError(state,
-                                    RoutineName + ':' + CurrentModuleObject + "=\"" + cAlphaFields(7) + "\" is required, missing for " +
+                                    std::string{RoutineName} + ':' + CurrentModuleObject + "=\"" + cAlphaFields(7) + "\" is required, missing for " +
                                         cAlphaFields(1) + " = " + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
                 } else {
                     ShowSevereError(state, cAlphaFields(7) + " not found = " + Alphas(7));
@@ -469,7 +469,7 @@ namespace ZoneDehumidifier {
         lNumericBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + ':' + CurrentModuleObject + ": Errors found in input.");
+            ShowFatalError(state, std::string{RoutineName} + ':' + CurrentModuleObject + ": Errors found in input.");
         }
 
         for (ZoneDehumidIndex = 1; ZoneDehumidIndex <= state.dataZoneDehumidifier->NumDehumidifiers; ++ZoneDehumidIndex) {
@@ -608,7 +608,7 @@ namespace ZoneDehumidifier {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitZoneDehumidifier");
+        static constexpr std::string_view RoutineName("InitZoneDehumidifier");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -768,7 +768,7 @@ namespace ZoneDehumidifier {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcZoneDehumidifier");
+        static constexpr std::string_view RoutineName("CalcZoneDehumidifier");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na

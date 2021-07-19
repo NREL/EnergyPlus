@@ -2253,10 +2253,9 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
         "  Cooling Coil Condenser Inlet;  !- Node or NodeList Name 2",
 
         "AirLoopHVAC:OutdoorAirSystem,",
-        "  DOAS OA System,          !- Name",
+        "  DOAS OA System,           !- Name",
         "  DOAS OA System Controllers,  !- Controller List Name",
-        "  DOAS OA System Equipment,!- Outdoor Air Equipment List Name",
-        "  DOAS Availability Managers;  !- Availability Manager List Name",
+        "  DOAS OA System Equipment; !- Outdoor Air Equipment List Name",
 
         "AirLoopHVAC:ControllerList,",
         "  DOAS OA System Controllers,  !- Name",
@@ -3231,8 +3230,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
 //"AirLoopHVAC:OutdoorAirSystem,",
 //"  DOAS OA System,          !- Name",
 //"  DOAS OA System Controllers,  !- Controller List Name",
-//"  DOAS OA System Equipment,!- Outdoor Air Equipment List Name",
-//"  DOAS Availability Managers;  !- Availability Manager List Name",
+//"  DOAS OA System Equipment;!- Outdoor Air Equipment List Name",
 
 //"AirLoopHVAC:ControllerList,",
 //"  DOAS OA System Controllers,  !- Name",
@@ -3771,7 +3769,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     state->dataDXCoils->NumDXCoils = 2;
     state->dataDXCoils->DXCoil.allocate(2);
     state->dataDXCoils->DXCoil(1).DXCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
-    state->dataDXCoils->DXCoil(1).CondenserType(1) = DataHVACGlobals::AirCooled;
+    state->dataDXCoils->DXCoil(1).CondenserType(1) = DataHeatBalance::RefrigCondenserType::Air;
     state->dataDXCoils->DXCoil(1).FuelType = "NaturalGas";
     state->dataDXCoils->DXCoil(1).ElecCoolingConsumption = 100.0;
     state->dataDXCoils->DXCoil(1).TotalCoolingEnergy = 100.0;
@@ -8485,8 +8483,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_1)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state->files.outputControl.sqlite = true;
-    state->dataStrGlobals->outputSqlFileName = "eplussqlite1.err";
-    state->dataStrGlobals->outputSqliteErrFileName = "eplusout1.sql";
+    state->dataStrGlobals->outputSqlFilePath = "eplussqlite1.err";
+    state->dataStrGlobals->outputSqliteErrFilePath = "eplusout1.sql";
 
     state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
@@ -8495,8 +8493,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_1)
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
 
-    state->dataStrGlobals->outputSqlFileName = "eplussqlite.err";
-    state->dataStrGlobals->outputSqliteErrFileName = "eplusout.sql";
+    state->dataStrGlobals->outputSqlFilePath = "eplussqlite.err";
+    state->dataStrGlobals->outputSqliteErrFilePath = "eplusout.sql";
 }
 
 TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_2)
@@ -8508,8 +8506,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_2)
 
     state->files.outputControl.sqlite = true;
 
-    state->dataStrGlobals->outputSqlFileName = "eplussqlite2.err";
-    state->dataStrGlobals->outputSqliteErrFileName = "eplusout2.sql";
+    state->dataStrGlobals->outputSqlFilePath = "eplussqlite2.err";
+    state->dataStrGlobals->outputSqliteErrFilePath = "eplusout2.sql";
     state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
     EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::InchPound);
@@ -8517,8 +8515,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_2)
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
 
-    state->dataStrGlobals->outputSqlFileName = "eplussqlite.err";
-    state->dataStrGlobals->outputSqliteErrFileName = "eplusout.sql";
+    state->dataStrGlobals->outputSqlFilePath = "eplussqlite.err";
+    state->dataStrGlobals->outputSqliteErrFilePath = "eplusout.sql";
 }
 
 TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_3)
@@ -8530,8 +8528,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_3)
 
     state->files.outputControl.sqlite = true;
 
-    state->dataStrGlobals->outputSqlFileName = "eplussqlite3.err";
-    state->dataStrGlobals->outputSqliteErrFileName = "eplusout3.sql";
+    state->dataStrGlobals->outputSqlFilePath = "eplussqlite3.err";
+    state->dataStrGlobals->outputSqliteErrFilePath = "eplusout3.sql";
     state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
     EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::None);
@@ -8539,8 +8537,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_3)
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
 
-    state->dataStrGlobals->outputSqlFileName = "eplussqlite.err";
-    state->dataStrGlobals->outputSqliteErrFileName = "eplusout.sql";
+    state->dataStrGlobals->outputSqlFilePath = "eplussqlite.err";
+    state->dataStrGlobals->outputSqliteErrFilePath = "eplusout.sql";
 }
 
 TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_1)
@@ -8552,8 +8550,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_1)
 
     state->files.outputControl.sqlite = true;
 
-    state->dataStrGlobals->outputSqlFileName = "eplussqlite4.err";
-    state->dataStrGlobals->outputSqliteErrFileName = "eplusout4.sql";
+    state->dataStrGlobals->outputSqlFilePath = "eplussqlite4.err";
+    state->dataStrGlobals->outputSqliteErrFilePath = "eplusout4.sql";
 
     state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
@@ -8562,8 +8560,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_1)
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
 
-    state->dataStrGlobals->outputSqlFileName = "eplussqlite.err";
-    state->dataStrGlobals->outputSqliteErrFileName = "eplusout.sql";
+    state->dataStrGlobals->outputSqlFilePath = "eplussqlite.err";
+    state->dataStrGlobals->outputSqliteErrFilePath = "eplusout.sql";
 }
 
 TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_2)
@@ -8576,8 +8574,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_2)
 
     state->files.outputControl.sqlite = true;
 
-    state->dataStrGlobals->outputSqlFileName = "eplussqlite5.err";
-    state->dataStrGlobals->outputSqliteErrFileName = "eplusout5.sql";
+    state->dataStrGlobals->outputSqlFilePath = "eplussqlite5.err";
+    state->dataStrGlobals->outputSqliteErrFilePath = "eplusout5.sql";
 
     state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
@@ -8586,8 +8584,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_2)
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
 
-    state->dataStrGlobals->outputSqlFileName = "eplussqlite.err";
-    state->dataStrGlobals->outputSqliteErrFileName = "eplusout.sql";
+    state->dataStrGlobals->outputSqlFilePath = "eplussqlite.err";
+    state->dataStrGlobals->outputSqliteErrFilePath = "eplusout.sql";
 }
 
 TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
@@ -9719,7 +9717,7 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_EscapeHTML)
 
     OutputReportTabular::CloseOutputTabularFile(*state);
 
-    std::vector<std::string> lines = read_lines_in_file(state->dataStrGlobals->outputTblHtmFileName);
+    std::vector<std::string> lines = read_lines_in_file(state->dataStrGlobals->outputTblHtmFilePath);
 
     // Lambda helper to locate a line in the html file, and compare that line with the expected html after trimming
     auto compare_html_output = [this, &lines](const std::string &lookup, const std::string &expectedHTMLString) {
@@ -9731,7 +9729,7 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_EscapeHTML)
             }
         }
         EXPECT_FALSE(found_cell.empty()) << "Did not find the lookup string '" << lookup << "' string in the html output at '"
-                                         << state->dataStrGlobals->outputTblHtmFileName << "'..." << '\n'
+                                         << state->dataStrGlobals->outputTblHtmFilePath << "'..." << '\n'
                                          << delimited_string(lines);
 
         // Trim leading and trailing spaces
@@ -9774,5 +9772,40 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_EscapeHTML)
     }
 
     // Clean up
-    FileSystem::removeFile(state->dataStrGlobals->outputTblHtmFileName);
+    FileSystem::removeFile(state->dataStrGlobals->outputTblHtmFilePath);
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_PredefinedTable_SigDigits_Force_NonZero)
+{
+
+    SetPredefinedTables(*state);
+
+    // < 1e8, not using scientific notation
+    Real64 value = 123.456;
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizPkTimeMin, "MyPlant Sizing Pass 1", value, 2);
+    EXPECT_EQ("123.46", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizPkTimeMin, "MyPlant Sizing Pass 1"));
+
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizPkTimeDayOfSim, "MyPlant Sizing Pass 1", value, 1);
+    EXPECT_EQ("123.5", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizPkTimeDayOfSim, "MyPlant Sizing Pass 1"));
+
+    // Force reset to numSigDigits = 2
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizPkTimeHour, "MyPlant Sizing Pass 1", value, 0);
+    EXPECT_EQ("123.", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizPkTimeHour, "MyPlant Sizing Pass 1"));
+
+    // > 1e8, switch to scientific notation
+    value = 123456789.1;
+
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizDesDay, "MyPlant Sizing Pass 1", value, 3);
+    EXPECT_EQ("0.123E+09", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizDesDay, "MyPlant Sizing Pass 1"));
+
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizPrevVdot, "MyPlant Sizing Pass 1", value, 2);
+    EXPECT_EQ("0.12E+09", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizPrevVdot, "MyPlant Sizing Pass 1"));
+
+    // Force reset to numSigDigits = 2 since we switch to scientific notation
+
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizMeasVdot, "MyPlant Sizing Pass 1", value, 1);
+    EXPECT_EQ("0.12E+09", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizMeasVdot, "MyPlant Sizing Pass 1"));
+
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizCalcVdot, "MyPlant Sizing Pass 1", value, 0);
+    EXPECT_EQ("0.12E+09", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizCalcVdot, "MyPlant Sizing Pass 1"));
 }

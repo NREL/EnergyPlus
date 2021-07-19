@@ -193,7 +193,7 @@
 !
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,9.5;
+  Version,9.6;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -13319,6 +13319,28 @@
     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,
     0.0000E+00,0.0000E+00,0.3812E+03,0.2957E+03,0.2101E+03;
 
+!-   ===========  ALL OBJECTS IN CLASS: ZONEAIRCONTAMINANTBALANCE ===========
+
+  ZoneAirContaminantBalance,
+    Yes,                     !- Carbon Dioxide Concentration
+    Outside CO2 Schedule,    !- Outdoor Carbon Dioxide Schedule Name
+    Yes,                     !- Generic Contaminant Concentration
+    Outside GC Schedule;     !- Outdoor Generic Contaminant Schedule Name
+
+  Schedule:Compact,
+    Outside CO2 Schedule,    !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,400.;       !- Field 3
+
+  Schedule:Compact,
+    Outside GC Schedule,     !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,23.;       !- Field 3
+
 !====   Report  ====
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
@@ -13326,6 +13348,10 @@
   Output:Variable,*,Zone Mean Air Temperature,hourly;
 
   Output:Variable,*,Zone Air Temperature,hourly;
+
+  Output:Variable,*,Zone Air CO2 Concentration,hourly;
+
+  Output:Variable,*,Zone Air Generic Air Contaminant Concentration,hourly;
 
   Output:Variable,*,Zone Air System Sensible Cooling Rate,hourly;
 

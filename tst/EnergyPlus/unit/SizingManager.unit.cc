@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
@@ -539,4 +540,55 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     state->dataGlobal->DayOfSim = 2;
     Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_FALSE(Answer);
+}
+
+TEST_F(EnergyPlusFixture, SizingManager_ReportTemperatureInputError)
+{
+
+    std::string objectName = "Sizing:Zone";
+    int paramNum = 1;
+    state->dataIPShortCut->cAlphaArgs.allocate(3);
+    state->dataIPShortCut->cNumericFieldNames.allocate(3);
+    state->dataIPShortCut->rNumericArgs.allocate(3);
+    state->dataIPShortCut->cAlphaArgs(paramNum) = "SPACE1-1";
+    state->dataIPShortCut->cNumericFieldNames(paramNum) = "Zone Cooling Design Supply Air Temperature";
+    state->dataIPShortCut->rNumericArgs(paramNum) = 14.0;
+    Real64 lowTempLimit = 0.0;
+    bool errorsFound = false;
+
+    // Test 1: No problems, no errors, both parameters
+    ReportTemperatureInputError(*state, objectName, paramNum, lowTempLimit, false, errorsFound);
+    ASSERT_FALSE(errorsFound);
+    paramNum = 3;
+    state->dataIPShortCut->cNumericFieldNames(paramNum) = "Zone Heating Design Supply Air Temperature";
+    state->dataIPShortCut->rNumericArgs(paramNum) = 50.0;
+    ReportTemperatureInputError(*state, objectName, paramNum, lowTempLimit, false, errorsFound);
+    ASSERT_FALSE(errorsFound);
+
+    // Test 2: Temperature is less than the lower limit allowed, but it's not a severe (check for both parameters)
+    paramNum = 1;
+    state->dataIPShortCut->rNumericArgs(paramNum) = -1.0;
+    ReportTemperatureInputError(*state, objectName, paramNum, lowTempLimit, false, errorsFound);
+    ASSERT_FALSE(errorsFound);
+    EXPECT_TRUE(
+        compare_err_stream(delimited_string({"   ** Warning ** Sizing:Zone=\"SPACE1-1\" has invalid data.",
+                                             "   **   ~~~   ** ... incorrect Zone Cooling Design Supply Air Temperature=[-1.00] is less than [0.00]",
+                                             "   **   ~~~   ** Please check your input to make sure this is correct."})));
+    paramNum = 3;
+    state->dataIPShortCut->rNumericArgs(paramNum) = -1.0;
+    ReportTemperatureInputError(*state, objectName, paramNum, lowTempLimit, false, errorsFound);
+    ASSERT_FALSE(errorsFound);
+    EXPECT_TRUE(
+        compare_err_stream(delimited_string({"   ** Warning ** Sizing:Zone=\"SPACE1-1\" has invalid data.",
+                                             "   **   ~~~   ** ... incorrect Zone Heating Design Supply Air Temperature=[-1.00] is less than [0.00]",
+                                             "   **   ~~~   ** Please check your input to make sure this is correct."})));
+
+    // Test 3: Heating Temperature is lower Cooling Temperature--this should become a severe error
+    state->dataIPShortCut->rNumericArgs(paramNum) = -2.0;
+    ReportTemperatureInputError(*state, objectName, paramNum, lowTempLimit, true, errorsFound);
+    ASSERT_TRUE(errorsFound);
+    EXPECT_TRUE(compare_err_stream(delimited_string({"   ** Severe  ** Sizing:Zone=\"SPACE1-1\" has invalid data.",
+                                                     "   **   ~~~   ** ... incorrect Zone Heating Design Supply Air Temperature=[-2.00] is less than "
+                                                     "Zone Cooling Design Supply Air Temperature=[-1.00]",
+                                                     "   **   ~~~   ** This is not allowed.  Please check and revise your input."})));
 }

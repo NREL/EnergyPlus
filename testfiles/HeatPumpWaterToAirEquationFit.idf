@@ -101,7 +101,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.5;
+  Version,9.6;
 
   Building,
     Building,                !- Name
@@ -2012,8 +2012,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 1,                !- Name
     OA Sys 1 Controllers,    !- Controller List Name
-    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name
-    Outdoor Air 1 Avail List;!- Availability Manager List Name
+    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:ControllerList,
     OA Sys 1 Controllers,    !- Name
@@ -2272,8 +2271,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 2,                !- Name
     OA Sys 2 Controllers,    !- Controller List Name
-    OA Sys 2 Equipment,      !- Outdoor Air Equipment List Name
-    Outdoor Air 2 Avail List;!- Availability Manager List Name
+    OA Sys 2 Equipment;      !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:ControllerList,
     OA Sys 2 Controllers,    !- Name
@@ -2525,8 +2523,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 3,                !- Name
     OA Sys 3 Controllers,    !- Controller List Name
-    OA Sys 3 Equipment,      !- Outdoor Air Equipment List Name
-    Outdoor Air 3 Avail List;!- Availability Manager List Name
+    OA Sys 3 Equipment;      !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:ControllerList,
     OA Sys 3 Controllers,    !- Name
@@ -2778,8 +2775,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 4,                !- Name
     OA Sys 4 Controllers,    !- Controller List Name
-    OA Sys 4 Equipment,      !- Outdoor Air Equipment List Name
-    Outdoor Air 4 Avail List;!- Availability Manager List Name
+    OA Sys 4 Equipment;      !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:ControllerList,
     OA Sys 4 Controllers,    !- Name
@@ -3031,8 +3027,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 5,                !- Name
     OA Sys 5 Controllers,    !- Controller List Name
-    OA Sys 5 Equipment,      !- Outdoor Air Equipment List Name
-    Outdoor Air 5 Avail List;!- Availability Manager List Name
+    OA Sys 5 Equipment;      !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:ControllerList,
     OA Sys 5 Controllers,    !- Name

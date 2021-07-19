@@ -100,7 +100,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.5;
+  Version,9.6;
 
   Building,
     Building,                !- Name
@@ -2781,10 +2781,9 @@
     VAV SYS 1 OA Mixing Box; !- Component 1 Name
 
   AirLoopHVAC:OutdoorAirSystem,
-    VAV SYS 1 OA System,     !- Name
+    VAV SYS 1 OA System,              !- Name
     VAV SYS 1 OA System Controllers,  !- Controller List Name
-    VAV SYS 1 OA System Equipment,  !- Outdoor Air Equipment List Name
-    VAV SYS 1 Availability Managers;  !- Availability Manager List Name
+    VAV SYS 1 OA System Equipment;    !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     VAV SYS 1 Outside Air Inlet;  !- Node or NodeList Name 1

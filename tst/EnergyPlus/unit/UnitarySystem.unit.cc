@@ -130,7 +130,7 @@ protected:
         state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
         state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "EAST ZONE";
         state->dataZoneEquip->ZoneEquipConfig(1).EquipListName = "ZONE2EQUIPMENT";
-        state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 20;
+        state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
         state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 1;
         state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode.allocate(1);
         state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 21;
@@ -479,6 +479,7 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     bool FirstHVACIteration(true);
     UnitarySys thisSys;
     UnitarySys *mySys(&thisSys);
+    mySys->UnitType = "AirLoopHVAC:UnitarySystem";
     mySys->m_CoolCoilExists = true;
     mySys->m_HeatCoilExists = true;
     mySys->m_MaxCoolAirVolFlow = DataSizing::AutoSize;
@@ -3735,6 +3736,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SetOnOffMassFlowRateTest)
     thisSys.setOnOffMassFlowRate(*state, OnOffAirFlowRatio, PartLoadRatio);
     EXPECT_EQ(0.5, state->dataHVACGlobal->MSHPMassFlowRateLow);
     EXPECT_EQ(1.0, state->dataHVACGlobal->MSHPMassFlowRateHigh);
+    EXPECT_EQ(1.0, state->dataUnitarySystems->CompOnFlowRatio);
 
     thisSys.setSpeedVariables(*state, state->dataUnitarySystems->HeatingLoad, PartLoadRatio);
     EXPECT_EQ(0.5, state->dataHVACGlobal->MSHPMassFlowRateLow);
@@ -3744,6 +3746,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SetOnOffMassFlowRateTest)
     thisSys.setOnOffMassFlowRate(*state, OnOffAirFlowRatio, PartLoadRatio);
     EXPECT_EQ(0.5, state->dataHVACGlobal->MSHPMassFlowRateLow);
     EXPECT_EQ(1.0, state->dataHVACGlobal->MSHPMassFlowRateHigh);
+    EXPECT_EQ(1.0, state->dataUnitarySystems->CompOnFlowRatio);
 
     thisSys.setSpeedVariables(*state, state->dataUnitarySystems->HeatingLoad, PartLoadRatio);
     EXPECT_EQ(0.5, state->dataHVACGlobal->MSHPMassFlowRateLow);
@@ -3768,11 +3771,13 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SetOnOffMassFlowRateTest)
     thisSys.setOnOffMassFlowRate(*state, OnOffAirFlowRatio, PartLoadRatio);
     EXPECT_EQ(0.25, state->dataHVACGlobal->MSHPMassFlowRateLow);
     EXPECT_EQ(0.25, state->dataHVACGlobal->MSHPMassFlowRateHigh);
+    EXPECT_EQ(0.25, state->dataUnitarySystems->CompOnFlowRatio);
 
     PartLoadRatio = 0.7;
     thisSys.setOnOffMassFlowRate(*state, OnOffAirFlowRatio, PartLoadRatio);
     EXPECT_EQ(0.25, state->dataHVACGlobal->MSHPMassFlowRateLow);
     EXPECT_EQ(0.25, state->dataHVACGlobal->MSHPMassFlowRateHigh);
+    EXPECT_EQ(0.25, state->dataUnitarySystems->CompOnFlowRatio);
 
     thisSys.setSpeedVariables(*state, state->dataUnitarySystems->HeatingLoad, PartLoadRatio);
     EXPECT_EQ(0.25, state->dataHVACGlobal->MSHPMassFlowRateLow);
@@ -3816,6 +3821,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SetOnOffMassFlowRateTest)
     EXPECT_EQ(0.25, state->dataUnitarySystems->CompOnMassFlow);
     EXPECT_EQ(0.0, state->dataHVACGlobal->MSHPMassFlowRateLow);
     EXPECT_EQ(0.25, state->dataHVACGlobal->MSHPMassFlowRateHigh);
+    EXPECT_EQ(0.25, state->dataUnitarySystems->CompOnFlowRatio);
 
     // cooling load at various speeds
     thisSys.m_HeatingSpeedNum = 0;
@@ -3825,6 +3831,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SetOnOffMassFlowRateTest)
     thisSys.setOnOffMassFlowRate(*state, OnOffAirFlowRatio, PartLoadRatio);
     EXPECT_EQ(0.6, state->dataHVACGlobal->MSHPMassFlowRateLow);
     EXPECT_EQ(1.2, state->dataHVACGlobal->MSHPMassFlowRateHigh);
+    EXPECT_EQ(1.2, state->dataUnitarySystems->CompOnFlowRatio);
 
     thisSys.m_HeatingSpeedNum = 0;
     thisSys.m_CoolingSpeedNum = 2;
@@ -3833,6 +3840,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SetOnOffMassFlowRateTest)
     thisSys.setOnOffMassFlowRate(*state, OnOffAirFlowRatio, PartLoadRatio);
     EXPECT_EQ(0.3, state->dataHVACGlobal->MSHPMassFlowRateLow);
     EXPECT_EQ(0.6, state->dataHVACGlobal->MSHPMassFlowRateHigh);
+    EXPECT_EQ(0.6, state->dataUnitarySystems->CompOnFlowRatio);
 
     // cycling fan mode should drop to 0 flow rate at speed = 1
     thisSys.m_HeatingSpeedNum = 0;
@@ -3844,6 +3852,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SetOnOffMassFlowRateTest)
     EXPECT_EQ(0.3, state->dataUnitarySystems->CompOnMassFlow);
     EXPECT_EQ(0.0, state->dataHVACGlobal->MSHPMassFlowRateLow);
     EXPECT_EQ(0.3, state->dataHVACGlobal->MSHPMassFlowRateHigh);
+    EXPECT_EQ(0.3, state->dataUnitarySystems->CompOnFlowRatio);
 
     // constant fan mode should not drop to idle flow rate at speed = 1
     thisSys.m_FanOpMode = DataHVACGlobals::ContFanCycCoil;
@@ -3857,6 +3866,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SetOnOffMassFlowRateTest)
     EXPECT_EQ(0.3, state->dataUnitarySystems->CompOnMassFlow);
     EXPECT_EQ(0.3, state->dataHVACGlobal->MSHPMassFlowRateLow);
     EXPECT_EQ(0.3, state->dataHVACGlobal->MSHPMassFlowRateHigh);
+    EXPECT_EQ(0.3, state->dataUnitarySystems->CompOnFlowRatio);
 
     // no load condition (operates at idle speed)
     thisSys.m_HeatingSpeedNum = 0;
@@ -3868,6 +3878,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SetOnOffMassFlowRateTest)
     EXPECT_EQ(0.2, state->dataUnitarySystems->CompOnMassFlow);
     EXPECT_EQ(0.2, state->dataHVACGlobal->MSHPMassFlowRateLow);
     EXPECT_EQ(0.2, state->dataHVACGlobal->MSHPMassFlowRateHigh);
+    EXPECT_EQ(0.2, state->dataUnitarySystems->CompOnFlowRatio);
 
     thisSys.m_MultiSpeedHeatingCoil = true;
     thisSys.m_HeatingSpeedNum = 1;
@@ -3877,6 +3888,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SetOnOffMassFlowRateTest)
     thisSys.setOnOffMassFlowRate(*state, OnOffAirFlowRatio, PartLoadRatio);
     EXPECT_EQ(0.25, state->dataHVACGlobal->MSHPMassFlowRateLow);
     EXPECT_EQ(0.25, state->dataHVACGlobal->MSHPMassFlowRateHigh);
+    EXPECT_EQ(0.25, state->dataUnitarySystems->CompOnFlowRatio);
 
     thisSys.setSpeedVariables(*state, state->dataUnitarySystems->HeatingLoad, PartLoadRatio);
     EXPECT_EQ(0.25, state->dataHVACGlobal->MSHPMassFlowRateLow);
@@ -3888,6 +3900,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SetOnOffMassFlowRateTest)
     thisSys.setOnOffMassFlowRate(*state, OnOffAirFlowRatio, PartLoadRatio);
     EXPECT_EQ(0.25, state->dataHVACGlobal->MSHPMassFlowRateLow);
     EXPECT_EQ(0.25, state->dataHVACGlobal->MSHPMassFlowRateHigh);
+    EXPECT_EQ(0.25, state->dataUnitarySystems->CompOnFlowRatio);
 
     thisSys.setSpeedVariables(*state, state->dataUnitarySystems->HeatingLoad, PartLoadRatio);
     EXPECT_EQ(0.25, state->dataHVACGlobal->MSHPMassFlowRateLow);
@@ -3902,6 +3915,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SetOnOffMassFlowRateTest)
     thisSys.setOnOffMassFlowRate(*state, OnOffAirFlowRatio, PartLoadRatio);
     EXPECT_EQ(0.3, state->dataHVACGlobal->MSHPMassFlowRateLow);
     EXPECT_EQ(0.3, state->dataHVACGlobal->MSHPMassFlowRateHigh);
+    EXPECT_EQ(0.3, state->dataUnitarySystems->CompOnFlowRatio);
 
     thisSys.setSpeedVariables(*state, state->dataUnitarySystems->CoolingLoad, PartLoadRatio);
     EXPECT_EQ(0.3, state->dataHVACGlobal->MSHPMassFlowRateLow);
@@ -3912,10 +3926,30 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SetOnOffMassFlowRateTest)
     thisSys.setOnOffMassFlowRate(*state, OnOffAirFlowRatio, PartLoadRatio);
     EXPECT_EQ(0.3, state->dataHVACGlobal->MSHPMassFlowRateLow);
     EXPECT_EQ(0.3, state->dataHVACGlobal->MSHPMassFlowRateHigh);
+    // EXPECT_EQ(0.3, state->dataUnitarySystems->CompOnFlowRatio);
 
     thisSys.setSpeedVariables(*state, state->dataUnitarySystems->CoolingLoad, PartLoadRatio);
     EXPECT_EQ(0.3, state->dataHVACGlobal->MSHPMassFlowRateLow);
     EXPECT_EQ(0.3, state->dataHVACGlobal->MSHPMassFlowRateHigh);
+
+    // tests to make sure the proper speed ratio is used to set CompOnFlowRatio
+    thisSys.m_CoolingSpeedNum = 1;
+    thisSys.m_CoolingSpeedRatio = 0.0;
+    thisSys.m_CoolingFanSpeedRatio = 1.0;
+    thisSys.m_MultiOrVarSpeedCoolCoil = false;
+    state->dataUnitarySystems->HeatingLoad = false;
+    state->dataUnitarySystems->CoolingLoad = true;
+    thisSys.setOnOffMassFlowRate(*state, OnOffAirFlowRatio, PartLoadRatio);
+    EXPECT_EQ(1.0, state->dataUnitarySystems->CompOnFlowRatio);
+
+    thisSys.m_CoolingSpeedNum = 1;
+    thisSys.m_CoolingSpeedRatio = 1.0;
+    thisSys.m_CoolingFanSpeedRatio = 0.5;
+    thisSys.m_MultiOrVarSpeedCoolCoil = false;
+    state->dataUnitarySystems->HeatingLoad = false;
+    state->dataUnitarySystems->CoolingLoad = true;
+    thisSys.setOnOffMassFlowRate(*state, OnOffAirFlowRatio, PartLoadRatio);
+    EXPECT_EQ(0.5, state->dataUnitarySystems->CompOnFlowRatio);
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
@@ -4006,7 +4040,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
         EXPECT_EQ(1.005, thisSys.m_MaxCoolAirVolFlow);
         EXPECT_EQ(1.005, thisSys.m_MaxHeatAirVolFlow);
         EXPECT_EQ(1.005, thisSys.m_MaxNoCoolHeatAirVolFlow);
-        EXPECT_EQ(18827.616766698276, state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesCoolingLoad);
+        EXPECT_NEAR(18827.6, state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesCoolingLoad, 1.0);
     }
 
     // #6200 defect file shows fan flow rate when cooling coil is off and no cooling coil exists. Allow user to set flow rate = 0 when coil does not
@@ -4064,8 +4098,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
 
         EXPECT_NEAR(1.005, thisSys.m_DesignFanVolFlowRate, 0.0000000001);
         EXPECT_NEAR(1.005, thisSys.m_MaxCoolAirVolFlow, 0.0000000001);
-        EXPECT_EQ(1.005, thisSys.m_MaxHeatAirVolFlow);
-        EXPECT_EQ(1.005, thisSys.m_MaxNoCoolHeatAirVolFlow);
+        EXPECT_NEAR(1.005, thisSys.m_MaxHeatAirVolFlow, 0.0000000001);
+        EXPECT_NEAR(1.005, thisSys.m_MaxNoCoolHeatAirVolFlow, 0.0000000001);
         EXPECT_NEAR(15148.243236712493, state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesHeatingLoad, 0.0000000001);
     }
 
@@ -4081,10 +4115,10 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
 
     mySys->sizeSystem(*state, FirstHVACIteration, AirLoopNum);
 
-    EXPECT_EQ(1.005, thisSys.m_DesignFanVolFlowRate);
+    EXPECT_NEAR(1.005, thisSys.m_DesignFanVolFlowRate, 0.0000000001);
     EXPECT_EQ(0.0, thisSys.m_MaxCoolAirVolFlow);
-    EXPECT_EQ(1.005, thisSys.m_MaxHeatAirVolFlow);
-    EXPECT_EQ(1.005, thisSys.m_MaxNoCoolHeatAirVolFlow);
+    EXPECT_NEAR(1.005, thisSys.m_MaxHeatAirVolFlow, 0.0000000001);
+    EXPECT_NEAR(1.005, thisSys.m_MaxNoCoolHeatAirVolFlow, 0.0000000001);
     EXPECT_NEAR(15148.243236712493, state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesHeatingLoad, 0.0000000001);
 
     // continue with unit testing of cooling and heating system
@@ -4119,7 +4153,10 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
         thisSys.m_MaxHeatAirVolFlow = DataSizing::AutoSize;
         thisSys.m_MaxNoCoolHeatAirVolFlow = DataSizing::AutoSize;
         thisSys.m_DesignFanVolFlowRate = DataSizing::AutoSize;
-
+        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).CoolingCapacity = false;
+        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingCapacity = false;
+        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesCoolingLoad = 0.0;
+        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesHeatingLoad = 0.0;
         // for FractionOfAutosizedCoolingAirflow, set sizing data to 1.005 and UnitarySystem MaxCoolAirVolFlow to 1, they will multiply and
         // yield 1.005
         if (iCoolingSizingType == DataSizing::FractionOfAutosizedCoolingAirflow)
@@ -4129,9 +4166,10 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
         if (iCoolingSizingType == DataSizing::FlowPerCoolingCapacity) thisSys.m_MaxCoolAirVolFlow = 1.005 / 18827.616766698276;
         // for FractionOfAutosizedHeatingAirflow, set sizing data to 1.005 and UnitarySystem MaxHeatAirVolFlow to 1, they will multiply and
         // yield 1.005
-        if (iHeatingSizingType == DataSizing::FractionOfAutosizedHeatingAirflow)
+        if (iHeatingSizingType == DataSizing::FractionOfAutosizedHeatingAirflow) {
             state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 1.005;
-        if (iHeatingSizingType == DataSizing::FractionOfAutosizedHeatingAirflow) thisSys.m_MaxHeatAirVolFlow = 1.0;
+            thisSys.m_MaxHeatAirVolFlow = 1.0;
+        }
         // for FlowPerHeatingCapacity, do the division so sizing will yield 1.005
         if (iHeatingSizingType == DataSizing::FlowPerHeatingCapacity) thisSys.m_MaxHeatAirVolFlow = 1.005 / 1431.9234900374995;
 
@@ -4141,8 +4179,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
         EXPECT_NEAR(1.005, thisSys.m_MaxCoolAirVolFlow, 0.0000000001);
         EXPECT_NEAR(1.005, thisSys.m_MaxHeatAirVolFlow, 0.0000000001);
         EXPECT_NEAR(1.005, thisSys.m_MaxNoCoolHeatAirVolFlow, 0.0000000001);
-        EXPECT_EQ(18827.616766698276, state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesCoolingLoad);
-        EXPECT_NEAR(1431.9234900374995, state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesHeatingLoad, 0.0000000001);
+        EXPECT_NEAR(18827.6, state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesCoolingLoad, 0.1);
+        EXPECT_NEAR(1431.9, state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesHeatingLoad, 0.1);
     }
 }
 
@@ -6344,8 +6382,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetBadSupplyAirMethodInput)
 
     DataZoneEquipment::GetZoneEquipmentData(*state); // read zone equipment configuration and list objects
 
-    state->dataHeatingCoils->GetCoilsInputFlag = true;
-    state->dataHeatingCoils->HeatingCoil.deallocate();
+    // state->dataHeatingCoils->GetCoilsInputFlag = true;
+    // state->dataHeatingCoils->HeatingCoil.deallocate();
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
@@ -6529,8 +6567,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetBadSupplyAirMethodInputSZVAV)
 
     DataZoneEquipment::GetZoneEquipmentData(*state); // read zone equipment configuration and list objects
 
-    state->dataHeatingCoils->GetCoilsInputFlag = true;
-    state->dataHeatingCoils->HeatingCoil.deallocate();
+    // state->dataHeatingCoils->GetCoilsInputFlag = true;
+    // state->dataHeatingCoils->HeatingCoil.deallocate();
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
@@ -12097,12 +12135,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputZoneEquipment)
     EXPECT_FALSE(ErrorsFound); // expect no errors
     EXPECT_FALSE(thisSys->ATMixerExists);
     EXPECT_EQ(1, thisSys->ControlZoneNum);
-    EXPECT_EQ(state->dataLoopNodes->NodeID(2), "EAST ZONE UNITARY SYSTEM INLET");
-    EXPECT_EQ(2, thisSys->AirInNode);
-    EXPECT_EQ(state->dataLoopNodes->NodeID(3), "EAST ZONE SUPPLY INLET");
-    EXPECT_EQ(3, thisSys->AirOutNode);
-    EXPECT_EQ(state->dataLoopNodes->NodeID(5), "HEATING COIL AIR INLET NODE");
-    EXPECT_EQ(5, thisSys->HeatCoilInletNodeNum);
+    EXPECT_EQ(state->dataLoopNodes->NodeID(thisSys->AirInNode), "EAST ZONE UNITARY SYSTEM INLET");
+    EXPECT_EQ(state->dataLoopNodes->NodeID(thisSys->AirOutNode), "EAST ZONE SUPPLY INLET");
+    EXPECT_EQ(state->dataLoopNodes->NodeID(thisSys->HeatCoilInletNodeNum), "HEATING COIL AIR INLET NODE");
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputZoneEquipmentBlankCtrlZone)
@@ -14315,8 +14350,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
         "  AirLoopHVAC:OutdoorAirSystem,",
         "    Sys 1 Furnace DX Cool OA System,  !- Name",
         "    Sys 1 Furnace DX Cool OA System Controllers,  !- Controller List Name",
-        "    Sys 1 Furnace DX Cool OA System Equipment,  !- Outdoor Air Equipment List Name",
-        "    Sys 1 Furnace DX Cool Availability Managers;  !- Availability Manager List Name",
+        "    Sys 1 Furnace DX Cool OA System Equipment;  !- Outdoor Air Equipment List Name",
 
         "  AirLoopHVAC:ControllerList,",
         "    Sys 1 Furnace DX Cool OA System Controllers,  !- Name",
@@ -15727,6 +15761,90 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
         "      Zone Exhaust Node,              !- Air Inlet Node Name",
         "      Furnace DX Cool Supply Fan Outlet;  !- Air Outlet Node Name",
 
+        "    ComponentCost:LineItem,",
+        "      Cost Per Each,            !- Name",
+        "      ,                         !- Type",
+        "      Coil:Cooling:DX,          !- Line Item Type",
+        "      Furnace DX Cool Cooling Coil,  !- Item Name",
+        "      ,                         !- Object End-Use Key",
+        "      1,                        !- Cost per Each {$}",
+        "      ,                         !- Cost per Area {$/m2}",
+        "      ,                         !- Cost per Unit of Output Capacity {$/kW}",
+        "      ,                         !- Cost per Unit of Output Capacity per COP {$/kW}",
+        "      ,                         !- Cost per Volume {$/m3}",
+        "      ,                         !- Cost per Volume Rate {$/(m3/s)}",
+        "      ;                         !- Cost per Energy per Temperature Difference {$/(W/K)}",
+
+        "    ComponentCost:LineItem,",
+        "      Cost Per Each Wildcard,   !- Name",
+        "      ,                         !- Type",
+        "      Coil:Cooling:DX,          !- Line Item Type",
+        "      *,                        !- Item Name",
+        "      ,                         !- Object End-Use Key",
+        "      1,                        !- Cost per Each {$}",
+        "      ,                         !- Cost per Area {$/m2}",
+        "      ,                         !- Cost per Unit of Output Capacity {$/kW}",
+        "      ,                         !- Cost per Unit of Output Capacity per COP {$/kW}",
+        "      ,                         !- Cost per Volume {$/m3}",
+        "      ,                         !- Cost per Volume Rate {$/(m3/s)}",
+        "      ;                         !- Cost per Energy per Temperature Difference {$/(W/K)}",
+
+        "    ComponentCost:LineItem,",
+        "      Cost Per Output Capacity, !- Name",
+        "      ,                         !- Type",
+        "      Coil:Cooling:DX,          !- Line Item Type",
+        "      Furnace DX Cool Cooling Coil,  !- Item Name",
+        "      ,                         !- Object End-Use Key",
+        "      ,                         !- Cost per Each {$}",
+        "      ,                         !- Cost per Area {$/m2}",
+        "      10,                       !- Cost per Unit of Output Capacity {$/kW}",
+        "      ,                         !- Cost per Unit of Output Capacity per COP {$/kW}",
+        "      ,                         !- Cost per Volume {$/m3}",
+        "      ,                         !- Cost per Volume Rate {$/(m3/s)}",
+        "      ;                         !- Cost per Energy per Temperature Difference {$/(W/K)}",
+
+        "    ComponentCost:LineItem,",
+        "      Cost Per Output Capacity Wildcard, !- Name",
+        "      ,                         !- Type",
+        "      Coil:Cooling:DX,          !- Line Item Type",
+        "      *,                        !- Item Name",
+        "      ,                         !- Object End-Use Key",
+        "      ,                         !- Cost per Each {$}",
+        "      ,                         !- Cost per Area {$/m2}",
+        "      10,                       !- Cost per Unit of Output Capacity {$/kW}",
+        "      ,                         !- Cost per Unit of Output Capacity per COP {$/kW}",
+        "      ,                         !- Cost per Volume {$/m3}",
+        "      ,                         !- Cost per Volume Rate {$/(m3/s)}",
+        "      ;                         !- Cost per Energy per Temperature Difference {$/(W/K)}",
+
+        "    ComponentCost:LineItem,",
+        "      Cost Per Output Capacity per COP, !- Name",
+        "      ,                         !- Type",
+        "      Coil:Cooling:DX,          !- Line Item Type",
+        "      Furnace DX Cool Cooling Coil,  !- Item Name",
+        "      ,                         !- Object End-Use Key",
+        "      ,                         !- Cost per Each {$}",
+        "      ,                         !- Cost per Area {$/m2}",
+        "      ,                         !- Cost per Unit of Output Capacity {$/kW}",
+        "      100,                      !- Cost per Unit of Output Capacity per COP {$/kW}",
+        "      ,                         !- Cost per Volume {$/m3}",
+        "      ,                         !- Cost per Volume Rate {$/(m3/s)}",
+        "      ;                         !- Cost per Energy per Temperature Difference {$/(W/K)}",
+
+        "    ComponentCost:LineItem,",
+        "      Cost Per Output Capacity per COP Wildcard, !- Name",
+        "      ,                         !- Type",
+        "      Coil:Cooling:DX,          !- Line Item Type",
+        "      *,                        !- Item Name",
+        "      ,                         !- Object End-Use Key",
+        "      ,                         !- Cost per Each {$}",
+        "      ,                         !- Cost per Area {$/m2}",
+        "      ,                         !- Cost per Unit of Output Capacity {$/kW}",
+        "      100,                      !- Cost per Unit of Output Capacity per COP {$/kW}",
+        "      ,                         !- Cost per Volume {$/m3}",
+        "      ,                         !- Cost per Volume Rate {$/(m3/s)}",
+        "      ;                         !- Cost per Energy per Temperature Difference {$/(W/K)}",
+
     });
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
@@ -15776,7 +15894,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -50.0;
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).RemainingOutputReqToDehumidSP = -0.007806893;
     state->dataEnvrn->StdRhoAir = 1.2043;
-    state->dataLoopNodes->Node(3).MassFlowRateMax = 1.5 * state->dataEnvrn->StdRhoAir;
+    // set fan outlet node max flow
+    state->dataLoopNodes->Node(thisSys->CoolCoilInletNodeNum).MassFlowRateMax = 1.5 * state->dataEnvrn->StdRhoAir;
     int CompIndex = 1;
     bool HeatActive = false;
     bool CoolActive = true;
@@ -15858,6 +15977,30 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
     // EXPECT_NEAR(thisSys->m_SpeedRatio, 0.228062, 0.001);
     EXPECT_NEAR(thisSys->m_SpeedRatio, 0.12, 0.001);
     EXPECT_NEAR(sensOut, -11998.0, 210.0);
+
+    // coil cost estimates
+    CostEstimateManager::GetCostEstimateInput(*state);
+    state->dataCostEstimateManager->GetCostInput = false;
+    state->dataCostEstimateManager->DoCostEstimate = true;
+    CostEstimateManager::CalcCostEstimate(*state);
+
+    // Cost Per Each: Qty = 1; $/Ea = 1; Total = 1 * 1 = 1
+    EXPECT_NEAR(state->dataCostEstimateManager->CostLineItem(1).LineSubTotal, 1.0, 0.01);
+
+    // Cost Per Each Wildcard: Qty = 1; $/Ea = 1; Total = 1 * 1 = 1
+    EXPECT_NEAR(state->dataCostEstimateManager->CostLineItem(2).LineSubTotal, 1.0, 0.01);
+
+    // Cost Per Output Capacity: Qty = 1; $/kW = 10; RatedCap = 34.772 kW; Total = 1 * 10 * 34.772 = 347.72
+    EXPECT_NEAR(state->dataCostEstimateManager->CostLineItem(3).LineSubTotal, 347.72, 0.01);
+
+    // Cost Per Output Capacity Wildcard: Qty = 1; $/kW = 10; RatedCap = 34.772 kW; Total = 1 * 10 * 34.772 = 347.72
+    EXPECT_NEAR(state->dataCostEstimateManager->CostLineItem(4).LineSubTotal, 347.72, 0.01);
+
+    // Cost Per Output Capacity per COP: Qty = 1; $/kW = 100 ; RatedCap = 34.772 kW; COP = 3; Total = 1 * 100 * 34.772 * 3 = 10431.6
+    EXPECT_NEAR(state->dataCostEstimateManager->CostLineItem(5).LineSubTotal, 10431.64, 0.01);
+
+    // Cost Per Output Capacity per COP Wildcard: Qty = 1; $/kW = 100 ; RatedCap = 34.772 kW; COP = 3; Total = 1 * 100 * 34.772 * 3 = 10431.6
+    EXPECT_NEAR(state->dataCostEstimateManager->CostLineItem(6).LineSubTotal, 10431.64, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_reportUnitarySystemAncillaryPowerTest)
@@ -16984,28 +17127,21 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_DesuperHeatCoilStptNodeTest)
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
 
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
+    InternalHeatGains::ManageInternalHeatGains(*state, true);
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     bool FirstHVACIteration = true;
     UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
-    thisSys->AirInNode = 3;
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 3;
-
-    state->dataZoneEquip->ZoneEquipInputsFilled = true; // indicate zone data is available
-    state->dataLoopNodes->NodeID.allocate(20);
-    state->dataLoopNodes->NodeID(20) = "East Zone Air Node";
-    state->dataHeatBal->ZoneIntGain.allocate(1);
-    state->dataHeatBal->ZoneIntGain(1).NumberOfDevices = 0;
-    state->dataHeatBal->RefrigCaseCredit.allocate(1);
-    state->dataHeatBal->RefrigCaseCredit(1).SenCaseCreditToZone = 0;
-    state->dataLoopNodes->Node.allocate(20);
-    state->dataLoopNodes->Node(20).Temp = 24.0;      // 24C db
-    state->dataLoopNodes->Node(20).HumRat = 0.00922; // 17C wb
-
-    RefrigeratedCase::ManageRefrigeratedCaseRacks(*state);
     thisSys->getUnitarySystemInputData(*state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     EXPECT_FALSE(ErrorsFound);                                                           // expect no errors
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = thisSys->AirInNode;
+
+    state->dataLoopNodes->Node(thisSys->NodeNumOfControlledZone).Temp = 24.0;      // 24C db
+    state->dataLoopNodes->Node(thisSys->NodeNumOfControlledZone).HumRat = 0.00922; // 17C wb
+
+    RefrigeratedCase::ManageRefrigeratedCaseRacks(*state);
 
     OutputReportPredefined::SetPredefinedTables(*state);
 
@@ -17039,20 +17175,22 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_DesuperHeatCoilStptNodeTest)
 
     // set up node conditions to test UnitarySystem set point based control
     // Unitary system air inlet node = 3
-    state->dataLoopNodes->Node(3).MassFlowRate = thisSys->m_DesignMassFlowRate;
-    state->dataLoopNodes->Node(3).MassFlowRateMaxAvail = thisSys->m_DesignMassFlowRate; // max avail at fan inlet so fan won't limit flow
+    state->dataLoopNodes->Node(thisSys->AirInNode).MassFlowRate = thisSys->m_DesignMassFlowRate;
+    state->dataLoopNodes->Node(thisSys->AirInNode).MassFlowRateMaxAvail =
+        thisSys->m_DesignMassFlowRate; // max avail at fan inlet so fan won't limit flow
 
     // test HEATING condition
-    state->dataLoopNodes->Node(3).Temp = 24.0;         // 24C db
-    state->dataLoopNodes->Node(3).HumRat = 0.00922;    // 17C wb
-    state->dataLoopNodes->Node(3).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
+    state->dataLoopNodes->Node(thisSys->AirInNode).Temp = 24.0;         // 24C db
+    state->dataLoopNodes->Node(thisSys->AirInNode).HumRat = 0.00922;    // 17C wb
+    state->dataLoopNodes->Node(thisSys->AirInNode).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
 
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
     // Heating coil air inlet node = 4
-    state->dataLoopNodes->Node(4).MassFlowRateMax = thisSys->m_DesignMassFlowRate; // max at fan outlet so fan won't limit flow
+    state->dataLoopNodes->Node(thisSys->HeatCoilInletNodeNum).MassFlowRateMax =
+        thisSys->m_DesignMassFlowRate; // max at fan outlet so fan won't limit flow
     // Heating coil air outlet node = 5
-    state->dataLoopNodes->Node(5).TempSetPoint = 25.0;
+    state->dataLoopNodes->Node(thisSys->HeatCoilOutletNodeNum).TempSetPoint = 25.0;
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
@@ -17073,7 +17211,9 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_DesuperHeatCoilStptNodeTest)
                       latOut);
 
     // check that heating coil air outlet node is at set point
-    EXPECT_NEAR(state->dataLoopNodes->Node(5).Temp, state->dataLoopNodes->Node(5).TempSetPoint, 0.001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(thisSys->HeatCoilOutletNodeNum).Temp,
+                state->dataLoopNodes->Node(thisSys->HeatCoilOutletNodeNum).TempSetPoint,
+                0.001);
     // heating coil air inlet node temp is less than heating coil air outlet node temp
-    EXPECT_GT(state->dataLoopNodes->Node(5).Temp, state->dataLoopNodes->Node(4).Temp);
+    EXPECT_GT(state->dataLoopNodes->Node(thisSys->HeatCoilOutletNodeNum).Temp, state->dataLoopNodes->Node(thisSys->HeatCoilInletNodeNum).Temp);
 }

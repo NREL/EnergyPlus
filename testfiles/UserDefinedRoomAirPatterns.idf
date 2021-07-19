@@ -59,7 +59,7 @@
 !
 !   The model also contains an under floor zone and a suspended ceiling zone
 
-  Version,9.5;
+  Version,9.6;
 
   Timestep,4;
 
@@ -9967,8 +9967,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     VAV SYS 1 OA,            !- Name
     VAV SYS 1 OAControllers, !- Controller List Name
-    VAV SYS 1 OAEquipment,   !- Outdoor Air Equipment List Name
-    VAV SYS 1 Availability Managers;  !- Availability Manager List Name
+    VAV SYS 1 OAEquipment;   !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     VAV SYS 1 OANode List;   !- Node or NodeList Name 1

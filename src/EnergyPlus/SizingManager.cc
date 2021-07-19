@@ -138,7 +138,7 @@ void ManageSizing(EnergyPlusData &state)
     using OutputReportTabular::isCompLoadRepReq;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("ManageSizing: ");
+    static constexpr std::string_view RoutineName("ManageSizing: ");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool Available(false); // an environment is available to process
@@ -185,7 +185,7 @@ void ManageSizing(EnergyPlusData &state)
     if (state.dataGlobal->DoZoneSizing || state.dataGlobal->DoSystemSizing) {
         if ((state.dataSize->NumSysSizInput > 0 && state.dataSize->NumZoneSizingInput == 0) ||
             (!state.dataGlobal->DoZoneSizing && state.dataGlobal->DoSystemSizing && state.dataSize->NumSysSizInput > 0)) {
-            ShowSevereError(state, RoutineName + "Requested System Sizing but did not request Zone Sizing.");
+            ShowSevereError(state, std::string{RoutineName} + "Requested System Sizing but did not request Zone Sizing.");
             ShowContinueError(state, "System Sizing cannot be done without Zone Sizing");
             ShowFatalError(state, "Program terminates for preceding conditions.");
         }
@@ -203,12 +203,12 @@ void ManageSizing(EnergyPlusData &state)
             if (fileHasSizingPeriodDays) {
                 ShowWarningError(
                     state,
-                    RoutineName +
+                    std::string{RoutineName} +
                         "The ZoneComponentLoadSummary report was requested but no sizing objects were found so that report cannot be generated.");
             } else {
                 ShowWarningError(state,
-                                 RoutineName + "The ZoneComponentLoadSummary report was requested but no SizingPeriod:DesignDay or "
-                                               "SizingPeriod:WeatherFileDays objects were found so that report cannot be generated.");
+                                 std::string{RoutineName} + "The ZoneComponentLoadSummary report was requested but no SizingPeriod:DesignDay or "
+                                                            "SizingPeriod:WeatherFileDays objects were found so that report cannot be generated.");
             }
         }
     }
@@ -221,7 +221,8 @@ void ManageSizing(EnergyPlusData &state)
     if ((state.dataGlobal->DoZoneSizing) && (state.dataSize->NumZoneSizingInput == 0)) {
         ShowWarningError(
             state,
-            RoutineName + "For a zone sizing run, there must be at least 1 Sizing:Zone input object. SimulationControl Zone Sizing option ignored.");
+            std::string{RoutineName} +
+                "For a zone sizing run, there must be at least 1 Sizing:Zone input object. SimulationControl Zone Sizing option ignored.");
     }
 
     if ((state.dataSize->NumZoneSizingInput > 0) &&
@@ -235,11 +236,11 @@ void ManageSizing(EnergyPlusData &state)
         Available = true;
 
         if (state.dataSize->SizingFileColSep == CharComma) {
-            state.files.zsz.fileName = state.files.outputZszCsvFileName;
+            state.files.zsz.filePath = state.files.outputZszCsvFilePath;
         } else if (state.dataSize->SizingFileColSep == CharTab) {
-            state.files.zsz.fileName = state.files.outputZszTabFileName;
+            state.files.zsz.filePath = state.files.outputZszTabFilePath;
         } else {
-            state.files.zsz.fileName = state.files.outputZszTxtFileName;
+            state.files.zsz.filePath = state.files.outputZszTxtFilePath;
         }
 
         state.files.zsz.ensure_open(state, "ManageSizing", state.files.outputControl.zsz);
@@ -409,7 +410,8 @@ void ManageSizing(EnergyPlusData &state)
                 UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::EndZoneSizingCalc);
                 state.dataSize->ZoneSizingRunDone = true;
             } else {
-                ShowSevereError(state, RoutineName + "No Sizing periods were performed for Zone Sizing. No Zone Sizing calculations saved.");
+                ShowSevereError(state,
+                                std::string{RoutineName} + "No Sizing periods were performed for Zone Sizing. No Zone Sizing calculations saved.");
                 ErrorsFound = true;
             }
 
@@ -436,7 +438,7 @@ void ManageSizing(EnergyPlusData &state)
     if ((state.dataGlobal->DoSystemSizing) && (state.dataSize->NumSysSizInput == 0) && (state.dataSizingManager->NumAirLoops > 0)) {
         ShowWarningError(
             state,
-            RoutineName +
+            std::string{RoutineName} +
                 "For a system sizing run, there must be at least 1 Sizing:System object input. SimulationControl System Sizing option ignored.");
     }
 
@@ -447,11 +449,11 @@ void ManageSizing(EnergyPlusData &state)
         state.dataGlobal->SysSizingCalc = true;
         Available = true;
         if (state.dataSize->SizingFileColSep == CharComma) {
-            state.files.ssz.fileName = state.files.outputSszCsvFileName;
+            state.files.ssz.filePath = state.files.outputSszCsvFilePath;
         } else if (state.dataSize->SizingFileColSep == CharTab) {
-            state.files.ssz.fileName = state.files.outputSszTabFileName;
+            state.files.ssz.filePath = state.files.outputSszTabFilePath;
         } else {
-            state.files.ssz.fileName = state.files.outputSszTxtFileName;
+            state.files.ssz.filePath = state.files.outputSszTxtFilePath;
         }
         state.files.ssz.ensure_open(state, "ManageSizing", state.files.outputControl.ssz);
 
@@ -573,7 +575,8 @@ void ManageSizing(EnergyPlusData &state)
             UpdateSysSizing(state, DataGlobalConstants::CallIndicator::EndSysSizingCalc);
             state.dataSize->SysSizingRunDone = true;
         } else {
-            ShowSevereError(state, RoutineName + "No Sizing periods were performed for System Sizing. No System Sizing calculations saved.");
+            ShowSevereError(state,
+                            std::string{RoutineName} + "No Sizing periods were performed for System Sizing. No System Sizing calculations saved.");
             ErrorsFound = true;
         }
     } else if ((state.dataSize->NumZoneSizingInput > 0) &&
@@ -773,16 +776,16 @@ void ManageSizing(EnergyPlusData &state)
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchSysSizCalcClAir, curName, CalcSysSizing(AirLoopNum).DesCoolVolFlow);
             if (std::abs(CalcSysSizing(AirLoopNum).DesCoolVolFlow) <= 1.e-8) {
                 ShowWarningError(state,
-                                 RoutineName + "Calculated Cooling Design Air Flow Rate for System=" + FinalSysSizing(AirLoopNum).AirPriLoopName +
-                                     " is zero.");
+                                 std::string{RoutineName} +
+                                     "Calculated Cooling Design Air Flow Rate for System=" + FinalSysSizing(AirLoopNum).AirPriLoopName + " is zero.");
                 ShowContinueError(state, "Check Sizing:Zone and ZoneControl:Thermostat inputs.");
             }
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchSysSizUserClAir, curName, FinalSysSizing(AirLoopNum).DesCoolVolFlow);
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchSysSizCalcHtAir, curName, CalcSysSizing(AirLoopNum).DesHeatVolFlow);
             if (std::abs(CalcSysSizing(AirLoopNum).DesHeatVolFlow) <= 1.e-8) {
                 ShowWarningError(state,
-                                 RoutineName + "Calculated Heating Design Air Flow Rate for System=" + FinalSysSizing(AirLoopNum).AirPriLoopName +
-                                     " is zero.");
+                                 std::string{RoutineName} +
+                                     "Calculated Heating Design Air Flow Rate for System=" + FinalSysSizing(AirLoopNum).AirPriLoopName + " is zero.");
                 ShowContinueError(state, "Check Sizing:Zone and ZoneControl:Thermostat inputs.");
             }
             std::string coolPeakLoadKind;
@@ -856,7 +859,7 @@ void ManageSizing(EnergyPlusData &state)
     if ((state.dataGlobal->DoPlantSizing) && (state.dataSize->NumPltSizInput == 0)) {
         ShowWarningError(
             state,
-            RoutineName +
+            std::string{RoutineName} +
                 "For a plant sizing run, there must be at least 1 Sizing:Plant object input. SimulationControl Plant Sizing option ignored.");
     }
 
@@ -2215,7 +2218,7 @@ void GetOARequirements(EnergyPlusData &state)
     using ScheduleManager::GetScheduleMaxValue;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("GetOARequirements: "); // include trailing blank space
+    static constexpr std::string_view RoutineName("GetOARequirements: "); // include trailing blank space
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int NumAlphas;  // Number of Alphas for each GetObjectItem call
@@ -2289,7 +2292,7 @@ void GetOARequirements(EnergyPlusData &state)
         lNumericBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in input.  Preceding condition(s) cause termination.");
+            ShowFatalError(state, std::string{RoutineName} + "Errors found in input.  Preceding condition(s) cause termination.");
         }
     }
 }
@@ -2336,7 +2339,7 @@ void ProcessInputOARequirements(EnergyPlusData &state,
     // na
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("GetOARequirements: "); // include trailing blank space
+    static constexpr std::string_view RoutineName("GetOARequirements: "); // include trailing blank space
 
     // INTERFACE BLOCK SPECIFICATIONS
     // na
@@ -2367,7 +2370,7 @@ void ProcessInputOARequirements(EnergyPlusData &state,
                        Alphas(2), "PROPORTIONALCONTROLBASEDONDESIGNOCCUPANCY")) { // Proportional Control based on ASHRAE Standard 62.1-2004
             state.dataSize->OARequirements(OAIndex).OAFlowMethod = ZOAM_ProportionalControlDesOcc;
         } else {
-            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataSize->OARequirements(OAIndex).Name + "\",");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataSize->OARequirements(OAIndex).Name + "\",");
             ShowContinueError(state, "...Invalid " + cAlphaFields(2) + "=\"" + Alphas(2) + "\",");
             ShowContinueError(state,
                               "...Valid choices are Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, Maximum, IndoorAirQualityProcedure, "
@@ -2431,13 +2434,14 @@ void ProcessInputOARequirements(EnergyPlusData &state,
             state.dataSize->OARequirements(OAIndex).OAFlowFracSchPtr = GetScheduleIndex(state, Alphas(3));
             if (state.dataSize->OARequirements(OAIndex).OAFlowFracSchPtr > 0) {
                 if (!CheckScheduleValueMinMax(state, state.dataSize->OARequirements(OAIndex).OAFlowFracSchPtr, ">=", 0.0, "<=", 1.0)) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataSize->OARequirements(OAIndex).Name + "\",");
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataSize->OARequirements(OAIndex).Name + "\",");
                     ShowContinueError(state, "Error found in " + cAlphaFields(3) + " = " + Alphas(3));
                     ShowContinueError(state, "Schedule values must be (>=0., <=1.)");
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataSize->OARequirements(OAIndex).Name + "\",");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataSize->OARequirements(OAIndex).Name + "\",");
                 ShowContinueError(state, "...Not Found " + cAlphaFields(3) + "=\"" + Alphas(3) + "\".");
                 ErrorsFound = true;
             }
@@ -2449,13 +2453,14 @@ void ProcessInputOARequirements(EnergyPlusData &state,
             state.dataSize->OARequirements(OAIndex).OAPropCtlMinRateSchPtr = GetScheduleIndex(state, Alphas(4));
             if (state.dataSize->OARequirements(OAIndex).OAPropCtlMinRateSchPtr > 0) {
                 if (!CheckScheduleValueMinMax(state, state.dataSize->OARequirements(OAIndex).OAPropCtlMinRateSchPtr, ">=", 0.0, "<=", 1.0)) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataSize->OARequirements(OAIndex).Name + "\",");
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataSize->OARequirements(OAIndex).Name + "\",");
                     ShowContinueError(state, "Error found in " + cAlphaFields(4) + " = " + Alphas(4));
                     ShowContinueError(state, "Schedule values must be (>=0., <=1.)");
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataSize->OARequirements(OAIndex).Name + "\",");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataSize->OARequirements(OAIndex).Name + "\",");
                 ShowContinueError(state, "...Not Found " + cAlphaFields(4) + "=\"" + Alphas(4) + "\".");
                 ErrorsFound = true;
             }
@@ -2486,7 +2491,7 @@ void GetZoneAirDistribution(EnergyPlusData &state)
     using ScheduleManager::GetScheduleIndex;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("GetZoneAirDistribution: "); // include trailing blank space
+    static constexpr std::string_view RoutineName("GetZoneAirDistribution: "); // include trailing blank space
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int NumAlphas;  // Number of Alphas for each GetObjectItem call
@@ -2576,14 +2581,16 @@ void GetZoneAirDistribution(EnergyPlusData &state)
                     if (state.dataSize->ZoneAirDistribution(ZADIndex).ZoneADEffSchPtr > 0) {
                         if (!CheckScheduleValueMinMax(state, state.dataSize->ZoneAirDistribution(ZADIndex).ZoneADEffSchPtr, ">", 0.0)) {
                             ShowSevereError(state,
-                                            RoutineName + CurrentModuleObject + "=\"" + state.dataSize->ZoneAirDistribution(ZADIndex).Name + "\",");
+                                            std::string{RoutineName} + CurrentModuleObject + "=\"" +
+                                                state.dataSize->ZoneAirDistribution(ZADIndex).Name + "\",");
                             ShowContinueError(state, "Error found in " + cAlphaFields(2) + " = " + Alphas(2));
                             ShowContinueError(state, "Schedule values must be >0.0)");
                             ErrorsFound = true;
                         }
                     } else {
                         ShowSevereError(state,
-                                        RoutineName + CurrentModuleObject + "=\"" + state.dataSize->ZoneAirDistribution(ZADIndex).Name + "\",");
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataSize->ZoneAirDistribution(ZADIndex).Name +
+                                            "\",");
                         ShowContinueError(state, "...Not Found " + cAlphaFields(2) + "=\"" + Alphas(2) + "\".");
                         ErrorsFound = true;
                     }
@@ -2599,7 +2606,7 @@ void GetZoneAirDistribution(EnergyPlusData &state)
         lNumericBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in input.  Preceding condition(s) cause termination.");
+            ShowFatalError(state, std::string{RoutineName} + "Errors found in input.  Preceding condition(s) cause termination.");
         }
     }
 }
@@ -2908,18 +2915,11 @@ void GetZoneSizingInput(EnergyPlusData &state)
                 //      \units C
                 //      \note Zone Cooling Design Supply Air Temperature is only used when Zone Cooling Design
                 //      \note Supply Air Temperature Input Method = SupplyAirTemperature
+                Real64 lowTempLimit = 0.0;
                 if (state.dataIPShortCut->lNumericFieldBlanks(1)) {
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).CoolDesTemp = 0.0;
-                } else if (state.dataIPShortCut->rNumericArgs(1) < 0.0 &&
-                           state.dataSize->ZoneSizingInput(ZoneSizIndex).ZnCoolDgnSAMethod == SupplyAirTemperature) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
-                    ShowContinueError(state,
-                                      format("... incorrect {}=[{:.2R}],  value should not be negative.",
-                                             state.dataIPShortCut->cNumericFieldNames(1),
-                                             state.dataIPShortCut->rNumericArgs(1)));
-                    ErrorsFound = true;
-                } else if (state.dataIPShortCut->rNumericArgs(1) >= 0.0 &&
-                           state.dataSize->ZoneSizingInput(ZoneSizIndex).ZnCoolDgnSAMethod == SupplyAirTemperature) {
+                } else if (state.dataSize->ZoneSizingInput(ZoneSizIndex).ZnCoolDgnSAMethod == SupplyAirTemperature) {
+                    ReportTemperatureInputError(state, cCurrentModuleObject, 1, lowTempLimit, false, ErrorsFound);
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).CoolDesTemp = state.dataIPShortCut->rNumericArgs(1);
                 } else {
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).CoolDesTemp = 0.0;
@@ -2965,16 +2965,10 @@ void GetZoneSizingInput(EnergyPlusData &state)
                 //      \note Supply Air Temperature Input Method = SupplyAirTemperature
                 if (state.dataIPShortCut->lNumericFieldBlanks(3)) {
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).HeatDesTemp = 0.0;
-                } else if (state.dataIPShortCut->rNumericArgs(3) < 0.0 &&
-                           state.dataSize->ZoneSizingInput(ZoneSizIndex).ZnHeatDgnSAMethod == SupplyAirTemperature) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
-                    ShowContinueError(state,
-                                      format("... incorrect {}=[{:.2R}],  value should not be negative.",
-                                             state.dataIPShortCut->cNumericFieldNames(3),
-                                             state.dataIPShortCut->rNumericArgs(3)));
-                    ErrorsFound = true;
-                } else if (state.dataIPShortCut->rNumericArgs(3) >= 0.0 &&
-                           state.dataSize->ZoneSizingInput(ZoneSizIndex).ZnHeatDgnSAMethod == SupplyAirTemperature) {
+                } else if (state.dataSize->ZoneSizingInput(ZoneSizIndex).ZnHeatDgnSAMethod == SupplyAirTemperature) {
+                    ReportTemperatureInputError(state, cCurrentModuleObject, 1, lowTempLimit, false, ErrorsFound);
+                    ReportTemperatureInputError(
+                        state, cCurrentModuleObject, 1, state.dataSize->ZoneSizingInput(ZoneSizIndex).CoolDesTemp, true, ErrorsFound);
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).HeatDesTemp = state.dataIPShortCut->rNumericArgs(3);
                 } else {
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).HeatDesTemp = 0.0;
@@ -3370,6 +3364,32 @@ void GetZoneSizingInput(EnergyPlusData &state)
 
     if (ErrorsFound) {
         ShowFatalError(state, cCurrentModuleObject + ": Errors found in getting input. Program terminates.");
+    }
+}
+
+void ReportTemperatureInputError(
+    EnergyPlusData &state, std::string cObjectName, int const paramNum, Real64 comparisonTemperature, bool const shouldFlagSevere, bool &ErrorsFound)
+{
+    if (state.dataIPShortCut->rNumericArgs(1) < comparisonTemperature) {
+        if (shouldFlagSevere) { // heating supply air temperature is lower than cooling supply air temperature--not allowed
+            ShowSevereError(state, cObjectName + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" has invalid data.");
+            ShowContinueError(state,
+                              format("... incorrect {}=[{:.2R}] is less than {}=[{:.2R}]",
+                                     state.dataIPShortCut->cNumericFieldNames(paramNum),
+                                     state.dataIPShortCut->rNumericArgs(paramNum),
+                                     state.dataIPShortCut->cNumericFieldNames(paramNum - 2),
+                                     state.dataIPShortCut->rNumericArgs(paramNum - 2)));
+            ShowContinueError(state, format("This is not allowed.  Please check and revise your input."));
+            ErrorsFound = true;
+        } else { // then input is lower than comparison tempeature--just produce a warning for user to check input
+            ShowWarningError(state, cObjectName + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" has invalid data.");
+            ShowContinueError(state,
+                              format("... incorrect {}=[{:.2R}] is less than [{:.2R}]",
+                                     state.dataIPShortCut->cNumericFieldNames(paramNum),
+                                     state.dataIPShortCut->rNumericArgs(paramNum),
+                                     comparisonTemperature));
+            ShowContinueError(state, format("Please check your input to make sure this is correct."));
+        }
     }
 }
 
@@ -4295,7 +4315,7 @@ void ReportZoneSizing(EnergyPlusData &state,
     // This subroutine writes one item of zone sizing data to the "eio" file..
 
     if (state.dataSizingManager->ReportZoneSizingMyOneTimeFlag) {
-        static constexpr auto Format_990(
+        static constexpr fmt::string_view Format_990(
             "! <Zone Sizing Information>, Zone Name, Load Type, Calc Des Load {W}, User Des Load {W}, Calc Des Air Flow "
             "Rate {m3/s}, User Des Air Flow Rate {m3/s}, Design Day Name, Date/Time of Peak, Temperature at Peak {C}, "
             "Humidity Ratio at Peak {kgWater/kgDryAir}, Floor Area {m2}, # Occupants, Calc Outdoor Air Flow Rate {m3/s}, "
@@ -4304,7 +4324,7 @@ void ReportZoneSizing(EnergyPlusData &state,
         state.dataSizingManager->ReportZoneSizingMyOneTimeFlag = false;
     }
 
-    static constexpr auto Format_991(
+    static constexpr fmt::string_view Format_991(
         " Zone Sizing Information, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {:.5R}\n");
     print(state.files.eio,
           Format_991,
@@ -4410,7 +4430,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
     // Using/Aliasing
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("GetZoneHVACSizing: "); // include trailing blank space
+    static constexpr std::string_view RoutineName("GetZoneHVACSizing: "); // include trailing blank space
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -5036,7 +5056,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
     lNumericBlanks.deallocate();
 
     if (ErrorsFound) {
-        ShowFatalError(state, RoutineName + "Errors found in input.  Preceding condition(s) cause termination.");
+        ShowFatalError(state, std::string{RoutineName} + "Errors found in input.  Preceding condition(s) cause termination.");
     }
 }
 
@@ -5050,7 +5070,7 @@ void GetAirTerminalSizing(EnergyPlusData &state)
     // Obtains input data for the AirTerminal sizing methods object and stores it in
     // appropriate data structure.
 
-    static std::string const RoutineName("GetAirTerminalSizing: "); // include trailing blank space
+    static constexpr std::string_view RoutineName("GetAirTerminalSizing: "); // include trailing blank space
 
     int NumAlphas;           // Number of Alphas for each GetObjectItem call
     int NumNumbers;          // Number of Numbers for each GetObjectItem call
@@ -5094,7 +5114,7 @@ void GetAirTerminalSizing(EnergyPlusData &state)
     }
 
     if (ErrorsFound) {
-        ShowFatalError(state, RoutineName + "Errors found in input.  Preceding condition(s) cause termination.");
+        ShowFatalError(state, std::string{RoutineName} + "Errors found in input.  Preceding condition(s) cause termination.");
     }
 }
 

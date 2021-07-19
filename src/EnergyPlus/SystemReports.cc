@@ -158,7 +158,7 @@ void InitEnergyReports(EnergyPlusData &state)
     int MainBranchNum;
     int SupplyCoolBranchNum;
     int SupplyHeatBranchNum;
-    int VarType;
+    OutputProcessor::VariableType VarType;
     int VarIndex;
     int OutNum;
     int NodeCount;
@@ -2451,17 +2451,17 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
     Array1D_string SubCompNames;
     Array1D_string InletNodeNames;
     Array1D_int InletNodeNumbers;
-    Array1D_int InletFluidStreams;
+    Array1D<NodeInputManager::compFluidStream> InletFluidStreams;
     Array1D_string OutletNodeNames;
     Array1D_int OutletNodeNumbers;
-    Array1D_int OutletFluidStreams;
+    Array1D<NodeInputManager::compFluidStream> OutletFluidStreams;
     int NumChildren;
     int NumGrandChildren;
     bool IsParent;
 
     // Dimension GetMeteredVariables arrays
     Array1D_int VarIndexes;                                         // Variable Numbers
-    Array1D_int VarTypes;                                           // Variable Types (1=integer, 2=real, 3=meter)
+    Array1D<OutputProcessor::VariableType> VarTypes;                // Variable Types (1=integer, 2=real, 3=meter)
     Array1D_string UnitsStrings;                                    // UnitsStrings for each variable
     Array1D<OutputProcessor::TimeStepType> IndexTypes;              // Variable Idx Types (1=Zone,2=HVAC)
     Array1D<OutputProcessor::Unit> unitsForVar;                     // units from enum for each variable
@@ -5244,7 +5244,7 @@ void MatchPlantSys(EnergyPlusData &state,
 
 void FindDemandSideMatch(EnergyPlusData &state,
                          std::string const &CompType, // Inlet node of the component to find the match of
-                         std::string const &CompName, // Outlet node of the component to find the match of
+                         std::string_view CompName,   // Outlet node of the component to find the match of
                          bool &MatchFound,            // Set to .TRUE. when a match is found
                          int &MatchLoopType,          // Loop number of the match
                          int &MatchLoop,              // Loop number of the match
@@ -5361,7 +5361,7 @@ void ReportAirLoopConnections(EnergyPlusData &state)
     // na
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const errstring("**error**");
+    static constexpr std::string_view errstring("**error**");
 
     // INTERFACE BLOCK SPECIFICATIONS
     // na
@@ -5370,19 +5370,24 @@ void ReportAirLoopConnections(EnergyPlusData &state)
     // na
 
     // Formats
-    static constexpr auto Format_706("! <#AirLoopHVACs>,<Number of AirLoopHVACs>");
-    static constexpr auto Format_708(
+    static constexpr fmt::string_view Format_706("! <#AirLoopHVACs>,<Number of AirLoopHVACs>");
+    static constexpr fmt::string_view Format_708(
         "! <AirLoopHVAC>,<Air Loop Name>,<# Return Nodes>,<# Supply Nodes>,<# Zones Cooled>,<# Zones Heated>,<Outdoor Air Used>");
-    static constexpr auto Format_709("! <AirLoop Return Connections>,<Connection Count>,<AirLoopHVAC Name>,<Zn Eqp Return Node #>,<Zn Eqp Return "
-                                     "Node Name>,<AirLoop Return Node #>,<Air Loop Return Node Name>");
-    static constexpr auto Format_710("! <AirLoop Supply Connections>,<Connection Count>,<AirLoopHVAC Name>,<Zn Eqp Supply Node #>,<Zn Eqp Supply "
-                                     "Node Name>,<AirLoop Supply Node #>,<Air Loop Supply Node Name>");
-    static constexpr auto Format_711("! <Cooled Zone Info>,<Cooled Zone Count>,<Cooled Zone Name>,<Cooled Zone Inlet Node #>,<Cooled Zone Inlet "
-                                     "Node Name>,<AirLoopHVAC Name>");
-    static constexpr auto Format_712("! <Heated Zone Info>,<Heated Zone Count>,<Heated Zone Name>,<Heated Zone Inlet Node #>,<Heated Zone Inlet "
-                                     "Node Name>,<AirLoopHVAC Name>");
-    static constexpr auto Format_714("! <Outdoor Air Connections>,<OA Inlet Node #>,<OA Return Air Inlet Node Name>,<OA Outlet Node #>,<OA Mixed "
-                                     "Air Outlet Node Name>,<AirLoopHVAC Name>");
+    static constexpr fmt::string_view Format_709(
+        "! <AirLoop Return Connections>,<Connection Count>,<AirLoopHVAC Name>,<Zn Eqp Return Node #>,<Zn Eqp Return "
+        "Node Name>,<AirLoop Return Node #>,<Air Loop Return Node Name>");
+    static constexpr fmt::string_view Format_710(
+        "! <AirLoop Supply Connections>,<Connection Count>,<AirLoopHVAC Name>,<Zn Eqp Supply Node #>,<Zn Eqp Supply "
+        "Node Name>,<AirLoop Supply Node #>,<Air Loop Supply Node Name>");
+    static constexpr fmt::string_view Format_711(
+        "! <Cooled Zone Info>,<Cooled Zone Count>,<Cooled Zone Name>,<Cooled Zone Inlet Node #>,<Cooled Zone Inlet "
+        "Node Name>,<AirLoopHVAC Name>");
+    static constexpr fmt::string_view Format_712(
+        "! <Heated Zone Info>,<Heated Zone Count>,<Heated Zone Name>,<Heated Zone Inlet Node #>,<Heated Zone Inlet "
+        "Node Name>,<AirLoopHVAC Name>");
+    static constexpr fmt::string_view Format_714(
+        "! <Outdoor Air Connections>,<OA Inlet Node #>,<OA Return Air Inlet Node Name>,<OA Outlet Node #>,<OA Mixed "
+        "Air Outlet Node Name>,<AirLoopHVAC Name>");
 
     auto &NodeID(state.dataLoopNodes->NodeID);
 

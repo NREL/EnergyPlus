@@ -448,7 +448,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                                                     state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name,
                                                     DataLoopNode::NodeFluidType::Water,
                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                    1,
+                                                    NodeInputManager::compFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
         }
 
@@ -461,7 +461,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                                                     state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name,
                                                     DataLoopNode::NodeFluidType::Water,
                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                    1,
+                                                    NodeInputManager::compFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
         }
 
@@ -726,7 +726,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Air,
                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                    2,
+                                                    NodeInputManager::compFluidStream::Secondary,
                                                     DataLoopNode::ObjectIsNotParent);
         }
 
@@ -749,7 +749,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Air,
                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                    2,
+                                                    NodeInputManager::compFluidStream::Secondary,
                                                     DataLoopNode::ObjectIsNotParent);
         }
 
@@ -1050,61 +1050,7 @@ void MTGeneratorSpecs::InitMTGenerators(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     //  Uses the status flags to trigger initializations.
 
-    std::string const RoutineName("InitMTGenerators");
-    bool errFlag;
-
-    if (this->myFlag) {
-        this->setupOutputVars(state);
-        this->myFlag = false;
-    }
-
-    if (this->MyPlantScanFlag && allocated(state.dataPlnt->PlantLoop) && this->HeatRecActive) {
-        errFlag = false;
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->Name,
-                                                DataPlant::TypeOf_Generator_MicroTurbine,
-                                                this->HRLoopNum,
-                                                this->HRLoopSideNum,
-                                                this->HRBranchNum,
-                                                this->HRCompNum,
-                                                errFlag,
-                                                _,
-                                                _,
-                                                _,
-                                                _,
-                                                _);
-        if (errFlag) {
-            ShowFatalError(state, "InitMTGenerators: Program terminated due to previous condition(s).");
-        }
-
-        this->MyPlantScanFlag = false;
-    }
-
-    if (this->MySizeAndNodeInitFlag && (!this->MyPlantScanFlag) && this->HeatRecActive) {
-
-        // size mass flow rate
-        Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                       state.dataPlnt->PlantLoop(this->HRLoopNum).FluidName,
-                                                       DataGlobalConstants::InitConvTemp,
-                                                       state.dataPlnt->PlantLoop(this->HRLoopNum).FluidIndex,
-                                                       RoutineName);
-
-        this->DesignHeatRecMassFlowRate = rho * this->RefHeatRecVolFlowRate;
-        this->HeatRecMaxMassFlowRate = rho * this->HeatRecMaxVolFlowRate;
-
-        PlantUtilities::InitComponentNodes(state,
-                                           0.0,
-                                           this->HeatRecMaxMassFlowRate,
-                                           this->HeatRecInletNodeNum,
-                                           this->HeatRecOutletNodeNum,
-                                           this->HRLoopNum,
-                                           this->HRLoopSideNum,
-                                           this->HRBranchNum,
-                                           this->HRCompNum);
-
-        this->MySizeAndNodeInitFlag = false;
-
-    } // end one time inits
+    this->oneTimeInit(state); // end one time inits
 
     if (!this->HeatRecActive) return;
 
@@ -1228,7 +1174,7 @@ void MTGeneratorSpecs::CalcMTGeneratorModel(EnergyPlusData &state,
     int const MaxAncPowerIter(50);       // Maximum number of iteration (subroutine ancillary power iteration loop)
     Real64 const AncPowerDiffToler(5.0); // Tolerance for Ancillary Power Difference (W)
     Real64 const RelaxFactor(0.7);       // Relaxation factor for iteration loop
-    std::string const RoutineName("CalcMTGeneratorModel");
+    static constexpr std::string_view RoutineName("CalcMTGeneratorModel");
 
     //   Load local variables from data structure (for code readability)
     // Min allowed operating fraction at full load
@@ -1947,6 +1893,64 @@ void MTGeneratorSpecs::UpdateMTGeneratorRecords(EnergyPlusData &state)
     }
     this->AncillaryEnergy = this->AncillaryPowerRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     this->StandbyEnergy = this->StandbyPowerRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+}
+void MTGeneratorSpecs::oneTimeInit(EnergyPlusData &state)
+{
+
+    std::string const RoutineName("InitMTGenerators");
+    bool errFlag;
+
+    if (this->myFlag) {
+        this->setupOutputVars(state);
+        this->myFlag = false;
+    }
+
+    if (this->MyPlantScanFlag && allocated(state.dataPlnt->PlantLoop) && this->HeatRecActive) {
+        errFlag = false;
+        PlantUtilities::ScanPlantLoopsForObject(state,
+                                                this->Name,
+                                                DataPlant::TypeOf_Generator_MicroTurbine,
+                                                this->HRLoopNum,
+                                                this->HRLoopSideNum,
+                                                this->HRBranchNum,
+                                                this->HRCompNum,
+                                                errFlag,
+                                                _,
+                                                _,
+                                                _,
+                                                _,
+                                                _);
+        if (errFlag) {
+            ShowFatalError(state, "InitMTGenerators: Program terminated due to previous condition(s).");
+        }
+
+        this->MyPlantScanFlag = false;
+    }
+
+    if (this->MySizeAndNodeInitFlag && (!this->MyPlantScanFlag) && this->HeatRecActive) {
+
+        // size mass flow rate
+        Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                       state.dataPlnt->PlantLoop(this->HRLoopNum).FluidName,
+                                                       DataGlobalConstants::InitConvTemp,
+                                                       state.dataPlnt->PlantLoop(this->HRLoopNum).FluidIndex,
+                                                       RoutineName);
+
+        this->DesignHeatRecMassFlowRate = rho * this->RefHeatRecVolFlowRate;
+        this->HeatRecMaxMassFlowRate = rho * this->HeatRecMaxVolFlowRate;
+
+        PlantUtilities::InitComponentNodes(state,
+                                           0.0,
+                                           this->HeatRecMaxMassFlowRate,
+                                           this->HeatRecInletNodeNum,
+                                           this->HeatRecOutletNodeNum,
+                                           this->HRLoopNum,
+                                           this->HRLoopSideNum,
+                                           this->HRBranchNum,
+                                           this->HRCompNum);
+
+        this->MySizeAndNodeInitFlag = false;
+    }
 }
 
 } // namespace EnergyPlus::MicroturbineElectricGenerator

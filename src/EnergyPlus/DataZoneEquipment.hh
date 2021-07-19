@@ -146,14 +146,15 @@ namespace DataZoneEquipment {
         std::string Group;
         int ReportVarIndex;
         OutputProcessor::TimeStepType ReportVarIndexType;
-        int ReportVarType;
+        OutputProcessor::VariableType ReportVarType;
         Real64 CurMeterReading;
 
         // Default Constructor
         EquipMeterData()
             : ReportVarUnits(OutputProcessor::Unit::None), ResourceType(DataGlobalConstants::ResourceType::None),
               EndUse_CompMode(SystemReports::iEndUseType::NoHeatNoCool), ReportVarIndex(0),
-              ReportVarIndexType(OutputProcessor::TimeStepType::TimeStepZone), ReportVarType(0), CurMeterReading(0.0)
+              ReportVarIndexType(OutputProcessor::TimeStepType::TimeStepZone), ReportVarType(OutputProcessor::VariableType::NotFound),
+              CurMeterReading(0.0)
         {
         }
     };
@@ -432,8 +433,8 @@ namespace DataZoneEquipment {
     void SetupZoneEquipmentForConvectionFlowRegime(EnergyPlusData &state);
 
     bool CheckZoneEquipmentList(EnergyPlusData &state,
-                                std::string const &ComponentType, // Type of component
-                                std::string const &ComponentName, // Name of component
+                                std::string_view ComponentType, // Type of component
+                                std::string_view ComponentName, // Name of component
                                 Optional_int CtrlZoneNum = _);
 
     int GetControlledZoneIndex(EnergyPlusData &state, std::string const &ZoneName); // Zone name to match into Controlled Zone structure

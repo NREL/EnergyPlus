@@ -108,7 +108,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.5;
+  Version,9.6;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -400,9 +400,9 @@
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 7:00,0.05,        !- Field 3
+    Until: 7:00,0.0,         !- Field 3
     Until: 18:00,1.0,        !- Field 5
-    Until: 24:00,0.05;       !- Field 7
+    Until: 24:00,0.0;        !- Field 7
 
   Schedule:Compact,
     OutdoorAirAvailSched,    !- Name
@@ -1471,8 +1471,8 @@
     Outdoor Air Mixer Inlet Node,  !- Return Air Node Name
     Mixed Air Node,          !- Mixed Air Node Name
     Outside Air Inlet Node,  !- Actuator Node Name
-    0.25,                    !- Minimum Outdoor Air Flow Rate {m3/s}
-    1.6,                     !- Maximum Outdoor Air Flow Rate {m3/s}
+    0.7,                     !- Minimum Outdoor Air Flow Rate {m3/s}
+    0.778,                   !- Maximum Outdoor Air Flow Rate {m3/s}
     ElectronicEnthalpy,      !- Economizer Control Type
     ModulateFlow,            !- Economizer Control Action Type
     23.,                     !- Economizer Maximum Limit Dry-Bulb Temperature {C}
@@ -1517,23 +1517,86 @@
 
   AirLoopHVAC:OutdoorAirSystem:EquipmentList,
     OA Sys 1 Equipment,      !- Name
-    OutdoorAir:Mixer,        !- Component 1 Object Type
-    OA Mixing Box 1;         !- Component 1 Name
+    CoilSystem:Cooling:DX,   !- Component 1 Object Type
+    OA DX Cooling Coil,      !- Component 1 Name
+    OutdoorAir:Mixer,        !- Component 2 Object Type
+    OA Mixing Box 1;         !- Component 2 Name
+
+  CoilSystem:Cooling:DX,
+    OA DX Cooling Coil,      !- Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
+    Outside Air Inlet Node,         !- DX Cooling Coil System Inlet Node Name
+    OA Cooling Coil 1 Outlet Node,  !- DX Cooling Coil System Outlet Node Name
+    OA Cooling Coil 1 Outlet Node,  !- DX Cooling Coil System Sensor Node Name
+    Coil:Cooling:DX:SingleSpeed,    !- Cooling Coil Object Type
+    OA Cooling Coil 1,       !- Cooling Coil Name
+    ,                        !- Dehumidification Control Type
+    ,                        !- Run on Sensible Load
+    ,                        !- Run on Latent Load
+    Yes;                     !- Use Outdoor Air DX Cooling Coil
+
+  Coil:Cooling:DX:SingleSpeed,
+    OA Cooling Coil 1,       !- Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
+    21000,                   !- Gross Rated Total Cooling Capacity {W}
+    0.615,                   !- Gross Rated Sensible Heat Ratio
+    3.0,                     !- Gross Rated Cooling COP {W/W}
+    0.67,                    !- Rated Air Flow Rate {m3/s}
+    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    Outside Air Inlet Node,         !- Air Inlet Node Name
+    OA Cooling Coil 1 Outlet Node,  !- Air Outlet Node Name
+    WindACCoolCapFT,         !- Total Cooling Capacity Function of Temperature Curve Name
+    WindACCoolCapFFF,        !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    WindACEIRFT,             !- Energy Input Ratio Function of Temperature Curve Name
+    WindACEIRFFF,            !- Energy Input Ratio Function of Flow Fraction Curve Name
+    WindACPLFFPLR,           !- Part Load Fraction Correlation Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Latent Capacity Time Constant {s}
+    ,                        !- Condenser Air Inlet Node Name
+    ,                        !- Condenser Type
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
+    ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Supply Water Storage Tank Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ,                        !- Basin Heater Capacity {W/K}
+    ,                        !- Basin Heater Setpoint Temperature {C}
+    ,                        !- Basin Heater Operating Schedule Name
+    ,                        !- Sensible Heat Ratio Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Function of Flow Fraction Curve Name
+    Yes;                     !- Report ASHRAE Standard 127 Performance Ratings
+
+  SetpointManager:Scheduled,
+    OA Temp Manager 1,  !- Name
+    Temperature,             !- Control Variable
+    OA Cooling Supply Air Temp Sch,  !- Schedule Name
+    OA Cooling Coil 1 Outlet Node;   !- Setpoint Node or NodeList Name
+
+  Schedule:Compact,
+    OA Cooling Supply Air Temp Sch,  !- Name
+    Temperature,             !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00, 23.0;      !- Field 3
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:OUTDOORAIRSYSTEM ===========
 
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 1,                !- Name
     OA Sys 1 Controllers,    !- Controller List Name
-    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name
-    Outdoor Air 1 Avail List;!- Availability Manager List Name
+    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTDOORAIR:MIXER ===========
 
   OutdoorAir:Mixer,
     OA Mixing Box 1,         !- Name
     Mixed Air Node,          !- Mixed Air Node Name
-    Outside Air Inlet Node,  !- Outdoor Air Stream Node Name
+    OA Cooling Coil 1 Outlet Node,  !- Outdoor Air Stream Node Name
     Relief Air Outlet Node,  !- Relief Air Stream Node Name
     Outdoor Air Mixer Inlet Node;  !- Return Air Stream Node Name
 
@@ -1788,6 +1851,10 @@
   Output:Variable,Air Loop Outlet Node,System Node Mass Flow Rate,timestep;
 
   Output:Variable,Air Loop Outlet Node,System Node Temperature,timestep;
+
+  Output:Variable,OA Cooling Coil 1 Outlet Node,System Node Temperature,timestep;
+
+  Output:Variable,OA Cooling Coil 1 Outlet Node,System Node Setpoint Temperature,timestep;
 
   Output:Variable,*,Unitary System Fan Part Load Ratio,timestep;
 

@@ -75,61 +75,48 @@ namespace HeatRecovery {
     int constexpr BALANCEDHX_PERFDATATYPE1 = 1;
 
     // Heat exchanger configurations
-    int constexpr Counter_Flow = 1;
-    int constexpr Parallel_Flow = 2;
-    int constexpr Cross_Flow_Both_Unmixed = 3;
-    int constexpr Cross_Flow_Other = 4;
+    enum class HXConfiguration
+    {
+        Unassigned = -1,
+        CounterFlow,
+        ParallelFlow,
+        CrossFlowBothUnmixed,
+        CrossFlowOther
+    };
 
     // Heat exchanger configuration types
-    int constexpr Plate = 1;
-    int constexpr Rotary = 2;
+    enum class HXConfigurationType
+    {
+        Unassigned = -1,
+        Plate,
+        Rotary
+    };
 
     // Economizer lockout operation
-    int constexpr EconoLockOut_No = 0;
-    int constexpr EconoLockOut_Yes = 1;
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE:
-
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Sizing routine for the module
-
-    // Update routines to check convergence and update nodes
-
-    // Common routines
-
-    // External function calls
-
-    // Types
+    enum class EconomizerLockout
+    {
+        Unassigned = -1,
+        No,
+        Yes
+    };
 
     struct HeatExchCond
     {
         // Members
-        std::string Name;             // name of component
-        int ExchTypeNum;              // Integer equivalent to ExchType
-        int HeatExchPerfTypeNum;      // Desiccant balanced heat exchanger performance data type num
-        std::string HeatExchPerfName; // Desiccant balanced heat exchanger performance data name
-        int SchedPtr;                 // index of schedule
-        int FlowArr;                  // flow Arrangement:
-        // 1: COUNTER_FLOW
-        // 2: PARALLEL_FLOW
-        // 3: CROSS_FLOW_BOTH_UNMIXED
-        int EconoLockOut;        // 1: Yes;  0: No
-        Real64 hARatio;          // ratio of supply side h*A to secondary side h*A
-        Real64 NomSupAirVolFlow; // nominal supply air volume flow rate (m3/s)
-        Real64 NomSupAirInTemp;  // nominal supply air inlet temperature (C)
-        Real64 NomSupAirOutTemp; // nominal supply air outlet temperature (C)
-        Real64 NomSecAirVolFlow; // nominal secondary air volume flow rate (m3/s)
-        Real64 NomSecAirInTemp;  // nominal secondary air inlet temperature (C)
-        Real64 NomElecPower;     // nominal electric power consumption [W]
+        std::string Name;               // name of component
+        int ExchTypeNum;                // Integer equivalent to ExchType
+        int HeatExchPerfTypeNum;        // Desiccant balanced heat exchanger performance data type num
+        std::string HeatExchPerfName;   // Desiccant balanced heat exchanger performance data name
+        int SchedPtr;                   // index of schedule
+        HXConfiguration FlowArr;        // flow Arrangement:
+        EconomizerLockout EconoLockOut; // 1: Yes;  0: No
+        Real64 hARatio;                 // ratio of supply side h*A to secondary side h*A
+        Real64 NomSupAirVolFlow;        // nominal supply air volume flow rate (m3/s)
+        Real64 NomSupAirInTemp;         // nominal supply air inlet temperature (C)
+        Real64 NomSupAirOutTemp;        // nominal supply air outlet temperature (C)
+        Real64 NomSecAirVolFlow;        // nominal secondary air volume flow rate (m3/s)
+        Real64 NomSecAirInTemp;         // nominal secondary air inlet temperature (C)
+        Real64 NomElecPower;            // nominal electric power consumption [W]
         // values describing nominal condition (derived from input parameters)
         Real64 UA0;               // (Uavg*A) at nominal condition
         Real64 mTSup0;            // product mDot*Tabs, supply  air, nominal cond.
@@ -165,7 +152,7 @@ namespace HeatRecovery {
         Real64 CoolEffectLatent75;    // cooling latent effectiveness at 75% rated air flow
         int HeatExchEconoMode;        // generic heat exchanger economize mode option
         // 1 = None, 2 = Bypass, 3 = Stop Rotary HX Rotation
-        int ExchConfigNum; // parameter equivalent of HX configuration, plate or rotary
+        HXConfigurationType ExchConfig; // parameter equivalent of HX configuration, plate or rotary
         // frost control parameters
         std::string FrostControlType;      // type of frost control used if any
         Real64 ThresholdTemperature;       // threshold temperature for frost control
@@ -211,20 +198,20 @@ namespace HeatRecovery {
 
         // Default Constructor
         HeatExchCond()
-            : ExchTypeNum(0), HeatExchPerfTypeNum(0), SchedPtr(0), FlowArr(0), EconoLockOut(0), hARatio(0.0), NomSupAirVolFlow(0.0),
-              NomSupAirInTemp(0.0), NomSupAirOutTemp(0.0), NomSecAirVolFlow(0.0), NomSecAirInTemp(0.0), NomElecPower(0.0), UA0(0.0), mTSup0(0.0),
-              mTSec0(0.0), NomSupAirMassFlow(0.0), NomSecAirMassFlow(0.0), SupInletNode(0), SupOutletNode(0), SecInletNode(0), SecOutletNode(0),
-              SupInTemp(0.0), SupInHumRat(0.0), SupInEnth(0.0), SupInMassFlow(0.0), SecInTemp(0.0), SecInHumRat(0.0), SecInEnth(0.0),
-              SecInMassFlow(0.0), PerfDataIndex(0), FaceArea(0.0), UnbalancedWarningFlag(true), HeatEffectSensible100(0.0), HeatEffectSensible75(0.0),
-              HeatEffectLatent100(0.0), HeatEffectLatent75(0.0), CoolEffectSensible100(0.0), CoolEffectSensible75(0.0), CoolEffectLatent100(0.0),
-              CoolEffectLatent75(0.0), HeatExchEconoMode(0), ExchConfigNum(0), ThresholdTemperature(0.0), InitialDefrostTime(0.0),
-              RateofDefrostTimeIncrease(0.0), DefrostFraction(0.0), ControlToTemperatureSetPoint(false), SupOutTemp(0.0), SupOutHumRat(0.0),
-              SupOutEnth(0.0), SupOutMassFlow(0.0), SecOutTemp(0.0), SecOutHumRat(0.0), SecOutEnth(0.0), SecOutMassFlow(0.0), SensHeatingRate(0.0),
-              SensHeatingEnergy(0.0), LatHeatingRate(0.0), LatHeatingEnergy(0.0), TotHeatingRate(0.0), TotHeatingEnergy(0.0), SensCoolingRate(0.0),
-              SensCoolingEnergy(0.0), LatCoolingRate(0.0), LatCoolingEnergy(0.0), TotCoolingRate(0.0), TotCoolingEnergy(0.0), ElecUseEnergy(0.0),
-              ElecUseRate(0.0), SensEffectiveness(0.0), LatEffectiveness(0.0), SupBypassMassFlow(0.0), SecBypassMassFlow(0.0), LowFlowErrCount(0),
-              LowFlowErrIndex(0), UnBalancedErrCount(0), UnBalancedErrIndex(0), myEnvrnFlag(true), SensEffectivenessFlag(false),
-              LatEffectivenessFlag(false)
+            : ExchTypeNum(0), HeatExchPerfTypeNum(0), SchedPtr(0), FlowArr(HXConfiguration::Unassigned), EconoLockOut(EconomizerLockout::Unassigned),
+              hARatio(0.0), NomSupAirVolFlow(0.0), NomSupAirInTemp(0.0), NomSupAirOutTemp(0.0), NomSecAirVolFlow(0.0), NomSecAirInTemp(0.0),
+              NomElecPower(0.0), UA0(0.0), mTSup0(0.0), mTSec0(0.0), NomSupAirMassFlow(0.0), NomSecAirMassFlow(0.0), SupInletNode(0),
+              SupOutletNode(0), SecInletNode(0), SecOutletNode(0), SupInTemp(0.0), SupInHumRat(0.0), SupInEnth(0.0), SupInMassFlow(0.0),
+              SecInTemp(0.0), SecInHumRat(0.0), SecInEnth(0.0), SecInMassFlow(0.0), PerfDataIndex(0), FaceArea(0.0), UnbalancedWarningFlag(true),
+              HeatEffectSensible100(0.0), HeatEffectSensible75(0.0), HeatEffectLatent100(0.0), HeatEffectLatent75(0.0), CoolEffectSensible100(0.0),
+              CoolEffectSensible75(0.0), CoolEffectLatent100(0.0), CoolEffectLatent75(0.0), HeatExchEconoMode(0),
+              ExchConfig(HXConfigurationType::Unassigned), ThresholdTemperature(0.0), InitialDefrostTime(0.0), RateofDefrostTimeIncrease(0.0),
+              DefrostFraction(0.0), ControlToTemperatureSetPoint(false), SupOutTemp(0.0), SupOutHumRat(0.0), SupOutEnth(0.0), SupOutMassFlow(0.0),
+              SecOutTemp(0.0), SecOutHumRat(0.0), SecOutEnth(0.0), SecOutMassFlow(0.0), SensHeatingRate(0.0), SensHeatingEnergy(0.0),
+              LatHeatingRate(0.0), LatHeatingEnergy(0.0), TotHeatingRate(0.0), TotHeatingEnergy(0.0), SensCoolingRate(0.0), SensCoolingEnergy(0.0),
+              LatCoolingRate(0.0), LatCoolingEnergy(0.0), TotCoolingRate(0.0), TotCoolingEnergy(0.0), ElecUseEnergy(0.0), ElecUseRate(0.0),
+              SensEffectiveness(0.0), LatEffectiveness(0.0), SupBypassMassFlow(0.0), SecBypassMassFlow(0.0), LowFlowErrCount(0), LowFlowErrIndex(0),
+              UnBalancedErrCount(0), UnBalancedErrIndex(0), myEnvrnFlag(true), SensEffectivenessFlag(false), LatEffectivenessFlag(false)
         {
         }
     };
@@ -507,7 +494,7 @@ namespace HeatRecovery {
     // Functions
 
     void SimHeatRecovery(EnergyPlusData &state,
-                         std::string const &CompName,                 // name of the heat exchanger unit
+                         std::string_view CompName,                   // name of the heat exchanger unit
                          bool const FirstHVACIteration,               // TRUE if 1st HVAC simulation of system timestep
                          int &CompIndex,                              // Pointer to Component
                          int const FanOpMode,                         // Supply air fan operating mode
@@ -567,18 +554,18 @@ namespace HeatRecovery {
     Real64 SafeDiv(Real64 const a, Real64 const b);
 
     void CalculateEpsFromNTUandZ(EnergyPlusData &state,
-                                 Real64 const NTU,  // number of transfer units
-                                 Real64 const Z,    // capacity rate ratio
-                                 int const FlowArr, // flow arrangement
-                                 Real64 &Eps        // heat exchanger effectiveness
+                                 Real64 const NTU,              // number of transfer units
+                                 Real64 const Z,                // capacity rate ratio
+                                 HXConfiguration const FlowArr, // flow arrangement
+                                 Real64 &Eps                    // heat exchanger effectiveness
     );
 
     void CalculateNTUfromEpsAndZ(EnergyPlusData &state,
-                                 Real64 &NTU,       // number of transfer units
-                                 int &Err,          // error indicator
-                                 Real64 const Z,    // capacity rate ratio
-                                 int const FlowArr, // flow arrangement
-                                 Real64 const Eps   // heat exchanger effectiveness
+                                 Real64 &NTU,                   // number of transfer units
+                                 int &Err,                      // error indicator
+                                 Real64 const Z,                // capacity rate ratio
+                                 HXConfiguration const FlowArr, // flow arrangement
+                                 Real64 const Eps               // heat exchanger effectiveness
     );
 
     Real64 GetNTUforCrossFlowBothUnmixed(EnergyPlusData &state,
@@ -586,8 +573,9 @@ namespace HeatRecovery {
                                          Real64 const Z    // capacity rate ratio
     );
 
-    Real64 GetResidCrossFlowBothUnmixed(Real64 const NTU,          // number of transfer units
-                                        Array1D<Real64> const &Par // par(1) = Eps, par(2) = Z
+    Real64 GetResidCrossFlowBothUnmixed(EnergyPlusData &state,
+                                        Real64 const NTU,                // number of transfer units
+                                        std::array<Real64, 2> const &Par // par(1) = Eps, par(2) = Z
     );
 
     void CheckModelBoundsTempEq(EnergyPlusData &state,

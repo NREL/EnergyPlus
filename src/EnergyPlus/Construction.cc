@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
+#include <EnergyPlus/BITF.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataConversions.hh>
@@ -1197,7 +1198,19 @@ void ConstructionProps::calculateExponentialMatrix()
     // raised in order to calculate the exponential matrix.  A new cut-off
     // criteria based on the number of significant figures in a double-
     // precision variable is used as a more practical limit on the
-    // exponentiation algorithm.
+    // exponentiation algorithm.  One thing to note is that the EnergyPlus
+    // code is slightly different here than what is presented in Seem's
+    // dissertation.  In Seem's dissertation, AMatRowNormMax (delta, the
+    // timestep, is already factored into this term above) is divided by
+    // 2^k with k defined in the code above.  Dividing AMatRowNormMax by
+    // 2^k would have the net effect of decreasing the value of
+    // AMatRowNormMax and thus potentially CheckVal as well.  l, the integer
+    // value of CheckVal, is used to define the number of terms in the
+    // exponential matrix of AMat that are required for an accurate estimation
+    // of that matrix.  In practice, additional terms probably won't have
+    // a large effect but in general should make the calculation MORE accurate.
+    // Also, if the new terms are too small, then as noted above the cut-off
+    // criteria will not use them.
 
     CheckVal = min(3.0 * AMatRowNormMax + 6.0, 100.0);
     l = int(CheckVal);
@@ -1872,7 +1885,7 @@ void ConstructionProps::calculateFinalCoefficients()
 void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const cCounter)
 {
 
-    static constexpr auto Format_700{" Construction CTF,{},{:4},{:4},{:4},{:8.3F},{:15.4N},{:8.3F},{:8.3F},{:8.3F},{:8.3F},{}\n"};
+    static constexpr fmt::string_view Format_700{" Construction CTF,{},{:4},{:4},{:4},{:8.3F},{:15.4N},{:8.3F},{:8.3F},{:8.3F},{:8.3F},{}\n"};
     print(state.files.eio,
           Format_700,
           this->Name,
@@ -1891,11 +1904,11 @@ void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const 
         int Layer = this->LayerPoint(I);
         {
             auto const SELECT_CASE_var(state.dataMaterial->Material(Layer).Group);
-            if (SELECT_CASE_var == DataHeatBalance::Air) {
-                static constexpr auto Format_702(" Material:Air,{},{:12.4N}\n");
+            if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::Air) {
+                static constexpr fmt::string_view Format_702(" Material:Air,{},{:12.4N}\n");
                 print(state.files.eio, Format_702, state.dataMaterial->Material(Layer).Name, state.dataMaterial->Material(Layer).Resistance);
             } else {
-                static constexpr auto Format_701(" Material CTF Summary,{},{:8.4F},{:14.3F},{:11.3F},{:13.3F},{:12.4N}\n");
+                static constexpr fmt::string_view Format_701(" Material CTF Summary,{},{:8.4F},{:14.3F},{:11.3F},{:13.3F},{:12.4N}\n");
                 print(state.files.eio,
                       Format_701,
                       state.dataMaterial->Material(Layer).Name,
@@ -1910,10 +1923,10 @@ void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const 
 
     for (int I = this->NumCTFTerms; I >= 0; --I) {
         if (I != 0) {
-            static constexpr auto Format_703(" CTF,{:4},{:20.8N},{:20.8N},{:20.8N},{:20.8N}\n");
+            static constexpr fmt::string_view Format_703(" CTF,{:4},{:20.8N},{:20.8N},{:20.8N},{:20.8N}\n");
             print(state.files.eio, Format_703, I, this->CTFOutside(I), this->CTFCross(I), this->CTFInside(I), this->CTFFlux(I));
         } else {
-            static constexpr auto Format_704(" CTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
+            static constexpr fmt::string_view Format_704(" CTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
             print(state.files.eio, Format_704, I, this->CTFOutside(I), this->CTFCross(I), this->CTFInside(I));
         }
     }
@@ -1921,18 +1934,18 @@ void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const 
     if (this->SourceSinkPresent) {
         // QTFs...
         for (int I = this->NumCTFTerms; I >= 0; --I) {
-            static constexpr auto Format_705(" QTF,{:4},{:20.8N},{:20.8N}\n");
+            static constexpr fmt::string_view Format_705(" QTF,{:4},{:20.8N},{:20.8N}\n");
             print(state.files.eio, Format_705, I, this->CTFSourceOut(I), this->CTFSourceIn(I));
         }
         // QTFs for source/sink location temperature calculation...
         for (int I = this->NumCTFTerms; I >= 0; --I) {
-            static constexpr auto Format_706(" Source/Sink Loc Internal Temp QTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
+            static constexpr fmt::string_view Format_706(" Source/Sink Loc Internal Temp QTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
             print(state.files.eio, Format_706, I, this->CTFTSourceOut(I), this->CTFTSourceIn(I), this->CTFTSourceQ(I));
         }
         if (this->TempAfterLayer != 0) {
             // QTFs for user specified interior temperature calculation...
             for (int I = this->NumCTFTerms; I >= 0; --I) {
-                static constexpr auto Format_707(" User Loc Internal Temp QTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
+                static constexpr fmt::string_view Format_707(" User Loc Internal Temp QTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
                 print(state.files.eio, Format_707, I, this->CTFTUserOut(I), this->CTFTUserIn(I), this->CTFTUserSource(I));
             }
         }
@@ -1951,8 +1964,10 @@ bool ConstructionProps::isGlazingConstruction(EnergyPlusData &state) const
     // Commonly used routine in several places in EnergyPlus which examines if current
     // construction is glazing construction
     auto const MaterialGroup = state.dataMaterial->Material(LayerPoint(1)).Group;
-    return MaterialGroup == DataHeatBalance::WindowGlass || MaterialGroup == DataHeatBalance::Shade || MaterialGroup == DataHeatBalance::Screen ||
-           MaterialGroup == DataHeatBalance::WindowBlind || MaterialGroup == DataHeatBalance::WindowSimpleGlazing;
+    return BITF_TEST_ANY(BITF(MaterialGroup),
+                         BITF(DataHeatBalance::MaterialGroup::WindowGlass) | BITF(DataHeatBalance::MaterialGroup::Shade) |
+                             BITF(DataHeatBalance::MaterialGroup::Screen) | BITF(DataHeatBalance::MaterialGroup::WindowBlind) |
+                             BITF(DataHeatBalance::MaterialGroup::WindowSimpleGlazing));
 }
 
 Real64 ConstructionProps::setUserTemperatureLocationPerpendicular(EnergyPlusData &state, Real64 userValue)

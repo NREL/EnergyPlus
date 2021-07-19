@@ -46,9 +46,11 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus headers
+#include <EnergyPlus/BITF.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/Material.hh>
@@ -158,7 +160,7 @@ namespace WindowManager {
             }
         }
 
-        state.dataHeatBal->HConvIn(SurfNum) = aSystem->getHc(Tarcog::ISO15099::Environment::Indoor);
+        state.dataHeatBalSurf->SurfHConvInt(SurfNum) = aSystem->getHc(Environment::Indoor);
         if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum)) || aFactory.isInteriorShade()) {
             // It is not clear why EnergyPlus keeps this interior calculations separately for interior shade. This does create different
             // solution from heat transfer from tarcog itself. Need to confirm with LBNL team about this approach. Note that heat flow
@@ -190,8 +192,8 @@ namespace WindowManager {
                 ShadeArea * (glassEmiss * TauShIR / ShGlReflFacIR) *
                 (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas(state.dataWindowManager->nglface), 4) - rmir);
             auto tind = surface.getInsideAirTemperature(state, SurfNum) + DataGlobalConstants::KelvinConv;
-            auto ConvHeatGainFrZoneSideOfShade =
-                ShadeArea * state.dataHeatBal->HConvIn(SurfNum) * (state.dataWindowManager->thetas(state.dataWindowManager->nglfacep) - tind);
+            auto ConvHeatGainFrZoneSideOfShade = ShadeArea * state.dataHeatBalSurf->SurfHConvInt(SurfNum) *
+                                                 (state.dataWindowManager->thetas(state.dataWindowManager->nglfacep) - tind);
             state.dataSurface->SurfWinHeatGain(SurfNum) =
                 state.dataSurface->SurfWinTransSolar(SurfNum) + ConvHeatGainFrZoneSideOfShade + NetIRHeatGainGlass + NetIRHeatGainShade;
             state.dataSurface->SurfWinHeatTransfer(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum);
@@ -241,10 +243,10 @@ namespace WindowManager {
         }
 
         auto TransDiff = construction.TransDiff;
-        state.dataSurface->SurfWinHeatGain(SurfNum) -= state.dataHeatBal->QS(surface.SolarEnclIndex) * surface.Area * TransDiff;
-        state.dataSurface->SurfWinHeatTransfer(SurfNum) -= state.dataHeatBal->QS(surface.SolarEnclIndex) * surface.Area * TransDiff;
+        state.dataSurface->SurfWinHeatGain(SurfNum) -= state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) * surface.Area * TransDiff;
+        state.dataSurface->SurfWinHeatTransfer(SurfNum) -= state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) * surface.Area * TransDiff;
         state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) =
-            state.dataHeatBal->QS(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * surface.Area * TransDiff;
+            state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * surface.Area * TransDiff;
 
         for (auto k = 1; k <= surface.getTotLayers(state); ++k) {
             state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(2 * k - 1) = state.dataWindowManager->thetas(2 * k - 1);
@@ -340,13 +342,15 @@ namespace WindowManager {
 
         auto matGroup = material->Group;
 
-        if (matGroup == WindowGlass || matGroup == WindowSimpleGlazing || matGroup == WindowBlind || matGroup == Shade || matGroup == Screen ||
-            matGroup == ComplexWindowShade) {
+        if BITF_TEST_ANY (BITF(matGroup),
+                          BITF(DataHeatBalance::MaterialGroup::WindowGlass) | BITF(DataHeatBalance::MaterialGroup::WindowSimpleGlazing) |
+                              BITF(DataHeatBalance::MaterialGroup::WindowBlind) | BITF(DataHeatBalance::MaterialGroup::Shade) |
+                              BITF(DataHeatBalance::MaterialGroup::Screen) | BITF(DataHeatBalance::MaterialGroup::ComplexWindowShade)) {
             ++m_SolidLayerIndex;
             aLayer = getSolidLayer(state, m_Surface, *material, m_SolidLayerIndex, m_SurfNum);
-        } else if (matGroup == WindowGas || matGroup == WindowGasMixture) {
+        } else if (matGroup == DataHeatBalance::MaterialGroup::WindowGas || matGroup == DataHeatBalance::MaterialGroup::WindowGasMixture) {
             aLayer = getGapLayer(*material);
-        } else if (matGroup == ComplexWindowGap) {
+        } else if (matGroup == DataHeatBalance::MaterialGroup::ComplexWindowGap) {
             aLayer = getComplexGapLayer(state, *material);
         }
 
@@ -384,7 +388,7 @@ namespace WindowManager {
         auto Aright = 0.0;
         auto Afront = 0.0;
 
-        if (material.Group == WindowGlass || material.Group == WindowSimpleGlazing) {
+        if (material.Group == DataHeatBalance::MaterialGroup::WindowGlass || material.Group == DataHeatBalance::MaterialGroup::WindowSimpleGlazing) {
             emissFront = material.AbsorpThermalFront;
             emissBack = material.AbsorpThermalBack;
             transThermalFront = material.TransThermal;
@@ -392,7 +396,7 @@ namespace WindowManager {
             thickness = material.Thickness;
             conductivity = material.Conductivity;
         }
-        if (material.Group == WindowBlind) {
+        if (material.Group == DataHeatBalance::MaterialGroup::WindowBlind) {
             auto blNum = state.dataSurface->SurfWinBlindNumber(m_SurfNum);
             auto blind = state.dataHeatBal->Blind(blNum);
             thickness = blind.SlatThickness;
@@ -414,7 +418,7 @@ namespace WindowManager {
                 m_ExteriorShade = true;
             }
         }
-        if (material.Group == Shade) {
+        if (material.Group == DataHeatBalance::MaterialGroup::Shade) {
             emissFront = material.AbsorpThermal;
             emissBack = material.AbsorpThermal;
             transThermalFront = material.TransThermal;
@@ -430,7 +434,7 @@ namespace WindowManager {
                 m_ExteriorShade = true;
             }
         }
-        if (material.Group == Screen) {
+        if (material.Group == DataHeatBalance::MaterialGroup::Screen) {
             // Simon: Existing code already takes into account geometry of Woven and scales down
             // emissivity for openning area.
             emissFront = material.AbsorpThermal;
@@ -448,7 +452,7 @@ namespace WindowManager {
                 m_ExteriorShade = true;
             }
         }
-        if (material.Group == ComplexWindowShade) {
+        if (material.Group == DataHeatBalance::MaterialGroup::ComplexWindowShade) {
             auto shdPtr = material.ComplexShadePtr;
             auto &shade(state.dataHeatBal->ComplexShade(shdPtr));
             thickness = shade.Thickness;
@@ -617,7 +621,7 @@ namespace WindowManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Creates indoor environment object from surface properties in EnergyPlus
         auto tin = m_Surface.getInsideAirTemperature(state, m_SurfNum) + DataGlobalConstants::KelvinConv;
-        auto hcin = state.dataHeatBal->HConvIn(m_SurfNum);
+        auto hcin = state.dataHeatBalSurf->SurfHConvInt(m_SurfNum);
 
         auto IR = m_Surface.getInsideIR(state, m_SurfNum);
 
@@ -646,7 +650,7 @@ namespace WindowManager {
         double tSky = state.dataEnvrn->SkyTempKelvin;
         double airSpeed = 0.0;
         if (m_Surface.ExtWind) {
-            airSpeed = m_Surface.WindSpeed;
+            airSpeed = state.dataSurface->SurfOutWindSpeed(m_SurfNum);
         }
         double fclr = 1 - state.dataEnvrn->CloudFraction;
         Tarcog::ISO15099::AirHorizontalDirection airDirection = Tarcog::ISO15099::AirHorizontalDirection::Windward;

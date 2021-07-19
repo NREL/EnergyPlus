@@ -207,7 +207,7 @@ void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
     //  flow (or source side) rate is calculated from the reference capacity, the COP, and the condenser
     //  loop design delta T.
 
-    static std::string const RoutineName("SizeCGSHPChillerHeater");
+    static constexpr std::string_view RoutineName("SizeCGSHPChillerHeater");
 
     bool ErrorsFound; // If errors detected in input
 
@@ -604,7 +604,7 @@ void GetWrapperInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                 DataLoopNode::NodeFluidType::Water,
                                                 DataLoopNode::NodeConnectionType::Inlet,
-                                                1,
+                                                NodeInputManager::compFluidStream::Primary,
                                                 DataLoopNode::ObjectIsNotParent); // node name : connection should be careful!
         state.dataPlantCentralGSHP->Wrapper(WrapperNum).CHWOutletNodeNum =
             NodeInputManager::GetOnlySingleNode(state,
@@ -614,7 +614,7 @@ void GetWrapperInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                 DataLoopNode::NodeFluidType::Water,
                                                 DataLoopNode::NodeConnectionType::Outlet,
-                                                1,
+                                                NodeInputManager::compFluidStream::Primary,
                                                 DataLoopNode::ObjectIsNotParent);
         BranchNodeConnections::TestCompSet(state,
                                            state.dataIPShortCut->cCurrentModuleObject,
@@ -631,7 +631,7 @@ void GetWrapperInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                 DataLoopNode::NodeFluidType::Water,
                                                 DataLoopNode::NodeConnectionType::Inlet,
-                                                2,
+                                                NodeInputManager::compFluidStream::Secondary,
                                                 DataLoopNode::ObjectIsNotParent); // node name : connection should be careful!
         state.dataPlantCentralGSHP->Wrapper(WrapperNum).GLHEOutletNodeNum =
             NodeInputManager::GetOnlySingleNode(state,
@@ -641,7 +641,7 @@ void GetWrapperInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                 DataLoopNode::NodeFluidType::Water,
                                                 DataLoopNode::NodeConnectionType::Outlet,
-                                                2,
+                                                NodeInputManager::compFluidStream::Secondary,
                                                 DataLoopNode::ObjectIsNotParent);
         BranchNodeConnections::TestCompSet(state,
                                            state.dataIPShortCut->cCurrentModuleObject,
@@ -658,7 +658,7 @@ void GetWrapperInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                 DataLoopNode::NodeFluidType::Water,
                                                 DataLoopNode::NodeConnectionType::Inlet,
-                                                3,
+                                                NodeInputManager::compFluidStream::Tertiary,
                                                 DataLoopNode::ObjectIsNotParent); // node name : connection should be careful!
         state.dataPlantCentralGSHP->Wrapper(WrapperNum).HWOutletNodeNum =
             NodeInputManager::GetOnlySingleNode(state,
@@ -668,7 +668,7 @@ void GetWrapperInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                 DataLoopNode::NodeFluidType::Water,
                                                 DataLoopNode::NodeConnectionType::Outlet,
-                                                3,
+                                                NodeInputManager::compFluidStream::Tertiary,
                                                 DataLoopNode::ObjectIsNotParent);
         BranchNodeConnections::TestCompSet(state,
                                            state.dataIPShortCut->cCurrentModuleObject,
@@ -759,7 +759,7 @@ void GetWrapperInput(EnergyPlusData &state)
                 int CompIndex = UtilityRoutines::FindItemInList(CompName, state.dataPlantCentralGSHP->ChillerHeater);
                 // User may enter invalid name rather than selecting one from the object list
                 if (CompIndex <= 0) {
-                    ShowSevereError(state, "GetWrapperInput: Invalid Chiller Heater Modules Performance Component Name =" + CompName);
+                    ShowSevereError(state, "GetWrapperInput: Invalid Chiller Heater Modules Performance Component Name =" + std::string{CompName});
                     ShowContinueError(state, "Select the name of ChillerHeaterPerformance:Electric:EIR object(s) from the object list.");
                     ShowFatalError(state, "Program terminates due to preceding condition.");
                 }
@@ -1463,7 +1463,6 @@ void GetChillerHeaterInput(EnergyPlusData &state)
                 ShowContinueError(state, "PLR          =    0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00");
 
                 const auto curve_output = format("Curve Output = {:7.2F}", fmt::join(CurveValArray, ","));
-                std::cout << curve_output << '\n';
                 ShowContinueError(state, curve_output);
 
                 CHErrorsFound = true;
@@ -1503,7 +1502,7 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     //  Uses the status flags to trigger initializations.
 
-    static std::string const RoutineName("InitCGSHPHeatPump");
+    static constexpr std::string_view RoutineName("InitCGSHPHeatPump");
 
     if (this->setupOutputVarsFlag) {
         this->setupOutputVars(state);
@@ -1836,8 +1835,8 @@ void WrapperSpecs::CalcChillerModel(EnergyPlusData &state)
     // REFERENCES:
     // 1. DOE-2 Engineers Manual, Version 2.1A, November 1982, LBL-11353
 
-    static std::string const RoutineName("CalcChillerHeaterModel");
-    static std::string const RoutineNameElecEIRChiller("CalcElectricEIRChillerModel");
+    static constexpr std::string_view RoutineName("CalcChillerHeaterModel");
+    static constexpr std::string_view RoutineNameElecEIRChiller("CalcElectricEIRChillerModel");
 
     bool IsLoadCoolRemaining(true);
     bool NextCompIndicator(false);       // Component indicator when identical chiller heaters exist
@@ -2286,8 +2285,8 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
     // REFERENCES:
     // 1. DOE-2 Engineers Manual, Version 2.1A, November 1982, LBL-11353
 
-    static std::string const RoutineName("CalcChillerHeaterModel");
-    static std::string const RoutineNameElecEIRChiller("CalcElectricEIRChillerModel");
+    static constexpr std::string_view RoutineName("CalcChillerHeaterModel");
+    static constexpr std::string_view RoutineNameElecEIRChiller("CalcElectricEIRChillerModel");
 
     bool IsLoadHeatRemaining(true);     // Ture if heating load remains for this chiller heater
     bool NextCompIndicator(false);      // Component indicator when identical chiller heaters exist
@@ -2520,7 +2519,7 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
                 } else {
                     ShowWarningError(state, "ChillerHeaterPerformance:Electric:EIR \"" + this->ChillerHeater(ChillerHeaterNum).Name + "\":");
                     ShowContinueError(state,
-                                      format("Chiller condensor temperature for curve fit are not decided, defalt value= cond_leaving ({:.3R}).",
+                                      format("Chiller condenser temperature for curve fit are not decided, default value= cond_leaving ({:.3R}).",
                                              state.dataPlantCentralGSHP->ChillerCapFT));
                     CondTempforCurve = state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->HWLoopNum).TempSetPointNodeNum).TempSetPoint;
                 }
@@ -3527,6 +3526,9 @@ void WrapperSpecs::UpdateChillerHeaterRecords(EnergyPlusData &state) // Wrapper 
         this->ChillerHeater(ChillerHeaterNum).Report.EvapEnergy = this->ChillerHeater(ChillerHeaterNum).Report.QEvap * SecInTimeStep;
         this->ChillerHeater(ChillerHeaterNum).Report.CondEnergy = this->ChillerHeater(ChillerHeaterNum).Report.QCond * SecInTimeStep;
     }
+}
+void WrapperSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
 }
 
 } // namespace EnergyPlus::PlantCentralGSHP

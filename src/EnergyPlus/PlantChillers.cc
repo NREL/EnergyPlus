@@ -167,7 +167,7 @@ namespace PlantChillers {
         // This routine will get the input
         // required by the Electric Chiller model.
 
-        static std::string const RoutineName("GetElectricChillerInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetElectricChillerInput: "); // include trailing blank space
 
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
@@ -252,7 +252,7 @@ namespace PlantChillers {
                                                                                state.dataIPShortCut->cAlphaArgs(1),
                                                                                DataLoopNode::NodeFluidType::Water,
                                                                                DataLoopNode::NodeConnectionType::Inlet,
-                                                                               1,
+                                                                               NodeInputManager::compFluidStream::Primary,
                                                                                DataLoopNode::ObjectIsNotParent);
             thisChiller.EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                 state.dataIPShortCut->cAlphaArgs(4),
@@ -261,7 +261,7 @@ namespace PlantChillers {
                                                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                                                 DataLoopNode::NodeFluidType::Water,
                                                                                 DataLoopNode::NodeConnectionType::Outlet,
-                                                                                1,
+                                                                                NodeInputManager::compFluidStream::Primary,
                                                                                 DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state,
                                                state.dataIPShortCut->cCurrentModuleObject,
@@ -300,7 +300,7 @@ namespace PlantChillers {
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Air,
                                                                                    DataLoopNode::NodeConnectionType::OutsideAirReference,
-                                                                                   2,
+                                                                                   NodeInputManager::compFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 bool Okay;
                 OutAirNodeManager::CheckAndAddAirNodeNumber(state, thisChiller.CondInletNodeNum, Okay);
@@ -316,7 +316,7 @@ namespace PlantChillers {
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                    2,
+                                                                                    NodeInputManager::compFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
             } else if (thisChiller.CondenserType == DataPlant::CondenserType::WaterCooled) {
                 thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -326,7 +326,7 @@ namespace PlantChillers {
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Water,
                                                                                    DataLoopNode::NodeConnectionType::Inlet,
-                                                                                   2,
+                                                                                   NodeInputManager::compFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                     state.dataIPShortCut->cAlphaArgs(6),
@@ -335,7 +335,7 @@ namespace PlantChillers {
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Water,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                    2,
+                                                                                    NodeInputManager::compFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
                 BranchNodeConnections::TestCompSet(state,
                                                    state.dataIPShortCut->cCurrentModuleObject,
@@ -361,7 +361,7 @@ namespace PlantChillers {
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::blank,
                                                                                    DataLoopNode::NodeConnectionType::Inlet,
-                                                                                   2,
+                                                                                   NodeInputManager::compFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                     state.dataIPShortCut->cAlphaArgs(6),
@@ -370,7 +370,7 @@ namespace PlantChillers {
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::blank,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                    2,
+                                                                                    NodeInputManager::compFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
                 BranchNodeConnections::TestCompSet(state,
                                                    state.dataIPShortCut->cCurrentModuleObject,
@@ -435,7 +435,8 @@ namespace PlantChillers {
                     thisChiller.FlowMode = DataPlant::FlowMode::NotModulated;
                 } else {
                     ShowSevereError(state,
-                                    RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
+                                    std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
+                                        state.dataIPShortCut->cAlphaArgs(1) + "\",");
                     ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7));
                     ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                     ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
@@ -458,7 +459,7 @@ namespace PlantChillers {
                                                                                       state.dataIPShortCut->cAlphaArgs(1),
                                                                                       DataLoopNode::NodeFluidType::Water,
                                                                                       DataLoopNode::NodeConnectionType::Inlet,
-                                                                                      3,
+                                                                                      NodeInputManager::compFluidStream::Tertiary,
                                                                                       DataLoopNode::ObjectIsNotParent);
                 if (thisChiller.HeatRecInletNodeNum == 0) {
                     ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + state.dataIPShortCut->cAlphaArgs(8));
@@ -472,7 +473,7 @@ namespace PlantChillers {
                                                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                                                        DataLoopNode::NodeFluidType::Water,
                                                                                        DataLoopNode::NodeConnectionType::Outlet,
-                                                                                       3,
+                                                                                       NodeInputManager::compFluidStream::Tertiary,
                                                                                        DataLoopNode::ObjectIsNotParent);
                 if (thisChiller.HeatRecOutletNodeNum == 0) {
                     ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + state.dataIPShortCut->cAlphaArgs(9));
@@ -516,8 +517,9 @@ namespace PlantChillers {
                     if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
                         thisChiller.HeatRecInletLimitSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(11));
                         if (thisChiller.HeatRecInletLimitSchedNum == 0) {
-                            ShowSevereError(
-                                state, RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
+                                                state.dataIPShortCut->cAlphaArgs(1) + "\"");
                             ShowContinueError(state,
                                               "Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + '=' + state.dataIPShortCut->cAlphaArgs(11));
                             ErrorsFound = true;
@@ -538,7 +540,7 @@ namespace PlantChillers {
                                                                                                  state.dataIPShortCut->cAlphaArgs(1),
                                                                                                  DataLoopNode::NodeFluidType::Water,
                                                                                                  DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                 1,
+                                                                                                 NodeInputManager::compFluidStream::Primary,
                                                                                                  DataLoopNode::ObjectIsNotParent);
                     } else {
                         thisChiller.HeatRecSetPointNodeNum = 0;
@@ -783,132 +785,9 @@ namespace PlantChillers {
         // Uses the status flags to trigger initializations.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitElectricChiller");
+        static constexpr std::string_view const RoutineName("InitElectricChiller");
 
-        if (this->MyFlag) {
-            // Locate the chillers on the plant loops for later usage
-            bool errFlag = false;
-            this->setupOutputVariables(state);
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    this->plantTypeOfNum,
-                                                    this->CWLoopNum,
-                                                    this->CWLoopSideNum,
-                                                    this->CWBranchNum,
-                                                    this->CWCompNum,
-                                                    errFlag,
-                                                    this->TempLowLimitEvapOut,
-                                                    _,
-                                                    _,
-                                                    this->EvapInletNodeNum,
-                                                    _);
-            if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled) {
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        this->plantTypeOfNum,
-                                                        this->CDLoopNum,
-                                                        this->CDLoopSideNum,
-                                                        this->CDBranchNum,
-                                                        this->CDCompNum,
-                                                        errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        this->CondInletNodeNum,
-                                                        _);
-                PlantUtilities::InterConnectTwoPlantLoopSides(
-                    state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, this->plantTypeOfNum, true);
-            }
-            if (this->HeatRecActive) {
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        this->plantTypeOfNum,
-                                                        this->HRLoopNum,
-                                                        this->HRLoopSideNum,
-                                                        this->HRBranchNum,
-                                                        this->HRCompNum,
-                                                        errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        this->HeatRecInletNodeNum,
-                                                        _);
-                PlantUtilities::InterConnectTwoPlantLoopSides(
-                    state, this->CWLoopNum, this->CWLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, this->plantTypeOfNum, true);
-            }
-
-            if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled &&
-                this->HeatRecActive) {
-                PlantUtilities::InterConnectTwoPlantLoopSides(
-                    state, this->CDLoopNum, this->CDLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, this->plantTypeOfNum, false);
-            }
-
-            if (errFlag) {
-                ShowFatalError(state, "InitElectricChiller: Program terminated due to previous condition(s).");
-            }
-
-            if (this->FlowMode == DataPlant::FlowMode::Constant) {
-                // reset flow priority
-                state.dataPlnt->PlantLoop(this->CWLoopNum)
-                    .LoopSide(this->CWLoopSideNum)
-                    .Branch(this->CWBranchNum)
-                    .Comp(this->CWCompNum)
-                    .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
-            }
-
-            if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
-                // reset flow priority
-                state.dataPlnt->PlantLoop(this->CWLoopNum)
-                    .LoopSide(this->CWLoopSideNum)
-                    .Branch(this->CWBranchNum)
-                    .Comp(this->CWCompNum)
-                    .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
-
-                // check if setpoint on outlet node
-                if ((state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
-                    (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
-                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                        if (!this->ModulatedFlowErrDone) {
-                            ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
-                            ShowContinueError(
-                                state,
-                                "  A temperature setpoint is needed at the outlet node of a chiller in variable flow mode, use a SetpointManager");
-                            ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
-                            this->ModulatedFlowErrDone = true;
-                        }
-                    } else {
-                        // need call to EMS to check node
-                        bool FatalError = false; // but not really fatal yet, but should be.
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(
-                            state, this->EvapOutletNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, FatalError);
-                        state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
-                        if (FatalError) {
-                            if (!this->ModulatedFlowErrDone) {
-                                ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
-                                ShowContinueError(
-                                    state, "  A temperature setpoint is needed at the outlet node of a chiller evaporator in variable flow mode");
-                                ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node ");
-                                ShowContinueError(state, "  or use an EMS actuator to establish a setpoint at the outlet node ");
-                                ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
-                                this->ModulatedFlowErrDone = true;
-                            }
-                        }
-                    }
-                    this->ModulatedFlowSetToLoop = true;
-                    {
-                        auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
-                        if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
-                            state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint =
-                                state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
-                        } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
-                            state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi =
-                                state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
-                        }
-                    }
-                }
-            }
-            this->MyFlag = false;
-        }
+        this->oneTimeInit(state);
 
         if (this->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
 
@@ -1116,7 +995,7 @@ namespace PlantChillers {
         // is calculated from the nominal capacity, the COP, and the condenser loop design delta T.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeElectricChiller");
+        static constexpr std::string_view RoutineName("SizeElectricChiller");
 
         int PltSizCondNum(0);    // Plant Sizing index for condenser loop
         bool ErrorsFound(false); // If errors detected in input
@@ -1406,7 +1285,7 @@ namespace PlantChillers {
         // 1. BLAST Users Manual
         // 2. CHILLER User Manual
 
-        static std::string const RoutineName("CalcElectricChillerModel");
+        static constexpr std::string_view RoutineName("CalcElectricChillerModel");
         this->EvapMassFlowRate = 0.0;
         this->CondMassFlowRate = 0.0;
         this->Power = 0.0;
@@ -2000,7 +1879,7 @@ namespace PlantChillers {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate the heat recovered from the chiller condenser
 
-        static std::string const RoutineName("ChillerHeatRecovery");
+        static constexpr std::string_view RoutineName("ChillerHeatRecovery");
 
         // setup initial state
         PlantUtilities::SafeCopyPlantNode(state, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum);
@@ -2146,6 +2025,134 @@ namespace PlantChillers {
             }
         }
     }
+    void ElectricChillerSpecs::oneTimeInit(EnergyPlusData &state)
+    {
+
+        if (this->MyFlag) {
+            // Locate the chillers on the plant loops for later usage
+            bool errFlag = false;
+            this->setupOutputVariables(state);
+            PlantUtilities::ScanPlantLoopsForObject(state,
+                                                    this->Name,
+                                                    this->plantTypeOfNum,
+                                                    this->CWLoopNum,
+                                                    this->CWLoopSideNum,
+                                                    this->CWBranchNum,
+                                                    this->CWCompNum,
+                                                    errFlag,
+                                                    this->TempLowLimitEvapOut,
+                                                    _,
+                                                    _,
+                                                    this->EvapInletNodeNum,
+                                                    _);
+            if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled) {
+                PlantUtilities::ScanPlantLoopsForObject(state,
+                                                        this->Name,
+                                                        this->plantTypeOfNum,
+                                                        this->CDLoopNum,
+                                                        this->CDLoopSideNum,
+                                                        this->CDBranchNum,
+                                                        this->CDCompNum,
+                                                        errFlag,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        this->CondInletNodeNum,
+                                                        _);
+                PlantUtilities::InterConnectTwoPlantLoopSides(
+                    state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, this->plantTypeOfNum, true);
+            }
+            if (this->HeatRecActive) {
+                PlantUtilities::ScanPlantLoopsForObject(state,
+                                                        this->Name,
+                                                        this->plantTypeOfNum,
+                                                        this->HRLoopNum,
+                                                        this->HRLoopSideNum,
+                                                        this->HRBranchNum,
+                                                        this->HRCompNum,
+                                                        errFlag,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        this->HeatRecInletNodeNum,
+                                                        _);
+                PlantUtilities::InterConnectTwoPlantLoopSides(
+                    state, this->CWLoopNum, this->CWLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, this->plantTypeOfNum, true);
+            }
+
+            if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled &&
+                this->HeatRecActive) {
+                PlantUtilities::InterConnectTwoPlantLoopSides(
+                    state, this->CDLoopNum, this->CDLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, this->plantTypeOfNum, false);
+            }
+
+            if (errFlag) {
+                ShowFatalError(state, "InitElectricChiller: Program terminated due to previous condition(s).");
+            }
+
+            if (this->FlowMode == DataPlant::FlowMode::Constant) {
+                // reset flow priority
+                state.dataPlnt->PlantLoop(this->CWLoopNum)
+                    .LoopSide(this->CWLoopSideNum)
+                    .Branch(this->CWBranchNum)
+                    .Comp(this->CWCompNum)
+                    .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
+            }
+
+            if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
+                // reset flow priority
+                state.dataPlnt->PlantLoop(this->CWLoopNum)
+                    .LoopSide(this->CWLoopSideNum)
+                    .Branch(this->CWBranchNum)
+                    .Comp(this->CWCompNum)
+                    .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
+
+                // check if setpoint on outlet node
+                if ((state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
+                    (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
+                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                        if (!this->ModulatedFlowErrDone) {
+                            ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
+                            ShowContinueError(
+                                state,
+                                "  A temperature setpoint is needed at the outlet node of a chiller in variable flow mode, use a SetpointManager");
+                            ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
+                            this->ModulatedFlowErrDone = true;
+                        }
+                    } else {
+                        // need call to EMS to check node
+                        bool FatalError = false; // but not really fatal yet, but should be.
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(
+                            state, this->EvapOutletNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, FatalError);
+                        state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
+                        if (FatalError) {
+                            if (!this->ModulatedFlowErrDone) {
+                                ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
+                                ShowContinueError(
+                                    state, "  A temperature setpoint is needed at the outlet node of a chiller evaporator in variable flow mode");
+                                ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node ");
+                                ShowContinueError(state, "  or use an EMS actuator to establish a setpoint at the outlet node ");
+                                ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
+                                this->ModulatedFlowErrDone = true;
+                            }
+                        }
+                    }
+                    this->ModulatedFlowSetToLoop = true;
+                    {
+                        auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
+                        if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+                            state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint =
+                                state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
+                        } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                            state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi =
+                                state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
+                        }
+                    }
+                }
+            }
+            this->MyFlag = false;
+        }
+    }
 
     EngineDrivenChillerSpecs *EngineDrivenChillerSpecs::factory(EnergyPlusData &state, std::string const &chillerName)
     {
@@ -2209,7 +2216,7 @@ namespace PlantChillers {
 
         // Locals
         // PARAMETERS
-        static std::string const RoutineName("GetEngineDrivenChillerInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetEngineDrivenChillerInput: "); // include trailing blank space
 
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
@@ -2295,7 +2302,7 @@ namespace PlantChillers {
                                                                                state.dataIPShortCut->cAlphaArgs(1),
                                                                                DataLoopNode::NodeFluidType::Water,
                                                                                DataLoopNode::NodeConnectionType::Inlet,
-                                                                               1,
+                                                                               NodeInputManager::compFluidStream::Primary,
                                                                                DataLoopNode::ObjectIsNotParent);
             thisChiller.EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                 state.dataIPShortCut->cAlphaArgs(4),
@@ -2304,7 +2311,7 @@ namespace PlantChillers {
                                                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                                                 DataLoopNode::NodeFluidType::Water,
                                                                                 DataLoopNode::NodeConnectionType::Outlet,
-                                                                                1,
+                                                                                NodeInputManager::compFluidStream::Primary,
                                                                                 DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state,
                                                state.dataIPShortCut->cCurrentModuleObject,
@@ -2342,7 +2349,7 @@ namespace PlantChillers {
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Air,
                                                                                    DataLoopNode::NodeConnectionType::OutsideAirReference,
-                                                                                   2,
+                                                                                   NodeInputManager::compFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 bool Okay;
                 OutAirNodeManager::CheckAndAddAirNodeNumber(state, thisChiller.CondInletNodeNum, Okay);
@@ -2359,7 +2366,7 @@ namespace PlantChillers {
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                    2,
+                                                                                    NodeInputManager::compFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
             } else if (thisChiller.CondenserType == DataPlant::CondenserType::WaterCooled) {
                 thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -2369,7 +2376,7 @@ namespace PlantChillers {
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Water,
                                                                                    DataLoopNode::NodeConnectionType::Inlet,
-                                                                                   2,
+                                                                                   NodeInputManager::compFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                     state.dataIPShortCut->cAlphaArgs(6),
@@ -2378,7 +2385,7 @@ namespace PlantChillers {
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Water,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                    2,
+                                                                                    NodeInputManager::compFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
                 BranchNodeConnections::TestCompSet(state,
                                                    state.dataIPShortCut->cCurrentModuleObject,
@@ -2404,7 +2411,7 @@ namespace PlantChillers {
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::blank,
                                                                                    DataLoopNode::NodeConnectionType::Inlet,
-                                                                                   2,
+                                                                                   NodeInputManager::compFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                     state.dataIPShortCut->cAlphaArgs(6),
@@ -2413,7 +2420,7 @@ namespace PlantChillers {
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::blank,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                    2,
+                                                                                    NodeInputManager::compFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
                 BranchNodeConnections::TestCompSet(state,
                                                    state.dataIPShortCut->cCurrentModuleObject,
@@ -2537,7 +2544,7 @@ namespace PlantChillers {
                                                                                       state.dataIPShortCut->cAlphaArgs(1),
                                                                                       DataLoopNode::NodeFluidType::Water,
                                                                                       DataLoopNode::NodeConnectionType::Inlet,
-                                                                                      3,
+                                                                                      NodeInputManager::compFluidStream::Tertiary,
                                                                                       DataLoopNode::ObjectIsNotParent);
                 if (thisChiller.HeatRecInletNodeNum == 0) {
                     ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(13) + '=' + state.dataIPShortCut->cAlphaArgs(13));
@@ -2551,7 +2558,7 @@ namespace PlantChillers {
                                                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                                                        DataLoopNode::NodeFluidType::Water,
                                                                                        DataLoopNode::NodeConnectionType::Outlet,
-                                                                                       3,
+                                                                                       NodeInputManager::compFluidStream::Tertiary,
                                                                                        DataLoopNode::ObjectIsNotParent);
                 if (thisChiller.HeatRecOutletNodeNum == 0) {
                     ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(14) + '=' + state.dataIPShortCut->cAlphaArgs(14));
@@ -2612,7 +2619,8 @@ namespace PlantChillers {
                     thisChiller.FlowMode = DataPlant::FlowMode::NotModulated;
                 } else {
                     ShowSevereError(state,
-                                    RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
+                                    std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
+                                        state.dataIPShortCut->cAlphaArgs(1) + "\",");
                     ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(15) + '=' + state.dataIPShortCut->cAlphaArgs(15));
                     ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                     ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
@@ -2848,125 +2856,9 @@ namespace PlantChillers {
         // Uses the status flags to trigger initializations.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitEngineDrivenChiller");
+        static constexpr std::string_view RoutineName("InitEngineDrivenChiller");
 
-        if (this->MyFlag) {
-            // Locate the chillers on the plant loops for later usage
-            bool errFlag = false;
-            this->setupOutputVariables(state);
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    this->plantTypeOfNum,
-                                                    this->CWLoopNum,
-                                                    this->CWLoopSideNum,
-                                                    this->CWBranchNum,
-                                                    this->CWCompNum,
-                                                    errFlag,
-                                                    this->TempLowLimitEvapOut,
-                                                    _,
-                                                    _,
-                                                    this->EvapInletNodeNum,
-                                                    _);
-            if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled) {
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        this->plantTypeOfNum,
-                                                        this->CDLoopNum,
-                                                        this->CDLoopSideNum,
-                                                        this->CDBranchNum,
-                                                        this->CDCompNum,
-                                                        errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        this->CondInletNodeNum,
-                                                        _);
-                PlantUtilities::InterConnectTwoPlantLoopSides(
-                    state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, this->plantTypeOfNum, true);
-            }
-            if (this->HeatRecActive) {
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        this->plantTypeOfNum,
-                                                        this->HRLoopNum,
-                                                        this->HRLoopSideNum,
-                                                        this->HRBranchNum,
-                                                        this->HRCompNum,
-                                                        errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        this->HeatRecInletNodeNum,
-                                                        _);
-                PlantUtilities::InterConnectTwoPlantLoopSides(
-                    state, this->CWLoopNum, this->CWLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, this->plantTypeOfNum, true);
-            }
-
-            if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled &&
-                this->HeatRecActive) {
-                PlantUtilities::InterConnectTwoPlantLoopSides(
-                    state, this->CDLoopNum, this->CDLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, this->plantTypeOfNum, false);
-            }
-            if (errFlag) {
-                ShowFatalError(state, "InitEngineDrivenChiller: Program terminated due to previous condition(s).");
-            }
-
-            if (this->FlowMode == DataPlant::FlowMode::Constant) {
-                // reset flow priority
-                state.dataPlnt->PlantLoop(this->CWLoopNum)
-                    .LoopSide(this->CWLoopSideNum)
-                    .Branch(this->CWBranchNum)
-                    .Comp(this->CWCompNum)
-                    .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
-            }
-
-            if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
-                // reset flow priority
-                state.dataPlnt->PlantLoop(this->CWLoopNum)
-                    .LoopSide(this->CWLoopSideNum)
-                    .Branch(this->CWBranchNum)
-                    .Comp(this->CWCompNum)
-                    .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
-                // check if setpoint on outlet node
-                if ((state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
-                    (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
-                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                        if (!this->ModulatedFlowErrDone) {
-                            ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
-                            ShowContinueError(
-                                state,
-                                "  A temperature setpoint is needed at the outlet node of a chiller in variable flow mode, use a SetpointManager");
-                            ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
-                            this->ModulatedFlowErrDone = true;
-                        }
-                    } else {
-                        // need call to EMS to check node
-                        bool FatalError = false; // but not really fatal yet, but should be.
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(
-                            state, this->EvapOutletNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, FatalError);
-                        state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
-                        if (FatalError) {
-                            if (!this->ModulatedFlowErrDone) {
-                                ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
-                                ShowContinueError(
-                                    state, "  A temperature setpoint is needed at the outlet node of a chiller evaporator in variable flow mode");
-                                ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node ");
-                                ShowContinueError(state, "  or use an EMS actuator to establish a setpoint at the outlet node ");
-                                ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
-                                this->ModulatedFlowErrDone = true;
-                            }
-                        }
-                    }
-                    this->ModulatedFlowSetToLoop = true;
-                    state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint =
-                        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
-                    state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi =
-                        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
-                }
-            }
-
-            this->MyFlag = false;
-        }
+        this->oneTimeInit(state);
 
         // Initialize critical Demand Side Variables
         if (this->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
@@ -3127,7 +3019,7 @@ namespace PlantChillers {
         // is calculated from the nominal capacity, the COP, and the condenser loop design delta T.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeEngineDrivenChiller");
+        static constexpr std::string_view RoutineName("SizeEngineDrivenChiller");
 
         int PltSizCondNum = 0;
         bool ErrorsFound = false;
@@ -3440,7 +3332,7 @@ namespace PlantChillers {
         Real64 const ReferenceTemp(25.0); // Reference temperature by which lower heating
         // value is reported.  This should be subtracted
         // off of when calculated exhaust energies.
-        static std::string const RoutineName("CalcEngineDrivenChillerModel");
+        static constexpr std::string_view RoutineName("CalcEngineDrivenChillerModel");
 
         // set module level inlet and outlet nodes
         this->EvapMassFlowRate = 0.0;
@@ -4091,7 +3983,7 @@ namespace PlantChillers {
         // performs a check to verify that
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("ChillerHeatRecovery");
+        static constexpr std::string_view RoutineName("ChillerHeatRecovery");
 
         // Need to set the HeatRecRatio to 1.0 if it is not modified
         HeatRecRatio = 1.0;
@@ -4192,6 +4084,127 @@ namespace PlantChillers {
             state.dataLoopNodes->Node(this->HeatRecOutletNodeNum).Temp = this->HeatRecOutletTemp;
         }
     }
+    void EngineDrivenChillerSpecs::oneTimeInit(EnergyPlusData &state)
+    {
+
+        if (this->MyFlag) {
+            // Locate the chillers on the plant loops for later usage
+            bool errFlag = false;
+            this->setupOutputVariables(state);
+            PlantUtilities::ScanPlantLoopsForObject(state,
+                                                    this->Name,
+                                                    this->plantTypeOfNum,
+                                                    this->CWLoopNum,
+                                                    this->CWLoopSideNum,
+                                                    this->CWBranchNum,
+                                                    this->CWCompNum,
+                                                    errFlag,
+                                                    this->TempLowLimitEvapOut,
+                                                    _,
+                                                    _,
+                                                    this->EvapInletNodeNum,
+                                                    _);
+            if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled) {
+                PlantUtilities::ScanPlantLoopsForObject(state,
+                                                        this->Name,
+                                                        this->plantTypeOfNum,
+                                                        this->CDLoopNum,
+                                                        this->CDLoopSideNum,
+                                                        this->CDBranchNum,
+                                                        this->CDCompNum,
+                                                        errFlag,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        this->CondInletNodeNum,
+                                                        _);
+                PlantUtilities::InterConnectTwoPlantLoopSides(
+                    state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, this->plantTypeOfNum, true);
+            }
+            if (this->HeatRecActive) {
+                PlantUtilities::ScanPlantLoopsForObject(state,
+                                                        this->Name,
+                                                        this->plantTypeOfNum,
+                                                        this->HRLoopNum,
+                                                        this->HRLoopSideNum,
+                                                        this->HRBranchNum,
+                                                        this->HRCompNum,
+                                                        errFlag,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        this->HeatRecInletNodeNum,
+                                                        _);
+                PlantUtilities::InterConnectTwoPlantLoopSides(
+                    state, this->CWLoopNum, this->CWLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, this->plantTypeOfNum, true);
+            }
+
+            if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled &&
+                this->HeatRecActive) {
+                PlantUtilities::InterConnectTwoPlantLoopSides(
+                    state, this->CDLoopNum, this->CDLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, this->plantTypeOfNum, false);
+            }
+            if (errFlag) {
+                ShowFatalError(state, "InitEngineDrivenChiller: Program terminated due to previous condition(s).");
+            }
+
+            if (this->FlowMode == DataPlant::FlowMode::Constant) {
+                // reset flow priority
+                state.dataPlnt->PlantLoop(this->CWLoopNum)
+                    .LoopSide(this->CWLoopSideNum)
+                    .Branch(this->CWBranchNum)
+                    .Comp(this->CWCompNum)
+                    .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
+            }
+
+            if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
+                // reset flow priority
+                state.dataPlnt->PlantLoop(this->CWLoopNum)
+                    .LoopSide(this->CWLoopSideNum)
+                    .Branch(this->CWBranchNum)
+                    .Comp(this->CWCompNum)
+                    .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
+                // check if setpoint on outlet node
+                if ((state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
+                    (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
+                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                        if (!this->ModulatedFlowErrDone) {
+                            ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
+                            ShowContinueError(
+                                state,
+                                "  A temperature setpoint is needed at the outlet node of a chiller in variable flow mode, use a SetpointManager");
+                            ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
+                            this->ModulatedFlowErrDone = true;
+                        }
+                    } else {
+                        // need call to EMS to check node
+                        bool FatalError = false; // but not really fatal yet, but should be.
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(
+                            state, this->EvapOutletNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, FatalError);
+                        state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
+                        if (FatalError) {
+                            if (!this->ModulatedFlowErrDone) {
+                                ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
+                                ShowContinueError(
+                                    state, "  A temperature setpoint is needed at the outlet node of a chiller evaporator in variable flow mode");
+                                ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node ");
+                                ShowContinueError(state, "  or use an EMS actuator to establish a setpoint at the outlet node ");
+                                ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
+                                this->ModulatedFlowErrDone = true;
+                            }
+                        }
+                    }
+                    this->ModulatedFlowSetToLoop = true;
+                    state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint =
+                        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
+                    state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi =
+                        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
+                }
+            }
+
+            this->MyFlag = false;
+        }
+    }
 
     GTChillerSpecs *GTChillerSpecs::factory(EnergyPlusData &state, std::string const &chillerName)
     {
@@ -4257,7 +4270,7 @@ namespace PlantChillers {
         // METHODOLOGY EMPLOYED:
         // EnergyPlus input processor
 
-        static std::string const RoutineName("GetGTChillerInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetGTChillerInput: "); // include trailing blank space
 
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
@@ -4343,7 +4356,7 @@ namespace PlantChillers {
                                                                                state.dataIPShortCut->cAlphaArgs(1),
                                                                                DataLoopNode::NodeFluidType::Water,
                                                                                DataLoopNode::NodeConnectionType::Inlet,
-                                                                               1,
+                                                                               NodeInputManager::compFluidStream::Primary,
                                                                                DataLoopNode::ObjectIsNotParent);
             thisChiller.EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                 state.dataIPShortCut->cAlphaArgs(4),
@@ -4352,7 +4365,7 @@ namespace PlantChillers {
                                                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                                                 DataLoopNode::NodeFluidType::Water,
                                                                                 DataLoopNode::NodeConnectionType::Outlet,
-                                                                                1,
+                                                                                NodeInputManager::compFluidStream::Primary,
                                                                                 DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state,
                                                state.dataIPShortCut->cCurrentModuleObject,
@@ -4390,7 +4403,7 @@ namespace PlantChillers {
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Air,
                                                                                    DataLoopNode::NodeConnectionType::OutsideAirReference,
-                                                                                   2,
+                                                                                   NodeInputManager::compFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 bool Okay;
                 OutAirNodeManager::CheckAndAddAirNodeNumber(state, thisChiller.CondInletNodeNum, Okay);
@@ -4406,7 +4419,7 @@ namespace PlantChillers {
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                    2,
+                                                                                    NodeInputManager::compFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
             } else { // WaterCooled CondenserType
                 thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -4416,7 +4429,7 @@ namespace PlantChillers {
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::blank,
                                                                                    DataLoopNode::NodeConnectionType::Inlet,
-                                                                                   2,
+                                                                                   NodeInputManager::compFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                     state.dataIPShortCut->cAlphaArgs(6),
@@ -4425,7 +4438,7 @@ namespace PlantChillers {
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::blank,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                    2,
+                                                                                    NodeInputManager::compFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
                 BranchNodeConnections::TestCompSet(state,
                                                    state.dataIPShortCut->cCurrentModuleObject,
@@ -4528,7 +4541,7 @@ namespace PlantChillers {
                                                                                       state.dataIPShortCut->cAlphaArgs(1),
                                                                                       DataLoopNode::NodeFluidType::Water,
                                                                                       DataLoopNode::NodeConnectionType::Inlet,
-                                                                                      3,
+                                                                                      NodeInputManager::compFluidStream::Tertiary,
                                                                                       DataLoopNode::ObjectIsNotParent);
                 if (thisChiller.HeatRecInletNodeNum == 0) {
                     ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7));
@@ -4542,7 +4555,7 @@ namespace PlantChillers {
                                                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                                                        DataLoopNode::NodeFluidType::Water,
                                                                                        DataLoopNode::NodeConnectionType::Outlet,
-                                                                                       3,
+                                                                                       NodeInputManager::compFluidStream::Tertiary,
                                                                                        DataLoopNode::ObjectIsNotParent);
                 if (thisChiller.HeatRecOutletNodeNum == 0) {
                     ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + state.dataIPShortCut->cAlphaArgs(8));
@@ -4602,7 +4615,8 @@ namespace PlantChillers {
                     thisChiller.FlowMode = DataPlant::FlowMode::NotModulated;
                 } else {
                     ShowSevereError(state,
-                                    RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
+                                    std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
+                                        state.dataIPShortCut->cAlphaArgs(1) + "\",");
                     ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + state.dataIPShortCut->cAlphaArgs(9));
                     ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                     ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
@@ -4825,126 +4839,9 @@ namespace PlantChillers {
         // Uses the status flags to trigger initializations.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitGTChiller");
+        static constexpr std::string_view RoutineName("InitGTChiller");
 
-        // Init more variables
-        if (this->MyFlag) {
-            // Locate the chillers on the plant loops for later usage
-            bool errFlag = false;
-            this->setupOutputVariables(state);
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    this->plantTypeOfNum,
-                                                    this->CWLoopNum,
-                                                    this->CWLoopSideNum,
-                                                    this->CWBranchNum,
-                                                    this->CWCompNum,
-                                                    errFlag,
-                                                    this->TempLowLimitEvapOut,
-                                                    _,
-                                                    _,
-                                                    this->EvapInletNodeNum,
-                                                    _);
-            if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled) {
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        this->plantTypeOfNum,
-                                                        this->CDLoopNum,
-                                                        this->CDLoopSideNum,
-                                                        this->CDBranchNum,
-                                                        this->CDCompNum,
-                                                        errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        this->CondInletNodeNum,
-                                                        _);
-                PlantUtilities::InterConnectTwoPlantLoopSides(
-                    state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, this->plantTypeOfNum, true);
-            }
-            if (this->HeatRecActive) {
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        this->plantTypeOfNum,
-                                                        this->HRLoopNum,
-                                                        this->HRLoopSideNum,
-                                                        this->HRBranchNum,
-                                                        this->HRCompNum,
-                                                        errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        this->HeatRecInletNodeNum,
-                                                        _);
-                PlantUtilities::InterConnectTwoPlantLoopSides(
-                    state, this->CWLoopNum, this->CWLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, this->plantTypeOfNum, true);
-            }
-
-            if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled &&
-                this->HeatRecActive) {
-                PlantUtilities::InterConnectTwoPlantLoopSides(
-                    state, this->CDLoopNum, this->CDLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, this->plantTypeOfNum, false);
-            }
-            if (errFlag) {
-                ShowFatalError(state, "InitGTChiller: Program terminated due to previous condition(s).");
-            }
-
-            if (this->FlowMode == DataPlant::FlowMode::Constant) {
-                // reset flow priority
-                state.dataPlnt->PlantLoop(this->CWLoopNum)
-                    .LoopSide(this->CWLoopSideNum)
-                    .Branch(this->CWBranchNum)
-                    .Comp(this->CWCompNum)
-                    .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
-            }
-
-            if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
-                // reset flow priority
-                state.dataPlnt->PlantLoop(this->CWLoopNum)
-                    .LoopSide(this->CWLoopSideNum)
-                    .Branch(this->CWBranchNum)
-                    .Comp(this->CWCompNum)
-                    .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
-
-                // check if setpoint on outlet node
-                if ((state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
-                    (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
-                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                        if (!this->ModulatedFlowErrDone) {
-                            ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
-                            ShowContinueError(
-                                state,
-                                "  A temperature setpoint is needed at the outlet node of a chiller in variable flow mode, use a SetpointManager");
-                            ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
-                            this->ModulatedFlowErrDone = true;
-                        }
-                    } else {
-                        // need call to EMS to check node
-                        bool FatalError = false; // but not really fatal yet, but should be.
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(
-                            state, this->EvapOutletNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, FatalError);
-                        state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
-                        if (FatalError) {
-                            if (!this->ModulatedFlowErrDone) {
-                                ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
-                                ShowContinueError(
-                                    state, "  A temperature setpoint is needed at the outlet node of a chiller evaporator in variable flow mode");
-                                ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node ");
-                                ShowContinueError(state, "  or use an EMS actuator to establish a setpoint at the outlet node ");
-                                ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
-                                this->ModulatedFlowErrDone = true;
-                            }
-                        }
-                    }
-                    this->ModulatedFlowSetToLoop = true;
-                    state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint =
-                        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
-                    state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi =
-                        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
-                }
-            }
-            this->MyFlag = false;
-        }
+        this->oneTimeInit(state);
 
         if (this->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
 
@@ -5103,7 +5000,7 @@ namespace PlantChillers {
         // is calculated from the nominal capacity, the COP, and the condenser loop design delta T.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeGTChiller");
+        static constexpr std::string_view RoutineName("SizeGTChiller");
 
         bool ErrorsFound = false;
         Real64 tmpNomCap = this->NomCap;
@@ -5453,8 +5350,8 @@ namespace PlantChillers {
         // 2. CHILLER User Manual
 
         Real64 const ExhaustCP(1.047); // Exhaust Gas Specific Heat
-        static std::string const RoutineName("CalcGTChillerModel");
-        static std::string const RoutineNameHeatRecovery("ChillerHeatRecovery");
+        static constexpr std::string_view RoutineName("CalcGTChillerModel");
+        static constexpr std::string_view RoutineNameHeatRecovery("ChillerHeatRecovery");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 TempEvapOutSetPoint(0.0); // C - evaporator outlet temperature setpoint
@@ -6166,6 +6063,127 @@ namespace PlantChillers {
             }
         }
     }
+    void GTChillerSpecs::oneTimeInit(EnergyPlusData &state)
+    {
+        // Init more variables
+        if (this->MyFlag) {
+            // Locate the chillers on the plant loops for later usage
+            bool errFlag = false;
+            this->setupOutputVariables(state);
+            PlantUtilities::ScanPlantLoopsForObject(state,
+                                                    this->Name,
+                                                    this->plantTypeOfNum,
+                                                    this->CWLoopNum,
+                                                    this->CWLoopSideNum,
+                                                    this->CWBranchNum,
+                                                    this->CWCompNum,
+                                                    errFlag,
+                                                    this->TempLowLimitEvapOut,
+                                                    _,
+                                                    _,
+                                                    this->EvapInletNodeNum,
+                                                    _);
+            if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled) {
+                PlantUtilities::ScanPlantLoopsForObject(state,
+                                                        this->Name,
+                                                        this->plantTypeOfNum,
+                                                        this->CDLoopNum,
+                                                        this->CDLoopSideNum,
+                                                        this->CDBranchNum,
+                                                        this->CDCompNum,
+                                                        errFlag,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        this->CondInletNodeNum,
+                                                        _);
+                PlantUtilities::InterConnectTwoPlantLoopSides(
+                    state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, this->plantTypeOfNum, true);
+            }
+            if (this->HeatRecActive) {
+                PlantUtilities::ScanPlantLoopsForObject(state,
+                                                        this->Name,
+                                                        this->plantTypeOfNum,
+                                                        this->HRLoopNum,
+                                                        this->HRLoopSideNum,
+                                                        this->HRBranchNum,
+                                                        this->HRCompNum,
+                                                        errFlag,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        this->HeatRecInletNodeNum,
+                                                        _);
+                PlantUtilities::InterConnectTwoPlantLoopSides(
+                    state, this->CWLoopNum, this->CWLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, this->plantTypeOfNum, true);
+            }
+
+            if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled &&
+                this->HeatRecActive) {
+                PlantUtilities::InterConnectTwoPlantLoopSides(
+                    state, this->CDLoopNum, this->CDLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, this->plantTypeOfNum, false);
+            }
+            if (errFlag) {
+                ShowFatalError(state, "InitGTChiller: Program terminated due to previous condition(s).");
+            }
+
+            if (this->FlowMode == DataPlant::FlowMode::Constant) {
+                // reset flow priority
+                state.dataPlnt->PlantLoop(this->CWLoopNum)
+                    .LoopSide(this->CWLoopSideNum)
+                    .Branch(this->CWBranchNum)
+                    .Comp(this->CWCompNum)
+                    .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
+            }
+
+            if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
+                // reset flow priority
+                state.dataPlnt->PlantLoop(this->CWLoopNum)
+                    .LoopSide(this->CWLoopSideNum)
+                    .Branch(this->CWBranchNum)
+                    .Comp(this->CWCompNum)
+                    .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
+
+                // check if setpoint on outlet node
+                if ((state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
+                    (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
+                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                        if (!this->ModulatedFlowErrDone) {
+                            ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
+                            ShowContinueError(
+                                state,
+                                "  A temperature setpoint is needed at the outlet node of a chiller in variable flow mode, use a SetpointManager");
+                            ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
+                            this->ModulatedFlowErrDone = true;
+                        }
+                    } else {
+                        // need call to EMS to check node
+                        bool FatalError = false; // but not really fatal yet, but should be.
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(
+                            state, this->EvapOutletNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, FatalError);
+                        state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
+                        if (FatalError) {
+                            if (!this->ModulatedFlowErrDone) {
+                                ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
+                                ShowContinueError(
+                                    state, "  A temperature setpoint is needed at the outlet node of a chiller evaporator in variable flow mode");
+                                ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node ");
+                                ShowContinueError(state, "  or use an EMS actuator to establish a setpoint at the outlet node ");
+                                ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
+                                this->ModulatedFlowErrDone = true;
+                            }
+                        }
+                    }
+                    this->ModulatedFlowSetToLoop = true;
+                    state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint =
+                        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
+                    state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi =
+                        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
+                }
+            }
+            this->MyFlag = false;
+        }
+    }
 
     ConstCOPChillerSpecs *ConstCOPChillerSpecs::factory(EnergyPlusData &state, std::string const &chillerName)
     {
@@ -6221,7 +6239,7 @@ namespace PlantChillers {
         // arrays associated with the type PlantLoopProps.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetConstCOPChillerInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetConstCOPChillerInput: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas; // Number of elements in the alpha array
@@ -6325,7 +6343,7 @@ namespace PlantChillers {
                                                                                state.dataIPShortCut->cAlphaArgs(1),
                                                                                DataLoopNode::NodeFluidType::Water,
                                                                                DataLoopNode::NodeConnectionType::Inlet,
-                                                                               1,
+                                                                               NodeInputManager::compFluidStream::Primary,
                                                                                DataLoopNode::ObjectIsNotParent);
             thisChiller.EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                 state.dataIPShortCut->cAlphaArgs(3),
@@ -6334,7 +6352,7 @@ namespace PlantChillers {
                                                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                                                 DataLoopNode::NodeFluidType::Water,
                                                                                 DataLoopNode::NodeConnectionType::Outlet,
-                                                                                1,
+                                                                                NodeInputManager::compFluidStream::Primary,
                                                                                 DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state,
                                                state.dataIPShortCut->cCurrentModuleObject,
@@ -6372,7 +6390,7 @@ namespace PlantChillers {
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Air,
                                                                                    DataLoopNode::NodeConnectionType::OutsideAirReference,
-                                                                                   2,
+                                                                                   NodeInputManager::compFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 bool Okay;
                 OutAirNodeManager::CheckAndAddAirNodeNumber(state, thisChiller.CondInletNodeNum, Okay);
@@ -6389,7 +6407,7 @@ namespace PlantChillers {
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                    2,
+                                                                                    NodeInputManager::compFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
             } else if (thisChiller.CondenserType == DataPlant::CondenserType::WaterCooled) {
                 thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -6399,7 +6417,7 @@ namespace PlantChillers {
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Water,
                                                                                    DataLoopNode::NodeConnectionType::Inlet,
-                                                                                   2,
+                                                                                   NodeInputManager::compFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                     state.dataIPShortCut->cAlphaArgs(5),
@@ -6408,7 +6426,7 @@ namespace PlantChillers {
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Water,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                    2,
+                                                                                    NodeInputManager ::compFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
                 BranchNodeConnections::TestCompSet(state,
                                                    state.dataIPShortCut->cCurrentModuleObject,
@@ -6434,7 +6452,7 @@ namespace PlantChillers {
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::blank,
                                                                                    DataLoopNode::NodeConnectionType::Inlet,
-                                                                                   2,
+                                                                                   NodeInputManager::compFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                     state.dataIPShortCut->cAlphaArgs(5),
@@ -6443,7 +6461,7 @@ namespace PlantChillers {
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::blank,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                    2,
+                                                                                    NodeInputManager::compFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
                 BranchNodeConnections::TestCompSet(state,
                                                    state.dataIPShortCut->cCurrentModuleObject,
@@ -6473,7 +6491,8 @@ namespace PlantChillers {
                     thisChiller.FlowMode = DataPlant::FlowMode::NotModulated;
                 } else {
                     ShowSevereError(state,
-                                    RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
+                                    std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
+                                        state.dataIPShortCut->cAlphaArgs(1) + "\",");
                     ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7));
                     ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                     ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
@@ -6626,104 +6645,10 @@ namespace PlantChillers {
         // Based on InitElectricChiller from Fred Buhl
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitConstCOPChiller");
-        Real64 const TempDesCondIn(25.0); // Design condenser inlet temp. C
+        static constexpr std::string_view RoutineName("InitConstCOPChiller");
+        constexpr Real64 TempDesCondIn(25.0); // Design condenser inlet temp. C
 
-        // Init more variables
-        if (this->MyFlag) {
-            // Locate the chillers on the plant loops for later usage
-            bool errFlag = false;
-            this->setupOutputVariables(state);
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    this->plantTypeOfNum,
-                                                    this->CWLoopNum,
-                                                    this->CWLoopSideNum,
-                                                    this->CWBranchNum,
-                                                    this->CWCompNum,
-                                                    errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    this->EvapInletNodeNum,
-                                                    _);
-            if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled) {
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        this->plantTypeOfNum,
-                                                        this->CDLoopNum,
-                                                        this->CDLoopSideNum,
-                                                        this->CDBranchNum,
-                                                        this->CDCompNum,
-                                                        errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        this->CondInletNodeNum,
-                                                        _);
-                PlantUtilities::InterConnectTwoPlantLoopSides(
-                    state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, this->plantTypeOfNum, true);
-            }
-
-            if (errFlag) {
-                ShowFatalError(state, "CalcConstCOPChillerModel: Program terminated due to previous condition(s).");
-            }
-            if (this->FlowMode == DataPlant::FlowMode::Constant) {
-                // reset flow priority
-                state.dataPlnt->PlantLoop(this->CWLoopNum)
-                    .LoopSide(this->CWLoopSideNum)
-                    .Branch(this->CWBranchNum)
-                    .Comp(this->CWCompNum)
-                    .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
-            }
-
-            if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
-                // reset flow priority
-                state.dataPlnt->PlantLoop(this->CWLoopNum)
-                    .LoopSide(this->CWLoopSideNum)
-                    .Branch(this->CWBranchNum)
-                    .Comp(this->CWCompNum)
-                    .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
-
-                // check if setpoint on outlet node
-                if ((state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
-                    (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
-                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                        if (!this->ModulatedFlowErrDone) {
-                            ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
-                            ShowContinueError(
-                                state,
-                                "  A temperature setpoint is needed at the outlet node of a chiller in variable flow mode, use a SetpointManager");
-                            ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
-                            this->ModulatedFlowErrDone = true;
-                        }
-                    } else {
-                        // need call to EMS to check node
-                        bool FatalError = false; // but not really fatal yet, but should be.
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(
-                            state, this->EvapOutletNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, FatalError);
-                        state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
-                        if (FatalError) {
-                            if (!this->ModulatedFlowErrDone) {
-                                ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
-                                ShowContinueError(
-                                    state, "  A temperature setpoint is needed at the outlet node of a chiller evaporator in variable flow mode");
-                                ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node ");
-                                ShowContinueError(state, "  or use an EMS actuator to establish a setpoint at the outlet node ");
-                                ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
-                                this->ModulatedFlowErrDone = true;
-                            }
-                        }
-                    }
-                    this->ModulatedFlowSetToLoop = true;
-                    state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint =
-                        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
-                    state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi =
-                        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
-                }
-            }
-            this->MyFlag = false;
-        }
+        this->oneTimeInit(state);
 
         // Initialize critical Demand Side Variables at the beginning of each environment
         if (this->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
@@ -6843,7 +6768,7 @@ namespace PlantChillers {
         // is calculated from the nominal capacity, the COP, and the condenser loop design delta T.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeConstCOPChiller");
+        static constexpr std::string_view RoutineName("SizeConstCOPChiller");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 tmpNomCap;           // local nominal capacity cooling power
@@ -7093,7 +7018,7 @@ namespace PlantChillers {
         //                      Jun. 2016, Rongpeng Zhang, LBNL. Applied the chiller supply water temperature sensor fault model
         //                      Nov. 2016, Rongpeng Zhang, LBNL. Added Fouling Chiller fault
 
-        static std::string const RoutineName("CalcConstCOPChillerModel");
+        static constexpr std::string_view RoutineName("CalcConstCOPChillerModel");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 EvapDeltaTemp;
@@ -7622,6 +7547,104 @@ namespace PlantChillers {
             // set outlet node temperatures
             state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp = this->EvapOutletTemp;
             state.dataLoopNodes->Node(this->CondOutletNodeNum).Temp = this->CondOutletTemp;
+        }
+    }
+    void ConstCOPChillerSpecs::oneTimeInit(EnergyPlusData &state)
+    {
+        // Init more variables
+        if (this->MyFlag) {
+            // Locate the chillers on the plant loops for later usage
+            bool errFlag = false;
+            this->setupOutputVariables(state);
+            PlantUtilities::ScanPlantLoopsForObject(state,
+                                                    this->Name,
+                                                    this->plantTypeOfNum,
+                                                    this->CWLoopNum,
+                                                    this->CWLoopSideNum,
+                                                    this->CWBranchNum,
+                                                    this->CWCompNum,
+                                                    errFlag,
+                                                    _,
+                                                    _,
+                                                    _,
+                                                    this->EvapInletNodeNum,
+                                                    _);
+            if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled) {
+                PlantUtilities::ScanPlantLoopsForObject(state,
+                                                        this->Name,
+                                                        this->plantTypeOfNum,
+                                                        this->CDLoopNum,
+                                                        this->CDLoopSideNum,
+                                                        this->CDBranchNum,
+                                                        this->CDCompNum,
+                                                        errFlag,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        this->CondInletNodeNum,
+                                                        _);
+                PlantUtilities::InterConnectTwoPlantLoopSides(
+                    state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, this->plantTypeOfNum, true);
+            }
+
+            if (errFlag) {
+                ShowFatalError(state, "CalcConstCOPChillerModel: Program terminated due to previous condition(s).");
+            }
+            if (this->FlowMode == DataPlant::FlowMode::Constant) {
+                // reset flow priority
+                state.dataPlnt->PlantLoop(this->CWLoopNum)
+                    .LoopSide(this->CWLoopSideNum)
+                    .Branch(this->CWBranchNum)
+                    .Comp(this->CWCompNum)
+                    .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
+            }
+
+            if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
+                // reset flow priority
+                state.dataPlnt->PlantLoop(this->CWLoopNum)
+                    .LoopSide(this->CWLoopSideNum)
+                    .Branch(this->CWBranchNum)
+                    .Comp(this->CWCompNum)
+                    .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
+
+                // check if setpoint on outlet node
+                if ((state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
+                    (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
+                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                        if (!this->ModulatedFlowErrDone) {
+                            ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
+                            ShowContinueError(
+                                state,
+                                "  A temperature setpoint is needed at the outlet node of a chiller in variable flow mode, use a SetpointManager");
+                            ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
+                            this->ModulatedFlowErrDone = true;
+                        }
+                    } else {
+                        // need call to EMS to check node
+                        bool FatalError = false; // but not really fatal yet, but should be.
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(
+                            state, this->EvapOutletNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, FatalError);
+                        state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
+                        if (FatalError) {
+                            if (!this->ModulatedFlowErrDone) {
+                                ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
+                                ShowContinueError(
+                                    state, "  A temperature setpoint is needed at the outlet node of a chiller evaporator in variable flow mode");
+                                ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node ");
+                                ShowContinueError(state, "  or use an EMS actuator to establish a setpoint at the outlet node ");
+                                ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
+                                this->ModulatedFlowErrDone = true;
+                            }
+                        }
+                    }
+                    this->ModulatedFlowSetToLoop = true;
+                    state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint =
+                        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
+                    state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi =
+                        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
+                }
+            }
+            this->MyFlag = false;
         }
     }
 

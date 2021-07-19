@@ -82,7 +82,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 118
 
-  Version,9.5;
+  Version,9.6;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -32634,14 +32634,12 @@
   AirLoopHVAC:OutdoorAirSystem,
     AHU-1_OA,                !- Name
     AHU-1_OA_Controllers,    !- Controller List Name
-    AHU-1_OA_Equipment,      !- Outdoor Air Equipment List Name
-    AHU-1 Availability Manager List;  !- Availability Manager List Name
+    AHU-1_OA_Equipment;      !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AHU-2_OA,                !- Name
     AHU-2_OA_Controllers,    !- Controller List Name
-    AHU-2_OA_Equipment,      !- Outdoor Air Equipment List Name
-    AHU-2 Availability Manager List;  !- Availability Manager List Name
+    AHU-2_OA_Equipment;      !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     AHU-1_OANode List;       !- Node or NodeList Name 1

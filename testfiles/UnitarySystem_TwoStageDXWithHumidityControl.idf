@@ -99,7 +99,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.5;
+  Version,9.6;
 
   Building,
     Building,                !- Name
@@ -2701,8 +2701,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     Sys 1 Furnace DX Cool OA System,  !- Name
     Sys 1 Furnace DX Cool OA System Controllers,  !- Controller List Name
-    Sys 1 Furnace DX Cool OA System Equipment,  !- Outdoor Air Equipment List Name
-    Sys 1 Furnace DX Cool Availability Managers;  !- Availability Manager List Name
+    Sys 1 Furnace DX Cool OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:ControllerList,
     Sys 1 Furnace DX Cool OA System Controllers,  !- Name
@@ -3187,8 +3186,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     Sys 2 Furnace DX Cool OA System,  !- Name
     Sys 2 Furnace DX Cool OA System Controllers,  !- Controller List Name
-    Sys 2 Furnace DX Cool OA System Equipment,  !- Outdoor Air Equipment List Name
-    Sys 2 Furnace DX Cool Availability Managers;  !- Availability Manager List Name
+    Sys 2 Furnace DX Cool OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:ControllerList,
     Sys 2 Furnace DX Cool OA System Controllers,  !- Name
@@ -3754,8 +3752,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     Sys 3 Heat Pump Air Source OA System,  !- Name
     Sys 3 Heat Pump Air Source OA System Controllers,  !- Controller List Name
-    Sys 3 Heat Pump Air Source OA System Equipment,  !- Outdoor Air Equipment List Name
-    Sys 3 Heat Pump Air Source Availability Managers;  !- Availability Manager List Name
+    Sys 3 Heat Pump Air Source OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:ControllerList,
     Sys 3 Heat Pump Air Source OA System Controllers,  !- Name
@@ -4321,8 +4318,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     Sys 4 Heat Pump Air Source OA System,  !- Name
     Sys 4 Heat Pump Air Source OA System Controllers,  !- Controller List Name
-    Sys 4 Heat Pump Air Source OA System Equipment,  !- Outdoor Air Equipment List Name
-    Sys 4 Heat Pump Air Source Availability Managers;  !- Availability Manager List Name
+    Sys 4 Heat Pump Air Source OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:ControllerList,
     Sys 4 Heat Pump Air Source OA System Controllers,  !- Name
@@ -4814,8 +4810,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     Sys 5 Furnace DX Cool OA System,  !- Name
     Sys 5 Furnace DX Cool OA System Controllers,  !- Controller List Name
-    Sys 5 Furnace DX Cool OA System Equipment,  !- Outdoor Air Equipment List Name
-    Sys 5 Furnace DX Cool Availability Managers;  !- Availability Manager List Name
+    Sys 5 Furnace DX Cool OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:ControllerList,
     Sys 5 Furnace DX Cool OA System Controllers,  !- Name

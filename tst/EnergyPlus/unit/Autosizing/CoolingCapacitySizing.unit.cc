@@ -89,7 +89,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     state->dataHVACFan->fanObjs[0]->simulate(*state, _, _, _, _);
 
     // this global state is what would be set up by E+ currently
-    static std::string const routineName("CoolingCapacitySizingGauntlet");
+    static constexpr std::string_view routineName("CoolingCapacitySizingGauntlet");
 
     state->dataSize->ZoneEqSizing.allocate(1);
 
@@ -494,7 +494,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     state->dataAirLoopHVACDOAS->airloopDOAS[0].SizingCoolOATemp = 32.0;
     state->dataAirLoopHVACDOAS->airloopDOAS[0].m_FanIndex = 0;
     state->dataAirLoopHVACDOAS->airloopDOAS[0].FanBlowTroughFlag = true;
-    state->dataAirLoopHVACDOAS->airloopDOAS[0].m_FanTypeNum = SimAirServingZones::Fan_System_Object;
+    state->dataAirLoopHVACDOAS->airloopDOAS[0].m_FanTypeNum = SimAirServingZones::CompType::Fan_System_Object;
     state->dataAirLoopHVACDOAS->airloopDOAS[0].SizingCoolOAHumRat = 0.009;
     state->dataAirLoopHVACDOAS->airloopDOAS[0].PrecoolTemp = 12.0;
     state->dataAirLoopHVACDOAS->airloopDOAS[0].PrecoolHumRat = 0.006;

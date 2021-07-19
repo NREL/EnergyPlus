@@ -152,6 +152,8 @@ namespace CTElectricGenerator {
         void CalcCTGeneratorModel(EnergyPlusData &state, bool RunFlag, Real64 MyLoad, bool FirstHVACIteration);
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     void GetCTGeneratorInput(EnergyPlusData &state);

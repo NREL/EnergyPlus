@@ -60,8 +60,13 @@ namespace EnergyPlus {
 
 namespace HVACCooledBeam {
 
-    int constexpr Passive_Cooled_Beam(1);
-    int constexpr Active_Cooled_Beam(2);
+    enum class CooledBeamType
+    {
+        Unassigned = -1,
+        Passive,
+        Active
+    };
+
     Real64 constexpr NomMassFlowPerBeam(0.07); // nominal water mass flow rate per beam [kg/s]
     Real64 constexpr MinWaterVel(0.2);         // minimum water velocity [m/s]
     Real64 constexpr Coeff2(10000.0);
@@ -73,8 +78,8 @@ namespace HVACCooledBeam {
         std::string Name;            // name of unit
         std::string UnitType;        // type of unit = AirTerminal:SingleDuct:ConstantVolume:CooledBeam
         int UnitType_Num;            // index to type of unit = 1 (there's only 1 type so far)
-        std::string CBType;          // type of cooled beam: active | passive
-        int CBType_Num;              // index to type of cooled beam: passive=1; active=2
+        std::string CBTypeString;    // type of cooled beam: active | passive
+        CooledBeamType CBType;       // index to type of cooled beam
         std::string Sched;           // availability schedule
         int SchedPtr;                // index to schedule
         Real64 MaxAirVolFlow;        // m3/s (autosizable)
@@ -129,7 +134,7 @@ namespace HVACCooledBeam {
 
         // Default Constructor
         CoolBeamData()
-            : UnitType_Num(0), CBType_Num(0), SchedPtr(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0), MaxCoolWaterVolFlow(0.0),
+            : UnitType_Num(0), CBType(CooledBeamType::Unassigned), SchedPtr(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0), MaxCoolWaterVolFlow(0.0),
               MaxCoolWaterMassFlow(0.0), AirInNode(0), AirOutNode(0), CWInNode(0), CWOutNode(0), ADUNum(0), NumBeams(0.0), BeamLength(0.0),
               DesInletWaterTemp(0.0), DesOutletWaterTemp(0.0), CoilArea(0.0), a(0.0), n1(0.0), n2(0.0), n3(0.0), a0(0.0), K1(0.0), n(0.0), Kin(0.0),
               InDiam(0.0), TWIn(0.0), TWOut(0.0), EnthWaterOut(0.0), BeamFlow(0.0), CoolWaterMassFlow(0.0), BeamCoolingEnergy(0.0),
@@ -144,12 +149,12 @@ namespace HVACCooledBeam {
     };
 
     void SimCoolBeam(EnergyPlusData &state,
-                     std::string const &CompName, // name of the cooled beam unit
-                     bool FirstHVACIteration,     // TRUE if first HVAC iteration in time step
-                     int ZoneNum,                 // index of zone served by the unit
-                     int ZoneNodeNum,             // zone node number of zone served by the unit
-                     int &CompIndex,              // which cooled beam unit in data structure
-                     Real64 &NonAirSysOutput      // convective cooling by the beam system [W]
+                     std::string_view CompName, // name of the cooled beam unit
+                     bool FirstHVACIteration,   // TRUE if first HVAC iteration in time step
+                     int ZoneNum,               // index of zone served by the unit
+                     int ZoneNodeNum,           // zone node number of zone served by the unit
+                     int &CompIndex,            // which cooled beam unit in data structure
+                     Real64 &NonAirSysOutput    // convective cooling by the beam system [W]
     );
 
     void GetCoolBeams(EnergyPlusData &state);

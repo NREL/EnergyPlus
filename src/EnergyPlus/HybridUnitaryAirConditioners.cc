@@ -75,7 +75,7 @@ namespace EnergyPlus::HybridUnitaryAirConditioners {
 
 // Begin routines for zone HVAC Hybrid Evaporative cooler unit
 void SimZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
-                                         std::string const &CompName,    // name of the packaged terminal heat pump
+                                         std::string_view CompName,      // name of the packaged terminal heat pump
                                          int const ZoneNum,              // number of zone being served
                                          Real64 &SensibleOutputProvided, // sensible capacity delivered to zone cooling is negative
                                          Real64 &LatentOutputProvided,   // Latent add/removal  (kg/s), dehumid = negative
@@ -477,7 +477,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
     int UnitLoop;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("GetInputZoneHybridUnitaryAirConditioners: ");
+    static constexpr std::string_view RoutineName("GetInputZoneHybridUnitaryAirConditioners: ");
     cCurrentModuleObject = "ZoneHVAC:HybridUnitaryHVAC";
     state.dataHybridUnitaryAC->NumZoneHybridEvap = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumFields, NumAlphas, NumNumbers);
@@ -590,7 +590,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                                   Alphas(1),
                                   DataLoopNode::NodeFluidType::Air,
                                   DataLoopNode::NodeConnectionType::Inlet,
-                                  1,
+                                  NodeInputManager::compFluidStream::Primary,
                                   ObjectIsNotParent);
             state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryInletNode =
                 GetOnlySingleNode(state,
@@ -600,7 +600,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                                   Alphas(1),
                                   DataLoopNode::NodeFluidType::Air,
                                   DataLoopNode::NodeConnectionType::OutsideAir,
-                                  1,
+                                  NodeInputManager::compFluidStream::Primary,
                                   ObjectIsNotParent);
             state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).OutletNode =
                 GetOnlySingleNode(state,
@@ -610,7 +610,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                                   Alphas(1),
                                   DataLoopNode::NodeFluidType::Air,
                                   DataLoopNode::NodeConnectionType::Outlet,
-                                  1,
+                                  NodeInputManager::compFluidStream::Primary,
                                   ObjectIsNotParent);
             state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryOutletNode =
                 GetOnlySingleNode(state,
@@ -620,7 +620,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                                   Alphas(1),
                                   DataLoopNode::NodeFluidType::Air,
                                   DataLoopNode::NodeConnectionType::ReliefAir,
-                                  1,
+                                  NodeInputManager::compFluidStream::Primary,
                                   ObjectIsNotParent);
             TestCompSet(state, cCurrentModuleObject, Alphas(1), Alphas(9), Alphas(11), "Hybrid Evap Air Zone Nodes");
             TestCompSet(state, cCurrentModuleObject, Alphas(1), Alphas(10), Alphas(12), "Hybrid Evap Air Zone Secondary Nodes");
@@ -679,7 +679,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                 state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr =
                     UtilityRoutines::FindItemInList(Alphas(19), state.dataSize->OARequirements);
                 if (state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr == 0) {
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + " = " + Alphas(1) + " invalid data");
+                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + " = " + Alphas(1) + " invalid data");
                     ShowContinueError(state, "Invalid-not found " + cAlphaFields(19) + "=\"" + Alphas(19) + "\".");
                     ErrorsFound = true;
                 } else {
@@ -702,7 +702,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                 ErrorsFound = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).ParseMode(
                     state, Alphas, cAlphaFields, Numbers, cNumericFields, lAlphaBlanks, cCurrentModuleObject);
                 if (ErrorsFound) {
-                    ShowFatalError(state, RoutineName + "Errors found parsing modes");
+                    ShowFatalError(state, std::string{RoutineName} + "Errors found parsing modes");
                     ShowContinueError(state, "... Preceding condition causes termination.");
                     break;
                 }
@@ -1310,7 +1310,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
     }
     Errors = ErrorsFound;
     if (ErrorsFound) {
-        ShowFatalError(state, RoutineName + "Errors found in getting input.");
+        ShowFatalError(state, std::string{RoutineName} + "Errors found in getting input.");
         ShowContinueError(state, "... Preceding condition causes termination.");
     }
 }
