@@ -2704,8 +2704,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     VAV Sys 1 OA System,     !- Name
     VAV Sys 1 OA System Controllers,  !- Controller List Name
-    VAV Sys 1 OA System Equipment,  !- Outdoor Air Equipment List Name
-    VAV Sys 1 Availability Managers;  !- Availability Manager List Name
+    VAV Sys 1 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:ControllerList,
     VAV Sys 1 OA System Controllers,  !- Name

@@ -10788,146 +10788,122 @@
   AirLoopHVAC:OutdoorAirSystem,
     Split GSW OA System,     !- Name
     Split GSW OA System Controllers,  !- Controller List Name
-    Split GSW OA System Equipment,  !- Outdoor Air Equipment List Name
-    Split GSW Availability Managers;  !- Availability Manager List Name
+    Split GSW OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     Split GNW OA System,     !- Name
     Split GNW OA System Controllers,  !- Controller List Name
-    Split GNW OA System Equipment,  !- Outdoor Air Equipment List Name
-    Split GNW Availability Managers;  !- Availability Manager List Name
+    Split GNW OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     Split Office OA System,  !- Name
     Split Office OA System Controllers,  !- Controller List Name
-    Split Office OA System Equipment,  !- Outdoor Air Equipment List Name
-    Split Office Availability Managers;  !- Availability Manager List Name
+    Split Office OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     Split GNE OA System,     !- Name
     Split GNE OA System Controllers,  !- Controller List Name
-    Split GNE OA System Equipment,  !- Outdoor Air Equipment List Name
-    Split GNE Availability Managers;  !- Availability Manager List Name
+    Split GNE OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     Split GN1 OA System,     !- Name
     Split GN1 OA System Controllers,  !- Controller List Name
-    Split GN1 OA System Equipment,  !- Outdoor Air Equipment List Name
-    Split GN1 Availability Managers;  !- Availability Manager List Name
+    Split GN1 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     Split GN2 OA System,     !- Name
     Split GN2 OA System Controllers,  !- Controller List Name
-    Split GN2 OA System Equipment,  !- Outdoor Air Equipment List Name
-    Split GN2 Availability Managers;  !- Availability Manager List Name
+    Split GN2 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     Split GS1 OA System,     !- Name
     Split GS1 OA System Controllers,  !- Controller List Name
-    Split GS1 OA System Equipment,  !- Outdoor Air Equipment List Name
-    Split GS1 Availability Managers;  !- Availability Manager List Name
+    Split GS1 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     Split GS2 OA System,     !- Name
     Split GS2 OA System Controllers,  !- Controller List Name
-    Split GS2 OA System Equipment,  !- Outdoor Air Equipment List Name
-    Split GS2 Availability Managers;  !- Availability Manager List Name
+    Split GS2 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     Split MSW OA System,     !- Name
     Split MSW OA System Controllers,  !- Controller List Name
-    Split MSW OA System Equipment,  !- Outdoor Air Equipment List Name
-    Split MSW Availability Managers;  !- Availability Manager List Name
+    Split MSW OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     Split MNW OA System,     !- Name
     Split MNW OA System Controllers,  !- Controller List Name
-    Split MNW OA System Equipment,  !- Outdoor Air Equipment List Name
-    Split MNW Availability Managers;  !- Availability Manager List Name
+    Split MNW OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     Split MSE OA System,     !- Name
     Split MSE OA System Controllers,  !- Controller List Name
-    Split MSE OA System Equipment,  !- Outdoor Air Equipment List Name
-    Split MSE Availability Managers;  !- Availability Manager List Name
+    Split MSE OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     Split MNE OA System,     !- Name
     Split MNE OA System Controllers,  !- Controller List Name
-    Split MNE OA System Equipment,  !- Outdoor Air Equipment List Name
-    Split MNE Availability Managers;  !- Availability Manager List Name
+    Split MNE OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     Split MN1 OA System,     !- Name
     Split MN1 OA System Controllers,  !- Controller List Name
-    Split MN1 OA System Equipment,  !- Outdoor Air Equipment List Name
-    Split MN1 Availability Managers;  !- Availability Manager List Name
+    Split MN1 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     Split MN2 OA System,     !- Name
     Split MN2 OA System Controllers,  !- Controller List Name
-    Split MN2 OA System Equipment,  !- Outdoor Air Equipment List Name
-    Split MN2 Availability Managers;  !- Availability Manager List Name
+    Split MN2 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     Split MS1 OA System,     !- Name
     Split MS1 OA System Controllers,  !- Controller List Name
-    Split MS1 OA System Equipment,  !- Outdoor Air Equipment List Name
-    Split MS1 Availability Managers;  !- Availability Manager List Name
+    Split MS1 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     Split MS2 OA System,     !- Name
     Split MS2 OA System Controllers,  !- Controller List Name
-    Split MS2 OA System Equipment,  !- Outdoor Air Equipment List Name
-    Split MS2 Availability Managers;  !- Availability Manager List Name
+    Split MS2 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     Split TSW OA System,     !- Name
     Split TSW OA System Controllers,  !- Controller List Name
-    Split TSW OA System Equipment,  !- Outdoor Air Equipment List Name
-    Split TSW Availability Managers;  !- Availability Manager List Name
+    Split TSW OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     Split TNW OA System,     !- Name
     Split TNW OA System Controllers,  !- Controller List Name
-    Split TNW OA System Equipment,  !- Outdoor Air Equipment List Name
-    Split TNW Availability Managers;  !- Availability Manager List Name
+    Split TNW OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     Split TSE OA System,     !- Name
     Split TSE OA System Controllers,  !- Controller List Name
-    Split TSE OA System Equipment,  !- Outdoor Air Equipment List Name
-    Split TSE Availability Managers;  !- Availability Manager List Name
+    Split TSE OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     Split TNE OA System,     !- Name
     Split TNE OA System Controllers,  !- Controller List Name
-    Split TNE OA System Equipment,  !- Outdoor Air Equipment List Name
-    Split TNE Availability Managers;  !- Availability Manager List Name
+    Split TNE OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     Split TN1 OA System,     !- Name
     Split TN1 OA System Controllers,  !- Controller List Name
-    Split TN1 OA System Equipment,  !- Outdoor Air Equipment List Name
-    Split TN1 Availability Managers;  !- Availability Manager List Name
+    Split TN1 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     Split TN2 OA System,     !- Name
     Split TN2 OA System Controllers,  !- Controller List Name
-    Split TN2 OA System Equipment,  !- Outdoor Air Equipment List Name
-    Split TN2 Availability Managers;  !- Availability Manager List Name
+    Split TN2 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     Split TS1 OA System,     !- Name
     Split TS1 OA System Controllers,  !- Controller List Name
-    Split TS1 OA System Equipment,  !- Outdoor Air Equipment List Name
-    Split TS1 Availability Managers;  !- Availability Manager List Name
+    Split TS1 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     Split TS2 OA System,     !- Name
     Split TS2 OA System Controllers,  !- Controller List Name
-    Split TS2 OA System Equipment,  !- Outdoor Air Equipment List Name
-    Split TS2 Availability Managers;  !- Availability Manager List Name
+    Split TS2 OA System Equipment;  !- Outdoor Air Equipment List Name
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTSIDE AIR NODE ===========
 

@@ -5956,8 +5956,8 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                     state.dataContaminantBalance->MixingMassFlowCO2(ZoneB) += MassFlowToB * state.dataContaminantBalance->ZoneAirCO2(ZoneA);
                 }
                 if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                    state.dataContaminantBalance->MixingMassFlowCO2(ZoneA) += MassFlowToA * state.dataContaminantBalance->ZoneAirGC(ZoneB);
-                    state.dataContaminantBalance->MixingMassFlowCO2(ZoneB) += MassFlowToB * state.dataContaminantBalance->ZoneAirGC(ZoneA);
+                    state.dataContaminantBalance->MixingMassFlowGC(ZoneA) += MassFlowToA * state.dataContaminantBalance->ZoneAirGC(ZoneB);
+                    state.dataContaminantBalance->MixingMassFlowGC(ZoneB) += MassFlowToB * state.dataContaminantBalance->ZoneAirGC(ZoneA);
                 }
 
             } // J=1,RefDoorMixing(ZoneA)%NumRefDoorConnections

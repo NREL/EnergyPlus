@@ -4514,10 +4514,9 @@ TEST_F(EnergyPlusFixture, MixedAir_MiscGetsPart2)
         "    DOAS OA Mixing Box;      !- Component 2 Name",
 
         "AirLoopHVAC:OutdoorAirSystem,",
-        "    DOAS OA System,          !- Name",
+        "    DOAS OA System,           !- Name",
         "    DOAS OA System Controllers,  !- Controller List Name",
-        "    DOAS OA System Equipment,!- Outdoor Air Equipment List Name",
-        "    DOAS Availability Managers;  !- Availability Manager List Name",
+        "    DOAS OA System Equipment; !- Outdoor Air Equipment List Name",
 
         "OutdoorAir:Mixer,",
         "    SPACE1-1 OA Mixing Box,  !- Name",
@@ -5796,8 +5795,7 @@ TEST_F(EnergyPlusFixture, MixedAir_OAControllerOrderInControllersListTest)
         "  AirLoopHVAC:OutdoorAirSystem,",
         "    OA Sys 1,                !- Name",
         "    OA Sys 1 Controllers,    !- Controller List Name",
-        "    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name",
-        "    VAV Sys 1 Avail List;    !- Availability Manager List Name",
+        "    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name",
 
         "  AirLoopHVAC:ControllerList,",
         "    OA Sys 1 Controllers,    !- Name",
@@ -6679,7 +6677,7 @@ TEST_F(EnergyPlusFixture, OAController_LowExhaustMassFlowTest)
         "    OA Controller;           !- Controller 1 Name",
 
         " AirLoopHVAC:OutdoorAirSystem:EquipmentList,",
-        "    OA Sys Equipment list,   !- Name",
+        "    OA Sys Equipment List,   !- Name",
         "    HeatExchanger:AirToAir:SensibleAndLatent,  !- Component 1 Object Type",
         "    OA Heat Recovery,        !- Component 1 Name",
         "    Coil:Heating:Electric,   !- Component 2 Object Type",
@@ -6689,8 +6687,8 @@ TEST_F(EnergyPlusFixture, OAController_LowExhaustMassFlowTest)
 
         " AirLoopHVAC:OutdoorAirSystem,",
         "    OA Sys,                  !- Name",
-        "    OA Sys controller,       !- Controller List Name",
-        "    OA Sys Equipment list;   !- Outdoor Air Equipment List Name",
+        "    OA Sys Controller,       !- Controller List Name",
+        "    OA Sys Equipment List;   !- Outdoor Air Equipment List Name",
 
         " Coil:Heating:Electric,",
         "    OA Sys Heating Coil,     !- Name",
@@ -6707,6 +6705,8 @@ TEST_F(EnergyPlusFixture, OAController_LowExhaustMassFlowTest)
     GetOutsideAirSysInputs(*state);
     EXPECT_EQ(1, state->dataAirLoop->NumOASystems);
     EXPECT_EQ("OA SYS", state->dataAirLoop->OutsideAirSys(1).Name);
+    EXPECT_EQ("OA SYS CONTROLLER", state->dataAirLoop->OutsideAirSys(1).ControllerListName);
+    EXPECT_EQ("OA SYS EQUIPMENT LIST", state->dataAirLoop->OutsideAirSys(1).ComponentListName);
 
     EXPECT_EQ(3, state->dataAirLoop->OutsideAirSys(1).NumComponents);
     EXPECT_EQ("OA HEAT RECOVERY", state->dataAirLoop->OutsideAirSys(1).ComponentName(1));
