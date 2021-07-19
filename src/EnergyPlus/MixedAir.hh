@@ -126,6 +126,7 @@ namespace MixedAir {
     };
 
     // OA Controller Limiting Factor (used for integer output variable values for OAControllerProps::OALimitingFactor
+    // can't change these to enum class since these are used in SetupOutputVariable()
     constexpr int limitFactorNone = 0;        // No limit other than fixed OA amount
     constexpr int limitFactorLimits = 1;      // Limits and scheduled limits
     constexpr int limitFactorEconomizer = 2;  // Economizer operation
