@@ -370,8 +370,13 @@ namespace BaseboardElectric {
                                 _,
                                 "System");
 
-            SetupOutputVariable(
-                state, "Baseboard Total Heating Rate", OutputProcessor::Unit::W, thisBaseboard.Power, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, thisBaseboard.EquipName);
+            SetupOutputVariable(state,
+                                "Baseboard Total Heating Rate",
+                                OutputProcessor::Unit::W,
+                                thisBaseboard.Power,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                thisBaseboard.EquipName);
 
             SetupOutputVariable(state,
                                 "Baseboard Electricity Energy",

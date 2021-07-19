@@ -1102,47 +1102,120 @@ namespace IceThermalStorage {
 
     void SimpleIceStorageData::setupOutputVars(EnergyPlusData &state)
     {
-        SetupOutputVariable(state, "Ice Thermal Storage Requested Load", OutputProcessor::Unit::W, this->MyLoad, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Ice Thermal Storage Requested Load",
+                            OutputProcessor::Unit::W,
+                            this->MyLoad,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Ice Thermal Storage End Fraction", OutputProcessor::Unit::None, this->IceFracRemain, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Ice Thermal Storage End Fraction",
+                            OutputProcessor::Unit::None,
+                            this->IceFracRemain,
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(state, "Ice Thermal Storage Mass Flow Rate", OutputProcessor::Unit::kg_s, this->ITSmdot, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Ice Thermal Storage Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->ITSmdot,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Ice Thermal Storage Inlet Temperature", OutputProcessor::Unit::C, this->ITSInletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Ice Thermal Storage Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->ITSInletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Ice Thermal Storage Outlet Temperature", OutputProcessor::Unit::C, this->ITSOutletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Ice Thermal Storage Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->ITSOutletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Ice Thermal Storage Cooling Discharge Rate", OutputProcessor::Unit::W, this->ITSCoolingRate_rep, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Ice Thermal Storage Cooling Discharge Rate",
+                            OutputProcessor::Unit::W,
+                            this->ITSCoolingRate_rep,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Ice Thermal Storage Cooling Discharge Energy", OutputProcessor::Unit::J, this->ITSCoolingEnergy_rep, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
+        SetupOutputVariable(state,
+                            "Ice Thermal Storage Cooling Discharge Energy",
+                            OutputProcessor::Unit::J,
+                            this->ITSCoolingEnergy_rep,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Ice Thermal Storage Cooling Charge Rate", OutputProcessor::Unit::W, this->ITSChargingRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Ice Thermal Storage Cooling Charge Rate",
+                            OutputProcessor::Unit::W,
+                            this->ITSChargingRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Ice Thermal Storage Cooling Charge Energy", OutputProcessor::Unit::J, this->ITSChargingEnergy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
+        SetupOutputVariable(state,
+                            "Ice Thermal Storage Cooling Charge Energy",
+                            OutputProcessor::Unit::J,
+                            this->ITSChargingEnergy,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->Name);
     }
 
     void DetailedIceStorageData::setupOutputVars(EnergyPlusData &state)
     {
-        SetupOutputVariable(state, "Ice Thermal Storage Cooling Rate", OutputProcessor::Unit::W, this->CompLoad, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Ice Thermal Storage Cooling Rate",
+                            OutputProcessor::Unit::W,
+                            this->CompLoad,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Ice Thermal Storage Change Fraction", OutputProcessor::Unit::None, this->IceFracChange, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Ice Thermal Storage Change Fraction",
+                            OutputProcessor::Unit::None,
+                            this->IceFracChange,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Ice Thermal Storage End Fraction", OutputProcessor::Unit::None, this->IceFracRemaining, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Ice Thermal Storage End Fraction",
+                            OutputProcessor::Unit::None,
+                            this->IceFracRemaining,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Ice Thermal Storage On Coil Fraction", OutputProcessor::Unit::None, this->IceFracOnCoil, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Ice Thermal Storage On Coil Fraction",
+                            OutputProcessor::Unit::None,
+                            this->IceFracOnCoil,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Ice Thermal Storage Mass Flow Rate", OutputProcessor::Unit::kg_s, this->MassFlowRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Ice Thermal Storage Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->MassFlowRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
         SetupOutputVariable(state,
                             "Ice Thermal Storage Bypass Mass Flow Rate",
@@ -1152,29 +1225,69 @@ namespace IceThermalStorage {
                             OutputProcessor::SOVStoreType::Average,
                             this->Name);
 
-        SetupOutputVariable(
-            state, "Ice Thermal Storage Tank Mass Flow Rate", OutputProcessor::Unit::kg_s, this->TankMassFlowRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Ice Thermal Storage Tank Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->TankMassFlowRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Ice Thermal Storage Fluid Inlet Temperature", OutputProcessor::Unit::C, this->InletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Ice Thermal Storage Fluid Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->InletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Ice Thermal Storage Blended Outlet Temperature", OutputProcessor::Unit::C, this->OutletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Ice Thermal Storage Blended Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->OutletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Ice Thermal Storage Tank Outlet Temperature", OutputProcessor::Unit::C, this->TankOutletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Ice Thermal Storage Tank Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->TankOutletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Ice Thermal Storage Cooling Discharge Rate", OutputProcessor::Unit::W, this->DischargingRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Ice Thermal Storage Cooling Discharge Rate",
+                            OutputProcessor::Unit::W,
+                            this->DischargingRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Ice Thermal Storage Cooling Discharge Energy", OutputProcessor::Unit::J, this->DischargingEnergy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
+        SetupOutputVariable(state,
+                            "Ice Thermal Storage Cooling Discharge Energy",
+                            OutputProcessor::Unit::J,
+                            this->DischargingEnergy,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Ice Thermal Storage Cooling Charge Rate", OutputProcessor::Unit::W, this->ChargingRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Ice Thermal Storage Cooling Charge Rate",
+                            OutputProcessor::Unit::W,
+                            this->ChargingRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Ice Thermal Storage Cooling Charge Energy", OutputProcessor::Unit::J, this->ChargingEnergy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
+        SetupOutputVariable(state,
+                            "Ice Thermal Storage Cooling Charge Energy",
+                            OutputProcessor::Unit::J,
+                            this->ChargingEnergy,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->Name);
 
         SetupOutputVariable(state,
                             "Ice Thermal Storage Ancillary Electricity Rate",

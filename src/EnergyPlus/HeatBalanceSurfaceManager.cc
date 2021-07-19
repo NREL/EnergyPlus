@@ -2078,8 +2078,13 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
 
         //     ENDIF
         if (state.dataGlobal->DisplayAdvancedReportVariables) {
-            SetupOutputVariable(
-                state, "Surface Construction Index", OutputProcessor::Unit::None, Surface(loop).Construction, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Average, Surface(loop).Name);
+            SetupOutputVariable(state,
+                                "Surface Construction Index",
+                                OutputProcessor::Unit::None,
+                                Surface(loop).Construction,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                Surface(loop).Name);
         }
     }
 

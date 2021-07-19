@@ -1092,8 +1092,13 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
         bool errFlag = false;
 
         // setup output variables
-        SetupOutputVariable(
-            state, "Heat Pump Load Side Heat Transfer Rate", OutputProcessor::Unit::W, this->loadSideHeatTransfer, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->name);
+        SetupOutputVariable(state,
+                            "Heat Pump Load Side Heat Transfer Rate",
+                            OutputProcessor::Unit::W,
+                            this->loadSideHeatTransfer,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->name);
         SetupOutputVariable(state,
                             "Heat Pump Load Side Heat Transfer Energy",
                             OutputProcessor::Unit::J,
@@ -1113,17 +1118,48 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->name);
-        SetupOutputVariable(
-            state, "Heat Pump Source Side Heat Transfer Energy", OutputProcessor::Unit::J, this->sourceSideEnergy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->name);
-        SetupOutputVariable(
-            state, "Heat Pump Load Side Inlet Temperature", OutputProcessor::Unit::C, this->loadSideInletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->name);
-        SetupOutputVariable(
-            state, "Heat Pump Load Side Outlet Temperature", OutputProcessor::Unit::C, this->loadSideOutletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->name);
-        SetupOutputVariable(
-            state, "Heat Pump Source Side Inlet Temperature", OutputProcessor::Unit::C, this->sourceSideInletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->name);
-        SetupOutputVariable(
-            state, "Heat Pump Source Side Outlet Temperature", OutputProcessor::Unit::C, this->sourceSideOutletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->name);
-        SetupOutputVariable(state, "Heat Pump Electricity Rate", OutputProcessor::Unit::W, this->powerUsage, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->name);
+        SetupOutputVariable(state,
+                            "Heat Pump Source Side Heat Transfer Energy",
+                            OutputProcessor::Unit::J,
+                            this->sourceSideEnergy,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->name);
+        SetupOutputVariable(state,
+                            "Heat Pump Load Side Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->loadSideInletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->name);
+        SetupOutputVariable(state,
+                            "Heat Pump Load Side Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->loadSideOutletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->name);
+        SetupOutputVariable(state,
+                            "Heat Pump Source Side Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->sourceSideInletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->name);
+        SetupOutputVariable(state,
+                            "Heat Pump Source Side Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->sourceSideOutletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->name);
+        SetupOutputVariable(state,
+                            "Heat Pump Electricity Rate",
+                            OutputProcessor::Unit::W,
+                            this->powerUsage,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->name);
         if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRCooling) { // energy from HeatPump:PlantLoop:EIR:Cooling object
             SetupOutputVariable(state,
                                 "Heat Pump Electricity Energy",
@@ -1151,8 +1187,13 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                                 "Heat Pump",
                                 "Plant");
         }
-        SetupOutputVariable(
-            state, "Heat Pump Load Side Mass Flow Rate", OutputProcessor::Unit::kg_s, this->loadSideMassFlowRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->name);
+        SetupOutputVariable(state,
+                            "Heat Pump Load Side Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->loadSideMassFlowRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->name);
         SetupOutputVariable(state,
                             "Heat Pump Source Side Mass Flow Rate",
                             OutputProcessor::Unit::kg_s,

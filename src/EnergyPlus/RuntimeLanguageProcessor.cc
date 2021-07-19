@@ -2623,7 +2623,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
     int VariableNum(0); // temporary
     int RuntimeReportVarNum;
     bool Found;
-    OutputProcessor::SOVTimeStepType FreqString;    // temporary
+    OutputProcessor::SOVTimeStepType FreqString; // temporary
     OutputProcessor::SOVStoreType VarTypeString; // temporary
     std::string ResourceTypeString;
     std::string GroupTypeString;

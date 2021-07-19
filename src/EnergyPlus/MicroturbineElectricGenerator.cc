@@ -882,8 +882,13 @@ void GetMTGeneratorInput(EnergyPlusData &state)
 
 void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
 {
-    SetupOutputVariable(
-        state, "Generator Produced AC Electricity Rate", OutputProcessor::Unit::W, this->ElecPowerGenerated, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Generator Produced AC Electricity Rate",
+                        OutputProcessor::Unit::W,
+                        this->ElecPowerGenerated,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
     SetupOutputVariable(state,
                         "Generator Produced AC Electricity Energy",
@@ -898,8 +903,13 @@ void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
                         _,
                         "Plant");
 
-    SetupOutputVariable(
-        state, "Generator LHV Basis Electric Efficiency", OutputProcessor::Unit::None, this->ElectricEfficiencyLHV, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Generator LHV Basis Electric Efficiency",
+                        OutputProcessor::Unit::None,
+                        this->ElectricEfficiencyLHV,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
     //    Fuel specific report variables
     SetupOutputVariable(state,
@@ -923,20 +933,41 @@ void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
                         _,
                         "Plant");
 
-    SetupOutputVariable(
-        state, "Generator " + this->FuelType + " Mass Flow Rate", OutputProcessor::Unit::kg_s, this->FuelMdot, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Generator " + this->FuelType + " Mass Flow Rate",
+                        OutputProcessor::Unit::kg_s,
+                        this->FuelMdot,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
     //    general fuel use report (to match other generators)
-    SetupOutputVariable(
-        state, "Generator Fuel HHV Basis Rate", OutputProcessor::Unit::W, this->FuelEnergyUseRateHHV, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Generator Fuel HHV Basis Rate",
+                        OutputProcessor::Unit::W,
+                        this->FuelEnergyUseRateHHV,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
-    SetupOutputVariable(state, "Generator Fuel HHV Basis Energy", OutputProcessor::Unit::J, this->FuelEnergyHHV, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
+    SetupOutputVariable(state,
+                        "Generator Fuel HHV Basis Energy",
+                        OutputProcessor::Unit::J,
+                        this->FuelEnergyHHV,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->Name);
 
     //    Heat recovery (to water) report variables
     if (this->HeatRecActive) {
 
-        SetupOutputVariable(
-            state, "Generator Produced Thermal Rate", OutputProcessor::Unit::W, this->QHeatRecovered, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Generator Produced Thermal Rate",
+                            OutputProcessor::Unit::W,
+                            this->QHeatRecovered,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
         SetupOutputVariable(state,
                             "Generator Produced Thermal Energy",
@@ -959,19 +990,39 @@ void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Average,
                             this->Name);
 
-        SetupOutputVariable(
-            state, "Generator Heat Recovery Inlet Temperature", OutputProcessor::Unit::C, this->HeatRecInletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Generator Heat Recovery Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->HeatRecInletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Generator Heat Recovery Outlet Temperature", OutputProcessor::Unit::C, this->HeatRecOutletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Generator Heat Recovery Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->HeatRecOutletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Generator Heat Recovery Water Mass Flow Rate", OutputProcessor::Unit::kg_s, this->HeatRecMdot, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Generator Heat Recovery Water Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->HeatRecMdot,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
     }
 
     if (this->StandbyPower > 0.0) { // Report Standby Power if entered by user
-        SetupOutputVariable(
-            state, "Generator Standby Electricity Rate", OutputProcessor::Unit::W, this->StandbyPowerRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Generator Standby Electricity Rate",
+                            OutputProcessor::Unit::W,
+                            this->StandbyPowerRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
         SetupOutputVariable(state,
                             "Generator Standby Electricity Energy",
@@ -988,11 +1039,21 @@ void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
     }
 
     if (this->AncillaryPower > 0.0) { // Report Ancillary Power if entered by user
-        SetupOutputVariable(
-            state, "Generator Ancillary Electricity Rate", OutputProcessor::Unit::W, this->AncillaryPowerRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Generator Ancillary Electricity Rate",
+                            OutputProcessor::Unit::W,
+                            this->AncillaryPowerRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Generator Ancillary Electricity Energy", OutputProcessor::Unit::J, this->AncillaryEnergy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
+        SetupOutputVariable(state,
+                            "Generator Ancillary Electricity Energy",
+                            OutputProcessor::Unit::J,
+                            this->AncillaryEnergy,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->Name);
     }
 
     //   Report combustion air outlet conditions if exhaust air calculations are active
@@ -1005,8 +1066,13 @@ void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Average,
                             this->Name);
 
-        SetupOutputVariable(
-            state, "Generator Exhaust Air Temperature", OutputProcessor::Unit::C, this->ExhaustAirTemperature, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Generator Exhaust Air Temperature",
+                            OutputProcessor::Unit::C,
+                            this->ExhaustAirTemperature,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
     }
 }
 

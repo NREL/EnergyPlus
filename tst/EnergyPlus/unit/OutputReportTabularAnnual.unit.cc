@@ -163,9 +163,27 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Average, "Lite1");
-    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Average, "Lite2");
-    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Average, "Lite3");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Power",
+                        OutputProcessor::Unit::W,
+                        extLitPow,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Average,
+                        "Lite1");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Power",
+                        OutputProcessor::Unit::W,
+                        extLitPow,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Average,
+                        "Lite2");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Power",
+                        OutputProcessor::Unit::W,
+                        extLitPow,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Average,
+                        "Lite3");
 
     state->dataGlobal->DoWeathSim = true;
 
@@ -237,9 +255,27 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Average, "Lite1");
-    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Average, "Lite2");
-    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Average, "Lite3");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Power",
+                        OutputProcessor::Unit::W,
+                        extLitPow,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Average,
+                        "Lite1");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Power",
+                        OutputProcessor::Unit::W,
+                        extLitPow,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Average,
+                        "Lite2");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Power",
+                        OutputProcessor::Unit::W,
+                        extLitPow,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Average,
+                        "Lite3");
 
     state->dataGlobal->DoWeathSim = true;
     state->dataGlobal->TimeStepZone = 0.25;

@@ -7242,14 +7242,42 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputV
     std::vector<std::string> ZoneNames({"Zone1", "Zone2"});
 
     for (int i = 0; i < 2; ++i) {
-        SetupOutputVariable(*state, "Zone Mean Air Temperature", OutputProcessor::Unit::C, zoneTemp, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Average, ZoneNames[i]);
+        SetupOutputVariable(*state,
+                            "Zone Mean Air Temperature",
+                            OutputProcessor::Unit::C,
+                            zoneTemp,
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
+                            ZoneNames[i]);
 
-        SetupOutputVariable(*state, "Zone Heating Setpoint Not Met Time", OutputProcessor::Unit::hr, timeNotMet, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, ZoneNames[i]);
-        SetupOutputVariable(
-            *state, "Zone Heating Setpoint Not Met While Occupied Time", OutputProcessor::Unit::hr, timeNotMet, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, ZoneNames[i]);
-        SetupOutputVariable(*state, "Zone Cooling Setpoint Not Met Time", OutputProcessor::Unit::hr, timeNotMet, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, ZoneNames[i]);
-        SetupOutputVariable(
-            *state, "Zone Cooling Setpoint Not Met While Occupied Time", OutputProcessor::Unit::hr, timeNotMet, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, ZoneNames[i]);
+        SetupOutputVariable(*state,
+                            "Zone Heating Setpoint Not Met Time",
+                            OutputProcessor::Unit::hr,
+                            timeNotMet,
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
+                            ZoneNames[i]);
+        SetupOutputVariable(*state,
+                            "Zone Heating Setpoint Not Met While Occupied Time",
+                            OutputProcessor::Unit::hr,
+                            timeNotMet,
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
+                            ZoneNames[i]);
+        SetupOutputVariable(*state,
+                            "Zone Cooling Setpoint Not Met Time",
+                            OutputProcessor::Unit::hr,
+                            timeNotMet,
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
+                            ZoneNames[i]);
+        SetupOutputVariable(*state,
+                            "Zone Cooling Setpoint Not Met While Occupied Time",
+                            OutputProcessor::Unit::hr,
+                            timeNotMet,
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
+                            ZoneNames[i]);
     }
 
     // We do need to trick it into thinking it's a weather simulation, otherwise the monthly reports aren't reported
@@ -7902,12 +7930,39 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable(
-        *state, "Heating Coal Energy", OutputProcessor::Unit::J, CoalHeating, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, "Lite4", _, "Coal", "Heating", "General");
-    SetupOutputVariable(
-        *state, "Heating Gasoline Energy", OutputProcessor::Unit::J, GasolineHeating, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, "Lite5", _, "Gasoline", "Heating", "General");
-    SetupOutputVariable(
-        *state, "Heating Propane Energy", OutputProcessor::Unit::J, PropaneHeating, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, "Lite6", _, "Propane", "Heating", "General");
+    SetupOutputVariable(*state,
+                        "Heating Coal Energy",
+                        OutputProcessor::Unit::J,
+                        CoalHeating,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite4",
+                        _,
+                        "Coal",
+                        "Heating",
+                        "General");
+    SetupOutputVariable(*state,
+                        "Heating Gasoline Energy",
+                        OutputProcessor::Unit::J,
+                        GasolineHeating,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite5",
+                        _,
+                        "Gasoline",
+                        "Heating",
+                        "General");
+    SetupOutputVariable(*state,
+                        "Heating Propane Energy",
+                        OutputProcessor::Unit::J,
+                        PropaneHeating,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite6",
+                        _,
+                        "Propane",
+                        "Heating",
+                        "General");
     state->dataGlobal->DoWeathSim = true;
     state->dataGlobal->TimeStepZone = 1.0;
     state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;
@@ -9455,12 +9510,39 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable(
-        *state, "Heating Coal Energy", OutputProcessor::Unit::J, CoalHeating, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, "Lite4", _, "Coal", "Heating", "General");
-    SetupOutputVariable(
-        *state, "Heating Gasoline Energy", OutputProcessor::Unit::J, GasolineHeating, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, "Lite5", _, "Gasoline", "Heating", "General");
-    SetupOutputVariable(
-        *state, "Heating Propane Energy", OutputProcessor::Unit::J, PropaneHeating, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, "Lite6", _, "Propane", "Heating", "General");
+    SetupOutputVariable(*state,
+                        "Heating Coal Energy",
+                        OutputProcessor::Unit::J,
+                        CoalHeating,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite4",
+                        _,
+                        "Coal",
+                        "Heating",
+                        "General");
+    SetupOutputVariable(*state,
+                        "Heating Gasoline Energy",
+                        OutputProcessor::Unit::J,
+                        GasolineHeating,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite5",
+                        _,
+                        "Gasoline",
+                        "Heating",
+                        "General");
+    SetupOutputVariable(*state,
+                        "Heating Propane Energy",
+                        OutputProcessor::Unit::J,
+                        PropaneHeating,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite6",
+                        _,
+                        "Propane",
+                        "Heating",
+                        "General");
     state->dataGlobal->DoWeathSim = true;
     state->dataGlobal->TimeStepZone = 1.0;
     state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;

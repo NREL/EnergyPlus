@@ -2138,15 +2138,41 @@ namespace CondenserLoopTowers {
     {
         // Set up output variables CurrentModuleObject='CoolingTower:SingleSpeed'
         if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd) {
-            SetupOutputVariable(
-                state, "Cooling Tower Inlet Temperature", OutputProcessor::Unit::C, this->InletWaterTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-            SetupOutputVariable(
-                state, "Cooling Tower Outlet Temperature", OutputProcessor::Unit::C, this->OutletWaterTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-            SetupOutputVariable(
-                state, "Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, this->WaterMassFlowRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-            SetupOutputVariable(state, "Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, this->Qactual, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-            SetupOutputVariable(
-                state, "Cooling Tower Fan Electricity Rate", OutputProcessor::Unit::W, this->FanPower, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Inlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->InletWaterTemp,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Outlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->OutletWaterTemp,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                this->WaterMassFlowRate,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                this->Qactual,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Fan Electricity Rate",
+                                OutputProcessor::Unit::W,
+                                this->FanPower,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
@@ -2160,12 +2186,27 @@ namespace CondenserLoopTowers {
                                 this->EndUseSubcategory,
                                 "Plant");
             // Added for fluid bypass
-            SetupOutputVariable(
-                state, "Cooling Tower Bypass Fraction", OutputProcessor::Unit::None, this->BypassFraction, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-            SetupOutputVariable(
-                state, "Cooling Tower Operating Cells Count", OutputProcessor::Unit::None, this->NumCellOn, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-            SetupOutputVariable(
-                state, "Cooling Tower Fan Cycling Ratio", OutputProcessor::Unit::None, this->FanCyclingRatio, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Bypass Fraction",
+                                OutputProcessor::Unit::None,
+                                this->BypassFraction,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Operating Cells Count",
+                                OutputProcessor::Unit::None,
+                                this->NumCellOn,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Fan Cycling Ratio",
+                                OutputProcessor::Unit::None,
+                                this->FanCyclingRatio,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
                 SetupOutputVariable(state,
                                     "Cooling Tower Basin Heater Electricity Rate",
@@ -2191,15 +2232,41 @@ namespace CondenserLoopTowers {
 
         // CurrentModuleObject='CoolingTower:TwoSpeed'
         if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_TwoSpd) {
-            SetupOutputVariable(
-                state, "Cooling Tower Inlet Temperature", OutputProcessor::Unit::C, this->InletWaterTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-            SetupOutputVariable(
-                state, "Cooling Tower Outlet Temperature", OutputProcessor::Unit::C, this->OutletWaterTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-            SetupOutputVariable(
-                state, "Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, this->WaterMassFlowRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-            SetupOutputVariable(state, "Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, this->Qactual, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-            SetupOutputVariable(
-                state, "Cooling Tower Fan Electricity Rate", OutputProcessor::Unit::W, this->FanPower, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Inlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->InletWaterTemp,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Outlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->OutletWaterTemp,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                this->WaterMassFlowRate,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                this->Qactual,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Fan Electricity Rate",
+                                OutputProcessor::Unit::W,
+                                this->FanPower,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
@@ -2212,12 +2279,27 @@ namespace CondenserLoopTowers {
                                 "HeatRejection",
                                 this->EndUseSubcategory,
                                 "Plant");
-            SetupOutputVariable(
-                state, "Cooling Tower Fan Cycling Ratio", OutputProcessor::Unit::None, this->FanCyclingRatio, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-            SetupOutputVariable(
-                state, "Cooling Tower Fan Speed Level", OutputProcessor::Unit::None, this->SpeedSelected, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-            SetupOutputVariable(
-                state, "Cooling Tower Operating Cells Count", OutputProcessor::Unit::None, this->NumCellOn, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Fan Cycling Ratio",
+                                OutputProcessor::Unit::None,
+                                this->FanCyclingRatio,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Fan Speed Level",
+                                OutputProcessor::Unit::None,
+                                this->SpeedSelected,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Operating Cells Count",
+                                OutputProcessor::Unit::None,
+                                this->NumCellOn,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
                 SetupOutputVariable(state,
                                     "Cooling Tower Basin Heater Electricity Rate",
@@ -2243,15 +2325,41 @@ namespace CondenserLoopTowers {
 
         // CurrentModuleObject='CoolingTower:VariableSpeed'
         if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_VarSpd) {
-            SetupOutputVariable(
-                state, "Cooling Tower Inlet Temperature", OutputProcessor::Unit::C, this->InletWaterTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-            SetupOutputVariable(
-                state, "Cooling Tower Outlet Temperature", OutputProcessor::Unit::C, this->OutletWaterTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-            SetupOutputVariable(
-                state, "Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, this->WaterMassFlowRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-            SetupOutputVariable(state, "Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, this->Qactual, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-            SetupOutputVariable(
-                state, "Cooling Tower Fan Electricity Rate", OutputProcessor::Unit::W, this->FanPower, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Inlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->InletWaterTemp,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Outlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->OutletWaterTemp,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                this->WaterMassFlowRate,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                this->Qactual,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Fan Electricity Rate",
+                                OutputProcessor::Unit::W,
+                                this->FanPower,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
@@ -2264,12 +2372,27 @@ namespace CondenserLoopTowers {
                                 "HeatRejection",
                                 this->EndUseSubcategory,
                                 "Plant");
-            SetupOutputVariable(
-                state, "Cooling Tower Air Flow Rate Ratio", OutputProcessor::Unit::None, this->AirFlowRatio, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-            SetupOutputVariable(
-                state, "Cooling Tower Fan Part Load Ratio", OutputProcessor::Unit::None, this->FanCyclingRatio, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-            SetupOutputVariable(
-                state, "Cooling Tower Operating Cells Count", OutputProcessor::Unit::None, this->NumCellOn, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Air Flow Rate Ratio",
+                                OutputProcessor::Unit::None,
+                                this->AirFlowRatio,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Fan Part Load Ratio",
+                                OutputProcessor::Unit::None,
+                                this->FanCyclingRatio,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Operating Cells Count",
+                                OutputProcessor::Unit::None,
+                                this->NumCellOn,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
                 SetupOutputVariable(state,
                                     "Cooling Tower Basin Heater Electricity Rate",
@@ -2295,15 +2418,41 @@ namespace CondenserLoopTowers {
 
         // CurrentModuleObject='CoolingTower:VariableSpeed:Merkel'
         if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_VarSpdMerkel) {
-            SetupOutputVariable(
-                state, "Cooling Tower Inlet Temperature", OutputProcessor::Unit::C, this->InletWaterTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-            SetupOutputVariable(
-                state, "Cooling Tower Outlet Temperature", OutputProcessor::Unit::C, this->OutletWaterTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-            SetupOutputVariable(
-                state, "Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, this->WaterMassFlowRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-            SetupOutputVariable(state, "Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, this->Qactual, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-            SetupOutputVariable(
-                state, "Cooling Tower Fan Electricity Rate", OutputProcessor::Unit::W, this->FanPower, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Inlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->InletWaterTemp,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Outlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->OutletWaterTemp,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                this->WaterMassFlowRate,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                this->Qactual,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Fan Electricity Rate",
+                                OutputProcessor::Unit::W,
+                                this->FanPower,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
@@ -2316,11 +2465,21 @@ namespace CondenserLoopTowers {
                                 "HeatRejection",
                                 this->EndUseSubcategory,
                                 "Plant");
-            SetupOutputVariable(
-                state, "Cooling Tower Fan Speed Ratio", OutputProcessor::Unit::None, this->AirFlowRatio, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Fan Speed Ratio",
+                                OutputProcessor::Unit::None,
+                                this->AirFlowRatio,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
 
-            SetupOutputVariable(
-                state, "Cooling Tower Operating Cells Count", OutputProcessor::Unit::None, this->NumCellOn, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Operating Cells Count",
+                                OutputProcessor::Unit::None,
+                                this->NumCellOn,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
                 SetupOutputVariable(state,
                                     "Cooling Tower Basin Heater Electricity Rate",
@@ -2352,7 +2511,13 @@ namespace CondenserLoopTowers {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 this->Name);
-            SetupOutputVariable(state, "Cooling Tower Make Up Water Volume", OutputProcessor::Unit::m3, this->MakeUpVol, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Make Up Water Volume",
+                                OutputProcessor::Unit::m3,
+                                this->MakeUpVol,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Storage Tank Water Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
@@ -2439,14 +2604,41 @@ namespace CondenserLoopTowers {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->Name);
-        SetupOutputVariable(
-            state, "Cooling Tower Water Evaporation Volume", OutputProcessor::Unit::m3, this->EvaporationVol, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
-        SetupOutputVariable(
-            state, "Cooling Tower Water Drift Volume Flow Rate", OutputProcessor::Unit::m3_s, this->DriftVdot, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-        SetupOutputVariable(state, "Cooling Tower Water Drift Volume", OutputProcessor::Unit::m3, this->DriftVol, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
-        SetupOutputVariable(
-            state, "Cooling Tower Water Blowdown Volume Flow Rate", OutputProcessor::Unit::m3_s, this->BlowdownVdot, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-        SetupOutputVariable(state, "Cooling Tower Water Blowdown Volume", OutputProcessor::Unit::m3, this->BlowdownVol, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
+        SetupOutputVariable(state,
+                            "Cooling Tower Water Evaporation Volume",
+                            OutputProcessor::Unit::m3,
+                            this->EvaporationVol,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Cooling Tower Water Drift Volume Flow Rate",
+                            OutputProcessor::Unit::m3_s,
+                            this->DriftVdot,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Cooling Tower Water Drift Volume",
+                            OutputProcessor::Unit::m3,
+                            this->DriftVol,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Cooling Tower Water Blowdown Volume Flow Rate",
+                            OutputProcessor::Unit::m3_s,
+                            this->BlowdownVdot,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Cooling Tower Water Blowdown Volume",
+                            OutputProcessor::Unit::m3,
+                            this->BlowdownVol,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->Name);
     }
 
     void CoolingTower::SizeTower(EnergyPlusData &state)

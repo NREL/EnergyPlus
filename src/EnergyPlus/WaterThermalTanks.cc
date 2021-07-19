@@ -4878,16 +4878,36 @@ void WaterThermalTankData::setupChilledWaterTankOutputVars(EnergyPlusData &state
 {
 
     // CurrentModuleObject='ThermalStorage:ChilledWater:Mixed/ThermalStorage:ChilledWater:Stratified'
-    SetupOutputVariable(
-        state, "Chilled Water Thermal Storage Tank Temperature", OutputProcessor::Unit::C, this->TankTempAvg, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Chilled Water Thermal Storage Tank Temperature",
+                        OutputProcessor::Unit::C,
+                        this->TankTempAvg,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
-    SetupOutputVariable(
-        state, "Chilled Water Thermal Storage Final Tank Temperature", OutputProcessor::Unit::C, this->TankTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Chilled Water Thermal Storage Final Tank Temperature",
+                        OutputProcessor::Unit::C,
+                        this->TankTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
-    SetupOutputVariable(
-        state, "Chilled Water Thermal Storage Tank Heat Gain Rate", OutputProcessor::Unit::W, this->LossRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-    SetupOutputVariable(
-        state, "Chilled Water Thermal Storage Tank Heat Gain Energy", OutputProcessor::Unit::J, this->LossEnergy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
+    SetupOutputVariable(state,
+                        "Chilled Water Thermal Storage Tank Heat Gain Rate",
+                        OutputProcessor::Unit::W,
+                        this->LossRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Chilled Water Thermal Storage Tank Heat Gain Energy",
+                        OutputProcessor::Unit::J,
+                        this->LossEnergy,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->Name);
 
     SetupOutputVariable(state,
                         "Chilled Water Thermal Storage Use Side Mass Flow Rate",
@@ -4913,10 +4933,20 @@ void WaterThermalTankData::setupChilledWaterTankOutputVars(EnergyPlusData &state
                         OutputProcessor::SOVStoreType::Average,
                         this->Name);
 
-    SetupOutputVariable(
-        state, "Chilled Water Thermal Storage Use Side Heat Transfer Rate", OutputProcessor::Unit::W, this->UseRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-    SetupOutputVariable(
-        state, "Chilled Water Thermal Storage Use Side Heat Transfer Energy", OutputProcessor::Unit::J, this->UseEnergy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
+    SetupOutputVariable(state,
+                        "Chilled Water Thermal Storage Use Side Heat Transfer Rate",
+                        OutputProcessor::Unit::W,
+                        this->UseRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Chilled Water Thermal Storage Use Side Heat Transfer Energy",
+                        OutputProcessor::Unit::J,
+                        this->UseEnergy,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->Name);
 
     SetupOutputVariable(state,
                         "Chilled Water Thermal Storage Source Side Mass Flow Rate",
@@ -5042,36 +5072,107 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
 
     // Setup report variables for WaterHeater:Mixed
     // CurrentModuleObject='WaterHeater:Mixed'
-    SetupOutputVariable(state, "Water Heater Tank Temperature", OutputProcessor::Unit::C, this->TankTempAvg, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Tank Temperature",
+                        OutputProcessor::Unit::C,
+                        this->TankTempAvg,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
-    SetupOutputVariable(state, "Water Heater Final Tank Temperature", OutputProcessor::Unit::C, this->TankTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Final Tank Temperature",
+                        OutputProcessor::Unit::C,
+                        this->TankTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
-    SetupOutputVariable(state, "Water Heater Heat Loss Rate", OutputProcessor::Unit::W, this->LossRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-    SetupOutputVariable(state, "Water Heater Heat Loss Energy", OutputProcessor::Unit::J, this->LossEnergy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Heat Loss Rate",
+                        OutputProcessor::Unit::W,
+                        this->LossRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Heat Loss Energy",
+                        OutputProcessor::Unit::J,
+                        this->LossEnergy,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->Name);
 
-    SetupOutputVariable(
-        state, "Water Heater Use Side Mass Flow Rate", OutputProcessor::Unit::kg_s, this->UseMassFlowRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Use Side Mass Flow Rate",
+                        OutputProcessor::Unit::kg_s,
+                        this->UseMassFlowRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
-    SetupOutputVariable(
-        state, "Water Heater Use Side Inlet Temperature", OutputProcessor::Unit::C, this->UseInletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Use Side Inlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->UseInletTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
-    SetupOutputVariable(
-        state, "Water Heater Use Side Outlet Temperature", OutputProcessor::Unit::C, this->UseOutletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Use Side Outlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->UseOutletTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
-    SetupOutputVariable(state, "Water Heater Use Side Heat Transfer Rate", OutputProcessor::Unit::W, this->UseRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-    SetupOutputVariable(state, "Water Heater Use Side Heat Transfer Energy", OutputProcessor::Unit::J, this->UseEnergy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Use Side Heat Transfer Rate",
+                        OutputProcessor::Unit::W,
+                        this->UseRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Use Side Heat Transfer Energy",
+                        OutputProcessor::Unit::J,
+                        this->UseEnergy,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->Name);
 
-    SetupOutputVariable(
-        state, "Water Heater Source Side Mass Flow Rate", OutputProcessor::Unit::kg_s, this->SourceMassFlowRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Source Side Mass Flow Rate",
+                        OutputProcessor::Unit::kg_s,
+                        this->SourceMassFlowRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
-    SetupOutputVariable(
-        state, "Water Heater Source Side Inlet Temperature", OutputProcessor::Unit::C, this->SourceInletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Source Side Inlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->SourceInletTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
-    SetupOutputVariable(
-        state, "Water Heater Source Side Outlet Temperature", OutputProcessor::Unit::C, this->SourceOutletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Source Side Outlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->SourceOutletTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
-    SetupOutputVariable(
-        state, "Water Heater Source Side Heat Transfer Rate", OutputProcessor::Unit::W, this->SourceRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Source Side Heat Transfer Rate",
+                        OutputProcessor::Unit::W,
+                        this->SourceRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
     SetupOutputVariable(state,
                         "Water Heater Source Side Heat Transfer Energy",
                         OutputProcessor::Unit::J,
@@ -5115,32 +5216,110 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name);
 
-    SetupOutputVariable(
-        state, "Water Heater Total Demand Heat Transfer Rate", OutputProcessor::Unit::W, this->TotalDemandRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-    SetupOutputVariable(
-        state, "Water Heater Total Demand Heat Transfer Energy", OutputProcessor::Unit::J, this->TotalDemandEnergy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Total Demand Heat Transfer Rate",
+                        OutputProcessor::Unit::W,
+                        this->TotalDemandRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Total Demand Heat Transfer Energy",
+                        OutputProcessor::Unit::J,
+                        this->TotalDemandEnergy,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->Name);
 
-    SetupOutputVariable(state, "Water Heater Heating Rate", OutputProcessor::Unit::W, this->HeaterRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-    SetupOutputVariable(state, "Water Heater Heating Energy", OutputProcessor::Unit::J, this->HeaterEnergy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Heating Rate",
+                        OutputProcessor::Unit::W,
+                        this->HeaterRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Heating Energy",
+                        OutputProcessor::Unit::J,
+                        this->HeaterEnergy,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->Name);
 
-    SetupOutputVariable(
-        state, "Water Heater Unmet Demand Heat Transfer Rate", OutputProcessor::Unit::W, this->UnmetRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-    SetupOutputVariable(
-        state, "Water Heater Unmet Demand Heat Transfer Energy", OutputProcessor::Unit::J, this->UnmetEnergy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Unmet Demand Heat Transfer Rate",
+                        OutputProcessor::Unit::W,
+                        this->UnmetRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Unmet Demand Heat Transfer Energy",
+                        OutputProcessor::Unit::J,
+                        this->UnmetEnergy,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->Name);
 
-    SetupOutputVariable(state, "Water Heater Venting Heat Transfer Rate", OutputProcessor::Unit::W, this->VentRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-    SetupOutputVariable(state, "Water Heater Venting Heat Transfer Energy", OutputProcessor::Unit::J, this->VentEnergy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Venting Heat Transfer Rate",
+                        OutputProcessor::Unit::W,
+                        this->VentRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Venting Heat Transfer Energy",
+                        OutputProcessor::Unit::J,
+                        this->VentEnergy,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->Name);
 
-    SetupOutputVariable(
-        state, "Water Heater Net Heat Transfer Rate", OutputProcessor::Unit::W, this->NetHeatTransferRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-    SetupOutputVariable(
-        state, "Water Heater Net Heat Transfer Energy", OutputProcessor::Unit::J, this->NetHeatTransferEnergy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Net Heat Transfer Rate",
+                        OutputProcessor::Unit::W,
+                        this->NetHeatTransferRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Net Heat Transfer Energy",
+                        OutputProcessor::Unit::J,
+                        this->NetHeatTransferEnergy,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->Name);
 
-    SetupOutputVariable(state, "Water Heater Cycle On Count", OutputProcessor::Unit::None, this->CycleOnCount, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
-    SetupOutputVariable(state, "Water Heater Runtime Fraction", OutputProcessor::Unit::None, this->RuntimeFraction, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-    SetupOutputVariable(state, "Water Heater Part Load Ratio", OutputProcessor::Unit::None, this->PartLoadRatio, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Cycle On Count",
+                        OutputProcessor::Unit::None,
+                        this->CycleOnCount,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Runtime Fraction",
+                        OutputProcessor::Unit::None,
+                        this->RuntimeFraction,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Part Load Ratio",
+                        OutputProcessor::Unit::None,
+                        this->PartLoadRatio,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
-    SetupOutputVariable(state, "Water Heater " + this->FuelType + " Rate", OutputProcessor::Unit::W, this->FuelRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater " + this->FuelType + " Rate",
+                        OutputProcessor::Unit::W,
+                        this->FuelRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
     SetupOutputVariable(state,
                         "Water Heater " + this->FuelType + " Energy",
                         OutputProcessor::Unit::J,
@@ -5194,8 +5373,13 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                         this->EndUseSubcategoryName,
                         "Plant");
 
-    SetupOutputVariable(
-        state, "Water Heater Water Volume Flow Rate", OutputProcessor::Unit::m3_s, this->VolFlowRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Water Volume Flow Rate",
+                        OutputProcessor::Unit::m3_s,
+                        this->VolFlowRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
     SetupOutputVariable(state,
                         "Water Heater Water Volume",
                         OutputProcessor::Unit::m3,
@@ -5224,8 +5408,13 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
     if (this->HeatPumpNum > 0) {
         // CurrentModuleObject='WaterHeater:HeatPump:PumpedCondenser'
         HeatPumpWaterHeaterData &HPWH = state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum);
-        SetupOutputVariable(
-            state, "Water Heater Compressor Part Load Ratio", OutputProcessor::Unit::None, HPWH.HeatingPLR, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, HPWH.Name);
+        SetupOutputVariable(state,
+                            "Water Heater Compressor Part Load Ratio",
+                            OutputProcessor::Unit::None,
+                            HPWH.HeatingPLR,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            HPWH.Name);
         SetupOutputVariable(state,
                             "Water Heater Off Cycle Ancillary Electricity Rate",
                             OutputProcessor::Unit::W,
@@ -5264,8 +5453,13 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                             "DHW",
                             "Water Heater Parasitic",
                             "Plant");
-        SetupOutputVariable(
-            state, "Water Heater Heat Pump Control Tank Temperature", OutputProcessor::Unit::C, HPWH.ControlTempAvg, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, HPWH.Name);
+        SetupOutputVariable(state,
+                            "Water Heater Heat Pump Control Tank Temperature",
+                            OutputProcessor::Unit::C,
+                            HPWH.ControlTempAvg,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            HPWH.Name);
         SetupOutputVariable(state,
                             "Water Heater Heat Pump Control Tank Final Temperature",
                             OutputProcessor::Unit::C,
@@ -5373,25 +5567,65 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
     // CurrentModuleObject='WaterHeater:Stratified'
     if (this->TypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
 
-        SetupOutputVariable(
-            state, "Water Heater Heater 1 Heating Rate", OutputProcessor::Unit::W, this->HeaterRate1, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-        SetupOutputVariable(
-            state, "Water Heater Heater 2 Heating Rate", OutputProcessor::Unit::W, this->HeaterRate2, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Water Heater Heater 1 Heating Rate",
+                            OutputProcessor::Unit::W,
+                            this->HeaterRate1,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Water Heater Heater 2 Heating Rate",
+                            OutputProcessor::Unit::W,
+                            this->HeaterRate2,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Water Heater Heater 1 Heating Energy", OutputProcessor::Unit::J, this->HeaterEnergy1, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
-        SetupOutputVariable(
-            state, "Water Heater Heater 2 Heating Energy", OutputProcessor::Unit::J, this->HeaterEnergy2, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
+        SetupOutputVariable(state,
+                            "Water Heater Heater 1 Heating Energy",
+                            OutputProcessor::Unit::J,
+                            this->HeaterEnergy1,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Water Heater Heater 2 Heating Energy",
+                            OutputProcessor::Unit::J,
+                            this->HeaterEnergy2,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Water Heater Heater 1 Cycle On Count", OutputProcessor::Unit::None, this->CycleOnCount1, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
-        SetupOutputVariable(
-            state, "Water Heater Heater 2 Cycle On Count", OutputProcessor::Unit::None, this->CycleOnCount2, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
+        SetupOutputVariable(state,
+                            "Water Heater Heater 1 Cycle On Count",
+                            OutputProcessor::Unit::None,
+                            this->CycleOnCount1,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Water Heater Heater 2 Cycle On Count",
+                            OutputProcessor::Unit::None,
+                            this->CycleOnCount2,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Water Heater Heater 1 Runtime Fraction", OutputProcessor::Unit::None, this->RuntimeFraction1, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-        SetupOutputVariable(
-            state, "Water Heater Heater 2 Runtime Fraction", OutputProcessor::Unit::None, this->RuntimeFraction2, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Water Heater Heater 1 Runtime Fraction",
+                            OutputProcessor::Unit::None,
+                            this->RuntimeFraction1,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Water Heater Heater 2 Runtime Fraction",
+                            OutputProcessor::Unit::None,
+                            this->RuntimeFraction2,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
         for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
             SetupOutputVariable(state,

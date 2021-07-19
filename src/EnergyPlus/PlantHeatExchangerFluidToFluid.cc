@@ -531,8 +531,13 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
 
 void HeatExchangerStruct::setupOutputVars(EnergyPlusData &state)
 {
-    SetupOutputVariable(
-        state, "Fluid Heat Exchanger Heat Transfer Rate", OutputProcessor::Unit::W, this->HeatTransferRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Fluid Heat Exchanger Heat Transfer Rate",
+                        OutputProcessor::Unit::W,
+                        this->HeatTransferRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
     SetupOutputVariable(state,
                         "Fluid Heat Exchanger Heat Transfer Energy",
@@ -595,11 +600,21 @@ void HeatExchangerStruct::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Average,
                         this->Name);
 
-    SetupOutputVariable(
-        state, "Fluid Heat Exchanger Operation Status", OutputProcessor::Unit::None, this->OperationStatus, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Fluid Heat Exchanger Operation Status",
+                        OutputProcessor::Unit::None,
+                        this->OperationStatus,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
-    SetupOutputVariable(
-        state, "Fluid Heat Exchanger Effectiveness", OutputProcessor::Unit::None, this->Effectiveness, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Fluid Heat Exchanger Effectiveness",
+                        OutputProcessor::Unit::None,
+                        this->Effectiveness,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 }
 
 void HeatExchangerStruct::initialize(EnergyPlusData &state)

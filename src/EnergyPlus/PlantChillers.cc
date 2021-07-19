@@ -611,7 +611,13 @@ namespace PlantChillers {
 
     void ElectricChillerSpecs::setupOutputVariables(EnergyPlusData &state)
     {
-        SetupOutputVariable(state, "Chiller Electricity Rate", OutputProcessor::Unit::W, this->Power, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Electricity Rate",
+                            OutputProcessor::Unit::W,
+                            this->Power,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
         SetupOutputVariable(state,
                             "Chiller Electricity Energy",
                             OutputProcessor::Unit::J,
@@ -625,7 +631,13 @@ namespace PlantChillers {
                             this->EndUseSubcategory,
                             "Plant");
 
-        SetupOutputVariable(state, "Chiller Evaporator Cooling Rate", OutputProcessor::Unit::W, this->QEvaporator, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Evaporator Cooling Rate",
+                            OutputProcessor::Unit::W,
+                            this->QEvaporator,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
         SetupOutputVariable(state,
                             "Chiller Evaporator Cooling Energy",
                             OutputProcessor::Unit::J,
@@ -638,14 +650,34 @@ namespace PlantChillers {
                             "CHILLERS",
                             _,
                             "Plant");
-        SetupOutputVariable(
-            state, "Chiller Evaporator Inlet Temperature", OutputProcessor::Unit::C, this->EvapInletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-        SetupOutputVariable(
-            state, "Chiller Evaporator Outlet Temperature", OutputProcessor::Unit::C, this->EvapOutletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-        SetupOutputVariable(
-            state, "Chiller Evaporator Mass Flow Rate", OutputProcessor::Unit::kg_s, this->EvapMassFlowRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-        SetupOutputVariable(
-            state, "Chiller Condenser Heat Transfer Rate", OutputProcessor::Unit::W, this->QCondenser, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Evaporator Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->EvapInletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Evaporator Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->EvapOutletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Evaporator Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->EvapMassFlowRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Condenser Heat Transfer Rate",
+                            OutputProcessor::Unit::W,
+                            this->QCondenser,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
         SetupOutputVariable(state,
                             "Chiller Condenser Heat Transfer Energy",
                             OutputProcessor::Unit::J,
@@ -658,16 +690,37 @@ namespace PlantChillers {
                             "HEATREJECTION",
                             _,
                             "Plant");
-        SetupOutputVariable(state, "Chiller COP", OutputProcessor::Unit::W_W, this->ActualCOP, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-        SetupOutputVariable(
-            state, "Chiller Condenser Inlet Temperature", OutputProcessor::Unit::C, this->CondInletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Chiller COP",
+                            OutputProcessor::Unit::W_W,
+                            this->ActualCOP,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Condenser Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->CondInletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
         // Condenser mass flow and outlet temp are valid for water cooled
         if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
-            SetupOutputVariable(
-                state, "Chiller Condenser Outlet Temperature", OutputProcessor::Unit::C, this->CondOutletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-            SetupOutputVariable(
-                state, "Chiller Condenser Mass Flow Rate", OutputProcessor::Unit::kg_s, this->CondMassFlowRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Chiller Condenser Outlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->CondOutletTemp,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
+            SetupOutputVariable(state,
+                                "Chiller Condenser Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                this->CondMassFlowRate,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
         } else if (this->CondenserType == DataPlant::CondenserType::AirCooled) {
         } else if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
@@ -695,8 +748,13 @@ namespace PlantChillers {
 
         // If heat recovery is active then setup report variables
         if (this->HeatRecActive) {
-            SetupOutputVariable(
-                state, "Chiller Total Recovered Heat Rate", OutputProcessor::Unit::W, this->QHeatRecovery, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Chiller Total Recovered Heat Rate",
+                                OutputProcessor::Unit::W,
+                                this->QHeatRecovery,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
             SetupOutputVariable(state,
                                 "Chiller Total Recovered Heat Energy",
                                 OutputProcessor::Unit::J,
@@ -709,8 +767,13 @@ namespace PlantChillers {
                                 "HEATRECOVERY",
                                 _,
                                 "Plant");
-            SetupOutputVariable(
-                state, "Chiller Heat Recovery Inlet Temperature", OutputProcessor::Unit::C, this->HeatRecInletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Chiller Heat Recovery Inlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->HeatRecInletTemp,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
             SetupOutputVariable(state,
                                 "Chiller Heat Recovery Outlet Temperature",
                                 OutputProcessor::Unit::C,
@@ -718,8 +781,13 @@ namespace PlantChillers {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 this->Name);
-            SetupOutputVariable(
-                state, "Chiller Heat Recovery Mass Flow Rate", OutputProcessor::Unit::kg_s, this->HeatRecMdot, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Chiller Heat Recovery Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                this->HeatRecMdot,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
             SetupOutputVariable(state,
                                 "Chiller Effective Heat Rejection Temperature",
                                 OutputProcessor::Unit::C,
@@ -2682,9 +2750,27 @@ namespace PlantChillers {
 
     void EngineDrivenChillerSpecs::setupOutputVariables(EnergyPlusData &state)
     {
-        SetupOutputVariable(state, "Chiller Drive Shaft Power", OutputProcessor::Unit::W, this->Power, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-        SetupOutputVariable(state, "Chiller Drive Shaft Energy", OutputProcessor::Unit::J, this->Energy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
-        SetupOutputVariable(state, "Chiller Evaporator Cooling Rate", OutputProcessor::Unit::W, this->QEvaporator, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Drive Shaft Power",
+                            OutputProcessor::Unit::W,
+                            this->Power,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Drive Shaft Energy",
+                            OutputProcessor::Unit::J,
+                            this->Energy,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Evaporator Cooling Rate",
+                            OutputProcessor::Unit::W,
+                            this->QEvaporator,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
         SetupOutputVariable(state,
                             "Chiller Evaporator Cooling Energy",
                             OutputProcessor::Unit::J,
@@ -2697,14 +2783,34 @@ namespace PlantChillers {
                             "CHILLERS",
                             _,
                             "Plant");
-        SetupOutputVariable(
-            state, "Chiller Evaporator Inlet Temperature", OutputProcessor::Unit::C, this->EvapInletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-        SetupOutputVariable(
-            state, "Chiller Evaporator Outlet Temperature", OutputProcessor::Unit::C, this->EvapOutletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-        SetupOutputVariable(
-            state, "Chiller Evaporator Mass Flow Rate", OutputProcessor::Unit::kg_s, this->EvapMassFlowRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-        SetupOutputVariable(
-            state, "Chiller Condenser Heat Transfer Rate", OutputProcessor::Unit::W, this->QCondenser, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Evaporator Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->EvapInletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Evaporator Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->EvapOutletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Evaporator Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->EvapMassFlowRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Condenser Heat Transfer Rate",
+                            OutputProcessor::Unit::W,
+                            this->QCondenser,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
         SetupOutputVariable(state,
                             "Chiller Condenser Heat Transfer Energy",
                             OutputProcessor::Unit::J,
@@ -2718,15 +2824,30 @@ namespace PlantChillers {
                             _,
                             "Plant");
 
-        SetupOutputVariable(
-            state, "Chiller Condenser Inlet Temperature", OutputProcessor::Unit::C, this->CondInletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Condenser Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->CondInletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
         // Condenser mass flow and outlet temp are valid for Water Cooled
         if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
-            SetupOutputVariable(
-                state, "Chiller Condenser Outlet Temperature", OutputProcessor::Unit::C, this->CondOutletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-            SetupOutputVariable(
-                state, "Chiller Condenser Mass Flow Rate", OutputProcessor::Unit::kg_s, this->CondMassFlowRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Chiller Condenser Outlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->CondOutletTemp,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
+            SetupOutputVariable(state,
+                                "Chiller Condenser Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                this->CondMassFlowRate,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
         } else if (this->CondenserType == DataPlant::CondenserType::AirCooled) {
         } else if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
@@ -2752,8 +2873,13 @@ namespace PlantChillers {
             }
         }
 
-        SetupOutputVariable(
-            state, "Chiller " + this->FuelType + " Rate", OutputProcessor::Unit::W, this->FuelEnergyUseRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Chiller " + this->FuelType + " Rate",
+                            OutputProcessor::Unit::W,
+                            this->FuelEnergyUseRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
         SetupOutputVariable(state,
                             "Chiller " + this->FuelType + " Energy",
                             OutputProcessor::Unit::J,
@@ -2767,17 +2893,44 @@ namespace PlantChillers {
                             _,
                             "Plant");
 
-        SetupOutputVariable(state, "Chiller COP", OutputProcessor::Unit::W_W, this->FuelCOP, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-        SetupOutputVariable(
-            state, "Chiller " + this->FuelType + " Mass Flow Rate", OutputProcessor::Unit::kg_s, this->FuelMdot, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-        SetupOutputVariable(state, "Chiller Exhaust Temperature", OutputProcessor::Unit::C, this->ExhaustStackTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-        SetupOutputVariable(
-            state, "Chiller Heat Recovery Mass Flow Rate", OutputProcessor::Unit::kg_s, this->HeatRecMdot, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Chiller COP",
+                            OutputProcessor::Unit::W_W,
+                            this->FuelCOP,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Chiller " + this->FuelType + " Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->FuelMdot,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Exhaust Temperature",
+                            OutputProcessor::Unit::C,
+                            this->ExhaustStackTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Heat Recovery Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->HeatRecMdot,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
         if (this->HeatRecActive) {
             // need to only report if heat recovery active
-            SetupOutputVariable(
-                state, "Chiller Jacket Recovered Heat Rate", OutputProcessor::Unit::W, this->QJacketRecovered, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Chiller Jacket Recovered Heat Rate",
+                                OutputProcessor::Unit::W,
+                                this->QJacketRecovered,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
             SetupOutputVariable(state,
                                 "Chiller Jacket Recovered Heat Energy",
                                 OutputProcessor::Unit::J,
@@ -2791,8 +2944,13 @@ namespace PlantChillers {
                                 _,
                                 "Plant");
 
-            SetupOutputVariable(
-                state, "Chiller Lube Recovered Heat Rate", OutputProcessor::Unit::W, this->QLubeOilRecovered, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Chiller Lube Recovered Heat Rate",
+                                OutputProcessor::Unit::W,
+                                this->QLubeOilRecovered,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
             SetupOutputVariable(state,
                                 "Chiller Lube Recovered Heat Energy",
                                 OutputProcessor::Unit::J,
@@ -2806,8 +2964,13 @@ namespace PlantChillers {
                                 _,
                                 "Plant");
 
-            SetupOutputVariable(
-                state, "Chiller Exhaust Recovered Heat Rate", OutputProcessor::Unit::W, this->QExhaustRecovered, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Chiller Exhaust Recovered Heat Rate",
+                                OutputProcessor::Unit::W,
+                                this->QExhaustRecovered,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
             SetupOutputVariable(state,
                                 "Chiller Exhaust Recovered Heat Energy",
                                 OutputProcessor::Unit::J,
@@ -2821,12 +2984,27 @@ namespace PlantChillers {
                                 _,
                                 "Plant");
 
-            SetupOutputVariable(
-                state, "Chiller Total Recovered Heat Rate", OutputProcessor::Unit::W, this->QTotalHeatRecovered, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-            SetupOutputVariable(
-                state, "Chiller Total Recovered Heat Energy", OutputProcessor::Unit::J, this->TotalHeatEnergyRec, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
-            SetupOutputVariable(
-                state, "Chiller Heat Recovery Inlet Temperature", OutputProcessor::Unit::C, this->HeatRecInletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Chiller Total Recovered Heat Rate",
+                                OutputProcessor::Unit::W,
+                                this->QTotalHeatRecovered,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
+            SetupOutputVariable(state,
+                                "Chiller Total Recovered Heat Energy",
+                                OutputProcessor::Unit::J,
+                                this->TotalHeatEnergyRec,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                this->Name);
+            SetupOutputVariable(state,
+                                "Chiller Heat Recovery Inlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->HeatRecInletTemp,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
             SetupOutputVariable(state,
                                 "Chiller Heat Recovery Outlet Temperature",
                                 OutputProcessor::Unit::C,
@@ -4700,9 +4878,27 @@ namespace PlantChillers {
 
     void GTChillerSpecs::setupOutputVariables(EnergyPlusData &state)
     {
-        SetupOutputVariable(state, "Chiller Drive Shaft Power", OutputProcessor::Unit::W, this->Power, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-        SetupOutputVariable(state, "Chiller Drive Shaft Energy", OutputProcessor::Unit::J, this->Energy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
-        SetupOutputVariable(state, "Chiller Evaporator Cooling Rate", OutputProcessor::Unit::W, this->QEvaporator, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Drive Shaft Power",
+                            OutputProcessor::Unit::W,
+                            this->Power,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Drive Shaft Energy",
+                            OutputProcessor::Unit::J,
+                            this->Energy,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Evaporator Cooling Rate",
+                            OutputProcessor::Unit::W,
+                            this->QEvaporator,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
         SetupOutputVariable(state,
                             "Chiller Evaporator Cooling Energy",
                             OutputProcessor::Unit::J,
@@ -4715,14 +4911,34 @@ namespace PlantChillers {
                             "CHILLERS",
                             _,
                             "Plant");
-        SetupOutputVariable(
-            state, "Chiller Evaporator Inlet Temperature", OutputProcessor::Unit::C, this->EvapInletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-        SetupOutputVariable(
-            state, "Chiller Evaporator Outlet Temperature", OutputProcessor::Unit::C, this->EvapOutletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-        SetupOutputVariable(
-            state, "Chiller Evaporator Mass Flow Rate", OutputProcessor::Unit::kg_s, this->EvapMassFlowRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-        SetupOutputVariable(
-            state, "Chiller Condenser Heat Transfer Rate", OutputProcessor::Unit::W, this->QCondenser, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Evaporator Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->EvapInletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Evaporator Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->EvapOutletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Evaporator Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->EvapMassFlowRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Condenser Heat Transfer Rate",
+                            OutputProcessor::Unit::W,
+                            this->QCondenser,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
         SetupOutputVariable(state,
                             "Chiller Condenser Heat Transfer Energy",
                             OutputProcessor::Unit::J,
@@ -4736,15 +4952,30 @@ namespace PlantChillers {
                             _,
                             "Plant");
 
-        SetupOutputVariable(
-            state, "Chiller Condenser Inlet Temperature", OutputProcessor::Unit::C, this->CondInletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Condenser Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->CondInletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
         // Condenser mass flow and outlet temp are valid for water cooled
         if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
-            SetupOutputVariable(
-                state, "Chiller Condenser Outlet Temperature", OutputProcessor::Unit::C, this->CondOutletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-            SetupOutputVariable(
-                state, "Chiller Condenser Mass Flow Rate", OutputProcessor::Unit::kg_s, this->CondMassFlowRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Chiller Condenser Outlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->CondOutletTemp,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
+            SetupOutputVariable(state,
+                                "Chiller Condenser Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                this->CondMassFlowRate,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
         } else if (this->CondenserType == DataPlant::CondenserType::AirCooled) {
         } else if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
@@ -4770,8 +5001,13 @@ namespace PlantChillers {
             }
         }
 
-        SetupOutputVariable(
-            state, "Chiller Lube Recovered Heat Rate", OutputProcessor::Unit::W, this->HeatRecLubeRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Lube Recovered Heat Rate",
+                            OutputProcessor::Unit::W,
+                            this->HeatRecLubeRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
         SetupOutputVariable(state,
                             "Chiller Lube Recovered Heat Energy",
                             OutputProcessor::Unit::J,
@@ -4785,8 +5021,13 @@ namespace PlantChillers {
                             _,
                             "Plant");
 
-        SetupOutputVariable(
-            state, "Chiller " + this->FuelType + " Rate", OutputProcessor::Unit::W, this->FuelEnergyUsedRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Chiller " + this->FuelType + " Rate",
+                            OutputProcessor::Unit::W,
+                            this->FuelEnergyUsedRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
         SetupOutputVariable(state,
                             "Chiller " + this->FuelType + " Energy",
@@ -4808,15 +5049,48 @@ namespace PlantChillers {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->Name);
-        SetupOutputVariable(state, "Chiller " + this->FuelType + " Mass", OutputProcessor::Unit::kg, this->FuelMassUsed, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
-        SetupOutputVariable(state, "Chiller Exhaust Temperature", OutputProcessor::Unit::C, this->ExhaustStackTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-        SetupOutputVariable(
-            state, "Chiller Heat Recovery Inlet Temperature", OutputProcessor::Unit::C, this->HeatRecInletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-        SetupOutputVariable(
-            state, "Chiller Heat Recovery Outlet Temperature", OutputProcessor::Unit::C, this->HeatRecOutletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-        SetupOutputVariable(
-            state, "Chiller Heat Recovery Mass Flow Rate", OutputProcessor::Unit::kg_s, this->HeatRecMdot, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-        SetupOutputVariable(state, "Chiller COP", OutputProcessor::Unit::W_W, this->FuelCOP, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Chiller " + this->FuelType + " Mass",
+                            OutputProcessor::Unit::kg,
+                            this->FuelMassUsed,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Exhaust Temperature",
+                            OutputProcessor::Unit::C,
+                            this->ExhaustStackTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Heat Recovery Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->HeatRecInletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Heat Recovery Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->HeatRecOutletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Heat Recovery Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->HeatRecMdot,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Chiller COP",
+                            OutputProcessor::Unit::W_W,
+                            this->FuelCOP,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
             SetupEMSInternalVariable(state, "Chiller Nominal Capacity", this->Name, "[W]", this->NomCap);
@@ -6540,7 +6814,13 @@ namespace PlantChillers {
 
     void ConstCOPChillerSpecs::setupOutputVariables(EnergyPlusData &state)
     {
-        SetupOutputVariable(state, "Chiller Electricity Rate", OutputProcessor::Unit::W, this->Power, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Electricity Rate",
+                            OutputProcessor::Unit::W,
+                            this->Power,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
         SetupOutputVariable(state,
                             "Chiller Electricity Energy",
                             OutputProcessor::Unit::J,
@@ -6553,7 +6833,13 @@ namespace PlantChillers {
                             "Cooling",
                             _,
                             "Plant");
-        SetupOutputVariable(state, "Chiller Evaporator Cooling Rate", OutputProcessor::Unit::W, this->QEvaporator, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Evaporator Cooling Rate",
+                            OutputProcessor::Unit::W,
+                            this->QEvaporator,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
         SetupOutputVariable(state,
                             "Chiller Evaporator Cooling Energy",
                             OutputProcessor::Unit::J,
@@ -6566,15 +6852,41 @@ namespace PlantChillers {
                             "CHILLERS",
                             _,
                             "Plant");
-        SetupOutputVariable(
-            state, "Chiller Evaporator Inlet Temperature", OutputProcessor::Unit::C, this->EvapInletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-        SetupOutputVariable(
-            state, "Chiller Evaporator Outlet Temperature", OutputProcessor::Unit::C, this->EvapOutletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-        SetupOutputVariable(
-            state, "Chiller Evaporator Mass Flow Rate", OutputProcessor::Unit::kg_s, this->EvapMassFlowRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-        SetupOutputVariable(state, "Chiller COP", OutputProcessor::Unit::W_W, this->ActualCOP, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-        SetupOutputVariable(
-            state, "Chiller Condenser Heat Transfer Rate", OutputProcessor::Unit::W, this->QCondenser, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Evaporator Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->EvapInletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Evaporator Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->EvapOutletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Evaporator Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->EvapMassFlowRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Chiller COP",
+                            OutputProcessor::Unit::W_W,
+                            this->ActualCOP,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Condenser Heat Transfer Rate",
+                            OutputProcessor::Unit::W,
+                            this->QCondenser,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
         SetupOutputVariable(state,
                             "Chiller Condenser Heat Transfer Energy",
                             OutputProcessor::Unit::J,
@@ -6588,15 +6900,30 @@ namespace PlantChillers {
                             _,
                             "Plant");
 
-        SetupOutputVariable(
-            state, "Chiller Condenser Inlet Temperature", OutputProcessor::Unit::C, this->CondInletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Condenser Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->CondInletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
         // Condenser mass flow and outlet temp are valid for water cooled
         if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
-            SetupOutputVariable(
-                state, "Chiller Condenser Outlet Temperature", OutputProcessor::Unit::C, this->CondOutletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-            SetupOutputVariable(
-                state, "Chiller Condenser Mass Flow Rate", OutputProcessor::Unit::kg_s, this->CondMassFlowRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Chiller Condenser Outlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->CondOutletTemp,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
+            SetupOutputVariable(state,
+                                "Chiller Condenser Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                this->CondMassFlowRate,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
         } else if (this->CondenserType == DataPlant::CondenserType::AirCooled) {
         } else if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
             if (this->BasinHeaterPowerFTempDiff > 0.0) {

@@ -868,23 +868,53 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
                         _,
                         "Plant");
 
-    SetupOutputVariable(
-        state, "Chiller Heater System Cooling Rate", OutputProcessor::Unit::W, this->Report.CoolingRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Chiller Heater System Cooling Rate",
+                        OutputProcessor::Unit::W,
+                        this->Report.CoolingRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
-    SetupOutputVariable(
-        state, "Chiller Heater System Heating Rate", OutputProcessor::Unit::W, this->Report.HeatingRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Chiller Heater System Heating Rate",
+                        OutputProcessor::Unit::W,
+                        this->Report.HeatingRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
-    SetupOutputVariable(
-        state, "Chiller Heater System Source Heat Transfer Rate", OutputProcessor::Unit::W, this->Report.GLHERate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Chiller Heater System Source Heat Transfer Rate",
+                        OutputProcessor::Unit::W,
+                        this->Report.GLHERate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
-    SetupOutputVariable(
-        state, "Chiller Heater System Cooling Mass Flow Rate", OutputProcessor::Unit::kg_s, this->Report.CHWmdot, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Chiller Heater System Cooling Mass Flow Rate",
+                        OutputProcessor::Unit::kg_s,
+                        this->Report.CHWmdot,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
-    SetupOutputVariable(
-        state, "Chiller Heater System Heating Mass Flow Rate", OutputProcessor::Unit::kg_s, this->Report.HWmdot, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Chiller Heater System Heating Mass Flow Rate",
+                        OutputProcessor::Unit::kg_s,
+                        this->Report.HWmdot,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
-    SetupOutputVariable(
-        state, "Chiller Heater System Source Mass Flow Rate", OutputProcessor::Unit::kg_s, this->Report.GLHEmdot, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Chiller Heater System Source Mass Flow Rate",
+                        OutputProcessor::Unit::kg_s,
+                        this->Report.GLHEmdot,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Cooling Inlet Temperature",

@@ -1109,8 +1109,13 @@ namespace FuelCellElectricGenerator {
 
     void FCDataStruct::setupOutputVars(EnergyPlusData &state)
     {
-        SetupOutputVariable(
-            state, "Generator Produced AC Electricity Rate", OutputProcessor::Unit::W, this->Report.ACPowerGen, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Generator Produced AC Electricity Rate",
+                            OutputProcessor::Unit::W,
+                            this->Report.ACPowerGen,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
         SetupOutputVariable(state,
                             "Generator Produced AC Electricity Energy",
@@ -1125,7 +1130,13 @@ namespace FuelCellElectricGenerator {
                             _,
                             "Plant");
 
-        SetupOutputVariable(state, "Generator Produced Thermal Rate", OutputProcessor::Unit::W, this->Report.qHX, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Generator Produced Thermal Rate",
+                            OutputProcessor::Unit::W,
+                            this->Report.qHX,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
         SetupOutputVariable(state,
                             "Generator Produced Thermal Energy",
@@ -1153,8 +1164,13 @@ namespace FuelCellElectricGenerator {
                             _,
                             "Plant");
 
-        SetupOutputVariable(
-            state, "Generator Fuel HHV Basis Rate", OutputProcessor::Unit::W, this->Report.FuelEnergyUseRateHHV, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Generator Fuel HHV Basis Rate",
+                            OutputProcessor::Unit::W,
+                            this->Report.FuelEnergyUseRateHHV,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
         SetupOutputVariable(state,
                             "Generator Zone Sensible Heat Transfer Rate",
@@ -1200,8 +1216,13 @@ namespace FuelCellElectricGenerator {
         }
 
         if (state.dataGlobal->DisplayAdvancedReportVariables) { // show extra data originally needed for detailed comparative testing
-            SetupOutputVariable(
-                state, "Generator Air Inlet Temperature", OutputProcessor::Unit::C, this->Report.TairInlet, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Generator Air Inlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->Report.TairInlet,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
 
             SetupOutputVariable(state,
                                 "Generator Power Module Entering Air Temperature",
@@ -1211,8 +1232,13 @@ namespace FuelCellElectricGenerator {
                                 OutputProcessor::SOVStoreType::Average,
                                 this->Name);
 
-            SetupOutputVariable(
-                state, "Generator Air Molar Flow Rate", OutputProcessor::Unit::kmol_s, this->Report.NdotAir, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Generator Air Molar Flow Rate",
+                                OutputProcessor::Unit::kmol_s,
+                                this->Report.NdotAir,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
 
             SetupOutputVariable(state,
                                 "Generator Power Module Entering Air Enthalpy",
@@ -1222,11 +1248,21 @@ namespace FuelCellElectricGenerator {
                                 OutputProcessor::SOVStoreType::Average,
                                 this->Name);
 
-            SetupOutputVariable(
-                state, "Generator Blower Electricity Rate", OutputProcessor::Unit::W, this->Report.BlowerPower, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Generator Blower Electricity Rate",
+                                OutputProcessor::Unit::W,
+                                this->Report.BlowerPower,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
 
-            SetupOutputVariable(
-                state, "Generator Blower Electricity Energy", OutputProcessor::Unit::J, this->Report.BlowerEnergy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
+            SetupOutputVariable(state,
+                                "Generator Blower Electricity Energy",
+                                OutputProcessor::Unit::J,
+                                this->Report.BlowerEnergy,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                this->Name);
 
             SetupOutputVariable(state,
                                 "Generator Blower Skin Heat Loss Rate",
@@ -1236,8 +1272,13 @@ namespace FuelCellElectricGenerator {
                                 OutputProcessor::SOVStoreType::Average,
                                 this->Name);
 
-            SetupOutputVariable(
-                state, "Generator Fuel Inlet Temperature", OutputProcessor::Unit::C, this->Report.TfuelInlet, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Generator Fuel Inlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->Report.TfuelInlet,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
 
             SetupOutputVariable(state,
                                 "Generator Power Module Entering Fuel Temperature",
@@ -1247,8 +1288,13 @@ namespace FuelCellElectricGenerator {
                                 OutputProcessor::SOVStoreType::Average,
                                 this->Name);
 
-            SetupOutputVariable(
-                state, "Generator Fuel Molar Flow Rate", OutputProcessor::Unit::kmol_s, this->Report.NdotFuel, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Generator Fuel Molar Flow Rate",
+                                OutputProcessor::Unit::kmol_s,
+                                this->Report.NdotFuel,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
 
             SetupOutputVariable(state,
                                 "Generator Fuel Consumption LHV Basis Energy",
@@ -1346,11 +1392,21 @@ namespace FuelCellElectricGenerator {
                                 OutputProcessor::SOVStoreType::Average,
                                 this->Name);
 
-            SetupOutputVariable(
-                state, "Generator Product Gas Temperature", OutputProcessor::Unit::C, this->Report.TprodGas, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Generator Product Gas Temperature",
+                                OutputProcessor::Unit::C,
+                                this->Report.TprodGas,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
 
-            SetupOutputVariable(
-                state, "Generator Product Gas Enthalpy", OutputProcessor::Unit::W, this->Report.EnthalProdGas, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Generator Product Gas Enthalpy",
+                                OutputProcessor::Unit::W,
+                                this->Report.EnthalProdGas,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
 
             SetupOutputVariable(state,
                                 "Generator Product Gas Molar Flow Rate",
@@ -1424,14 +1480,29 @@ namespace FuelCellElectricGenerator {
                                 OutputProcessor::SOVStoreType::Average,
                                 this->Name);
 
-            SetupOutputVariable(
-                state, "Generator Inverter Loss Power", OutputProcessor::Unit::W, this->Report.PCUlosses, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Generator Inverter Loss Power",
+                                OutputProcessor::Unit::W,
+                                this->Report.PCUlosses,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
 
-            SetupOutputVariable(
-                state, "Generator Produced DC Electricity Rate", OutputProcessor::Unit::W, this->Report.DCPowerGen, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Generator Produced DC Electricity Rate",
+                                OutputProcessor::Unit::W,
+                                this->Report.DCPowerGen,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
 
-            SetupOutputVariable(
-                state, "Generator DC Power Efficiency", OutputProcessor::Unit::None, this->Report.DCPowerEff, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Generator DC Power Efficiency",
+                                OutputProcessor::Unit::None,
+                                this->Report.DCPowerEff,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
 
             SetupOutputVariable(state,
                                 "Generator Electric Storage Charge State",
@@ -1441,17 +1512,37 @@ namespace FuelCellElectricGenerator {
                                 OutputProcessor::SOVStoreType::Average,
                                 this->Name);
 
-            SetupOutputVariable(
-                state, "Generator DC Storage Charging Power", OutputProcessor::Unit::W, this->Report.StoredPower, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Generator DC Storage Charging Power",
+                                OutputProcessor::Unit::W,
+                                this->Report.StoredPower,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
 
-            SetupOutputVariable(
-                state, "Generator DC Storage Charging Energy", OutputProcessor::Unit::J, this->Report.StoredEnergy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
+            SetupOutputVariable(state,
+                                "Generator DC Storage Charging Energy",
+                                OutputProcessor::Unit::J,
+                                this->Report.StoredEnergy,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                this->Name);
 
-            SetupOutputVariable(
-                state, "Generator DC Storage Discharging Power", OutputProcessor::Unit::W, this->Report.DrawnPower, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Generator DC Storage Discharging Power",
+                                OutputProcessor::Unit::W,
+                                this->Report.DrawnPower,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
 
-            SetupOutputVariable(
-                state, "Generator DC Storage Discharging Energy", OutputProcessor::Unit::J, this->Report.DrawnEnergy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
+            SetupOutputVariable(state,
+                                "Generator DC Storage Discharging Energy",
+                                OutputProcessor::Unit::J,
+                                this->Report.DrawnEnergy,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                this->Name);
 
             SetupOutputVariable(state,
                                 "Generator Ancillary AC Electricity Rate",
@@ -1485,8 +1576,13 @@ namespace FuelCellElectricGenerator {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name);
 
-            SetupOutputVariable(
-                state, "Generator Number of Cycles", OutputProcessor::Unit::None, this->Report.NumCycles, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Generator Number of Cycles",
+                                OutputProcessor::Unit::None,
+                                this->Report.NumCycles,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
 
             SetupOutputVariable(state,
                                 "Generator Power Module Skin Heat Loss Rate",

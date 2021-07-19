@@ -641,8 +641,13 @@ namespace WaterUse {
                             OutputProcessor::SOVStoreType::Average,
                             this->Name);
 
-        SetupOutputVariable(
-            state, "Water Use Equipment Total Mass Flow Rate", OutputProcessor::Unit::kg_s, this->TotalMassFlowRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Water Use Equipment Total Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->TotalMassFlowRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
         SetupOutputVariable(state,
                             "Water Use Equipment Hot Water Volume Flow Rate",
@@ -668,9 +673,21 @@ namespace WaterUse {
                             OutputProcessor::SOVStoreType::Average,
                             this->Name);
 
-        SetupOutputVariable(state, "Water Use Equipment Hot Water Volume", OutputProcessor::Unit::m3, this->HotVolume, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
+        SetupOutputVariable(state,
+                            "Water Use Equipment Hot Water Volume",
+                            OutputProcessor::Unit::m3,
+                            this->HotVolume,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->Name);
 
-        SetupOutputVariable(state, "Water Use Equipment Cold Water Volume", OutputProcessor::Unit::m3, this->ColdVolume, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
+        SetupOutputVariable(state,
+                            "Water Use Equipment Cold Water Volume",
+                            OutputProcessor::Unit::m3,
+                            this->ColdVolume,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->Name);
 
         SetupOutputVariable(state,
                             "Water Use Equipment Total Volume",
@@ -697,22 +714,53 @@ namespace WaterUse {
                             this->EndUseSubcatName,
                             "Plant");
 
-        SetupOutputVariable(
-            state, "Water Use Equipment Hot Water Temperature", OutputProcessor::Unit::C, this->HotTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Water Use Equipment Hot Water Temperature",
+                            OutputProcessor::Unit::C,
+                            this->HotTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Water Use Equipment Cold Water Temperature", OutputProcessor::Unit::C, this->ColdTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Water Use Equipment Cold Water Temperature",
+                            OutputProcessor::Unit::C,
+                            this->ColdTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Water Use Equipment Target Water Temperature", OutputProcessor::Unit::C, this->TargetTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Water Use Equipment Target Water Temperature",
+                            OutputProcessor::Unit::C,
+                            this->TargetTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Water Use Equipment Mixed Water Temperature", OutputProcessor::Unit::C, this->MixedTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Water Use Equipment Mixed Water Temperature",
+                            OutputProcessor::Unit::C,
+                            this->MixedTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Water Use Equipment Drain Water Temperature", OutputProcessor::Unit::C, this->DrainTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Water Use Equipment Drain Water Temperature",
+                            OutputProcessor::Unit::C,
+                            this->DrainTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(state, "Water Use Equipment Heating Rate", OutputProcessor::Unit::W, this->Power, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Water Use Equipment Heating Rate",
+                            OutputProcessor::Unit::W,
+                            this->Power,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
         if (this->Connections == 0) {
             SetupOutputVariable(state,
@@ -773,10 +821,20 @@ namespace WaterUse {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name);
 
-            SetupOutputVariable(
-                state, "Water Use Equipment Zone Latent Gain Rate", OutputProcessor::Unit::W, this->LatentRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-            SetupOutputVariable(
-                state, "Water Use Equipment Zone Latent Gain Energy", OutputProcessor::Unit::J, this->LatentEnergy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
+            SetupOutputVariable(state,
+                                "Water Use Equipment Zone Latent Gain Rate",
+                                OutputProcessor::Unit::W,
+                                this->LatentRate,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
+            SetupOutputVariable(state,
+                                "Water Use Equipment Zone Latent Gain Energy",
+                                OutputProcessor::Unit::J,
+                                this->LatentEnergy,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                this->Name);
 
             SetupOutputVariable(state,
                                 "Water Use Equipment Zone Moisture Gain Mass Flow Rate",
@@ -785,8 +843,13 @@ namespace WaterUse {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 this->Name);
-            SetupOutputVariable(
-                state, "Water Use Equipment Zone Moisture Gain Mass", OutputProcessor::Unit::kg, this->MoistureMass, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
+            SetupOutputVariable(state,
+                                "Water Use Equipment Zone Moisture Gain Mass",
+                                OutputProcessor::Unit::kg,
+                                this->MoistureMass,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                this->Name);
 
             SetupZoneInternalGain(state,
                                   this->Zone,
@@ -866,10 +929,21 @@ namespace WaterUse {
                             OutputProcessor::SOVStoreType::Average,
                             this->Name);
 
-        SetupOutputVariable(state, "Water Use Connections Hot Water Volume", OutputProcessor::Unit::m3, this->HotVolume, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
+        SetupOutputVariable(state,
+                            "Water Use Connections Hot Water Volume",
+                            OutputProcessor::Unit::m3,
+                            this->HotVolume,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Water Use Connections Cold Water Volume", OutputProcessor::Unit::m3, this->ColdVolume, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
+        SetupOutputVariable(state,
+                            "Water Use Connections Cold Water Volume",
+                            OutputProcessor::Unit::m3,
+                            this->ColdVolume,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->Name);
 
         SetupOutputVariable(state,
                             "Water Use Connections Total Volume",
@@ -881,20 +955,45 @@ namespace WaterUse {
         // ResourceTypeKey='Water', EndUseKey='DHW', EndUseSubKey=EndUseSubcategoryName, GroupKey='Plant')
         // tHIS WAS double counting
 
-        SetupOutputVariable(
-            state, "Water Use Connections Hot Water Temperature", OutputProcessor::Unit::C, this->HotTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Water Use Connections Hot Water Temperature",
+                            OutputProcessor::Unit::C,
+                            this->HotTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Water Use Connections Cold Water Temperature", OutputProcessor::Unit::C, this->ColdTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Water Use Connections Cold Water Temperature",
+                            OutputProcessor::Unit::C,
+                            this->ColdTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Water Use Connections Drain Water Temperature", OutputProcessor::Unit::C, this->DrainTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Water Use Connections Drain Water Temperature",
+                            OutputProcessor::Unit::C,
+                            this->DrainTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Water Use Connections Return Water Temperature", OutputProcessor::Unit::C, this->ReturnTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Water Use Connections Return Water Temperature",
+                            OutputProcessor::Unit::C,
+                            this->ReturnTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Water Use Connections Waste Water Temperature", OutputProcessor::Unit::C, this->WasteTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Water Use Connections Waste Water Temperature",
+                            OutputProcessor::Unit::C,
+                            this->WasteTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
         SetupOutputVariable(state,
                             "Water Use Connections Heat Recovery Water Temperature",
@@ -912,10 +1011,20 @@ namespace WaterUse {
                             OutputProcessor::SOVStoreType::Average,
                             this->Name);
 
-        SetupOutputVariable(
-            state, "Water Use Connections Heat Recovery Rate", OutputProcessor::Unit::W, this->RecoveryRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, this->Name);
-        SetupOutputVariable(
-            state, "Water Use Connections Heat Recovery Energy", OutputProcessor::Unit::J, this->RecoveryEnergy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, this->Name);
+        SetupOutputVariable(state,
+                            "Water Use Connections Heat Recovery Rate",
+                            OutputProcessor::Unit::W,
+                            this->RecoveryRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Water Use Connections Heat Recovery Energy",
+                            OutputProcessor::Unit::J,
+                            this->RecoveryEnergy,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->Name);
         // Does this go on a meter?
 
         // To do:  Add report variable for starved flow when tank can't deliver?

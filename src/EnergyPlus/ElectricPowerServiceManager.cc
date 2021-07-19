@@ -312,8 +312,13 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
     } // if transformers
 
     if (numLoadCenters_ > 0) {
-        SetupOutputVariable(
-            state, "Facility Total Purchased Electricity Rate", OutputProcessor::Unit::W, electPurchRate_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
+        SetupOutputVariable(state,
+                            "Facility Total Purchased Electricity Rate",
+                            OutputProcessor::Unit::W,
+                            electPurchRate_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name_);
         SetupOutputVariable(state,
                             "Facility Total Purchased Electricity Energy",
                             OutputProcessor::Unit::J,
@@ -327,8 +332,13 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
                             _,
                             "Plant");
 
-        SetupOutputVariable(
-            state, "Facility Total Surplus Electricity Rate", OutputProcessor::Unit::W, electSurplusRate_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
+        SetupOutputVariable(state,
+                            "Facility Total Surplus Electricity Rate",
+                            OutputProcessor::Unit::W,
+                            electSurplusRate_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name_);
         SetupOutputVariable(state,
                             "Facility Total Surplus Electricity Energy",
                             OutputProcessor::Unit::J,
@@ -342,8 +352,13 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
                             _,
                             "Plant");
 
-        SetupOutputVariable(
-            state, "Facility Net Purchased Electricity Rate", OutputProcessor::Unit::W, electricityNetRate_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
+        SetupOutputVariable(state,
+                            "Facility Net Purchased Electricity Rate",
+                            OutputProcessor::Unit::W,
+                            electricityNetRate_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name_);
         SetupOutputVariable(state,
                             "Facility Net Purchased Electricity Energy",
                             OutputProcessor::Unit::J,
@@ -357,15 +372,42 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
                             _,
                             "Plant");
 
-        SetupOutputVariable(
-            state, "Facility Total Building Electricity Demand Rate", OutputProcessor::Unit::W, totalBldgElecDemand_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
-        SetupOutputVariable(
-            state, "Facility Total HVAC Electricity Demand Rate", OutputProcessor::Unit::W, totalHVACElecDemand_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
-        SetupOutputVariable(
-            state, "Facility Total Electricity Demand Rate", OutputProcessor::Unit::W, totalElectricDemand_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
+        SetupOutputVariable(state,
+                            "Facility Total Building Electricity Demand Rate",
+                            OutputProcessor::Unit::W,
+                            totalBldgElecDemand_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name_);
+        SetupOutputVariable(state,
+                            "Facility Total HVAC Electricity Demand Rate",
+                            OutputProcessor::Unit::W,
+                            totalHVACElecDemand_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name_);
+        SetupOutputVariable(state,
+                            "Facility Total Electricity Demand Rate",
+                            OutputProcessor::Unit::W,
+                            totalElectricDemand_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name_);
 
-        SetupOutputVariable(state, "Facility Total Produced Electricity Rate", OutputProcessor::Unit::W, electProdRate_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
-        SetupOutputVariable(state, "Facility Total Produced Electricity Energy", OutputProcessor::Unit::J, electricityProd_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, name_);
+        SetupOutputVariable(state,
+                            "Facility Total Produced Electricity Rate",
+                            OutputProcessor::Unit::W,
+                            electProdRate_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name_);
+        SetupOutputVariable(state,
+                            "Facility Total Produced Electricity Energy",
+                            OutputProcessor::Unit::J,
+                            electricityProd_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            name_);
 
         reportPVandWindCapacity(state);
 
@@ -1061,16 +1103,55 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
     }
 
     // Setup general output variables for reporting in the electric load center
-    SetupOutputVariable(
-        state, "Electric Load Center Produced Electricity Rate", OutputProcessor::Unit::W, genElectProdRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
-    SetupOutputVariable(state, "Electric Load Center Produced Electricity Energy", OutputProcessor::Unit::J, genElectricProd, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, name_);
-    SetupOutputVariable(
-        state, "Electric Load Center Supplied Electricity Rate", OutputProcessor::Unit::W, subpanelFeedInRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
-    SetupOutputVariable(state, "Electric Load Center Drawn Electricity Rate", OutputProcessor::Unit::W, subpanelDrawRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
-    SetupOutputVariable(state, "Electric Load Center Produced Thermal Rate", OutputProcessor::Unit::W, thermalProdRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
-    SetupOutputVariable(state, "Electric Load Center Produced Thermal Energy", OutputProcessor::Unit::J, thermalProd, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, name_);
-    SetupOutputVariable(
-        state, "Electric Load Center Requested Electricity Rate", OutputProcessor::Unit::W, totalPowerRequest_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
+    SetupOutputVariable(state,
+                        "Electric Load Center Produced Electricity Rate",
+                        OutputProcessor::Unit::W,
+                        genElectProdRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        name_);
+    SetupOutputVariable(state,
+                        "Electric Load Center Produced Electricity Energy",
+                        OutputProcessor::Unit::J,
+                        genElectricProd,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        name_);
+    SetupOutputVariable(state,
+                        "Electric Load Center Supplied Electricity Rate",
+                        OutputProcessor::Unit::W,
+                        subpanelFeedInRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        name_);
+    SetupOutputVariable(state,
+                        "Electric Load Center Drawn Electricity Rate",
+                        OutputProcessor::Unit::W,
+                        subpanelDrawRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        name_);
+    SetupOutputVariable(state,
+                        "Electric Load Center Produced Thermal Rate",
+                        OutputProcessor::Unit::W,
+                        thermalProdRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        name_);
+    SetupOutputVariable(state,
+                        "Electric Load Center Produced Thermal Energy",
+                        OutputProcessor::Unit::J,
+                        thermalProd,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        name_);
+    SetupOutputVariable(state,
+                        "Electric Load Center Requested Electricity Rate",
+                        OutputProcessor::Unit::W,
+                        totalPowerRequest_,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        name_);
 
     if (state.dataGlobal->AnyEnergyManagementSystemInModel && storagePresent_) {
         SetupEMSActuator(state, "Electrical Storage", name_, "Power Draw Rate", "[W]", eMSOverridePelFromStorage_, eMSValuePelFromStorage_);
@@ -2160,8 +2241,13 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
 
     maxPowerOut = ratedElecPowerOutput, nominalThermElectRatio = thermalToElectRatio;
 
-    SetupOutputVariable(
-        state, "Generator Requested Electricity Rate", OutputProcessor::Unit::W, powerRequestThisTimestep, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, objectName);
+    SetupOutputVariable(state,
+                        "Generator Requested Electricity Rate",
+                        OutputProcessor::Unit::W,
+                        powerRequestThisTimestep,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        objectName);
     if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
         SetupEMSInternalVariable(state, "Generator Nominal Maximum Power", objectName, "[W]", maxPowerOut);
         SetupEMSInternalVariable(state, "Generator Nominal Thermal To Electric Ratio", objectName, "[ratio]", nominalThermElectRatio);
@@ -2481,13 +2567,55 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
 
         } // end switch modelType
 
-        SetupOutputVariable(state, "Inverter DC to AC Efficiency", OutputProcessor::Unit::None, efficiency_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
-        SetupOutputVariable(state, "Inverter DC Input Electricity Rate", OutputProcessor::Unit::W, dCPowerIn_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
-        SetupOutputVariable(state, "Inverter DC Input Electricity Energy", OutputProcessor::Unit::J, dCEnergyIn_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, name_);
-        SetupOutputVariable(state, "Inverter AC Output Electricity Rate", OutputProcessor::Unit::W, aCPowerOut_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
-        SetupOutputVariable(state, "Inverter AC Output Electricity Energy", OutputProcessor::Unit::J, aCEnergyOut_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, name_);
-        SetupOutputVariable(state, "Inverter Conversion Loss Power", OutputProcessor::Unit::W, conversionLossPower_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
-        SetupOutputVariable(state, "Inverter Conversion Loss Energy", OutputProcessor::Unit::J, conversionLossEnergy_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, name_);
+        SetupOutputVariable(state,
+                            "Inverter DC to AC Efficiency",
+                            OutputProcessor::Unit::None,
+                            efficiency_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name_);
+        SetupOutputVariable(state,
+                            "Inverter DC Input Electricity Rate",
+                            OutputProcessor::Unit::W,
+                            dCPowerIn_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name_);
+        SetupOutputVariable(state,
+                            "Inverter DC Input Electricity Energy",
+                            OutputProcessor::Unit::J,
+                            dCEnergyIn_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            name_);
+        SetupOutputVariable(state,
+                            "Inverter AC Output Electricity Rate",
+                            OutputProcessor::Unit::W,
+                            aCPowerOut_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name_);
+        SetupOutputVariable(state,
+                            "Inverter AC Output Electricity Energy",
+                            OutputProcessor::Unit::J,
+                            aCEnergyOut_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            name_);
+        SetupOutputVariable(state,
+                            "Inverter Conversion Loss Power",
+                            OutputProcessor::Unit::W,
+                            conversionLossPower_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name_);
+        SetupOutputVariable(state,
+                            "Inverter Conversion Loss Energy",
+                            OutputProcessor::Unit::J,
+                            conversionLossEnergy_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            name_);
         SetupOutputVariable(state,
                             "Inverter Conversion Loss Decrement Energy",
                             OutputProcessor::Unit::J,
@@ -2500,9 +2628,27 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
                             "POWERCONVERSION",
                             _,
                             "Plant");
-        SetupOutputVariable(state, "Inverter Thermal Loss Rate", OutputProcessor::Unit::W, thermLossRate_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
-        SetupOutputVariable(state, "Inverter Thermal Loss Energy", OutputProcessor::Unit::J, thermLossEnergy_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, name_);
-        SetupOutputVariable(state, "Inverter Ancillary AC Electricity Rate", OutputProcessor::Unit::W, ancillACuseRate_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
+        SetupOutputVariable(state,
+                            "Inverter Thermal Loss Rate",
+                            OutputProcessor::Unit::W,
+                            thermLossRate_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name_);
+        SetupOutputVariable(state,
+                            "Inverter Thermal Loss Energy",
+                            OutputProcessor::Unit::J,
+                            thermLossEnergy_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            name_);
+        SetupOutputVariable(state,
+                            "Inverter Ancillary AC Electricity Rate",
+                            OutputProcessor::Unit::W,
+                            ancillACuseRate_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name_);
         SetupOutputVariable(state,
                             "Inverter Ancillary AC Electricity Energy",
                             OutputProcessor::Unit::J,
@@ -2880,13 +3026,55 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
         }
         zoneRadFract_ = state.dataIPShortCut->rNumericArgs(4);
 
-        SetupOutputVariable(state, "Converter AC to DC Efficiency", OutputProcessor::Unit::None, efficiency_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
-        SetupOutputVariable(state, "Converter AC Input Electricity Rate", OutputProcessor::Unit::W, aCPowerIn_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
-        SetupOutputVariable(state, "Converter AC Input Electricity Energy", OutputProcessor::Unit::J, aCEnergyIn_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, name_);
-        SetupOutputVariable(state, "Converter DC Output Electricity Rate", OutputProcessor::Unit::W, dCPowerOut_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
-        SetupOutputVariable(state, "Converter DC Output Electricity Energy", OutputProcessor::Unit::J, dCEnergyOut_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, name_);
-        SetupOutputVariable(state, "Converter Electricity Loss Rate", OutputProcessor::Unit::W, conversionLossPower_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
-        SetupOutputVariable(state, "Converter Electricity Loss Energy", OutputProcessor::Unit::J, conversionLossEnergy_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, name_);
+        SetupOutputVariable(state,
+                            "Converter AC to DC Efficiency",
+                            OutputProcessor::Unit::None,
+                            efficiency_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name_);
+        SetupOutputVariable(state,
+                            "Converter AC Input Electricity Rate",
+                            OutputProcessor::Unit::W,
+                            aCPowerIn_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name_);
+        SetupOutputVariable(state,
+                            "Converter AC Input Electricity Energy",
+                            OutputProcessor::Unit::J,
+                            aCEnergyIn_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            name_);
+        SetupOutputVariable(state,
+                            "Converter DC Output Electricity Rate",
+                            OutputProcessor::Unit::W,
+                            dCPowerOut_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name_);
+        SetupOutputVariable(state,
+                            "Converter DC Output Electricity Energy",
+                            OutputProcessor::Unit::J,
+                            dCEnergyOut_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            name_);
+        SetupOutputVariable(state,
+                            "Converter Electricity Loss Rate",
+                            OutputProcessor::Unit::W,
+                            conversionLossPower_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name_);
+        SetupOutputVariable(state,
+                            "Converter Electricity Loss Energy",
+                            OutputProcessor::Unit::J,
+                            conversionLossEnergy_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            name_);
         SetupOutputVariable(state,
                             "Converter Electricity Loss Decrement Energy",
                             OutputProcessor::Unit::J,
@@ -2899,9 +3087,27 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
                             "POWERCONVERSION",
                             _,
                             "Plant");
-        SetupOutputVariable(state, "Converter Thermal Loss Rate", OutputProcessor::Unit::W, thermLossRate_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
-        SetupOutputVariable(state, "Converter Thermal Loss Energy", OutputProcessor::Unit::J, thermLossEnergy_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, name_);
-        SetupOutputVariable(state, "Converter Ancillary AC Electricity Rate", OutputProcessor::Unit::W, ancillACuseRate_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
+        SetupOutputVariable(state,
+                            "Converter Thermal Loss Rate",
+                            OutputProcessor::Unit::W,
+                            thermLossRate_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name_);
+        SetupOutputVariable(state,
+                            "Converter Thermal Loss Energy",
+                            OutputProcessor::Unit::J,
+                            thermLossEnergy_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            name_);
+        SetupOutputVariable(state,
+                            "Converter Ancillary AC Electricity Rate",
+                            OutputProcessor::Unit::W,
+                            ancillACuseRate_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name_);
         SetupOutputVariable(state,
                             "Converter Ancillary AC Electricity Energy",
                             OutputProcessor::Unit::J,
@@ -3372,8 +3578,13 @@ ElectricStorage::ElectricStorage( // main constructor
         } // switch storage model type
 
         if (storageModelMode_ == StorageModelType::kiBaMBattery or storageModelMode_ == StorageModelType::liIonNmcBattery) {
-            SetupOutputVariable(
-                state, "Electric Storage Operating Mode Index", OutputProcessor::Unit::None, storageMode_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
+            SetupOutputVariable(state,
+                                "Electric Storage Operating Mode Index",
+                                OutputProcessor::Unit::None,
+                                storageMode_,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                name_);
             SetupOutputVariable(state,
                                 "Electric Storage Battery Charge State",
                                 OutputProcessor::Unit::Ah,
@@ -3381,18 +3592,53 @@ ElectricStorage::ElectricStorage( // main constructor
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 name_); // issue #4921
-            SetupOutputVariable(state, "Electric Storage Charge Fraction", OutputProcessor::Unit::None, fractionSOC_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
-            SetupOutputVariable(state, "Electric Storage Total Current", OutputProcessor::Unit::A, batteryCurrent_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
-            SetupOutputVariable(state, "Electric Storage Total Voltage", OutputProcessor::Unit::V, batteryVoltage_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
+            SetupOutputVariable(state,
+                                "Electric Storage Charge Fraction",
+                                OutputProcessor::Unit::None,
+                                fractionSOC_,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                name_);
+            SetupOutputVariable(state,
+                                "Electric Storage Total Current",
+                                OutputProcessor::Unit::A,
+                                batteryCurrent_,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                name_);
+            SetupOutputVariable(state,
+                                "Electric Storage Total Voltage",
+                                OutputProcessor::Unit::V,
+                                batteryVoltage_,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                name_);
 
             if (lifeCalculation_ == BatteryDegradationModelType::lifeCalculationYes) {
-                SetupOutputVariable(
-                    state, "Electric Storage Degradation Fraction", OutputProcessor::Unit::None, batteryDamage_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
+                SetupOutputVariable(state,
+                                    "Electric Storage Degradation Fraction",
+                                    OutputProcessor::Unit::None,
+                                    batteryDamage_,
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    name_);
             }
         }
 
-        SetupOutputVariable(state, "Electric Storage Charge Power", OutputProcessor::Unit::W, storedPower_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
-        SetupOutputVariable(state, "Electric Storage Charge Energy", OutputProcessor::Unit::J, storedEnergy_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, name_);
+        SetupOutputVariable(state,
+                            "Electric Storage Charge Power",
+                            OutputProcessor::Unit::W,
+                            storedPower_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name_);
+        SetupOutputVariable(state,
+                            "Electric Storage Charge Energy",
+                            OutputProcessor::Unit::J,
+                            storedEnergy_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            name_);
         SetupOutputVariable(state,
                             "Electric Storage Production Decrement Energy",
                             OutputProcessor::Unit::J,
@@ -3405,7 +3651,13 @@ ElectricStorage::ElectricStorage( // main constructor
                             "ELECTRICSTORAGE",
                             _,
                             "Plant");
-        SetupOutputVariable(state, "Electric Storage Discharge Power", OutputProcessor::Unit::W, drawnPower_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
+        SetupOutputVariable(state,
+                            "Electric Storage Discharge Power",
+                            OutputProcessor::Unit::W,
+                            drawnPower_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name_);
         SetupOutputVariable(state,
                             "Electric Storage Discharge Energy",
                             OutputProcessor::Unit::J,
@@ -3418,8 +3670,20 @@ ElectricStorage::ElectricStorage( // main constructor
                             "ELECTRICSTORAGE",
                             _,
                             "Plant");
-        SetupOutputVariable(state, "Electric Storage Thermal Loss Rate", OutputProcessor::Unit::W, thermLossRate_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
-        SetupOutputVariable(state, "Electric Storage Thermal Loss Energy", OutputProcessor::Unit::J, thermLossEnergy_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, name_);
+        SetupOutputVariable(state,
+                            "Electric Storage Thermal Loss Rate",
+                            OutputProcessor::Unit::W,
+                            thermLossRate_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name_);
+        SetupOutputVariable(state,
+                            "Electric Storage Thermal Loss Energy",
+                            OutputProcessor::Unit::J,
+                            thermLossEnergy_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            name_);
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
             if (storageModelMode_ == StorageModelType::simpleBucketStorage) {
                 SetupEMSInternalVariable(state, "Electrical Storage Simple Maximum Capacity", name_, "[J]", maxEnergyCapacity_);
@@ -3428,8 +3692,13 @@ ElectricStorage::ElectricStorage( // main constructor
             }
         }
         if (storageModelMode_ == StorageModelType::liIonNmcBattery) {
-            SetupOutputVariable(
-                state, "Electric Storage Battery Temperature", OutputProcessor::Unit::C, batteryTemperature_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
+            SetupOutputVariable(state,
+                                "Electric Storage Battery Temperature",
+                                OutputProcessor::Unit::C,
+                                batteryTemperature_,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                name_);
         }
 
         if (zoneNum_ > 0) {
@@ -4467,17 +4736,83 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
                 }
             }
         }
-        SetupOutputVariable(state, "Transformer Efficiency", OutputProcessor::Unit::None, efficiency_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
-        SetupOutputVariable(state, "Transformer Input Electricity Rate", OutputProcessor::Unit::W, powerIn_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
-        SetupOutputVariable(state, "Transformer Input Electricity Energy", OutputProcessor::Unit::J, energyIn_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, name_);
-        SetupOutputVariable(state, "Transformer Output Electricity Rate", OutputProcessor::Unit::W, powerOut_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
-        SetupOutputVariable(state, "Transformer Output Electricity Energy", OutputProcessor::Unit::J, energyOut_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, name_);
-        SetupOutputVariable(state, "Transformer No Load Loss Rate", OutputProcessor::Unit::W, noLoadLossRate_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
-        SetupOutputVariable(state, "Transformer No Load Loss Energy", OutputProcessor::Unit::J, noLoadLossEnergy_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, name_);
-        SetupOutputVariable(state, "Transformer Load Loss Rate", OutputProcessor::Unit::W, loadLossRate_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
-        SetupOutputVariable(state, "Transformer Load Loss Energy", OutputProcessor::Unit::J, loadLossEnergy_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, name_);
-        SetupOutputVariable(state, "Transformer Thermal Loss Rate", OutputProcessor::Unit::W, thermalLossRate_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, name_);
-        SetupOutputVariable(state, "Transformer Thermal Loss Energy", OutputProcessor::Unit::J, thermalLossEnergy_, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, name_);
+        SetupOutputVariable(state,
+                            "Transformer Efficiency",
+                            OutputProcessor::Unit::None,
+                            efficiency_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name_);
+        SetupOutputVariable(state,
+                            "Transformer Input Electricity Rate",
+                            OutputProcessor::Unit::W,
+                            powerIn_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name_);
+        SetupOutputVariable(state,
+                            "Transformer Input Electricity Energy",
+                            OutputProcessor::Unit::J,
+                            energyIn_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            name_);
+        SetupOutputVariable(state,
+                            "Transformer Output Electricity Rate",
+                            OutputProcessor::Unit::W,
+                            powerOut_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name_);
+        SetupOutputVariable(state,
+                            "Transformer Output Electricity Energy",
+                            OutputProcessor::Unit::J,
+                            energyOut_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            name_);
+        SetupOutputVariable(state,
+                            "Transformer No Load Loss Rate",
+                            OutputProcessor::Unit::W,
+                            noLoadLossRate_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name_);
+        SetupOutputVariable(state,
+                            "Transformer No Load Loss Energy",
+                            OutputProcessor::Unit::J,
+                            noLoadLossEnergy_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            name_);
+        SetupOutputVariable(state,
+                            "Transformer Load Loss Rate",
+                            OutputProcessor::Unit::W,
+                            loadLossRate_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name_);
+        SetupOutputVariable(state,
+                            "Transformer Load Loss Energy",
+                            OutputProcessor::Unit::J,
+                            loadLossEnergy_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            name_);
+        SetupOutputVariable(state,
+                            "Transformer Thermal Loss Rate",
+                            OutputProcessor::Unit::W,
+                            thermalLossRate_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name_);
+        SetupOutputVariable(state,
+                            "Transformer Thermal Loss Energy",
+                            OutputProcessor::Unit::J,
+                            thermalLossEnergy_,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            name_);
         if (usageMode_ == TransformerUse::powerInFromGrid) { // power losses metered as an end use exterior equipment
             SetupOutputVariable(state,
                                 "Transformer Distribution Electricity Loss Energy",

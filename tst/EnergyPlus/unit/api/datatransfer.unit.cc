@@ -178,14 +178,36 @@ public:
         state->dataInputProcessing->inputProcessor->preScanReportingVariables(*state);
         for (auto &val : this->realVariablePlaceholders) {
             if (val.meterType) {
-                SetupOutputVariable(
-                    *state, val.varName, OutputProcessor::Unit::kg_s, val.value, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, val.varKey, _, "ELECTRICITY", "HEATING", _, "System");
+                SetupOutputVariable(*state,
+                                    val.varName,
+                                    OutputProcessor::Unit::kg_s,
+                                    val.value,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    val.varKey,
+                                    _,
+                                    "ELECTRICITY",
+                                    "HEATING",
+                                    _,
+                                    "System");
             } else {
-                SetupOutputVariable(*state, val.varName, OutputProcessor::Unit::kg_s, val.value, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Average, val.varKey);
+                SetupOutputVariable(*state,
+                                    val.varName,
+                                    OutputProcessor::Unit::kg_s,
+                                    val.value,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    val.varKey);
             }
         }
         for (auto &val : this->intVariablePlaceholders) {
-            SetupOutputVariable(*state, val.varName, OutputProcessor::Unit::kg_s, val.value, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Average, val.varKey);
+            SetupOutputVariable(*state,
+                                val.varName,
+                                OutputProcessor::Unit::kg_s,
+                                val.value,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                val.varKey);
         }
     }
 

@@ -1429,8 +1429,13 @@ namespace LowTempRadiantSystem {
 
             auto &thisHydrSys(state.dataLowTempRadSys->HydrRadSys(Item));
 
-            SetupOutputVariable(
-                state, "Zone Radiant HVAC Heating Rate", OutputProcessor::Unit::W, thisHydrSys.HeatPower, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, thisHydrSys.Name);
+            SetupOutputVariable(state,
+                                "Zone Radiant HVAC Heating Rate",
+                                OutputProcessor::Unit::W,
+                                thisHydrSys.HeatPower,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                thisHydrSys.Name);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Heating Energy",
                                 OutputProcessor::Unit::J,
@@ -1455,8 +1460,13 @@ namespace LowTempRadiantSystem {
                                 "HEATINGCOILS",
                                 _,
                                 "System");
-            SetupOutputVariable(
-                state, "Zone Radiant HVAC Cooling Rate", OutputProcessor::Unit::W, thisHydrSys.CoolPower, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, thisHydrSys.Name);
+            SetupOutputVariable(state,
+                                "Zone Radiant HVAC Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                thisHydrSys.CoolPower,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                thisHydrSys.Name);
 
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Cooling Energy",
@@ -1544,8 +1554,13 @@ namespace LowTempRadiantSystem {
 
             auto &thisCFloSys(state.dataLowTempRadSys->CFloRadSys(Item));
 
-            SetupOutputVariable(
-                state, "Zone Radiant HVAC Heating Rate", OutputProcessor::Unit::W, thisCFloSys.HeatPower, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, thisCFloSys.Name);
+            SetupOutputVariable(state,
+                                "Zone Radiant HVAC Heating Rate",
+                                OutputProcessor::Unit::W,
+                                thisCFloSys.HeatPower,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                thisCFloSys.Name);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Heating Energy",
                                 OutputProcessor::Unit::J,
@@ -1570,8 +1585,13 @@ namespace LowTempRadiantSystem {
                                 "HEATINGCOILS",
                                 _,
                                 "System");
-            SetupOutputVariable(
-                state, "Zone Radiant HVAC Cooling Rate", OutputProcessor::Unit::W, thisCFloSys.CoolPower, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, thisCFloSys.Name);
+            SetupOutputVariable(state,
+                                "Zone Radiant HVAC Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                thisCFloSys.CoolPower,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                thisCFloSys.Name);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Cooling Energy",
                                 OutputProcessor::Unit::J,
@@ -1734,8 +1754,13 @@ namespace LowTempRadiantSystem {
 
             auto &thisElecSys(state.dataLowTempRadSys->ElecRadSys(Item));
 
-            SetupOutputVariable(
-                state, "Zone Radiant HVAC Electricity Rate", OutputProcessor::Unit::W, thisElecSys.ElecPower, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, thisElecSys.Name);
+            SetupOutputVariable(state,
+                                "Zone Radiant HVAC Electricity Rate",
+                                OutputProcessor::Unit::W,
+                                thisElecSys.ElecPower,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                thisElecSys.Name);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Electricity Energy",
                                 OutputProcessor::Unit::J,
@@ -1748,8 +1773,13 @@ namespace LowTempRadiantSystem {
                                 "Heating",
                                 _,
                                 "System");
-            SetupOutputVariable(
-                state, "Zone Radiant HVAC Heating Rate", OutputProcessor::Unit::W, thisElecSys.HeatPower, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, thisElecSys.Name);
+            SetupOutputVariable(state,
+                                "Zone Radiant HVAC Heating Rate",
+                                OutputProcessor::Unit::W,
+                                thisElecSys.HeatPower,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                thisElecSys.Name);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Heating Energy",
                                 OutputProcessor::Unit::J,

@@ -959,11 +959,27 @@ void GetFanInput(EnergyPlusData &state)
 
     for (FanNum = 1; FanNum <= state.dataFans->NumFans; ++FanNum) {
         // Setup Report variables for the Fans  CurrentModuleObject='Fans'
-        SetupOutputVariable(state, "Fan Electricity Rate", OutputProcessor::Unit::W, Fan(FanNum).FanPower, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Fan(FanNum).FanName);
-        SetupOutputVariable(
-            state, "Fan Rise in Air Temperature", OutputProcessor::Unit::deltaC, Fan(FanNum).DeltaTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Fan(FanNum).FanName);
-        SetupOutputVariable(
-            state, "Fan Heat Gain to Air", OutputProcessor::Unit::W, Fan(FanNum).PowerLossToAir, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Fan(FanNum).FanName);
+        SetupOutputVariable(state,
+                            "Fan Electricity Rate",
+                            OutputProcessor::Unit::W,
+                            Fan(FanNum).FanPower,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            Fan(FanNum).FanName);
+        SetupOutputVariable(state,
+                            "Fan Rise in Air Temperature",
+                            OutputProcessor::Unit::deltaC,
+                            Fan(FanNum).DeltaTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            Fan(FanNum).FanName);
+        SetupOutputVariable(state,
+                            "Fan Heat Gain to Air",
+                            OutputProcessor::Unit::W,
+                            Fan(FanNum).PowerLossToAir,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            Fan(FanNum).FanName);
         SetupOutputVariable(state,
                             "Fan Electricity Energy",
                             OutputProcessor::Unit::J,
@@ -1034,8 +1050,13 @@ void GetFanInput(EnergyPlusData &state)
 
     for (OnOffFanNum = 1; OnOffFanNum <= NumOnOff; ++OnOffFanNum) {
         FanNum = NumSimpFan + NumVarVolFan + NumZoneExhFan + OnOffFanNum;
-        SetupOutputVariable(
-            state, "Fan Runtime Fraction", OutputProcessor::Unit::None, Fan(FanNum).FanRuntimeFraction, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Fan(FanNum).FanName);
+        SetupOutputVariable(state,
+                            "Fan Runtime Fraction",
+                            OutputProcessor::Unit::None,
+                            Fan(FanNum).FanRuntimeFraction,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            Fan(FanNum).FanName);
     }
 
     bool anyRan;

@@ -290,8 +290,13 @@ void SetupNodeVarsForReporting(EnergyPlusData &state)
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     NodeID(NumNode));
-                SetupOutputVariable(
-                    state, "System Node Pressure", OutputProcessor::Unit::Pa, Node(NumNode).Press, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, NodeID(NumNode));
+                SetupOutputVariable(state,
+                                    "System Node Pressure",
+                                    OutputProcessor::Unit::Pa,
+                                    Node(NumNode).Press,
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    NodeID(NumNode));
                 SetupOutputVariable(state,
                                     "System Node Standard Density Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
@@ -345,8 +350,13 @@ void SetupNodeVarsForReporting(EnergyPlusData &state)
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     NodeID(NumNode));
-                SetupOutputVariable(
-                    state, "System Node Wind Speed", OutputProcessor::Unit::m_s, Node(NumNode).OutAirWindSpeed, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, NodeID(NumNode));
+                SetupOutputVariable(state,
+                                    "System Node Wind Speed",
+                                    OutputProcessor::Unit::m_s,
+                                    Node(NumNode).OutAirWindSpeed,
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    NodeID(NumNode));
                 SetupOutputVariable(state,
                                     "System Node Wind Direction",
                                     OutputProcessor::Unit::deg,
@@ -354,10 +364,20 @@ void SetupNodeVarsForReporting(EnergyPlusData &state)
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     NodeID(NumNode));
-                SetupOutputVariable(
-                    state, "System Node Quality", OutputProcessor::Unit::None, Node(NumNode).Quality, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, NodeID(NumNode));
-                SetupOutputVariable(
-                    state, "System Node Height", OutputProcessor::Unit::m, Node(NumNode).Height, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, NodeID(NumNode));
+                SetupOutputVariable(state,
+                                    "System Node Quality",
+                                    OutputProcessor::Unit::None,
+                                    Node(NumNode).Quality,
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    NodeID(NumNode));
+                SetupOutputVariable(state,
+                                    "System Node Height",
+                                    OutputProcessor::Unit::m,
+                                    Node(NumNode).Height,
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    NodeID(NumNode));
                 if (state.dataGlobal->DisplayAdvancedReportVariables) {
                     SetupOutputVariable(state,
                                         "System Node Minimum Temperature",
@@ -431,8 +451,13 @@ void SetupNodeVarsForReporting(EnergyPlusData &state)
                                         NodeID(NumNode));
                 }
                 if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                    SetupOutputVariable(
-                        state, "System Node CO2 Concentration", OutputProcessor::Unit::ppm, Node(NumNode).CO2, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, NodeID(NumNode));
+                    SetupOutputVariable(state,
+                                        "System Node CO2 Concentration",
+                                        OutputProcessor::Unit::ppm,
+                                        Node(NumNode).CO2,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Average,
+                                        NodeID(NumNode));
                 }
                 if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                     SetupOutputVariable(state,
