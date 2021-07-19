@@ -3332,12 +3332,12 @@ Real64 CalcCeilingDiffuserIntConvCoeff(EnergyPlusData &state,
     // OTHER NOTES:
     // The correlations shown below differ from (and are less accurate than) those shown
     // in the reference above (Fisher 1997).  They have been reformulated with an outlet
-    // temperature reference in order to accomodate the structure of the EnergyPlus code.
+    // temperature reference in order to accommodate the structure of the EnergyPlus code.
 
     // If the Ceiling Diffuser option is selected the following correlations are used.
     // The development of the ceiling diffuser convection correlations is shown in reference 4.
     // The correlations shown below differ from (and are less accurate than) those shown in reference 4 because they have been
-    // reformulated with an outlet temperature reference in order to accomodate the structure of the
+    // reformulated with an outlet temperature reference in order to accommodate the structure of the
     // EnergyPlus code.
 
     // Set HConvIn using the proper correlation based on Surface Tilt
@@ -5743,7 +5743,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
-    // collects dynamic updates needed for adaptive convectin algorithm
+    // collects dynamic updates needed for adaptive convection algorithm
 
     // METHODOLOGY EMPLOYED:
     // Decide flow regime to set IntConvClassification
