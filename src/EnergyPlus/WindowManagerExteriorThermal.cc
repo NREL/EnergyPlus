@@ -160,7 +160,7 @@ namespace WindowManager {
             }
         }
 
-        state.dataHeatBalSurf->SurfHConvInt(SurfNum) = aSystem->getHc(Environment::Indoor);
+        state.dataHeatBalSurf->SurfHConvInt(SurfNum) = aSystem->getHc(Tarcog::ISO15099::Environment::Indoor);
         if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum)) || aFactory.isInteriorShade()) {
             // It is not clear why EnergyPlus keeps this interior calculations separately for interior shade. This does create different
             // solution from heat transfer from tarcog itself. Need to confirm with LBNL team about this approach. Note that heat flow

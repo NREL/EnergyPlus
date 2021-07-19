@@ -8704,8 +8704,8 @@ void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state)
             ////////////////////////////////////////////////////////////////////
             // BEAM SOLAR ON EXTERIOR WINDOW TRANSMITTED AS BEAM AND/OR DIFFUSE
             ////////////////////////////////////////////////////////////////////
-            Real64 TBmBm = aLayer->getPropertySimple(PropertySimple::T, Side::Front, Scattering::DirectDirect, Theta, Phi);
-            Real64 TBmDif = aLayer->getPropertySimple(PropertySimple::T, Side::Front, Scattering::DirectDiffuse, Theta, Phi);
+            Real64 TBmBm = aLayer->getPropertySimple(minLambda, maxLambda, PropertySimple::T, Side::Front, Scattering::DirectDirect, Theta, Phi);
+            Real64 TBmDif = aLayer->getPropertySimple(minLambda, maxLambda, PropertySimple::T, Side::Front, Scattering::DirectDiffuse, Theta, Phi);
             Real64 SurfWinTransBmBmSolar =
                 TBmBm * SunLitFract * CosInc * state.dataSurface->Surface(SurfNum).Area * window.InOutProjSLFracMult(state.dataGlobal->HourOfDay);
             Real64 SurfWinTransBmDifSolar =
