@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
@@ -79,6 +80,7 @@ using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::HeatBalanceAirManager;
 using namespace EnergyPlus::HeatBalanceManager;
+using namespace EnergyPlus::HVACManager;
 
 TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest)
 {
@@ -2239,6 +2241,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_InfiltrationReport)
     state->dataHeatBalFanSys->MCPI.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->OAMFL.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->MCPTI.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
 
     state->dataHeatBalFanSys->MAT(1) = 21.0;
     state->dataHeatBalFanSys->MAT(2) = 22.0;
@@ -2253,6 +2256,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_InfiltrationReport)
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->OutHumRat = 0.0005;
     state->dataEnvrn->StdRhoAir = 1.20;
+    state->dataEnvrn->WindSpeed = 1.0;
     state->dataHeatBal->Zone(1).WindSpeed = 1.0;
     state->dataHeatBal->Zone(2).WindSpeed = 1.0;
     state->dataHeatBal->Zone(3).WindSpeed = 1.0;
@@ -2262,13 +2266,127 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_InfiltrationReport)
     state->dataHeatBal->Zone(3).OutDryBulbTemp = 15.0;
     state->dataHeatBal->Zone(4).OutDryBulbTemp = 15.0;
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
+    state->dataHVACGlobal->TimeStepSys = 1.0;
+    state->dataGlobal->TimeStepZone = 1.0;
+    state->dataGlobal->TimeStepZoneSec = 3600;
 
     CalcAirFlowSimple(*state, 2);
 
-    EXPECT_EQ(state->dataHeatBalFanSys->MCPI(1), state->dataHeatBal->Infiltration(1).MCpI_temp); // one per zone
-    EXPECT_EQ(state->dataHeatBalFanSys->MCPI(2), state->dataHeatBal->Infiltration(2).MCpI_temp); // one per zone
-    EXPECT_EQ(state->dataHeatBalFanSys->MCPI(3), state->dataHeatBal->Infiltration(3).MCpI_temp); // one per zone
-    EXPECT_EQ(state->dataHeatBalFanSys->MCPI(4), state->dataHeatBal->Infiltration(4).MCpI_temp); // one per zone
+    EXPECT_NEAR(state->dataHeatBal->Infiltration(1).MCpI_temp, 0.07 * 1.2242 * 1005.77, 0.01); // zone level reporting matches object level
+    EXPECT_NEAR(state->dataHeatBal->Infiltration(2).MCpI_temp, 0.07 * 1.2242 * 1005.77, 0.01); // zone level reporting matches object level
+    EXPECT_NEAR(state->dataHeatBal->Infiltration(3).MCpI_temp, 22.486, 0.01);                  // zone level reporting matches object level
+    EXPECT_NEAR(state->dataHeatBal->Infiltration(4).MCpI_temp, 24.459, 0.01);                  // zone level reporting matches object level
+
+    EXPECT_EQ(state->dataHeatBalFanSys->MCPI(1), state->dataHeatBal->Infiltration(1).MCpI_temp); // zone level reporting matches object level
+    EXPECT_EQ(state->dataHeatBalFanSys->MCPI(2), state->dataHeatBal->Infiltration(2).MCpI_temp); // zone level reporting matches object level
+    EXPECT_EQ(state->dataHeatBalFanSys->MCPI(3), state->dataHeatBal->Infiltration(3).MCpI_temp); // zone level reporting matches object level
+    EXPECT_EQ(state->dataHeatBalFanSys->MCPI(4), state->dataHeatBal->Infiltration(4).MCpI_temp); // zone level reporting matches object level
+
+    ReportAirHeatBalance(*state);
+
+    auto &ZnAirRpt(state->dataHeatBal->ZnAirRpt);
+    EXPECT_NEAR(ZnAirRpt(1).InfilHeatLoss, state->dataHeatBal->Infiltration(1).InfilHeatLoss, 0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(2).InfilHeatLoss, state->dataHeatBal->Infiltration(2).InfilHeatLoss, 0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(3).InfilHeatLoss, state->dataHeatBal->Infiltration(3).InfilHeatLoss, 0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(4).InfilHeatLoss, state->dataHeatBal->Infiltration(4).InfilHeatLoss, 0.000001); // zone level reporting matches object level
+
+    EXPECT_NEAR(ZnAirRpt(1).InfilHeatGain, state->dataHeatBal->Infiltration(1).InfilHeatGain, 0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(2).InfilHeatGain, state->dataHeatBal->Infiltration(2).InfilHeatGain, 0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(3).InfilHeatGain, state->dataHeatBal->Infiltration(3).InfilHeatGain, 0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(4).InfilHeatGain, state->dataHeatBal->Infiltration(4).InfilHeatGain, 0.000001); // zone level reporting matches object level
+
+    EXPECT_NEAR(
+        ZnAirRpt(1).InfilTotalLoss, state->dataHeatBal->Infiltration(1).InfilTotalLoss, 0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(
+        ZnAirRpt(2).InfilTotalLoss, state->dataHeatBal->Infiltration(2).InfilTotalLoss, 0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(
+        ZnAirRpt(3).InfilTotalLoss, state->dataHeatBal->Infiltration(3).InfilTotalLoss, 0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(
+        ZnAirRpt(4).InfilTotalLoss, state->dataHeatBal->Infiltration(4).InfilTotalLoss, 0.000001); // zone level reporting matches object level
+
+    EXPECT_NEAR(
+        ZnAirRpt(1).InfilTotalGain, state->dataHeatBal->Infiltration(1).InfilTotalGain, 0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(
+        ZnAirRpt(2).InfilTotalGain, state->dataHeatBal->Infiltration(2).InfilTotalGain, 0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(
+        ZnAirRpt(3).InfilTotalGain, state->dataHeatBal->Infiltration(3).InfilTotalGain, 0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(
+        ZnAirRpt(4).InfilTotalGain, state->dataHeatBal->Infiltration(4).InfilTotalGain, 0.000001); // zone level reporting matches object level
+
+    EXPECT_NEAR(ZnAirRpt(1).InfilMass, state->dataHeatBal->Infiltration(1).InfilMass, 0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(2).InfilMass, state->dataHeatBal->Infiltration(2).InfilMass, 0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(3).InfilMass, state->dataHeatBal->Infiltration(3).InfilMass, 0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(4).InfilMass, state->dataHeatBal->Infiltration(4).InfilMass, 0.000001); // zone level reporting matches object level
+
+    EXPECT_NEAR(ZnAirRpt(1).InfilMdot, state->dataHeatBal->Infiltration(1).MassFlowRate, 0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(2).InfilMdot, state->dataHeatBal->Infiltration(2).MassFlowRate, 0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(3).InfilMdot, state->dataHeatBal->Infiltration(3).MassFlowRate, 0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(4).InfilMdot, state->dataHeatBal->Infiltration(4).MassFlowRate, 0.000001); // zone level reporting matches object level
+
+    EXPECT_NEAR(ZnAirRpt(1).InfilVolumeCurDensity,
+                state->dataHeatBal->Infiltration(1).InfilVolumeCurDensity,
+                0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(2).InfilVolumeCurDensity,
+                state->dataHeatBal->Infiltration(2).InfilVolumeCurDensity,
+                0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(3).InfilVolumeCurDensity,
+                state->dataHeatBal->Infiltration(3).InfilVolumeCurDensity,
+                0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(4).InfilVolumeCurDensity,
+                state->dataHeatBal->Infiltration(4).InfilVolumeCurDensity,
+                0.000001); // zone level reporting matches object level
+
+    EXPECT_NEAR(ZnAirRpt(1).InfilAirChangeRate,
+                state->dataHeatBal->Infiltration(1).InfilAirChangeRate,
+                0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(2).InfilAirChangeRate,
+                state->dataHeatBal->Infiltration(2).InfilAirChangeRate,
+                0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(3).InfilAirChangeRate,
+                state->dataHeatBal->Infiltration(3).InfilAirChangeRate,
+                0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(4).InfilAirChangeRate,
+                state->dataHeatBal->Infiltration(4).InfilAirChangeRate,
+                0.000001); // zone level reporting matches object level
+
+    EXPECT_NEAR(ZnAirRpt(1).InfilVdotCurDensity,
+                state->dataHeatBal->Infiltration(1).InfilVdotCurDensity,
+                0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(2).InfilVdotCurDensity,
+                state->dataHeatBal->Infiltration(2).InfilVdotCurDensity,
+                0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(3).InfilVdotCurDensity,
+                state->dataHeatBal->Infiltration(3).InfilVdotCurDensity,
+                0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(4).InfilVdotCurDensity,
+                state->dataHeatBal->Infiltration(4).InfilVdotCurDensity,
+                0.000001); // zone level reporting matches object level
+
+    EXPECT_NEAR(ZnAirRpt(1).InfilVolumeStdDensity,
+                state->dataHeatBal->Infiltration(1).InfilVolumeStdDensity,
+                0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(2).InfilVolumeStdDensity,
+                state->dataHeatBal->Infiltration(2).InfilVolumeStdDensity,
+                0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(3).InfilVolumeStdDensity,
+                state->dataHeatBal->Infiltration(3).InfilVolumeStdDensity,
+                0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(4).InfilVolumeStdDensity,
+                state->dataHeatBal->Infiltration(4).InfilVolumeStdDensity,
+                0.000001); // zone level reporting matches object level
+
+    EXPECT_NEAR(ZnAirRpt(1).InfilVdotStdDensity,
+                state->dataHeatBal->Infiltration(1).InfilVdotStdDensity,
+                0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(2).InfilVdotStdDensity,
+                state->dataHeatBal->Infiltration(2).InfilVdotStdDensity,
+                0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(3).InfilVdotStdDensity,
+                state->dataHeatBal->Infiltration(3).InfilVdotStdDensity,
+                0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(4).InfilVdotStdDensity,
+                state->dataHeatBal->Infiltration(4).InfilVdotStdDensity,
+                0.000001); // zone level reporting matches object level
 }
 
 TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays)
