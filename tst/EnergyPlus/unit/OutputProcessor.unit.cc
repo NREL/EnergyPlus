@@ -1264,26 +1264,18 @@ namespace OutputProcessor {
 
     TEST_F(SQLiteFixture, OutputProcessor_validateTimeStepType)
     {
-        std::map<std::string, OutputProcessor::TimeStepType> const resource_map = {// Zone
-                                                                                   {"ZONE", OutputProcessor::TimeStepType::TimeStepZone},
-                                                                                   {"HEATBALANCE", OutputProcessor::TimeStepType::TimeStepZone},
-                                                                                   {"HEAT BALANCE", OutputProcessor::TimeStepType::TimeStepZone},
+        std::map<OutputProcessor::SOVTimeStepType, OutputProcessor::TimeStepType> const resource_map = {// Zone
+                                                                                   {OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::TimeStepType::TimeStepZone},
                                                                                    // System
-                                                                                   {"HVAC", OutputProcessor::TimeStepType::TimeStepSystem},
-                                                                                   {"SYSTEM", OutputProcessor::TimeStepType::TimeStepSystem},
-                                                                                   {"PLANT", OutputProcessor::TimeStepType::TimeStepSystem}};
+                                                                                   {OutputProcessor::SOVTimeStepType::HVAC, OutputProcessor::TimeStepType::TimeStepSystem},
+                                                                                   {OutputProcessor::SOVTimeStepType::System, OutputProcessor::TimeStepType::TimeStepSystem},
+                                                                                   {OutputProcessor::SOVTimeStepType::Plant, OutputProcessor::TimeStepType::TimeStepSystem}};
 
         auto const calledFrom = "UnitTest";
 
         for (auto const &indexGroup : resource_map) {
-            EXPECT_EQ(indexGroup.second, ValidateTimeStepType(*state, indexGroup.first, calledFrom)) << "where indexTypeKey is " << indexGroup.first;
+            EXPECT_EQ(indexGroup.second, ValidateTimeStepType(*state, indexGroup.first, calledFrom));
         }
-    }
-
-    TEST_F(SQLiteFixture, OutputProcessor_DeathTest_validateTimeStepType)
-    {
-        auto const calledFrom = "UnitTest";
-        EXPECT_ANY_THROW(ValidateTimeStepType(*state, "BAD INPUT", calledFrom));
     }
 
     TEST_F(SQLiteFixture, OutputProcessor_standardIndexTypeKey)
@@ -1299,31 +1291,14 @@ namespace OutputProcessor {
 
     TEST_F(SQLiteFixture, OutputProcessor_validateVariableType)
     {
-        std::map<std::string, StoreType> const resource_map = {{"STATE", StoreType::Averaged},
-                                                               {"AVERAGE", StoreType::Averaged},
-                                                               {"AVERAGED", StoreType::Averaged},
-                                                               {"NON STATE", StoreType::Summed},
-                                                               {"NONSTATE", StoreType::Summed},
-                                                               {"SUM", StoreType::Summed},
-                                                               {"SUMMED", StoreType::Summed}};
+        std::map<OutputProcessor::SOVStoreType, StoreType> const resource_map = {{OutputProcessor::SOVStoreType::State, StoreType::Averaged},
+                                                               {OutputProcessor::SOVStoreType::Average, StoreType::Averaged},
+                                                               {OutputProcessor::SOVStoreType::NonState, StoreType::Summed},
+                                                               {OutputProcessor::SOVStoreType::Summed, StoreType::Summed}};
 
         for (auto const &variableType : resource_map) {
-            EXPECT_EQ(variableType.second, validateVariableType(*state, variableType.first)) << "where variableTypeKey is " << variableType.first;
+            EXPECT_EQ(variableType.second, validateVariableType(*state, variableType.first));
         }
-
-        state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
-
-        std::string const variableTypeKey = "BAD INPUT";
-
-        auto index = validateVariableType(*state, variableTypeKey);
-
-        EXPECT_EQ(StoreType::Averaged, index);
-
-        auto errorData = queryResult("SELECT * FROM Errors;", "Errors");
-
-        ASSERT_EQ(1ul, errorData.size());
-        std::vector<std::string> errorData0{"1", "1", "1", "Invalid variable type requested=BAD INPUT", "1"};
-        EXPECT_EQ(errorData0, errorData[0]);
     }
 
     TEST_F(SQLiteFixture, OutputProcessor_standardVariableTypeKey)
@@ -3047,14 +3022,14 @@ namespace OutputProcessor {
 
         auto timeStep = 1.0;
 
-        SetupTimePointers(*state, "Zone", timeStep);
+        SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
 
         EXPECT_DOUBLE_EQ(timeStep, *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep);
         EXPECT_DOUBLE_EQ(0.0, state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute);
 
         timeStep = 2.0;
 
-        SetupTimePointers(*state, "HVAC", timeStep);
+        SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
 
         EXPECT_DOUBLE_EQ(timeStep, *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep);
         EXPECT_DOUBLE_EQ(0.0, state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute);
@@ -3197,17 +3172,17 @@ namespace OutputProcessor {
         Real64 ilgrLiving;
         Real64 ilgrAttic;
 
-        SetupOutputVariable(*state, "Zone Total Internal Latent Gain Rate", OutputProcessor::Unit::J, ilgrGarage, "Zone", "Sum", "Garage");
-        SetupOutputVariable(*state, "Zone Total Internal Latent Gain Rate", OutputProcessor::Unit::J, ilgrLiving, "Zone", "Sum", "Living");
-        SetupOutputVariable(*state, "Zone Total Internal Latent Gain Rate", OutputProcessor::Unit::J, ilgrAttic, "Zone", "Sum", "Attic");
+        SetupOutputVariable(*state, "Zone Total Internal Latent Gain Rate", OutputProcessor::Unit::J, ilgrGarage, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, "Garage");
+        SetupOutputVariable(*state, "Zone Total Internal Latent Gain Rate", OutputProcessor::Unit::J, ilgrLiving, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, "Living");
+        SetupOutputVariable(*state, "Zone Total Internal Latent Gain Rate", OutputProcessor::Unit::J, ilgrAttic, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, "Attic");
 
         Real64 isgrGarage;
         Real64 isgrLiving;
         Real64 isgrAttic;
 
-        SetupOutputVariable(*state, "Zone Total Internal Sensible Gain Rate", OutputProcessor::Unit::J, isgrGarage, "Zone", "Sum", "Garage");
-        SetupOutputVariable(*state, "Zone Total Internal Sensible Gain Rate", OutputProcessor::Unit::J, isgrLiving, "Zone", "Sum", "Living");
-        SetupOutputVariable(*state, "Zone Total Internal Sensible Gain Rate", OutputProcessor::Unit::J, isgrAttic, "Zone", "Sum", "Attic");
+        SetupOutputVariable(*state, "Zone Total Internal Sensible Gain Rate", OutputProcessor::Unit::J, isgrGarage, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, "Garage");
+        SetupOutputVariable(*state, "Zone Total Internal Sensible Gain Rate", OutputProcessor::Unit::J, isgrLiving, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, "Living");
+        SetupOutputVariable(*state, "Zone Total Internal Sensible Gain Rate", OutputProcessor::Unit::J, isgrAttic, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, "Attic");
 
         state->dataGlobal->DoWeathSim = true;
         state->dataGlobal->TimeStepZone = 0.25;
@@ -3254,17 +3229,17 @@ namespace OutputProcessor {
         Real64 ilgrLiving1;
         Real64 ilgrLiving2;
 
-        SetupOutputVariable(*state, "Zone Total Internal Latent Gain Rate", OutputProcessor::Unit::J, ilgrGarage, "Zone", "Sum", "Garage");
-        SetupOutputVariable(*state, "Zone Total Internal Latent Gain Rate", OutputProcessor::Unit::J, ilgrLiving1, "Zone", "Sum", "Living1");
-        SetupOutputVariable(*state, "Zone Total Internal Latent Gain Rate", OutputProcessor::Unit::J, ilgrLiving2, "Zone", "Sum", "Living2");
+        SetupOutputVariable(*state, "Zone Total Internal Latent Gain Rate", OutputProcessor::Unit::J, ilgrGarage, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, "Garage");
+        SetupOutputVariable(*state, "Zone Total Internal Latent Gain Rate", OutputProcessor::Unit::J, ilgrLiving1, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, "Living1");
+        SetupOutputVariable(*state, "Zone Total Internal Latent Gain Rate", OutputProcessor::Unit::J, ilgrLiving2, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, "Living2");
 
         Real64 isgrGarage;
         Real64 isgrLiving;
         Real64 isgrAttic;
 
-        SetupOutputVariable(*state, "Zone Total Internal Sensible Gain Rate", OutputProcessor::Unit::J, isgrGarage, "Zone", "Sum", "Garage");
-        SetupOutputVariable(*state, "Zone Total Internal Sensible Gain Rate", OutputProcessor::Unit::J, isgrLiving, "Zone", "Sum", "Living1");
-        SetupOutputVariable(*state, "Zone Total Internal Sensible Gain Rate", OutputProcessor::Unit::J, isgrAttic, "Zone", "Sum", "Living2");
+        SetupOutputVariable(*state, "Zone Total Internal Sensible Gain Rate", OutputProcessor::Unit::J, isgrGarage, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, "Garage");
+        SetupOutputVariable(*state, "Zone Total Internal Sensible Gain Rate", OutputProcessor::Unit::J, isgrLiving, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, "Living1");
+        SetupOutputVariable(*state, "Zone Total Internal Sensible Gain Rate", OutputProcessor::Unit::J, isgrAttic, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, "Living2");
 
         state->dataGlobal->DoWeathSim = true;
         state->dataGlobal->TimeStepZone = 0.25;
@@ -3455,8 +3430,8 @@ namespace OutputProcessor {
                             "Site Outdoor Air Drybulb Temperature",
                             OutputProcessor::Unit::C,
                             state->dataEnvrn->OutDryBulbTemp,
-                            "Zone",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
                             "Environment");
 
         auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
@@ -3499,8 +3474,8 @@ namespace OutputProcessor {
                             "Chiller Electricity Energy",
                             OutputProcessor::Unit::J,
                             cooling_consumption,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             "Cool-1",
                             _,
                             "ELECTRICITY",
@@ -3513,8 +3488,8 @@ namespace OutputProcessor {
                             "Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
-                            "Zone",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
                             "LIGHTS 1",
                             _,
                             "Electricity",
@@ -3530,8 +3505,8 @@ namespace OutputProcessor {
                             "Environmental Impact Fuel Oil No 2 CO2 Emissions Mass",
                             OutputProcessor::Unit::kg,
                             fuel_oil_co2,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             "Site",
                             _,
                             "CO2",
@@ -3595,9 +3570,9 @@ namespace OutputProcessor {
 
         GetReportVariableInput(*state);
         Real64 fuel_used = 999;
-        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1");
-        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2");
-        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler3");
+        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, "Boiler1");
+        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, "Boiler2");
+        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, "Boiler3");
 
         auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
@@ -3627,9 +3602,9 @@ namespace OutputProcessor {
 
         GetReportVariableInput(*state);
         Real64 fuel_used = 999;
-        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1");
-        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2");
-        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler3");
+        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, "Boiler1");
+        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, "Boiler2");
+        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, "Boiler3");
 
         auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
@@ -3657,9 +3632,9 @@ namespace OutputProcessor {
 
         GetReportVariableInput(*state);
         Real64 fuel_used = 999;
-        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1");
-        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2");
-        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler3");
+        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, "Boiler1");
+        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, "Boiler2");
+        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, "Boiler3");
 
         auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
@@ -3690,18 +3665,18 @@ namespace OutputProcessor {
         GetReportVariableInput(*state);
         Real64 vol_flow = 999;
         SetupOutputVariable(
-            *state, "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "Zn003:Wall001");
+            *state, "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, "Zn003:Wall001");
         SetupOutputVariable(
-            *state, "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "Zn003:Wall002");
+            *state, "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, "Zn003:Wall002");
         SetupOutputVariable(*state,
                             "AFN Linkage Node 1 to Node 2 Volume Flow Rate",
                             OutputProcessor::Unit::m3_s,
                             vol_flow,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             "Zn003:Wall002:Win001");
         SetupOutputVariable(
-            *state, "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "Zn003:Wall003");
+            *state, "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, "Zn003:Wall003");
 
         auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
@@ -3747,18 +3722,18 @@ namespace OutputProcessor {
         GetReportVariableInput(*state);
         Real64 vol_flow = 999;
         SetupOutputVariable(
-            *state, "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "ZN003:WALL001");
+            *state, "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, "ZN003:WALL001");
         SetupOutputVariable(
-            *state, "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "ZN003:WALL002");
+            *state, "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, "ZN003:WALL002");
         SetupOutputVariable(*state,
                             "AFN Linkage Node 1 to Node 2 Volume Flow Rate",
                             OutputProcessor::Unit::m3_s,
                             vol_flow,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             "ZN003:WALL002:WIN001");
         SetupOutputVariable(
-            *state, "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "ZN003:WALL003");
+            *state, "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, "ZN003:WALL003");
 
         auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
@@ -3892,8 +3867,8 @@ namespace OutputProcessor {
                             "Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
-                            "Zone",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SPACE1-1 LIGHTS 1",
                             _,
                             "Electricity",
@@ -3907,8 +3882,8 @@ namespace OutputProcessor {
                             "Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
-                            "Zone",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SPACE2-1 LIGHTS 1",
                             _,
                             "Electricity",
@@ -3922,8 +3897,8 @@ namespace OutputProcessor {
                             "Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
-                            "Zone",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SPACE3-1 LIGHTS 1",
                             _,
                             "Electricity",
@@ -3937,8 +3912,8 @@ namespace OutputProcessor {
                             "Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
-                            "Zone",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SPACE4-1 LIGHTS 1",
                             _,
                             "Electricity",
@@ -3952,8 +3927,8 @@ namespace OutputProcessor {
                             "Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
-                            "Zone",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SPACE5-1 LIGHTS 1",
                             _,
                             "Electricity",
@@ -3965,15 +3940,15 @@ namespace OutputProcessor {
                             1);
         Real64 zone_infil_total_loss = 0;
         SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE1-1");
+            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, "SPACE1-1");
         SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE2-1");
+            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, "SPACE2-1");
         SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE3-1");
+            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, "SPACE3-1");
         SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE4-1");
+            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, "SPACE4-1");
         SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE5-1");
+            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, "SPACE5-1");
 
         bool errors_found = false;
 
@@ -4110,8 +4085,8 @@ namespace OutputProcessor {
 
         auto timeStep = 1.0 / 6;
 
-        SetupTimePointers(*state, "Zone", timeStep);
-        SetupTimePointers(*state, "HVAC", timeStep);
+        SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
+        SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
 
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
@@ -4121,16 +4096,16 @@ namespace OutputProcessor {
                             "Site Outdoor Air Drybulb Temperature",
                             OutputProcessor::Unit::C,
                             state->dataEnvrn->OutDryBulbTemp,
-                            "Zone",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
                             "Environment");
         Real64 light_consumption = 999;
         SetupOutputVariable(*state,
                             "Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
-                            "Zone",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SPACE1-1 LIGHTS 1",
                             _,
                             "Electricity",
@@ -4144,8 +4119,8 @@ namespace OutputProcessor {
                             "Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
-                            "Zone",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SPACE2-1 LIGHTS 1",
                             _,
                             "Electricity",
@@ -4159,8 +4134,8 @@ namespace OutputProcessor {
                             "Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
-                            "Zone",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SPACE3-1 LIGHTS 1",
                             _,
                             "Electricity",
@@ -4174,8 +4149,8 @@ namespace OutputProcessor {
                             "Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
-                            "Zone",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SPACE4-1 LIGHTS 1",
                             _,
                             "Electricity",
@@ -4189,8 +4164,8 @@ namespace OutputProcessor {
                             "Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
-                            "Zone",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SPACE5-1 LIGHTS 1",
                             _,
                             "Electricity",
@@ -4202,15 +4177,15 @@ namespace OutputProcessor {
                             1);
         Real64 zone_infil_total_loss = 999;
         SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE1-1");
+            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, "SPACE1-1");
         SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE2-1");
+            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, "SPACE2-1");
         SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE3-1");
+            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, "SPACE3-1");
         SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE4-1");
+            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, "SPACE4-1");
         SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE5-1");
+            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, "SPACE5-1");
 
         UpdateMeterReporting(*state);
 
@@ -4373,8 +4348,8 @@ namespace OutputProcessor {
 
         auto timeStep = 1.0 / 6;
 
-        SetupTimePointers(*state, "Zone", timeStep);
-        SetupTimePointers(*state, "HVAC", timeStep);
+        SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
+        SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
 
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
@@ -4384,16 +4359,16 @@ namespace OutputProcessor {
                             "Site Outdoor Air Drybulb Temperature",
                             OutputProcessor::Unit::C,
                             state->dataEnvrn->OutDryBulbTemp,
-                            "Zone",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
                             "Environment");
         Real64 light_consumption = 999;
         SetupOutputVariable(*state,
                             "Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
-                            "Zone",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SPACE1-1 LIGHTS 1",
                             _,
                             "Electricity",
@@ -4407,8 +4382,8 @@ namespace OutputProcessor {
                             "Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
-                            "Zone",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SPACE2-1 LIGHTS 1",
                             _,
                             "Electricity",
@@ -4422,8 +4397,8 @@ namespace OutputProcessor {
                             "Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
-                            "Zone",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SPACE3-1 LIGHTS 1",
                             _,
                             "Electricity",
@@ -4437,8 +4412,8 @@ namespace OutputProcessor {
                             "Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
-                            "Zone",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SPACE4-1 LIGHTS 1",
                             _,
                             "Electricity",
@@ -4452,8 +4427,8 @@ namespace OutputProcessor {
                             "Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
-                            "Zone",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SPACE5-1 LIGHTS 1",
                             _,
                             "Electricity",
@@ -4465,19 +4440,19 @@ namespace OutputProcessor {
                             1);
         Real64 zone_infil_total_loss = 999;
         SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE1-1");
+            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, "SPACE1-1");
         SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE2-1");
+            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, "SPACE2-1");
         SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE3-1");
+            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, "SPACE3-1");
         SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE4-1");
+            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, "SPACE4-1");
         SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE5-1");
+            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, "SPACE5-1");
         Real64 fuel_used = 999;
         Real64 boiler_load = 999;
-        SetupOutputVariable(*state, "Boiler Heating Rate", OutputProcessor::Unit::W, boiler_load, "System", "Average", "Boiler1");
-        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1");
+        SetupOutputVariable(*state, "Boiler Heating Rate", OutputProcessor::Unit::W, boiler_load, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, "Boiler1");
+        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, "Boiler1");
 
         UpdateMeterReporting(*state);
 
@@ -4649,8 +4624,8 @@ namespace OutputProcessor {
 
         auto timeStep = 1.0 / 6;
 
-        SetupTimePointers(*state, "Zone", timeStep);
-        SetupTimePointers(*state, "HVAC", timeStep);
+        SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
+        SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
 
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
@@ -4660,16 +4635,16 @@ namespace OutputProcessor {
                             "Site Outdoor Air Drybulb Temperature",
                             OutputProcessor::Unit::C,
                             state->dataEnvrn->OutDryBulbTemp,
-                            "Zone",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
                             "Environment");
         Real64 light_consumption = 999;
         SetupOutputVariable(*state,
                             "Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
-                            "Zone",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SPACE1-1 LIGHTS 1",
                             _,
                             "Electricity",
@@ -4683,8 +4658,8 @@ namespace OutputProcessor {
                             "Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
-                            "Zone",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SPACE2-1 LIGHTS 1",
                             _,
                             "Electricity",
@@ -4698,8 +4673,8 @@ namespace OutputProcessor {
                             "Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
-                            "Zone",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SPACE3-1 LIGHTS 1",
                             _,
                             "Electricity",
@@ -4713,8 +4688,8 @@ namespace OutputProcessor {
                             "Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
-                            "Zone",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SPACE4-1 LIGHTS 1",
                             _,
                             "Electricity",
@@ -4728,8 +4703,8 @@ namespace OutputProcessor {
                             "Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
-                            "Zone",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SPACE5-1 LIGHTS 1",
                             _,
                             "Electricity",
@@ -4741,19 +4716,19 @@ namespace OutputProcessor {
                             1);
         Real64 zone_infil_total_loss = 999;
         SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE1-1");
+            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, "SPACE1-1");
         SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE2-1");
+            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, "SPACE2-1");
         SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE3-1");
+            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, "SPACE3-1");
         SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE4-1");
+            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, "SPACE4-1");
         SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE5-1");
+            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, "SPACE5-1");
         Real64 fuel_used = 999;
         Real64 boiler_load = 999;
-        SetupOutputVariable(*state, "Boiler Heating Rate", OutputProcessor::Unit::W, boiler_load, "System", "Average", "Boiler1");
-        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1");
+        SetupOutputVariable(*state, "Boiler Heating Rate", OutputProcessor::Unit::W, boiler_load, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, "Boiler1");
+        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, "Boiler1");
 
         UpdateMeterReporting(*state);
 
@@ -4870,8 +4845,8 @@ namespace OutputProcessor {
         }
         // OutputProcessor::TimeValue.allocate(2);
         auto timeStep = 1.0 / 6;
-        SetupTimePointers(*state, "Zone", timeStep);
-        SetupTimePointers(*state, "HVAC", timeStep);
+        SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
+        SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
 
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 10;
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 10;
@@ -4887,8 +4862,8 @@ namespace OutputProcessor {
                             "Zone Ideal Loads Supply Air Total Heating Energy",
                             OutputProcessor::Unit::J,
                             PurchAir(1).TotHeatEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             PurchAir(1).Name,
                             _,
                             "DISTRICTHEATING",
@@ -5019,8 +4994,8 @@ namespace OutputProcessor {
 
         auto timeStep = 1.0 / 6;
 
-        SetupTimePointers(*state, "Zone", timeStep);
-        SetupTimePointers(*state, "HVAC", timeStep);
+        SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
+        SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
 
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
@@ -5030,16 +5005,16 @@ namespace OutputProcessor {
                             "Site Outdoor Air Drybulb Temperature",
                             OutputProcessor::Unit::C,
                             state->dataEnvrn->OutDryBulbTemp,
-                            "Zone",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
                             "Environment");
         Real64 light_consumption = 999;
         SetupOutputVariable(*state,
                             "Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
-                            "Zone",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SPACE1-1 LIGHTS 1",
                             _,
                             "Electricity",
@@ -5103,8 +5078,8 @@ namespace OutputProcessor {
 
         auto timeStep = 1.0 / 6;
 
-        SetupTimePointers(*state, "Zone", timeStep);
-        SetupTimePointers(*state, "HVAC", timeStep);
+        SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
+        SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
 
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
@@ -5117,16 +5092,16 @@ namespace OutputProcessor {
                             "Site Outdoor Air Drybulb Temperature",
                             OutputProcessor::Unit::C,
                             state->dataEnvrn->OutDryBulbTemp,
-                            "Zone",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
                             "Environment");
         Real64 light_consumption = 999;
         SetupOutputVariable(*state,
                             "Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
-                            "Zone",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SPACE1-1 LIGHTS 1",
                             _,
                             "Electricity",
@@ -5289,17 +5264,17 @@ namespace OutputProcessor {
         state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
         state->dataZoneEquip->ZoneEquipConfig(state->dataGlobal->NumOfZones).IsControlled = true;
         SetupOutputVariable(
-            *state, "Surface Average Face Conduction Heat Transfer Energy", OutputProcessor::Unit::J, transferredenergy, "Zone", "Sum", "*");
-        SetupOutputVariable(*state, "Surface Window Heat Loss Energy", OutputProcessor::Unit::J, transferredenergy, "Zone", "Sum", "*");
-        SetupOutputVariable(*state, "Zone Windows Total Heat Gain Energy", OutputProcessor::Unit::J, transferredenergy, "Zone", "Sum", "*");
-        SetupOutputVariable(*state, "Surface Window Heat Gain Energy", OutputProcessor::Unit::J, transferredenergy, "Zone", "Sum", "*");
-        SetupOutputVariable(*state, "Zone Ventilation Total Heat Gain Energy", OutputProcessor::Unit::J, transferredenergy, "Zone", "Sum", "*");
-        SetupOutputVariable(*state, "Zone Ventilation Total Heat Loss Energy", OutputProcessor::Unit::J, transferredenergy, "Zone", "Sum", "*");
-        SetupOutputVariable(*state, "Zone Infiltration Total Heat Gain Energy", OutputProcessor::Unit::J, transferredenergy, "Zone", "Sum", "*");
-        SetupOutputVariable(*state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, transferredenergy, "Zone", "Sum", "*");
-        SetupOutputVariable(*state, "Zone Electric Equipment Total Heating Energy", OutputProcessor::Unit::J, transferredenergy, "Zone", "Sum", "*");
-        SetupOutputVariable(*state, "Zone Lights Total Heating Energy", OutputProcessor::Unit::J, transferredenergy, "Zone", "Sum", "*");
-        SetupOutputVariable(*state, "People Total Heating Energy", OutputProcessor::Unit::J, transferredenergy, "Zone", "Sum", "*");
+            *state, "Surface Average Face Conduction Heat Transfer Energy", OutputProcessor::Unit::J, transferredenergy, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, "*");
+        SetupOutputVariable(*state, "Surface Window Heat Loss Energy", OutputProcessor::Unit::J, transferredenergy, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, "*");
+        SetupOutputVariable(*state, "Zone Windows Total Heat Gain Energy", OutputProcessor::Unit::J, transferredenergy, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, "*");
+        SetupOutputVariable(*state, "Surface Window Heat Gain Energy", OutputProcessor::Unit::J, transferredenergy, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, "*");
+        SetupOutputVariable(*state, "Zone Ventilation Total Heat Gain Energy", OutputProcessor::Unit::J, transferredenergy, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, "*");
+        SetupOutputVariable(*state, "Zone Ventilation Total Heat Loss Energy", OutputProcessor::Unit::J, transferredenergy, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, "*");
+        SetupOutputVariable(*state, "Zone Infiltration Total Heat Gain Energy", OutputProcessor::Unit::J, transferredenergy, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, "*");
+        SetupOutputVariable(*state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, transferredenergy, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, "*");
+        SetupOutputVariable(*state, "Zone Electric Equipment Total Heating Energy", OutputProcessor::Unit::J, transferredenergy, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, "*");
+        SetupOutputVariable(*state, "Zone Lights Total Heating Energy", OutputProcessor::Unit::J, transferredenergy, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, "*");
+        SetupOutputVariable(*state, "People Total Heating Energy", OutputProcessor::Unit::J, transferredenergy, OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::SOVStoreType::Summed, "*");
         SystemReports::AllocateAndSetUpVentReports(*state);
         SystemReports::AllocateAndSetUpVentReports(*state);
         GetCustomMeterInput(*state, errors_found);

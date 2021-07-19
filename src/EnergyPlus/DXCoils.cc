@@ -5702,13 +5702,13 @@ void GetDXCoils(EnergyPlusData &state)
             // Setup Report Variables for Cooling Equipment
             // CurrentModuleObject='Coil:Cooling:DX:SingleSpeed/Coil:Cooling:DX:TwoStageWithHumidityControlMode'
             SetupOutputVariable(
-                state, "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, Coil.TotalCoolingEnergyRate, "System", "Average", Coil.Name);
+                state, "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, Coil.TotalCoolingEnergyRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Total Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 Coil.TotalCoolingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 Coil.Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -5716,21 +5716,21 @@ void GetDXCoils(EnergyPlusData &state)
                                 _,
                                 "System");
             SetupOutputVariable(
-                state, "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, Coil.SensCoolingEnergyRate, "System", "Average", Coil.Name);
+                state, "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, Coil.SensCoolingEnergyRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             SetupOutputVariable(
-                state, "Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, Coil.SensCoolingEnergy, "System", "Sum", Coil.Name);
+                state, "Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, Coil.SensCoolingEnergy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, Coil.Name);
             SetupOutputVariable(
-                state, "Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, Coil.LatCoolingEnergyRate, "System", "Average", Coil.Name);
+                state, "Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, Coil.LatCoolingEnergyRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             SetupOutputVariable(
-                state, "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, Coil.LatCoolingEnergy, "System", "Sum", Coil.Name);
+                state, "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, Coil.LatCoolingEnergy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, Coil.Name);
             SetupOutputVariable(
-                state, "Cooling Coil Electricity Rate", OutputProcessor::Unit::W, Coil.ElecCoolingPower, "System", "Average", Coil.Name);
+                state, "Cooling Coil Electricity Rate", OutputProcessor::Unit::W, Coil.ElecCoolingPower, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 Coil.ElecCoolingConsumption,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 Coil.Name,
                                 _,
                                 "Electricity",
@@ -5738,14 +5738,14 @@ void GetDXCoils(EnergyPlusData &state)
                                 _,
                                 "System");
             SetupOutputVariable(
-                state, "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.CoolingCoilRuntimeFraction, "System", "Average", Coil.Name);
+                state, "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.CoolingCoilRuntimeFraction, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             if (Coil.IsSecondaryDXCoilInZone) {
                 SetupOutputVariable(state,
                                     "Secondary Coil Heat Rejection Rate",
                                     OutputProcessor::Unit::W,
                                     Coil.SecCoilSensibleHeatGainRate,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     Coil.Name);
             }
 
@@ -5755,15 +5755,15 @@ void GetDXCoils(EnergyPlusData &state)
                                     "Cooling Coil Condensate Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     Coil.CondensateVdot,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     Coil.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Condensate Volume",
                                     OutputProcessor::Unit::m3,
                                     Coil.CondensateVol,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     Coil.Name,
                                     _,
                                     "OnSiteWater",
@@ -5783,13 +5783,13 @@ void GetDXCoils(EnergyPlusData &state)
 
             if (Coil.ReportEvapCondVars) {
                 SetupOutputVariable(
-                    state, "Cooling Coil Condenser Inlet Temperature", OutputProcessor::Unit::C, Coil.CondInletTemp, "System", "Average", Coil.Name);
+                    state, "Cooling Coil Condenser Inlet Temperature", OutputProcessor::Unit::C, Coil.CondInletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Evaporative Condenser Water Volume",
                                     OutputProcessor::Unit::m3,
                                     Coil.EvapWaterConsump,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     Coil.Name,
                                     _,
                                     "Water",
@@ -5800,8 +5800,8 @@ void GetDXCoils(EnergyPlusData &state)
                                     "Cooling Coil Evaporative Condenser Mains Supply Water Volume",
                                     OutputProcessor::Unit::m3,
                                     Coil.EvapWaterConsump,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     Coil.Name,
                                     _,
                                     "MainsWater",
@@ -5812,15 +5812,15 @@ void GetDXCoils(EnergyPlusData &state)
                                     "Cooling Coil Evaporative Condenser Pump Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     Coil.EvapCondPumpElecPower,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     Coil.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Evaporative Condenser Pump Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     Coil.EvapCondPumpElecConsumption,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     Coil.Name,
                                     _,
                                     "Electricity",
@@ -5832,15 +5832,15 @@ void GetDXCoils(EnergyPlusData &state)
                                         "Cooling Coil Basin Heater Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         Coil.BasinHeaterPower,
-                                        "System",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Average,
                                         Coil.Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Basin Heater Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         Coil.BasinHeaterConsumption,
-                                        "System",
-                                        "Sum",
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Summed,
                                         Coil.Name,
                                         _,
                                         "Electricity",
@@ -5857,15 +5857,15 @@ void GetDXCoils(EnergyPlusData &state)
                                     "Cooling Coil Stage 2 Runtime Fraction",
                                     OutputProcessor::Unit::None,
                                     Coil.CoolingCoilStg2RuntimeFrac,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     Coil.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Dehumidification Mode",
                                     OutputProcessor::Unit::None,
                                     Coil.DehumidificationMode,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     Coil.Name);
             }
 
@@ -5875,13 +5875,13 @@ void GetDXCoils(EnergyPlusData &state)
             // Setup Report Variables for Heating Equipment
             // CurrentModuleObject='Coil:Heating:DX:SingleSpeed'
             SetupOutputVariable(
-                state, "Heating Coil Heating Rate", OutputProcessor::Unit::W, Coil.TotalHeatingEnergyRate, "System", "Average", Coil.Name);
+                state, "Heating Coil Heating Rate", OutputProcessor::Unit::W, Coil.TotalHeatingEnergyRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             SetupOutputVariable(state,
                                 "Heating Coil Heating Energy",
                                 OutputProcessor::Unit::J,
                                 Coil.TotalHeatingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 Coil.Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -5889,13 +5889,13 @@ void GetDXCoils(EnergyPlusData &state)
                                 _,
                                 "System");
             SetupOutputVariable(
-                state, "Heating Coil Electricity Rate", OutputProcessor::Unit::W, Coil.ElecHeatingPower, "System", "Average", Coil.Name);
+                state, "Heating Coil Electricity Rate", OutputProcessor::Unit::W, Coil.ElecHeatingPower, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             SetupOutputVariable(state,
                                 "Heating Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 Coil.ElecHeatingConsumption,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 Coil.Name,
                                 _,
                                 "Electricity",
@@ -5903,13 +5903,13 @@ void GetDXCoils(EnergyPlusData &state)
                                 _,
                                 "System");
             SetupOutputVariable(
-                state, "Heating Coil Defrost Electricity Rate", OutputProcessor::Unit::W, Coil.DefrostPower, "System", "Average", Coil.Name);
+                state, "Heating Coil Defrost Electricity Rate", OutputProcessor::Unit::W, Coil.DefrostPower, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             SetupOutputVariable(state,
                                 "Heating Coil Defrost Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 Coil.DefrostConsumption,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 Coil.Name,
                                 _,
                                 "Electricity",
@@ -5920,15 +5920,15 @@ void GetDXCoils(EnergyPlusData &state)
                                 "Heating Coil Crankcase Heater Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 Coil.CrankcaseHeaterPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 Coil.Name);
             SetupOutputVariable(state,
                                 "Heating Coil Crankcase Heater Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 Coil.CrankcaseHeaterConsumption,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 Coil.Name,
                                 _,
                                 "Electricity",
@@ -5936,37 +5936,37 @@ void GetDXCoils(EnergyPlusData &state)
                                 _,
                                 "System");
             SetupOutputVariable(
-                state, "Heating Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.HeatingCoilRuntimeFraction, "System", "Average", Coil.Name);
+                state, "Heating Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.HeatingCoilRuntimeFraction, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             if (Coil.IsSecondaryDXCoilInZone) {
                 SetupOutputVariable(state,
                                     "Secondary Coil Total Heat Removal Rate",
                                     OutputProcessor::Unit::W,
                                     Coil.SecCoilTotalHeatRemovalRate,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     Coil.Name);
                 SetupOutputVariable(state,
                                     "Secondary Coil Sensible Heat Removal Rate",
                                     OutputProcessor::Unit::W,
                                     Coil.SecCoilSensibleHeatRemovalRate,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     Coil.Name);
                 SetupOutputVariable(state,
                                     "Secondary Coil Latent Heat Removal Rate",
                                     OutputProcessor::Unit::W,
                                     Coil.SecCoilLatentHeatRemovalRate,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     Coil.Name);
                 SetupOutputVariable(
-                    state, "Secondary Coil Sensible Heat Ratio", OutputProcessor::Unit::None, Coil.SecCoilSHR, "System", "Average", Coil.Name);
+                    state, "Secondary Coil Sensible Heat Ratio", OutputProcessor::Unit::None, Coil.SecCoilSHR, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
                 SetupOutputVariable(state,
                                     "Secondary Coil Compressor Part Load Ratio",
                                     OutputProcessor::Unit::None,
                                     Coil.CompressorPartLoadRatio,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     Coil.Name);
             }
         }
@@ -5975,13 +5975,13 @@ void GetDXCoils(EnergyPlusData &state)
             // Setup Report Variables for Cooling Equipment
             // CurrentModuleObject='Coil:Cooling:DX:TwoSpeed'
             SetupOutputVariable(
-                state, "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, Coil.TotalCoolingEnergyRate, "System", "Average", Coil.Name);
+                state, "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, Coil.TotalCoolingEnergyRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Total Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 Coil.TotalCoolingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 Coil.Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -5989,21 +5989,21 @@ void GetDXCoils(EnergyPlusData &state)
                                 _,
                                 "System");
             SetupOutputVariable(
-                state, "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, Coil.SensCoolingEnergyRate, "System", "Average", Coil.Name);
+                state, "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, Coil.SensCoolingEnergyRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             SetupOutputVariable(
-                state, "Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, Coil.SensCoolingEnergy, "System", "Sum", Coil.Name);
+                state, "Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, Coil.SensCoolingEnergy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, Coil.Name);
             SetupOutputVariable(
-                state, "Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, Coil.LatCoolingEnergyRate, "System", "Average", Coil.Name);
+                state, "Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, Coil.LatCoolingEnergyRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             SetupOutputVariable(
-                state, "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, Coil.LatCoolingEnergy, "System", "Sum", Coil.Name);
+                state, "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, Coil.LatCoolingEnergy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, Coil.Name);
             SetupOutputVariable(
-                state, "Cooling Coil Electricity Rate", OutputProcessor::Unit::W, Coil.ElecCoolingPower, "System", "Average", Coil.Name);
+                state, "Cooling Coil Electricity Rate", OutputProcessor::Unit::W, Coil.ElecCoolingPower, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 Coil.ElecCoolingConsumption,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 Coil.Name,
                                 _,
                                 "Electricity",
@@ -6011,26 +6011,26 @@ void GetDXCoils(EnergyPlusData &state)
                                 _,
                                 "System");
             SetupOutputVariable(
-                state, "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.CoolingCoilRuntimeFraction, "System", "Average", Coil.Name);
+                state, "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.CoolingCoilRuntimeFraction, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             if (Coil.IsSecondaryDXCoilInZone) {
                 SetupOutputVariable(state,
                                     "Secondary Coil Heat Rejection Rate",
                                     OutputProcessor::Unit::W,
                                     Coil.SecCoilSensibleHeatGainRate,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     Coil.Name);
             }
 
             if (Coil.ReportEvapCondVars) {
                 SetupOutputVariable(
-                    state, "Cooling Coil Condenser Inlet Temperature", OutputProcessor::Unit::C, Coil.CondInletTemp, "System", "Average", Coil.Name);
+                    state, "Cooling Coil Condenser Inlet Temperature", OutputProcessor::Unit::C, Coil.CondInletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Evaporative Condenser Water Volume",
                                     OutputProcessor::Unit::m3,
                                     Coil.EvapWaterConsump,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     Coil.Name,
                                     _,
                                     "Water",
@@ -6041,8 +6041,8 @@ void GetDXCoils(EnergyPlusData &state)
                                     "Cooling Coil Evaporative Condenser Mains Supply Water Volume",
                                     OutputProcessor::Unit::m3,
                                     Coil.EvapWaterConsump,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     Coil.Name,
                                     _,
                                     "MainsWater",
@@ -6053,15 +6053,15 @@ void GetDXCoils(EnergyPlusData &state)
                                     "Cooling Coil Evaporative Condenser Pump Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     Coil.EvapCondPumpElecPower,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     Coil.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Evaporative Condenser Pump Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     Coil.EvapCondPumpElecConsumption,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     Coil.Name,
                                     _,
                                     "Electricity",
@@ -6073,15 +6073,15 @@ void GetDXCoils(EnergyPlusData &state)
                                         "Cooling Coil Basin Heater Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         Coil.BasinHeaterPower,
-                                        "System",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Average,
                                         Coil.Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Basin Heater Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         Coil.BasinHeaterConsumption,
-                                        "System",
-                                        "Sum",
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Summed,
                                         Coil.Name,
                                         _,
                                         "Electricity",
@@ -6098,15 +6098,15 @@ void GetDXCoils(EnergyPlusData &state)
             // CurrentModuleObject='Coil:WaterHeating:AirToWaterHeatPump:Pumped'
             // or 'Coil:WaterHeating:AirToWaterHeatPump:Wrapped'
             SetupOutputVariable(
-                state, "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, Coil.TotalCoolingEnergyRate, "System", "Average", Coil.Name);
+                state, "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, Coil.TotalCoolingEnergyRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
 
             if (Coil.IsDXCoilInZone) {
                 SetupOutputVariable(state,
                                     "Cooling Coil Total Cooling Energy",
                                     OutputProcessor::Unit::J,
                                     Coil.TotalCoolingEnergy,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     Coil.Name,
                                     _,
                                     "ENERGYTRANSFER",
@@ -6115,34 +6115,34 @@ void GetDXCoils(EnergyPlusData &state)
                                     "System");
             } else {
                 SetupOutputVariable(
-                    state, "Cooling Coil Total Cooling Energy", OutputProcessor::Unit::J, Coil.TotalCoolingEnergy, "System", "Sum", Coil.Name);
+                    state, "Cooling Coil Total Cooling Energy", OutputProcessor::Unit::J, Coil.TotalCoolingEnergy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, Coil.Name);
             }
 
             SetupOutputVariable(
-                state, "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, Coil.SensCoolingEnergyRate, "System", "Average", Coil.Name);
+                state, "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, Coil.SensCoolingEnergyRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             SetupOutputVariable(
-                state, "Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, Coil.SensCoolingEnergy, "System", "Sum", Coil.Name);
+                state, "Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, Coil.SensCoolingEnergy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, Coil.Name);
             SetupOutputVariable(
-                state, "Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, Coil.LatCoolingEnergyRate, "System", "Average", Coil.Name);
+                state, "Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, Coil.LatCoolingEnergyRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             SetupOutputVariable(
-                state, "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, Coil.LatCoolingEnergy, "System", "Sum", Coil.Name);
+                state, "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, Coil.LatCoolingEnergy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, Coil.Name);
             SetupOutputVariable(
-                state, "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.CoolingCoilRuntimeFraction, "System", "Average", Coil.Name);
+                state, "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.CoolingCoilRuntimeFraction, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
 
             if (Coil.ReportCoolingCoilCrankcasePower) {
                 SetupOutputVariable(state,
                                     "Cooling Coil Crankcase Heater Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     Coil.CrankcaseHeaterPower,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     Coil.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Crankcase Heater Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     Coil.CrankcaseHeaterConsumption,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     Coil.Name,
                                     _,
                                     "Electricity",
@@ -6156,30 +6156,30 @@ void GetDXCoils(EnergyPlusData &state)
                                 "Cooling Coil Total Water Heating Rate",
                                 OutputProcessor::Unit::W,
                                 Coil.TotalHeatingEnergyRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 Coil.Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Total Water Heating Energy",
                                 OutputProcessor::Unit::J,
                                 Coil.TotalHeatingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 Coil.Name); //, &
             //                           ResourceTypeKey='ENERGYTRANSFER',EndUseKey='HEATING',GroupKey='Plant')
             SetupOutputVariable(state,
                                 "Cooling Coil Water Heating Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 Coil.ElecWaterHeatingPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 Coil.Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Water Heating Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 Coil.ElecWaterHeatingConsumption,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 Coil.Name,
                                 _,
                                 "Electricity",
@@ -6192,13 +6192,13 @@ void GetDXCoils(EnergyPlusData &state)
             // Setup Report Variables for Cooling Equipment:
             // CurrentModuleObject='Coil:Cooling:DX:MultiSpeed'
             SetupOutputVariable(
-                state, "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, Coil.TotalCoolingEnergyRate, "System", "Average", Coil.Name);
+                state, "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, Coil.TotalCoolingEnergyRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Total Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 Coil.TotalCoolingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 Coil.Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -6206,21 +6206,21 @@ void GetDXCoils(EnergyPlusData &state)
                                 _,
                                 "System");
             SetupOutputVariable(
-                state, "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, Coil.SensCoolingEnergyRate, "System", "Average", Coil.Name);
+                state, "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, Coil.SensCoolingEnergyRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             SetupOutputVariable(
-                state, "Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, Coil.SensCoolingEnergy, "System", "Sum", Coil.Name);
+                state, "Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, Coil.SensCoolingEnergy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, Coil.Name);
             SetupOutputVariable(
-                state, "Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, Coil.LatCoolingEnergyRate, "System", "Average", Coil.Name);
+                state, "Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, Coil.LatCoolingEnergyRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             SetupOutputVariable(
-                state, "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, Coil.LatCoolingEnergy, "System", "Sum", Coil.Name);
+                state, "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, Coil.LatCoolingEnergy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, Coil.Name);
             SetupOutputVariable(
-                state, "Cooling Coil Electricity Rate", OutputProcessor::Unit::W, Coil.ElecCoolingPower, "System", "Average", Coil.Name);
+                state, "Cooling Coil Electricity Rate", OutputProcessor::Unit::W, Coil.ElecCoolingPower, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 Coil.ElecCoolingConsumption,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 Coil.Name,
                                 _,
                                 "Electricity",
@@ -6230,13 +6230,13 @@ void GetDXCoils(EnergyPlusData &state)
 
             if (Coil.FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
                 SetupOutputVariable(
-                    state, "Cooling Coil " + Coil.FuelType + " Rate", OutputProcessor::Unit::W, Coil.FuelUsed, "System", "Average", Coil.Name);
+                    state, "Cooling Coil " + Coil.FuelType + " Rate", OutputProcessor::Unit::W, Coil.FuelUsed, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil " + Coil.FuelType + " Energy",
                                     OutputProcessor::Unit::J,
                                     Coil.FuelConsumed,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     Coil.Name,
                                     _,
                                     Coil.FuelType,
@@ -6246,17 +6246,17 @@ void GetDXCoils(EnergyPlusData &state)
             }
 
             SetupOutputVariable(
-                state, "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.CoolingCoilRuntimeFraction, "System", "Average", Coil.Name);
+                state, "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.CoolingCoilRuntimeFraction, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
 
             if (Coil.ReportEvapCondVars) {
                 SetupOutputVariable(
-                    state, "Cooling Coil Condenser Inlet Temperature", OutputProcessor::Unit::C, Coil.CondInletTemp, "System", "Average", Coil.Name);
+                    state, "Cooling Coil Condenser Inlet Temperature", OutputProcessor::Unit::C, Coil.CondInletTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Evaporative Condenser Water Volume",
                                     OutputProcessor::Unit::m3,
                                     Coil.EvapWaterConsump,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     Coil.Name,
                                     _,
                                     "Water",
@@ -6267,8 +6267,8 @@ void GetDXCoils(EnergyPlusData &state)
                                     "Cooling Coil Evaporative Condenser Mains Supply Water Volume",
                                     OutputProcessor::Unit::m3,
                                     Coil.EvapWaterConsump,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     Coil.Name,
                                     _,
                                     "MainsWater",
@@ -6279,15 +6279,15 @@ void GetDXCoils(EnergyPlusData &state)
                                     "Cooling Coil Evaporative Condenser Pump Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     Coil.EvapCondPumpElecPower,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     Coil.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Evaporative Condenser Pump Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     Coil.EvapCondPumpElecConsumption,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     Coil.Name,
                                     _,
                                     "Electricity",
@@ -6299,15 +6299,15 @@ void GetDXCoils(EnergyPlusData &state)
                                         "Cooling Coil Basin Heater Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         Coil.BasinHeaterPower,
-                                        "System",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Average,
                                         Coil.Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Basin Heater Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         Coil.BasinHeaterConsumption,
-                                        "System",
-                                        "Sum",
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Summed,
                                         Coil.Name,
                                         _,
                                         "Electricity",
@@ -6321,8 +6321,8 @@ void GetDXCoils(EnergyPlusData &state)
                                     "Secondary Coil Heat Rejection Rate",
                                     OutputProcessor::Unit::W,
                                     Coil.SecCoilSensibleHeatGainRate,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     Coil.Name);
             }
 
@@ -6332,13 +6332,13 @@ void GetDXCoils(EnergyPlusData &state)
             // Setup Report Variables for Heating Equipment:
             // CurrentModuleObject='Coil:Heating:DX:MultiSpeed'
             SetupOutputVariable(
-                state, "Heating Coil Heating Rate", OutputProcessor::Unit::W, Coil.TotalHeatingEnergyRate, "System", "Average", Coil.Name);
+                state, "Heating Coil Heating Rate", OutputProcessor::Unit::W, Coil.TotalHeatingEnergyRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             SetupOutputVariable(state,
                                 "Heating Coil Heating Energy",
                                 OutputProcessor::Unit::J,
                                 Coil.TotalHeatingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 Coil.Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -6346,13 +6346,13 @@ void GetDXCoils(EnergyPlusData &state)
                                 _,
                                 "System");
             SetupOutputVariable(
-                state, "Heating Coil Electricity Rate", OutputProcessor::Unit::W, Coil.ElecHeatingPower, "System", "Average", Coil.Name);
+                state, "Heating Coil Electricity Rate", OutputProcessor::Unit::W, Coil.ElecHeatingPower, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             SetupOutputVariable(state,
                                 "Heating Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 Coil.ElecHeatingConsumption,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 Coil.Name,
                                 _,
                                 "Electricity",
@@ -6362,13 +6362,13 @@ void GetDXCoils(EnergyPlusData &state)
 
             if (Coil.FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
                 SetupOutputVariable(
-                    state, "Heating Coil " + Coil.FuelType + " Rate", OutputProcessor::Unit::W, Coil.FuelUsed, "System", "Average", Coil.Name);
+                    state, "Heating Coil " + Coil.FuelType + " Rate", OutputProcessor::Unit::W, Coil.FuelUsed, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil " + Coil.FuelType + " Energy",
                                     OutputProcessor::Unit::J,
                                     Coil.FuelConsumed,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     Coil.Name,
                                     _,
                                     Coil.FuelType,
@@ -6383,15 +6383,15 @@ void GetDXCoils(EnergyPlusData &state)
                                     "Heating Coil Defrost " + Coil.FuelType + " Rate",
                                     OutputProcessor::Unit::W,
                                     Coil.DefrostPower,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     Coil.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil Defrost " + Coil.FuelType + " Energy",
                                     OutputProcessor::Unit::J,
                                     Coil.DefrostConsumption,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     Coil.Name,
                                     _,
                                     Coil.FuelType,
@@ -6400,13 +6400,13 @@ void GetDXCoils(EnergyPlusData &state)
                                     "System");
             } else {
                 SetupOutputVariable(
-                    state, "Heating Coil Defrost Electricity Rate", OutputProcessor::Unit::W, Coil.DefrostPower, "System", "Average", Coil.Name);
+                    state, "Heating Coil Defrost Electricity Rate", OutputProcessor::Unit::W, Coil.DefrostPower, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil Defrost Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     Coil.DefrostConsumption,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     Coil.Name,
                                     _,
                                     "Electricity",
@@ -6419,15 +6419,15 @@ void GetDXCoils(EnergyPlusData &state)
                                 "Heating Coil Crankcase Heater Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 Coil.CrankcaseHeaterPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 Coil.Name);
             SetupOutputVariable(state,
                                 "Heating Coil Crankcase Heater Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 Coil.CrankcaseHeaterConsumption,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 Coil.Name,
                                 _,
                                 "Electricity",
@@ -6435,32 +6435,32 @@ void GetDXCoils(EnergyPlusData &state)
                                 _,
                                 "System");
             SetupOutputVariable(
-                state, "Heating Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.HeatingCoilRuntimeFraction, "System", "Average", Coil.Name);
+                state, "Heating Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.HeatingCoilRuntimeFraction, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
 
             if (Coil.IsSecondaryDXCoilInZone) {
                 SetupOutputVariable(state,
                                     "Secondary Coil Total Heat Removal Rate",
                                     OutputProcessor::Unit::W,
                                     Coil.SecCoilTotalHeatRemovalRate,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     Coil.Name);
                 SetupOutputVariable(state,
                                     "Secondary Coil Sensible Heat Removal Rate",
                                     OutputProcessor::Unit::W,
                                     Coil.SecCoilSensibleHeatRemovalRate,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     Coil.Name);
                 SetupOutputVariable(state,
                                     "Secondary Coil Latent Heat Removal Rate",
                                     OutputProcessor::Unit::W,
                                     Coil.SecCoilLatentHeatRemovalRate,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     Coil.Name);
                 SetupOutputVariable(
-                    state, "Secondary Coil Sensible Heat Ratio", OutputProcessor::Unit::None, Coil.SecCoilSHR, "System", "Average", Coil.Name);
+                    state, "Secondary Coil Sensible Heat Ratio", OutputProcessor::Unit::None, Coil.SecCoilSHR, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             }
         }
 
@@ -6469,13 +6469,13 @@ void GetDXCoils(EnergyPlusData &state)
             // Setup Report Variables for Cooling Equipment:
             // CurrentModuleObject='Coil:Cooling:DX:VariableRefrigerantFlow
             SetupOutputVariable(
-                state, "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, Coil.TotalCoolingEnergyRate, "System", "Average", Coil.Name);
+                state, "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, Coil.TotalCoolingEnergyRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Total Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 Coil.TotalCoolingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 Coil.Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -6483,29 +6483,29 @@ void GetDXCoils(EnergyPlusData &state)
                                 _,
                                 "System");
             SetupOutputVariable(
-                state, "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, Coil.SensCoolingEnergyRate, "System", "Average", Coil.Name);
+                state, "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, Coil.SensCoolingEnergyRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             SetupOutputVariable(
-                state, "Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, Coil.SensCoolingEnergy, "System", "Sum", Coil.Name);
+                state, "Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, Coil.SensCoolingEnergy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, Coil.Name);
             SetupOutputVariable(
-                state, "Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, Coil.LatCoolingEnergyRate, "System", "Average", Coil.Name);
+                state, "Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, Coil.LatCoolingEnergyRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             SetupOutputVariable(
-                state, "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, Coil.LatCoolingEnergy, "System", "Sum", Coil.Name);
+                state, "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, Coil.LatCoolingEnergy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, Coil.Name);
             SetupOutputVariable(
-                state, "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.CoolingCoilRuntimeFraction, "System", "Average", Coil.Name);
+                state, "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.CoolingCoilRuntimeFraction, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             if (Coil.CondensateCollectMode == iCondensate::ToTank) {
                 SetupOutputVariable(state,
                                     "Cooling Coil Condensate Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     Coil.CondensateVdot,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     Coil.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Condensate Volume",
                                     OutputProcessor::Unit::m3,
                                     Coil.CondensateVol,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     Coil.Name,
                                     _,
                                     "OnSiteWater",
@@ -6520,13 +6520,13 @@ void GetDXCoils(EnergyPlusData &state)
             // Setup Report Variables for Heating Equipment:
             // CurrentModuleObject='Coil:Heating:DX:VariableRefrigerantFlow
             SetupOutputVariable(
-                state, "Heating Coil Heating Rate", OutputProcessor::Unit::W, Coil.TotalHeatingEnergyRate, "System", "Average", Coil.Name);
+                state, "Heating Coil Heating Rate", OutputProcessor::Unit::W, Coil.TotalHeatingEnergyRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             SetupOutputVariable(state,
                                 "Heating Coil Heating Energy",
                                 OutputProcessor::Unit::J,
                                 Coil.TotalHeatingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 Coil.Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -6534,7 +6534,7 @@ void GetDXCoils(EnergyPlusData &state)
                                 _,
                                 "System");
             SetupOutputVariable(
-                state, "Heating Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.HeatingCoilRuntimeFraction, "System", "Average", Coil.Name);
+                state, "Heating Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.HeatingCoilRuntimeFraction, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
         }
 
         // VRF cooling coil for FluidTCtrl, report variables
@@ -6542,13 +6542,13 @@ void GetDXCoils(EnergyPlusData &state)
             // Setup Report Variables for Cooling Equipment:
             // CurrentModuleObject='Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl
             SetupOutputVariable(
-                state, "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, Coil.TotalCoolingEnergyRate, "System", "Average", Coil.Name);
+                state, "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, Coil.TotalCoolingEnergyRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Total Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 Coil.TotalCoolingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 Coil.Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -6556,35 +6556,35 @@ void GetDXCoils(EnergyPlusData &state)
                                 _,
                                 "System");
             SetupOutputVariable(
-                state, "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, Coil.SensCoolingEnergyRate, "System", "Average", Coil.Name);
+                state, "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, Coil.SensCoolingEnergyRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             SetupOutputVariable(
-                state, "Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, Coil.SensCoolingEnergy, "System", "Sum", Coil.Name);
+                state, "Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, Coil.SensCoolingEnergy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, Coil.Name);
             SetupOutputVariable(
-                state, "Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, Coil.LatCoolingEnergyRate, "System", "Average", Coil.Name);
+                state, "Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, Coil.LatCoolingEnergyRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             SetupOutputVariable(
-                state, "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, Coil.LatCoolingEnergy, "System", "Sum", Coil.Name);
+                state, "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, Coil.LatCoolingEnergy, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Summed, Coil.Name);
             SetupOutputVariable(
-                state, "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.CoolingCoilRuntimeFraction, "System", "Average", Coil.Name);
+                state, "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.CoolingCoilRuntimeFraction, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             // Followings for VRF_FluidTCtrl Only
             SetupOutputVariable(
-                state, "Cooling Coil VRF Evaporating Temperature", OutputProcessor::Unit::C, Coil.EvaporatingTemp, "System", "Average", Coil.Name);
+                state, "Cooling Coil VRF Evaporating Temperature", OutputProcessor::Unit::C, Coil.EvaporatingTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             SetupOutputVariable(
-                state, "Cooling Coil VRF Super Heating Degrees", OutputProcessor::Unit::C, Coil.ActualSH, "System", "Average", Coil.Name);
+                state, "Cooling Coil VRF Super Heating Degrees", OutputProcessor::Unit::C, Coil.ActualSH, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
 
             if (Coil.CondensateCollectMode == iCondensate::ToTank) {
                 SetupOutputVariable(state,
                                     "Cooling Coil Condensate Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     Coil.CondensateVdot,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     Coil.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Condensate Volume",
                                     OutputProcessor::Unit::m3,
                                     Coil.CondensateVol,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     Coil.Name,
                                     _,
                                     "OnSiteWater",
@@ -6599,13 +6599,13 @@ void GetDXCoils(EnergyPlusData &state)
             // Setup Report Variables for Heating Equipment:
             // CurrentModuleObject='Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl
             SetupOutputVariable(
-                state, "Heating Coil Heating Rate", OutputProcessor::Unit::W, Coil.TotalHeatingEnergyRate, "System", "Average", Coil.Name);
+                state, "Heating Coil Heating Rate", OutputProcessor::Unit::W, Coil.TotalHeatingEnergyRate, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             SetupOutputVariable(state,
                                 "Heating Coil Heating Energy",
                                 OutputProcessor::Unit::J,
                                 Coil.TotalHeatingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 Coil.Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -6613,12 +6613,12 @@ void GetDXCoils(EnergyPlusData &state)
                                 _,
                                 "System");
             SetupOutputVariable(
-                state, "Heating Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.HeatingCoilRuntimeFraction, "System", "Average", Coil.Name);
+                state, "Heating Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.HeatingCoilRuntimeFraction, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             // Followings for VRF_FluidTCtrl Only
             SetupOutputVariable(
-                state, "Heating Coil VRF Condensing Temperature", OutputProcessor::Unit::C, Coil.CondensingTemp, "System", "Average", Coil.Name);
+                state, "Heating Coil VRF Condensing Temperature", OutputProcessor::Unit::C, Coil.CondensingTemp, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
             SetupOutputVariable(
-                state, "Heating Coil VRF Subcooling Degrees", OutputProcessor::Unit::C, Coil.ActualSC, "System", "Average", Coil.Name);
+                state, "Heating Coil VRF Subcooling Degrees", OutputProcessor::Unit::C, Coil.ActualSC, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, Coil.Name);
         }
     }
 
@@ -6822,15 +6822,15 @@ void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the cur
                                             "Cooling Coil Crankcase Heater Electricity Rate",
                                             OutputProcessor::Unit::W,
                                             state.dataDXCoils->DXCoil(DXCoilNumTemp).CrankcaseHeaterPower,
-                                            "System",
-                                            "Average",
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Average,
                                             state.dataDXCoils->DXCoil(DXCoilNumTemp).Name);
                         SetupOutputVariable(state,
                                             "Cooling Coil Crankcase Heater Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             state.dataDXCoils->DXCoil(DXCoilNumTemp).CrankcaseHeaterConsumption,
-                                            "System",
-                                            "Sum",
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Summed,
                                             state.dataDXCoils->DXCoil(DXCoilNumTemp).Name,
                                             _,
                                             "Electricity",

@@ -894,16 +894,16 @@ namespace OutputProcessor {
 
         // METHODOLOGY EMPLOYED:
         // Look it up in a list of valid index types.
-
-        std::vector<OutputProcessor::SOVTimeStepType> zoneIndexes({OutputProcessor::SOVTimeStepType::Zone});
-        std::vector<OutputProcessor::SOVTimeStepType> systemIndexes({OutputProcessor::SOVTimeStepType::HVAC, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVTimeStepType::Plant});
-
-        if (std::find(zoneIndexes.begin(), zoneIndexes.end(), TimeStepTypeKey) != zoneIndexes.end()) {
+        switch (TimeStepTypeKey) {
+        case OutputProcessor::SOVTimeStepType::Zone:
             return TimeStepType::TimeStepZone;
-        }
-
-        if (std::find(systemIndexes.begin(), systemIndexes.end(), TimeStepTypeKey) != systemIndexes.end()) {
+        case OutputProcessor::SOVTimeStepType::HVAC:
+        case OutputProcessor::SOVTimeStepType::System:
+        case OutputProcessor::SOVTimeStepType::Plant:
             return TimeStepType::TimeStepSystem;
+        case OutputProcessor::SOVTimeStepType::Invalid:
+        case OutputProcessor::SOVTimeStepType::Num:
+            ShowFatalError(state, "Bad SOVTimeStepType passed to ValidateTimeStepType");
         }
     }
 
@@ -979,6 +979,9 @@ namespace OutputProcessor {
         case OutputProcessor::SOVStoreType::NonState:
         case OutputProcessor::SOVStoreType::Summed:
             return StoreType::Summed;
+        case OutputProcessor::SOVStoreType::Invalid:
+        case OutputProcessor::SOVStoreType::Num:
+            ShowFatalError(state, "Bad SOVStoreType passed to validateVariableType");
         }
     }
 

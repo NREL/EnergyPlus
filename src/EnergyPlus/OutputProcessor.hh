@@ -567,7 +567,7 @@ namespace OutputProcessor {
     void InitializeOutput(EnergyPlusData &state);
 
     void SetupTimePointers(EnergyPlusData &state,
-                           std::string const &IndexKey, // Which timestep is being set up, 'Zone'=1, 'HVAC'=2
+                           OutputProcessor::SOVTimeStepType const &IndexKey, // Which timestep is being set up, 'Zone'=1, 'HVAC'=2
                            Real64 &TimeStep             // The timestep variable.  Used to get the address
     );
 

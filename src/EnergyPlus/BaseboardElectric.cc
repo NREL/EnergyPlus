@@ -361,8 +361,8 @@ namespace BaseboardElectric {
                                 "Baseboard Total Heating Energy",
                                 OutputProcessor::Unit::J,
                                 thisBaseboard.Energy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 thisBaseboard.EquipName,
                                 _,
                                 "ENERGYTRANSFER",
@@ -371,14 +371,14 @@ namespace BaseboardElectric {
                                 "System");
 
             SetupOutputVariable(
-                state, "Baseboard Total Heating Rate", OutputProcessor::Unit::W, thisBaseboard.Power, "System", "Average", thisBaseboard.EquipName);
+                state, "Baseboard Total Heating Rate", OutputProcessor::Unit::W, thisBaseboard.Power, OutputProcessor::SOVTimeStepType::System, OutputProcessor::SOVStoreType::Average, thisBaseboard.EquipName);
 
             SetupOutputVariable(state,
                                 "Baseboard Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 thisBaseboard.ElecUseLoad,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 thisBaseboard.EquipName,
                                 _,
                                 "Electricity",
@@ -390,8 +390,8 @@ namespace BaseboardElectric {
                                 "Baseboard Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 thisBaseboard.ElecUseRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 thisBaseboard.EquipName);
         }
     }
