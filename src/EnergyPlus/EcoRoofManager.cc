@@ -178,7 +178,6 @@ namespace EcoRoofManager {
         Real64 Cfhn;   // transfer coefficient at near-neutral conditions
         Real64 Cf;     // bulk Transfer coefficient, equation 10 page 6 (FASST).
         Real64 ra;     // Aerodynamic Resistance
-        Real64 f1inv;  // intermediate calculation variable
         Real64 f2inv;  // intermediate calculation variable
         Real64 f1;     // intermediate calculation variable
         Real64 f2;     // intermediate calculation variable
@@ -243,8 +242,6 @@ namespace EcoRoofManager {
                                         state.dataHeatBalSurf->SurfHGrdExt(SurfNum),
                                         state.dataHeatBalSurf->SurfHAirExt(SurfNum));
         }
-
-        RS = state.dataEnvrn->BeamSolarRad + state.dataSolarShading->SurfAnisoSkyMult(SurfNum) * state.dataEnvrn->DifSolarRad;
 
         Latm = 1.0 * Sigma * 1.0 * state.dataSurface->Surface(SurfNum).ViewFactorGround * pow_4(state.dataEnvrn->GroundTempKelvin) +
                1.0 * Sigma * 1.0 * state.dataSurface->Surface(SurfNum).ViewFactorSky * pow_4(state.dataEnvrn->SkyTempKelvin);
@@ -546,8 +543,7 @@ namespace EcoRoofManager {
             // s/m and depends on wind speed, leaf's surface roughness,
             // and stability of atsmophere.
 
-            f1inv = min(1.0, (0.004 * RS + 0.005) / (0.81 * (0.004 * RS + 1.0))); // SW radiation-related term
-            f1 = 1.0 / f1inv;
+            CalculateEcoRoofSolar(state, RS, f1, SurfNum);
             if (state.dataEcoRoofMgr->MoistureMax == state.dataEcoRoofMgr->MoistureResidual) {
                 f2inv = 1.0e10;
             } else {
@@ -1192,6 +1188,22 @@ namespace EcoRoofManager {
         //  ,CumET,CumRunoff, CumIrrigation, SoilDensity, SoilSpecHeat,SoilConductivity,Alphag
         // 799 format(' ',I3,' ',I3,' ',' ',f9.3,' ',f6.2,' ',f6.2,' ',f5.3,' ',f5.3,' ',f6.4, '  '  &
         //    f7.3, ' ', f7.3, ' ',f7.3, ' ',f6.1,' ',f7.1,'  ',f6.3,'  ',f6.2)
+    }
+
+    void CalculateEcoRoofSolar(EnergyPlusData &state,
+                               Real64 &RS, // Solar on roof (assumed horizontal)
+                               Real64 &f1, // Solar term for Stomatal Resistance
+                               int const SurfNum)
+    {
+
+        // Use SOLCOS(3) here to calculate RS since as stated in comments above this is only done for one surface currently.
+        // So, it is better to assume that the roof is flat until multiple surfaces can be handled.  Then, the next line can
+        // use state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum) instead of
+        // SOLCOS(3).
+        RS = max(state.dataEnvrn->SOLCOS(3), 0.0) * state.dataEnvrn->BeamSolarRad +
+             state.dataSolarShading->SurfAnisoSkyMult(SurfNum) * state.dataEnvrn->DifSolarRad;
+        Real64 f1inv = min(1.0, (0.004 * RS + 0.005) / (0.81 * (0.004 * RS + 1.0)));
+        f1 = 1.0 / f1inv;
     }
 
 } // namespace EcoRoofManager

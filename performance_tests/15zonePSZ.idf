@@ -7710,8 +7710,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC:1_OA,             !- Name
     PSZ-AC:1_OA_Controllers, !- Controller List Name
-    PSZ-AC:1_OA_Equipment,   !- Outdoor Air Equipment List Name
-    PSZ-AC:1 Availability Manager List;  !- Availability Manager List Name
+    PSZ-AC:1_OA_Equipment;   !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     PSZ-AC:1_OANode List;    !- Node or NodeList Name 1
@@ -7995,8 +7994,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC:2_OA,             !- Name
     PSZ-AC:2_OA_Controllers, !- Controller List Name
-    PSZ-AC:2_OA_Equipment,   !- Outdoor Air Equipment List Name
-    PSZ-AC:2 Availability Manager List;  !- Availability Manager List Name
+    PSZ-AC:2_OA_Equipment;   !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     PSZ-AC:2_OANode List;    !- Node or NodeList Name 1
@@ -8280,8 +8278,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC:3_OA,             !- Name
     PSZ-AC:3_OA_Controllers, !- Controller List Name
-    PSZ-AC:3_OA_Equipment,   !- Outdoor Air Equipment List Name
-    PSZ-AC:3 Availability Manager List;  !- Availability Manager List Name
+    PSZ-AC:3_OA_Equipment;   !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     PSZ-AC:3_OANode List;    !- Node or NodeList Name 1
@@ -8565,8 +8562,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC:4_OA,             !- Name
     PSZ-AC:4_OA_Controllers, !- Controller List Name
-    PSZ-AC:4_OA_Equipment,   !- Outdoor Air Equipment List Name
-    PSZ-AC:4 Availability Manager List;  !- Availability Manager List Name
+    PSZ-AC:4_OA_Equipment;   !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     PSZ-AC:4_OANode List;    !- Node or NodeList Name 1
@@ -8850,8 +8846,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC:5_OA,             !- Name
     PSZ-AC:5_OA_Controllers, !- Controller List Name
-    PSZ-AC:5_OA_Equipment,   !- Outdoor Air Equipment List Name
-    PSZ-AC:5 Availability Manager List;  !- Availability Manager List Name
+    PSZ-AC:5_OA_Equipment;   !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     PSZ-AC:5_OANode List;    !- Node or NodeList Name 1
@@ -9135,8 +9130,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC:6_OA,             !- Name
     PSZ-AC:6_OA_Controllers, !- Controller List Name
-    PSZ-AC:6_OA_Equipment,   !- Outdoor Air Equipment List Name
-    PSZ-AC:6 Availability Manager List;  !- Availability Manager List Name
+    PSZ-AC:6_OA_Equipment;   !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     PSZ-AC:6_OANode List;    !- Node or NodeList Name 1
@@ -9420,8 +9414,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC:7_OA,             !- Name
     PSZ-AC:7_OA_Controllers, !- Controller List Name
-    PSZ-AC:7_OA_Equipment,   !- Outdoor Air Equipment List Name
-    PSZ-AC:7 Availability Manager List;  !- Availability Manager List Name
+    PSZ-AC:7_OA_Equipment;   !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     PSZ-AC:7_OANode List;    !- Node or NodeList Name 1
@@ -9705,8 +9698,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC:8_OA,             !- Name
     PSZ-AC:8_OA_Controllers, !- Controller List Name
-    PSZ-AC:8_OA_Equipment,   !- Outdoor Air Equipment List Name
-    PSZ-AC:8 Availability Manager List;  !- Availability Manager List Name
+    PSZ-AC:8_OA_Equipment;   !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     PSZ-AC:8_OANode List;    !- Node or NodeList Name 1
@@ -9990,8 +9982,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC:9_OA,             !- Name
     PSZ-AC:9_OA_Controllers, !- Controller List Name
-    PSZ-AC:9_OA_Equipment,   !- Outdoor Air Equipment List Name
-    PSZ-AC:9 Availability Manager List;  !- Availability Manager List Name
+    PSZ-AC:9_OA_Equipment;   !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     PSZ-AC:9_OANode List;    !- Node or NodeList Name 1
@@ -10275,8 +10266,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC:10_OA,            !- Name
     PSZ-AC:10_OA_Controllers,!- Controller List Name
-    PSZ-AC:10_OA_Equipment,  !- Outdoor Air Equipment List Name
-    PSZ-AC:10 Availability Manager List;  !- Availability Manager List Name
+    PSZ-AC:10_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     PSZ-AC:10_OANode List;   !- Node or NodeList Name 1
@@ -10560,8 +10550,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC:11_OA,            !- Name
     PSZ-AC:11_OA_Controllers,!- Controller List Name
-    PSZ-AC:11_OA_Equipment,  !- Outdoor Air Equipment List Name
-    PSZ-AC:11 Availability Manager List;  !- Availability Manager List Name
+    PSZ-AC:11_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     PSZ-AC:11_OANode List;   !- Node or NodeList Name 1
@@ -10845,8 +10834,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC:12_OA,            !- Name
     PSZ-AC:12_OA_Controllers,!- Controller List Name
-    PSZ-AC:12_OA_Equipment,  !- Outdoor Air Equipment List Name
-    PSZ-AC:12 Availability Manager List;  !- Availability Manager List Name
+    PSZ-AC:12_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     PSZ-AC:12_OANode List;   !- Node or NodeList Name 1
@@ -11130,8 +11118,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC:13_OA,            !- Name
     PSZ-AC:13_OA_Controllers,!- Controller List Name
-    PSZ-AC:13_OA_Equipment,  !- Outdoor Air Equipment List Name
-    PSZ-AC:13 Availability Manager List;  !- Availability Manager List Name
+    PSZ-AC:13_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     PSZ-AC:13_OANode List;   !- Node or NodeList Name 1
@@ -11415,8 +11402,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC:14_OA,            !- Name
     PSZ-AC:14_OA_Controllers,!- Controller List Name
-    PSZ-AC:14_OA_Equipment,  !- Outdoor Air Equipment List Name
-    PSZ-AC:14 Availability Manager List;  !- Availability Manager List Name
+    PSZ-AC:14_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     PSZ-AC:14_OANode List;   !- Node or NodeList Name 1
@@ -11700,8 +11686,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC:15_OA,            !- Name
     PSZ-AC:15_OA_Controllers,!- Controller List Name
-    PSZ-AC:15_OA_Equipment,  !- Outdoor Air Equipment List Name
-    PSZ-AC:15 Availability Manager List;  !- Availability Manager List Name
+    PSZ-AC:15_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     PSZ-AC:15_OANode List;   !- Node or NodeList Name 1

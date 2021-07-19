@@ -4025,8 +4025,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys ZN1,              !- Name
     OA Sys ZN1 Controllers,  !- Controller List Name
-    OA Sys ZN1 Equipment,    !- Outdoor Air Equipment List Name
-    System ZN1 Avail List;   !- Availability Manager List Name
+    OA Sys ZN1 Equipment;    !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     OutsideAirInletNodes ZN1;!- Node or NodeList Name 1
@@ -4375,8 +4374,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys ZN3,              !- Name
     OA Sys ZN3 Controllers,  !- Controller List Name
-    OA Sys ZN3 Equipment,    !- Outdoor Air Equipment List Name
-    System ZN3 Avail List;   !- Availability Manager List Name
+    OA Sys ZN3 Equipment;    !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     OutsideAirInletNodes ZN3;!- Node or NodeList Name 1
@@ -4725,8 +4723,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys ZN5,              !- Name
     OA Sys ZN5 Controllers,  !- Controller List Name
-    OA Sys ZN5 Equipment,    !- Outdoor Air Equipment List Name
-    System ZN5 Avail List;   !- Availability Manager List Name
+    OA Sys ZN5 Equipment;    !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     OutsideAirInletNodes ZN5;!- Node or NodeList Name 1
@@ -5075,8 +5072,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys ZN7,              !- Name
     OA Sys ZN7 Controllers,  !- Controller List Name
-    OA Sys ZN7 Equipment,    !- Outdoor Air Equipment List Name
-    System ZN7 Avail List;   !- Availability Manager List Name
+    OA Sys ZN7 Equipment;    !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     OutsideAirInletNodes ZN7;!- Node or NodeList Name 1
@@ -5425,8 +5421,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys ZN9,              !- Name
     OA Sys ZN9 Controllers,  !- Controller List Name
-    OA Sys ZN9 Equipment,    !- Outdoor Air Equipment List Name
-    System ZN9 Avail List;   !- Availability Manager List Name
+    OA Sys ZN9 Equipment;    !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     OutsideAirInletNodes ZN9;!- Node or NodeList Name 1
@@ -5775,8 +5770,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys ZN11,             !- Name
     OA Sys ZN11 Controllers, !- Controller List Name
-    OA Sys ZN11 Equipment,   !- Outdoor Air Equipment List Name
-    System ZN11 Avail List;  !- Availability Manager List Name
+    OA Sys ZN11 Equipment;   !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     OutsideAirInletNodes ZN11;  !- Node or NodeList Name 1
@@ -6125,8 +6119,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys ZN13,             !- Name
     OA Sys ZN13 Controllers, !- Controller List Name
-    OA Sys ZN13 Equipment,   !- Outdoor Air Equipment List Name
-    System ZN13 Avail List;  !- Availability Manager List Name
+    OA Sys ZN13 Equipment;   !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     OutsideAirInletNodes ZN13;  !- Node or NodeList Name 1
@@ -6475,8 +6468,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys ZN15,             !- Name
     OA Sys ZN15 Controllers, !- Controller List Name
-    OA Sys ZN15 Equipment,   !- Outdoor Air Equipment List Name
-    System ZN15 Avail List;  !- Availability Manager List Name
+    OA Sys ZN15 Equipment;   !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     OutsideAirInletNodes ZN15;  !- Node or NodeList Name 1
@@ -6825,8 +6817,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys ZN17,             !- Name
     OA Sys ZN17 Controllers, !- Controller List Name
-    OA Sys ZN17 Equipment,   !- Outdoor Air Equipment List Name
-    System ZN17 Avail List;  !- Availability Manager List Name
+    OA Sys ZN17 Equipment;   !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     OutsideAirInletNodes ZN17;  !- Node or NodeList Name 1
@@ -7175,8 +7166,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys ZN19,             !- Name
     OA Sys ZN19 Controllers, !- Controller List Name
-    OA Sys ZN19 Equipment,   !- Outdoor Air Equipment List Name
-    System ZN19 Avail List;  !- Availability Manager List Name
+    OA Sys ZN19 Equipment;   !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     OutsideAirInletNodes ZN19;  !- Node or NodeList Name 1

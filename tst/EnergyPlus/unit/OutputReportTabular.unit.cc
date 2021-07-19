@@ -2277,10 +2277,9 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
         "  Cooling Coil Condenser Inlet;  !- Node or NodeList Name 2",
 
         "AirLoopHVAC:OutdoorAirSystem,",
-        "  DOAS OA System,          !- Name",
+        "  DOAS OA System,           !- Name",
         "  DOAS OA System Controllers,  !- Controller List Name",
-        "  DOAS OA System Equipment,!- Outdoor Air Equipment List Name",
-        "  DOAS Availability Managers;  !- Availability Manager List Name",
+        "  DOAS OA System Equipment; !- Outdoor Air Equipment List Name",
 
         "AirLoopHVAC:ControllerList,",
         "  DOAS OA System Controllers,  !- Name",
@@ -3255,8 +3254,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
 //"AirLoopHVAC:OutdoorAirSystem,",
 //"  DOAS OA System,          !- Name",
 //"  DOAS OA System Controllers,  !- Controller List Name",
-//"  DOAS OA System Equipment,!- Outdoor Air Equipment List Name",
-//"  DOAS Availability Managers;  !- Availability Manager List Name",
+//"  DOAS OA System Equipment;!- Outdoor Air Equipment List Name",
 
 //"AirLoopHVAC:ControllerList,",
 //"  DOAS OA System Controllers,  !- Name",

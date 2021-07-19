@@ -8288,8 +8288,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     VAV_5_OA,                !- Name
     VAV_5_OA_Controllers,    !- Controller List Name
-    VAV_5_OA_Equipment,      !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    VAV_5_OA_Equipment;      !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     VAV_5_OANode List;       !- Node or NodeList Name 1
@@ -8675,8 +8674,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     VAV_1_OA,                !- Name
     VAV_1_OA_Controllers,    !- Controller List Name
-    VAV_1_OA_Equipment,      !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    VAV_1_OA_Equipment;      !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     VAV_1_OANode List;       !- Node or NodeList Name 1
@@ -9065,8 +9063,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     VAV_2_OA,                !- Name
     VAV_2_OA_Controllers,    !- Controller List Name
-    VAV_2_OA_Equipment,      !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    VAV_2_OA_Equipment;      !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     VAV_2_OANode List;       !- Node or NodeList Name 1
@@ -9455,8 +9452,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     VAV_3_OA,                !- Name
     VAV_3_OA_Controllers,    !- Controller List Name
-    VAV_3_OA_Equipment,      !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    VAV_3_OA_Equipment;      !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     VAV_3_OANode List;       !- Node or NodeList Name 1

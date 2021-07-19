@@ -1071,8 +1071,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
                           "  AirLoopHVAC:OutdoorAirSystem,",
                           "    CV_1_OA,                !- Name",
                           "    CV_1_OA_Controllers,    !- Controller List Name",
-                          "    CV_1_OA_Equipment,      !- Outdoor Air Equipment List Name",
-                          "    CV_1 Availability Manager List;  !- Availability Manager List Name",
+                          "    CV_1_OA_Equipment;      !- Outdoor Air Equipment List Name",
 
                           "  OutdoorAir:NodeList,",
                           "    CV_1_OANode List;       !- Node or NodeList Name 1",
@@ -2650,8 +2649,7 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
                           "  AirLoopHVAC:OutdoorAirSystem,",
                           "    CV_1_OA,                !- Name",
                           "    CV_1_OA_Controllers,    !- Controller List Name",
-                          "    CV_1_OA_Equipment,      !- Outdoor Air Equipment List Name",
-                          "    CV_1 Availability Manager List;  !- Availability Manager List Name",
+                          "    CV_1_OA_Equipment;      !- Outdoor Air Equipment List Name",
 
                           "  OutdoorAir:NodeList,",
                           "    CV_1_OANode List;       !- Node or NodeList Name 1",

@@ -3039,8 +3039,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     ZN_1_FLR_1_SEC_1:Sys_OA, !- Name
     ZN_1_FLR_1_SEC_1:Sys_OAControllers,  !- Controller List Name
-    ZN_1_FLR_1_SEC_1:Sys_OAEquipment,  !- Outdoor Air Equipment List Name
-    ZN_1_FLR_1_SEC_1:Sys Availability Manager List;  !- Availability Manager List Name
+    ZN_1_FLR_1_SEC_1:Sys_OAEquipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     ZN_1_FLR_1_SEC_1:Sys_OANode List;  !- Node or NodeList Name 1
@@ -3317,8 +3316,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     ZN_1_FLR_1_SEC_2:Sys_OA, !- Name
     ZN_1_FLR_1_SEC_2:Sys_OAControllers,  !- Controller List Name
-    ZN_1_FLR_1_SEC_2:Sys_OAEquipment,  !- Outdoor Air Equipment List Name
-    ZN_1_FLR_1_SEC_2:Sys Availability Manager List;  !- Availability Manager List Name
+    ZN_1_FLR_1_SEC_2:Sys_OAEquipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     ZN_1_FLR_1_SEC_2:Sys_OANode List;  !- Node or NodeList Name 1
@@ -3595,8 +3593,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     ZN_1_FLR_1_SEC_3:Sys_OA, !- Name
     ZN_1_FLR_1_SEC_3:Sys_OAControllers,  !- Controller List Name
-    ZN_1_FLR_1_SEC_3:Sys_OAEquipment,  !- Outdoor Air Equipment List Name
-    ZN_1_FLR_1_SEC_3:Sys Availability Manager List;  !- Availability Manager List Name
+    ZN_1_FLR_1_SEC_3:Sys_OAEquipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     ZN_1_FLR_1_SEC_3:Sys_OANode List;  !- Node or NodeList Name 1
@@ -3873,8 +3870,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     ZN_1_FLR_1_SEC_4:Sys_OA, !- Name
     ZN_1_FLR_1_SEC_4:Sys_OAControllers,  !- Controller List Name
-    ZN_1_FLR_1_SEC_4:Sys_OAEquipment,  !- Outdoor Air Equipment List Name
-    ZN_1_FLR_1_SEC_4:Sys Availability Manager List;  !- Availability Manager List Name
+    ZN_1_FLR_1_SEC_4:Sys_OAEquipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     ZN_1_FLR_1_SEC_4:Sys_OANode List;  !- Node or NodeList Name 1
@@ -4151,8 +4147,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     ZN_1_FLR_1_SEC_5:Sys_OA, !- Name
     ZN_1_FLR_1_SEC_5:Sys_OAControllers,  !- Controller List Name
-    ZN_1_FLR_1_SEC_5:Sys_OAEquipment,  !- Outdoor Air Equipment List Name
-    ZN_1_FLR_1_SEC_5:Sys Availability Manager List;  !- Availability Manager List Name
+    ZN_1_FLR_1_SEC_5:Sys_OAEquipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     ZN_1_FLR_1_SEC_5:Sys_OANode List;  !- Node or NodeList Name 1

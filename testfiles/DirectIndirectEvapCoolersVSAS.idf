@@ -4607,8 +4607,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     FURNACE_PACU_CAV:1_OA,   !- Name
     FURNACE_PACU_CAV:1_OA_Controllers,  !- Controller List Name
-    FURNACE_PACU_CAV:1_OA_Equipment,  !- Outdoor Air Equipment List Name
-    FURNACE_PACU_CAV:1 Availability Manager List;  !- Availability Manager List Name
+    FURNACE_PACU_CAV:1_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     FURNACE_PACU_CAV:1_OANode List;  !- Node or NodeList Name 1
@@ -4901,8 +4900,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     FURNACE_PACU_CAV:2_OA,   !- Name
     FURNACE_PACU_CAV:2_OA_Controllers,  !- Controller List Name
-    FURNACE_PACU_CAV:2_OA_Equipment,  !- Outdoor Air Equipment List Name
-    FURNACE_PACU_CAV:2 Availability Manager List;  !- Availability Manager List Name
+    FURNACE_PACU_CAV:2_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     FURNACE_PACU_CAV:2_OANode List;  !- Node or NodeList Name 1
@@ -5170,8 +5168,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     FURNACE_PACU_CAV:3_OA,   !- Name
     FURNACE_PACU_CAV:3_OA_Controllers,  !- Controller List Name
-    FURNACE_PACU_CAV:3_OA_Equipment,  !- Outdoor Air Equipment List Name
-    FURNACE_PACU_CAV:3 Availability Manager List;  !- Availability Manager List Name
+    FURNACE_PACU_CAV:3_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     FURNACE_PACU_CAV:3_OANode List;  !- Node or NodeList Name 1
@@ -5462,8 +5459,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     FURNACE_PACU_CAV:4_OA,   !- Name
     FURNACE_PACU_CAV:4_OA_Controllers,  !- Controller List Name
-    FURNACE_PACU_CAV:4_OA_Equipment,  !- Outdoor Air Equipment List Name
-    FURNACE_PACU_CAV:4 Availability Manager List;  !- Availability Manager List Name
+    FURNACE_PACU_CAV:4_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     FURNACE_PACU_CAV:4_OANode List;  !- Node or NodeList Name 1

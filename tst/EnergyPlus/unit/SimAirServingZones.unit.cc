@@ -1949,8 +1949,7 @@ TEST_F(EnergyPlusFixture, AirLoop_ReturnFan_MinFlow)
         "AirLoopHVAC:OutdoorAirSystem,",
         "  Mixing Box,                             !- Name",
         "  Mixing Box Controller List,             !- Controller List Name",
-        "  Mixing Box Equipment List,              !- Outdoor Air Equipment List Name",
-        "  Mixing Box Availability Manager List;   !- Availability Manager List Name",
+        "  Mixing Box Equipment List;              !- Outdoor Air Equipment List Name",
 
         "AirLoopHVAC:ControllerList,",
         "  Mixing Box Controller List,             !- Name",
