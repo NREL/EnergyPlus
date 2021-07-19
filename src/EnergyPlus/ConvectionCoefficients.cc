@@ -6378,7 +6378,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
         }
 
         if (state.dataSurface->SurfIntConvClassification(SurfNum) == ConvectionConstants::InConvClass_Invalid) {
-            ShowSevereError(state, "DynamicIntConvSurfaceClassification: failed to resolve Hc model for D surface named " + Surface(SurfNum).Name);
+            ShowSevereError(state, "DynamicIntConvSurfaceClassification: failed to resolve Hc model for E surface named " + Surface(SurfNum).Name);
         }
 
         break;
