@@ -3130,7 +3130,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBDaylightingNoExtWindow)
 {
 
-    std::string const idf_objects = R"IDF(
+    std::string const idf_objects1 = R"IDF(
     Building,
         Building,                !- Name
         0,                       !- North Axis {deg}
@@ -3426,7 +3426,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBDaylightingNoExtWi
         -2.6475,                 !- Vertex 4 X-coordinate {m}
         30.1033,                 !- Vertex 4 Y-coordinate {m}
         0.0000;                  !- Vertex 4 Z-coordinate {m}
+    )IDF";
 
+    std::string const idf_objects2 = R"IDF(
     Daylighting:Controls,
         Zone_0_DaylCtrl,         !- Name
         Zone_0,                  !- Zone Name
@@ -3453,6 +3455,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBDaylightingNoExtWi
         0.85;                    !- Z-Coordinate of Reference Point {m}
     )IDF";
 
+    std::string const idf_objects = idf_objects1 + idf_objects2;
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
