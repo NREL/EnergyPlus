@@ -1076,7 +1076,7 @@ namespace BaseboardRadiator {
 
         // PURPOSE OF THIS SUBROUTINE: This subroutine calculates the heat exchange rate
         // in a pure convective baseboard heater.  The heater is assumed to be crossflow
-        // with both fluids unmixed. The air flow is bouyancy driven and a constant air
+        // with both fluids unmixed. The air flow is buoyancy driven and a constant air
         // flow velocity of 0.5m/s is assumed. The solution is by the effectiveness-NTU
         // method found in Icropera and DeWitt, Fundamentals of Heat and Mass Transfer,
         // Chapter 11.4, p. 523, eq. 11.33

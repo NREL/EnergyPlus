@@ -11161,8 +11161,7 @@ DO iSys = 1, numCompactSysVAV
   CALL CreateNewObj('AirLoopHVAC:OutdoorAirSystem')
   CALL AddToObjFld('Name', base + vsAirHandlerNameOff,' OA System')
   CALL AddToObjFld('Controller List Name', base + vsAirHandlerNameOff,' OA System Controllers')
-  CALL AddToObjFld('Outdoor Air Equipment List Name', base + vsAirHandlerNameOff,' OA System Equipment')
-  CALL AddToObjFld('Availability Manager List Name', base + vsAirHandlerNameOff,' Availability Managers',.TRUE.)
+  CALL AddToObjFld('Outdoor Air Equipment List Name', base + vsAirHandlerNameOff,' OA System Equipment',.TRUE.)
   !CONTROLLER LIST ~ line 545
   CALL CreateNewObj('AirLoopHVAC:ControllerList')
   CALL AddToObjFld('Name', base + vsAirHandlerNameOff,' OA System Controllers')
@@ -12820,8 +12819,7 @@ DO iSys = 1, numCompactSysPVAV
   CALL CreateNewObj('AirLoopHVAC:OutdoorAirSystem')
   CALL AddToObjFld('Name', base + pvavsAirHandlerNameOff,' OA System')
   CALL AddToObjFld('Controller List Name', base + pvavsAirHandlerNameOff,' OA System Controllers')
-  CALL AddToObjFld('Outdoor Air Equipment List Name', base + pvavsAirHandlerNameOff,' OA System Equipment')
-  CALL AddToObjFld('Availability Manager List Name', base + pvavsAirHandlerNameOff,' Availability Managers',.TRUE.)
+  CALL AddToObjFld('Outdoor Air Equipment List Name', base + pvavsAirHandlerNameOff,' OA System Equipment',.TRUE.)
   !Object ==> AirLoopHVAC:ControllerList
   CALL CreateNewObj('AirLoopHVAC:ControllerList')
   CALL AddToObjFld('Name', base + pvavsAirHandlerNameOff,' OA System Controllers')
@@ -14349,8 +14347,7 @@ DO iSys = 1, numCompactSysUnit
   CALL CreateNewObj('AirLoopHVAC:OutdoorAirSystem')
   CALL AddToObjFld('Name', base + usAirHandlerNameOff,' OA System')
   CALL AddToObjFld('Controller List Name', base + usAirHandlerNameOff,' OA System Controllers')
-  CALL AddToObjFld('Outdoor Air Equipment List Name', base + usAirHandlerNameOff,' OA System Equipment')
-  CALL AddToObjFld('Availability Manager List Name', base + usAirHandlerNameOff,' Availability Managers',.TRUE.)
+  CALL AddToObjFld('Outdoor Air Equipment List Name', base + usAirHandlerNameOff,' OA System Equipment',.TRUE.)
   !CONTROLLER LIST
   CALL CreateNewObj('AirLoopHVAC:ControllerList')
   CALL AddToObjFld('Name', base + usAirHandlerNameOff,' OA System Controllers')
@@ -15279,8 +15276,7 @@ DO iSys = 1, numCompactSysUnitHP
   CALL CreateNewObj('AirLoopHVAC:OutdoorAirSystem')
   CALL AddToObjFld('Name', base + usAirHandlerNameOff,' OA System')
   CALL AddToObjFld('Controller List Name', base + uhpsAirHandlerNameOff,' OA System Controllers')
-  CALL AddToObjFld('Outdoor Air Equipment List Name', base + uhpsAirHandlerNameOff,' OA System Equipment')
-  CALL AddToObjFld('Availability Manager List Name', base + uhpsAirHandlerNameOff,' Availability Managers',.TRUE.)
+  CALL AddToObjFld('Outdoor Air Equipment List Name', base + uhpsAirHandlerNameOff,' OA System Equipment',.TRUE.)
   !Object ==> AirLoopHVAC:ControllerList
   CALL CreateNewObj('AirLoopHVAC:ControllerList')
   CALL AddToObjFld('Name', base + uhpsAirHandlerNameOff,' OA System Controllers')
@@ -17813,8 +17809,7 @@ DO iSys = 1, numCompactSysUnitarySystem
   CALL CreateNewObj('AirLoopHVAC:OutdoorAirSystem')
   CALL AddToObjFld('Name', base + usAirHandlerNameOff,' OA System')
   CALL AddToObjFld('Controller List Name', base + ussAirHandlerNameOff,' OA System Controllers')
-  CALL AddToObjFld('Outdoor Air Equipment List Name', base + ussAirHandlerNameOff,' OA System Equipment')
-  CALL AddToObjFld('Availability Manager List Name', base + ussAirHandlerNameOff,' Availability Managers',.TRUE.)
+  CALL AddToObjFld('Outdoor Air Equipment List Name', base + ussAirHandlerNameOff,' OA System Equipment',.TRUE.)
   !Object ==> AirLoopHVAC:ControllerList
   CALL CreateNewObj('AirLoopHVAC:ControllerList')
   CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' OA System Controllers')
@@ -19985,8 +19980,7 @@ DO iSys = 1, numCompactSysConstVol
   CALL CreateNewObj('AirLoopHVAC:OutdoorAirSystem')
   CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' OA System')
   CALL AddToObjFld('Controller List Name', base + cvsAirHandlerNameOff,' OA System Controllers')
-  CALL AddToObjFld('Outdoor Air Equipment List Name', base + cvsAirHandlerNameOff,' OA System Equipment')
-  CALL AddToObjFld('Availability Manager List Name', base + cvsAirHandlerNameOff,' Availability Managers',.TRUE.)
+  CALL AddToObjFld('Outdoor Air Equipment List Name', base + cvsAirHandlerNameOff,' OA System Equipment',.TRUE.)
   !***AirLoopHVAC:ControllerList
   CALL CreateNewObj('AirLoopHVAC:ControllerList')
   CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' OA System Controllers')
@@ -22189,8 +22183,7 @@ DO iSys = 1, numCompactSysDualDuct
   CALL CreateNewObj('AirLoopHVAC:OutdoorAirSystem')
   CALL AddToObjFld('Name', base + ddsAirHandlerNameOff,' OA System')
   CALL AddToObjFld('Controller List Name', base + ddsAirHandlerNameOff,' OA System Controllers')
-  CALL AddToObjFld('Outdoor Air Equipment List Name', base + ddsAirHandlerNameOff,' OA System Equipment')
-  CALL AddToObjFld('Availability Manager List Name', base + ddsAirHandlerNameOff,' Availability Managers',.TRUE.)
+  CALL AddToObjFld('Outdoor Air Equipment List Name', base + ddsAirHandlerNameOff,' OA System Equipment',.TRUE.)
   !CONTROLLER LIST ~ line 545
   CALL CreateNewObj('AirLoopHVAC:ControllerList')
   CALL AddToObjFld('Name', base + ddsAirHandlerNameOff,' OA System Controllers')
@@ -32593,8 +32586,7 @@ DO iSys = 1, numCompactDedOutAir
   CALL CreateNewObj('AirLoopHVAC:OutdoorAirSystem')
   CALL AddToObjFld('Name', base + doasNameOff,' OA System')
   CALL AddToObjFld('Controller List Name', base + doasNameOff,' OA System Controllers')
-  CALL AddToObjFld('Outdoor Air Equipment List Name', base + doasNameOff,' OA System Equipment')
-  CALL AddToObjFld('Availability Manager List Name', base + doasNameOff,' Availability Managers',.TRUE.)
+  CALL AddToObjFld('Outdoor Air Equipment List Name', base + doasNameOff,' OA System Equipment',.TRUE.)
   !***AirLoopHVAC:ControllerList
   CALL CreateNewObj('AirLoopHVAC:ControllerList')
   CALL AddToObjFld('Name', base + doasNameOff,' OA System Controllers')
