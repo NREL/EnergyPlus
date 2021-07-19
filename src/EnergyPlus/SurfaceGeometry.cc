@@ -290,8 +290,6 @@ namespace SurfaceGeometry {
         static constexpr std::string_view RoutineName("SetUpZoneGeometry: ");
 
         Real64 AverageHeight; // Used to keep track of average height of a surface/zone
-        int SurfNum;          // Surface number (DO loop counter)
-        int ZoneNum;          // Zone number for current surface and DO loop counter
         Real64 ZMax;          // Maximum Z of a surface (detailed outside coefficient calculation)
         Real64 ZMin;          // Minimum Z of a surface (detailed outside coefficient calculation)
         Real64 ZCeilAvg;
@@ -335,7 +333,7 @@ namespace SurfaceGeometry {
         ZoneCeilingHeightEntered.dimension(state.dataGlobal->NumOfZones, false);
         ZoneCeilingArea.dimension(state.dataGlobal->NumOfZones, 0.0);
 
-        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
             state.dataSurfaceGeometry->CosZoneRelNorth(ZoneNum) =
                 std::cos(-state.dataHeatBal->Zone(ZoneNum).RelNorth * DataGlobalConstants::DegToRadians);
@@ -369,7 +367,7 @@ namespace SurfaceGeometry {
         state.dataSurface->ShadingSurfaceFirst = -1;
         state.dataSurface->ShadingSurfaceLast = -1;
 
-        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) { // Loop through all surfaces...
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) { // Loop through all surfaces...
 
             state.dataSurface->SurfAirSkyRadSplit(SurfNum) = std::sqrt(0.5 * (1.0 + state.dataSurface->Surface(SurfNum).CosTilt));
 
@@ -398,21 +396,28 @@ namespace SurfaceGeometry {
             e.TotalSurfArea = 0.0;
         }
 
+        for (auto &s : state.dataHeatBal->Space) {
+            s.ExtWindowArea = 0.0;
+            s.TotalSurfArea = 0.0;
+        }
         DetailedWWR = (state.dataInputProcessing->inputProcessor->getNumSectionsFound("DETAILEDWWR_DEBUG") > 0);
         if (DetailedWWR) {
             print(state.files.debug, "{}", "=======User Entered Classification =================");
             print(state.files.debug, "{}", "Surface,Class,Area,Tilt");
         }
 
-        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) { // Loop through all surfaces to find windows...
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) { // Loop through all surfaces to find windows...
 
             if (!state.dataSurface->Surface(SurfNum).HeatTransSurf && !state.dataSurface->Surface(SurfNum).IsAirBoundarySurf)
                 continue; // Skip shadowing (sub)surfaces
-            ZoneNum = state.dataSurface->Surface(SurfNum).Zone;
+            int const ZoneNum = state.dataSurface->Surface(SurfNum).Zone;
+            int const spaceNum = state.dataSurface->Surface(SurfNum).Space;
             state.dataHeatBal->Zone(ZoneNum).TotalSurfArea += state.dataSurface->Surface(SurfNum).Area;
+            state.dataHeatBal->Space(spaceNum).TotalSurfArea += state.dataSurface->Surface(SurfNum).Area;
             if (state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TypeIsWindow) {
                 state.dataHeatBal->Zone(ZoneNum).TotalSurfArea += state.dataSurface->SurfWinFrameArea(SurfNum);
                 state.dataHeatBal->Zone(ZoneNum).HasWindow = true;
+                state.dataHeatBal->Space(spaceNum).TotalSurfArea += state.dataSurface->SurfWinFrameArea(SurfNum);
             }
             if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Roof)
                 ZoneCeilingArea(ZoneNum) += state.dataSurface->Surface(SurfNum).GrossArea;
@@ -459,15 +464,15 @@ namespace SurfaceGeometry {
 
                 if ((state.dataSurface->Surface(SurfNum).ExtBoundCond > 0) &&
                     (state.dataSurface->Surface(SurfNum).BaseSurf != SurfNum)) { // Interzone window present
-                    state.dataHeatBal->Zone(state.dataSurface->Surface(SurfNum).Zone).HasInterZoneWindow = true;
+                    state.dataHeatBal->Zone(ZoneNum).HasInterZoneWindow = true;
                 } else {
                     if (((state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment) ||
                          (state.dataSurface->Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt)) &&
                         (state.dataSurface->Surface(SurfNum).Class != SurfaceClass::TDD_Dome)) {
-                        state.dataHeatBal->Zone(state.dataSurface->Surface(SurfNum).Zone).ExtWindowArea +=
-                            state.dataSurface->Surface(SurfNum).GrossArea;
-                        state.dataHeatBal->Zone(state.dataSurface->Surface(SurfNum).Zone).ExtWindowArea_Multiplied =
-                            state.dataHeatBal->Zone(state.dataSurface->Surface(SurfNum).Zone).ExtWindowArea +
+                        state.dataHeatBal->Zone(ZoneNum).ExtWindowArea += state.dataSurface->Surface(SurfNum).GrossArea;
+                        state.dataHeatBal->Space(spaceNum).ExtWindowArea += state.dataSurface->Surface(SurfNum).GrossArea;
+                        state.dataHeatBal->Zone(ZoneNum).ExtWindowArea_Multiplied =
+                            state.dataHeatBal->Zone(ZoneNum).ExtWindowArea +
                             state.dataSurface->Surface(SurfNum).GrossArea * state.dataSurface->Surface(SurfNum).Multiplier *
                                 state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
                         if (DetailedWWR) {
@@ -489,7 +494,7 @@ namespace SurfaceGeometry {
             print(state.files.debug, "{}\n", "Zone,ExtWallArea,ExtWindowArea");
         }
 
-        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             CeilCount = 0.0;
             FloorCount = 0.0;
             Count = 0;
@@ -506,7 +511,8 @@ namespace SurfaceGeometry {
                       state.dataHeatBal->Zone(ZoneNum).ExtWindowArea);
             }
             // Use AllSurfaceFirst which includes air boundaries
-            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast; ++SurfNum) {
+            for (int SurfNum = state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast;
+                 ++SurfNum) {
                 if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Roof) {
                     // Use Average Z for surface, more important for roofs than floors...
                     ++CeilCount;
@@ -577,7 +583,7 @@ namespace SurfaceGeometry {
 
         // Calculate zone centroid (and min/max x,y,z for zone)
         // Use AllSurfaceFirst which includes air boundaries
-        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             nonInternalMassSurfacesPresent = false;
             TotSurfArea = 0.0;
             state.dataHeatBal->Zone(ZoneNum).Centroid = Vector(0.0, 0.0, 0.0);
@@ -589,7 +595,8 @@ namespace SurfaceGeometry {
                 state.dataHeatBal->Zone(ZoneNum).MinimumZ = state.dataSurface->Surface(state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst).Vertex(1).z;
                 state.dataHeatBal->Zone(ZoneNum).MaximumZ = state.dataSurface->Surface(state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst).Vertex(1).z;
             }
-            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
+            for (int SurfNum = state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast;
+                 ++SurfNum) {
                 if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::IntMass) continue;
                 nonInternalMassSurfacesPresent = true;
                 if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Wall ||
@@ -641,13 +648,13 @@ namespace SurfaceGeometry {
 
         state.dataSurface->SurfAdjacentZone.dimension(state.dataSurface->TotSurfaces, 0);
         // note -- adiabatic surfaces will show same zone as surface
-        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (state.dataSurface->Surface(SurfNum).ExtBoundCond <= 0) continue;
             state.dataSurface->SurfAdjacentZone(SurfNum) = state.dataSurface->Surface(state.dataSurface->Surface(SurfNum).ExtBoundCond).Zone;
         }
 
-        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                 if (!state.dataSurface->Surface(SurfNum).HeatTransSurf &&
                     state.dataSurface->Surface(SurfNum).ZoneName == state.dataHeatBal->Zone(ZoneNum).Name)
                     ++state.dataHeatBal->Zone(ZoneNum).NumShadingSurfaces;
@@ -669,7 +676,7 @@ namespace SurfaceGeometry {
             } // surfaces
         }     // zones
 
-        for (int SurfNum : state.dataSurface->AllSurfaceListReportOrder) {
+        for (int const SurfNum : state.dataSurface->AllSurfaceListReportOrder) {
             if (state.dataSurface->Surface(SurfNum).Construction > 0 &&
                 state.dataSurface->Surface(SurfNum).Construction <= state.dataHeatBal->TotConstructs) {
                 NominalUwithConvCoeffs = ComputeNominalUwithConvCoeffs(state, SurfNum, isWithConvCoefValid);
@@ -745,7 +752,7 @@ namespace SurfaceGeometry {
             "Area {m2}, Number of Surfaces, Number of SubSurfaces, Number of Shading SubSurfaces,  Part of Total Building Area");
         print(state.files.eio, "{}\n", Format_721);
 
-        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             // Write Zone Information to the initialization output file
 
             {

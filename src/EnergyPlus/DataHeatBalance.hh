@@ -354,19 +354,17 @@ namespace DataHeatBalance {
         std::string Name = "";             // Space name
         int ZoneNum = 0;                   // Pointer to Zone wich contains this space
         Real64 UserEnteredFloorArea = 0.0; // User input floor area for this space
-        Real64 CalcFloorArea = 0.0;        // Calculated floor area used for this space
-        bool HasFloor;                     // Has "Floor" surface
         std::string SpaceType = "General"; // Space type tag
         EPVector<std::string> Tags;        // Optional tags for reporting
         EPVector<int> Surfaces;            // Pointers to surfaces in this space
-        bool EnforcedReciprocity;          // if zone required forced reciprocity --
-        //   less out of bounds temperature errors allowed
-        int RadiantEnclosureNum = 0; // Radiant exchange enclosure this space belongs to
-        int SolarEnclosureNum = 0;   // Solar distribution enclosure this space belongs to
-        Real64 FloorArea = 0.0;      // Floor area used for this space
-        Real64 ExtWindowArea = 0.0;  // Exterior Window Area for Zone
-        Real64 TotalSurfArea = 0.0;  // Total surface area for Zone
-        Real64 OriginZ = 0.0;        // Z origin  [m]
+        Real64 CalcFloorArea = 0.0;        // Calculated floor area used for this space
+        Real64 FloorArea = 0.0;            // Floor area used for this space
+        bool HasFloor = false;             // Has "Floor" surface
+        Real64 ExtWindowArea = 0.0;        // Exterior Window Area for Zone
+        Real64 TotalSurfArea = 0.0;        // Total surface area for Zone
+        bool EnforcedReciprocity = false;  // if zone/space required forced reciprocity -- less out of bounds temp errors allowed
+        int RadiantEnclosureNum = 0;       // Radiant exchange enclosure this space belongs to
+        int SolarEnclosureNum = 0;         // Solar distribution enclosure this space belongs to
     };
 
     struct SpaceListData
@@ -452,7 +450,7 @@ namespace DataHeatBalance {
         std::vector<int> ZoneExtSolarSurfaceList;    // List of exterior solar surfaces in a zone
         int ZoneRadEnclosureFirst;                   // For Zone resimulation, need a range of enclosures for CalcInteriorRadExchange
         int ZoneRadEnclosureLast;                    // For Zone resimulation, need a range of enclosures for CalcInteriorRadExchange
-        int ZoneFirstSpaceSolEnclosure;          // TODO: For daylighting, this is a punt, it's the solar enclosure number of the first space in the zone
+        int ZoneFirstSpaceSolEnclosure; // TODO: For daylighting, this is a punt, it's the solar enclosure number of the first space in the zone
 
         Real64 OutDryBulbTemp;                 // Zone outside dry bulb air temperature (C)
         bool OutDryBulbTempEMSOverrideOn;      // if true, EMS is calling to override the surface's outdoor air temp

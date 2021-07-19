@@ -436,6 +436,7 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
     // exterior windows in Daylighting:Detailed zones. Note that it is possible for a
     // Daylighting:Detailed zone to have zero exterior windows of its own, but it may have an interior
     // through which daylight passes from adjacent zones with exterior windows.
+    if (state.dataDaylightingData->TotRefPoints == 0) return;
     if (state.dataGlobal->BeginSimFlag) {
         state.dataDaylightingManager->TotWindowsWithDayl = 0;
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
@@ -4223,7 +4224,6 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
     cCurrentModuleObject = "Daylighting:Controls";
     TotDaylightingControls = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     if (TotDaylightingControls > 0) {
-        state.dataDaylightingData->ZoneDaylight.allocate(state.dataGlobal->NumOfSpaces);
         state.dataDaylightingData->EnclDaylight.allocate(state.dataViewFactor->NumOfSolarEnclosures);
         GetInputDayliteRefPt(state, ErrorsFound);
         GetDaylightingControls(state, TotDaylightingControls, ErrorsFound);
