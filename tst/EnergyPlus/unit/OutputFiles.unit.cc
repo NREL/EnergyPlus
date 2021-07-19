@@ -175,6 +175,7 @@ TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
     EXPECT_EQ(format("{:.3T}", 1.28349999999999948505E-004), "1.283E-004");
     EXPECT_EQ(format("{:.3T}", 2.56700000000000005430E-004), "2.567E-004");
     EXPECT_EQ(format("{:.3T}", 0.15159450340364988286), "0.151");
+    EXPECT_EQ(format("{:.3T}", 0.0), "0.000");
 
     EXPECT_EQ(format("{:.3T}", 2.14633893312000043063E-002), "2.146E-002");
     EXPECT_EQ(format("{:.3T}", 8.55666666666666278192E-005), "8.556E-005");
@@ -192,5 +193,23 @@ TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
     // code is expected to round down with the old version, but clearly it should not
     // for the case of "Trim"
     // EXPECT_EQ(format("{:.4T}", 0.096970000000000000639), "9.6969E-002");
+
+    // Z formatting matches Fortran's 'E' format
+    // This is the output of running a test in Fortran by issuing `PRINT "(E12.1)", 100.0`
+    //                                     "123456789xyz"   // This is properly size 12
+    EXPECT_EQ(format("{:12.1Z}", 100.0), "     0.1E+03");
+    EXPECT_EQ(format("{:12.2Z}", 100.0), "    0.10E+03"); // Why not 1E02
+    EXPECT_EQ(format("{:12.3Z}", 100.0), "   0.100E+03");
+    EXPECT_EQ(format("{:12.4Z}", 100.0), "  0.1000E+03");
+
+    EXPECT_EQ(format("{:12.1Z}", 123.456), "     0.1E+03");
+    EXPECT_EQ(format("{:12.2Z}", 123.456), "    0.12E+03"); // Why not 12E
+    EXPECT_EQ(format("{:12.3Z}", 123.456), "   0.123E+03");
+    EXPECT_EQ(format("{:12.4Z}", 123.456), "  0.1235E+03");
+
+    EXPECT_EQ(format("{:12.1Z}", 0.0), "     0.0E+00");
+    EXPECT_EQ(format("{:12.2Z}", 0.0), "    0.00E+00"); // Why not 12E
+    EXPECT_EQ(format("{:12.3Z}", 0.0), "   0.000E+00");
+    EXPECT_EQ(format("{:12.4Z}", 0.0), "  0.0000E+00");
 }
 } // namespace EnergyPlus

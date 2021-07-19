@@ -52,7 +52,30 @@
 
 namespace EnergyPlus {
 
-constexpr int NumPsychMonitors = 19; // Parameterization of Number of psychrometric routines that
+enum class PsychrometricFunction : int
+{
+    Unassigned = -1,
+    TdpFnTdbTwbPb,
+    RhFnTdbWPb,
+    TwbFnTdbWPb,
+    VFnTdbWPb,
+    WFnTdpPb,
+    WFnTdbH,
+    WFnTdbTwbPb,
+    WFnTdbRhPb,
+    PsatFnTemp,
+    TsatFnHPb,
+    TsatFnPb,
+    RhFnTdbRhov,
+    RhFnTdbRhovLBnd0C,
+    TwbFnTdbWPb2,
+    TwbFnTdbWPb3, // convergence,
+    WFnTdbTwbPb2,
+    TsatFnPb2, // iteration,
+    TwbFnTdbWPb_cache,
+    PsatFnTemp_cache,
+    Num // The number of enums in this enum class
+};
 
 #ifdef EP_nocache_Psychrometrics
 #undef EP_cache_PsyTwbFnTdbWPb
@@ -67,18 +90,32 @@ constexpr int NumPsychMonitors = 19; // Parameterization of Number of psychromet
 #endif
 
 #ifdef EP_cache_PsyTwbFnTdbWPb
+constexpr int twbcache_size = 1024 * 1024;
+constexpr int twbprecision_bits = 20;
+#endif
+#ifdef EP_cache_PsyPsatFnTemp
+constexpr int psatcache_size = 1024 * 1024;
+constexpr int psatprecision_bits = 24; // 28  //24  //32
+constexpr Int64 psatcache_mask = psatcache_size - 1;
+#endif
+#ifdef EP_cache_PsyTsatFnPb
+constexpr int tsatcache_size = 1024 * 1024;
+constexpr int tsatprecision_bits = 24;
+constexpr Int64 tsatcache_mask = tsatcache_size - 1;
+#endif
+#ifdef EP_cache_PsyTsatFnHPb
+constexpr int tsat_hbp_cache_size = 1024 * 1024;
+constexpr int tsat_hbp_precision_bits = 28;
+#endif
+
+#ifdef EP_cache_PsyTwbFnTdbWPb
 struct cached_twb_t
 {
     // Members
-    Int64 iTdb;
-    Int64 iW;
-    Int64 iPb;
-    Real64 Twb;
-
-    // Default Constructor
-    cached_twb_t() : iTdb(0), iW(0), iPb(0), Twb(0.0)
-    {
-    }
+    std::uint64_t iTdb{0};
+    std::uint64_t iW{0};
+    std::uint64_t iPb{0};
+    Real64 Twb{0};
 };
 #endif
 #ifdef EP_cache_PsyTsatFnHPb
@@ -126,40 +163,28 @@ struct PsychrometricCacheData : BaseGlobalStruct
 {
 
 #ifdef EP_cache_PsyTwbFnTdbWPb
-    Array1D<cached_twb_t> cached_Twb; // DIMENSION(0:twbcache_size)
+    std::array<cached_twb_t, twbcache_size> cached_Twb;
 #endif
 #ifdef EP_cache_PsyPsatFnTemp
-    Array1D<cached_psat_t> cached_Psat; // DIMENSION(0:psatcache_size)
+    std::array<cached_psat_t, psatcache_size> cached_Psat;
 #endif
 #ifdef EP_cache_PsyTsatFnPb
-    Array1D<cached_tsat_pb> cached_Tsat; // DIMENSION(0:tsatcache_size)
+    std::array<cached_tsat_h_pb, tsatcache_size> cached_Tsat;
 #endif
 #ifdef EP_cache_PsyTsatFnHPb
-    Array1D<cached_tsat_h_pb> cached_Tsat_HPb; // DIMENSION(0:tsat_hbp_cache_size)
+    std::array<cached_tsat_h_pb, tsat_hbp_cache_size> cached_Tsat_HPb;
 #endif
 
 #ifdef EP_psych_stats
-    Array1D<Int64> NumTimesCalled = Array1D<Int64>(NumPsychMonitors, 0);
-    Array1D_int NumIterations = Array1D_int(NumPsychMonitors, 0);
+    std::array<std::int64_t, static_cast<int>(PsychrometricFunction::Num)> NumTimesCalled;
+    std::array<int, static_cast<int>(PsychrometricFunction::Num)> NumIterations;
 #endif
 
     void clear_state() override
     {
-#ifdef EP_cache_PsyTwbFnTdbWPb
-        cached_Twb.clear();
-#endif
-#ifdef EP_cache_PsyPsatFnTemp
-        cached_Psat.clear();
-#endif
-#ifdef EP_cache_PsyTsatFnPb
-        cached_Tsat.clear();
-#endif
-#ifdef EP_cache_PsyTsatFnHPb
-        cached_Tsat_HPb.clear();
-#endif
 #ifdef EP_psych_stats
-        NumTimesCalled = Array1D<Int64>(NumPsychMonitors, 0);
-        NumIterations = Array1D_int(NumPsychMonitors, 0);
+        NumTimesCalled.fill(0);
+        NumIterations.fill(0);
 #endif
     }
 };

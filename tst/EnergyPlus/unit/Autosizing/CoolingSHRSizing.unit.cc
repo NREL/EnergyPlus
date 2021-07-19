@@ -60,7 +60,7 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataSize->ZoneSizingInput.allocate(1);
     state->dataSize->ZoneSizingInput(1).ZoneNum = 1;
-    static std::string const routineName("CoolingSHRSizingGauntlet");
+    static constexpr std::string_view routineName("CoolingSHRSizingGauntlet");
 
     // create the sizer and set up the flags to specify the sizing configuration
     CoolingSHRSizer sizer;

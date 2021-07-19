@@ -1101,7 +1101,7 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
             wallSurfaceString += "," + state.dataSurface->Surface(wl).Name;
         }
 
-        static constexpr auto fmt = "{},{},{},{},{:.2R},{:.2R},{:.2R},{},{}{}\n";
+        static constexpr fmt::string_view fmt = "{},{},{},{},{:.2R},{:.2R},{:.2R},{},{}{}\n";
         print(state.files.eio,
               fmt,
               foundationInputs[state.dataSurface->Surface(kv.floorSurface).OSCPtr].name,
@@ -1234,7 +1234,7 @@ void KivaManager::calcKivaSurfaceResults(EnergyPlusData &state)
             std::string contextStr = "Surface=\"" + state.dataSurface->Surface(surfNum).Name + "\"";
             Kiva::setMessageCallback(kivaErrorCallback, &contextStr);
             surfaceMap[surfNum].calc_weighted_results();
-            state.dataHeatBal->HConvIn(surfNum) = state.dataSurfaceGeometry->kivaManager.surfaceMap[surfNum].results.hconv;
+            state.dataHeatBalSurf->SurfHConvInt(surfNum) = state.dataSurfaceGeometry->kivaManager.surfaceMap[surfNum].results.hconv;
         }
     }
     Kiva::setMessageCallback(kivaErrorCallback, nullptr);

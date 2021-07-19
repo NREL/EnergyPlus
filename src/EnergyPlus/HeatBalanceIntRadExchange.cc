@@ -115,9 +115,9 @@ namespace HeatBalanceIntRadExchange {
                                  Array1D<Real64> &NetLWRadToSurf,     // Net long wavelength radiant exchange from other surfaces
                                  Optional_int_const ZoneToResimulate, // if passed in, then only calculate for this zone
 #ifdef EP_Count_Calls
-                                 std::string const &CalledFrom)
+                                 std::string_view const CalledFrom)
 #else
-                                 [[maybe_unused]] std::string const &CalledFrom)
+                                 [[maybe_unused]] std::string_view const CalledFrom)
 #endif
     {
 
@@ -613,6 +613,7 @@ namespace HeatBalanceIntRadExchange {
                     SaveApproximateViewFactors = thisEnclosure.F;
                 }
 
+                bool anyIntMassInZone = DoesZoneHaveInternalMass(state, thisEnclosure.NumOfSurfaces, thisEnclosure.SurfacePtr);
                 FixViewFactors(state,
                                thisEnclosure.NumOfSurfaces,
                                thisEnclosure.Area,
@@ -623,7 +624,8 @@ namespace HeatBalanceIntRadExchange {
                                CheckValue2,
                                FinalCheckValue,
                                NumIterations,
-                               FixedRowSum);
+                               FixedRowSum,
+                               anyIntMassInZone);
 
                 // Calculate the script F factors
                 CalcScriptF(state, thisEnclosure.NumOfSurfaces, thisEnclosure.Area, thisEnclosure.F, thisEnclosure.Emissivity, thisEnclosure.ScriptF);
@@ -915,6 +917,7 @@ namespace HeatBalanceIntRadExchange {
             Real64 FixedRowSum = 0.0;
             int NumIterations = 0;
 
+            bool anyIntMassInZone = DoesZoneHaveInternalMass(state, thisEnclosure.NumOfSurfaces, thisEnclosure.SurfacePtr);
             FixViewFactors(state,
                            thisEnclosure.NumOfSurfaces,
                            thisEnclosure.Area,
@@ -925,7 +928,8 @@ namespace HeatBalanceIntRadExchange {
                            CheckValue2,
                            FinalCheckValue,
                            NumIterations,
-                           FixedRowSum);
+                           FixedRowSum,
+                           anyIntMassInZone);
 
             if (ViewFactorReport) { // Write to SurfInfo File
                 // Zone Surface Information Output
@@ -1474,7 +1478,8 @@ namespace HeatBalanceIntRadExchange {
                         Real64 &FixedCheckValue,         // check after fixed of SUM(F) - N
                         Real64 &FinalCheckValue,         // the one to go with
                         int &NumIterations,              // number of iterations to fixed
-                        Real64 &RowSum                   // RowSum of Fixed
+                        Real64 &RowSum,                  // RowSum of Fixed
+                        bool const anyIntMassInZone      // are there any internal mass surfaces in the zone
     )
     {
 
@@ -1534,7 +1539,11 @@ namespace HeatBalanceIntRadExchange {
         bool Converged;
         int i;
         int j;
-
+        bool severeErrorPresent;
+        // OriginalCheckValue is the first pass at a completeness check.  Even if this is zero,
+        // there is no guarantee that reciprocity is satisfied.  As a result, the rest of this
+        // routine is needed to correct any issues even if the user defined view factors
+        // satisfy completeness (OriginalCheckValue = 0).
         OriginalCheckValue = std::abs(sum(F) - N);
 
         //  Allocate and zero arrays
@@ -1543,9 +1552,20 @@ namespace HeatBalanceIntRadExchange {
         Accelerator = 1.0;
         ConvrgOld = 10.0;
         LargestArea = maxval(A);
-
-        //  Check for Strange Geometry
-        if (LargestArea > (sum(A) - LargestArea)) {
+        severeErrorPresent = false;
+        // Check for Strange Geometry
+        // When one surface has an area that exceeds the sum of all other surface areas in a zone,
+        // essentially the situation is a non-complete enclosure.  As a result, the view factors
+        // calculated using the standard procedure below will not converge and may result in invalid
+        // view factors where either reciprocity or completeness is not satisfied.  However, when
+        // the largest surface is just slightly smaller than the rest of the surface areas in the
+        // zone, it has been shown that there can still be problems.  The correction below can
+        // be helpful in avoiding these problems.  So, the criteria below (with the 0.99 term added
+        // into the comparison in the next line of code) intends to capture more cases that are
+        // "unbalanced" in surface area distribution so other strange cases can take advantage of
+        // this correction.  The use of 0.99 is simply to provide some reasonable boundary numerically
+        // and does not have some derived theoretical basis.
+        if (LargestArea > 0.99 * (sum(A) - LargestArea) && (N > 3)) {
             for (i = 1; i <= N; ++i) {
                 if (LargestArea != A(i)) continue;
                 state.dataHeatBalIntRadExchg->LargestSurf = i;
@@ -1676,22 +1696,44 @@ namespace HeatBalanceIntRadExchange {
                 }
                 Real64 const sum_FixedF(sum(FixedF));
                 FinalCheckValue = FixedCheckValue = CheckConvergeTolerance = std::abs(sum_FixedF - N);
+                RowSum = sum_FixedF;
                 if (CheckConvergeTolerance > 0.005) {
+                    if (CheckConvergeTolerance > 0.1) {
+                        ShowSevereError(state,
+                                        "FixViewFactors: View factors convergence has failed "
+                                        "and will lead to heat balance errors in zone=\"" +
+                                            enclName + "\".");
+                        severeErrorPresent = true;
+                    }
                     ShowWarningError(state,
-                                     "FixViewFactors: View factors not complete. Check for bad surface descriptions or unenclosed zone=\"" +
+                                     "FixViewFactors: View factors not complete. Check "
+                                     "for bad surface descriptions or unenclosed zone=\"" +
                                          enclName + "\".");
                     ShowContinueError(state,
-                                      format("Enforced reciprocity has tolerance (ideal is 0)=[{:.6R}], Row Sum (ideal is {})=[{:.2R}].",
+                                      format("Enforced reciprocity has tolerance (ideal is "
+                                             "0)=[{:.6R}], Row Sum (ideal is {})=[{:.2R}].",
                                              CheckConvergeTolerance,
                                              N,
                                              RowSum));
-                    ShowContinueError(state, "If zone is unusual, or tolerance is on the order of 0.001, view factors are probably OK.");
+                    ShowContinueError(state,
+                                      "If zone is unusual or tolerance is on the order of 0.001, view "
+                                      "factors might be OK but results should be checked carefully.");
+                    if (anyIntMassInZone) {
+                        ShowContinueError(state,
+                                          "For zones with internal mass like this one, this"
+                                          "can happen when the internal mass has an area that"
+                                          "is much larger than the other surfaces in the zone.");
+                        ShowContinueError(state,
+                                          "If a single thermal mass element exists in this zone"
+                                          "that has an area that is larger than the sum of the"
+                                          "rest of the surface areas, consider breaking it up"
+                                          "into two or more separate internal mass elements.");
+                    }
                 }
                 if (std::abs(FixedCheckValue) < std::abs(OriginalCheckValue)) {
                     F = FixedF;
                     FinalCheckValue = FixedCheckValue;
                 }
-                RowSum = sum_FixedF;
                 return;
             }
         }
@@ -1710,6 +1752,19 @@ namespace HeatBalanceIntRadExchange {
                     state, "FixViewFactors: View factors not complete. Check for bad surface descriptions or unenclosed zone=\"" + enclName + "\".");
             }
         }
+        if (severeErrorPresent) {
+            ShowFatalError(state,
+                           "FixViewFactors: View factor calculations significantly out "
+                           "of tolerance.  See above messages for more information.");
+        }
+    }
+
+    bool DoesZoneHaveInternalMass(EnergyPlusData &state, int const numZoneSurfaces, const Array1D_int &surfPointer)
+    {
+        for (int i = 1; i <= numZoneSurfaces; ++i) {
+            if (state.dataSurface->Surface(surfPointer(i)).Class == SurfaceClass::IntMass) return true;
+        }
+        return false;
     }
 
     void CalcScriptF(EnergyPlusData &state,
@@ -1998,21 +2053,21 @@ namespace HeatBalanceIntRadExchange {
                                 bool &ErrorsFound                        // True when errors are found
     )
     {
-        static std::string const routineName("GetRadiantSystemSurface: "); // include trailing blank space
+        static constexpr std::string_view routineName("GetRadiantSystemSurface: "); // include trailing blank space
 
         // For radiant zone equipment, find the referenced surface and check if it is in the same zone or radiant enclosure
         int const surfNum = UtilityRoutines::FindItemInList(SurfaceName, state.dataSurface->Surface);
 
         // Trap for surfaces that do not exist
         if (surfNum == 0) {
-            ShowSevereError(state, routineName + "Invalid Surface name = " + SurfaceName);
+            ShowSevereError(state, std::string{routineName} + "Invalid Surface name = " + SurfaceName);
             ShowContinueError(state, "Occurs for " + cCurrentModuleObject + " = " + RadSysName);
             ErrorsFound = true;
             return surfNum;
         }
 
         if (RadSysZoneNum == 0) {
-            ShowSevereError(state, routineName + "Invalid Zone number passed by " + cCurrentModuleObject + " = " + RadSysName);
+            ShowSevereError(state, std::string{routineName} + "Invalid Zone number passed by " + cCurrentModuleObject + " = " + RadSysName);
             ErrorsFound = true;
             return surfNum;
         }
@@ -2023,16 +2078,18 @@ namespace HeatBalanceIntRadExchange {
         if (radSysEnclNum == 0) {
             // This should never happen - but it does in some simple unit tests that are designed to throw errors
             ShowSevereError(state,
-                            routineName + "Somehow the radiant system enclosure number is zero for" + cCurrentModuleObject + " = " + RadSysName);
+                            std::string{routineName} + "Somehow the radiant system enclosure number is zero for" + cCurrentModuleObject + " = " +
+                                RadSysName);
             ErrorsFound = true;
         } else if (surfRadEnclNum == 0) {
             // This should never happen
             ShowSevereError(state,
-                            routineName + "Somehow  the surface enclosure number is zero for" + cCurrentModuleObject + " = " + RadSysName +
-                                " and Surface = " + SurfaceName); // LCOV_EXCL_LINE
-            ErrorsFound = true;                                   // LCOV_EXCL_LINE
+                            std::string{routineName} + "Somehow  the surface enclosure number is zero for" + cCurrentModuleObject + " = " +
+                                RadSysName + " and Surface = " + SurfaceName); // LCOV_EXCL_LINE
+            ErrorsFound = true;                                                // LCOV_EXCL_LINE
         } else if (surfRadEnclNum != radSysEnclNum) {
-            ShowSevereError(state, routineName + "Surface = " + SurfaceName + " is not in the same zone or enclosure as the radiant equipment.");
+            ShowSevereError(
+                state, std::string{routineName} + "Surface = " + SurfaceName + " is not in the same zone or enclosure as the radiant equipment.");
             ShowContinueError(state, "Surface zone or enclosure = " + state.dataViewFactor->ZoneRadiantInfo(surfRadEnclNum).Name);
             ShowContinueError(state, "Radiant equipment zone or enclosure = " + state.dataViewFactor->ZoneRadiantInfo(radSysEnclNum).Name);
             ShowContinueError(state, "Occurs for " + cCurrentModuleObject + " = " + RadSysName);
