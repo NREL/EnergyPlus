@@ -501,8 +501,8 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
     EXPECT_EQ(state->dataSurface->SurfIntConvClassification(5), ConvectionConstants::InConvClass_A3_StableHoriz);
 
     // vertical floor is currently not a valid case, so returns zero with a severe error
-//    DynamicIntConvSurfaceClassification(*state, 6);
-//    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(6), 0);
+    //    DynamicIntConvSurfaceClassification(*state, 6);
+    //    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(6), 0);
 
     DynamicIntConvSurfaceClassification(*state, 7);
     EXPECT_EQ(state->dataSurface->SurfIntConvClassification(7), ConvectionConstants::InConvClass_A3_StableTilted);
@@ -550,8 +550,8 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
     EXPECT_EQ(state->dataSurface->SurfIntConvClassification(5), ConvectionConstants::InConvClass_A3_UnstableHoriz);
 
     // vertical floor is currently not a valid case, so returns zero with a severe error
-//    DynamicIntConvSurfaceClassification(*state, 6);
-//    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(6), 0);
+    //    DynamicIntConvSurfaceClassification(*state, 6);
+    //    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(6), 0);
 
     DynamicIntConvSurfaceClassification(*state, 7);
     EXPECT_EQ(state->dataSurface->SurfIntConvClassification(7), ConvectionConstants::InConvClass_A3_UnstableTilted);
