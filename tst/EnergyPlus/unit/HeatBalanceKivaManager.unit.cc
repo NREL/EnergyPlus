@@ -63,6 +63,7 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/HeatBalanceKivaManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/WeatherManager.hh>
@@ -258,6 +259,22 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     Real64 expectedResult4 = kv4.instance.bcs->slabConvectiveTemp;
 
     EXPECT_NEAR(expectedResult4, zoneAssumedTemperature4 + DataGlobalConstants::KelvinConv, 0.001);
+
+    // Test initial run period date of May 1st
+    Real64 zoneAssumedTemperature5 = 15.0;
+    HeatBalanceKivaManager::KivaInstanceMap kv5(*state, fnd, 0, {}, 0, zoneAssumedTemperature5, 1.0, 0, &km);
+
+    kv5.zoneControlNum = 1;
+    kv5.zoneControlType = 1; // Temperature
+
+    // Set day of year to 121 (May 1st)
+    state->dataEnvrn->DayOfYear = 121;
+
+    km.surfaceConvMap[0].f = Kiva::getMoWiTTForcedTerm;
+//    Kiva::Surface surf;
+//    surf.boundaryConditionType = Kiva::Surface::CONSTANT_TEMPERATURE;
+    kv5.initGround(*state, kivaweather);
+
 }
 
 TEST_F(EnergyPlusFixture, OpaqueSkyCover_InterpretWeatherMissingOpaqueSkyCover)

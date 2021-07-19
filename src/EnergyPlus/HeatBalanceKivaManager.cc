@@ -161,7 +161,7 @@ void KivaInstanceMap::initGround(EnergyPlusData &state, const KivaWeatherData &k
     int acceleratedTimestep = 30; // days
     int accDate =
         state.dataEnvrn->DayOfYear - 1 - acceleratedTimestep * (numAccelaratedTimesteps + 1); // date time = last timestep from the day before
-    while (accDate < 0) {
+    while (accDate <= 0) {
         accDate = accDate + 365 + state.dataWeatherManager->LeapYearAdd;
     }
 
