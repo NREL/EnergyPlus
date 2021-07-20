@@ -2261,7 +2261,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
         bool errFlag = false;
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
-                                                DataPlant::TypeOf_FluidToFluidPlantHtExchg,
+                                                this->TypeNum,
                                                 this->DemandSideLoop.loopNum,
                                                 this->DemandSideLoop.loopSideNum,
                                                 this->DemandSideLoop.branchNum,
@@ -2276,8 +2276,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
         if (this->DemandSideLoop.loopSideNum != DataPlant::DemandSide) { // throw error
             ShowSevereError(state,
                             format("{} Invalid connections for {} name = \"{}\"",
-                                   RoutineName,
-                                   DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_FluidToFluidPlantHtExchg),
+                                   RoutineName, DataPlant::ccSimPlantEquipTypes(this->TypeNum),
                                    this->Name));
             ShowContinueError(state, "The \"Loop Demand Side\" connections are not on the Demand Side of a plant loop");
             errFlag = true;
@@ -2285,7 +2284,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
 
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
-                                                DataPlant::TypeOf_FluidToFluidPlantHtExchg,
+                                                this->TypeNum,
                                                 this->SupplySideLoop.loopNum,
                                                 this->SupplySideLoop.loopSideNum,
                                                 this->SupplySideLoop.branchNum,
@@ -2300,8 +2299,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
         if (this->SupplySideLoop.loopSideNum != DataPlant::SupplySide) { // throw error
             ShowSevereError(state,
                             format("{} Invalid connections for {} name = \"{}\"",
-                                   RoutineName,
-                                   DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_FluidToFluidPlantHtExchg),
+                                   RoutineName, DataPlant::ccSimPlantEquipTypes(this->TypeNum),
                                    this->Name));
             ShowContinueError(state, "The \"Loop Supply Side\" connections are not on the Supply Side of a plant loop");
             errFlag = true;
@@ -2311,8 +2309,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
         if (this->SupplySideLoop.loopNum == this->DemandSideLoop.loopNum) { // user is being too tricky, don't allow
             ShowSevereError(state,
                             format("{} Invalid connections for {} name = \"{}\"",
-                                   RoutineName,
-                                   DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_FluidToFluidPlantHtExchg),
+                                   RoutineName, DataPlant::ccSimPlantEquipTypes(this->TypeNum),
                                    this->Name));
             ShowContinueError(state, R"(The "Loop Supply Side" and "Loop Demand Side" need to be on different loops.)");
             errFlag = true;
@@ -2323,7 +2320,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
                                                           this->SupplySideLoop.loopSideNum,
                                                           this->DemandSideLoop.loopNum,
                                                           this->DemandSideLoop.loopSideNum,
-                                                          DataPlant::TypeOf_FluidToFluidPlantHtExchg,
+                                                          this->TypeNum,
                                                           true);
         }
 
