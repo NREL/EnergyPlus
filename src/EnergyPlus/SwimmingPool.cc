@@ -1087,7 +1087,7 @@ void ReportSwimmingPool(EnergyPlusData &state)
         int SurfNum = state.dataSwimmingPools->Pool(PoolNum).SurfacePtr; // surface number index
 
         // First transfer the surface inside temperature data to the current pool water temperature
-        state.dataSwimmingPools->Pool(PoolNum).PoolWaterTemp = state.dataHeatBalSurf->SurfInTempHistCurr(SurfNum);
+        state.dataSwimmingPools->Pool(PoolNum).PoolWaterTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum);
 
         // Next calculate the amount of heating done by the plant loop
         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,

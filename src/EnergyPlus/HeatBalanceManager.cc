@@ -6307,9 +6307,9 @@ namespace HeatBalanceManager {
             if (thisSurface.Class == DataSurfaces::SurfaceClass::Window) {
                 auto &thisConstruct(thisSurface.Construction);
                 if (!state.dataConstruction->Construct(thisConstruct).WindowTypeBSDF) {
-                    state.dataHeatBal->SurfWinFenLaySurfTempFront(SurfNum, 1) = state.dataHeatBalSurf->SurfOutTempHistCurr(SurfNum);
+                    state.dataHeatBal->SurfWinFenLaySurfTempFront(SurfNum, 1) = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum);
                     state.dataHeatBal->SurfWinFenLaySurfTempBack(SurfNum, state.dataConstruction->Construct(thisConstruct).TotLayers) =
-                        state.dataHeatBalSurf->SurfInTempHistCurr(SurfNum);
+                        state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum);
                 }
             }
         }
