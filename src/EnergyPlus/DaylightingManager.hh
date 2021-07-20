@@ -298,7 +298,6 @@ namespace DaylightingManager {
     );
 
     void FigureMapPointDayltgFactorsToAddIllums(EnergyPlusData &state,
-                                                int const ZoneNum,
                                                 int const MapNum,
                                                 int const iMapPoint,
                                                 int const iHour,

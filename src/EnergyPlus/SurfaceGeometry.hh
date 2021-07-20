@@ -88,7 +88,7 @@ namespace SurfaceGeometry {
 
     void GetSurfaceData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
-    void CreateMissingSpaces(EnergyPlusData &state, bool &ErrorsFound);
+    void CreateMissingSpaces(EnergyPlusData &state);
 
     void checkSubSurfAzTiltNorm(EnergyPlusData &state,
                                 SurfaceData &baseSurface, // Base surface data (in)

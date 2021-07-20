@@ -3603,7 +3603,6 @@ void InitIntSolarDistribution(EnergyPlusData &state)
         int const firstSurfOpaque = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
         int const lastSurfOpaque = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
         for (int SurfNum = firstSurfOpaque; SurfNum <= lastSurfOpaque; ++SurfNum) {
-            int const radEnclosureNum = Surface(SurfNum).RadEnclIndex;
             int const solEnclosureNum = Surface(SurfNum).SolarEnclIndex;
             int const ConstrNum = Surface(SurfNum).Construction;
 

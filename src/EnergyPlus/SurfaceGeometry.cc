@@ -1816,7 +1816,7 @@ namespace SurfaceGeometry {
 
         state.dataSurfaceGeometry->SurfaceTmp.deallocate(); // DeAllocate the Temp Surface derived type
 
-        CreateMissingSpaces(state, ErrorsFound);
+        CreateMissingSpaces(state);
 
         //  For each Base Surface Type (Wall, Floor, Roof)
 
@@ -2808,7 +2808,7 @@ namespace SurfaceGeometry {
         }
     }
 
-    void CreateMissingSpaces(EnergyPlusData &state, bool &ErrorsFound)
+    void CreateMissingSpaces(EnergyPlusData &state)
     {
         // Scan surfaces to see if Space was assigned in input
         for (int surfNum = 1; surfNum <= state.dataSurface->TotSurfaces; ++surfNum) {

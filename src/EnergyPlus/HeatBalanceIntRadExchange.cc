@@ -508,9 +508,8 @@ namespace HeatBalanceIntRadExchange {
             }
             int numEnclosureSurfaces = 0;
             for (int spaceNum : thisEnclosure.SpaceNums) {
-                for (int surfNum : state.dataHeatBal->Space(spaceNum).Surfaces) {
-                    ++numEnclosureSurfaces;
-                }
+                // Note that Space.Surfaces only includes HT surfs, see SurfaceGeometry::CreateMissingSpaces
+                numEnclosureSurfaces += int(state.dataHeatBal->Space(spaceNum).Surfaces.size());
             }
             thisEnclosure.NumOfSurfaces = numEnclosureSurfaces;
             state.dataHeatBalIntRadExchg->MaxNumOfRadEnclosureSurfs =
@@ -816,10 +815,8 @@ namespace HeatBalanceIntRadExchange {
             }
             int numEnclosureSurfaces = 0;
             for (int spaceNum : thisEnclosure.SpaceNums) {
-                for (int surfNum : state.dataHeatBal->Space(spaceNum).Surfaces) {
-                    // Include only heat transfer surfaces
-                    ++numEnclosureSurfaces;
-                }
+                // Note that Space.Surfaces only includes HT surfs, see SurfaceGeometry::CreateMissingSpaces
+                numEnclosureSurfaces += int(state.dataHeatBal->Space(spaceNum).Surfaces.size());
             }
             thisEnclosure.NumOfSurfaces = numEnclosureSurfaces;
             if (numEnclosureSurfaces < 1) ShowFatalError(state, "No surfaces in an enclosure in InitSolarViewFactors");

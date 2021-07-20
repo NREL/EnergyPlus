@@ -1628,11 +1628,11 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const ZoneNum)
                     // Also calculate corresponding glare factors.
                     ILB = IL;
                     for (IHR = 1; IHR <= 24; ++IHR) {
-                        FigureMapPointDayltgFactorsToAddIllums(state, ZoneNum, MapNum, ILB, IHR, IWin, loopwin, NWX, NWY, ICtrl);
+                        FigureMapPointDayltgFactorsToAddIllums(state, MapNum, ILB, IHR, IWin, loopwin, NWX, NWY, ICtrl);
                     } // End of sun position loop, IHR
                 } else {
                     ILB = IL;
-                    FigureMapPointDayltgFactorsToAddIllums(state, ZoneNum, MapNum, ILB, state.dataGlobal->HourOfDay, IWin, loopwin, NWX, NWY, ICtrl);
+                    FigureMapPointDayltgFactorsToAddIllums(state, MapNum, ILB, state.dataGlobal->HourOfDay, IWin, loopwin, NWX, NWY, ICtrl);
                 }
 
             } // End of window loop, loopwin - IWin
@@ -4055,7 +4055,6 @@ void FigureRefPointDayltgFactorsToAddIllums(EnergyPlusData &state,
 }
 
 void FigureMapPointDayltgFactorsToAddIllums(EnergyPlusData &state,
-                                            int const ZoneNum,
                                             int const MapNum,
                                             int const iMapPoint,
                                             int const iHour,
@@ -10234,25 +10233,23 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
         int const thisZoneEnclNum = Zone(ZoneNum).ZoneFirstSpaceSolEnclosure;
         for (int adjEnclNum = 1; adjEnclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++adjEnclNum) {
             if (adjEnclNum == thisZoneEnclNum) continue;
-            for (int SpaceNumAdj : state.dataViewFactor->EnclSolInfo(adjEnclNum).SpaceNums) {
-                // Require that ZoneNumAdj have a least one exterior window
-                bool AdjEnclHasExtWins = false;
-                for (int SurfNumAdj : state.dataViewFactor->EnclSolInfo(adjEnclNum).SurfacePtr) {
-                    if (state.dataSurface->Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) {
-                        AdjEnclHasExtWins = true;
-                        break;
-                    }
+            // Require that adjEnclNum have a least one exterior window
+            bool AdjEnclHasExtWins = false;
+            for (int SurfNumAdj : state.dataViewFactor->EnclSolInfo(adjEnclNum).SurfacePtr) {
+                if (state.dataSurface->Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) {
+                    AdjEnclHasExtWins = true;
+                    break;
                 }
-                if (!AdjEnclHasExtWins) continue;
-                // Loop again through surfaces in ZoneNumAdj and see if any are interior windows adjacent to ZoneNum
-                for (int SurfNumAdj : state.dataViewFactor->EnclSolInfo(adjEnclNum).SpaceNums) {
-                    if (state.dataSurface->Surface(SurfNumAdj).ExtBoundCond >= 1) {
-                        // This is an interior window in ZoneNumAdj
-                        if (state.dataSurface->Surface(state.dataSurface->Surface(SurfNumAdj).ExtBoundCond).SolarEnclIndex == thisZoneEnclNum) {
-                            // This interior window is adjacent to ZoneNum
-                            ++NumList;
-                            break;
-                        }
+            }
+            if (!AdjEnclHasExtWins) continue;
+            // Loop again through surfaces in ZoneNumAdj and see if any are interior windows adjacent to ZoneNum
+            for (int SurfNumAdj : state.dataViewFactor->EnclSolInfo(adjEnclNum).SpaceNums) {
+                if (state.dataSurface->Surface(SurfNumAdj).ExtBoundCond >= 1) {
+                    // This is an interior window in ZoneNumAdj
+                    if (state.dataSurface->Surface(state.dataSurface->Surface(SurfNumAdj).ExtBoundCond).SolarEnclIndex == thisZoneEnclNum) {
+                        // This interior window is adjacent to ZoneNum
+                        ++NumList;
+                        break;
                     }
                 }
             }
