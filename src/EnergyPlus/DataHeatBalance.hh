@@ -924,9 +924,10 @@ namespace DataHeatBalance {
             : ZonePtr(0), SchedPtr(0), ModelType(0), DesignLevel(0.0), ConstantTermCoef(0.0), TemperatureTermCoef(0.0), VelocityTermCoef(0.0),
               VelocitySQTermCoef(0.0), LeakageArea(0.0), BasicStackCoefficient(0.0), BasicWindCoefficient(0.0), FlowCoefficient(0.0),
               AIM2StackCoefficient(0.0), AIM2WindCoefficient(0.0), PressureExponent(0.0), ShelterFactor(0.0), EMSOverrideOn(false),
-              EMSAirFlowRateValue(0.0), QuadratureSum(false), OABalancePtr(0), VolumeFlowRate(0.0), MassFlowRate(0.0), InfilHeatLoss(0.0),
-              InfilHeatGain(0.0), InfilLatentLoss(0.0), InfilLatentGain(0.0), InfilTotalLoss(0.0), InfilTotalGain(0.0), InfilVdotCurDensity(0.0),
-              InfilVdotStdDensity(0.0), InfilVolumeCurDensity(0.0), InfilVolumeStdDensity(0.0), InfilMass(0.0), InfilAirChangeRate(0.0)
+              EMSAirFlowRateValue(0.0), QuadratureSum(false), OABalancePtr(0), VolumeFlowRate(0.0), MassFlowRate(0.0), MCpI_temp(0.0),
+              InfilHeatGain(0.0), InfilHeatLoss(0.0), InfilLatentGain(0.0), InfilLatentLoss(0.0), InfilTotalGain(0.0), InfilTotalLoss(0.0),
+              InfilVolumeCurDensity(0.0), InfilVolumeStdDensity(0.0), InfilVdotCurDensity(0.0), InfilVdotStdDensity(0.0), InfilMass(0.0),
+              InfilAirChangeRate(0.0)
         {
         }
     };
