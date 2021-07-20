@@ -40,6 +40,10 @@ if(USE_PSYCH_ERRORS)
   add_definitions("-DEP_psych_errors")
 endif()
 
+if(BUILD_CPGFUNCTION)
+  add_definitions("-DBUILD_CPGFUNCTION")
+endif()
+
 set(SRC
     "${PROJECT_SOURCE_DIR}/third_party/milo/dtoa.h"
     "${PROJECT_SOURCE_DIR}/third_party/milo/itoa.h"

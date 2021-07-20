@@ -792,7 +792,6 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Response_Factors_
         "    KATemps,            !- Undisturbed Ground Temperature Model Name",
         "    2.423,              !- Ground Thermal Conductivity {W/m-K}",
         "    2.343E+06,          !- Ground Thermal Heat Capacity {J/m3-K}",
-        "    UHFcalc,            !- g-function Calculation Model name",
         "    GHE-1 g-functions;  !- Response Factors Object Name",
     });
 
@@ -863,8 +862,9 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Array_IDF_Check)
                           "    KATemps,            !- Undisturbed Ground Temperature Model Name",
                           "    2.423,              !- Ground Thermal Conductivity {W/m-K}",
                           "    2.343E+06,          !- Ground Thermal Heat Capacity {J/m3-K}",
-                          "    ,                    !- Response Factors Object Name",
-                          "    GHE-Array;            !- !- GHE Array Object Name"});
+                          "    ,                   !- Response Factors Object Name",
+                          "    UHFCalc,            !- g-Function Calculation Method",
+                          "    GHE-Array;          !- GHE Array Object Name"});
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -950,7 +950,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Single_BHs_IDF_Ch
                           "    KATemps,            !- Undisturbed Ground Temperature Model Name",
                           "    2.423,              !- Ground Thermal Conductivity {W/m-K}",
                           "    2.343E+06,          !- Ground Thermal Heat Capacity {J/m3-K}",
-                          "    ,                    !- Response Factors Object Name",
+                          "    ,                   !- Response Factors Object Name",
+                          "    UHFCalc,            !- g-Function Calculation Method",
                           "    ,                   !- GHE Array Object Name",
                           "    GHE-1,              !- GHE Borehole Definition 1",
                           "    GHE-2,              !- GHE Borehole Definition 2",
@@ -1041,7 +1042,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcGFunction_Check)
                           "    KATemps,            !- Undisturbed Ground Temperature Model Name",
                           "    2.423,              !- Ground Thermal Conductivity {W/m-K}",
                           "    2.343E+06,          !- Ground Thermal Heat Capacity {J/m3-K}",
-                          "    ,                    !- Response Factors Object Name",
+                          "    ,                   !- Response Factors Object Name",
+                          "    UHFCalc,            !- g-Function Calculation Method",
                           "    ,                   !- GHE Array Object Name",
                           "    GHE-1,              !- GHE Borehole Definition 1",
                           "    GHE-2,              !- GHE Borehole Definition 2",
@@ -1377,7 +1379,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_conduction_re
                           "    KATemps,            !- Undisturbed Ground Temperature Model Name",
                           "    2.423,              !- Ground Thermal Conductivity {W/m-K}",
                           "    2.343E+06,          !- Ground Thermal Heat Capacity {J/m3-K}",
-                          "    ,                    !- Response Factors Object Name",
+                          "    ,                   !- Response Factors Object Name",
+                          "    UHFCalc,            !- g-Function Calculation Method",
                           "    GHE-Array;          !- GHE Array Object Name"});
 
     state->dataSysVars->DisableGLHECaching = true;
@@ -1436,7 +1439,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_friction_factor)
                           "    KATemps,            !- Undisturbed Ground Temperature Model Name",
                           "    2.423,              !- Ground Thermal Conductivity {W/m-K}",
                           "    2.343E+06,          !- Ground Thermal Heat Capacity {J/m3-K}",
-                          "    ,                    !- Response Factors Object Name",
+                          "    ,                   !- Response Factors Object Name",
+                          "    UHFCalc,            !- g-Function Calculation Method",
                           "    GHE-Array;          !- GHE Array Object Name"});
 
     // Envr variable
@@ -1527,7 +1531,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_convection_re
                           "    KATemps,            !- Undisturbed Ground Temperature Model Name",
                           "    2.423,              !- Ground Thermal Conductivity {W/m-K}",
                           "    2.343E+06,          !- Ground Thermal Heat Capacity {J/m3-K}",
-                          "    ,                    !- Response Factors Object Name",
+                          "    ,                   !- Response Factors Object Name",
+                          "    UHFCalc,            !- g-Function Calculation Method",
                           "    GHE-Array;          !- GHE Array Object Name",
 
                           "Branch,",
@@ -1831,7 +1836,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_resistance)
                           "    KATemps,            !- Undisturbed Ground Temperature Model Name",
                           "    2.423,              !- Ground Thermal Conductivity {W/m-K}",
                           "    2.343E+06,          !- Ground Thermal Heat Capacity {J/m3-K}",
-                          "    ,                    !- Response Factors Object Name",
+                          "    ,                   !- Response Factors Object Name",
+                          "    UHFCalc,            !- g-Function Calculation Method",
                           "    GHE-Array;          !- GHE Array Object Name",
 
                           "Branch,",
@@ -2351,7 +2357,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_1
         "    KATemps,            !- Undisturbed Ground Temperature Model Name",
         "    4.0,                !- Ground Thermal Conductivity {W/m-K}",
         "    2.4957E+06,         !- Ground Thermal Heat Capacity {J/m3-K}",
-        "    ,                    !- Response Factors Object Name",
+        "    ,                   !- Response Factors Object Name",
+        "    UHFCalc,            !- g-Function Calculation Method",
         "    GHE-Array;          !- GHE Array Object Name"});
 
     // Envr variable
@@ -2649,7 +2656,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_2
         "    KATemps,            !- Undisturbed Ground Temperature Model Name",
         "    1.0,                !- Ground Thermal Conductivity {W/m-K}",
         "    2.4957E+06,         !- Ground Thermal Heat Capacity {J/m3-K}",
-        "    ,                    !- Response Factors Object Name",
+        "    ,                   !- Response Factors Object Name",
+        "    UHFCalc,            !- g-Function Calculation Method",
         "    GHE-Array;          !- GHE Array Object Name"});
 
     // Envr variable
@@ -2947,7 +2955,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_3
         "    KATemps,            !- Undisturbed Ground Temperature Model Name",
         "    1.0,                !- Ground Thermal Conductivity {W/m-K}",
         "    2.4957E+06,         !- Ground Thermal Heat Capacity {J/m3-K}",
-        "    ,                    !- Response Factors Object Name",
+        "    ,                   !- Response Factors Object Name",
+        "    UHFCalc,            !- g-Function Calculation Method",
         "    GHE-Array;          !- GHE Array Object Name"});
 
     // Envr variable
@@ -3245,7 +3254,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
         "    KATemps,            !- Undisturbed Ground Temperature Model Name",
         "    4.0,                !- Ground Thermal Conductivity {W/m-K}",
         "    2.4957E+06,         !- Ground Thermal Heat Capacity {J/m3-K}",
-        "    ,                    !- Response Factors Object Name",
+        "    ,                   !- Response Factors Object Name",
+        "    UHFCalc,            !- g-Function Calculation Method",
         "    GHE-Array;          !- GHE Array Object Name"});
 
     // Envr variable
@@ -3543,7 +3553,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
         "    KATemps,            !- Undisturbed Ground Temperature Model Name",
         "    3.0,                !- Ground Thermal Conductivity {W/m-K}",
         "    2.4957E+06,         !- Ground Thermal Heat Capacity {J/m3-K}",
-        "    ,                    !- Response Factors Object Name",
+        "    ,                   !- Response Factors Object Name",
+        "    UHFCalc,            !- g-Function Calculation Method",
         "    GHE-Array;          !- GHE Array Object Name"});
 
     // Envr variable
@@ -3841,7 +3852,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
         "    KATemps,            !- Undisturbed Ground Temperature Model Name",
         "    1.0,                !- Ground Thermal Conductivity {W/m-K}",
         "    2.4957E+06,         !- Ground Thermal Heat Capacity {J/m3-K}",
-        "    ,                    !- Response Factors Object Name",
+        "    ,                   !- Response Factors Object Name",
+        "    UHFCalc,            !- g-Function Calculation Method",
         "    GHE-Array;          !- GHE Array Object Name"});
 
     // Envr variable
