@@ -942,23 +942,6 @@ void SetupOutputVariable(EnergyPlusData &state,
                          Optional_int_const indexGroupKey = _                     // Group identifier for SQL output
 );
 
-void SetupOutputVariable(std::string const &VariableName,                         // String Name of variable
-                         OutputProcessor::Unit const &VariableUnit,               // Actual units corresponding to the actual variable
-                         Real64 &ActualVariable,                                  // Actual Variable, used to set up pointer
-                         OutputProcessor::SOVTimeStepType const &TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
-                         OutputProcessor::SOVStoreType const &VariableTypeKey,    // State, Average=1, NonState, Sum=2
-                         int const KeyedValue,                                    // Associated Key for this variable
-                         Optional_string_const ReportFreq = _,                    // Internal use -- causes reporting at this freqency
-                         Optional_string_const ResourceTypeKey = _,               // Meter Resource Type (Electricity, Gas, etc)
-                         Optional_string_const EndUseKey = _,                     // Meter End Use Key (Lights, Heating, Cooling, etc)
-                         Optional_string_const EndUseSubKey = _,                  // Meter End Use Sub Key (General Lights, Task Lights, etc)
-                         Optional_string_const GroupKey = _,                      // Meter Super Group Key (Building, System, Plant)
-                         Optional_string_const ZoneKey = _,                       // Meter Zone Key (zone name)
-                         Optional_int_const ZoneMult = _,                         // Zone Multiplier, defaults to 1
-                         Optional_int_const ZoneListMult = _,                     // Zone List Multiplier, defaults to 1
-                         Optional_int_const indexGroupKey = _                     // Group identifier for SQL output
-);
-
 void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType const TimeStepTypeKey); // What kind of data to update (Zone, HVAC)
 
 void AssignReportNumber(EnergyPlusData &state, int &ReportNumber);
