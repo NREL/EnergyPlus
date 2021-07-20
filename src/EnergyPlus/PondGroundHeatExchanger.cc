@@ -379,6 +379,8 @@ void PondGroundHeatExchangerData::InitPondGroundHeatExchanger(EnergyPlusData &st
     // repeated warm up days tend to drive the initial pond temperature toward the drybulb temperature
     // For each environment start the pond midway between drybulb and ground temp.
 
+    this->oneTimeInit(state);
+
     if (FirstHVACIteration && !state.dataHVACGlobal->ShortenTimeStepSys && this->firstTimeThrough) {
         // update past temperature
         this->PastBulkTemperature = this->BulkTemperature;
@@ -428,7 +430,7 @@ void PondGroundHeatExchangerData::CalcPondGroundHeatExchanger(EnergyPlusData &st
     //   Rejecter With Closed-Loop Ground-Source Heat Pump Systems.
     //   ASHRAE Transactions.  106(2):107-121.
 
-    static std::string const RoutineName("CalcPondGroundHeatExchanger");
+    static constexpr std::string_view RoutineName("CalcPondGroundHeatExchanger");
 
     Real64 PondMass = this->Depth * this->Area *
                       FluidProperties::GetDensityGlycol(
@@ -497,7 +499,7 @@ Real64 PondGroundHeatExchangerData::CalcTotalFLux(EnergyPlusData &state, Real64 
     Real64 const SchmidtAir(0.6);  // Schmidt number for air - assumed constant
     Real64 const PondHeight(0.0);  // for now
 
-    static std::string const RoutineName("PondGroundHeatExchanger:CalcTotalFlux");
+    static constexpr std::string_view RoutineName("PondGroundHeatExchanger:CalcTotalFlux");
 
     // make a surface heat balance and solve for temperature
     Real64 ThermalAbs = 0.9; // thermal absorptivity
@@ -671,7 +673,7 @@ Real64 PondGroundHeatExchangerData::CalcEffectiveness(EnergyPlusData &state,
 
     Real64 const MaxLaminarRe(2300.0); // Maximum Reynolds number for laminar flow
     Real64 const GravConst(9.81);      // gravitational constant - should be fixed!
-    static std::string const CalledFrom("PondGroundHeatExchanger:CalcEffectiveness");
+    static constexpr std::string_view CalledFrom("PondGroundHeatExchanger:CalcEffectiveness");
 
     // evaluate properties at pipe fluid temperature for given pipe fluid
 
@@ -799,7 +801,7 @@ void PondGroundHeatExchangerData::UpdatePondGroundHeatExchanger(EnergyPlusData &
     // ground heat exchangers.   This routine must also set the outlet water
     // conditions.
 
-    static std::string const RoutineName("PondGroundHeatExchanger:Update");
+    static constexpr std::string_view RoutineName("PondGroundHeatExchanger:Update");
 
     // Calculate the water side outlet conditions and set the
     // appropriate conditions on the correct HVAC node.
@@ -828,66 +830,70 @@ void PondGroundHeatExchangerData::UpdatePondGroundHeatExchanger(EnergyPlusData &
     // keep track of the bulk temperature
     this->BulkTemperature = this->PondTemp;
 }
-void PondGroundHeatExchangerData::oneTimeInit_new(EnergyPlusData &state)
+void PondGroundHeatExchangerData::oneTimeInit(EnergyPlusData &state)
 {
     Real64 const DesignVelocity(0.5); // Hypothetical design max pipe velocity [m/s]
     Real64 const PondHeight(0.0);     // for now
 
     static std::string const RoutineName("InitPondGroundHeatExchanger");
 
-    this->setupOutputVars(state);
+    if (this->setupOutputVarsFlag) {
+        this->setupOutputVars(state);
+        this->setupOutputVarsFlag = false;
+    }
 
-    if (state.dataGlobal->WarmupFlag) {
+    if (this->OneTimeFlag || state.dataGlobal->WarmupFlag) {
         // initialize pond temps to mean of drybulb and ground temps.
         this->BulkTemperature = this->PastBulkTemperature =
             0.5 * (DataEnvironment::OutDryBulbTempAt(state, PondHeight) + state.dataEnvrn->GroundTemp_Deep);
+        this->OneTimeFlag = false;
     }
 
     // Init more variables
-    // Locate the hx on the plant loops for later usage
-    bool errFlag = false;
-    PlantUtilities::ScanPlantLoopsForObject(state,
-                                            this->Name,
-                                            DataPlant::TypeOf_GrndHtExchgPond,
-                                            this->LoopNum,
-                                            this->LoopSideNum,
-                                            this->BranchNum,
-                                            this->CompNum,
-                                            errFlag,
-                                            _,
-                                            _,
-                                            _,
-                                            _,
-                                            _);
-    if (errFlag) {
-        ShowFatalError(state, "InitPondGroundHeatExchanger: Program terminated due to previous condition(s).");
-    }
-    Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                   state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
-                                                   DataPrecisionGlobals::constant_zero,
-                                                   state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
-                                                   RoutineName);
-    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+    if (this->MyFlag) {
+        // Locate the hx on the plant loops for later usage
+        bool errFlag = false;
+        PlantUtilities::ScanPlantLoopsForObject(state,
+                                                this->Name,
+                                                DataPlant::TypeOf_GrndHtExchgPond,
+                                                this->LoopNum,
+                                                this->LoopSideNum,
+                                                this->BranchNum,
+                                                this->CompNum,
+                                                errFlag,
+                                                _,
+                                                _,
+                                                _,
+                                                _,
+                                                _);
+        if (errFlag) {
+            ShowFatalError(state, "InitPondGroundHeatExchanger: Program terminated due to previous condition(s).");
+        }
+        Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
                                                        DataPrecisionGlobals::constant_zero,
                                                        state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
                                                        RoutineName);
-    this->DesignMassFlowRate = DataGlobalConstants::Pi / 4.0 * pow_2(this->TubeInDiameter) * DesignVelocity * rho * this->NumCircuits;
-    this->DesignCapacity = this->DesignMassFlowRate * Cp * 10.0; // assume 10C delta T?
-    PlantUtilities::InitComponentNodes(state,
-                                       0.0,
-                                       this->DesignMassFlowRate,
-                                       this->InletNodeNum,
-                                       this->OutletNodeNum,
-                                       this->LoopNum,
-                                       this->LoopSideNum,
-                                       this->BranchNum,
-                                       this->CompNum);
-    PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNodeNum, this->DesignMassFlowRate / rho);
-}
+        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                           state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                           DataPrecisionGlobals::constant_zero,
+                                                           state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                           RoutineName);
+        this->DesignMassFlowRate = DataGlobalConstants::Pi / 4.0 * pow_2(this->TubeInDiameter) * DesignVelocity * rho * this->NumCircuits;
+        this->DesignCapacity = this->DesignMassFlowRate * Cp * 10.0; // assume 10C delta T?
+        PlantUtilities::InitComponentNodes(state,
+                                           0.0,
+                                           this->DesignMassFlowRate,
+                                           this->InletNodeNum,
+                                           this->OutletNodeNum,
+                                           this->LoopNum,
+                                           this->LoopSideNum,
+                                           this->BranchNum,
+                                           this->CompNum);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNodeNum, this->DesignMassFlowRate / rho);
 
-void PondGroundHeatExchangerData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
-{
+        this->MyFlag = false;
+    }
 }
 
 } // namespace EnergyPlus::PondGroundHeatExchanger

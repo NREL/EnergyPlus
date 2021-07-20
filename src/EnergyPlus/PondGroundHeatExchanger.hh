@@ -101,6 +101,10 @@ namespace PondGroundHeatExchanger {
         Real64 HeatTransferRate; // total fluid heat transfer rate, Watts
         Real64 Energy;           // cumulative energy, Joules
 
+        bool OneTimeFlag;
+        bool MyFlag;
+        bool setupOutputVarsFlag;
+
         int WaterIndex;
 
         bool firstTimeThrough;
@@ -110,7 +114,8 @@ namespace PondGroundHeatExchanger {
             : DesignMassFlowRate(0.0), DesignCapacity(0.0), Depth(0.0), Area(0.0), TubeInDiameter(0.0), TubeOutDiameter(0.0), TubeConductivity(0.0),
               GrndConductivity(0.0), CircuitLength(0.0), BulkTemperature(0.0), PastBulkTemperature(0.0), NumCircuits(0), InletNodeNum(0),
               OutletNodeNum(0), FrozenErrIndex(0), ConsecutiveFrozen(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), InletTemp(0.0),
-              OutletTemp(0.0), MassFlowRate(0.0), PondTemp(0.0), HeatTransferRate(0.0), Energy(0.0), WaterIndex(0), firstTimeThrough(true)
+              OutletTemp(0.0), MassFlowRate(0.0), PondTemp(0.0), HeatTransferRate(0.0), Energy(0.0), OneTimeFlag(true), MyFlag(true),
+              setupOutputVarsFlag(true), WaterIndex(0), firstTimeThrough(true)
         {
         }
 
@@ -144,8 +149,6 @@ namespace PondGroundHeatExchanger {
         void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
         void oneTimeInit(EnergyPlusData &state) override;
-
-        void oneTimeInit_new(EnergyPlusData &state) override;
     };
 
     void GetPondGroundHeatExchanger(EnergyPlusData &state);
