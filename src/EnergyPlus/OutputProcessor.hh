@@ -942,7 +942,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                          Optional_int_const indexGroupKey = _                     // Group identifier for SQL output
 );
 
-void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType const TimeStepTypeKey); // What kind of data to update (Zone, HVAC)
+void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType TimeStepTypeKey); // What kind of data to update (Zone, HVAC)
 
 void AssignReportNumber(EnergyPlusData &state, int &ReportNumber);
 
@@ -951,33 +951,33 @@ void GenOutputVariablesAuditReport(EnergyPlusData &state);
 void UpdateMeterReporting(EnergyPlusData &state);
 
 void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
-                                            int const WhichMeter,              // Which meter number
-                                            bool const MeterFileOnlyIndicator, // true if this is a meter file only reporting
-                                            OutputProcessor::ReportingFrequency const FrequencyIndicator, // at what frequency is the meter reported
-                                            bool const CumulativeIndicator // true if this is a Cumulative meter reporting
+                                            int WhichMeter,              // Which meter number
+                                            bool MeterFileOnlyIndicator, // true if this is a meter file only reporting
+                                            OutputProcessor::ReportingFrequency FrequencyIndicator, // at what frequency is the meter reported
+                                            bool CumulativeIndicator // true if this is a Cumulative meter reporting
 );
 
 int GetMeterIndex(EnergyPlusData &state, std::string const &MeterName);
 
-std::string GetMeterResourceType(EnergyPlusData &state, int const MeterNumber); // Which Meter Number (from GetMeterIndex)
+std::string GetMeterResourceType(EnergyPlusData &state, int MeterNumber); // Which Meter Number (from GetMeterIndex)
 
-Real64 GetCurrentMeterValue(EnergyPlusData &state, int const MeterNumber); // Which Meter Number (from GetMeterIndex)
+Real64 GetCurrentMeterValue(EnergyPlusData &state, int MeterNumber); // Which Meter Number (from GetMeterIndex)
 
 Real64 GetInstantMeterValue(EnergyPlusData &state,
-                            int const MeterNumber,                           // Which Meter Number (from GetMeterIndex)
-                            OutputProcessor::TimeStepType const TimeStepType // Whether this is zone of HVAC
+                            int MeterNumber,                           // Which Meter Number (from GetMeterIndex)
+                            OutputProcessor::TimeStepType TimeStepType // Whether this is zone of HVAC
 );
 
 void IncrementInstMeterCache(EnergyPlusData &state);
 
 Real64 GetInternalVariableValue(EnergyPlusData &state,
-                                OutputProcessor::VariableType const varType, // 1=integer, 2=real, 3=meter
-                                int const keyVarIndex                        // Array index
+                                OutputProcessor::VariableType varType, // 1=integer, 2=real, 3=meter
+                                int keyVarIndex                        // Array index
 );
 
 Real64 GetInternalVariableValueExternalInterface(EnergyPlusData &state,
-                                                 OutputProcessor::VariableType const varType, // 1=integer, 2=REAL(r64), 3=meter
-                                                 int const keyVarIndex                        // Array index
+                                                 OutputProcessor::VariableType varType, // 1=integer, 2=REAL(r64), 3=meter
+                                                 int keyVarIndex                        // Array index
 );
 
 int GetNumMeteredVariables(EnergyPlusData &state,
