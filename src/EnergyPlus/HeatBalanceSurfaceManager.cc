@@ -2037,13 +2037,13 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                             "Average",
                             Surface(loop).Name);
         if (Surface(loop).ExtBoundCond == ExternalEnvironment) {
-            SetupOutputVariable(state,
-                                "Surface Outside Face Convection Classification Index",
-                                OutputProcessor::Unit::None,
-                                state.dataSurface->SurfOutConvClassification(loop),
-                                "Zone",
-                                "Average",
-                                Surface(loop).Name);
+            //            SetupOutputVariable(state,
+            //                                "Surface Outside Face Convection Classification Index",
+            //                                OutputProcessor::Unit::None,
+            //                                state.dataSurface->SurfOutConvClassification(loop),
+            //                                "Zone",
+            //                                "Average",
+            //                                Surface(loop).Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Forced Convection Model Equation Index",
                                 OutputProcessor::Unit::None,

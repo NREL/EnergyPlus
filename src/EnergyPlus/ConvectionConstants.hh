@@ -144,10 +144,14 @@ int constexpr HcExt_AlamdariHammondStableHorizontal{324};
 int constexpr HcExt_AlamdariHammondUnstableHorizontal{325};
 
 // Parameters for classification of outside face of surfaces
-constexpr int OutConvClass_WindwardVertWall{101};
-constexpr int OutConvClass_LeewardVertWall{102};
-constexpr int OutConvClass_RoofStable{103};
-constexpr int OutConvClass_RoofUnstable{104};
+enum class OutConvClass
+{
+    Invalid = -1,
+    WindwardVertWall = 101,
+    LeewardVertWall = 102,
+    RoofStable = 103,
+    RoofUnstable = 104,
+};
 
 enum class ConvSurfDeltaT : int
 {

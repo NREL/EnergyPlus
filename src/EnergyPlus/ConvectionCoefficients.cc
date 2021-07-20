@@ -5653,17 +5653,17 @@ void DynamicExtConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
         }
 
         if (DeltaTemp < 0.0) {
-            state.dataSurface->SurfOutConvClassification(SurfNum) = ConvectionConstants::OutConvClass_RoofStable;
+            state.dataSurface->SurfOutConvClassification(SurfNum) = ConvectionConstants::OutConvClass::RoofStable;
         } else {
-            state.dataSurface->SurfOutConvClassification(SurfNum) = ConvectionConstants::OutConvClass_RoofUnstable;
+            state.dataSurface->SurfOutConvClassification(SurfNum) = ConvectionConstants::OutConvClass::RoofUnstable;
         }
 
     } else {
 
         if (Windward(Surface(SurfNum).CosTilt, Surface(SurfNum).Azimuth, surfWindDir)) {
-            state.dataSurface->SurfOutConvClassification(SurfNum) = ConvectionConstants::OutConvClass_WindwardVertWall;
+            state.dataSurface->SurfOutConvClassification(SurfNum) = ConvectionConstants::OutConvClass::WindwardVertWall;
         } else {
-            state.dataSurface->SurfOutConvClassification(SurfNum) = ConvectionConstants::OutConvClass_LeewardVertWall;
+            state.dataSurface->SurfOutConvClassification(SurfNum) = ConvectionConstants::OutConvClass::LeewardVertWall;
         }
     }
 }
@@ -5678,7 +5678,7 @@ void MapExtConvClassificationToHcModels(EnergyPlusData &state, int const SurfNum
     //       RE-ENGINEERED  na
 
     switch (state.dataSurface->SurfOutConvClassification(SurfNum)) {
-    case ConvectionConstants::OutConvClass_WindwardVertWall:
+    case ConvectionConstants::OutConvClass::WindwardVertWall:
         state.dataSurface->SurfOutConvHfModelEq(SurfNum) = state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HWindWallWindwardEqNum;
         if (state.dataSurface->SurfOutConvHfModelEq(SurfNum) == ConvectionConstants::HcExt_UserCurve) {
             state.dataSurface->SurfOutConvHfUserCurveIndex(SurfNum) =
@@ -5690,7 +5690,7 @@ void MapExtConvClassificationToHcModels(EnergyPlusData &state, int const SurfNum
                 state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatVertWallUserCurveNum;
         }
         break;
-    case ConvectionConstants::OutConvClass_LeewardVertWall:
+    case ConvectionConstants::OutConvClass::LeewardVertWall:
         state.dataSurface->SurfOutConvHfModelEq(SurfNum) = state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HWindWallLeewardEqNum;
         if (state.dataSurface->SurfOutConvHfModelEq(SurfNum) == ConvectionConstants::HcExt_UserCurve) {
             state.dataSurface->SurfOutConvHfUserCurveIndex(SurfNum) =
@@ -5702,7 +5702,7 @@ void MapExtConvClassificationToHcModels(EnergyPlusData &state, int const SurfNum
                 state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatVertWallUserCurveNum;
         }
         break;
-    case ConvectionConstants::OutConvClass_RoofStable:
+    case ConvectionConstants::OutConvClass::RoofStable:
         state.dataSurface->SurfOutConvHfModelEq(SurfNum) = state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HWindHorizRoofEqNum;
         if (state.dataSurface->SurfOutConvHfModelEq(SurfNum) == ConvectionConstants::HcExt_UserCurve) {
             state.dataSurface->SurfOutConvHfUserCurveIndex(SurfNum) =
@@ -5714,7 +5714,7 @@ void MapExtConvClassificationToHcModels(EnergyPlusData &state, int const SurfNum
                 state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatStableHorizUserCurveNum;
         }
         break;
-    case ConvectionConstants::OutConvClass_RoofUnstable:
+    case ConvectionConstants::OutConvClass::RoofUnstable:
         state.dataSurface->SurfOutConvHfModelEq(SurfNum) = state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HWindHorizRoofEqNum;
         if (state.dataSurface->SurfOutConvHfModelEq(SurfNum) == ConvectionConstants::HcExt_UserCurve) {
             state.dataSurface->SurfOutConvHfUserCurveIndex(SurfNum) =
@@ -5728,7 +5728,7 @@ void MapExtConvClassificationToHcModels(EnergyPlusData &state, int const SurfNum
         break;
     default:
         ShowSevereError(state,
-                        format("MapExtConvClassificationToHcModels: caught unknown outdoor surface classification:{}",
+                        format("MapExtConvClassificationToHcModels: caught unknown outdoor surface classification: {}",
                                state.dataSurface->SurfOutConvClassification(SurfNum)));
     }
 }

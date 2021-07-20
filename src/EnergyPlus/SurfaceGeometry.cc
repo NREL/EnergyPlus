@@ -1016,7 +1016,7 @@ namespace SurfaceGeometry {
             state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::Invalid;
             state.dataSurface->SurfIntConvHcModelEq(SurfNum) = 0;
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) = 0;
-            state.dataSurface->SurfOutConvClassification(SurfNum) = 0;
+            state.dataSurface->SurfOutConvClassification(SurfNum) = ConvectionConstants::OutConvClass::Invalid;
             state.dataSurface->SurfOutConvHfModelEq(SurfNum) = 0;
             state.dataSurface->SurfOutConvHfUserCurveIndex(SurfNum) = 0;
             state.dataSurface->SurfOutConvHnModelEq(SurfNum) = 0;
