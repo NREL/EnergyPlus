@@ -55,6 +55,7 @@
 // EnergyPlus headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 
 namespace EnergyPlus {
 
@@ -65,6 +66,12 @@ namespace UnitarySystems {
 
     struct UnitarySysInputSpec
     {
+        // system_type is not an object input but the actual type of object (e.g., UnitarySystem, CoilSystem:Cooling:DX, etc.).
+        // Each specific getInput sets this string accordingly so that processInputSpec knows the object type
+        // that will be used in warnings and reporting. This is a work in progress.
+        std::string system_type;
+
+        // object input fields
         std::string name;
         std::string control_type;
         std::string controlling_zone_or_thermostat_location;
@@ -119,6 +126,8 @@ namespace UnitarySystems {
         std::string design_specification_multispeed_object_type;
         std::string design_specification_multispeed_object_name;
 
+        std::string dx_cooling_coil_system_sensor_node_name;
+
         UnitarySysInputSpec();
 
         ~UnitarySysInputSpec()
@@ -128,7 +137,6 @@ namespace UnitarySystems {
 
     struct DesignSpecMSHP
     {
-        // friend class UnitarySys;
 
     public:
         DesignSpecMSHP(); // constructor
@@ -399,8 +407,8 @@ namespace UnitarySystems {
         bool m_HeatCompNotSetYet;
         bool m_SuppCompNotSetYet;
         bool m_OKToPrintSizing;
+        bool m_IsDXCoil;
         Real64 m_SmallLoadTolerance;
-        bool m_setupOutputVars;
 
     public:
         // SZVAV variables
@@ -807,6 +815,11 @@ namespace UnitarySystems {
         static void
         getUnitarySystemInputData(EnergyPlusData &state, std::string_view Name, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
 
+        static void
+        getDXCoilSystemData(EnergyPlusData &state, std::string_view Name, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
+
+        static void allocateUnitarySys(EnergyPlusData &state);
+
         static HVACSystemData *
         factory(EnergyPlusData &state, int const object_type_of_num, std::string const objectName, bool const ZoneEquipment, int const ZoneOAUnitNum);
 
@@ -880,6 +893,7 @@ namespace UnitarySystems {
     bool searchExhaustNodes(EnergyPlusData &state, const int nodeToFind, int &ZoneEquipConfigIndex, int &ExhaustNodeIndex);
     // void setSystemParams(EnergyPlusData &state, UnitarySys &thisSys, Real64 &TotalFloorAreaOnAirLoop, const std::string thisObjectName);
     bool searchTotalComponents(EnergyPlusData &state, std::string_view objectNameToFind, int &compIndex, int &branchIndex, int &airLoopIndex);
+    void setupAllOutputVars(EnergyPlusData &state, int const numAllSystemTypes);
 
 } // namespace UnitarySystems
 struct UnitarySystemsData : BaseGlobalStruct
@@ -938,6 +952,7 @@ struct UnitarySystemsData : BaseGlobalStruct
 
     bool getInputOnceFlag = true;
     bool getMSHPInputOnceFlag = true;
+    bool reportVariablesAreSetup = false;
 
     std::vector<UnitarySystems::UnitarySys> unitarySys;
     std::vector<UnitarySystems::DesignSpecMSHP> designSpecMSHP;
@@ -973,6 +988,7 @@ struct UnitarySystemsData : BaseGlobalStruct
         initUnitarySystemsQActual = 0.0;
         getMSHPInputOnceFlag = true;
         getInputOnceFlag = true;
+        reportVariablesAreSetup = false;
         unitarySys.clear();
         if (designSpecMSHP.size() > 0) designSpecMSHP.clear();
         myOneTimeFlag = true;
