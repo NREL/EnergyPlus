@@ -10001,8 +10001,7 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
         std::string refPt2;
         if (state.dataDaylightingData->ZoneDaylight(state.dataDaylightingData->IllumMap(MapNum).Zone).TotalDaylRefPoints > 1) {
             refPt2 = "";
-            for (int i = 2; i <= state.dataDaylightingData->ZoneDaylight(state.dataDaylightingData->IllumMap(MapNum).Zone).TotalDaylRefPoints; ++i)
-            {
+            for (int i = 2; i <= state.dataDaylightingData->ZoneDaylight(state.dataDaylightingData->IllumMap(MapNum).Zone).TotalDaylRefPoints; ++i) {
                 refPt2 += RefPts(state.dataDaylightingData->IllumMap(MapNum).Zone, i);
                 if (i < state.dataDaylightingData->ZoneDaylight(state.dataDaylightingData->IllumMap(MapNum).Zone).TotalDaylRefPoints) {
                     refPt2 += ",";
