@@ -84,7 +84,6 @@
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
-#include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACDuct.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
@@ -3527,7 +3526,6 @@ void SimAirLoopComponent(EnergyPlusData &state,
     using Humidifiers::SimHumidifier;
     using HVACDuct::SimDuct;
     using HVACDXHeatPumpSystem::SimDXHeatPumpSystem;
-    using HVACDXSystem::SimDXCoolingSystem;
     using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
     using HVACMultiSpeedHeatPump::SimMSHeatPump;
     using HVACUnitaryBypassVAV::SimUnitaryBypassVAV;
@@ -3611,8 +3609,26 @@ void SimAirLoopComponent(EnergyPlusData &state,
             if (QActual > 0.0) HeatingActive = true; // determine if coil is ON
 
         } else if (SELECT_CASE_var == CompType::DXSystem) { // CoilSystem:Cooling:DX  old 'AirLoopHVAC:UnitaryCoolOnly'
-            SimDXCoolingSystem(state, CompName, FirstHVACIteration, AirLoopNum, CompIndex, _, _, QActual);
-            if (QActual > 0.0) CoolingActive = true; // determine if coil is ON
+            if (CompPointer == nullptr) {
+                UnitarySystems::UnitarySys thisSys;
+                CompPointer = thisSys.factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, CompName, false, 0);
+                // temporary fix for saving pointer, eventually apply to UnitarySystem 25 lines down
+                state.dataAirSystemsData->PrimaryAirSystems(airLoopNum).Branch(branchNum).Comp(compNum).compPointer = CompPointer;
+            }
+            Real64 sensOut = 0.0;
+            Real64 latOut = 0.0;
+            CompPointer->simulate(state,
+                                  CompName,
+                                  FirstHVACIteration,
+                                  AirLoopNum,
+                                  CompIndex,
+                                  HeatingActive,
+                                  CoolingActive,
+                                  OAUnitNum,
+                                  OAUCoilOutTemp,
+                                  ZoneEquipFlag,
+                                  sensOut,
+                                  latOut);
 
         } else if (SELECT_CASE_var == CompType::DXHeatPumpSystem) { // 'CoilSystem:Heating:DX'
             SimDXHeatPumpSystem(state, CompName, FirstHVACIteration, AirLoopNum, CompIndex, _, _, QActual);

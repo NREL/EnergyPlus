@@ -55,6 +55,7 @@
 // EnergyPlus headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 
 namespace EnergyPlus {
 
@@ -65,7 +66,12 @@ namespace UnitarySystems {
 
     struct UnitarySysInputSpec
     {
+        // system_type is not an object input but the actual type of object (e.g., UnitarySystem, CoilSystem:Cooling:DX, etc.).
+        // Each specific getInput sets this string accordingly so that processInputSpec knows the object type
+        // that will be used in warnings and reporting. This is a work in progress.
         std::string system_type;
+
+        // object input fields
         std::string name;
         std::string control_type;
         std::string controlling_zone_or_thermostat_location;
@@ -120,6 +126,8 @@ namespace UnitarySystems {
         std::string design_specification_multispeed_object_type;
         std::string design_specification_multispeed_object_name;
 
+        std::string dx_cooling_coil_system_sensor_node_name;
+
         UnitarySysInputSpec();
 
         ~UnitarySysInputSpec()
@@ -129,7 +137,6 @@ namespace UnitarySystems {
 
     struct DesignSpecMSHP
     {
-        // friend class UnitarySys;
 
     public:
         DesignSpecMSHP(); // constructor
@@ -400,11 +407,11 @@ namespace UnitarySystems {
         bool m_HeatCompNotSetYet;
         bool m_SuppCompNotSetYet;
         bool m_OKToPrintSizing;
+        bool m_IsDXCoil;
         Real64 m_SmallLoadTolerance;
-        bool m_setupOutputVars;
-
         bool m_waterSideEconomizerFlag;   // true if water-side economizer coil is active
         Real64 m_minAirToWaterTempOffset; // coil entering air to entering water temp offset
+
 
     public:
         // SZVAV variables
@@ -450,8 +457,8 @@ namespace UnitarySystems {
         DesignSpecMSHP *m_CompPointerMSHP;
         std::string Name;
         std::string UnitType;
-        Real64 LoadSHR;                // Load sensible heat ratio with humidity control
-        Real64 CoilSHR;                // Load sensible heat ratio with humidity control
+        Real64 LoadSHR; // Load sensible heat ratio with humidity control
+        Real64 CoilSHR; // Load sensible heat ratio with humidity control
         bool runWaterSideEconomizer;   // true if water-side economizer conditioon is favorbale
         int WaterSideEconomizerStatus; // water side economizer status flag, report variable
 
@@ -813,8 +820,13 @@ namespace UnitarySystems {
         static void
         getUnitarySystemInputData(EnergyPlusData &state, std::string_view Name, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
 
+        static void
+        getDXCoilSystemData(EnergyPlusData &state, std::string_view Name, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
+
         static void getCoilWaterSystemInputData(
             EnergyPlusData &state, std::string_view CoilSysName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
+
+        static void allocateUnitarySys(EnergyPlusData &state);
 
         static HVACSystemData *
         factory(EnergyPlusData &state, int const object_type_of_num, std::string const objectName, bool const ZoneEquipment, int const ZoneOAUnitNum);
@@ -948,13 +960,13 @@ struct UnitarySystemsData : BaseGlobalStruct
 
     bool getInputOnceFlag = true;
     bool getMSHPInputOnceFlag = true;
+    bool reportVariablesAreSetup = false;
 
     std::vector<UnitarySystems::UnitarySys> unitarySys;
     std::vector<UnitarySystems::DesignSpecMSHP> designSpecMSHP;
 
     bool myOneTimeFlag = true;
     bool getInputFlag = true;
-    bool reportVariablesAreSetup = false;
 
     bool getCoilWaterSysInputOnceFlag = true;
     std::string const coilSysCoolingWaterObjectName = "CoilSystem:Cooling:Water";
@@ -993,7 +1005,6 @@ struct UnitarySystemsData : BaseGlobalStruct
         if (designSpecMSHP.size() > 0) designSpecMSHP.clear();
         myOneTimeFlag = true;
         getInputFlag = true;
-
         getCoilWaterSysInputOnceFlag = true;
         numCoilWaterSystems = 0;
     }

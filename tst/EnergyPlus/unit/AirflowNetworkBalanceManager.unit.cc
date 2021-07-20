@@ -11199,8 +11199,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
         "  AirLoopHVAC:OutdoorAirSystem,",
         "    OA Sys 1,                !- Name",
         "    OA Sys 1 Controllers,    !- Controller List Name",
-        "    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name",
-        "    Reheat System 1 Avail List;  !- Availability Manager List Name",
+        "    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name",
 
         "  OutdoorAir:NodeList,",
         "    OutsideAirInletNodes;    !- Node or NodeList Name 1",
@@ -13043,8 +13042,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
         "AirLoopHVAC:OutdoorAirSystem,",
         "  Heat Pump 1 OA System,                                   !- Name",
         "  Heat Pump 1 OA System Controllers,                       !- Controller List Name",
-        "  Heat Pump 1 OA System Equipment,                         !- Outdoor Air Equipment List Name",
-        "  Heat Pump 1 Availability Managers;                       !- Availability Manager List Name",
+        "  Heat Pump 1 OA System Equipment;                         !- Outdoor Air Equipment List Name",
 
         "AirLoopHVAC:ControllerList,",
         "  Heat Pump 1 OA System Controllers,                       !- Name",
@@ -18831,8 +18829,7 @@ TEST_F(EnergyPlusFixture, DISABLED_AirLoopNumTest)
         "  AirLoopHVAC:OutdoorAirSystem,",
         "    OA Sys 1,                !- Name",
         "    OA Sys 1 Controllers,    !- Controller List Name",
-        "    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name",
-        "    Reheat System 1 Avail List;  !- Availability Manager List Name",
+        "    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name",
 
         "  OutdoorAir:NodeList,",
         "    OutsideAirInletNodes;    !- Node or NodeList Name 1",

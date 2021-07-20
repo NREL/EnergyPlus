@@ -150,7 +150,6 @@ struct HVACControllersData;
 struct HVACCooledBeamData;
 struct HVACCtrlData;
 struct HVACDXHeatPumpSystemData;
-struct HVACDXSystemData;
 struct HVACDuctData;
 struct HVACFanData;
 struct HVACGlobalsData;
@@ -412,7 +411,6 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<HVACCooledBeamData> dataHVACCooledBeam;
     std::unique_ptr<HVACCtrlData> dataHVACCtrl;
     std::unique_ptr<HVACDXHeatPumpSystemData> dataHVACDXHeatPumpSys;
-    std::unique_ptr<HVACDXSystemData> dataHVACDXSys;
     std::unique_ptr<HVACDuctData> dataHVACDuct;
     std::unique_ptr<HVACFanData> dataHVACFan;
     std::unique_ptr<HVACGlobalsData> dataHVACGlobal;

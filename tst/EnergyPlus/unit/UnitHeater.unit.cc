@@ -2106,8 +2106,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
         "AirLoopHVAC:OutdoorAirSystem,",
         "    VAV System OA System,    !- Name",
         "    VAV System OA System Controllers,  !- Controller List Name",
-        "    VAV System OA System Equipment,  !- Outdoor Air Equipment List Name",
-        "    VAV System Availability Managers;  !- Availability Manager List Name",
+        "    VAV System OA System Equipment;  !- Outdoor Air Equipment List Name",
 
         "AirLoopHVAC:ControllerList,",
         "    VAV System OA System Controllers,  !- Name",
