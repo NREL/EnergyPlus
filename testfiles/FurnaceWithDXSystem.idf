@@ -1368,6 +1368,8 @@
 
   Output:Variable,*,Unitary System Fan Part Load Ratio,timestep;
 
+  Output:Variable,*,Fan Electricity Rate,timestep; !- HVAC Average [W]
+
   Output:Variable,*,Zone Air System Sensible Heating Energy,timestep;
 
   Output:Variable,*,Zone Air System Sensible Cooling Energy,timestep;

@@ -2253,10 +2253,9 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
         "  Cooling Coil Condenser Inlet;  !- Node or NodeList Name 2",
 
         "AirLoopHVAC:OutdoorAirSystem,",
-        "  DOAS OA System,          !- Name",
+        "  DOAS OA System,           !- Name",
         "  DOAS OA System Controllers,  !- Controller List Name",
-        "  DOAS OA System Equipment,!- Outdoor Air Equipment List Name",
-        "  DOAS Availability Managers;  !- Availability Manager List Name",
+        "  DOAS OA System Equipment; !- Outdoor Air Equipment List Name",
 
         "AirLoopHVAC:ControllerList,",
         "  DOAS OA System Controllers,  !- Name",
@@ -3231,8 +3230,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
 //"AirLoopHVAC:OutdoorAirSystem,",
 //"  DOAS OA System,          !- Name",
 //"  DOAS OA System Controllers,  !- Controller List Name",
-//"  DOAS OA System Equipment,!- Outdoor Air Equipment List Name",
-//"  DOAS Availability Managers;  !- Availability Manager List Name",
+//"  DOAS OA System Equipment;!- Outdoor Air Equipment List Name",
 
 //"AirLoopHVAC:ControllerList,",
 //"  DOAS OA System Controllers,  !- Name",
@@ -3771,7 +3769,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     state->dataDXCoils->NumDXCoils = 2;
     state->dataDXCoils->DXCoil.allocate(2);
     state->dataDXCoils->DXCoil(1).DXCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
-    state->dataDXCoils->DXCoil(1).CondenserType(1) = DataHVACGlobals::AirCooled;
+    state->dataDXCoils->DXCoil(1).CondenserType(1) = DataHeatBalance::RefrigCondenserType::Air;
     state->dataDXCoils->DXCoil(1).FuelType = "NaturalGas";
     state->dataDXCoils->DXCoil(1).ElecCoolingConsumption = 100.0;
     state->dataDXCoils->DXCoil(1).TotalCoolingEnergy = 100.0;

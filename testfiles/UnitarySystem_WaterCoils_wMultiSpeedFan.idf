@@ -1689,8 +1689,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA System,               !- Name
     OA System Controllers,   !- Controller List Name
-    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name
-    OA Availability List;    !- Availability Manager List Name
+    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTDOORAIR:MIXER ===========
 

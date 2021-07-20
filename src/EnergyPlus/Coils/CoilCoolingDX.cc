@@ -128,7 +128,7 @@ void CoilCoolingDX::getInput(EnergyPlus::EnergyPlusData &state)
 
 void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, const CoilCoolingDXInputSpecification &input_data)
 {
-    static const std::string routineName("CoilCoolingDX::instantiateFromInputSpec: ");
+    static constexpr std::string_view routineName("CoilCoolingDX::instantiateFromInputSpec: ");
     this->original_input_specs = input_data;
     bool errorsFound = false;
     this->name = input_data.name;
@@ -172,7 +172,8 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
 
     // Ultimately, this restriction should go away - condenser inlet node could be from anywhere
     if (!OutAirNodeManager::CheckOutAirNodeNumber(state, this->condInletNodeIndex)) {
-        ShowWarningError(state, routineName + state.dataCoilCooingDX->coilCoolingDXObjectName + "=\"" + this->name + "\", may be invalid");
+        ShowWarningError(state,
+                         std::string{routineName} + state.dataCoilCooingDX->coilCoolingDXObjectName + "=\"" + this->name + "\", may be invalid");
         ShowContinueError(state,
                           "Condenser Inlet Node Name=\"" + input_data.condenser_inlet_node_name +
                               "\", node does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
@@ -216,7 +217,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
     }
 
     if (this->availScheduleIndex == 0) {
-        ShowSevereError(state, routineName + state.dataCoilCooingDX->coilCoolingDXObjectName + "=\"" + this->name + "\", invalid");
+        ShowSevereError(state, std::string{routineName} + state.dataCoilCooingDX->coilCoolingDXObjectName + "=\"" + this->name + "\", invalid");
         ShowContinueError(state, "...Availability Schedule Name=\"" + input_data.availability_schedule_name + "\".");
         errorsFound = true;
     }
@@ -235,7 +236,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
 
     if (errorsFound) {
         ShowFatalError(state,
-                       routineName + "Errors found in getting " + state.dataCoilCooingDX->coilCoolingDXObjectName +
+                       std::string{routineName} + "Errors found in getting " + state.dataCoilCooingDX->coilCoolingDXObjectName +
                            " input. Preceding condition(s) causes termination.");
     }
 }
@@ -600,7 +601,7 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state,
         this->myOneTimeInitFlag = false;
     }
 
-    std::string RoutineName = "CoilCoolingDX::simulate";
+    static constexpr std::string_view RoutineName = "CoilCoolingDX::simulate";
 
     // get node references
     auto &evapInletNode = state.dataLoopNodes->Node(this->evapInletNodeIndex);
@@ -904,13 +905,15 @@ void CoilCoolingDX::reportAllStandardRatings(EnergyPlus::EnergyPlusData &state)
 
     if (!state.dataCoilCooingDX->coilCoolingDXs.empty()) {
         Real64 const ConvFromSIToIP(3.412141633); // Conversion from SI to IP [3.412 Btu/hr-W]
-        static constexpr auto Format_990("! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
-                                         "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER {Btu/W-h}, IEER {Btu/W-h}\n");
+        static constexpr fmt::string_view Format_990(
+            "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
+            "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER {Btu/W-h}, IEER {Btu/W-h}\n");
         print(state.files.eio, "{}", Format_990);
         for (auto &coil : state.dataCoilCooingDX->coilCoolingDXs) {
             coil.performance.calcStandardRatings210240(state);
 
-            static constexpr auto Format_991(" DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}\n");
+            static constexpr fmt::string_view Format_991(
+                " DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}\n");
             print(state.files.eio,
                   Format_991,
                   "Coil:Cooling:DX",
