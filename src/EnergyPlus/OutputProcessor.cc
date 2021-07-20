@@ -260,7 +260,7 @@ namespace OutputProcessor {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // ValidateTimeStepType will throw a Fatal if not valid
-        TimeStepType timeStepType = ValidateTimeStepType(state, TimeStepTypeKey, "SetupTimePointers");
+        TimeStepType timeStepType = ValidateTimeStepType(state, TimeStepTypeKey);
 
         TimeSteps tPtr;
         tPtr.TimeStep = &TimeStep;
@@ -653,7 +653,7 @@ namespace OutputProcessor {
         op->GetOutputInputFlag = false;
 
         // First check environment variable to see of possible override for minimum reporting frequency
-        if (state.dataSysVars->MinReportFrequency != "") {
+        if (!state.dataSysVars->MinReportFrequency.empty()) {
             // Formats
             static constexpr fmt::string_view Format_800("! <Minimum Reporting Frequency (overriding input value)>, Value, Input Value\n");
             static constexpr fmt::string_view Format_801(" Minimum Reporting Frequency, {},{}\n");
@@ -776,8 +776,6 @@ namespace OutputProcessor {
             StrOut = format(MonthFormat, strip(String), Day, Hour, Minute);
             break;
         case ReportingFrequency::Yearly:
-            StrOut = format(EnvrnFormat, strip(String), Mon, Day, Hour, Minute);
-            break;
         case ReportingFrequency::Simulation:
             StrOut = format(EnvrnFormat, strip(String), Mon, Day, Hour, Minute);
             break;
@@ -789,97 +787,8 @@ namespace OutputProcessor {
         String = StrOut;
     }
 
-    void ProduceMinMaxStringWStartMinute(EnergyPlusData &state,
-                                         std::string &String,                // Current value
-                                         int const DateValue,                // Date of min/max
-                                         ReportingFrequency const ReportFreq // Reporting Frequency
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   January 2001
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine produces the appropriate min/max string depending
-        // on the reporting frequency.  Used in Meter reporting.
-
-        // METHODOLOGY EMPLOYED:
-        // Prior to calling this routine, the basic value string will be
-        // produced, but DecodeMonDayHrMin will not have been called.  Uses the MinutesPerTimeStep
-        // value to set the StartMinute.
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using General::DecodeMonDayHrMin;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr fmt::string_view HrFormat("{},{:02}:{:02}");
-        static constexpr fmt::string_view DayFormat("{},{:2},{:02}:{:02}");
-        static constexpr fmt::string_view MonthFormat("{},{:2},{:2},{:02}:{:02}");
-        static constexpr fmt::string_view EnvrnFormat("{},{:2},{:2},{:2},{:02}:{:02}");
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Mon;
-        int Day;
-        int Hour;
-        int Minute;
-        int StartMinute;
-        std::string StrOut;
-
-        DecodeMonDayHrMin(DateValue, Mon, Day, Hour, Minute);
-
-        switch (ReportFreq) {
-        case ReportingFrequency::Hourly: // Hourly -- used in meters
-            StartMinute = Minute - state.dataGlobal->MinutesPerTimeStep + 1;
-            StrOut = format(HrFormat, strip(String), StartMinute, Minute);
-            break;
-
-        case ReportingFrequency::Daily: // Daily
-            StartMinute = Minute - state.dataGlobal->MinutesPerTimeStep + 1;
-            StrOut = format(DayFormat, strip(String), Hour, StartMinute, Minute);
-            break;
-
-        case ReportingFrequency::Monthly: // Monthly
-            StartMinute = Minute - state.dataGlobal->MinutesPerTimeStep + 1;
-            StrOut = format(MonthFormat, strip(String), Day, Hour, StartMinute, Minute);
-            break;
-
-        case ReportingFrequency::Yearly: // Yearly
-            StartMinute = Minute - state.dataGlobal->MinutesPerTimeStep + 1;
-            StrOut = format(EnvrnFormat, strip(String), Mon, Day, Hour, StartMinute, Minute);
-            break;
-
-        case ReportingFrequency::Simulation: // Environment
-            StartMinute = Minute - state.dataGlobal->MinutesPerTimeStep + 1;
-            StrOut = format(EnvrnFormat, strip(String), Mon, Day, Hour, StartMinute, Minute);
-            break;
-
-        default: // Each, TimeStep, Hourly dont have this
-            StrOut = std::string();
-            break;
-        }
-
-        String = StrOut;
-    }
-
     TimeStepType ValidateTimeStepType(EnergyPlusData &state,
-                                      OutputProcessor::SOVTimeStepType const &TimeStepTypeKey, // Index type (Zone, HVAC) for variables
-                                      std::string_view CalledFrom                              // Routine called from (for error messages)
-    )
+                                      OutputProcessor::SOVTimeStepType const &TimeStepTypeKey) // Index type (Zone, HVAC) for variables
     {
 
         // FUNCTION INFORMATION:
@@ -904,6 +813,7 @@ namespace OutputProcessor {
         case OutputProcessor::SOVTimeStepType::Invalid:
         case OutputProcessor::SOVTimeStepType::Num:
             ShowFatalError(state, "Bad SOVTimeStepType passed to ValidateTimeStepType");
+            assert(false);  // compiler doesn't understand that ShowFatalError aborts
         }
     }
 
@@ -982,6 +892,7 @@ namespace OutputProcessor {
         case OutputProcessor::SOVStoreType::Invalid:
         case OutputProcessor::SOVStoreType::Num:
             ShowFatalError(state, "Bad SOVStoreType passed to validateVariableType");
+            assert(false);
         }
     }
 
@@ -1722,7 +1633,7 @@ namespace OutputProcessor {
 
         // Basic ResourceType for Meters
         {
-            auto const meterType(UserInputResourceType);
+            auto const& meterType(UserInputResourceType);
 
             if (meterType == "ELECTRICITY") {
                 OutResourceType = "Electricity";
@@ -3744,8 +3655,7 @@ namespace OutputProcessor {
             assert(false);
         }
 
-        const std::string StringOut = format(DateFmt, Day, monthName, Hour, Minute);
-        return StringOut;
+        return format(DateFmt, Day, monthName, Hour, Minute);
     }
 
     void ReportMeterDetails(EnergyPlusData &state)
@@ -3790,7 +3700,7 @@ namespace OutputProcessor {
 
             const std::string mtrUnitString = unitEnumToStringBrackets(op->RVariableTypes(op->VarMeterArrays(VarMeter).RepVariable).units);
 
-            std::string Multipliers = "";
+            std::string Multipliers;
             const auto ZoneMult = op->RVariableTypes(op->VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneMult;
             const auto ZoneListMult = op->RVariableTypes(op->VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneListMult;
 
@@ -3817,13 +3727,13 @@ namespace OutputProcessor {
 
         for (int Meter = 1; Meter <= op->NumEnergyMeters; ++Meter) {
             print(state.files.mtd, "\n For Meter={}{}", op->EnergyMeters(Meter).Name, unitEnumToStringBrackets(op->EnergyMeters(Meter).Units));
-            if (op->EnergyMeters(Meter).ResourceType != "") {
+            if (!op->EnergyMeters(Meter).ResourceType.empty()) {
                 print(state.files.mtd, ", ResourceType={}", op->EnergyMeters(Meter).ResourceType);
             }
-            if (op->EnergyMeters(Meter).EndUse != "") {
+            if (!op->EnergyMeters(Meter).EndUse.empty()) {
                 print(state.files.mtd, ", EndUse={}", op->EnergyMeters(Meter).EndUse);
             }
-            if (op->EnergyMeters(Meter).Group != "") {
+            if (!op->EnergyMeters(Meter).Group.empty()) {
                 print(state.files.mtd, ", Group={}", op->EnergyMeters(Meter).Group);
             }
             print(state.files.mtd, ", contents are:\n");
@@ -3836,7 +3746,7 @@ namespace OutputProcessor {
                         for (int VarMeter1 = 1; VarMeter1 <= op->VarMeterArrays(VarMeter).NumOnMeters; ++VarMeter1) {
                             if (op->VarMeterArrays(VarMeter).OnMeters(VarMeter1) != Meter) continue;
 
-                            std::string Multipliers = "";
+                            std::string Multipliers;
                             const auto ZoneMult = op->RVariableTypes(op->VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneMult;
                             const auto ZoneListMult = op->RVariableTypes(op->VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneListMult;
 
@@ -4319,8 +4229,6 @@ namespace OutputProcessor {
             print_meter(state, 9);
             break;
         case ReportingFrequency::Yearly: //  5
-            print_meter(state, 11);
-            break;
         case ReportingFrequency::Simulation: //  4
             print_meter(state, 11);
             break;
@@ -4694,38 +4602,6 @@ namespace OutputProcessor {
         // easier maintenance and writing of data to the SQL database.
 
         i32toa(repValue, state.dataOutputProcessor->s_WriteNumericData);
-
-        if (state.dataSQLiteProcedures->sqlite) {
-            state.dataSQLiteProcedures->sqlite->createSQLiteReportDataRecord(reportID, repValue);
-        }
-
-        if (state.files.eso.good()) {
-            print(state.files.eso, "{},{}\n", creportID, state.dataOutputProcessor->s_WriteNumericData);
-        }
-    }
-
-    void WriteNumericData(EnergyPlusData &state,
-                          int const reportID,           // The variable's reporting ID
-                          std::string const &creportID, // variable ID in characters
-                          int64_t const repValue        // The variable's value
-    )
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Mark Adams
-        //       DATE WRITTEN   May 2016
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE:
-        // This subroutine writes real data to the output files and
-        // SQL database.
-        // This is a refactor of WriteIntegerData.
-        //
-        // Much of the code here was an included in earlier versions
-        // of the UpdateDataandReport subroutine. The code was moved to facilitate
-        // easier maintenance and writing of data to the SQL database.
-
-        i64toa(repValue, state.dataOutputProcessor->s_WriteNumericData);
 
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteReportDataRecord(reportID, repValue);
@@ -5276,7 +5152,7 @@ namespace OutputProcessor {
             return OutputProcessor::Unit::J;
         } else if (unitUpper == "DELTAC") {
             return OutputProcessor::Unit::deltaC;
-        } else if (unitUpper == "") {
+        } else if (unitUpper.empty()) {
             return OutputProcessor::Unit::None;
         } else if (unitUpper == "W") {
             return OutputProcessor::Unit::W;
@@ -5502,7 +5378,7 @@ void SetupOutputVariable(EnergyPlusData &state,
             }
         }
 
-        TimeStepType = ValidateTimeStepType(state, TimeStepTypeKey, "SetupOutputVariable");
+        TimeStepType = ValidateTimeStepType(state, TimeStepTypeKey);
         VariableType = validateVariableType(state, VariableTypeKey);
 
         if (present(customUnitName)) {
@@ -5697,7 +5573,7 @@ void SetupOutputVariable(EnergyPlusData &state,
 
         if (Loop == 1) ++op->NumOfIVariable_Setup;
 
-        TimeStepType = ValidateTimeStepType(state, TimeStepTypeKey, "SetupOutputVariable");
+        TimeStepType = ValidateTimeStepType(state, TimeStepTypeKey);
         VariableType = validateVariableType(state, VariableTypeKey);
 
         AddToOutputVariableList(state, VarName, TimeStepType, VariableType, VariableType::Integer, VariableUnit);
@@ -6678,7 +6554,7 @@ void GenOutputVariablesAuditReport(EnergyPlusData &state)
         if (op->ReqRepVars(Loop).Key.empty()) op->ReqRepVars(Loop).Key = "*";
         if (has(op->ReqRepVars(Loop).VarName, "OPAQUE SURFACE INSIDE FACE CONDUCTION") && !state.dataGlobal->DisplayAdvancedReportVariables &&
             !state.dataOutputProcessor->OpaqSurfWarned) {
-            ShowWarningError(state, "Variables containing \"Opaque Surface Inside Face Conduction\" are now \"advanced\" variables.");
+            ShowWarningError(state, R"(Variables containing "Opaque Surface Inside Face Conduction" are now "advanced" variables.)");
             ShowContinueError(state, "You must enter the \"Output:Diagnostics,DisplayAdvancedReportVariables;\" statement to view.");
             ShowContinueError(state, "First, though, read cautionary statements in the \"InputOutputReference\" document.");
             state.dataOutputProcessor->OpaqSurfWarned = true;

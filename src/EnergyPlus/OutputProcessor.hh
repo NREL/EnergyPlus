@@ -616,12 +616,6 @@ namespace OutputProcessor {
                              ReportingFrequency const ReportFreq // Reporting Frequency
     );
 
-    void ProduceMinMaxStringWStartMinute(EnergyPlusData &state,
-                                         std::string &String,                // Current value
-                                         int const DateValue,                // Date of min/max
-                                         ReportingFrequency const ReportFreq // Reporting Frequency
-    );
-
     // TODO: GET RID OF THESE REDIMENSIONS
     inline void ReallocateIntegerArray(Array1D_int &Array,
                                        int &ArrayMax,     // Current and resultant dimension for Array
@@ -636,8 +630,7 @@ namespace OutputProcessor {
     inline void ReallocateIVar(EnergyPlusData &state);
 
     TimeStepType ValidateTimeStepType(EnergyPlusData &state,
-                                      OutputProcessor::SOVTimeStepType const &TimeStepTypeKey, // Index type (Zone, HVAC) for variables
-                                      std::string_view CalledFrom                              // Routine called from (for error messages)
+                                      OutputProcessor::SOVTimeStepType const &TimeStepTypeKey // Index type (Zone, HVAC) for variables
     );
 
     std::string StandardTimeStepTypeKey(TimeStepType const timeStepType);
@@ -861,12 +854,6 @@ namespace OutputProcessor {
                           int const reportID,           // The variable's reporting ID
                           std::string const &creportID, // variable ID in characters
                           int32_t const repValue        // The variable's value
-    );
-
-    void WriteNumericData(EnergyPlusData &state,
-                          int const reportID,           // The variable's reporting ID
-                          std::string const &creportID, // variable ID in characters
-                          int64_t const repValue        // The variable's value
     );
 
     void WriteIntegerVariableOutput(EnergyPlusData &state,
