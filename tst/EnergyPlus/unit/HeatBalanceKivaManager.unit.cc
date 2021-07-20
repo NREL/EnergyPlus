@@ -264,17 +264,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     Real64 zoneAssumedTemperature5 = 15.0;
     HeatBalanceKivaManager::KivaInstanceMap kv5(*state, fnd, 0, {}, 0, zoneAssumedTemperature5, 1.0, 0, &km);
 
-    kv5.zoneControlNum = 1;
-    kv5.zoneControlType = 1; // Temperature
-
     // Set day of year to 121 (May 1st)
     state->dataEnvrn->DayOfYear = 121;
 
-    km.surfaceConvMap[0].f = Kiva::getMoWiTTForcedTerm;
-//    Kiva::Surface surf;
-//    surf.boundaryConditionType = Kiva::Surface::CONSTANT_TEMPERATURE;
-    kv5.initGround(*state, kivaweather);
-
+    int numAccelaratedTimesteps = 3;
+    int acceleratedTimestep = 30; // days
+    int accDate = kv5.getAccDate(*state, numAccelaratedTimesteps, acceleratedTimestep);
+    EXPECT_GT(accDate, 0);
 }
 
 TEST_F(EnergyPlusFixture, OpaqueSkyCover_InterpretWeatherMissingOpaqueSkyCover)
