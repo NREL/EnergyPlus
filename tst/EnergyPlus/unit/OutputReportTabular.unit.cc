@@ -6862,15 +6862,18 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
 
     state->dataGlobal->NumOfZones = 4;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataGlobal->NumOfSpaces = 4;
+    state->dataHeatBal->Space.allocate(state->dataGlobal->NumOfSpaces);
 
     state->dataHeatBal->Zone(iZone).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(iZone).HTSurfaceLast = 1;
-    state->dataHeatBal->Zone(iZone).RadiantEnclosureNum = 1;
+    state->dataHeatBal->Space(iZone).RadiantEnclosureNum = 1;
 
     state->dataSurface->TotSurfaces = 4;
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
     state->dataSurface->Surface(1).HeatTransSurf = true;
     state->dataSurface->Surface(1).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(1).RadEnclIndex = 1;
 
     Array1D<Real64> peopleDelaySeq;
     peopleDelaySeq.allocate(state->dataGlobal->NumOfTimeStepInHour * 24);
@@ -8195,10 +8198,12 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
 
     state->dataGlobal->NumOfZones = 1;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataGlobal->NumOfSpaces = 1;
+    state->dataHeatBal->Space.allocate(state->dataGlobal->NumOfSpaces);
 
     state->dataHeatBal->Zone(iZone).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(iZone).HTSurfaceLast = 4;
-    state->dataHeatBal->Zone(iZone).RadiantEnclosureNum = 1;
+    state->dataHeatBal->Space(iZone).RadiantEnclosureNum = 1;
     int radEnclosureNum = 1;
 
     state->dataSurface->TotSurfaces = 4;
@@ -8258,6 +8263,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     state->dataSurface->Surface(2).Class = SurfaceClass::Wall;
     state->dataSurface->Surface(3).Class = SurfaceClass::Floor;
     state->dataSurface->Surface(4).Class = SurfaceClass::Shading;
+    state->dataSurface->Surface(1).RadEnclIndex = 1;
+    state->dataSurface->Surface(2).RadEnclIndex = 1;
+    state->dataSurface->Surface(3).RadEnclIndex = 1;
+    state->dataSurface->Surface(4).RadEnclIndex = 1;
 
     for (int jSurf = 1; jSurf <= 4; ++jSurf) {
         for (int step = 1; step <= 10; ++step) {
@@ -8307,6 +8316,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     state->dataSurface->Surface(4).Class = SurfaceClass::Wall;
     state->dataSurface->Surface(1).Class = SurfaceClass::Floor;
     state->dataSurface->Surface(3).Class = SurfaceClass::Shading;
+    state->dataSurface->Surface(2).RadEnclIndex = 1;
+    state->dataSurface->Surface(4).RadEnclIndex = 1;
+    state->dataSurface->Surface(1).RadEnclIndex = 1;
+    state->dataSurface->Surface(3).RadEnclIndex = 1;
 
     for (int jSurf = 1; jSurf <= 4; ++jSurf) {
         for (int step = 1; step <= 10; ++step) {

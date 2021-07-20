@@ -1227,9 +1227,10 @@ namespace HeatBalanceIntRadExchange {
             }
             if (!enclMatchFound) {
                 if (spaceListNum > 0) {
-                    ShowSevereError(state,
-                                    "AlignInputViewFactors: " + cCurrentModuleObject + "=\"" + thisSpaceOrSpaceListName +
-                                        "\" found a matching ZoneList, but did not find a matching radiant or solar enclosure with the same zones.");
+                    ShowSevereError(
+                        state,
+                        "AlignInputViewFactors: " + cCurrentModuleObject + "=\"" + thisSpaceOrSpaceListName +
+                            "\" found a matching SpaceList, but did not find a matching radiant or solar enclosure with the same spaces.");
                     ErrorsFound = true;
 
                 } else {

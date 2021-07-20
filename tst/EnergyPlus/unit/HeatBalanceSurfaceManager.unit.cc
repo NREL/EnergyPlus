@@ -291,12 +291,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     state->dataHeatBalSurf->SurfAbsThermalInt.allocate(1);
 
     state->dataViewFactor->NumOfRadiantEnclosures = 1;
-    state->dataViewFactor->ZoneRadiantInfo.allocate(1);
+    state->dataViewFactor->EnclRadInfo.allocate(1);
     state->dataHeatBal->EnclRadReCalc.allocate(1);
     state->dataHeatBal->EnclRadReCalc(1) = true;
     state->dataHeatBal->EnclRadThermAbsMult.allocate(1);
-    state->dataViewFactor->ZoneRadiantInfo(1).SurfacePtr.allocate(1);
-    state->dataViewFactor->ZoneRadiantInfo(1).SurfacePtr(1) = 1;
+    state->dataViewFactor->EnclRadInfo(1).SurfacePtr.allocate(1);
+    state->dataViewFactor->EnclRadInfo(1).SurfacePtr(1) = 1;
 
     ComputeIntThermalAbsorpFactors(*state);
 
