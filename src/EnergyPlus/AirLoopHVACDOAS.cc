@@ -62,7 +62,6 @@
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
-#include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
@@ -618,10 +617,17 @@ namespace AirLoopHVACDOAS {
                         state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) =
                             HVACHXAssistedCoolingCoil::GetCoilOutletNode(state, CompType, CompName, OutletNodeErrFlag);
                     } else if (SELECT_CASE_var == "COILSYSTEM:COOLING:DX") {
-                        state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) = HVACDXSystem::GetCoolingCoilInletNodeNum(
-                            state, state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), InletNodeErrFlag);
-                        state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) = HVACDXSystem::GetCoolingCoilOutletNodeNum(
-                            state, state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), OutletNodeErrFlag);
+                        state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) =
+                            state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum)
+                                .compPointer[CompNum]
+                                ->getAirInNode(
+                                    state, state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), 0, InletNodeErrFlag);
+                        state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) =
+                            state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum)
+                                .compPointer[CompNum]
+                                ->getAirOutNode(
+                                    state, state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), 0, OutletNodeErrFlag);
+                        // DXCoolingCoilFlag doesn't do anything, isn't used
                         state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).DXCoolingCoilFlag = true;
                     } else if (SELECT_CASE_var == "COILSYSTEM:HEATING:DX") {
                         state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) =
