@@ -6963,7 +6963,6 @@ namespace UnitarySystems {
     void UnitarySys::getDXCoilSystemData(
         EnergyPlusData &state, std::string_view objectName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound)
     {
-        static constexpr std::string_view getDXCoilSystem("getDXCoilSystemData");
         std::string cCurrentModuleObject = "CoilSystem:Cooling:DX";
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
         if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {

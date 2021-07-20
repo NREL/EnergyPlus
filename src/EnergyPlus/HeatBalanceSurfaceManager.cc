@@ -2015,14 +2015,13 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                                 "State",
                                 Surface(loop).Name);
         }
-        //    IF (DisplayAdvancedReportVariables) THEN  !CurrentModuleObject='Opaque Surfaces(Advanced)'
-        SetupOutputVariable(state,
-                            "Surface Inside Face Convection Classification Index",
-                            OutputProcessor::Unit::None,
-                            state.dataSurface->SurfIntConvClassification(loop),
-                            "Zone",
-                            "Average",
-                            Surface(loop).Name);
+        //        SetupOutputVariable(state,
+        //                            "Surface Inside Face Convection Classification Index",
+        //                            OutputProcessor::Unit::None,
+        //                            state.dataSurface->SurfIntConvClassification(loop),
+        //                            "Zone",
+        //                            "Average",
+        //                            Surface(loop).Name);
         SetupOutputVariable(state,
                             "Surface Inside Face Convection Model Equation Index",
                             OutputProcessor::Unit::None,

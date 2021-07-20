@@ -1253,10 +1253,11 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<bool> SurfIsRadSurfOrVentSlabOrPool;    // surface cannot be part of both a radiant surface & ventilated slab group
 
     // Surface ConvCoeff Properties
-    Array1D<int> SurfTAirRef;                     // Flag for reference air temperature
-    Array1D<int> SurfIntConvCoeffIndex;           // Interior Convection Coefficient pointer (different data structure) when being overridden
-    Array1D<int> SurfExtConvCoeffIndex;           // Exterior Convection Coefficient pointer (different data structure) when being overridden
-    Array1D<int> SurfIntConvClassification;       // current classification for inside face air flow regime and surface orientation
+    Array1D<int> SurfTAirRef;           // Flag for reference air temperature
+    Array1D<int> SurfIntConvCoeffIndex; // Interior Convection Coefficient pointer (different data structure) when being overridden
+    Array1D<int> SurfExtConvCoeffIndex; // Exterior Convection Coefficient pointer (different data structure) when being overridden
+    Array1D<ConvectionConstants::InConvClass>
+        SurfIntConvClassification;                // current classification for inside face air flow regime and surface orientation
     Array1D<int> SurfIntConvHcModelEq;            // current convection model for inside face
     Array1D<int> SurfIntConvHcUserCurveIndex;     // current index to user convection model if used
     Array1D<int> SurfOutConvClassification;       // current classification for outside face wind regime and convection orientation
