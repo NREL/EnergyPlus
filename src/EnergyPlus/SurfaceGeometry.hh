@@ -381,10 +381,11 @@ namespace SurfaceGeometry {
 
     void SetupShadeSurfacesForSolarCalcs(EnergyPlusData &state);
 
-    void SetupEnclosuresAndAirBoundaries(EnergyPlusData &state,
-                                         Array1D<DataViewFactorInformation::EnclosureViewFactorInformation> &Enclosures, // Radiant or Solar Enclosures
-                                         SurfaceGeometry::enclosureType const &EnclosureType,                       // Radiant or Solar
-                                         bool &ErrorsFound);                                                        // Set to true if errors found
+    void
+    SetupEnclosuresAndAirBoundaries(EnergyPlusData &state,
+                                    Array1D<DataViewFactorInformation::EnclosureViewFactorInformation> &Enclosures, // Radiant or Solar Enclosures
+                                    SurfaceGeometry::enclosureType const &EnclosureType,                            // Radiant or Solar
+                                    bool &ErrorsFound);                                                             // Set to true if errors found
 
     void CheckConvexity(EnergyPlusData &state,
                         int const SurfNum, // Current surface number

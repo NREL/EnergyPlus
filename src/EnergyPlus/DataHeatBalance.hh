@@ -521,7 +521,8 @@ namespace DataHeatBalance {
               OpaqOrIntMassSurfaceLast(-1), WindowSurfaceFirst(0), WindowSurfaceLast(-1), OpaqOrWinSurfaceFirst(0), OpaqOrWinSurfaceLast(-1),
               TDDDomeFirst(0), TDDDomeLast(-1), InsideConvectionAlgo(ConvectionConstants::HcInt_ASHRAESimple), NumSurfaces(0), NumSubSurfaces(0),
               NumShadingSurfaces(0), OutsideConvectionAlgo(ConvectionConstants::HcExt_ASHRAESimple), Centroid(0.0, 0.0, 0.0), MinimumX(0.0),
-              MaximumX(0.0), MinimumY(0.0), MaximumY(0.0), MinimumZ(0.0), MaximumZ(0.0), ZoneRadEnclosureFirst(-1), ZoneRadEnclosureLast(-1), ZoneFirstSpaceSolEnclosure(0),
+              MaximumX(0.0), MinimumY(0.0), MaximumY(0.0), MinimumZ(0.0), MaximumZ(0.0), ZoneRadEnclosureFirst(-1), ZoneRadEnclosureLast(-1),
+              ZoneFirstSpaceSolEnclosure(0),
 
               OutDryBulbTemp(0.0), OutDryBulbTempEMSOverrideOn(false), OutDryBulbTempEMSOverrideValue(0.0), OutWetBulbTemp(0.0),
               OutWetBulbTempEMSOverrideOn(false), OutWetBulbTempEMSOverrideValue(0.0), WindSpeed(0.0), WindSpeedEMSOverrideOn(false),
