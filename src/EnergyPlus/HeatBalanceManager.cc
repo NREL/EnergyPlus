@@ -4909,8 +4909,6 @@ namespace HeatBalanceManager {
 
         GetZoneData(state, ErrorsFound); // Read Zone data from input file
 
-        GetSpaceData(state, ErrorsFound);
-
         SurfaceGeometry::SetupZoneGeometry(state, ErrorsFound);
     }
 
@@ -5172,7 +5170,10 @@ namespace HeatBalanceManager {
 
         // allocate the array the holds the predefined report data
         state.dataHeatBal->ZonePreDefRep.allocate(state.dataGlobal->NumOfZones);
-    }
+        
+        // Now get Space data after Zones are set up, because Space is optional, Zones are not
+        GetSpaceData(state, ErrorsFound);
+   }
 
     void GetZoneLocalEnvData(EnergyPlusData &state, bool &ErrorsFound) // Error flag indicator (true if errors found)
     {

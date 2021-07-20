@@ -1816,7 +1816,7 @@ namespace SurfaceGeometry {
 
         state.dataSurfaceGeometry->SurfaceTmp.deallocate(); // DeAllocate the Temp Surface derived type
 
-        CreateMissingSpaces(state);
+        CreateMissingSpaces(state, ErrorsFound);
 
         //  For each Base Surface Type (Wall, Floor, Roof)
 
@@ -2808,8 +2808,9 @@ namespace SurfaceGeometry {
         }
     }
 
-    void CreateMissingSpaces(EnergyPlusData &state)
+    void CreateMissingSpaces(EnergyPlusData &state, bool &ErrorsFound)
     {
+        static constexpr std::string_view RoutineName("CreateMissingSpaces: ");
         // Scan surfaces to see if Space was assigned in input
         for (int surfNum = 1; surfNum <= state.dataSurface->TotSurfaces; ++surfNum) {
             auto &thisSurf = state.dataSurface->Surface(surfNum);
@@ -2849,6 +2850,14 @@ namespace SurfaceGeometry {
                 thisSurf.Space = lastSpaceForZone;
                 // Add to Space's list of surfaces
                 state.dataHeatBal->Space(lastSpaceForZone).Surfaces.emplace_back(surfNum);
+            }
+        }
+
+        // Check that all Spaces have at least one Surface
+        for (int spaceNum = 1; spaceNum < state.dataGlobal->NumOfSpaces; ++spaceNum) {
+            if (int(state.dataHeatBal->Space(spaceNum).Surfaces.size()) == 0) {
+                ShowSevereError(state, std::string(RoutineName) + "Space = " + state.dataHeatBal->Space(spaceNum).Name + " has no surfaces.");
+                ErrorsFound = true;
             }
         }
     }

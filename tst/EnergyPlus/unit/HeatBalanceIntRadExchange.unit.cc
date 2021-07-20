@@ -494,8 +494,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest)
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetSpaceData(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
 
     state->dataViewFactor->NumOfRadiantEnclosures = 3;
     state->dataViewFactor->EnclRadInfo.allocate(3);
@@ -597,8 +595,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest2)
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetSpaceData(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
 
     state->dataViewFactor->NumOfSolarEnclosures = 3;
     state->dataViewFactor->EnclSolInfo.allocate(3);
@@ -696,8 +692,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest3)
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetSpaceData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     state->dataViewFactor->NumOfSolarEnclosures = 3;
@@ -799,8 +793,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest4)
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetSpaceData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     state->dataViewFactor->NumOfRadiantEnclosures = 3;
