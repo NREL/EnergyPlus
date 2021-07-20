@@ -3531,7 +3531,7 @@ void WrapperSpecs::oneTimeInit_new([[maybe_unused]] EnergyPlusData &state)
 {
 }
 
-void WrapperSpecs::oneTimeInit(EnergyPlusData &state)
+void WrapperSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
 {
 }
 

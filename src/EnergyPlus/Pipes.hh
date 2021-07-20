@@ -96,6 +96,7 @@ namespace Pipes {
                       bool FirstHVACIteration,
                       Real64 &CurLoad,
                       bool RunFlag) override;
+        void oneTimeInit_new(EnergyPlusData &state) override;
         void oneTimeInit(EnergyPlusData &state) override;
         void initEachEnvironment(EnergyPlusData &state) const;
     };
