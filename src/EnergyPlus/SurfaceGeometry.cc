@@ -2844,10 +2844,11 @@ namespace SurfaceGeometry {
             auto &thisSurf = state.dataSurface->Surface(surfNum);
             if (!thisSurf.HeatTransSurf) continue; // ignore shading surfaces
             if (thisSurf.Space == 0) {
-                int lastSpace = state.dataHeatBal->Zone(thisSurf.Zone).Spaces.size();
-                thisSurf.Space = state.dataHeatBal->Zone(thisSurf.Zone).Spaces(lastSpace);
+                int const numSpaces = state.dataHeatBal->Zone(thisSurf.Zone).Spaces.size();
+                int const lastSpaceForZone = state.dataHeatBal->Zone(thisSurf.Zone).Spaces(numSpaces);
+                thisSurf.Space = lastSpaceForZone;
                 // Add to Space's list of surfaces
-                state.dataHeatBal->Space(lastSpace).Surfaces.emplace_back(surfNum);
+                state.dataHeatBal->Space(lastSpaceForZone).Surfaces.emplace_back(surfNum);
             }
         }
     }
