@@ -353,17 +353,9 @@ public:
     fs::path outputErrFilePath{"eplusout.err"};
     std::unique_ptr<std::ostream> err_stream;
 
-    static bool hasSingleton()
-    {
-        return getSingletonInternal() != nullptr;
-    }
-
     JsonOutputStreams json; // Internal streams used for json outputs
 
     void flushAll(); // For RunningEnergyPlusViaAPI only
-
-private:
-    static IOFiles *&getSingletonInternal();
 };
 
 class SharedFileHandle

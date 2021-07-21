@@ -124,8 +124,7 @@ namespace PlantComponentTemperatureSources {
         // Uses the status flags to trigger initializations.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-
-        static std::string const RoutineName("InitWaterSource");
+        static constexpr std::string_view RoutineName("InitWaterSource");
 
         // Initialize critical Demand Side Variables at the beginning of each environment
         if (this->MyEnvironFlag && state.dataGlobal->BeginEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
@@ -372,7 +371,7 @@ namespace PlantComponentTemperatureSources {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        static std::string const RoutineName("CalcWaterSource");
+        static constexpr std::string_view RoutineName("CalcWaterSource");
 
         if (this->MassFlowRate > 0.0) {
             this->OutletTemp = this->BoundaryTemp;

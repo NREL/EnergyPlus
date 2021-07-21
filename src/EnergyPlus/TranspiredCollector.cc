@@ -115,8 +115,8 @@ namespace TranspiredCollector {
     using DataVectorTypes::Vector;
 
     void SimTranspiredCollector(EnergyPlusData &state,
-                                std::string const &CompName, // component name
-                                int &CompIndex               // component index (to reduce string compares during simulation)
+                                std::string_view CompName, // component name
+                                int &CompIndex             // component index (to reduce string compares during simulation)
     )
     {
 
@@ -150,7 +150,7 @@ namespace TranspiredCollector {
         if (CompIndex == 0) {
             UTSCNum = UtilityRoutines::FindItemInList(CompName, state.dataTranspiredCollector->UTSC);
             if (UTSCNum == 0) {
-                ShowFatalError(state, "Transpired Collector not found=" + CompName);
+                ShowFatalError(state, "Transpired Collector not found=" + std::string{CompName});
             }
             CompIndex = UTSCNum;
         } else {
@@ -256,7 +256,7 @@ namespace TranspiredCollector {
         Real64 AvgTilt;       // temp for error checking
         int SurfID;           // local surface "pointer"
         Real64 TiltRads;      // average tilt of collector in radians
-        Real64 tempHdeltaNPL; // temporary variable for bouyancy length scale
+        Real64 tempHdeltaNPL; // temporary variable for buoyancy length scale
         int NumUTSCSplitter(0);
         Array1D_string AlphasSplit; // Alpha items for extensible
         // Solar Collectors:Unglazed Transpired object

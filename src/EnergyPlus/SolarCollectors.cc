@@ -92,7 +92,7 @@ namespace SolarCollectors {
     // must be connected to a WATER HEATER object on the supply side of the plant loop.  Water is assumed to be
     // the heat transfer fluid.
 
-    static std::string const fluidNameWater("WATER");
+    static constexpr std::string_view fluidNameWater("WATER");
 
     PlantComponent *CollectorData::factory(EnergyPlusData &state, std::string const &objectName)
     {
@@ -864,7 +864,7 @@ namespace SolarCollectors {
         // METHODOLOGY EMPLOYED:
         // Inlet and outlet nodes are initialized.  The maximum collector flow rate is requested.
 
-        static std::string const RoutineName("InitSolarCollector");
+        static constexpr std::string_view RoutineName("InitSolarCollector");
         Real64 const BigNumber(9999.9); // Component desired mass flow rate
 
         this->oneTimeInit(state); // Do the one time initializations
@@ -1034,7 +1034,7 @@ namespace SolarCollectors {
         // components are less than zero but the net adds up to greater than zero.  The EnergyPlus subroutine, on the other
         // hand, requires each component incident angle modifier always to be greater than zero.
 
-        static std::string const RoutineName("CalcSolarCollector");
+        static constexpr std::string_view RoutineName("CalcSolarCollector");
         Real64 efficiency = 0.0; // Thermal efficiency of solar energy conversion
 
         int SurfNum = this->Surface;
@@ -1326,7 +1326,7 @@ namespace SolarCollectors {
         // New York (1991).
         // NOTES:
 
-        static std::string const RoutineName("CalcICSSolarCollector");
+        static constexpr std::string_view RoutineName("CalcICSSolarCollector");
 
         int SurfNum = this->Surface;
         int ParamNum = this->Parameters;
@@ -1995,7 +1995,7 @@ namespace SolarCollectors {
         Real64 hConvA2W; // convection coefficient, [W/m2K]
 
         Real64 const gravity(9.806); // gravitational constant [m/s^2]
-        static std::string const CalledFrom("SolarCollectors:CalcConvCoeffAbsPlateAndWater");
+        static constexpr std::string_view CalledFrom("SolarCollectors:CalcConvCoeffAbsPlateAndWater");
 
         Real64 DeltaT = std::abs(TAbsorber - TWater);
         Real64 TReference = TAbsorber - 0.25 * (TAbsorber - TWater);
@@ -2062,7 +2062,7 @@ namespace SolarCollectors {
         // PURPOSE OF THIS SUBROUTINE:
         // Updates the node variables with local variables.
 
-        static std::string const RoutineName("UpdateSolarCollector");
+        static constexpr std::string_view RoutineName("UpdateSolarCollector");
 
         PlantUtilities::SafeCopyPlantNode(state, this->InletNode, this->OutletNode);
         // Set outlet node variables that are possibly changed
