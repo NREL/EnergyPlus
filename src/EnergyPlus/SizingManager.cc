@@ -1716,7 +1716,7 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                                                      "Standard 62.1 Simplified Procedure");
         } else {
             OutputReportPredefined::PreDefTableEntry(
-                state, state.dataOutRptPredefined->pdchS62svrHtEvMthd, FinalSysSizing(AirLoopNum).AirPriLoopName, "");
+                state, state.dataOutRptPredefined->pdchS62svrHtEvMthd, FinalSysSizing(AirLoopNum).AirPriLoopName, "Not calculated");
         }
         OutputReportPredefined::PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchS62svrHtVot,
