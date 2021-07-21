@@ -1326,7 +1326,6 @@ namespace UnitarySystems {
             }
         }
 
-
         this->m_CoolingPartLoadFrac = 0.0;
         this->m_HeatingPartLoadFrac = 0.0;
         this->m_SuppHeatPartLoadFrac = 0.0;
@@ -7190,7 +7189,6 @@ namespace UnitarySystems {
                 } else {
                     state.dataUnitarySystems->unitarySys[sysNum] = thisSys;
                 }
-
             }
 
             if (errorsFound) {
