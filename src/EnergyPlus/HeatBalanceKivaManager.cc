@@ -183,7 +183,7 @@ void KivaInstanceMap::initGround(EnergyPlusData &state, const KivaWeatherData &k
     instance.foundation->numericalScheme = Kiva::Foundation::NS_ADI;
 }
 
-inline int KivaInstanceMap::getAccDate(EnergyPlusData &state, const int numAccelaratedTimesteps, const int acceleratedTimestep)
+int KivaInstanceMap::getAccDate(EnergyPlusData &state, const int numAccelaratedTimesteps, const int acceleratedTimestep)
 {
     // Determine accelerated intervals
     int accDate =
