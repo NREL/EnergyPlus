@@ -814,7 +814,7 @@ namespace OutputProcessor {
         case OutputProcessor::SOVTimeStepType::Num:
             ShowFatalError(state, "Bad SOVTimeStepType passed to ValidateTimeStepType");
         }
-        assert(false);  // compiler doesn't understand that ShowFatalError aborts
+        assert(false); // compiler doesn't understand that ShowFatalError aborts
     }
 
     std::string StandardTimeStepTypeKey(TimeStepType const timeStepType)
@@ -1633,7 +1633,7 @@ namespace OutputProcessor {
 
         // Basic ResourceType for Meters
         {
-            auto const& meterType(UserInputResourceType);
+            auto const &meterType(UserInputResourceType);
 
             if (meterType == "ELECTRICITY") {
                 OutResourceType = "Electricity";
@@ -4228,7 +4228,7 @@ namespace OutputProcessor {
         case ReportingFrequency::Monthly: //  3
             print_meter(state, 9);
             break;
-        case ReportingFrequency::Yearly: //  5
+        case ReportingFrequency::Yearly:     //  5
         case ReportingFrequency::Simulation: //  4
             print_meter(state, 11);
             break;
@@ -5260,22 +5260,22 @@ namespace OutputProcessor {
 // *****************************************************************************
 
 void SetupOutputVariable(EnergyPlusData &state,
-                         std::string const &VariableName,                         // String Name of variable (with units)
+                         std::string const &VariableName,                        // String Name of variable (with units)
                          OutputProcessor::Unit const VariableUnit,               // Actual units corresponding to the actual variable
-                         Real64 &ActualVariable,                                  // Actual Variable, used to set up pointer
+                         Real64 &ActualVariable,                                 // Actual Variable, used to set up pointer
                          OutputProcessor::SOVTimeStepType const TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType const VariableTypeKey,    // State, Average=1, NonState, Sum=2
-                         std::string const &KeyedValue,                           // Associated Key for this variable
-                         Optional_string_const ReportFreq,                        // Internal use -- causes reporting at this frequency
-                         Optional_string_const ResourceTypeKey,                   // Meter Resource Type (Electricity, Gas, etc)
-                         Optional_string_const EndUseKey,                         // Meter End Use Key (Lights, Heating, Cooling, etc)
-                         Optional_string_const EndUseSubKey,                      // Meter End Use Sub Key (General Lights, Task Lights, etc)
-                         Optional_string_const GroupKey,                          // Meter Super Group Key (Building, System, Plant)
-                         Optional_string_const ZoneKey,                           // Meter Zone Key (zone name)
-                         Optional_int_const ZoneMult,                             // Zone Multiplier, defaults to 1
-                         Optional_int_const ZoneListMult,                         // Zone List Multiplier, defaults to 1
-                         Optional_int_const indexGroupKey,                        // Group identifier for SQL output
-                         Optional_string_const customUnitName                     // the custom name for the units from EMS definition of units
+                         std::string const &KeyedValue,                          // Associated Key for this variable
+                         Optional_string_const ReportFreq,                       // Internal use -- causes reporting at this frequency
+                         Optional_string_const ResourceTypeKey,                  // Meter Resource Type (Electricity, Gas, etc)
+                         Optional_string_const EndUseKey,                        // Meter End Use Key (Lights, Heating, Cooling, etc)
+                         Optional_string_const EndUseSubKey,                     // Meter End Use Sub Key (General Lights, Task Lights, etc)
+                         Optional_string_const GroupKey,                         // Meter Super Group Key (Building, System, Plant)
+                         Optional_string_const ZoneKey,                          // Meter Zone Key (zone name)
+                         Optional_int_const ZoneMult,                            // Zone Multiplier, defaults to 1
+                         Optional_int_const ZoneListMult,                        // Zone List Multiplier, defaults to 1
+                         Optional_int_const indexGroupKey,                       // Group identifier for SQL output
+                         Optional_string_const customUnitName                    // the custom name for the units from EMS definition of units
 )
 {
 
@@ -5510,14 +5510,14 @@ void SetupOutputVariable(EnergyPlusData &state,
 }
 
 void SetupOutputVariable(EnergyPlusData &state,
-                         std::string const &VariableName,                         // String Name of variable
+                         std::string const &VariableName,                        // String Name of variable
                          OutputProcessor::Unit const VariableUnit,               // Actual units corresponding to the actual variable
-                         int &ActualVariable,                                     // Actual Variable, used to set up pointer
+                         int &ActualVariable,                                    // Actual Variable, used to set up pointer
                          OutputProcessor::SOVTimeStepType const TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType const VariableTypeKey,    // State, Average=1, NonState, Sum=2
-                         std::string const &KeyedValue,                           // Associated Key for this variable
-                         Optional_string_const ReportFreq,                        // Internal use -- causes reporting at this freqency
-                         Optional_int_const indexGroupKey                         // Group identifier for SQL output
+                         std::string const &KeyedValue,                          // Associated Key for this variable
+                         Optional_string_const ReportFreq,                       // Internal use -- causes reporting at this freqency
+                         Optional_int_const indexGroupKey                        // Group identifier for SQL output
 )
 {
 
