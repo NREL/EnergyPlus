@@ -116,7 +116,7 @@ namespace HeatBalanceKivaManager {
         int zoneControlNum;
         Real64 zoneAssumedTemperature;
         void initGround(EnergyPlusData &state, const KivaWeatherData &kivaWeather);
-        int getAccDate(EnergyPlusData &state, int const numAccelaratedTimesteps, int const acceleratedTimestep);
+        int getAccDate(EnergyPlusData &state, const int numAccelaratedTimesteps, const int acceleratedTimestep);
         void
         setInitialBoundaryConditions(EnergyPlusData &state, const KivaWeatherData &kivaWeather, const int date, const int hour, const int timestep);
         void setBoundaryConditions(EnergyPlusData &state);
