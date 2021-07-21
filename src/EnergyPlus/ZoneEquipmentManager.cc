@@ -2055,8 +2055,8 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                     state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow == 0) {
                     bool NoCoolLoadSizingData = false;
                     for (TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
-                        if (state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolZoneTempSeq(TimeStepIndex) >
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).ZoneTempAtCoolPeak ||
+                        if ((state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolZoneTempSeq(TimeStepIndex) >
+                             state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).ZoneTempAtCoolPeak) ||
                             !NoCoolLoadSizingData) {
                             state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).ZoneTempAtCoolPeak =
                                 state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolZoneTempSeq(TimeStepIndex);
@@ -2073,7 +2073,7 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                         }
                     }
                     if ((state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).ZoneTempAtCoolPeak >
-                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneTempAtCoolPeak) &&
+                         state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneTempAtCoolPeak) &&
                         (state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).ZoneTempAtCoolPeak != 0) &&
                         (NoCoolLoadSizingData)) {
                         state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolDesDay =
