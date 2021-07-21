@@ -5554,6 +5554,18 @@ namespace HeatBalanceManager {
                 }
             }
         }
+
+        // Make sure every zone has at least one space
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            auto &thisZone = state.dataHeatBal->Zone(zoneNum);
+            if (thisZone.Spaces.empty()) {
+                ++state.dataGlobal->NumOfSpaces;
+                state.dataHeatBal->Space(state.dataGlobal->NumOfSpaces).ZoneNum = zoneNum;
+                state.dataHeatBal->Space(state.dataGlobal->NumOfSpaces).Name = thisZone.Name;
+                // Add to zone's list of spaces
+                thisZone.Spaces.emplace_back(state.dataGlobal->NumOfSpaces);
+            }
+        }
     }
     // End of Get Input subroutines for the HB Module
     //******************************************************************************

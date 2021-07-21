@@ -534,7 +534,7 @@ namespace DataRoomAirModel {
         Array1D<bool> SurfMask;                                     // Sized to num of surfs in Zone, true if surface is associated with this node
         std::string NodeIntGainsListName;                           // name of node's internal gains list
         bool HasIntGainsAssigned;                                   // True if this node has internal gain assigned
-        int NumIntGains;                                            // Number of mathching internal gain objects for all spaces in the zone
+        int NumIntGains;                                            // Number of matching internal gain objects for all spaces in the zone
         Array1D<int> IntGainsDeviceSpaces;                          // index pointers to space struct
         Array1D<int> IntGainsDeviceIndices;                         // index pointers to internal gains struct
         Array1D<Real64> IntGainsFractions;                          // gain fractions to this node

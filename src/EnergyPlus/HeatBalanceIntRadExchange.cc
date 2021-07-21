@@ -1632,7 +1632,7 @@ namespace HeatBalanceIntRadExchange {
             FinalCheckValue = FixedCheckValue = std::abs(RowSum - N);
             F = FixedF;
             for (int spaceNum : spaceNums) {
-                state.dataHeatBal->Space(spaceNum).EnforcedReciprocity = true;
+                state.dataHeatBal->Zone(state.dataHeatBal->Space(spaceNum).ZoneNum).EnforcedReciprocity = true;
             }
             return; // Do not iterate, stop with reciprocity satisfied.
 

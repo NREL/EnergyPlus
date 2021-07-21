@@ -4235,11 +4235,13 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
 
     state.dataDaylightingManager->maxNumRefPtInAnyZone = 0;
     state.dataDaylightingManager->maxNumRefPtInAnyEncl = 0;
-    for (int enclNum = 1; enclNum < state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
+    for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
         // Loop through all spaces in the same enclosure to find total reference points
         int numEnclRefPoints = 0;
         for (int const spaceNum : state.dataViewFactor->EnclSolInfo(enclNum).SpaceNums) {
-            int numRefPoints = state.dataDaylightingData->ZoneDaylight(spaceNum).TotalDaylRefPoints;
+            int zoneNum = state.dataHeatBal->Space(spaceNum).ZoneNum;
+            // TODO MJW: Reference points will be double-counted for zone with more than one space
+            int numRefPoints = state.dataDaylightingData->ZoneDaylight(zoneNum).TotalDaylRefPoints;
             numEnclRefPoints += numRefPoints;
             state.dataDaylightingManager->maxNumRefPtInAnyZone = max(numRefPoints, state.dataDaylightingManager->maxNumRefPtInAnyZone);
         }

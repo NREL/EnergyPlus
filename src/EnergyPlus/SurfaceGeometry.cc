@@ -2826,16 +2826,16 @@ namespace SurfaceGeometry {
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             auto &thisZone = state.dataHeatBal->Zone(zoneNum);
             if (thisZone.AnySurfacesWithoutSpace) {
-                // If any surfaces in the zone are not assigned to a space, create a new space
-                ++state.dataGlobal->NumOfSpaces;
-                state.dataHeatBal->Space(state.dataGlobal->NumOfSpaces).ZoneNum = zoneNum;
-                // Add to zone's list of spaces
-                thisZone.Spaces.emplace_back(state.dataGlobal->NumOfSpaces);
+                // If any surfaces in the zone are not assigned to a space, may need to create a new space
+                // Every zone has at least one space, created in HeatBalanceManager::GetSpaceData
+                // If no surfaces have a space assigned, then the default space will be used, otherwise, create a new space
                 if (thisZone.AnySurfacesWithSpace) {
-                    // If some surfaces in the zone are assigned to a space, the new space if the remainder of the zone
+                    ++state.dataGlobal->NumOfSpaces;
+                    state.dataHeatBal->Space(state.dataGlobal->NumOfSpaces).ZoneNum = zoneNum;
+                    // Add to zone's list of spaces
+                    thisZone.Spaces.emplace_back(state.dataGlobal->NumOfSpaces);
+                    // If some surfaces in the zone are assigned to a space, the new space is the remainder of the zone
                     state.dataHeatBal->Space(state.dataGlobal->NumOfSpaces).Name = thisZone.Name + "-Remainder";
-                } else {
-                    state.dataHeatBal->Space(state.dataGlobal->NumOfSpaces).Name = thisZone.Name;
                 }
             }
         }
@@ -2853,7 +2853,7 @@ namespace SurfaceGeometry {
             }
         }
 
-        // Check that all Spaces have at least one Surface
+        // TODO MJW: Is this necessary? Check that all Spaces have at least one Surface
         for (int spaceNum = 1; spaceNum < state.dataGlobal->NumOfSpaces; ++spaceNum) {
             if (int(state.dataHeatBal->Space(spaceNum).Surfaces.size()) == 0) {
                 ShowSevereError(state, std::string(RoutineName) + "Space = " + state.dataHeatBal->Space(spaceNum).Name + " has no surfaces.");

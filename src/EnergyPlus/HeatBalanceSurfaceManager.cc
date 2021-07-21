@@ -8226,7 +8226,7 @@ void TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state, Real64 TH12, i
                                                   "C");
                 }
             }
-            if (state.dataHeatBal->Space(state.dataSurface->Surface(SurfNum).Space).EnforcedReciprocity) {
+            if (zone.EnforcedReciprocity) {
                 if (WarmupSurfTemp > 3) {
                     ShowSevereError(state, "CalcHeatBalanceInsideSurf: Zone=\"" + zone.Name + "\" has view factor enforced reciprocity");
                     ShowContinueError(state, " and is having temperature out of bounds errors. Please correct zone geometry and rerun.");

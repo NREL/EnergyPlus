@@ -100,14 +100,17 @@ protected:
         state->dataSize->CurSysNum = 0;
         state->dataSize->CurOASysNum = 0;
         state->dataGlobal->NumOfZones = 1;
+        state->dataGlobal->NumOfSpaces = 1;
         state->dataLoopNodes->NumOfNodes = 5;
         state->dataGlobal->BeginEnvrnFlag = true;
         int NumOfSurfaces = 2;
         state->dataRoomAirMod->RoomAirflowNetworkZoneInfo.allocate(state->dataGlobal->NumOfZones);
         state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+        state->dataHeatBal->Space.allocate(state->dataGlobal->NumOfSpaces);
         state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
         state->dataZoneEquip->ZoneEquipList.allocate(state->dataGlobal->NumOfZones);
         state->dataHeatBal->ZoneIntGain.allocate(state->dataGlobal->NumOfZones);
+        state->dataHeatBal->SpaceIntGainDevices.allocate(state->dataGlobal->NumOfSpaces);
         state->dataLoopNodes->NodeID.allocate(state->dataLoopNodes->NumOfNodes);
         state->dataLoopNodes->Node.allocate(state->dataLoopNodes->NumOfNodes);
         state->dataSurface->Surface.allocate(NumOfSurfaces);
@@ -171,8 +174,14 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).HVAC(1).Name = "ZoneHVAC";
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(1).IntGainsDeviceIndices.allocate(1);
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).IntGainsDeviceIndices.allocate(1);
+    state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(1).IntGainsDeviceSpaces.allocate(1);
+    state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).IntGainsDeviceSpaces.allocate(1);
+    state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(1).NumIntGains = 1;
+    state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).NumIntGains = 1;
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(1).IntGainsDeviceIndices(1) = 1;
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).IntGainsDeviceIndices(1) = 1;
+    state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(1).IntGainsDeviceSpaces(1) = 1;
+    state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).IntGainsDeviceSpaces(1) = 1;
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(1).IntGainsFractions.allocate(1);
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).IntGainsFractions.allocate(1);
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(1).IntGainsFractions(1) = 0.4;
@@ -255,6 +264,7 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataHeatBal->Zone(ZoneNum).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(ZoneNum).HTSurfaceLast = 2;
     state->dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpMoist = 0;
+    state->dataHeatBal->Zone(ZoneNum).Spaces.emplace_back(1);
 
     state->dataHeatBal->SpaceIntGainDevices(ZoneNum).NumberOfDevices = 1;
     state->dataHeatBal->SpaceIntGainDevices(ZoneNum).Device.allocate(state->dataHeatBal->SpaceIntGainDevices(1).NumberOfDevices);

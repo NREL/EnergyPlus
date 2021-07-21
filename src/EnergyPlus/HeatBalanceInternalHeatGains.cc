@@ -72,8 +72,11 @@ void SetupZoneInternalGain(EnergyPlusData &state,
 )
 {
     // Distribute zone internal gain across all spaces in the zone weighted by floor area
+    Real64 gainFrac = 1.0;
     for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).Spaces) {
-        Real64 gainFrac = state.dataHeatBal->Space(spaceNum).FloorArea / state.dataHeatBal->Zone(ZoneNum).FloorArea;
+        if (state.dataHeatBal->Zone(ZoneNum).Spaces.size() > 1) {
+            gainFrac = state.dataHeatBal->Space(spaceNum).FloorArea / state.dataHeatBal->Zone(ZoneNum).FloorArea;
+        }
         SetupSpaceInternalGain(state,
                                spaceNum,
                                gainFrac,

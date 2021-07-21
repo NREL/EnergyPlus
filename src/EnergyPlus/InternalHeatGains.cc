@@ -627,7 +627,7 @@ namespace InternalHeatGains {
                     }
 
                     // Set space load fractions
-                    if (int(state.dataHeatBal->People(Loop).SpacePtrs.size()) == 1) {
+                    if (int(state.dataHeatBal->People(Loop).SpacePtrs.size()) <= 1) {
                         state.dataHeatBal->People(Loop).SpaceFracs.emplace_back(1.0);
                     } else {
                         Real64 const zoneArea = state.dataHeatBal->Zone(state.dataHeatBal->People(Loop).ZonePtr).FloorArea;

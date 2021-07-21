@@ -349,7 +349,6 @@ namespace DataHeatBalance {
         bool HasFloor = false;             // Has "Floor" surface
         Real64 ExtWindowArea = 0.0;        // Exterior Window Area for Zone
         Real64 TotalSurfArea = 0.0;        // Total surface area for Zone
-        bool EnforcedReciprocity = false;  // if zone/space required forced reciprocity -- less out of bounds temp errors allowed
         int RadiantEnclosureNum = 0;       // Radiant exchange enclosure this space belongs to
         int SolarEnclosureNum = 0;         // Solar distribution enclosure this space belongs to
     };
@@ -473,6 +472,7 @@ namespace DataHeatBalance {
         Real64 NominalInfilVent;            // internal infiltration/ventilation
         Real64 NominalMixing;               // internal mixing/cross mixing
         bool TempOutOfBoundsReported;       // if any temp out of bounds errors, first will show zone details.
+        bool EnforcedReciprocity;           // if zone/space required forced reciprocity -- less out of bounds temp errors allowed
         int ZoneMinCO2SchedIndex;           // Index for the schedule the schedule which determines minimum CO2 concentration
         int ZoneMaxCO2SchedIndex;           // Index for the schedule the schedule which determines maximum CO2 concentration
         int ZoneContamControllerSchedIndex; // Index for this schedule
@@ -530,8 +530,8 @@ namespace DataHeatBalance {
               LinkedOutAirNode(0.0), isPartOfTotalArea(true), isNominalOccupied(false), isNominalControlled(false), TotOccupants(0.0),
               AirHBimBalanceErrIndex(0), NoHeatToReturnAir(false), RefrigCaseRA(false), HasAdjustedReturnTempByITE(false),
               AdjustedReturnTempByITE(0.0), HasLtsRetAirGain(false), HasAirFlowWindowReturn(false), InternalHeatGains(0.0), NominalInfilVent(0.0),
-              NominalMixing(0.0), TempOutOfBoundsReported(false), ZoneMinCO2SchedIndex(0), ZoneMaxCO2SchedIndex(0), ZoneContamControllerSchedIndex(0),
-              FlagCustomizedZoneCap(false),
+              NominalMixing(0.0), TempOutOfBoundsReported(false), EnforcedReciprocity(false), ZoneMinCO2SchedIndex(0), ZoneMaxCO2SchedIndex(0),
+              ZoneContamControllerSchedIndex(0), FlagCustomizedZoneCap(false),
               // Hybrid Modeling
               ZoneMeasuredTemperature(0.0), ZoneMeasuredHumidityRatio(0.0), ZoneMeasuredCO2Concentration(0.0), ZoneMeasuredSupplyAirTemperature(0.0),
               ZoneMeasuredSupplyAirFlowRate(0.0), ZoneMeasuredSupplyAirHumidityRatio(0.0), ZoneMeasuredSupplyAirCO2Concentration(0.0),
