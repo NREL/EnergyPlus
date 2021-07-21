@@ -159,7 +159,7 @@ namespace OutputProcessor {
         default:
             assert(false);
         }
-        return "Impossible day";  // even though the above switch block will *always* either return a string or assert, compilers still warn...
+        return "Impossible day"; // even though the above switch block will *always* either return a string or assert, compilers still warn...
     }
 
     constexpr std::array<std::string_view, 14> endUseCategoryNames = {"HEATING",
