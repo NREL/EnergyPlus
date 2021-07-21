@@ -916,6 +916,7 @@ namespace DataHeatBalance {
         Real64 InfilVolumeStdDensity; // Volume of Air {m3} due to infiltration at standard density (adjusted for elevation)
         Real64 InfilVdotCurDensity;   // Volume flow rate of Air {m3/s} due to infiltration at current zone air density
         Real64 InfilVdotStdDensity;   // Volume flow rate of Air {m3/s} due to infiltration standard density (adjusted elevation)
+        Real64 InfilMdot;             // Mass flow rate {kg/s} due to infiltration for reporting
         Real64 InfilMass;             // Mass of Air {kg} due to infiltration
         Real64 InfilAirChangeRate;    // Infiltration air change rate {ach}
 
@@ -926,8 +927,8 @@ namespace DataHeatBalance {
               AIM2StackCoefficient(0.0), AIM2WindCoefficient(0.0), PressureExponent(0.0), ShelterFactor(0.0), EMSOverrideOn(false),
               EMSAirFlowRateValue(0.0), QuadratureSum(false), OABalancePtr(0), VolumeFlowRate(0.0), MassFlowRate(0.0), MCpI_temp(0.0),
               InfilHeatGain(0.0), InfilHeatLoss(0.0), InfilLatentGain(0.0), InfilLatentLoss(0.0), InfilTotalGain(0.0), InfilTotalLoss(0.0),
-              InfilVolumeCurDensity(0.0), InfilVolumeStdDensity(0.0), InfilVdotCurDensity(0.0), InfilVdotStdDensity(0.0), InfilMass(0.0),
-              InfilAirChangeRate(0.0)
+              InfilVolumeCurDensity(0.0), InfilVolumeStdDensity(0.0), InfilVdotCurDensity(0.0), InfilVdotStdDensity(0.0), InfilMdot(0.0),
+              InfilMass(0.0), InfilAirChangeRate(0.0)
         {
         }
     };

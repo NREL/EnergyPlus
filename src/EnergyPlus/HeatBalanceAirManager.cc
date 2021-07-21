@@ -1270,7 +1270,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             SetupOutputVariable(state,
                                 "Infiltration Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                state.dataHeatBal->Infiltration(Loop).MassFlowRate,
+                                state.dataHeatBal->Infiltration(Loop).InfilMdot,
                                 "Zone",
                                 "Average",
                                 state.dataHeatBal->Infiltration(Loop).Name);

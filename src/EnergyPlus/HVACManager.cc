@@ -2481,12 +2481,10 @@ void ReportAirHeatBalance(EnergyPlusData &state)
         }
 
         // first calculate mass flows using outside air heat capacity for consistency with input to heat balance
-        ZnAirRpt(ZoneLoop).InfilMass =
-            (state.dataHeatBalFanSys->MCPI(ZoneLoop) / CpAir) * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
         ZnAirRpt(ZoneLoop).InfilMdot = (state.dataHeatBalFanSys->MCPI(ZoneLoop) / CpAir) * ADSCorrectionFactor;
-        ZnAirRpt(ZoneLoop).VentilMass =
-            (state.dataHeatBalFanSys->MCPV(ZoneLoop) / CpAir) * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
+        ZnAirRpt(ZoneLoop).InfilMass = ZnAirRpt(ZoneLoop).InfilMdot * TimeStepSys * DataGlobalConstants::SecInHour;
         ZnAirRpt(ZoneLoop).VentilMdot = (state.dataHeatBalFanSys->MCPV(ZoneLoop) / CpAir) * ADSCorrectionFactor;
+        ZnAirRpt(ZoneLoop).VentilMass = ZnAirRpt(ZoneLoop).VentilMdot * TimeStepSys * DataGlobalConstants::SecInHour;
 
         // CR7751  second, calculate using indoor conditions for density property
         AirDensity = PsyRhoAirFnPbTdbW(state,
@@ -2494,23 +2492,19 @@ void ReportAirHeatBalance(EnergyPlusData &state)
                                        state.dataHeatBalFanSys->MAT(ZoneLoop),
                                        state.dataHeatBalFanSys->ZoneAirHumRatAvg(ZoneLoop),
                                        RoutineName3);
-        ZnAirRpt(ZoneLoop).InfilVolumeCurDensity =
-            (state.dataHeatBalFanSys->MCPI(ZoneLoop) / CpAir / AirDensity) * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
+        ZnAirRpt(ZoneLoop).InfilVdotCurDensity = ZnAirRpt(ZoneLoop).InfilMdot / AirDensity;
+        ZnAirRpt(ZoneLoop).InfilVolumeCurDensity = ZnAirRpt(ZoneLoop).InfilVdotCurDensity * TimeStepSys * DataGlobalConstants::SecInHour;
         ZnAirRpt(ZoneLoop).InfilAirChangeRate = ZnAirRpt(ZoneLoop).InfilVolumeCurDensity / (TimeStepSys * Zone(ZoneLoop).Volume);
-        ZnAirRpt(ZoneLoop).InfilVdotCurDensity = (state.dataHeatBalFanSys->MCPI(ZoneLoop) / CpAir / AirDensity) * ADSCorrectionFactor;
-        ZnAirRpt(ZoneLoop).VentilVolumeCurDensity =
-            (state.dataHeatBalFanSys->MCPV(ZoneLoop) / CpAir / AirDensity) * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
+        ZnAirRpt(ZoneLoop).VentilVdotCurDensity = ZnAirRpt(ZoneLoop).VentilMdot / AirDensity;
+        ZnAirRpt(ZoneLoop).VentilVolumeCurDensity = ZnAirRpt(ZoneLoop).VentilVdotCurDensity * TimeStepSys * DataGlobalConstants::SecInHour;
         ZnAirRpt(ZoneLoop).VentilAirChangeRate = ZnAirRpt(ZoneLoop).VentilVolumeCurDensity / (TimeStepSys * Zone(ZoneLoop).Volume);
-        ZnAirRpt(ZoneLoop).VentilVdotCurDensity = (state.dataHeatBalFanSys->MCPV(ZoneLoop) / CpAir / AirDensity) * ADSCorrectionFactor;
 
         // CR7751 third, calculate using standard dry air at nominal elevation
         AirDensity = state.dataEnvrn->StdRhoAir;
-        ZnAirRpt(ZoneLoop).InfilVolumeStdDensity =
-            (state.dataHeatBalFanSys->MCPI(ZoneLoop) / CpAir / AirDensity) * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
-        ZnAirRpt(ZoneLoop).InfilVdotStdDensity = (state.dataHeatBalFanSys->MCPI(ZoneLoop) / CpAir / AirDensity) * ADSCorrectionFactor;
-        ZnAirRpt(ZoneLoop).VentilVolumeStdDensity =
-            (state.dataHeatBalFanSys->MCPV(ZoneLoop) / CpAir / AirDensity) * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
-        ZnAirRpt(ZoneLoop).VentilVdotStdDensity = (state.dataHeatBalFanSys->MCPV(ZoneLoop) / CpAir / AirDensity) * ADSCorrectionFactor;
+        ZnAirRpt(ZoneLoop).InfilVdotStdDensity = ZnAirRpt(ZoneLoop).InfilMdot / AirDensity;
+        ZnAirRpt(ZoneLoop).InfilVolumeStdDensity = ZnAirRpt(ZoneLoop).InfilVdotStdDensity * TimeStepSys * DataGlobalConstants::SecInHour;
+        ZnAirRpt(ZoneLoop).VentilVdotStdDensity = ZnAirRpt(ZoneLoop).VentilMdot / AirDensity;
+        ZnAirRpt(ZoneLoop).VentilVolumeStdDensity = ZnAirRpt(ZoneLoop).VentilVdotStdDensity * TimeStepSys * DataGlobalConstants::SecInHour;
 
         //    ZnAirRpt(ZoneLoop)%VentilFanElec = 0.0
         ZnAirRpt(ZoneLoop).VentilAirTemp = 0.0;
