@@ -144,6 +144,7 @@ set(SRC
     Construction.hh
     ConvectionCoefficients.cc
     ConvectionCoefficients.hh
+    ConvectionConstants.hh
     CoolTower.cc
     CoolTower.hh
     CostEstimateManager.cc
@@ -316,8 +317,6 @@ set(SRC
     HVACCooledBeam.hh
     HVACDXHeatPumpSystem.cc
     HVACDXHeatPumpSystem.hh
-    HVACDXSystem.cc
-    HVACDXSystem.hh
     HVACDuct.cc
     HVACDuct.hh
     HVACFan.cc

@@ -2672,26 +2672,22 @@
   AirLoopHVAC:OutdoorAirSystem,
     OASystem_SouthZone_1stFloor,  !- Name
     OASystemControllers_SouthZone_1stFloor,  !- Controller List Name
-    OASystemEquipment_SouthZone_1stFloor,  !- Outdoor Air Equipment List Name
-    Air Loop Avail List;     !- Availability Manager List Name
+    OASystemEquipment_SouthZone_1stFloor;    !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     OASystem_NorthZone_1stFloor,  !- Name
     OASystemControllers_NorthZone_1stFloor,  !- Controller List Name
-    OASystemEquipment_NorthZone_1stFloor,  !- Outdoor Air Equipment List Name
-    Air Loop Avail List;     !- Availability Manager List Name
+    OASystemEquipment_NorthZone_1stFloor;    !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     OASystem_SouthZone_2ndFloor,  !- Name
     OASystemControllers_SouthZone_2ndFloor,  !- Controller List Name
-    OASystemEquipment_SouthZone_2ndFloor,  !- Outdoor Air Equipment List Name
-    Air Loop Avail List;     !- Availability Manager List Name
+    OASystemEquipment_SouthZone_2ndFloor;    !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     OASystem_NorthZone_2ndFloor,  !- Name
     OASystemControllers_NorthZone_2ndFloor,  !- Controller List Name
-    OASystemEquipment_NorthZone_2ndFloor,  !- Outdoor Air Equipment List Name
-    Air Loop Avail List;     !- Availability Manager List Name
+    OASystemEquipment_NorthZone_2ndFloor;    !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     OutsideAirInletNodes;    !- Node or NodeList Name 1
