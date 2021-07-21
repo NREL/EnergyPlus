@@ -457,8 +457,8 @@ namespace UnitarySystems {
         DesignSpecMSHP *m_CompPointerMSHP;
         std::string Name;
         std::string UnitType;
-        Real64 LoadSHR; // Load sensible heat ratio with humidity control
-        Real64 CoilSHR; // Load sensible heat ratio with humidity control
+        Real64 LoadSHR;                // Load sensible heat ratio with humidity control
+        Real64 CoilSHR;                // Load sensible heat ratio with humidity control
         bool runWaterSideEconomizer;   // true if water-side economizer conditioon is favorbale
         int WaterSideEconomizerStatus; // water side economizer status flag, report variable
 
@@ -968,7 +968,6 @@ struct UnitarySystemsData : BaseGlobalStruct
     bool myOneTimeFlag = true;
     bool getInputFlag = true;
 
-    bool getCoilWaterSysInputOnceFlag = true;
     std::string const coilSysCoolingWaterObjectName = "CoilSystem:Cooling:Water";
     int numCoilWaterSystems = 0;
 
@@ -1005,7 +1004,6 @@ struct UnitarySystemsData : BaseGlobalStruct
         if (designSpecMSHP.size() > 0) designSpecMSHP.clear();
         myOneTimeFlag = true;
         getInputFlag = true;
-        getCoilWaterSysInputOnceFlag = true;
         numCoilWaterSystems = 0;
     }
 
