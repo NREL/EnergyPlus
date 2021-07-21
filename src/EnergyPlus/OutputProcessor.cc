@@ -814,7 +814,7 @@ namespace OutputProcessor {
         case OutputProcessor::SOVTimeStepType::Num:
             ShowFatalError(state, "Bad SOVTimeStepType passed to ValidateTimeStepType");
         }
-        assert(false); // compiler doesn't understand that ShowFatalError aborts
+        return TimeStepType::TimeStepSystem; // compiler doesn't understand that ShowFatalError aborts
     }
 
     std::string StandardTimeStepTypeKey(TimeStepType const timeStepType)
@@ -893,7 +893,7 @@ namespace OutputProcessor {
         case OutputProcessor::SOVStoreType::Num:
             ShowFatalError(state, "Bad SOVStoreType passed to validateVariableType");
         }
-        assert(false);
+        return StoreType::Summed; // compiler doesn't understand that ShowFatalError aborts
     }
 
     std::string standardVariableTypeKey(StoreType const VariableType)

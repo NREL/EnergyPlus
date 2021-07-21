@@ -1272,8 +1272,6 @@ namespace OutputProcessor {
             {OutputProcessor::SOVTimeStepType::System, OutputProcessor::TimeStepType::TimeStepSystem},
             {OutputProcessor::SOVTimeStepType::Plant, OutputProcessor::TimeStepType::TimeStepSystem}};
 
-        auto const calledFrom = "UnitTest";
-
         for (auto const &indexGroup : resource_map) {
             EXPECT_EQ(indexGroup.second, ValidateTimeStepType(*state, indexGroup.first));
         }
