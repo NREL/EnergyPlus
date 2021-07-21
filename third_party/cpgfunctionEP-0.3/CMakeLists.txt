@@ -12,6 +12,7 @@ endif()
 # Everything will need to access this
 include_directories(include)
 # Third party includes
+include_directories(third_party/eigen-3.3.9)  # Eigen for LU decomposition
 include_directories(third_party/qdt-master)
 
 # Create a DLL with an API
@@ -41,7 +42,6 @@ ENDIF()
 
 # if we are only building cpgfnctionEP
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-    include_directories(third_party/eigen-3.3.9)  # Eigen for LU decomposition
     include_directories(third_party/nlohmann-3.9.1)
     # Turn on testing
     enable_testing()
