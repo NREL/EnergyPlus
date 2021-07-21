@@ -396,7 +396,11 @@ void OutsideEnergySourceSpecs::size(EnergyPlusData &state)
                                                                      "SizeDistrict" + typeName);
             NomCapDes = Cp * rho * state.dataSize->PlantSizData(PltSizNum).DeltaT * state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate;
         } else { // this->EnergyType == DataPlant::TypeOf_PurchSteam
-            Real64 const tempSteam(100.0);
+            Real64 const tempSteam = FluidProperties::GetSatTemperatureRefrig(state,
+                                                                              state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                                              state.dataEnvrn->StdBaroPress,
+                                                                              state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                                              "SizeDistrict" + typeName);
             Real64 const rhoSteam = FluidProperties::GetSatDensityRefrig(state,
                                                                          state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
                                                                          tempSteam,
@@ -504,15 +508,23 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
 
     // determine outlet temp based on inlet temp, cp, and MyLoad
     if ((this->MassFlowRate > 0.0) && runFlag) {
-        this->OutletTemp = (MyLoad + this->MassFlowRate * Cp * this->InletTemp) / (this->MassFlowRate * Cp);
-        // apply loop limits on temperature result to keep in check
-        if (this->OutletTemp < LoopMinTemp) {
-            this->OutletTemp = max(this->OutletTemp, LoopMinTemp);
-            MyLoad = this->MassFlowRate * Cp * (this->OutletTemp - this->InletTemp);
-        }
-        if (this->OutletTemp > LoopMaxTemp) {
-            this->OutletTemp = min(this->OutletTemp, LoopMaxTemp);
-            MyLoad = this->MassFlowRate * Cp * (this->OutletTemp - this->InletTemp);
+        if (this->EnergyType == DataPlant::TypeOf_PurchChilledWater || this->EnergyType == DataPlant::TypeOf_PurchHotWater) {
+            this->OutletTemp = (MyLoad + this->MassFlowRate * Cp * this->InletTemp) / (this->MassFlowRate * Cp);
+            // apply loop limits on temperature result to keep in check
+            if (this->OutletTemp < LoopMinTemp) {
+                this->OutletTemp = max(this->OutletTemp, LoopMinTemp);
+                MyLoad = this->MassFlowRate * Cp * (this->OutletTemp - this->InletTemp);
+            }
+            if (this->OutletTemp > LoopMaxTemp) {
+                this->OutletTemp = min(this->OutletTemp, LoopMaxTemp);
+                MyLoad = this->MassFlowRate * Cp * (this->OutletTemp - this->InletTemp);
+            }
+        } else if (this->EnergyType == DataPlant::TypeOf_PurchSteam) {
+            this->OutletTemp = FluidProperties::GetSatTemperatureRefrig(state,
+                                                                        state.dataPlnt->PlantLoop(LoopNum).FluidName,
+                                                                        state.dataEnvrn->StdBaroPress,
+                                                                        state.dataPlnt->PlantLoop(LoopNum).FluidIndex,
+                                                                        RoutineName);
         }
     } else {
         this->OutletTemp = this->InletTemp;

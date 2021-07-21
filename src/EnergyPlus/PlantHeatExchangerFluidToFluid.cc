@@ -534,6 +534,11 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
         }
     }
 
+    cCurrentModuleObject = "HeatExchanger:SteamToWater";
+    if (state.dataPlantHXFluidToFluid->NumberOfSteamToWaterHXs > 0) {
+
+    }
+
     if (ErrorsFound) {
         ShowFatalError(state, std::string{RoutineName} + "Errors found in processing " + cCurrentModuleObject + " input.");
     }
