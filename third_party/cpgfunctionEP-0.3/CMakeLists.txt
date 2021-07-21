@@ -83,8 +83,4 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     add_test(NAME RunTest6 COMMAND ${CMAKE_BINARY_DIR}/gFunction_tests)
     add_test(NAME RunTest7 COMMAND ${CMAKE_BINARY_DIR}/packed)
     add_test(NAME RunTest8 COMMAND ${CMAKE_BINARY_DIR}/gFunction_adaptive)
-else()
-    # If we are building from EnergyPlus then use their Eigen
-    find_package (Eigen3 3.3 REQUIRED)
-    target_link_libraries (example Eigen3::Eigen)
 endif()
