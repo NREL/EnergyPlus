@@ -3678,8 +3678,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "  AirLoopHVAC:OutdoorAirSystem,",
         "    DOAS OA System,          !- Name",
         "    DOAS OA System Controllers,  !- Controller List Name",
-        "    DOAS OA System Equipment,!- Outdoor Air Equipment List Name",
-        "    DOAS Availability Managers;  !- Availability Manager List Name",
+        "    DOAS OA System Equipment;!- Outdoor Air Equipment List Name",
 
         "  OutdoorAir:Mixer,",
         "    DOAS OA Mixing Box,      !- Name",
