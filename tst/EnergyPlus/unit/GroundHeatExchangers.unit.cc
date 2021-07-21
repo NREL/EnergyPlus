@@ -2635,7 +2635,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_2
         "    0.6,                !- Grout Thermal Conductivity {W/m-K}",
         "    1.0E+06,            !- Grout Thermal Heat Capacity {J/m3-K}",
         "    0.389,              !- Pipe Thermal Conductivity {W/m-K}",
-        "   8E+05,              !- Pipe Thermal Heat Capacity {J/m3-K}",
+        "    8E+05,              !- Pipe Thermal Heat Capacity {J/m3-K}",
         "    0.032,              !- Pipe Outer Diameter {m}",
         "    0.001627,           !- Pipe Thickness {m}",
         "    0.0426666667;       !- U-Tube Distance {m}",

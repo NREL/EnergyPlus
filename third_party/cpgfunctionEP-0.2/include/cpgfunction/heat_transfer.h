@@ -27,9 +27,9 @@ namespace gt::heat_transfer {
                         int nSum,
                         int nt) :
                         nSources(nSources),
-                        boreSegments(nSources),
+                        nSum(nSum),
                         h_ij(nSum, vector<double>(nt, 0)),
-                        nSum(nSum)
+                        boreSegments(nSources)
         {} // constructor
 
         // storage_mode = 1 is the reduced segment response vector

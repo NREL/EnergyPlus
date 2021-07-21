@@ -372,7 +372,7 @@ namespace GroundHeatExchangers {
 
         void calcUniformHeatFluxGFunctions(EnergyPlusData &state);
 
-        void calcUniformBHWallTempGFunctions(EnergyPlusData &state);
+        void calcUniformBHWallTempGFunctions();
 
         Real64 calcHXResistance(EnergyPlusData &state) override;
 
@@ -407,6 +407,8 @@ namespace GroundHeatExchangers {
         void initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 const &CurTime) override;
 
         void oneTimeInit(EnergyPlusData &state) override;
+
+        void setupTimeVectors();
     };
 
     struct GLHESlinky : GLHEBase // LCOV_EXCL_LINE

@@ -54,11 +54,9 @@
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
-// cpgfunction
-#ifdef BUILD_CPGFUNCTION
 // cpgfunction Headers
+#include <cpgfunction/boreholes.h>
 #include <cpgfunction/gfunction.h>
-#endif
 
 // JSON Headers
 #include <nlohmann/json.hpp>
@@ -981,8 +979,22 @@ void GLHEVert::calcUniformHeatFluxGFunctions(EnergyPlusData &state)
 
 //******************************************************************************
 
-void GLHEVert::calcUniformBHWallTempGFunctions([[maybe_unused]] EnergyPlusData &state)
+void GLHEVert::calcUniformBHWallTempGFunctions()
 {
+    // construct boreholes vector
+    std::vector<boreholes::Borehole> boreholes;
+    for (auto &bh : this->myRespFactors->myBorholes) {
+        boreholes.emplace_back(bh->props->bhLength, bh->props->bhTopDepth, bh->props->bhDiameter / 2.0, bh->xLoc, bh->yLoc);
+    }
+
+    this->setupTimeVectors();
+
+    std::vector<double> time;
+    for (auto &v : this->myRespFactors->time) {
+        time.push_back(v);
+    }
+
+    this->myRespFactors->GFNC = gfunction::uniform_borehole_wall_temperature(boreholes, time, this->soil.diffusivity, 12, true, true, 1, true);
 }
 
 //******************************************************************************
@@ -994,16 +1006,7 @@ void GLHEVert::calcGFunctions(EnergyPlusData &state)
     if (this->gFuncCalcMethod == GFuncCalcMethod::UniformHeatFlux) {
         this->calcUniformHeatFluxGFunctions(state);
     } else if (this->gFuncCalcMethod == GFuncCalcMethod::UniformBoreholeWallTemp) {
-#ifdef BUILD_CPGFUNCTION
-        // cpgfunction call here
-        this->calcUniformBHWallTempGFunctions(state);
-#else
-        // this version of E+ is not built with cpgfunction. revert back to UHF and warn the user
-        this->gFuncCalcMethod = GFuncCalcMethod::UniformHeatFlux;
-        std::string msg = "This version of EnergyPlus was not built with cpgfunction. UBWTcalc method cannot be used. Defaulting to UHFcalc method";
-        ShowWarningMessage(state, msg);
-        this->calcUniformHeatFluxGFunctions(state);
-#endif
+        this->calcUniformBHWallTempGFunctions();
     }
 
     // save data for later
@@ -1017,7 +1020,7 @@ void GLHEVert::calcGFunctions(EnergyPlusData &state)
 
 //******************************************************************************
 
-void GLHEVert::calcLongTimestepGFunctions(EnergyPlusData &state)
+void GLHEVert::setupTimeVectors()
 {
 
     constexpr int numDaysInYear(365);
@@ -1056,6 +1059,13 @@ void GLHEVert::calcLongTimestepGFunctions(EnergyPlusData &state)
         this->myRespFactors->LNTTS(index) = thisLNTTS;
         ++index;
     }
+}
+
+//******************************************************************************
+
+void GLHEVert::calcLongTimestepGFunctions(EnergyPlusData &state)
+{
+    this->setupTimeVectors();
 
     DisplayString(state, "Initializing GroundHeatExchanger:System: " + this->name);
 

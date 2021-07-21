@@ -82,10 +82,8 @@ option(USE_PSYCHROMETRICS_CACHING "Use psychrometrics cashing routines" ON)
 option(USE_GLYCOL_CACHING "Use glycol cashing routines" ON)
 option(USE_PSYCH_STATS "Compute psychrometric stats" OFF)
 option(USE_PSYCH_ERRORS "Report psychrometric errors " ON)
-option(BUILD_CPGFUNCTION "Build with cpgfunction " OFF)
 
 mark_as_advanced(BUILD_OBJEXXFCL_TESTING)
-mark_as_advanced(BUILD_CPGFUNCTION)
 
 #######################################################################
 
@@ -267,10 +265,8 @@ target_include_directories(project_options SYSTEM INTERFACE "${kiva_SOURCE_DIR}/
 add_subdirectory(scripts/dev/generate_embeddable_epJSON_schema)
 set_target_properties(generate_embeddedable_epJSON_schema PROPERTIES FOLDER "Internal")
 
-if(BUILD_CPGFUNCTION)
-  target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/cpgfunctionEP-0.1)
-  target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/cpgfunctionEP-0.1/include)
-endif()
+target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/cpgfunctionEP-0.2)
+target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/cpgfunctionEP-0.2/include)
 
 if(OPENGL_FOUND)
   set(BUILD_PENUMBRA_TESTING
