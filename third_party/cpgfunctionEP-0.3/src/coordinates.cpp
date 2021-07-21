@@ -3,9 +3,9 @@
 //
 
 #include <cpgfunction/coordinates.h>
-#include <nlohmann/json.hpp>
 #include <fstream>
-#include <iomanip>
+//#include <string>
+#include <algorithm>
 
 using namespace std;
 

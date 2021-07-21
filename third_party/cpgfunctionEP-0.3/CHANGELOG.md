@@ -1,5 +1,33 @@
 # History of changes - cpgfunctionEP
 
+## Version 0.3 (2021-07-21)
+
+### Changes
+
+* [Issue 30](https://github.com/j-c-cook/cpgfunctionEP/issues/30) - An interp1d
+  function is modified to perform nearest value extrapolation. The function now
+  also returns a double rather than having to pass the double in by reference to
+  be modified. 
+  
+* [Issue 31](https://github.com/j-c-cook/cpgfunctionEP/issues/31) - The 
+  g-function API is changed. The boolean argument for adaptive discretization is
+  removed. This is done because the number of segments is already an input. 
+  Having both arguments is redundant. The adaptive discretization object can
+  obtain the number of segments necessary for the ideal UBHWT and then be 
+  passed into the g-function calculation. 
+
+### Enhancements
+
+* [Issue 16](https://github.com/j-c-cook/cpgfunctionEP/issues/16) - An adaptive
+  discretization is added by double interpolation. The ideal segment length 
+  data are available for 5 heights and a range of total drilling depths. 
+  Therefore, via interpolation, any height and drilling depth is allowed. 
+  Extrapolation makes use of the closest point. 
+  
+* [Issue 22](https://github.com/j-c-cook/cpgfunctionEP/issues/22) - Adds time 
+  function that accepts time in seconds, hours, months or years. The time step
+  is constant logarithmic with a default of 0.35, beginning at ln(t/ts) = -8.5.
+
 ## Version 0.2 (2021-07-20)
 
 ### Removes
