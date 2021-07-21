@@ -4591,29 +4591,10 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_NoLoadTest)
     // verify no heating or cooling load
     EXPECT_DOUBLE_EQ(0.0, state->dataSize->CalcZoneSizing(1, 1).HeatLoad);
     EXPECT_DOUBLE_EQ(0.0, state->dataSize->CalcZoneSizing(1, 1).CoolLoad);
+
     // check for correct TstatTemps and ZoneTempsAt*Peaks for output
     EXPECT_DOUBLE_EQ(22.0, state->dataSize->CalcZoneSizing(1, 1).HeatTstatTemp);
     EXPECT_DOUBLE_EQ(24.0, state->dataSize->CalcZoneSizing(1, 1).CoolTstatTemp);
     EXPECT_DOUBLE_EQ(23.0, state->dataSize->FinalZoneSizing(1).ZoneTempAtHeatPeak);
     EXPECT_DOUBLE_EQ(23.0, state->dataSize->FinalZoneSizing(1).ZoneTempAtCoolPeak);
-
-    state->dataLoopNodes->Node.deallocate();
-    state->dataSize->ZoneEqSizing.deallocate();
-    state->dataHeatBal->Zone.deallocate();
-    state->dataSize->CalcZoneSizing.deallocate();
-    state->dataHeatBalFanSys->NonAirSystemResponse.deallocate();
-    state->dataHeatBalFanSys->SysDepZoneLoads.deallocate();
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.deallocate();
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.deallocate();
-    state->dataZoneEquip->ZoneEquipConfig.deallocate();
-    state->dataHeatBalFanSys->TempControlType.deallocate();
-    state->dataHeatBalFanSys->TempZoneThermostatSetPoint.deallocate();
-    state->dataHeatBalFanSys->ZoneThermostatSetPointLo.deallocate();
-    state->dataHeatBalFanSys->ZoneThermostatSetPointHi.deallocate();
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
-    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.deallocate();
-    state->dataZoneEnergyDemand->DeadBandOrSetback.deallocate();
-    state->dataZoneEnergyDemand->CurDeadBandOrSetback.deallocate();
-    state->dataHeatBalFanSys->ZoneMassBalanceFlag.deallocate();
-    state->dataHeatBal->MassConservation.deallocate();
 }
