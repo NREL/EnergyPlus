@@ -813,8 +813,8 @@ namespace OutputProcessor {
         case OutputProcessor::SOVTimeStepType::Invalid:
         case OutputProcessor::SOVTimeStepType::Num:
             ShowFatalError(state, "Bad SOVTimeStepType passed to ValidateTimeStepType");
-            assert(false);  // compiler doesn't understand that ShowFatalError aborts
         }
+        assert(false);  // compiler doesn't understand that ShowFatalError aborts
     }
 
     std::string StandardTimeStepTypeKey(TimeStepType const timeStepType)
@@ -892,8 +892,8 @@ namespace OutputProcessor {
         case OutputProcessor::SOVStoreType::Invalid:
         case OutputProcessor::SOVStoreType::Num:
             ShowFatalError(state, "Bad SOVStoreType passed to validateVariableType");
-            assert(false);
         }
+        assert(false);
     }
 
     std::string standardVariableTypeKey(StoreType const VariableType)
@@ -5261,10 +5261,10 @@ namespace OutputProcessor {
 
 void SetupOutputVariable(EnergyPlusData &state,
                          std::string const &VariableName,                         // String Name of variable (with units)
-                         OutputProcessor::Unit const &VariableUnit,               // Actual units corresponding to the actual variable
+                         OutputProcessor::Unit const VariableUnit,               // Actual units corresponding to the actual variable
                          Real64 &ActualVariable,                                  // Actual Variable, used to set up pointer
-                         OutputProcessor::SOVTimeStepType const &TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
-                         OutputProcessor::SOVStoreType const &VariableTypeKey,    // State, Average=1, NonState, Sum=2
+                         OutputProcessor::SOVTimeStepType const TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::SOVStoreType const VariableTypeKey,    // State, Average=1, NonState, Sum=2
                          std::string const &KeyedValue,                           // Associated Key for this variable
                          Optional_string_const ReportFreq,                        // Internal use -- causes reporting at this frequency
                          Optional_string_const ResourceTypeKey,                   // Meter Resource Type (Electricity, Gas, etc)
@@ -5511,10 +5511,10 @@ void SetupOutputVariable(EnergyPlusData &state,
 
 void SetupOutputVariable(EnergyPlusData &state,
                          std::string const &VariableName,                         // String Name of variable
-                         OutputProcessor::Unit const &VariableUnit,               // Actual units corresponding to the actual variable
+                         OutputProcessor::Unit const VariableUnit,               // Actual units corresponding to the actual variable
                          int &ActualVariable,                                     // Actual Variable, used to set up pointer
-                         OutputProcessor::SOVTimeStepType const &TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
-                         OutputProcessor::SOVStoreType const &VariableTypeKey,    // State, Average=1, NonState, Sum=2
+                         OutputProcessor::SOVTimeStepType const TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::SOVStoreType const VariableTypeKey,    // State, Average=1, NonState, Sum=2
                          std::string const &KeyedValue,                           // Associated Key for this variable
                          Optional_string_const ReportFreq,                        // Internal use -- causes reporting at this freqency
                          Optional_int_const indexGroupKey                         // Group identifier for SQL output

@@ -1275,7 +1275,7 @@ namespace OutputProcessor {
         auto const calledFrom = "UnitTest";
 
         for (auto const &indexGroup : resource_map) {
-            EXPECT_EQ(indexGroup.second, ValidateTimeStepType(*state, indexGroup.first, calledFrom));
+            EXPECT_EQ(indexGroup.second, ValidateTimeStepType(*state, indexGroup.first));
         }
     }
 
