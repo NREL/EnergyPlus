@@ -259,18 +259,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     Real64 expectedResult4 = kv4.instance.bcs->slabConvectiveTemp;
 
     EXPECT_NEAR(expectedResult4, zoneAssumedTemperature4 + DataGlobalConstants::KelvinConv, 0.001);
-
-    // Test initial run period date of May 1st
-    Real64 zoneAssumedTemperature5 = 15.0;
-    HeatBalanceKivaManager::KivaInstanceMap kv5(*state, fnd, 0, {}, 0, zoneAssumedTemperature5, 1.0, 0, &km);
-
-    // Set day of year to 121 (May 1st)
-    state->dataEnvrn->DayOfYear = 121;
-
-    int numAccelaratedTimesteps = 3;
-    int acceleratedTimestep = 30; // days
-    int accDate = kv5.getAccDate(*state, numAccelaratedTimesteps, acceleratedTimestep);
-    EXPECT_GT(accDate, 0);
 }
 
 TEST_F(EnergyPlusFixture, OpaqueSkyCover_InterpretWeatherMissingOpaqueSkyCover)
@@ -289,9 +277,59 @@ TEST_F(EnergyPlusFixture, OpaqueSkyCover_InterpretWeatherMissingOpaqueSkyCover)
     Real64 expected_OSky = 5;
     Real64 expected_ESky = (0.787 + 0.764 * std::log(TDewK / DataGlobalConstants::KelvinConv)) *
                            (1.0 + 0.0224 * expected_OSky - 0.0035 * pow_2(expected_OSky) + 0.00028 * pow_3(expected_OSky));
-    ;
 
     EXPECT_NEAR(expected_ESky, km.kivaWeather.skyEmissivity[0], 0.01);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceKiva_GetAccDate)
+{
+
+    // Create Kiva foundation and set parameters
+    Kiva::Foundation fnd;
+
+    fnd.reductionStrategy = Kiva::Foundation::RS_AP;
+
+    Kiva::Material concrete(1.95, 2400.0, 900.0);
+
+    Kiva::Layer tempLayer;
+    tempLayer.thickness = 0.10;
+    tempLayer.material = concrete;
+
+    fnd.slab.interior.emissivity = 0.8;
+    fnd.slab.layers.push_back(tempLayer);
+
+    tempLayer.thickness = 0.2;
+    tempLayer.material = concrete;
+
+    fnd.wall.layers.push_back(tempLayer);
+
+    fnd.wall.heightAboveGrade = 0.1;
+    fnd.wall.depthBelowSlab = 0.2;
+    fnd.wall.interior.emissivity = 0.8;
+    fnd.wall.exterior.emissivity = 0.8;
+    fnd.wall.interior.absorptivity = 0.8;
+    fnd.wall.exterior.absorptivity = 0.8;
+
+    fnd.foundationDepth = 0.0;
+    fnd.numericalScheme = Kiva::Foundation::NS_ADI;
+
+    fnd.polygon.outer().push_back(Kiva::Point(-6.0, -6.0));
+    fnd.polygon.outer().push_back(Kiva::Point(-6.0, 6.0));
+    fnd.polygon.outer().push_back(Kiva::Point(6.0, 6.0));
+    fnd.polygon.outer().push_back(Kiva::Point(6.0, -6.0));
+
+    HeatBalanceKivaManager::KivaManager km;
+    HeatBalanceKivaManager::KivaInstanceMap kv(*state, fnd, 0, {}, 0, 15.0, 1.0, 0, &km);
+
+    // Set day of year to 121 (May 1st)
+    state->dataEnvrn->DayOfYear = 121;
+
+    int numAccelaratedTimesteps = 3;
+    int acceleratedTimestep = 30; // days
+    int accDate = kv.getAccDate(*state, numAccelaratedTimesteps, acceleratedTimestep);
+
+    // Accelerated date should be greater than 0
+    EXPECT_GT(accDate, 0);
 }
 
 } // namespace EnergyPlus
