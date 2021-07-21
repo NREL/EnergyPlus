@@ -968,7 +968,6 @@ struct UnitarySystemsData : BaseGlobalStruct
     bool myOneTimeFlag = true;
     bool getInputFlag = true;
 
-    bool getCoilWaterSysInputOnceFlag = true;
     std::string const coilSysCoolingWaterObjectName = "CoilSystem:Cooling:Water";
     int numCoilWaterSystems = 0;
 
@@ -1005,7 +1004,6 @@ struct UnitarySystemsData : BaseGlobalStruct
         if (designSpecMSHP.size() > 0) designSpecMSHP.clear();
         myOneTimeFlag = true;
         getInputFlag = true;
-        getCoilWaterSysInputOnceFlag = true;
         numCoilWaterSystems = 0;
     }
 
