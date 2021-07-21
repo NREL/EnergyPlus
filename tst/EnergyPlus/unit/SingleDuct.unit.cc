@@ -766,8 +766,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
         "  AirLoopHVAC:OutdoorAirSystem,",
         "    OA Sys 1,                !- Name",
         "    OA Sys 1 Controllers,    !- Controller List Name",
-        "    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name",
-        "    VAV Sys 1 Avail List;    !- Availability Manager List Name",
+        "    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name",
 
         "  OutdoorAir:Node,",
         "    Main Cooling Coil 1 Condenser Node,  !- Name",
@@ -1718,8 +1717,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
         "  AirLoopHVAC:OutdoorAirSystem,",
         "    OA Sys 1,                !- Name",
         "    OA Sys 1 Controllers,    !- Controller List Name",
-        "    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name",
-        "    VAV Sys 1 Avail List;    !- Availability Manager List Name",
+        "    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name",
 
         "  OutdoorAir:Node,",
         "    Main Cooling Coil 1 Condenser Node,  !- Name",
