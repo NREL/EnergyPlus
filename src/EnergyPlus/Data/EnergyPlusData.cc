@@ -140,7 +140,6 @@ EnergyPlusData::EnergyPlusData()
     this->dataHVACCooledBeam = std::make_unique<HVACCooledBeamData>();
     this->dataHVACCtrl = std::make_unique<HVACCtrlData>();
     this->dataHVACDXHeatPumpSys = std::make_unique<HVACDXHeatPumpSystemData>();
-    this->dataHVACDXSys = std::make_unique<HVACDXSystemData>();
     this->dataHVACDuct = std::make_unique<HVACDuctData>();
     this->dataHVACFan = std::make_unique<HVACFanData>();
     this->dataHVACGlobal = std::make_unique<HVACGlobalsData>();
@@ -399,7 +398,6 @@ void EnergyPlusData::clear_state()
     this->dataHVACCooledBeam->clear_state();
     this->dataHVACCtrl->clear_state();
     this->dataHVACDXHeatPumpSys->clear_state();
-    this->dataHVACDXSys->clear_state();
     this->dataHVACDuct->clear_state();
     this->dataHVACFan->clear_state();
     this->dataHVACGlobal->clear_state();

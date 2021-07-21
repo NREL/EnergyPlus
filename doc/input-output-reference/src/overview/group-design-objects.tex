@@ -1087,7 +1087,7 @@ The input must be either \emph{SupplyAirTemperature} or \emph{TemperatureDiffere
 
 \paragraph{Field: Zone Cooling Design Supply Air Temperature}\label{field-zone-cooling-design-supply-air-temperature}
 
-The supply air temperature in degrees Celsius for the zone cooling design air flow rate calculation. Air is supplied to the zone at this temperature during the cooling design day simulation, The zone load is met by varying the zone air flow rate. The maximum zone flow rate is saved as the~ zone cooling design air flow rate. This field is only used when Zone Cooling Design Supply Air Temperature Input Method = \textbf{SupplyAirTemperature}.
+The supply air temperature in degrees Celsius for the zone cooling design air flow rate calculation. Air is supplied to the zone at this temperature during the cooling design day simulation. The zone load is met by varying the zone air flow rate. The maximum zone flow rate is saved as the~ zone cooling design air flow rate. This field is only used when Zone Cooling Design Supply Air Temperature Input Method = \textbf{SupplyAirTemperature}. If the value entered for this parameter is less than zero, a warning message is produced so that the user will double check the input to make sure it is correct.
 
 \paragraph{Field: Zone Cooling Design Supply Air Temperature Difference}\label{field-zone-cooling-design-supply-air-temperature-difference}
 
@@ -1099,7 +1099,8 @@ The input must be either \emph{SupplyAirTemperature} or \emph{TemperatureDiffere
 
 \paragraph{Field: Zone Heating Design Supply Air Temperature}\label{field-zone-heating-design-supply-air-temperature}
 
-The supply air temperature in degrees Celsius for the zone heating design air flow rate calculation. Air is supplied to the zone at this temperature during the heating design day simulation, The zone load is met by varying the zone air flow rate. The maximum zone flow rate is saved as the zone heating design air flow rate. This field is only used when Zone Heating Design Supply Air Temperature Input Method = \textbf{SupplyAirTemperature}.
+The supply air temperature in degrees Celsius for the zone heating design air flow rate calculation. Air is supplied to the zone at this temperature during the heating design day simulation. The zone load is met by varying the zone air flow rate. The maximum zone flow rate is saved as the zone heating design air flow rate. This field is only used when Zone Heating Design Supply Air Temperature Input Method = \textbf{SupplyAirTemperature}. If the value entered for this parameter is less than zero, a warning message is produced so that the user will double check the input to make sure it is correct though other severe errors may happen before this happens.  In addition, this parameter must be greater than the Zone Cooling Design Supply Air Temperature field shown above.
+
 
 \paragraph{Field: Zone Heating Design Supply Air Temperature Difference}\label{field-zone-heating-design-supply-air-temperature-difference}
 
