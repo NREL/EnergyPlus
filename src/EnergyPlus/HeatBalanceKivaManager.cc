@@ -1108,7 +1108,7 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
     return ErrorsFound;
 }
 
-inline Real64 KivaManager::getDeepGroundDepth(Kiva::Foundation fnd)
+Real64 KivaManager::getDeepGroundDepth(Kiva::Foundation fnd)
 {
     Real64 totalDepthOfWallBelowGrade = fnd.wall.depthBelowSlab + (fnd.foundationDepth - fnd.wall.heightAboveGrade) + fnd.slab.totalWidth();
     if (fnd.deepGroundDepth < totalDepthOfWallBelowGrade + 1.0) {
