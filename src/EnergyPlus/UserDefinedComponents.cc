@@ -217,7 +217,7 @@ namespace UserDefinedComponents {
     }
 
     void SimCoilUserDefined(EnergyPlusData &state,
-                            std::string const &EquipName, // user name for component
+                            std::string_view EquipName, // user name for component
                             int &CompIndex,
                             int const AirLoopNum,
                             bool &HeatingActive,
@@ -325,7 +325,7 @@ namespace UserDefinedComponents {
     }
 
     void SimZoneAirUserDefined(EnergyPlusData &state,
-                               std::string const &CompName,    // name of the packaged terminal heat pump
+                               std::string_view CompName,      // name of the packaged terminal heat pump
                                int const ZoneNum,              // number of zone being served
                                Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
                                Real64 &LatentOutputProvided,   // Latent add/removal  (kg/s), dehumid = negative
@@ -443,7 +443,7 @@ namespace UserDefinedComponents {
     }
 
     void SimAirTerminalUserDefined(EnergyPlusData &state,
-                                   std::string const &CompName,
+                                   std::string_view CompName,
                                    [[maybe_unused]] bool const FirstHVACIteration,
                                    int const ZoneNum,
                                    [[maybe_unused]] int const ZoneNodeNum,
@@ -2383,45 +2383,9 @@ namespace UserDefinedComponents {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        static std::string const RoutineName("InitPlantUserComponent");
+        static constexpr std::string_view RoutineName("InitPlantUserComponent");
 
-        if (this->myOneTimeFlag) {
-            // locate the connections to the plant loops
-            for (int ConnectionNum = 1; ConnectionNum <= this->NumPlantConnections; ++ConnectionNum) {
-                bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        DataPlant::TypeOf_PlantComponentUserDefined,
-                                                        this->Loop(ConnectionNum).LoopNum,
-                                                        this->Loop(ConnectionNum).LoopSideNum,
-                                                        this->Loop(ConnectionNum).BranchNum,
-                                                        this->Loop(ConnectionNum).CompNum,
-                                                        errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        this->Loop(ConnectionNum).InletNodeNum);
-                if (errFlag) {
-                    ShowFatalError(state, "InitPlantUserComponent: Program terminated due to previous condition(s).");
-                }
-
-                // set user input for flow priority
-                state.dataPlnt->PlantLoop(this->Loop(ConnectionNum).LoopNum)
-                    .LoopSide(this->Loop(ConnectionNum).LoopSideNum)
-                    .Branch(this->Loop(ConnectionNum).BranchNum)
-                    .Comp(this->Loop(ConnectionNum).CompNum)
-                    .FlowPriority = this->Loop(ConnectionNum).FlowPriority;
-
-                // set user input for how loads served
-                state.dataPlnt->PlantLoop(this->Loop(ConnectionNum).LoopNum)
-                    .LoopSide(this->Loop(ConnectionNum).LoopSideNum)
-                    .Branch(this->Loop(ConnectionNum).BranchNum)
-                    .Comp(this->Loop(ConnectionNum).CompNum)
-                    .HowLoadServed = this->Loop(ConnectionNum).HowLoadServed;
-            }
-
-            this->myOneTimeFlag = false;
-        }
+        this->oneTimeInit(state);
 
         if (LoopNum <= 0 || LoopNum > this->NumPlantConnections) return;
 
@@ -2461,7 +2425,7 @@ namespace UserDefinedComponents {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        static std::string const RoutineName("InitCoilUserDefined");
+        static constexpr std::string_view RoutineName("InitCoilUserDefined");
 
         if (this->myOneTimeFlag) {
             if (this->PlantIsConnected) {
@@ -2536,7 +2500,7 @@ namespace UserDefinedComponents {
         // PURPOSE OF THIS SUBROUTINE:
         // initialize data for user-defined zone HVAC forced air component model
 
-        static std::string const RoutineName("InitZoneAirUserDefined");
+        static constexpr std::string_view RoutineName("InitZoneAirUserDefined");
 
         if (this->myOneTimeFlag) {
             if (this->NumPlantConnections > 0) {
@@ -2627,7 +2591,7 @@ namespace UserDefinedComponents {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        static std::string const RoutineName("InitAirTerminalUserDefined");
+        static constexpr std::string_view RoutineName("InitAirTerminalUserDefined");
 
         if (this->myOneTimeFlag) {
             if (this->NumPlantConnections > 0) {
@@ -2771,6 +2735,47 @@ namespace UserDefinedComponents {
                 .Branch(this->Loop(LoopNum).BranchNum)
                 .Comp(this->Loop(LoopNum).CompNum)
                 .MaxOutletTemp = this->Loop(LoopNum).HiOutTempLimit;
+        }
+    }
+    void UserPlantComponentStruct::oneTimeInit(EnergyPlusData &state)
+    {
+
+        if (this->myOneTimeFlag) {
+            // locate the connections to the plant loops
+            for (int ConnectionNum = 1; ConnectionNum <= this->NumPlantConnections; ++ConnectionNum) {
+                bool errFlag = false;
+                PlantUtilities::ScanPlantLoopsForObject(state,
+                                                        this->Name,
+                                                        DataPlant::TypeOf_PlantComponentUserDefined,
+                                                        this->Loop(ConnectionNum).LoopNum,
+                                                        this->Loop(ConnectionNum).LoopSideNum,
+                                                        this->Loop(ConnectionNum).BranchNum,
+                                                        this->Loop(ConnectionNum).CompNum,
+                                                        errFlag,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        this->Loop(ConnectionNum).InletNodeNum);
+                if (errFlag) {
+                    ShowFatalError(state, "InitPlantUserComponent: Program terminated due to previous condition(s).");
+                }
+
+                // set user input for flow priority
+                state.dataPlnt->PlantLoop(this->Loop(ConnectionNum).LoopNum)
+                    .LoopSide(this->Loop(ConnectionNum).LoopSideNum)
+                    .Branch(this->Loop(ConnectionNum).BranchNum)
+                    .Comp(this->Loop(ConnectionNum).CompNum)
+                    .FlowPriority = this->Loop(ConnectionNum).FlowPriority;
+
+                // set user input for how loads served
+                state.dataPlnt->PlantLoop(this->Loop(ConnectionNum).LoopNum)
+                    .LoopSide(this->Loop(ConnectionNum).LoopSideNum)
+                    .Branch(this->Loop(ConnectionNum).BranchNum)
+                    .Comp(this->Loop(ConnectionNum).CompNum)
+                    .HowLoadServed = this->Loop(ConnectionNum).HowLoadServed;
+            }
+
+            this->myOneTimeFlag = false;
         }
     }
 

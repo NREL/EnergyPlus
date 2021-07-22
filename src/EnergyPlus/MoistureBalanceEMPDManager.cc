@@ -208,7 +208,7 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
 
         // See if Material was defined with R only.  (No density is defined then and not applicable for EMPD).
         //  What about materials other than "regular materials" (e.g. Glass, Air, etc)
-        if (state.dataMaterial->Material(MaterNum).Group == RegularMaterial && MaterialProps(1) > 0.0) {
+        if (state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::RegularMaterial && MaterialProps(1) > 0.0) {
             if (state.dataMaterial->Material(MaterNum).ROnly) {
                 //        CALL ShowSevereError('EMPD base material = "'//TRIM(dataMaterial.Material(MaterNum)%Name)//  &
                 //                             '" was Material:NoMass. It cannot be used for EMPD calculations.')
@@ -219,7 +219,7 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
                 ErrorsFound = true;
             }
         }
-        if (state.dataMaterial->Material(MaterNum).Group != RegularMaterial) {
+        if (state.dataMaterial->Material(MaterNum).Group != DataHeatBalance::MaterialGroup::RegularMaterial) {
             //      CALL ShowSevereError('GetMoistureBalanceEMPDInput: Only Material:Regular base materials are allowed '// &
             //                           'to have EMPD properties, material = '// TRIM(dataMaterial.Material(MaterNum)%Name))
             ShowSevereError(state,
@@ -443,7 +443,7 @@ void CalcMoistureBalanceEMPD(EnergyPlusData &state,
     using Psychrometrics::PsyRhovFnTdbWPb_fast;
     using Psychrometrics::PsyWFnTdbRhPb;
 
-    static std::string const RoutineName("CalcMoistureEMPD");
+    static constexpr std::string_view RoutineName("CalcMoistureEMPD");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int NOFITR;           // Number of iterations
@@ -727,7 +727,7 @@ void ReportMoistureBalanceEMPD(EnergyPlusData &state)
         if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue;
         MatNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
         if (state.dataMaterial->Material(MatNum).EMPDMaterialProps) {
-            static constexpr auto Format_700(
+            static constexpr fmt::string_view Format_700(
                 " Construction EMPD, {}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}\n");
             print(state.files.eio,
                   Format_700,

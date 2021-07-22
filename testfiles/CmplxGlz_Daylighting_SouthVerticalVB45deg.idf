@@ -86391,8 +86391,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     SYS-1 OA System,         !- Name
     SYS-1 OA System Controllers,  !- Controller List Name
-    SYS-1 OA System Equipment,  !- Outdoor Air Equipment List Name
-    SYS-1 Availability Managers;  !- Availability Manager List Name
+    SYS-1 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:ControllerList,
     SYS-1 OA System Controllers,  !- Name

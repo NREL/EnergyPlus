@@ -2191,8 +2191,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "  AirLoopHVAC:OutdoorAirSystem,",
         "    OA Sys 1,                !- Name",
         "    OA Sys 1 Controllers,    !- Controller List Name",
-        "    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name",
-        "    VAV Sys 1 Avail List;    !- Availability Manager List Name",
+        "    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name",
 
         "  OutdoorAir:Node,",
         "    Main Cooling Coil 1 Condenser Node,  !- Name",
@@ -3645,8 +3644,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest)
         "  AirLoopHVAC:OutdoorAirSystem,",
         "    Desiccant DXSystem OA System,  !- Name",
         "    Desiccant DXSystem OA System Controllers,  !- Controller List Name",
-        "    Desiccant DXSystem OA System Equipment,  !- Outdoor Air Equipment List Name",
-        "    Desiccant Outdoor Air Avail List;  !- Availability Manager List Name",
+        "    Desiccant DXSystem OA System Equipment;  !- Outdoor Air Equipment List Name",
 
         "  OutdoorAir:NodeList,",
         "    OutsideAirInletNodes;    !- Node or NodeList Name 1",
@@ -4825,8 +4823,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
         "  AirLoopHVAC:OutdoorAirSystem,",
         "    Desiccant DXSystem OA System,  !- Name",
         "    Desiccant DXSystem OA System Controllers,  !- Controller List Name",
-        "    Desiccant DXSystem OA System Equipment,  !- Outdoor Air Equipment List Name",
-        "    Desiccant Outdoor Air Avail List;  !- Availability Manager List Name",
+        "    Desiccant DXSystem OA System Equipment;  !- Outdoor Air Equipment List Name",
 
         "  OutdoorAir:NodeList,",
         "    OutsideAirInletNodes;    !- Node or NodeList Name 1",
@@ -6251,8 +6248,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
         "  AirLoopHVAC:OutdoorAirSystem,",
         "    Desiccant DXSystem OA System,  !- Name",
         "    Desiccant DXSystem OA System Controllers,  !- Controller List Name",
-        "    Desiccant DXSystem OA System Equipment,  !- Outdoor Air Equipment List Name",
-        "    Desiccant Outdoor Air Avail List;  !- Availability Manager List Name",
+        "    Desiccant DXSystem OA System Equipment;  !- Outdoor Air Equipment List Name",
 
         "  OutdoorAir:NodeList,",
         "    OutsideAirInletNodes;    !- Node or NodeList Name 1",

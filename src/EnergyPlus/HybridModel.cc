@@ -177,10 +177,11 @@ namespace HybridModel {
                     SupplyAirHumidityRatioSchPtr = GetScheduleIndex(state, cAlphaArgs(15));
                     SupplyAirCO2ConcentrationSchPtr = GetScheduleIndex(state, cAlphaArgs(16));
 
-                    /*  Note: Internal thermal mass can be calculated only with measured temperature.
-                                      Air infiltration rate can be calculated with either measured temperature, humifity ratio, or CO2 concentration.
-                                      People count can be calculated with either measured temperature, humifity ratio, or CO2 concentration.
-                    */
+                    //  Note: Internal thermal mass can be calculated only with measured temperature.
+                    //                  Air infiltration rate can be calculated with either measured temperature, humifity ratio, or CO2
+                    //                  concentration. People count can be calculated with either measured temperature, humifity ratio, or CO2
+                    //                  concentration.
+
                     // Initially set all flags to be false
                     state.dataHybridModel->HybridModelZone(ZonePtr).InternalThermalMassCalc_T = false;
                     state.dataHybridModel->HybridModelZone(ZonePtr).InfiltrationCalc_T = false;

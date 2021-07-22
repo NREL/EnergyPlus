@@ -187,7 +187,7 @@ namespace PlantUtilities {
     void LogPlantConvergencePoints(EnergyPlusData &state, bool FirstHVACIteration);
 
     void ScanPlantLoopsForObject(EnergyPlusData &state,
-                                 std::string const &CompName,
+                                 std::string_view CompName,
                                  int CompType,
                                  int &LoopNum,
                                  int &LoopSideNum,
@@ -201,10 +201,10 @@ namespace PlantUtilities {
                                  Optional_int_const SingleLoopSearch = _);
 
     void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
-                                  std::string const &CallerName, // really used for error messages
-                                  int NodeNum,                   // index in Node structure of node to be scanned
-                                  int &LoopNum,                  // return value for plant loop
-                                  int &LoopSideNum,              // return value for plant loop side
+                                  std::string_view const CallerName, // really used for error messages
+                                  int NodeNum,                       // index in Node structure of node to be scanned
+                                  int &LoopNum,                      // return value for plant loop
+                                  int &LoopSideNum,                  // return value for plant loop side
                                   int &BranchNum,
                                   Optional_int CompNum = _);
 
@@ -216,7 +216,7 @@ namespace PlantUtilities {
 
     int MyPlantSizingIndex(EnergyPlusData &state,
                            std::string const &CompType,          // component description
-                           std::string const &CompName,          // user name of component
+                           std::string_view CompName,            // user name of component
                            int NodeNumIn,                        // component water inlet node
                            int NodeNumOut,                       // component water outlet node
                            bool &ErrorsFound,                    // set to true if there's an error

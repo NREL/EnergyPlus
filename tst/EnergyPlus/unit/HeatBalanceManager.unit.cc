@@ -308,9 +308,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ProcessZoneData)
     EXPECT_FALSE(ErrorsFound);
 
     EXPECT_EQ("Zone One", state->dataHeatBal->Zone(1).Name);
-    EXPECT_EQ(AdaptiveConvectionAlgorithm, state->dataHeatBal->Zone(1).InsideConvectionAlgo);
+    EXPECT_EQ(ConvectionConstants::HcInt_AdaptiveConvectionAlgorithm, state->dataHeatBal->Zone(1).InsideConvectionAlgo);
     EXPECT_EQ("Zone Two", state->dataHeatBal->Zone(2).Name);
-    EXPECT_EQ(ASHRAETARP, state->dataHeatBal->Zone(2).InsideConvectionAlgo);
+    EXPECT_EQ(ConvectionConstants::HcInt_ASHRAETARP, state->dataHeatBal->Zone(2).InsideConvectionAlgo);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData)
@@ -341,9 +341,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData)
     state->dataMaterial->Material(3).Name = "GLASS";
 
     // Material layer group index
-    state->dataMaterial->Material(1).Group = 3; // WindowGlass
-    state->dataMaterial->Material(2).Group = 4; // WindowGas
-    state->dataMaterial->Material(3).Group = 3; // WindowGlass
+    state->dataMaterial->Material(1).Group = DataHeatBalance::MaterialGroup::WindowGlass;
+    state->dataMaterial->Material(2).Group = DataHeatBalance::MaterialGroup::WindowGas;
+    state->dataMaterial->Material(3).Group = DataHeatBalance::MaterialGroup::WindowGlass;
 
     state->dataHeatBal->NominalRforNominalUCalculation.allocate(1);
     state->dataHeatBal->NominalRforNominalUCalculation(1) = 0.0;
