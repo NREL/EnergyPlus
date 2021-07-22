@@ -201,5 +201,12 @@ int main(int argc, const char *argv[])
     setConsoleOutputState(state2, 0);
     energyplus(state2, argc, argv);
     printf("...and it is done.");
+    // running E+ with auxiliary tools will be tough, since we need to know the install or build directory
+    // for now we can call it and at least lock in the API
+    // We can call the Python API runtime test with an auxiliary tool argument so that it will actually test the functionality
+    printf("Running EnergyPlus with auxiliary tools...\n");
+    EnergyPlusState state3 = stateNew();
+    setEnergyPlusRootDirectory(state3, "/path/to/EPlus/root");
+
     return 0;
 }

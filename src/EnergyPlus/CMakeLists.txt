@@ -987,10 +987,20 @@ if(BUILD_TESTING)
     set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/runtime_python")
     file(MAKE_DIRECTORY ${TEST_DIR})
     configure_file("${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestRuntime.py" "${API_TEST_TARGET_DIR}/TestRuntime.py")
-    add_test(
-      NAME "API.TestRuntimePython"
-      COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestRuntime.py" -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}"
-      WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
+    # if we are building fortran, let's test that the python API properly sets the E+ install root by passing "-r"
+    # TODO: This test should actually *depend* on a successful build of ReadVars
+    # TODO: (cont'd) but I think all these tests need to be updated to depend on a successful energyplusapi build, so deferring for right now
+    if(BUILD_FORTRAN)
+      add_test(
+              NAME "API.TestRuntimePython"
+              COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestRuntime.py" -r -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}"
+              WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
+    else()
+      add_test(
+              NAME "API.TestRuntimePython"
+              COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestRuntime.py" -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}"
+              WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
+    endif()
 
     set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/exchange_python")
     file(MAKE_DIRECTORY ${TEST_DIR})
