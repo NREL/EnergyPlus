@@ -970,11 +970,18 @@ Real64 GLHEVert::doubleIntegral(std::shared_ptr<GLHEVertSingle> const &bh_i, std
 
 //******************************************************************************
 
-void GLHEVert::calcUniformHeatFluxGFunctions(EnergyPlusData &state)
+void GLHEVert::calcLongTimestepGFunctions(EnergyPlusData &state)
 {
-    this->calcShortTimestepGFunctions(state);
-    this->calcLongTimestepGFunctions(state);
-    this->combineShortAndLongTimestepGFunctions();
+    switch (this->gFuncCalcMethod) {
+    case GFuncCalcMethod::UniformHeatFlux:
+        this->calcUniformHeatFluxGFunctions(state);
+        break;
+    case GFuncCalcMethod::UniformBoreholeWallTemp:
+        this->calcUniformBHWallTempGFunctions();
+        break;
+    default:
+        assert(false);
+    }
 }
 
 //******************************************************************************
@@ -982,19 +989,17 @@ void GLHEVert::calcUniformHeatFluxGFunctions(EnergyPlusData &state)
 void GLHEVert::calcUniformBHWallTempGFunctions()
 {
     // construct boreholes vector
-    std::vector<boreholes::Borehole> boreholes;
+    std::vector<gt::boreholes::Borehole> boreholes;
     for (auto &bh : this->myRespFactors->myBorholes) {
         boreholes.emplace_back(bh->props->bhLength, bh->props->bhTopDepth, bh->props->bhDiameter / 2.0, bh->xLoc, bh->yLoc);
     }
-
-    this->setupTimeVectors();
 
     std::vector<double> time;
     for (auto &v : this->myRespFactors->time) {
         time.push_back(v);
     }
 
-    this->myRespFactors->GFNC = gfunction::uniform_borehole_wall_temperature(boreholes, time, this->soil.diffusivity, 12, true, true, 1, true);
+    this->myRespFactors->GFNC = gt::gfunction::uniform_borehole_wall_temperature(boreholes, time, this->soil.diffusivity);
 }
 
 //******************************************************************************
@@ -1003,11 +1008,10 @@ void GLHEVert::calcGFunctions(EnergyPlusData &state)
 {
 
     // No other choice than to calculate the g-functions here
-    if (this->gFuncCalcMethod == GFuncCalcMethod::UniformHeatFlux) {
-        this->calcUniformHeatFluxGFunctions(state);
-    } else if (this->gFuncCalcMethod == GFuncCalcMethod::UniformBoreholeWallTemp) {
-        this->calcUniformBHWallTempGFunctions();
-    }
+    this->setupTimeVectors();
+    this->calcShortTimestepGFunctions(state);
+    this->calcLongTimestepGFunctions(state);
+    this->combineShortAndLongTimestepGFunctions();
 
     // save data for later
     if (!state.dataSysVars->DisableGLHECaching) {
@@ -1063,10 +1067,8 @@ void GLHEVert::setupTimeVectors()
 
 //******************************************************************************
 
-void GLHEVert::calcLongTimestepGFunctions(EnergyPlusData &state)
+void GLHEVert::calcUniformHeatFluxGFunctions(EnergyPlusData &state)
 {
-    this->setupTimeVectors();
-
     DisplayString(state, "Initializing GroundHeatExchanger:System: " + this->name);
 
     // Calculate the g-functions
