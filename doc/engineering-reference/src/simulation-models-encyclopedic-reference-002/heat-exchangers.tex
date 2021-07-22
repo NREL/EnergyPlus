@@ -931,7 +931,7 @@ The \emph{g}-functions developed by Eskilson are given only down to values of $\
 
 In order to generate the long time-step response functions on the fly, EnergyPlus has two different models that make two different approximations for the calculation of the response functions. The first model uses uniform heat flux boundary conditions (UHFcalc model) – that is, it assumes that all boreholes have the same uniform heat flux. The heat flux may vary over time, but it is always uniform throughout the field. The second model uses uniform borehole wall temperatures (UBHWTcalc model) – the heat flux will vary between boreholes and vary vertically for each borehole.
 
-Calculation of g-functions with uniform heat flux boundary conditions is simpler, but accuracy can decrease as the borehole-to-borehole interference increases. Consider a case with a large rectangular borefield, say 9x16 boreholes – if there is a significant annual imbalance in the heat rejection/heat extraction, the interior of the field will become thermally saturated, and the heat flux in the interior of the field will decrease over time. See Spitler, et al. (2020) for an illustration. The accuracy of using this approximation is discussed by Malayappan and Spitler (2013) with application to sizing of ground heat exchangers. As shown there, use of the UHFcalc model tends to overpredict the long-term temperature change for fields with significant borehole-to-borehole interference and significant annual heat rejection/heat extraction. In general, the UBHWTcalc model can be recommended for all applications, even though for a smaller numbers of boreholes the UHFcalc model offers sufficient accuracy.
+Calculation of \emph{g}-functions with uniform heat flux boundary conditions is simpler, but accuracy can decrease as the borehole-to-borehole interference increases. Consider a case with a large rectangular borefield, say 9x16 boreholes – if there is a significant annual imbalance in the heat rejection/heat extraction, the interior of the field will become thermally saturated, and the heat flux in the interior of the field will decrease over time. See Spitler, et al. (2020) for an illustration. The accuracy of using this approximation is discussed by Malayappan and Spitler (2013) with application to sizing of ground heat exchangers. As shown there, use of the UHFcalc model tends to overpredict the long-term temperature change for fields with significant borehole-to-borehole interference and significant annual heat rejection/heat extraction. In general, the UBHWTcalc model can be recommended for all applications, even though for a smaller numbers of boreholes the UHFcalc model offers sufficient accuracy.
 
 For the UHFcalc model, EnergyPlus builds the model developed by Marcotte \& Pasquier(2009) which uses a discretized line source model. The \emph{g}-functions are generated using the following equation. The boreholes are discretized into segments. The temperature response of each segment on all other segments is then used to determine response factor for that particular geometry. The model estimates surface effects by creating ``imaginary" boreholes which are mirrored about the ground surface.
 
@@ -957,7 +957,11 @@ where:
 
 \(d(u_i, u_j^{'})\) is the distance between current point and point on other imaginary borehole.
 
-For the UBHWTcalc model, EnergyPlus builds on the model developed by Cimmino (2018, 2018b, 2019), with improvements (Cook and Spitler 2021) to reduce memory consumption and increase speed. The general approach is similar to that of the UHFcalc model, but the heat flux is adjusted for each segment to enforce the uniform borehole wall temperature model.
+For the UBHWTcalc model, EnergyPlus builds on the model developed by Cimmino (2018a, 2018b, 2019), with improvements (Cook and Spitler 2021) to reduce memory consumption and increase speed. The general approach is similar to that of the UHFcalc model, but the heat flux is adjusted for each segment to enforce the uniform borehole wall temperature model. Additionally, the methodology of Cimmino (UBHWTCalc) is a semi-analytical solution, so the solution is dependent on the number of segments used. The number of segments are adaptively discretized as to approximate a uniform inlet fluid temperature (UIFT) \emph{g}-function. 
+
+Cimmino (2015) introduced a (UIFT) g-function calculation that most closely matches physical reality. As boreholes are usually plumbed in parallel, the entering fluid temperatures are approximately uniform, and the actual distribution of heat within the field then depends on both the heat transfer outside the borehole and the heat transfer within the borehole. Thus, the g-function calculated with the UIFT boundary conditions depends on the flow rate and borehole thermal resistance in addition to the geometric configuration of the boreholes. Like, the UBHWT g-function calculation, the UIFT calculation also depends on the number of segments used – as the number of segments used increases, the solution converges. 
+
+So, though it’s possible to find a converged solution for the UIFT g-function, it strictly speaking only applies when the borehole thermal resistance and flow rate remain fixed. Both commonly change during the system operation, as changing fluid temperatures affect the fluid properties. Therefore, the UIFT solution might be thought of as having a range of g-functions that change slightly with time. Therefore, in much the same way that radiation heat transfer within a zone is modeled with simplified methods because the occupants are likely to move the furniture, the UBHWT calculation can be used as a reasonable approximation to the UIFT calculation. As shown by Spitler, et al. (2020) the UIFT g-function can closely match the UIFT g-function, with considerably fewer segments. The number of segments required to closely approximate the UIFT g-function varies with the number of boreholes and the borehole depth. Therefore, the UBHWT model uses an adaptive discretization algorithm that uses a smaller number of segments than the UIFT calculation. This provides excellent accuracy while requiring less computational time and memory. 
 
 
 \subsubsection{Short Time-Step Response Factors}\label{short-time-step-response-factors}
@@ -1145,6 +1149,10 @@ Compute the hourly loads as each hour and monthly loads as each month passes. Ca
 
 \hangindent=2em
 \hangafter=1
+\noindent Cimmino, M. (2015). "The effects of borehole thermal resistances and fluid flow rate on the g-functions of geo-thermal bore fields." International Journal of Heat and Mass Transfer 91: 1119-1127.
+
+\hangindent=2em
+\hangafter=1
 \noindent Cimmino, M. 2018a. "Fast calculation of the g-functions of geothermal borehole fields using similarities in the evaluation of the finite line source solution." Journal of Building Performance Simulation 11(6): 655-668.
 
 \hangindent=2em
@@ -1166,6 +1174,10 @@ Compute the hourly loads as each hour and monthly loads as each month passes. Ca
 \hangindent=2em
 \hangafter=1
 \noindent Spitler, J. D., J. C. Cook and X. Liu. 2020. A Preliminary Investigation on the Cost Reduction Potential of Optimizing Bore Fields for Commercial Ground Source Heat Pump Systems. Proceedings, 45th Workshop on Geothermal Reservoir Engineering. Stanford, California, Stanford University. 
+
+\hangindent=2em
+\hangafter=1
+\noindent Spitler, J. D., J. C. Cook and X. Liu. 2020. FY20 Second Milestone Report for Advanced Techno-Economic Model-ing for Geothermal Heat Pump Applications in Residential, Commercial, and Industry Building, Oak Ridge Na-tional Laboratory.
 
 \hangindent=2em
 \hangafter=1
