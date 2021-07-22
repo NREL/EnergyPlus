@@ -10,7 +10,7 @@
 ! System:   None.
 ! Plant:    PLANT LOAD PROFILE STEAM with Boiler:Steam.
 
-  Version,9.5;
+  Version,9.6;
 
   Building,
     Plant Load Profile Steam Example,  !- Name
