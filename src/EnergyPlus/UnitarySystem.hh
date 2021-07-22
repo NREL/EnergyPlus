@@ -412,7 +412,6 @@ namespace UnitarySystems {
         bool m_waterSideEconomizerFlag;   // true if water-side economizer coil is active
         Real64 m_minAirToWaterTempOffset; // coil entering air to entering water temp offset
 
-
     public:
         // SZVAV variables
         int UnitarySystemType_Num;
