@@ -7113,7 +7113,6 @@ namespace UnitarySystems {
                 int sysNum = getUnitarySystemIndex(state, thisObjectName);
                 UnitarySys thisSys;
                 if (sysNum == -1) {
-                    ++state.dataUnitarySystems->numCoilWaterSystems;
                     ++state.dataUnitarySystems->numUnitarySystems;
                     auto const &thisObjName = instance.key();
                     state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjName);

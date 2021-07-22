@@ -17279,7 +17279,6 @@ TEST_F(EnergyPlusFixture, WaterCoil_getCoilWaterSystemInputDataTest)
     auto &thisSys = unitSys[unitarySysIndex];
     // check object inputs
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ(state->dataUnitarySystems->numCoilWaterSystems, 1);
     EXPECT_EQ(state->dataUnitarySystems->numUnitarySystems, 1);
     EXPECT_EQ(thisSys.UnitarySystemType_Num, static_cast<int>(SimAirServingZones::CompType::UnitarySystemModel));
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
@@ -17365,7 +17364,6 @@ TEST_F(EnergyPlusFixture, DetailedWaterCoil_getCoilWaterSystemInputDataTest)
     auto &thisSys = unitSys[unitarySysIndex];
     // check object inputs
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ(state->dataUnitarySystems->numCoilWaterSystems, 1);
     EXPECT_EQ(state->dataUnitarySystems->numUnitarySystems, 1);
     EXPECT_EQ(thisSys.UnitarySystemType_Num, static_cast<int>(SimAirServingZones::CompType::UnitarySystemModel));
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
@@ -17467,7 +17465,6 @@ TEST_F(EnergyPlusFixture, HXAssistedWaterCoil_getCoilWaterSystemInputDataTest)
     auto &thisSys = unitSys[unitarySysIndex];
     // check object inputs
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ(state->dataUnitarySystems->numCoilWaterSystems, 1);
     EXPECT_EQ(state->dataUnitarySystems->numUnitarySystems, 1);
     EXPECT_EQ(thisSys.UnitarySystemType_Num, static_cast<int>(SimAirServingZones::CompType::UnitarySystemModel));
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
@@ -17660,7 +17657,6 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_ControlStatusTest)
     state->dataWaterCoils->WaterCoil(1).TotWaterCoolingCoilRate = 0.0;
 
     // check getinputs
-    EXPECT_EQ(state->dataUnitarySystems->numCoilWaterSystems, 1);
     EXPECT_EQ(state->dataUnitarySystems->numUnitarySystems, 1);
     EXPECT_EQ(thisSys.UnitarySystemType_Num, static_cast<int>(SimAirServingZones::CompType::UnitarySystemModel));
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
@@ -17906,7 +17902,6 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
     state->dataWaterCoils->WaterCoil(1).TotWaterCoolingCoilRate = 0.0;
 
     // check getinputs
-    EXPECT_EQ(state->dataUnitarySystems->numCoilWaterSystems, 1);
     EXPECT_EQ(state->dataUnitarySystems->numUnitarySystems, 1);
     EXPECT_EQ(thisSys.UnitarySystemType_Num, static_cast<int>(SimAirServingZones::CompType::UnitarySystemModel));
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");

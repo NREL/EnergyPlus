@@ -969,7 +969,6 @@ struct UnitarySystemsData : BaseGlobalStruct
     bool getInputFlag = true;
 
     std::string const coilSysCoolingWaterObjectName = "CoilSystem:Cooling:Water";
-    int numCoilWaterSystems = 0;
 
     void clear_state() override
     {
@@ -1004,7 +1003,6 @@ struct UnitarySystemsData : BaseGlobalStruct
         if (designSpecMSHP.size() > 0) designSpecMSHP.clear();
         myOneTimeFlag = true;
         getInputFlag = true;
-        numCoilWaterSystems = 0;
     }
 
     // Default Constructor
