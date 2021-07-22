@@ -5153,65 +5153,64 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // Ensure no duplicated names in AirflowNetwork component objects
-        /*
-        for (i = 1; i <= state.dataAirflowNetwork->AirflowNetworkNumOfComps; ++i) {
-            for (j = i + 1; j <= state.dataAirflowNetwork->AirflowNetworkNumOfComps; ++j) {
-                if (UtilityRoutines::SameString(state.dataAirflowNetwork->AirflowNetworkCompData(i).Name,
-        state.dataAirflowNetwork->AirflowNetworkCompData(j).Name)) {
-                    // SurfaceAirflowLeakageNames
-                    if (i <= 4 && j <= 4) {
-                        if (state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum == iComponentTypeNum::DOP)
-                            CompName(1) = "AirflowNetwork:MultiZone:Component:DetailedOpening";
-                        if (state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum == iComponentTypeNum::SOP)
-                            CompName(1) = "AirflowNetwork:MultiZone:Component:SimpleOpening";
-                        if (state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum == iComponentTypeNum::SCR) CompName(1) =
-        "AirflowNetwork:MultiZone:Surface:Crack"; if (state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum ==
-        iComponentTypeNum::SEL) CompName(1) = "AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea"; if
-        (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum == iComponentTypeNum::DOP) CompName(2) =
-        "AirflowNetwork:MultiZone:Component:DetailedOpening"; if (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum ==
-        iComponentTypeNum::SOP) CompName(2) = "AirflowNetwork:MultiZone:Component:SimpleOpening"; if
-        (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum == iComponentTypeNum::SCR) CompName(2) =
-        "AirflowNetwork:MultiZone:Surface:Crack"; if (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum ==
-        iComponentTypeNum::SEL) CompName(2) = "AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea"; ShowSevereError(state, RoutineName
-        + "Duplicated component names are found = " + state.dataAirflowNetwork->AirflowNetworkCompData(i).Name); ShowContinueError(state,
-        "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2)); ErrorsFound = true;
-                    }
-                    // Distribution component
-                    if (i > 4 && j > 4) {
-                        if (state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum == iComponentTypeNum::PLR) CompName(1) =
-        "AirflowNetwork:Distribution:Component:Leak"; if (state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum ==
-        iComponentTypeNum::DWC) CompName(1) = "AirflowNetwork:Distribution:Component:Duct"; if
-        (state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum == iComponentTypeNum::ELR) CompName(1) =
-        "AirflowNetwork:Distribution:Component:LeakageRatio"; if (state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum ==
-        iComponentTypeNum::DMP) CompName(1) = "AIRFLOWNETWORK:DISTRIBUTION:COMPONENT DAMPER"; if
-        (state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum == iComponentTypeNum::CVF) CompName(1) =
-        "AirflowNetwork:Distribution:Component:Fan"; if (state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum ==
-        iComponentTypeNum::CPD) CompName(1) = "AirflowNetwork:Distribution:Component:ConstantPressureDrop"; if
-        (state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum == iComponentTypeNum::COI) CompName(1) =
-        "AirflowNetwork:Distribution:Component:Coil"; if (state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum ==
-        iComponentTypeNum::TMU) CompName(1) = "AirflowNetwork:Distribution:Component:TerminalUnit"; if
-        (state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum == iComponentTypeNum::HEX) CompName(1) =
-        "AirflowNetwork:Distribution:Component:HeatExchanger"; if (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum ==
-        iComponentTypeNum::PLR) CompName(2) = "AirflowNetwork:Distribution:Component:Leak"; if
-        (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum == iComponentTypeNum::DWC) CompName(2) =
-        "AirflowNetwork:Distribution:Component:Duct"; if (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum ==
-        iComponentTypeNum::ELR) CompName(2) = "AirflowNetwork:Distribution:Component:LeakageRatio"; if
-        (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum == iComponentTypeNum::DMP) CompName(2) =
-        "AIRFLOWNETWORK:DISTRIBUTION:COMPONENT DAMPER"; if (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum ==
-        iComponentTypeNum::CVF) CompName(2) = "AirflowNetwork:Distribution:Component:Fan"; if
-        (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum == iComponentTypeNum::CPD) CompName(2) =
-        "AirflowNetwork:Distribution:Component:ConstantPressureDrop"; if (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum
-        == iComponentTypeNum::COI) CompName(2) = "AirflowNetwork:Distribution:Component:Coil"; if
-        (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum == iComponentTypeNum::TMU) CompName(2) =
-        "AirflowNetwork:Distribution:Component:TerminalUnit"; if (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum ==
-        iComponentTypeNum::HEX) CompName(2) = "AirflowNetwork:Distribution:Component:HeatExchanger"; ShowSevereError(state, std::string{RoutineName} +
-        "Duplicated component names are found = " + state.dataAirflowNetwork->AirflowNetworkCompData(i).Name); ShowContinueError(state, "A
-        unique component name is required in both objects " + CompName(1) + " and " + CompName(2)); ErrorsFound = true;
-                    }
-                }
-            }
-        }
-        */
+        //        for (i = 1; i <= state.dataAirflowNetwork->AirflowNetworkNumOfComps; ++i) {
+        //            for (j = i + 1; j <= state.dataAirflowNetwork->AirflowNetworkNumOfComps; ++j) {
+        //                if (UtilityRoutines::SameString(state.dataAirflowNetwork->AirflowNetworkCompData(i).Name,
+        //        state.dataAirflowNetwork->AirflowNetworkCompData(j).Name)) {
+        //                    // SurfaceAirflowLeakageNames
+        //                    if (i <= 4 && j <= 4) {
+        //                        if (state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum == iComponentTypeNum::DOP)
+        //                            CompName(1) = "AirflowNetwork:MultiZone:Component:DetailedOpening";
+        //                        if (state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum == iComponentTypeNum::SOP)
+        //                            CompName(1) = "AirflowNetwork:MultiZone:Component:SimpleOpening";
+        //                        if (state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum == iComponentTypeNum::SCR) CompName(1) =
+        //        "AirflowNetwork:MultiZone:Surface:Crack"; if (state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum ==
+        //        iComponentTypeNum::SEL) CompName(1) = "AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea"; if
+        //        (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum == iComponentTypeNum::DOP) CompName(2) =
+        //        "AirflowNetwork:MultiZone:Component:DetailedOpening"; if (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum ==
+        //        iComponentTypeNum::SOP) CompName(2) = "AirflowNetwork:MultiZone:Component:SimpleOpening"; if
+        //        (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum == iComponentTypeNum::SCR) CompName(2) =
+        //        "AirflowNetwork:MultiZone:Surface:Crack"; if (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum ==
+        //        iComponentTypeNum::SEL) CompName(2) = "AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea"; ShowSevereError(state, RoutineName
+        //        + "Duplicated component names are found = " + state.dataAirflowNetwork->AirflowNetworkCompData(i).Name); ShowContinueError(state,
+        //        "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2)); ErrorsFound = true;
+        //                    }
+        //                    // Distribution component
+        //                    if (i > 4 && j > 4) {
+        //                        if (state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum == iComponentTypeNum::PLR) CompName(1) =
+        //        "AirflowNetwork:Distribution:Component:Leak"; if (state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum ==
+        //        iComponentTypeNum::DWC) CompName(1) = "AirflowNetwork:Distribution:Component:Duct"; if
+        //        (state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum == iComponentTypeNum::ELR) CompName(1) =
+        //        "AirflowNetwork:Distribution:Component:LeakageRatio"; if (state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum ==
+        //        iComponentTypeNum::DMP) CompName(1) = "AIRFLOWNETWORK:DISTRIBUTION:COMPONENT DAMPER"; if
+        //        (state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum == iComponentTypeNum::CVF) CompName(1) =
+        //        "AirflowNetwork:Distribution:Component:Fan"; if (state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum ==
+        //        iComponentTypeNum::CPD) CompName(1) = "AirflowNetwork:Distribution:Component:ConstantPressureDrop"; if
+        //        (state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum == iComponentTypeNum::COI) CompName(1) =
+        //        "AirflowNetwork:Distribution:Component:Coil"; if (state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum ==
+        //        iComponentTypeNum::TMU) CompName(1) = "AirflowNetwork:Distribution:Component:TerminalUnit"; if
+        //        (state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum == iComponentTypeNum::HEX) CompName(1) =
+        //        "AirflowNetwork:Distribution:Component:HeatExchanger"; if (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum ==
+        //        iComponentTypeNum::PLR) CompName(2) = "AirflowNetwork:Distribution:Component:Leak"; if
+        //        (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum == iComponentTypeNum::DWC) CompName(2) =
+        //        "AirflowNetwork:Distribution:Component:Duct"; if (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum ==
+        //        iComponentTypeNum::ELR) CompName(2) = "AirflowNetwork:Distribution:Component:LeakageRatio"; if
+        //        (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum == iComponentTypeNum::DMP) CompName(2) =
+        //        "AIRFLOWNETWORK:DISTRIBUTION:COMPONENT DAMPER"; if (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum ==
+        //        iComponentTypeNum::CVF) CompName(2) = "AirflowNetwork:Distribution:Component:Fan"; if
+        //        (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum == iComponentTypeNum::CPD) CompName(2) =
+        //        "AirflowNetwork:Distribution:Component:ConstantPressureDrop"; if (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum
+        //        == iComponentTypeNum::COI) CompName(2) = "AirflowNetwork:Distribution:Component:Coil"; if
+        //        (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum == iComponentTypeNum::TMU) CompName(2) =
+        //        "AirflowNetwork:Distribution:Component:TerminalUnit"; if (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum ==
+        //        iComponentTypeNum::HEX) CompName(2) = "AirflowNetwork:Distribution:Component:HeatExchanger"; ShowSevereError(state,
+        //        std::string{RoutineName} + "Duplicated component names are found = " + state.dataAirflowNetwork->AirflowNetworkCompData(i).Name);
+        //        ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2)); ErrorsFound
+        //        = true;
+        //                    }
+        //                }
+        //            }
+        //        }
 
         // Node and component validation
         for (count = 1; count <= state.dataAirflowNetwork->AirflowNetworkNumOfLinks; ++count) {
@@ -5351,30 +5350,28 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // Provide a warning when a door component is assigned as envelope leakage
-        /*
-        if (!ErrorsFound) {
-            for (count = 1; count <= state.dataAirflowNetwork->AirflowNetworkNumOfSurfaces; ++count) {
-                if
-        (state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataAirflowNetwork->AirflowNetworkLinkageData(count).NodeNums[0]).ExtNodeNum
-        > 0 &&
-                    state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataAirflowNetwork->AirflowNetworkLinkageData(count).NodeNums[1]).EPlusZoneNum
-        > 0 && state.dataAirflowNetwork->AirflowNetworkLinkageData(count).CompNum > 0) { if
-        (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(count).CompNum).CompTypeNum
-        == iComponentTypeNum::SOP) {
-                    }
-                }
-                if
-        (state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataAirflowNetwork->AirflowNetworkLinkageData(count).NodeNums[1]).ExtNodeNum
-        > 0 &&
-                    state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataAirflowNetwork->AirflowNetworkLinkageData(count).NodeNums[0]).EPlusZoneNum
-        > 0 && state.dataAirflowNetwork->AirflowNetworkLinkageData(count).CompNum > 0) { if
-        (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(count).CompNum).CompTypeNum
-        == iComponentTypeNum::SOP) {
-                    }
-                }
-            }
-        }
-        */
+        //        if (!ErrorsFound) {
+        //            for (count = 1; count <= state.dataAirflowNetwork->AirflowNetworkNumOfSurfaces; ++count) {
+        //                if
+        //        (state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataAirflowNetwork->AirflowNetworkLinkageData(count).NodeNums[0]).ExtNodeNum
+        //        > 0 &&
+        //                    state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataAirflowNetwork->AirflowNetworkLinkageData(count).NodeNums[1]).EPlusZoneNum
+        //        > 0 && state.dataAirflowNetwork->AirflowNetworkLinkageData(count).CompNum > 0) { if
+        //        (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(count).CompNum).CompTypeNum
+        //        == iComponentTypeNum::SOP) {
+        //                    }
+        //                }
+        //                if
+        //        (state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataAirflowNetwork->AirflowNetworkLinkageData(count).NodeNums[1]).ExtNodeNum
+        //        > 0 &&
+        //                    state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataAirflowNetwork->AirflowNetworkLinkageData(count).NodeNums[0]).EPlusZoneNum
+        //        > 0 && state.dataAirflowNetwork->AirflowNetworkLinkageData(count).CompNum > 0) { if
+        //        (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(count).CompNum).CompTypeNum
+        //        == iComponentTypeNum::SOP) {
+        //                    }
+        //                }
+        //            }
+        //        }
 
         // Ensure the name of each heat exchanger is shown either once or twice in the field of
         if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControlSimpleADS ||
