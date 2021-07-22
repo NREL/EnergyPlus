@@ -17272,9 +17272,10 @@ TEST_F(EnergyPlusFixture, WaterCoil_getCoilWaterSystemInputDataTest)
 
     int unitarySysIndex(0);
     bool ErrorsFound(false);
+
+    UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, "COIL SYSTEM WATER", zoneEquipment, 0);
     UnitarySystems::UnitarySys::getCoilWaterSystemInputData(*state, "Coil System Water", zoneEquipment, 0, ErrorsFound);
-    // re-run to fill in additional inputs
-    UnitarySystems::UnitarySys::getCoilWaterSystemInputData(*state, "Coil System Water", zoneEquipment, 0, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
     UnitarySystems::UnitarySys *unitSys = &state->dataUnitarySystems->unitarySys[unitarySysIndex];
     auto &thisSys = unitSys[unitarySysIndex];
     // check object inputs
@@ -17357,9 +17358,9 @@ TEST_F(EnergyPlusFixture, DetailedWaterCoil_getCoilWaterSystemInputDataTest)
 
     int unitarySysIndex(0);
     bool ErrorsFound(false);
+    UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, "COIL SYSTEM WATER", zoneEquipment, 0);
     UnitarySystems::UnitarySys::getCoilWaterSystemInputData(*state, "Coil System Water", zoneEquipment, 0, ErrorsFound);
-    // re-run to fill in additional inputs
-    UnitarySystems::UnitarySys::getCoilWaterSystemInputData(*state, "Coil System Water", zoneEquipment, 0, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
     UnitarySystems::UnitarySys *unitSys = &state->dataUnitarySystems->unitarySys[unitarySysIndex];
     auto &thisSys = unitSys[unitarySysIndex];
     // check object inputs
@@ -17458,9 +17459,9 @@ TEST_F(EnergyPlusFixture, HXAssistedWaterCoil_getCoilWaterSystemInputDataTest)
 
     int unitarySysIndex(0);
     bool ErrorsFound(false);
+    UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, "COIL SYSTEM WATER", zoneEquipment, 0);
     UnitarySystems::UnitarySys::getCoilWaterSystemInputData(*state, "Coil System Water", zoneEquipment, 0, ErrorsFound);
-    // re-run to fill in additional inputs
-    UnitarySystems::UnitarySys::getCoilWaterSystemInputData(*state, "Coil System Water", zoneEquipment, 0, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
     UnitarySystems::UnitarySys *unitSys = &state->dataUnitarySystems->unitarySys[unitarySysIndex];
     auto &thisSys = unitSys[unitarySysIndex];
     // check object inputs
@@ -17536,9 +17537,9 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_ControlStatusTest)
 
     int unitarySysIndex(0);
     bool ErrorsFound(false);
+    UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, "COIL SYSTEM WATER", zoneEquipment, 0);
     UnitarySystems::UnitarySys::getCoilWaterSystemInputData(*state, "Coil System Water", zoneEquipment, 0, ErrorsFound);
-    // re-run to fill in additional inputs
-    UnitarySystems::UnitarySys::getCoilWaterSystemInputData(*state, "Coil System Water", zoneEquipment, 0, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
     UnitarySystems::UnitarySys *unitSys = &state->dataUnitarySystems->unitarySys[unitarySysIndex];
     auto &thisSys = unitSys[unitarySysIndex];
 
@@ -17777,9 +17778,9 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
 
     int unitarySysIndex(0);
     bool ErrorsFound(false);
+    UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, "COIL SYSTEM WATER", zoneEquipment, 0);
     UnitarySystems::UnitarySys::getCoilWaterSystemInputData(*state, "Coil System Water", zoneEquipment, 0, ErrorsFound);
-    // re-run to fill in additional inputs
-    UnitarySystems::UnitarySys::getCoilWaterSystemInputData(*state, "Coil System Water", zoneEquipment, 0, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
     UnitarySystems::UnitarySys *unitSys = &state->dataUnitarySystems->unitarySys[unitarySysIndex];
     auto &thisSys = unitSys[unitarySysIndex];
 
