@@ -1,4 +1,4 @@
-! UnitarySystem_5Zone_wWaterSideEconomizer.idf
+! UnitarySystem_5Zones_wWaterSideEconomizer.idf
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !                          file derived from 5ZoneAutoDXVAV.idf
 !
@@ -2815,8 +2815,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 1,                !- Name
     OA Sys 1 Controllers,    !- Controller List Name
-    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name
-    VAV Sys 1 Avail List;    !- Availability Manager List Name
+    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:ControllerList,
     OA Sys 1 Controllers,    !- Name
