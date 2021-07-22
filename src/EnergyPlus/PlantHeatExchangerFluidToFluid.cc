@@ -2402,7 +2402,7 @@ void HeatExchangerStruct::oneTimeInit_new(EnergyPlusData &state)
         ShowFatalError(state, format("{} Program terminated due to previous condition(s).", RoutineName));
     }
 }
-void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
+void HeatExchangerStruct::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
 {
 }
 

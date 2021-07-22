@@ -307,7 +307,7 @@ void PlantProfileData::oneTimeInit_new(EnergyPlusData &state)
         }
     }
 }
-void PlantProfileData::oneTimeInit(EnergyPlusData &state)
+void PlantProfileData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
 {
 }
 
