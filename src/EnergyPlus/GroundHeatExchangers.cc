@@ -1004,7 +1004,7 @@ void GLHEVert::calcUniformBHWallTempGFunctions()
     gt::segments::adaptive adpt_disc;
     int nbh = boreholes.size();
     double H = double(this->bhLength); // all heights are considered the same
-    double drilling_depth = nbh * H; // total drilling depth (m)
+    double drilling_depth = double(nbh) * H; // total drilling depth (m)
     int nSegments = adpt_disc.discretize(H, drilling_depth);
 
     this->myRespFactors->GFNC = gt::gfunction::uniform_borehole_wall_temperature(boreholes, time, this->soil.diffusivity, nSegments);
