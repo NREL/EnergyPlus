@@ -1008,6 +1008,11 @@ if(BUILD_TESTING)
     # if we are building fortran, let's test that the python API properly sets the E+ install root by passing "-r"
     # TODO: This test should actually *depend* on a successful build of ReadVars
     # TODO: (cont'd) but I think all these tests need to be updated to depend on a successful energyplusapi build, so deferring for right now
+
+    # TODO: Also, the use of TEST_DIR should be fixed up here.
+    # The test scripts should probably not be copied anywhere, just add API_TEST_TARGET_DIR to PATH prior to executing the Python script,
+    # then it will be able to find the pyenergyplus package.  I think that alone would clean up a bunch of this.  The working directory
+    # can still be set to individual tst/runtime, etc. folders for running individually.  The -d arg won't be needed at that point.
     if(BUILD_FORTRAN)
       add_test(
               NAME "API.TestRuntimePython"
