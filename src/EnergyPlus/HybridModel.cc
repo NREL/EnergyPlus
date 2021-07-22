@@ -444,15 +444,15 @@ namespace HybridModel {
                                             "Zone Infiltration Hybrid Model Air Change Rate",
                                             OutputProcessor::Unit::ach,
                                             state.dataHeatBal->Zone(ZonePtr).InfilOAAirChangeRateHM,
-                                            "Zone",
-                                            "Average",
+                                            OutputProcessor::SOVTimeStepType::Zone,
+                                            OutputProcessor::SOVStoreType::Average,
                                             state.dataHeatBal->Zone(ZonePtr).Name);
                         SetupOutputVariable(state,
                                             "Zone Infiltration Hybrid Model Mass Flow Rate",
                                             OutputProcessor::Unit::kg_s,
                                             state.dataHeatBal->Zone(ZonePtr).MCPIHM,
-                                            "Zone",
-                                            "Average",
+                                            OutputProcessor::SOVTimeStepType::Zone,
+                                            OutputProcessor::SOVStoreType::Average,
                                             state.dataHeatBal->Zone(ZonePtr).Name);
                     }
                     if (state.dataHybridModel->HybridModelZone(ZonePtr).PeopleCountCalc_T ||
@@ -462,8 +462,8 @@ namespace HybridModel {
                                             "Zone Hybrid Model People Count",
                                             OutputProcessor::Unit::None,
                                             state.dataHeatBal->Zone(ZonePtr).NumOccHM,
-                                            "Zone",
-                                            "Average",
+                                            OutputProcessor::SOVTimeStepType::Zone,
+                                            OutputProcessor::SOVStoreType::Average,
                                             state.dataHeatBal->Zone(ZonePtr).Name);
                     }
 
