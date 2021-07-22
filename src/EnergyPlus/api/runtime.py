@@ -195,7 +195,7 @@ class Runtime:
         this_script_dir = os.path.dirname(this_file)  # returns C:\EnergyPlus\pyenergyplus
         eplus_root_dir = os.path.dirname(os.path.normpath(this_script_dir))  # returns C:\EnergyPlus
         self._set_energyplus_root_directory(state, eplus_root_dir)
-
+        
         args_with_program_name = [b"energyplus"]  # don't require the program name argument, just add it here
         for cla in command_line_args:
             if isinstance(cla, str):

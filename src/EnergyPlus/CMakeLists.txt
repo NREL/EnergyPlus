@@ -1012,12 +1012,12 @@ if(BUILD_TESTING)
       add_test(
               NAME "API.TestRuntimePython"
               COMMAND "${Python_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestRuntime.py" -r -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}"
-              WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
+              WORKING_DIRECTORY "${TEST_DIR}")
     else()
       add_test(
               NAME "API.TestRuntimePython"
               COMMAND "${Python_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestRuntime.py" -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}"
-              WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
+              WORKING_DIRECTORY "${TEST_DIR}")
     endif()
 
     set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/exchange_python")
@@ -1026,7 +1026,7 @@ if(BUILD_TESTING)
     add_test(
       NAME "API.TestDataTransferPython"
       COMMAND "${Python_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestDataTransfer.py" -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}"
-      WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
+      WORKING_DIRECTORY "${TEST_DIR}")
 
     # set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/autosizing_python")
     # file(MAKE_DIRECTORY ${TEST_DIR}) configure_file(

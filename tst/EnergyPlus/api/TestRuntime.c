@@ -206,7 +206,9 @@ int main(int argc, const char *argv[])
     // We can call the Python API runtime test with an auxiliary tool argument so that it will actually test the functionality
     printf("Running EnergyPlus with auxiliary tools...\n");
     EnergyPlusState state3 = stateNew();
-    setEnergyPlusRootDirectory(state3, "/path/to/EPlus/root");
-
+    setEnergyPlusRootDirectory(state3, "/eplus/repos/2eplus/cmake-build-debug/Products");
+    const int argc2 = 3;
+    const char *argv2[] = {"-r", "-D", "/eplus/repos/2eplus/testfiles/1ZoneUncontrolled.idf"};
+    energyplus(state3, argc2, argv2);
     return 0;
 }

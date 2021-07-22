@@ -397,6 +397,7 @@ int RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const &filepath
     if (status || state.dataGlobal->outputEpJSONConversionOnly) return status;
     try {
         EnergyPlus::SimulationManager::ManageSimulation(state);
+        // TODO: Does this exception handler leave too early before closing open files?
     } catch (const EnergyPlus::FatalError &e) {
         return EnergyPlus::AbortEnergyPlus(state);
     } catch (const std::exception &e) {
