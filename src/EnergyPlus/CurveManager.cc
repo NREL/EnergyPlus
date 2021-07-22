@@ -2433,8 +2433,8 @@ namespace CurveManager {
                                         "Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput1,
-                                        "HVAC",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::HVAC,
+                                        OutputProcessor::SOVStoreType::Average,
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 case 2:
@@ -2442,8 +2442,8 @@ namespace CurveManager {
                                         "Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput2,
-                                        "HVAC",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::HVAC,
+                                        OutputProcessor::SOVStoreType::Average,
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 case 3:
@@ -2451,8 +2451,8 @@ namespace CurveManager {
                                         "Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput3,
-                                        "HVAC",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::HVAC,
+                                        OutputProcessor::SOVStoreType::Average,
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 case 4:
@@ -2460,8 +2460,8 @@ namespace CurveManager {
                                         "Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput4,
-                                        "HVAC",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::HVAC,
+                                        OutputProcessor::SOVStoreType::Average,
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 case 5:
@@ -2469,8 +2469,8 @@ namespace CurveManager {
                                         "Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput5,
-                                        "HVAC",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::HVAC,
+                                        OutputProcessor::SOVStoreType::Average,
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 case 6:
@@ -2478,8 +2478,8 @@ namespace CurveManager {
                                         "Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput6,
-                                        "HVAC",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::HVAC,
+                                        OutputProcessor::SOVStoreType::Average,
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 default:
@@ -2492,8 +2492,8 @@ namespace CurveManager {
                                 "Performance Curve Output Value",
                                 OutputProcessor::Unit::None,
                                 state.dataCurveManager->PerfCurve(CurveIndex).CurveOutput,
-                                "HVAC",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::HVAC,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataCurveManager->PerfCurve(CurveIndex).Name);
         }
 
@@ -2502,29 +2502,29 @@ namespace CurveManager {
                                 "Performance Curve Input Variable 1 Value",
                                 OutputProcessor::Unit::None,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).CurveInput1,
-                                "HVAC",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::HVAC,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).Name);
             SetupOutputVariable(state,
                                 "Performance Curve Input Variable 2 Value",
                                 OutputProcessor::Unit::None,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).CurveInput2,
-                                "HVAC",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::HVAC,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).Name);
             SetupOutputVariable(state,
                                 "Performance Curve Input Variable 3 Value",
                                 OutputProcessor::Unit::None,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).CurveInput3,
-                                "HVAC",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::HVAC,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).Name);
             SetupOutputVariable(state,
                                 "Performance Curve Output Value",
                                 OutputProcessor::Unit::None,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).CurveOutput,
-                                "HVAC",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::HVAC,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).Name);
         }
 
