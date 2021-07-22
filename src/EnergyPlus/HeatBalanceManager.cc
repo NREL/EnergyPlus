@@ -5809,6 +5809,12 @@ namespace HeatBalanceManager {
     {
         // Allocate zone / encl hb arrays
 
+        // TODO MJW: Punt for now, sometimes unit test will get here and need these to be allocated, but simulations need them sooner
+        if (!state.dataHeatBal->ZoneIntGain.allocated()) {
+            state.dataHeatBal->ZoneIntGain.allocate(state.dataGlobal->NumOfZones);
+            state.dataHeatBal->SpaceIntGain.allocate(state.dataGlobal->NumOfSpaces);
+            state.dataHeatBal->SpaceIntGainDevices.allocate(state.dataGlobal->NumOfSpaces);
+        }
         state.dataHeatBal->ZoneMRT.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBal->ZoneSolAbsFirstCalc.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBal->EnclRadReCalc.allocate(state.dataGlobal->NumOfZones);

@@ -409,8 +409,6 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(state->dataGlobal->NumOfZones);
     state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(state->dataGlobal->NumOfZones);
 
-    HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
-    EXPECT_FALSE(ErrorsFound);                            // expect no errors
     DataZoneEquipment::GetZoneEquipmentData(*state);      // read zone equipment    SystemReports::ReportMaxVentilationLoads();
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     state->dataHeatBal->ZnAirRpt.allocate(state->dataGlobal->NumOfZones);

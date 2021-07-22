@@ -166,8 +166,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
 
     int spaceNum = 1;
 
+    state->dataHeatBal->Zone.allocate(spaceNum);
+    state->dataHeatBal->Zone(spaceNum).Name = "Test";
+    state->dataHeatBal->Zone(spaceNum).Spaces.emplace_back(spaceNum);
     state->dataHeatBal->Space.allocate(spaceNum);
     state->dataHeatBal->Space(spaceNum).Name = "Test";
+    state->dataHeatBal->Space(spaceNum).ZoneNum = spaceNum;
     state->dataViewFactor->EnclRadInfo.allocate(spaceNum);
     state->dataViewFactor->EnclRadInfo(spaceNum).Name = state->dataHeatBal->Space(spaceNum).Name;
     state->dataViewFactor->EnclRadInfo(spaceNum).SpaceNums.push_back(spaceNum);

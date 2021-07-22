@@ -259,9 +259,12 @@ namespace InternalHeatGains {
 
         auto &ErrorsFound(state.dataInternalHeatGains->ErrorsFound);
 
-        state.dataHeatBal->ZoneIntGain.allocate(state.dataGlobal->NumOfZones);
-        state.dataHeatBal->SpaceIntGain.allocate(state.dataGlobal->NumOfSpaces);
-        state.dataHeatBal->SpaceIntGainDevices.allocate(state.dataGlobal->NumOfSpaces);
+        // TODO MJW: Punt for now, sometimes unit test need these to be allocated in AllocateZoneHeatBalArrays, but simulations need them here
+        if (!state.dataHeatBal->ZoneIntGain.allocated()) {
+            state.dataHeatBal->ZoneIntGain.allocate(state.dataGlobal->NumOfZones);
+            state.dataHeatBal->SpaceIntGain.allocate(state.dataGlobal->NumOfSpaces);
+            state.dataHeatBal->SpaceIntGainDevices.allocate(state.dataGlobal->NumOfSpaces);
+        }
         state.dataHeatBal->ZnRpt.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBal->SpaceRpt.allocate(state.dataGlobal->NumOfSpaces);
         state.dataHeatBal->ZoneIntEEuse.allocate(state.dataGlobal->NumOfZones);

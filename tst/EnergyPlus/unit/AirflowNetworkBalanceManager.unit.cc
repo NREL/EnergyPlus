@@ -4476,30 +4476,11 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_UserDefinedDuctViewFactor
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    bool ErrorsFound = false;
     // Read objects
-    SimulationManager::GetProjectData(*state);
-    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetWindowGlassSpectralData(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetHeatBalanceInput(*state);
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     state->dataEnvrn->OutBaroPress = 101000;
     state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
-    SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
-
-    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
-    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
     GetAirflowNetworkInput(*state);
@@ -9244,8 +9225,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
          "  AnalyticalSolution;      !- Algorithm"});
     ASSERT_TRUE(process_idf(idf_objects));
 
-    bool errors = false;
-
     // Set up some environmental parameters
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->OutDryBulbTemp = 25.0;
@@ -9255,31 +9234,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
     state->dataEnvrn->SiteWindExp = 0.0;      // Disconnect variation by height
     state->dataEnvrn->WindSpeed = 10.0;
 
-    bool ErrorsFound = false;
-    // Read objects
-    SimulationManager::GetProjectData(*state);
-    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetWindowGlassSpectralData(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetHeatBalanceInput(*state);
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
-    SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
-
-    // Magic to get surfaces read in correctly
-    state->dataHeatBal->AnyCTF = true;
-    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
-    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(*state, errors); // setup zone geometry and get zone data
-    EXPECT_FALSE(errors);                            // expect no errors
 
     CurveManager::GetCurveInput(*state);
     EXPECT_EQ(state->dataCurveManager->NumCurves, 2);
@@ -9289,7 +9246,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
     GetAirflowNetworkInput(*state);
     // Issue 7656
     std::string const error_string = delimited_string({
-        "   ** Warning ** No Timestep object found.  Number of TimeSteps in Hour defaulted to 4.",
+        //"   ** Warning ** No Timestep object found.  Number of TimeSteps in Hour defaulted to 4.",
         "   ** Warning ** CheckUsedConstructions: There are 2 nominally unused constructions in input.",
         "   **   ~~~   ** For explicit details on each unused construction, use Output:Diagnostics,DisplayExtraWarnings;",
     });
@@ -17446,30 +17403,11 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_DuplicatedNodeNameTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    bool ErrorsFound = false;
     // Read objects
-    SimulationManager::GetProjectData(*state);
-    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetWindowGlassSpectralData(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetHeatBalanceInput(*state);
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     state->dataEnvrn->OutBaroPress = 101000;
     state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
-    SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
-
-    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
-    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
     ASSERT_THROW(GetAirflowNetworkInput(*state), std::runtime_error);
