@@ -6303,9 +6303,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
 
     WriteVeriSumTable(*state);
 
-    /***********************************************************************************************************************************************
-     *                                                              Check Yes/No flag                                                              *
-     ***********************************************************************************************************************************************/
+    // Check Yes/No flag
 
     // RowName, ColumnName, value
     std::vector<std::tuple<std::string, std::string, std::string>> results_strings({
@@ -6342,9 +6340,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
         EXPECT_EQ(std::get<2>(v), flag) << "Failed for RowName=" << rowName << "; ColumnName=" << columnName;
     }
 
-    /***********************************************************************************************************************************************
-     *                                                       Check each zone and total rows                                                        *
-     ***********************************************************************************************************************************************/
+    // Check each zone and total rows
 
     // RowName, ColumnName, value
     std::vector<std::tuple<std::string, std::string, Real64>> results({
@@ -7494,9 +7490,7 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
         // Internal: Just to ensure that we gets the same one with round
         EXPECT_EQ(format("{:.2R}", round(oriAzimuth * 100.0) / 100.0), format("{:.2R}", oriAzimuth));
 
-        /****************************************************************************
-         *                            Wall (odd entries)                             *
-         *****************************************************************************/
+        // Wall (odd entries)
 
         // Internal: Dumb check to ensure we didn't mess up in the indexation
         EXPECT_EQ(oriAzimuth, state->dataSurface->Surface(i).Azimuth) << "Surface Name = " << state->dataSurface->Surface(i).Name;
@@ -7512,9 +7506,7 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
             cardinalDir)
             << "Azimuth was " << expectedAzimuthToCard.first << "for Surface '" << state->dataSurface->Surface(i).Name << "'.";
 
-        /****************************************************************************
-         *                           Window (even entries)                           *
-         *****************************************************************************/
+        // Window (even entries)
 
         EXPECT_EQ(oriAzimuth, state->dataSurface->Surface(i + 1).Azimuth) << "Surface Name = " << state->dataSurface->Surface(i + 1).Name;
 
@@ -7598,9 +7590,7 @@ TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
     for (int i = 1; i <= state->dataSurface->TotSurfaces; i++) {
         if (i % 2 == 1) {
 
-            /****************************************************************************
-             *                            Wall (odd entries)                             *
-             *****************************************************************************/
+            // Wall (odd entries)
 
             // Check the wall gross area
             EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(
@@ -7636,9 +7626,7 @@ TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
                       "S");
         } else {
 
-            /****************************************************************************
-             *                           door (even entries)                           *
-             *****************************************************************************/
+            // Door (even entries)
 
             // Check the door gross area
             EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(
@@ -9261,9 +9249,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
 
     WriteVeriSumTable(*state);
 
-    /***********************************************************************************************************************************************
-     *                                                              Check Yes/No flag                                                              *
-     ***********************************************************************************************************************************************/
+    // Check yes/no flag
 
     // RowName, ColumnName, value
     std::vector<std::tuple<std::string, std::string, std::string>> results_strings({
@@ -9300,9 +9286,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
         EXPECT_EQ(std::get<2>(v), flag) << "Failed for RowName=" << rowName << "; ColumnName=" << columnName;
     }
 
-    /***********************************************************************************************************************************************
-     *                                                       Check each zone and total rows                                                        *
-     ***********************************************************************************************************************************************/
+    // Check each zone and total rows
 
     // RowName, ColumnName, value
     std::vector<std::tuple<std::string, std::string, Real64>> results({

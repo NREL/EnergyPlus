@@ -2702,7 +2702,6 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
     Real64 mDotFromOARequirement(0.0);
 
     if (this->SysType_Num == SysType::SingleDuctConstVolNoReheat) {
-        /*Real64 mDotFromOARequirement( 0.0 );*/
         if (!this->NoOAFlowInputFromUser) {
             mDotFromOARequirement = this->AirMassFlowRateMax;
             int airLoopNum(0);

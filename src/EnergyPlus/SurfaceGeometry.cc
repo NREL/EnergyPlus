@@ -10504,15 +10504,13 @@ namespace SurfaceGeometry {
                 if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(alpF), "Hourly")) {
                     state.dataSurfaceGeometry->kivaManager.settings.timestepType = HeatBalanceKivaManager::KivaManager::Settings::HOURLY;
                     state.dataSurfaceGeometry->kivaManager.timestep = 3600.; // seconds
-                } else /* if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs( alpF ), "Timestep")) */ {
+                } else { // if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs( alpF ), "Timestep"))
                     state.dataSurfaceGeometry->kivaManager.settings.timestepType = HeatBalanceKivaManager::KivaManager::Settings::TIMESTEP;
                     state.dataSurfaceGeometry->kivaManager.timestep = state.dataGlobal->MinutesPerTimeStep * 60.;
                 }
             }
             alpF++;
         }
-
-        /* ====================================================================== */
 
         // Read Foundation objects
         cCurrentModuleObject = "Foundation:Kiva";

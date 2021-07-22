@@ -451,7 +451,7 @@ void GetShadowingInput(EnergyPlusData &state)
                     ShowSevereError(*state, message);
                 } else if (messageType == Pumbra::MSG_WARN) {
                     ShowWarningError(*state, message);
-                } else /*if (messageType == MSG_INFO)*/ {
+                } else { // if (messageType == MSG_INFO)
                     ShowMessage(*state, message);
                 }
             };
