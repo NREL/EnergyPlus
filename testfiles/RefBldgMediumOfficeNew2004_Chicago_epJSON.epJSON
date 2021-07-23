@@ -7166,8 +7166,8 @@
             "sensible_heat_fraction": "Autocalculate",
             "thermal_comfort_model_1_type": "Fanger",
             "work_efficiency_schedule_name": "WORK_EFF_SCH",
-            "zone_floor_area_per_person": 18.58,
-            "zone_or_zonelist_name": "Core_bottom"
+            "floor_area_per_person": 18.58,
+            "zone_or_zonelist_or_space_or_spacelist_name": "Core_bottom"
         },
         "Core_mid People": {
             "activity_level_schedule_name": "ACTIVITY_SCH",
@@ -7182,8 +7182,8 @@
             "sensible_heat_fraction": "Autocalculate",
             "thermal_comfort_model_1_type": "Fanger",
             "work_efficiency_schedule_name": "WORK_EFF_SCH",
-            "zone_floor_area_per_person": 18.58,
-            "zone_or_zonelist_name": "Core_mid"
+            "floor_area_per_person": 18.58,
+            "zone_or_zonelist_or_space_or_spacelist_name": "Core_mid"
         },
         "Core_top People": {
             "activity_level_schedule_name": "ACTIVITY_SCH",
@@ -7198,8 +7198,8 @@
             "sensible_heat_fraction": "Autocalculate",
             "thermal_comfort_model_1_type": "Fanger",
             "work_efficiency_schedule_name": "WORK_EFF_SCH",
-            "zone_floor_area_per_person": 18.58,
-            "zone_or_zonelist_name": "Core_top"
+            "floor_area_per_person": 18.58,
+            "zone_or_zonelist_or_space_or_spacelist_name": "Core_top"
         },
         "Perimeter_bot_ZN_1 People": {
             "activity_level_schedule_name": "ACTIVITY_SCH",
@@ -7214,8 +7214,8 @@
             "sensible_heat_fraction": "Autocalculate",
             "thermal_comfort_model_1_type": "Fanger",
             "work_efficiency_schedule_name": "WORK_EFF_SCH",
-            "zone_floor_area_per_person": 18.58,
-            "zone_or_zonelist_name": "Perimeter_bot_ZN_1"
+            "floor_area_per_person": 18.58,
+            "zone_or_zonelist_or_space_or_spacelist_name": "Perimeter_bot_ZN_1"
         },
         "Perimeter_bot_ZN_2 People": {
             "activity_level_schedule_name": "ACTIVITY_SCH",
@@ -7230,8 +7230,8 @@
             "sensible_heat_fraction": "Autocalculate",
             "thermal_comfort_model_1_type": "Fanger",
             "work_efficiency_schedule_name": "WORK_EFF_SCH",
-            "zone_floor_area_per_person": 18.58,
-            "zone_or_zonelist_name": "Perimeter_bot_ZN_2"
+            "floor_area_per_person": 18.58,
+            "zone_or_zonelist_or_space_or_spacelist_name": "Perimeter_bot_ZN_2"
         },
         "Perimeter_bot_ZN_3 People": {
             "activity_level_schedule_name": "ACTIVITY_SCH",
@@ -7246,8 +7246,8 @@
             "sensible_heat_fraction": "Autocalculate",
             "thermal_comfort_model_1_type": "Fanger",
             "work_efficiency_schedule_name": "WORK_EFF_SCH",
-            "zone_floor_area_per_person": 18.58,
-            "zone_or_zonelist_name": "Perimeter_bot_ZN_3"
+            "floor_area_per_person": 18.58,
+            "zone_or_zonelist_or_space_or_spacelist_name": "Perimeter_bot_ZN_3"
         },
         "Perimeter_bot_ZN_4 People": {
             "activity_level_schedule_name": "ACTIVITY_SCH",
@@ -7262,8 +7262,8 @@
             "sensible_heat_fraction": "Autocalculate",
             "thermal_comfort_model_1_type": "Fanger",
             "work_efficiency_schedule_name": "WORK_EFF_SCH",
-            "zone_floor_area_per_person": 18.58,
-            "zone_or_zonelist_name": "Perimeter_bot_ZN_4"
+            "floor_area_per_person": 18.58,
+            "zone_or_zonelist_or_space_or_spacelist_name": "Perimeter_bot_ZN_4"
         },
         "Perimeter_mid_ZN_1 People": {
             "activity_level_schedule_name": "ACTIVITY_SCH",
@@ -7278,8 +7278,8 @@
             "sensible_heat_fraction": "Autocalculate",
             "thermal_comfort_model_1_type": "Fanger",
             "work_efficiency_schedule_name": "WORK_EFF_SCH",
-            "zone_floor_area_per_person": 18.58,
-            "zone_or_zonelist_name": "Perimeter_mid_ZN_1"
+            "floor_area_per_person": 18.58,
+            "zone_or_zonelist_or_space_or_spacelist_name": "Perimeter_mid_ZN_1"
         },
         "Perimeter_mid_ZN_2 People": {
             "activity_level_schedule_name": "ACTIVITY_SCH",
@@ -7294,8 +7294,8 @@
             "sensible_heat_fraction": "Autocalculate",
             "thermal_comfort_model_1_type": "Fanger",
             "work_efficiency_schedule_name": "WORK_EFF_SCH",
-            "zone_floor_area_per_person": 18.58,
-            "zone_or_zonelist_name": "Perimeter_mid_ZN_2"
+            "floor_area_per_person": 18.58,
+            "zone_or_zonelist_or_space_or_spacelist_name": "Perimeter_mid_ZN_2"
         },
         "Perimeter_mid_ZN_3 People": {
             "activity_level_schedule_name": "ACTIVITY_SCH",
@@ -7310,8 +7310,8 @@
             "sensible_heat_fraction": "Autocalculate",
             "thermal_comfort_model_1_type": "Fanger",
             "work_efficiency_schedule_name": "WORK_EFF_SCH",
-            "zone_floor_area_per_person": 18.58,
-            "zone_or_zonelist_name": "Perimeter_mid_ZN_3"
+            "floor_area_per_person": 18.58,
+            "zone_or_zonelist_or_space_or_spacelist_name": "Perimeter_mid_ZN_3"
         },
         "Perimeter_mid_ZN_4 People": {
             "activity_level_schedule_name": "ACTIVITY_SCH",
@@ -7326,8 +7326,8 @@
             "sensible_heat_fraction": "Autocalculate",
             "thermal_comfort_model_1_type": "Fanger",
             "work_efficiency_schedule_name": "WORK_EFF_SCH",
-            "zone_floor_area_per_person": 18.58,
-            "zone_or_zonelist_name": "Perimeter_mid_ZN_4"
+            "floor_area_per_person": 18.58,
+            "zone_or_zonelist_or_space_or_spacelist_name": "Perimeter_mid_ZN_4"
         },
         "Perimeter_top_ZN_1 People": {
             "activity_level_schedule_name": "ACTIVITY_SCH",
@@ -7342,8 +7342,8 @@
             "sensible_heat_fraction": "Autocalculate",
             "thermal_comfort_model_1_type": "Fanger",
             "work_efficiency_schedule_name": "WORK_EFF_SCH",
-            "zone_floor_area_per_person": 18.58,
-            "zone_or_zonelist_name": "Perimeter_top_ZN_1"
+            "floor_area_per_person": 18.58,
+            "zone_or_zonelist_or_space_or_spacelist_name": "Perimeter_top_ZN_1"
         },
         "Perimeter_top_ZN_2 People": {
             "activity_level_schedule_name": "ACTIVITY_SCH",
@@ -7358,8 +7358,8 @@
             "sensible_heat_fraction": "Autocalculate",
             "thermal_comfort_model_1_type": "Fanger",
             "work_efficiency_schedule_name": "WORK_EFF_SCH",
-            "zone_floor_area_per_person": 18.58,
-            "zone_or_zonelist_name": "Perimeter_top_ZN_2"
+            "floor_area_per_person": 18.58,
+            "zone_or_zonelist_or_space_or_spacelist_name": "Perimeter_top_ZN_2"
         },
         "Perimeter_top_ZN_3 People": {
             "activity_level_schedule_name": "ACTIVITY_SCH",
@@ -7374,8 +7374,8 @@
             "sensible_heat_fraction": "Autocalculate",
             "thermal_comfort_model_1_type": "Fanger",
             "work_efficiency_schedule_name": "WORK_EFF_SCH",
-            "zone_floor_area_per_person": 18.58,
-            "zone_or_zonelist_name": "Perimeter_top_ZN_3"
+            "floor_area_per_person": 18.58,
+            "zone_or_zonelist_or_space_or_spacelist_name": "Perimeter_top_ZN_3"
         },
         "Perimeter_top_ZN_4 People": {
             "activity_level_schedule_name": "ACTIVITY_SCH",
@@ -7390,8 +7390,8 @@
             "sensible_heat_fraction": "Autocalculate",
             "thermal_comfort_model_1_type": "Fanger",
             "work_efficiency_schedule_name": "WORK_EFF_SCH",
-            "zone_floor_area_per_person": 18.58,
-            "zone_or_zonelist_name": "Perimeter_top_ZN_4"
+            "floor_area_per_person": 18.58,
+            "zone_or_zonelist_or_space_or_spacelist_name": "Perimeter_top_ZN_4"
         }
     },
     "Pipe:Adiabatic": {
