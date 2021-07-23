@@ -40566,482 +40566,402 @@
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop G SW OA System,  !- Name
     AirLoop G SW OA System Controllers,  !- Controller List Name
-    AirLoop G SW OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop G SW Availability Manager;  !- Availability Manager List Name
+    AirLoop G SW OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop G NW OA System,  !- Name
     AirLoop G NW OA System Controllers,  !- Controller List Name
-    AirLoop G NW OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop G NW Availability Manager;  !- Availability Manager List Name
+    AirLoop G NW OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop Office OA System,!- Name
     AirLoop Office OA System Controllers,  !- Controller List Name
-    AirLoop Office OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop Office Availability Manager;  !- Availability Manager List Name
+    AirLoop Office OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop G NE OA System,  !- Name
     AirLoop G NE OA System Controllers,  !- Controller List Name
-    AirLoop G NE OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop G NE Availability Manager;  !- Availability Manager List Name
+    AirLoop G NE OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop G N1 OA System,  !- Name
     AirLoop G N1 OA System Controllers,  !- Controller List Name
-    AirLoop G N1 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop G N1 Availability Manager;  !- Availability Manager List Name
+    AirLoop G N1 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop G N2 OA System,  !- Name
     AirLoop G N2 OA System Controllers,  !- Controller List Name
-    AirLoop G N2 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop G N2 Availability Manager;  !- Availability Manager List Name
+    AirLoop G N2 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop G S1 OA System,  !- Name
     AirLoop G S1 OA System Controllers,  !- Controller List Name
-    AirLoop G S1 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop G S1 Availability Manager;  !- Availability Manager List Name
+    AirLoop G S1 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop G S2 OA System,  !- Name
     AirLoop G S2 OA System Controllers,  !- Controller List Name
-    AirLoop G S2 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop G S2 Availability Manager;  !- Availability Manager List Name
+    AirLoop G S2 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F2 SW OA System, !- Name
     AirLoop F2 SW OA System Controllers,  !- Controller List Name
-    AirLoop F2 SW OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F2 SW OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F2 NW OA System, !- Name
     AirLoop F2 NW OA System Controllers,  !- Controller List Name
-    AirLoop F2 NW OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F2 NW OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F2 SE OA System, !- Name
     AirLoop F2 SE OA System Controllers,  !- Controller List Name
-    AirLoop F2 SE OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F2 SE OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F2 NE OA System, !- Name
     AirLoop F2 NE OA System Controllers,  !- Controller List Name
-    AirLoop F2 NE OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F2 NE OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F2 N1 OA System, !- Name
     AirLoop F2 N1 OA System Controllers,  !- Controller List Name
-    AirLoop F2 N1 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F2 N1 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F2 N2 OA System, !- Name
     AirLoop F2 N2 OA System Controllers,  !- Controller List Name
-    AirLoop F2 N2 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F2 N2 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F2 S1 OA System, !- Name
     AirLoop F2 S1 OA System Controllers,  !- Controller List Name
-    AirLoop F2 S1 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F2 S1 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F2 S2 OA System, !- Name
     AirLoop F2 S2 OA System Controllers,  !- Controller List Name
-    AirLoop F2 S2 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F2 S2 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F3 SW OA System, !- Name
     AirLoop F3 SW OA System Controllers,  !- Controller List Name
-    AirLoop F3 SW OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F3 SW OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F3 NW OA System, !- Name
     AirLoop F3 NW OA System Controllers,  !- Controller List Name
-    AirLoop F3 NW OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F3 NW OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F3 SE OA System, !- Name
     AirLoop F3 SE OA System Controllers,  !- Controller List Name
-    AirLoop F3 SE OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F3 SE OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F3 NE OA System, !- Name
     AirLoop F3 NE OA System Controllers,  !- Controller List Name
-    AirLoop F3 NE OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F3 NE OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F3 N1 OA System, !- Name
     AirLoop F3 N1 OA System Controllers,  !- Controller List Name
-    AirLoop F3 N1 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F3 N1 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F3 N2 OA System, !- Name
     AirLoop F3 N2 OA System Controllers,  !- Controller List Name
-    AirLoop F3 N2 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F3 N2 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F3 S1 OA System, !- Name
     AirLoop F3 S1 OA System Controllers,  !- Controller List Name
-    AirLoop F3 S1 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F3 S1 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F3 S2 OA System, !- Name
     AirLoop F3 S2 OA System Controllers,  !- Controller List Name
-    AirLoop F3 S2 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F3 S2 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F4 SW OA System, !- Name
     AirLoop F4 SW OA System Controllers,  !- Controller List Name
-    AirLoop F4 SW OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F4 SW OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F4 NW OA System, !- Name
     AirLoop F4 NW OA System Controllers,  !- Controller List Name
-    AirLoop F4 NW OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F4 NW OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F4 SE OA System, !- Name
     AirLoop F4 SE OA System Controllers,  !- Controller List Name
-    AirLoop F4 SE OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F4 SE OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F4 NE OA System, !- Name
     AirLoop F4 NE OA System Controllers,  !- Controller List Name
-    AirLoop F4 NE OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F4 NE OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F4 N1 OA System, !- Name
     AirLoop F4 N1 OA System Controllers,  !- Controller List Name
-    AirLoop F4 N1 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F4 N1 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F4 N2 OA System, !- Name
     AirLoop F4 N2 OA System Controllers,  !- Controller List Name
-    AirLoop F4 N2 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F4 N2 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F4 S1 OA System, !- Name
     AirLoop F4 S1 OA System Controllers,  !- Controller List Name
-    AirLoop F4 S1 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F4 S1 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F4 S2 OA System, !- Name
     AirLoop F4 S2 OA System Controllers,  !- Controller List Name
-    AirLoop F4 S2 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F4 S2 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop M SW OA System,  !- Name
     AirLoop M SW OA System Controllers,  !- Controller List Name
-    AirLoop M SW OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop M SW OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop M NW OA System,  !- Name
     AirLoop M NW OA System Controllers,  !- Controller List Name
-    AirLoop M NW OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop M NW OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop M SE OA System,  !- Name
     AirLoop M SE OA System Controllers,  !- Controller List Name
-    AirLoop M SE OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop M SE OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop M NE OA System,  !- Name
     AirLoop M NE OA System Controllers,  !- Controller List Name
-    AirLoop M NE OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop M NE OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop M N1 OA System,  !- Name
     AirLoop M N1 OA System Controllers,  !- Controller List Name
-    AirLoop M N1 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop M N1 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop M N2 OA System,  !- Name
     AirLoop M N2 OA System Controllers,  !- Controller List Name
-    AirLoop M N2 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop M N2 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop M S1 OA System,  !- Name
     AirLoop M S1 OA System Controllers,  !- Controller List Name
-    AirLoop M S1 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop M S1 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop M S2 OA System,  !- Name
     AirLoop M S2 OA System Controllers,  !- Controller List Name
-    AirLoop M S2 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop M S2 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F6 SW OA System, !- Name
     AirLoop F6 SW OA System Controllers,  !- Controller List Name
-    AirLoop F6 SW OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F6 SW OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F6 NW OA System, !- Name
     AirLoop F6 NW OA System Controllers,  !- Controller List Name
-    AirLoop F6 NW OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F6 NW OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F6 SE OA System, !- Name
     AirLoop F6 SE OA System Controllers,  !- Controller List Name
-    AirLoop F6 SE OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F6 SE OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F6 NE OA System, !- Name
     AirLoop F6 NE OA System Controllers,  !- Controller List Name
-    AirLoop F6 NE OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F6 NE OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F6 N1 OA System, !- Name
     AirLoop F6 N1 OA System Controllers,  !- Controller List Name
-    AirLoop F6 N1 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F6 N1 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F6 N2 OA System, !- Name
     AirLoop F6 N2 OA System Controllers,  !- Controller List Name
-    AirLoop F6 N2 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F6 N2 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F6 S1 OA System, !- Name
     AirLoop F6 S1 OA System Controllers,  !- Controller List Name
-    AirLoop F6 S1 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F6 S1 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F6 S2 OA System, !- Name
     AirLoop F6 S2 OA System Controllers,  !- Controller List Name
-    AirLoop F6 S2 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F6 S2 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F7 SW OA System, !- Name
     AirLoop F7 SW OA System Controllers,  !- Controller List Name
-    AirLoop F7 SW OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F7 SW OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F7 NW OA System, !- Name
     AirLoop F7 NW OA System Controllers,  !- Controller List Name
-    AirLoop F7 NW OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F7 NW OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F7 SE OA System, !- Name
     AirLoop F7 SE OA System Controllers,  !- Controller List Name
-    AirLoop F7 SE OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F7 SE OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F7 NE OA System, !- Name
     AirLoop F7 NE OA System Controllers,  !- Controller List Name
-    AirLoop F7 NE OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F7 NE OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F7 N1 OA System, !- Name
     AirLoop F7 N1 OA System Controllers,  !- Controller List Name
-    AirLoop F7 N1 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F7 N1 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F7 N2 OA System, !- Name
     AirLoop F7 N2 OA System Controllers,  !- Controller List Name
-    AirLoop F7 N2 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F7 N2 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F7 S1 OA System, !- Name
     AirLoop F7 S1 OA System Controllers,  !- Controller List Name
-    AirLoop F7 S1 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F7 S1 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F7 S2 OA System, !- Name
     AirLoop F7 S2 OA System Controllers,  !- Controller List Name
-    AirLoop F7 S2 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F7 S2 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F8 SW OA System, !- Name
     AirLoop F8 SW OA System Controllers,  !- Controller List Name
-    AirLoop F8 SW OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F8 SW OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F8 NW OA System, !- Name
     AirLoop F8 NW OA System Controllers,  !- Controller List Name
-    AirLoop F8 NW OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F8 NW OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F8 SE OA System, !- Name
     AirLoop F8 SE OA System Controllers,  !- Controller List Name
-    AirLoop F8 SE OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F8 SE OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F8 NE OA System, !- Name
     AirLoop F8 NE OA System Controllers,  !- Controller List Name
-    AirLoop F8 NE OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F8 NE OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F8 N1 OA System, !- Name
     AirLoop F8 N1 OA System Controllers,  !- Controller List Name
-    AirLoop F8 N1 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F8 N1 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F8 N2 OA System, !- Name
     AirLoop F8 N2 OA System Controllers,  !- Controller List Name
-    AirLoop F8 N2 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F8 N2 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F8 S1 OA System, !- Name
     AirLoop F8 S1 OA System Controllers,  !- Controller List Name
-    AirLoop F8 S1 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F8 S1 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F8 S2 OA System, !- Name
     AirLoop F8 S2 OA System Controllers,  !- Controller List Name
-    AirLoop F8 S2 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F8 S2 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F9 SW OA System, !- Name
     AirLoop F9 SW OA System Controllers,  !- Controller List Name
-    AirLoop F9 SW OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F9 SW OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F9 NW OA System, !- Name
     AirLoop F9 NW OA System Controllers,  !- Controller List Name
-    AirLoop F9 NW OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F9 NW OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F9 SE OA System, !- Name
     AirLoop F9 SE OA System Controllers,  !- Controller List Name
-    AirLoop F9 SE OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F9 SE OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F9 NE OA System, !- Name
     AirLoop F9 NE OA System Controllers,  !- Controller List Name
-    AirLoop F9 NE OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F9 NE OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F9 N1 OA System, !- Name
     AirLoop F9 N1 OA System Controllers,  !- Controller List Name
-    AirLoop F9 N1 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F9 N1 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F9 N2 OA System, !- Name
     AirLoop F9 N2 OA System Controllers,  !- Controller List Name
-    AirLoop F9 N2 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F9 N2 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F9 S1 OA System, !- Name
     AirLoop F9 S1 OA System Controllers,  !- Controller List Name
-    AirLoop F9 S1 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F9 S1 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop F9 S2 OA System, !- Name
     AirLoop F9 S2 OA System Controllers,  !- Controller List Name
-    AirLoop F9 S2 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop F9 S2 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop T SW OA System,  !- Name
     AirLoop T SW OA System Controllers,  !- Controller List Name
-    AirLoop T SW OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop T SW OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop T NW OA System,  !- Name
     AirLoop T NW OA System Controllers,  !- Controller List Name
-    AirLoop T NW OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop T NW OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop T SE OA System,  !- Name
     AirLoop T SE OA System Controllers,  !- Controller List Name
-    AirLoop T SE OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop T SE OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop T NE OA System,  !- Name
     AirLoop T NE OA System Controllers,  !- Controller List Name
-    AirLoop T NE OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop T NE OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop T N1 OA System,  !- Name
     AirLoop T N1 OA System Controllers,  !- Controller List Name
-    AirLoop T N1 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop T N1 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop T N2 OA System,  !- Name
     AirLoop T N2 OA System Controllers,  !- Controller List Name
-    AirLoop T N2 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop T N2 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop T S1 OA System,  !- Name
     AirLoop T S1 OA System Controllers,  !- Controller List Name
-    AirLoop T S1 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop T S1 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop T S2 OA System,  !- Name
     AirLoop T S2 OA System Controllers,  !- Controller List Name
-    AirLoop T S2 OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop AllApts Availability Manager;  !- Availability Manager List Name
+    AirLoop T S2 OA System Equipment;  !- Outdoor Air Equipment List Name
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTDOORAIR:MIXER ===========
 

@@ -68,6 +68,7 @@
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -165,7 +166,6 @@ namespace DaylightingDevices {
     // Mills, A. F.  Heat and Mass Transfer, 1995, p. 499.  (Shape factor for adjacent rectangles.)
 
     // Using/Aliasing
-    using DataHeatBalance::MinimalShadowing;
     using DataSurfaces::ExternalEnvironment;
     using DataSurfaces::SurfaceClass;
 
@@ -321,58 +321,58 @@ namespace DaylightingDevices {
                                     "Tubular Daylighting Device Transmitted Solar Radiation Rate",
                                     OutputProcessor::Unit::W,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransmittedSolar,
-                                    "Zone",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Pipe Absorbed Solar Radiation Rate",
                                     OutputProcessor::Unit::W,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).PipeAbsorbedSolar,
-                                    "Zone",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Heat Gain Rate",
                                     OutputProcessor::Unit::W,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).HeatGain,
-                                    "Zone",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Heat Loss Rate",
                                     OutputProcessor::Unit::W,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).HeatLoss,
-                                    "Zone",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
 
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Beam Solar Transmittance",
                                     OutputProcessor::Unit::None,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolBeam,
-                                    "Zone",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Beam Visible Transmittance",
                                     OutputProcessor::Unit::None,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransVisBeam,
-                                    "Zone",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Diffuse Solar Transmittance",
                                     OutputProcessor::Unit::None,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolDiff,
-                                    "Zone",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Diffuse Visible Transmittance",
                                     OutputProcessor::Unit::None,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransVisDiff,
-                                    "Zone",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
 
             } // PipeNum
@@ -1272,23 +1272,23 @@ namespace DaylightingDevices {
         DomeSurf = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome;
 
         if (!state.dataSysVars->DetailedSkyDiffuseAlgorithm || !state.dataSurface->ShadingTransmittanceVaries ||
-            state.dataHeatBal->SolarDistribution == MinimalShadowing) {
-            IsoSkyRad = state.dataHeatBal->MultIsoSky(DomeSurf) * state.dataHeatBal->DifShdgRatioIsoSky(DomeSurf);
-            HorizonRad = state.dataHeatBal->MultHorizonZenith(DomeSurf) * state.dataHeatBal->DifShdgRatioHoriz(DomeSurf);
+            state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::MinimalShadowing) {
+            IsoSkyRad = state.dataSolarShading->SurfMultIsoSky(DomeSurf) * state.dataSolarShading->SurfDifShdgRatioIsoSky(DomeSurf);
+            HorizonRad = state.dataSolarShading->SurfMultHorizonZenith(DomeSurf) * state.dataSolarShading->SurfDifShdgRatioHoriz(DomeSurf);
         } else {
-            IsoSkyRad = state.dataHeatBal->MultIsoSky(DomeSurf) * state.dataHeatBal->curDifShdgRatioIsoSky(DomeSurf);
-            HorizonRad = state.dataHeatBal->MultHorizonZenith(DomeSurf) *
-                         state.dataHeatBal->DifShdgRatioHorizHRTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, DomeSurf);
+            IsoSkyRad = state.dataSolarShading->SurfMultIsoSky(DomeSurf) * state.dataSolarShading->SurfCurDifShdgRatioIsoSky(DomeSurf);
+            HorizonRad = state.dataSolarShading->SurfMultHorizonZenith(DomeSurf) *
+                         state.dataSolarShading->SurfDifShdgRatioHorizHRTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, DomeSurf);
         }
-        CircumSolarRad = state.dataHeatBal->MultCircumSolar(DomeSurf) *
-                         state.dataHeatBal->SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, DomeSurf);
+        CircumSolarRad = state.dataSolarShading->SurfMultCircumSolar(DomeSurf) *
+                         state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, DomeSurf);
 
         AnisoSkyTDDMult = state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso * IsoSkyRad +
                           TransTDD(state, PipeNum, COSI, DataDaylightingDevices::iRadType::SolarBeam) * CircumSolarRad +
                           state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolHorizon * HorizonRad;
 
-        if (state.dataHeatBal->SurfAnisoSkyMult(DomeSurf) > 0.0) {
-            CalcTDDTransSolAniso = AnisoSkyTDDMult / state.dataHeatBal->SurfAnisoSkyMult(DomeSurf);
+        if (state.dataSolarShading->SurfAnisoSkyMult(DomeSurf) > 0.0) {
+            CalcTDDTransSolAniso = AnisoSkyTDDMult / state.dataSolarShading->SurfAnisoSkyMult(DomeSurf);
         } else {
             CalcTDDTransSolAniso = 0.0;
         }

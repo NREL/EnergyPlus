@@ -69,10 +69,10 @@ namespace BranchNodeConnections {
 
     void RegisterNodeConnection(EnergyPlusData &state,
                                 int NodeNumber,                                // Number for this Node
-                                std::string const &NodeName,                   // Name of this Node
-                                std::string const &ObjectType,                 // Type of object this Node is connected to (e.g. Chiller:Electric)
-                                std::string const &ObjectName,                 // Name of object this Node is connected to (e.g. MyChiller)
-                                std::string const &ConnectionType,             // Connection Type for this Node (must be valid)
+                                std::string_view const NodeName,               // Name of this Node
+                                std::string_view const ObjectType,             // Type of object this Node is connected to (e.g. Chiller:Electric)
+                                std::string_view const ObjectName,             // Name of object this Node is connected to (e.g. MyChiller)
+                                std::string_view const ConnectionType,         // Connection Type for this Node (must be valid)
                                 NodeInputManager::compFluidStream FluidStream, // Count on Fluid Streams
                                 bool IsParent,                                 // True when node is a parent node
                                 bool &errFlag,                                 // Will be True if errors already detected or if errors found here
@@ -90,7 +90,7 @@ namespace BranchNodeConnections {
                                     bool &errFlag                                  // Will be True if errors already detected or if errors found here
     );
 
-    bool IsValidConnectionType(std::string const &ConnectionType);
+    bool IsValidConnectionType(std::string_view ConnectionType);
 
     void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound);
 
@@ -141,12 +141,12 @@ namespace BranchNodeConnections {
                          bool &ErrorsFound);
 
     void SetUpCompSets(EnergyPlusData &state,
-                       std::string const &ParentType,        // Parent Object Type
-                       std::string const &ParentName,        // Parent Object Name
-                       std::string const &CompType,          // Component Type
-                       std::string const &CompName,          // Component Name
-                       std::string const &InletNode,         // Inlet Node Name
-                       std::string const &OutletNode,        // Outlet Node Name
+                       std::string_view ParentType,          // Parent Object Type
+                       std::string_view ParentName,          // Parent Object Name
+                       std::string_view CompType,            // Component Type
+                       std::string_view CompName,            // Component Name
+                       std::string_view InletNode,           // Inlet Node Name
+                       std::string_view OutletNode,          // Outlet Node Name
                        Optional_string_const Description = _ // Description
     );
 
@@ -154,7 +154,7 @@ namespace BranchNodeConnections {
 
     void TestCompSet(EnergyPlusData &state,
                      std::string const &CompType,   // Component Type
-                     std::string const &CompName,   // Component Name
+                     std::string_view CompName,     // Component Name
                      std::string const &InletNode,  // Inlet Node Name
                      std::string const &OutletNode, // Outlet Node Name
                      std::string const &Description // Description of Node Pair (for warning message)

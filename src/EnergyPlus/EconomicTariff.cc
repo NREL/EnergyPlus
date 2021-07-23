@@ -141,7 +141,7 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
     using DataGlobalConstants::AssignResourceTypeNum;
     using OutputReportTabular::AddTOCEntry;
 
-    std::string const RoutineName("GetInputEconomicsTariff: ");
+    static constexpr std::string_view RoutineName("GetInputEconomicsTariff: ");
     int iInObj;    // loop index variable for reading in objects
     int jObj;      // loop index for objects
     int NumAlphas; // Number of elements in the alpha array
@@ -182,7 +182,7 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
         for (jFld = 1; jFld <= NumAlphas; ++jFld) {
             //  args are always turned to upper case but this is okay...
             if (hasi(state.dataIPShortCut->cAlphaArgs(jFld), "UtilityCost:")) {
-                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\".");
+                ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\".");
                 ShowContinueError(state, "... a field was found containing UtilityCost: which may indicate a missing comma.");
             }
         }
@@ -197,7 +197,7 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
             }
         }
         if (found > 0) {
-            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
             ShowContinueError(state, "...Duplicate name. Name has already been used.");
             ErrorsFound = true;
         }
@@ -207,7 +207,8 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
         GetVariableKeyCountandType(state, tariff(iInObj).reportMeter, KeyCount, TypeVar, AvgSumVar, StepTypeVar, UnitsVar);
         // if no meters found for that name
         if (KeyCount == 0) {
-            ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" missing meter");
+            ShowWarningError(state,
+                             std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" missing meter");
             ShowContinueError(state,
                               "Meter referenced is not present due to a lack of equipment that uses that energy source/meter:\"" +
                                   tariff(iInObj).reportMeter + "\".");
@@ -218,7 +219,8 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
             GetVariableKeys(state, tariff(iInObj).reportMeter, TypeVar, NamesOfKeys, IndexesForKeyVar);
             // although this retrieves all keys for a variable, we only need one so the first one is chosen
             if (KeyCount > 1) {
-                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" multiple keys");
+                ShowWarningError(state,
+                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" multiple keys");
                 ShowContinueError(state, "... Multiple keys for variable select. First key will be used.");
             }
             // assign the index
@@ -295,7 +297,8 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
                 tariff(iInObj).convChoice = iEconConv::M3;
                 tariff(iInObj).energyConv = 1.0;
                 tariff(iInObj).demandConv = 3600.0;
-                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
+                ShowWarningError(state,
+                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
                 ShowContinueError(state,
                                   state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) +
                                       "\", Defaulting to m^3 (Water resource detected).");
@@ -332,7 +335,8 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
                 tariff(iInObj).energyConv = 9.4781712e-9;
                 tariff(iInObj).demandConv = 0.00003412;
                 ShowWarningError(state,
-                                 RoutineName + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" potentially invalid data");
+                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                     "\" potentially invalid data");
                 ShowContinueError(state,
                                   state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) +
                                       "\", Therm is an unusual choice for an electric resource.)");
@@ -342,7 +346,8 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
                 tariff(iInObj).convChoice = iEconConv::KWH;
                 tariff(iInObj).energyConv = 0.0000002778;
                 tariff(iInObj).demandConv = 0.001;
-                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
+                ShowWarningError(state,
+                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
                 ShowContinueError(state,
                                   state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) +
                                       "\", Defaulting to kWh (Electric resource detected)");
@@ -396,7 +401,8 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
                 tariff(iInObj).convChoice = iEconConv::KWH;
                 tariff(iInObj).energyConv = 0.0000002778;
                 tariff(iInObj).demandConv = 0.001;
-                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
+                ShowWarningError(state,
+                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
                 ShowContinueError(state,
                                   state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\", Defaulting to kWh.");
             }
@@ -434,7 +440,8 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
                 tariff(iInObj).convChoice = iEconConv::KWH;
                 tariff(iInObj).energyConv = 0.0000002778;
                 tariff(iInObj).demandConv = 0.001;
-                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
+                ShowWarningError(state,
+                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
                 ShowContinueError(state,
                                   state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\", Defaulting to kWh.");
             }
@@ -446,7 +453,8 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
             tariff(iInObj).periodSchedule = state.dataIPShortCut->cAlphaArgs(4);                          // name of the period schedule (time of day)
             tariff(iInObj).periodSchIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4)); // index to the period schedule
             if (tariff(iInObj).periodSchIndex == 0) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
+                ShowSevereError(state,
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
                 ShowContinueError(state,
                                   " not found " + state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) + "\".");
                 ErrorsFound = true;
@@ -459,7 +467,8 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
             tariff(iInObj).seasonSchedule = state.dataIPShortCut->cAlphaArgs(5); // name of the season schedule (winter/summer)
             tariff(iInObj).seasonSchIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(5)); // index to the season schedule
             if (tariff(iInObj).seasonSchIndex == 0) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
+                ShowSevereError(state,
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
                 ShowContinueError(state,
                                   " not found " + state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" + state.dataIPShortCut->cAlphaArgs(5) + "\".");
                 ErrorsFound = true;
@@ -472,7 +481,8 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
             tariff(iInObj).monthSchedule = state.dataIPShortCut->cAlphaArgs(6);                          // name of month schedule (when months end)
             tariff(iInObj).monthSchIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6)); // index to the month schedule
             if (tariff(iInObj).monthSchIndex == 0) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
+                ShowSevereError(state,
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
                 ShowContinueError(state,
                                   " not found " + state.dataIPShortCut->cAlphaFieldNames(6) + "=\"" + state.dataIPShortCut->cAlphaArgs(6) + "\".");
                 ErrorsFound = true;
@@ -488,7 +498,8 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
                 if ((SELECT_CASE_var == 1) || (SELECT_CASE_var == 3) || (SELECT_CASE_var == 5) || (SELECT_CASE_var == 15)) {
                     tariff(iInObj).demandWindow = iDemandWindow::Hour;
                     tariff(iInObj).demWinTime = 1.00;
-                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
+                    ShowWarningError(
+                        state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
                     ShowContinueError(state,
                                       format("Demand window of QuarterHour is not consistent with number of timesteps per hour [{}].",
                                              state.dataGlobal->NumOfTimeStepInHour));
@@ -496,7 +507,8 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
                 } else if ((SELECT_CASE_var == 2) || (SELECT_CASE_var == 6) || (SELECT_CASE_var == 10) || (SELECT_CASE_var == 30)) {
                     tariff(iInObj).demandWindow = iDemandWindow::Half;
                     tariff(iInObj).demWinTime = 0.50;
-                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
+                    ShowWarningError(
+                        state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
                     ShowContinueError(state,
                                       format("Demand window of QuarterHour is not consistent with number of timesteps per hour [{}].",
                                              state.dataGlobal->NumOfTimeStepInHour));
@@ -512,7 +524,8 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
                 if ((SELECT_CASE_var == 1) || (SELECT_CASE_var == 3) || (SELECT_CASE_var == 5) || (SELECT_CASE_var == 15)) {
                     tariff(iInObj).demandWindow = iDemandWindow::Hour;
                     tariff(iInObj).demWinTime = 1.00;
-                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
+                    ShowWarningError(
+                        state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
                     ShowContinueError(state,
                                       format("Demand window of HalfHour is not consistent with number of timesteps per hour [{}].",
                                              state.dataGlobal->NumOfTimeStepInHour));
@@ -580,12 +593,14 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
         // check if meter is consistent with buy or sell option
         if ((tariff(iInObj).buyOrSell == sellToUtility) &&
             (!UtilityRoutines::SameString(tariff(iInObj).reportMeter, "ELECTRICITYSURPLUSSOLD:FACILITY"))) {
-            ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" atypical meter");
+            ShowWarningError(state,
+                             std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" atypical meter");
             ShowContinueError(state, "The meter chosen \"" + tariff(iInObj).reportMeter + "\" is not typically used with the sellToUtility option.");
             ShowContinueError(state, "Usually the ElectricitySurplusSold:Facility meter is selected when the sellToUtility option is used.");
         }
         if ((tariff(iInObj).buyOrSell == netMetering) && (!UtilityRoutines::SameString(tariff(iInObj).reportMeter, "ELECTRICITYNET:FACILITY"))) {
-            ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" atypical meter");
+            ShowWarningError(state,
+                             std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" atypical meter");
             ShowContinueError(state, "The meter chosen \"" + tariff(iInObj).reportMeter + " is not typically used with the netMetering option.");
             ShowContinueError(state, "Usually the ElectricityNet:Facility meter is selected when the netMetering option is used.");
         }
@@ -594,7 +609,8 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
             if (hasi(tariff(iInObj).reportMeter, "Elec")) { // test if electric meter
                 if (!(UtilityRoutines::SameString(tariff(iInObj).reportMeter, "Electricity:Facility") ||
                       UtilityRoutines::SameString(tariff(iInObj).reportMeter, "ElectricityPurchased:Facility"))) {
-                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" atypical meter");
+                    ShowWarningError(
+                        state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" atypical meter");
                     ShowContinueError(state,
                                       "The meter chosen \"" + tariff(iInObj).reportMeter + " is not typically used with the buyFromUtility option.");
                     ShowContinueError(state,
@@ -631,7 +647,7 @@ void GetInputEconomicsQualify(EnergyPlusData &state, bool &ErrorsFound) // true 
 
     //    Read the input file for "Economics:Qualify" objects.
 
-    std::string const RoutineName("GetInputEconomicsQualify: ");
+    static constexpr std::string_view RoutineName("GetInputEconomicsQualify: ");
     int iInObj;    // loop index variable for reading in objects
     int NumAlphas; // Number of elements in the alpha array
     int NumNums;   // Number of elements in the numeric array
@@ -661,7 +677,7 @@ void GetInputEconomicsQualify(EnergyPlusData &state, bool &ErrorsFound) // true 
         // check to make sure none of the values are another economic object
         for (jFld = 1; jFld <= NumAlphas; ++jFld) {
             if (hasi(state.dataIPShortCut->cAlphaArgs(jFld), "UtilityCost:")) {
-                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\".");
+                ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\".");
                 ShowContinueError(state, "... a field was found containing UtilityCost: which may indicate a missing comma.");
             }
         }
@@ -692,7 +708,7 @@ void GetInputEconomicsQualify(EnergyPlusData &state, bool &ErrorsFound) // true 
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), "Maximum")) {
             qualify(iInObj).isMaximum = true;
         } else {
-            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
             ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) + "\".");
             ErrorsFound = true;
             qualify(iInObj).isMaximum = true;
@@ -715,7 +731,7 @@ void GetInputEconomicsQualify(EnergyPlusData &state, bool &ErrorsFound) // true 
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "Consecutive")) {
             qualify(iInObj).isConsecutive = true;
         } else {
-            ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
+            ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
             ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" + state.dataIPShortCut->cAlphaArgs(5) + "\".");
             ErrorsFound = true;
             qualify(iInObj).isConsecutive = true;
@@ -732,7 +748,7 @@ void GetInputEconomicsChargeSimple(EnergyPlusData &state, bool &ErrorsFound) // 
 
     //    Read the input file for "Economics:Charge:Simple" objects.
 
-    std::string const RoutineName("GetInputEconomicsChargeSimple: ");
+    static constexpr std::string_view RoutineName("GetInputEconomicsChargeSimple: ");
     int iInObj;    // loop index variable for reading in objects
     int NumAlphas; // Number of elements in the alpha array
     int NumNums;   // Number of elements in the numeric array
@@ -763,7 +779,7 @@ void GetInputEconomicsChargeSimple(EnergyPlusData &state, bool &ErrorsFound) // 
         // check to make sure none of the values are another economic object
         for (jFld = 1; jFld <= NumAlphas; ++jFld) {
             if (hasi(state.dataIPShortCut->cAlphaArgs(jFld), "UtilityCost:")) {
-                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\".");
+                ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\".");
                 ShowContinueError(state, "... a field was found containing UtilityCost: which may indicate a missing comma.");
             }
         }
@@ -794,7 +810,8 @@ void GetInputEconomicsChargeSimple(EnergyPlusData &state, bool &ErrorsFound) // 
         if (chargeSimple(iInObj).season != seasonAnnual) {
             if (chargeSimple(iInObj).tariffIndx != 0) {
                 if (tariff(chargeSimple(iInObj).tariffIndx).seasonSchIndex == 0) {
-                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
+                    ShowWarningError(
+                        state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
                     ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) + "\".");
                     ShowContinueError(state,
                                       " a Season other than Annual is used but no Season Schedule Name is specified in the UtilityCost:Tariff.");
@@ -830,7 +847,7 @@ void GetInputEconomicsChargeBlock(EnergyPlusData &state, bool &ErrorsFound) // t
 
     //    Read the input file for "Economics:Charge:Block" objects.
 
-    std::string const RoutineName("GetInputEconomicsChargeBlock: ");
+    static constexpr std::string_view RoutineName("GetInputEconomicsChargeBlock: ");
     int iInObj;    // loop index variable for reading in objects
     int NumAlphas; // Number of elements in the alpha array
     int NumNums;   // Number of elements in the numeric array
@@ -865,7 +882,7 @@ void GetInputEconomicsChargeBlock(EnergyPlusData &state, bool &ErrorsFound) // t
         // check to make sure none of the values are another economic object
         for (jFld = 1; jFld <= NumAlphas; ++jFld) {
             if (hasi(state.dataIPShortCut->cAlphaArgs(jFld), "UtilityCost:")) {
-                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\".");
+                ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\".");
                 ShowContinueError(state, "... a field was found containing UtilityCost: which may indicate a missing comma.");
             }
         }
@@ -896,7 +913,8 @@ void GetInputEconomicsChargeBlock(EnergyPlusData &state, bool &ErrorsFound) // t
         if (chargeBlock(iInObj).season != seasonAnnual) {
             if (chargeBlock(iInObj).tariffIndx != 0) {
                 if (tariff(chargeBlock(iInObj).tariffIndx).seasonSchIndex == 0) {
-                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
+                    ShowWarningError(
+                        state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
                     ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) + "\".");
                     ShowContinueError(state,
                                       " a Season other than Annual is used but no Season Schedule Name is specified in the UtilityCost:Tariff.");
@@ -978,7 +996,7 @@ void GetInputEconomicsRatchet(EnergyPlusData &state, bool &ErrorsFound) // true 
 
     //    Read the input file for "Economics:Ratchet" objects.
 
-    std::string const RoutineName("GetInputEconomicsRatchet: ");
+    static constexpr std::string_view RoutineName("GetInputEconomicsRatchet: ");
     int iInObj;    // loop index variable for reading in objects
     int NumAlphas; // Number of elements in the alpha array
     int NumNums;   // Number of elements in the numeric array
@@ -1008,7 +1026,7 @@ void GetInputEconomicsRatchet(EnergyPlusData &state, bool &ErrorsFound) // true 
         // check to make sure none of the values are another economic object
         for (jFld = 1; jFld <= NumAlphas; ++jFld) {
             if (hasi(state.dataIPShortCut->cAlphaArgs(jFld), "UtilityCost:")) {
-                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\".");
+                ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\".");
                 ShowContinueError(state, "... a field was found containing UtilityCost: which may indicate a missing comma.");
             }
         }
@@ -1075,7 +1093,7 @@ void GetInputEconomicsVariable(EnergyPlusData &state, bool &ErrorsFound) // true
 
     //    Read the input file for "Economics:Variable" objects.
 
-    std::string const RoutineName("GetInputEconomicsVariable: ");
+    static constexpr std::string_view RoutineName("GetInputEconomicsVariable: ");
 
     int numEconVarObj;
     int tariffPt;
@@ -1108,7 +1126,7 @@ void GetInputEconomicsVariable(EnergyPlusData &state, bool &ErrorsFound) // true
         // check to make sure none of the values are another economic object
         for (jFld = 1; jFld <= NumAlphas; ++jFld) {
             if (hasi(state.dataIPShortCut->cAlphaArgs(jFld), "UtilityCost:")) {
-                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\".");
+                ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\".");
                 ShowContinueError(state, "... a field was found containing UtilityCost: which may indicate a missing comma.");
             }
         }
@@ -1127,7 +1145,7 @@ void GetInputEconomicsVariable(EnergyPlusData &state, bool &ErrorsFound) // true
             econVar(variablePt).varUnitType = varUnitTypeCurrency;
         } else {
             econVar(variablePt).varUnitType = varUnitTypeDimensionless;
-            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
             ShowContinueError(state, "invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".");
             ErrorsFound = true;
         }
@@ -1152,7 +1170,7 @@ void GetInputEconomicsComputation(EnergyPlusData &state, bool &ErrorsFound) // t
     //    Read the input file for "Economics:Computation" objects.
     //    This object is only used for very complex rates.
 
-    std::string const RoutineName("GetInputEconomicsComputation: ");
+    static constexpr std::string_view RoutineName("GetInputEconomicsComputation: ");
 
     int tariffPt;
     int iInObj;    // loop index variable for reading in objects
@@ -1191,7 +1209,7 @@ void GetInputEconomicsComputation(EnergyPlusData &state, bool &ErrorsFound) // t
         // check to make sure none of the values are another economic object
         for (jFld = 1; jFld <= NumAlphas; ++jFld) {
             if (hasi(state.dataIPShortCut->cAlphaArgs(jFld), "UtilityCost:")) {
-                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\".");
+                ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\".");
                 ShowContinueError(state, "... a field was found containing UtilityCost: which may indicate a missing comma.");
             }
         }
@@ -1211,14 +1229,15 @@ void GetInputEconomicsComputation(EnergyPlusData &state, bool &ErrorsFound) // t
                 computation(tariffPt).firstStep = 0;
                 computation(tariffPt).lastStep = -1;
                 computation(tariffPt).isUserDef = false;
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data.");
+                ShowSevereError(state,
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data.");
                 ShowContinueError(state, "... No lines in the computation can be interpreted ");
                 ErrorsFound = true;
             } else {
                 computation(tariffPt).isUserDef = true;
             }
         } else {
-            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data.");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data.");
             ShowContinueError(state,
                               "... not found " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
             ErrorsFound = true;
@@ -1235,7 +1254,7 @@ void GetInputEconomicsCurrencyType(EnergyPlusData &state, bool &ErrorsFound) // 
     //   This is a "unique" object.
 
     std::string const CurrentModuleObject("CurrencyType");
-    std::string const RoutineName("GetInputEconomicsCurrencyType: ");
+    static constexpr std::string_view RoutineName("GetInputEconomicsCurrencyType: ");
 
     int NumCurrencyType;
     int NumAlphas; // Number of elements in the alpha array
@@ -1269,12 +1288,12 @@ void GetInputEconomicsCurrencyType(EnergyPlusData &state, bool &ErrorsFound) // 
             }
         }
         if (state.dataCostEstimateManager->selectedMonetaryUnit == 0) {
-            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data.");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data.");
             ShowContinueError(state, "... invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + '.');
             ErrorsFound = true;
         }
     } else if (NumCurrencyType > 1) {
-        ShowWarningError(state, RoutineName + CurrentModuleObject + " Only one instance of this object is allowed. USD will be used.");
+        ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + " Only one instance of this object is allowed. USD will be used.");
         state.dataCostEstimateManager->selectedMonetaryUnit = 1; // USD - U.S. Dollar
     }
 }
@@ -4027,8 +4046,6 @@ void LEEDtariffReporting(EnergyPlusData &state)
 
     using namespace OutputReportPredefined;
 
-    int elecFacilMeter;
-    int gasFacilMeter;
     int distCoolFacilMeter;
     int distHeatFacilMeter;
     Real64 elecTotalEne;
@@ -4061,8 +4078,6 @@ void LEEDtariffReporting(EnergyPlusData &state)
     auto &tariff(state.dataEconTariff->tariff);
 
     if (state.dataEconTariff->numTariff > 0) {
-        elecFacilMeter = GetMeterIndex(state, "ELECTRICITY:FACILITY");
-        gasFacilMeter = GetMeterIndex(state, "NATURALGAS:FACILITY");
         distCoolFacilMeter = GetMeterIndex(state, "DISTRICTCOOLING:FACILITY");
         distHeatFacilMeter = GetMeterIndex(state, "DISTRICTHEATING:FACILITY");
         elecTotalEne = 0.0;
@@ -4096,7 +4111,7 @@ void LEEDtariffReporting(EnergyPlusData &state)
                     elecTotalCost += tariff(iTariff).totalAnnualCost;
                     elecTariffNames += ' ' + tariff(iTariff).tariffName;
                     elecUnits = tariff(iTariff).convChoice;
-                } else if (tariff(iTariff).reportMeterIndx == gasFacilMeter) {
+                } else if (tariff(iTariff).kindGasMtr == kindMeterGas) {
                     if (tariff(iTariff).totalAnnualEnergy > gasTotalEne) gasTotalEne = tariff(iTariff).totalAnnualEnergy;
                     gasTotalCost += tariff(iTariff).totalAnnualCost;
                     gasTariffNames += ' ' + tariff(iTariff).tariffName;
@@ -4114,12 +4129,13 @@ void LEEDtariffReporting(EnergyPlusData &state)
                     distHeatTariffNames += ' ' + tariff(iTariff).tariffName;
                     distHeatUnits = tariff(iTariff).convChoice;
                     distHeatDemWindowUnits = tariff(iTariff).demandWindow;
-                } else {
+                } else if (tariff(iTariff).kindWaterMtr == kindMeterNotWater) {
                     if (tariff(iTariff).totalAnnualEnergy > otherTotalEne) otherTotalEne = tariff(iTariff).totalAnnualEnergy;
                     otherTotalCost += tariff(iTariff).totalAnnualCost;
                     othrTariffNames += ' ' + tariff(iTariff).tariffName;
                     othrUnits = tariff(iTariff).convChoice;
                     othrDemWindowUnits = tariff(iTariff).demandWindow;
+                } else {
                 }
             }
         }
@@ -4203,8 +4219,6 @@ void WriteTabularTariffReports(EnergyPlusData &state)
     Array1D_string rowHead;
     Array2D_string tableBody;
     // other local variables
-    int elecFacilMeter;
-    int gasFacilMeter;
     Real64 elecTotalCost;
     Real64 gasTotalCost;
     Real64 otherTotalCost;
@@ -4248,8 +4262,6 @@ void WriteTabularTariffReports(EnergyPlusData &state)
             // Economics Results Summary Report
             //---------------------------------
             WriteReportHeaders(state, "Economics Results Summary Report", "Entire Facility", OutputProcessor::StoreType::Averaged);
-            elecFacilMeter = GetMeterIndex(state, "ELECTRICITY:FACILITY");
-            gasFacilMeter = GetMeterIndex(state, "NATURALGAS:FACILITY");
 
             for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
                 OutputReportTabular::iUnitsStyle unitsStyle_cur = state.dataOutRptTab->unitsStyle;
@@ -4295,11 +4307,12 @@ void WriteTabularTariffReports(EnergyPlusData &state)
                         allTotalCost += tariff(iTariff).totalAnnualCost;
                         if (tariff(iTariff).kindElectricMtr >= kindMeterElecSimple) {
                             elecTotalCost += tariff(iTariff).totalAnnualCost;
-                        } else if (tariff(iTariff).reportMeterIndx == gasFacilMeter) {
+                        } else if (tariff(iTariff).kindGasMtr == kindMeterGas) {
                             gasTotalCost += tariff(iTariff).totalAnnualCost;
-                        } else {
+                        } else if (tariff(iTariff).kindWaterMtr == kindMeterNotWater) {
                             otherTotalCost += tariff(iTariff).totalAnnualCost;
                             // removed because this was confusing        columnHead(3) = tariff(iTariff)%reportMeter
+                        } else {
                         }
                     }
                 }

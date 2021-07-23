@@ -170,13 +170,13 @@ using namespace OutputReportPredefined;
 using namespace DataHeatBalance;
 using namespace HybridModel;
 
-std::ofstream &open_tbl_stream(EnergyPlusData &state, int const iStyle, std::string const &filename, bool output_to_file)
+std::ofstream &open_tbl_stream(EnergyPlusData &state, int const iStyle, fs::path const &filePath, bool output_to_file)
 {
     std::ofstream &tbl_stream(*state.dataOutRptTab->TabularOutputFile(iStyle));
     if (output_to_file) {
-        tbl_stream.open(filename);
+        tbl_stream.open(filePath);
         if (!tbl_stream) {
-            ShowFatalError(state, "OpenOutputTabularFile: Could not open file \"" + filename + "\" for output (write).");
+            ShowFatalError(state, "OpenOutputTabularFile: Could not open file \"" + filePath.string() + "\" for output (write).");
         }
     } else {
         tbl_stream.setstate(std::ios_base::badbit);
@@ -3019,7 +3019,7 @@ void OpenOutputTabularFile(EnergyPlusData &state)
             if (ort->TableStyle(iStyle) == iTableStyle::Comma) {
                 DisplayString(state, "Writing tabular output file results using comma format.");
                 std::ofstream &tbl_stream =
-                    open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblCsvFileName, state.files.outputControl.tabular);
+                    open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblCsvFilePath, state.files.outputControl.tabular);
                 tbl_stream << "Program Version:" << curDel << state.dataStrGlobals->VerStringVar << '\n';
                 tbl_stream << "Tabular Output Report in Format: " << curDel << "Comma\n";
                 tbl_stream << '\n';
@@ -3034,7 +3034,7 @@ void OpenOutputTabularFile(EnergyPlusData &state)
             } else if (ort->TableStyle(iStyle) == iTableStyle::Tab) {
                 DisplayString(state, "Writing tabular output file results using tab format.");
                 std::ofstream &tbl_stream =
-                    open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblTabFileName, state.files.outputControl.tabular);
+                    open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblTabFilePath, state.files.outputControl.tabular);
                 tbl_stream << "Program Version" << curDel << state.dataStrGlobals->VerStringVar << '\n';
                 tbl_stream << "Tabular Output Report in Format: " << curDel << "Tab\n";
                 tbl_stream << '\n';
@@ -3049,7 +3049,7 @@ void OpenOutputTabularFile(EnergyPlusData &state)
             } else if (ort->TableStyle(iStyle) == iTableStyle::HTML) {
                 DisplayString(state, "Writing tabular output file results using HTML format.");
                 std::ofstream &tbl_stream =
-                    open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblHtmFileName, state.files.outputControl.tabular);
+                    open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblHtmFilePath, state.files.outputControl.tabular);
                 tbl_stream << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/html4/loose.dtd\">\n";
                 tbl_stream << "<html>\n";
                 tbl_stream << "<head>\n";
@@ -3085,7 +3085,7 @@ void OpenOutputTabularFile(EnergyPlusData &state)
             } else if (ort->TableStyle(iStyle) == iTableStyle::XML) {
                 DisplayString(state, "Writing tabular output file results using XML format.");
                 std::ofstream &tbl_stream =
-                    open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblXmlFileName, state.files.outputControl.tabular);
+                    open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblXmlFilePath, state.files.outputControl.tabular);
                 tbl_stream << "<?xml version=\"1.0\"?>\n";
                 tbl_stream << "<EnergyPlusTabularReports>\n";
                 tbl_stream << "  <state.dataHeatBal->BuildingName>" << state.dataHeatBal->BuildingName << "</state.dataHeatBal->BuildingName>\n";
@@ -3106,7 +3106,7 @@ void OpenOutputTabularFile(EnergyPlusData &state)
             } else {
                 DisplayString(state, "Writing tabular output file results using text format.");
                 std::ofstream &tbl_stream =
-                    open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblTxtFileName, state.files.outputControl.tabular);
+                    open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblTxtFilePath, state.files.outputControl.tabular);
                 tbl_stream << "Program Version: " << state.dataStrGlobals->VerStringVar << '\n';
                 tbl_stream << "Tabular Output Report in Format: " << curDel << "Fixed\n";
                 tbl_stream << '\n';
@@ -4289,10 +4289,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
     // the output variables and data structures shown.
 
     // Using/Aliasing
-    using DataHVACGlobals::AirCooled;
-    using DataHVACGlobals::EvapCooled;
     auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-    using DataHVACGlobals::WaterCooled;
 
     Real64 H2OHtOfVap_HVAC = Psychrometrics::PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, state.dataEnvrn->OutDryBulbTemp);
     Real64 RhoWater = Psychrometrics::RhoH2O(state.dataEnvrn->OutDryBulbTemp);
@@ -4371,10 +4368,10 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
             DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed ||
             DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
             DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
-            if (DXCoil(iCoil).CondenserType(1) == AirCooled) {
+            if (DXCoil(iCoil).CondenserType(1) == DataHeatBalance::RefrigCondenserType::Air) {
                 state.dataHeatBal->SysTotalHVACRejectHeatLoss += DXCoil(iCoil).ElecCoolingConsumption + DXCoil(iCoil).DefrostConsumption +
                                                                  DXCoil(iCoil).CrankcaseHeaterConsumption + DXCoil(iCoil).TotalCoolingEnergy;
-            } else if (DXCoil(iCoil).CondenserType(1) == EvapCooled) {
+            } else if (DXCoil(iCoil).CondenserType(1) == DataHeatBalance::RefrigCondenserType::Evap) {
                 state.dataHeatBal->SysTotalHVACRejectHeatLoss += DXCoil(iCoil).EvapCondPumpElecConsumption + DXCoil(iCoil).BasinHeaterConsumption +
                                                                  DXCoil(iCoil).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC;
             }
@@ -4392,10 +4389,10 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
     auto &VarSpeedCoil(state.dataVariableSpeedCoils->VarSpeedCoil);
     for (int iCoil = 1; iCoil <= state.dataVariableSpeedCoils->NumVarSpeedCoils; ++iCoil) {
         if (VarSpeedCoil(iCoil).VSCoilTypeOfNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
-            if (VarSpeedCoil(iCoil).CondenserType == AirCooled) {
+            if (VarSpeedCoil(iCoil).CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
                 state.dataHeatBal->SysTotalHVACRejectHeatLoss += VarSpeedCoil(iCoil).Energy + VarSpeedCoil(iCoil).CrankcaseHeaterConsumption +
                                                                  VarSpeedCoil(iCoil).DefrostConsumption + VarSpeedCoil(iCoil).EnergyLoadTotal;
-            } else if (VarSpeedCoil(iCoil).CondenserType == EvapCooled) {
+            } else if (VarSpeedCoil(iCoil).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
                 state.dataHeatBal->SysTotalHVACRejectHeatLoss += VarSpeedCoil(iCoil).EvapCondPumpElecConsumption +
                                                                  VarSpeedCoil(iCoil).BasinHeaterConsumption +
                                                                  VarSpeedCoil(iCoil).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC;
@@ -4419,10 +4416,10 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
     // Packaged TES
     auto &TESCoil(state.dataPackagedThermalStorageCoil->TESCoil);
     for (int iCoil = 1; iCoil <= state.dataPackagedThermalStorageCoil->NumTESCoils; ++iCoil) {
-        if (TESCoil(iCoil).CondenserType == AirCooled) {
+        if (TESCoil(iCoil).CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += TESCoil(iCoil).EvapTotCoolingEnergy + TESCoil(iCoil).ElecCoolingEnergy +
                                                              TESCoil(iCoil).ElectColdWeatherEnergy - TESCoil(iCoil).Q_Ambient;
-        } else if (TESCoil(iCoil).CondenserType == EvapCooled) {
+        } else if (TESCoil(iCoil).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += TESCoil(iCoil).EvapCondPumpElecConsumption +
                                                              TESCoil(iCoil).ElectEvapCondBasinHeaterEnergy +
                                                              TESCoil(iCoil).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC - TESCoil(iCoil).Q_Ambient;
@@ -4440,14 +4437,14 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
     // Variable Refrigerant Flow
     auto &VRF(state.dataHVACVarRefFlow->VRF);
     for (int iCoil = 1; iCoil <= state.dataHVACVarRefFlow->NumVRFCond; ++iCoil) {
-        if (VRF(iCoil).CondenserType == AirCooled) {
+        if (VRF(iCoil).CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += VRF(iCoil).CoolElecConsumption + VRF(iCoil).HeatElecConsumption +
                                                              VRF(iCoil).CrankCaseHeaterElecConsumption + VRF(iCoil).DefrostConsumption +
                                                              (VRF(iCoil).TotalCoolingCapacity - VRF(iCoil).TotalHeatingCapacity) * TimeStepSysSec;
-        } else if (VRF(iCoil).CondenserType == EvapCooled) {
+        } else if (VRF(iCoil).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += VRF(iCoil).EvapCondPumpElecConsumption + VRF(iCoil).BasinHeaterConsumption +
                                                              VRF(iCoil).EvapWaterConsumpRate * TimeStepSysSec * RhoWater * H2OHtOfVap_HVAC;
-        } else if (VRF(iCoil).CondenserType == WaterCooled) {
+        } else if (VRF(iCoil).CondenserType == DataHeatBalance::RefrigCondenserType::Water) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += VRF(iCoil).QCondEnergy;
         }
     }
@@ -4455,12 +4452,12 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
     // Refrigerated Rack
     auto &RefrigRack(state.dataRefrigCase->RefrigRack);
     for (int iRef = 1; iRef <= state.dataRefrigCase->NumRefrigeratedRacks; ++iRef) {
-        if (RefrigRack(iRef).CondenserType == AirCooled) {
+        if (RefrigRack(iRef).CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += RefrigRack(iRef).RackElecConsumption + RefrigRack(iRef).RackCoolingEnergy;
-        } else if (RefrigRack(iRef).CondenserType == EvapCooled) {
+        } else if (RefrigRack(iRef).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += RefrigRack(iRef).EvapPumpConsumption + RefrigRack(iRef).BasinHeaterConsumption +
                                                              RefrigRack(iRef).EvapWaterConsumption * RhoWater * H2OHtOfVap_HVAC;
-        } else if (RefrigRack(iRef).CondenserType == WaterCooled) {
+        } else if (RefrigRack(iRef).CondenserType == DataHeatBalance::RefrigCondenserType::Water) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += RefrigRack(iRef).CondEnergy;
         }
     }
@@ -5447,8 +5444,8 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
     storeASHRAEHDD = "";
     storeASHRAECDD = "";
     lineTypeinterim = StatLineType::Initialized;
-    if (FileSystem::fileExists(state.files.inStatFileName.fileName)) {
-        auto statFile = state.files.inStatFileName.open(state, "FillWeatherPredefinedEntries");
+    if (FileSystem::fileExists(state.files.inStatFilePath.filePath)) {
+        auto statFile = state.files.inStatFilePath.open(state, "FillWeatherPredefinedEntries");
         while (statFile.good()) { // end of file, or error
             lineType = lineTypeinterim;
             auto lineIn = statFile.readLine().data;
@@ -13525,10 +13522,10 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
     //   For each step of sequence from each design day, compute the
     //   contributions from previous timesteps multiplied by the decay
     //   curve. Rather than store every internal load's radiant contribution
-    //   to each surface, the TMULT and ITABSF sequences were also stored
+    //   to each surface, the EnclRadThermAbsMult and ITABSF sequences were also stored
     //   which allocates the total radiant to each surface in the zone. The
     //   formula used is:
-    //       QRadThermInAbs(SurfNum) = QL(NZ) * TMULT(NZ) * ITABSF(SurfNum)
+    //       QRadThermInAbs(SurfNum) = QL(NZ) * EnclRadThermAbsMult(NZ) * SurfAbsThermalInt(SurfNum)
 
     auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
@@ -14412,7 +14409,7 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
             // if exterior is other side coefficients using ground preprocessor terms then
             // set it to ground instead of other side coefficients
             if (curExtBoundCond == OtherSideCoefNoCalcExt || curExtBoundCond == OtherSideCoefCalcExt) {
-                if (has_prefixi(state.dataSurface->OSC(state.dataSurface->Surface(kSurf).OSCPtr).Name, "surfPropOthSdCoef")) {
+                if (has_prefixi(AsString(state.dataSurface->OSC(state.dataSurface->Surface(kSurf).OSCPtr).Name), "surfPropOthSdCoef")) {
                     curExtBoundCond = Ground;
                 }
             }

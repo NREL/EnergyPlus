@@ -54,6 +54,7 @@ extern "C" {
 
 // C++ Headers
 #include <string>
+#include <vector>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -334,13 +335,14 @@ void CloseSocket(EnergyPlusData &state, int const FlagToWriteToSocket)
     // Try to establish socket connection. This is needed if Ptolemy started E+,
     //  but E+ had an error before the call to InitExternalInterface.
 
-    fileExist = FileSystem::fileExists(state.dataExternalInterface->socCfgFilNam);
+    fileExist = FileSystem::fileExists(state.dataExternalInterface->socCfgFilPath);
 
     if ((state.dataExternalInterface->socketFD == -1) && fileExist) {
-        state.dataExternalInterface->socketFD = establishclientsocket(state.dataExternalInterface->socCfgFilNam.c_str());
+        state.dataExternalInterface->socketFD = establishclientsocket(state.dataExternalInterface->socCfgFilPath.string().c_str());
     }
 
     if (state.dataExternalInterface->socketFD >= 0) {
+        // TODO: use retVal?
         retVal = sendclientmessage(&state.dataExternalInterface->socketFD, &FlagToWriteToSocket);
         // Don't close socket as this may give sometimes an IOException in Windows
         // This problem seems to affect only Windows but not Mac
@@ -429,15 +431,15 @@ void InitExternalInterface(EnergyPlusData &state)
         }
 
         // Get port number
-        if (FileSystem::fileExists(state.dataExternalInterface->socCfgFilNam)) {
-            state.dataExternalInterface->socketFD = establishclientsocket(state.dataExternalInterface->socCfgFilNam.c_str());
+        if (FileSystem::fileExists(state.dataExternalInterface->socCfgFilPath)) {
+            state.dataExternalInterface->socketFD = establishclientsocket(state.dataExternalInterface->socCfgFilPath.string().c_str());
             if (state.dataExternalInterface->socketFD < 0) {
                 ShowSevereError(state,
                                 format("ExternalInterface: Could not open socket. File descriptor = {}.", state.dataExternalInterface->socketFD));
                 state.dataExternalInterface->ErrorsFound = true;
             }
         } else {
-            ShowSevereError(state, "ExternalInterface: Did not find file \"" + state.dataExternalInterface->socCfgFilNam + "\".");
+            ShowSevereError(state, "ExternalInterface: Did not find file \"" + state.dataExternalInterface->socCfgFilPath.string() + "\".");
             ShowContinueError(state, "This file needs to be in same directory as in.idf.");
             ShowContinueError(state, "Check the documentation for the ExternalInterface.");
             state.dataExternalInterface->ErrorsFound = true;
@@ -1008,7 +1010,7 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
     // Using/Aliasing
     using DataStringGlobals::altpathChar;
     using DataStringGlobals::pathChar;
-    using DataSystemVariables::CheckForActualFileName;
+    using DataSystemVariables::CheckForActualFilePath;
 
     using RuntimeLanguageProcessor::FindEMSVariable;
     using RuntimeLanguageProcessor::isExternalInterfaceErlVariable;
@@ -1030,10 +1032,11 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
     int retValfmiVersion;
     int retValfmiPathLib;
     Array1D_string NameListInstances(5);
-    bool fileExist;
-    std::string tempFullFileName;
+    fs::path tempFullFilePath;
+
     Array1D_string strippedFileName; // remove path from entered file name
     Array1D_string fullFileName;     // entered file name/found
+
     std::string::size_type pos;
     int FOUND;
 
@@ -1048,12 +1051,12 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
         // in any case, the relative paths work fine here
 
         // post process as needed in case these are used later
-        state.dataExternalInterface->FMURootWorkingFolder = "tmp-fmus";
-        state.dataExternalInterface->FMURootWorkingFolder += pathChar; // getStringFromCharArray( FMUWorkingFolderCharArr );
+        state.dataExternalInterface->FMURootWorkingFolder = fs::path("tmp-fmus"); // getStringFromCharArray( FMUWorkingFolderCharArr );
 
         // Get and store the names of all FMUs in EnergyPlus data structure
         strippedFileName.allocate(state.dataExternalInterface->NumFMUObjects);
         fullFileName.allocate(state.dataExternalInterface->NumFMUObjects);
+
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport";
         for (Loop = 1; Loop <= state.dataExternalInterface->NumFMUObjects; ++Loop) {
@@ -1072,11 +1075,14 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
             // Get the FMU name
             state.dataExternalInterface->FMU(Loop).Name = state.dataIPShortCut->cAlphaArgs(1);
 
+            fs::path inputPath = FileSystem::makeNativePath(state.dataExternalInterface->FMU(Loop).Name);
+
             std::string contextString = cCurrentModuleObject + ", " + state.dataIPShortCut->cAlphaFieldNames(1) + ": ";
 
-            CheckForActualFileName(state, state.dataIPShortCut->cAlphaArgs(1), fileExist, tempFullFileName, contextString);
+            tempFullFilePath = CheckForActualFilePath(state, inputPath, contextString);
+            if (!tempFullFilePath.empty()) {
 
-            if (fileExist) {
+                // TODO: eliminate this old block once confident
                 pos = index(state.dataExternalInterface->FMU(Loop).Name, pathChar, true); // look backwards
                 if (pos != std::string::npos) {
                     strippedFileName(Loop) = state.dataExternalInterface->FMU(Loop).Name.substr(pos + 1);
@@ -1088,7 +1094,7 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                         strippedFileName(Loop) = state.dataExternalInterface->FMU(Loop).Name;
                     }
                 }
-                fullFileName(Loop) = tempFullFileName;
+                fullFileName(Loop) = tempFullFilePath.string();
             } else {
                 state.dataExternalInterface->ErrorsFound = true;
             }
@@ -1100,6 +1106,7 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
 
         // check for dups that aren't the same file
         // this is windows code...
+        // So this check that if I entered two different things and get the same end filename, then it's wrong?
         for (j = 1; j <= state.dataExternalInterface->NumFMUObjects; ++j) {
             for (k = 2; k <= state.dataExternalInterface->NumFMUObjects; ++k) {
                 if (!UtilityRoutines::SameString(strippedFileName(j), strippedFileName(k))) continue;
@@ -1115,6 +1122,7 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                 state.dataExternalInterface->ErrorsFound = true;
             }
         }
+
         if (state.dataExternalInterface->ErrorsFound) {
             strippedFileName.deallocate();
             fullFileName.deallocate();
@@ -1185,9 +1193,9 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
         // write output folder where FMUs will be unpacked later on.
         for (i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
             for (j = 1; j <= state.dataExternalInterface->FMU(i).NumInstances; ++j) {
-                state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder = state.dataExternalInterface->FMURootWorkingFolder +
-                                                                                strippedFileName(i) + '_' +
-                                                                                state.dataExternalInterface->FMU(i).Instance(j).Name;
+                state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder =
+                    state.dataExternalInterface->FMURootWorkingFolder /
+                    fs::path(strippedFileName(i) + '_' + state.dataExternalInterface->FMU(i).Instance(j).Name);
             }
         }
 
@@ -1196,12 +1204,12 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
             for (j = 1; j <= state.dataExternalInterface->FMU(i).NumInstances; ++j) {
                 // get the length of working folder trimmed
                 state.dataExternalInterface->FMU(i).Instance(j).LenWorkingFolder =
-                    state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder.length();
+                    state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder.string().length();
                 // unpack fmus
                 // preprocess arguments for library call
                 {
                     auto fullFileNameArr(getCharArrayFromString(fullFileName(i)));
-                    auto workingFolderArr(getCharArrayFromString(state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder));
+                    auto workingFolderArr(getCharArrayFromString(state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder.string()));
                     int lenFileName(len(fullFileName(i)));
 
                     // make the library call
@@ -1220,7 +1228,7 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                 {
                     // determine modelID and modelGUID of all FMU instances
                     // preprocess arguments for library call
-                    auto workingFolderArr(getCharArrayFromString(state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder));
+                    auto workingFolderArr(getCharArrayFromString(state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder.string()));
 
                     // make the library call
                     state.dataExternalInterface->FMU(i).Instance(j).Index =
@@ -1245,11 +1253,13 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                 {
                     // get the path to the binaries
                     // preprocess args for library call
-                    auto workingFolderArr(getCharArrayFromString(state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder));
-                    state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder_wLib =
-                        state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder +
-                        "                                                                                           ";
-                    auto workingFolderWithLibArr(getCharArrayFromString(state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder_wLib));
+                    auto workingFolderArr(getCharArrayFromString(state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder.string()));
+                    // Reserve some space in the string, becasue addLibPathCurrentWorkflowFolder doesn't allocate memory for the
+                    // workingFolderWithLibArr Note: you can't call str.resize(str.length() + 91) because the conversion to std::vector<char> will
+                    // find the null terminator and so it will have no effect
+                    std::string reservedString = state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder.string() +
+                                                 "                                                                                           ";
+                    auto workingFolderWithLibArr(getCharArrayFromString(reservedString));
 
                     // make the library call
                     retValfmiPathLib = addLibPathCurrentWorkingFolder(&workingFolderWithLibArr[0],
@@ -1258,7 +1268,8 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                                                                       &state.dataExternalInterface->FMU(i).Instance(j).Index);
 
                     // post process args in case they are used later
-                    state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder_wLib = trim(getStringFromCharArray(workingFolderWithLibArr));
+                    state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder_wLib =
+                        fs::path(trim(getStringFromCharArray(workingFolderWithLibArr)));
 
                     if (retValfmiPathLib != 0) {
                         ShowSevereError(state, "ExternalInterface/InitExternalInterfaceFMUImport: Error when trying to");
@@ -1273,13 +1284,13 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
 
                     // get the length of the working folder with libraries
                     state.dataExternalInterface->FMU(i).Instance(j).LenWorkingFolder_wLib =
-                        state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder_wLib.length();
+                        state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder_wLib.string().length();
                 }
 
                 {
                     // determine the FMI version
                     // preprocess args for library call
-                    auto workingFolderWithLibArr(getCharArrayFromString(state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder_wLib));
+                    auto workingFolderWithLibArr(getCharArrayFromString(state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder_wLib.string()));
                     auto VersionNumArr(
                         getCharArrayFromString("    ")); // the version should only be 3 characters long, since for now we only handle "1.0"
 
