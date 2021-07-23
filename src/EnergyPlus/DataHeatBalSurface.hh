@@ -155,14 +155,14 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Real64> QAirExtReport;        // Surface Outside Face Thermal Radiation to Air Heat Transfer Rate [W]
     Array1D<Real64> QHeatEmiReport;       // Surface Outside Face Heat Emission to Air Rate [W]
 
-    Array1D<Real64> SurfOpaqInsFaceCondGainRep;      // Opaq Surf Ins Face Cond when Opaq Surf Ins Face Cond >= 0
-    Array1D<Real64> SurfOpaqInsFaceCondLossRep;      // Opaq Surf Ins Face Cond when Opaq Surf Ins Face Cond  < 0
-    Array1D<Real64> SurfOpaqInsFaceConduction;       // Opaque surface inside face heat conduction flow (W) from inside of opaque surfaces,
-                                                     // for reporting (W)
-    Array1D<Real64> SurfOpaqInsFaceConductionFlux;   // Opaque surface inside face heat conduction flux (W/m2) from inside of opaque surfaces,
-                                                     // for reporting (W/m2)
-    Array1D<Real64> SurfOpaqInsFaceConductionEnergy; // Opaque surface inside face heat conduction flow (J) from inside of opaque surfaces,
-                                                     // for reporting (J)
+    Array1D<Real64> SurfOpaqInsFaceCondGainRep; // Opaq Surf Ins Face Cond when Opaq Surf Ins Face Cond >= 0
+    Array1D<Real64> SurfOpaqInsFaceCondLossRep; // Opaq Surf Ins Face Cond when Opaq Surf Ins Face Cond  < 0
+    Array1D<Real64> SurfOpaqInsFaceCond;        // Opaque surface inside face heat conduction flow (W) from inside of opaque surfaces,
+                                                // for reporting (W)
+    Array1D<Real64> SurfOpaqInsFaceCondFlux;    // Opaque surface inside face heat conduction flux (W/m2) from inside of opaque surfaces,
+                                                // for reporting (W/m2)
+    Array1D<Real64> SurfOpaqInsFaceCondEnergy;  // Opaque surface inside face heat conduction flow (J) from inside of opaque surfaces,
+                                                // for reporting (J)
 
     Array1D<Real64> SurfOpaqExtFaceCondGainRep; // Opaq Surf Ext Face Cond when Opaq Surf Ext Face Cond >= 0
     Array1D<Real64> SurfOpaqExtFaceCondLossRep; // Opaq Surf Ext Face Cond when Opaq Surf Ext Face Cond  < 0
@@ -210,20 +210,23 @@ struct HeatBalSurfData : BaseGlobalStruct
     // REAL(r64) variables from BLDCTF.inc and only used in the Heat Balance
     //    Array3D<Real64> TH; // Temperature History (SurfNum,Hist Term,In/Out) where:
     // Hist Term (1 = Current Time, 2-MaxCTFTerms = previous times),  In/Out (1 = Outside, 2 = Inside)
-    Array1D<Array1D<Real64>> SurfInsideTempHist;  // Temperature History (SurfNum,Hist Term,In/Out) where:
-    Array1D<Array1D<Real64>> SurfOutsideTempHist; // Temperature History (SurfNum,Hist Term,In/Out) where:
+    Array1D<Array1D<Real64>> SurfInsideTempHist;  // Temperature history - inside (Hist Term, SurfNum)
+    Array1D<Array1D<Real64>> SurfOutsideTempHist; // Temperature history - outside (Hist Term, SurfNum)
+    Array1D<Array1D<Real64>>
+        SurfInsideTempHistMaster; // Master temperature history (on the time step for the construct) - inside (Hist Term, SurfNum)
+    Array1D<Array1D<Real64>>
+        SurfOutsideTempHistMaster;                // Master temperature history (on the time step for the construct) - outside (Hist Term, SurfNum)
+    Array1D<Array1D<Real64>> SurfInsideFluxHist;  // Flux history - inside (Hist Term, SurfNum)
+    Array1D<Array1D<Real64>> SurfOutsideFluxHist; // Flux history - outside (Hist Term, SurfNum)
+    Array1D<Array1D<Real64>> SurfInsideFluxHistMaster;  // Master flux history (on the time step for the construct) - inside (Hist Term, SurfNum)
+    Array1D<Array1D<Real64>> SurfOutsideFluxHistMaster; // Master flux history (on the time step for the construct) - outside (Hist Term, SurfNum)
 
-    Array3D<Real64> QH;         // Flux History (TH and QH are interpolated from THM and QHM for the next user requested time step)
-    Array3D<Real64> THM;        // Master Temperature History (on the time step for the construct)
-    Array3D<Real64> QHM;        // Master Flux History (on the time step for the construct)
     Array2D<Real64> TsrcHist;   // Temperature history at the source location (SurfNum,Term)
     Array2D<Real64> TuserHist;  // Temperature history at the user specified location (SurfNum,Term)
     Array2D<Real64> QsrcHist;   // Heat source/sink history for the surface (SurfNum,Term)
     Array2D<Real64> TsrcHistM;  // Master temperature history at the source location (SurfNum,Term)
     Array2D<Real64> TuserHistM; // Master temperature history at the user specified location (SurfNum,Term)
     Array2D<Real64> QsrcHistM;  // Master heat source/sink history for the surface (SurfNum,Term)
-//    Array1D<Real64> SurfOutTempHistCurr;
-//    Array1D<Real64> SurfInTempHistCurr;
 
     Array2D<Real64> ZoneFractDifShortZtoZ; // Fraction of diffuse short radiation in Zone 2 transmitted to Zone 1
     Array1D_bool EnclSolRecDifShortFromZ;  // True if Zone gets short radiation from another
@@ -300,9 +303,9 @@ struct HeatBalSurfData : BaseGlobalStruct
         this->QdotRadOutRepPerArea.deallocate();
         this->SurfOpaqInsFaceCondGainRep.deallocate();
         this->SurfOpaqInsFaceCondLossRep.deallocate();
-        this->SurfOpaqInsFaceConduction.deallocate();
-        this->SurfOpaqInsFaceConductionFlux.deallocate();
-        this->SurfOpaqInsFaceConductionEnergy.deallocate();
+        this->SurfOpaqInsFaceCond.deallocate();
+        this->SurfOpaqInsFaceCondFlux.deallocate();
+        this->SurfOpaqInsFaceCondEnergy.deallocate();
         this->SurfOpaqExtFaceCondGainRep.deallocate();
         this->SurfOpaqExtFaceCondLossRep.deallocate();
         this->SurfOpaqOutFaceCond.deallocate();
@@ -332,9 +335,12 @@ struct HeatBalSurfData : BaseGlobalStruct
         this->SurfWinInitialDifSolInTrans.deallocate();
         this->SurfInsideTempHist.deallocate();
         this->SurfOutsideTempHist.deallocate();
-        this->QH.deallocate();
-        this->THM.deallocate();
-        this->QHM.deallocate();
+        this->SurfInsideTempHistMaster.deallocate();
+        this->SurfOutsideTempHistMaster.deallocate();
+        this->SurfInsideFluxHist.deallocate();
+        this->SurfOutsideFluxHist.deallocate();
+        this->SurfInsideFluxHistMaster.deallocate();
+        this->SurfOutsideFluxHistMaster.deallocate();
         this->TsrcHist.deallocate();
         this->QsrcHist.deallocate();
         this->TsrcHistM.deallocate();
