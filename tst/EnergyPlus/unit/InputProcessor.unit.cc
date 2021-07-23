@@ -4696,67 +4696,66 @@ TEST_F(InputProcessorFixture, epJSONgetFieldValue_extensiblesFromIDF)
         }
     }
 }
+//
+//   TEST_F( InputProcessorFixture, processIDF_json )
+//   {
+//          const json schema = initialize();
+//          InputProcessor IP;
+//          IdfParser idf_parser(schema);
+//          State state(schema);
+//
+//          std::string const idf = delimited_string({
+//                                                                                                                         "Version,",
+//                                                                                                                         "8.3;",
+//                                                                                                                         "SimulationControl, NO, NO,
+//   NO, YES, YES;",
+//                                                                                                           });
+//
+//          json::parser_callback_t cb = [&state](int depth, json::parse_event_t event, json &parsed,
+//                                                                                        unsigned line_num, unsigned line_index) -> bool {
+//                state->traverse(event, parsed, line_num, line_index);
+//                return true;
+//          };
+//
+//          IP->epJSON = idf_parser.decode(idf, schema);
+//          json::parse(IP->epJSON.dump(2), cb);
+//
+//          EXPECT_EQ(2, state->errors + state->warnings);
+//
+//          // auto index = FindItemInSortedList( version_name, ListOfObjects, NumObjectDefs );
+//          // if ( index != 0 ) index = iListOfObjects( index );
+//          // index = ObjectStartRecord( index );
+//          // EXPECT_EQ( 1, index );
+//
+//          json &loc = IP->epJSON["properties"]["Version"];
+//
+//          // EXPECT_EQ( "Version", IDFRecords( index ).Name );
+//          EXPECT_EQ(1, loc['alphas'].size());  // EXPECT_EQ( 1, IDFRecords( index ).NumAlphas )
+//          EXPECT_EQ(0, loc['numerics'].size());  // EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
+//          EXPECT_EQ(1, )  // EXPECT_EQ( 1, IDFRecords( index ).ObjectDefPtr );
+//          EXPECT_TRUE( compare_containers( std::vector< std::string >( { "8.5" } ), IDFRecords( index ).Alphas ) );
+//          EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), IDFRecords( index ).AlphBlank ) );
+//          EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
+//          EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
+//
+//          std::string const simulation_control_name( "SIMULATIONCONTROL" );
+//
+//          index = FindItemInSortedList( simulation_control_name, ListOfObjects, NumObjectDefs );
+//          if ( index != 0 ) index = iListOfObjects( index );
+//
+//          index = ObjectStartRecord( index );
+//
+//          ASSERT_EQ( 2, index );
+//
+//          EXPECT_EQ( simulation_control_name, IDFRecords( index ).Name );
+//          EXPECT_EQ( 5, IDFRecords( index ).NumAlphas );
+//          EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
+//          EXPECT_EQ( 2, IDFRecords( index ).ObjectDefPtr );
+//          EXPECT_TRUE( compare_containers( std::vector< std::string >( { "NO", "NO", "NO", "YES", "YES" } ), IDFRecords( index ).Alphas ) );
+//          EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false } ), IDFRecords( index ).AlphBlank ) );
+//          EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
+//          EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
+//
+//   }
 
-/*
-   TEST_F( InputProcessorFixture, processIDF_json )
-   {
-          const json schema = initialize();
-          InputProcessor IP;
-          IdfParser idf_parser(schema);
-          State state(schema);
-
-          std::string const idf = delimited_string({
-                                                                                                                         "Version,",
-                                                                                                                         "8.3;",
-                                                                                                                         "SimulationControl, NO, NO,
-   NO, YES, YES;",
-                                                                                                           });
-
-          json::parser_callback_t cb = [&state](int depth, json::parse_event_t event, json &parsed,
-                                                                                        unsigned line_num, unsigned line_index) -> bool {
-                state->traverse(event, parsed, line_num, line_index);
-                return true;
-          };
-
-          IP->epJSON = idf_parser.decode(idf, schema);
-          json::parse(IP->epJSON.dump(2), cb);
-
-          EXPECT_EQ(2, state->errors + state->warnings);
-
-          // auto index = FindItemInSortedList( version_name, ListOfObjects, NumObjectDefs );
-          // if ( index != 0 ) index = iListOfObjects( index );
-          // index = ObjectStartRecord( index );
-          // EXPECT_EQ( 1, index );
-
-          json &loc = IP->epJSON["properties"]["Version"];
-
-          // EXPECT_EQ( "Version", IDFRecords( index ).Name );
-          EXPECT_EQ(1, loc['alphas'].size());  // EXPECT_EQ( 1, IDFRecords( index ).NumAlphas )
-          EXPECT_EQ(0, loc['numerics'].size());  // EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
-          EXPECT_EQ(1, )  // EXPECT_EQ( 1, IDFRecords( index ).ObjectDefPtr );
-          EXPECT_TRUE( compare_containers( std::vector< std::string >( { "8.5" } ), IDFRecords( index ).Alphas ) );
-          EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), IDFRecords( index ).AlphBlank ) );
-          EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
-          EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
-
-          std::string const simulation_control_name( "SIMULATIONCONTROL" );
-
-          index = FindItemInSortedList( simulation_control_name, ListOfObjects, NumObjectDefs );
-          if ( index != 0 ) index = iListOfObjects( index );
-
-          index = ObjectStartRecord( index );
-
-          ASSERT_EQ( 2, index );
-
-          EXPECT_EQ( simulation_control_name, IDFRecords( index ).Name );
-          EXPECT_EQ( 5, IDFRecords( index ).NumAlphas );
-          EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
-          EXPECT_EQ( 2, IDFRecords( index ).ObjectDefPtr );
-          EXPECT_TRUE( compare_containers( std::vector< std::string >( { "NO", "NO", "NO", "YES", "YES" } ), IDFRecords( index ).Alphas ) );
-          EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false } ), IDFRecords( index ).AlphBlank ) );
-          EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
-          EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
-
-   }
-   */
 } // namespace EnergyPlus
