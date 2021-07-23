@@ -1437,7 +1437,7 @@ void MicroCHPDataStruct::oneTimeInit_new(EnergyPlusData &state)
         }
     }
 }
-void MicroCHPDataStruct::oneTimeInit(EnergyPlusData &state)
+void MicroCHPDataStruct::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
 {
 }
 } // namespace EnergyPlus::MicroCHPElectricGenerator
