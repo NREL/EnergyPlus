@@ -172,6 +172,9 @@ namespace PlantHeatExchangerFluidToFluid {
         Real64 HeatTransferEnergy;
         Real64 Effectiveness;
         Real64 OperationStatus;
+        Real64 MaxSteamVolumeFlowRate;
+        Real64 DegOfSubCool;
+        Real64 DegOfLoopSubCool;
         int DmdSideModulatSolvNoConvergeErrorCount;
         int DmdSideModulatSolvNoConvergeErrorIndex;
         int DmdSideModulatSolvFailErrorCount;
@@ -185,8 +188,9 @@ namespace PlantHeatExchangerFluidToFluid {
             : AvailSchedNum(0), HeatExchangeModelType(iFluidHXType::Unassigned), UA(0.0), UAWasAutoSized(false), ControlMode(iCtrlType::Unassigned),
               SetPointNodeNum(0), TempControlTol(0.0), ControlSignalTemp(iCtrlTemp::Unassigned), MinOperationTemp(-99999.0),
               MaxOperationTemp(99999.0), ComponentTypeOfNum(0), SizingFactor(1.0), HeatTransferRate(0.0), HeatTransferEnergy(0.0), Effectiveness(0.0),
-              OperationStatus(0.0), DmdSideModulatSolvNoConvergeErrorCount(0), DmdSideModulatSolvNoConvergeErrorIndex(0),
-              DmdSideModulatSolvFailErrorCount(0), DmdSideModulatSolvFailErrorIndex(0), MyOneTimeFlag(true), MyFlag(true), MyEnvrnFlag(true)
+              OperationStatus(0.0), MaxSteamVolumeFlowRate(0.0), DegOfSubCool(0.0), DegOfLoopSubCool(0.0), DmdSideModulatSolvNoConvergeErrorCount(0),
+              DmdSideModulatSolvNoConvergeErrorIndex(0), DmdSideModulatSolvFailErrorCount(0), DmdSideModulatSolvFailErrorIndex(0),
+              MyOneTimeFlag(true), MyFlag(true), MyEnvrnFlag(true)
         {
         }
 

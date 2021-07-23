@@ -169,7 +169,7 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   November 2012
-    //       MODIFIED       June 2021, Dareum Nam, Add Steam to water heat exchanger
+    //       MODIFIED       June 2021, Dareum Nam, Add steam to water heat exchanger
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -215,328 +215,487 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
     rNumericArgs.dimension(MaxNumNumbers, 0.0);
     lNumericFieldBlanks.dimension(MaxNumNumbers, false);
 
+    if (state.dataPlantHXFluidToFluid->NumberOfHXs > 0) {
+        state.dataPlantHXFluidToFluid->FluidHX.allocate(state.dataPlantHXFluidToFluid->NumberOfHXs);
+    }
+
     cCurrentModuleObject = "HeatExchanger:FluidToFluid";
-    if (state.dataPlantHXFluidToFluid->NumberOfPlantFluidHXs > 0) {
-        state.dataPlantHXFluidToFluid->FluidHX.allocate(state.dataPlantHXFluidToFluid->NumberOfPlantFluidHXs);
-        for (int CompLoop = 1; CompLoop <= state.dataPlantHXFluidToFluid->NumberOfPlantFluidHXs; ++CompLoop) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     CompLoop,
-                                                                     cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     rNumericArgs,
-                                                                     NumNums,
-                                                                     IOStat,
-                                                                     lNumericFieldBlanks,
-                                                                     lAlphaFieldBlanks,
-                                                                     cAlphaFieldNames,
-                                                                     cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+    for (int CompLoop = 1; CompLoop <= state.dataPlantHXFluidToFluid->NumberOfPlantFluidHXs; ++CompLoop) {
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 cCurrentModuleObject,
+                                                                 CompLoop,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
+        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).Name = cAlphaArgs(1);
-            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).TypeNum = DataPlant::TypeOf_FluidToFluidPlantHtExchg;
+        state.dataPlantHXFluidToFluid->FluidHX(CompLoop).Name = cAlphaArgs(1);
+        state.dataPlantHXFluidToFluid->FluidHX(CompLoop).TypeNum = DataPlant::TypeOf_FluidToFluidPlantHtExchg;
 
-            if (lAlphaFieldBlanks(2)) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).AvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn;
-            } else {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).AvailSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2));
-                if (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).AvailSchedNum <= 0) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
-                    ShowContinueError(state, "Invalid " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
-                    ShowContinueError(state, "Schedule was not found ");
-                    ErrorsFound = true;
-                }
-            }
-
-            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).DemandSideLoop.inletNodeNum =
-                NodeInputManager::GetOnlySingleNode(state,
-                                                    cAlphaArgs(3),
-                                                    ErrorsFound,
-                                                    cCurrentModuleObject,
-                                                    cAlphaArgs(1),
-                                                    DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::NodeConnectionType::Inlet,
-                                                    NodeInputManager::compFluidStream::Primary,
-                                                    DataLoopNode::ObjectIsNotParent);
-            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).DemandSideLoop.outletNodeNum =
-                NodeInputManager::GetOnlySingleNode(state,
-                                                    cAlphaArgs(4),
-                                                    ErrorsFound,
-                                                    cCurrentModuleObject,
-                                                    cAlphaArgs(1),
-                                                    DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::NodeConnectionType::Outlet,
-                                                    NodeInputManager::compFluidStream::Primary,
-                                                    DataLoopNode::ObjectIsNotParent);
-            BranchNodeConnections::TestCompSet(
-                state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(3), cAlphaArgs(4), "Loop Demand Side Plant Nodes");
-            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).DemandSideLoop.DesignVolumeFlowRate = rNumericArgs(1);
-            if (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).DemandSideLoop.DesignVolumeFlowRate == DataSizing::AutoSize) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).DemandSideLoop.DesignVolumeFlowRateWasAutoSized = true;
-            }
-
-            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SupplySideLoop.inletNodeNum =
-                NodeInputManager::GetOnlySingleNode(state,
-                                                    cAlphaArgs(5),
-                                                    ErrorsFound,
-                                                    cCurrentModuleObject,
-                                                    cAlphaArgs(1),
-                                                    DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::NodeConnectionType::Inlet,
-                                                    NodeInputManager::compFluidStream::Secondary,
-                                                    DataLoopNode::ObjectIsNotParent);
-            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SupplySideLoop.outletNodeNum =
-                NodeInputManager::GetOnlySingleNode(state,
-                                                    cAlphaArgs(6),
-                                                    ErrorsFound,
-                                                    cCurrentModuleObject,
-                                                    cAlphaArgs(1),
-                                                    DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::NodeConnectionType::Outlet,
-                                                    NodeInputManager::compFluidStream::Secondary,
-                                                    DataLoopNode::ObjectIsNotParent);
-            BranchNodeConnections::TestCompSet(
-                state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(5), cAlphaArgs(6), "Loop Supply Side Plant Nodes");
-            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SupplySideLoop.DesignVolumeFlowRate = rNumericArgs(2);
-            if (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SupplySideLoop.DesignVolumeFlowRate == DataSizing::AutoSize) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SupplySideLoop.DesignVolumeFlowRateWasAutoSized = true;
-            }
-
-            if (UtilityRoutines::SameString(cAlphaArgs(7), "CrossFlowBothUnMixed")) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = iFluidHXType::CrossFlowBothUnMixed;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(7), "CrossFlowBothMixed")) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = iFluidHXType::CrossFlowBothMixed;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(7), "CrossFlowSupplyMixedDemandUnMixed")) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = iFluidHXType::CrossFlowSupplyLoopMixedDemandLoopUnMixed;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(7), "CrossFlowSupplyUnMixedDemandMixed")) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = iFluidHXType::CrossFlowSupplyLoopUnMixedDemandLoopMixed;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(7), "CounterFlow")) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = iFluidHXType::CounterFlow;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(7), "ParallelFlow")) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = iFluidHXType::ParallelFlow;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(7), "Ideal")) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = iFluidHXType::Ideal;
-            } else {
+        if (lAlphaFieldBlanks(2)) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).AvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn;
+        } else {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).AvailSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2));
+            if (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).AvailSchedNum <= 0) {
                 ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + cAlphaFieldNames(7) + " = " + cAlphaArgs(7));
+                ShowContinueError(state, "Invalid " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
+                ShowContinueError(state, "Schedule was not found ");
                 ErrorsFound = true;
             }
+        }
 
-            if (!lNumericFieldBlanks(3)) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).UA = rNumericArgs(3);
-                if (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).UA == DataSizing::AutoSize) {
-                    state.dataPlantHXFluidToFluid->FluidHX(CompLoop).UAWasAutoSized = true;
-                }
-            } else {
-                if (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType != iFluidHXType::Ideal) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
-                    ShowContinueError(state, "Missing entry for " + cNumericFieldNames(3));
-                    ErrorsFound = true;
-                }
+        state.dataPlantHXFluidToFluid->FluidHX(CompLoop).DemandSideLoop.inletNodeNum =
+            NodeInputManager::GetOnlySingleNode(state,
+                                                cAlphaArgs(3),
+                                                ErrorsFound,
+                                                cCurrentModuleObject,
+                                                cAlphaArgs(1),
+                                                DataLoopNode::NodeFluidType::Water,
+                                                DataLoopNode::NodeConnectionType::Inlet,
+                                                NodeInputManager::compFluidStream::Primary,
+                                                DataLoopNode::ObjectIsNotParent);
+        state.dataPlantHXFluidToFluid->FluidHX(CompLoop).DemandSideLoop.outletNodeNum =
+            NodeInputManager::GetOnlySingleNode(state,
+                                                cAlphaArgs(4),
+                                                ErrorsFound,
+                                                cCurrentModuleObject,
+                                                cAlphaArgs(1),
+                                                DataLoopNode::NodeFluidType::Water,
+                                                DataLoopNode::NodeConnectionType::Outlet,
+                                                NodeInputManager::compFluidStream::Primary,
+                                                DataLoopNode::ObjectIsNotParent);
+        BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(3), cAlphaArgs(4), "Loop Demand Side Plant Nodes");
+        state.dataPlantHXFluidToFluid->FluidHX(CompLoop).DemandSideLoop.DesignVolumeFlowRate = rNumericArgs(1);
+        if (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).DemandSideLoop.DesignVolumeFlowRate == DataSizing::AutoSize) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).DemandSideLoop.DesignVolumeFlowRateWasAutoSized = true;
+        }
+
+        state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SupplySideLoop.inletNodeNum =
+            NodeInputManager::GetOnlySingleNode(state,
+                                                cAlphaArgs(5),
+                                                ErrorsFound,
+                                                cCurrentModuleObject,
+                                                cAlphaArgs(1),
+                                                DataLoopNode::NodeFluidType::Water,
+                                                DataLoopNode::NodeConnectionType::Inlet,
+                                                NodeInputManager::compFluidStream::Secondary,
+                                                DataLoopNode::ObjectIsNotParent);
+        state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SupplySideLoop.outletNodeNum =
+            NodeInputManager::GetOnlySingleNode(state,
+                                                cAlphaArgs(6),
+                                                ErrorsFound,
+                                                cCurrentModuleObject,
+                                                cAlphaArgs(1),
+                                                DataLoopNode::NodeFluidType::Water,
+                                                DataLoopNode::NodeConnectionType::Outlet,
+                                                NodeInputManager::compFluidStream::Secondary,
+                                                DataLoopNode::ObjectIsNotParent);
+        BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(5), cAlphaArgs(6), "Loop Supply Side Plant Nodes");
+        state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SupplySideLoop.DesignVolumeFlowRate = rNumericArgs(2);
+        if (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SupplySideLoop.DesignVolumeFlowRate == DataSizing::AutoSize) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SupplySideLoop.DesignVolumeFlowRateWasAutoSized = true;
+        }
+
+        if (UtilityRoutines::SameString(cAlphaArgs(7), "CrossFlowBothUnMixed")) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = iFluidHXType::CrossFlowBothUnMixed;
+        } else if (UtilityRoutines::SameString(cAlphaArgs(7), "CrossFlowBothMixed")) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = iFluidHXType::CrossFlowBothMixed;
+        } else if (UtilityRoutines::SameString(cAlphaArgs(7), "CrossFlowSupplyMixedDemandUnMixed")) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = iFluidHXType::CrossFlowSupplyLoopMixedDemandLoopUnMixed;
+        } else if (UtilityRoutines::SameString(cAlphaArgs(7), "CrossFlowSupplyUnMixedDemandMixed")) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = iFluidHXType::CrossFlowSupplyLoopUnMixedDemandLoopMixed;
+        } else if (UtilityRoutines::SameString(cAlphaArgs(7), "CounterFlow")) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = iFluidHXType::CounterFlow;
+        } else if (UtilityRoutines::SameString(cAlphaArgs(7), "ParallelFlow")) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = iFluidHXType::ParallelFlow;
+        } else if (UtilityRoutines::SameString(cAlphaArgs(7), "Ideal")) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = iFluidHXType::Ideal;
+        } else {
+            ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
+            ShowContinueError(state, "Invalid " + cAlphaFieldNames(7) + " = " + cAlphaArgs(7));
+            ErrorsFound = true;
+        }
+
+        if (!lNumericFieldBlanks(3)) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).UA = rNumericArgs(3);
+            if (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).UA == DataSizing::AutoSize) {
+                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).UAWasAutoSized = true;
             }
-
-            if (UtilityRoutines::SameString(cAlphaArgs(8), "UncontrolledOn")) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode = iCtrlType::UncontrolledOn;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(8), "OperationSchemeModulated")) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode = iCtrlType::OperationSchemeModulated;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(8), "OperationSchemeOnOff")) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode = iCtrlType::OperationSchemeOnOff;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(8), "HeatingSetpointModulated")) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode = iCtrlType::HeatingSetPointModulated;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(8), "HeatingSetpointOnOff")) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode = iCtrlType::HeatingSetPointOnOff;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(8), "CoolingSetpointModulated")) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode = iCtrlType::CoolingSetPointModulated;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(8), "CoolingSetpointOnOff")) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode = iCtrlType::CoolingSetPointOnOff;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(8), "DualDeadbandSetpointModulated")) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode = iCtrlType::DualDeadBandSetPointModulated;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(8), "DualDeadbandSetpointOnOff")) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode = iCtrlType::DualDeadBandSetPointOnOff;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(8), "CoolingDifferentialOnOff")) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode = iCtrlType::CoolingDifferentialOnOff;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(8), "CoolingSetpointOnOffWithComponentOverride")) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode = iCtrlType::CoolingSetPointOnOffWithComponentOverride;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(8), "TrackComponentOnOff")) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode = iCtrlType::TrackComponentOnOff;
-            } else {
+        } else {
+            if (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType != iFluidHXType::Ideal) {
                 ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + cAlphaFieldNames(8) + " = " + cAlphaArgs(8));
+                ShowContinueError(state, "Missing entry for " + cNumericFieldNames(3));
                 ErrorsFound = true;
             }
+        }
 
-            if (!lAlphaFieldBlanks(9)) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum =
-                    NodeInputManager::GetOnlySingleNode(state,
-                                                        cAlphaArgs(9),
-                                                        ErrorsFound,
-                                                        cCurrentModuleObject,
-                                                        cAlphaArgs(1),
-                                                        DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::NodeConnectionType::Sensor,
-                                                        NodeInputManager::compFluidStream::Primary,
-                                                        DataLoopNode::ObjectIsNotParent);
-                // check that node actually has setpoints on it
-                if ((state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::HeatingSetPointModulated) ||
-                    (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::HeatingSetPointOnOff) ||
-                    (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::CoolingSetPointModulated) ||
-                    (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::CoolingSetPointOnOff) ||
-                    (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::CoolingSetPointOnOffWithComponentOverride)) {
-                    if (state.dataLoopNodes->Node(state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum).TempSetPoint ==
-                        DataLoopNode::SensedNodeFlagValue) {
-                        if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                            ShowSevereError(state,
-                                            std::string{RoutineName} + " Missing temperature setpoint for DataLoopNode::Node = " + cAlphaArgs(9));
+        if (UtilityRoutines::SameString(cAlphaArgs(8), "UncontrolledOn")) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode = iCtrlType::UncontrolledOn;
+        } else if (UtilityRoutines::SameString(cAlphaArgs(8), "OperationSchemeModulated")) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode = iCtrlType::OperationSchemeModulated;
+        } else if (UtilityRoutines::SameString(cAlphaArgs(8), "OperationSchemeOnOff")) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode = iCtrlType::OperationSchemeOnOff;
+        } else if (UtilityRoutines::SameString(cAlphaArgs(8), "HeatingSetpointModulated")) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode = iCtrlType::HeatingSetPointModulated;
+        } else if (UtilityRoutines::SameString(cAlphaArgs(8), "HeatingSetpointOnOff")) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode = iCtrlType::HeatingSetPointOnOff;
+        } else if (UtilityRoutines::SameString(cAlphaArgs(8), "CoolingSetpointModulated")) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode = iCtrlType::CoolingSetPointModulated;
+        } else if (UtilityRoutines::SameString(cAlphaArgs(8), "CoolingSetpointOnOff")) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode = iCtrlType::CoolingSetPointOnOff;
+        } else if (UtilityRoutines::SameString(cAlphaArgs(8), "DualDeadbandSetpointModulated")) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode = iCtrlType::DualDeadBandSetPointModulated;
+        } else if (UtilityRoutines::SameString(cAlphaArgs(8), "DualDeadbandSetpointOnOff")) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode = iCtrlType::DualDeadBandSetPointOnOff;
+        } else if (UtilityRoutines::SameString(cAlphaArgs(8), "CoolingDifferentialOnOff")) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode = iCtrlType::CoolingDifferentialOnOff;
+        } else if (UtilityRoutines::SameString(cAlphaArgs(8), "CoolingSetpointOnOffWithComponentOverride")) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode = iCtrlType::CoolingSetPointOnOffWithComponentOverride;
+        } else if (UtilityRoutines::SameString(cAlphaArgs(8), "TrackComponentOnOff")) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode = iCtrlType::TrackComponentOnOff;
+        } else {
+            ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
+            ShowContinueError(state, "Invalid " + cAlphaFieldNames(8) + " = " + cAlphaArgs(8));
+            ErrorsFound = true;
+        }
+
+        if (!lAlphaFieldBlanks(9)) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum =
+                NodeInputManager::GetOnlySingleNode(state,
+                                                    cAlphaArgs(9),
+                                                    ErrorsFound,
+                                                    cCurrentModuleObject,
+                                                    cAlphaArgs(1),
+                                                    DataLoopNode::NodeFluidType::Water,
+                                                    DataLoopNode::NodeConnectionType::Sensor,
+                                                    NodeInputManager::compFluidStream::Primary,
+                                                    DataLoopNode::ObjectIsNotParent);
+            // check that node actually has setpoints on it
+            if ((state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::HeatingSetPointModulated) ||
+                (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::HeatingSetPointOnOff) ||
+                (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::CoolingSetPointModulated) ||
+                (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::CoolingSetPointOnOff) ||
+                (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::CoolingSetPointOnOffWithComponentOverride)) {
+                if (state.dataLoopNodes->Node(state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum).TempSetPoint ==
+                    DataLoopNode::SensedNodeFlagValue) {
+                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                        ShowSevereError(state, std::string{RoutineName} + " Missing temperature setpoint for DataLoopNode::Node = " + cAlphaArgs(9));
+                        ShowContinueError(state, "Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
+                        ShowContinueError(state, " Use a setpoint manager to place a single temperature setpoint on the node");
+                        ErrorsFound = true;
+                    } else {
+                        // need call to EMS to check node
+                        bool NodeEMSSetPointMissing = false;
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(state,
+                                                                    state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum,
+                                                                    EMSManager::SPControlType::iTemperatureSetPoint,
+                                                                    NodeEMSSetPointMissing);
+                        if (NodeEMSSetPointMissing) {
+                            ShowSevereError(state, std::string{RoutineName} + " Missing temperature setpoint for node = " + cAlphaArgs(9));
                             ShowContinueError(state, "Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
-                            ShowContinueError(state, " Use a setpoint manager to place a single temperature setpoint on the node");
+                            ShowContinueError(state, "Use a setpoint manager or EMS actuator to place a single temperature setpoint on the node");
                             ErrorsFound = true;
-                        } else {
-                            // need call to EMS to check node
-                            bool NodeEMSSetPointMissing = false;
-                            EMSManager::CheckIfNodeSetPointManagedByEMS(state,
-                                                                        state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum,
-                                                                        EMSManager::SPControlType::iTemperatureSetPoint,
-                                                                        NodeEMSSetPointMissing);
-                            if (NodeEMSSetPointMissing) {
-                                ShowSevereError(state, std::string{RoutineName} + " Missing temperature setpoint for node = " + cAlphaArgs(9));
-                                ShowContinueError(state, "Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
-                                ShowContinueError(state, "Use a setpoint manager or EMS actuator to place a single temperature setpoint on the node");
-                                ErrorsFound = true;
-                            }
-                        }
-                    }
-                } else if ((state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::DualDeadBandSetPointModulated) ||
-                           (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::DualDeadBandSetPointOnOff)) {
-                    if ((state.dataLoopNodes->Node(state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum).TempSetPointHi ==
-                         DataLoopNode::SensedNodeFlagValue) ||
-                        (state.dataLoopNodes->Node(state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum).TempSetPointLo ==
-                         DataLoopNode::SensedNodeFlagValue)) {
-                        if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                            ShowSevereError(state, std::string{RoutineName} + " Missing dual temperature setpoints for node = " + cAlphaArgs(9));
-                            ShowContinueError(state, "Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
-                            ShowContinueError(state, " Use a setpoint manager to place a dual temperature setpoint on the node");
-                            ErrorsFound = true;
-                        } else {
-                            // need call to EMS to check node
-                            bool NodeEMSSetPointMissing = false;
-                            EMSManager::CheckIfNodeSetPointManagedByEMS(state,
-                                                                        state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum,
-                                                                        EMSManager::SPControlType::iTemperatureMinSetPoint,
-                                                                        NodeEMSSetPointMissing);
-                            EMSManager::CheckIfNodeSetPointManagedByEMS(state,
-                                                                        state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum,
-                                                                        EMSManager::SPControlType::iTemperatureMaxSetPoint,
-                                                                        NodeEMSSetPointMissing);
-                            if (NodeEMSSetPointMissing) {
-                                ShowSevereError(state, std::string{RoutineName} + " Missing temperature setpoint for node = " + cAlphaArgs(9));
-                                ShowContinueError(state, "Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
-                                ShowContinueError(state, "Use a setpoint manager or EMS actuators to place a dual temperature setpoints on the node");
-                                ErrorsFound = true;
-                            }
                         }
                     }
                 }
-
-            } else {
-                // need to name a setpoint node if using a setpoint type control mode
-                if ((state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::HeatingSetPointModulated) ||
-                    (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::HeatingSetPointOnOff) ||
-                    (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::CoolingSetPointModulated) ||
-                    (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::CoolingSetPointOnOff) ||
-                    (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::DualDeadBandSetPointModulated) ||
-                    (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::DualDeadBandSetPointOnOff) ||
-                    (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::CoolingSetPointOnOffWithComponentOverride)) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
-                    ShowContinueError(state, "Missing entry for " + cAlphaFieldNames(9));
-                    ErrorsFound = true;
+            } else if ((state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::DualDeadBandSetPointModulated) ||
+                       (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::DualDeadBandSetPointOnOff)) {
+                if ((state.dataLoopNodes->Node(state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum).TempSetPointHi ==
+                     DataLoopNode::SensedNodeFlagValue) ||
+                    (state.dataLoopNodes->Node(state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum).TempSetPointLo ==
+                     DataLoopNode::SensedNodeFlagValue)) {
+                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                        ShowSevereError(state, std::string{RoutineName} + " Missing dual temperature setpoints for node = " + cAlphaArgs(9));
+                        ShowContinueError(state, "Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
+                        ShowContinueError(state, " Use a setpoint manager to place a dual temperature setpoint on the node");
+                        ErrorsFound = true;
+                    } else {
+                        // need call to EMS to check node
+                        bool NodeEMSSetPointMissing = false;
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(state,
+                                                                    state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum,
+                                                                    EMSManager::SPControlType::iTemperatureMinSetPoint,
+                                                                    NodeEMSSetPointMissing);
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(state,
+                                                                    state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum,
+                                                                    EMSManager::SPControlType::iTemperatureMaxSetPoint,
+                                                                    NodeEMSSetPointMissing);
+                        if (NodeEMSSetPointMissing) {
+                            ShowSevereError(state, std::string{RoutineName} + " Missing temperature setpoint for node = " + cAlphaArgs(9));
+                            ShowContinueError(state, "Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
+                            ShowContinueError(state, "Use a setpoint manager or EMS actuators to place a dual temperature setpoints on the node");
+                            ErrorsFound = true;
+                        }
+                    }
                 }
             }
 
-            if (!lNumericFieldBlanks(4)) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).TempControlTol = rNumericArgs(4);
-            } else {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).TempControlTol = 0.01;
+        } else {
+            // need to name a setpoint node if using a setpoint type control mode
+            if ((state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::HeatingSetPointModulated) ||
+                (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::HeatingSetPointOnOff) ||
+                (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::CoolingSetPointModulated) ||
+                (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::CoolingSetPointOnOff) ||
+                (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::DualDeadBandSetPointModulated) ||
+                (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::DualDeadBandSetPointOnOff) ||
+                (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::CoolingSetPointOnOffWithComponentOverride)) {
+                ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Missing entry for " + cAlphaFieldNames(9));
+                ErrorsFound = true;
             }
+        }
 
-            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatTransferMeteringEndUse = cAlphaArgs(10);
+        if (!lNumericFieldBlanks(4)) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).TempControlTol = rNumericArgs(4);
+        } else {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).TempControlTol = 0.01;
+        }
 
-            if (!lAlphaFieldBlanks(11)) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).OtherCompSupplySideLoop.inletNodeNum =
-                    NodeInputManager::GetOnlySingleNode(state,
-                                                        cAlphaArgs(11),
-                                                        ErrorsFound,
-                                                        cCurrentModuleObject,
-                                                        cAlphaArgs(1),
-                                                        DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::NodeConnectionType::Actuator,
-                                                        NodeInputManager::compFluidStream::Primary,
-                                                        DataLoopNode::ObjectIsNotParent);
-            } else {
-                if (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::CoolingSetPointOnOffWithComponentOverride) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
-                    ShowContinueError(state, "Missing entry for " + cAlphaFieldNames(11));
-                    ErrorsFound = true;
-                }
+        state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatTransferMeteringEndUse = cAlphaArgs(10);
+
+        if (!lAlphaFieldBlanks(11)) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).OtherCompSupplySideLoop.inletNodeNum =
+                NodeInputManager::GetOnlySingleNode(state,
+                                                    cAlphaArgs(11),
+                                                    ErrorsFound,
+                                                    cCurrentModuleObject,
+                                                    cAlphaArgs(1),
+                                                    DataLoopNode::NodeFluidType::Water,
+                                                    DataLoopNode::NodeConnectionType::Actuator,
+                                                    NodeInputManager::compFluidStream::Primary,
+                                                    DataLoopNode::ObjectIsNotParent);
+        } else {
+            if (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::CoolingSetPointOnOffWithComponentOverride) {
+                ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Missing entry for " + cAlphaFieldNames(11));
+                ErrorsFound = true;
             }
+        }
 
-            if (!lAlphaFieldBlanks(12)) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).OtherCompDemandSideLoop.inletNodeNum =
-                    NodeInputManager::GetOnlySingleNode(state,
-                                                        cAlphaArgs(12),
-                                                        ErrorsFound,
-                                                        cCurrentModuleObject,
-                                                        cAlphaArgs(1),
-                                                        DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::NodeConnectionType::Actuator,
-                                                        NodeInputManager::compFluidStream::Primary,
-                                                        DataLoopNode::ObjectIsNotParent);
-            } else {
-                if (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::CoolingSetPointOnOffWithComponentOverride) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
-                    ShowContinueError(state, "Missing entry for " + cAlphaFieldNames(12));
-                    ErrorsFound = true;
-                }
+        if (!lAlphaFieldBlanks(12)) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).OtherCompDemandSideLoop.inletNodeNum =
+                NodeInputManager::GetOnlySingleNode(state,
+                                                    cAlphaArgs(12),
+                                                    ErrorsFound,
+                                                    cCurrentModuleObject,
+                                                    cAlphaArgs(1),
+                                                    DataLoopNode::NodeFluidType::Water,
+                                                    DataLoopNode::NodeConnectionType::Actuator,
+                                                    NodeInputManager::compFluidStream::Primary,
+                                                    DataLoopNode::ObjectIsNotParent);
+        } else {
+            if (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::CoolingSetPointOnOffWithComponentOverride) {
+                ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Missing entry for " + cAlphaFieldNames(12));
+                ErrorsFound = true;
             }
+        }
 
-            if (!lAlphaFieldBlanks(13)) {
-                if (UtilityRoutines::SameString(cAlphaArgs(13), "WetBulbTemperature")) {
-                    state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlSignalTemp = iCtrlTemp::WetBulbTemperature;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(13), "DryBulbTemperature")) {
-                    state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlSignalTemp = iCtrlTemp::DryBulbTemperature;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(13), "Loop")) {
-                    state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlSignalTemp = iCtrlTemp::LoopTemperature;
-                }
-            } else {
-                if (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::CoolingSetPointOnOffWithComponentOverride) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
-                    ShowContinueError(state, "Missing entry for " + cAlphaFieldNames(13));
-                    ErrorsFound = true;
-                }
+        if (!lAlphaFieldBlanks(13)) {
+            if (UtilityRoutines::SameString(cAlphaArgs(13), "WetBulbTemperature")) {
+                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlSignalTemp = iCtrlTemp::WetBulbTemperature;
+            } else if (UtilityRoutines::SameString(cAlphaArgs(13), "DryBulbTemperature")) {
+                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlSignalTemp = iCtrlTemp::DryBulbTemperature;
+            } else if (UtilityRoutines::SameString(cAlphaArgs(13), "Loop")) {
+                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlSignalTemp = iCtrlTemp::LoopTemperature;
             }
+        } else {
+            if (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::CoolingSetPointOnOffWithComponentOverride) {
+                ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Missing entry for " + cAlphaFieldNames(13));
+                ErrorsFound = true;
+            }
+        }
 
-            if (!lNumericFieldBlanks(5)) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SizingFactor = rNumericArgs(5);
-            } else {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SizingFactor = 1.0;
-            }
+        if (!lNumericFieldBlanks(5)) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SizingFactor = rNumericArgs(5);
+        } else {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SizingFactor = 1.0;
+        }
 
-            if (!lNumericFieldBlanks(6)) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).MinOperationTemp = rNumericArgs(6);
-            } else {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).MinOperationTemp = -9999.0;
-            }
+        if (!lNumericFieldBlanks(6)) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).MinOperationTemp = rNumericArgs(6);
+        } else {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).MinOperationTemp = -9999.0;
+        }
 
-            if (!lNumericFieldBlanks(7)) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).MaxOperationTemp = rNumericArgs(7);
-            } else {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).MaxOperationTemp = 9999.0;
-            }
+        if (!lNumericFieldBlanks(7)) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).MaxOperationTemp = rNumericArgs(7);
+        } else {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).MaxOperationTemp = 9999.0;
         }
     }
 
     cCurrentModuleObject = "HeatExchanger:SteamToWater";
-    if (state.dataPlantHXFluidToFluid->NumberOfSteamToWaterHXs > 0) {
+    for (int SteamCompLoop = 1; SteamCompLoop <= state.dataPlantHXFluidToFluid->NumberOfSteamToWaterHXs; ++SteamCompLoop) {
+        int CompLoop = SteamCompLoop + state.dataPlantHXFluidToFluid->NumberOfPlantFluidHXs;
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 cCurrentModuleObject,
+                                                                 CompLoop,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
+        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
+        state.dataPlantHXFluidToFluid->FluidHX(CompLoop).Name = cAlphaArgs(1);
+        state.dataPlantHXFluidToFluid->FluidHX(CompLoop).TypeNum = DataPlant::TypeOf_SteamToWaterPlantHtExchg;
+
+        if (lAlphaFieldBlanks(2)) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).AvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn;
+        } else {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).AvailSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2));
+            if (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).AvailSchedNum <= 0) {
+                ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Invalid " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
+                ShowContinueError(state, "Schedule was not found ");
+                ErrorsFound = true;
+            }
+        }
+
+        state.dataPlantHXFluidToFluid->FluidHX(CompLoop).DemandSideLoop.inletNodeNum =
+            NodeInputManager::GetOnlySingleNode(state,
+                                                cAlphaArgs(3),
+                                                ErrorsFound,
+                                                cCurrentModuleObject,
+                                                cAlphaArgs(1),
+                                                DataLoopNode::NodeFluidType::Water,
+                                                DataLoopNode::NodeConnectionType::Inlet,
+                                                NodeInputManager::compFluidStream::Primary,
+                                                DataLoopNode::ObjectIsNotParent);
+        state.dataPlantHXFluidToFluid->FluidHX(CompLoop).DemandSideLoop.outletNodeNum =
+            NodeInputManager::GetOnlySingleNode(state,
+                                                cAlphaArgs(4),
+                                                ErrorsFound,
+                                                cCurrentModuleObject,
+                                                cAlphaArgs(1),
+                                                DataLoopNode::NodeFluidType::Water,
+                                                DataLoopNode::NodeConnectionType::Outlet,
+                                                NodeInputManager::compFluidStream::Primary,
+                                                DataLoopNode::ObjectIsNotParent);
+        BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(3), cAlphaArgs(4), "Water Side Plant Nodes");
+        state.dataPlantHXFluidToFluid->FluidHX(CompLoop).DemandSideLoop.DesignVolumeFlowRate = rNumericArgs(1);
+        if (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).DemandSideLoop.DesignVolumeFlowRate == DataSizing::AutoSize) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).DemandSideLoop.DesignVolumeFlowRateWasAutoSized = true;
+        }
+
+        state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SupplySideLoop.inletNodeNum =
+            NodeInputManager::GetOnlySingleNode(state,
+                                                cAlphaArgs(5),
+                                                ErrorsFound,
+                                                cCurrentModuleObject,
+                                                cAlphaArgs(1),
+                                                DataLoopNode::NodeFluidType::Steam,
+                                                DataLoopNode::NodeConnectionType::Inlet,
+                                                NodeInputManager::compFluidStream::Secondary,
+                                                DataLoopNode::ObjectIsNotParent);
+        state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SupplySideLoop.outletNodeNum =
+            NodeInputManager::GetOnlySingleNode(state,
+                                                cAlphaArgs(6),
+                                                ErrorsFound,
+                                                cCurrentModuleObject,
+                                                cAlphaArgs(1),
+                                                DataLoopNode::NodeFluidType::Steam,
+                                                DataLoopNode::NodeConnectionType::Outlet,
+                                                NodeInputManager::compFluidStream::Secondary,
+                                                DataLoopNode::ObjectIsNotParent);
+        BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(5), cAlphaArgs(6), "Steam Side Plant Nodes");
+        state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SupplySideLoop.DesignVolumeFlowRate = rNumericArgs(2);
+        if (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SupplySideLoop.DesignVolumeFlowRate == DataSizing::AutoSize) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SupplySideLoop.DesignVolumeFlowRateWasAutoSized = true;
+        }
+
+        state.dataPlantHXFluidToFluid->FluidHX(CompLoop).MaxSteamVolumeFlowRate = rNumericArgs(3);
+
+        if (!lNumericFieldBlanks(4)) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).DegOfSubCool = rNumericArgs(4);
+        } else {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).DegOfSubCool = 5.0;
+        }
+
+        if (!lNumericFieldBlanks(5)) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).DegOfLoopSubCool = rNumericArgs(5);
+        } else {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).DegOfLoopSubCool = 20.0;
+        }
+
+        if (UtilityRoutines::SameString(cAlphaArgs(7), "OperationSchemeModulated")) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode = iCtrlType::OperationSchemeModulated;
+        } else if (UtilityRoutines::SameString(cAlphaArgs(7), "OperationSchemeOnOff")) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode = iCtrlType::OperationSchemeOnOff;
+        } else if (UtilityRoutines::SameString(cAlphaArgs(7), "HeatingSetpointModulated")) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode = iCtrlType::HeatingSetPointModulated;
+        } else if (UtilityRoutines::SameString(cAlphaArgs(7), "HeatingSetpointOnOff")) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode = iCtrlType::HeatingSetPointOnOff;
+        } else {
+            ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
+            ShowContinueError(state, "Invalid " + cAlphaFieldNames(7) + " = " + cAlphaArgs(7));
+            ErrorsFound = true;
+        }
+
+        if (!lAlphaFieldBlanks(8)) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum =
+                NodeInputManager::GetOnlySingleNode(state,
+                                                    cAlphaArgs(8),
+                                                    ErrorsFound,
+                                                    cCurrentModuleObject,
+                                                    cAlphaArgs(1),
+                                                    DataLoopNode::NodeFluidType::Water,
+                                                    DataLoopNode::NodeConnectionType::Sensor,
+                                                    NodeInputManager::compFluidStream::Primary,
+                                                    DataLoopNode::ObjectIsNotParent);
+            // check that node actually has setpoints on it
+            if ((state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::HeatingSetPointModulated) ||
+                (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::HeatingSetPointOnOff)) {
+                if (state.dataLoopNodes->Node(state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum).TempSetPoint ==
+                    DataLoopNode::SensedNodeFlagValue) {
+                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                        ShowSevereError(state, std::string{RoutineName} + " Missing temperature setpoint for DataLoopNode::Node = " + cAlphaArgs(8));
+                        ShowContinueError(state, "Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
+                        ShowContinueError(state, " Use a setpoint manager to place a single temperature setpoint on the node");
+                        ErrorsFound = true;
+                    } else {
+                        // need call to EMS to check node
+                        bool NodeEMSSetPointMissing = false;
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(state,
+                                                                    state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum,
+                                                                    EMSManager::SPControlType::iTemperatureSetPoint,
+                                                                    NodeEMSSetPointMissing);
+                        if (NodeEMSSetPointMissing) {
+                            ShowSevereError(state, std::string{RoutineName} + " Missing temperature setpoint for node = " + cAlphaArgs(8));
+                            ShowContinueError(state, "Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
+                            ShowContinueError(state, "Use a setpoint manager or EMS actuator to place a single temperature setpoint on the node");
+                            ErrorsFound = true;
+                        }
+                    }
+                }
+            }
+        } else {
+            // need to name a setpoint node if using a setpoint type control mode
+            if ((state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::HeatingSetPointModulated) ||
+                (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::HeatingSetPointOnOff)) {
+                ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, "Missing entry for " + cAlphaFieldNames(8));
+                ErrorsFound = true;
+            }
+        }
+
+        if (!lNumericFieldBlanks(6)) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SizingFactor = rNumericArgs(6);
+        } else {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SizingFactor = 1.0;
+        }
     }
 
     if (ErrorsFound) {
@@ -548,9 +707,9 @@ void HeatExchangerStruct::setupOutputVars(EnergyPlusData &state)
 {
     std::string reportVarPrefix;
 
-    if (this->TypeNum = DataPlant::TypeOf_FluidToFluidPlantHtExchg) {
+    if (this->TypeNum == DataPlant::TypeOf_FluidToFluidPlantHtExchg) {
         reportVarPrefix = "Fluid ";
-    } else if (this->TypeNum = DataPlant::TypeOf_FluidToFluidPlantHtExchg) {
+    } else if (this->TypeNum == DataPlant::TypeOf_FluidToFluidPlantHtExchg) {
         reportVarPrefix = "Steam to Water ";
     }
 
@@ -631,11 +790,10 @@ void HeatExchangerStruct::setupOutputVars(EnergyPlusData &state)
                         "Average",
                         this->Name);
 
-    if (this->TypeNum = DataPlant::TypeOf_FluidToFluidPlantHtExchg) {
+    if (this->TypeNum == DataPlant::TypeOf_FluidToFluidPlantHtExchg) {
         SetupOutputVariable(
             state, "Fluid Heat Exchanger Effectiveness", OutputProcessor::Unit::None, this->Effectiveness, "System", "Average", this->Name);
     }
-    
 }
 
 void HeatExchangerStruct::initialize(EnergyPlusData &state)
@@ -2300,10 +2458,9 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
                                                 _);
 
         if (this->DemandSideLoop.loopSideNum != DataPlant::DemandSide) { // throw error
-            ShowSevereError(state,
-                            format("{} Invalid connections for {} name = \"{}\"",
-                                   RoutineName, DataPlant::ccSimPlantEquipTypes(this->TypeNum),
-                                   this->Name));
+            ShowSevereError(
+                state,
+                format("{} Invalid connections for {} name = \"{}\"", RoutineName, DataPlant::ccSimPlantEquipTypes(this->TypeNum), this->Name));
             ShowContinueError(state, "The \"Loop Demand Side\" connections are not on the Demand Side of a plant loop");
             errFlag = true;
         }
@@ -2323,20 +2480,18 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
                                                 _);
 
         if (this->SupplySideLoop.loopSideNum != DataPlant::SupplySide) { // throw error
-            ShowSevereError(state,
-                            format("{} Invalid connections for {} name = \"{}\"",
-                                   RoutineName, DataPlant::ccSimPlantEquipTypes(this->TypeNum),
-                                   this->Name));
+            ShowSevereError(
+                state,
+                format("{} Invalid connections for {} name = \"{}\"", RoutineName, DataPlant::ccSimPlantEquipTypes(this->TypeNum), this->Name));
             ShowContinueError(state, "The \"Loop Supply Side\" connections are not on the Supply Side of a plant loop");
             errFlag = true;
         }
 
         // make sure it is not the same loop on both sides.
         if (this->SupplySideLoop.loopNum == this->DemandSideLoop.loopNum) { // user is being too tricky, don't allow
-            ShowSevereError(state,
-                            format("{} Invalid connections for {} name = \"{}\"",
-                                   RoutineName, DataPlant::ccSimPlantEquipTypes(this->TypeNum),
-                                   this->Name));
+            ShowSevereError(
+                state,
+                format("{} Invalid connections for {} name = \"{}\"", RoutineName, DataPlant::ccSimPlantEquipTypes(this->TypeNum), this->Name));
             ShowContinueError(state, R"(The "Loop Supply Side" and "Loop Demand Side" need to be on different loops.)");
             errFlag = true;
         } else {
