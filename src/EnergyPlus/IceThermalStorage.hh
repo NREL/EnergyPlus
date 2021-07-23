@@ -153,6 +153,8 @@ namespace IceThermalStorage {
 
         void oneTimeInit(EnergyPlusData &state) override;
 
+        void oneTimeInit_new(EnergyPlusData &state) override;
+
         void CalcIceStorageDormant(EnergyPlusData &state);
 
         void CalcIceStorageCapacity(EnergyPlusData &state, Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap);

@@ -188,8 +188,6 @@ namespace IceThermalStorage {
             this->MyEnvrnFlag = true;
         }
 
-        this->oneTimeInit(state);
-
         //------------------------------------------------------------------------
         // FIRST PROCESS (MyLoad = 0.0 as IN)
         // At this moment as first calling of ITS, ITS provide ONLY MaxCap/OptCap/MinCap.
@@ -1292,7 +1290,7 @@ namespace IceThermalStorage {
         this->ParasiticElecEnergy = 0.0;
     }
 
-    void SimpleIceStorageData::oneTimeInit(EnergyPlusData &state)
+    void SimpleIceStorageData::oneTimeInit_new(EnergyPlusData &state)
     {
 
         bool errFlag;
@@ -1877,6 +1875,9 @@ namespace IceThermalStorage {
             }
             this->ITSmdot = this->ITSMassFlowRate;
         }
+    }
+    void SimpleIceStorageData::oneTimeInit(EnergyPlusData &state)
+    {
     }
 
     void UpdateIceFractions(EnergyPlusData &state)
