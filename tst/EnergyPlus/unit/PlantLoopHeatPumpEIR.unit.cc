@@ -2916,5 +2916,85 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
     EXPECT_EQ(Groups(2), "PLANT");
 }
 
+TEST_F(EnergyPlusFixture, TestOperatingFlowRates_FullyAutosized_AirSource)
+{
+    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
+                                                      "  hp cooling side,",
+                                                      "  node 1,",
+                                                      "  node 2,",
+                                                      "  AirSource,",
+                                                      "  node 3,",
+                                                      "  node 4,",
+                                                      "  ,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  3.14,",
+                                                      "  ,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "Curve:Linear,",
+                                                      "  dummyCurve,",
+                                                      "  1,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"});
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // set up the plant loops
+    // first the load side
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+
+    // the init call expects a "from" calling point
+    PlantLocation myLocation = PlantLocation(1, 2, 1, 1);
+
+    // call the factory with a valid name to trigger reading inputs
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+
+    // verify the size of the vector and the processed condition
+    EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
+
+    // for now we know the order is maintained, so get each heat pump object
+    EIRPlantLoopHeatPump *thisCoolingPLHP = &state->dataEIRPlantLoopHeatPump->heatPumps[0];
+
+    // do a bit of extra wiring up to the plant
+    PLHPPlantLoadSideComp.Name = thisCoolingPLHP->name;
+    PLHPPlantLoadSideComp.NodeNumIn = thisCoolingPLHP->loadSideNodes.inlet;
+
+    state->dataSize->PlantSizData.allocate(1);
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 0.010;
+    state->dataSize->PlantSizData(1).DeltaT = 1.0;
+
+    // call for all initialization
+    state->dataGlobal->BeginEnvrnFlag = true;
+    thisCoolingPLHP->onInitLoopEquip(*state, myLocation);
+
+    state->dataPlnt->PlantFinalSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
+
+    // assign the plant sizing data
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
+
+    // call with run flag ON, flow locked at nonzero both
+    state->dataPlnt->PlantLoop(1).LoopSide(2).FlowLock = DataPlant::iFlowLock::Locked;
+    state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.14;
+    thisCoolingPLHP->running = true;
+    thisCoolingPLHP->sizeLoadSide(*state);
+    thisCoolingPLHP->sizeSrcSideASHP(*state);
+    thisCoolingPLHP->setOperatingFlowRatesASHP(*state);
+    EXPECT_NEAR(0.14, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
+    EXPECT_TRUE(thisCoolingPLHP->running);
+}
+
 #pragma clang diagnostic pop
 #pragma clang diagnostic pop

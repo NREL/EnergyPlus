@@ -2256,10 +2256,9 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
         "  Cooling Coil Condenser Inlet;  !- Node or NodeList Name 2",
 
         "AirLoopHVAC:OutdoorAirSystem,",
-        "  DOAS OA System,          !- Name",
+        "  DOAS OA System,           !- Name",
         "  DOAS OA System Controllers,  !- Controller List Name",
-        "  DOAS OA System Equipment,!- Outdoor Air Equipment List Name",
-        "  DOAS Availability Managers;  !- Availability Manager List Name",
+        "  DOAS OA System Equipment; !- Outdoor Air Equipment List Name",
 
         "AirLoopHVAC:ControllerList,",
         "  DOAS OA System Controllers,  !- Name",
@@ -3234,8 +3233,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
 //"AirLoopHVAC:OutdoorAirSystem,",
 //"  DOAS OA System,          !- Name",
 //"  DOAS OA System Controllers,  !- Controller List Name",
-//"  DOAS OA System Equipment,!- Outdoor Air Equipment List Name",
-//"  DOAS Availability Managers;  !- Availability Manager List Name",
+//"  DOAS OA System Equipment;!- Outdoor Air Equipment List Name",
 
 //"AirLoopHVAC:ControllerList,",
 //"  DOAS OA System Controllers,  !- Name",
@@ -3479,8 +3477,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
                         "Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         _,
                         "Electricity",
@@ -3490,8 +3488,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
                         "Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
                         _,
                         "Electricity",
@@ -3501,8 +3499,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
                         "Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite3",
                         _,
                         "Electricity",
@@ -3547,8 +3545,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
                         "Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         _,
                         "Electricity",
@@ -3558,8 +3556,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
                         "Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
                         _,
                         "Electricity",
@@ -3569,8 +3567,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
                         "Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite3",
                         _,
                         "Electricity",
@@ -3585,8 +3583,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
 
     auto timeStep = 1.0;
 
-    SetupTimePointers(*state, "Zone", timeStep);
-    SetupTimePointers(*state, "HVAC", timeStep);
+    SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
+    SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
 
     *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
     *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
@@ -3774,7 +3772,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     state->dataDXCoils->NumDXCoils = 2;
     state->dataDXCoils->DXCoil.allocate(2);
     state->dataDXCoils->DXCoil(1).DXCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
-    state->dataDXCoils->DXCoil(1).CondenserType(1) = DataHVACGlobals::AirCooled;
+    state->dataDXCoils->DXCoil(1).CondenserType(1) = DataHeatBalance::RefrigCondenserType::Air;
     state->dataDXCoils->DXCoil(1).FuelType = "NaturalGas";
     state->dataDXCoils->DXCoil(1).ElecCoolingConsumption = 100.0;
     state->dataDXCoils->DXCoil(1).TotalCoolingEnergy = 100.0;
@@ -6308,9 +6306,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
 
     WriteVeriSumTable(*state);
 
-    /***********************************************************************************************************************************************
-     *                                                              Check Yes/No flag                                                              *
-     ***********************************************************************************************************************************************/
+    // Check Yes/No flag
 
     // RowName, ColumnName, value
     std::vector<std::tuple<std::string, std::string, std::string>> results_strings({
@@ -6347,9 +6343,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
         EXPECT_EQ(std::get<2>(v), flag) << "Failed for RowName=" << rowName << "; ColumnName=" << columnName;
     }
 
-    /***********************************************************************************************************************************************
-     *                                                       Check each zone and total rows                                                        *
-     ***********************************************************************************************************************************************/
+    // Check each zone and total rows
 
     // RowName, ColumnName, value
     std::vector<std::tuple<std::string, std::string, Real64>> results({
@@ -6453,8 +6447,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
                         "Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         _,
                         "Electricity",
@@ -6464,8 +6458,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
                         "Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
                         _,
                         "Electricity",
@@ -6475,8 +6469,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
                         "Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite3",
                         _,
                         "Electricity",
@@ -7247,14 +7241,42 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputV
     std::vector<std::string> ZoneNames({"Zone1", "Zone2"});
 
     for (int i = 0; i < 2; ++i) {
-        SetupOutputVariable(*state, "Zone Mean Air Temperature", OutputProcessor::Unit::C, zoneTemp, "Zone", "Average", ZoneNames[i]);
+        SetupOutputVariable(*state,
+                            "Zone Mean Air Temperature",
+                            OutputProcessor::Unit::C,
+                            zoneTemp,
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
+                            ZoneNames[i]);
 
-        SetupOutputVariable(*state, "Zone Heating Setpoint Not Met Time", OutputProcessor::Unit::hr, timeNotMet, "Zone", "Sum", ZoneNames[i]);
-        SetupOutputVariable(
-            *state, "Zone Heating Setpoint Not Met While Occupied Time", OutputProcessor::Unit::hr, timeNotMet, "Zone", "Sum", ZoneNames[i]);
-        SetupOutputVariable(*state, "Zone Cooling Setpoint Not Met Time", OutputProcessor::Unit::hr, timeNotMet, "Zone", "Sum", ZoneNames[i]);
-        SetupOutputVariable(
-            *state, "Zone Cooling Setpoint Not Met While Occupied Time", OutputProcessor::Unit::hr, timeNotMet, "Zone", "Sum", ZoneNames[i]);
+        SetupOutputVariable(*state,
+                            "Zone Heating Setpoint Not Met Time",
+                            OutputProcessor::Unit::hr,
+                            timeNotMet,
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
+                            ZoneNames[i]);
+        SetupOutputVariable(*state,
+                            "Zone Heating Setpoint Not Met While Occupied Time",
+                            OutputProcessor::Unit::hr,
+                            timeNotMet,
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
+                            ZoneNames[i]);
+        SetupOutputVariable(*state,
+                            "Zone Cooling Setpoint Not Met Time",
+                            OutputProcessor::Unit::hr,
+                            timeNotMet,
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
+                            ZoneNames[i]);
+        SetupOutputVariable(*state,
+                            "Zone Cooling Setpoint Not Met While Occupied Time",
+                            OutputProcessor::Unit::hr,
+                            timeNotMet,
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
+                            ZoneNames[i]);
     }
 
     // We do need to trick it into thinking it's a weather simulation, otherwise the monthly reports aren't reported
@@ -7499,9 +7521,7 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
         // Internal: Just to ensure that we gets the same one with round
         EXPECT_EQ(format("{:.2R}", round(oriAzimuth * 100.0) / 100.0), format("{:.2R}", oriAzimuth));
 
-        /****************************************************************************
-         *                            Wall (odd entries)                             *
-         *****************************************************************************/
+        // Wall (odd entries)
 
         // Internal: Dumb check to ensure we didn't mess up in the indexation
         EXPECT_EQ(oriAzimuth, state->dataSurface->Surface(i).Azimuth) << "Surface Name = " << state->dataSurface->Surface(i).Name;
@@ -7517,9 +7537,7 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
             cardinalDir)
             << "Azimuth was " << expectedAzimuthToCard.first << "for Surface '" << state->dataSurface->Surface(i).Name << "'.";
 
-        /****************************************************************************
-         *                           Window (even entries)                           *
-         *****************************************************************************/
+        // Window (even entries)
 
         EXPECT_EQ(oriAzimuth, state->dataSurface->Surface(i + 1).Azimuth) << "Surface Name = " << state->dataSurface->Surface(i + 1).Name;
 
@@ -7603,9 +7621,7 @@ TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
     for (int i = 1; i <= state->dataSurface->TotSurfaces; i++) {
         if (i % 2 == 1) {
 
-            /****************************************************************************
-             *                            Wall (odd entries)                             *
-             *****************************************************************************/
+            // Wall (odd entries)
 
             // Check the wall gross area
             EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(
@@ -7641,9 +7657,7 @@ TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
                       "S");
         } else {
 
-            /****************************************************************************
-             *                           door (even entries)                           *
-             *****************************************************************************/
+            // Door (even entries)
 
             // Check the door gross area
             EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(
@@ -7878,8 +7892,8 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         "Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         _,
                         "Electricity",
@@ -7889,8 +7903,8 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         "Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
                         _,
                         "Electricity",
@@ -7900,19 +7914,46 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         "Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite3",
                         _,
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable(
-        *state, "Heating Coal Energy", OutputProcessor::Unit::J, CoalHeating, "Zone", "Sum", "Lite4", _, "Coal", "Heating", "General");
-    SetupOutputVariable(
-        *state, "Heating Gasoline Energy", OutputProcessor::Unit::J, GasolineHeating, "Zone", "Sum", "Lite5", _, "Gasoline", "Heating", "General");
-    SetupOutputVariable(
-        *state, "Heating Propane Energy", OutputProcessor::Unit::J, PropaneHeating, "Zone", "Sum", "Lite6", _, "Propane", "Heating", "General");
+    SetupOutputVariable(*state,
+                        "Heating Coal Energy",
+                        OutputProcessor::Unit::J,
+                        CoalHeating,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite4",
+                        _,
+                        "Coal",
+                        "Heating",
+                        "General");
+    SetupOutputVariable(*state,
+                        "Heating Gasoline Energy",
+                        OutputProcessor::Unit::J,
+                        GasolineHeating,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite5",
+                        _,
+                        "Gasoline",
+                        "Heating",
+                        "General");
+    SetupOutputVariable(*state,
+                        "Heating Propane Energy",
+                        OutputProcessor::Unit::J,
+                        PropaneHeating,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite6",
+                        _,
+                        "Propane",
+                        "Heating",
+                        "General");
     state->dataGlobal->DoWeathSim = true;
     state->dataGlobal->TimeStepZone = 1.0;
     state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;
@@ -7921,8 +7962,8 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
 
     auto timeStep = 1.0;
 
-    SetupTimePointers(*state, "Zone", timeStep);
-    SetupTimePointers(*state, "HVAC", timeStep);
+    SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
+    SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
 
     *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
     *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
@@ -8426,8 +8467,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_8317_ValidateOutputTableMon
                         "Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         _,
                         "Electricity",
@@ -8437,8 +8478,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_8317_ValidateOutputTableMon
                         "Exterior Lights Electricity Rate",
                         OutputProcessor::Unit::W,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
                         _,
                         "Electricity",
@@ -9266,9 +9307,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
 
     WriteVeriSumTable(*state);
 
-    /***********************************************************************************************************************************************
-     *                                                              Check Yes/No flag                                                              *
-     ***********************************************************************************************************************************************/
+    // Check yes/no flag
 
     // RowName, ColumnName, value
     std::vector<std::tuple<std::string, std::string, std::string>> results_strings({
@@ -9305,9 +9344,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
         EXPECT_EQ(std::get<2>(v), flag) << "Failed for RowName=" << rowName << "; ColumnName=" << columnName;
     }
 
-    /***********************************************************************************************************************************************
-     *                                                       Check each zone and total rows                                                        *
-     ***********************************************************************************************************************************************/
+    // Check each zone and total rows
 
     // RowName, ColumnName, value
     std::vector<std::tuple<std::string, std::string, Real64>> results({
@@ -9431,8 +9468,8 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                         "Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         _,
                         "Electricity",
@@ -9442,8 +9479,8 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                         "Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
                         _,
                         "Electricity",
@@ -9453,19 +9490,46 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                         "Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite3",
                         _,
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable(
-        *state, "Heating Coal Energy", OutputProcessor::Unit::J, CoalHeating, "Zone", "Sum", "Lite4", _, "Coal", "Heating", "General");
-    SetupOutputVariable(
-        *state, "Heating Gasoline Energy", OutputProcessor::Unit::J, GasolineHeating, "Zone", "Sum", "Lite5", _, "Gasoline", "Heating", "General");
-    SetupOutputVariable(
-        *state, "Heating Propane Energy", OutputProcessor::Unit::J, PropaneHeating, "Zone", "Sum", "Lite6", _, "Propane", "Heating", "General");
+    SetupOutputVariable(*state,
+                        "Heating Coal Energy",
+                        OutputProcessor::Unit::J,
+                        CoalHeating,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite4",
+                        _,
+                        "Coal",
+                        "Heating",
+                        "General");
+    SetupOutputVariable(*state,
+                        "Heating Gasoline Energy",
+                        OutputProcessor::Unit::J,
+                        GasolineHeating,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite5",
+                        _,
+                        "Gasoline",
+                        "Heating",
+                        "General");
+    SetupOutputVariable(*state,
+                        "Heating Propane Energy",
+                        OutputProcessor::Unit::J,
+                        PropaneHeating,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite6",
+                        _,
+                        "Propane",
+                        "Heating",
+                        "General");
     state->dataGlobal->DoWeathSim = true;
     state->dataGlobal->TimeStepZone = 1.0;
     state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;
@@ -9474,8 +9538,8 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
 
     auto timeStep = 1.0;
 
-    SetupTimePointers(*state, "Zone", timeStep);
-    SetupTimePointers(*state, "HVAC", timeStep);
+    SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
+    SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
 
     *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
     *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
@@ -9778,6 +9842,41 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_EscapeHTML)
 
     // Clean up
     FileSystem::removeFile(state->dataStrGlobals->outputTblHtmFilePath);
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_PredefinedTable_SigDigits_Force_NonZero)
+{
+
+    SetPredefinedTables(*state);
+
+    // < 1e8, not using scientific notation
+    Real64 value = 123.456;
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizPkTimeMin, "MyPlant Sizing Pass 1", value, 2);
+    EXPECT_EQ("123.46", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizPkTimeMin, "MyPlant Sizing Pass 1"));
+
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizPkTimeDayOfSim, "MyPlant Sizing Pass 1", value, 1);
+    EXPECT_EQ("123.5", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizPkTimeDayOfSim, "MyPlant Sizing Pass 1"));
+
+    // Force reset to numSigDigits = 2
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizPkTimeHour, "MyPlant Sizing Pass 1", value, 0);
+    EXPECT_EQ("123.", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizPkTimeHour, "MyPlant Sizing Pass 1"));
+
+    // > 1e8, switch to scientific notation
+    value = 123456789.1;
+
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizDesDay, "MyPlant Sizing Pass 1", value, 3);
+    EXPECT_EQ("0.123E+09", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizDesDay, "MyPlant Sizing Pass 1"));
+
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizPrevVdot, "MyPlant Sizing Pass 1", value, 2);
+    EXPECT_EQ("0.12E+09", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizPrevVdot, "MyPlant Sizing Pass 1"));
+
+    // Force reset to numSigDigits = 2 since we switch to scientific notation
+
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizMeasVdot, "MyPlant Sizing Pass 1", value, 1);
+    EXPECT_EQ("0.12E+09", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizMeasVdot, "MyPlant Sizing Pass 1"));
+
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizCalcVdot, "MyPlant Sizing Pass 1", value, 0);
+    EXPECT_EQ("0.12E+09", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizCalcVdot, "MyPlant Sizing Pass 1"));
 }
 
 
