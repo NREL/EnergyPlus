@@ -84,7 +84,7 @@ void kivaErrorCallback(const int messageType, const std::string message, void *c
         ShowMessage(*contextPair.first, fullMessage);
     } else if (messageType == Kiva::MSG_WARN) {
         ShowWarningError(*contextPair.first, fullMessage);
-    } else /* if (messageType == Kiva::MSG_ERR) */ {
+    } else { // if (messageType == Kiva::MSG_ERR)
         ShowSevereError(*contextPair.first, fullMessage);
         ShowFatalError(*contextPair.first, "Kiva: Errors discovered, program terminates.");
     }
@@ -1209,7 +1209,7 @@ void KivaInstanceMap::plotDomain()
 
     output << "\n";
 
-    for (std::size_t k = ground.nZ - 1; /* k >= 0 && */ k < ground.nZ; k--) {
+    for (std::size_t k = ground.nZ - 1; k < ground.nZ; k--) { // k >= 0 used to be commented out but in the loop exit conditional check here
 
         output << k << ", " << ground.domain.meshZ.centers[k];
 
@@ -1265,7 +1265,7 @@ void KivaManager::defineDefaultFoundation(EnergyPlusData &state)
     } else if (settings.deepGroundBoundary == Settings::ZERO_FLUX) {
         defFnd.deepGroundDepth = settings.deepGroundDepth;
         defFnd.deepGroundBoundary = Kiva::Foundation::DGB_ZERO_FLUX;
-    } else /* if (settings.deepGroundBoundary == Settings::GROUNDWATER) */ {
+    } else { // if (settings.deepGroundBoundary == Settings::GROUNDWATER)
         defFnd.deepGroundDepth = settings.deepGroundDepth;
         defFnd.deepGroundBoundary = Kiva::Foundation::DGB_FIXED_TEMPERATURE;
     }
