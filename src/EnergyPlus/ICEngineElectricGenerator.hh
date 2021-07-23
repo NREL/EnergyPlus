@@ -132,7 +132,6 @@ namespace ICEngineElectricGenerator {
         bool MyPlantScanFlag;
         bool MySizeAndNodeInitFlag;
         bool CheckEquipName;
-        bool myFlag;
 
         // Default Constructor
         ICEngineGeneratorSpecs()
@@ -146,7 +145,7 @@ namespace ICEngineElectricGenerator {
               FuelEnergyUseRate(0.0), TotalHeatEnergyRec(0.0), JacketEnergyRec(0.0), LubeOilEnergyRec(0.0), ExhaustEnergyRec(0.0), FuelEnergy(0.0),
               FuelMdot(0.0), ExhaustStackTemp(0.0), ElecPowerGenerated(0.0), ElecEnergyGenerated(0.0), HeatRecMaxTemp(0.0), HRLoopNum(0),
               HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0), MyEnvrnFlag(true), MyPlantScanFlag(true), MySizeAndNodeInitFlag(true),
-              CheckEquipName(true), myFlag(true)
+              CheckEquipName(true)
         {
         }
 
@@ -175,6 +174,8 @@ namespace ICEngineElectricGenerator {
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
         void oneTimeInit(EnergyPlusData &state) override;
+
+        void oneTimeInit_new(EnergyPlusData &state) override;
     };
 
     void GetICEngineGeneratorInput(EnergyPlusData &state);

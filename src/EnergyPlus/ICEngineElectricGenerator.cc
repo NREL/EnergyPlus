@@ -759,8 +759,6 @@ namespace ICEngineElectricGenerator {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
 
-        this->oneTimeInit(state); // end one time inits
-
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag && this->HeatRecActive) {
             int HeatRecInletNode = this->HeatRecInletNodeNum;
@@ -823,16 +821,13 @@ namespace ICEngineElectricGenerator {
             state.dataLoopNodes->Node(HeatRecOutletNode).Temp = this->HeatRecOutletTemp;
         }
     }
-    void ICEngineGeneratorSpecs::oneTimeInit(EnergyPlusData &state)
+    void ICEngineGeneratorSpecs::oneTimeInit_new(EnergyPlusData &state)
     {
         static constexpr std::string_view RoutineName("InitICEngineGenerators");
 
         bool errFlag;
 
-        if (this->myFlag) {
-            this->setupOutputVars(state);
-            this->myFlag = false;
-        }
+        this->setupOutputVars(state);
 
         if (this->MyPlantScanFlag && allocated(state.dataPlnt->PlantLoop) && this->HeatRecActive) {
             errFlag = false;
@@ -880,6 +875,10 @@ namespace ICEngineElectricGenerator {
 
             this->MySizeAndNodeInitFlag = false;
         }
+    }
+
+    void ICEngineGeneratorSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+    {
     }
 
 } // namespace ICEngineElectricGenerator
