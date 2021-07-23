@@ -616,16 +616,14 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
             state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SupplySideLoop.DesignVolumeFlowRateWasAutoSized = true;
         }
 
-        state.dataPlantHXFluidToFluid->FluidHX(CompLoop).MaxSteamVolumeFlowRate = rNumericArgs(3);
-
-        if (!lNumericFieldBlanks(4)) {
-            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).DegOfSubCool = rNumericArgs(4);
+        if (!lNumericFieldBlanks(3)) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).DegOfSubCool = rNumericArgs(3);
         } else {
             state.dataPlantHXFluidToFluid->FluidHX(CompLoop).DegOfSubCool = 5.0;
         }
 
-        if (!lNumericFieldBlanks(5)) {
-            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).DegOfLoopSubCool = rNumericArgs(5);
+        if (!lNumericFieldBlanks(4)) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).DegOfLoopSubCool = rNumericArgs(4);
         } else {
             state.dataPlantHXFluidToFluid->FluidHX(CompLoop).DegOfLoopSubCool = 20.0;
         }
@@ -691,8 +689,8 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
             }
         }
 
-        if (!lNumericFieldBlanks(6)) {
-            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SizingFactor = rNumericArgs(6);
+        if (!lNumericFieldBlanks(5)) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SizingFactor = rNumericArgs(5);
         } else {
             state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SizingFactor = 1.0;
         }
@@ -813,13 +811,14 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
     this->oneTimeInit(state); // plant setup
 
     if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
-
         Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
                                                        DataGlobalConstants::InitConvTemp,
                                                        state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
                                                        RoutineNameNoColon);
+
         this->DemandSideLoop.MassFlowRateMax = rho * this->DemandSideLoop.DesignVolumeFlowRate;
+
         PlantUtilities::InitComponentNodes(state,
                                            this->DemandSideLoop.MassFlowRateMin,
                                            this->DemandSideLoop.MassFlowRateMax,
@@ -830,29 +829,69 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
                                            this->DemandSideLoop.branchNum,
                                            this->DemandSideLoop.compNum);
 
-        rho = FluidProperties::GetDensityGlycol(state,
-                                                state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidName,
-                                                DataGlobalConstants::InitConvTemp,
-                                                state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidIndex,
-                                                RoutineNameNoColon);
-        this->SupplySideLoop.MassFlowRateMax = rho * this->SupplySideLoop.DesignVolumeFlowRate;
-        PlantUtilities::InitComponentNodes(state,
-                                           this->SupplySideLoop.MassFlowRateMin,
-                                           this->SupplySideLoop.MassFlowRateMax,
-                                           this->SupplySideLoop.inletNodeNum,
-                                           this->SupplySideLoop.outletNodeNum,
-                                           this->SupplySideLoop.loopNum,
-                                           this->SupplySideLoop.loopSideNum,
-                                           this->SupplySideLoop.branchNum,
-                                           this->SupplySideLoop.compNum);
-        this->MyEnvrnFlag = false;
+        this->DemandSideLoop.InletTemp = state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Temp;
+
+        if (this->TypeNum == DataPlant::TypeOf_FluidToFluidPlantHtExchg) {
+            rho = FluidProperties::GetDensityGlycol(state,
+                                                    state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidName,
+                                                    DataGlobalConstants::InitConvTemp,
+                                                    state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidIndex,
+                                                    RoutineNameNoColon);
+
+            this->SupplySideLoop.MassFlowRateMax = rho * this->SupplySideLoop.DesignVolumeFlowRate;
+
+            PlantUtilities::InitComponentNodes(state,
+                                               this->SupplySideLoop.MassFlowRateMin,
+                                               this->SupplySideLoop.MassFlowRateMax,
+                                               this->SupplySideLoop.inletNodeNum,
+                                               this->SupplySideLoop.outletNodeNum,
+                                               this->SupplySideLoop.loopNum,
+                                               this->SupplySideLoop.loopSideNum,
+                                               this->SupplySideLoop.branchNum,
+                                               this->SupplySideLoop.compNum);
+
+            this->SupplySideLoop.InletTemp = state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).Temp;
+
+            this->MyEnvrnFlag = false;
+
+        } else if (this->TypeNum == DataPlant::TypeOf_SteamToWaterPlantHtExchg) {
+            Real64 rhoSteam = FluidProperties::GetSatDensityRefrig(state,
+                                                                   state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidName,
+                                                                   DataGlobalConstants::InitConvTemp,
+                                                                   1.0,
+                                                                   state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidIndex,
+                                                                   RoutineNameNoColon);
+
+            Real64 StartEnthSteam = FluidProperties::GetSatEnthalpyRefrig(state,
+                                                                          state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidName,
+                                                                          DataGlobalConstants::InitConvTemp,
+                                                                          1.0,
+                                                                          state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidIndex,
+                                                                          RoutineNameNoColon);
+
+            this->SupplySideLoop.MassFlowRateMax = rhoSteam * this->SupplySideLoop.DesignVolumeFlowRate;
+
+            PlantUtilities::InitComponentNodes(state,
+                                               this->SupplySideLoop.MassFlowRateMin,
+                                               this->SupplySideLoop.MassFlowRateMax,
+                                               this->SupplySideLoop.inletNodeNum,
+                                               this->SupplySideLoop.outletNodeNum,
+                                               this->SupplySideLoop.loopNum,
+                                               this->SupplySideLoop.loopSideNum,
+                                               this->SupplySideLoop.branchNum,
+                                               this->SupplySideLoop.compNum);
+
+            this->SupplySideLoop.InletTemp = state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).Temp;
+            this->SupplySideLoop.InletEnthalpy = StartEnthSteam;
+            this->SupplySideLoop.InletQuality = 1.0;
+
+            this->MyEnvrnFlag = false;
+        }
     }
+
     if (!state.dataGlobal->BeginEnvrnFlag) {
         this->MyEnvrnFlag = true;
     }
-
-    this->DemandSideLoop.InletTemp = state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Temp;
-    this->SupplySideLoop.InletTemp = state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).Temp;
 
     if (this->ControlMode == iCtrlType::CoolingSetPointOnOffWithComponentOverride) {
         // store current value for setpoint in central plant loop data structure

@@ -124,12 +124,16 @@ namespace PlantHeatExchangerFluidToFluid {
         Real64 InletTemp;                      // current inlet fluid temperature [C]
         Real64 InletMassFlowRate;              // current inlet mass flow rate [kg/s]
         Real64 OutletTemp;                     // component outlet temperature [C]
+        Real64 InletQuality;
+        Real64 OutletQuality;
+        Real64 InletEnthalpy;
+        Real64 OutletEnthalpy;
 
         // Default Constructor
         PlantConnectionStruct()
             : inletNodeNum(0), outletNodeNum(0), MassFlowRateMin(0.0), MassFlowRateMax(0.0), DesignVolumeFlowRate(0.0),
               DesignVolumeFlowRateWasAutoSized(false), MyLoad(0.0), MinLoad(0.0), MaxLoad(0.0), OptLoad(0.0), InletTemp(0.0), InletMassFlowRate(0.0),
-              OutletTemp(0.0)
+              OutletTemp(0.0), InletQuality(1.0), OutletQuality(1.0), InletEnthalpy(0.0), OutletEnthalpy(0.0)
         {
         }
     };
@@ -172,7 +176,6 @@ namespace PlantHeatExchangerFluidToFluid {
         Real64 HeatTransferEnergy;
         Real64 Effectiveness;
         Real64 OperationStatus;
-        Real64 MaxSteamVolumeFlowRate;
         Real64 DegOfSubCool;
         Real64 DegOfLoopSubCool;
         int DmdSideModulatSolvNoConvergeErrorCount;
@@ -188,7 +191,7 @@ namespace PlantHeatExchangerFluidToFluid {
             : AvailSchedNum(0), HeatExchangeModelType(iFluidHXType::Unassigned), UA(0.0), UAWasAutoSized(false), ControlMode(iCtrlType::Unassigned),
               SetPointNodeNum(0), TempControlTol(0.0), ControlSignalTemp(iCtrlTemp::Unassigned), MinOperationTemp(-99999.0),
               MaxOperationTemp(99999.0), ComponentTypeOfNum(0), SizingFactor(1.0), HeatTransferRate(0.0), HeatTransferEnergy(0.0), Effectiveness(0.0),
-              OperationStatus(0.0), MaxSteamVolumeFlowRate(0.0), DegOfSubCool(0.0), DegOfLoopSubCool(0.0), DmdSideModulatSolvNoConvergeErrorCount(0),
+              OperationStatus(0.0), DegOfSubCool(0.0), DegOfLoopSubCool(0.0), DmdSideModulatSolvNoConvergeErrorCount(0),
               DmdSideModulatSolvNoConvergeErrorIndex(0), DmdSideModulatSolvFailErrorCount(0), DmdSideModulatSolvFailErrorIndex(0),
               MyOneTimeFlag(true), MyFlag(true), MyEnvrnFlag(true)
         {
