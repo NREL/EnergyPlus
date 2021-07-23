@@ -191,8 +191,6 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    state->dataHeatBal->ZoneIntGain.allocate(1);
-
     createFacilityElectricPowerServiceObject(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
 

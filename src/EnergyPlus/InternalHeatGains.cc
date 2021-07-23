@@ -270,15 +270,15 @@ namespace InternalHeatGains {
         state.dataHeatBal->ZoneIntEEuse.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBal->RefrigCaseCredit.allocate(state.dataGlobal->NumOfZones);
 
-        EPVector<bool> RepVarSet;
-        EPVector<bool> SpaceRepVarSet;
+        Array1D_bool RepVarSet;
+        Array1D_bool SpaceRepVarSet;
         RepVarSet.allocate(state.dataGlobal->NumOfZones);
         SpaceRepVarSet.allocate(state.dataGlobal->NumOfSpaces);
-        for (auto repVar : RepVarSet) {
-            repVar = true;
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            RepVarSet(zoneNum) = true;
         }
-        for (auto repVar : SpaceRepVarSet) {
-            repVar = true;
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->NumOfSpaces; ++spaceNum) {
+            SpaceRepVarSet(spaceNum) = true;
         }
 
         // Determine argument length of objects gotten by this routine
@@ -742,7 +742,7 @@ namespace InternalHeatGains {
                                         ShowWarningError(state,
                                                          std::string{RoutineName} + CurrentModuleObject + "=\"" +
                                                              state.dataHeatBal->People(Loop).Name + "\", specifies " +
-                                                             state.dataIPShortCut->cNumericFieldNames(2) +
+                                                             state.dataIPShortCut->cNumericFieldNames(3) +
                                                              ", but Zone Floor Area = 0.  0 People will result.");
                                     }
                                 } else {
@@ -1630,11 +1630,11 @@ namespace InternalHeatGains {
             }
         }
 
-        for (auto repVar : RepVarSet) {
-            repVar = true;
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            RepVarSet(zoneNum) = true;
         }
-        for (auto repVar : SpaceRepVarSet) {
-            repVar = true;
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->NumOfSpaces; ++spaceNum) {
+            SpaceRepVarSet(spaceNum) = true;
         }
         CurrentModuleObject = "Lights";
         state.dataHeatBal->NumLightsStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
@@ -2204,11 +2204,11 @@ namespace InternalHeatGains {
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtArea, "Interior Lighting Total", state.dataInternalHeatGains->sumArea);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtPower, "Interior Lighting Total", state.dataInternalHeatGains->sumPower);
 
-        for (auto repVar : RepVarSet) {
-            repVar = true;
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            RepVarSet(zoneNum) = true;
         }
-        for (auto repVar : SpaceRepVarSet) {
-            repVar = true;
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->NumOfSpaces; ++spaceNum) {
+            SpaceRepVarSet(spaceNum) = true;
         }
         CurrentModuleObject = "ElectricEquipment";
         state.dataHeatBal->NumZoneElectricStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
@@ -2668,11 +2668,11 @@ namespace InternalHeatGains {
             }     // Item - Number of ZoneElectric objects
         }         // Check on number of ZoneElectric
 
-        for (auto repVar : RepVarSet) {
-            repVar = true;
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            RepVarSet(zoneNum) = true;
         }
-        for (auto repVar : SpaceRepVarSet) {
-            repVar = true;
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->NumOfSpaces; ++spaceNum) {
+            SpaceRepVarSet(spaceNum) = true;
         }
         CurrentModuleObject = "GasEquipment";
         state.dataHeatBal->NumZoneGasStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
@@ -3170,11 +3170,11 @@ namespace InternalHeatGains {
             }     // Item - number of gas statements
         }         // check for number of gas statements
 
-        for (auto repVar : RepVarSet) {
-            repVar = true;
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            RepVarSet(zoneNum) = true;
         }
-        for (auto repVar : SpaceRepVarSet) {
-            repVar = true;
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->NumOfSpaces; ++spaceNum) {
+            SpaceRepVarSet(spaceNum) = true;
         }
         CurrentModuleObject = "HotWaterEquipment";
         state.dataHeatBal->NumHotWaterEqStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
@@ -3634,11 +3634,11 @@ namespace InternalHeatGains {
             }     // Item - number of hot water statements
         }
 
-        for (auto repVar : RepVarSet) {
-            repVar = true;
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            RepVarSet(zoneNum) = true;
         }
-        for (auto repVar : SpaceRepVarSet) {
-            repVar = true;
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->NumOfSpaces; ++spaceNum) {
+            SpaceRepVarSet(spaceNum) = true;
         }
         CurrentModuleObject = "SteamEquipment";
         state.dataHeatBal->NumSteamEqStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
@@ -4098,11 +4098,11 @@ namespace InternalHeatGains {
             }     // Item - number of hot water statements
         }
 
-        for (auto repVar : RepVarSet) {
-            repVar = true;
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            RepVarSet(zoneNum) = true;
         }
-        for (auto repVar : SpaceRepVarSet) {
-            repVar = true;
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->NumOfSpaces; ++spaceNum) {
+            SpaceRepVarSet(spaceNum) = true;
         }
         CurrentModuleObject = "OtherEquipment";
         state.dataHeatBal->NumOtherEqStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
@@ -4588,11 +4588,11 @@ namespace InternalHeatGains {
             }     // Item - number of other equipment statements
         }
 
-        for (auto repVar : RepVarSet) {
-            repVar = true;
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            RepVarSet(zoneNum) = true;
         }
-        for (auto repVar : SpaceRepVarSet) {
-            repVar = true;
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->NumOfSpaces; ++spaceNum) {
+            SpaceRepVarSet(spaceNum) = true;
         }
         CurrentModuleObject = "ElectricEquipment:ITE:AirCooled";
         state.dataHeatBal->NumZoneITEqStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
@@ -5478,11 +5478,11 @@ namespace InternalHeatGains {
             }
         } // Check on number of ZoneITEq
 
-        for (auto repVar : RepVarSet) {
-            repVar = true;
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            RepVarSet(zoneNum) = true;
         }
-        for (auto repVar : SpaceRepVarSet) {
-            repVar = true;
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->NumOfSpaces; ++spaceNum) {
+            SpaceRepVarSet(spaceNum) = true;
         }
         CurrentModuleObject = "ZoneBaseboard:OutdoorTemperatureControlled";
         state.dataHeatBal->TotBBHeat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
@@ -5726,11 +5726,11 @@ namespace InternalHeatGains {
                                   &state.dataHeatBal->ZoneBBHeat(Loop).RadGainRate);
         }
 
-        for (auto repVar : RepVarSet) {
-            repVar = true;
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            RepVarSet(zoneNum) = true;
         }
-        for (auto repVar : SpaceRepVarSet) {
-            repVar = true;
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->NumOfSpaces; ++spaceNum) {
+            SpaceRepVarSet(spaceNum) = true;
         }
         CurrentModuleObject = "ZoneContaminantSourceAndSink:CarbonDioxide";
         state.dataHeatBal->TotCO2Gen = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
@@ -5836,6 +5836,7 @@ namespace InternalHeatGains {
         }
 
         RepVarSet.deallocate();
+        SpaceRepVarSet.deallocate();
         IHGNumbers.deallocate();
         AlphaName.deallocate();
 
