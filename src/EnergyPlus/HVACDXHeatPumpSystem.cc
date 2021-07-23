@@ -73,7 +73,7 @@ namespace HVACDXHeatPumpSystem {
     // Module containing the DXHeatPumpSystem simulation routines
 
     // MODULE INFORMATION:
-    //       AUTHOR         Brent Griffith (derived from HVACDXSystem.cc by R.Liesen)
+    //       AUTHOR         Brent Griffith (derived by R.Liesen)
     //       DATE WRITTEN   May 2011
     //                      Feb 2013, Bo Shen, Oak Ridge National Lab
     //                      Add Coil:Heating:DX:VariableSpeed
@@ -109,7 +109,7 @@ namespace HVACDXHeatPumpSystem {
     {
 
         // SUBROUTINE INFORMATION:
-        //       AUTHOR         Brent Griffith (derived from HVACDXSystem.cc by R.Liesen)
+        //       AUTHOR         Brent Griffith (derived by R.Liesen)
         //       DATE WRITTEN   May 2011
         //                      Feb 2013, Bo Shen, Oak Ridge National Lab
         //                      Add Coil:Heating:DX:VariableSpeed
@@ -242,7 +242,7 @@ namespace HVACDXHeatPumpSystem {
     {
 
         // SUBROUTINE INFORMATION:
-        //       AUTHOR         Brent Griffith (derived from HVACDXSystem.cc by R.Liesen)
+        //       AUTHOR         Brent Griffith (derived by R.Liesen)
         //       DATE WRITTEN   May 2011
         //                      Feb 2013, Bo Shen, Oak Ridge National Lab
         //                      Add Coil:Heating:DX:VariableSpeed
@@ -418,8 +418,8 @@ namespace HVACDXHeatPumpSystem {
                                 "Coil System Part Load Ratio",
                                 OutputProcessor::Unit::None,
                                 DXHeatPumpSystem(DXHeatSysNum).PartLoadFrac,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 DXHeatPumpSystem(DXHeatSysNum).Name);
         }
 
@@ -446,7 +446,7 @@ namespace HVACDXHeatPumpSystem {
     {
 
         // SUBROUTINE INFORMATION:
-        //       AUTHOR         Brent Griffith (derived from HVACDXSystem.cc by R.Liesen)
+        //       AUTHOR         Brent Griffith (derived by R.Liesen)
         //       DATE WRITTEN   May 2011
         //       RE-ENGINEERED  na
 
