@@ -61,6 +61,11 @@ import unittest
 
 from pyenergyplus.api import EnergyPlusAPI
 
+parent = os.path.dirname
+this_file = os.path.realpath(__file__)  # returns C:\EnergyPlusRepo\tst\EnergyPlus\api\test_OutputFiles.py
+repo_root = parent(parent(parent(parent(this_file))))  # returns C:\EnergyPlusRepo
+idf_path = os.path.join(repo_root, "testfiles", "1ZoneUncontrolled.idf")  # returns C:\EnergyPlus
+
 
 class TestAPIFlushOutput(unittest.TestCase):
     """
@@ -88,7 +93,7 @@ class TestAPIFlushOutput(unittest.TestCase):
         """
         with tempfile.TemporaryDirectory() as tempdir:
             print(tempdir)
-            cmd_args = shlex.split(f'-d {tempdir} -D @IDF_FILE@')
+            cmd_args = shlex.split(f'-d {tempdir} -D {idf_path}')
             return_code = self.api.runtime.run_energyplus(self.state, cmd_args)
             self.assertEqual(return_code, 0)
             out_files = gb.glob(os.path.join(tempdir, "*"))
