@@ -1345,22 +1345,28 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
 
     state.dataHeatBalSurf->SurfInsideTempHist.allocate(Construction::MaxCTFTerms);
     state.dataHeatBalSurf->SurfOutsideTempHist.allocate(Construction::MaxCTFTerms);
-    state.dataHeatBalSurf->SurfInsideTempHistMaster.allocate(Construction::MaxCTFTerms);
-    state.dataHeatBalSurf->SurfOutsideTempHistMaster.allocate(Construction::MaxCTFTerms);
     state.dataHeatBalSurf->SurfInsideFluxHist.allocate(Construction::MaxCTFTerms);
     state.dataHeatBalSurf->SurfOutsideFluxHist.allocate(Construction::MaxCTFTerms);
-    state.dataHeatBalSurf->SurfInsideFluxHistMaster.allocate(Construction::MaxCTFTerms);
-    state.dataHeatBalSurf->SurfOutsideFluxHistMaster.allocate(Construction::MaxCTFTerms);
     for (int loop = 1; loop <= Construction::MaxCTFTerms; ++loop) {
         state.dataHeatBalSurf->SurfInsideTempHist(loop).dimension(state.dataSurface->TotSurfaces, 0);
         state.dataHeatBalSurf->SurfOutsideTempHist(loop).dimension(state.dataSurface->TotSurfaces, 0);
-        state.dataHeatBalSurf->SurfInsideTempHistMaster(loop).dimension(state.dataSurface->TotSurfaces, 0);
-        state.dataHeatBalSurf->SurfOutsideTempHistMaster(loop).dimension(state.dataSurface->TotSurfaces, 0);
         state.dataHeatBalSurf->SurfInsideFluxHist(loop).dimension(state.dataSurface->TotSurfaces, 0);
         state.dataHeatBalSurf->SurfOutsideFluxHist(loop).dimension(state.dataSurface->TotSurfaces, 0);
-        state.dataHeatBalSurf->SurfInsideFluxHistMaster(loop).dimension(state.dataSurface->TotSurfaces, 0);
-        state.dataHeatBalSurf->SurfOutsideFluxHistMaster(loop).dimension(state.dataSurface->TotSurfaces, 0);
     }
+
+    if (!state.dataHeatBal->SimpleCTFOnly) {
+        state.dataHeatBalSurf->SurfInsideTempHistMaster.allocate(Construction::MaxCTFTerms);
+        state.dataHeatBalSurf->SurfOutsideTempHistMaster.allocate(Construction::MaxCTFTerms);
+        state.dataHeatBalSurf->SurfInsideFluxHistMaster.allocate(Construction::MaxCTFTerms);
+        state.dataHeatBalSurf->SurfOutsideFluxHistMaster.allocate(Construction::MaxCTFTerms);
+        for (int loop = 1; loop <= Construction::MaxCTFTerms; ++loop) {
+            state.dataHeatBalSurf->SurfInsideTempHistMaster(loop).dimension(state.dataSurface->TotSurfaces, 0);
+            state.dataHeatBalSurf->SurfOutsideTempHistMaster(loop).dimension(state.dataSurface->TotSurfaces, 0);
+            state.dataHeatBalSurf->SurfInsideFluxHistMaster(loop).dimension(state.dataSurface->TotSurfaces, 0);
+            state.dataHeatBalSurf->SurfOutsideFluxHistMaster(loop).dimension(state.dataSurface->TotSurfaces, 0);
+        }
+    }
+
     state.dataHeatBalSurf->SurfTempOut.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfTempInRep.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfTempInMovInsRep.dimension(state.dataSurface->TotSurfaces, 0.0);
@@ -2236,12 +2242,18 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
             for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
                 state.dataHeatBalSurf->SurfInsideTempHist(CTFTermNum)(SurfNum) = SurfInitialTemp;
                 state.dataHeatBalSurf->SurfOutsideTempHist(CTFTermNum)(SurfNum) = SurfInitialTemp;
-                state.dataHeatBalSurf->SurfInsideTempHistMaster(CTFTermNum)(SurfNum) = SurfInitialTemp;
-                state.dataHeatBalSurf->SurfOutsideTempHistMaster(CTFTermNum)(SurfNum) = SurfInitialTemp;
                 state.dataHeatBalSurf->SurfInsideFluxHist(CTFTermNum)(SurfNum) = 0.0;
                 state.dataHeatBalSurf->SurfOutsideFluxHist(CTFTermNum)(SurfNum) = 0.0;
-                state.dataHeatBalSurf->SurfInsideFluxHistMaster(CTFTermNum)(SurfNum) = 0.0;
-                state.dataHeatBalSurf->SurfOutsideFluxHistMaster(CTFTermNum)(SurfNum) = 0.0;
+            }
+        }
+        if (!state.dataHeatBal->SimpleCTFOnly) {
+            for (int CTFTermNum = 1; CTFTermNum <= Construction::MaxCTFTerms; ++CTFTermNum) {
+                for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
+                    state.dataHeatBalSurf->SurfInsideTempHistMaster(CTFTermNum)(SurfNum) = SurfInitialTemp;
+                    state.dataHeatBalSurf->SurfOutsideTempHistMaster(CTFTermNum)(SurfNum) = SurfInitialTemp;
+                    state.dataHeatBalSurf->SurfInsideFluxHistMaster(CTFTermNum)(SurfNum) = 0.0;
+                    state.dataHeatBalSurf->SurfOutsideFluxHistMaster(CTFTermNum)(SurfNum) = 0.0;
+                }
             }
         }
     }
@@ -2271,20 +2283,34 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
         // Reset outside boundary conditions if necessary
         if ((Surface(SurfNum).ExtBoundCond == ExternalEnvironment) || (Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt)) {
             for (int CTFTermNum = 1; CTFTermNum <= Construction::MaxCTFTerms; ++CTFTermNum) {
-                state.dataHeatBalSurf->SurfOutsideTempHistMaster(CTFTermNum)(SurfNum) = state.dataSurface->SurfOutDryBulbTemp(SurfNum);
                 state.dataHeatBalSurf->SurfOutsideTempHist(CTFTermNum)(SurfNum) = state.dataSurface->SurfOutDryBulbTemp(SurfNum);
             }
 
         } else if (Surface(SurfNum).ExtBoundCond == Ground) {
             for (int CTFTermNum = 1; CTFTermNum <= Construction::MaxCTFTerms; ++CTFTermNum) {
-                state.dataHeatBalSurf->SurfOutsideTempHistMaster(CTFTermNum)(SurfNum) = state.dataEnvrn->GroundTemp;
                 state.dataHeatBalSurf->SurfOutsideTempHist(CTFTermNum)(SurfNum) = state.dataEnvrn->GroundTemp;
             }
 
         } else if (Surface(SurfNum).ExtBoundCond == GroundFCfactorMethod) {
             for (int CTFTermNum = 1; CTFTermNum <= Construction::MaxCTFTerms; ++CTFTermNum) {
-                state.dataHeatBalSurf->SurfOutsideTempHistMaster(CTFTermNum)(SurfNum) = state.dataEnvrn->GroundTempFC;
                 state.dataHeatBalSurf->SurfOutsideTempHist(CTFTermNum)(SurfNum) = state.dataEnvrn->GroundTempFC;
+            }
+        }
+        if (!state.dataHeatBal->SimpleCTFOnly) {
+            if ((Surface(SurfNum).ExtBoundCond == ExternalEnvironment) || (Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt)) {
+                for (int CTFTermNum = 1; CTFTermNum <= Construction::MaxCTFTerms; ++CTFTermNum) {
+                    state.dataHeatBalSurf->SurfOutsideTempHistMaster(CTFTermNum)(SurfNum) = state.dataSurface->SurfOutDryBulbTemp(SurfNum);
+                }
+
+            } else if (Surface(SurfNum).ExtBoundCond == Ground) {
+                for (int CTFTermNum = 1; CTFTermNum <= Construction::MaxCTFTerms; ++CTFTermNum) {
+                    state.dataHeatBalSurf->SurfOutsideTempHistMaster(CTFTermNum)(SurfNum) = state.dataEnvrn->GroundTemp;
+                }
+
+            } else if (Surface(SurfNum).ExtBoundCond == GroundFCfactorMethod) {
+                for (int CTFTermNum = 1; CTFTermNum <= Construction::MaxCTFTerms; ++CTFTermNum) {
+                    state.dataHeatBalSurf->SurfOutsideTempHistMaster(CTFTermNum)(SurfNum) = state.dataEnvrn->GroundTempFC;
+                }
             }
         }
 
@@ -2306,8 +2332,12 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
                 state.dataConstruction->Construct(Surface(SurfNum).Construction).UValue *
                 (state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) - state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum));
             state.dataHeatBalSurf->SurfInsideFluxHist(CTFTermNum)(SurfNum) = state.dataHeatBalSurf->SurfOutsideFluxHist(2)(SurfNum);
-            state.dataHeatBalSurf->SurfOutsideFluxHistMaster(CTFTermNum)(SurfNum) = state.dataHeatBalSurf->SurfOutsideFluxHist(2)(SurfNum);
-            state.dataHeatBalSurf->SurfInsideFluxHistMaster(CTFTermNum)(SurfNum) = state.dataHeatBalSurf->SurfOutsideFluxHist(2)(SurfNum);
+        }
+        if (!state.dataHeatBal->SimpleCTFOnly) {
+            for (int CTFTermNum = 2; CTFTermNum <= state.dataConstruction->Construct(Surface(SurfNum).Construction).NumCTFTerms + 1; ++CTFTermNum) {
+                state.dataHeatBalSurf->SurfOutsideFluxHistMaster(CTFTermNum)(SurfNum) = state.dataHeatBalSurf->SurfOutsideFluxHist(2)(SurfNum);
+                state.dataHeatBalSurf->SurfInsideFluxHistMaster(CTFTermNum)(SurfNum) = state.dataHeatBalSurf->SurfOutsideFluxHist(2)(SurfNum);
+            }
         }
     }
 
@@ -4846,8 +4876,6 @@ void UpdateThermalHistories(EnergyPlusData &state)
         state.dataHeatBalSurfMgr->UpdateThermalHistoriesFirstTimeFlag = false;
     }
 
-    //    auto const l111(state.dataHeatBalSurf->TH.index(1, 1, 1));
-    //    auto const l211(state.dataHeatBalSurf->TH.index(2, 1, 1));
     auto &Surface(state.dataSurface->Surface);
 
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
@@ -4855,8 +4883,6 @@ void UpdateThermalHistories(EnergyPlusData &state)
         int const lastSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
         for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
             // Loop through all (heat transfer) surfaces...  [ l11 ] = ( 1, 1, SurfNum ), [ l21 ] = ( 2, 1, SurfNum )
-            //            int l11 = l111 + SurfNum - 1;
-            //            int l21 = l211 + SurfNum - 1;
             auto const &surface(Surface(SurfNum));
 
             if ((surface.HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CTF) &&
@@ -4920,6 +4946,16 @@ void UpdateThermalHistories(EnergyPlusData &state)
         }
     } // ...end of loop over all (heat transfer) surfaces...
 
+    if (state.dataHeatBal->SimpleCTFOnly && !state.dataGlobal->AnyConstrOverridesInModel) {
+        for (int HistTermNum = Construction::MaxCTFTerms; HistTermNum >= 2; --HistTermNum) { // Tuned Linear indexing
+            state.dataHeatBalSurf->SurfInsideTempHist(HistTermNum) = state.dataHeatBalSurf->SurfInsideTempHist(HistTermNum - 1);
+            state.dataHeatBalSurf->SurfOutsideTempHist(HistTermNum) = state.dataHeatBalSurf->SurfOutsideTempHist(HistTermNum - 1);
+            state.dataHeatBalSurf->SurfInsideFluxHist(HistTermNum) = state.dataHeatBalSurf->SurfInsideFluxHist(HistTermNum - 1);
+            state.dataHeatBalSurf->SurfOutsideFluxHist(HistTermNum) = state.dataHeatBalSurf->SurfOutsideFluxHist(HistTermNum - 1);
+        }
+        return;
+    }
+
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
         int const firstSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
         int const lastSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
@@ -4930,7 +4966,7 @@ void UpdateThermalHistories(EnergyPlusData &state)
                 continue;
             if (state.dataHeatBalSurf->SurfCurrNumHist(SurfNum) == 0) { // First time step in a block for a surface, update arrays
                 state.dataHeatBalSurfMgr->TempExt1(SurfNum) = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum);
-                state.dataHeatBalSurfMgr->TempInt1(SurfNum) = state.dataHeatBalSurf->SurfTempIn(SurfNum);
+                state.dataHeatBalSurfMgr->TempInt1(SurfNum) = state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum);
                 state.dataHeatBalSurfMgr->QExt1(SurfNum) = state.dataHeatBalSurf->SurfOutsideFluxHist(1)(SurfNum);
                 state.dataHeatBalSurfMgr->QInt1(SurfNum) = state.dataHeatBalSurf->SurfInsideFluxHist(1)(SurfNum);
             }
@@ -4957,14 +4993,6 @@ void UpdateThermalHistories(EnergyPlusData &state)
 
     // SHIFT TEMPERATURE AND FLUX HISTORIES:
     // SHIFT AIR TEMP AND FLUX SHIFT VALUES WHEN AT BOTTOM OF ARRAY SPACE.
-    // todo - UpdateThermalHistoriesSimpleCTF
-    //    for (int HistTermNum = Construction::MaxCTFTerms; HistTermNum >= 3; --HistTermNum) { // Tuned Linear indexing
-    //        state.dataHeatBalSurf->SurfInsideTempHistMaster(HistTermNum) = state.dataHeatBalSurf->SurfInsideTempHistMaster(HistTermNum - 1);
-    //        state.dataHeatBalSurf->SurfOutsideTempHistMaster(HistTermNum) = state.dataHeatBalSurf->SurfOutsideTempHistMaster(HistTermNum - 1);
-    //        state.dataHeatBalSurf->SurfInsideFluxHistMaster(HistTermNum) = state.dataHeatBalSurf->SurfInsideFluxHistMaster(HistTermNum - 1);
-    //        state.dataHeatBalSurf->SurfOutsideFluxHistMaster(HistTermNum) = state.dataHeatBalSurf->SurfOutsideFluxHistMaster(HistTermNum - 1);
-    //    }
-
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
         int const firstSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
         int const lastSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;

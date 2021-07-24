@@ -10001,6 +10001,12 @@ namespace HeatBalanceManager {
         bool DoCTFErrorReport(false);
         for (auto &construction : state.dataConstruction->Construct) {
             construction.calculateTransferFunction(state, ErrorsFound, DoCTFErrorReport);
+            if (construction.NumHistories > 1) {
+                state.dataHeatBal->SimpleCTFOnly = false;
+            }
+        }
+        if (state.dataHeatBal->AnyInternalHeatSourceInInput) {
+            state.dataHeatBal->SimpleCTFOnly = false;
         }
 
         bool InitCTFDoReport;
