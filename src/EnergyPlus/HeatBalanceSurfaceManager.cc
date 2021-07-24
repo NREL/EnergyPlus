@@ -1341,7 +1341,6 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
     state.dataHeatBal->SurfQRadThermInAbs.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfQAdditionalHeatSourceOutside.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside.dimension(state.dataSurface->TotSurfaces, 0.0);
-    state.dataHeatBalSurf->SurfCurrNumHist.dimension(state.dataSurface->TotSurfaces, 0);
 
     state.dataHeatBalSurf->SurfInsideTempHist.allocate(Construction::MaxCTFTerms);
     state.dataHeatBalSurf->SurfOutsideTempHist.allocate(Construction::MaxCTFTerms);
@@ -1354,11 +1353,14 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
         state.dataHeatBalSurf->SurfOutsideFluxHist(loop).dimension(state.dataSurface->TotSurfaces, 0);
     }
 
-    if (!state.dataHeatBal->SimpleCTFOnly) {
+    if (!state.dataHeatBal->SimpleCTFOnly || state.dataGlobal->AnyEnergyManagementSystemInModel) {
+        state.dataHeatBalSurf->SurfCurrNumHist.dimension(state.dataSurface->TotSurfaces, 0);
+
         state.dataHeatBalSurf->SurfInsideTempHistMaster.allocate(Construction::MaxCTFTerms);
         state.dataHeatBalSurf->SurfOutsideTempHistMaster.allocate(Construction::MaxCTFTerms);
         state.dataHeatBalSurf->SurfInsideFluxHistMaster.allocate(Construction::MaxCTFTerms);
         state.dataHeatBalSurf->SurfOutsideFluxHistMaster.allocate(Construction::MaxCTFTerms);
+
         for (int loop = 1; loop <= Construction::MaxCTFTerms; ++loop) {
             state.dataHeatBalSurf->SurfInsideTempHistMaster(loop).dimension(state.dataSurface->TotSurfaces, 0);
             state.dataHeatBalSurf->SurfOutsideTempHistMaster(loop).dimension(state.dataSurface->TotSurfaces, 0);
@@ -2167,7 +2169,6 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
         int const lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
         for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
             state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = SurfInitialTemp;
-            state.dataHeatBalSurf->SurfCurrNumHist(SurfNum) = 0;                 // module level array
             state.dataHeatBalSurf->SurfTempIn(SurfNum) = SurfInitialTemp;        // module level array
             state.dataHeatBalSurf->SurfTempInTmp(SurfNum) = SurfInitialTemp;     // module level array
             state.dataHeatBalSurf->SurfHConvInt(SurfNum) = SurfInitialConvCoeff; // module level array
@@ -2246,7 +2247,14 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
                 state.dataHeatBalSurf->SurfOutsideFluxHist(CTFTermNum)(SurfNum) = 0.0;
             }
         }
-        if (!state.dataHeatBal->SimpleCTFOnly) {
+    }
+    if (!state.dataHeatBal->SimpleCTFOnly || state.dataGlobal->AnyEnergyManagementSystemInModel) {
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            int const firstSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst;
+            int const lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
+            for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
+                state.dataHeatBalSurf->SurfCurrNumHist(SurfNum) = 0;
+            }
             for (int CTFTermNum = 1; CTFTermNum <= Construction::MaxCTFTerms; ++CTFTermNum) {
                 for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
                     state.dataHeatBalSurf->SurfInsideTempHistMaster(CTFTermNum)(SurfNum) = SurfInitialTemp;
@@ -2296,22 +2304,12 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
                 state.dataHeatBalSurf->SurfOutsideTempHist(CTFTermNum)(SurfNum) = state.dataEnvrn->GroundTempFC;
             }
         }
-        if (!state.dataHeatBal->SimpleCTFOnly) {
-            if ((Surface(SurfNum).ExtBoundCond == ExternalEnvironment) || (Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt)) {
-                for (int CTFTermNum = 1; CTFTermNum <= Construction::MaxCTFTerms; ++CTFTermNum) {
-                    state.dataHeatBalSurf->SurfOutsideTempHistMaster(CTFTermNum)(SurfNum) = state.dataSurface->SurfOutDryBulbTemp(SurfNum);
-                }
-
-            } else if (Surface(SurfNum).ExtBoundCond == Ground) {
-                for (int CTFTermNum = 1; CTFTermNum <= Construction::MaxCTFTerms; ++CTFTermNum) {
-                    state.dataHeatBalSurf->SurfOutsideTempHistMaster(CTFTermNum)(SurfNum) = state.dataEnvrn->GroundTemp;
-                }
-
-            } else if (Surface(SurfNum).ExtBoundCond == GroundFCfactorMethod) {
-                for (int CTFTermNum = 1; CTFTermNum <= Construction::MaxCTFTerms; ++CTFTermNum) {
-                    state.dataHeatBalSurf->SurfOutsideTempHistMaster(CTFTermNum)(SurfNum) = state.dataEnvrn->GroundTempFC;
-                }
-            }
+        // Initialize the flux histories
+        for (int CTFTermNum = 2; CTFTermNum <= state.dataConstruction->Construct(Surface(SurfNum).Construction).NumCTFTerms + 1; ++CTFTermNum) {
+            state.dataHeatBalSurf->SurfOutsideFluxHist(CTFTermNum)(SurfNum) =
+                state.dataConstruction->Construct(Surface(SurfNum).Construction).UValue *
+                (state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) - state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum));
+            state.dataHeatBalSurf->SurfInsideFluxHist(CTFTermNum)(SurfNum) = state.dataHeatBalSurf->SurfOutsideFluxHist(2)(SurfNum);
         }
 
         if (state.dataSurface->SurfExtCavityPresent(SurfNum)) {
@@ -2325,15 +2323,23 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
             state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].f = KIVA_HF_DEF;
             state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].out = KIVA_CONST_CONV(0.0);
         }
-
-        // Initialize the flux histories
-        for (int CTFTermNum = 2; CTFTermNum <= state.dataConstruction->Construct(Surface(SurfNum).Construction).NumCTFTerms + 1; ++CTFTermNum) {
-            state.dataHeatBalSurf->SurfOutsideFluxHist(CTFTermNum)(SurfNum) =
-                state.dataConstruction->Construct(Surface(SurfNum).Construction).UValue *
-                (state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) - state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum));
-            state.dataHeatBalSurf->SurfInsideFluxHist(CTFTermNum)(SurfNum) = state.dataHeatBalSurf->SurfOutsideFluxHist(2)(SurfNum);
-        }
-        if (!state.dataHeatBal->SimpleCTFOnly) {
+    }
+    if (!state.dataHeatBal->SimpleCTFOnly || state.dataGlobal->AnyEnergyManagementSystemInModel) {
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            if (!Surface(SurfNum).HeatTransSurf) continue;
+            if ((Surface(SurfNum).ExtBoundCond == ExternalEnvironment) || (Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt)) {
+                for (int CTFTermNum = 1; CTFTermNum <= Construction::MaxCTFTerms; ++CTFTermNum) {
+                    state.dataHeatBalSurf->SurfOutsideTempHistMaster(CTFTermNum)(SurfNum) = state.dataSurface->SurfOutDryBulbTemp(SurfNum);
+                }
+            } else if (Surface(SurfNum).ExtBoundCond == Ground) {
+                for (int CTFTermNum = 1; CTFTermNum <= Construction::MaxCTFTerms; ++CTFTermNum) {
+                    state.dataHeatBalSurf->SurfOutsideTempHistMaster(CTFTermNum)(SurfNum) = state.dataEnvrn->GroundTemp;
+                }
+            } else if (Surface(SurfNum).ExtBoundCond == GroundFCfactorMethod) {
+                for (int CTFTermNum = 1; CTFTermNum <= Construction::MaxCTFTerms; ++CTFTermNum) {
+                    state.dataHeatBalSurf->SurfOutsideTempHistMaster(CTFTermNum)(SurfNum) = state.dataEnvrn->GroundTempFC;
+                }
+            }
             for (int CTFTermNum = 2; CTFTermNum <= state.dataConstruction->Construct(Surface(SurfNum).Construction).NumCTFTerms + 1; ++CTFTermNum) {
                 state.dataHeatBalSurf->SurfOutsideFluxHistMaster(CTFTermNum)(SurfNum) = state.dataHeatBalSurf->SurfOutsideFluxHist(2)(SurfNum);
                 state.dataHeatBalSurf->SurfInsideFluxHistMaster(CTFTermNum)(SurfNum) = state.dataHeatBalSurf->SurfOutsideFluxHist(2)(SurfNum);
@@ -5008,8 +5014,6 @@ void UpdateThermalHistories(EnergyPlusData &state)
 
             ++state.dataHeatBalSurf->SurfCurrNumHist(SurfNum);
             state.dataHeatBalSurfMgr->SumTime(SurfNum) = double(state.dataHeatBalSurf->SurfCurrNumHist(SurfNum)) * state.dataGlobal->TimeStepZone;
-            // TODO - construct num can be overwritten by EMS and changes the CTFTerms, but a warning would be thrown.
-            // TODO - if CTFTimeStep != TimeStepZone(-> construct.NumHistories == 1), the following condition is not SurfNum dependent.
 
             if (state.dataHeatBalSurf->SurfCurrNumHist(SurfNum) == construct.NumHistories) {
                 state.dataHeatBalSurf->SurfCurrNumHist(SurfNum) = 0;
