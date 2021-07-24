@@ -993,8 +993,8 @@ if(BUILD_TESTING)
   # directory, but add_test has to be called so early, it's hard to figure that
   # out ahead of time.  I dunno.  Just skipping these on MSVC builds for now.
   # TODO: Move this stuff to a new tst/EnergyPlus/api/CMakeLists.txt file and overhaul the copying, etc.
-  if(NOT MSVC)
-    set(DIR_WITH_PY_ENERGYPLUS "${PROJECT_BINARY_DIR}/Products")
+  # if(NOT MSVC)
+    set(DIR_WITH_PY_ENERGYPLUS $<TARGET_FILE_DIR:energyplusapi>)  # TODO: Make this a generator expression for the current build type (release/debug)
 
     # Functional API does not need a run folder to be created
     add_test(NAME "API.TestFunctionalPython" COMMAND "${Python_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestFunctional.py")
@@ -1029,7 +1029,7 @@ if(BUILD_TESTING)
     set_tests_properties("API.test_SysExit" PROPERTIES ENVIRONMENT PYTHONPATH=${DIR_WITH_PY_ENERGYPLUS})
     add_test(NAME "API.test_OutputFiles" COMMAND "${Python_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/test_OutputFiles.py")
     set_tests_properties("API.test_OutputFiles" PROPERTIES ENVIRONMENT PYTHONPATH=${DIR_WITH_PY_ENERGYPLUS})
-  endif()
+  # endif()
 endif()
 
 if(UNIX AND NOT APPLE)
