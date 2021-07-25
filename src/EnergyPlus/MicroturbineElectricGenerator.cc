@@ -1050,6 +1050,8 @@ void MTGeneratorSpecs::InitMTGenerators(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     //  Uses the status flags to trigger initializations.
 
+    this->oneTimeInit(state); // end one time inits
+
     if (!this->HeatRecActive) return;
 
     // Do the Begin Environment initializations
@@ -1892,14 +1894,16 @@ void MTGeneratorSpecs::UpdateMTGeneratorRecords(EnergyPlusData &state)
     this->AncillaryEnergy = this->AncillaryPowerRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     this->StandbyEnergy = this->StandbyPowerRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 }
-
-void MTGeneratorSpecs::oneTimeInit_new(EnergyPlusData &state)
+void MTGeneratorSpecs::oneTimeInit(EnergyPlusData &state)
 {
 
     std::string const RoutineName("InitMTGenerators");
     bool errFlag;
 
-    this->setupOutputVars(state);
+    if (this->myFlag) {
+        this->setupOutputVars(state);
+        this->myFlag = false;
+    }
 
     if (this->MyPlantScanFlag && allocated(state.dataPlnt->PlantLoop) && this->HeatRecActive) {
         errFlag = false;
@@ -1947,9 +1951,6 @@ void MTGeneratorSpecs::oneTimeInit_new(EnergyPlusData &state)
 
         this->MySizeAndNodeInitFlag = false;
     }
-}
-void MTGeneratorSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
-{
 }
 
 } // namespace EnergyPlus::MicroturbineElectricGenerator
