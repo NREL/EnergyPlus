@@ -1394,12 +1394,15 @@ void MicroCHPDataStruct::UpdateMicroCHPGeneratorRecords(EnergyPlusData &state) /
         state.dataLoopNodes->Node(this->AirOutletNodeID).Temp = this->A42Model.Teng;
     }
 }
-void MicroCHPDataStruct::oneTimeInit_new(EnergyPlusData &state)
+void MicroCHPDataStruct::oneTimeInit(EnergyPlusData &state)
 {
 
     bool errFlag;
 
-    this->setupOutputVars(state);
+    if (this->myFlag) {
+        this->setupOutputVars(state);
+        this->myFlag = false;
+    }
 
     if (this->MyPlantScanFlag) {
         if (allocated(state.dataPlnt->PlantLoop)) {
@@ -1436,8 +1439,5 @@ void MicroCHPDataStruct::oneTimeInit_new(EnergyPlusData &state)
             this->MyPlantScanFlag = false;
         }
     }
-}
-void MicroCHPDataStruct::oneTimeInit(EnergyPlusData &state)
-{
 }
 } // namespace EnergyPlus::MicroCHPElectricGenerator
