@@ -197,7 +197,7 @@ class EPlusRunManager(object):
         else:
             return EPLaunchWorkflowResponse1(
                 success=False,
-                message="Workflow location missing: {}!".format(args['worflow location']),
+                message="Workflow location missing: {}!".format(args['workflow location']),
                 column_data=[]
             )
 
@@ -210,18 +210,14 @@ class EPlusRunManager(object):
             else:
                 command_line_args = [energyplus_binary]
 
-            # other command line arguments can work the same either way once E+ supports these auxiliary tools via API
-            if not by_api:
-                if extension == '.imf':
-                    command_line_args += ['--epmacro']
-                # should be able to do this once we get pyExpandObjects going
-                if extension != '.epJSON':
-                    command_line_args += ['--expandobjects']
-            else:
-                # something here to warn the user that we didn't, or error out if it imf, or something...
-                ...
+            if extension == '.imf':
+                command_line_args += ['--epmacro']
 
-            # maybe add -d run_directory support to the E+ call here
+            # should be able to do this once we get pyExpandObjects going
+            if extension != '.epJSON':
+                command_line_args += ['--expandobjects']
+
+            # TODO: add -d run_directory support to the E+ call here
 
             # if not isIP:  # if using SI output units just use readvars CLI option
             #     command_line_args += ['--readvars']
