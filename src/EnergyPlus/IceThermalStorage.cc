@@ -280,6 +280,8 @@ namespace IceThermalStorage {
             this->MyEnvrnFlag = true;
         }
 
+        this->oneTimeInit(state); // Initialize detailed ice storage
+
         this->SimDetailedIceStorage(state); // Simulate detailed ice storage
 
         this->UpdateDetailedIceStorage(state); // Update detailed ice storage
@@ -1194,7 +1196,7 @@ namespace IceThermalStorage {
                             "System");
     }
 
-    void DetailedIceStorageData::oneTimeInit_new(EnergyPlusData &state)
+    void DetailedIceStorageData::oneTimeInit(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1211,21 +1213,24 @@ namespace IceThermalStorage {
 
         int CompNum; // local do loop index
 
-        bool errFlag = false;
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->Name,
-                                                DataPlant::TypeOf_TS_IceDetailed,
-                                                this->PlantLoopNum,
-                                                this->PlantLoopSideNum,
-                                                this->PlantBranchNum,
-                                                this->PlantCompNum,
-                                                errFlag);
+        if (this->MyPlantScanFlag) {
+            bool errFlag = false;
+            PlantUtilities::ScanPlantLoopsForObject(state,
+                                                    this->Name,
+                                                    DataPlant::TypeOf_TS_IceDetailed,
+                                                    this->PlantLoopNum,
+                                                    this->PlantLoopSideNum,
+                                                    this->PlantBranchNum,
+                                                    this->PlantCompNum,
+                                                    errFlag);
 
-        if (errFlag) {
-            ShowFatalError(state, "DetailedIceStorageData: oneTimeInit: Program terminated due to previous condition(s).");
+            if (errFlag) {
+                ShowFatalError(state, "DetailedIceStorageData: oneTimeInit: Program terminated due to previous condition(s).");
+            }
+
+            this->setupOutputVars(state);
+            this->MyPlantScanFlag = false;
         }
-
-        this->setupOutputVars(state);
 
         if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag2) { // Beginning of environment initializations
             // Make sure all state variables are reset at the beginning of every environment to avoid problems.
@@ -1871,7 +1876,7 @@ namespace IceThermalStorage {
             this->ITSmdot = this->ITSMassFlowRate;
         }
     }
-    void SimpleIceStorageData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+    void SimpleIceStorageData::oneTimeInit(EnergyPlusData &state)
     {
     }
 
@@ -1997,9 +2002,6 @@ namespace IceThermalStorage {
                 this->ParasiticElecEnergy = this->DischargeParaElecLoad * this->ChargingEnergy;
             }
         }
-    }
-    void DetailedIceStorageData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
-    {
     }
 
 } // namespace IceThermalStorage

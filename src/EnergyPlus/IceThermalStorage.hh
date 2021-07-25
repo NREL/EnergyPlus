@@ -232,6 +232,7 @@ namespace IceThermalStorage {
         bool ResetXForITSFlag;
         bool MyEnvrnFlag;
         bool CheckEquipName;
+        bool MyPlantScanFlag;
         bool MyEnvrnFlag2;
 
         // Default Constructor
@@ -242,7 +243,7 @@ namespace IceThermalStorage {
               IceFracRemaining(1.0), IceFracOnCoil(1.0), DischargingRate(0.0), DischargingEnergy(0.0), ChargingRate(0.0), ChargingEnergy(0.0),
               MassFlowRate(0.0), BypassMassFlowRate(0.0), TankMassFlowRate(0.0), InletTemp(0.0), OutletTemp(0.0), TankOutletTemp(0.0),
               ParasiticElecRate(0.0), ParasiticElecEnergy(0.0), DischargeIterErrors(0), DischargeErrorCount(0), ChargeIterErrors(0),
-              ChargeErrorCount(0), ResetXForITSFlag(false), MyEnvrnFlag(true), CheckEquipName(true), MyEnvrnFlag2(true)
+              ChargeErrorCount(0), ResetXForITSFlag(false), MyEnvrnFlag(true), CheckEquipName(true), MyPlantScanFlag(true), MyEnvrnFlag2(true)
         {
         }
 
@@ -255,8 +256,6 @@ namespace IceThermalStorage {
                       bool RunFlag) override;
 
         void oneTimeInit(EnergyPlusData &state) override;
-
-        void oneTimeInit_new(EnergyPlusData &state) override;
 
         void SimDetailedIceStorage(EnergyPlusData &state);
 
