@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
@@ -54,62 +53,31 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-import licensetext
-import sys
-import os
+from json import dumps
+from pathlib import Path
+from sys import exit
 
-TOOL_NAME = 'license-check'
+dirs = [
+    Path(__file__).resolve().parent.parent.parent / 'src' / 'EnergyPlus',
+    Path(__file__).resolve().parent.parent.parent / 'tst' / 'EnergyPlus' / 'unit'
+]
+total_c_comments = 0
+for d in dirs:
+    for p in d.glob("**/*"):
+        if p.is_file() and str(p.name).endswith('.cc') or str(p.name).endswith('.hh'):
+            file_lines = p.open(encoding='utf-8', errors='ignore').readlines()
+            for line_number, li in enumerate(file_lines, start=1):
+                remaining_line = li.strip()
+                if '//' in li:
+                    index = li.index('//')
+                    remaining_line = li[:index]
+                if '/*' in remaining_line:
+                    total_c_comments += 1
+                    print(dumps({
+                        "tool": "check_for_c_style_comments",
+                        "filename": str(p.relative_to(d)), "file": str(p.relative_to(d)),
+                        "line": line_number, "messagetype": "error", "message": "Found C Style Comment in Codebase"
+                    }))
 
-#
-# Directories to check
-#
-cpp_dirs = ["./src/EnergyPlus/",
-            "./tst/EnergyPlus/unit/"]
-
-python_dirs = ["./"]
-
-current = licensetext.current()
-
-# Check LICENSE.txt
-# Create the text as it should be
-licensetxt = licensetext.merge_paragraphs(current)
-# Load the text file
-filename = "LICENSE.txt"
-fp = open(filename)
-filetxt = fp.read()
-fp.close()
-# Compare the two strings
-base_license_text_success = licensetext.check_license('LICENSE.txt', filetxt,
-                                                      licensetxt,
-                                                      toolname=TOOL_NAME)
-
-# Create C++ Checker object
-checker = licensetext.Checker(current, toolname=TOOL_NAME)
-
-# Check files
-cpp_file_license_success = True
-for base in cpp_dirs:
-    file_success = checker.visit(base)
-    if not file_success:
-        cpp_file_license_success = False
-
-# Create Python Checker object
-checker = licensetext.Checker(licensetext.current_python(), offset=2,
-                              extensions=['py'], toolname=TOOL_NAME,
-                              shebang=True, empty_passes=True)
-
-# Check files
-python_file_license_success = True
-patterns = [r'.*third_party.*', r'^\.(\\|/)build.*',
-            r'^\.(\\|/)bin.*', r'.*readthedocs.*',
-            r'.*venv.*', r'.*cmake-build-.*']
-for base in python_dirs:
-    file_success = checker.visit(base, exclude_patterns=patterns)
-    if not file_success:
-        python_file_license_success = False
-
-if (base_license_text_success and cpp_file_license_success
-   and python_file_license_success):
-    sys.exit(0)
-else:
-    sys.exit(1)
+if total_c_comments > 0:
+    exit(1)
