@@ -884,7 +884,7 @@ void SwimmingPoolData::calculate(EnergyPlusData &state)
     //        SurfTempInTmp( SurfNum ) = ( SurfCTFConstInPart( SurfNum ) + QRadThermInAbs( SurfNum ) + QRadSWInAbs( SurfNum ) + HConvIn( SurfNum
     //)
     //* RefAirTemp( SurfNum ) + NetLWRadToSurf( SurfNum ) + Construct( ConstrNum ).CTFSourceIn( 0 ) * QsrcHist( 1, SurfNum ) +
-    //QdotRadHVACInRepPerArea( SurfNum ) + IterDampConst * SurfTempInsOld(
+    // QdotRadHVACInRepPerArea( SurfNum ) + IterDampConst * SurfTempInsOld(
     // SurfNum ) + Construct( ConstrNum ).CTFCross( 0 ) * TH11 ) / ( Construct( ConstrNum ).CTFInside( 0 ) + HConvIn( SurfNum ) + IterDampConst );
     //// Constant part of conduction eq (history terms) | LW radiation from internal sources | SW radiation from internal sources | Convection
     // from surface to zone air | Net radiant exchange with other zone surfaces | Heat source/sink term for radiant systems | (if there is one
