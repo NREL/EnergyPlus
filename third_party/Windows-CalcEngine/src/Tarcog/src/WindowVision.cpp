@@ -33,6 +33,7 @@ namespace Tarcog::ISO15099
 
         for(const auto & [key, frame] : m_Frame)
         {
+            std::ignore = key;
             frameWeightedUValue += frame.projectedArea() * frame.frameData().UValue;
             edgeOfGlassWeightedUValue += frame.edgeOfGlassArea() * frame.frameData().EdgeUValue;
         }
@@ -65,6 +66,7 @@ namespace Tarcog::ISO15099
 
         for(const auto & [key, frame] : m_Frame)
         {
+            std::ignore = key;
             frameWeightedSHGC += frame.projectedArea() * frame.frameData().shgc(m_HcExterior);
         }
 
@@ -274,6 +276,7 @@ namespace Tarcog::ISO15099
 
         for(const auto & [key, frame] : m_Frame)
         {
+            std::ignore = key;
             area += frame.projectedArea();
         }
 
@@ -286,6 +289,7 @@ namespace Tarcog::ISO15099
 
         for(const auto & [key, frame] : m_Frame)
         {
+            std::ignore = key;
             area += frame.edgeOfGlassArea();
         }
 

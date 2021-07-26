@@ -128,6 +128,7 @@ namespace Tarcog
         {
             for(auto & [key, aSystem] : m_System)
             {
+                std::ignore = key;
                 aSystem->setWidth(width);
             }
             m_Solved = false;
@@ -137,6 +138,7 @@ namespace Tarcog
         {
             for(auto & [key, aSystem] : m_System)
             {
+                std::ignore = key;
                 aSystem->setHeight(height);
             }
             m_Solved = false;
@@ -146,6 +148,7 @@ namespace Tarcog
         {
             for(auto & [key, aSystem] : m_System)
             {
+                std::ignore = key;
                 aSystem->setWidth(width);
                 aSystem->setHeight(height);
             }
@@ -156,6 +159,7 @@ namespace Tarcog
         {
             for(auto & [key, aSystem] : m_System)
             {
+                std::ignore = key;
                 aSystem->setInteriorAndExteriorSurfacesHeight(height);
             }
             m_Solved = false;
@@ -165,6 +169,7 @@ namespace Tarcog
         {
             for(auto & [key, aSystem] : m_System)
             {
+                std::ignore = key;
                 aSystem->solve();
             }
             m_Solved = true;
