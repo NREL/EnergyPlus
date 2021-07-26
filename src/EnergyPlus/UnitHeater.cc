@@ -661,45 +661,45 @@ namespace UnitHeater {
                                 "Zone Unit Heater Heating Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
             SetupOutputVariable(state,
                                 "Zone Unit Heater Heating Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
             SetupOutputVariable(state,
                                 "Zone Unit Heater Fan Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).ElecPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
             // Note that the unit heater fan electric is NOT metered because this value is already metered through the fan component
             SetupOutputVariable(state,
                                 "Zone Unit Heater Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).ElecEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
             SetupOutputVariable(state,
                                 "Zone Unit Heater Fan Availability Status",
                                 OutputProcessor::Unit::None,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).AvailStatus,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
             if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType_Num == FanType_SimpleOnOff) {
                 SetupOutputVariable(state,
                                     "Zone Unit Heater Fan Part Load Ratio",
                                     OutputProcessor::Unit::None,
                                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanPartLoadRatio,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
             }
         }

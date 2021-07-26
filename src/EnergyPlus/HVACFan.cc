@@ -606,33 +606,62 @@ namespace HVACFan {
             ShowFatalError(state, std::string{routineName} + "Errors found in input for fan name = " + name + ".  Program terminates.");
         }
 
-        SetupOutputVariable(state, "Fan Electricity Rate", OutputProcessor::Unit::W, m_fanPower, "System", "Average", name);
-        SetupOutputVariable(state, "Fan Rise in Air Temperature", OutputProcessor::Unit::deltaC, m_deltaTemp, "System", "Average", name);
-        SetupOutputVariable(state, "Fan Heat Gain to Air", OutputProcessor::Unit::W, m_powerLossToAir, "System", "Average", name);
+        SetupOutputVariable(state,
+                            "Fan Electricity Rate",
+                            OutputProcessor::Unit::W,
+                            m_fanPower,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name);
+        SetupOutputVariable(state,
+                            "Fan Rise in Air Temperature",
+                            OutputProcessor::Unit::deltaC,
+                            m_deltaTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name);
+        SetupOutputVariable(state,
+                            "Fan Heat Gain to Air",
+                            OutputProcessor::Unit::W,
+                            m_powerLossToAir,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name);
         SetupOutputVariable(state,
                             "Fan Electricity Energy",
                             OutputProcessor::Unit::J,
                             m_fanEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             name,
                             _,
                             "Electricity",
                             "Fans",
                             m_endUseSubcategoryName,
                             "System");
-        SetupOutputVariable(state, "Fan Air Mass Flow Rate", OutputProcessor::Unit::kg_s, m_outletAirMassFlowRate, "System", "Average", name);
+        SetupOutputVariable(state,
+                            "Fan Air Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            m_outletAirMassFlowRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name);
         if (speedControl == SpeedControlMethod::Discrete && m_numSpeeds == 1) {
-            SetupOutputVariable(
-                state, "Fan Runtime Fraction", OutputProcessor::Unit::None, m_fanRunTimeFractionAtSpeed[0], "System", "Average", name);
+            SetupOutputVariable(state,
+                                "Fan Runtime Fraction",
+                                OutputProcessor::Unit::None,
+                                m_fanRunTimeFractionAtSpeed[0],
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                name);
         } else if (speedControl == SpeedControlMethod::Discrete && m_numSpeeds > 1) {
             for (auto speedLoop = 0; speedLoop < m_numSpeeds; ++speedLoop) {
                 SetupOutputVariable(state,
                                     "Fan Runtime Fraction Speed " + fmt::to_string(speedLoop + 1),
                                     OutputProcessor::Unit::None,
                                     m_fanRunTimeFractionAtSpeed[speedLoop],
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     name);
             }
         }
