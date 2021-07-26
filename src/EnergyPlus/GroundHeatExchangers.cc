@@ -124,6 +124,7 @@ using namespace GroundTemperatureManager;
 // MODULE PARAMETER DEFINITIONS
 constexpr Real64 hrsPerMonth(730.0); // Number of hours in month
 constexpr Real64 maxTSinHr(60);      // Max number of time step in a hour
+constexpr std::array<std::string_view, 2> GFuncCalcMethodsStrs = {"UHFCALC", "UBHWTCALC"};
 
 //******************************************************************************
 
@@ -995,15 +996,15 @@ void GLHEVert::calcUniformBHWallTempGFunctions()
         boreholes.emplace_back(bh->props->bhLength, bh->props->bhTopDepth, bh->props->bhDiameter / 2.0, bh->xLoc, bh->yLoc);
     }
 
+    // convert time to a std::vector from an Array1D
     std::vector<double> time;
     for (auto &v : this->myRespFactors->time) {
         time.push_back(v);
     }
 
     // Obtain number of segments by adaptive discretization
-    gt::segments::adaptive adpt_disc;
-    double drilling_depth = double(boreholes.size()) * double(this->bhLength); // total drilling depth (m)
-    int nSegments = adpt_disc.discretize(double(this->bhLength), drilling_depth);
+    gt::segments::adaptive adptDisc;
+    int nSegments = adptDisc.discretize(this->bhLength, this->totalTubeLength);
 
     this->myRespFactors->GFNC = gt::gfunction::uniform_borehole_wall_temperature(boreholes, time, this->soil.diffusivity, nSegments);
 }
@@ -1461,6 +1462,7 @@ void GLHEVert::makeThisGLHECacheStruct()
     d["Pipe Thickness"] = this->myRespFactors->props->pipe.thickness;
     d["U-tube Dist"] = this->myRespFactors->props->bhUTubeDist;
     d["Max Simulation Years"] = this->myRespFactors->maxSimYears;
+    d["g-Function Calc Method"] =  GroundHeatExchangers::GFuncCalcMethodsStrs[int(this->gFuncCalcMethod)];
 
     int i = 0;
     for (auto &thisBH : this->myRespFactors->myBorholes) {
