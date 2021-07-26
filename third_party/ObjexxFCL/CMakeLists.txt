@@ -65,7 +65,6 @@ set(src
   src/ObjexxFCL/CArray.hh
   src/ObjexxFCL/CArrayA.fwd.hh
   src/ObjexxFCL/CArrayA.hh
-  src/ObjexxFCL/char.functions.cc
   src/ObjexxFCL/char.functions.hh
   src/ObjexxFCL/command.cc
   src/ObjexxFCL/command.hh

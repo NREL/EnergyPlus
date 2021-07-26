@@ -143,7 +143,7 @@ using namespace DataBranchAirLoopPlant;
 using namespace DataLoopNode;
 using namespace FluidProperties;
 
-static std::string const fluidNameSteam("STEAM");
+static constexpr std::string_view fluidNameSteam("STEAM");
 
 void ManagePlantLoops(EnergyPlusData &state,
                       bool const FirstHVACIteration,
@@ -296,7 +296,7 @@ void GetPlantLoopData(EnergyPlusData &state)
     using SystemAvailabilityManager::GetPlantAvailabilityManager;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("GetPlant/CondenserLoopData: ");
+    static constexpr std::string_view RoutineName("GetPlant/CondenserLoopData: ");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int LoopNum;   // DO loop counter for loops
@@ -512,7 +512,7 @@ void GetPlantLoopData(EnergyPlusData &state)
         } else if (UtilityRoutines::SameString(LoadingScheme, "SequentialUniformPLR")) {
             this_loop.LoadDistribution = DataPlant::iLoadingScheme::SequentialUniformPLR;
         } else {
-            ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
+            ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
             ShowContinueError(state, "..." + state.dataIPShortCut->cAlphaFieldNames(14) + "=\"" + Alpha(14) + "\".");
             ShowContinueError(state, "Will default to SequentialLoad."); // TODO rename point
             this_loop.LoadDistribution = DataPlant::iLoadingScheme::Sequential;
@@ -525,7 +525,7 @@ void GetPlantLoopData(EnergyPlusData &state)
                 this_loop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
             } else if (UtilityRoutines::SameString(Alpha(16), "DualSetpointDeadband")) {
                 if (this_loop.FluidType == DataLoopNode::NodeFluidType::Steam) {
-                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
+                    ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
                     ShowContinueError(state,
                                       state.dataIPShortCut->cAlphaFieldNames(16) + "=\"" + Alpha(16) + "\" not valid for " +
                                           state.dataIPShortCut->cAlphaFieldNames(2) + "= Steam");
@@ -538,7 +538,7 @@ void GetPlantLoopData(EnergyPlusData &state)
             } else if (UtilityRoutines::SameString(Alpha(16), "")) {
                 this_loop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
             } else {
-                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
+                ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
                 ShowContinueError(state, "..." + state.dataIPShortCut->cAlphaFieldNames(16) + "=\"" + Alpha(16) + "\".");
                 ShowContinueError(state, "Will default to SingleSetPoint."); // TODO rename point
                 this_loop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
@@ -556,7 +556,7 @@ void GetPlantLoopData(EnergyPlusData &state)
             } else if (UtilityRoutines::SameString(Alpha(17), "None") || state.dataIPShortCut->lAlphaFieldBlanks(17)) {
                 this_loop.CommonPipeType = DataPlant::iCommonPipeType::No;
             } else {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
                 ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(17) + "=\"" + Alpha(17) + "\".");
                 ShowContinueError(state, "Refer to I/O reference document for more details.");
                 ErrorsFound = true;
@@ -567,7 +567,7 @@ void GetPlantLoopData(EnergyPlusData &state)
 
         if (this_loop.CommonPipeType == DataPlant::iCommonPipeType::TwoWay) {
             if (this_demand_side.InletNodeSetPt && this_supply_side.InletNodeSetPt) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
                 ShowContinueError(state,
                                   "While using a two way common pipe there can be setpoint on only one node other than Plant Supply Outlet node.");
                 ShowContinueError(state, "Currently both Plant Demand inlet and plant supply inlet have setpoints.");
@@ -575,7 +575,7 @@ void GetPlantLoopData(EnergyPlusData &state)
                 ErrorsFound = true;
             }
             if (!this_demand_side.InletNodeSetPt && !this_supply_side.InletNodeSetPt) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
                 ShowContinueError(state, "While using a two way common pipe there must be a setpoint in addition to the Plant Supply Outlet node.");
                 ShowContinueError(state, "Currently neither plant demand inlet nor plant supply inlet have setpoints.");
                 ShowContinueError(state, "Select one of the two nodes and rerun the simulation.");
@@ -622,7 +622,7 @@ void GetPlantLoopData(EnergyPlusData &state)
                     // We are OK here, move on
                 } else {
                     // We have an erroneous input, alert user
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
                     ShowContinueError(
                         state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(PressSimAlphaIndex) + "=\"" + Alpha(PressSimAlphaIndex) + "\".");
                     ShowContinueError(state, "Currently only options are: ");
@@ -643,7 +643,7 @@ void GetPlantLoopData(EnergyPlusData &state)
 
             // if we made it this far, there was no match, and it wasn't blank
             if (!MatchedPressureString) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
                 ShowContinueError(
                     state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(PressSimAlphaIndex) + "=\"" + Alpha(PressSimAlphaIndex) + "\".");
                 ErrorsFound = true;
@@ -662,7 +662,7 @@ void GetPlantLoopData(EnergyPlusData &state)
         }
 
         if (GetFirstBranchInletNodeName(state, this_demand_side.BranchList) != this_demand_side.NodeNameIn) {
-            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
             ShowContinueError(state,
                               "The inlet node of the first branch in the " + state.dataIPShortCut->cAlphaFieldNames(12) + '=' +
                                   Alpha(12)); //"Plant Demand Side Branch List"
@@ -681,7 +681,7 @@ void GetPlantLoopData(EnergyPlusData &state)
 
         if (GetLastBranchOutletNodeName(state, this_demand_side.BranchList) != this_demand_side.NodeNameOut) {
             //"Plant Demand Side Branch List"
-            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
             ShowContinueError(state, "The outlet node of the last branch in the " + state.dataIPShortCut->cAlphaFieldNames(12) + '=' + Alpha(12));
             //"Plant Demand Side Outlet Node Name"
             ShowContinueError(state, "is not the same as the " + state.dataIPShortCut->cAlphaFieldNames(11) + '=' + Alpha(11));
@@ -695,7 +695,7 @@ void GetPlantLoopData(EnergyPlusData &state)
 
         if (GetFirstBranchInletNodeName(state, this_supply_side.BranchList) != this_supply_side.NodeNameIn) {
             //"Plant Supply Side Branch List"
-            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
             ShowContinueError(state, "The inlet node of the first branch in the " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + Alpha(8));
             //"Plant Supply Side Inlet Node Name
             ShowContinueError(state, "is not the same as the " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + Alpha(6));
@@ -709,7 +709,7 @@ void GetPlantLoopData(EnergyPlusData &state)
 
         if (GetLastBranchOutletNodeName(state, this_supply_side.BranchList) != this_supply_side.NodeNameOut) {
             //"Plant Supply Side Branch List"
-            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
             ShowContinueError(state, "The outlet node of the last branch in the " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + Alpha(8));
             //"Plant Supply Side Outlet Node Name"
             ShowContinueError(state, "is not the same as the " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + Alpha(7));
@@ -723,7 +723,7 @@ void GetPlantLoopData(EnergyPlusData &state)
     }
 
     if (ErrorsFound) {
-        ShowFatalError(state, RoutineName + "Errors found in processing input. Preceding conditions cause termination.");
+        ShowFatalError(state, std::string{RoutineName} + "Errors found in processing input. Preceding conditions cause termination.");
     }
 
     // set up loop status (set by system availability managers) report variables
@@ -735,8 +735,8 @@ void GetPlantLoopData(EnergyPlusData &state)
                             "Plant System Cycle On Off Status",
                             OutputProcessor::Unit::None,
                             state.dataPlnt->PlantAvailMgr(LoopNum).AvailStatus,
-                            "Plant",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Plant,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPlnt->PlantLoop(LoopNum).Name);
     }
 }
@@ -1895,66 +1895,66 @@ void SetupReports(EnergyPlusData &state)
                             "Plant Supply Side Cooling Demand Rate",
                             OutputProcessor::Unit::W,
                             loop.CoolingDemand,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPlnt->PlantLoop(LoopNum).Name);
         SetupOutputVariable(state,
                             "Plant Supply Side Heating Demand Rate",
                             OutputProcessor::Unit::W,
                             loop.HeatingDemand,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPlnt->PlantLoop(LoopNum).Name);
         SetupOutputVariable(state,
                             "Plant Supply Side Inlet Mass Flow Rate",
                             OutputProcessor::Unit::kg_s,
                             loop.InletNodeFlowrate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPlnt->PlantLoop(LoopNum).Name);
 
         SetupOutputVariable(state,
                             "Plant Supply Side Inlet Temperature",
                             OutputProcessor::Unit::C,
                             loop.InletNodeTemperature,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPlnt->PlantLoop(LoopNum).Name);
         SetupOutputVariable(state,
                             "Plant Supply Side Outlet Temperature",
                             OutputProcessor::Unit::C,
                             loop.OutletNodeTemperature,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPlnt->PlantLoop(LoopNum).Name);
 
         SetupOutputVariable(state,
                             "Plant Supply Side Not Distributed Demand Rate",
                             OutputProcessor::Unit::W,
                             loop.DemandNotDispatched,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPlnt->PlantLoop(LoopNum).Name);
         SetupOutputVariable(state,
                             "Plant Supply Side Unmet Demand Rate",
                             OutputProcessor::Unit::W,
                             loop.UnmetDemand,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPlnt->PlantLoop(LoopNum).Name);
         SetupOutputVariable(state,
                             "Debug Plant Loop Bypass Fraction",
                             OutputProcessor::Unit::None,
                             loop.BypassFrac,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPlnt->PlantLoop(LoopNum).Name);
         SetupOutputVariable(state,
                             "Debug Plant Last Simulated Loop Side",
                             OutputProcessor::Unit::None,
                             loop.LastLoopSideSimulated,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPlnt->PlantLoop(LoopNum).Name);
     }
 
@@ -1966,57 +1966,57 @@ void SetupReports(EnergyPlusData &state)
                                 "Plant Demand Side Lumped Capacitance Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TankTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPlnt->PlantLoop(LoopNum).Name);
             SetupOutputVariable(state,
                                 "Plant Supply Side Lumped Capacitance Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_TankTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPlnt->PlantLoop(LoopNum).Name);
             SetupOutputVariable(state,
                                 "Plant Demand Side Lumped Capacitance Heat Transport Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_MdotCpDeltaT,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPlnt->PlantLoop(LoopNum).Name);
             SetupOutputVariable(state,
                                 "Plant Supply Side Lumped Capacitance Heat Transport Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_MdotCpDeltaT,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPlnt->PlantLoop(LoopNum).Name);
             SetupOutputVariable(state,
                                 "Plant Demand Side Lumped Capacitance Heat Storage Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_McpDTdt,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPlnt->PlantLoop(LoopNum).Name);
             SetupOutputVariable(state,
                                 "Plant Supply Side Lumped Capacitance Heat Storage Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_McpDTdt,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPlnt->PlantLoop(LoopNum).Name);
             SetupOutputVariable(state,
                                 "Plant Demand Side Lumped Capacitance Excessive Storage Time",
                                 OutputProcessor::Unit::hr,
                                 state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_CapExcessStorageTimeReport,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataPlnt->PlantLoop(LoopNum).Name);
             SetupOutputVariable(state,
                                 "Plant Supply Side Lumped Capacitance Excessive Storage Time",
                                 OutputProcessor::Unit::hr,
                                 state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_CapExcessStorageTimeReport,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataPlnt->PlantLoop(LoopNum).Name);
             for (LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
                 for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
@@ -2028,8 +2028,8 @@ void SetupReports(EnergyPlusData &state)
                                                 "Plant Component Distributed Demand Rate",
                                                 OutputProcessor::Unit::W,
                                                 state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).MyLoad,
-                                                "System",
-                                                "Average",
+                                                OutputProcessor::SOVTimeStepType::System,
+                                                OutputProcessor::SOVStoreType::Average,
                                                 state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).Name);
                         }
                     }
@@ -2405,8 +2405,8 @@ void ReInitPlantLoopsAtFirstHVACIteration(EnergyPlusData &state)
     // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 const StartQuality(1.0);
     Real64 const StartHumRat(0.0);
-    static std::string const RoutineNameAlt("InitializeLoops");
-    static std::string const RoutineName("PlantManager:InitializeLoop");
+    static constexpr std::string_view RoutineNameAlt("InitializeLoops");
+    static constexpr std::string_view RoutineName("PlantManager:InitializeLoop");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int LoopNum;                      // plant loop counter
@@ -2957,7 +2957,7 @@ void SizePlantLoop(EnergyPlusData &state,
     using FluidProperties::GetDensityGlycol;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("SizePlantLoop");
+    static constexpr std::string_view RoutineName("SizePlantLoop");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int PlantSizNum(0);      // index of Plant Sizing data for this loop
@@ -3204,7 +3204,7 @@ void ResizePlantLoopLevelSizes(EnergyPlusData &state, int const LoopNum // Suppl
     using FluidProperties::GetDensityGlycol;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("ResizePlantLoop");
+    static constexpr std::string_view RoutineName("ResizePlantLoop");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int PlantSizNum(0);      // index of Plant Sizing data for this loop

@@ -56,6 +56,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -214,11 +215,11 @@ namespace VariableSpeedCoils {
         Real64 MaxOATCrankcaseHeater;         // maximum OAT for crankcase heater operation [C]
         Real64 CrankcaseHeaterConsumption;    // report variable for total crankcase heater energy consumption [J]
         // condenser evaporative precooling
-        int CondenserInletNodeNum;       // Node number of outdoor condenser
-        int CondenserType;               // Type of condenser for DX cooling coil: AIR COOLED or EVAP COOLED
-        bool ReportEvapCondVars;         // true if any performance mode includes an evap condenser
-        Real64 EvapCondPumpElecNomPower; // Nominal power input to the evap condenser water circulation pump [W]
-        Real64 EvapCondPumpElecPower;    // Average power consumed by the evap condenser water circulation pump over
+        int CondenserInletNodeNum;                          // Node number of outdoor condenser
+        DataHeatBalance::RefrigCondenserType CondenserType; // Type of condenser for DX cooling coil: AIR COOLED or EVAP COOLED
+        bool ReportEvapCondVars;                            // true if any performance mode includes an evap condenser
+        Real64 EvapCondPumpElecNomPower;                    // Nominal power input to the evap condenser water circulation pump [W]
+        Real64 EvapCondPumpElecPower;                       // Average power consumed by the evap condenser water circulation pump over
         // the time step [W]
         Real64 EvapWaterConsumpRate;        // Evap condenser water consumption rate [m3/s]
         Real64 EvapCondPumpElecConsumption; // Electric energy consumed by the evap condenser water circulation pump [J]
@@ -308,9 +309,9 @@ namespace VariableSpeedCoils {
               OATempCompressorOn(0.0), MaxOATDefrost(0.0), DefrostTime(0.0), DefrostCapacity(0.0), HPCompressorRuntime(0.0),
               HPCompressorRuntimeLast(0.0), TimeLeftToDefrost(0.0), DefrostPower(0.0), DefrostConsumption(0.0), ReportCoolingCoilCrankcasePower(true),
               CrankcaseHeaterCapacity(0.0), CrankcaseHeaterPower(0.0), MaxOATCrankcaseHeater(0.0), CrankcaseHeaterConsumption(0.0),
-              CondenserInletNodeNum(0), CondenserType(DataHVACGlobals::AirCooled), ReportEvapCondVars(false), EvapCondPumpElecNomPower(0.0),
-              EvapCondPumpElecPower(0.0), EvapWaterConsumpRate(0.0), EvapCondPumpElecConsumption(0.0), EvapWaterConsump(0.0),
-              BasinHeaterConsumption(0.0), BasinHeaterPowerFTempDiff(0.0), BasinHeaterSetPointTemp(0.0), BasinHeaterPower(0.0),
+              CondenserInletNodeNum(0), CondenserType(DataHeatBalance::RefrigCondenserType::Air), ReportEvapCondVars(false),
+              EvapCondPumpElecNomPower(0.0), EvapCondPumpElecPower(0.0), EvapWaterConsumpRate(0.0), EvapCondPumpElecConsumption(0.0),
+              EvapWaterConsump(0.0), BasinHeaterConsumption(0.0), BasinHeaterPowerFTempDiff(0.0), BasinHeaterSetPointTemp(0.0), BasinHeaterPower(0.0),
               BasinHeaterSchedulePtr(0), EvapCondAirFlow(DataGlobalConstants::MaxSpeedLevels, 0.0),
               EvapCondEffect(DataGlobalConstants::MaxSpeedLevels, 0.0),
               MSRatedEvapCondVolFlowPerRatedTotCap(DataGlobalConstants::MaxSpeedLevels, 0.0), EvapWaterSupplyMode(101), EvapWaterSupTankID(0),
@@ -345,7 +346,7 @@ namespace VariableSpeedCoils {
     };
 
     void SimVariableSpeedCoils(EnergyPlusData &state,
-                               std::string const &CompName,   // Coil Name
+                               std::string_view CompName,     // Coil Name
                                int &CompIndex,                // Index for Component name
                                int const CyclingScheme,       // Continuous fan OR cycling compressor
                                Real64 &MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
@@ -531,6 +532,8 @@ namespace VariableSpeedCoils {
     void setVarSpeedHPWHFanIndex(EnergyPlusData &state, int const dXCoilNum, int const fanIndex);
 
     void setVarSpeedFanInfo(EnergyPlusData &state, int const dXCoilNum, std::string const fanName, int const fanIndex, int const fanTypeNum);
+
+    void getCoilTypeAndName(EnergyPlusData &state, int const dXCoilNum, std::string &CoilType, std::string &CoilName, bool &ErrorsFound);
 
 } // namespace VariableSpeedCoils
 

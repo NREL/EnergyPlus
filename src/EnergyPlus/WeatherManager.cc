@@ -338,12 +338,12 @@ namespace WeatherManager {
         // if another environment is available in the "run list" or if the end has been
         // reached.
 
-        static std::string const RoutineName("GetNextEnvironment: ");
-        static constexpr auto EnvNameFormat("Environment,{},{},{},{},{},{},{},{},{},{},{},{},{}\n");
-        static constexpr auto EnvDSTNFormat("Environment:Daylight Saving,No,{}\n");
-        static constexpr auto EnvDSTYFormat("Environment:Daylight Saving,Yes,{},{},{}\n");
-        static constexpr auto DateFormat("{:02}/{:02}");
-        static constexpr auto DateFormatWithYear("{:02}/{:02}/{:04}");
+        static constexpr std::string_view RoutineName("GetNextEnvironment: ");
+        static constexpr fmt::string_view EnvNameFormat("Environment,{},{},{},{},{},{},{},{},{},{},{},{},{}\n");
+        static constexpr fmt::string_view EnvDSTNFormat("Environment:Daylight Saving,No,{}\n");
+        static constexpr fmt::string_view EnvDSTYFormat("Environment:Daylight Saving,Yes,{},{},{}\n");
+        static constexpr fmt::string_view DateFormat("{:02}/{:02}");
+        static constexpr fmt::string_view DateFormatWithYear("{:02}/{:02}/{:04}");
         static Array1D_string const SpecialDayNames(5, {"Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2"});
         static Array1D_string const ValidDayNames(12,
                                                   {"Sunday",
@@ -385,188 +385,261 @@ namespace WeatherManager {
                                 "Site Outdoor Air Drybulb Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataEnvrn->OutDryBulbTemp,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Site Outdoor Air Dewpoint Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataEnvrn->OutDewPointTemp,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Site Outdoor Air Wetbulb Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataEnvrn->OutWetBulbTemp,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Site Outdoor Air Humidity Ratio",
                                 OutputProcessor::Unit::kgWater_kgDryAir,
                                 state.dataEnvrn->OutHumRat,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Site Outdoor Air Relative Humidity",
                                 OutputProcessor::Unit::Perc,
                                 state.dataEnvrn->OutRelHum,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Site Outdoor Air Barometric Pressure",
                                 OutputProcessor::Unit::Pa,
                                 state.dataEnvrn->OutBaroPress,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 "Environment");
-            SetupOutputVariable(state, "Site Wind Speed", OutputProcessor::Unit::m_s, state.dataEnvrn->WindSpeed, "Zone", "Average", "Environment");
-            SetupOutputVariable(state, "Site Wind Direction", OutputProcessor::Unit::deg, state.dataEnvrn->WindDir, "Zone", "Average", "Environment");
-            SetupOutputVariable(state, "Site Sky Temperature", OutputProcessor::Unit::C, state.dataEnvrn->SkyTemp, "Zone", "Average", "Environment");
+            SetupOutputVariable(state,
+                                "Site Wind Speed",
+                                OutputProcessor::Unit::m_s,
+                                state.dataEnvrn->WindSpeed,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                "Environment");
+            SetupOutputVariable(state,
+                                "Site Wind Direction",
+                                OutputProcessor::Unit::deg,
+                                state.dataEnvrn->WindDir,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                "Environment");
+            SetupOutputVariable(state,
+                                "Site Sky Temperature",
+                                OutputProcessor::Unit::C,
+                                state.dataEnvrn->SkyTemp,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                "Environment");
             SetupOutputVariable(state,
                                 "Site Horizontal Infrared Radiation Rate per Area",
                                 OutputProcessor::Unit::W_m2,
                                 state.dataWeatherManager->HorizIRSky,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Site Diffuse Solar Radiation Rate per Area",
                                 OutputProcessor::Unit::W_m2,
                                 state.dataEnvrn->DifSolarRad,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Site Direct Solar Radiation Rate per Area",
                                 OutputProcessor::Unit::W_m2,
                                 state.dataEnvrn->BeamSolarRad,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 "Environment");
-            SetupOutputVariable(
-                state, "Site Precipitation Depth", OutputProcessor::Unit::m, state.dataEnvrn->LiquidPrecipitation, "Zone", "Sum", "Environment");
+            SetupOutputVariable(state,
+                                "Site Precipitation Depth",
+                                OutputProcessor::Unit::m,
+                                state.dataEnvrn->LiquidPrecipitation,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Environment");
             SetupOutputVariable(state,
                                 "Site Ground Reflected Solar Radiation Rate per Area",
                                 OutputProcessor::Unit::W_m2,
                                 state.dataEnvrn->GndSolarRad,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 "Environment");
-            SetupOutputVariable(
-                state, "Site Ground Temperature", OutputProcessor::Unit::C, state.dataEnvrn->GroundTemp, "Zone", "Average", "Environment");
+            SetupOutputVariable(state,
+                                "Site Ground Temperature",
+                                OutputProcessor::Unit::C,
+                                state.dataEnvrn->GroundTemp,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                "Environment");
             SetupOutputVariable(state,
                                 "Site Surface Ground Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataEnvrn->GroundTemp_Surface,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 "Environment");
-            SetupOutputVariable(
-                state, "Site Deep Ground Temperature", OutputProcessor::Unit::C, state.dataEnvrn->GroundTemp_Deep, "Zone", "Average", "Environment");
+            SetupOutputVariable(state,
+                                "Site Deep Ground Temperature",
+                                OutputProcessor::Unit::C,
+                                state.dataEnvrn->GroundTemp_Deep,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                "Environment");
             SetupOutputVariable(state,
                                 "Site Simple Factor Model Ground Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataEnvrn->GroundTempFC,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 "Environment");
-            SetupOutputVariable(
-                state, "Site Total Sky Cover", OutputProcessor::Unit::None, state.dataEnvrn->TotalCloudCover, "Zone", "Average", "Environment");
-            SetupOutputVariable(
-                state, "Site Opaque Sky Cover", OutputProcessor::Unit::None, state.dataEnvrn->OpaqueCloudCover, "Zone", "Average", "Environment");
-            SetupOutputVariable(
-                state, "Site Outdoor Air Enthalpy", OutputProcessor::Unit::J_kg, state.dataEnvrn->OutEnthalpy, "Zone", "Average", "Environment");
-            SetupOutputVariable(
-                state, "Site Outdoor Air Density", OutputProcessor::Unit::kg_m3, state.dataEnvrn->OutAirDensity, "Zone", "Average", "Environment");
+            SetupOutputVariable(state,
+                                "Site Total Sky Cover",
+                                OutputProcessor::Unit::None,
+                                state.dataEnvrn->TotalCloudCover,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                "Environment");
+            SetupOutputVariable(state,
+                                "Site Opaque Sky Cover",
+                                OutputProcessor::Unit::None,
+                                state.dataEnvrn->OpaqueCloudCover,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                "Environment");
+            SetupOutputVariable(state,
+                                "Site Outdoor Air Enthalpy",
+                                OutputProcessor::Unit::J_kg,
+                                state.dataEnvrn->OutEnthalpy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                "Environment");
+            SetupOutputVariable(state,
+                                "Site Outdoor Air Density",
+                                OutputProcessor::Unit::kg_m3,
+                                state.dataEnvrn->OutAirDensity,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                "Environment");
             SetupOutputVariable(state,
                                 "Site Solar Azimuth Angle",
                                 OutputProcessor::Unit::deg,
                                 state.dataWeatherManager->SolarAzimuthAngle,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Site Solar Altitude Angle",
                                 OutputProcessor::Unit::deg,
                                 state.dataWeatherManager->SolarAltitudeAngle,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 "Environment");
-            SetupOutputVariable(
-                state, "Site Solar Hour Angle", OutputProcessor::Unit::deg, state.dataWeatherManager->HrAngle, "Zone", "Average", "Environment");
-            SetupOutputVariable(
-                state, "Site Rain Status", OutputProcessor::Unit::None, state.dataWeatherManager->RptIsRain, "Zone", "Average", "Environment");
+            SetupOutputVariable(state,
+                                "Site Solar Hour Angle",
+                                OutputProcessor::Unit::deg,
+                                state.dataWeatherManager->HrAngle,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                "Environment");
+            SetupOutputVariable(state,
+                                "Site Rain Status",
+                                OutputProcessor::Unit::None,
+                                state.dataWeatherManager->RptIsRain,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                "Environment");
             SetupOutputVariable(state,
                                 "Site Snow on Ground Status",
                                 OutputProcessor::Unit::None,
                                 state.dataWeatherManager->RptIsSnow,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Site Exterior Horizontal Sky Illuminance",
                                 OutputProcessor::Unit::lux,
                                 state.dataEnvrn->HISKF,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Site Exterior Horizontal Beam Illuminance",
                                 OutputProcessor::Unit::lux,
                                 state.dataEnvrn->HISUNF,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Site Exterior Beam Normal Illuminance",
                                 OutputProcessor::Unit::lux,
                                 state.dataEnvrn->HISUNFnorm,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Site Sky Diffuse Solar Radiation Luminous Efficacy",
                                 OutputProcessor::Unit::lum_W,
                                 state.dataEnvrn->PDIFLW,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Site Beam Solar Radiation Luminous Efficacy",
                                 OutputProcessor::Unit::lum_W,
                                 state.dataEnvrn->PDIRLW,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Site Daylighting Model Sky Clearness",
                                 OutputProcessor::Unit::None,
                                 state.dataEnvrn->SkyClearness,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Site Daylighting Model Sky Brightness",
                                 OutputProcessor::Unit::None,
                                 state.dataEnvrn->SkyBrightness,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Site Daylight Saving Time Status",
                                 OutputProcessor::Unit::None,
                                 state.dataEnvrn->DSTIndicator,
-                                "Zone",
-                                "State",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
                                 "Environment");
-            SetupOutputVariable(
-                state, "Site Day Type Index", OutputProcessor::Unit::None, state.dataWeatherManager->RptDayType, "Zone", "State", "Environment");
-            SetupOutputVariable(
-                state, "Site Mains Water Temperature", OutputProcessor::Unit::C, state.dataEnvrn->WaterMainsTemp, "Zone", "Average", "Environment");
+            SetupOutputVariable(state,
+                                "Site Day Type Index",
+                                OutputProcessor::Unit::None,
+                                state.dataWeatherManager->RptDayType,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
+                                "Environment");
+            SetupOutputVariable(state,
+                                "Site Mains Water Temperature",
+                                OutputProcessor::Unit::C,
+                                state.dataEnvrn->WaterMainsTemp,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                "Environment");
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator(state,
@@ -636,8 +709,9 @@ namespace WeatherManager {
             AllocateWeatherData(state);
             if (state.dataWeatherManager->NumIntervalsPerHour != 1) {
                 if (state.dataWeatherManager->NumIntervalsPerHour != state.dataGlobal->NumOfTimeStepInHour) {
-                    ShowSevereError(
-                        state, RoutineName + "Number of intervals per hour on Weather file does not match specified number of Time Steps Per Hour");
+                    ShowSevereError(state,
+                                    std::string{RoutineName} +
+                                        "Number of intervals per hour on Weather file does not match specified number of Time Steps Per Hour");
                     ErrorsFound = true;
                 }
             }
@@ -653,30 +727,30 @@ namespace WeatherManager {
                     CheckWeatherFileValidity(state);
                 }
                 if (ErrorsFound) {
-                    ShowSevereError(state, RoutineName + "No location specified, program will terminate.");
+                    ShowSevereError(state, std::string{RoutineName} + "No location specified, program will terminate.");
                 }
             } else {
                 ErrorsFound = true;
-                ShowSevereError(state, RoutineName + "No Design Days or Run Period(s) specified, program will terminate.");
+                ShowSevereError(state, std::string{RoutineName} + "No Design Days or Run Period(s) specified, program will terminate.");
             }
             if (state.dataSysVars->DDOnly && state.dataEnvrn->TotDesDays == 0) {
                 ErrorsFound = true;
                 ShowSevereError(state,
-                                RoutineName +
+                                std::string{RoutineName} +
                                     "Requested Design Days only (DataSystemVariables::DDOnly) but no Design Days specified, program will terminate.");
             }
             if (state.dataSysVars->ReverseDD && state.dataEnvrn->TotDesDays == 1) {
                 ErrorsFound = true;
                 ShowSevereError(
                     state,
-                    RoutineName +
+                    std::string{RoutineName} +
                         "Requested Reverse Design Days (DataSystemVariables::ReverseDD) but only 1 Design Day specified, program will terminate.");
             }
 
             // Throw a Fatal now that we have said it'll terminalte
             if (ErrorsFound) {
                 CloseWeatherFile(state); // will only close if opened.
-                ShowFatalError(state, RoutineName + "Errors found in Weather Data Input. Program terminates.");
+                ShowFatalError(state, std::string{RoutineName} + "Errors found in Weather Data Input. Program terminates.");
             }
 
             state.dataEnvrn->CurrentOverallSimDay = 0;
@@ -712,7 +786,7 @@ namespace WeatherManager {
                 if (state.dataHeatBal->AdaptiveComfortRequested_ASH55 || state.dataHeatBal->AdaptiveComfortRequested_CEN15251) {
                     if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) {
                         if (state.dataGlobal->DoDesDaySim) {
-                            ShowWarningError(state, RoutineName + "Adaptive Comfort being reported during design day.");
+                            ShowWarningError(state, std::string{RoutineName} + "Adaptive Comfort being reported during design day.");
                             Real64 GrossApproxAvgDryBulb = (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Envrn).MaxDryBulb +
                                                             (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Envrn).MaxDryBulb -
                                                              state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Envrn).DailyDBRange)) /
@@ -760,7 +834,7 @@ namespace WeatherManager {
                 if ((state.dataGlobal->DoDesDaySim && (state.dataGlobal->KindOfSim != DataGlobalConstants::KindOfSim::RunPeriodWeather)) ||
                     ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) && state.dataGlobal->DoWeathSim)) {
                     if (state.dataWeatherManager->PrntEnvHeaders && state.dataReportFlag->DoWeatherInitReporting) {
-                        static constexpr auto EnvironFormat(
+                        static constexpr fmt::string_view EnvironFormat(
                             "! <Environment>,Environment Name,Environment Type, Start Date, End Date, Start DayOfWeek, Duration {#days}, "
                             "Source:Start DayOfWeek,  Use Daylight Saving, Use Holidays, Apply Weekend Holiday Rule,  Use Rain Values, Use Snow "
                             "Values, Sky Temperature Model\n! <Environment:Special Days>, Special Day Name, Special Day Type, Source, Start Date, "
@@ -816,8 +890,9 @@ namespace WeatherManager {
                                 int runEndJulian = dataperiod.DataEnJDay;
                                 if (!dataperiod.HasYearData) {
                                     ShowSevereError(state,
-                                                    RoutineName + "Actual weather runperiod has been entered but weatherfile DATA PERIOD "
-                                                                  "does not have year included in start/end date.");
+                                                    std::string{RoutineName} +
+                                                        "Actual weather runperiod has been entered but weatherfile DATA PERIOD "
+                                                        "does not have year included in start/end date.");
                                     ShowContinueError(state, "...to match the RunPeriod, the DATA PERIOD should be mm/dd/yyyy for both, or");
                                     ShowContinueError(state, R"(...set "Treat Weather as Actual" to "No".)");
                                 }
@@ -866,7 +941,7 @@ namespace WeatherManager {
                                                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndMonth,
                                                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndDay);
                                 ShowSevereError(state,
-                                                RoutineName + "Runperiod [mm/dd] (Start=" + StDate + ",End=" + EnDate +
+                                                std::string{RoutineName} + "Runperiod [mm/dd] (Start=" + StDate + ",End=" + EnDate +
                                                     ") requested not within Data Period(s) from Weather File");
                             } else {
                                 StDate = format(DateFormatWithYear,
@@ -878,7 +953,7 @@ namespace WeatherManager {
                                                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndDay,
                                                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndYear);
                                 ShowSevereError(state,
-                                                RoutineName + "Runperiod [mm/dd/yyyy] (Start=" + StDate + ",End=" + EnDate +
+                                                std::string{RoutineName} + "Runperiod [mm/dd/yyyy] (Start=" + StDate + ",End=" + EnDate +
                                                     ") requested not within Data Period(s) from Weather File");
                             }
                             StDate =
@@ -900,12 +975,12 @@ namespace WeatherManager {
                             } else {
                                 ShowContinueError(state, "Multiple Weather Data Periods 1st (Start=" + StDate + ",End=" + EnDate + ')');
                             }
-                            ShowFatalError(state, RoutineName + "Program terminates due to preceding condition.");
+                            ShowFatalError(state, std::string{RoutineName} + "Program terminates due to preceding condition.");
                         }
 
                         if (missingLeap) {
                             // Bail out now if we still need to
-                            ShowFatalError(state, RoutineName + "Program terminates due to preceding condition.");
+                            ShowFatalError(state, std::string{RoutineName} + "Program terminates due to preceding condition.");
                         }
 
                         // Following builds Environment start/end for ASHRAE 55 warnings
@@ -961,14 +1036,14 @@ namespace WeatherManager {
                                 if (state.dataHeatBal->AdaptiveComfortRequested_ASH55 || state.dataHeatBal->AdaptiveComfortRequested_CEN15251) {
                                     if (state.dataWeatherManager->WFAllowsLeapYears) {
                                         ShowSevereError(state,
-                                                        RoutineName +
+                                                        std::string{RoutineName} +
                                                             "AdaptiveComfort Reporting does not work correctly with leap years in weather files.");
                                         ErrorsFound = true;
                                     }
                                     if (state.dataWeatherManager->NumDataPeriods != 1) {
                                         ShowSevereError(
                                             state,
-                                            RoutineName +
+                                            std::string{RoutineName} +
                                                 "AdaptiveComfort Reporting does not work correctly with multiple dataperiods in weather files.");
                                         ErrorsFound = true;
                                     }
@@ -981,20 +1056,23 @@ namespace WeatherManager {
                                                                             state.dataWeatherManager->LeapYearAdd);
                                         if (RunEnJDay - RunStJDay + 1 != 365) {
                                             ShowSevereError(state,
-                                                            RoutineName + "AdaptiveComfort Reporting does not work correctly with weather files "
-                                                                          "that do not contain 365 days.");
+                                                            std::string{RoutineName} +
+                                                                "AdaptiveComfort Reporting does not work correctly with weather files "
+                                                                "that do not contain 365 days.");
                                             ErrorsFound = true;
                                         }
                                     } else {
                                         ShowSevereError(state,
-                                                        RoutineName + "AdaptiveComfort Reporting does not work correctly with weather files that "
-                                                                      "do not start on 1 January.");
+                                                        std::string{RoutineName} +
+                                                            "AdaptiveComfort Reporting does not work correctly with weather files that "
+                                                            "do not start on 1 January.");
                                         ErrorsFound = true;
                                     }
                                     if (state.dataWeatherManager->NumIntervalsPerHour != 1) {
                                         ShowSevereError(state,
-                                                        RoutineName + "AdaptiveComfort Reporting does not work correctly with weather files that "
-                                                                      "have multiple interval records per hour.");
+                                                        std::string{RoutineName} +
+                                                            "AdaptiveComfort Reporting does not work correctly with weather files that "
+                                                            "have multiple interval records per hour.");
                                         ErrorsFound = true;
                                     }
                                 }
@@ -1082,7 +1160,7 @@ namespace WeatherManager {
                                 print(state.files.eio, EnvDSTNFormat, Source);
                             }
                             for (int i = 1; i <= state.dataWeatherManager->NumSpecialDays; ++i) {
-                                static constexpr auto EnvSpDyFormat("Environment:Special Days,{},{},{},{},{:3}");
+                                static constexpr fmt::string_view EnvSpDyFormat("Environment:Special Days,{},{},{},{},{:3}");
                                 if (state.dataWeatherManager->SpecialDays(i).WthrFile && state.dataWeatherManager->UseSpecialDays &&
                                     state.dataReportFlag->DoWeatherInitReporting) {
                                     StDate = format(DateFormat,
@@ -1176,7 +1254,7 @@ namespace WeatherManager {
         }
 
         if (ErrorsFound && !state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation) {
-            ShowSevereError(state, RoutineName + "Errors found in getting a new environment");
+            ShowSevereError(state, std::string{RoutineName} + "Errors found in getting a new environment");
             Available = false;
         } else if (ErrorsFound) {
             Available = false;
@@ -1511,7 +1589,7 @@ namespace WeatherManager {
         // need to set DST (Daylight Saving Time) dates at start of environment or year.
         // DST is only projected for one year.
 
-        static std::string const RoutineName("SetDSTDateRanges: ");
+        static constexpr std::string_view RoutineName("SetDSTDateRanges: ");
 
         int ActStartMonth; // Actual Start Month
         int ActStartDay;   // Actual Start Day of Month
@@ -1532,7 +1610,7 @@ namespace WeatherManager {
             }
             ThisDay += 7 * (state.dataWeatherManager->DST.StDay - 1);
             if (ThisDay > ActEndDayOfMonth(state.dataWeatherManager->DST.StMon)) {
-                ShowSevereError(state, RoutineName + "Determining DST: DST Start Date, Nth Day of Month, not enough Nths");
+                ShowSevereError(state, std::string{RoutineName} + "Determining DST: DST Start Date, Nth Day of Month, not enough Nths");
                 ErrorsFound = true;
             } else {
                 ActStartMonth = state.dataWeatherManager->DST.StMon;
@@ -1559,7 +1637,7 @@ namespace WeatherManager {
             if (ThisDay > ActEndDayOfMonth(state.dataWeatherManager->DST.EnMon)) {
                 ActEndMonth = 0; // Suppress uninitialized warning
                 ActEndDay = 0;   // Suppress uninitialized warning
-                ShowSevereError(state, RoutineName + "Determining DST: DST End Date, Nth Day of Month, not enough Nths");
+                ShowSevereError(state, std::string{RoutineName} + "Determining DST: DST End Date, Nth Day of Month, not enough Nths");
                 ErrorsFound = true;
             } else {
                 ActEndMonth = state.dataWeatherManager->DST.EnMon;
@@ -1575,7 +1653,7 @@ namespace WeatherManager {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Program terminates due to preceding condition(s).");
+            ShowFatalError(state, std::string{RoutineName} + "Program terminates due to preceding condition(s).");
         }
 
         if (present(DSTActStMon)) {
@@ -1610,7 +1688,7 @@ namespace WeatherManager {
         // need to set Special Day dates at start of environment or year.
         // Special Days are only projected for one year.
 
-        static std::string const RoutineName("SetSpecialDayDates: ");
+        static constexpr std::string_view RoutineName("SetSpecialDayDates: ");
 
         int JDay;
         Array1D_int ActEndDayOfMonth(12);
@@ -1650,7 +1728,7 @@ namespace WeatherManager {
                 ThisDay += 7 * (state.dataWeatherManager->SpecialDays(i).Day - 1);
                 if (ThisDay > ActEndDayOfMonth(state.dataWeatherManager->SpecialDays(i).Month)) {
                     ShowSevereError(state,
-                                    RoutineName + "Special Day Date, Nth Day of Month, not enough Nths, for SpecialDay=" +
+                                    std::string{RoutineName} + "Special Day Date, Nth Day of Month, not enough Nths, for SpecialDay=" +
                                         state.dataWeatherManager->SpecialDays(i).Name);
                     ErrorsFound = true;
                     continue;
@@ -1669,7 +1747,7 @@ namespace WeatherManager {
             }
             if (state.dataWeatherManager->SpecialDayTypes(JDay) != 0) {
                 ShowWarningError(state,
-                                 RoutineName + "Special Day definition (" + state.dataWeatherManager->SpecialDays(i).Name +
+                                 std::string{RoutineName} + "Special Day definition (" + state.dataWeatherManager->SpecialDays(i).Name +
                                      ") is overwriting previously entered special day period");
                 if (state.dataWeatherManager->UseSpecialDays) {
                     ShowContinueError(state, "...This could be caused by definitions on the Weather File.");
@@ -1686,7 +1764,7 @@ namespace WeatherManager {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Program terminates due to preceding condition(s).");
+            ShowFatalError(state, std::string{RoutineName} + "Program terminates due to preceding condition(s).");
         }
     }
 
@@ -2087,7 +2165,7 @@ namespace WeatherManager {
         // day boundary (current hour = 24), the next hour is hour 1 of next
         // weather data day (Tomorrow%).
 
-        static std::string const RoutineName("SetCurrentWeather");
+        static constexpr std::string_view RoutineName("SetCurrentWeather");
 
         state.dataWeatherManager->NextHour = state.dataGlobal->HourOfDay + 1;
 
@@ -3410,8 +3488,7 @@ namespace WeatherManager {
 
         EP_SIZE_CHECK(WCodesArr, 9); // NOLINT(misc-static-assert)
 
-        static std::string const ValidDigits("0123456789");
-        static std::string const fmt9I1("(9I1)");
+        static constexpr std::string_view ValidDigits("0123456789");
 
         std::string::size_type Pos;
 
@@ -3709,11 +3786,11 @@ namespace WeatherManager {
         Real64 const ZhangHuangModCoeff_C5(0.014);    // -0.0980d0
         Real64 const ZhangHuangModCoeff_D(-17.853);   // -10.8568d0
         Real64 const ZhangHuangModCoeff_K(0.843);     // 49.3112d0
-        static std::string const RoutineNamePsyWFnTdbTwbPb("SetUpDesignDay:PsyWFnTdbTwbPb");
-        static std::string const RoutineNamePsyWFnTdpPb("SetUpDesignDay:PsyWFnTdpPb");
-        static std::string const RoutineNamePsyWFnTdbH("SetUpDesignDay:PsyWFnTdbH");
-        static std::string const WeatherManager("WeatherManager");
-        static std::string const RoutineNameLong("WeatherManager.cc subroutine SetUpDesignDay");
+        static constexpr std::string_view RoutineNamePsyWFnTdbTwbPb("SetUpDesignDay:PsyWFnTdbTwbPb");
+        static constexpr std::string_view RoutineNamePsyWFnTdpPb("SetUpDesignDay:PsyWFnTdpPb");
+        static constexpr std::string_view RoutineNamePsyWFnTdbH("SetUpDesignDay:PsyWFnTdbH");
+        static constexpr std::string_view WeatherManager("WeatherManager");
+        static constexpr std::string_view RoutineNameLong("WeatherManager.cc subroutine SetUpDesignDay");
 
         std::string StringOut;
         //     For reporting purposes, set year to current system year
@@ -3749,7 +3826,7 @@ namespace WeatherManager {
         state.dataWeatherManager->DesignDay(EnvrnNum).DayOfMonth = state.dataWeatherManager->DesDayInput(EnvrnNum).DayOfMonth;
         state.dataWeatherManager->DesignDay(EnvrnNum).DayOfYear =
             General::OrdinalDay(state.dataWeatherManager->DesignDay(EnvrnNum).Month, state.dataWeatherManager->DesignDay(EnvrnNum).DayOfMonth, 0);
-        static constexpr auto MnDyFmt("{:02}/{:02}");
+        static constexpr fmt::string_view MnDyFmt("{:02}/{:02}");
         state.dataEnvrn->CurMnDy =
             format(MnDyFmt, state.dataWeatherManager->DesDayInput(EnvrnNum).Month, state.dataWeatherManager->DesDayInput(EnvrnNum).DayOfMonth);
         // EnvironmentName = DesDayInput( EnvrnNum ).Title;
@@ -3812,13 +3889,14 @@ namespace WeatherManager {
                                   state.dataWeatherManager->DesignDay(EnvrnNum).CosSolarDeclinAngle);
 
         if (state.dataWeatherManager->PrintDDHeader && state.dataReportFlag->DoWeatherInitReporting) {
-            static constexpr auto EnvDDHdFormat(
+            static constexpr fmt::string_view EnvDDHdFormat(
                 "! <Environment:Design Day Data>, Max Dry-Bulb Temp {C}, Temp Range {dC}, Temp Range Ind Type, "
                 "Hum Ind Type, Hum Ind Value at Max Temp, Hum Ind Units, Pressure {Pa}, Wind Direction {deg CW from N}, Wind "
                 "Speed {m/s}, Clearness, Rain, Snow");
             print(state.files.eio, "{}\n", EnvDDHdFormat);
-            static constexpr auto DDayMiscHdFormat("! <Environment:Design Day Misc>,DayOfYear,ASHRAE A Coeff,ASHRAE B Coeff,ASHRAE C Coeff,Solar "
-                                                   "Constant-Annual Variation,Eq of Time {minutes}, Solar Declination Angle {deg}, Solar Model");
+            static constexpr fmt::string_view DDayMiscHdFormat(
+                "! <Environment:Design Day Misc>,DayOfYear,ASHRAE A Coeff,ASHRAE B Coeff,ASHRAE C Coeff,Solar "
+                "Constant-Annual Variation,Eq of Time {minutes}, Solar Declination Angle {deg}, Solar Model");
             print(state.files.eio, "{}\n", DDayMiscHdFormat);
             state.dataWeatherManager->PrintDDHeader = false;
         }
@@ -3868,7 +3946,7 @@ namespace WeatherManager {
 
             print(state.files.eio, "{},{}\n", AlpUseRain, AlpUseSnow);
 
-            static constexpr auto DDayMiscFormat("Environment:Design Day Misc,{:3},");
+            static constexpr fmt::string_view DDayMiscFormat("Environment:Design Day Misc,{:3},");
             print(state.files.eio, DDayMiscFormat, state.dataWeatherManager->DesignDay(EnvrnNum).DayOfYear);
             print(state.files.eio, "{:.1R},", A);
             print(state.files.eio, "{:.4R},", B);
@@ -4807,11 +4885,12 @@ namespace WeatherManager {
             state.dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(
                 state, state.dataEnvrn->StdBaroPress, DataPrecisionGlobals::constant_twenty, DataPrecisionGlobals::constant_zero);
             // Write Final Location Information to the initialization output file
-            static constexpr auto LocHdFormat("! <Site:Location>, Location Name, Latitude {N+/S- Deg}, Longitude {E+/W- Deg},  Time Zone Number "
-                                              "{GMT+/-}, Elevation {m},  Standard Pressure at Elevation {Pa}, Standard RhoAir at Elevation\n");
+            static constexpr fmt::string_view LocHdFormat(
+                "! <Site:Location>, Location Name, Latitude {N+/S- Deg}, Longitude {E+/W- Deg},  Time Zone Number "
+                "{GMT+/-}, Elevation {m},  Standard Pressure at Elevation {Pa}, Standard RhoAir at Elevation\n");
             print(state.files.eio, "{}", LocHdFormat);
 
-            static constexpr auto LocFormat("Site:Location,{},{:.2R},{:.2R},{:.2R},{:.2R},{:.0R},{:.4R}\n");
+            static constexpr fmt::string_view LocFormat("Site:Location,{},{:.2R},{:.2R},{:.2R},{:.2R},{:.0R},{:.4R}\n");
             print(state.files.eio,
                   LocFormat,
                   state.dataWeatherManager->LocationTitle,
@@ -4959,14 +5038,14 @@ namespace WeatherManager {
         // incremented.  Finally, the header information for the report must
         // be sent to the output file.
 
-        static std::string const EnvironmentString(",5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]");
-        static std::string const TimeStepString(
+        static constexpr std::string_view EnvironmentString(",5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]");
+        static constexpr std::string_view TimeStepString(
             ",8,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType");
-        static std::string const DailyString(
+        static constexpr std::string_view DailyString(
             ",5,Cumulative Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],DayType  ! When Daily ");
-        static std::string const MonthlyString(",2,Cumulative Days of Simulation[],Month[]  ! When Monthly ");
-        static std::string const RunPeriodString(",1,Cumulative Days of Simulation[] ! When Run Period ");
-        static std::string const YearlyString(",1,Calendar Year of Simulation[] ! When Annual ");
+        static constexpr std::string_view MonthlyString(",2,Cumulative Days of Simulation[],Month[]  ! When Monthly ");
+        static constexpr std::string_view RunPeriodString(",1,Cumulative Days of Simulation[] ! When Run Period ");
+        static constexpr std::string_view YearlyString(",1,Calendar Year of Simulation[] ! When Annual ");
 
         AssignReportNumber(state, state.dataWeatherManager->EnvironmentReportNbr);
         if (state.dataWeatherManager->EnvironmentReportNbr != 1) { //  problem
@@ -5046,14 +5125,15 @@ namespace WeatherManager {
             if (printEnvrnStamp) {
 
                 if (state.dataReportFlag->PrintEndDataDictionary && state.dataGlobal->DoOutputReporting) {
-                    static constexpr auto EndOfHeaderString("End of Data Dictionary"); // End of data dictionary marker
+                    static constexpr fmt::string_view EndOfHeaderString("End of Data Dictionary"); // End of data dictionary marker
                     print(state.files.eso, "{}\n", EndOfHeaderString);
                     print(state.files.mtr, "{}\n", EndOfHeaderString);
                     state.dataReportFlag->PrintEndDataDictionary = false;
                 }
                 if (state.dataGlobal->DoOutputReporting) {
                     std::string const &Title(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).Title);
-                    static constexpr auto EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
+                    static constexpr fmt::string_view EnvironmentStampFormatStr(
+                        "{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
                     print(state.files.eso,
                           EnvironmentStampFormatStr,
                           state.dataWeatherManager->EnvironmentReportChr,
@@ -6569,8 +6649,8 @@ namespace WeatherManager {
                                                 "Sizing Period Site Drybulb Temperature Range Modifier Schedule Value",
                                                 unitType,
                                                 state.dataWeatherManager->SPSiteDryBulbRangeModScheduleValue(EnvrnNum),
-                                                "Zone",
-                                                "Average",
+                                                OutputProcessor::SOVTimeStepType::Zone,
+                                                OutputProcessor::SOVStoreType::Average,
                                                 state.dataIPShortCut->cAlphaArgs(4));
                         }
                         if (state.dataIPShortCut->cAlphaArgs(3) == "MultiplierSchedule") {
@@ -6896,8 +6976,8 @@ namespace WeatherManager {
                                                 "Sizing Period Site Humidity Condition Schedule Value",
                                                 unitType,
                                                 state.dataWeatherManager->SPSiteHumidityConditionScheduleValue(EnvrnNum),
-                                                "Zone",
-                                                "Average",
+                                                OutputProcessor::SOVTimeStepType::Zone,
+                                                OutputProcessor::SOVStoreType::Average,
                                                 state.dataIPShortCut->cAlphaArgs(6));
                         }
 
@@ -7039,8 +7119,8 @@ namespace WeatherManager {
                                                 "Sizing Period Site Beam Solar Schedule Value",
                                                 unitType,
                                                 state.dataWeatherManager->SPSiteBeamSolarScheduleValue(EnvrnNum),
-                                                "Zone",
-                                                "Average",
+                                                OutputProcessor::SOVTimeStepType::Zone,
+                                                OutputProcessor::SOVStoreType::Average,
                                                 state.dataIPShortCut->cAlphaArgs(11));
                         }
                         if (!ScheduleManager::CheckDayScheduleValueMinMax(
@@ -7093,8 +7173,8 @@ namespace WeatherManager {
                                                 "Sizing Period Site Diffuse Solar Schedule Value",
                                                 unitType,
                                                 state.dataWeatherManager->SPSiteDiffuseSolarScheduleValue(EnvrnNum),
-                                                "Zone",
-                                                "Average",
+                                                OutputProcessor::SOVTimeStepType::Zone,
+                                                OutputProcessor::SOVStoreType::Average,
                                                 state.dataIPShortCut->cAlphaArgs(12));
                         }
                         if (!ScheduleManager::CheckDayScheduleValueMinMax(
@@ -7333,7 +7413,7 @@ namespace WeatherManager {
         //        \object-list DayScheduleNames
         //        \object-list ScheduleNames
 
-        static std::string const RoutineName("GetWeatherProperties:");
+        static constexpr std::string_view RoutineName("GetWeatherProperties:");
 
         int Found;
         int envFound;
@@ -7367,8 +7447,8 @@ namespace WeatherManager {
                     if (state.dataWeatherManager->Environment(j).KindOfEnvrn != DataGlobalConstants::KindOfSim::RunPeriodWeather) continue;
                     if (state.dataWeatherManager->Environment(j).WP_Type1 != 0) {
                         ShowSevereError(state,
-                                        RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                            "\", indicated Environment Name already assigned.");
+                                        std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
+                                            state.dataIPShortCut->cAlphaArgs(1) + "\", indicated Environment Name already assigned.");
                         if (!state.dataWeatherManager->Environment(j).Title.empty()) {
                             ShowContinueError(state,
                                               "...Environment=\"" + state.dataWeatherManager->Environment(j).Title + "\", already using " +
@@ -7398,16 +7478,16 @@ namespace WeatherManager {
                 envFound = Found;
                 if (Found == 0) {
                     ShowSevereError(state,
-                                    RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                        "\", invalid Environment Name referenced.");
+                                    std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
+                                        state.dataIPShortCut->cAlphaArgs(1) + "\", invalid Environment Name referenced.");
                     ShowContinueError(state, "...remainder of object not processed.");
                     ErrorsFound = true;
                     continue;
                 } else {
                     if (state.dataWeatherManager->Environment(Found).WP_Type1 != 0) {
                         ShowSevereError(state,
-                                        RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                            "\", indicated Environment Name already assigned.");
+                                        std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
+                                            state.dataIPShortCut->cAlphaArgs(1) + "\", indicated Environment Name already assigned.");
                         ShowContinueError(state,
                                           "...Environment=\"" + state.dataWeatherManager->Environment(Found).Title + "\", already using " +
                                               state.dataIPShortCut->cCurrentModuleObject + "=\"" +
@@ -7458,7 +7538,7 @@ namespace WeatherManager {
                 state.dataWeatherManager->WPSkyTemperature(i).IsSchedule = false;
             } else {
                 ShowSevereError(state,
-                                RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                     "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '.');
                 ShowContinueError(state,
                                   "...entered value=\"" + state.dataIPShortCut->cAlphaArgs(2) +
@@ -7475,8 +7555,8 @@ namespace WeatherManager {
                     Found = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                     if (Found == 0) {
                         ShowSevereError(state,
-                                        RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                            "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '.');
+                                        std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
+                                            state.dataIPShortCut->cAlphaArgs(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '.');
                         ShowContinueError(state, "...Entered name=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".");
                         ShowContinueError(state,
                                           "...Should be a full year schedule (\"Schedule:Year\", \"Schedule:Compact\", \"Schedule:File\", or "
@@ -7490,8 +7570,8 @@ namespace WeatherManager {
                     Found = ScheduleManager::GetDayScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                     if (Found == 0) {
                         ShowSevereError(state,
-                                        RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                            "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '.');
+                                        std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
+                                            state.dataIPShortCut->cAlphaArgs(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '.');
                         ShowContinueError(state, "...Entered name=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".");
                         ShowContinueError(
                             state,
@@ -7509,8 +7589,8 @@ namespace WeatherManager {
                                                     "Sizing Period Site Sky Temperature Schedule Value",
                                                     unitType,
                                                     state.dataWeatherManager->SPSiteSkyTemperatureScheduleValue(envFound),
-                                                    "Zone",
-                                                    "Average",
+                                                    OutputProcessor::SOVTimeStepType::Zone,
+                                                    OutputProcessor::SOVStoreType::Average,
                                                     state.dataIPShortCut->cAlphaArgs(3));
                             }
                             state.dataWeatherManager->WPSkyTemperature(i).IsSchedule = true;
@@ -7527,8 +7607,8 @@ namespace WeatherManager {
                     state.dataWeatherManager->WPSkyTemperature(i).UseWeatherFileHorizontalIR = false;
                 } else {
                     ShowSevereError(state,
-                                    RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                        "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + '.');
+                                    std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
+                                        state.dataIPShortCut->cAlphaArgs(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + '.');
                     ShowContinueError(state, "...entered value=\"" + state.dataIPShortCut->cAlphaArgs(4) + "\", should be Yes or No.");
                     ErrorsFound = true;
                 }
@@ -7682,7 +7762,7 @@ namespace WeatherManager {
 
         // Write Final Ground Reflectance Modifier Information to the initialization output file
         print(state.files.eio, "{}\n", "! <Site:GroundReflectance:SnowModifier>, Normal, Daylighting {dimensionless}");
-        static constexpr auto Format_720(" Site:GroundReflectance:SnowModifier, {:7.3F}, {:7.3F}\n");
+        static constexpr fmt::string_view Format_720(" Site:GroundReflectance:SnowModifier, {:7.3F}, {:7.3F}\n");
         print(state.files.eio, Format_720, state.dataWeatherManager->SnowGndRefModifier, state.dataWeatherManager->SnowGndRefModifierForDayltg);
 
         print(state.files.eio,
@@ -7922,7 +8002,7 @@ namespace WeatherManager {
               "Speed Modifier Coefficient-Internal,Temperature Modifier Coefficient-Internal");
 
         // Formats
-        static constexpr auto Format_720("Environment:Weather Station,{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
+        static constexpr fmt::string_view Format_720("Environment:Weather Station,{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
         print(state.files.eio,
               Format_720,
               WeatherFileWindSensorHeight,
@@ -8839,7 +8919,7 @@ namespace WeatherManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine skips the initial header records on the EnergyPlus Weather File (in.epw).
 
-        static std::string const Header("DATA PERIODS");
+        static constexpr std::string_view Header("DATA PERIODS");
 
         // Read in Header Information
         InputFile::ReadResult<std::string> Line{"", true, false};
@@ -8849,7 +8929,8 @@ namespace WeatherManager {
             Line = state.files.inputWeatherFile.readLine();
             if (Line.eof) {
                 ShowFatalError(state,
-                               "Unexpected End-of-File on EPW Weather file, while reading header information, looking for header=" + Header,
+                               "Unexpected End-of-File on EPW Weather file, while reading header information, looking for header=" +
+                                   std::string{Header},
                                OptionalOutputFileRef{state.files.eso});
             }
             uppercase(Line.data);
@@ -8915,12 +8996,12 @@ namespace WeatherManager {
         // This subroutine reports the counts of missing/out of range data
         // for weather file environments.
 
-        static std::string const MissString("Missing Data Found on Weather Data File");
-        static constexpr auto msFmt("Missing {}, Number of items={:5}");
-        static std::string const InvString("Invalid Data Found on Weather Data File");
-        static constexpr auto ivFmt("Invalid {}, Number of items={:5}");
-        static std::string const RangeString("Out of Range Data Found on Weather Data File");
-        static constexpr auto rgFmt("Out of Range {} [{},{}], Number of items={:5}");
+        static constexpr std::string_view MissString("Missing Data Found on Weather Data File");
+        static constexpr fmt::string_view msFmt("Missing {}, Number of items={:5}");
+        static constexpr std::string_view InvString("Invalid Data Found on Weather Data File");
+        static constexpr fmt::string_view ivFmt("Invalid {}, Number of items={:5}");
+        static constexpr std::string_view RangeString("Out of Range Data Found on Weather Data File");
+        static constexpr fmt::string_view rgFmt("Out of Range {} [{},{}], Number of items={:5}");
 
         if (!state.dataEnvrn->DisplayWeatherMissingDataWarnings) return;
 
@@ -8928,7 +9009,7 @@ namespace WeatherManager {
         auto missedHeaderCheck{[&](Real64 const value, std::string const &description) {
             if (value > 0) {
                 if (!MissedHeader) {
-                    ShowWarningError(state, MissString);
+                    ShowWarningError(state, std::string{MissString});
                     MissedHeader = true;
                 }
                 ShowMessage(state, format(msFmt, "\"" + description + "\"", value));
@@ -8947,26 +9028,23 @@ namespace WeatherManager {
         missedHeaderCheck(state.dataWeatherManager->Missed.OpaqSkyCvr, "Opaque Sky Cover");
         missedHeaderCheck(state.dataWeatherManager->Missed.SnowDepth, "Snow Depth");
         if (state.dataWeatherManager->Missed.WeathCodes > 0) {
-            ShowWarningError(state, InvString);
+            ShowWarningError(state, std::string{InvString});
             ShowMessage(state, format(ivFmt, "\"Weather Codes\" (not equal 9 digits)", state.dataWeatherManager->Missed.WeathCodes));
         }
         missedHeaderCheck(state.dataWeatherManager->Missed.LiquidPrecip, "Liquid Precipitation Depth");
 
         bool OutOfRangeHeader = false;
-        auto outOfRangeHeaderCheck{[&](Real64 const value,
-                                       std::string const &description,
-                                       std::string const &rangeLow,
-                                       std::string const &rangeHigh,
-                                       std::string const &extraMsg) {
-            if (value > 0) {
-                if (!OutOfRangeHeader) {
-                    ShowWarningError(state, RangeString);
-                    OutOfRangeHeader = true;
+        auto outOfRangeHeaderCheck{
+            [&](Real64 const value, std::string_view description, std::string_view rangeLow, std::string_view rangeHigh, std::string_view extraMsg) {
+                if (value > 0) {
+                    if (!OutOfRangeHeader) {
+                        ShowWarningError(state, std::string{RangeString});
+                        OutOfRangeHeader = true;
+                    }
+                    ShowMessage(state, EnergyPlus::format(rgFmt, description, rangeLow, rangeHigh, value));
+                    if (!extraMsg.empty()) ShowMessage(state, std::string{extraMsg});
                 }
-                ShowMessage(state, format(rgFmt, description, rangeLow, rangeHigh, value));
-                if (!extraMsg.empty()) ShowMessage(state, extraMsg);
-            }
-        }};
+            }};
         outOfRangeHeaderCheck(state.dataWeatherManager->OutOfRange.DryBulb, "Dry Bulb Temperatures", ">=-90", "<=70", "");
         outOfRangeHeaderCheck(
             state.dataWeatherManager->OutOfRange.StnPres, "Atmospheric Pressure", ">31000", "<=120000", "Out of Range values set to last good value");

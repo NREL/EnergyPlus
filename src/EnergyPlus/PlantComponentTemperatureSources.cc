@@ -124,8 +124,7 @@ namespace PlantComponentTemperatureSources {
         // Uses the status flags to trigger initializations.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-
-        static std::string const RoutineName("InitWaterSource");
+        static constexpr std::string_view RoutineName("InitWaterSource");
 
         this->oneTimeInit(state);
 
@@ -225,43 +224,43 @@ namespace PlantComponentTemperatureSources {
                             "Plant Temperature Source Component Mass Flow Rate",
                             OutputProcessor::Unit::kg_s,
                             this->MassFlowRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Plant Temperature Source Component Inlet Temperature",
                             OutputProcessor::Unit::C,
                             this->InletTemp,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Plant Temperature Source Component Outlet Temperature",
                             OutputProcessor::Unit::C,
                             this->OutletTemp,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Plant Temperature Source Component Source Temperature",
                             OutputProcessor::Unit::C,
                             this->BoundaryTemp,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Plant Temperature Source Component Heat Transfer Rate",
                             OutputProcessor::Unit::W,
                             this->HeatRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Plant Temperature Source Component Heat Transfer Energy",
                             OutputProcessor::Unit::J,
                             this->HeatEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             this->Name);
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
             SetupEMSActuator(state,
@@ -374,7 +373,7 @@ namespace PlantComponentTemperatureSources {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        static std::string const RoutineName("CalcWaterSource");
+        static constexpr std::string_view RoutineName("CalcWaterSource");
 
         if (this->MassFlowRate > 0.0) {
             this->OutletTemp = this->BoundaryTemp;
