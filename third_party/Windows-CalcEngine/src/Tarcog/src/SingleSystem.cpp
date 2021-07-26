@@ -308,6 +308,7 @@ namespace Tarcog
         {
             for(auto & [key, environment] : m_Environment)
             {
+                std::ignore = key;
                 environment->setHeight(height);
             }
         }
