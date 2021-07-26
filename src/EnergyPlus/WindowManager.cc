@@ -2487,7 +2487,8 @@ namespace WindowManager {
             }
 
             // IR incident on window from zone surfaces and high-temp radiant sources
-            state.dataWindowManager->Rmir = state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalSurf->QdotRadHVACInRepPerArea(SurfNum);
+            state.dataWindowManager->Rmir =
+                state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalSurf->QdotRadHVACInRepPerArea(SurfNum);
 
             // Short-wave radiation (from interior and exterior solar and zone lights)
             // absorbed at each face. Assumes equal split between faces of short-wave absorbed in glass layer.

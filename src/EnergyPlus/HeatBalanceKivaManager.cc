@@ -384,8 +384,8 @@ void KivaInstanceMap::setBoundaryConditions(EnergyPlusData &state)
     Real64 TARadTotal = 0.0;
     Real64 TAConvTotal = 0.0;
     for (auto &wl : wallSurfaces) {
-        Real64 Q = state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(wl) +         // solar
-                   state.dataHeatBal->SurfQRadThermInAbs(wl) +              // internal gains
+        Real64 Q = state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(wl) +    // solar
+                   state.dataHeatBal->SurfQRadThermInAbs(wl) +         // internal gains
                    state.dataHeatBalSurf->QdotRadHVACInRepPerArea(wl); // HVAC
 
         Real64 &A = state.dataSurface->Surface(wl).Area;

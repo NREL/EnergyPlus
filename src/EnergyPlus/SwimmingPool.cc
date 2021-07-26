@@ -883,7 +883,8 @@ void SwimmingPoolData::calculate(EnergyPlusData &state)
     // Standard Heat Balance Equation:
     //        SurfTempInTmp( SurfNum ) = ( SurfCTFConstInPart( SurfNum ) + QRadThermInAbs( SurfNum ) + QRadSWInAbs( SurfNum ) + HConvIn( SurfNum
     //)
-    //* RefAirTemp( SurfNum ) + NetLWRadToSurf( SurfNum ) + Construct( ConstrNum ).CTFSourceIn( 0 ) * QsrcHist( 1, SurfNum ) + QdotRadHVACInRepPerArea( SurfNum ) + IterDampConst * SurfTempInsOld(
+    //* RefAirTemp( SurfNum ) + NetLWRadToSurf( SurfNum ) + Construct( ConstrNum ).CTFSourceIn( 0 ) * QsrcHist( 1, SurfNum ) +
+    //QdotRadHVACInRepPerArea( SurfNum ) + IterDampConst * SurfTempInsOld(
     // SurfNum ) + Construct( ConstrNum ).CTFCross( 0 ) * TH11 ) / ( Construct( ConstrNum ).CTFInside( 0 ) + HConvIn( SurfNum ) + IterDampConst );
     //// Constant part of conduction eq (history terms) | LW radiation from internal sources | SW radiation from internal sources | Convection
     // from surface to zone air | Net radiant exchange with other zone surfaces | Heat source/sink term for radiant systems | (if there is one
@@ -927,7 +928,7 @@ void SwimmingPoolData::calculate(EnergyPlusData &state)
     // to the air directly and added to the zone air heat balance
     Real64 LWsum = (state.dataHeatBal->SurfQRadThermInAbs(SurfNum) + state.dataHeatBalSurf->SurfNetLWRadToSurf(SurfNum) +
                     state.dataHeatBalSurf->QdotRadHVACInRepPerArea(SurfNum)); // summation of all long-wavelenth radiation going to surface
-    Real64 LWtotal = this->CurCoverLWRadFac * LWsum;                       // total flux from long-wavelength radiation to surface
+    Real64 LWtotal = this->CurCoverLWRadFac * LWsum;                          // total flux from long-wavelength radiation to surface
     Real64 SWtotal =
         this->CurCoverSWRadFac * state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum); // total flux from short-wavelength radiation to surface
     this->RadConvertToConvect =
