@@ -199,6 +199,7 @@ namespace EvaporativeFluidCoolers {
         Real64 FanPower;          // Evaporative fluid cooler fan power used
         Real64 AirFlowRateRatio;  // Ratio of air flow rate through VS evaporative fluid cooler
         Real64 WaterUsage;        // Evaporative fluid cooler water usage (m3/s)
+        bool MyOneTimeFlag;
         bool MyEnvrnFlag;
         bool OneTimeFlagForEachEvapFluidCooler;
         bool CheckEquipName;
@@ -239,7 +240,7 @@ namespace EvaporativeFluidCoolers {
               BypassFraction(0.0), EvapLossMode(EvapLoss::ByMoistTheory), BlowdownMode(Blowdown::ByConcentration), SchedIDBlowdown(0), WaterTankID(0),
               WaterTankDemandARRID(0), UserEvapLossFactor(0.0), DriftLossFraction(0.0), ConcentrationRatio(0.0), SuppliedByWaterSystem(false),
               LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), InletWaterTemp(0.0), OutletWaterTemp(0.0), WaterInletNode(0), WaterOutletNode(0),
-              WaterMassFlowRate(0.0), Qactual(0.0), FanPower(0.0), AirFlowRateRatio(0.0), WaterUsage(0.0), MyEnvrnFlag(true),
+              WaterMassFlowRate(0.0), Qactual(0.0), FanPower(0.0), AirFlowRateRatio(0.0), WaterUsage(0.0), MyOneTimeFlag(true), MyEnvrnFlag(true),
               OneTimeFlagForEachEvapFluidCooler(true), CheckEquipName(true), fluidCoolerInletWaterTemp(0.0), fluidCoolerOutletWaterTemp(0.0),
               FanEnergy(0.0), WaterAmountUsed(0.0), EvaporationVdot(0.0), EvaporationVol(0.0), DriftVdot(0.0), DriftVol(0.0), BlowdownVdot(0.0),
               BlowdownVol(0.0), MakeUpVdot(0.0), MakeUpVol(0.0), TankSupplyVdot(0.0), TankSupplyVol(0.0), StarvedMakeUpVdot(0.0),
@@ -282,8 +283,6 @@ namespace EvaporativeFluidCoolers {
         void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
         void oneTimeInit(EnergyPlusData &state) override;
-
-        void oneTimeInit_new(EnergyPlusData &state) override;
     };
 
     // Object Data

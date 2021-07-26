@@ -2660,26 +2660,31 @@ namespace EvaporativeFluidCoolers {
             this->WaterAmountUsed = this->WaterUsage * ReportingConstant;
         }
     }
-    void EvapFluidCoolerSpecs::oneTimeInit_new(EnergyPlusData &state)
+    void EvapFluidCoolerSpecs::oneTimeInit(EnergyPlusData &state)
     {
         bool ErrorsFound(false); // Flag if input data errors are found
 
-        this->setupOutputVars(state);
+        if (this->MyOneTimeFlag) {
 
-        this->FluidIndex = state.dataPlnt->PlantLoop(state.dataSize->CurLoopNum).FluidIndex;
-        std::string FluidName = FluidProperties::GetGlycolNameByIndex(state, this->FluidIndex);
+            this->setupOutputVars(state);
 
-        if (UtilityRoutines::SameString(this->PerformanceInputMethod, "STANDARDDESIGNCAPACITY")) {
-            this->PerformanceInputMethod_Num = PIM::StandardDesignCapacity;
-            if (FluidName != "WATER") {
-                ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + " = \"" + this->Name +
-                                    R"(". StandardDesignCapacity performance input method is only valid for fluid type = "Water".)");
-                ShowContinueError(state,
-                                  "Currently, Fluid Type = " + FluidName +
-                                      " in CondenserLoop = " + state.dataPlnt->PlantLoop(state.dataSize->CurLoopNum).Name);
-                ErrorsFound = true;
+            this->FluidIndex = state.dataPlnt->PlantLoop(state.dataSize->CurLoopNum).FluidIndex;
+            std::string FluidName = FluidProperties::GetGlycolNameByIndex(state, this->FluidIndex);
+
+            if (UtilityRoutines::SameString(this->PerformanceInputMethod, "STANDARDDESIGNCAPACITY")) {
+                this->PerformanceInputMethod_Num = PIM::StandardDesignCapacity;
+                if (FluidName != "WATER") {
+                    ShowSevereError(state,
+                                    state.dataIPShortCut->cCurrentModuleObject + " = \"" + this->Name +
+                                        R"(". StandardDesignCapacity performance input method is only valid for fluid type = "Water".)");
+                    ShowContinueError(state,
+                                      "Currently, Fluid Type = " + FluidName +
+                                          " in CondenserLoop = " + state.dataPlnt->PlantLoop(state.dataSize->CurLoopNum).Name);
+                    ErrorsFound = true;
+                }
             }
+
+            this->MyOneTimeFlag = false;
         }
 
         if (this->OneTimeFlagForEachEvapFluidCooler) {
@@ -2716,10 +2721,6 @@ namespace EvaporativeFluidCoolers {
 
             this->OneTimeFlagForEachEvapFluidCooler = false;
         }
-    }
-
-    void EvapFluidCoolerSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
-    {
     }
 
 } // namespace EvaporativeFluidCoolers
