@@ -472,8 +472,8 @@ namespace BaseboardRadiator {
                                 "Baseboard Total Heating Energy",
                                 OutputProcessor::Unit::J,
                                 baseboard->Baseboard(BaseboardNum).Energy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 baseboard->Baseboard(BaseboardNum).EquipID,
                                 _,
                                 "ENERGYTRANSFER",
@@ -485,8 +485,8 @@ namespace BaseboardRadiator {
                                 "Baseboard Hot Water Energy",
                                 OutputProcessor::Unit::J,
                                 baseboard->Baseboard(BaseboardNum).Energy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 baseboard->Baseboard(BaseboardNum).EquipID,
                                 _,
                                 "PLANTLOOPHEATINGDEMAND",
@@ -498,56 +498,56 @@ namespace BaseboardRadiator {
                                 "Baseboard Total Heating Rate",
                                 OutputProcessor::Unit::W,
                                 baseboard->Baseboard(BaseboardNum).Power,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 baseboard->Baseboard(BaseboardNum).EquipID);
 
             SetupOutputVariable(state,
                                 "Baseboard Hot Water Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 baseboard->Baseboard(BaseboardNum).WaterMassFlowRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 baseboard->Baseboard(BaseboardNum).EquipID);
 
             SetupOutputVariable(state,
                                 "Baseboard Air Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 baseboard->Baseboard(BaseboardNum).AirMassFlowRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 baseboard->Baseboard(BaseboardNum).EquipID);
 
             SetupOutputVariable(state,
                                 "Baseboard Air Inlet Temperature",
                                 OutputProcessor::Unit::C,
                                 baseboard->Baseboard(BaseboardNum).AirInletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 baseboard->Baseboard(BaseboardNum).EquipID);
 
             SetupOutputVariable(state,
                                 "Baseboard Air Outlet Temperature",
                                 OutputProcessor::Unit::C,
                                 baseboard->Baseboard(BaseboardNum).AirOutletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 baseboard->Baseboard(BaseboardNum).EquipID);
 
             SetupOutputVariable(state,
                                 "Baseboard Water Inlet Temperature",
                                 OutputProcessor::Unit::C,
                                 baseboard->Baseboard(BaseboardNum).WaterInletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 baseboard->Baseboard(BaseboardNum).EquipID);
 
             SetupOutputVariable(state,
                                 "Baseboard Water Outlet Temperature",
                                 OutputProcessor::Unit::C,
                                 baseboard->Baseboard(BaseboardNum).WaterOutletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 baseboard->Baseboard(BaseboardNum).EquipID);
         }
     }
