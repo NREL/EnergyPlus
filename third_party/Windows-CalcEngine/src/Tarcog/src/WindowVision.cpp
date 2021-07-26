@@ -31,11 +31,10 @@ namespace Tarcog::ISO15099
         auto frameWeightedUValue{0.0};
         auto edgeOfGlassWeightedUValue{0.0};
 
-        for(const auto & [key, frame] : m_Frame)
+        for(const auto & frame : m_Frame)
         {
-            std::ignore = key;
-            frameWeightedUValue += frame.projectedArea() * frame.frameData().UValue;
-            edgeOfGlassWeightedUValue += frame.edgeOfGlassArea() * frame.frameData().EdgeUValue;
+            frameWeightedUValue += frame.second.projectedArea() * frame.second.frameData().UValue;
+            edgeOfGlassWeightedUValue += frame.second.edgeOfGlassArea() * frame.second.frameData().EdgeUValue;
         }
 
         const auto COGWeightedUValue{m_IGUUvalue
@@ -64,10 +63,9 @@ namespace Tarcog::ISO15099
     {
         auto frameWeightedSHGC{0.0};
 
-        for(const auto & [key, frame] : m_Frame)
+        for(const auto & frame : m_Frame)
         {
-            std::ignore = key;
-            frameWeightedSHGC += frame.projectedArea() * frame.frameData().shgc(m_HcExterior);
+            frameWeightedSHGC += frame.second.projectedArea() * frame.second.frameData().shgc(m_HcExterior);
         }
 
         const auto COGWeightedSHGC{m_IGUSystem->getSHGC(tSol)
@@ -274,10 +272,9 @@ namespace Tarcog::ISO15099
     {
         auto area{0.0};
 
-        for(const auto & [key, frame] : m_Frame)
+        for(const auto & frame : m_Frame)
         {
-            std::ignore = key;
-            area += frame.projectedArea();
+            area += frame.second.projectedArea();
         }
 
         return area;
@@ -287,10 +284,9 @@ namespace Tarcog::ISO15099
     {
         auto area{0.0};
 
-        for(const auto & [key, frame] : m_Frame)
+        for(const auto & frame : m_Frame)
         {
-            std::ignore = key;
-            area += frame.edgeOfGlassArea();
+            area += frame.second.edgeOfGlassArea();
         }
 
         return area;
