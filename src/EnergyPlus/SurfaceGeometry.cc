@@ -14907,27 +14907,27 @@ namespace SurfaceGeometry {
             } else {
                 state.dataViewFactor->NumOfSolarEnclosures = state.dataGlobal->NumOfSpaces;
             }
+        }
 
-            // ToDo: For now, set the max and min enclosure numbers for each zone to be used in CalcInteriorRadExchange with ZoneToResimulate
-            for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-                for (int spaceNum : state.dataHeatBal->Zone(zoneNum).Spaces) {
-                    if (state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureFirst == -1) { // initial value
-                        state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureFirst = state.dataHeatBal->Space(spaceNum).RadiantEnclosureNum;
-                    } else {
-                        state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureFirst =
-                            min(state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureFirst, state.dataHeatBal->Space(spaceNum).RadiantEnclosureNum);
-                    }
-                    state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureLast =
-                        max(state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureLast, state.dataHeatBal->Space(spaceNum).RadiantEnclosureNum);
-                    // TODO: For daylighting, set the zone solar enclosure number to the first space's number
-                    if (state.dataHeatBal->Zone(zoneNum).ZoneFirstSpaceSolEnclosure == 0) {
-                        state.dataHeatBal->Zone(zoneNum).ZoneFirstSpaceSolEnclosure = state.dataHeatBal->Space(spaceNum).SolarEnclosureNum;
-                    }
+        // ToDo: For now, set the max and min enclosure numbers for each zone to be used in CalcInteriorRadExchange with ZoneToResimulate
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            for (int spaceNum : state.dataHeatBal->Zone(zoneNum).Spaces) {
+                if (state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureFirst == -1) { // initial value
+                    state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureFirst = state.dataHeatBal->Space(spaceNum).RadiantEnclosureNum;
+                } else {
+                    state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureFirst =
+                        min(state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureFirst, state.dataHeatBal->Space(spaceNum).RadiantEnclosureNum);
                 }
-                assert(state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureFirst != -1);
-                assert(state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureLast != -1);
-                assert(state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureFirst <= state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureLast);
+                state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureLast =
+                    max(state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureLast, state.dataHeatBal->Space(spaceNum).RadiantEnclosureNum);
+                // TODO: For daylighting, set the zone solar enclosure number to the first space's number
+                if (state.dataHeatBal->Zone(zoneNum).ZoneFirstSpaceSolEnclosure == 0) {
+                    state.dataHeatBal->Zone(zoneNum).ZoneFirstSpaceSolEnclosure = state.dataHeatBal->Space(spaceNum).SolarEnclosureNum;
+                }
             }
+            assert(state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureFirst != -1);
+            assert(state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureLast != -1);
+            assert(state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureFirst <= state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureLast);
         }
     }
 
