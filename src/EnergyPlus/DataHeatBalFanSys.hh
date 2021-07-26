@@ -198,16 +198,6 @@ struct HeatBalFanSysData : BaseGlobalStruct
     // temperature at source
     Array1D<Real64> CTFTuserConstPart; // Constant Outside Portion of the CTF calculation of
     // temperature at the user specified location
-    Array1D<Real64> QHTRadSysSurf; // Current radiant heat flux at a surface due to the presence
-    // of high temperature radiant heaters
-    Array1D<Real64> QHWBaseboardSurf; // Current radiant heat flux at a surface due to the presence
-    // of hot water baseboard heaters
-    Array1D<Real64> QSteamBaseboardSurf; // Current radiant heat flux at a surface due to the presence
-    // of steam baseboard heaters
-    Array1D<Real64> QElecBaseboardSurf; // Current radiant heat flux at a surface due to the presence
-    // of electric baseboard heaters
-    Array1D<Real64> QCoolingPanelSurf; // Current radiant heat flux at a surface due to the presence
-    // of simple cooling panels
     Array1D<Real64> QRadSurfAFNDuct;     // Current radiant heat flux at a surface due to radiation from AFN ducts
     Array1D<Real64> QPoolSurfNumerator;  // Current pool heat flux impact at the surface (numerator of surface heat balance)
     Array1D<Real64> PoolHeatTransCoefs;  // Current pool heat transfer coefficients (denominator of surface heat balance)
@@ -350,10 +340,6 @@ struct HeatBalFanSysData : BaseGlobalStruct
         this->QPVSysSource.deallocate();
         this->CTFTsrcConstPart.deallocate();
         this->CTFTuserConstPart.deallocate();
-        this->QHTRadSysSurf.deallocate();
-        this->QHWBaseboardSurf.deallocate();
-        this->QSteamBaseboardSurf.deallocate();
-        this->QElecBaseboardSurf.deallocate();
         this->QPoolSurfNumerator.deallocate();
         this->QRadSurfAFNDuct.deallocate();
         this->PoolHeatTransCoefs.deallocate();

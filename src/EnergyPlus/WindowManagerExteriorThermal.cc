@@ -186,7 +186,7 @@ namespace WindowManager {
             auto glassEmiss = aGlassLayer->getSurface(Side::Back)->getEmissivity();
             auto RhoGlIR2 = 1.0 - glassEmiss;
             auto ShGlReflFacIR = 1.0 - RhoGlIR2 * RhoShIR1;
-            auto rmir = surface.getInsideIR(state, SurfNum);
+            auto rmir = state.dataHeatBalSurf->QdotRadHVACInRepPerArea(SurfNum);
             auto NetIRHeatGainShade =
                 ShadeArea * EpsShIR2 *
                     (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas(state.dataWindowManager->nglfacep), 4) - rmir) +
@@ -229,7 +229,7 @@ namespace WindowManager {
             auto ConvHeatGainFrZoneSideOfGlass =
                 surface.Area * h_cin * (backSurface->getTemperature() - aSystem->getAirTemperature(Environment::Indoor));
 
-            auto rmir = surface.getInsideIR(state, SurfNum);
+            auto rmir = state.dataHeatBalSurf->QdotRadHVACInRepPerArea(SurfNum);
             auto NetIRHeatGainGlass =
                 surface.Area * backSurface->getEmissivity() * (state.dataWindowManager->sigma * pow(backSurface->getTemperature(), 4) - rmir);
 
@@ -625,7 +625,7 @@ namespace WindowManager {
         auto tin = m_Surface.getInsideAirTemperature(state, m_SurfNum) + DataGlobalConstants::KelvinConv;
         auto hcin = state.dataHeatBalSurf->SurfHConvInt(m_SurfNum);
 
-        auto IR = m_Surface.getInsideIR(state, m_SurfNum);
+        auto IR = state.dataHeatBalSurf->QdotRadHVACInRepPerArea(m_SurfNum);
 
         std::shared_ptr<CEnvironment> Indoor = std::make_shared<CIndoorEnvironment>(tin, state.dataEnvrn->OutBaroPress);
         Indoor->setHCoeffModel(BoundaryConditionsCoeffModel::CalculateH, hcin);

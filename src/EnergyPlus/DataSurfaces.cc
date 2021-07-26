@@ -58,6 +58,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -337,15 +338,6 @@ Real64 SurfaceData::getInsideAirTemperature(EnergyPlusData &state, const int t_S
     return RefAirTemp;
 }
 
-Real64 SurfaceData::getInsideIR(EnergyPlusData &state, const int t_SurfNum)
-{
-
-    const Real64 value = state.dataSurface->SurfWinIRfromParentZone(t_SurfNum) + state.dataHeatBalFanSys->QHTRadSysSurf(t_SurfNum) +
-                         state.dataHeatBalFanSys->QHWBaseboardSurf(t_SurfNum) + state.dataHeatBalFanSys->QSteamBaseboardSurf(t_SurfNum) +
-                         state.dataHeatBalFanSys->QElecBaseboardSurf(t_SurfNum);
-    return value;
-}
-
 Real64 SurfaceData::getOutsideAirTemperature(EnergyPlusData &state, const int t_SurfNum) const
 {
     // SUBROUTINE INFORMATION:
@@ -396,9 +388,7 @@ Real64 SurfaceData::getOutsideIR(EnergyPlusData &state, const int t_SurfNum) con
     // Calculates outside infrared radiation
     Real64 value = 0;
     if (ExtBoundCond > 0) {
-        value = state.dataSurface->SurfWinIRfromParentZone(ExtBoundCond) + state.dataHeatBalFanSys->QHTRadSysSurf(ExtBoundCond) +
-                state.dataHeatBalFanSys->QHWBaseboardSurf(ExtBoundCond) + state.dataHeatBalFanSys->QSteamBaseboardSurf(ExtBoundCond) +
-                state.dataHeatBalFanSys->QElecBaseboardSurf(ExtBoundCond);
+        value = state.dataSurface->SurfWinIRfromParentZone(ExtBoundCond) + state.dataHeatBalSurf->QdotRadHVACInRepPerArea(ExtBoundCond);
     } else {
         Real64 tout = getOutsideAirTemperature(state, t_SurfNum) + DataGlobalConstants::KelvinConv;
         value = state.dataWindowManager->sigma * pow_4(tout);

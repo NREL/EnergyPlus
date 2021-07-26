@@ -2487,10 +2487,7 @@ namespace WindowManager {
             }
 
             // IR incident on window from zone surfaces and high-temp radiant sources
-            state.dataWindowManager->Rmir = state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalFanSys->QHTRadSysSurf(SurfNum) +
-                                            state.dataHeatBalFanSys->QHWBaseboardSurf(SurfNum) +
-                                            state.dataHeatBalFanSys->QSteamBaseboardSurf(SurfNum) +
-                                            state.dataHeatBalFanSys->QElecBaseboardSurf(SurfNum);
+            state.dataWindowManager->Rmir = state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalSurf->QdotRadHVACInRepPerArea(SurfNum);
 
             // Short-wave radiation (from interior and exterior solar and zone lights)
             // absorbed at each face. Assumes equal split between faces of short-wave absorbed in glass layer.
@@ -2746,9 +2743,7 @@ namespace WindowManager {
                 // from surfaces and high-temp radiant sources in the adjacent zone
 
                 state.dataWindowManager->Outir =
-                    state.dataSurface->SurfWinIRfromParentZone(SurfNumAdj) + state.dataHeatBalFanSys->QHTRadSysSurf(SurfNumAdj) +
-                    state.dataHeatBalFanSys->QHWBaseboardSurf(SurfNumAdj) + state.dataHeatBalFanSys->QSteamBaseboardSurf(SurfNumAdj) +
-                    state.dataHeatBalFanSys->QElecBaseboardSurf(SurfNumAdj);
+                    state.dataSurface->SurfWinIRfromParentZone(SurfNumAdj) + state.dataHeatBalSurf->QdotRadHVACInRepPerArea(SurfNumAdj);
 
             } else { // Exterior window (Ext BoundCond = 0)
                 // Calculate LWR from surrounding surfaces if defined for an exterior window

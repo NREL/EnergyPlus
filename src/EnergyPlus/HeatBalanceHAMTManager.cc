@@ -1180,14 +1180,10 @@ namespace HeatBalanceHAMTManager {
 
         cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).htc = state.dataMstBal->HConvInFD(sid);
 
-        cells(Intcell(sid)).Qadds = state.dataSurface->Surface(sid).Area *
-                                    (state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(sid) + state.dataHeatBalSurf->SurfNetLWRadToSurf(sid) +
-                                     state.dataHeatBalFanSys->QHTRadSysSurf(sid) + state.dataHeatBalFanSys->QCoolingPanelSurf(sid) +
-                                     state.dataHeatBalFanSys->QHWBaseboardSurf(sid) + state.dataHeatBalFanSys->QSteamBaseboardSurf(sid) +
-                                     state.dataHeatBalFanSys->QElecBaseboardSurf(sid) + state.dataHeatBal->SurfQRadThermInAbs(sid) +
-                                     state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(sid));
-        // Check, Is this per unit area or for the whole wall.
-        //    cells(Intcell(sid))%Qadds=QRadSWInAbs(sid)+NetLWRadToSurf(sid)+QHtRadSysSurf(sid)+QRadThermInAbs(sid)
+        cells(Intcell(sid)).Qadds =
+            state.dataSurface->Surface(sid).Area * (state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(sid) + state.dataHeatBalSurf->SurfNetLWRadToSurf(sid) +
+                                                    state.dataHeatBalSurf->QdotRadHVACInRepPerArea(sid) + state.dataHeatBal->SurfQRadThermInAbs(sid) +
+                                                    state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(sid));
 
         cells(state.dataHeatBalHAMTMgr->ExtConcell(sid)).rh =
             PsyRhFnTdbRhov(state, cells(state.dataHeatBalHAMTMgr->ExtConcell(sid)).temp, RhoOut, HAMTExt);
