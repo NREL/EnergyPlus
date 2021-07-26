@@ -55,18 +55,21 @@
 
 import glob as gb
 import os
-import shlex
 import tempfile
 import unittest
 
 from pyenergyplus.api import EnergyPlusAPI
 
-def parent(x):
-  return os.path.dirname(os.path.realpath(x))
 
-this_file = os.path.realpath(__file__)  # returns C:\EnergyPlusRepo\tst\EnergyPlus\api\test_OutputFiles.py
-repo_root = parent(parent(parent(parent(this_file))))  # returns C:\EnergyPlusRepo
-idf_path = repo_root + os.sep + os.sep + "testfiles" + os.sep + os.sep + "1ZoneUncontrolled.idf"  # returns C:\EnergyPlusRepo\testfiles\1Zon.idf
+def parent(x):
+    return os.path.dirname(os.path.realpath(x))
+
+
+this_file = os.path.realpath(__file__)  # returns C:\EPRepo\tst\EnergyPlus\api\test_OutputFiles.py
+repo_root = parent(parent(parent(parent(this_file))))  # returns C:\EPRepo
+# something **very** odd was happening with os.path.join here on Windows.  Putting a couple separators manually works OK
+idf_path = repo_root + os.sep + os.sep + "testfiles" + os.sep + os.sep + "1ZoneUncontrolled.idf"
+# at this point, idf_path should be something like: C:\\EPRepo\\testfiles\\1ZoneUncontrolled.idf
 
 
 class TestAPIFlushOutput(unittest.TestCase):

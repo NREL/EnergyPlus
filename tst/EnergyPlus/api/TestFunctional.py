@@ -55,7 +55,6 @@
 
 import sys
 
-print(sys.path)
 from pyenergyplus.api import EnergyPlusAPI
 
 api = EnergyPlusAPI()
