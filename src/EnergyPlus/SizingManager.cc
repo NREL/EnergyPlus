@@ -2250,7 +2250,7 @@ void DetermineSystemPopulationDiversity(EnergyPlusData &state)
             FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
         if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
 
-        // compute D if not set to autosize
+        // compute D if set to autosize
         if (SysSizInput(SysSizNum).OccupantDiversity == AutoSize) {
             if (state.dataSize->PzSumBySys(AirLoopNum) > 0.0) {
                 state.dataSize->DBySys(AirLoopNum) = state.dataSize->PsBySys(AirLoopNum) / state.dataSize->PzSumBySys(AirLoopNum);

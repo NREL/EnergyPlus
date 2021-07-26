@@ -62,14 +62,15 @@ Additional discussion regarding the proposal of making `D` a user input is neede
 Following a review of the NFP, it was decided that the `VentilationRateProcedure` field value would be replaced by `Standard62.1VentilationRateProcedure` and the Simplified Procedure would be referred to as `Standard62.1SimplifiedProcedure` thus requiring a transition rule. Changes were made to this NFP to reflect this.
 
 ## Testing/Validation/Data Sources
-Unit tests covering the calculation of the SP as well as the ventilation optimization control "cap" will be added. Two example files (see below) will be developed and their output checked against "manual" calculations.
+Three test suites are added to check the followings: (1) OccupantDiversity.unit.cc: the first unit unit test has the `Sizing:System` object that the user specified the `Occupant Diversity` and the second unit test has the `Sizing:System` object that the `Occupant Diversity` is autosized (i.e., calculated from the schedule); (2) Standard621SimplifiedProcedure.unit.cc: this suite includes three tests that have `AirTerminal:SingleDuct:VAV:NoReheat` and `AirTerminal:SingleDuct:SeriesPIU:Reheat` under different conditions - both are autosized, one of them is autosized (two cases); (3) MixedAir.unit.cc: a new test was added to see whether the system outdoor air is properly capped when the VRP is selected.
+Two example files are added. The first one has two `Sizing:System` objects having user-specified value and 'autosize' value in the `Occupant Diversity` field, respectively. This part will demonstrate how the users would leverage the `Occupant Diversity` field. In this file, the five `AirTerminal:SingleDuct:VAV:Reheat` objects are all autosized by the Standard 62.1 Simplified Procedure. The second example file aims to demonstrate how the `Minimum Primary Air Flow Rate` of the PIU air terminals are autosized by the Standard 62.1 Simplified Procedure. There are two PIU air terminals (one `AirTerminal:SingleDuct:ParallelPIU:Reheat` and `AirTerminal:SingleDuct:SeriesPIU:Reheat`)
 
 ## Input Output Reference Documentation
 The only changes to the Input/Output Reference document will be in the description of the System Outdoor Air Method field of the `Sizing:System` object and the new Occupant Diversity, also in the `Sizing:System` object. Changes and additions are respectively strikethrough and underlined in the text below.
 
 ### System Outdoor Air Method
->The method used to calculate the system minimum outdoor air flow. The <ins>three</ins> choices are ZoneSum<ins>, Standard62.1VentilationRateProcedure (VRP), and Standard62.1SimplifiedProcedure (SP)</ins>. ZoneSum sums the outdoor air flows across all zones served by the system. VRP uses the multi-zone equations defined in <ins>ASHRAE Standard</ins> 62.1 <ins>~~-2007~~</ins> to calculate the system outdoor air flow. VRP considers zone air distribution effectiveness and zone diversification of outdoor air fractions. VRP may also adjust autosized air terminal maximum and minimum supply flow rates if needed to ensure adequate outdoor air flow rate to each zone. <ins>SP is similar to VRP and was introduced in ASHRAE Standard 62.1-2019. The main difference with VRP is that it uses a simplified approach to calculate the system's ventilation efficiency which is in turn used to calculate the system outdoor air flow. Additionally, when set to autosize, the minimum (primary) air flow (or air flow fraction) for these air terminals will be calculated following SP: \hyperref[airterminalsingleductvavnoreheat]{AirTerminal:SingleDuct:VAV:NoReheat} (\emph{Constant Minimum Air Flow Fraction} or \emph{Fixed Minimum Air Flow Fraction}), 
-\hyperref[airterminalsingleductvavreheat]{AirTerminal:SingleDuct:VAV:Reheat} (\emph{Constant Minimum Air Flow Fraction} or \emph{Fixed Minimum Air Flow Fraction}), \hyperref[airterminalsingleductseriespiureheat]{AirTerminal:SingleDuct:SeriesPIU:Reheat} (\emph{Minimum Primary Air Flow Fraction}), 
+>The method used to calculate the system minimum outdoor air flow. The <ins>three</ins> choices are ZoneSum<ins>, Standard62.1VentilationRateProcedure (VRP), and Standard62.1SimplifiedProcedure (SP)</ins>. ZoneSum sums the outdoor air flows across all zones served by the system. VRP uses the multi-zone equations defined in <ins>ASHRAE Standard</ins> 62.1 <ins>~~-2007~~</ins> to calculate the system outdoor air flow. VRP considers zone air distribution effectiveness and zone diversification of outdoor air fractions. VRP may also adjust autosized air terminal maximum and minimum supply flow rates if needed to ensure adequate outdoor air flow rate to each zone. <ins>SP is similar to VRP and was introduced in ASHRAE Standard 62.1-2019. The main difference with VRP is that it uses a simplified approach to calculate the system's ventilation efficiency which is in turn used to calculate the system outdoor air flow. Additionally, when set to autosize, the minimum (primary) air flow (or air flow fraction) for these air terminals will be calculated following SP: \hyperref[airterminalsingleductvavnoreheat]{AirTerminal:SingleDuct:VAV:NoReheat} (\emph{Constant Minimum Air Flow Fraction} or \emph{Fixed Minimum Air Flow Fraction}),
+\hyperref[airterminalsingleductvavreheat]{AirTerminal:SingleDuct:VAV:Reheat} (\emph{Constant Minimum Air Flow Fraction} or \emph{Fixed Minimum Air Flow Fraction}), \hyperref[airterminalsingleductseriespiureheat]{AirTerminal:SingleDuct:SeriesPIU:Reheat} (\emph{Minimum Primary Air Flow Fraction}),
  \hyperref[airterminalsingleductparallelpiureheat]{AirTerminal:SingleDuct:ParallelPIU:Reheat}(\emph{Minimum Primary Air Flow Fraction})</ins>
 
  ### Occupant Diversity
@@ -115,7 +116,7 @@ Sizing:System,
       \maximum 1.0
       \minimum> 0.0
       \default autosize
-      \note The Occupant Diversity is used to determine a multi-zone system's outdoor air intake when the System Outdoor Air Method is 
+      \note The Occupant Diversity is used to determine a multi-zone system's outdoor air intake when the System Outdoor Air Method is
       \note Standard62.1VentilationRateProcedure or the Standard62.1SimplifiedProcedure. If set to be autosized, it will be calculated
       \note using the information in the People objects assigned to each zone attached to this system/airloop.
 ```
@@ -250,8 +251,7 @@ The following equation in the in the sub-sub-section "Calculation of system mini
 > \end{equation}
 
 ## Example Files and Transition Changes
-Two example files using the SP will be developed to showcase of to correctly set up a model to use the SP using both standard and PIU air terminals. 
-
+Two example files using the SP are developed to showcase of to correctly set up a model to use the SP using both standard and PIU air terminals. More details are presented above.
 Review of the original NFP prompted a request to change the existing `VentilationRateProcedure` field value to `Standard62.1SimplifiedProcedure`. This change requires a transition rule.
 
 # References
