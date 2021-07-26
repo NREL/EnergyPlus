@@ -96,8 +96,6 @@ namespace HeatBalFiniteDiffManager {
     //    involving latent heat, Simulation, Vol 18, No. 2, February 1972
 
     // Using/Aliasing
-    using DataHeatBalance::Air;
-    using DataHeatBalance::RegularMaterial;
     using DataHeatBalSurface::MinSurfaceTempLimit;
     using DataSurfaces::Ground;
     // Fan system Source/Sink heat value, and source/sink location temp from CondFD
@@ -249,7 +247,7 @@ namespace HeatBalFiniteDiffManager {
                     continue;
                 }
 
-                if (state.dataMaterial->Material(MaterNum).Group != RegularMaterial) {
+                if (state.dataMaterial->Material(MaterNum).Group != DataHeatBalance::MaterialGroup::RegularMaterial) {
                     ShowSevereError(state,
                                     cCurrentModuleObject + ": Reference Material is not appropriate type for CondFD properties, material=" +
                                         state.dataMaterial->Material(MaterNum).Name + ", must have regular properties (L,Cp,K,D)");
@@ -344,7 +342,7 @@ namespace HeatBalFiniteDiffManager {
                     continue;
                 }
 
-                if (state.dataMaterial->Material(MaterNum).Group != RegularMaterial) {
+                if (state.dataMaterial->Material(MaterNum).Group != DataHeatBalance::MaterialGroup::RegularMaterial) {
                     ShowSevereError(state,
                                     cCurrentModuleObject + ": Reference Material is not appropriate type for CondFD properties, material=" +
                                         state.dataMaterial->Material(MaterNum).Name + ", must have regular properties (L,Cp,K,D)");
@@ -655,7 +653,7 @@ namespace HeatBalFiniteDiffManager {
 
                     mAlpha = 0.0;
 
-                } else if (state.dataMaterial->Material(CurrentLayer).Group == 1) { //  Group 1 = Air
+                } else if (state.dataMaterial->Material(CurrentLayer).Group == DataHeatBalance::MaterialGroup::Air) { //  Group 1 = Air
 
                     //  Again, these values are only needed temporarily and to calculate flux,
                     //   Air layer will be handled
@@ -745,7 +743,8 @@ namespace HeatBalFiniteDiffManager {
                 Ipts1 = int(state.dataMaterial->Material(CurrentLayer).Thickness / dxn);
                 //  set high conductivity layers to a single full size node thickness. (two half nodes)
                 if (Ipts1 <= 1) Ipts1 = 1;
-                if (state.dataMaterial->Material(CurrentLayer).ROnly || state.dataMaterial->Material(CurrentLayer).Group == 1) {
+                if (state.dataMaterial->Material(CurrentLayer).ROnly ||
+                    state.dataMaterial->Material(CurrentLayer).Group == DataHeatBalance::MaterialGroup::Air) {
 
                     Ipts1 = 1; //  single full node in R layers- surfaces of adjacent material or inside/outside layer
                 }
@@ -884,8 +883,8 @@ namespace HeatBalFiniteDiffManager {
                                 "CondFD Inner Solver Loop Iteration Count",
                                 OutputProcessor::Unit::None,
                                 SurfaceFD(SurfNum).GSloopCounter,
-                                "Zone",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataSurface->Surface(SurfNum).Name);
 
             // Setup EMS Material Actuators
@@ -913,65 +912,65 @@ namespace HeatBalFiniteDiffManager {
                                     format("CondFD Surface Temperature Node {}", Lay),
                                     OutputProcessor::Unit::C,
                                     SurfaceFD(SurfNum).TDreport(Lay),
-                                    "Zone",
-                                    "State",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Surface Heat Flux Node {}", Lay),
                                     OutputProcessor::Unit::W_m2,
                                     SurfaceFD(SurfNum).QDreport(Lay),
-                                    "Zone",
-                                    "State",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Phase Change State {}", Lay),
                                     OutputProcessor::Unit::None,
                                     SurfaceFD(SurfNum).PhaseChangeState(Lay),
-                                    "Zone",
-                                    "State",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Phase Change Previous State {}", Lay),
                                     OutputProcessor::Unit::None,
                                     SurfaceFD(SurfNum).PhaseChangeStateOld(Lay),
-                                    "Zone",
-                                    "State",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Phase Change Node Temperature {}", Lay),
                                     OutputProcessor::Unit::C,
                                     SurfaceFD(SurfNum).TDT(Lay),
-                                    "Zone",
-                                    "State",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Phase Change Node Conductivity {}", Lay),
                                     OutputProcessor::Unit::W_mK,
                                     SurfaceFD(SurfNum).condNodeReport(Lay),
-                                    "Zone",
-                                    "State",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Phase Change Node Specific Heat {}", Lay),
                                     OutputProcessor::Unit::J_kgK,
                                     SurfaceFD(SurfNum).specHeatNodeReport(Lay),
-                                    "Zone",
-                                    "State",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(SurfNum).Name);
                 if (state.dataGlobal->DisplayAdvancedReportVariables) {
                     SetupOutputVariable(state,
                                         format("CondFD Surface Heat Capacitance Outer Half Node {}", Lay),
                                         OutputProcessor::Unit::W_m2K,
                                         SurfaceFD(SurfNum).CpDelXRhoS1(Lay),
-                                        "Zone",
-                                        "State",
+                                        OutputProcessor::SOVTimeStepType::Zone,
+                                        OutputProcessor::SOVStoreType::State,
                                         state.dataSurface->Surface(SurfNum).Name);
                     SetupOutputVariable(state,
                                         format("CondFD Surface Heat Capacitance Inner Half Node {}", Lay),
                                         OutputProcessor::Unit::W_m2K,
                                         SurfaceFD(SurfNum).CpDelXRhoS2(Lay),
-                                        "Zone",
-                                        "State",
+                                        OutputProcessor::SOVTimeStepType::Zone,
+                                        OutputProcessor::SOVStoreType::State,
                                         state.dataSurface->Surface(SurfNum).Name);
                 }
             }
@@ -1214,7 +1213,7 @@ namespace HeatBalFiniteDiffManager {
         auto &ConstructFD = state.dataHeatBalFiniteDiffMgr->ConstructFD;
 
         // Formats
-        static constexpr auto Format_702(" ConductionFiniteDifference Node,{},{:.8R},{},{},{}\n");
+        static constexpr fmt::string_view Format_702(" ConductionFiniteDifference Node,{},{:.8R},{},{},{}\n");
 
         print(state.files.eio,
               "! <ConductionFiniteDifference HeatBalanceSettings>,Scheme Type,Space Discretization Constant,Relaxation Factor,Inside Face Surface "
@@ -1252,7 +1251,7 @@ namespace HeatBalFiniteDiffManager {
                 if (state.dataConstruction->Construct(ThisNum).TypeIsAirBoundary) continue;
                 if (!state.dataConstruction->Construct(ThisNum).IsUsed) continue;
 
-                static constexpr auto Format_700(" Construction CondFD,{},{},{},{},{:.6R}\n");
+                static constexpr fmt::string_view Format_700(" Construction CondFD,{},{},{},{},{:.6R}\n");
                 print(state.files.eio,
                       Format_700,
                       state.dataConstruction->Construct(ThisNum).Name,
@@ -1262,7 +1261,7 @@ namespace HeatBalFiniteDiffManager {
                       ConstructFD(ThisNum).DeltaTime / DataGlobalConstants::SecInHour);
 
                 for (Layer = 1; Layer <= state.dataConstruction->Construct(ThisNum).TotLayers; ++Layer) {
-                    static constexpr auto Format_701(" Material CondFD Summary,{},{:.4R},{},{:.8R},{:.8R},{:.8R}\n");
+                    static constexpr fmt::string_view Format_701(" Material CondFD Summary,{},{:.4R},{},{:.8R},{:.8R},{:.8R}\n");
                     print(state.files.eio,
                           Format_701,
                           ConstructFD(ThisNum).Name(Layer),
@@ -1533,7 +1532,7 @@ namespace HeatBalFiniteDiffManager {
 
                 // Calculate the Dry Heat Conduction Equation
 
-                if (mat.ROnly || mat.Group == 1) { // R Layer or Air Layer  **********
+                if (mat.ROnly || mat.Group == DataHeatBalance::MaterialGroup::Air) { // R Layer or Air Layer  **********
                     // Use algebraic equation for TDT based on R
                     Real64 const Rlayer(mat.Resistance);
                     TDT_i = (TDT_p + (QRadSWOutFD + hgnd * Tgnd + (hconvo + hrad) * Toa + hsky * Tsky) * Rlayer) /
@@ -1835,8 +1834,8 @@ namespace HeatBalFiniteDiffManager {
             auto const TDT_m(TDT(i - 1));
             auto const TDT_p(TDT(i + 1));
 
-            bool const RLayerPresent(mat.ROnly || mat.Group == 1);
-            bool const RLayer2Present(mat2.ROnly || mat2.Group == 1);
+            bool const RLayerPresent(mat.ROnly || mat.Group == DataHeatBalance::MaterialGroup::Air);
+            bool const RLayer2Present(mat2.ROnly || mat2.Group == DataHeatBalance::MaterialGroup::Air);
 
             Real64 const Rlayer(mat.Resistance);   // Resistance value of R Layer
             Real64 const Rlayer2(mat2.Resistance); // Resistance value of next layer to inside
@@ -2208,7 +2207,7 @@ namespace HeatBalFiniteDiffManager {
 
             // Calculate the Dry Heat Conduction Equation
 
-            if (mat.ROnly || mat.Group == 1) { // R Layer or Air Layer
+            if (mat.ROnly || mat.Group == DataHeatBalance::MaterialGroup::Air) { // R Layer or Air Layer
                 // Use algebraic equation for TDT based on R
                 Real64 const IterDampConst(
                     5.0); // Damping constant for inside surface temperature iterations. Only used for massless (R-value only) Walls

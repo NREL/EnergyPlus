@@ -331,6 +331,8 @@ add_subdirectory(src/ConvertInputFormat)
 
 if(BUILD_FORTRAN)
   include(CMakeAddFortranSubdirectory)
+  # Define a top-level target `fortran_project_options`
+  include(cmake/Fortran.cmake)
   cmake_add_fortran_subdirectory(
     src/ExpandObjects
     PROJECT ExpandObjects
