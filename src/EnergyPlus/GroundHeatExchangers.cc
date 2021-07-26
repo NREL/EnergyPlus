@@ -3074,7 +3074,6 @@ void GLHEVert::initGLHESimVars(EnergyPlusData &state)
                       DataGlobalConstants::SecInHour;
 
     // Init more variables
-    this->oneTimeInit(state);
 
     if (this->myEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
         this->initEnvironment(state, currTime);
@@ -3139,7 +3138,7 @@ void GLHEVert::initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 co
 
 //******************************************************************************
 
-void GLHEVert::oneTimeInit(EnergyPlusData &state)
+void GLHEVert::oneTimeInit_new(EnergyPlusData &state)
 {
 
     using DataPlant::TypeOf_GrndHtExchgSystem;
@@ -3155,6 +3154,9 @@ void GLHEVert::oneTimeInit(EnergyPlusData &state)
         }
         this->myOneTImeInitFlag = false;
     }
+}
+void GLHEVert::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
 }
 
 //******************************************************************************
