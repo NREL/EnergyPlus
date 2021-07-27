@@ -58,7 +58,6 @@
 #include <cpgfunction/boreholes.h>
 #include <cpgfunction/gfunction.h>
 #include <cpgfunction/segments.h>
-#include <cpgfunction/utilities.h>
 
 // JSON Headers
 #include <nlohmann/json.hpp>
@@ -996,21 +995,11 @@ void GLHEVert::calcUniformBHWallTempGFunctions()
     for (auto &bh : this->myRespFactors->myBorholes) {
         boreholes.emplace_back(bh->props->bhLength, bh->props->bhTopDepth, bh->props->bhDiameter / 2.0, bh->xLoc, bh->yLoc);
     }
-    
-    // The methodology requires a somewhat "special" time step due to the load history reconstruction
+
     // convert time to a std::vector from an Array1D
     std::vector<double> time;
-    double year = 1;
-    double seconds_in_year = gt::utilities::year_to_sec(year);
-    double last_val = this->myRespFactors->time[this->myRespFactors->time.size() - 1];
-    double years = last_val / seconds_in_year;
-    std::string time_units = "year";
-    // Geometrically growing time vector for duration
-    std::vector<double> time = gt::utilities::time_geometric_auto(duration, time_units);
-    // replace my response factor time with this time
-    this->myRespFactors->time.resize(time.size());
-    for (int i=0; i<time.size(); i++) {
-        this->myRespFactors->time.resize[i] = time[i];
+    for (auto &v : this->myRespFactors->time) {
+        time.push_back(v);
     }
 
     // Obtain number of segments by adaptive discretization
