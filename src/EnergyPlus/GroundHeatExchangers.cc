@@ -125,6 +125,7 @@ using namespace GroundTemperatureManager;
 // MODULE PARAMETER DEFINITIONS
 constexpr Real64 hrsPerMonth(730.0); // Number of hours in month
 constexpr Real64 maxTSinHr(60);      // Max number of time step in a hour
+constexpr std::array<std::string_view, 2> GFuncCalcMethodsStrs = {"UHFCALC", "UBHWTCALC"};
 
 //******************************************************************************
 
@@ -995,8 +996,9 @@ void GLHEVert::calcUniformBHWallTempGFunctions()
     for (auto &bh : this->myRespFactors->myBorholes) {
         boreholes.emplace_back(bh->props->bhLength, bh->props->bhTopDepth, bh->props->bhDiameter / 2.0, bh->xLoc, bh->yLoc);
     }
-
+    
     // The methodology requires a somewhat "special" time step due to the load history reconstruction
+    // convert time to a std::vector from an Array1D
     std::vector<double> time;
     double year = 1;
     double seconds_in_year = gt::utilities::year_to_sec(year);
@@ -1012,9 +1014,8 @@ void GLHEVert::calcUniformBHWallTempGFunctions()
     }
 
     // Obtain number of segments by adaptive discretization
-    gt::segments::adaptive adpt_disc;
-    double drilling_depth = double(boreholes.size()) * double(this->bhLength); // total drilling depth (m)
-    int nSegments = adpt_disc.discretize(double(this->bhLength), drilling_depth);
+    gt::segments::adaptive adptDisc;
+    int nSegments = adptDisc.discretize(this->bhLength, this->totalTubeLength);
 
     this->myRespFactors->GFNC = gt::gfunction::uniform_borehole_wall_temperature(boreholes, time, this->soil.diffusivity, nSegments);
 }
@@ -1472,6 +1473,7 @@ void GLHEVert::makeThisGLHECacheStruct()
     d["Pipe Thickness"] = this->myRespFactors->props->pipe.thickness;
     d["U-tube Dist"] = this->myRespFactors->props->bhUTubeDist;
     d["Max Simulation Years"] = this->myRespFactors->maxSimYears;
+    d["g-Function Calc Method"] =  GroundHeatExchangers::GFuncCalcMethodsStrs[int(this->gFuncCalcMethod)];
 
     int i = 0;
     for (auto &thisBH : this->myRespFactors->myBorholes) {
@@ -2712,18 +2714,55 @@ void GetGroundHeatExchangerInput(EnergyPlusData &state)
 
 void GLHEBase::setupOutput(EnergyPlusData &state)
 {
-    SetupOutputVariable(
-        state, "Ground Heat Exchanger Average Borehole Temperature", OutputProcessor::Unit::C, this->bhTemp, "System", "Average", this->name);
-    SetupOutputVariable(state, "Ground Heat Exchanger Heat Transfer Rate", OutputProcessor::Unit::W, this->QGLHE, "System", "Average", this->name);
-    SetupOutputVariable(state, "Ground Heat Exchanger Inlet Temperature", OutputProcessor::Unit::C, this->inletTemp, "System", "Average", this->name);
-    SetupOutputVariable(
-        state, "Ground Heat Exchanger Outlet Temperature", OutputProcessor::Unit::C, this->outletTemp, "System", "Average", this->name);
-    SetupOutputVariable(
-        state, "Ground Heat Exchanger Mass Flow Rate", OutputProcessor::Unit::kg_s, this->massFlowRate, "System", "Average", this->name);
-    SetupOutputVariable(
-        state, "Ground Heat Exchanger Average Fluid Temperature", OutputProcessor::Unit::C, this->aveFluidTemp, "System", "Average", this->name);
-    SetupOutputVariable(
-        state, "Ground Heat Exchanger Farfield Ground Temperature", OutputProcessor::Unit::C, this->tempGround, "System", "Average", this->name);
+    SetupOutputVariable(state,
+                        "Ground Heat Exchanger Average Borehole Temperature",
+                        OutputProcessor::Unit::C,
+                        this->bhTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
+    SetupOutputVariable(state,
+                        "Ground Heat Exchanger Heat Transfer Rate",
+                        OutputProcessor::Unit::W,
+                        this->QGLHE,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
+    SetupOutputVariable(state,
+                        "Ground Heat Exchanger Inlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->inletTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
+    SetupOutputVariable(state,
+                        "Ground Heat Exchanger Outlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->outletTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
+    SetupOutputVariable(state,
+                        "Ground Heat Exchanger Mass Flow Rate",
+                        OutputProcessor::Unit::kg_s,
+                        this->massFlowRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
+    SetupOutputVariable(state,
+                        "Ground Heat Exchanger Average Fluid Temperature",
+                        OutputProcessor::Unit::C,
+                        this->aveFluidTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
+    SetupOutputVariable(state,
+                        "Ground Heat Exchanger Farfield Ground Temperature",
+                        OutputProcessor::Unit::C,
+                        this->tempGround,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
 }
 
 //******************************************************************************
