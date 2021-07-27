@@ -617,9 +617,8 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
     }
 }
 
-void BLASTAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
+void BLASTAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
 {
-
     this->setupOutputVars(state);
 
     // Locate the chillers on the plant loops for later usage
@@ -838,10 +837,6 @@ void BLASTAbsorberSpecs::initialize(EnergyPlusData &state,
     // Uses the status flags to trigger initializations.
 
     // Init more variables
-    if (this->MyOneTimeFlag) {
-        this->oneTimeInit(state);
-        this->MyOneTimeFlag = false;
-    }
 
     if (this->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
         this->initEachEnvironment(state);
@@ -1863,6 +1858,10 @@ void BLASTAbsorberSpecs::updateRecords(EnergyPlusData &state, Real64 MyLoad, boo
             state.dataLoopNodes->Node(this->GeneratorOutletNodeNum).Temp = this->GenOutletTemp;
         }
     }
+}
+
+void BLASTAbsorberSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
 }
 
 } // namespace EnergyPlus::ChillerAbsorption
