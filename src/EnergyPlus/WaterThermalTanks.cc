@@ -192,7 +192,7 @@ void WaterThermalTankData::getDesignCapacities([[maybe_unused]] EnergyPlusData &
     OptLoad = this->MaxCapacity;
 }
 
-int getTankIDX(EnergyPlusData &state, std::string const &CompName, int &CompIndex)
+int getTankIDX(EnergyPlusData &state, std::string_view CompName, int &CompIndex)
 {
     if (state.dataWaterThermalTanks->getWaterThermalTankInputFlag) {
         GetWaterThermalTankInput(state);
@@ -204,7 +204,7 @@ int getTankIDX(EnergyPlusData &state, std::string const &CompName, int &CompInde
     if (CompIndex == 0) {
         CompNum = UtilityRoutines::FindItem(CompName, state.dataWaterThermalTanks->WaterThermalTank);
         if (CompNum == 0) {
-            ShowFatalError(state, "SimWaterThermalTank_WaterTank:  Unit not found=" + CompName);
+            ShowFatalError(state, "SimWaterThermalTank_WaterTank:  Unit not found=" + std::string{CompName});
         }
         CompIndex = CompNum;
     } else {
@@ -231,7 +231,7 @@ int getTankIDX(EnergyPlusData &state, std::string const &CompName, int &CompInde
     return CompNum;
 }
 
-int getHPTankIDX(EnergyPlusData &state, std::string const &CompName, int &CompIndex)
+int getHPTankIDX(EnergyPlusData &state, std::string_view CompName, int &CompIndex)
 {
     if (state.dataWaterThermalTanks->getWaterThermalTankInputFlag) {
         GetWaterThermalTankInput(state);
@@ -243,7 +243,7 @@ int getHPTankIDX(EnergyPlusData &state, std::string const &CompName, int &CompIn
     if (CompIndex == 0) {
         CompNum = UtilityRoutines::FindItem(CompName, state.dataWaterThermalTanks->HPWaterHeater);
         if (CompNum == 0) {
-            ShowFatalError(state, "SimWaterThermalTank_HeatPump:  Unit not found=" + CompName);
+            ShowFatalError(state, "SimWaterThermalTank_HeatPump:  Unit not found=" + std::string{CompName});
         }
         CompIndex = CompNum;
     } else {
@@ -506,7 +506,7 @@ void SimulateWaterHeaterStandAlone(EnergyPlusData &state, int const WaterHeaterN
 }
 
 void SimHeatPumpWaterHeater(EnergyPlusData &state,
-                            std::string const &CompName,
+                            std::string_view CompName,
                             bool const FirstHVACIteration,
                             Real64 &SensLoadMet, // sensible load met by this equipment and sent to zone, W
                             Real64 &LatLoadMet,  // net latent load met and sent to zone (kg/s), dehumid = negative
@@ -535,7 +535,7 @@ void SimHeatPumpWaterHeater(EnergyPlusData &state,
     if (CompIndex == 0) {
         HeatPumpNum = UtilityRoutines::FindItemInList(CompName, state.dataWaterThermalTanks->HPWaterHeater);
         if (HeatPumpNum == 0) {
-            ShowFatalError(state, "SimHeatPumpWaterHeater: Unit not found=" + CompName);
+            ShowFatalError(state, "SimHeatPumpWaterHeater: Unit not found=" + std::string{CompName});
         }
         CompIndex = HeatPumpNum;
     } else {
@@ -660,7 +660,7 @@ void CalcWaterThermalTankZoneGains(EnergyPlusData &state)
 bool getDesuperHtrInput(EnergyPlusData &state)
 {
     bool ErrorsFound = false;
-    std::string const RoutineName = "getDesuperHtrInput";
+    static constexpr std::string_view RoutineName = "getDesuperHtrInput";
 
     state.dataIPShortCut->cCurrentModuleObject = cCoilDesuperheater;
     for (int DesuperheaterNum = 1; DesuperheaterNum <= state.dataWaterThermalTanks->numWaterHeaterDesuperheater; ++DesuperheaterNum) {
@@ -2308,7 +2308,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
 {
     bool ErrorsFound = false;
     state.dataIPShortCut->cCurrentModuleObject = cMixedWHModuleObj;
-    std::string const RoutineName = "getWaterHeaterMixedInputs";
+    static constexpr std::string_view RoutineName = "getWaterHeaterMixedInputs";
 
     for (int WaterThermalTankNum = 1; WaterThermalTankNum <= state.dataWaterThermalTanks->numWaterHeaterMixed; ++WaterThermalTankNum) {
         int NumAlphas;
@@ -2358,8 +2358,9 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
 
         Tank.SetPointTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            ShowSevereError(
-                state, RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", missing data.");
+            ShowSevereError(state,
+                            std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                "\", missing data.");
             ShowContinueError(state, "blank field, missing " + state.dataIPShortCut->cAlphaFieldNames(2) + " is required");
             ErrorsFound = true;
         } else if (Tank.SetPointTempSchedule == 0) {
@@ -2763,7 +2764,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
 bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
 {
     bool ErrorsFound = false;
-    std::string const RoutineName = "getWaterHeaterStratifiedInput";
+    static constexpr std::string_view RoutineName = "getWaterHeaterStratifiedInput";
 
     state.dataIPShortCut->cCurrentModuleObject = cStratifiedWHModuleObj; //'WaterHeater:Stratified'
 
@@ -2870,8 +2871,9 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
 
         Tank.SetPointTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(5));
         if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-            ShowSevereError(
-                state, RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", missing data.");
+            ShowSevereError(state,
+                            std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                "\", missing data.");
             ShowContinueError(state, "blank field, missing " + state.dataIPShortCut->cAlphaFieldNames(5) + " is required");
             ErrorsFound = true;
         } else if (Tank.SetPointTempSchedule == 0) {
@@ -2915,8 +2917,9 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
 
         Tank.SetPointTempSchedule2 = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6));
         if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-            ShowSevereError(
-                state, RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", missing data.");
+            ShowSevereError(state,
+                            std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                "\", missing data.");
             ShowContinueError(state, "blank field, missing " + state.dataIPShortCut->cAlphaFieldNames(6) + " is required");
             ErrorsFound = true;
         } else if (Tank.SetPointTempSchedule2 == 0) {
@@ -3659,7 +3662,7 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
 bool getWaterTankStratifiedInput(EnergyPlusData &state)
 {
     bool ErrorsFound = false;
-    std::string const RoutineName = "getWaterTankStratifiedInput";
+    static constexpr std::string_view RoutineName = "getWaterTankStratifiedInput";
 
     state.dataIPShortCut->cCurrentModuleObject = cStratifiedCWTankModuleObj; // 'ThermalStorage:ChilledWater:Stratified'
 
@@ -4063,9 +4066,6 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
 
     bool ErrorsFound = false;
 
-    static std::string const RoutineName("GetWaterThermalTankInput: ");
-    static std::string const RoutineNameNoColon("GetWaterThermalTankInput");
-
     // Make sure refrigeration input is gotten before this input
     RefrigeratedCase::CheckRefrigerationInput(state);
 
@@ -4087,17 +4087,19 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCoilDesuperheater);
 
         if (state.dataWaterThermalTanks->numWaterThermalTank > 0) {
-            static constexpr auto Format_720(
+            static constexpr fmt::string_view Format_720(
                 "! <Water Heater Information>,Type,Name,Volume {{m3}},Maximum Capacity {{W}},Standard Rated Recovery Efficiency, "
                 "Standard Rated Energy Factor\n");
-            static constexpr auto Format_721(
+            static constexpr fmt::string_view Format_721(
                 "! <Heat Pump Water Heater Information>,Type,Name,Volume {{m3}},Maximum Capacity {{W}},Standard Rated Recovery "
                 "Efficiency,Standard Rated Energy Factor,\"DX Coil Total Cooling Rate {{W, HPWH Only}}\"\n");
-            static constexpr auto Format_722("! <Water Heater Stratified Node Information>,Node Number,Height {{m}},Volume {{m3}},Maximum Capacity "
-                                             "{{W}},Off-Cycle UA {{W/K}},On-Cycle UA {{W/K}},Number Of Inlets,Number Of Outlets\n");
-            static constexpr auto Format_725("! <Chilled Water Tank Information>,Type,Name,Volume {{m3}},Use Side Design Flow Rate {{m3/s}}, "
-                                             "Source Side Design Flow Rate {{m3/s}}\n");
-            static constexpr auto Format_726(
+            static constexpr fmt::string_view Format_722(
+                "! <Water Heater Stratified Node Information>,Node Number,Height {{m}},Volume {{m3}},Maximum Capacity "
+                "{{W}},Off-Cycle UA {{W/K}},On-Cycle UA {{W/K}},Number Of Inlets,Number Of Outlets\n");
+            static constexpr fmt::string_view Format_725(
+                "! <Chilled Water Tank Information>,Type,Name,Volume {{m3}},Use Side Design Flow Rate {{m3/s}}, "
+                "Source Side Design Flow Rate {{m3/s}}\n");
+            static constexpr fmt::string_view Format_726(
                 "! <Chilled Water Tank Stratified Node Information>,Node Number,Height {{m}},Volume {{m3}},UA {{W/K}},Number Of "
                 "Inlets,Number Of Outlets\n");
 
@@ -4876,83 +4878,113 @@ void WaterThermalTankData::setupChilledWaterTankOutputVars(EnergyPlusData &state
 {
 
     // CurrentModuleObject='ThermalStorage:ChilledWater:Mixed/ThermalStorage:ChilledWater:Stratified'
-    SetupOutputVariable(
-        state, "Chilled Water Thermal Storage Tank Temperature", OutputProcessor::Unit::C, this->TankTempAvg, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Chilled Water Thermal Storage Tank Temperature",
+                        OutputProcessor::Unit::C,
+                        this->TankTempAvg,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
-    SetupOutputVariable(
-        state, "Chilled Water Thermal Storage Final Tank Temperature", OutputProcessor::Unit::C, this->TankTemp, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Chilled Water Thermal Storage Final Tank Temperature",
+                        OutputProcessor::Unit::C,
+                        this->TankTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
-    SetupOutputVariable(
-        state, "Chilled Water Thermal Storage Tank Heat Gain Rate", OutputProcessor::Unit::W, this->LossRate, "System", "Average", this->Name);
-    SetupOutputVariable(
-        state, "Chilled Water Thermal Storage Tank Heat Gain Energy", OutputProcessor::Unit::J, this->LossEnergy, "System", "Sum", this->Name);
+    SetupOutputVariable(state,
+                        "Chilled Water Thermal Storage Tank Heat Gain Rate",
+                        OutputProcessor::Unit::W,
+                        this->LossRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Chilled Water Thermal Storage Tank Heat Gain Energy",
+                        OutputProcessor::Unit::J,
+                        this->LossEnergy,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->Name);
 
     SetupOutputVariable(state,
                         "Chilled Water Thermal Storage Use Side Mass Flow Rate",
                         OutputProcessor::Unit::kg_s,
                         this->UseMassFlowRate,
-                        "System",
-                        "Average",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Chilled Water Thermal Storage Use Side Inlet Temperature",
                         OutputProcessor::Unit::C,
                         this->UseInletTemp,
-                        "System",
-                        "Average",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Chilled Water Thermal Storage Use Side Outlet Temperature",
                         OutputProcessor::Unit::C,
                         this->UseOutletTemp,
-                        "System",
-                        "Average",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
                         this->Name);
 
-    SetupOutputVariable(
-        state, "Chilled Water Thermal Storage Use Side Heat Transfer Rate", OutputProcessor::Unit::W, this->UseRate, "System", "Average", this->Name);
-    SetupOutputVariable(
-        state, "Chilled Water Thermal Storage Use Side Heat Transfer Energy", OutputProcessor::Unit::J, this->UseEnergy, "System", "Sum", this->Name);
+    SetupOutputVariable(state,
+                        "Chilled Water Thermal Storage Use Side Heat Transfer Rate",
+                        OutputProcessor::Unit::W,
+                        this->UseRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Chilled Water Thermal Storage Use Side Heat Transfer Energy",
+                        OutputProcessor::Unit::J,
+                        this->UseEnergy,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->Name);
 
     SetupOutputVariable(state,
                         "Chilled Water Thermal Storage Source Side Mass Flow Rate",
                         OutputProcessor::Unit::kg_s,
                         this->SourceMassFlowRate,
-                        "System",
-                        "Average",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Chilled Water Thermal Storage Source Side Inlet Temperature",
                         OutputProcessor::Unit::C,
                         this->SourceInletTemp,
-                        "System",
-                        "Average",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Chilled Water Thermal Storage Source Side Outlet Temperature",
                         OutputProcessor::Unit::C,
                         this->SourceOutletTemp,
-                        "System",
-                        "Average",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Chilled Water Thermal Storage Source Side Heat Transfer Rate",
                         OutputProcessor::Unit::W,
                         this->SourceRate,
-                        "System",
-                        "Average",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Chilled Water Thermal Storage Source Side Heat Transfer Energy",
                         OutputProcessor::Unit::J,
                         this->SourceEnergy,
-                        "System",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
                         this->Name);
 
     if (this->TypeNum == DataPlant::TypeOf_ChilledWaterTankStratified) {
@@ -4962,8 +4994,8 @@ void WaterThermalTankData::setupChilledWaterTankOutputVars(EnergyPlusData &state
                                 format("Chilled Water Thermal Storage Temperature Node {}", NodeNum),
                                 OutputProcessor::Unit::C,
                                 this->Node(NodeNum).TempAvg,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 this->Name);
         }
 
@@ -4972,8 +5004,8 @@ void WaterThermalTankData::setupChilledWaterTankOutputVars(EnergyPlusData &state
                                 format("Chilled Water Thermal Storage Final Temperature Node {}", NodeNum),
                                 OutputProcessor::Unit::C,
                                 this->Node(NodeNum).Temp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 this->Name);
         }
     }
@@ -4981,7 +5013,7 @@ void WaterThermalTankData::setupChilledWaterTankOutputVars(EnergyPlusData &state
     if (this->TypeNum == DataPlant::TypeOf_ChilledWaterTankStratified) {
 
         for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
-            static constexpr auto Format_724("Chilled Water Tank Stratified Node Information,{},{:.4T},{:.4T},{:.4T},{},{}\n");
+            static constexpr fmt::string_view Format_724("Chilled Water Tank Stratified Node Information,{},{:.4T},{:.4T},{:.4T},{},{}\n");
 
             print(state.files.eio,
                   Format_724,
@@ -5040,42 +5072,113 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
 
     // Setup report variables for WaterHeater:Mixed
     // CurrentModuleObject='WaterHeater:Mixed'
-    SetupOutputVariable(state, "Water Heater Tank Temperature", OutputProcessor::Unit::C, this->TankTempAvg, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Tank Temperature",
+                        OutputProcessor::Unit::C,
+                        this->TankTempAvg,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
-    SetupOutputVariable(state, "Water Heater Final Tank Temperature", OutputProcessor::Unit::C, this->TankTemp, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Final Tank Temperature",
+                        OutputProcessor::Unit::C,
+                        this->TankTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
-    SetupOutputVariable(state, "Water Heater Heat Loss Rate", OutputProcessor::Unit::W, this->LossRate, "System", "Average", this->Name);
-    SetupOutputVariable(state, "Water Heater Heat Loss Energy", OutputProcessor::Unit::J, this->LossEnergy, "System", "Sum", this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Heat Loss Rate",
+                        OutputProcessor::Unit::W,
+                        this->LossRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Heat Loss Energy",
+                        OutputProcessor::Unit::J,
+                        this->LossEnergy,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->Name);
 
-    SetupOutputVariable(
-        state, "Water Heater Use Side Mass Flow Rate", OutputProcessor::Unit::kg_s, this->UseMassFlowRate, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Use Side Mass Flow Rate",
+                        OutputProcessor::Unit::kg_s,
+                        this->UseMassFlowRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
-    SetupOutputVariable(
-        state, "Water Heater Use Side Inlet Temperature", OutputProcessor::Unit::C, this->UseInletTemp, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Use Side Inlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->UseInletTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
-    SetupOutputVariable(
-        state, "Water Heater Use Side Outlet Temperature", OutputProcessor::Unit::C, this->UseOutletTemp, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Use Side Outlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->UseOutletTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
-    SetupOutputVariable(state, "Water Heater Use Side Heat Transfer Rate", OutputProcessor::Unit::W, this->UseRate, "System", "Average", this->Name);
-    SetupOutputVariable(state, "Water Heater Use Side Heat Transfer Energy", OutputProcessor::Unit::J, this->UseEnergy, "System", "Sum", this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Use Side Heat Transfer Rate",
+                        OutputProcessor::Unit::W,
+                        this->UseRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Use Side Heat Transfer Energy",
+                        OutputProcessor::Unit::J,
+                        this->UseEnergy,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->Name);
 
-    SetupOutputVariable(
-        state, "Water Heater Source Side Mass Flow Rate", OutputProcessor::Unit::kg_s, this->SourceMassFlowRate, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Source Side Mass Flow Rate",
+                        OutputProcessor::Unit::kg_s,
+                        this->SourceMassFlowRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
-    SetupOutputVariable(
-        state, "Water Heater Source Side Inlet Temperature", OutputProcessor::Unit::C, this->SourceInletTemp, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Source Side Inlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->SourceInletTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
-    SetupOutputVariable(
-        state, "Water Heater Source Side Outlet Temperature", OutputProcessor::Unit::C, this->SourceOutletTemp, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Source Side Outlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->SourceOutletTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
-    SetupOutputVariable(
-        state, "Water Heater Source Side Heat Transfer Rate", OutputProcessor::Unit::W, this->SourceRate, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Source Side Heat Transfer Rate",
+                        OutputProcessor::Unit::W,
+                        this->SourceRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
     SetupOutputVariable(state,
                         "Water Heater Source Side Heat Transfer Energy",
                         OutputProcessor::Unit::J,
                         this->SourceEnergy,
-                        "System",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         _,
                         "PLANTLOOPHEATINGDEMAND",
@@ -5087,64 +5190,142 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                         "Water Heater Off Cycle Parasitic Tank Heat Transfer Rate",
                         OutputProcessor::Unit::W,
                         this->OffCycParaRateToTank,
-                        "System",
-                        "Average",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Water Heater Off Cycle Parasitic Tank Heat Transfer Energy",
                         OutputProcessor::Unit::J,
                         this->OffCycParaEnergyToTank,
-                        "System",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Water Heater On Cycle Parasitic Tank Heat Transfer Rate",
                         OutputProcessor::Unit::W,
                         this->OnCycParaRateToTank,
-                        "System",
-                        "Average",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Water Heater On Cycle Parasitic Tank Heat Transfer Energy",
                         OutputProcessor::Unit::J,
                         this->OnCycParaEnergyToTank,
-                        "System",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
                         this->Name);
 
-    SetupOutputVariable(
-        state, "Water Heater Total Demand Heat Transfer Rate", OutputProcessor::Unit::W, this->TotalDemandRate, "System", "Average", this->Name);
-    SetupOutputVariable(
-        state, "Water Heater Total Demand Heat Transfer Energy", OutputProcessor::Unit::J, this->TotalDemandEnergy, "System", "Sum", this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Total Demand Heat Transfer Rate",
+                        OutputProcessor::Unit::W,
+                        this->TotalDemandRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Total Demand Heat Transfer Energy",
+                        OutputProcessor::Unit::J,
+                        this->TotalDemandEnergy,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->Name);
 
-    SetupOutputVariable(state, "Water Heater Heating Rate", OutputProcessor::Unit::W, this->HeaterRate, "System", "Average", this->Name);
-    SetupOutputVariable(state, "Water Heater Heating Energy", OutputProcessor::Unit::J, this->HeaterEnergy, "System", "Sum", this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Heating Rate",
+                        OutputProcessor::Unit::W,
+                        this->HeaterRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Heating Energy",
+                        OutputProcessor::Unit::J,
+                        this->HeaterEnergy,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->Name);
 
-    SetupOutputVariable(
-        state, "Water Heater Unmet Demand Heat Transfer Rate", OutputProcessor::Unit::W, this->UnmetRate, "System", "Average", this->Name);
-    SetupOutputVariable(
-        state, "Water Heater Unmet Demand Heat Transfer Energy", OutputProcessor::Unit::J, this->UnmetEnergy, "System", "Sum", this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Unmet Demand Heat Transfer Rate",
+                        OutputProcessor::Unit::W,
+                        this->UnmetRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Unmet Demand Heat Transfer Energy",
+                        OutputProcessor::Unit::J,
+                        this->UnmetEnergy,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->Name);
 
-    SetupOutputVariable(state, "Water Heater Venting Heat Transfer Rate", OutputProcessor::Unit::W, this->VentRate, "System", "Average", this->Name);
-    SetupOutputVariable(state, "Water Heater Venting Heat Transfer Energy", OutputProcessor::Unit::J, this->VentEnergy, "System", "Sum", this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Venting Heat Transfer Rate",
+                        OutputProcessor::Unit::W,
+                        this->VentRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Venting Heat Transfer Energy",
+                        OutputProcessor::Unit::J,
+                        this->VentEnergy,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->Name);
 
-    SetupOutputVariable(
-        state, "Water Heater Net Heat Transfer Rate", OutputProcessor::Unit::W, this->NetHeatTransferRate, "System", "Average", this->Name);
-    SetupOutputVariable(
-        state, "Water Heater Net Heat Transfer Energy", OutputProcessor::Unit::J, this->NetHeatTransferEnergy, "System", "Sum", this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Net Heat Transfer Rate",
+                        OutputProcessor::Unit::W,
+                        this->NetHeatTransferRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Net Heat Transfer Energy",
+                        OutputProcessor::Unit::J,
+                        this->NetHeatTransferEnergy,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->Name);
 
-    SetupOutputVariable(state, "Water Heater Cycle On Count", OutputProcessor::Unit::None, this->CycleOnCount, "System", "Sum", this->Name);
-    SetupOutputVariable(state, "Water Heater Runtime Fraction", OutputProcessor::Unit::None, this->RuntimeFraction, "System", "Average", this->Name);
-    SetupOutputVariable(state, "Water Heater Part Load Ratio", OutputProcessor::Unit::None, this->PartLoadRatio, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Cycle On Count",
+                        OutputProcessor::Unit::None,
+                        this->CycleOnCount,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Runtime Fraction",
+                        OutputProcessor::Unit::None,
+                        this->RuntimeFraction,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Part Load Ratio",
+                        OutputProcessor::Unit::None,
+                        this->PartLoadRatio,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
-    SetupOutputVariable(state, "Water Heater " + this->FuelType + " Rate", OutputProcessor::Unit::W, this->FuelRate, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater " + this->FuelType + " Rate",
+                        OutputProcessor::Unit::W,
+                        this->FuelRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
     SetupOutputVariable(state,
                         "Water Heater " + this->FuelType + " Energy",
                         OutputProcessor::Unit::J,
                         this->FuelEnergy,
-                        "System",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         _,
                         this->FuelType,
@@ -5156,15 +5337,15 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                         "Water Heater Off Cycle Parasitic " + this->OffCycParaFuelType + " Rate",
                         OutputProcessor::Unit::W,
                         this->OffCycParaFuelRate,
-                        "System",
-                        "Average",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Water Heater Off Cycle Parasitic " + this->OffCycParaFuelType + " Energy",
                         OutputProcessor::Unit::J,
                         this->OffCycParaFuelEnergy,
-                        "System",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         _,
                         this->OffCycParaFuelType,
@@ -5176,15 +5357,15 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                         "Water Heater On Cycle Parasitic " + this->OnCycParaFuelType + " Rate",
                         OutputProcessor::Unit::W,
                         this->OnCycParaFuelRate,
-                        "System",
-                        "Average",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Water Heater On Cycle Parasitic " + this->OnCycParaFuelType + " Energy",
                         OutputProcessor::Unit::J,
                         this->OnCycParaFuelEnergy,
-                        "System",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         _,
                         this->OnCycParaFuelType,
@@ -5192,14 +5373,19 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                         this->EndUseSubcategoryName,
                         "Plant");
 
-    SetupOutputVariable(
-        state, "Water Heater Water Volume Flow Rate", OutputProcessor::Unit::m3_s, this->VolFlowRate, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Water Heater Water Volume Flow Rate",
+                        OutputProcessor::Unit::m3_s,
+                        this->VolFlowRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
     SetupOutputVariable(state,
                         "Water Heater Water Volume",
                         OutputProcessor::Unit::m3,
                         this->VolumeConsumed,
-                        "System",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         _,
                         "Water",
@@ -5210,8 +5396,8 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                         "Water Heater Mains Water Volume",
                         OutputProcessor::Unit::m3,
                         this->VolumeConsumed,
-                        "System",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         _,
                         "MainsWater",
@@ -5222,21 +5408,26 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
     if (this->HeatPumpNum > 0) {
         // CurrentModuleObject='WaterHeater:HeatPump:PumpedCondenser'
         HeatPumpWaterHeaterData &HPWH = state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum);
-        SetupOutputVariable(
-            state, "Water Heater Compressor Part Load Ratio", OutputProcessor::Unit::None, HPWH.HeatingPLR, "System", "Average", HPWH.Name);
+        SetupOutputVariable(state,
+                            "Water Heater Compressor Part Load Ratio",
+                            OutputProcessor::Unit::None,
+                            HPWH.HeatingPLR,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            HPWH.Name);
         SetupOutputVariable(state,
                             "Water Heater Off Cycle Ancillary Electricity Rate",
                             OutputProcessor::Unit::W,
                             HPWH.OffCycParaFuelRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             HPWH.Name);
         SetupOutputVariable(state,
                             "Water Heater Off Cycle Ancillary Electricity Energy",
                             OutputProcessor::Unit::J,
                             HPWH.OffCycParaFuelEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             HPWH.Name,
                             _,
                             "Electricity",
@@ -5247,29 +5438,34 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                             "Water Heater On Cycle Ancillary Electricity Rate",
                             OutputProcessor::Unit::W,
                             HPWH.OnCycParaFuelRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             HPWH.Name);
         SetupOutputVariable(state,
                             "Water Heater On Cycle Ancillary Electricity Energy",
                             OutputProcessor::Unit::J,
                             HPWH.OnCycParaFuelEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             HPWH.Name,
                             _,
                             "Electricity",
                             "DHW",
                             "Water Heater Parasitic",
                             "Plant");
-        SetupOutputVariable(
-            state, "Water Heater Heat Pump Control Tank Temperature", OutputProcessor::Unit::C, HPWH.ControlTempAvg, "System", "Average", HPWH.Name);
+        SetupOutputVariable(state,
+                            "Water Heater Heat Pump Control Tank Temperature",
+                            OutputProcessor::Unit::C,
+                            HPWH.ControlTempAvg,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            HPWH.Name);
         SetupOutputVariable(state,
                             "Water Heater Heat Pump Control Tank Final Temperature",
                             OutputProcessor::Unit::C,
                             HPWH.ControlTempFinal,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             HPWH.Name);
     }
 
@@ -5279,22 +5475,22 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                             "Water Heater Part Load Ratio",
                             OutputProcessor::Unit::None,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).DesuperheaterPLR,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name);
         SetupOutputVariable(state,
                             "Water Heater On Cycle Parasitic Electricity Rate",
                             OutputProcessor::Unit::W,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).OnCycParaFuelRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name);
         SetupOutputVariable(state,
                             "Water Heater On Cycle Parasitic Electricity Energy",
                             OutputProcessor::Unit::J,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).OnCycParaFuelEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name,
                             _,
                             "Electricity",
@@ -5305,15 +5501,15 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                             "Water Heater Off Cycle Parasitic Electricity Rate",
                             OutputProcessor::Unit::W,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).OffCycParaFuelRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name);
         SetupOutputVariable(state,
                             "Water Heater Off Cycle Parasitic Electricity Energy",
                             OutputProcessor::Unit::J,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).OffCycParaFuelEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name,
                             _,
                             "Electricity",
@@ -5324,22 +5520,22 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                             "Water Heater Heat Reclaim Efficiency Modifier Multiplier",
                             OutputProcessor::Unit::None,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).HEffFTempOutput,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name);
         SetupOutputVariable(state,
                             "Water Heater Pump Electricity Rate",
                             OutputProcessor::Unit::W,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).PumpPower,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name);
         SetupOutputVariable(state,
                             "Water Heater Pump Electricity Energy",
                             OutputProcessor::Unit::J,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).PumpEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name,
                             _,
                             "Electricity",
@@ -5350,15 +5546,15 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                             "Water Heater Heating Rate",
                             OutputProcessor::Unit::W,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).HeaterRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name);
         SetupOutputVariable(state,
                             "Water Heater Heating Energy",
                             OutputProcessor::Unit::J,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).HeaterEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name,
                             _,
                             "EnergyTransfer",
@@ -5371,33 +5567,73 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
     // CurrentModuleObject='WaterHeater:Stratified'
     if (this->TypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
 
-        SetupOutputVariable(
-            state, "Water Heater Heater 1 Heating Rate", OutputProcessor::Unit::W, this->HeaterRate1, "System", "Average", this->Name);
-        SetupOutputVariable(
-            state, "Water Heater Heater 2 Heating Rate", OutputProcessor::Unit::W, this->HeaterRate2, "System", "Average", this->Name);
+        SetupOutputVariable(state,
+                            "Water Heater Heater 1 Heating Rate",
+                            OutputProcessor::Unit::W,
+                            this->HeaterRate1,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Water Heater Heater 2 Heating Rate",
+                            OutputProcessor::Unit::W,
+                            this->HeaterRate2,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Water Heater Heater 1 Heating Energy", OutputProcessor::Unit::J, this->HeaterEnergy1, "System", "Sum", this->Name);
-        SetupOutputVariable(
-            state, "Water Heater Heater 2 Heating Energy", OutputProcessor::Unit::J, this->HeaterEnergy2, "System", "Sum", this->Name);
+        SetupOutputVariable(state,
+                            "Water Heater Heater 1 Heating Energy",
+                            OutputProcessor::Unit::J,
+                            this->HeaterEnergy1,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Water Heater Heater 2 Heating Energy",
+                            OutputProcessor::Unit::J,
+                            this->HeaterEnergy2,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Water Heater Heater 1 Cycle On Count", OutputProcessor::Unit::None, this->CycleOnCount1, "System", "Sum", this->Name);
-        SetupOutputVariable(
-            state, "Water Heater Heater 2 Cycle On Count", OutputProcessor::Unit::None, this->CycleOnCount2, "System", "Sum", this->Name);
+        SetupOutputVariable(state,
+                            "Water Heater Heater 1 Cycle On Count",
+                            OutputProcessor::Unit::None,
+                            this->CycleOnCount1,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Water Heater Heater 2 Cycle On Count",
+                            OutputProcessor::Unit::None,
+                            this->CycleOnCount2,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Water Heater Heater 1 Runtime Fraction", OutputProcessor::Unit::None, this->RuntimeFraction1, "System", "Average", this->Name);
-        SetupOutputVariable(
-            state, "Water Heater Heater 2 Runtime Fraction", OutputProcessor::Unit::None, this->RuntimeFraction2, "System", "Average", this->Name);
+        SetupOutputVariable(state,
+                            "Water Heater Heater 1 Runtime Fraction",
+                            OutputProcessor::Unit::None,
+                            this->RuntimeFraction1,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Water Heater Heater 2 Runtime Fraction",
+                            OutputProcessor::Unit::None,
+                            this->RuntimeFraction2,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
         for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
             SetupOutputVariable(state,
                                 format("Water Heater Temperature Node {}", NodeNum),
                                 OutputProcessor::Unit::C,
                                 this->Node(NodeNum).TempAvg,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 this->Name);
         }
 
@@ -5406,8 +5642,8 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                                 format("Water Heater Final Temperature Node {}", NodeNum),
                                 OutputProcessor::Unit::C,
                                 this->Node(NodeNum).Temp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 this->Name);
         }
     }
@@ -5415,7 +5651,7 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
     if (this->TypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
 
         for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
-            static constexpr auto Format_723("Water Heater Stratified Node Information,{},{:.4T},{:.4T},{:.3T},{:.4T},{:.4T},{},{}\n");
+            static constexpr fmt::string_view Format_723("Water Heater Stratified Node Information,{},{:.4T},{:.4T},{:.3T},{:.4T},{:.4T},{},{}\n");
             print(state.files.eio,
                   Format_723,
                   NodeNum,
@@ -5473,7 +5709,7 @@ void WaterThermalTankData::SetupStratifiedNodes(EnergyPlusData &state)
     // the Newton-Raphson iterative method.  For vertical cylinders and other shapes, the node heights are calculated
     // using basic geometry.
 
-    static std::string const RoutineName("GetWaterThermalTankInput");
+    static constexpr std::string_view RoutineName("GetWaterThermalTankInput");
 
     const Real64 Tolerance(1.0e-8); // Tolerance for Newton-Raphson solution
     const Real64 FluidCond(0.6);    // Conductivity of water (W/m-K)
@@ -5693,9 +5929,9 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
 
     auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
 
-    static std::string const RoutineName("InitWaterThermalTank");
-    static std::string const GetWaterThermalTankInput("GetWaterThermalTankInput");
-    static std::string const SizeTankForDemand("SizeTankForDemandSide");
+    static constexpr std::string_view RoutineName("InitWaterThermalTank");
+    static constexpr std::string_view GetWaterThermalTankInput("GetWaterThermalTankInput");
+    static constexpr std::string_view SizeTankForDemand("SizeTankForDemandSide");
 
     if (this->scanPlantLoopsFlag && allocated(state.dataPlnt->PlantLoop)) {
         if ((this->UseInletNode > 0) && (this->HeatPumpNum == 0)) {
@@ -6529,7 +6765,7 @@ void WaterThermalTankData::CalcWaterThermalTankMixed(EnergyPlusData &state) // W
     // the timestep.  The final reported heat rates are averages based on the total energy transfer over the
     // timestep.
 
-    static std::string const RoutineName("CalcWaterThermalTankMixed");
+    static constexpr std::string_view RoutineName("CalcWaterThermalTankMixed");
 
     Real64 TimeElapsed_loc =
         state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed;
@@ -7406,7 +7642,7 @@ void WaterThermalTankData::CalcWaterThermalTankStratified(EnergyPlusData &state)
     // Final node temperatures are reported as final instantaneous values as well as averages over the
     // time step.  Heat transfer rates are averages over the time step.
 
-    static std::string const RoutineName("CalcWaterThermalTankStratified");
+    static constexpr std::string_view RoutineName("CalcWaterThermalTankStratified");
     const Real64 TemperatureConvergenceCriteria = 0.0001;
     const Real64 SubTimestepMax = 60.0 * 10.0; // seconds
     const Real64 SubTimestepMin = 10.0;        // seconds
@@ -10605,7 +10841,7 @@ void WaterThermalTankData::SizeSupplySidePlantConnections(EnergyPlusData &state,
     // For water heaters sides on Supply LoopSide, obtains hot water flow rate from the plant sizing array
     //  (adapted approach from boiler sizing routines)
 
-    static std::string const RoutineName("SizeSupplySidePlantConnections");
+    static constexpr std::string_view RoutineName("SizeSupplySidePlantConnections");
 
     auto &PlantSizData(state.dataSize->PlantSizData);
 
@@ -10767,7 +11003,7 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
     // BA benchmark report for residential design mode
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("SizeTankForDemandSide");
+    static constexpr std::string_view RoutineName("SizeTankForDemandSide");
     Real64 const GalTocubicMeters(0.0037854);
     Real64 const kBtuPerHrToWatts(293.1);
 
@@ -11114,7 +11350,7 @@ void WaterThermalTankData::SizeTankForSupplySide(EnergyPlusData &state)
     // REFERENCES:
     // BA benchmark report for residential design mode
 
-    static std::string const RoutineName("SizeTankForSupplySide");
+    static constexpr std::string_view RoutineName("SizeTankForSupplySide");
 
     Real64 Tstart = 14.44;
     Real64 Tfinish = 57.22;
@@ -11239,7 +11475,7 @@ void WaterThermalTankData::SizeDemandSidePlantConnections(EnergyPlusData &state)
     //  recovery rate that if continued would reheat tank in user specified amount of time.
     //  initial and final tank temperatures are 14.44 and reheat to 57.22 (values from CalcStandardRatings routine)
 
-    static std::string const RoutineName("SizeDemandSidePlantConnections");
+    static constexpr std::string_view RoutineName("SizeDemandSidePlantConnections");
 
     auto &PlantSizData(state.dataSize->PlantSizData);
 
@@ -11463,7 +11699,7 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
     // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 const GalTocubicMeters(0.0037854);
     Real64 const kBtuPerHrToWatts(293.1);
-    static std::string const RoutineName("SizeStandAloneWaterHeater");
+    static constexpr std::string_view RoutineName("SizeStandAloneWaterHeater");
 
     Real64 Tstart = 14.44;
     Real64 Tfinish = 57.22;
@@ -12274,10 +12510,10 @@ void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
             MaxCapacity_loc = this->MaxCapacity;
         }
 
-        static constexpr auto Format_720("Water Heater Information,{},{},{:.4T},{:.1T},{:.3T},{:.4T}\n");
+        static constexpr fmt::string_view Format_720("Water Heater Information,{},{},{:.4T},{:.1T},{:.3T},{:.4T}\n");
         print(state.files.eio, Format_720, this->Type, this->Name, this->Volume, MaxCapacity_loc, RecoveryEfficiency, EnergyFactor);
     } else {
-        static constexpr auto Format_721("Heat Pump Water Heater Information,{},{},{:.4T},{:.1T},{:.3T},{:.4T},{:.0T}\n");
+        static constexpr fmt::string_view Format_721("Heat Pump Water Heater Information,{},{},{:.4T},{:.1T},{:.3T},{:.4T},{:.0T}\n");
         print(state.files.eio,
               Format_721,
               state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).Type,
@@ -12313,7 +12549,7 @@ void WaterThermalTankData::ReportCWTankInits(EnergyPlusData &state)
         return;
     }
 
-    static constexpr auto Format_728("Chilled Water Tank Information,{},{},{:.4T},{:.4T},{:.4T}\n");
+    static constexpr fmt::string_view Format_728("Chilled Water Tank Information,{},{},{:.4T},{:.4T},{:.4T}\n");
     print(state.files.eio, Format_728, this->Type, this->Name, this->Volume, this->UseDesignVolFlowRate, this->SourceDesignVolFlowRate);
 
     this->AlreadyReported = true;

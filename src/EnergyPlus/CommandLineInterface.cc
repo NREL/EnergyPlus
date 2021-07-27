@@ -161,9 +161,9 @@ namespace CommandLineInterface {
         opt.parse(argCount, &cStrArgs[0]);
 
         // print arguments parsed (useful for debugging)
-        /*std::string pretty;
-        opt.prettyPrint(pretty);
-        std::cout << pretty << std::endl;*/
+        //        std::string pretty;
+        //        opt.prettyPrint(pretty);
+        //        std::cout << pretty << std::endl;
 
         std::string usage;
         opt.getUsage(usage);
@@ -484,10 +484,9 @@ namespace CommandLineInterface {
         state.files.outputSszTxtFilePath = composePath(sszSuffix + ".txt");
         state.dataStrGlobals->outputAdsFilePath = composePath(adsSuffix + ".out");
         state.files.shade.filePath = composePath(shdSuffix + ".csv");
-
         if (suffixType == "L") {
-            // out/sqlite.er:w
-            state.dataStrGlobals->outputSqliteErrFilePath = fs::path(state.dataStrGlobals->outDirPath.string() + sqliteSuffix + ".err");
+            // out/sqlite.err
+            state.dataStrGlobals->outputSqliteErrFilePath = state.dataStrGlobals->outDirPath / fs::path{sqliteSuffix + ".err"};
         } else {
             // if 'D':  out/eplus-sqlite.err
             state.dataStrGlobals->outputSqliteErrFilePath = composePath(sqliteSuffix + ".err");

@@ -84,7 +84,6 @@
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
-#include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACDuct.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
@@ -461,13 +460,13 @@ void GetAirPathData(EnergyPlusData &state)
         PrimaryAirSystems(AirSysNum).Name = Alphas(1);
         AirToZoneNodeInfo(AirSysNum).AirLoopName = Alphas(1);
         if (NumAlphas < 9) {
-            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", insufficient information.");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", insufficient information.");
             ShowContinueError(state, "...Have supplied less than 9 alpha fields.");
             ErrorsFound = true;
             continue;
         }
         if (NumNumbers < 1) {
-            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", insufficient information.");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", insufficient information.");
             ShowContinueError(state, "...Have supplied less than 1 numeric field.");
             ErrorsFound = true;
             continue;
@@ -516,7 +515,7 @@ void GetAirPathData(EnergyPlusData &state)
             TestUniqueNodes(state.dataSimAirServingZones->TestUniqueNodesNum).FieldName = cAlphaFields(6);
             TestUniqueNodes(state.dataSimAirServingZones->TestUniqueNodesNum).NodeNameUsed = true;
         } else {
-            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", duplicate node name.");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", duplicate node name.");
             ShowContinueError(state, "...used for " + cAlphaFields(6) + "=\"" + Alphas(6) + "\"");
             ShowContinueError(state,
                               "...first used in " + CurrentModuleObject + "=\"" + TestUniqueNodes(test).AirLoopName + "\" for " +
@@ -533,7 +532,7 @@ void GetAirPathData(EnergyPlusData &state)
                 TestUniqueNodes(state.dataSimAirServingZones->TestUniqueNodesNum).FieldName = cAlphaFields(7);
                 TestUniqueNodes(state.dataSimAirServingZones->TestUniqueNodesNum).NodeNameUsed = true;
             } else {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", duplicate node name.");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", duplicate node name.");
                 ShowContinueError(state, "...used for " + cAlphaFields(7) + "=\"" + Alphas(7) + "\"");
                 ShowContinueError(state,
                                   "...first used in " + CurrentModuleObject + "=\"" + TestUniqueNodes(test).AirLoopName + "\" for " +
@@ -550,7 +549,7 @@ void GetAirPathData(EnergyPlusData &state)
             TestUniqueNodes(state.dataSimAirServingZones->TestUniqueNodesNum).FieldName = cAlphaFields(8);
             TestUniqueNodes(state.dataSimAirServingZones->TestUniqueNodesNum).NodeNameUsed = true;
         } else {
-            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", duplicate node name/list.");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", duplicate node name/list.");
             ShowContinueError(state, "...used for " + cAlphaFields(8) + "=\"" + Alphas(8) + "\"");
             ShowContinueError(state,
                               "...first used in " + CurrentModuleObject + "=\"" + TestUniqueNodes(test).AirLoopName + "\" for " +
@@ -566,7 +565,7 @@ void GetAirPathData(EnergyPlusData &state)
             TestUniqueNodes(state.dataSimAirServingZones->TestUniqueNodesNum).FieldName = cAlphaFields(9);
             TestUniqueNodes(state.dataSimAirServingZones->TestUniqueNodesNum).NodeNameUsed = true;
         } else {
-            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", duplicate node name/list.");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", duplicate node name/list.");
             ShowContinueError(state, "...used for " + cAlphaFields(9) + "=\"" + Alphas(9) + "\"");
             ShowContinueError(state,
                               "...first used in " + CurrentModuleObject + "=\"" + TestUniqueNodes(test).AirLoopName + "\" for " +
@@ -593,7 +592,7 @@ void GetAirPathData(EnergyPlusData &state)
             }
         }
         if ((test == 0) && (AirToZoneNodeInfo(AirSysNum).NumReturnNodes > 0) && !lAlphaBlanks(7)) {
-            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid.");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid.");
             ShowContinueError(state, cAlphaFields(7) + " (Return Air Path or ZoneHVAC:EquipmentConnections) not valid = \"" + Alphas(7) + "\".");
             ErrorsFound = true;
         }
@@ -619,12 +618,13 @@ void GetAirPathData(EnergyPlusData &state)
         }
         // Allow at most 3 supply nodes (for a 3 deck system)
         if (NumNodes > 3) {
-            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name + "\", too many nodes.");
+            ShowSevereError(state,
+                            std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name + "\", too many nodes.");
             ShowContinueError(state, "Only 1st 3 Nodes will be used from " + cAlphaFields(8) + "=\"" + Alphas(8) + "\".");
             ErrorsFound = true;
         }
         if (NumNodes == 0) {
-            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name + "\", too few nodes.");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name + "\", too few nodes.");
             ShowContinueError(state, "There must be at least 1 supply node in the system.");
             ErrorsFound = true;
         }
@@ -658,7 +658,7 @@ void GetAirPathData(EnergyPlusData &state)
             ErrorsFound = true;
         }
         if (NumNodes != AirToZoneNodeInfo(AirSysNum).NumSupplyNodes) {
-            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", node mismatch.");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", node mismatch.");
             ShowContinueError(state,
                               format("...number of air system exit nodes [{}] must match number of zone equip inlet nodes [{}].",
                                      NumNodes,
@@ -677,7 +677,8 @@ void GetAirPathData(EnergyPlusData &state)
         ConnectorListName = Alphas(5);
         PrimaryAirSystems(AirSysNum).NumBranches = NumBranchesInBranchList(state, BranchListName);
         if (PrimaryAirSystems(AirSysNum).NumBranches == 0) {
-            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name + "\", insufficient information.");
+            ShowSevereError(
+                state, std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name + "\", insufficient information.");
             ShowContinueError(state, "...there must be at least 1 branch specified.");
             ErrorsFound = true;
         }
@@ -692,7 +693,8 @@ void GetAirPathData(EnergyPlusData &state)
             NumCompsOnBranch = NumCompsInBranch(state, BranchNames(BranchNum));
             if (NumCompsOnBranch <= 0) {
                 ShowSevereError(state,
-                                RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name + "\", insufficient information.");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name +
+                                    "\", insufficient information.");
                 ShowContinueError(state, "...Branch=\"" + BranchNames(BranchNum) + "\", no components on branch.");
                 ErrorsFound = true;
                 continue;
@@ -751,7 +753,7 @@ void GetAirPathData(EnergyPlusData &state)
                 if (UtilityRoutines::SameString(CompTypes(CompNum), "AirLoopHVAC:OutdoorAirSystem")) {
                     if (PrimaryAirSystems(AirSysNum).OASysExists) {
                         ShowSevereError(state,
-                                        RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name +
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name +
                                             "\", too many outdoor air systems.");
                         ShowContinueError(state, "Only one AirLoopHVAC:OutdoorAirSystem allowed.");
                         ErrorsFound = true;
@@ -775,12 +777,15 @@ void GetAirPathData(EnergyPlusData &state)
                             PrimaryAirSystems(AirSysNum).OAMixOAInNodeNum = GetOAMixerInletNodeNumber(state, OAMixNum);
                         } else {
                             ShowSevereError(state,
-                                            RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name + "\", item not found.");
+                                            std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name +
+                                                "\", item not found.");
                             ShowContinueError(state, "OutdoorAir:Mixer for AirLoopHVAC:OutdoorAirSystem=\"" + CompNames(CompNum) + "\" not found.");
                             ErrorsFound = true;
                         }
                     } else {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name + "\", item not found.");
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name +
+                                            "\", item not found.");
                         ShowContinueError(state, "AirLoopHVAC:OutdoorAirSystem=\"" + CompNames(CompNum) + "\" not found.");
                         ShowContinueError(state, "  referenced in Branch=\"" + PrimaryAirSystems(AirSysNum).Branch(BranchNum).Name + "\".");
                         ErrorsFound = true;
@@ -845,7 +850,8 @@ void GetAirPathData(EnergyPlusData &state)
         //  Check for errors
         for (OutBranchNum = 1; OutBranchNum <= PrimaryAirSystems(AirSysNum).NumOutletBranches; ++OutBranchNum) {
             if (PrimaryAirSystems(AirSysNum).OutletBranchNum(OutBranchNum) != 0) continue;
-            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name + "\", branch in error.");
+            ShowSevereError(state,
+                            std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name + "\", branch in error.");
             ShowContinueError(state, "Probable missing or misspelled node referenced in the branch(es):");
             for (BranchNum = 1; BranchNum <= PrimaryAirSystems(AirSysNum).NumBranches; ++BranchNum) {
                 ShowContinueError(state, "Possible Error in Branch Object=\"" + PrimaryAirSystems(AirSysNum).Branch(BranchNum).Name + "\".");
@@ -864,7 +870,8 @@ void GetAirPathData(EnergyPlusData &state)
                 }
             }
             if (PrimaryAirSystems(AirSysNum).InletBranchNum(InBranchNum) == 0) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name + "\", connection to zone.");
+                ShowSevereError(
+                    state, std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name + "\", connection to zone.");
                 ShowContinueError(state, "No Connection found for Return Air from Zone");
                 ShowContinueError(state,
                                   "Expected node name =\"" +
@@ -890,7 +897,8 @@ void GetAirPathData(EnergyPlusData &state)
                     MixerExists = true;
                 }
             } else {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name + "\", connector list object.");
+                ShowSevereError(
+                    state, std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name + "\", connector list object.");
                 ShowContinueError(state, "ConnectorList object=\"" + ConnectorListName + "\" not found in input.");
             }
             errFlag = false;
@@ -1048,7 +1056,7 @@ void GetAirPathData(EnergyPlusData &state)
                     ValidateComponent(state, ControllerType, ControllerName, IsNotOK, CurrentModuleObject);
                     if (IsNotOK) {
                         ShowContinueError(state,
-                                          RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name +
+                                          std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name +
                                               "\", for ControllerList=\"" + ControllerListName + "\".");
                         ErrorsFound = true;
                     }
@@ -1056,7 +1064,9 @@ void GetAirPathData(EnergyPlusData &state)
                     PrimaryAirSystems(AirSysNum).CanBeLockedOutByEcono(ControllerNum) = false;
                 } // End of ControllerListNum Loop
             } else {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name + "\", controller list object.");
+                ShowSevereError(state,
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name +
+                                    "\", controller list object.");
                 ShowContinueError(state, "ControllerList object=\"" + ControllerListName + "\" not found in input.");
                 ErrorsFound = true;
             }
@@ -1135,7 +1145,8 @@ void GetAirPathData(EnergyPlusData &state)
         }
         if (NumControllers + NumOASysSimpControllers == 0) {
             if (!PackagedUnit(AirSysNum)) {
-                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name + "\" has no Controllers.");
+                ShowWarningError(
+                    state, std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name + "\" has no Controllers.");
             }
             PrimaryAirSystems(AirSysNum).NumControllers = 0;
             PrimaryAirSystems(AirSysNum).ControllerName.allocate(0);
@@ -1297,7 +1308,7 @@ void GetAirPathData(EnergyPlusData &state)
                     } else if (componentType == "FAN:ONOFF" || componentType == "COIL:COOLING:DX:SINGLESPEED" ||
                                componentType == "COIL:HEATING:DX:SINGLESPEED" || componentType == "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ||
                                componentType == "COIL:COOLING:DX:MULTISPEED" || componentType == "COIL:HEATING:DX:MULTISPEED") {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + " = \"" + PrimaryAirSystems(AirSysNum).Name + "\".");
+                        ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " = \"" + PrimaryAirSystems(AirSysNum).Name + "\".");
                         ShowContinueError(state,
                                           "..Invalid Air Loop Component Type = \"" +
                                               PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).TypeOf + "\".");
@@ -1310,7 +1321,7 @@ void GetAirPathData(EnergyPlusData &state)
                         ErrorsFound = true;
 
                     } else {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + " = \"" + PrimaryAirSystems(AirSysNum).Name + "\".");
+                        ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " = \"" + PrimaryAirSystems(AirSysNum).Name + "\".");
                         ShowContinueError(state,
                                           "..Invalid Air Loop Component Type = \"" +
                                               PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).TypeOf + "\".");
@@ -1340,7 +1351,7 @@ void GetAirPathData(EnergyPlusData &state)
                     if (NodeNotFound) {
                         ErrorsFound = true;
                         ShowSevereError(state,
-                                        RoutineName + CurrentModuleObject + "=\"" +
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" +
                                             PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name + "\", invalid actuator.");
                         ShowContinueError(state,
                                           "...this coil requires a water coil controller and the inlet node of a water coil must also be an "
@@ -1364,7 +1375,8 @@ void GetAirPathData(EnergyPlusData &state)
                 if (NodeNotFound) {
                     ErrorsFound = true;
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + "=\"" + GetOACompName(state, OASysNum, OACompNum) + "\", invalid actuator.");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + GetOACompName(state, OASysNum, OACompNum) +
+                                        "\", invalid actuator.");
                     ShowContinueError(state,
                                       "...this coil requires a water coil controller and the inlet node of a water coil must also be an actuator "
                                       "node of a water coil controller.");
@@ -1382,8 +1394,8 @@ void GetAirPathData(EnergyPlusData &state)
                             "Air System Simulation Cycle On Off Status",
                             OutputProcessor::Unit::None,
                             state.dataAirLoop->PriAirSysAvailMgr(AirSysNum).AvailStatus,
-                            "HVAC",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::HVAC,
+                            OutputProcessor::SOVStoreType::Average,
                             PrimaryAirSystems(AirSysNum).Name);
     }
 
@@ -2512,22 +2524,22 @@ void SimAirLoops(EnergyPlusData &state, bool const FirstHVACIteration, bool &Sim
                             "Air System Simulation Maximum Iteration Count",
                             OutputProcessor::Unit::None,
                             state.dataSimAirServingZones->salIterMax,
-                            "HVAC",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::HVAC,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SimAir");
         SetupOutputVariable(state,
                             "Air System Simulation Iteration Count",
                             OutputProcessor::Unit::None,
                             state.dataSimAirServingZones->salIterTot,
-                            "HVAC",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::HVAC,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SimAir");
         SetupOutputVariable(state,
                             "Air System Component Model Simulation Calls",
                             OutputProcessor::Unit::None,
                             state.dataSimAirServingZones->NumCallsTot,
-                            "HVAC",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::HVAC,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SimAir");
         state.dataSimAirServingZones->OutputSetupFlag = true;
     }
@@ -3451,7 +3463,10 @@ void SimAirLoopComponents(EnergyPlusData &state,
                                 FirstHVACIteration,
                                 AirLoopNum,
                                 PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompIndex,
-                                PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).compPointer);
+                                PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).compPointer,
+                                AirLoopNum,
+                                BranchNum,
+                                CompNum);
         } // End of component loop
 
         // Enforce continuity through the splitter
@@ -3469,7 +3484,10 @@ void SimAirLoopComponent(EnergyPlusData &state,
                          bool const FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
                          int const AirLoopNum,          // Primary air loop number
                          int &CompIndex,                // numeric pointer for CompType/CompName -- passed back from other routines
-                         HVACSystemData *CompPointer    // equipment actual pointer
+                         HVACSystemData *CompPointer,   // equipment actual pointer
+                         int const &airLoopNum,         // index to AirloopHVAC
+                         int const &branchNum,          // index to AirloopHVAC branch
+                         int const &compNum             // index to AirloopHVAC branch component
 )
 {
 
@@ -3497,7 +3515,6 @@ void SimAirLoopComponent(EnergyPlusData &state,
     using Humidifiers::SimHumidifier;
     using HVACDuct::SimDuct;
     using HVACDXHeatPumpSystem::SimDXHeatPumpSystem;
-    using HVACDXSystem::SimDXCoolingSystem;
     using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
     using HVACMultiSpeedHeatPump::SimMSHeatPump;
     using HVACUnitaryBypassVAV::SimUnitaryBypassVAV;
@@ -3581,8 +3598,26 @@ void SimAirLoopComponent(EnergyPlusData &state,
             if (QActual > 0.0) HeatingActive = true; // determine if coil is ON
 
         } else if (SELECT_CASE_var == CompType::DXSystem) { // CoilSystem:Cooling:DX  old 'AirLoopHVAC:UnitaryCoolOnly'
-            SimDXCoolingSystem(state, CompName, FirstHVACIteration, AirLoopNum, CompIndex, _, _, QActual);
-            if (QActual > 0.0) CoolingActive = true; // determine if coil is ON
+            if (CompPointer == nullptr) {
+                UnitarySystems::UnitarySys thisSys;
+                CompPointer = thisSys.factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, CompName, false, 0);
+                // temporary fix for saving pointer, eventually apply to UnitarySystem 25 lines down
+                state.dataAirSystemsData->PrimaryAirSystems(airLoopNum).Branch(branchNum).Comp(compNum).compPointer = CompPointer;
+            }
+            Real64 sensOut = 0.0;
+            Real64 latOut = 0.0;
+            CompPointer->simulate(state,
+                                  CompName,
+                                  FirstHVACIteration,
+                                  AirLoopNum,
+                                  CompIndex,
+                                  HeatingActive,
+                                  CoolingActive,
+                                  OAUnitNum,
+                                  OAUCoilOutTemp,
+                                  ZoneEquipFlag,
+                                  sensOut,
+                                  latOut);
 
         } else if (SELECT_CASE_var == CompType::DXHeatPumpSystem) { // 'CoilSystem:Heating:DX'
             SimDXHeatPumpSystem(state, CompName, FirstHVACIteration, AirLoopNum, CompIndex, _, _, QActual);

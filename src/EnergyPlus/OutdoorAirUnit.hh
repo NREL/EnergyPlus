@@ -243,11 +243,11 @@ namespace OutdoorAirUnit {
     };
 
     void SimOutdoorAirUnit(EnergyPlusData &state,
-                           std::string const &CompName, // name of the outdoor air unit
-                           int ZoneNum,                 // number of zone being served
-                           bool FirstHVACIteration,     // TRUE if 1st HVAC simulation of system timestep
-                           Real64 &PowerMet,            // Sensible power supplied (W)
-                           Real64 &LatOutputProvided,   // Latent add/removal supplied by window AC (kg/s), dehumid = negative
+                           std::string_view CompName, // name of the outdoor air unit
+                           int ZoneNum,               // number of zone being served
+                           bool FirstHVACIteration,   // TRUE if 1st HVAC simulation of system timestep
+                           Real64 &PowerMet,          // Sensible power supplied (W)
+                           Real64 &LatOutputProvided, // Latent add/removal supplied by window AC (kg/s), dehumid = negative
                            int &CompIndex);
 
     void GetOutdoorAirUnitInputs(EnergyPlusData &state);

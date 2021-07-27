@@ -1158,7 +1158,7 @@ int InputProcessor::getObjectItemNum(EnergyPlusData &state,
     for (auto it = obj->begin(); it != obj->end(); ++it) {
         auto it2 = it.value().find(NameTypeVal);
 
-        if ((it2 != it.value().end()) && (UtilityRoutines::MakeUPPERCase(it2.value()) == upperObjName)) {
+        if ((it2 != it.value().end()) && (UtilityRoutines::MakeUPPERCase(AsString(it2.value())) == upperObjName)) {
             found = true;
             break;
         }
@@ -1935,7 +1935,7 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
             json const &fields = obj.value();
             for (auto const &extensions : fields[extension_key]) {
                 try {
-                    auto const report_name = UtilityRoutines::MakeUPPERCase(extensions.at("report_name"));
+                    auto const report_name = UtilityRoutines::MakeUPPERCase(AsString(extensions.at("report_name")));
                     if (report_name == "ALLMONTHLY" || report_name == "ALLSUMMARYANDMONTHLY") {
                         for (int i = 1; i <= DataOutputs::NumMonthlyReports; ++i) {
                             addVariablesForMonthlyReport(state, DataOutputs::MonthlyNamedReports(i));

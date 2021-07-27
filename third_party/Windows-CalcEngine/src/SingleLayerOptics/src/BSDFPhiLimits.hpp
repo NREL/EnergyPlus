@@ -4,19 +4,20 @@
 #include <vector>
 #include <memory>
 
-namespace SingleLayerOptics {
+namespace SingleLayerOptics
+{
+    class CPhiLimits
+    {
+    public:
+        explicit CPhiLimits(size_t t_NumOfPhis);
 
-	class CPhiLimits {
-	public:
-		explicit CPhiLimits( const size_t t_NumOfPhis );
+        const std::vector<double> & getPhiLimits() const;
 
-		std::shared_ptr< std::vector< double > > getPhiLimits() const;
+    private:
+        void createLimits(const std::vector<double> & t_PhiAngles);
+        std::vector<double> m_PhiLimits;
+    };
 
-	private:
-		void createLimits( const std::vector< double >& t_PhiAngles );
-		std::shared_ptr< std::vector< double > > m_PhiLimits;
-	};
-
-}
+}   // namespace SingleLayerOptics
 
 #endif

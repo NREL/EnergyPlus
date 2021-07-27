@@ -125,7 +125,7 @@ constexpr const char *fluidNameSteam("STEAM");
 constexpr const char *fluidNameWater("WATER");
 
 void SimPIU(EnergyPlusData &state,
-            std::string const &CompName,   // name of the PIU
+            std::string_view CompName,     // name of the PIU
             bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
             int const ZoneNum,             // index of zone served by PIU
             int const ZoneNodeNum,         // zone node number of zone served by PIU
@@ -156,7 +156,7 @@ void SimPIU(EnergyPlusData &state,
     if (CompIndex == 0) {
         PIUNum = UtilityRoutines::FindItemInList(CompName, state.dataPowerInductionUnits->PIU);
         if (PIUNum == 0) {
-            ShowFatalError(state, "SimPIU: PIU Unit not found=" + CompName);
+            ShowFatalError(state, "SimPIU: PIU Unit not found=" + std::string{CompName});
         }
         CompIndex = PIUNum;
     } else {
@@ -254,7 +254,7 @@ void GetPIUs(EnergyPlusData &state)
     int SupAirIn;            // controlled zone supply air inlet index
     bool AirNodeFound;
     int ADUNum;
-    static std::string const RoutineName("GetPIUs: "); // include trailing blank space
+    static constexpr std::string_view RoutineName("GetPIUs: "); // include trailing blank space
     bool SteamMessageNeeded;
     int FanType_Num; // integer representation of fan type
 
@@ -306,7 +306,7 @@ void GetPIUs(EnergyPlusData &state)
                 GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2)); // convert schedule name to pointer
             if (state.dataPowerInductionUnits->PIU(PIUNum).SchedPtr == 0) {
                 ShowSevereError(state,
-                                RoutineName + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
+                                std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
                                     " entered =" + state.dataIPShortCut->cAlphaArgs(2) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
                                     state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
@@ -328,7 +328,7 @@ void GetPIUs(EnergyPlusData &state)
             state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantTypeNum = TypeOf_CoilSteamAirHeating;
             state.dataPowerInductionUnits->PIU(PIUNum).HCoil_FluidIndex = FindRefrigerant(state, "Steam");
             if (state.dataPowerInductionUnits->PIU(PIUNum).HCoil_FluidIndex == 0) {
-                ShowSevereError(state, RoutineName + "Steam Properties for " + state.dataIPShortCut->cAlphaArgs(1) + " not found.");
+                ShowSevereError(state, std::string{RoutineName} + "Steam Properties for " + state.dataIPShortCut->cAlphaArgs(1) + " not found.");
                 if (SteamMessageNeeded) ShowContinueError(state, "Steam Fluid Properties should have been included in the input file.");
                 ErrorsFound = true;
                 SteamMessageNeeded = false;
@@ -475,8 +475,8 @@ void GetPIUs(EnergyPlusData &state)
         // one assumes if there isn't one assigned, it's an error?
         if (state.dataPowerInductionUnits->PIU(PIUNum).ADUNum == 0) {
             ShowSevereError(state,
-                            RoutineName + "No matching Air Distribution Unit, for PIU = [" + state.dataPowerInductionUnits->PIU(PIUNum).UnitType +
-                                ',' + state.dataPowerInductionUnits->PIU(PIUNum).Name + "].");
+                            std::string{RoutineName} + "No matching Air Distribution Unit, for PIU = [" +
+                                state.dataPowerInductionUnits->PIU(PIUNum).UnitType + ',' + state.dataPowerInductionUnits->PIU(PIUNum).Name + "].");
             ShowContinueError(state,
                               "...should have outlet node = " + state.dataLoopNodes->NodeID(state.dataPowerInductionUnits->PIU(PIUNum).OutAirNode));
             ErrorsFound = true;
@@ -545,7 +545,7 @@ void GetPIUs(EnergyPlusData &state)
                 GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2)); // convert schedule name to pointer
             if (state.dataPowerInductionUnits->PIU(PIUNum).SchedPtr == 0) {
                 ShowSevereError(state,
-                                RoutineName + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
+                                std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
                                     " entered =" + state.dataIPShortCut->cAlphaArgs(2) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
                                     state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
@@ -566,7 +566,7 @@ void GetPIUs(EnergyPlusData &state)
             state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantTypeNum = TypeOf_CoilSteamAirHeating;
             state.dataPowerInductionUnits->PIU(PIUNum).HCoil_FluidIndex = FindRefrigerant(state, "Steam");
             if (state.dataPowerInductionUnits->PIU(PIUNum).HCoil_FluidIndex == 0) {
-                ShowSevereError(state, RoutineName + "Steam Properties for " + state.dataIPShortCut->cAlphaArgs(1) + " not found.");
+                ShowSevereError(state, std::string{RoutineName} + "Steam Properties for " + state.dataIPShortCut->cAlphaArgs(1) + " not found.");
                 if (SteamMessageNeeded) ShowContinueError(state, "Steam Fluid Properties should have been included in the input file.");
                 ErrorsFound = true;
                 SteamMessageNeeded = false;
@@ -728,8 +728,8 @@ void GetPIUs(EnergyPlusData &state)
         // one assumes if there isn't one assigned, it's an error?
         if (state.dataPowerInductionUnits->PIU(PIUNum).ADUNum == 0) {
             ShowSevereError(state,
-                            RoutineName + "No matching Air Distribution Unit, for PIU = [" + state.dataPowerInductionUnits->PIU(PIUNum).UnitType +
-                                ',' + state.dataPowerInductionUnits->PIU(PIUNum).Name + "].");
+                            std::string{RoutineName} + "No matching Air Distribution Unit, for PIU = [" +
+                                state.dataPowerInductionUnits->PIU(PIUNum).UnitType + ',' + state.dataPowerInductionUnits->PIU(PIUNum).Name + "].");
             ShowContinueError(state,
                               "...should have outlet node = " + state.dataLoopNodes->NodeID(state.dataPowerInductionUnits->PIU(PIUNum).OutAirNode));
             ErrorsFound = true;
@@ -764,7 +764,7 @@ void GetPIUs(EnergyPlusData &state)
     }
 
     if (ErrorsFound) {
-        ShowFatalError(state, RoutineName + "Errors found in getting input.  Preceding conditions cause termination.");
+        ShowFatalError(state, std::string{RoutineName} + "Errors found in getting input.  Preceding conditions cause termination.");
     }
 
     for (PIUNum = 1; PIUNum <= state.dataPowerInductionUnits->NumPIUs; ++PIUNum) {
@@ -773,43 +773,43 @@ void GetPIUs(EnergyPlusData &state)
                             "Zone Air Terminal Primary Damper Position",
                             OutputProcessor::Unit::None,
                             state.dataPowerInductionUnits->PIU(PIUNum).PriDamperPosition,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPowerInductionUnits->PIU(PIUNum).Name);
         SetupOutputVariable(state,
                             "Zone Air Terminal Heating Rate",
                             OutputProcessor::Unit::W,
                             state.dataPowerInductionUnits->PIU(PIUNum).HeatingRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPowerInductionUnits->PIU(PIUNum).Name);
         SetupOutputVariable(state,
                             "Zone Air Terminal Heating Energy",
                             OutputProcessor::Unit::J,
                             state.dataPowerInductionUnits->PIU(PIUNum).HeatingEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataPowerInductionUnits->PIU(PIUNum).Name);
         SetupOutputVariable(state,
                             "Zone Air Terminal Sensible Cooling Rate",
                             OutputProcessor::Unit::W,
                             state.dataPowerInductionUnits->PIU(PIUNum).SensCoolRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPowerInductionUnits->PIU(PIUNum).Name);
         SetupOutputVariable(state,
                             "Zone Air Terminal Sensible Cooling Energy",
                             OutputProcessor::Unit::J,
                             state.dataPowerInductionUnits->PIU(PIUNum).SensCoolEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataPowerInductionUnits->PIU(PIUNum).Name);
         SetupOutputVariable(state,
                             "Zone Air Terminal Outdoor Air Volume Flow Rate",
                             OutputProcessor::Unit::m3_s,
                             state.dataPowerInductionUnits->PIU(PIUNum).OutdoorAirFlowRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPowerInductionUnits->PIU(PIUNum).Name);
     }
 }
@@ -841,7 +841,7 @@ void InitPIU(EnergyPlusData &state,
     using PlantUtilities::ScanPlantLoopsForObject;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("InitPIU");
+    static constexpr std::string_view RoutineName("InitPIU");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int PriNode;    // primary air inlet node number
@@ -1086,7 +1086,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
     using PlantUtilities::MyPlantSizingIndex;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("SizePIU");
+    static constexpr std::string_view RoutineName("SizePIU");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int PltSizHeatNum; // index of plant sizing object for 1st heating loop
@@ -2375,7 +2375,7 @@ void ReportPIU(EnergyPlusData &state, int const PIUNum) // number of the current
 
 // ===================== Utilities =====================================
 
-bool PIUnitHasMixer(EnergyPlusData &state, std::string const &CompName) // component (mixer) name
+bool PIUnitHasMixer(EnergyPlusData &state, std::string_view CompName) // component (mixer) name
 {
 
     // FUNCTION INFORMATION:

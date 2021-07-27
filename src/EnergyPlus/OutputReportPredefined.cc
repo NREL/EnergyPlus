@@ -1279,7 +1279,7 @@ namespace OutputReportPredefined {
     }
 
     void PreDefTableEntry(
-        EnergyPlusData &state, int const columnIndex, std::string const &objName, Real64 const tableEntryReal, Optional_int_const numSigDigits)
+        EnergyPlusData &state, int const columnIndex, std::string_view objName, Real64 const tableEntryReal, Optional_int_const numSigDigits)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -1350,7 +1350,7 @@ namespace OutputReportPredefined {
         state.dataOutRptPredefined->tableEntry(state.dataOutRptPredefined->numTableEntry).origEntryIsReal = true;
     }
 
-    void PreDefTableEntry(EnergyPlusData &state, int const columnIndex, std::string const &objName, std::string const &tableEntryChar)
+    void PreDefTableEntry(EnergyPlusData &state, int const columnIndex, std::string_view objName, std::string_view tableEntryChar)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -1390,7 +1390,7 @@ namespace OutputReportPredefined {
         state.dataOutRptPredefined->tableEntry(state.dataOutRptPredefined->numTableEntry).indexColumn = columnIndex;
     }
 
-    void PreDefTableEntry(EnergyPlusData &state, int const columnIndex, std::string const &objName, int const tableEntryInt)
+    void PreDefTableEntry(EnergyPlusData &state, int const columnIndex, std::string_view objName, int const tableEntryInt)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -1430,7 +1430,7 @@ namespace OutputReportPredefined {
         state.dataOutRptPredefined->tableEntry(state.dataOutRptPredefined->numTableEntry).indexColumn = columnIndex;
     }
 
-    std::string RetrievePreDefTableEntry(EnergyPlusData &state, int const columnIndex, std::string const &objName)
+    std::string RetrievePreDefTableEntry(EnergyPlusData &state, int const columnIndex, std::string_view objName)
     {
         for (int iTableEntry = 1; iTableEntry <= state.dataOutRptPredefined->numTableEntry; ++iTableEntry) {
             if (state.dataOutRptPredefined->tableEntry(iTableEntry).indexColumn == columnIndex &&
@@ -1488,11 +1488,8 @@ namespace OutputReportPredefined {
         }
     }
 
-    void AddCompSizeTableEntry(EnergyPlusData &state,
-                               std::string const &FieldType,
-                               std::string const &FieldName,
-                               std::string const &FieldDescription,
-                               Real64 const FieldValue)
+    void AddCompSizeTableEntry(
+        EnergyPlusData &state, std::string_view FieldType, std::string_view FieldName, std::string_view FieldDescription, Real64 const FieldValue)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -1598,10 +1595,7 @@ namespace OutputReportPredefined {
         state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recKind = receivingKind;
     }
 
-    int newPreDefReport(EnergyPlusData &state,
-                        std::string const &inReportName,
-                        std::string const &inReportAbrev,
-                        std::string const &inReportNamewithSpaces)
+    int newPreDefReport(EnergyPlusData &state, std::string_view inReportName, std::string_view inReportAbrev, std::string_view inReportNamewithSpaces)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -1658,7 +1652,7 @@ namespace OutputReportPredefined {
         return newPreDefReport;
     }
 
-    int newPreDefSubTable(EnergyPlusData &state, int const reportIndex, std::string const &subTableName)
+    int newPreDefSubTable(EnergyPlusData &state, int const reportIndex, std::string_view subTableName)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -1711,7 +1705,7 @@ namespace OutputReportPredefined {
         return state.dataOutRptPredefined->numSubTable;
     }
 
-    void addFootNoteSubTable(EnergyPlusData &state, int const subTableIndex, std::string const &footnoteText)
+    void addFootNoteSubTable(EnergyPlusData &state, int const subTableIndex, std::string_view footnoteText)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -1748,7 +1742,7 @@ namespace OutputReportPredefined {
         }
     }
 
-    int newPreDefColumn(EnergyPlusData &state, int const subTableIndex, std::string const &columnHeading)
+    int newPreDefColumn(EnergyPlusData &state, int const subTableIndex, std::string_view columnHeading)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer

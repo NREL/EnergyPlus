@@ -108,7 +108,7 @@ namespace HVACSingleDuctInduc {
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
     void SimIndUnit(EnergyPlusData &state,
-                    std::string const &CompName,   // name of the terminal unit
+                    std::string_view CompName,     // name of the terminal unit
                     bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
                     int const ZoneNum,             // index of zone served by the terminal unit
                     int const ZoneNodeNum,         // zone node number of zone served by the terminal unit
@@ -141,7 +141,7 @@ namespace HVACSingleDuctInduc {
         if (CompIndex == 0) {
             IUNum = UtilityRoutines::FindItemInList(CompName, state.dataHVACSingleDuctInduc->IndUnit);
             if (IUNum == 0) {
-                ShowFatalError(state, "SimIndUnit: Induction Unit not found=" + CompName);
+                ShowFatalError(state, "SimIndUnit: Induction Unit not found=" + std::string{CompName});
             }
             CompIndex = IUNum;
         } else {
@@ -225,7 +225,7 @@ namespace HVACSingleDuctInduc {
         using WaterCoils::GetCoilWaterInletNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetIndUnits "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetIndUnits "); // include trailing blank space
 
         int IUIndex;                     // loop index
         int IUNum;                       // current fan coil number
@@ -297,8 +297,8 @@ namespace HVACSingleDuctInduc {
                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (state.dataHVACSingleDuctInduc->IndUnit(IUNum).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
-                                        cAlphaFields(1) + '=' + Alphas(1));
+                                    std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) +
+                                        " for " + cAlphaFields(1) + '=' + Alphas(1));
                     ErrorsFound = true;
                 }
             }
@@ -427,7 +427,7 @@ namespace HVACSingleDuctInduc {
             // one assumes if there isn't one assigned, it's an error?
             if (state.dataHVACSingleDuctInduc->IndUnit(IUNum).ADUNum == 0) {
                 ShowSevereError(state,
-                                RoutineName + "No matching Air Distribution Unit, for Unit = [" +
+                                std::string{RoutineName} + "No matching Air Distribution Unit, for Unit = [" +
                                     state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType + ',' +
                                     state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name + "].");
                 ShowContinueError(
@@ -477,8 +477,8 @@ namespace HVACSingleDuctInduc {
                                 "Zone Air Terminal Outdoor Air Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutdoorAirFlowRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name);
         }
 
@@ -489,7 +489,7 @@ namespace HVACSingleDuctInduc {
         lAlphaBlanks.deallocate();
         lNumericBlanks.deallocate();
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in getting input. Preceding conditions cause termination.");
+            ShowFatalError(state, std::string{RoutineName} + "Errors found in getting input. Preceding conditions cause termination.");
         }
     }
 
@@ -522,7 +522,7 @@ namespace HVACSingleDuctInduc {
         using PlantUtilities::ScanPlantLoopsForObject;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitIndUnit");
+        static constexpr std::string_view RoutineName("InitIndUnit");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PriNode;     // primary air inlet node number
@@ -800,7 +800,7 @@ namespace HVACSingleDuctInduc {
         using WaterCoils::SetCoilDesFlow;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeIndUnit");
+        static constexpr std::string_view RoutineName("SizeIndUnit");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizHeatNum; // index of plant sizing object for 1st heating loop
@@ -1676,7 +1676,7 @@ namespace HVACSingleDuctInduc {
 
     // ========================= Utilities =======================
 
-    bool FourPipeInductionUnitHasMixer(EnergyPlusData &state, std::string const &CompName) // component (mixer) name
+    bool FourPipeInductionUnitHasMixer(EnergyPlusData &state, std::string_view CompName) // component (mixer) name
     {
 
         // FUNCTION INFORMATION:

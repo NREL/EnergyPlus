@@ -584,7 +584,8 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
                 // Write the bare-window four sky daylight factors at noon time to the eio file; this is done only
                 // for first time that daylight factors are calculated and so is insensitive to possible variation
                 // due to change in ground reflectance from month to month, or change in storm window status.
-                static constexpr auto Format_700("! <Sky Daylight Factors>, MonthAndDay, Zone Name, Window Name, Reference Point, Daylight Factor\n");
+                static constexpr fmt::string_view Format_700(
+                    "! <Sky Daylight Factors>, MonthAndDay, Zone Name, Window Name, Reference Point, Daylight Factor\n");
                 print(state.files.eio, Format_700);
                 for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                     if (state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins == 0 ||
@@ -4367,15 +4368,15 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
                                             format("Daylighting Window Reference Point {} Illuminance", refPtNum),
                                             OutputProcessor::Unit::lux,
                                             state.dataSurface->SurfaceWindow(SurfLoop).IllumFromWinAtRefPtRep(refPtNum),
-                                            "Zone",
-                                            "Average",
+                                            OutputProcessor::SOVTimeStepType::Zone,
+                                            OutputProcessor::SOVStoreType::Average,
                                             state.dataSurface->Surface(SurfLoop).Name);
                         SetupOutputVariable(state,
                                             format("Daylighting Window Reference Point {} View Luminance", refPtNum),
                                             OutputProcessor::Unit::cd_m2,
                                             state.dataSurface->SurfaceWindow(SurfLoop).LumWinFromRefPtRep(refPtNum),
-                                            "Zone",
-                                            "Average",
+                                            OutputProcessor::SOVTimeStepType::Zone,
+                                            OutputProcessor::SOVStoreType::Average,
                                             state.dataSurface->Surface(SurfLoop).Name);
                     }
                 }
@@ -4400,15 +4401,15 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
                                                     "Daylighting Window Reference Point Illuminance",
                                                     OutputProcessor::Unit::lux,
                                                     state.dataSurface->SurfaceWindow(enclSurfNum).IllumFromWinAtRefPtRep(refPtCount),
-                                                    "Zone",
-                                                    "Average",
+                                                    OutputProcessor::SOVTimeStepType::Zone,
+                                                    OutputProcessor::SOVStoreType::Average,
                                                     varKey);
                                 SetupOutputVariable(state,
                                                     "Daylighting Window Reference Point View Luminance",
                                                     OutputProcessor::Unit::cd_m2,
                                                     state.dataSurface->SurfaceWindow(enclSurfNum).LumWinFromRefPtRep(refPtCount),
-                                                    "Zone",
-                                                    "Average",
+                                                    OutputProcessor::SOVTimeStepType::Zone,
+                                                    OutputProcessor::SOVStoreType::Average,
                                                     varKey);
                             }
                         }
@@ -5148,29 +5149,29 @@ void GetDaylightingControls(EnergyPlusData &state,
                                     format("Daylighting Reference Point {} Illuminance", refPtNum),
                                     OutputProcessor::Unit::lux,
                                     zone_daylight.DaylIllumAtRefPt(refPtNum),
-                                    "Zone",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
                                     zone_daylight.Name);
                 SetupOutputVariable(state,
                                     format("Daylighting Reference Point {} Daylight Illuminance Setpoint Exceeded Time", refPtNum),
                                     OutputProcessor::Unit::hr,
                                     zone_daylight.TimeExceedingDaylightIlluminanceSPAtRefPt(refPtNum),
-                                    "Zone",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     zone_daylight.Name);
                 SetupOutputVariable(state,
                                     format("Daylighting Reference Point {} Glare Index", refPtNum),
                                     OutputProcessor::Unit::None,
                                     zone_daylight.GlareIndexAtRefPt(refPtNum),
-                                    "Zone",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
                                     zone_daylight.Name);
                 SetupOutputVariable(state,
                                     format("Daylighting Reference Point {} Glare Index Setpoint Exceeded Time", refPtNum),
                                     OutputProcessor::Unit::hr,
                                     zone_daylight.TimeExceedingGlareIndexSPAtRefPt(refPtNum),
-                                    "Zone",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     zone_daylight.Name);
             }
         }
@@ -5208,8 +5209,8 @@ void GetDaylightingControls(EnergyPlusData &state,
                             "Daylighting Lighting Power Multiplier",
                             OutputProcessor::Unit::None,
                             zone_daylight.ZonePowerReductionFactor,
-                            "Zone",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
                             zone_daylight.Name);
     }
 }
@@ -10514,14 +10515,14 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
         }
 
     } // End of primary zone loop
-    static constexpr auto Format_700(
+    static constexpr fmt::string_view Format_700(
         "! <Zone/Window Adjacency Daylighting Counts>, Zone Name, Number of Exterior Windows, Number of Exterior Windows in Adjacent Zones\n");
     print(state.files.eio, Format_700);
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         if (state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalDaylRefPoints == 0 ||
             state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylightMethod != DataDaylighting::iDaylightingMethod::SplitFluxDaylighting)
             continue;
-        static constexpr auto Format_701("Zone/Window Adjacency Daylighting Counts, {},{},{}\n");
+        static constexpr fmt::string_view Format_701("Zone/Window Adjacency Daylighting Counts, {},{},{}\n");
         print(
             state.files.eio,
             Format_701,
@@ -10529,14 +10530,15 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
             state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalExtWindows,
             (state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins - state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalExtWindows));
     }
-    static constexpr auto Format_702("! <Zone/Window Adjacency Daylighting Matrix>, Zone Name, Number of Adjacent Zones with Windows,Adjacent "
-                                     "Zone Names - 1st 100 (max)\n");
+    static constexpr fmt::string_view Format_702(
+        "! <Zone/Window Adjacency Daylighting Matrix>, Zone Name, Number of Adjacent Zones with Windows,Adjacent "
+        "Zone Names - 1st 100 (max)\n");
     print(state.files.eio, Format_702);
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         if (state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalDaylRefPoints == 0 ||
             state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylightMethod != DataDaylighting::iDaylightingMethod::SplitFluxDaylighting)
             continue;
-        static constexpr auto Format_703("Zone/Window Adjacency Daylighting Matrix, {},{}");
+        static constexpr fmt::string_view Format_703("Zone/Window Adjacency Daylighting Matrix, {},{}");
         print(state.files.eio, Format_703, Zone(ZoneNum).Name, state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfIntWinAdjZones);
         for (int loop = 1, loop_end = min(state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfIntWinAdjZones, 100); loop <= loop_end; ++loop) {
             print(state.files.eio, ",{}", Zone(state.dataDaylightingData->ZoneDaylight(ZoneNum).AdjIntWinZoneNums(loop)).Name);
