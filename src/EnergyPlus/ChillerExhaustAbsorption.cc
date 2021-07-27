@@ -700,9 +700,8 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         ChillerName);
 }
 
-void ExhaustAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
+void ExhaustAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
 {
-    if (this->oneTimeFlag) {
         this->setupOutputVariables(state);
 
         bool errFlag = false;
@@ -841,8 +840,7 @@ void ExhaustAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
             state.dataLoopNodes->Node(this->HeatSupplyNodeNum).TempSetPointLo =
                 state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->HWLoopNum).TempSetPointNodeNum).TempSetPointLo;
         }
-        this->oneTimeFlag = false;
-    }
+
 }
 
 void ExhaustAbsorberSpecs::initialize(EnergyPlusData &state)
@@ -871,8 +869,6 @@ void ExhaustAbsorberSpecs::initialize(EnergyPlusData &state)
     int HeatOutletNode; // node number of hot water outlet node
     Real64 rho;         // local fluid density
     Real64 mdot;        // lcoal fluid mass flow rate
-
-    this->oneTimeInit(state);
 
     CondInletNode = this->CondReturnNodeNum;
     CondOutletNode = this->CondSupplyNodeNum;
@@ -970,8 +966,7 @@ void ExhaustAbsorberSpecs::initialize(EnergyPlusData &state)
             state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->HWLoopNum).TempSetPointNodeNum).TempSetPointLo;
     }
 
-    if ((this->isWaterCooled) && ((this->InHeatingMode) || (this->InCoolingMode)) &&
-        (!this->oneTimeFlag)) { // combining oneTimeInit and plantScanInit could cause a diff here
+    if ((this->isWaterCooled) && ((this->InHeatingMode) || (this->InCoolingMode))) { // combining oneTimeInit and plantScanInit could cause a diff here
         mdot = this->DesCondMassFlowRate;
 
         PlantUtilities::SetComponentFlowRate(
@@ -2145,6 +2140,10 @@ void ExhaustAbsorberSpecs::updateHeatRecords(EnergyPlusData &state, Real64 MyLoa
     this->HeatThermalEnergy = this->HeatThermalEnergyUseRate * RptConstant;
     this->ElectricEnergy = this->ElectricPower * RptConstant;
     this->HeatElectricEnergy = this->HeatElectricPower * RptConstant;
+}
+
+void ExhaustAbsorberSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
 }
 
 } // namespace EnergyPlus::ChillerExhaustAbsorption
