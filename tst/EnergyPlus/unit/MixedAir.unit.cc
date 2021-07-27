@@ -5360,7 +5360,6 @@ TEST_F(EnergyPlusFixture, MechVentController_VRPCap)
     GetOARequirements(*state);
     GetZoneEquipment(*state);
     GetOAControllerInputs(*state);
-    //    GetSystemSizingInput(*state);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(SOAM_VRP, state->dataMixedAir->VentilationMechanical(1).SystemOAMethod);
 
