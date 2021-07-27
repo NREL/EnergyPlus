@@ -3944,6 +3944,8 @@ void ElectricStorage::simulateSimpleBucketModel(EnergyPlusData &state,
                                                 Real64 const controlSOCMaxFracLimit,
                                                 Real64 const controlSOCMinFracLimit)
 {
+    Real64 const minEfficiency = 0.001;
+
     // given arguments for how the storage operation would like to run storage charge or discharge
     // apply model constraints and adjust arguments accordingly
 
@@ -3961,8 +3963,13 @@ void ElectricStorage::simulateSimpleBucketModel(EnergyPlusData &state,
         // now check to see if charge would exceed capacity, and modify to just fill physical storage cap
         if ((lastTimeStepStateOfCharge_ + powerCharge * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour * energeticEfficCharge_) >=
             (maxEnergyCapacity_ * controlSOCMaxFracLimit)) {
-            powerCharge = ((maxEnergyCapacity_ * controlSOCMaxFracLimit) - lastTimeStepStateOfCharge_) /
-                          (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour * energeticEfficCharge_);
+            if (energeticEfficCharge_ >= minEfficiency) {
+                powerCharge = ((maxEnergyCapacity_ * controlSOCMaxFracLimit) - lastTimeStepStateOfCharge_) /
+                              (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour * energeticEfficCharge_);
+            } else {
+                powerCharge = ((maxEnergyCapacity_ * controlSOCMaxFracLimit) - lastTimeStepStateOfCharge_) /
+                              (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour * minEfficiency);
+            }
         }
     } // charging
 
@@ -3998,8 +4005,13 @@ void ElectricStorage::simulateSimpleBucketModel(EnergyPlusData &state,
     if (discharging) {
         pelIntoStorage_ = 0.0;
         pelFromStorage_ = powerDischarge;
-        thisTimeStepStateOfCharge_ = lastTimeStepStateOfCharge_ -
-                                     powerDischarge * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour / energeticEfficDischarge_;
+        if (energeticEfficDischarge_ >= minEfficiency) {
+            thisTimeStepStateOfCharge_ = lastTimeStepStateOfCharge_ - powerDischarge * state.dataHVACGlobal->TimeStepSys *
+                                                                          DataGlobalConstants::SecInHour / energeticEfficDischarge_;
+        } else {
+            thisTimeStepStateOfCharge_ =
+                lastTimeStepStateOfCharge_ - powerDischarge * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour / minEfficiency;
+        }
         thisTimeStepStateOfCharge_ = max(thisTimeStepStateOfCharge_, 0.0);
     }
 
