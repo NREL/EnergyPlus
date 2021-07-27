@@ -88,6 +88,22 @@ namespace gt::utilities {
         return time;
     } // vector<double> time_geometric
 
+    vector<double> time_geometric_auto(double duration, const string& units) {
+        double time_in_seconds = time_to_seconds(duration, units);
+
+        double dt = 100. * 3600.;
+
+        int Nt = ceil(time_in_seconds / dt);
+        if (Nt < 5) {
+            Nt = 5;
+        } else if (Nt > 30) {
+            Nt = 30;
+        }
+
+        vector<double> time = time_geometric(dt, time_in_seconds, Nt);
+        return time;
+    }
+
     vector<double> Eskilson_original_points() {
         // Eskilsons original 27 time steps
         vector<double> logtime = {-8.5, -7.8, -7.2, -6.5, -5.9, -5.2, -4.5,
@@ -170,24 +186,5 @@ namespace gt::utilities {
         // ln(t/ts) = 3.003.
         return time;
     }  // time_vector();
-
-    vector<double> time_vector_constant_expansion(
-            double& H, double& alpha, double& duration,
-            const string& units, const double expansion_constant) {
-        double time_in_seconds = time_to_seconds(duration, units);
-        // find the number of points necessary
-        double log_time_begin = -8.5;
-        double ts = time_scale(H, alpha);
-        double log_time_end = log(time_in_seconds / ts);
-        int n_points = ceil((log_time_end - log_time_begin) /
-                expansion_constant) + 1;
-        vector<double> log_time(n_points, 0);
-        log_time[0] = log_time_begin;
-        for (int i=1; i<n_points;i++) {
-            log_time[i] = log_time_begin + i * expansion_constant;
-        }  // next i
-        vector<double> time = convert_time(log_time, H, alpha);
-        return time;
-    }
 
 } // namespace gt::utilities

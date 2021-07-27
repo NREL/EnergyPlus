@@ -1,5 +1,25 @@
 # History of changes - cpgfunctionEP
 
+## Version 0.3.1 (2021-07-26)
+
+### Fixes
+
+* [Issue 35](https://github.com/j-c-cook/cpgfunctionEP/issues/35) - The adaptive g-function calculation is fixed by 
+  replacing the constant log time vector expansion function with a geometric expansion. The constant log time vector
+  expansion is removed from the library because it is incompatible with Cimmino's load history reconstruction scheme.
+  
+* [Issue 34](https://github.com/j-c-cook/cpgfunctionEP/issues/34) - The discretization function in `gt::segments::adaptive`
+  now takes height as a copy rather than reference. The reason is that EnergyPlus seemed to require it this way, given 
+  the variable was being passed from another objects instance. 
+  
+* [Issue 33](https://github.com/j-c-cook/cpgfunctionEP/issues/33) - EnergyPlus has a clang-tidy check that runs at each 
+  push. The instantiation of `gt::segments::SegmentResponse` was made clang-tidy by reordering the arguments that are 
+  passed in. The instances must be in the same order as the arguments that are passed. 
+
+* [Issue 32](https://github.com/j-c-cook/cpgfunctionEP/issues/32) - The Eigen library is now referenced locally in 
+  CMakeLists. It is not acceptable to require EnergyPlus users to install libraries. Therefore, the find_package 
+  function of CMake is not able to be used for Eigen. 
+
 ## Version 0.3 (2021-07-21)
 
 ### Changes

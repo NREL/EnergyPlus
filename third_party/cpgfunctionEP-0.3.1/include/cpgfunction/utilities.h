@@ -22,6 +22,7 @@ namespace gt::utilities {
     double time_to_seconds(double& duration, const string& units);
 
     vector<double> time_geometric(double dt, double tmax, int Nt);
+    vector<double> time_geometric_auto(double duration, const string& units);
     vector<double> Eskilson_original_points();
     vector<double> time_Eskilson(const double &H, const double &alpha);
     vector<double> convert_time(vector<double> &logtime, const double &H,
@@ -31,9 +32,6 @@ namespace gt::utilities {
                       double H, double alpha);
     vector<double> time_vector_Eskilson(
             double& H, double& alpha, double& duration, const string& units);
-    vector<double> time_vector_constant_expansion(
-            double& H, double& alpha, double& duration,
-            const string& units="sec", const double expansion_constant=0.35);
 
 } // namespace gt::utilities
 
