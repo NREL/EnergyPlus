@@ -1,5 +1,19 @@
 # History of changes - cpgfunctionEP
 
+## Version 0.3.2 (2021-07-27)
+
+### Fixes
+
+* [Issue 38](https://github.com/j-c-cook/cpgfunctionEP/issues/38) - The investigation of this issue reopened 
+  [Issue 35](https://github.com/j-c-cook/cpgfunctionEP/issues/35). There was a bug that occurred when the time value in
+  the interpolation function fell between 0 and t1. This bug had not propagated because time steps that small in the 
+  beginning had never been tested. It was false to claim Cimmino's load history reconstruction methodology required 
+  a special time-step. While it may be slightly more accurate with a geometric expansion, the solution is still valid
+  for all ln(t/ts) values (as it should be).
+  
+* [Issue 34 (Reopened)](https://github.com/j-c-cook/cpgfunctionEP/issues/34) - Both arguments in 
+  `gt::segments::SegmentResponse` are now passed as a copy. 
+
 ## Version 0.3.1 (2021-07-26)
 
 ### Fixes

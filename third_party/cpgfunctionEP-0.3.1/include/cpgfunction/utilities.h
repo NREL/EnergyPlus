@@ -32,6 +32,9 @@ namespace gt::utilities {
                       double H, double alpha);
     vector<double> time_vector_Eskilson(
             double& H, double& alpha, double& duration, const string& units);
+    vector<double> time_vector_constant_expansion(
+            double& H, double& alpha, double& duration,
+            const string& units="sec", const double expansion_constant=0.35);
 
 } // namespace gt::utilities
 

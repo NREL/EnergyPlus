@@ -187,4 +187,23 @@ namespace gt::utilities {
         return time;
     }  // time_vector();
 
+    vector<double> time_vector_constant_expansion(
+            double& H, double& alpha, double& duration,
+            const string& units, const double expansion_constant) {
+        double time_in_seconds = time_to_seconds(duration, units);
+        // find the number of points necessary
+        double log_time_begin = -8.5;
+        double ts = time_scale(H, alpha);
+        double log_time_end = log(time_in_seconds / ts);
+        int n_points = ceil((log_time_end - log_time_begin) /
+                expansion_constant) + 1;
+        vector<double> log_time(n_points, 0);
+        log_time[0] = log_time_begin;
+        for (int i=1; i<n_points;i++) {
+            log_time[i] = log_time_begin + i * expansion_constant;
+        }  // next i
+        vector<double> time = convert_time(log_time, H, alpha);
+        return time;
+    }
+
 } // namespace gt::utilities

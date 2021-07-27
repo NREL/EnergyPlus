@@ -75,8 +75,8 @@ namespace jcc::interpolation {
         // then interpolate 0 to t1
         if (0 < xp && xp < time[0]) {
             double h;
-            SegRes.get_h_value(h, i, j, k);
-            yp = linterp(xp, 0, 0, time[0], h);
+            SegRes.get_h_value(h, i, j, 0);  // this must pull k == 0
+            yp = linterp(xp, 0., 0., time[0], h);
             return;
         }
         // loop until the value for interpolation is found
