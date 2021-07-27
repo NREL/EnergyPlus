@@ -188,6 +188,7 @@ namespace ChillerIndirectAbsorption {
         Real64 ChillerONOFFCyclingFrac;                // fraction of time chiller is on
         Real64 EnergyLossToEnvironment;                // J - piping energy loss from generator outlet to pump inlet
         bool GenInputOutputNodesUsed;
+        bool MyOneTimeFlag;
         bool MyEnvrnFlag;
         ReportVars Report;
         DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl;
@@ -209,7 +210,7 @@ namespace ChillerIndirectAbsorption {
               FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0), PossibleSubcooling(false), CondMassFlowRate(0.0),
               EvapMassFlowRate(0.0), GenMassFlowRate(0.0), CondOutletTemp(0.0), EvapOutletTemp(0.0), GenOutletTemp(0.0), SteamOutletEnthalpy(0.0),
               PumpingPower(0.0), PumpingEnergy(0.0), QGenerator(0.0), GeneratorEnergy(0.0), QEvaporator(0.0), EvaporatorEnergy(0.0), QCondenser(0.0),
-              CondenserEnergy(0.0), ChillerONOFFCyclingFrac(0.0), EnergyLossToEnvironment(0.0), GenInputOutputNodesUsed(false),
+              CondenserEnergy(0.0), ChillerONOFFCyclingFrac(0.0), EnergyLossToEnvironment(0.0), GenInputOutputNodesUsed(false), MyOneTimeFlag(true),
               MyEnvrnFlag(true), EquipFlowCtrl(DataBranchAirLoopPlant::ControlTypeEnum::Unknown)
         {
         }
@@ -230,8 +231,6 @@ namespace ChillerIndirectAbsorption {
         void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
         void oneTimeInit(EnergyPlusData &state) override;
-
-        void oneTimeInit_new(EnergyPlusData &state) override;
 
         void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad);
 
