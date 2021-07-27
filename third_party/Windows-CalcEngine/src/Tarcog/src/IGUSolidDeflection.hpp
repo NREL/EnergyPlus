@@ -5,60 +5,70 @@
 
 #include "IGUSolidLayer.hpp"
 
-namespace Tarcog {
+namespace Tarcog
+{
+    namespace ISO15099
+    {
+        ////////////////////////////////////////////////////////////////////////////
+        ////    CIGUSolidLayerDeflection
+        ////////////////////////////////////////////////////////////////////////////
+        class CIGUSolidLayerDeflection : public CIGUSolidLayer
+        {
+        public:
+            explicit CIGUSolidLayerDeflection(const CIGUSolidLayer & t_SolidLayer);
+            CIGUSolidLayerDeflection(const CIGUSolidLayer & t_SolidLayer,
+                                     double t_YoungsModulus,
+                                     double t_PoisonRatio);
 
-	////////////////////////////////////////////////////////////////////////////
-	////    CIGUSolidLayerDeflection
-	////////////////////////////////////////////////////////////////////////////
-	class CIGUSolidLayerDeflection : public CIGUSolidLayer {
-	public:
-		explicit CIGUSolidLayerDeflection( CIGUSolidLayer const& t_SolidLayer );
-		CIGUSolidLayerDeflection( CIGUSolidLayer const& t_SolidLayer,
-		                          const double t_YoungsModulus, const double t_PoisonRatio );
+            double flexuralRigidity() const;
+            bool isDeflected() const override;
 
-		CIGUSolidLayerDeflection( CIGUSolidLayerDeflection const& t_Layer );
-		CIGUSolidLayerDeflection & operator=( CIGUSolidLayerDeflection const & t_Layer );
+            std::shared_ptr<CBaseLayer> clone() const override;
 
-		double flexuralRigidity() const;
+        protected:
+            void calculateConvectionOrConductionFlow() override;
+            double pressureDifference() const;
 
-		std::shared_ptr< CBaseLayer > clone() const override;
+        private:
+            double m_YoungsModulus;
+            double m_PoisonRatio;
+        };
 
-	protected:
-		void calculateConvectionOrConductionFlow() override;
-		double pressureDifference() const;
+        ////////////////////////////////////////////////////////////////////////////
+        ////    CIGUDeflectionTempAndPressure
+        ////////////////////////////////////////////////////////////////////////////
+        class CIGUDeflectionTempAndPressure : public CIGUSolidLayerDeflection
+        {
+        public:
+            CIGUDeflectionTempAndPressure(
+              const std::shared_ptr<CIGUSolidLayerDeflection> & t_SolidLayer,
+              double t_MaxDeflectionCoeff,
+              double t_MeanDeflectionCoeff);
 
-	private:
-		double m_YoungsModulus;
-		double m_PoisonRatio;
-	};
+            std::shared_ptr<CBaseLayer> clone() const override;
 
-	////////////////////////////////////////////////////////////////////////////
-	////    CIGUDeflectionTempAndPressure
-	////////////////////////////////////////////////////////////////////////////
-	class CIGUDeflectionTempAndPressure : public CIGUSolidLayerDeflection {
-	public:
-		CIGUDeflectionTempAndPressure( std::shared_ptr< CIGUSolidLayerDeflection > const& t_SolidLayer,
-		                               double const t_MaxDeflectionCoeff, double const t_MinDeflectionCoeff );
+        protected:
+            void calculateConvectionOrConductionFlow() override;
 
-	protected:
-		void calculateConvectionOrConductionFlow() override;
+        private:
+            double LdMean(double t_P, double t_D) const;
+            double LdMax(double t_P, double t_D) const;
 
-	private:
-		double LdMean( double const t_P, double const t_D ) const;
-		double LdMax( double const t_P, double const t_D ) const;
+            double m_MaxCoeff;
+            double m_MeanCoeff;
+        };
 
-		double m_MaxCoeff;
-		double m_MeanCoeff;
-	};
-
-	////////////////////////////////////////////////////////////////////////////
-	////    CIGUDeflectionMeasuread
-	////////////////////////////////////////////////////////////////////////////
-	class CIGUDeflectionMeasuread : public CIGUSolidLayerDeflection {
-	public:
-		CIGUDeflectionMeasuread( std::shared_ptr< CIGUSolidLayerDeflection >& t_Layer,
-		                         const double t_MeanDeflection, const double t_MaxDeflection );
-	};
-}
+        ////////////////////////////////////////////////////////////////////////////
+        ////    CIGUDeflectionMeasuread
+        ////////////////////////////////////////////////////////////////////////////
+        class CIGUDeflectionMeasuread : public CIGUSolidLayerDeflection
+        {
+        public:
+            CIGUDeflectionMeasuread(std::shared_ptr<CIGUSolidLayerDeflection> & t_Layer,
+                                    const double t_MeanDeflection,
+                                    const double t_MaxDeflection);
+        };
+    }   // namespace ISO15099
+}   // namespace Tarcog
 
 #endif
