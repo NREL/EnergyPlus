@@ -124,8 +124,8 @@ add_subdirectory(re2)
 set_target_properties(re2 PROPERTIES FOLDER ThirdParty/re2)
 add_subdirectory(fmt-6.1.2)
 set_target_properties(fmt PROPERTIES FOLDER ThirdParty/fmt)
-add_subdirectory(cpgfunctionEP-0.3.1)
-set_target_properties(cpgfunctionEP PROPERTIES FOLDER ThirdParty/cpgfunctionEP-0.3.1)
+add_subdirectory(cpgfunctionEP-0.3.2)
+set_target_properties(cpgfunctionEP PROPERTIES FOLDER ThirdParty/cpgfunctionEP-0.3.2)
 
 # Kiva
 include(cmake/kiva.cmake)

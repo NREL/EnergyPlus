@@ -221,9 +221,6 @@ namespace gt::gfunction {
         }  // next i
 
         for (int p=0; p<nt; p++) {
-            if (p==1) {
-                int a = 1;
-            }
             // ------------- fill A ------------
             start = std::chrono::steady_clock::now();
             auto _fillA = [&Hb, &dt, &time, &SegRes, &A]
@@ -443,7 +440,7 @@ namespace gt::gfunction {
             jcc::interpolation::interp1d(t_reconstructed, yp, t, y);
 
             int idx;
-            for (int j=0; j<p; j++) {
+            for (int j=0; j<p+1; j++) {
                 double c = yp[j];
                 double d = yp[j+1];
                 double e = dt_reconstructed[j];
@@ -507,3 +504,4 @@ namespace gt::gfunction {
         }  // next k
     }  // _temporal_superposition();
 } // namespace gt::gfunction
+            

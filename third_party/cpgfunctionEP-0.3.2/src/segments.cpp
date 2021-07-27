@@ -37,7 +37,7 @@ namespace gt::segments {
         index = i * (2*nSources - i - 1) / 2 + j;
     }  // SegmentResponse::get_index_value();
 
-    int adaptive::discretize(double height, double& drilling_depth) {
+    int adaptive::discretize(double height, double drilling_depth) {
         // Given the height of a field and the total drilling depth
         // determine the ideal number of segments for UBHWT to match
         // a converged UIFT solution

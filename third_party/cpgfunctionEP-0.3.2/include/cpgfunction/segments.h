@@ -76,7 +76,7 @@ namespace gt::segments {
 
         adaptive() = default; // constructor
 
-        int discretize(double height, double& drilling_depth);
+        int discretize(double height, double drilling_depth);
 
     };
 
