@@ -1694,10 +1694,17 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
                 }
             }
             if (!nameFound) {
-                ShowSevereError(
-                    state,
-                    format("{} Field[{}]=\"{}\", invalid report name -- will not be reported.", CurrentModuleObject, iReport, AlphArray(iReport)));
-                //      ErrorsFound=.TRUE.
+                if (UtilityRoutines::SameString(AlphArray(iReport), "Standard62.1Summary")) {
+                    ShowWarningError(state, format("{} Field[{}]=\"Standard62.1Summary\", Report is not enabled.", CurrentModuleObject, iReport));
+                    ShowContinueError(state, "Do Zone Sizing or Do System Sizing must be enabled in SimulationControl.");
+
+                } else {
+                    ShowSevereError(
+                        state,
+                        format(
+                            "{} Field[{}]=\"{}\", invalid report name -- will not be reported.", CurrentModuleObject, iReport, AlphArray(iReport)));
+                    //      ErrorsFound=.TRUE.
+                }
             }
         }
         CreatePredefinedMonthlyReports(state);

@@ -89,6 +89,9 @@
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
+// C++ Headers
+#include <algorithm>
+
 using namespace EnergyPlus;
 using namespace DataGlobalConstants;
 using namespace DataEnvironment;
@@ -9911,4 +9914,70 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_PredefinedTable_SigDigits_Forc
 
     PreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizCalcVdot, "MyPlant Sizing Pass 1", value, 0);
     EXPECT_EQ("0.12E+09", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizCalcVdot, "MyPlant Sizing Pass 1"));
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_PredefinedTable_Standard62_1_NoSizing)
+{
+    // Test for #8822 - new warning to explain why Standard62.1 report is not enabled
+    std::string const idf_objects = delimited_string({
+        "Output:Table:SummaryReports,",
+        " Standard62.1Summary; !- Report 1 Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // These are already set to these values, but be explicit.
+    // Because DoZoneSizing and DoSystemSizing are both false Standard62.1Summary is **not** enabled
+    state->files.outputControl.tabular = true;
+    state->dataGlobal->DoZoneSizing = false;
+    state->dataGlobal->DoSystemSizing = false;
+
+    EXPECT_EQ(1, state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Output:Table:SummaryReports"));
+
+    EXPECT_EQ(0, state->dataOutRptPredefined->numReportName);
+    SetPredefinedTables(*state);
+    EXPECT_GT(state->dataOutRptPredefined->numReportName, 0);
+    auto &reportNameArray = state->dataOutRptPredefined->reportName;
+    auto it = std::find_if(
+        reportNameArray.begin(), reportNameArray.end(), [](const auto &rN) { return UtilityRoutines::SameString("Standard62.1Summary", rN.name); });
+    EXPECT_FALSE(it != reportNameArray.end()); // Not found
+
+    GetInputOutputTableSummaryReports(*state);
+
+    std::string expected_error =
+        delimited_string({"   ** Warning ** Output:Table:SummaryReports Field[1]=\"Standard62.1Summary\", Report is not enabled.",
+                          "   **   ~~~   ** Do Zone Sizing or Do System Sizing must be enabled in SimulationControl."});
+
+    compare_err_stream(expected_error, true);
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_PredefinedTable_Standard62_1_WithSizing)
+{
+    // Test for #8822 - ensures that when Zone/System sizing is requested, the report is there and the warning isn't.
+    std::string const idf_objects = delimited_string({
+        "Output:Table:SummaryReports,",
+        " Standard62.1Summary; !- Report 1 Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // Because DoZoneSizing is true Standard62.1Summary **is** enabled
+    state->files.outputControl.tabular = true;
+    state->dataGlobal->DoZoneSizing = true;
+    state->dataGlobal->DoSystemSizing = false;
+
+    EXPECT_EQ(1, state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Output:Table:SummaryReports"));
+
+    EXPECT_EQ(0, state->dataOutRptPredefined->numReportName);
+    SetPredefinedTables(*state);
+    EXPECT_GT(state->dataOutRptPredefined->numReportName, 0);
+    auto &reportNameArray = state->dataOutRptPredefined->reportName;
+    auto it = std::find_if(
+        reportNameArray.begin(), reportNameArray.end(), [](const auto &rN) { return UtilityRoutines::SameString("Standard62.1Summary", rN.name); });
+    EXPECT_TRUE(it != reportNameArray.end());
+    // EXPECT_TRUE(UtilityRoutines::FindItem("Standard62.1Summary", state->dataOutRptPredefined->reportName));
+
+    GetInputOutputTableSummaryReports(*state);
+
+    EXPECT_FALSE(has_err_output(true));
 }
