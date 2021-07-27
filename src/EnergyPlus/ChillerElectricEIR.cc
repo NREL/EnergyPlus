@@ -997,7 +997,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
     }
 }
 
-void ElectricEIRChillerSpecs::oneTimeInit_new(EnergyPlusData &state)
+void ElectricEIRChillerSpecs::oneTimeInit(EnergyPlusData &state)
 {
     this->setupOutputVars(state);
 
@@ -1250,6 +1250,10 @@ void ElectricEIRChillerSpecs::initialize(EnergyPlusData &state, bool const RunFl
     //  Uses the status flags to trigger initializations.
 
     // Init more variables
+    if (this->oneTimeFlag) {
+        this->oneTimeInit(state);
+        this->oneTimeFlag = false;
+    }
 
     this->EquipFlowCtrl =
         state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowCtrl;
@@ -2509,10 +2513,6 @@ void ElectricEIRChillerSpecs::update(EnergyPlusData &state, Real64 const MyLoad,
             this->HeatRecMassFlow = state.dataLoopNodes->Node(this->HeatRecInletNodeNum).MassFlowRate;
         }
     }
-}
-
-void ElectricEIRChillerSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
-{
 }
 
 } // namespace EnergyPlus::ChillerElectricEIR
