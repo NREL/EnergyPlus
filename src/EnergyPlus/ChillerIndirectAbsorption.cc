@@ -712,8 +712,9 @@ void IndirectAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
     }
 }
 
-void IndirectAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
+void IndirectAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
 {
+    this->setupOutputVars(state);
     // Locate the chillers on the plant loops for later usage
     bool errFlag = false;
     PlantUtilities::ScanPlantLoopsForObject(state,
@@ -839,11 +840,6 @@ void IndirectAbsorberSpecs::initialize(EnergyPlusData &state, bool RunFlag, Real
     static constexpr std::string_view RoutineName("InitIndirectAbsorpChiller");
 
     // Init more variables
-    if (this->MyOneTimeFlag) {
-        this->oneTimeInit(state);
-        this->setupOutputVars(state);
-        this->MyOneTimeFlag = false;
-    }
 
     this->EquipFlowCtrl =
         state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowCtrl;
@@ -2187,6 +2183,10 @@ void IndirectAbsorberSpecs::updateRecords(EnergyPlusData &state, Real64 MyLoad, 
             state.dataLoopNodes->Node(this->GeneratorOutletNodeNum).Temp = this->GenOutletTemp;
         }
     }
+}
+
+void IndirectAbsorberSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
 }
 
 } // namespace EnergyPlus::ChillerIndirectAbsorption
