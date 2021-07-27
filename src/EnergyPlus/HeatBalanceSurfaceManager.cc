@@ -3201,7 +3201,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                             SurfNum2 = state.dataDaylightingDevicesData->TDDPipe(state.dataSurface->SurfWinTDDPipeNum(SurfNum)).Dome;
                         }
 
-                        std::pair<Real64, Real64> incomingAngle = getSunWCEAngles(state, SurfNum2, BSDFHemisphere::Incoming);
+                        std::pair<Real64, Real64> incomingAngle = getSunWCEAngles(state, SurfNum2, BSDFDirection::Incoming);
                         Real64 Theta = incomingAngle.first;
                         Real64 Phi = incomingAngle.second;
 
