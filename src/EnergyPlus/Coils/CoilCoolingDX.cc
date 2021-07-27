@@ -245,35 +245,66 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
 {
 
     // setup output variables, needs to be done after object is instantiated and emplaced
-    SetupOutputVariable(
-        state, "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, this->totalCoolingEnergyRate, "System", "Average", this->name);
+    SetupOutputVariable(state,
+                        "Cooling Coil Total Cooling Rate",
+                        OutputProcessor::Unit::W,
+                        this->totalCoolingEnergyRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
     SetupOutputVariable(state,
                         "Cooling Coil Total Cooling Energy",
                         OutputProcessor::Unit::J,
                         this->totalCoolingEnergy,
-                        "System",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
                         this->name,
                         _,
                         "ENERGYTRANSFER",
                         "COOLINGCOILS",
                         _,
                         "System");
-    SetupOutputVariable(
-        state, "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, this->sensCoolingEnergyRate, "System", "Average", this->name);
-    SetupOutputVariable(
-        state, "Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, this->sensCoolingEnergy, "System", "Sum", this->name);
-    SetupOutputVariable(
-        state, "Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, this->latCoolingEnergyRate, "System", "Average", this->name);
-    SetupOutputVariable(state, "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, this->latCoolingEnergy, "System", "Sum", this->name);
-    SetupOutputVariable(
-        state, "Cooling Coil Electricity Rate", OutputProcessor::Unit::W, this->performance.powerUse, "System", "Average", this->name);
+    SetupOutputVariable(state,
+                        "Cooling Coil Sensible Cooling Rate",
+                        OutputProcessor::Unit::W,
+                        this->sensCoolingEnergyRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
+    SetupOutputVariable(state,
+                        "Cooling Coil Sensible Cooling Energy",
+                        OutputProcessor::Unit::J,
+                        this->sensCoolingEnergy,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->name);
+    SetupOutputVariable(state,
+                        "Cooling Coil Latent Cooling Rate",
+                        OutputProcessor::Unit::W,
+                        this->latCoolingEnergyRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
+    SetupOutputVariable(state,
+                        "Cooling Coil Latent Cooling Energy",
+                        OutputProcessor::Unit::J,
+                        this->latCoolingEnergy,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->name);
+    SetupOutputVariable(state,
+                        "Cooling Coil Electricity Rate",
+                        OutputProcessor::Unit::W,
+                        this->performance.powerUse,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
     SetupOutputVariable(state,
                         "Cooling Coil Electricity Energy",
                         OutputProcessor::Unit::J,
                         this->performance.electricityConsumption,
-                        "System",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
                         this->name,
                         _,
                         "Electricity",
@@ -286,15 +317,15 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
                             "Cooling Coil " + this->performance.compressorFuelTypeForOutput + " Rate",
                             OutputProcessor::Unit::W,
                             this->performance.compressorFuelRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             this->name);
         SetupOutputVariable(state,
                             "Cooling Coil " + this->performance.compressorFuelTypeForOutput + " Energy",
                             OutputProcessor::Unit::J,
                             this->performance.compressorFuelConsumption,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             this->name,
                             _,
                             this->performance.compressorFuelTypeForOutput,
@@ -303,21 +334,26 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
                             "System");
     }
 
-    SetupOutputVariable(
-        state, "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, this->coolingCoilRuntimeFraction, "System", "Average", this->name);
+    SetupOutputVariable(state,
+                        "Cooling Coil Runtime Fraction",
+                        OutputProcessor::Unit::None,
+                        this->coolingCoilRuntimeFraction,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
     SetupOutputVariable(state,
                         "Cooling Coil Crankcase Heater Electricity Rate",
                         OutputProcessor::Unit::W,
                         this->performance.crankcaseHeaterPower,
-                        "System",
-                        "Average",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
                         this->name);
     SetupOutputVariable(state,
                         "Cooling Coil Crankcase Heater Electricity Energy",
                         OutputProcessor::Unit::J,
                         this->performance.crankcaseHeaterElectricityConsumption,
-                        "System",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
                         this->name,
                         _,
                         "Electricity",
@@ -325,57 +361,105 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
                         _,
                         "System");
     // Ported from variable speed coil
-    SetupOutputVariable(
-        state, "Cooling Coil Air Mass Flow Rate", OutputProcessor::Unit::kg_s, this->airMassFlowRate, "System", "Average", this->name);
-    SetupOutputVariable(
-        state, "Cooling Coil Air Inlet Temperature", OutputProcessor::Unit::C, this->inletAirDryBulbTemp, "System", "Average", this->name);
+    SetupOutputVariable(state,
+                        "Cooling Coil Air Mass Flow Rate",
+                        OutputProcessor::Unit::kg_s,
+                        this->airMassFlowRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
+    SetupOutputVariable(state,
+                        "Cooling Coil Air Inlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->inletAirDryBulbTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
     SetupOutputVariable(state,
                         "Cooling Coil Air Inlet Humidity Ratio",
                         OutputProcessor::Unit::kgWater_kgDryAir,
                         this->inletAirHumRat,
-                        "System",
-                        "Average",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
                         this->name);
-    SetupOutputVariable(
-        state, "Cooling Coil Air Outlet Temperature", OutputProcessor::Unit::C, this->outletAirDryBulbTemp, "System", "Average", this->name);
+    SetupOutputVariable(state,
+                        "Cooling Coil Air Outlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->outletAirDryBulbTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
     SetupOutputVariable(state,
                         "Cooling Coil Air Outlet Humidity Ratio",
                         OutputProcessor::Unit::kgWater_kgDryAir,
                         this->outletAirHumRat,
-                        "System",
-                        "Average",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
                         this->name);
-    SetupOutputVariable(
-        state, "Cooling Coil Part Load Ratio", OutputProcessor::Unit::None, this->partLoadRatioReport, "System", "Average", this->name);
-    SetupOutputVariable(state, "Cooling Coil Upper Speed Level", OutputProcessor::Unit::None, this->speedNumReport, "System", "Average", this->name);
-    SetupOutputVariable(
-        state, "Cooling Coil Neighboring Speed Levels Ratio", OutputProcessor::Unit::None, this->speedRatioReport, "System", "Average", this->name);
+    SetupOutputVariable(state,
+                        "Cooling Coil Part Load Ratio",
+                        OutputProcessor::Unit::None,
+                        this->partLoadRatioReport,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
+    SetupOutputVariable(state,
+                        "Cooling Coil Upper Speed Level",
+                        OutputProcessor::Unit::None,
+                        this->speedNumReport,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
+    SetupOutputVariable(state,
+                        "Cooling Coil Neighboring Speed Levels Ratio",
+                        OutputProcessor::Unit::None,
+                        this->speedRatioReport,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
     SetupOutputVariable(state,
                         "Cooling Coil Condenser Inlet Temperature",
                         OutputProcessor::Unit::C,
                         this->condenserInletTemperature,
-                        "System",
-                        "Average",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
                         this->name);
-    SetupOutputVariable(
-        state, "Cooling Coil Dehumidification Mode", OutputProcessor::Unit::None, this->dehumidificationMode, "System", "Average", this->name);
-    SetupOutputVariable(state, "Cooling Coil Waste Heat Power", OutputProcessor::Unit::W, this->wasteHeatEnergyRate, "System", "Average", this->name);
-    SetupOutputVariable(state, "Cooling Coil Waste Heat Energy", OutputProcessor::Unit::J, this->wasteHeatEnergy, "System", "Sum", this->name);
+    SetupOutputVariable(state,
+                        "Cooling Coil Dehumidification Mode",
+                        OutputProcessor::Unit::None,
+                        this->dehumidificationMode,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
+    SetupOutputVariable(state,
+                        "Cooling Coil Waste Heat Power",
+                        OutputProcessor::Unit::W,
+                        this->wasteHeatEnergyRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
+    SetupOutputVariable(state,
+                        "Cooling Coil Waste Heat Energy",
+                        OutputProcessor::Unit::J,
+                        this->wasteHeatEnergy,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->name);
 
     if (this->performance.evapCondBasinHeatCap > 0) {
         SetupOutputVariable(state,
                             "Cooling Coil Basin Heater Electricity Rate",
                             OutputProcessor::Unit::W,
                             this->performance.basinHeaterPower,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             this->name);
         SetupOutputVariable(state,
                             "Cooling Coil Basin Heater Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->performance.basinHeaterElectricityConsumption,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             this->name,
                             _,
                             "Electricity",
@@ -388,15 +472,15 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
                             "Cooling Coil Condensate Volume Flow Rate",
                             OutputProcessor::Unit::m3_s,
                             this->condensateVolumeFlow,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             this->name);
         SetupOutputVariable(state,
                             "Cooling Coil Condensate Volume",
                             OutputProcessor::Unit::m3,
                             this->condensateVolumeConsumption,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             this->name,
                             _,
                             "OnSiteWater",
@@ -409,15 +493,15 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
                             "Cooling Coil Evaporative Condenser Pump Electricity Rate",
                             OutputProcessor::Unit::W,
                             this->evapCondPumpElecPower,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             this->name);
         SetupOutputVariable(state,
                             "Cooling Coil Evaporative Condenser Pump Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->evapCondPumpElecConsumption,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             this->name,
                             _,
                             "Electricity",
@@ -428,15 +512,15 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
                             "Cooling Coil Evaporative Condenser Water Volume Flow Rate",
                             OutputProcessor::Unit::m3_s,
                             this->evaporativeCondSupplyTankVolumeFlow,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             this->name);
         SetupOutputVariable(state,
                             "Cooling Coil Evaporative Condenser Water Volume",
                             OutputProcessor::Unit::m3,
                             this->evaporativeCondSupplyTankConsump,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             this->name,
                             _,
                             "Water",
@@ -447,8 +531,8 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
                             "Cooling Coil Evaporative Condenser Mains Supply Water Volume",
                             OutputProcessor::Unit::m3,
                             this->evaporativeCondSupplyTankConsump,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             this->name,
                             _,
                             "MainsWater",
@@ -461,29 +545,29 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
                             "SubcoolReheat Cooling Coil Operation Mode",
                             OutputProcessor::Unit::None,
                             this->performance.OperatingMode,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             this->name);
         SetupOutputVariable(state,
                             "SubcoolReheat Cooling Coil Operation Mode Ratio",
                             OutputProcessor::Unit::None,
                             this->performance.ModeRatio,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             this->name);
         SetupOutputVariable(state,
                             "SubcoolReheat Cooling Coil Recovered Heat Energy Rate",
                             OutputProcessor::Unit::W,
                             this->recoveredHeatEnergyRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             this->name);
         SetupOutputVariable(state,
                             "SubcoolReheat Cooling Coil Recovered Heat Energy",
                             OutputProcessor::Unit::J,
                             this->recoveredHeatEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             this->name,
                             _,
                             "ENERGYTRANSFER",
@@ -497,12 +581,17 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
                             "Secondary Coil Heat Rejection Rate",
                             OutputProcessor::Unit::W,
                             this->secCoilSensHeatRejEnergyRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             this->name);
 
-        SetupOutputVariable(
-            state, "Secondary Coil Heat Rejection Energy", OutputProcessor::Unit::J, this->secCoilSensHeatRejEnergy, "System", "Sum", this->name);
+        SetupOutputVariable(state,
+                            "Secondary Coil Heat Rejection Energy",
+                            OutputProcessor::Unit::J,
+                            this->secCoilSensHeatRejEnergy,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->name);
     }
 }
 

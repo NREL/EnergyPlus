@@ -345,8 +345,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                             "Generic Air Contaminant Constant Source Generation Volume Flow Rate",
                             OutputProcessor::Unit::m3_s,
                             state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCGenRate,
-                            "Zone",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataContaminantBalance->ZoneContamGenericConstant(Loop).Name);
 
         // Zone total report variables
@@ -357,8 +357,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                                 "Zone Generic Air Contaminant Generation Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataHeatBal->ZnRpt(ZonePtr).GCRate,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatBal->Zone(ZonePtr).Name);
         }
         SetupZoneInternalGain(state,
@@ -483,8 +483,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                             "Generic Air Contaminant Pressure Driven Generation Volume Flow Rate",
                             OutputProcessor::Unit::m3_s,
                             state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).GCGenRate,
-                            "Zone",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).Name);
 
         if (state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfNum > 0) {
@@ -503,8 +503,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                                 "Zone Generic Air Contaminant Generation Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataHeatBal->ZnRpt(ZonePtr).GCRate,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatBal->Zone(ZonePtr).Name);
         }
         if (ZonePtr > 0)
@@ -611,8 +611,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                             "Generic Air Contaminant Cutoff Model Generation Volume Flow Rate",
                             OutputProcessor::Unit::m3_s,
                             state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).GCGenRate,
-                            "Zone",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).Name);
 
         // Zone total report variables
@@ -623,8 +623,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                                 "Zone Generic Air Contaminant Generation Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataHeatBal->ZnRpt(ZonePtr).GCRate,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatBal->Zone(ZonePtr).Name);
         }
         SetupZoneInternalGain(state,
@@ -730,15 +730,15 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                             "Generic Air Contaminant Decay Model Generation Volume Flow Rate",
                             OutputProcessor::Unit::m3_s,
                             state.dataContaminantBalance->ZoneContamGenericDecay(Loop).GCGenRate,
-                            "Zone",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataContaminantBalance->ZoneContamGenericDecay(Loop).Name);
         SetupOutputVariable(state,
                             "Generic Air Contaminant Decay Model Generation Emission Start Elapsed Time",
                             OutputProcessor::Unit::s,
                             state.dataContaminantBalance->ZoneContamGenericDecay(Loop).GCTime,
-                            "Zone",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataContaminantBalance->ZoneContamGenericDecay(Loop).Name);
 
         // Zone total report variables
@@ -749,8 +749,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                                 "Zone Generic Air Contaminant Generation Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataHeatBal->ZnRpt(ZonePtr).GCRate,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatBal->Zone(ZonePtr).Name);
         }
         SetupZoneInternalGain(state,
@@ -855,16 +855,16 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                             "Generic Air Contaminant Boundary Layer Diffusion Generation Volume Flow Rate",
                             OutputProcessor::Unit::m3_s,
                             state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).GCGenRate,
-                            "Zone",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).Name);
         if (state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).SurfNum > 0) {
             SetupOutputVariable(state,
                                 "Generic Air Contaminant Boundary Layer Diffusion Inside Face Concentration",
                                 OutputProcessor::Unit::ppm,
                                 state.dataSurface->SurfGenericContam(state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).SurfNum),
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).SurfName);
         }
 
@@ -876,8 +876,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                                 "Zone Generic Air Contaminant Generation Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataHeatBal->ZnRpt(ZonePtr).GCRate,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatBal->Zone(ZonePtr).Name);
         }
         SetupZoneInternalGain(state,
@@ -972,8 +972,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                             "Generic Air Contaminant Deposition Velocity Removal Volume Flow Rate",
                             OutputProcessor::Unit::m3_s,
                             state.dataContaminantBalance->ZoneContamGenericDVS(Loop).GCGenRate,
-                            "Zone",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataContaminantBalance->ZoneContamGenericDVS(Loop).Name);
 
         ZonePtr = state.dataSurface->Surface(state.dataContaminantBalance->ZoneContamGenericDVS(Loop).SurfNum).Zone;
@@ -984,8 +984,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                                 "Zone Generic Air Contaminant Generation Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataHeatBal->ZnRpt(ZonePtr).GCRate,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatBal->Zone(ZonePtr).Name);
         }
         SetupZoneInternalGain(state,
@@ -1082,8 +1082,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                             "Generic Air Contaminant Deposition Rate Removal Volume Flow Rate",
                             OutputProcessor::Unit::m3_s,
                             state.dataContaminantBalance->ZoneContamGenericDRS(Loop).GCGenRate,
-                            "Zone",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataContaminantBalance->ZoneContamGenericDRS(Loop).Name);
 
         ZonePtr = state.dataContaminantBalance->ZoneContamGenericDRS(Loop).ActualZoneNum;
@@ -1094,8 +1094,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                                 "Zone Generic Air Contaminant Generation Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataHeatBal->ZnRpt(ZonePtr).GCRate,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatBal->Zone(ZonePtr).Name);
         }
         SetupZoneInternalGain(state,
@@ -1434,29 +1434,29 @@ void InitZoneContSetPoints(EnergyPlusData &state)
                                     "Zone Air CO2 Concentration",
                                     OutputProcessor::Unit::ppm,
                                     state.dataContaminantBalance->ZoneAirCO2(Loop),
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->Zone(Loop).Name);
                 SetupOutputVariable(state,
                                     "Zone Air CO2 Predicted Load to Setpoint Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
                                     state.dataContaminantBalance->CO2PredictedRate(Loop),
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->Zone(Loop).Name);
                 SetupOutputVariable(state,
                                     "Zone Air CO2 Setpoint Concentration",
                                     OutputProcessor::Unit::ppm,
                                     state.dataContaminantBalance->ZoneCO2SetPoint(Loop),
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->Zone(Loop).Name);
                 SetupOutputVariable(state,
                                     "Zone Air CO2 Internal Gain Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     state.dataContaminantBalance->ZoneCO2Gain(Loop),
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->Zone(Loop).Name);
             }
 
@@ -1502,22 +1502,22 @@ void InitZoneContSetPoints(EnergyPlusData &state)
                                     "Zone Air Generic Air Contaminant Concentration",
                                     OutputProcessor::Unit::ppm,
                                     state.dataContaminantBalance->ZoneAirGC(Loop),
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->Zone(Loop).Name);
                 SetupOutputVariable(state,
                                     "Zone Generic Air Contaminant Predicted Load to Setpoint Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
                                     state.dataContaminantBalance->GCPredictedRate(Loop),
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->Zone(Loop).Name);
                 SetupOutputVariable(state,
                                     "Zone Generic Air Contaminant Setpoint Concentration",
                                     OutputProcessor::Unit::ppm,
                                     state.dataContaminantBalance->ZoneGCSetPoint(Loop),
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->Zone(Loop).Name);
             }
         } // Loop
