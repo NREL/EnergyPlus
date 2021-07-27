@@ -2589,9 +2589,25 @@ namespace SurfaceGeometry {
             ShowWarningError(state, RoutineName + "When using DElight daylighting the presence of exterior shading surfaces is ignored.");
         }
 
-        // Initialize run time surface arrays
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
+            // Initialize run time surface arrays
             state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->Surface(SurfNum).Construction;
+            // Automatic Surface Multipliers: Assign representative heat transfer surfaces
+            bool useAutomaticSurfaceMultipliers = true; // TODO: Replace with user input
+            if (useAutomaticSurfaceMultipliers) {
+                // Conditions where surface always needs to be unique
+                bool forceUniqueSurface = state.dataSurface->Surface(SurfNum).HasShadeControl || state.dataSurface->SurfWinAirflowSource(SurfNum);
+                if (forceUniqueSurface) {
+                    state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum = SurfNum;
+                } else {
+                    // Make hash key for this surface (used to determine uniqueness)
+                    state.dataSurface->Surface(SurfNum).make_hash_key(state, SurfNum);
+                    // Insert surface key into map. If key already exists, it will not be added.
+                    state.dataSurface->RepresentativeSurfaceMap.insert({state.dataSurface->Surface(SurfNum).calcHashKey,SurfNum});
+                    // Assign the representative surface number based on the first instance of the identical key
+                    state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum = state.dataSurface->RepresentativeSurfaceMap[state.dataSurface->Surface(SurfNum).calcHashKey];
+                }
+            }
         }
     }
 

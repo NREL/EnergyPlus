@@ -623,6 +623,49 @@ Real64 SurfaceData::get_average_height(EnergyPlusData &state) const
     return std::abs(averageHeight) / SinTilt;
 }
 
+void SurfaceData::make_hash_key(EnergyPlusData &state, const int&  SurfNum)
+{
+    calcHashKey = SurfaceCalcHashKey();
+    calcHashKey.Construction = Construction;
+    calcHashKey.Azimuth = round(Azimuth * 10.0) / 10.0;
+    calcHashKey.Tilt = round(Tilt * 10.0) / 10.0;
+    calcHashKey.Height = round(Height * 10.0) / 10.0;
+    calcHashKey.Zone = Zone;
+    calcHashKey.TAirRef = TAirRef;
+
+    auto& extBoundCond = state.dataSurface->Surface(SurfNum).ExtBoundCond;
+    if (extBoundCond > 0) {
+        calcHashKey.ExtZone = state.dataSurface->Surface(extBoundCond).Zone;
+    } else {
+        calcHashKey.ExtZone = 0;
+    }
+
+    calcHashKey.ExtSolar = ExtSolar;
+    calcHashKey.ExtWind = ExtWind;
+    calcHashKey.ViewFactorGround = round(ViewFactorGround * 10.0) / 10.0;
+    calcHashKey.ViewFactorSky = round(ViewFactorSky * 10.0) / 10.0;
+
+    calcHashKey.HeatTransferAlgorithm = HeatTransferAlgorithm;
+    calcHashKey.IntConvCoeff = IntConvCoeff;
+    calcHashKey.ExtConvCoeff = ExtConvCoeff;
+    calcHashKey.OSCPtr = OSCPtr;
+    calcHashKey.OSCMPtr = OSCMPtr;
+
+    calcHashKey.FrameDivider = FrameDivider;
+    calcHashKey.SurfWinStormWinConstr = state.dataSurface->SurfWinStormWinConstr(SurfNum);
+
+    calcHashKey.MaterialMovInsulExt = MaterialMovInsulExt;
+    calcHashKey.MaterialMovInsulInt = MaterialMovInsulInt;
+    calcHashKey.SchedMovInsulExt = SchedMovInsulExt;
+    calcHashKey.SchedMovInsulInt = SchedMovInsulInt;
+    calcHashKey.ExternalShadingSchInd = ExternalShadingSchInd;
+    calcHashKey.SurroundingSurfacesNum = SurroundingSurfacesNum;
+    calcHashKey.LinkedOutAirNode = LinkedOutAirNode;
+    calcHashKey.OutsideHeatSourceTermSchedule = OutsideHeatSourceTermSchedule;
+    calcHashKey.InsideHeatSourceTermSchedule = InsideHeatSourceTermSchedule;
+
+}
+
 // Functions
 
 void SetSurfaceOutBulbTempAt(EnergyPlusData &state)

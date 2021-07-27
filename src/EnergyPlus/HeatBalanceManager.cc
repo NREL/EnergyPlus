@@ -7947,6 +7947,8 @@ namespace HeatBalanceManager {
                     ErrorsFound = true;
                 } else {
                     state.dataSurface->SurfIncSolSSG(Loop).SurfPtr = SurfNum;
+                    // Automatic Surface Multipliers: Do not use representative surfaces
+                    state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum = SurfNum;
                 }
 
                 // Assign construction number

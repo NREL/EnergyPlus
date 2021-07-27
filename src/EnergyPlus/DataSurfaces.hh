@@ -51,6 +51,7 @@
 // C++ Headers
 #include <cstddef>
 #include <vector>
+#include <unordered_map>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -545,7 +546,148 @@ namespace DataSurfaces {
 
     }; // Surface2D
 
-    struct SurfaceData
+struct SurfaceCalcHashKey
+{
+    // Values that must be the same in order for surfaces to use a representative calculation
+
+    int Construction;         // Pointer to the construction in the Construct derived type
+    Real64 Azimuth;           // Direction the surface outward normal faces (degrees) or FACING
+    Real64 Tilt;              // Angle (deg) between the ground outward normal and the surface outward normal
+    Real64 Height;            // Height of the surface (m)
+    int Zone;                 // Interior environment or zone the surface is a part of
+    int TAirRef;              // Flag for reference air temperature
+    int ExtZone;              // For an "interzone" surface, this is the adjacent ZONE number (not adjacent SURFACE number).
+    bool ExtSolar;            // True if the "outside" of the surface is exposed to solar
+    bool ExtWind;             // True if the "outside" of the surface is exposed to wind
+    Real64 ViewFactorGround;  // View factor to the ground from the exterior of the surface for diffuse solar radiation
+    Real64 ViewFactorSky;     // View factor to the sky from the exterior of the surface for diffuse solar radiation
+
+    // Special Properties
+    iHeatTransferModel HeatTransferAlgorithm; // used for surface-specific heat transfer algorithm.
+    int IntConvCoeff;                         // Interior Convection Coefficient Algorithm pointer (different data structure)
+    int ExtConvCoeff;                         // Exterior Convection Coefficient Algorithm pointer (different data structure)
+    int OSCPtr;                               // Pointer to OSC data structure
+    int OSCMPtr;                              // "Pointer" to OSCM data structure (other side conditions from a model)
+
+    // Windows
+    int FrameDivider;                         // Pointer to frame and divider information (windows only)
+    int SurfWinStormWinConstr;                // Construction with storm window (windows only)
+    //   Airflow control                      // Not supported
+    //   Shading Control                      // Not supported
+
+    // Other special boundary conditions
+    //   SolarIncidentInside                  // Not supported
+    int MaterialMovInsulExt;                  // Pointer to the material used for exterior movable insulation
+    int MaterialMovInsulInt;                  // Pointer to the material used for interior movable insulation
+    int SchedMovInsulExt;                     // Schedule for exterior movable insulation
+    int SchedMovInsulInt;                     // Schedule for interior movable insulation
+    int ExternalShadingSchInd;                // Schedule for a the external shading
+    int SurroundingSurfacesNum;               // Index of a surrounding surfaces list (defined in SurfaceProperties::SurroundingSurfaces)
+    int LinkedOutAirNode;                     // Index of the an OutdoorAir:Node
+    int OutsideHeatSourceTermSchedule;        // Pointer to the schedule of additional source of heat flux rate applied to the outside surface
+    int InsideHeatSourceTermSchedule;         // Pointer to the schedule of additional source of heat flux rate applied to the inside surface
+
+    // based on boost::hash_combine
+    std::size_t hash_combine(std::size_t current_hash, std::size_t new_hash) const
+    {
+        current_hash ^= new_hash + 0x9e3779b9 + (current_hash << 6) + (current_hash >> 2);
+        return current_hash;
+    }
+
+    std::vector<std::size_t> get_hash_list() const
+    {
+        using std::hash;
+
+        return {
+            hash<int>()(Construction),
+            hash<Real64>()(Azimuth),
+            hash<Real64>()(Tilt),
+            hash<Real64>()(Height),
+            hash<int>()(Zone),
+            hash<int>()(TAirRef),
+            hash<int>()(ExtZone),
+            hash<bool>()(ExtSolar),
+            hash<bool>()(ExtWind),
+            hash<Real64>()(ViewFactorGround),
+            hash<Real64>()(ViewFactorSky),
+
+            hash<iHeatTransferModel>()(HeatTransferAlgorithm),
+            hash<int>()(IntConvCoeff),
+            hash<int>()(ExtConvCoeff),
+            hash<int>()(OSCPtr),
+            hash<int>()(OSCMPtr),
+
+            hash<int>()(FrameDivider),
+            hash<int>()(SurfWinStormWinConstr),
+
+            hash<int>()(MaterialMovInsulExt),
+            hash<int>()(MaterialMovInsulInt),
+            hash<int>()(SchedMovInsulExt),
+            hash<int>()(SchedMovInsulInt),
+            hash<int>()(ExternalShadingSchInd),
+            hash<int>()(SurroundingSurfacesNum),
+            hash<int>()(LinkedOutAirNode),
+            hash<int>()(OutsideHeatSourceTermSchedule),
+            hash<int>()(InsideHeatSourceTermSchedule)
+        };
+    }
+
+    std::size_t get_hash() const
+    {
+        auto hash_list = get_hash_list();
+        std::size_t combined_hash = 0u;
+        for (auto hash : hash_list)
+        {
+            combined_hash = hash_combine(combined_hash,hash);
+        }
+        return combined_hash;
+    }
+
+    bool operator==(const SurfaceCalcHashKey &other) const
+    {
+        return (Construction == other.Construction &&
+            Azimuth == other.Azimuth &&
+            Tilt == other.Tilt &&
+            Height == other.Height &&
+            Zone == other.Zone &&
+            ExtZone == other.ExtZone &&
+            ExtSolar == other.ExtSolar &&
+            ExtWind == other.ExtWind &&
+            ViewFactorGround == other.ViewFactorGround &&
+            ViewFactorSky == other.ViewFactorSky &&
+
+            HeatTransferAlgorithm == other.HeatTransferAlgorithm &&
+            IntConvCoeff == other.IntConvCoeff &&
+            ExtConvCoeff == other.ExtConvCoeff &&
+            OSCPtr == other.OSCPtr &&
+            OSCMPtr == other.OSCMPtr &&
+
+            FrameDivider == other.FrameDivider &&
+            SurfWinStormWinConstr == other.SurfWinStormWinConstr &&
+
+            MaterialMovInsulExt == other.MaterialMovInsulExt &&
+            MaterialMovInsulInt == other.MaterialMovInsulInt &&
+            SchedMovInsulExt == other.SchedMovInsulExt &&
+            SchedMovInsulInt == other.SchedMovInsulInt &&
+            ExternalShadingSchInd == other.ExternalShadingSchInd &&
+            SurroundingSurfacesNum == other.SurroundingSurfacesNum &&
+            LinkedOutAirNode == other.LinkedOutAirNode &&
+            OutsideHeatSourceTermSchedule == other.OutsideHeatSourceTermSchedule &&
+            InsideHeatSourceTermSchedule == other.InsideHeatSourceTermSchedule
+        );
+    }
+};
+
+struct SurfaceCalcHasher
+{
+    std::size_t operator()(const SurfaceCalcHashKey& key) const
+    {
+        return key.get_hash();
+    }
+};
+
+
+struct SurfaceData
     {
 
         // Types
@@ -555,6 +697,10 @@ namespace DataSurfaces {
         // Members
         std::string Name;                 // User supplied name of the surface (must be unique)
         int Construction;                 // Pointer to the construction in the Construct derived type
+
+        int RepresentativeCalcSurfNum;    // Index of the surface that is used to calculate the heat
+                                          // balance for this surface
+
         bool EMSConstructionOverrideON;   // if true, EMS is calling to override the construction value
         int EMSConstructionOverrideValue; // pointer value to use for Construction when overridden
         int ConstructionStoredInputValue; // holds the original value for Construction per surface input
@@ -754,12 +900,14 @@ namespace DataSurfaces {
         int SolarEnclSurfIndex; //  Pointer to solar enclosure surface data, ZoneSolarInfo(n).SurfacePtr(RadEnclSurfIndex) points to this surface
         bool IsAirBoundarySurf; // True if surface is an air boundary surface (Construction:AirBoundary),
 
+        SurfaceCalcHashKey calcHashKey; // Hash key used for determining if this surface requires unique calculations.
+
         std::vector<int> DisabledShadowingZoneList; // Array of all disabled shadowing zone number to the current surface
                                                     // the surface diffusion model
 
         // Default Constructor
         SurfaceData()
-            : Construction(0), EMSConstructionOverrideON(false), EMSConstructionOverrideValue(0), ConstructionStoredInputValue(0),
+            : Construction(0), RepresentativeCalcSurfNum(-1), EMSConstructionOverrideON(false), EMSConstructionOverrideValue(0), ConstructionStoredInputValue(0),
               Class(SurfaceClass::None), Shape(SurfaceShape::None), Sides(0), Area(0.0), GrossArea(0.0), NetAreaShadowCalc(0.0), Perimeter(0.0),
               Azimuth(0.0), Height(0.0), Reveal(0.0), Tilt(0.0), Width(0.0), HeatTransSurf(false), OutsideHeatSourceTermSchedule(0),
               InsideHeatSourceTermSchedule(0), HeatTransferAlgorithm(iHeatTransferModel::NotSet), BaseSurf(0), NumSubSurfaces(0), Zone(0),
@@ -821,6 +969,8 @@ namespace DataSurfaces {
         int getTotLayers(EnergyPlusData &state) const;
 
         Real64 get_average_height(EnergyPlusData &state) const;
+
+        void make_hash_key(EnergyPlusData &state, const int&  SurfNum);
 
     private: // Methods
              // Computed Shape Category
@@ -1339,6 +1489,9 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfBmToDiffReflFacGnd; // Factor for incident solar from diffuse beam refl from ground
     Array1D<Real64> SurfSkyDiffReflFacGnd;  // sky diffuse reflection view factors from ground
     Array2D<Real64> SurfWinA;               // Time step value of factor for beam absorbed in window glass layers
+
+    std::unordered_map<DataSurfaces::SurfaceCalcHashKey, int, DataSurfaces::SurfaceCalcHasher> RepresentativeSurfaceMap; // A map that categorizes similar surfaces with
+                                                                       // a single representative surface index
 
     // Time step value of factor for diffuse absorbed in window layers
     Array2D<Real64> SurfWinADiffFront;
