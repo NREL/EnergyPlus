@@ -504,4 +504,3 @@ namespace gt::gfunction {
         }  // next k
     }  // _temporal_superposition();
 } // namespace gt::gfunction
-            
