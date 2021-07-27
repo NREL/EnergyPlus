@@ -509,7 +509,11 @@ namespace HeatBalanceIntRadExchange {
             int numEnclosureSurfaces = 0;
             for (int spaceNum : thisEnclosure.SpaceNums) {
                 // Note that Space.Surfaces only includes HT surfs, see SurfaceGeometry::CreateMissingSpaces
-                numEnclosureSurfaces += int(state.dataHeatBal->Space(spaceNum).Surfaces.size());
+                // But it also includes air boundary surfaces which need to be excluded here
+                for (int surfNum : state.dataHeatBal->Space(spaceNum).Surfaces) {
+                    if (state.dataSurface->Surface(surfNum).IsAirBoundarySurf) continue;
+                    ++numEnclosureSurfaces;
+                }
             }
             thisEnclosure.NumOfSurfaces = numEnclosureSurfaces;
             state.dataHeatBalIntRadExchg->MaxNumOfRadEnclosureSurfs =
@@ -532,6 +536,7 @@ namespace HeatBalanceIntRadExchange {
             for (int const spaceNum : thisEnclosure.SpaceNums) {
                 int priorZoneTotEnclSurfs = enclosureSurfNum;
                 for (int surfNum : state.dataHeatBal->Space(spaceNum).Surfaces) {
+                    if (state.dataSurface->Surface(surfNum).IsAirBoundarySurf) continue;
                     ++enclosureSurfNum;
                     thisEnclosure.SurfacePtr(enclosureSurfNum) = surfNum;
                 }
@@ -816,7 +821,11 @@ namespace HeatBalanceIntRadExchange {
             int numEnclosureSurfaces = 0;
             for (int spaceNum : thisEnclosure.SpaceNums) {
                 // Note that Space.Surfaces only includes HT surfs, see SurfaceGeometry::CreateMissingSpaces
-                numEnclosureSurfaces += int(state.dataHeatBal->Space(spaceNum).Surfaces.size());
+                // But it also includes air boundary surfaces which need to be excluded here
+                for (int surfNum : state.dataHeatBal->Space(spaceNum).Surfaces) {
+                    if (state.dataSurface->Surface(surfNum).IsAirBoundarySurf) continue;
+                    ++numEnclosureSurfaces;
+                }
             }
             thisEnclosure.NumOfSurfaces = numEnclosureSurfaces;
             if (numEnclosureSurfaces < 1) ShowFatalError(state, "No surfaces in an enclosure in InitSolarViewFactors");
@@ -834,7 +843,7 @@ namespace HeatBalanceIntRadExchange {
             for (int const spaceNum : thisEnclosure.SpaceNums) {
                 int priorZoneTotEnclSurfs = enclosureSurfNum;
                 for (int surfNum : state.dataHeatBal->Space(spaceNum).Surfaces) {
-                    // Do not include non-heat transfer surfaces
+                    if (state.dataSurface->Surface(surfNum).IsAirBoundarySurf) continue;
                     ++enclosureSurfNum;
                     thisEnclosure.SurfacePtr(enclosureSurfNum) = surfNum;
                     // Store pointers back to here
@@ -1277,7 +1286,7 @@ namespace HeatBalanceIntRadExchange {
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         NoUserInputF = true;
         UserFZoneIndex = state.dataInputProcessing->inputProcessor->getObjectItemNum(
-            state, "ZoneProperty:UserViewFactors:BySurfaceName", "zone_or_zonelist_name", EnclosureName);
+            state, "ZoneProperty:UserViewFactors:BySurfaceName", "space_or_spacelist_name", EnclosureName);
 
         if (UserFZoneIndex > 0) {
             enclosureSurfaceNames.allocate(N);

@@ -243,8 +243,7 @@ void DayltgAveInteriorReflectance(EnergyPlusData &state, int const ZoneNum) // E
 
     // Average inside surface reflectance of enclosure
     if (AInsTot <= 0.0) {
-        ShowSevereError(state,
-                        "DayltgAveInteriorReflectance: Total opaque surface area is <=0.0 in solar enclosure=" + thisEnclosure.Name);
+        ShowSevereError(state, "DayltgAveInteriorReflectance: Total opaque surface area is <=0.0 in solar enclosure=" + thisEnclosure.Name);
         ShowFatalError(state, "Program terminates due to preceding conditions.");
     }
     state.dataDaylightingData->EnclDaylight(enclNum).AveVisDiffReflect = ARHTOT / AInsTot;
@@ -490,7 +489,6 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
             if ((state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalDaylRefPoints > 0 &&
                  state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins > 0) ||
                 state.dataDaylightingData->ZoneDaylight(ZoneNum).AdjZoneHasDayltgCtrl) {
-                int const enclNum = state.dataHeatBal->Zone(ZoneNum).ZoneFirstSpaceSolEnclosure;
                 DayltgAveInteriorReflectance(state, ZoneNum);
             }
         }
