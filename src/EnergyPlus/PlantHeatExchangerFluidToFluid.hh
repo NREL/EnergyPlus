@@ -92,6 +92,8 @@ namespace PlantHeatExchangerFluidToFluid {
         CoolingDifferentialOnOff,
         CoolingSetPointOnOffWithComponentOverride,
         TrackComponentOnOff,
+        LoadControl,               // for steam to water HX
+        TemperatureSetpointControl // for steam to water HX
     };
 
     enum class iCtrlTemp
@@ -128,6 +130,8 @@ namespace PlantHeatExchangerFluidToFluid {
         Real64 OutletQuality;
         Real64 InletEnthalpy;
         Real64 OutletEnthalpy;
+        Real64 InletSteamPress;
+        Real64 LoopLoss;
 
         // Default Constructor
         PlantConnectionStruct()
@@ -155,6 +159,7 @@ namespace PlantHeatExchangerFluidToFluid {
         std::string Name;
         int TypeNum;
         int AvailSchedNum;
+
         iFluidHXType HeatExchangeModelType;
         Real64 UA;
         bool UAWasAutoSized; // true is UA was autosized on input
@@ -217,6 +222,8 @@ namespace PlantHeatExchangerFluidToFluid {
         void size(EnergyPlusData &state);
 
         void calculate(EnergyPlusData &state, Real64 SupSideMdot, Real64 DmdSideMdot);
+
+        void calculateSteamToWaterHX(EnergyPlusData &state, Real64 const MyLoad, Real64 const DmdSideMdot);
 
         void control(EnergyPlusData &state, int LoopNum, Real64 MyLoad, bool FirstHVACIteration);
 
