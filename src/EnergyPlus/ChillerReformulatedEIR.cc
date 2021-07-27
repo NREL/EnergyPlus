@@ -779,9 +779,8 @@ void ReformulatedEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
     }
 }
 
-void ReformulatedEIRChillerSpecs::oneTimeInit_new(EnergyPlusData &state)
+void ReformulatedEIRChillerSpecs::oneTimeInit(EnergyPlusData &state)
 {
-    this->setupOutputVars(state);
     // Locate the chillers on the plant loops for later usage
     bool errFlag = false;
     PlantUtilities::ScanPlantLoopsForObject(state,
@@ -907,6 +906,11 @@ void ReformulatedEIRChillerSpecs::initialize(EnergyPlusData &state, bool const R
     static constexpr std::string_view RoutineName("InitElecReformEIRChiller");
 
     // Init more variables
+    if (this->MyInitFlag) {
+        this->oneTimeInit(state);
+        this->setupOutputVars(state);
+        this->MyInitFlag = false;
+    }
 
     this->EquipFlowCtrl =
         state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowCtrl;
@@ -2761,10 +2765,6 @@ void ReformulatedEIRChillerSpecs::checkMinMaxCurveBoundaries(EnergyPlusData &sta
                                            this->ChillerEIRFPLR);
         }
     }
-}
-
-void ReformulatedEIRChillerSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
-{
 }
 
 } // namespace EnergyPlus::ChillerReformulatedEIR

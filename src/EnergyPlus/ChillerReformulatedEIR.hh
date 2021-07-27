@@ -190,6 +190,7 @@ namespace ChillerReformulatedEIR {
         Real64 FaultyChillerFoulingFactor; // Chiller fouling factor
         std::string EndUseSubcategory;     // identifier use for the end use subcategory
         bool MyEnvrnFlag;
+        bool MyInitFlag;
         bool MySizeFlag;
         Real64 ChillerCondAvgTemp;   // average condenser temp for curves with Heat recovery [C]
         Real64 ChillerFalseLoadRate; // Chiller false load over and above water side load [J]
@@ -240,7 +241,7 @@ namespace ChillerReformulatedEIR {
               IterFailed(0), IterFailedIndex(0), DeltaTErrCount(0), DeltaTErrCountIndex(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0),
               CWCompNum(0), CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0), HRLoopNum(0), HRLoopSideNum(0), HRBranchNum(0),
               HRCompNum(0), CondMassFlowIndex(0), PossibleSubcooling(false), FaultyChillerFoulingFlag(false), FaultyChillerFoulingIndex(0),
-              FaultyChillerFoulingFactor(1.0), MyEnvrnFlag(true), MySizeFlag(true), ChillerCondAvgTemp(0.0),
+              FaultyChillerFoulingFactor(1.0), MyEnvrnFlag(true), MyInitFlag(true), MySizeFlag(true), ChillerCondAvgTemp(0.0),
               ChillerFalseLoadRate(0.0), ChillerCyclingRatio(0.0), ChillerPartLoadRatio(0.0), ChillerEIRFPLR(0.0), ChillerEIRFT(0.0),
               ChillerCapFT(0.0), HeatRecOutletTemp(0.0), QHeatRecovery(0.0), QCondenser(0.0), QEvaporator(0.0), Power(0.0), EvapOutletTemp(0.0),
               CondOutletTemp(0.0), EvapMassFlowRate(0.0), CondMassFlowRate(0.0), ChillerFalseLoad(0.0), Energy(0.0), EvapEnergy(0.0), CondEnergy(0.0),
@@ -267,8 +268,6 @@ namespace ChillerReformulatedEIR {
         void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
         void oneTimeInit(EnergyPlusData &state) override;
-
-        void oneTimeInit_new(EnergyPlusData &state) override;
 
         void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad);
 
