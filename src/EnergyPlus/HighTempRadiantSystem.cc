@@ -1331,8 +1331,8 @@ namespace HighTempRadiantSystem {
             ZoneNum = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ZonePtr;
 
             state.dataHeatBalFanSys->QHTRadSysToPerson(ZoneNum) = state.dataHighTempRadSys->QHTRadSource(RadSysNum) *
-                                                         state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracRadiant *
-                                                         state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracDistribPerson;
+                                                                  state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracRadiant *
+                                                                  state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracDistribPerson;
 
             state.dataHeatBalFanSys->QdotRadHVACToPerson(ZoneNum) += state.dataHeatBalFanSys->QHTRadSysToPerson(ZoneNum);
 

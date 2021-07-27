@@ -100,12 +100,12 @@ namespace DataHeatBalFanSys {
 
 struct HeatBalFanSysData : BaseGlobalStruct
 {
-    Array1D<Real64> SumConvHTRadSys;         // Sum of convection to zone air from hi temp radiant heaters
-    Array1D<Real64> SumLatentHTRadSys;       // Sum of latent gains from hi temp radiant heaters
-    Array1D<Real64> SumConvPool;             // Sum of convection to zone air from pools
-    Array1D<Real64> SumLatentPool;           // Sum of latent gains from pools
-    Array1D<Real64> QHTRadSysToPerson;       // Sum of radiant gains to people from hi temp radiant heaters
-    Array1D<Real64> QdotRadHVACToPerson;     // Sum of radiant gains to people from HVAC
+    Array1D<Real64> SumConvHTRadSys;     // Sum of convection to zone air from hi temp radiant heaters
+    Array1D<Real64> SumLatentHTRadSys;   // Sum of latent gains from hi temp radiant heaters
+    Array1D<Real64> SumConvPool;         // Sum of convection to zone air from pools
+    Array1D<Real64> SumLatentPool;       // Sum of latent gains from pools
+    Array1D<Real64> QHTRadSysToPerson;   // Sum of radiant gains to people from hi temp radiant heaters
+    Array1D<Real64> QdotRadHVACToPerson; // Sum of radiant gains to people from HVAC
     // Zone air drybulb conditions variables
     Array1D<Real64> ZTAV;         // Zone Air Temperature Averaged over the Zone Time step
     Array1D<Real64> MAT;          // MEAN AIR TEMPERATURE (C)
