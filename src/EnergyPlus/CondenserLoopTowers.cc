@@ -2030,10 +2030,8 @@ namespace CondenserLoopTowers {
         }
     }
 
-    void CoolingTower::oneTimeInit_new(EnergyPlusData &state)
+    void CoolingTower::oneTimeInit(EnergyPlusData &state)
     {
-        this->setupOutputVariables(state);
-
         // Locate the tower on the plant loops for later usage
         bool ErrorsFound = false;
         PlantUtilities::ScanPlantLoopsForObject(
@@ -2086,6 +2084,12 @@ namespace CondenserLoopTowers {
 
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
+
+        if (this->oneTimeFlag) {
+            this->setupOutputVariables(state);
+            this->oneTimeInit(state);
+            this->oneTimeFlag = false;
+        }
 
         // Begin environment initializations
         if (this->envrnFlag && state.dataGlobal->BeginEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
@@ -6443,10 +6447,6 @@ namespace CondenserLoopTowers {
             this->WaterAmountUsed = this->WaterUsage * ReportingConstant;
             this->BasinHeaterConsumption = this->BasinHeaterPower * ReportingConstant;
         }
-    }
-
-    void CoolingTower::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
-    {
     }
 
 } // namespace CondenserLoopTowers
