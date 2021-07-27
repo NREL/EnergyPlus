@@ -5,66 +5,92 @@
 #include <map>
 #include <vector>
 
-namespace Tarcog {
+#include "IGU.hpp"
 
-	enum class Environment;
-	class CIGU;
-	class CBaseIGULayer;
-	class CIGUSolidLayer;
-	class CIGUGapLayer;
-	class CEnvironment;
-	class CNonLinearSolver;
+namespace Tarcog
+{
+    namespace ISO15099
+    {
+        enum class Environment;
 
-	class CSingleSystem {
-	public:
-		CSingleSystem( std::shared_ptr< CIGU > const& t_IGU,
-		               std::shared_ptr< CEnvironment > const& t_Indoor,
-		               std::shared_ptr< CEnvironment > const& t_Outdoor );
+        class CBaseIGULayer;
 
-		CSingleSystem( CSingleSystem const & t_SingleSystem );
-		CSingleSystem & operator=( CSingleSystem const & t_SingleSystem );
+        class CIGUSolidLayer;
 
-		std::vector< std::shared_ptr< CIGUSolidLayer > > getSolidLayers() const;
-		std::vector< std::shared_ptr< CIGUGapLayer > > getGapLayers() const;
+        class CIGUGapLayer;
 
-		std::shared_ptr< std::vector< double > > getTemperatures() const;
-		std::shared_ptr< std::vector< double > > getRadiosities() const;
+        class CEnvironment;
 
-		std::shared_ptr< std::vector< double > > getMaxDeflections() const;
-		std::shared_ptr< std::vector< double > > getMeanDeflections() const;
+        class CNonLinearSolver;
 
-		std::shared_ptr< CSingleSystem > clone() const;
+        class CSingleSystem
+        {
+        public:
+            CSingleSystem(CIGU & t_IGU,
+                          const std::shared_ptr<CEnvironment> & t_Indoor,
+                          const std::shared_ptr<CEnvironment> & t_Outdoor);
 
-		double getHeatFlow( Environment const t_Environment ) const;
-		double getConvectiveHeatFlow( Environment const t_Environment ) const;
-		double getRadiationHeatFlow( Environment const t_Environment ) const;
-		double getHc( Environment const t_Environment ) const;
-		double getAirTemperature( Environment const t_Environment ) const;
+            CSingleSystem(const CSingleSystem & t_SingleSystem);
+            CSingleSystem & operator=(const CSingleSystem & t_SingleSystem);
 
-		// If interior layer have openings, this will return heat flow from airflow
-		double getVentilationFlow( Environment const t_Environment ) const;
-		double getUValue() const;
-		size_t getNumberOfIterations() const;
-		double solutionTolarance() const;
-		bool isToleranceAchieved() const;
+            [[nodiscard]] std::vector<std::shared_ptr<CIGUSolidLayer>> getSolidLayers() const;
+            [[nodiscard]] std::vector<std::shared_ptr<CIGUGapLayer>> getGapLayers() const;
 
-		// Set solution tolerance
-		void setTolerance( double const t_Tolerance ) const;
-		// Set intial guess for solution.
-		void setInitialGuess( std::vector< double > const& t_Temperatures ) const;
+            [[nodiscard]] std::vector<double> getSolidEffectiveLayerConductivities() const;
+            [[nodiscard]] std::vector<double> getGapEffectiveLayerConductivities() const;
 
-		void setSolarRadiation( double const t_SolarRadiation );
-		double getSolarRadiation() const;
+            [[nodiscard]] std::vector<double> getTemperatures() const;
+            [[nodiscard]] std::vector<double> getRadiosities() const;
 
-		void solve() const;
+            [[nodiscard]] std::vector<double> getMaxDeflections() const;
+            [[nodiscard]] std::vector<double> getMeanDeflections() const;
 
-	private:
-		std::shared_ptr< CIGU > m_IGU;
-		std::map< Environment, std::shared_ptr< CEnvironment > > m_Environment;
-		std::shared_ptr< CNonLinearSolver > m_NonLinearSolver;
-		void initializeStartValues();
-	};
+            [[nodiscard]] std::shared_ptr<CSingleSystem> clone() const;
 
-}
+            [[nodiscard]] double getHeatFlow(Environment t_Environment) const;
+            [[nodiscard]] double getConvectiveHeatFlow(Environment t_Environment) const;
+            [[nodiscard]] double getRadiationHeatFlow(Environment t_Environment) const;
+            [[nodiscard]] double getHc(Environment t_Environment) const;
+            [[nodiscard]] double getAirTemperature(Environment t_Environment) const;
+
+            // If interior layer have openings, this will return heat flow from airflow
+            [[nodiscard]] double getVentilationFlow(Environment t_Environment) const;
+            [[nodiscard]] double getUValue() const;
+            [[nodiscard]] size_t getNumberOfIterations() const;
+            [[nodiscard]] double solutionTolarance() const;
+            [[nodiscard]] bool isToleranceAchieved() const;
+
+            [[nodiscard]] double EffectiveConductivity() const;
+
+            // Set solution tolerance
+            void setTolerance(double t_Tolerance) const;
+            // Set intial guess for solution.
+            void setInitialGuess(const std::vector<double> & t_Temperatures) const;
+
+            void setSolarRadiation(double t_SolarRadiation);
+            [[nodiscard]] double getSolarRadiation() const;
+
+            void solve() const;
+
+            [[nodiscard]] double thickness() const;
+
+            void setAbsorptances(const std::vector<double> & absorptances);
+
+            void setWidth(double width);
+            void setHeight(double height);
+
+            //! If IGU is part of the window then frame will still count in surface height.
+            void setInteriorAndExteriorSurfacesHeight(double height);
+
+        private:
+            CIGU m_IGU;
+            std::map<Environment, std::shared_ptr<CEnvironment>> m_Environment;
+            std::shared_ptr<CNonLinearSolver> m_NonLinearSolver;
+            void initializeStartValues();
+        };
+
+    }   // namespace ISO15099
+
+}   // namespace Tarcog
 
 #endif
