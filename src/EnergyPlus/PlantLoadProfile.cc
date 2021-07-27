@@ -633,24 +633,24 @@ void GetPlantProfileInput(EnergyPlusData &state)
                                 "Plant Load Profile Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).MassFlowRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name);
 
             SetupOutputVariable(state,
                                 "Plant Load Profile Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Power,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name);
 
             SetupOutputVariable(state,
                                 "Plant Load Profile Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Energy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -662,8 +662,8 @@ void GetPlantProfileInput(EnergyPlusData &state)
                                 "Plant Load Profile Heating Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).HeatingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name,
                                 _,
                                 "PLANTLOOPHEATINGDEMAND",
@@ -675,8 +675,8 @@ void GetPlantProfileInput(EnergyPlusData &state)
                                 "Load Profile Steam Outlet Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).OutletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name);
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
