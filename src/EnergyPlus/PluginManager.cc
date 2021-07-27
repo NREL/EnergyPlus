@@ -164,16 +164,16 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
                 EnergyPlus::ShowFatalError(state, "Python Plugin Output Variable problem causes program termination");
             }
             bool isMetered = false;
-            std::string sAvgOrSum = "Average";
+            OutputProcessor::SOVStoreType sAvgOrSum = OutputProcessor::SOVStoreType::Average;
             if (avgOrSum == "SUMMED") {
-                sAvgOrSum = "Sum";
+                sAvgOrSum = OutputProcessor::SOVStoreType::Summed;
             } else if (avgOrSum == "METERED") {
-                sAvgOrSum = "Sum";
+                sAvgOrSum = OutputProcessor::SOVStoreType::Summed;
                 isMetered = true;
             }
-            std::string sUpdateFreq = "Zone";
+            OutputProcessor::SOVTimeStepType sUpdateFreq = OutputProcessor::SOVTimeStepType::Zone;
             if (updateFreq == "SYSTEMTIMESTEP") {
-                sUpdateFreq = "System";
+                sUpdateFreq = OutputProcessor::SOVTimeStepType::System;
             }
             OutputProcessor::Unit thisUnit = OutputProcessor::Unit::None;
             if (!units.empty()) {

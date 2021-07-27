@@ -749,15 +749,15 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
                             "Pipe Fluid Heat Transfer Rate",
                             OutputProcessor::Unit::W,
                             state.dataPipeHT->PipeHT(Item).FluidHeatLossRate,
-                            "Plant",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Plant,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPipeHT->PipeHT(Item).Name);
         SetupOutputVariable(state,
                             "Pipe Fluid Heat Transfer Energy",
                             OutputProcessor::Unit::J,
                             state.dataPipeHT->PipeHT(Item).FluidHeatLossEnergy,
-                            "Plant",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::Plant,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataPipeHT->PipeHT(Item).Name);
 
         if (state.dataPipeHT->PipeHT(Item).EnvironmentPtr == iEnvrnPtr::ZoneEnv) {
@@ -765,15 +765,15 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
                                 "Pipe Ambient Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataPipeHT->PipeHT(Item).EnvironmentHeatLossRate,
-                                "Plant",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Plant,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPipeHT->PipeHT(Item).Name);
             SetupOutputVariable(state,
                                 "Pipe Ambient Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataPipeHT->PipeHT(Item).EnvHeatLossEnergy,
-                                "Plant",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::Plant,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataPipeHT->PipeHT(Item).Name);
 
             SetupZoneInternalGain(state,
@@ -788,29 +788,29 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
                             "Pipe Mass Flow Rate",
                             OutputProcessor::Unit::kg_s,
                             state.dataPipeHT->PipeHT(Item).MassFlowRate,
-                            "Plant",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Plant,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPipeHT->PipeHT(Item).Name);
         SetupOutputVariable(state,
                             "Pipe Volume Flow Rate",
                             OutputProcessor::Unit::m3_s,
                             state.dataPipeHT->PipeHT(Item).VolumeFlowRate,
-                            "Plant",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Plant,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPipeHT->PipeHT(Item).Name);
         SetupOutputVariable(state,
                             "Pipe Inlet Temperature",
                             OutputProcessor::Unit::C,
                             state.dataPipeHT->PipeHT(Item).FluidInletTemp,
-                            "Plant",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Plant,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPipeHT->PipeHT(Item).Name);
         SetupOutputVariable(state,
                             "Pipe Outlet Temperature",
                             OutputProcessor::Unit::C,
                             state.dataPipeHT->PipeHT(Item).FluidOutletTemp,
-                            "Plant",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Plant,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPipeHT->PipeHT(Item).Name);
     }
 }

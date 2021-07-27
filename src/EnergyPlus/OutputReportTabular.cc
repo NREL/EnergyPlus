@@ -1694,10 +1694,17 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
                 }
             }
             if (!nameFound) {
-                ShowSevereError(
-                    state,
-                    format("{} Field[{}]=\"{}\", invalid report name -- will not be reported.", CurrentModuleObject, iReport, AlphArray(iReport)));
-                //      ErrorsFound=.TRUE.
+                if (UtilityRoutines::SameString(AlphArray(iReport), "Standard62.1Summary")) {
+                    ShowWarningError(state, format("{} Field[{}]=\"Standard62.1Summary\", Report is not enabled.", CurrentModuleObject, iReport));
+                    ShowContinueError(state, "Do Zone Sizing or Do System Sizing must be enabled in SimulationControl.");
+
+                } else {
+                    ShowSevereError(
+                        state,
+                        format(
+                            "{} Field[{}]=\"{}\", invalid report name -- will not be reported.", CurrentModuleObject, iReport, AlphArray(iReport)));
+                    //      ErrorsFound=.TRUE.
+                }
             }
         }
         CreatePredefinedMonthlyReports(state);
@@ -14409,7 +14416,7 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
             // if exterior is other side coefficients using ground preprocessor terms then
             // set it to ground instead of other side coefficients
             if (curExtBoundCond == OtherSideCoefNoCalcExt || curExtBoundCond == OtherSideCoefCalcExt) {
-                if (has_prefixi(state.dataSurface->OSC(state.dataSurface->Surface(kSurf).OSCPtr).Name, "surfPropOthSdCoef")) {
+                if (has_prefixi(AsString(state.dataSurface->OSC(state.dataSurface->Surface(kSurf).OSCPtr).Name), "surfPropOthSdCoef")) {
                     curExtBoundCond = Ground;
                 }
             }
