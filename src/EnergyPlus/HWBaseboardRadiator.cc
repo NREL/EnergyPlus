@@ -1736,16 +1736,13 @@ namespace HWBaseboardRadiator {
         auto &HWBaseboardDesignObject = state.dataHWBaseboardRad->HWBaseboardDesignObject;
         auto &QBBRadSource = state.dataHWBaseboardRad->QBBRadSource;
 
-        // Initialize arrays
-        state.dataHeatBalFanSys->QHWBaseboardToPerson = 0.0;
-
         for (BaseboardNum = 1; BaseboardNum <= NumHWBaseboards; ++BaseboardNum) {
 
             HWBaseboardDesignData HWBaseboardDesignDataObject{
                 HWBaseboardDesignObject(HWBaseboard(BaseboardNum).DesignObjectPtr)}; // Contains the data for the design object
             ZoneNum = HWBaseboard(BaseboardNum).ZonePtr;
             if (ZoneNum <= 0) continue;
-            state.dataHeatBalFanSys->QHWBaseboardToPerson(ZoneNum) += QBBRadSource(BaseboardNum) * HWBaseboardDesignDataObject.FracDistribPerson;
+            state.dataHeatBalFanSys->QdotRadHVACToPerson(ZoneNum) += QBBRadSource(BaseboardNum) * HWBaseboardDesignDataObject.FracDistribPerson;
 
             for (RadSurfNum = 1; RadSurfNum <= HWBaseboard(BaseboardNum).TotSurfToDistrib; ++RadSurfNum) {
                 SurfNum = HWBaseboard(BaseboardNum).SurfacePtr(RadSurfNum);

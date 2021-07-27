@@ -1069,16 +1069,13 @@ namespace ElectricBaseboardRadiator {
         int ZoneNum;              // Pointer to the Zone derived type
         Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
 
-        // Initialize arrays
-        state.dataHeatBalFanSys->QElecBaseboardToPerson = 0.0;
-
         auto &ElecBaseboard = state.dataElectBaseboardRad->ElecBaseboard;
         for (BaseboardNum = 1; BaseboardNum <= state.dataElectBaseboardRad->NumElecBaseboards; ++BaseboardNum) {
 
             if (ElecBaseboard(BaseboardNum).ZonePtr >
                 0) { // issue 5806 can be zero during first calls to baseboards, will be set after all are modeled
                 ZoneNum = ElecBaseboard(BaseboardNum).ZonePtr;
-                state.dataHeatBalFanSys->QElecBaseboardToPerson(ZoneNum) +=
+                state.dataHeatBalFanSys->QdotRadHVACToPerson(ZoneNum) +=
                     state.dataElectBaseboardRad->QBBElecRadSource(BaseboardNum) * ElecBaseboard(BaseboardNum).FracDistribPerson;
 
                 for (RadSurfNum = 1; RadSurfNum <= ElecBaseboard(BaseboardNum).TotSurfToDistrib; ++RadSurfNum) {

@@ -1695,16 +1695,13 @@ void DistributeCoolingPanelRadGains(EnergyPlusData &state)
     int ZoneNum;              // Pointer to the Zone derived type
     Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
 
-    // Initialize arrays
-    state.dataHeatBalFanSys->QCoolingPanelToPerson = 0.0;
-
     for (CoolingPanelNum = 1; CoolingPanelNum <= state.dataChilledCeilingPanelSimple->NumCoolingPanels; ++CoolingPanelNum) {
 
         auto &ThisCP(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum));
 
         ZoneNum = ThisCP.ZonePtr;
         if (ZoneNum <= 0) continue;
-        state.dataHeatBalFanSys->QCoolingPanelToPerson(ZoneNum) +=
+        state.dataHeatBalFanSys->QdotRadHVACToPerson(ZoneNum) +=
             state.dataChilledCeilingPanelSimple->CoolingPanelSource(CoolingPanelNum) * ThisCP.FracDistribPerson;
 
         for (RadSurfNum = 1; RadSurfNum <= ThisCP.TotSurfToDistrib; ++RadSurfNum) {

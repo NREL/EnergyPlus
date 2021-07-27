@@ -105,10 +105,7 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array1D<Real64> SumConvPool;             // Sum of convection to zone air from pools
     Array1D<Real64> SumLatentPool;           // Sum of latent gains from pools
     Array1D<Real64> QHTRadSysToPerson;       // Sum of radiant gains to people from hi temp radiant heaters
-    Array1D<Real64> QHWBaseboardToPerson;    // Sum of radiant gains to people from hot water baseboard heaters
-    Array1D<Real64> QSteamBaseboardToPerson; // Sum of radiant gains to people from steam baseboard heaters
-    Array1D<Real64> QElecBaseboardToPerson;  // Sum of radiant gains to people from electric baseboard heaters
-    Array1D<Real64> QCoolingPanelToPerson;   // Sum of radiant losses to people from cooling panels
+    Array1D<Real64> QdotRadHVACToPerson;     // Sum of radiant gains to people from HVAC
     // Zone air drybulb conditions variables
     Array1D<Real64> ZTAV;         // Zone Air Temperature Averaged over the Zone Time step
     Array1D<Real64> MAT;          // MEAN AIR TEMPERATURE (C)
@@ -271,9 +268,7 @@ struct HeatBalFanSysData : BaseGlobalStruct
         this->SumConvPool.deallocate();
         this->SumLatentPool.deallocate();
         this->QHTRadSysToPerson.deallocate();
-        this->QHWBaseboardToPerson.deallocate();
-        this->QSteamBaseboardToPerson.deallocate();
-        this->QElecBaseboardToPerson.deallocate();
+        this->QdotRadHVACToPerson.deallocate();
         this->ZTAV.deallocate();
         this->MAT.deallocate();
         this->TempTstatAir.deallocate();
