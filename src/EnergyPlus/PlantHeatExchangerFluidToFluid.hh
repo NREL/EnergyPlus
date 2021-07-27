@@ -159,7 +159,6 @@ namespace PlantHeatExchangerFluidToFluid {
         std::string Name;
         int TypeNum;
         int AvailSchedNum;
-
         iFluidHXType HeatExchangeModelType;
         Real64 UA;
         bool UAWasAutoSized; // true is UA was autosized on input
