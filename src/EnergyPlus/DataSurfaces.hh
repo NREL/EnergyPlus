@@ -1257,11 +1257,13 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<int> SurfIntConvCoeffIndex; // Interior Convection Coefficient pointer (different data structure) when being overridden
     Array1D<int> SurfExtConvCoeffIndex; // Exterior Convection Coefficient pointer (different data structure) when being overridden
     Array1D<ConvectionConstants::InConvClass>
-        SurfIntConvClassification;            // current classification for inside face air flow regime and surface orientation
-    Array1D<int> SurfIntConvHcModelEq;        // current convection model for inside face
-    Array1D<int> SurfIntConvHcUserCurveIndex; // current index to user convection model if used
+        SurfIntConvClassification;             // current classification for inside face air flow regime and surface orientation
+    Array1D<int> SurfIntConvClassificationRpt; // current classification for inside face air flow regime and surface orientation for reporting
+    Array1D<int> SurfIntConvHcModelEq;         // current convection model for inside face
+    Array1D<int> SurfIntConvHcUserCurveIndex;  // current index to user convection model if used
     Array1D<ConvectionConstants::OutConvClass>
         SurfOutConvClassification;                // current classification for outside face wind regime and convection orientation
+    Array1D<int> SurfOutConvClassificationRpt;    // current classification for outside face wind regime and convection orientation for reporting
     Array1D<int> SurfOutConvHfModelEq;            // current convection model for forced convection at outside face
     Array1D<int> SurfOutConvHfUserCurveIndex;     // current index to user forced convection model if used
     Array1D<int> SurfOutConvHnModelEq;            // current Convection model for natural convection at outside face

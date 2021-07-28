@@ -2019,7 +2019,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
         SetupOutputVariable(state,
                             "Surface Inside Face Convection Classification Index",
                             OutputProcessor::Unit::None,
-                            state.dataSurface->SurfIntConvClassification(loop),
+                            state.dataSurface->SurfIntConvClassificationRpt(loop),
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Average,
                             Surface(loop).Name);
@@ -2041,7 +2041,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Surface Outside Face Convection Classification Index",
                                 OutputProcessor::Unit::None,
-                                state.dataSurface->SurfOutConvClassification(loop),
+                                state.dataSurface->SurfOutConvClassificationRpt(loop),
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Average,
                                 Surface(loop).Name);
@@ -5628,6 +5628,10 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
         if (Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
             state.dataHeatBalSurf->SumSurfaceHeatEmission += state.dataHeatBalSurf->QHeatEmiReport(SurfNum) * state.dataGlobal->TimeStepZoneSec;
         }
+
+        // these were converted to enum and added as separate report variables here
+        state.dataSurface->SurfIntConvClassificationRpt(SurfNum) = (int)state.dataSurface->SurfIntConvClassification(SurfNum);
+        state.dataSurface->SurfOutConvClassificationRpt(SurfNum) = (int)state.dataSurface->SurfOutConvClassification(SurfNum);
     }
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         int const firstSurfOpaq = state.dataHeatBal->Zone(ZoneNum).OpaqOrIntMassSurfaceFirst;

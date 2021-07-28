@@ -990,9 +990,11 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfExtConvCoeffIndex.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfTAirRef.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfIntConvClassification.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfIntConvClassificationRpt.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfIntConvHcModelEq.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfIntConvHcUserCurveIndex.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfOutConvClassification.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfOutConvClassificationRpt.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfOutConvHfModelEq.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfOutConvHfUserCurveIndex.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfOutConvHnModelEq.allocate(state.dataSurface->TotSurfaces);
