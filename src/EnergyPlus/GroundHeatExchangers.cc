@@ -1462,7 +1462,7 @@ void GLHEVert::makeThisGLHECacheStruct()
     d["Pipe Thickness"] = this->myRespFactors->props->pipe.thickness;
     d["U-tube Dist"] = this->myRespFactors->props->bhUTubeDist;
     d["Max Simulation Years"] = this->myRespFactors->maxSimYears;
-    d["g-Function Calc Method"] =  GroundHeatExchangers::GFuncCalcMethodsStrs[int(this->gFuncCalcMethod)];
+    d["g-Function Calc Method"] = GroundHeatExchangers::GFuncCalcMethodsStrs[int(this->gFuncCalcMethod)];
 
     int i = 0;
     for (auto &thisBH : this->myRespFactors->myBorholes) {

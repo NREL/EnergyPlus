@@ -1681,7 +1681,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcGFunction_UBHWT)
     EXPECT_NEAR(thisGLHE.interpGFunc(-8.775189), 2.37, tolerance);
     EXPECT_NEAR(thisGLHE.interpGFunc(-8.637595), 2.45, tolerance);
     EXPECT_NEAR(thisGLHE.interpGFunc(-8.5), 2.53, tolerance);
-    EXPECT_NEAR(thisGLHE.interpGFunc(-7.8), 2.46, tolerance);
+    EXPECT_NEAR(thisGLHE.interpGFunc(-7.8), 2.90, tolerance);
     EXPECT_NEAR(thisGLHE.interpGFunc(-7.2), 3.17, tolerance);
     EXPECT_NEAR(thisGLHE.interpGFunc(-6.5), 3.52, tolerance);
     EXPECT_NEAR(thisGLHE.interpGFunc(-5.9), 3.85, tolerance);
