@@ -1083,160 +1083,169 @@ void EIRPlantLoopHeatPump::checkConcurrentOperation(EnergyPlusData &state)
         }
     }
 }
-void EIRPlantLoopHeatPump::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
-{
-}
-
-void EIRPlantLoopHeatPump::oneTimeInit_new(EnergyPlusData &state)
+void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
 {
     // This function does all the one-time initialization
     std::string static const routineName = std::string("EIRPlantLoopHeatPump :") + __FUNCTION__;
 
-    bool errFlag = false;
+    if (this->oneTimeInitFlag) {
+        bool errFlag = false;
 
-    // setup output variables
-    SetupOutputVariable(
-        state, "Heat Pump Load Side Heat Transfer Rate", OutputProcessor::Unit::W, this->loadSideHeatTransfer, "System", "Average", this->name);
-    SetupOutputVariable(state,
-                        "Heat Pump Load Side Heat Transfer Energy",
-                        OutputProcessor::Unit::J,
-                        this->loadSideEnergy,
-                        "System",
-                        "Sum",
-                        this->name,
-                        _,
-                        "ENERGYTRANSFER",
-                        _,
-                        _,
-                        "Plant");
-    SetupOutputVariable(
-        state, "Heat Pump Source Side Heat Transfer Rate", OutputProcessor::Unit::W, this->sourceSideHeatTransfer, "System", "Average", this->name);
-    SetupOutputVariable(
-        state, "Heat Pump Source Side Heat Transfer Energy", OutputProcessor::Unit::J, this->sourceSideEnergy, "System", "Sum", this->name);
-    SetupOutputVariable(
-        state, "Heat Pump Load Side Inlet Temperature", OutputProcessor::Unit::C, this->loadSideInletTemp, "System", "Average", this->name);
-    SetupOutputVariable(
-        state, "Heat Pump Load Side Outlet Temperature", OutputProcessor::Unit::C, this->loadSideOutletTemp, "System", "Average", this->name);
-    SetupOutputVariable(
-        state, "Heat Pump Source Side Inlet Temperature", OutputProcessor::Unit::C, this->sourceSideInletTemp, "System", "Average", this->name);
-    SetupOutputVariable(
-        state, "Heat Pump Source Side Outlet Temperature", OutputProcessor::Unit::C, this->sourceSideOutletTemp, "System", "Average", this->name);
-    SetupOutputVariable(state, "Heat Pump Electricity Rate", OutputProcessor::Unit::W, this->powerUsage, "System", "Average", this->name);
-    if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRCooling) { // energy from HeatPump:PlantLoop:EIR:Cooling object
+        // setup output variables
+        SetupOutputVariable(
+            state, "Heat Pump Load Side Heat Transfer Rate", OutputProcessor::Unit::W, this->loadSideHeatTransfer, "System", "Average", this->name);
         SetupOutputVariable(state,
-                            "Heat Pump Electricity Energy",
+                            "Heat Pump Load Side Heat Transfer Energy",
                             OutputProcessor::Unit::J,
-                            this->powerEnergy,
+                            this->loadSideEnergy,
                             "System",
                             "Sum",
                             this->name,
                             _,
-                            "Electricity",
-                            "Cooling",
-                            "Heat Pump",
-                            "Plant");
-    } else if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRHeating) { // energy from HeatPump:PlantLoop:EIR:Heating object
-        SetupOutputVariable(state,
-                            "Heat Pump Electricity Energy",
-                            OutputProcessor::Unit::J,
-                            this->powerEnergy,
-                            "System",
-                            "Sum",
-                            this->name,
+                            "ENERGYTRANSFER",
                             _,
-                            "Electricity",
-                            "Heating",
-                            "Heat Pump",
+                            _,
                             "Plant");
-    }
-    SetupOutputVariable(
-        state, "Heat Pump Load Side Mass Flow Rate", OutputProcessor::Unit::kg_s, this->loadSideMassFlowRate, "System", "Average", this->name);
-    SetupOutputVariable(
-        state, "Heat Pump Source Side Mass Flow Rate", OutputProcessor::Unit::kg_s, this->sourceSideMassFlowRate, "System", "Average", this->name);
+        SetupOutputVariable(state,
+                            "Heat Pump Source Side Heat Transfer Rate",
+                            OutputProcessor::Unit::W,
+                            this->sourceSideHeatTransfer,
+                            "System",
+                            "Average",
+                            this->name);
+        SetupOutputVariable(
+            state, "Heat Pump Source Side Heat Transfer Energy", OutputProcessor::Unit::J, this->sourceSideEnergy, "System", "Sum", this->name);
+        SetupOutputVariable(
+            state, "Heat Pump Load Side Inlet Temperature", OutputProcessor::Unit::C, this->loadSideInletTemp, "System", "Average", this->name);
+        SetupOutputVariable(
+            state, "Heat Pump Load Side Outlet Temperature", OutputProcessor::Unit::C, this->loadSideOutletTemp, "System", "Average", this->name);
+        SetupOutputVariable(
+            state, "Heat Pump Source Side Inlet Temperature", OutputProcessor::Unit::C, this->sourceSideInletTemp, "System", "Average", this->name);
+        SetupOutputVariable(
+            state, "Heat Pump Source Side Outlet Temperature", OutputProcessor::Unit::C, this->sourceSideOutletTemp, "System", "Average", this->name);
+        SetupOutputVariable(state, "Heat Pump Electricity Rate", OutputProcessor::Unit::W, this->powerUsage, "System", "Average", this->name);
+        if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRCooling) { // energy from HeatPump:PlantLoop:EIR:Cooling object
+            SetupOutputVariable(state,
+                                "Heat Pump Electricity Energy",
+                                OutputProcessor::Unit::J,
+                                this->powerEnergy,
+                                "System",
+                                "Sum",
+                                this->name,
+                                _,
+                                "Electricity",
+                                "Cooling",
+                                "Heat Pump",
+                                "Plant");
+        } else if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRHeating) { // energy from HeatPump:PlantLoop:EIR:Heating object
+            SetupOutputVariable(state,
+                                "Heat Pump Electricity Energy",
+                                OutputProcessor::Unit::J,
+                                this->powerEnergy,
+                                "System",
+                                "Sum",
+                                this->name,
+                                _,
+                                "Electricity",
+                                "Heating",
+                                "Heat Pump",
+                                "Plant");
+        }
+        SetupOutputVariable(
+            state, "Heat Pump Load Side Mass Flow Rate", OutputProcessor::Unit::kg_s, this->loadSideMassFlowRate, "System", "Average", this->name);
+        SetupOutputVariable(state,
+                            "Heat Pump Source Side Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->sourceSideMassFlowRate,
+                            "System",
+                            "Average",
+                            this->name);
 
-    // find this component on the plant
-    bool thisErrFlag = false;
-    PlantUtilities::ScanPlantLoopsForObject(state,
-                                            this->name,
-                                            this->plantTypeOfNum,
-                                            this->loadSideLocation.loopNum,
-                                            this->loadSideLocation.loopSideNum,
-                                            this->loadSideLocation.branchNum,
-                                            this->loadSideLocation.compNum,
-                                            thisErrFlag,
-                                            _,
-                                            _,
-                                            _,
-                                            this->loadSideNodes.inlet,
-                                            _);
-
-    if (thisErrFlag) {
-        ShowSevereError(state,
-                        routineName + ": Plant topology problem for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
-                            this->name + "\"");
-        ShowContinueError(state, "Could not locate component's load side connections on a plant loop");
-        errFlag = true;
-    } else if (this->loadSideLocation.loopSideNum != DataPlant::SupplySide) { // only check if !thisErrFlag
-        ShowSevereError(state,
-                        routineName + ": Invalid connections for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
-                            this->name + "\"");
-        ShowContinueError(state, "The load side connections are not on the Supply Side of a plant loop");
-        errFlag = true;
-    }
-
-    thisErrFlag = false;
-    if (this->waterSource) {
+        // find this component on the plant
+        bool thisErrFlag = false;
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->name,
                                                 this->plantTypeOfNum,
-                                                this->sourceSideLocation.loopNum,
-                                                this->sourceSideLocation.loopSideNum,
-                                                this->sourceSideLocation.branchNum,
-                                                this->sourceSideLocation.compNum,
+                                                this->loadSideLocation.loopNum,
+                                                this->loadSideLocation.loopSideNum,
+                                                this->loadSideLocation.branchNum,
+                                                this->loadSideLocation.compNum,
                                                 thisErrFlag,
                                                 _,
                                                 _,
                                                 _,
-                                                this->sourceSideNodes.inlet,
+                                                this->loadSideNodes.inlet,
                                                 _);
 
         if (thisErrFlag) {
             ShowSevereError(state,
                             routineName + ": Plant topology problem for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
                                 this->name + "\"");
-            ShowContinueError(state, "Could not locate component's source side connections on a plant loop");
+            ShowContinueError(state, "Could not locate component's load side connections on a plant loop");
             errFlag = true;
-        } else if (this->sourceSideLocation.loopSideNum != DataPlant::DemandSide) { // only check if !thisErrFlag
+        } else if (this->loadSideLocation.loopSideNum != DataPlant::SupplySide) { // only check if !thisErrFlag
             ShowSevereError(state,
                             routineName + ": Invalid connections for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
                                 this->name + "\"");
-            ShowContinueError(state, "The source side connections are not on the Demand Side of a plant loop");
+            ShowContinueError(state, "The load side connections are not on the Supply Side of a plant loop");
             errFlag = true;
         }
 
-        // make sure it is not the same loop on both sides.
-        if (this->loadSideLocation.loopNum == this->sourceSideLocation.loopNum) { // user is being too tricky, don't allow
-            ShowSevereError(state,
-                            routineName + ": Invalid connections for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
-                                this->name + "\"");
-            ShowContinueError(state, "The load and source sides need to be on different loops.");
-            errFlag = true;
-        } else {
+        thisErrFlag = false;
+        if (this->waterSource) {
+            PlantUtilities::ScanPlantLoopsForObject(state,
+                                                    this->name,
+                                                    this->plantTypeOfNum,
+                                                    this->sourceSideLocation.loopNum,
+                                                    this->sourceSideLocation.loopSideNum,
+                                                    this->sourceSideLocation.branchNum,
+                                                    this->sourceSideLocation.compNum,
+                                                    thisErrFlag,
+                                                    _,
+                                                    _,
+                                                    _,
+                                                    this->sourceSideNodes.inlet,
+                                                    _);
 
-            PlantUtilities::InterConnectTwoPlantLoopSides(state,
-                                                          this->loadSideLocation.loopNum,
-                                                          this->loadSideLocation.loopSideNum,
-                                                          this->sourceSideLocation.loopNum,
-                                                          this->sourceSideLocation.loopSideNum,
-                                                          this->plantTypeOfNum,
-                                                          true);
+            if (thisErrFlag) {
+                ShowSevereError(state,
+                                routineName + ": Plant topology problem for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
+                                    this->name + "\"");
+                ShowContinueError(state, "Could not locate component's source side connections on a plant loop");
+                errFlag = true;
+            } else if (this->sourceSideLocation.loopSideNum != DataPlant::DemandSide) { // only check if !thisErrFlag
+                ShowSevereError(state,
+                                routineName + ": Invalid connections for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
+                                    this->name + "\"");
+                ShowContinueError(state, "The source side connections are not on the Demand Side of a plant loop");
+                errFlag = true;
+            }
+
+            // make sure it is not the same loop on both sides.
+            if (this->loadSideLocation.loopNum == this->sourceSideLocation.loopNum) { // user is being too tricky, don't allow
+                ShowSevereError(state,
+                                routineName + ": Invalid connections for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
+                                    this->name + "\"");
+                ShowContinueError(state, "The load and source sides need to be on different loops.");
+                errFlag = true;
+            } else {
+
+                PlantUtilities::InterConnectTwoPlantLoopSides(state,
+                                                              this->loadSideLocation.loopNum,
+                                                              this->loadSideLocation.loopSideNum,
+                                                              this->sourceSideLocation.loopNum,
+                                                              this->sourceSideLocation.loopSideNum,
+                                                              this->plantTypeOfNum,
+                                                              true);
+            }
+        } else if (this->airSource) {
+            // nothing to do here ?
         }
-    } else if (this->airSource) {
-        // nothing to do here ?
-    }
 
-    if (errFlag) {
-        ShowFatalError(state, routineName + ": Program terminated due to previous condition(s).");
+        if (errFlag) {
+            ShowFatalError(state, routineName + ": Program terminated due to previous condition(s).");
+        }
+        this->oneTimeInitFlag = false;
     }
 }
 } // namespace EnergyPlus::EIRPlantLoopHeatPumps
