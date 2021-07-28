@@ -1226,6 +1226,9 @@ namespace SimulationManager {
                         overrideBeginEnvResetSuppress = true;
                         overrideSystemTimestep = true;
                     } else if (overrideModeValue == "MODE06") {
+                        // Mode06 CSpline interpolation (64 Pa bin size + 20/16 bit)
+                        state.dataPsychrometrics->useInterpolationPsychTsatFnPb = true;
+                    } else if (overrideModeValue == "MODE07") {
                         // Mode05 plus internal variable MaxZoneTempDiff will be set to 1.00
                         overrideTimestep = true;
                         overrideZoneAirHeatBalAlg = true;
@@ -1233,8 +1236,8 @@ namespace SimulationManager {
                         overrideBeginEnvResetSuppress = true;
                         overrideSystemTimestep = true;
                         overrideMaxZoneTempDiff = true;
-                    } else if (overrideModeValue == "MODE07") {
-                        // Mode06 plus internal variable MaxAllowedDelTemp will be set to 0.1
+                    } else if (overrideModeValue == "MODE08") {
+                        // Mode07 plus internal variable MaxAllowedDelTemp will be set to 0.1
                         overrideTimestep = true;
                         overrideZoneAirHeatBalAlg = true;
                         overrideMinNumWarmupDays = true;
