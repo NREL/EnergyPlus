@@ -74,36 +74,42 @@ namespace SimAirServingZones {
 
     // CompType numerics -- for this module
     // component types addressed by this module
-    constexpr int OAMixer_Num(1);
-    constexpr int Fan_Simple_CV(2);
-    constexpr int Fan_Simple_VAV(3);
-    constexpr int WaterCoil_SimpleCool(4);
-    constexpr int WaterCoil_Cooling(5);
-    constexpr int WaterCoil_SimpleHeat(6);
-    constexpr int SteamCoil_AirHeat(7);
-    constexpr int WaterCoil_DetailedCool(8);
-    constexpr int Coil_ElectricHeat(9);
-    constexpr int Coil_GasHeat(10);
-    constexpr int WaterCoil_CoolingHXAsst(11);
-    constexpr int DXCoil_CoolingHXAsst(12);
-    constexpr int Coil_DeSuperHeat(13);
-    constexpr int DXSystem(14);
-    constexpr int HeatXchngr(15);
-    constexpr int Desiccant(16);
-    constexpr int Unglazed_SolarCollector(17);
-    constexpr int EvapCooler(18);
-    constexpr int Furnace_UnitarySys_HeatOnly(19);
-    constexpr int Furnace_UnitarySys_HeatCool(20);
-    constexpr int Humidifier(21);
-    constexpr int Duct(22);
-    constexpr int UnitarySystem_BypassVAVSys(23);
-    constexpr int UnitarySystem_MSHeatPump(24);
-    constexpr int Fan_ComponentModel(25);
-    constexpr int DXHeatPumpSystem(26);
-    constexpr int CoilUserDefined(27);
-    constexpr int Fan_System_Object(28);
-    constexpr int UnitarySystemModel(29);
-    constexpr int ZoneVRFasAirLoopEquip(30);
+    enum class CompType
+    {
+        Unassigned = -1,
+        OAMixer_Num,
+        Fan_Simple_CV,
+        Fan_Simple_VAV,
+        WaterCoil_SimpleCool,
+        WaterCoil_Cooling,
+        WaterCoil_SimpleHeat,
+        SteamCoil_AirHeat,
+        WaterCoil_DetailedCool,
+        Coil_ElectricHeat,
+        Coil_GasHeat,
+        WaterCoil_CoolingHXAsst,
+        DXCoil_CoolingHXAsst,
+        Coil_DeSuperHeat,
+        DXSystem,
+        HeatXchngr,
+        Desiccant,
+        Unglazed_SolarCollector,
+        EvapCooler,
+        Furnace_UnitarySys_HeatOnly,
+        Furnace_UnitarySys_HeatCool,
+        Humidifier,
+        Duct,
+        UnitarySystem_BypassVAVSys,
+        UnitarySystem_MSHeatPump,
+        Fan_ComponentModel,
+        DXHeatPumpSystem,
+        CoilUserDefined,
+        Fan_System_Object,
+        UnitarySystemModel,
+        ZoneVRFasAirLoopEquip,
+        PVT_AirBased,
+        VRFTerminalUnit
+    };
 
     void ManageAirLoops(EnergyPlusData &state,
                         bool FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
@@ -149,11 +155,15 @@ namespace SimAirServingZones {
 
     void SimAirLoopComponent(EnergyPlusData &state,
                              std::string const &CompName, // the component Name
-                             int CompType_Num,            // numeric equivalent for component type
+                             CompType CompType_Num,       // numeric equivalent for component type
                              bool FirstHVACIteration,     // TRUE if first full HVAC iteration in an HVAC timestep
                              int AirLoopNum,              // Primary air loop number
                              int &CompIndex,              // numeric pointer for CompType/CompName -- passed back from other routines
-                             HVACSystemData *CompPointer);
+                             HVACSystemData *CompPointer, // equipment actual pointer
+                             int const &airLoopNum,       // index to AirloopHVAC
+                             int const &branchNum,        // index to AirloopHVAC branch
+                             int const &compNum           // index to AirloopHVAC branch component
+    );
 
     void UpdateBranchConnections(EnergyPlusData &state,
                                  int AirLoopNum, // primary air system number
@@ -189,14 +199,17 @@ namespace SimAirServingZones {
                           Real64 &SystemCoolingEv // system ventilation efficiency
     );
 
-    void CheckWaterCoilIsOnAirLoop(
-        EnergyPlusData &state, int CoilTypeNum, std::string const &CompType, std::string const &CompName, bool &WaterCoilOnAirLoop);
+    void CheckWaterCoilIsOnAirLoop(EnergyPlusData &state,
+                                   SimAirServingZones::CompType CompTypeNum,
+                                   std::string const &CompType,
+                                   std::string const &CompName,
+                                   bool &WaterCoilOnAirLoop);
 
-    bool CheckWaterCoilOnPrimaryAirLoopBranch(EnergyPlusData &state, int CoilTypeNum, std::string const &CompName);
+    bool CheckWaterCoilOnPrimaryAirLoopBranch(EnergyPlusData &state, SimAirServingZones::CompType CompTypeNum, std::string const &CompName);
 
-    bool CheckWaterCoilOnOASystem(EnergyPlusData &state, int CoilTypeNum, std::string const &CompName);
+    bool CheckWaterCoilOnOASystem(EnergyPlusData &state, SimAirServingZones::CompType CompTypeNum, std::string const &CompName);
 
-    bool CheckWaterCoilSystemOnAirLoopOrOASystem(EnergyPlusData &state, int CoilTypeNum, std::string const &CompName);
+    bool CheckWaterCoilSystemOnAirLoopOrOASystem(EnergyPlusData &state, SimAirServingZones::CompType CoilTypeNum, std::string const &CompName);
 
 } // namespace SimAirServingZones
 
@@ -255,7 +268,7 @@ struct SimAirServingZonesData : BaseGlobalStruct
     // If Status<0, no speculative warm restart attempted.
     // If Status==0, warm restart failed.
     // If Status>0, warm restart succeeded.
-    int WarmRestartStatusSAL = DataHVACControllers::iControllerWarmRestartNone;
+    DataHVACControllers::ControllerWarmRestart WarmRestartStatusSAL = DataHVACControllers::ControllerWarmRestart::None;
     int IterSALC = 0;        // Iteration counter
     int ErrCountSALC = 0;    // Number of times that the maximum iterations was exceeded
     int MaxErrCountSALC = 0; // Number of times that the maximum iterations was exceeded
@@ -328,7 +341,7 @@ struct SimAirServingZonesData : BaseGlobalStruct
         this->NumCallsSAL2 = 0;     // Number of times SimAirLoopComponents() has been invoked per air loop for either Solve or ReSolve operations
         this->AirLoopConvergedFlagSAL = false;
         this->DoWarmRestartFlagSAL = false;
-        this->WarmRestartStatusSAL = DataHVACControllers::iControllerWarmRestartNone;
+        this->WarmRestartStatusSAL = DataHVACControllers::ControllerWarmRestart::None;
         this->IterSALC = 0;        // Iteration counter
         this->ErrCountSALC = 0;    // Number of times that the maximum iterations was exceeded
         this->MaxErrCountSALC = 0; // Number of times that the maximum iterations was exceeded

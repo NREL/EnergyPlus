@@ -154,8 +154,6 @@ namespace WindowComplexManager {
                               int &NBasis                         // Calculated Basis length
     );
 
-    void DetermineMaxBackSurfaces(EnergyPlusData &state);
-
     void ConstructBasis(EnergyPlusData &state,
                         int const IConst, // Index for accessing Construct array
                         BasisStruct &Basis);
@@ -165,10 +163,10 @@ namespace WindowComplexManager {
                           Real64 const Phi,   // Central azimuthal angle of element
                           int const Elem,     // Index number of element in basis
                           BasisElemDescr &BasisElem,
-                          Real64 const LowerTheta, // Lower edge of element (polar angle)
-                          Real64 const UpperTheta, // Upper edge of element (polar angle)
-                          Real64 const DPhi,       // Width of element (azimuthal angle)
-                          int const InputType      // Basis type
+                          Real64 const LowerTheta,              // Lower edge of element (polar angle)
+                          Real64 const UpperTheta,              // Upper edge of element (polar angle)
+                          Real64 const DPhi,                    // Width of element (azimuthal angle)
+                          DataBSDFWindow::Basis const InputType // Basis type
     );
 
     void SetupComplexWindowStateGeometry(EnergyPlusData &state,
@@ -228,7 +226,7 @@ namespace WindowComplexManager {
                                   Real64 &SurfInsideTemp,     // Inside window surface temperature
                                   Real64 &SurfOutsideTemp,    // Outside surface temperature (C)
                                   Real64 &SurfOutsideEmiss,
-                                  int const CalcCondition // Calucation condition (summer, winter or no condition)
+                                  DataBSDFWindow::Condition const CalcCondition // Calucation condition (summer, winter or no condition)
     );
 
     // This function check if gas with molecular weight has already been feed into coefficients and
@@ -336,7 +334,8 @@ struct WindowComplexManagerData : BaseGlobalStruct
     Array1D<Real64> tvent =
         Array1D<Real64>(TARCOGParams::maxlay + 1, 0.0); // Vector of temperatures of ventilation gas for forced ventilation, for each
     //  gap, and for outdoor and indoor environment [K] {maxlay+1}
-    Array1D_int LayerType = Array1D_int(TARCOGParams::maxlay, 0); // Glazing layer type flag {maxlay}:
+    Array1D<TARCOGParams::TARCOGLayerType> LayerType =
+        Array1D<TARCOGParams::TARCOGLayerType>(TARCOGParams::maxlay, TARCOGParams::TARCOGLayerType::SPECULAR); // Glazing layer type flag {maxlay}:
     //                 0 - Specular layer,
     //                 1 - Venetian blind (SD)
     //                 2 - Woven shade (SD) (not implemented)
@@ -386,6 +385,7 @@ struct WindowComplexManagerData : BaseGlobalStruct
         this->InitBSDFWindowsOnce = true;
         this->NumBasis = 0;
         this->MatrixNo = 0;
+        this->LayerType = Array1D<TARCOGParams::TARCOGLayerType>(TARCOGParams::maxlay, TARCOGParams::TARCOGLayerType::SPECULAR);
     }
 
     // Default Constructor

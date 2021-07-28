@@ -56,8 +56,6 @@
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Array2S.hh>
-#include <ObjexxFCL/Array5D.hh>
-#include <ObjexxFCL/Array6D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 #include <nlohmann/json.hpp>
@@ -71,6 +69,7 @@
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/FileSystem.hh>
 
 namespace EnergyPlus {
 
@@ -242,11 +241,11 @@ namespace CurveManager {
     {
     public:
         TableFile() = default;
-        TableFile(EnergyPlusData &state, std::string path);
-        std::string filePath;
+        TableFile(EnergyPlusData &state, fs::path const &path);
+        fs::path filePath;
         std::vector<std::vector<std::string>> contents;
         std::map<std::pair<std::size_t, std::size_t>, std::vector<double>> arrays;
-        bool load(EnergyPlusData &state, std::string path);
+        bool load(EnergyPlusData &state, fs::path const &path); // Note: this returns 'True' if ErrorsFound
         std::vector<double> &getArray(EnergyPlusData &state, std::pair<std::size_t, std::size_t> colAndRow);
 
     private:
@@ -275,7 +274,7 @@ namespace CurveManager {
         std::pair<double, double> getGridAxisLimits(int gridIndex, int axisIndex);
         double getGridValue(int gridIndex, int outputIndex, const std::vector<double> &target);
         std::map<std::string, const json &> independentVarRefs;
-        std::map<std::string, TableFile> tableFiles;
+        std::map<fs::path, TableFile> tableFiles;
         void clear();
 
     private:
@@ -311,8 +310,7 @@ namespace CurveManager {
                                   Optional<Real64 const> Var2 = _, // 2nd independent variable
                                   Optional<Real64 const> Var3 = _, // 3rd independent variable
                                   Optional<Real64 const> Var4 = _, // 4th independent variable
-                                  Optional<Real64 const> Var5 = _, // 5th independent variable
-                                  Optional<Real64 const> Var6 = _  // 6th independent variable
+                                  Optional<Real64 const> Var5 = _  // 5th independent variable
     );
 
     Real64 BtwxtTableInterpolation(EnergyPlusData &state,
@@ -331,10 +329,10 @@ namespace CurveManager {
     bool CheckCurveDims(EnergyPlusData &state,
                         int CurveIndex,
                         std::vector<int> validDims,
-                        std::string routineName,
-                        std::string objectType,
-                        std::string objectName,
-                        std::string curveFieldText);
+                        const std::string_view routineName,
+                        std::string_view objectType,
+                        std::string_view objectName,
+                        std::string_view curveFieldText);
 
     std::string GetCurveName(EnergyPlusData &state, int CurveIndex); // index of curve in curve array
 

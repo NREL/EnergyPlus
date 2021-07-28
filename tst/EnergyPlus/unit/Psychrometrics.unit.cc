@@ -222,7 +222,7 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyWFnTdpPb_Test)
         "   **   ~~~   **  Dew-Point= 100.00 Barometric Pressure= 81000.00",
         "   **   ~~~   ** Instead, calculated Humidity Ratio at 93.0 (7 degree less) = 20.0794 will be used. Simulation continues.",
     });
-    state->dataPsychrometrics->iPsyErrIndex(5) = 0;
+    state->dataPsychrometrics->iPsyErrIndex[static_cast<int>(PsychrometricFunction::WFnTdpPb)] = 0;
 
     W = Psychrometrics::PsyWFnTdpPb(*state, TDP, PB);
     EXPECT_NEAR(20.07942181, W, 0.0001);

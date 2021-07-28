@@ -72,7 +72,7 @@ namespace HeatBalanceIntRadExchange {
                                  int const SurfIterations,                // Number of iterations in calling subroutine
                                  Array1D<Real64> &NetLWRadToSurf,         // Net long wavelength radiant exchange from other surfaces
                                  Optional_int_const ZoneToResimulate = _, // if passed in, then only calculate for this zone
-                                 std::string const &CalledFrom = "");
+                                 std::string_view CalledFrom = "");
 
     void UpdateMovableInsulationFlag(EnergyPlusData &state,
                                      bool &MovableInsulationChange, // set to true if there is a change in the movable insulation state
@@ -125,7 +125,13 @@ namespace HeatBalanceIntRadExchange {
                         Real64 &FixedCheckValue,         // check after fixed of SUM(F) - N
                         Real64 &FinalCheckValue,         // the one to go with
                         int &NumIterations,              // number of iterations to fixed
-                        Real64 &RowSum                   // RowSum of Fixed
+                        Real64 &RowSum,                  // RowSum of Fixed
+                        bool const anyIntMassInZone      // are there any surfaces in the zone that are thermal mass
+    );
+
+    bool DoesZoneHaveInternalMass(EnergyPlusData &state,
+                                  int const numZoneSurfaces,     // Number of surfaces in the zone
+                                  const Array1D_int &surfPointer // Pointers to the surfaces in the zone
     );
 
     void CalcScriptF(EnergyPlusData &state,

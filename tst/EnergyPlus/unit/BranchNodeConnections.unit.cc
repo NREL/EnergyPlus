@@ -95,7 +95,7 @@ namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, BranchNodeErrorCheck_SingleNode)
 {
     bool errFlag = false;
-    RegisterNodeConnection(*state, 1, "BadNode", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
+    RegisterNodeConnection(*state, 1, "BadNode", "Type1", "Object1", "ZoneNode", NodeInputManager::compFluidStream::Primary, false, errFlag);
     bool ErrorsFound = false;
 
     CheckNodeConnections(*state, ErrorsFound);
@@ -107,10 +107,10 @@ TEST_F(EnergyPlusFixture, BranchNodeErrorCheck_SingleNode)
 TEST_F(EnergyPlusFixture, BranchNodeErrorCheck11Test)
 {
     bool errFlag = false;
-    RegisterNodeConnection(*state, 1, "BadNode", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
-    RegisterNodeConnection(*state, 2, "GoodNode", "Type2", "Object2", "Sensor", 1, false, errFlag);
-    RegisterNodeConnection(*state, 1, "BadNode", "Type3", "Object3", "ZoneNode", 1, false, errFlag);
-    RegisterNodeConnection(*state, 2, "GoodNode", "Type4", "Object4", "Outlet", 1, false, errFlag);
+    RegisterNodeConnection(*state, 1, "BadNode", "Type1", "Object1", "ZoneNode", NodeInputManager::compFluidStream::Primary, false, errFlag);
+    RegisterNodeConnection(*state, 2, "GoodNode", "Type2", "Object2", "Sensor", NodeInputManager::compFluidStream::Primary, false, errFlag);
+    RegisterNodeConnection(*state, 1, "BadNode", "Type3", "Object3", "ZoneNode", NodeInputManager::compFluidStream::Primary, false, errFlag);
+    RegisterNodeConnection(*state, 2, "GoodNode", "Type4", "Object4", "Outlet", NodeInputManager::compFluidStream::Primary, false, errFlag);
     bool ErrorsFound = false;
 
     CheckNodeConnections(*state, ErrorsFound);
@@ -902,10 +902,9 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure)
         "  Cooling Coil Condenser Inlet;  !- Node or NodeList Name 2",
 
         "AirLoopHVAC:OutdoorAirSystem,",
-        "  DOAS OA System,          !- Name",
+        "  DOAS OA System,           !- Name",
         "  DOAS OA System Controllers,  !- Controller List Name",
-        "  DOAS OA System Equipment,!- Outdoor Air Equipment List Name",
-        "  DOAS Availability Managers;  !- Availability Manager List Name",
+        "  DOAS OA System Equipment; !- Outdoor Air Equipment List Name",
 
         "AirLoopHVAC:ControllerList,",
         "  DOAS OA System Controllers,  !- Name",
@@ -1910,10 +1909,9 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheck)
         "  Cooling Coil Condenser Inlet;  !- Node or NodeList Name 2",
 
         "AirLoopHVAC:OutdoorAirSystem,",
-        "  DOAS OA System,          !- Name",
+        "  DOAS OA System,           !- Name",
         "  DOAS OA System Controllers,  !- Controller List Name",
-        "  DOAS OA System Equipment,!- Outdoor Air Equipment List Name",
-        "  DOAS Availability Managers;  !- Availability Manager List Name",
+        "  DOAS OA System Equipment; !- Outdoor Air Equipment List Name",
 
         "AirLoopHVAC:ControllerList,",
         "  DOAS OA System Controllers,  !- Name",

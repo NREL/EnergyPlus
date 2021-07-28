@@ -79,9 +79,9 @@ std::vector<std::string> getAllLinesInFile(std::string filePath)
 namespace EnergyPlus {
 
 // TEST_F( InputProcessorFixture, stress_get_number_objects_good ) {
-// 	auto compressors = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCompressorCurves.idf" );
-// 	auto cases = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCasesDataSet.idf" );
-// 	auto chillers = getAllLinesInFile( configured_source_directory() + "/datasets/Chillers.idf" );
+// 	auto compressors = getAllLinesInFile( configured_source_directory() / "datasets/RefrigerationCompressorCurves.idf" );
+// 	auto cases = getAllLinesInFile( configured_source_directory() / "datasets/RefrigerationCasesDataSet.idf" );
+// 	auto chillers = getAllLinesInFile( configured_source_directory() / "datasets/Chillers.idf" );
 
 // 	compressors.insert( compressors.end(), cases.begin(), cases.end() );
 // 	compressors.insert( compressors.end(), chillers.begin(), chillers.end() );
@@ -104,9 +104,9 @@ namespace EnergyPlus {
 // }
 
 // TEST_F( InputProcessorFixture, stress_get_number_objects_bad ) {
-// 	auto compressors = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCompressorCurves.idf" );
-// 	auto cases = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCasesDataSet.idf" );
-// 	auto chillers = getAllLinesInFile( configured_source_directory() + "/datasets/Chillers.idf" );
+// 	auto compressors = getAllLinesInFile( configured_source_directory() / "datasets/RefrigerationCompressorCurves.idf" );
+// 	auto cases = getAllLinesInFile( configured_source_directory() / "datasets/RefrigerationCasesDataSet.idf" );
+// 	auto chillers = getAllLinesInFile( configured_source_directory() / "datasets/Chillers.idf" );
 
 // 	compressors.insert( compressors.end(), cases.begin(), cases.end() );
 // 	compressors.insert( compressors.end(), chillers.begin(), chillers.end() );
@@ -129,9 +129,9 @@ namespace EnergyPlus {
 // }
 
 // TEST_F( InputProcessorFixture, stress_get_number_objects_worse ) {
-// 	auto compressors = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCompressorCurves.idf" );
-// 	auto cases = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCasesDataSet.idf" );
-// 	auto chillers = getAllLinesInFile( configured_source_directory() + "/datasets/Chillers.idf" );
+// 	auto compressors = getAllLinesInFile( configured_source_directory() / "datasets/RefrigerationCompressorCurves.idf" );
+// 	auto cases = getAllLinesInFile( configured_source_directory() / "datasets/RefrigerationCasesDataSet.idf" );
+// 	auto chillers = getAllLinesInFile( configured_source_directory() / "datasets/Chillers.idf" );
 
 // 	compressors.insert( compressors.end(), cases.begin(), cases.end() );
 // 	compressors.insert( compressors.end(), chillers.begin(), chillers.end() );
@@ -155,9 +155,9 @@ namespace EnergyPlus {
 // }
 
 // TEST_F( InputProcessorFixture, stress_get_number_objects_worst ) {
-// 	auto compressors = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCompressorCurves.idf" );
-// 	auto cases = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCasesDataSet.idf" );
-// 	auto chillers = getAllLinesInFile( configured_source_directory() + "/datasets/Chillers.idf" );
+// 	auto compressors = getAllLinesInFile( configured_source_directory() / "datasets/RefrigerationCompressorCurves.idf" );
+// 	auto cases = getAllLinesInFile( configured_source_directory() / "datasets/RefrigerationCasesDataSet.idf" );
+// 	auto chillers = getAllLinesInFile( configured_source_directory() / "datasets/Chillers.idf" );
 
 // 	compressors.insert( compressors.end(), cases.begin(), cases.end() );
 // 	compressors.insert( compressors.end(), chillers.begin(), chillers.end() );
@@ -4325,7 +4325,6 @@ TEST_F(InputProcessorFixture, epJSONgetObjectItem_minfields)
     root[obj_name2][name2] = mat1;
 
     state->dataInputProcessing->inputProcessor->epJSON = root;
-    // getEpJSON();
 
     int numAlphas = 0;
     int numNumbers = 0;
@@ -4406,66 +4405,357 @@ TEST_F(InputProcessorFixture, epJSONgetObjectItem_minfields)
     EXPECT_NEAR(state->dataIPShortCut->rNumericArgs(4), 0.0, 0.0001);
 }
 
-/*
-   TEST_F( InputProcessorFixture, processIDF_json )
-   {
-          const json schema = initialize();
-          InputProcessor IP;
-          IdfParser idf_parser(schema);
-          State state(schema);
+TEST_F(InputProcessorFixture, epJSONgetFieldValue_fromJSON)
+{
 
-          std::string const idf = delimited_string({
-                                                                                                                         "Version,",
-                                                                                                                         "8.3;",
-                                                                                                                         "SimulationControl, NO, NO,
-   NO, YES, YES;",
-                                                                                                           });
+    json root;
+    std::string obj_type1 = "Building";
+    std::string name1 = "Building 1";
+    json bldg1 = {{"loads_convergence_tolerance_value", 0.1}, {"terrain", "Ocean"}};
+    EXPECT_TRUE(bldg1.is_object());
+    root[obj_type1][name1] = bldg1;
 
-          json::parser_callback_t cb = [&state](int depth, json::parse_event_t event, json &parsed,
-                                                                                        unsigned line_num, unsigned line_index) -> bool {
-                state->traverse(event, parsed, line_num, line_index);
-                return true;
-          };
+    std::string obj_type2 = "Material";
+    std::string name2 = "Standard insulation_01";
+    json mat1 = {{"name", name1}, {"roughness", "MediumRough"}, {"thickness", 0.2}, {"solar_absorptance", 0.5}};
+    EXPECT_TRUE(mat1.is_object());
+    root[obj_type2][name2] = mat1;
 
-          IP.epJSON = idf_parser.decode(idf, schema);
-          json::parse(IP.epJSON.dump(2), cb);
+    auto &ip(state->dataInputProcessing->inputProcessor);
+    ip->epJSON = root;
 
-          EXPECT_EQ(2, state->errors + state->warnings);
+    state->dataGlobal->isEpJSON = true;
+    ip->initializeMaps();
+    std::string alphaFieldValue;
+    Real64 numericFieldValue = 0.0;
+    json objectSchemaProps;
 
-          // auto index = FindItemInSortedList( version_name, ListOfObjects, NumObjectDefs );
-          // if ( index != 0 ) index = iListOfObjects( index );
-          // index = ObjectStartRecord( index );
-          // EXPECT_EQ( 1, index );
+    // Building object
+    objectSchemaProps = ip->getObjectSchemaProps(*state, obj_type1);
+    // User inputs from above
+    // Note even though choice keys are case-sensitive during epJSON processing, getFieldValue pushes Alphas to UPPERcase
+    alphaFieldValue = ip->getAlphaFieldValue(bldg1, objectSchemaProps, "terrain");
+    EXPECT_EQ(alphaFieldValue, "OCEAN");
+    numericFieldValue = ip->getRealFieldValue(bldg1, objectSchemaProps, "loads_convergence_tolerance_value");
+    EXPECT_NEAR(numericFieldValue, 0.1, 0.0001);
+    // Defaults from schema
+    alphaFieldValue = ip->getAlphaFieldValue(bldg1, objectSchemaProps, "solar_distribution");
+    EXPECT_EQ(alphaFieldValue, "FULLEXTERIOR");
+    numericFieldValue = ip->getRealFieldValue(bldg1, objectSchemaProps, "north_axis");
+    EXPECT_NEAR(numericFieldValue, 0.0, 0.0001);
+    numericFieldValue = ip->getRealFieldValue(bldg1, objectSchemaProps, "temperature_convergence_tolerance_value");
+    EXPECT_NEAR(numericFieldValue, 0.4, 0.0001);
+    numericFieldValue = ip->getRealFieldValue(bldg1, objectSchemaProps, "maximum_number_of_warmup_days");
+    EXPECT_NEAR(numericFieldValue, 25.0, 0.0001);
+    numericFieldValue = ip->getRealFieldValue(bldg1, objectSchemaProps, "minimum_number_of_warmup_days");
+    EXPECT_NEAR(numericFieldValue, 1.0, 0.0001);
 
-          json &loc = IP.epJSON["properties"]["Version"];
+    // Material object
+    objectSchemaProps = ip->getObjectSchemaProps(*state, obj_type2);
+    // User inputs from above
+    // Note even though choice keys are case-sensitive during epJSON processing, getObjectItem pushes Alphas to UPPERcase
+    alphaFieldValue = ip->getAlphaFieldValue(mat1, objectSchemaProps, "roughness");
+    EXPECT_EQ(alphaFieldValue, "MEDIUMROUGH");
+    numericFieldValue = ip->getRealFieldValue(mat1, objectSchemaProps, "thickness");
+    EXPECT_NEAR(numericFieldValue, 0.2, 0.0001);
+    numericFieldValue = ip->getRealFieldValue(mat1, objectSchemaProps, "solar_absorptance");
+    EXPECT_NEAR(numericFieldValue, 0.5, 0.0001);
+    // Defaults from schema
+    numericFieldValue = ip->getRealFieldValue(mat1, objectSchemaProps, "thermal_absorptance");
+    EXPECT_NEAR(numericFieldValue, 0.9, 0.0001);
+    // Fields beyond min-fields also return their default if they have one (unlike getObjectItem)
+    numericFieldValue = ip->getRealFieldValue(mat1, objectSchemaProps, "visible_absorptance");
+    EXPECT_NEAR(numericFieldValue, 0.7, 0.0001);
+    // or zero if they don't have a default (in this case it's a required field, so it would have failed before now)
+    numericFieldValue = ip->getRealFieldValue(mat1, objectSchemaProps, "specific_heat");
+    EXPECT_NEAR(numericFieldValue, 0.0, 0.0001);
+}
 
-          // EXPECT_EQ( "Version", IDFRecords( index ).Name );
-          EXPECT_EQ(1, loc['alphas'].size());  // EXPECT_EQ( 1, IDFRecords( index ).NumAlphas )
-          EXPECT_EQ(0, loc['numerics'].size());  // EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
-          EXPECT_EQ(1, )  // EXPECT_EQ( 1, IDFRecords( index ).ObjectDefPtr );
-          EXPECT_TRUE( compare_containers( std::vector< std::string >( { "8.5" } ), IDFRecords( index ).Alphas ) );
-          EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), IDFRecords( index ).AlphBlank ) );
-          EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
-          EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
+TEST_F(InputProcessorFixture, epJSONgetFieldValue_AutosizefromJSON)
+{
 
-          std::string const simulation_control_name( "SIMULATIONCONTROL" );
+    json root;
+    std::string obj_type1 = "WaterHeater:Mixed";
+    std::string name1 = "Water Heater 1";
+    json wh1 = {{"tank_volume", "autosize"}, {"heater_maximum_capacity", "nonsense"}, {"source_side_effectiveness", "nothing"}};
+    EXPECT_TRUE(wh1.is_object());
+    root[obj_type1][name1] = wh1;
 
-          index = FindItemInSortedList( simulation_control_name, ListOfObjects, NumObjectDefs );
-          if ( index != 0 ) index = iListOfObjects( index );
+    auto &ip(state->dataInputProcessing->inputProcessor);
+    ip->epJSON = root;
+    state->dataGlobal->isEpJSON = true;
+    ip->initializeMaps();
+    std::string alphaFieldValue;
+    Real64 numericFieldValue = 0.0;
+    json objectSchemaProps;
 
-          index = ObjectStartRecord( index );
+    // Water heater object
+    objectSchemaProps = ip->getObjectSchemaProps(*state, obj_type1);
+    // User inputs from above
+    // If the field is autosizable and alpha input will return -99999
+    numericFieldValue = ip->getRealFieldValue(wh1, objectSchemaProps, "tank_volume");
+    EXPECT_EQ(numericFieldValue, -99999);
+    numericFieldValue = ip->getRealFieldValue(wh1, objectSchemaProps, "heater_maximum_capacity");
+    EXPECT_EQ(numericFieldValue, -99999);
+    // Even a field that is not autoszable will return -99999 here (assuming that gets checked upon epJSON input processing)
+    numericFieldValue = ip->getRealFieldValue(wh1, objectSchemaProps, "source_side_effectiveness");
+    EXPECT_EQ(numericFieldValue, -99999);
+    // Also check a field that defaults to autosize (not input above)
+    numericFieldValue = ip->getRealFieldValue(wh1, objectSchemaProps, "use_side_design_flow_rate");
+    EXPECT_EQ(numericFieldValue, -99999);
+}
+TEST_F(InputProcessorFixture, epJSONgetFieldValue_fromIDF)
+{
 
-          ASSERT_EQ( 2, index );
+    std::string const idf_objects = delimited_string({
+        "  WaterHeater:Mixed,",
+        "    Water Heater 1,          !- Name",
+        "    autosize,                !- Tank Volume {m3}",
+        "    DummySch,                !- Setpoint Temperature Schedule Name",
+        "    ,                        !- Deadband Temperature Difference {deltaC}",
+        "    ,                        !- Maximum Temperature Limit {C}",
+        "    ,                        !- Heater Control Type",
+        "    autosize,                !- Heater Maximum Capacity {W}",
+        "    ,                        !- Heater Minimum Capacity {W}",
+        "    ,                        !- Heater Ignition Minimum Flow Rate {m3/s}",
+        "    ,                        !- Heater Ignition Delay {s}",
+        "    ELECTRICITY,             !- Heater Fuel Type",
+        "    0.95,                    !- Heater Thermal Efficiency",
+        "    ,                        !- Part Load Factor Curve Name",
+        "    10,                      !- Off Cycle Parasitic Fuel Consumption Rate {W}",
+        "    ELECTRICITY,             !- Off Cycle Parasitic Fuel Type",
+        "    0,                       !- Off Cycle Parasitic Heat Fraction to Tank",
+        "    30,                      !- On Cycle Parasitic Fuel Consumption Rate {W}",
+        "    ELECTRICITY,             !- On Cycle Parasitic Fuel Type",
+        "    0,                       !- On Cycle Parasitic Heat Fraction to Tank",
+        "    Schedule,                !- Ambient Temperature Indicator",
+        "    DummySch,                !- Ambient Temperature Schedule Name",
+        "    ,                        !- Ambient Temperature Zone Name",
+        "    ,                        !- Ambient Temperature Outdoor Air Node Name",
+        "    2.0,                     !- Off Cycle Loss Coefficient to Ambient Temperature {W/K}",
+        "    1.0,                     !- Off Cycle Loss Fraction to Zone",
+        "    2.0,                     !- On Cycle Loss Coefficient to Ambient Temperature {W/K}",
+        "    1.0,                     !- On Cycle Loss Fraction to Zone",
+        "    0.00379,                 !- Peak Use Flow Rate {m3/s}",
+        "    DummySch,                !- Use Flow Rate Fraction Schedule Name",
+        "    ,                        !- Cold Water Supply Temperature Schedule Name",
+        "    ,                        !- Use Side Inlet Node Name",
+        "    ,                        !- Use Side Outlet Node Name",
+        "    ,                        !- Use Side Effectiveness",
+        "    Zone4WaterOutletNode,    !- Source Side Inlet Node Name",
+        "    Zone4WaterInletNode,     !- Source Side Outlet Node Name",
+        "    0.9;                     !- Source Side Effectiveness",
 
-          EXPECT_EQ( simulation_control_name, IDFRecords( index ).Name );
-          EXPECT_EQ( 5, IDFRecords( index ).NumAlphas );
-          EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
-          EXPECT_EQ( 2, IDFRecords( index ).ObjectDefPtr );
-          EXPECT_TRUE( compare_containers( std::vector< std::string >( { "NO", "NO", "NO", "YES", "YES" } ), IDFRecords( index ).Alphas ) );
-          EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false } ), IDFRecords( index ).AlphBlank ) );
-          EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
-          EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
+    });
 
-   }
-   */
+    ASSERT_TRUE(process_idf(idf_objects));
+    state->dataGlobal->isEpJSON = false;
+    std::string alphaFieldValue;
+    Real64 numericFieldValue = 0.0;
+    json objectSchemaProps;
+
+    // Water heater object
+    auto &ip(state->dataInputProcessing->inputProcessor);
+    std::string obj_type1 = "WaterHeater:Mixed";
+    objectSchemaProps = ip->getObjectSchemaProps(*state, obj_type1);
+    auto instances = ip->epJSON.find(obj_type1);
+    if (instances != ip->epJSON.end()) {
+        // globalSolverObject.referenceConditions.clear();
+        auto &instancesValue = instances.value();
+        for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+            auto const &fields = instance.value();
+            // User inputs from above
+            // An autosized field will return -99999
+            numericFieldValue = ip->getRealFieldValue(fields, objectSchemaProps, "tank_volume");
+            EXPECT_EQ(numericFieldValue, -99999);
+            numericFieldValue = ip->getRealFieldValue(fields, objectSchemaProps, "heater_maximum_capacity");
+            EXPECT_EQ(numericFieldValue, -99999);
+            // Check a numeric field that's not autosized
+            numericFieldValue = ip->getRealFieldValue(fields, objectSchemaProps, "source_side_effectiveness");
+            EXPECT_EQ(numericFieldValue, 0.9);
+            // Also check a field that defaults to autosize (not input above)
+            numericFieldValue = ip->getRealFieldValue(fields, objectSchemaProps, "use_side_design_flow_rate");
+            EXPECT_EQ(numericFieldValue, -99999);
+            // Check an alpha field
+            alphaFieldValue = ip->getAlphaFieldValue(fields, objectSchemaProps, "on_cycle_parasitic_fuel_type");
+            EXPECT_TRUE(UtilityRoutines::SameString(alphaFieldValue, "Electricity"));
+            // Check a defaulted alpha field
+            alphaFieldValue = ip->getAlphaFieldValue(fields, objectSchemaProps, "heater_control_type");
+            EXPECT_TRUE(UtilityRoutines::SameString(alphaFieldValue, "Cycle"));
+        }
+    }
+}
+
+TEST_F(InputProcessorFixture, epJSONgetFieldValue_extensiblesFromIDF)
+{
+
+    std::string const idf_objects = delimited_string({
+        "ZoneHVAC:EquipmentList,",
+        " Space Equipment,          !- Name",
+        " UniformPLR,               !- Load Distribution Scheme",
+        " ZoneHVAC:Baseboard:RadiantConvective:Electric,  !- Zone Equipment 1 Object Type",
+        " Baseboard Heat,           !- Zone Equipment 1 Name",
+        " 0,                        !- Zone Equipment 1 Cooling Sequence",
+        " 3,                        !- Zone Equipment 1 Heating or No-Load Sequence",
+        " ,                         !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name",
+        " ,                         !- Zone Equipment 1 Sequential Heating or No-Load Fraction Schedule Name",
+        " ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type",
+        " Air Terminal ADU,         !- Zone Equipment 2 Name",
+        " 2.1,                        !- Zone Equipment 2 Cooling Sequence",
+        " 1.9,                        !- Zone Equipment 2 Heating or No-Load Sequence",
+        " ADU Cooling Fraction Schedule, !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name",
+        " ADU Heating Fraction Schedule, !- Zone Equipment 2 Sequential Heating or No-Load Fraction Schedule Name",
+        " Fan:ZoneExhaust,          !- Zone Equipment 2 Object Type",
+        " Exhaust Fan,              !- Zone Equipment 3 Name",
+        " 1,                        !- Zone Equipment 3 Cooling Sequence",
+        " 1,                        !- Zone Equipment 3 Heating or No-Load Sequence",
+        " ,                         !- Zone Equipment 3 Sequential Cooling Fraction Schedule Name",
+        " ;                         !- Zone Equipment 3 Sequential Heating or No-Load Fraction Schedule Name",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    state->dataGlobal->isEpJSON = false;
+    std::string alphaFieldValue;
+    json objectSchemaProps;
+
+    // Water heater object
+    auto &ip(state->dataInputProcessing->inputProcessor);
+    std::string obj_type1 = "ZoneHVAC:EquipmentList";
+    objectSchemaProps = ip->getObjectSchemaProps(*state, obj_type1);
+    auto instances = ip->epJSON.find(obj_type1);
+    if (instances != ip->epJSON.end()) {
+        // globalSolverObject.referenceConditions.clear();
+        auto &instancesValue = instances.value();
+        for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+            auto const &objectFields = instance.value();
+            auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+            EXPECT_EQ(thisObjectName, "SPACE EQUIPMENT");
+            // Fields before extensibles
+            alphaFieldValue = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "load_distribution_scheme");
+            EXPECT_TRUE(UtilityRoutines::SameString(alphaFieldValue, "UniformPLR"));
+
+            // Extensibles
+
+            auto extensibles = objectFields.find("equipment");
+            auto const &extensionSchemaProps = objectSchemaProps["equipment"]["items"]["properties"];
+            std::vector<std::string> equipmentNames;
+            std::vector<std::string> equipmentTypes;
+            std::vector<std::string> coolFracSchedNames;
+            std::vector<std::string> heatFracSchedNames;
+            std::vector<int> coolSeqNums;
+            std::vector<int> heatSeqNums;
+            if (extensibles != objectFields.end()) {
+                auto extensiblesArray = extensibles.value();
+                int numExtensibles = extensiblesArray.size();
+                EXPECT_EQ(numExtensibles, 3);
+
+                equipmentNames.resize(numExtensibles);
+                equipmentTypes.resize(numExtensibles);
+                coolFracSchedNames.resize(numExtensibles);
+                heatFracSchedNames.resize(numExtensibles);
+                coolSeqNums.resize(numExtensibles);
+                heatSeqNums.resize(numExtensibles);
+
+                int counter = 0;
+                for (auto extensibleInstance : extensiblesArray) {
+                    equipmentNames[counter] = ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_name");
+                    equipmentTypes[counter] = ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_object_type");
+                    coolFracSchedNames[counter] =
+                        ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_sequential_cooling_fraction_schedule_name");
+                    heatFracSchedNames[counter] =
+                        ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_sequential_heating_fraction_schedule_name");
+                    coolSeqNums[counter] = ip->getIntFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_cooling_sequence");
+                    heatSeqNums[counter] =
+                        ip->getIntFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_heating_or_no_load_sequence");
+                    ++counter;
+                }
+                EXPECT_EQ(counter, 3);
+            }
+            EXPECT_TRUE(UtilityRoutines::SameString(equipmentNames[0], "Baseboard Heat"));
+            EXPECT_TRUE(UtilityRoutines::SameString(equipmentTypes[0], "ZoneHVAC:Baseboard:RadiantConvective:Electric"));
+            EXPECT_TRUE(UtilityRoutines::SameString(coolFracSchedNames[0], ""));
+            EXPECT_TRUE(UtilityRoutines::SameString(heatFracSchedNames[0], ""));
+            EXPECT_EQ(coolSeqNums[0], 0);
+            EXPECT_EQ(heatSeqNums[0], 3);
+
+            EXPECT_TRUE(UtilityRoutines::SameString(equipmentNames[1], "Air Terminal ADU"));
+            EXPECT_TRUE(UtilityRoutines::SameString(equipmentTypes[1], "ZoneHVAC:AirDistributionUnit"));
+            EXPECT_TRUE(UtilityRoutines::SameString(coolFracSchedNames[1], "ADU Cooling Fraction Schedule"));
+            EXPECT_TRUE(UtilityRoutines::SameString(heatFracSchedNames[1], "ADU Heating Fraction Schedule"));
+            // Not the input values above are 1.9 and 2.1, the should round to the nearest integer
+            EXPECT_EQ(coolSeqNums[1], 2);
+            EXPECT_EQ(heatSeqNums[1], 2);
+
+            EXPECT_TRUE(UtilityRoutines::SameString(equipmentNames[2], "Exhaust Fan"));
+            EXPECT_TRUE(UtilityRoutines::SameString(equipmentTypes[2], "Fan:ZoneExhaust"));
+            EXPECT_TRUE(UtilityRoutines::SameString(coolFracSchedNames[2], ""));
+            EXPECT_TRUE(UtilityRoutines::SameString(heatFracSchedNames[2], ""));
+            EXPECT_EQ(coolSeqNums[2], 1);
+            EXPECT_EQ(heatSeqNums[2], 1);
+        }
+    }
+}
+//
+//   TEST_F( InputProcessorFixture, processIDF_json )
+//   {
+//          const json schema = initialize();
+//          InputProcessor IP;
+//          IdfParser idf_parser(schema);
+//          State state(schema);
+//
+//          std::string const idf = delimited_string({
+//                                                                                                                         "Version,",
+//                                                                                                                         "8.3;",
+//                                                                                                                         "SimulationControl, NO, NO,
+//   NO, YES, YES;",
+//                                                                                                           });
+//
+//          json::parser_callback_t cb = [&state](int depth, json::parse_event_t event, json &parsed,
+//                                                                                        unsigned line_num, unsigned line_index) -> bool {
+//                state->traverse(event, parsed, line_num, line_index);
+//                return true;
+//          };
+//
+//          IP->epJSON = idf_parser.decode(idf, schema);
+//          json::parse(IP->epJSON.dump(2), cb);
+//
+//          EXPECT_EQ(2, state->errors + state->warnings);
+//
+//          // auto index = FindItemInSortedList( version_name, ListOfObjects, NumObjectDefs );
+//          // if ( index != 0 ) index = iListOfObjects( index );
+//          // index = ObjectStartRecord( index );
+//          // EXPECT_EQ( 1, index );
+//
+//          json &loc = IP->epJSON["properties"]["Version"];
+//
+//          // EXPECT_EQ( "Version", IDFRecords( index ).Name );
+//          EXPECT_EQ(1, loc['alphas'].size());  // EXPECT_EQ( 1, IDFRecords( index ).NumAlphas )
+//          EXPECT_EQ(0, loc['numerics'].size());  // EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
+//          EXPECT_EQ(1, )  // EXPECT_EQ( 1, IDFRecords( index ).ObjectDefPtr );
+//          EXPECT_TRUE( compare_containers( std::vector< std::string >( { "8.5" } ), IDFRecords( index ).Alphas ) );
+//          EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), IDFRecords( index ).AlphBlank ) );
+//          EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
+//          EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
+//
+//          std::string const simulation_control_name( "SIMULATIONCONTROL" );
+//
+//          index = FindItemInSortedList( simulation_control_name, ListOfObjects, NumObjectDefs );
+//          if ( index != 0 ) index = iListOfObjects( index );
+//
+//          index = ObjectStartRecord( index );
+//
+//          ASSERT_EQ( 2, index );
+//
+//          EXPECT_EQ( simulation_control_name, IDFRecords( index ).Name );
+//          EXPECT_EQ( 5, IDFRecords( index ).NumAlphas );
+//          EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
+//          EXPECT_EQ( 2, IDFRecords( index ).ObjectDefPtr );
+//          EXPECT_TRUE( compare_containers( std::vector< std::string >( { "NO", "NO", "NO", "YES", "YES" } ), IDFRecords( index ).Alphas ) );
+//          EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false } ), IDFRecords( index ).AlphBlank ) );
+//          EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
+//          EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
+//
+//   }
+
 } // namespace EnergyPlus

@@ -65,6 +65,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 
 namespace EnergyPlus {
@@ -116,9 +117,6 @@ namespace OutputReportTabular {
         InchPound,
         NotFound,
     };
-
-    extern int const stepTypeZone;
-    extern int const stepTypeHVAC;
 
     // These correspond to the columns in the load component table
     constexpr int cSensInst(1);
@@ -231,7 +229,7 @@ namespace OutputReportTabular {
         // the lowest bin and above the value of the last bin are also shown.
         int resIndex; // result index - pointer to BinResults array
         int numTables;
-        int typeOfVar;                          // 0=not found, 1=integer, 2=real, 3=meter
+        OutputProcessor::VariableType typeOfVar;
         OutputProcessor::StoreType avgSum;      // Variable  is Averaged=1 or Summed=2
         OutputProcessor::TimeStepType stepType; // Variable time step is Zone=1 or HVAC=2
         OutputProcessor::Unit units;            // the units enumeration
@@ -240,7 +238,7 @@ namespace OutputReportTabular {
 
         // Default Constructor
         OutputTableBinnedType()
-            : intervalStart(0.0), intervalSize(0.0), intervalCount(0), resIndex(0), numTables(0), typeOfVar(0),
+            : intervalStart(0.0), intervalSize(0.0), intervalCount(0), resIndex(0), numTables(0), typeOfVar(OutputProcessor::VariableType::NotFound),
               avgSum(OutputProcessor::StoreType::Averaged), stepType(OutputProcessor::TimeStepType::TimeStepZone), scheduleIndex(0)
         {
         }
@@ -316,12 +314,12 @@ namespace OutputReportTabular {
     struct MonthlyFieldSetInputType
     {
         // Members
-        std::string variMeter;                     // the name of the variable or meter
-        std::string colHead;                       // the column header to use instead of the variable name (only for predefined)
-        iAggType aggregate;                        // the type of aggregation for the variable (see aggType parameters)
-        OutputProcessor::Unit varUnits;            // Units enumeration
-        std::string variMeterUpper;                // the name of the variable or meter uppercased
-        int typeOfVar;                             // 0=not found, 1=integer, 2=real, 3=meter
+        std::string variMeter;          // the name of the variable or meter
+        std::string colHead;            // the column header to use instead of the variable name (only for predefined)
+        iAggType aggregate;             // the type of aggregation for the variable (see aggType parameters)
+        OutputProcessor::Unit varUnits; // Units enumeration
+        std::string variMeterUpper;     // the name of the variable or meter uppercased
+        OutputProcessor::VariableType typeOfVar;
         int keyCount;                              // noel
         OutputProcessor::StoreType varAvgSum;      // Variable  is Averaged=1 or Summed=2
         OutputProcessor::TimeStepType varStepType; // Variable time step is Zone=1 or HVAC=2
@@ -330,7 +328,7 @@ namespace OutputReportTabular {
 
         // Default Constructor
         MonthlyFieldSetInputType()
-            : aggregate(iAggType::Unassigned), varUnits(OutputProcessor::Unit::None), typeOfVar(0), keyCount(0),
+            : aggregate(iAggType::Unassigned), varUnits(OutputProcessor::Unit::None), typeOfVar(OutputProcessor::VariableType::NotFound), keyCount(0),
               varAvgSum(OutputProcessor::StoreType::Averaged), varStepType(OutputProcessor::TimeStepType::TimeStepZone)
         {
         }
@@ -352,24 +350,25 @@ namespace OutputReportTabular {
     struct MonthlyColumnsType
     {
         // Members
-        std::string varName;                    // name of variable
-        std::string colHead;                    // column header (not used for user defined monthly)
-        int varNum;                             // variable or meter number
-        int typeOfVar;                          // 0=not found, 1=integer, 2=real, 3=meter
-        OutputProcessor::StoreType avgSum;      // Variable  is Averaged=1 or Summed=2
-        OutputProcessor::TimeStepType stepType; // Variable time step is Zone=1 or HVAC=2
-        OutputProcessor::Unit units;            // the units string, may be blank
-        iAggType aggType;                       // index to the type of aggregation (see list of parameters)
-        Array1D<Real64> reslt;                  // monthly results
-        Array1D<Real64> duration;               // the time during which results are summed for use in averages
-        Array1D_int timeStamp;                  // encoded timestamp of max or min
-        Real64 aggForStep;                      // holds the aggregation for the HVAC time steps when smaller than
+        std::string varName;                     // name of variable
+        std::string colHead;                     // column header (not used for user defined monthly)
+        int varNum;                              // variable or meter number
+        OutputProcessor::VariableType typeOfVar; // 0=not found, 1=integer, 2=real, 3=meter
+        OutputProcessor::StoreType avgSum;       // Variable  is Averaged=1 or Summed=2
+        OutputProcessor::TimeStepType stepType;  // Variable time step is Zone=1 or HVAC=2
+        OutputProcessor::Unit units;             // the units string, may be blank
+        iAggType aggType;                        // index to the type of aggregation (see list of parameters)
+        Array1D<Real64> reslt;                   // monthly results
+        Array1D<Real64> duration;                // the time during which results are summed for use in averages
+        Array1D_int timeStamp;                   // encoded timestamp of max or min
+        Real64 aggForStep;                       // holds the aggregation for the HVAC time steps when smaller than
         // the zone timestep
 
         // Default Constructor
         MonthlyColumnsType()
-            : varNum(0), typeOfVar(0), avgSum(OutputProcessor::StoreType::Averaged), stepType(OutputProcessor::TimeStepType::TimeStepZone),
-              units(OutputProcessor::Unit::None), aggType(iAggType::Unassigned), reslt(12, 0.0), duration(12, 0.0), timeStamp(12, 0), aggForStep(0.0)
+            : varNum(0), typeOfVar(OutputProcessor::VariableType::NotFound), avgSum(OutputProcessor::StoreType::Averaged),
+              stepType(OutputProcessor::TimeStepType::TimeStepZone), units(OutputProcessor::Unit::None), aggType(iAggType::Unassigned),
+              reslt(12, 0.0), duration(12, 0.0), timeStamp(12, 0), aggForStep(0.0)
         {
         }
     };
@@ -477,7 +476,7 @@ namespace OutputReportTabular {
 
     // Functions
 
-    std::ofstream &open_tbl_stream(EnergyPlusData &state, int const iStyle, std::string const &filename, bool output_to_file = true);
+    std::ofstream &open_tbl_stream(EnergyPlusData &state, int const iStyle, fs::path const &filePath, bool output_to_file = true);
 
     void UpdateTabularReports(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
@@ -756,8 +755,8 @@ namespace OutputReportTabular {
 
     void DetermineBuildingFloorArea(EnergyPlusData &state);
 
-    /* Tables with Subcategories in particular have a blank for rowHead for display in the HTML output.
-     * This routine will fill up the blanks for output to Sql in particular */
+    // Tables with Subcategories in particular have a blank for rowHead for display in the HTML output.
+    // This routine will fill up the blanks for output to Sql in particular
     void FillRowHead(Array1D_string &rowHead);
 
     //======================================================================================================================
@@ -1106,7 +1105,7 @@ struct OutputReportTabularData : BaseGlobalStruct
     Real64 BigNum = 0.0;
     bool VarWarning = true;
     int ErrCount1 = 0;
-    Array1D_int MonthlyColumnsTypeOfVar;
+    Array1D<OutputProcessor::VariableType> MonthlyColumnsTypeOfVar;
     Array1D<OutputProcessor::TimeStepType> MonthlyColumnsStepType;
     Array1D<OutputReportTabular::iAggType> MonthlyColumnsAggType;
     Array1D_int MonthlyColumnsVarNum;

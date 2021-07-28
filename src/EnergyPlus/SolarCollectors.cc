@@ -92,7 +92,7 @@ namespace SolarCollectors {
     // must be connected to a WATER HEATER object on the supply side of the plant loop.  Water is assumed to be
     // the heat transfer fluid.
 
-    static std::string const fluidNameWater("WATER");
+    static constexpr std::string_view fluidNameWater("WATER");
 
     PlantComponent *CollectorData::factory(EnergyPlusData &state, std::string const &objectName)
     {
@@ -384,7 +384,7 @@ namespace SolarCollectors {
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Water,
                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                        1,
+                                                        NodeInputManager::compFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 state.dataSolarCollectors->Collector(CollectorNum).OutletNode =
                     NodeInputManager::GetOnlySingleNode(state,
@@ -394,7 +394,7 @@ namespace SolarCollectors {
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Water,
                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                        1,
+                                                        NodeInputManager::compFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
 
                 if (NumNumbers > 0) {
@@ -675,7 +675,7 @@ namespace SolarCollectors {
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Water,
                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                        1,
+                                                        NodeInputManager::compFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 state.dataSolarCollectors->Collector(CollectorNum).OutletNode =
                     NodeInputManager::GetOnlySingleNode(state,
@@ -685,7 +685,7 @@ namespace SolarCollectors {
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Water,
                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                        1,
+                                                        NodeInputManager::compFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
 
                 if (NumNumbers > 0) {
@@ -723,24 +723,48 @@ namespace SolarCollectors {
                                 "Solar Collector Incident Angle Modifier",
                                 OutputProcessor::Unit::None,
                                 this->IncidentAngleModifier,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 this->Name);
 
-            SetupOutputVariable(state, "Solar Collector Efficiency", OutputProcessor::Unit::None, this->Efficiency, "System", "Average", this->Name);
+            SetupOutputVariable(state,
+                                "Solar Collector Efficiency",
+                                OutputProcessor::Unit::None,
+                                this->Efficiency,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
 
-            SetupOutputVariable(state, "Solar Collector Heat Transfer Rate", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
+            SetupOutputVariable(state,
+                                "Solar Collector Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                this->Power,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
 
-            SetupOutputVariable(state, "Solar Collector Heat Gain Rate", OutputProcessor::Unit::W, this->HeatGain, "System", "Average", this->Name);
+            SetupOutputVariable(state,
+                                "Solar Collector Heat Gain Rate",
+                                OutputProcessor::Unit::W,
+                                this->HeatGain,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
 
-            SetupOutputVariable(state, "Solar Collector Heat Loss Rate", OutputProcessor::Unit::W, this->HeatLoss, "System", "Average", this->Name);
+            SetupOutputVariable(state,
+                                "Solar Collector Heat Loss Rate",
+                                OutputProcessor::Unit::W,
+                                this->HeatLoss,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
 
             SetupOutputVariable(state,
                                 "Solar Collector Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
                                 this->Energy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 _,
                                 "SolarWater",
@@ -753,36 +777,56 @@ namespace SolarCollectors {
                                 "Solar Collector Transmittance Absorptance Product",
                                 OutputProcessor::Unit::None,
                                 this->TauAlpha,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 this->Name);
 
             SetupOutputVariable(state,
                                 "Solar Collector Overall Top Heat Loss Coefficient",
                                 OutputProcessor::Unit::W_m2C,
                                 this->UTopLoss,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 this->Name);
 
-            SetupOutputVariable(
-                state, "Solar Collector Absorber Plate Temperature", OutputProcessor::Unit::C, this->TempOfAbsPlate, "System", "Average", this->Name);
+            SetupOutputVariable(state,
+                                "Solar Collector Absorber Plate Temperature",
+                                OutputProcessor::Unit::C,
+                                this->TempOfAbsPlate,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
 
-            SetupOutputVariable(
-                state, "Solar Collector Storage Water Temperature", OutputProcessor::Unit::C, this->TempOfWater, "System", "Average", this->Name);
+            SetupOutputVariable(state,
+                                "Solar Collector Storage Water Temperature",
+                                OutputProcessor::Unit::C,
+                                this->TempOfWater,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
 
-            SetupOutputVariable(
-                state, "Solar Collector Thermal Efficiency", OutputProcessor::Unit::None, this->Efficiency, "System", "Average", this->Name);
+            SetupOutputVariable(state,
+                                "Solar Collector Thermal Efficiency",
+                                OutputProcessor::Unit::None,
+                                this->Efficiency,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
 
-            SetupOutputVariable(
-                state, "Solar Collector Storage Heat Transfer Rate", OutputProcessor::Unit::W, this->StoredHeatRate, "System", "Average", this->Name);
+            SetupOutputVariable(state,
+                                "Solar Collector Storage Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                this->StoredHeatRate,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
 
             SetupOutputVariable(state,
                                 "Solar Collector Storage Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
                                 this->StoredHeatEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 _,
                                 "SolarWater",
@@ -790,15 +834,20 @@ namespace SolarCollectors {
                                 _,
                                 "Plant");
 
-            SetupOutputVariable(
-                state, "Solar Collector Skin Heat Transfer Rate", OutputProcessor::Unit::W, this->SkinHeatLossRate, "System", "Average", this->Name);
+            SetupOutputVariable(state,
+                                "Solar Collector Skin Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                this->SkinHeatLossRate,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
 
             SetupOutputVariable(state,
                                 "Solar Collector Skin Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
                                 this->CollHeatLossEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 _,
                                 "SolarWater",
@@ -806,15 +855,20 @@ namespace SolarCollectors {
                                 _,
                                 "Plant");
 
-            SetupOutputVariable(
-                state, "Solar Collector Heat Transfer Rate", OutputProcessor::Unit::W, this->HeatRate, "System", "Average", this->Name);
+            SetupOutputVariable(state,
+                                "Solar Collector Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                this->HeatRate,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
 
             SetupOutputVariable(state,
                                 "Solar Collector Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
                                 this->HeatEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 _,
                                 "SolarWater",
@@ -864,37 +918,10 @@ namespace SolarCollectors {
         // METHODOLOGY EMPLOYED:
         // Inlet and outlet nodes are initialized.  The maximum collector flow rate is requested.
 
-        static std::string const RoutineName("InitSolarCollector");
+        static constexpr std::string_view RoutineName("InitSolarCollector");
         Real64 const BigNumber(9999.9); // Component desired mass flow rate
 
-        // Do the one time initializations
-        if (this->MyOneTimeFlag) {
-            this->setupOutputVars(state);
-            this->MyOneTimeFlag = false;
-        }
-
-        if (this->SetLoopIndexFlag) {
-            if (allocated(state.dataPlnt->PlantLoop)) {
-                bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        this->TypeNum,
-                                                        this->WLoopNum,
-                                                        this->WLoopSideNum,
-                                                        this->WLoopBranchNum,
-                                                        this->WLoopCompNum,
-                                                        errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _);
-                if (errFlag) {
-                    ShowFatalError(state, "InitSolarCollector: Program terminated due to previous condition(s).");
-                }
-                this->SetLoopIndexFlag = false;
-            }
-        }
+        this->oneTimeInit(state); // Do the one time initializations
 
         if (!state.dataGlobal->SysSizingCalc && this->InitSizing) {
             PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNode, this->VolFlowRateMax);
@@ -1061,7 +1088,7 @@ namespace SolarCollectors {
         // components are less than zero but the net adds up to greater than zero.  The EnergyPlus subroutine, on the other
         // hand, requires each component incident angle modifier always to be greater than zero.
 
-        static std::string const RoutineName("CalcSolarCollector");
+        static constexpr std::string_view RoutineName("CalcSolarCollector");
         Real64 efficiency = 0.0; // Thermal efficiency of solar energy conversion
 
         int SurfNum = this->Surface;
@@ -1137,21 +1164,19 @@ namespace SolarCollectors {
             {
                 auto const SELECT_CASE_var(state.dataSolarCollectors->Parameters(ParamNum).TestType);
                 if (SELECT_CASE_var == TestTypeEnum::INLET) {
-                    FRULpTest =
-                        state.dataSolarCollectors->Parameters(ParamNum).eff1 +
-                        state.dataSolarCollectors->Parameters(ParamNum).eff2 * (inletTemp - state.dataSurface->Surface(SurfNum).OutDryBulbTemp);
+                    FRULpTest = state.dataSolarCollectors->Parameters(ParamNum).eff1 +
+                                state.dataSolarCollectors->Parameters(ParamNum).eff2 * (inletTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum));
                     TestTypeMod = 1.0;
 
                 } else if (SELECT_CASE_var == TestTypeEnum::AVERAGE) {
                     FRULpTest = state.dataSolarCollectors->Parameters(ParamNum).eff1 +
                                 state.dataSolarCollectors->Parameters(ParamNum).eff2 *
-                                    ((inletTemp + outletTemp) * 0.5 - state.dataSurface->Surface(SurfNum).OutDryBulbTemp);
+                                    ((inletTemp + outletTemp) * 0.5 - state.dataSurface->SurfOutDryBulbTemp(SurfNum));
                     TestTypeMod = 1.0 / (1.0 - FRULpTest / (2.0 * mCpATest));
 
                 } else if (SELECT_CASE_var == TestTypeEnum::OUTLET) {
-                    FRULpTest =
-                        state.dataSolarCollectors->Parameters(ParamNum).eff1 +
-                        state.dataSolarCollectors->Parameters(ParamNum).eff2 * (outletTemp - state.dataSurface->Surface(SurfNum).OutDryBulbTemp);
+                    FRULpTest = state.dataSolarCollectors->Parameters(ParamNum).eff1 +
+                                state.dataSolarCollectors->Parameters(ParamNum).eff2 * (outletTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum));
                     TestTypeMod = 1.0 / (1.0 - FRULpTest / mCpATest);
                 }
             }
@@ -1194,7 +1219,7 @@ namespace SolarCollectors {
                 // Calculate fluid heat gain (or loss)
                 // Heat loss is possible if there is no incident radiation and fluid is still flowing.
                 Q = (FRTAN * incidentAngleModifier * state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) +
-                     FRULpTest * (inletTemp - state.dataSurface->Surface(SurfNum).OutDryBulbTemp)) *
+                     FRULpTest * (inletTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum))) *
                     area * FlowMod;
 
                 outletTemp = inletTemp + Q / (massFlowRate * Cp);
@@ -1223,9 +1248,8 @@ namespace SolarCollectors {
 
                 // Calculate temperature of stagnant fluid in collector
                 Real64 A = -FRULT;
-                Real64 B = -FRUL + 2.0 * FRULT * state.dataSurface->Surface(SurfNum).OutDryBulbTemp;
-                Real64 C = -FRULT * pow_2(state.dataSurface->Surface(SurfNum).OutDryBulbTemp) +
-                           FRUL * state.dataSurface->Surface(SurfNum).OutDryBulbTemp -
+                Real64 B = -FRUL + 2.0 * FRULT * state.dataSurface->SurfOutDryBulbTemp(SurfNum);
+                Real64 C = -FRULT * pow_2(state.dataSurface->SurfOutDryBulbTemp(SurfNum)) + FRUL * state.dataSurface->SurfOutDryBulbTemp(SurfNum) -
                            FRTAN * incidentAngleModifier * state.dataHeatBal->SurfQRadSWOutIncident(SurfNum);
                 Real64 qEquation = (pow_2(B) - 4.0 * A * C);
                 if (qEquation < 0.0) {
@@ -1245,7 +1269,7 @@ namespace SolarCollectors {
                                                   qEquation);
                 }
                 if (FRULT == 0.0 || qEquation < 0.0) { // Linear, 1st order solution
-                    outletTemp = state.dataSurface->Surface(SurfNum).OutDryBulbTemp -
+                    outletTemp = state.dataSurface->SurfOutDryBulbTemp(SurfNum) -
                                  FRTAN * incidentAngleModifier * state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) / FRUL;
                 } else { // Quadratic, 2nd order solution
                     outletTemp = (-B + std::sqrt(qEquation)) / (2.0 * A);
@@ -1356,14 +1380,14 @@ namespace SolarCollectors {
         // New York (1991).
         // NOTES:
 
-        static std::string const RoutineName("CalcICSSolarCollector");
+        static constexpr std::string_view RoutineName("CalcICSSolarCollector");
 
         int SurfNum = this->Surface;
         int ParamNum = this->Parameters;
         Real64 SecInTimeStep = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         Real64 TempWater = this->SavedTempOfWater;
         Real64 TempAbsPlate = this->SavedTempOfAbsPlate;
-        Real64 TempOutdoorAir = state.dataSurface->Surface(SurfNum).OutDryBulbTemp;
+        Real64 TempOutdoorAir = state.dataSurface->SurfOutDryBulbTemp(SurfNum);
 
         Real64 TempOSCM; // Otherside condition model temperature [C]
         if (this->OSCM_ON) {
@@ -1766,10 +1790,10 @@ namespace SolarCollectors {
         int NumCovers = state.dataSolarCollectors->Parameters(ParamNum).NumOfCovers;
         int SurfNum = this->Surface;
 
-        Real64 TempAbsPlate = this->SavedTempOfAbsPlate;                            // absorber plate average temperature [C]
-        Real64 TempInnerCover = this->SavedTempOfInnerCover;                        // inner cover average temperature [C]
-        Real64 TempOuterCover = this->SavedTempOfOuterCover;                        // outer cover average temperature [C]
-        Real64 TempOutdoorAir = state.dataSurface->Surface(SurfNum).OutDryBulbTemp; // outdoor air temperature [C]
+        Real64 TempAbsPlate = this->SavedTempOfAbsPlate;                        // absorber plate average temperature [C]
+        Real64 TempInnerCover = this->SavedTempOfInnerCover;                    // inner cover average temperature [C]
+        Real64 TempOuterCover = this->SavedTempOfOuterCover;                    // outer cover average temperature [C]
+        Real64 TempOutdoorAir = state.dataSurface->SurfOutDryBulbTemp(SurfNum); // outdoor air temperature [C]
 
         Real64 EmissOfAbsPlate = state.dataSolarCollectors->Parameters(ParamNum).EmissOfAbsPlate;   // emissivity of absorber plate
         Real64 EmissOfOuterCover = state.dataSolarCollectors->Parameters(ParamNum).EmissOfCover(1); // emissivity of outer cover
@@ -1818,7 +1842,7 @@ namespace SolarCollectors {
         }
 
         // Calc collector outside surface convection heat transfer coefficient:
-        hConvCoefC2O = 2.8 + 3.0 * state.dataSurface->Surface(SurfNum).WindSpeed;
+        hConvCoefC2O = 2.8 + 3.0 * state.dataSurface->SurfOutWindSpeed(SurfNum);
 
         // Calc linearized radiation coefficient between outer cover and the surrounding:
         tempnom = state.dataSurface->Surface(SurfNum).ViewFactorSky * EmissOfOuterCover * DataGlobalConstants::StefanBoltzmann *
@@ -1862,7 +1886,7 @@ namespace SolarCollectors {
 
         // calculate the side loss coefficient.  Adds the insulation resistance and the combined
         // convection-radiation coefficients in series.
-        Real64 hRadConvOut = 5.7 + 3.8 * state.dataSurface->Surface(SurfNum).WindSpeed;
+        Real64 hRadConvOut = 5.7 + 3.8 * state.dataSurface->SurfOutWindSpeed(SurfNum);
         this->UsLoss =
             1.0 / (1.0 / (state.dataSolarCollectors->Parameters(ParamNum).ULossSide * this->AreaRatio) + 1.0 / (hRadConvOut * this->AreaRatio));
 
@@ -2025,7 +2049,7 @@ namespace SolarCollectors {
         Real64 hConvA2W; // convection coefficient, [W/m2K]
 
         Real64 const gravity(9.806); // gravitational constant [m/s^2]
-        static std::string const CalledFrom("SolarCollectors:CalcConvCoeffAbsPlateAndWater");
+        static constexpr std::string_view CalledFrom("SolarCollectors:CalcConvCoeffAbsPlateAndWater");
 
         Real64 DeltaT = std::abs(TAbsorber - TWater);
         Real64 TReference = TAbsorber - 0.25 * (TAbsorber - TWater);
@@ -2092,7 +2116,7 @@ namespace SolarCollectors {
         // PURPOSE OF THIS SUBROUTINE:
         // Updates the node variables with local variables.
 
-        static std::string const RoutineName("UpdateSolarCollector");
+        static constexpr std::string_view RoutineName("UpdateSolarCollector");
 
         PlantUtilities::SafeCopyPlantNode(state, this->InletNode, this->OutletNode);
         // Set outlet node variables that are possibly changed
@@ -2165,6 +2189,37 @@ namespace SolarCollectors {
         } else {
 
             VentCavIndex = CavNum;
+        }
+    }
+    void CollectorData::oneTimeInit(EnergyPlusData &state)
+    {
+
+        if (this->MyOneTimeFlag) {
+            this->setupOutputVars(state);
+            this->MyOneTimeFlag = false;
+        }
+
+        if (this->SetLoopIndexFlag) {
+            if (allocated(state.dataPlnt->PlantLoop)) {
+                bool errFlag = false;
+                PlantUtilities::ScanPlantLoopsForObject(state,
+                                                        this->Name,
+                                                        this->TypeNum,
+                                                        this->WLoopNum,
+                                                        this->WLoopSideNum,
+                                                        this->WLoopBranchNum,
+                                                        this->WLoopCompNum,
+                                                        errFlag,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _);
+                if (errFlag) {
+                    ShowFatalError(state, "InitSolarCollector: Program terminated due to previous condition(s).");
+                }
+                this->SetLoopIndexFlag = false;
+            }
         }
     }
 

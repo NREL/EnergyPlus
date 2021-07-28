@@ -1,6 +1,5 @@
 
-Version,
-  9.5;                                    !- Version Identifier
+Version,9.6;                              !- Version Identifier
 
 Timestep,
   4;                                      !- Number of Timesteps per Hour

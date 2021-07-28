@@ -230,14 +230,14 @@ void Calc_ISO15099(EnergyPlusData &state,
                    const Array1D<Real64> &SlatCurve,
                    const Array1D<Real64> &vvent,
                    const Array1D<Real64> &tvent,
-                   const Array1D_int &LayerType,
+                   const Array1D<TARCOGLayerType> &LayerType,
                    const Array1D_int &nslice,
                    const Array1D<Real64> &LaminateA,
                    const Array1D<Real64> &LaminateB,
                    const Array1D<Real64> &sumsol,
                    Array1D<Real64> &Ra,
                    Array1D<Real64> &Nu,
-                   int const ThermalMod,
+                   TARCOGThermalModel const ThermalMod,
                    int const Debug_mode,
                    Real64 &ShadeEmisRatioOut,
                    Real64 &ShadeEmisRatioIn,
@@ -841,7 +841,7 @@ void Calc_ISO15099(EnergyPlusData &state,
                                     ibc,
                                     hout_NOSD,
                                     hin_NOSD,
-                                    ISO15099,
+                                    TARCOGGassesParams::Stdrd::ISO15099,
                                     ThermalMod,
                                     SDScalar,
                                     height,
@@ -1218,7 +1218,7 @@ void therm1d(EnergyPlusData &state,
              const Array1D<Real64> &EffectiveOpenness,
              const Array1D<Real64> &vvent,
              const Array1D<Real64> &tvent,
-             const Array1D_int &LayerType,
+             const Array1D<TARCOGLayerType> &LayerType,
              Array1D<Real64> &Ra,
              Array1D<Real64> &Nu,
              Array1D<Real64> &vfreevent,
@@ -1232,7 +1232,7 @@ void therm1d(EnergyPlusData &state,
              Real64 &ShadeEmisRatioIn,
              Real64 &ShadeHcModifiedOut,
              Real64 &ShadeHcModifiedIn,
-             int const ThermalMod,
+             TARCOGThermalModel ThermalMod,
              [[maybe_unused]] int const Debug_mode,
              Real64 &AchievedErrorTolerance,
              int &TotalIndex,
@@ -1402,7 +1402,7 @@ void therm1d(EnergyPlusData &state,
     }
 
     // bi...Set LayerTypeSpec array - need to treat venetians AND woven shades as glass:
-    if (ThermalMod == THERM_MOD_CSM) {
+    if (ThermalMod == TARCOGThermalModel::CSM) {
         for (i = 1; i <= nlayer; ++i) {
             if (IsShadingLayer(LayerType(i))) {
                 //                    LayerTypeSpec( i ) = 0; //Unused
@@ -1552,7 +1552,7 @@ void therm1d(EnergyPlusData &state,
         if (!(GoAhead(nperr))) return;
 
         // bi...Override hhat values near SHADING DEVICE layer(s), but only for CSM thermal model:
-        if ((ThermalMod == THERM_MOD_CSM) && (SDLayerIndex > 0)) {
+        if ((ThermalMod == TARCOGThermalModel::CSM) && (SDLayerIndex > 0)) {
             // adjust hhat values
             // call adjusthhat(SDLayerIndex, ibc, tout, tind, nlayer, theta, wso, wsi, iwd, height, heightt, tilt,  &
             //               &  thick, gap, hout, hrout, hin, hrin, iprop, frct, presure, nmix, wght, gcon, gvis, gcp, &
@@ -2101,7 +2101,7 @@ void resist(int const nlayer,
             Array1D<Real64> &Theta,
             Array1D<Real64> &qlayer,
             const Array1D<Real64> &qv,
-            const Array1D_int &LayerType,
+            const Array1D<TARCOGLayerType> &LayerType,
             const Array1D<Real64> &thick,
             const Array1D<Real64> &scon,
             Real64 &ufactor,
@@ -2387,26 +2387,26 @@ void hatter(EnergyPlusData &state,
 
 void effectiveLayerCond(EnergyPlusData &state,
                         int const nlayer,
-                        const Array1D_int &LayerType,             // Layer type
-                        const Array1D<Real64> &scon,              // Layer thermal conductivity
-                        const Array1D<Real64> &thick,             // Layer thickness
-                        Array2A_int const iprop,                  // Gas type in gaps
-                        Array2A<Real64> const frct,               // Fraction of gas
-                        const Array1D_int &nmix,                  // Gas mixture
-                        const Array1D<Real64> &pressure,          // Gas pressure [Pa]
-                        const Array1D<Real64> &wght,              // Molecular weight
-                        Array2A<Real64> const gcon,               // Gas specific conductivity
-                        Array2A<Real64> const gvis,               // Gas specific viscosity
-                        Array2A<Real64> const gcp,                // Gas specific heat
-                        const Array1D<Real64> &EffectiveOpenness, // Layer effective openneess [m2]
-                        Array1D<Real64> &theta,                   // Layer surface tempeartures [K]
-                        Array1D<Real64> &sconScaled,              // Layer conductivity divided by thickness
-                        int &nperr,                               // Error message flag
-                        std::string &ErrorMessage                 // Error message
+                        const Array1D<TARCOGLayerType> &LayerType, // Layer type
+                        const Array1D<Real64> &scon,               // Layer thermal conductivity
+                        const Array1D<Real64> &thick,              // Layer thickness
+                        Array2A_int const iprop,                   // Gas type in gaps
+                        Array2A<Real64> const frct,                // Fraction of gas
+                        const Array1D_int &nmix,                   // Gas mixture
+                        const Array1D<Real64> &pressure,           // Gas pressure [Pa]
+                        const Array1D<Real64> &wght,               // Molecular weight
+                        Array2A<Real64> const gcon,                // Gas specific conductivity
+                        Array2A<Real64> const gvis,                // Gas specific viscosity
+                        Array2A<Real64> const gcp,                 // Gas specific heat
+                        const Array1D<Real64> &EffectiveOpenness,  // Layer effective openneess [m2]
+                        Array1D<Real64> &theta,                    // Layer surface tempeartures [K]
+                        Array1D<Real64> &sconScaled,               // Layer conductivity divided by thickness
+                        int &nperr,                                // Error message flag
+                        std::string &ErrorMessage                  // Error message
 )
 {
     for (auto i = 1; i <= nlayer; ++i) {
-        if (LayerType(i) != SPECULAR) {
+        if (LayerType(i) != TARCOGLayerType::SPECULAR) {
             auto tLayer = (theta(2 * i - 1) + theta(2 * i)) / 2;
             auto nmix1 = nmix(i);
             auto press1 = (pressure(i) + pressure(i + 1)) / 2.0;
@@ -2435,7 +2435,7 @@ void effectiveLayerCond(EnergyPlusData &state,
                      dens,
                      cp,
                      pr,
-                     1,
+                     TARCOGGassesParams::Stdrd::ISO15099,
                      nperr,
                      ErrorMessage);
             sconScaled(i) = (EffectiveOpenness(i) * con + (1 - EffectiveOpenness(i)) * scon(i)) / thick(i);
@@ -2546,7 +2546,7 @@ void filmi(EnergyPlusData &state,
                  dens,
                  cp,
                  pr,
-                 ISO15099,
+                 TARCOGGassesParams::Stdrd::ISO15099,
                  nperr,
                  ErrorMessage);
 
@@ -2701,7 +2701,7 @@ void filmg(EnergyPlusData &state,
                      dens,
                      cp,
                      pr,
-                     ISO15099,
+                     TARCOGGassesParams::Stdrd::ISO15099,
                      nperr,
                      ErrorMessage);
 

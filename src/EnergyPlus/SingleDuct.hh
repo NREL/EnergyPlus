@@ -332,8 +332,7 @@ namespace SingleDuct {
         void InitATMixer(EnergyPlusData &state, bool FirstHVACIteration);
     };
 
-    void
-    SimulateSingleDuct(EnergyPlusData &state, std::string const &CompName, bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum, int &CompIndex);
+    void SimulateSingleDuct(EnergyPlusData &state, std::string_view CompName, bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum, int &CompIndex);
 
     void GetSysInput(EnergyPlusData &state);
 

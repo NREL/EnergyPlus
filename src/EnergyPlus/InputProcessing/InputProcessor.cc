@@ -252,9 +252,9 @@ void cleanEPJSON(json &epjson)
 
 void InputProcessor::processInput(EnergyPlusData &state)
 {
-    std::ifstream input_stream(state.dataStrGlobals->inputFileName, std::ifstream::in | std::ifstream::binary);
+    std::ifstream input_stream(state.dataStrGlobals->inputFilePath, std::ifstream::in | std::ifstream::binary);
     if (!input_stream.is_open()) {
-        ShowFatalError(state, "Input file path " + state.dataStrGlobals->inputFileName + " not found");
+        ShowFatalError(state, "Input file path " + state.dataStrGlobals->inputFilePath.string() + " not found");
         return;
     }
 
@@ -286,7 +286,7 @@ void InputProcessor::processInput(EnergyPlusData &state)
                 input_file.append(line + '\n');
             }
             if (input_file.empty()) {
-                ShowFatalError(state, "Failed to read input file: " + state.dataStrGlobals->inputFileName);
+                ShowFatalError(state, "Failed to read input file: " + state.dataStrGlobals->inputFilePath.string());
                 return;
             }
 
@@ -298,8 +298,8 @@ void InputProcessor::processInput(EnergyPlusData &state)
                 cleanEPJSON(epJSONClean);
                 input_file = epJSONClean.dump(4, ' ', false, json::error_handler_t::replace);
                 // input_file = epJSON.dump(4, ' ', false, json::error_handler_t::replace);
-                std::string convertedIDF(state.dataStrGlobals->outputDirPathName + state.dataStrGlobals->inputFileNameOnly + ".epJSON");
-                FileSystem::makeNativePath(convertedIDF);
+                fs::path convertedIDF = FileSystem::makeNativePath(
+                    FileSystem::replaceFileExtension(state.dataStrGlobals->outputDirPath / state.dataStrGlobals->inputFilePathNameOnly, ".epJSON"));
                 std::ofstream convertedFS(convertedIDF, std::ofstream::out);
                 convertedFS << input_file << std::endl;
             }
@@ -330,8 +330,8 @@ void InputProcessor::processInput(EnergyPlusData &state)
     if (state.dataGlobal->isEpJSON && (state.dataGlobal->outputEpJSONConversion || state.dataGlobal->outputEpJSONConversionOnly)) {
         if (versionMatch) {
             std::string const encoded = idf_parser->encode(epJSON, schema);
-            std::string convertedEpJSON(state.dataStrGlobals->outputDirPathName + state.dataStrGlobals->inputFileNameOnly + ".idf");
-            FileSystem::makeNativePath(convertedEpJSON);
+            fs::path convertedEpJSON = FileSystem::makeNativePath(
+                FileSystem::replaceFileExtension(state.dataStrGlobals->outputDirPath / state.dataStrGlobals->inputFilePathNameOnly, ".idf"));
             std::ofstream convertedFS(convertedEpJSON, std::ofstream::out);
             convertedFS << encoded << std::endl;
         } else {
@@ -540,6 +540,117 @@ bool InputProcessor::getDefaultValue(EnergyPlusData &state, std::string const &o
     auto const &sizing_factor_schema_field_obj = schema_obj_props.at(fieldName);
     bool defaultFound = findDefault(value, sizing_factor_schema_field_obj);
     return defaultFound;
+}
+
+std::string InputProcessor::getAlphaFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName)
+{
+    // Return the value of fieldName in ep_object as a string.
+    // If the field is not present in ep_object then return its default if there is one, or return an empty string
+    auto const &schema_field_obj = schema_obj_props[fieldName];
+    assert(!schema_field_obj.empty()); // Check that field name exists in the schema for this object type
+    bool isDefaulted = false;
+    std::string value;
+    auto it = ep_object.find(fieldName);
+    if (it != ep_object.end()) {
+        auto const &field_value = it.value();
+        if (field_value.is_string()) {
+            auto valuePair = getObjectItemValue(field_value.get<std::string>(), schema_field_obj);
+            value = valuePair.first;
+            isDefaulted = valuePair.second;
+        } else {
+            assert(false); // String value requested but field type is numeric
+        }
+    } else {
+        isDefaulted = findDefault(value, schema_field_obj);
+        if (!isDefaulted) {
+            value = "";
+        }
+    }
+    return value;
+}
+
+Real64 InputProcessor::getRealFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName)
+{
+    // Return the value of fieldName in ep_object as a Real64.
+    // If the field value is a string, then assum autosize and return -99999.
+    // If the field is not present in ep_object then return its default if there is one, or return 0.0
+    auto const &schema_field_obj = schema_obj_props[fieldName];
+    assert(!schema_field_obj.empty()); // Check that field name exists in the schema for this object type
+    bool isDefaulted = false;
+    Real64 value = 0.0;
+    auto it = ep_object.find(fieldName);
+    if (it != ep_object.end()) {
+        auto const &field_value = it.value();
+        if (field_value.is_number()) {
+            if (field_value.is_number_integer()) {
+                value = field_value.get<std::int64_t>();
+            } else {
+                value = field_value.get<double>();
+            }
+        } else {
+            bool is_empty = field_value.get<std::string>().empty();
+            if (is_empty) {
+                isDefaulted = findDefault(value, schema_field_obj);
+            } else {
+                value = -99999; // autosize and autocalculate
+            }
+        }
+    } else {
+        isDefaulted = findDefault(value, schema_field_obj);
+        if (!isDefaulted) {
+            value = 0.0;
+        }
+    }
+    return value;
+}
+
+int InputProcessor::getIntFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName)
+{
+    // Return the value of fieldName in ep_object as an integer (rounded to nearest integer if the input value is real).
+    // If the field value is a string, then assume autosize or autocalulate and return -99999.
+    // If the field is not present in ep_object then return its default if there is one, or return 0
+
+    auto const &schema_field_obj = schema_obj_props[fieldName];
+    assert(!schema_field_obj.empty()); // Check that field name exists in the schema for this object type
+    bool isDefaulted = false;
+    int value = 0;
+    Real64 defaultValue = 0.0;
+    auto it = ep_object.find(fieldName);
+    if (it != ep_object.end()) {
+        auto const &field_value = it.value();
+        if (field_value.is_number()) {
+            if (field_value.is_number_integer()) {
+                value = field_value.get<std::int64_t>();
+            } else {
+                value = nint(field_value.get<double>());
+            }
+        } else {
+            bool is_empty = field_value.get<std::string>().empty();
+            if (is_empty) {
+                isDefaulted = findDefault(defaultValue, schema_field_obj);
+            } else {
+                value = -99999; // autosize and autocalculate
+            }
+        }
+    } else {
+        isDefaulted = findDefault(defaultValue, schema_field_obj);
+        if (isDefaulted) {
+            value = nint(defaultValue);
+        } else {
+            value = 0.0;
+        }
+    }
+    return value;
+}
+
+const json &InputProcessor::getObjectSchemaProps(EnergyPlusData &state, std::string const &objectWord)
+{
+    auto const &schema_properties = schema.at("properties");
+    const json &object_schema = schema_properties.at(objectWord);
+    assert(!object_schema.empty()); // If this fails, the object type does not exist in the schema
+
+    auto const &schema_obj_props = getPatternProperties(state, object_schema);
+    return schema_obj_props;
 }
 
 std::pair<std::string, bool> InputProcessor::getObjectItemValue(std::string const &field_value, json const &schema_field_obj)
@@ -1047,7 +1158,7 @@ int InputProcessor::getObjectItemNum(EnergyPlusData &state,
     for (auto it = obj->begin(); it != obj->end(); ++it) {
         auto it2 = it.value().find(NameTypeVal);
 
-        if ((it2 != it.value().end()) && (UtilityRoutines::MakeUPPERCase(it2.value()) == upperObjName)) {
+        if ((it2 != it.value().end()) && (UtilityRoutines::MakeUPPERCase(AsString(it2.value())) == upperObjName)) {
             found = true;
             break;
         }
@@ -1824,7 +1935,7 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
             json const &fields = obj.value();
             for (auto const &extensions : fields[extension_key]) {
                 try {
-                    auto const report_name = UtilityRoutines::MakeUPPERCase(extensions.at("report_name"));
+                    auto const report_name = UtilityRoutines::MakeUPPERCase(AsString(extensions.at("report_name")));
                     if (report_name == "ALLMONTHLY" || report_name == "ALLSUMMARYANDMONTHLY") {
                         for (int i = 1; i <= DataOutputs::NumMonthlyReports; ++i) {
                             addVariablesForMonthlyReport(state, DataOutputs::MonthlyNamedReports(i));

@@ -349,6 +349,29 @@ AirflowNetwork:SimulationControl,
       1.0;                     !- Ratio of Building Width Along Short Axis to Width Along Long Axis
 \end{lstlisting}
 
+If the AirflowNetwork:SimulationControl object is not provided in an input file, the default input object will be created by the program internally, as long as following conditions are satisfied:
+\begin{itemize}
+\item The number of AirflowNetwork:MultiZone:Zone objects >= 1
+\item The number of AirflowNetwork:MultiZone:Surface objects >= 2
+\end{itemize}
+The default input object is shown below:
+
+\begin{lstlisting}
+AirflowNetwork:SimulationControl,
+    AFNDefaultControl,          !- Name
+    MultizoneWithoutDistribution,  !- AirflowNetwork Control
+    SurfaceAverageCalculation,  !- Wind Pressure Coefficient Type
+    OpeningHeight,           !- Height Selection for Local Wind Pressure Calculation
+    LOWRISE,                 !- Building Type
+    500,                     !- Maximum Number of Iterations {dimensionless}
+    ZeroNodePressures,       !- Initialization Type
+    1.0E-04,                 !- Relative Airflow Convergence Tolerance {dimensionless}
+    1.0E-06,                 !- Absolute Airflow Convergence Tolerance {kg/s}
+    -0.5,                    !- Convergence Acceleration Limit {dimensionless}
+    0.0,                     !- Azimuth Angle of Long Axis of Building {deg}
+    1.0;                     !- Ratio of Building Width Along Short Axis to Width Along Long Axis
+\end{lstlisting}
+
 AirflowNetwork:MultiZone data objects are used to calculate multizone airflows. This section describes the input requirements for the following objects:
 
 \begin{itemize}
@@ -1648,20 +1671,22 @@ The first section presents the input object for distribution system nodes. Altho
 \subsection{AirflowNetwork:Distribution:DuctViewFactors}\label{airflownetworkdistributionductviewfactor}
 The AirflowNetwork:Distribution:DuctViewFactors object is used to represent the information needed for simplified surface-to-duct radiation heat transfer. View factors from each duct object to each referenced surface are provided by the user. EnergyPlus calculates the heat gain to the duct from the referenced surfaces. If the object is included, radiation is calculated for the referenced duct; radiation is neglected of the object is omitted.
 
-\subsubsection{Field: Name of Linkage}\label{field-name-of-linkage}
+\paragraph{Field: Name of Linkage}\label{field-name-of-linkage}
 Name of the linkage object in which the view factors are applied.
 
-\subsubsection{Field: Surface Exposure Fraction}\label{field-surface-exposure-fraction}
+\paragraph{Field: Surface Exposure Fraction}\label{field-surface-exposure-fraction}
 The fraction, range 0 to 1, of the duct surface that is exposed to the zone for a partially buried duct (dimensionless).
 
-\subsubsection{Field: Surface Emittance}\label{field-surface-emittance}
+\paragraph{Field: Surface Emittance}\label{field-surface-emittance}
 The air duct surface emittance factor in the range 0 to 1 based on the material properties (dimensionless).
 
-\subsubsection{Field: Surface 1 Name}\label{field-suface-1-name}
-This field specifies the name of the surface seen by the duct. Field is extensible to accommodate as many surfaces as required.
+\paragraph{Field: Surface \textless{}\#\textgreater{} Name}\label{field-suface-1-name}
+This field specifies the name of the surface seen by the duct.
 
-\subsubsection{Field: View Factor 1}\label{field-surface-1-view-factor}
-This field specifies the view factor from the duct to surface 1. Field is extensible to accommodate as many surfaces as required.
+\paragraph{Field: View Factor \textless{}\#\textgreater{}}\label{field-surface-1-view-factor}
+This field specifies the view factor from the duct to the surface.
+
+This object is extensible, so additional pairs of the last two fields can be added to the end of this object.
 
 An IDF example is provided below:
 

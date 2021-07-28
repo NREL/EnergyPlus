@@ -1253,8 +1253,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SimTest)
         "AirLoopHVAC:OutdoorAirSystem,",
         "    Air Loop HVAC Outdoor Air System 1,  !- Name",
         "    Air Loop HVAC Outdoor Air System 1 Controller List,  !- Controller List Name",
-        "    Air Loop HVAC Outdoor Air System 1 Equipment List,  !- Outdoor Air Equipment List Name",
-        "    Air Loop HVAC Outdoor Air System 1 Availability Manager List;  !- Availability Manager List Name",
+        "    Air Loop HVAC Outdoor Air System 1 Equipment List;  !- Outdoor Air Equipment List Name",
 
         "OutdoorAir:Mixer,",
         "    Air Loop HVAC Outdoor Air System 1 Outdoor Air Mixer,  !- Name",

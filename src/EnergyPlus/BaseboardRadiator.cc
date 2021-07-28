@@ -66,6 +66,7 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -75,16 +76,11 @@
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
-
-// Note: This file contains two modules:
-// Module BaseboardRadiator -- (ref: Object: ZoneHVAC:Baseboard:Convective:Water)
-// Module BaseboardElectric -- (ref: Object: ZoneHVAC:Baseboard:Convective:Electric)
-
 namespace BaseboardRadiator {
+
     // Module containing the routines dealing with the BASEBOARD HEATER
     // component(s).
 
@@ -265,7 +261,7 @@ namespace BaseboardRadiator {
         using namespace DataSizing;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetBaseboardInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetBaseboardInput: "); // include trailing blank space
         int const iHeatCAPMAlphaNum(5);             // get input index to water baseboard Radiator system heating capacity sizing method
         int const iHeatDesignCapacityNumericNum(1); // get input index to water baseboard Radiator system electric heating capacity
         int const iHeatCapacityPerFloorAreaNumericNum(
@@ -334,7 +330,7 @@ namespace BaseboardRadiator {
                     baseboard->Baseboard(BaseboardNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                     if (baseboard->Baseboard(BaseboardNum).SchedPtr == 0) {
                         ShowSevereError(state,
-                                        RoutineName + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
+                                        std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
                                             " entered =" + state.dataIPShortCut->cAlphaArgs(2) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) +
                                             '=' + state.dataIPShortCut->cAlphaArgs(1));
                         ErrorsFound = true;
@@ -348,7 +344,7 @@ namespace BaseboardRadiator {
                                                                                       state.dataIPShortCut->cAlphaArgs(1),
                                                                                       DataLoopNode::NodeFluidType::Water,
                                                                                       DataLoopNode::NodeConnectionType::Inlet,
-                                                                                      1,
+                                                                                      NodeInputManager::compFluidStream::Primary,
                                                                                       ObjectIsNotParent);
                 // get outlet node number
                 baseboard->Baseboard(BaseboardNum).WaterOutletNode = GetOnlySingleNode(state,
@@ -358,7 +354,7 @@ namespace BaseboardRadiator {
                                                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                                                        DataLoopNode::NodeFluidType::Water,
                                                                                        DataLoopNode::NodeConnectionType::Outlet,
-                                                                                       1,
+                                                                                       NodeInputManager::compFluidStream::Primary,
                                                                                        ObjectIsNotParent);
 
                 TestCompSet(state,
@@ -464,7 +460,7 @@ namespace BaseboardRadiator {
             }
 
             if (ErrorsFound) {
-                ShowFatalError(state, RoutineName + "Errors found in getting input.  Preceding condition(s) cause termination.");
+                ShowFatalError(state, std::string{RoutineName} + "Errors found in getting input.  Preceding condition(s) cause termination.");
             }
         }
 
@@ -476,8 +472,8 @@ namespace BaseboardRadiator {
                                 "Baseboard Total Heating Energy",
                                 OutputProcessor::Unit::J,
                                 baseboard->Baseboard(BaseboardNum).Energy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 baseboard->Baseboard(BaseboardNum).EquipID,
                                 _,
                                 "ENERGYTRANSFER",
@@ -489,8 +485,8 @@ namespace BaseboardRadiator {
                                 "Baseboard Hot Water Energy",
                                 OutputProcessor::Unit::J,
                                 baseboard->Baseboard(BaseboardNum).Energy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 baseboard->Baseboard(BaseboardNum).EquipID,
                                 _,
                                 "PLANTLOOPHEATINGDEMAND",
@@ -502,56 +498,56 @@ namespace BaseboardRadiator {
                                 "Baseboard Total Heating Rate",
                                 OutputProcessor::Unit::W,
                                 baseboard->Baseboard(BaseboardNum).Power,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 baseboard->Baseboard(BaseboardNum).EquipID);
 
             SetupOutputVariable(state,
                                 "Baseboard Hot Water Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 baseboard->Baseboard(BaseboardNum).WaterMassFlowRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 baseboard->Baseboard(BaseboardNum).EquipID);
 
             SetupOutputVariable(state,
                                 "Baseboard Air Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 baseboard->Baseboard(BaseboardNum).AirMassFlowRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 baseboard->Baseboard(BaseboardNum).EquipID);
 
             SetupOutputVariable(state,
                                 "Baseboard Air Inlet Temperature",
                                 OutputProcessor::Unit::C,
                                 baseboard->Baseboard(BaseboardNum).AirInletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 baseboard->Baseboard(BaseboardNum).EquipID);
 
             SetupOutputVariable(state,
                                 "Baseboard Air Outlet Temperature",
                                 OutputProcessor::Unit::C,
                                 baseboard->Baseboard(BaseboardNum).AirOutletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 baseboard->Baseboard(BaseboardNum).EquipID);
 
             SetupOutputVariable(state,
                                 "Baseboard Water Inlet Temperature",
                                 OutputProcessor::Unit::C,
                                 baseboard->Baseboard(BaseboardNum).WaterInletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 baseboard->Baseboard(BaseboardNum).EquipID);
 
             SetupOutputVariable(state,
                                 "Baseboard Water Outlet Temperature",
                                 OutputProcessor::Unit::C,
                                 baseboard->Baseboard(BaseboardNum).WaterOutletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 baseboard->Baseboard(BaseboardNum).EquipID);
         }
     }
@@ -574,7 +570,7 @@ namespace BaseboardRadiator {
         using PlantUtilities::ScanPlantLoopsForObject;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("BaseboardRadiator:InitBaseboard");
+        static constexpr std::string_view RoutineName("BaseboardRadiator:InitBaseboard");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WaterInletNode;
@@ -939,8 +935,7 @@ namespace BaseboardRadiator {
                         // pick an air  mass flow rate that is twice the water mass flow rate (CR8842)
                         baseboard->Baseboard(BaseboardNum).DesAirMassFlowRate = 2.0 * rho * baseboard->Baseboard(BaseboardNum).WaterVolFlowRateMax;
                         // pass along the coil number and the design load to the residual calculation
-                        Par(1) = DesCoilLoad;
-                        Par(2) = BaseboardNum;
+                        std::array<Real64, 2> Par2 = {DesCoilLoad, Real64(BaseboardNum)};
                         // set the lower and upper limits on the UA
                         UA0 = 0.001 * DesCoilLoad;
                         UA1 = DesCoilLoad;
@@ -958,7 +953,7 @@ namespace BaseboardRadiator {
                             if (LoadMet > DesCoilLoad) { // if the load met is greater than design load, OK to iterate on UA
                                 // Invert the baseboard model: given the design inlet conditions and the design load,
                                 // find the design UA.
-                                TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, HWBaseboardUAResidual, UA0, UA1, Par);
+                                General::SolveRoot(state, Acc, MaxIte, SolFla, UA, HWBaseboardUAResidual, UA0, UA1, Par2);
                                 // if the numerical inversion failed, issue error messages.
                                 if (SolFla == -1) {
                                     ShowSevereError(state,
@@ -1081,7 +1076,7 @@ namespace BaseboardRadiator {
 
         // PURPOSE OF THIS SUBROUTINE: This subroutine calculates the heat exchange rate
         // in a pure convective baseboard heater.  The heater is assumed to be crossflow
-        // with both fluids unmixed. The air flow is bouyancy driven and a constant air
+        // with both fluids unmixed. The air flow is buoyancy driven and a constant air
         // flow velocity of 0.5m/s is assumed. The solution is by the effectiveness-NTU
         // method found in Icropera and DeWitt, Fundamentals of Heat and Mass Transfer,
         // Chapter 11.4, p. 523, eq. 11.33
@@ -1235,8 +1230,8 @@ namespace BaseboardRadiator {
     }
 
     Real64 HWBaseboardUAResidual(EnergyPlusData &state,
-                                 Real64 const UA,           // UA of coil
-                                 Array1D<Real64> const &Par // par(1) = design coil load [W]
+                                 Real64 const UA,                 // UA of coil
+                                 std::array<Real64, 2> const &Par // par(1) = design coil load [W]
     )
     {
 
@@ -1261,10 +1256,10 @@ namespace BaseboardRadiator {
         int BaseboardIndex;
         Real64 LoadMet;
 
-        BaseboardIndex = int(Par(2));
+        BaseboardIndex = int(Par[1]);
         state.dataBaseboardRadiator->Baseboard(BaseboardIndex).UA = UA;
         SimHWConvective(state, BaseboardIndex, LoadMet);
-        Residuum = (Par(1) - LoadMet) / Par(1);
+        Residuum = (Par[0] - LoadMet) / Par[0];
 
         return Residuum;
     }

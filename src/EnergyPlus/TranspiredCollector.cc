@@ -115,8 +115,8 @@ namespace TranspiredCollector {
     using DataVectorTypes::Vector;
 
     void SimTranspiredCollector(EnergyPlusData &state,
-                                std::string const &CompName, // component name
-                                int &CompIndex               // component index (to reduce string compares during simulation)
+                                std::string_view CompName, // component name
+                                int &CompIndex             // component index (to reduce string compares during simulation)
     )
     {
 
@@ -150,7 +150,7 @@ namespace TranspiredCollector {
         if (CompIndex == 0) {
             UTSCNum = UtilityRoutines::FindItemInList(CompName, state.dataTranspiredCollector->UTSC);
             if (UTSCNum == 0) {
-                ShowFatalError(state, "Transpired Collector not found=" + CompName);
+                ShowFatalError(state, "Transpired Collector not found=" + std::string{CompName});
             }
             CompIndex = UTSCNum;
         } else {
@@ -229,12 +229,6 @@ namespace TranspiredCollector {
 
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
-        using DataHeatBalance::MediumRough;
-        using DataHeatBalance::MediumSmooth;
-        using DataHeatBalance::Rough;
-        using DataHeatBalance::Smooth;
-        using DataHeatBalance::VeryRough;
-        using DataHeatBalance::VerySmooth;
         using DataLoopNode::ObjectIsNotParent;
         using DataSurfaces::OtherSideCondModeledExt;
         using DataSurfaces::SurfaceData;
@@ -262,7 +256,7 @@ namespace TranspiredCollector {
         Real64 AvgTilt;       // temp for error checking
         int SurfID;           // local surface "pointer"
         Real64 TiltRads;      // average tilt of collector in radians
-        Real64 tempHdeltaNPL; // temporary variable for bouyancy length scale
+        Real64 tempHdeltaNPL; // temporary variable for buoyancy length scale
         int NumUTSCSplitter(0);
         Array1D_string AlphasSplit; // Alpha items for extensible
         // Solar Collectors:Unglazed Transpired object
@@ -355,40 +349,43 @@ namespace TranspiredCollector {
                     state.dataTranspiredCollector->UTSC(Item).ZoneNode = 0;
                     for (NumOASys = 1; NumOASys <= state.dataTranspiredCollector->UTSC(Item).NumOASysAttached; ++NumOASys) {
                         ACountBase = (NumOASys - 1) * 4 + 2;
-                        state.dataTranspiredCollector->UTSC(Item).InletNode(NumOASys) = GetOnlySingleNode(state,
-                                                                                                          AlphasSplit(ACountBase),
-                                                                                                          ErrorsFound,
-                                                                                                          CurrentModuleObject,
-                                                                                                          AlphasSplit(1),
-                                                                                                          DataLoopNode::NodeFluidType::Air,
-                                                                                                          DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                          NumOASys,
-                                                                                                          ObjectIsNotParent);
+                        state.dataTranspiredCollector->UTSC(Item).InletNode(NumOASys) =
+                            GetOnlySingleNode(state,
+                                              AlphasSplit(ACountBase),
+                                              ErrorsFound,
+                                              CurrentModuleObject,
+                                              AlphasSplit(1),
+                                              DataLoopNode::NodeFluidType::Air,
+                                              DataLoopNode::NodeConnectionType::Inlet,
+                                              static_cast<NodeInputManager::compFluidStream>(NumOASys),
+                                              ObjectIsNotParent);
 
-                        state.dataTranspiredCollector->UTSC(Item).OutletNode(NumOASys) = GetOnlySingleNode(state,
-                                                                                                           AlphasSplit(ACountBase + 1),
-                                                                                                           ErrorsFound,
-                                                                                                           CurrentModuleObject,
-                                                                                                           AlphasSplit(1),
-                                                                                                           DataLoopNode::NodeFluidType::Air,
-                                                                                                           DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                           NumOASys,
-                                                                                                           ObjectIsNotParent);
+                        state.dataTranspiredCollector->UTSC(Item).OutletNode(NumOASys) =
+                            GetOnlySingleNode(state,
+                                              AlphasSplit(ACountBase + 1),
+                                              ErrorsFound,
+                                              CurrentModuleObject,
+                                              AlphasSplit(1),
+                                              DataLoopNode::NodeFluidType::Air,
+                                              DataLoopNode::NodeConnectionType::Outlet,
+                                              static_cast<NodeInputManager::compFluidStream>(NumOASys),
+                                              ObjectIsNotParent);
                         TestCompSet(state,
                                     CurrentModuleObject,
                                     AlphasSplit(1),
                                     AlphasSplit(ACountBase),
                                     AlphasSplit(ACountBase + 1),
                                     "Transpired Collector Air Nodes"); // appears that test fails by design??
-                        state.dataTranspiredCollector->UTSC(Item).ControlNode(NumOASys) = GetOnlySingleNode(state,
-                                                                                                            AlphasSplit(ACountBase + 2),
-                                                                                                            ErrorsFound,
-                                                                                                            CurrentModuleObject,
-                                                                                                            AlphasSplit(1),
-                                                                                                            DataLoopNode::NodeFluidType::Air,
-                                                                                                            DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                            1,
-                                                                                                            ObjectIsNotParent);
+                        state.dataTranspiredCollector->UTSC(Item).ControlNode(NumOASys) =
+                            GetOnlySingleNode(state,
+                                              AlphasSplit(ACountBase + 2),
+                                              ErrorsFound,
+                                              CurrentModuleObject,
+                                              AlphasSplit(1),
+                                              DataLoopNode::NodeFluidType::Air,
+                                              DataLoopNode::NodeConnectionType::Sensor,
+                                              NodeInputManager::compFluidStream::Primary,
+                                              ObjectIsNotParent);
 
                         state.dataTranspiredCollector->UTSC(Item).ZoneNode(NumOASys) = GetOnlySingleNode(state,
                                                                                                          AlphasSplit(ACountBase + 3),
@@ -397,7 +394,7 @@ namespace TranspiredCollector {
                                                                                                          AlphasSplit(1),
                                                                                                          DataLoopNode::NodeFluidType::Air,
                                                                                                          DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                         1,
+                                                                                                         NodeInputManager::compFluidStream::Primary,
                                                                                                          ObjectIsNotParent);
 
                     } // Each OA System in a Multisystem
@@ -446,7 +443,7 @@ namespace TranspiredCollector {
                                                                                            Alphas(1),
                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                                                           1,
+                                                                                           NodeInputManager::compFluidStream::Primary,
                                                                                            ObjectIsNotParent);
                 state.dataTranspiredCollector->UTSC(Item).OutletNode(1) = GetOnlySingleNode(state,
                                                                                             Alphas(5),
@@ -455,7 +452,7 @@ namespace TranspiredCollector {
                                                                                             Alphas(1),
                                                                                             DataLoopNode::NodeFluidType::Air,
                                                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                                                            1,
+                                                                                            NodeInputManager::compFluidStream::Primary,
                                                                                             ObjectIsNotParent);
                 TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(4), Alphas(5), "Transpired Collector Air Nodes");
 
@@ -466,7 +463,7 @@ namespace TranspiredCollector {
                                                                                              Alphas(1),
                                                                                              DataLoopNode::NodeFluidType::Air,
                                                                                              DataLoopNode::NodeConnectionType::Sensor,
-                                                                                             1,
+                                                                                             NodeInputManager::compFluidStream::Primary,
                                                                                              ObjectIsNotParent);
                 state.dataTranspiredCollector->UTSC(Item).ZoneNode(1) = GetOnlySingleNode(state,
                                                                                           Alphas(7),
@@ -475,7 +472,7 @@ namespace TranspiredCollector {
                                                                                           Alphas(1),
                                                                                           DataLoopNode::NodeFluidType::Air,
                                                                                           DataLoopNode::NodeConnectionType::Sensor,
-                                                                                          1,
+                                                                                          NodeInputManager::compFluidStream::Primary,
                                                                                           ObjectIsNotParent);
             } // no splitter
 
@@ -514,15 +511,21 @@ namespace TranspiredCollector {
 
             Roughness = Alphas(11);
             // Select the correct Number for the associated ascii name for the roughness type
-            if (UtilityRoutines::SameString(Roughness, "VeryRough")) state.dataTranspiredCollector->UTSC(Item).CollRoughness = VeryRough;
-            if (UtilityRoutines::SameString(Roughness, "Rough")) state.dataTranspiredCollector->UTSC(Item).CollRoughness = Rough;
-            if (UtilityRoutines::SameString(Roughness, "MediumRough")) state.dataTranspiredCollector->UTSC(Item).CollRoughness = MediumRough;
-            if (UtilityRoutines::SameString(Roughness, "MediumSmooth")) state.dataTranspiredCollector->UTSC(Item).CollRoughness = MediumSmooth;
-            if (UtilityRoutines::SameString(Roughness, "Smooth")) state.dataTranspiredCollector->UTSC(Item).CollRoughness = Smooth;
-            if (UtilityRoutines::SameString(Roughness, "VerySmooth")) state.dataTranspiredCollector->UTSC(Item).CollRoughness = VerySmooth;
+            if (UtilityRoutines::SameString(Roughness, "VeryRough"))
+                state.dataTranspiredCollector->UTSC(Item).CollRoughness = DataSurfaces::SurfaceRoughness::VeryRough;
+            if (UtilityRoutines::SameString(Roughness, "Rough"))
+                state.dataTranspiredCollector->UTSC(Item).CollRoughness = DataSurfaces::SurfaceRoughness::Rough;
+            if (UtilityRoutines::SameString(Roughness, "MediumRough"))
+                state.dataTranspiredCollector->UTSC(Item).CollRoughness = DataSurfaces::SurfaceRoughness::MediumRough;
+            if (UtilityRoutines::SameString(Roughness, "MediumSmooth"))
+                state.dataTranspiredCollector->UTSC(Item).CollRoughness = DataSurfaces::SurfaceRoughness::MediumSmooth;
+            if (UtilityRoutines::SameString(Roughness, "Smooth"))
+                state.dataTranspiredCollector->UTSC(Item).CollRoughness = DataSurfaces::SurfaceRoughness::Smooth;
+            if (UtilityRoutines::SameString(Roughness, "VerySmooth"))
+                state.dataTranspiredCollector->UTSC(Item).CollRoughness = DataSurfaces::SurfaceRoughness::VerySmooth;
 
             // Was it set?
-            if (state.dataTranspiredCollector->UTSC(Item).CollRoughness == 0) {
+            if (state.dataTranspiredCollector->UTSC(Item).CollRoughness == DataSurfaces::SurfaceRoughness::Unassigned) {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cAlphaFieldNames(11) + " has incorrect entry of " + Alphas(11) + " in " + CurrentModuleObject +
                                     " =" + state.dataTranspiredCollector->UTSC(Item).Name);
@@ -701,50 +704,50 @@ namespace TranspiredCollector {
                                 "Solar Collector Heat Exchanger Effectiveness",
                                 OutputProcessor::Unit::None,
                                 state.dataTranspiredCollector->UTSC(Item).HXeff,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataTranspiredCollector->UTSC(Item).Name);
             SetupOutputVariable(state,
                                 "Solar Collector Leaving Air Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataTranspiredCollector->UTSC(Item).TairHX,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataTranspiredCollector->UTSC(Item).Name);
             SetupOutputVariable(state,
                                 "Solar Collector Outside Face Suction Velocity",
                                 OutputProcessor::Unit::m_s,
                                 state.dataTranspiredCollector->UTSC(Item).Vsuction,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataTranspiredCollector->UTSC(Item).Name);
             SetupOutputVariable(state,
                                 "Solar Collector Surface Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataTranspiredCollector->UTSC(Item).Tcoll,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataTranspiredCollector->UTSC(Item).Name);
             SetupOutputVariable(state,
                                 "Solar Collector Plenum Air Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataTranspiredCollector->UTSC(Item).Tplen,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataTranspiredCollector->UTSC(Item).Name);
             SetupOutputVariable(state,
                                 "Solar Collector Sensible Heating Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataTranspiredCollector->UTSC(Item).SensHeatingRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataTranspiredCollector->UTSC(Item).Name);
             SetupOutputVariable(state,
                                 "Solar Collector Sensible Heating Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataTranspiredCollector->UTSC(Item).SensHeatingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataTranspiredCollector->UTSC(Item).Name,
                                 _,
                                 "SolarAir",
@@ -756,50 +759,50 @@ namespace TranspiredCollector {
                                 "Solar Collector Natural Ventilation Air Change Rate",
                                 OutputProcessor::Unit::ach,
                                 state.dataTranspiredCollector->UTSC(Item).PassiveACH,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataTranspiredCollector->UTSC(Item).Name);
             SetupOutputVariable(state,
                                 "Solar Collector Natural Ventilation Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 state.dataTranspiredCollector->UTSC(Item).PassiveMdotVent,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataTranspiredCollector->UTSC(Item).Name);
             SetupOutputVariable(state,
                                 "Solar Collector Wind Natural Ventilation Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 state.dataTranspiredCollector->UTSC(Item).PassiveMdotWind,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataTranspiredCollector->UTSC(Item).Name);
             SetupOutputVariable(state,
                                 "Solar Collector Buoyancy Natural Ventilation Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 state.dataTranspiredCollector->UTSC(Item).PassiveMdotTherm,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataTranspiredCollector->UTSC(Item).Name);
             SetupOutputVariable(state,
                                 "Solar Collector Incident Solar Radiation",
                                 OutputProcessor::Unit::W_m2,
                                 state.dataTranspiredCollector->UTSC(Item).Isc,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataTranspiredCollector->UTSC(Item).Name);
             SetupOutputVariable(state,
                                 "Solar Collector System Efficiency",
                                 OutputProcessor::Unit::None,
                                 state.dataTranspiredCollector->UTSC(Item).UTSCEfficiency,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataTranspiredCollector->UTSC(Item).Name);
             SetupOutputVariable(state,
                                 "Solar Collector Surface Efficiency",
                                 OutputProcessor::Unit::None,
                                 state.dataTranspiredCollector->UTSC(Item).UTSCCollEff,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataTranspiredCollector->UTSC(Item).Name);
         }
 
@@ -911,19 +914,22 @@ namespace TranspiredCollector {
         }
 
         // determine average ambient temperature
-        Real64 const surfaceArea(sum_sub(state.dataSurface->Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs));
+        Real64 sum_area = 0.0;
+        for (int SurfNum : state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
+            sum_area += state.dataSurface->Surface(SurfNum).Area;
+        }
         if (!state.dataEnvrn->IsRain) {
-            Tamb = sum_product_sub(state.dataSurface->Surface,
-                                   &SurfaceData::OutDryBulbTemp,
-                                   &SurfaceData::Area,
-                                   state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
-                   surfaceArea;
+            Real64 sum_produc_area_drybulb = 0.0;
+            for (int SurfNum : state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
+                sum_produc_area_drybulb += state.dataSurface->Surface(SurfNum).Area * state.dataSurface->SurfOutDryBulbTemp(SurfNum);
+            }
+            Tamb = sum_produc_area_drybulb / sum_area;
         } else { // when raining we use wet bulb not drybulb
-            Tamb = sum_product_sub(state.dataSurface->Surface,
-                                   &SurfaceData::OutWetBulbTemp,
-                                   &SurfaceData::Area,
-                                   state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
-                   surfaceArea;
+            Real64 sum_produc_area_wetbulb = 0.0;
+            for (int SurfNum : state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
+                sum_produc_area_wetbulb += state.dataSurface->Surface(SurfNum).Area * state.dataSurface->SurfOutWetBulbTemp(SurfNum);
+            }
+            Tamb = sum_produc_area_wetbulb / sum_area;
         }
 
         // inits for each iteration
@@ -978,77 +984,75 @@ namespace TranspiredCollector {
         Array1D<Real64> LocalWindArr;
 
         // working variables
-        Real64 RhoAir;          // density of air
-        Real64 CpAir;           // specific heat of air
-        Real64 holeArea;        // area of perforations, includes corrugation of surface
-        Real64 Tamb;            // outdoor drybulb
-        Real64 A;               // projected area of collector, from sum of underlying surfaces
-        Real64 Vholes;          // mean velocity of air as it passes through collector holes
-        Real64 Vsuction;        // mean velocity of air as is approaches the collector
-        Real64 Vplen;           // mean velocity of air inside plenum
-        Real64 HcPlen;          // surface convection heat transfer coefficient for plenum surfaces
-        Real64 D;               // hole diameter
-        Real64 ReD;             // Reynolds number for holes
-        Real64 P;               // pitch, distance betweeen holes
-        Real64 Por;             // porosity, area fraction of collector that is open because of holes
-        Real64 Mdot;            // mass flow rate of suction air
-        Real64 QdotSource;      // energy flux for source/sink inside collector surface (for hybrid PV UTSC)
-        int ThisSurf;           // do loop counter
-        int NumSurfs;           // number of underlying HT surfaces associated with UTSC
-        int Roughness;          // parameters for surface roughness, defined in DataHeatBalance
-        Real64 SolAbs;          // solar absorptivity of collector
-        Real64 AbsExt;          // thermal emmittance of collector
-        Real64 TempExt;         // collector temperature
-        int SurfPtr;            // index of surface in main surface structure
-        Real64 HMovInsul;       // dummy for call to InitExteriorConvectionCoeff
-        Real64 HExt;            // dummy for call to InitExteriorConvectionCoeff
-        int ConstrNum;          // index of construction in main construction structure
-        Real64 AbsThermSurf;    // thermal emmittance of underlying wall.
-        Real64 TsoK;            // underlying surface temperature in Kelvin
-        Real64 TscollK;         // collector temperature in Kelvin  (lagged)
-        Real64 AreaSum;         // sum of contributing surfaces for area-weighted averages.
-        Real64 Vwind;           // localized, and area-weighted average for wind speed
-        Real64 HrSky;           // radiation coeff for sky, area-weighted average
-        Real64 HrGround;        // radiation coeff for ground, area-weighted average
-        Real64 HrAtm;           // radiation coeff for air (bulk atmosphere), area-weighted average
-        Real64 Isc;             // Incoming combined solar radiation, area-weighted average
-        Real64 HrPlen;          // radiation coeff for plenum surfaces, area-weighted average
-        Real64 Tso;             // temperature of underlying surface, area-weighted average
-        Real64 HcWind;          // convection coeff for high speed wind situations
-        Real64 NuD;             // nusselt number for Reynolds based on hole
-        Real64 U;               // overall heat exchanger coefficient
-        Real64 HXeff;           // effectiveness for heat exchanger
-        Real64 t;               // collector thickness
-        Real64 ReS;             // Reynolds number based on suction velocity and pitch
-        Real64 ReW;             // Reynolds number based on Wind and pitch
-        Real64 ReB;             // Reynolds number based on hole velocity and pitch
-        Real64 ReH;             // Reynolds number based on hole velocity and diameter
-        Real64 Tscoll;          // temperature of collector
-        Real64 TaHX;            // leaving air temperature from heat exchanger (entering plenum)
-        Real64 Taplen;          // Air temperature in plen and outlet node.
-        Real64 SensHeatingRate; // Rate at which the system is heating outdoor air
-        Real64 AlessHoles;      // Area for Kutscher's relation
+        Real64 RhoAir;                            // density of air
+        Real64 CpAir;                             // specific heat of air
+        Real64 holeArea;                          // area of perforations, includes corrugation of surface
+        Real64 Tamb;                              // outdoor drybulb
+        Real64 A;                                 // projected area of collector, from sum of underlying surfaces
+        Real64 Vholes;                            // mean velocity of air as it passes through collector holes
+        Real64 Vsuction;                          // mean velocity of air as is approaches the collector
+        Real64 Vplen;                             // mean velocity of air inside plenum
+        Real64 HcPlen;                            // surface convection heat transfer coefficient for plenum surfaces
+        Real64 D;                                 // hole diameter
+        Real64 ReD;                               // Reynolds number for holes
+        Real64 P;                                 // pitch, distance betweeen holes
+        Real64 Por;                               // porosity, area fraction of collector that is open because of holes
+        Real64 Mdot;                              // mass flow rate of suction air
+        Real64 QdotSource;                        // energy flux for source/sink inside collector surface (for hybrid PV UTSC)
+        int ThisSurf;                             // do loop counter
+        int NumSurfs;                             // number of underlying HT surfaces associated with UTSC
+        DataSurfaces::SurfaceRoughness Roughness; // parameters for surface roughness, defined in DataHeatBalance
+        Real64 SolAbs;                            // solar absorptivity of collector
+        Real64 AbsExt;                            // thermal emmittance of collector
+        Real64 TempExt;                           // collector temperature
+        int SurfPtr;                              // index of surface in main surface structure
+        Real64 HMovInsul;                         // dummy for call to InitExteriorConvectionCoeff
+        Real64 HExt;                              // dummy for call to InitExteriorConvectionCoeff
+        int ConstrNum;                            // index of construction in main construction structure
+        Real64 AbsThermSurf;                      // thermal emmittance of underlying wall.
+        Real64 TsoK;                              // underlying surface temperature in Kelvin
+        Real64 TscollK;                           // collector temperature in Kelvin  (lagged)
+        Real64 AreaSum;                           // sum of contributing surfaces for area-weighted averages.
+        Real64 Vwind;                             // localized, and area-weighted average for wind speed
+        Real64 HrSky;                             // radiation coeff for sky, area-weighted average
+        Real64 HrGround;                          // radiation coeff for ground, area-weighted average
+        Real64 HrAtm;                             // radiation coeff for air (bulk atmosphere), area-weighted average
+        Real64 Isc;                               // Incoming combined solar radiation, area-weighted average
+        Real64 HrPlen;                            // radiation coeff for plenum surfaces, area-weighted average
+        Real64 Tso;                               // temperature of underlying surface, area-weighted average
+        Real64 HcWind;                            // convection coeff for high speed wind situations
+        Real64 NuD;                               // nusselt number for Reynolds based on hole
+        Real64 U;                                 // overall heat exchanger coefficient
+        Real64 HXeff;                             // effectiveness for heat exchanger
+        Real64 t;                                 // collector thickness
+        Real64 ReS;                               // Reynolds number based on suction velocity and pitch
+        Real64 ReW;                               // Reynolds number based on Wind and pitch
+        Real64 ReB;                               // Reynolds number based on hole velocity and pitch
+        Real64 ReH;                               // Reynolds number based on hole velocity and diameter
+        Real64 Tscoll;                            // temperature of collector
+        Real64 TaHX;                              // leaving air temperature from heat exchanger (entering plenum)
+        Real64 Taplen;                            // Air temperature in plen and outlet node.
+        Real64 SensHeatingRate;                   // Rate at which the system is heating outdoor air
+        Real64 AlessHoles;                        // Area for Kutscher's relation
 
         // Active UTSC calculation
         // first do common things for both correlations
-        Real64 const surfaceArea(sum_sub(state.dataSurface->Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs));
+        Real64 sum_area = 0.0;
+        for (int SurfNum : state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
+            sum_area += state.dataSurface->Surface(SurfNum).Area;
+        }
         if (!state.dataEnvrn->IsRain) {
-            //            Tamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutDryBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum(
-            // Surface(  UTSC(  UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-            Tamb = sum_product_sub(state.dataSurface->Surface,
-                                   &SurfaceData::OutDryBulbTemp,
-                                   &SurfaceData::Area,
-                                   state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
-                   surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
-
+            Real64 sum_produc_area_drybulb = 0.0;
+            for (int SurfNum : state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
+                sum_produc_area_drybulb += state.dataSurface->Surface(SurfNum).Area * state.dataSurface->SurfOutDryBulbTemp(SurfNum);
+            }
+            Tamb = sum_produc_area_drybulb / sum_area;
         } else { // when raining we use wet bulb not drybulb
-            //            Tamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutWetBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum(
-            // Surface(  UTSC(  UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-            Tamb = sum_product_sub(state.dataSurface->Surface,
-                                   &SurfaceData::OutWetBulbTemp,
-                                   &SurfaceData::Area,
-                                   state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
-                   surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
+            Real64 sum_produc_area_wetbulb = 0.0;
+            for (int SurfNum : state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
+                sum_produc_area_wetbulb += state.dataSurface->Surface(SurfNum).Area * state.dataSurface->SurfOutWetBulbTemp(SurfNum);
+            }
+            Tamb = sum_produc_area_wetbulb / sum_area;
         }
 
         RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Tamb, state.dataEnvrn->OutHumRat);
@@ -1126,7 +1130,7 @@ namespace TranspiredCollector {
             // Initializations for this surface
             HMovInsul = 0.0;
             HExt = 0.0;
-            LocalWindArr(ThisSurf) = state.dataSurface->Surface(SurfPtr).WindSpeed;
+            LocalWindArr(ThisSurf) = state.dataSurface->SurfOutWindSpeed(SurfPtr);
             InitExteriorConvectionCoeff(
                 state, SurfPtr, HMovInsul, Roughness, AbsExt, TempExt, HExt, HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
             ConstrNum = state.dataSurface->Surface(SurfPtr).Construction;
@@ -1316,19 +1320,19 @@ namespace TranspiredCollector {
         Real64 Twbamb;
         Real64 OutHumRatAmb;
 
-        Real64 const surfaceArea(sum_sub(state.dataSurface->Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs));
         //        Tamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutDryBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum( Surface(
         // UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-        Tamb =
-            sum_product_sub(
-                state.dataSurface->Surface, &SurfaceData::OutDryBulbTemp, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
-            surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
-        //        Twbamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutWetBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum( Surface(
-        // UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-        Twbamb =
-            sum_product_sub(
-                state.dataSurface->Surface, &SurfaceData::OutWetBulbTemp, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
-            surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
+        Real64 sum_area = 0.0;
+        Real64 sum_produc_area_drybulb = 0.0;
+        Real64 sum_produc_area_wetbulb = 0.0;
+        for (int SurfNum : state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
+            sum_area += state.dataSurface->Surface(SurfNum).Area;
+            sum_produc_area_wetbulb += state.dataSurface->Surface(SurfNum).Area * state.dataSurface->SurfOutWetBulbTemp(SurfNum);
+            sum_produc_area_drybulb += state.dataSurface->Surface(SurfNum).Area * state.dataSurface->SurfOutDryBulbTemp(SurfNum);
+        }
+        Tamb = sum_produc_area_drybulb / sum_area;
+        Twbamb = sum_produc_area_wetbulb / sum_area;
+
         OutHumRatAmb = PsyWFnTdbTwbPb(state, Tamb, Twbamb, state.dataEnvrn->OutBaroPress);
 
         RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Tamb, OutHumRatAmb);

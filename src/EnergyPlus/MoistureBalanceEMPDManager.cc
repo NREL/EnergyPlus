@@ -208,7 +208,7 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
 
         // See if Material was defined with R only.  (No density is defined then and not applicable for EMPD).
         //  What about materials other than "regular materials" (e.g. Glass, Air, etc)
-        if (state.dataMaterial->Material(MaterNum).Group == RegularMaterial && MaterialProps(1) > 0.0) {
+        if (state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::RegularMaterial && MaterialProps(1) > 0.0) {
             if (state.dataMaterial->Material(MaterNum).ROnly) {
                 //        CALL ShowSevereError('EMPD base material = "'//TRIM(dataMaterial.Material(MaterNum)%Name)//  &
                 //                             '" was Material:NoMass. It cannot be used for EMPD calculations.')
@@ -219,7 +219,7 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
                 ErrorsFound = true;
             }
         }
-        if (state.dataMaterial->Material(MaterNum).Group != RegularMaterial) {
+        if (state.dataMaterial->Material(MaterNum).Group != DataHeatBalance::MaterialGroup::RegularMaterial) {
             //      CALL ShowSevereError('GetMoistureBalanceEMPDInput: Only Material:Regular base materials are allowed '// &
             //                           'to have EMPD properties, material = '// TRIM(dataMaterial.Material(MaterNum)%Name))
             ShowSevereError(state,
@@ -382,32 +382,69 @@ void InitMoistureBalanceEMPD(EnergyPlusData &state)
         if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) continue;
         EMPDReportVarsData &rvd = state.dataMoistureBalEMPD->EMPDReportVars(SurfNum);
         const std::string surf_name = state.dataSurface->Surface(SurfNum).Name;
-        SetupOutputVariable(
-            state, "EMPD Surface Inside Face Water Vapor Density", OutputProcessor::Unit::kg_m3, rvd.rv_surface, "Zone", "State", surf_name);
-        SetupOutputVariable(
-            state, "EMPD Surface Layer Moisture Content", OutputProcessor::Unit::kg_m3, rvd.u_surface_layer, "Zone", "State", surf_name);
-        SetupOutputVariable(state, "EMPD Deep Layer Moisture Content", OutputProcessor::Unit::kg_m3, rvd.u_deep_layer, "Zone", "State", surf_name);
-        SetupOutputVariable(
-            state, "EMPD Surface Layer Equivalent Relative Humidity", OutputProcessor::Unit::Perc, rvd.RH_surface_layer, "Zone", "State", surf_name);
-        SetupOutputVariable(
-            state, "EMPD Deep Layer Equivalent Relative Humidity", OutputProcessor::Unit::Perc, rvd.RH_deep_layer, "Zone", "State", surf_name);
+        SetupOutputVariable(state,
+                            "EMPD Surface Inside Face Water Vapor Density",
+                            OutputProcessor::Unit::kg_m3,
+                            rvd.rv_surface,
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::State,
+                            surf_name);
+        SetupOutputVariable(state,
+                            "EMPD Surface Layer Moisture Content",
+                            OutputProcessor::Unit::kg_m3,
+                            rvd.u_surface_layer,
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::State,
+                            surf_name);
+        SetupOutputVariable(state,
+                            "EMPD Deep Layer Moisture Content",
+                            OutputProcessor::Unit::kg_m3,
+                            rvd.u_deep_layer,
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::State,
+                            surf_name);
+        SetupOutputVariable(state,
+                            "EMPD Surface Layer Equivalent Relative Humidity",
+                            OutputProcessor::Unit::Perc,
+                            rvd.RH_surface_layer,
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::State,
+                            surf_name);
+        SetupOutputVariable(state,
+                            "EMPD Deep Layer Equivalent Relative Humidity",
+                            OutputProcessor::Unit::Perc,
+                            rvd.RH_deep_layer,
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::State,
+                            surf_name);
         SetupOutputVariable(state,
                             "EMPD Surface Layer Equivalent Humidity Ratio",
                             OutputProcessor::Unit::kgWater_kgDryAir,
                             rvd.w_surface_layer,
-                            "Zone",
-                            "State",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::State,
                             surf_name);
         SetupOutputVariable(state,
                             "EMPD Deep Layer Equivalent Humidity Ratio",
                             OutputProcessor::Unit::kgWater_kgDryAir,
                             rvd.w_deep_layer,
-                            "Zone",
-                            "State",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::State,
                             surf_name);
-        SetupOutputVariable(
-            state, "EMPD Surface Moisture Flux to Zone", OutputProcessor::Unit::kg_m2s, rvd.mass_flux_zone, "Zone", "State", surf_name);
-        SetupOutputVariable(state, "EMPD Deep Layer Moisture Flux", OutputProcessor::Unit::kg_m2s, rvd.mass_flux_deep, "Zone", "State", surf_name);
+        SetupOutputVariable(state,
+                            "EMPD Surface Moisture Flux to Zone",
+                            OutputProcessor::Unit::kg_m2s,
+                            rvd.mass_flux_zone,
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::State,
+                            surf_name);
+        SetupOutputVariable(state,
+                            "EMPD Deep Layer Moisture Flux",
+                            OutputProcessor::Unit::kg_m2s,
+                            rvd.mass_flux_deep,
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::State,
+                            surf_name);
     }
 
     if (state.dataMoistureBalEMPD->InitEnvrnFlag) state.dataMoistureBalEMPD->InitEnvrnFlag = false;
@@ -415,7 +452,7 @@ void InitMoistureBalanceEMPD(EnergyPlusData &state)
 
 void CalcMoistureBalanceEMPD(EnergyPlusData &state,
                              int const SurfNum,
-                             Real64 const TempSurfIn, // INSIDE SURFACE TEMPERATURE at current time step
+                             Real64 const SurfTempIn, // INSIDE SURFACE TEMPERATURE at current time step
                              Real64 const TempZone,   // Zone temperature at current time step.
                              Real64 &TempSat          // Saturated surface temperature.
 )
@@ -443,7 +480,7 @@ void CalcMoistureBalanceEMPD(EnergyPlusData &state,
     using Psychrometrics::PsyRhovFnTdbWPb_fast;
     using Psychrometrics::PsyWFnTdbRhPb;
 
-    static std::string const RoutineName("CalcMoistureEMPD");
+    static constexpr std::string_view RoutineName("CalcMoistureEMPD");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int NOFITR;           // Number of iterations
@@ -515,7 +552,7 @@ void CalcMoistureBalanceEMPD(EnergyPlusData &state,
         return;
     }
 
-    Taver = TempSurfIn;
+    Taver = SurfTempIn;
     // Calculate average vapor density [kg/m^3], and RH for use in material property calculations.
     RVaver = rv_surface_old;
     RHaver = RVaver * 461.52 * (Taver + DataGlobalConstants::KelvinConv) * std::exp(-23.7093 + 4111.0 / (Taver + 237.7));
@@ -727,7 +764,7 @@ void ReportMoistureBalanceEMPD(EnergyPlusData &state)
         if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue;
         MatNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
         if (state.dataMaterial->Material(MatNum).EMPDMaterialProps) {
-            static constexpr auto Format_700(
+            static constexpr fmt::string_view Format_700(
                 " Construction EMPD, {}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}\n");
             print(state.files.eio,
                   Format_700,

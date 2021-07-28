@@ -462,26 +462,26 @@ namespace CondenserLoopTowers {
         void report(EnergyPlusData &state, bool RunFlag);
 
         Real64 residualUA(EnergyPlusData &state,
-                          Real64 UA,                 // UA of cooling tower
-                          Array1D<Real64> const &Par // par(1) = design tower load [W]
+                          Real64 UA,                       // UA of cooling tower
+                          std::array<Real64, 6> const &Par // par(1) = design tower load [W]
         );
 
         Real64 residualTa(EnergyPlusData &state,
-                          Real64 FlowRatio,          // water or air flow ratio of cooling tower
-                          Array1D<Real64> const &Par // par(1) = tower number
+                          Real64 FlowRatio,                // water or air flow ratio of cooling tower
+                          std::array<Real64, 6> const &Par // par(1) = tower number
         );
 
         Real64 residualTr(EnergyPlusData &state,
-                          Real64 Trange,             // cooling tower range temperature [C]
-                          Array1D<Real64> const &Par // par(1) = tower number
+                          Real64 Trange,                   // cooling tower range temperature [C]
+                          std::array<Real64, 6> const &Par // par(1) = tower number
         );
 
         Real64 residualMerkelLoad(EnergyPlusData &state,
-                                  Real64 airFlowRateRatioLocal, // fan speed ratio (1.0 is continuous, 0.0 is off)
-                                  Array1D<Real64> const &Par    // par(1) = Tower number
+                                  Real64 airFlowRateRatioLocal,    // fan speed ratio (1.0 is continuous, 0.0 is off)
+                                  std::array<Real64, 8> const &Par // par(1) = Tower number
         );
 
-        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string_view objectName);
     };
 
     void GetTowerInput(EnergyPlusData &state);

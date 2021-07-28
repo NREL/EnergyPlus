@@ -4,48 +4,59 @@
 #include <memory>
 #include <vector>
 
-namespace FenestrationCommon {
+namespace FenestrationCommon
+{
+    enum class Side;
+    class CSeries;
 
-	enum class Side;
-	class CSeries;
+}   // namespace FenestrationCommon
 
-}
+namespace SingleLayerOptics
+{
+    class CMaterial;
+    class ICellDescription;
+    class CBeamDirection;
 
-namespace SingleLayerOptics {
+    // Handles optical layer "cell". Base behavior is to calculate specular (direct-direct)
+    // component of a light beam. Inherit from this class when want to create new shading type.
+    class CBaseCell
+    {
+    public:
+        CBaseCell();
+        CBaseCell(const std::shared_ptr<CMaterial> & t_Material,
+                  const std::shared_ptr<ICellDescription> & t_CellDescription);
 
-	class CMaterial;
-	class ICellDescription;
-	class CBeamDirection;
+        virtual void setSourceData(FenestrationCommon::CSeries & t_SourceData);
 
-	// Handles optical layer "cell". Base behavior is to calculate specular (direct-direct) component of a light
-	// beam. Inherit from this class when want to create new shading type.
-	class CBaseCell {
-	public:
-		CBaseCell();
-		CBaseCell( const std::shared_ptr< CMaterial >& t_Material,
-		           const std::shared_ptr< ICellDescription >& t_CellDescription );
+        // Direct to direct component of transmitted ray
+        // These dir_dir and dir_dir_band functions are returning only direct portion of the
+        // incoming beam that goes directly through cell without interfering (bouncing off) with
+        // material (Simon)
+        virtual double T_dir_dir(const FenestrationCommon::Side t_Side,
+                                 const CBeamDirection & t_Direction);
+        virtual double R_dir_dir(const FenestrationCommon::Side t_Side,
+                                 const CBeamDirection & t_Direction);
 
-		virtual void setSourceData( std::shared_ptr< FenestrationCommon::CSeries > t_SourceData );
+        virtual std::vector<double> T_dir_dir_band(const FenestrationCommon::Side t_Side,
+                                                   const CBeamDirection & t_Direction);
 
-		// Direct to direct component of transmitted ray
-		virtual double T_dir_dir( const FenestrationCommon::Side t_Side, const CBeamDirection& t_Direction );
-		virtual double R_dir_dir( const FenestrationCommon::Side t_Side, const CBeamDirection& t_Direction );
+        virtual std::vector<double> R_dir_dir_band(const FenestrationCommon::Side t_Side,
+                                                   const CBeamDirection & t_Direction);
 
-		virtual std::vector< double > T_dir_dir_band( const FenestrationCommon::Side t_Side,
-		                                              const CBeamDirection& t_Direction );
+        std::vector<double> getBandWavelengths() const;
+        void setBandWavelengths(const std::vector<double> & wavelengths) const;
+        int getBandIndex(double t_Wavelength) const;
+        size_t getBandSize() const;
 
-		virtual std::vector< double > R_dir_dir_band( const FenestrationCommon::Side t_Side,
-		                                              const CBeamDirection& t_Direction );
+        double getMinLambda() const;
+        double getMaxLambda() const;
 
-		std::vector< double > getBandWavelengths() const;
-		int getBandIndex( const double t_Wavelength );
-		size_t getBandSize() const;
+        void Flipped(bool flipped) const;
 
-	protected:
-		std::shared_ptr< CMaterial > m_Material;
-		std::shared_ptr< ICellDescription > m_CellDescription;
-
-	};
-}
+    protected:
+        std::shared_ptr<CMaterial> m_Material;
+        std::shared_ptr<ICellDescription> m_CellDescription;
+    };
+}   // namespace SingleLayerOptics
 
 #endif

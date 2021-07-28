@@ -72,7 +72,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 67
 
-  Version,9.5;
+  Version,9.6;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -25245,74 +25245,62 @@
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-HEATCOOL:10_OA,      !- Name
     PSZ-HEATCOOL:10_OA_Controllers,  !- Controller List Name
-    PSZ-HEATCOOL:10_OA_Equipment,  !- Outdoor Air Equipment List Name
-    PSZ-HEATCOOL:10 Availability Manager List;  !- Availability Manager List Name
+    PSZ-HEATCOOL:10_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-HEATCOOL:11_OA,      !- Name
     PSZ-HEATCOOL:11_OA_Controllers,  !- Controller List Name
-    PSZ-HEATCOOL:11_OA_Equipment,  !- Outdoor Air Equipment List Name
-    PSZ-HEATCOOL:11 Availability Manager List;  !- Availability Manager List Name
+    PSZ-HEATCOOL:11_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-HEATCOOL:12_OA,      !- Name
     PSZ-HEATCOOL:12_OA_Controllers,  !- Controller List Name
-    PSZ-HEATCOOL:12_OA_Equipment,  !- Outdoor Air Equipment List Name
-    PSZ-HEATCOOL:12 Availability Manager List;  !- Availability Manager List Name
+    PSZ-HEATCOOL:12_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-HEATCOOL:1_OA,       !- Name
     PSZ-HEATCOOL:1_OA_Controllers,  !- Controller List Name
-    PSZ-HEATCOOL:1_OA_Equipment,  !- Outdoor Air Equipment List Name
-    PSZ-HEATCOOL:1 Availability Manager List;  !- Availability Manager List Name
+    PSZ-HEATCOOL:1_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-HEATCOOL:2_OA,       !- Name
     PSZ-HEATCOOL:2_OA_Controllers,  !- Controller List Name
-    PSZ-HEATCOOL:2_OA_Equipment,  !- Outdoor Air Equipment List Name
-    PSZ-HEATCOOL:2 Availability Manager List;  !- Availability Manager List Name
+    PSZ-HEATCOOL:2_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-HEATCOOL:3_OA,       !- Name
     PSZ-HEATCOOL:3_OA_Controllers,  !- Controller List Name
-    PSZ-HEATCOOL:3_OA_Equipment,  !- Outdoor Air Equipment List Name
-    PSZ-HEATCOOL:3 Availability Manager List;  !- Availability Manager List Name
+    PSZ-HEATCOOL:3_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-HEATCOOL:4_OA,       !- Name
     PSZ-HEATCOOL:4_OA_Controllers,  !- Controller List Name
-    PSZ-HEATCOOL:4_OA_Equipment,  !- Outdoor Air Equipment List Name
-    PSZ-HEATCOOL:4 Availability Manager List;  !- Availability Manager List Name
+    PSZ-HEATCOOL:4_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-HEATCOOL:5_OA,       !- Name
     PSZ-HEATCOOL:5_OA_Controllers,  !- Controller List Name
-    PSZ-HEATCOOL:5_OA_Equipment,  !- Outdoor Air Equipment List Name
-    PSZ-HEATCOOL:5 Availability Manager List;  !- Availability Manager List Name
+    PSZ-HEATCOOL:5_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-HEATCOOL:6_OA,       !- Name
     PSZ-HEATCOOL:6_OA_Controllers,  !- Controller List Name
-    PSZ-HEATCOOL:6_OA_Equipment,  !- Outdoor Air Equipment List Name
-    PSZ-HEATCOOL:6 Availability Manager List;  !- Availability Manager List Name
+    PSZ-HEATCOOL:6_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-HEATCOOL:7_OA,       !- Name
     PSZ-HEATCOOL:7_OA_Controllers,  !- Controller List Name
-    PSZ-HEATCOOL:7_OA_Equipment,  !- Outdoor Air Equipment List Name
-    PSZ-HEATCOOL:7 Availability Manager List;  !- Availability Manager List Name
+    PSZ-HEATCOOL:7_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-HEATCOOL:8_OA,       !- Name
     PSZ-HEATCOOL:8_OA_Controllers,  !- Controller List Name
-    PSZ-HEATCOOL:8_OA_Equipment,  !- Outdoor Air Equipment List Name
-    PSZ-HEATCOOL:8 Availability Manager List;  !- Availability Manager List Name
+    PSZ-HEATCOOL:8_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-HEATCOOL:9_OA,       !- Name
     PSZ-HEATCOOL:9_OA_Controllers,  !- Controller List Name
-    PSZ-HEATCOOL:9_OA_Equipment,  !- Outdoor Air Equipment List Name
-    PSZ-HEATCOOL:9 Availability Manager List;  !- Availability Manager List Name
+    PSZ-HEATCOOL:9_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     PSZ-HEATCOOL:10_OANode List;  !- Node or NodeList Name 1

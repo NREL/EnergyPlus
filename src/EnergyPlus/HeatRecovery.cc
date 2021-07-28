@@ -142,7 +142,7 @@ namespace HeatRecovery {
     // Functions
 
     void SimHeatRecovery(EnergyPlusData &state,
-                         std::string const &CompName,             // name of the heat exchanger unit
+                         std::string_view CompName,               // name of the heat exchanger unit
                          bool const FirstHVACIteration,           // TRUE if 1st HVAC simulation of system timestep
                          int &CompIndex,                          // Pointer to Component
                          int const FanOpMode,                     // Supply air fan operating mode
@@ -184,7 +184,7 @@ namespace HeatRecovery {
         if (CompIndex == 0) {
             HeatExchNum = UtilityRoutines::FindItemInList(CompName, state.dataHeatRecovery->ExchCond);
             if (HeatExchNum == 0) {
-                ShowFatalError(state, "SimHeatRecovery: Unit not found=" + CompName);
+                ShowFatalError(state, "SimHeatRecovery: Unit not found=" + std::string{CompName});
             }
             CompIndex = HeatExchNum;
         } else {
@@ -372,7 +372,7 @@ namespace HeatRecovery {
                 state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    RoutineName + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
+                                    std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
                                         " entered =" + state.dataIPShortCut->cAlphaArgs(2) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) +
                                         '=' + state.dataIPShortCut->cAlphaArgs(1));
                     ErrorsFound = true;
@@ -381,11 +381,11 @@ namespace HeatRecovery {
             {
                 auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(3));
                 if (SELECT_CASE_var == "COUNTERFLOW") {
-                    state.dataHeatRecovery->ExchCond(ExchNum).FlowArr = Counter_Flow;
+                    state.dataHeatRecovery->ExchCond(ExchNum).FlowArr = HXConfiguration::CounterFlow;
                 } else if (SELECT_CASE_var == "PARALLELFLOW") {
-                    state.dataHeatRecovery->ExchCond(ExchNum).FlowArr = Parallel_Flow;
+                    state.dataHeatRecovery->ExchCond(ExchNum).FlowArr = HXConfiguration::ParallelFlow;
                 } else if (SELECT_CASE_var == "CROSSFLOWBOTHUNMIXED") {
-                    state.dataHeatRecovery->ExchCond(ExchNum).FlowArr = Cross_Flow_Both_Unmixed;
+                    state.dataHeatRecovery->ExchCond(ExchNum).FlowArr = HXConfiguration::CrossFlowBothUnmixed;
                 } else {
                     ShowSevereError(state, cCurrentModuleObject + ": incorrect flow arrangement: " + state.dataIPShortCut->cAlphaArgs(3));
                     ErrorsFound = true;
@@ -394,12 +394,12 @@ namespace HeatRecovery {
             {
                 auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(4));
                 if (SELECT_CASE_var == "YES") {
-                    state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconoLockOut_Yes;
+                    state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconomizerLockout::Yes;
                 } else if (SELECT_CASE_var == "NO") {
-                    state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconoLockOut_No;
+                    state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconomizerLockout::No;
                 } else {
                     if (state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                        state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconoLockOut_Yes;
+                        state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconomizerLockout::Yes;
                     } else {
                         ShowSevereError(state, cCurrentModuleObject + ": incorrect econo lockout: " + state.dataIPShortCut->cAlphaArgs(4));
                         ErrorsFound = true;
@@ -420,7 +420,7 @@ namespace HeatRecovery {
                                                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                                                        DataLoopNode::NodeFluidType::Air,
                                                                                        DataLoopNode::NodeConnectionType::Inlet,
-                                                                                       1,
+                                                                                       NodeInputManager::compFluidStream::Primary,
                                                                                        ObjectIsNotParent);
             state.dataHeatRecovery->ExchCond(ExchNum).SupOutletNode = GetOnlySingleNode(state,
                                                                                         state.dataIPShortCut->cAlphaArgs(6),
@@ -429,7 +429,7 @@ namespace HeatRecovery {
                                                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                                                         DataLoopNode::NodeFluidType::Air,
                                                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                                                        1,
+                                                                                        NodeInputManager::compFluidStream::Primary,
                                                                                         ObjectIsNotParent);
             state.dataHeatRecovery->ExchCond(ExchNum).SecInletNode = GetOnlySingleNode(state,
                                                                                        state.dataIPShortCut->cAlphaArgs(7),
@@ -438,7 +438,7 @@ namespace HeatRecovery {
                                                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                                                        DataLoopNode::NodeFluidType::Air,
                                                                                        DataLoopNode::NodeConnectionType::Inlet,
-                                                                                       2,
+                                                                                       NodeInputManager::compFluidStream::Secondary,
                                                                                        ObjectIsNotParent);
             state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode = GetOnlySingleNode(state,
                                                                                         state.dataIPShortCut->cAlphaArgs(8),
@@ -447,7 +447,7 @@ namespace HeatRecovery {
                                                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                                                         DataLoopNode::NodeFluidType::Air,
                                                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                                                        2,
+                                                                                        NodeInputManager::compFluidStream::Secondary,
                                                                                         ObjectIsNotParent);
 
             TestCompSet(state,
@@ -495,7 +495,7 @@ namespace HeatRecovery {
                 state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    RoutineName + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
+                                    std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
                                         " entered =" + state.dataIPShortCut->cAlphaArgs(2) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) +
                                         '=' + state.dataIPShortCut->cAlphaArgs(1));
                     ErrorsFound = true;
@@ -541,7 +541,7 @@ namespace HeatRecovery {
                                                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                                                        DataLoopNode::NodeFluidType::Air,
                                                                                        DataLoopNode::NodeConnectionType::Inlet,
-                                                                                       1,
+                                                                                       NodeInputManager::compFluidStream::Primary,
                                                                                        ObjectIsNotParent);
             state.dataHeatRecovery->ExchCond(ExchNum).SupOutletNode = GetOnlySingleNode(state,
                                                                                         state.dataIPShortCut->cAlphaArgs(4),
@@ -550,7 +550,7 @@ namespace HeatRecovery {
                                                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                                                         DataLoopNode::NodeFluidType::Air,
                                                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                                                        1,
+                                                                                        NodeInputManager::compFluidStream::Primary,
                                                                                         ObjectIsNotParent);
             state.dataHeatRecovery->ExchCond(ExchNum).SecInletNode = GetOnlySingleNode(state,
                                                                                        state.dataIPShortCut->cAlphaArgs(5),
@@ -559,7 +559,7 @@ namespace HeatRecovery {
                                                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                                                        DataLoopNode::NodeFluidType::Air,
                                                                                        DataLoopNode::NodeConnectionType::Inlet,
-                                                                                       2,
+                                                                                       NodeInputManager::compFluidStream::Secondary,
                                                                                        ObjectIsNotParent);
             state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode = GetOnlySingleNode(state,
                                                                                         state.dataIPShortCut->cAlphaArgs(6),
@@ -568,7 +568,7 @@ namespace HeatRecovery {
                                                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                                                         DataLoopNode::NodeFluidType::Air,
                                                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                                                        2,
+                                                                                        NodeInputManager::compFluidStream::Secondary,
                                                                                         ObjectIsNotParent);
 
             state.dataHeatRecovery->ExchCond(ExchNum).NomElecPower = state.dataIPShortCut->rNumericArgs(10);
@@ -584,9 +584,9 @@ namespace HeatRecovery {
             }
 
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), "Plate")) {
-                state.dataHeatRecovery->ExchCond(ExchNum).ExchConfigNum = Plate;
+                state.dataHeatRecovery->ExchCond(ExchNum).ExchConfig = HXConfigurationType::Plate;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), "Rotary")) {
-                state.dataHeatRecovery->ExchCond(ExchNum).ExchConfigNum = Rotary;
+                state.dataHeatRecovery->ExchCond(ExchNum).ExchConfig = HXConfigurationType::Rotary;
             } else {
                 ShowSevereError(state, cCurrentModuleObject + " configuration not found= " + state.dataIPShortCut->cAlphaArgs(8));
                 ShowContinueError(state, "HX configuration must be either Plate or Rotary");
@@ -617,12 +617,12 @@ namespace HeatRecovery {
             {
                 auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(10));
                 if (SELECT_CASE_var == "YES") {
-                    state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconoLockOut_Yes;
+                    state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconomizerLockout::Yes;
                 } else if (SELECT_CASE_var == "NO") {
-                    state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconoLockOut_No;
+                    state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconomizerLockout::No;
                 } else {
                     if (state.dataIPShortCut->lAlphaFieldBlanks(10)) {
-                        state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconoLockOut_Yes;
+                        state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconomizerLockout::Yes;
                     } else {
                         ShowSevereError(state, cCurrentModuleObject + ": incorrect econo lockout: " + state.dataIPShortCut->cAlphaArgs(10));
                         ErrorsFound = true;
@@ -674,7 +674,7 @@ namespace HeatRecovery {
                 state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    RoutineName + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
+                                    std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
                                         " entered =" + state.dataIPShortCut->cAlphaArgs(2) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) +
                                         '=' + state.dataIPShortCut->cAlphaArgs(1));
                     ErrorsFound = true;
@@ -690,7 +690,7 @@ namespace HeatRecovery {
                                                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                                                        DataLoopNode::NodeFluidType::Air,
                                                                                        DataLoopNode::NodeConnectionType::Inlet,
-                                                                                       1,
+                                                                                       NodeInputManager::compFluidStream::Primary,
                                                                                        ObjectIsNotParent);
             state.dataHeatRecovery->ExchCond(ExchNum).SupOutletNode = GetOnlySingleNode(state,
                                                                                         state.dataIPShortCut->cAlphaArgs(4),
@@ -699,7 +699,7 @@ namespace HeatRecovery {
                                                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                                                         DataLoopNode::NodeFluidType::Air,
                                                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                                                        1,
+                                                                                        NodeInputManager::compFluidStream::Primary,
                                                                                         ObjectIsNotParent);
             // process air inlet and outlet nodes
             state.dataHeatRecovery->ExchCond(ExchNum).SecInletNode = GetOnlySingleNode(state,
@@ -709,7 +709,7 @@ namespace HeatRecovery {
                                                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                                                        DataLoopNode::NodeFluidType::Air,
                                                                                        DataLoopNode::NodeConnectionType::Inlet,
-                                                                                       2,
+                                                                                       NodeInputManager::compFluidStream::Secondary,
                                                                                        ObjectIsNotParent);
             state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode = GetOnlySingleNode(state,
                                                                                         state.dataIPShortCut->cAlphaArgs(6),
@@ -718,7 +718,7 @@ namespace HeatRecovery {
                                                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                                                         DataLoopNode::NodeFluidType::Air,
                                                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                                                        2,
+                                                                                        NodeInputManager::compFluidStream::Secondary,
                                                                                         ObjectIsNotParent);
 
             // Set up the component set for the process side of the HX (Sec = Process)
@@ -744,12 +744,12 @@ namespace HeatRecovery {
             {
                 auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(9));
                 if (SELECT_CASE_var == "YES") {
-                    state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconoLockOut_Yes;
+                    state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconomizerLockout::Yes;
                 } else if (SELECT_CASE_var == "NO") {
-                    state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconoLockOut_No;
+                    state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconomizerLockout::No;
                 } else {
                     if (state.dataIPShortCut->lAlphaFieldBlanks(9)) {
-                        state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconoLockOut_No;
+                        state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconomizerLockout::No;
                     } else {
                         ShowSevereError(state, cCurrentModuleObject + ": incorrect econo lockout: " + state.dataIPShortCut->cAlphaArgs(9));
                         ErrorsFound = true;
@@ -1282,43 +1282,43 @@ namespace HeatRecovery {
                                 "Heat Exchanger Sensible Heating Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataHeatRecovery->ExchCond(ExchNum).SensHeatingRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatRecovery->ExchCond(ExchNum).Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Sensible Heating Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataHeatRecovery->ExchCond(ExchNum).SensHeatingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatRecovery->ExchCond(ExchNum).Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Latent Gain Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataHeatRecovery->ExchCond(ExchNum).LatHeatingRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatRecovery->ExchCond(ExchNum).Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Latent Gain Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataHeatRecovery->ExchCond(ExchNum).LatHeatingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatRecovery->ExchCond(ExchNum).Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Total Heating Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataHeatRecovery->ExchCond(ExchNum).TotHeatingRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatRecovery->ExchCond(ExchNum).Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Total Heating Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataHeatRecovery->ExchCond(ExchNum).TotHeatingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatRecovery->ExchCond(ExchNum).Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -1329,43 +1329,43 @@ namespace HeatRecovery {
                                 "Heat Exchanger Sensible Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataHeatRecovery->ExchCond(ExchNum).SensCoolingRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatRecovery->ExchCond(ExchNum).Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Sensible Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataHeatRecovery->ExchCond(ExchNum).SensCoolingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatRecovery->ExchCond(ExchNum).Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Latent Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataHeatRecovery->ExchCond(ExchNum).LatCoolingRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatRecovery->ExchCond(ExchNum).Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Latent Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataHeatRecovery->ExchCond(ExchNum).LatCoolingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatRecovery->ExchCond(ExchNum).Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Total Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataHeatRecovery->ExchCond(ExchNum).TotCoolingRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatRecovery->ExchCond(ExchNum).Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Total Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataHeatRecovery->ExchCond(ExchNum).TotCoolingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatRecovery->ExchCond(ExchNum).Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -1377,15 +1377,15 @@ namespace HeatRecovery {
                                 "Heat Exchanger Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataHeatRecovery->ExchCond(ExchNum).ElecUseRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatRecovery->ExchCond(ExchNum).Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataHeatRecovery->ExchCond(ExchNum).ElecUseEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatRecovery->ExchCond(ExchNum).Name,
                                 _,
                                 "ELECTRICITY",
@@ -1403,36 +1403,36 @@ namespace HeatRecovery {
                                 "Heat Exchanger Sensible Effectiveness",
                                 OutputProcessor::Unit::None,
                                 state.dataHeatRecovery->ExchCond(ExchNum).SensEffectiveness,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatRecovery->ExchCond(ExchNum).Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Latent Effectiveness",
                                 OutputProcessor::Unit::None,
                                 state.dataHeatRecovery->ExchCond(ExchNum).LatEffectiveness,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatRecovery->ExchCond(ExchNum).Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Supply Air Bypass Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 state.dataHeatRecovery->ExchCond(ExchNum).SupBypassMassFlow,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatRecovery->ExchCond(ExchNum).Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Exhaust Air Bypass Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 state.dataHeatRecovery->ExchCond(ExchNum).SecBypassMassFlow,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatRecovery->ExchCond(ExchNum).Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Defrost Time Fraction",
                                 OutputProcessor::Unit::None,
                                 state.dataHeatRecovery->ExchCond(ExchNum).DefrostFraction,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatRecovery->ExchCond(ExchNum).Name);
         }
 
@@ -2053,7 +2053,7 @@ namespace HeatRecovery {
             HighHumCtrlActiveFlag = false;
         }
 
-        if ((EconomizerActiveFlag || HighHumCtrlActiveFlag) && state.dataHeatRecovery->ExchCond(ExNum).EconoLockOut == EconoLockOut_Yes) {
+        if ((EconomizerActiveFlag || HighHumCtrlActiveFlag) && state.dataHeatRecovery->ExchCond(ExNum).EconoLockOut == EconomizerLockout::Yes) {
             UnitSupMassFlow = 0.0; // set HX supply flow to 0, all supply air will go through supply bypass
             UnitSecMassFlow = 0.0; // set HX secondary flow to 0, all secondary air will got through secondary bypass
             UnitOn = false;        // turn off HX calculations when in economizer mode
@@ -2300,8 +2300,8 @@ namespace HeatRecovery {
         }
 
         // Determine mass flow through heat exchanger and mass flow being bypassed (only flat plate bypasses flow)
-        if (((EconomizerActiveFlag || HighHumCtrlActiveFlag) && state.dataHeatRecovery->ExchCond(ExNum).EconoLockOut == EconoLockOut_Yes) &&
-            state.dataHeatRecovery->ExchCond(ExNum).ExchConfigNum == Plate) {
+        if (((EconomizerActiveFlag || HighHumCtrlActiveFlag) && state.dataHeatRecovery->ExchCond(ExNum).EconoLockOut == EconomizerLockout::Yes) &&
+            state.dataHeatRecovery->ExchCond(ExNum).ExchConfig == HXConfigurationType::Plate) {
             state.dataHeatRecovery->ExchCond(ExNum).SupBypassMassFlow = state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow;
             state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow = state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow;
             state.dataHeatRecovery->ExchCond(ExNum).SecBypassMassFlow = state.dataHeatRecovery->ExchCond(ExNum).SecInMassFlow;
@@ -2315,7 +2315,7 @@ namespace HeatRecovery {
         // Unit is scheduled OFF, so bypass heat exchange calcs
         if (GetCurrentScheduleValue(state, state.dataHeatRecovery->ExchCond(ExNum).SchedPtr) <= 0.0) UnitOn = false;
         //! Economizer is active, so bypass heat exchange calcs. This applies to both flat plate and rotary HX's
-        if ((EconomizerActiveFlag || HighHumCtrlActiveFlag) && state.dataHeatRecovery->ExchCond(ExNum).EconoLockOut == EconoLockOut_Yes) {
+        if ((EconomizerActiveFlag || HighHumCtrlActiveFlag) && state.dataHeatRecovery->ExchCond(ExNum).EconoLockOut == EconomizerLockout::Yes) {
             UnitOn = false;
         }
         // Determine if unit is ON or OFF based on air mass flow through the supply and secondary airstreams and operation flag
@@ -2554,7 +2554,7 @@ namespace HeatRecovery {
                     //     ELSE fully bypass HX to maintain supply outlet temp as high as possible
                     ControlFraction = 0.0;
                 }
-                if (state.dataHeatRecovery->ExchCond(ExNum).ExchConfigNum == Rotary) {
+                if (state.dataHeatRecovery->ExchCond(ExNum).ExchConfig == HXConfigurationType::Rotary) {
                     //       Rotory HX's never get bypassed, rotational speed is modulated
                     state.dataHeatRecovery->ExchCond(ExNum).SensEffectiveness *= ControlFraction;
                     state.dataHeatRecovery->ExchCond(ExNum).LatEffectiveness *= ControlFraction;
@@ -2967,7 +2967,7 @@ namespace HeatRecovery {
         if (state.dataHeatRecovery->ExchCond(ExNum).SecInMassFlow <= SmallMassFlow) UnitOn = false;
         if (HXPartLoadRatio == 0.0) UnitOn = false;
         if (!HXUnitOn) UnitOn = false;
-        if ((EconomizerActiveFlag || HighHumCtrlActiveFlag) && state.dataHeatRecovery->ExchCond(ExNum).EconoLockOut == EconoLockOut_Yes)
+        if ((EconomizerActiveFlag || HighHumCtrlActiveFlag) && state.dataHeatRecovery->ExchCond(ExNum).EconoLockOut == EconomizerLockout::Yes)
             UnitOn = false;
 
         if (UnitOn) {
@@ -3354,7 +3354,7 @@ namespace HeatRecovery {
                              min(1.0,
                                  SafeDiv((TempThreshold - state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp),
                                          (state.dataHeatRecovery->ExchCond(ExNum).SecInTemp - state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp))));
-            if (state.dataHeatRecovery->ExchCond(ExNum).ExchConfigNum == Rotary) {
+            if (state.dataHeatRecovery->ExchCond(ExNum).ExchConfig == HXConfigurationType::Rotary) {
                 state.dataHeatRecovery->ExchCond(ExNum).SensEffectiveness *= (1.0 - DFFraction);
                 state.dataHeatRecovery->ExchCond(ExNum).LatEffectiveness *= (1.0 - DFFraction);
             } else { // HX is a plate heat exchanger, bypass air to eliminate frost
@@ -3716,10 +3716,10 @@ namespace HeatRecovery {
     }
 
     void CalculateEpsFromNTUandZ(EnergyPlusData &state,
-                                 Real64 const NTU,  // number of transfer units
-                                 Real64 const Z,    // capacity rate ratio
-                                 int const FlowArr, // flow arrangement
-                                 Real64 &Eps        // heat exchanger effectiveness
+                                 Real64 const NTU,              // number of transfer units
+                                 Real64 const Z,                // capacity rate ratio
+                                 HXConfiguration const FlowArr, // flow arrangement
+                                 Real64 &Eps                    // heat exchanger effectiveness
     )
     {
 
@@ -3780,20 +3780,20 @@ namespace HeatRecovery {
         } else {
             {
                 auto const SELECT_CASE_var(FlowArr);
-                if (SELECT_CASE_var == Counter_Flow) { // COUNTER FLOW
+                if (SELECT_CASE_var == HXConfiguration::CounterFlow) { // COUNTER FLOW
                     if (std::abs(Z - 1.0) < SMALL) {
                         Eps = NTU / (NTU + 1.0);
                     } else {
                         Temp = std::exp(-NTU * (1.0 - Z));
                         Eps = (1.0 - Temp) / (1.0 - Z * Temp);
                     }
-                } else if (SELECT_CASE_var == Parallel_Flow) { // PARALLEL FLOW
+                } else if (SELECT_CASE_var == HXConfiguration::ParallelFlow) { // PARALLEL FLOW
                     Temp = (1.0 + Z);
                     Eps = (1.0 - std::exp(-NTU * Temp)) / Temp;
-                } else if (SELECT_CASE_var == Cross_Flow_Both_Unmixed) { // CROSS FLOW BOTH UNMIXED
+                } else if (SELECT_CASE_var == HXConfiguration::CrossFlowBothUnmixed) { // CROSS FLOW BOTH UNMIXED
                     Temp = Z * std::pow(NTU, -0.22);
                     Eps = 1.0 - std::exp((std::exp(-NTU * Temp) - 1.0) / Temp);
-                } else if (SELECT_CASE_var == Cross_Flow_Other) { // CROSS FLOW, Cmax MIXED, Cmin UNMIXED
+                } else if (SELECT_CASE_var == HXConfiguration::CrossFlowOther) { // CROSS FLOW, Cmax MIXED, Cmin UNMIXED
                     Eps = (1.0 - std::exp(-Z * (1.0 - std::exp(-NTU)))) / Z;
                 } else {
                     ShowFatalError(state, format("HeatRecovery: Illegal flow arrangement in CalculateEpsFromNTUandZ, Value={}", FlowArr));
@@ -3803,11 +3803,11 @@ namespace HeatRecovery {
     }
 
     void CalculateNTUfromEpsAndZ(EnergyPlusData &state,
-                                 Real64 &NTU,       // number of transfer units
-                                 int &Err,          // error indicator
-                                 Real64 const Z,    // capacity rate ratio
-                                 int const FlowArr, // flow arrangement
-                                 Real64 const Eps   // heat exchanger effectiveness
+                                 Real64 &NTU,                   // number of transfer units
+                                 int &Err,                      // error indicator
+                                 Real64 const Z,                // capacity rate ratio
+                                 HXConfiguration const FlowArr, // flow arrangement
+                                 Real64 const Eps               // heat exchanger effectiveness
     )
     {
 
@@ -3861,12 +3861,12 @@ namespace HeatRecovery {
             return;
         }
 
-        if (FlowArr == Parallel_Flow) {
+        if (FlowArr == HXConfiguration::ParallelFlow) {
             if (Eps < 0.0 || Eps > 1.0 / (1.0 + Z)) {
                 Err = 2;
                 return;
             }
-        } else if (FlowArr == Cross_Flow_Other) {
+        } else if (FlowArr == HXConfiguration::CrossFlowOther) {
             if (Eps < 0.0 || Eps > (1.0 - std::exp(-Z)) / Z) {
                 Err = 3;
                 return;
@@ -3892,17 +3892,17 @@ namespace HeatRecovery {
             // calculate based on configuration
             {
                 auto const SELECT_CASE_var(FlowArr);
-                if (SELECT_CASE_var == Counter_Flow) { // COUNTER FLOW
+                if (SELECT_CASE_var == HXConfiguration::CounterFlow) { // COUNTER FLOW
                     if (std::abs(Z - 1.0) < SMALL) {
                         NTU = Eps / (1.0 - Eps);
                     } else {
                         NTU = 1.0 / (Z - 1.0) * std::log((1.0 - Eps) / (1.0 - Eps * Z));
                     }
-                } else if (SELECT_CASE_var == Parallel_Flow) { // PARALLEL FLOW
+                } else if (SELECT_CASE_var == HXConfiguration::ParallelFlow) { // PARALLEL FLOW
                     NTU = -std::log(-Eps - Eps * Z + 1.0) / (Z + 1.0);
-                } else if (SELECT_CASE_var == Cross_Flow_Both_Unmixed) { // CROSS FLOW BOTH UNMIXED
+                } else if (SELECT_CASE_var == HXConfiguration::CrossFlowBothUnmixed) { // CROSS FLOW BOTH UNMIXED
                     NTU = GetNTUforCrossFlowBothUnmixed(state, Eps, Z);
-                } else if (SELECT_CASE_var == Cross_Flow_Other) { // CROSS FLOW, Cmax MIXED, Cmin UNMIXED
+                } else if (SELECT_CASE_var == HXConfiguration::CrossFlowOther) { // CROSS FLOW, Cmax MIXED, Cmin UNMIXED
                     NTU = -std::log(1.0 + std::log(1.0 - Eps * Z) / Z);
                 } else {
                     ShowFatalError(state, format("HeatRecovery: Illegal flow arrangement in CalculateNTUfromEpsAndZ, Value={}", FlowArr));
@@ -3962,10 +3962,7 @@ namespace HeatRecovery {
         int SolFla;              // Flag of solver
         Real64 const NTU0(0.0);  // lower bound for NTU
         Real64 const NTU1(50.0); // upper bound for NTU
-        Array1D<Real64> Par(2);
-
-        Par(1) = Eps;
-        Par(2) = Z;
+        std::array<Real64, 2> Par = {Eps, Z};
 
         SolveRoot(state, Acc, MaxIte, SolFla, NTU, GetResidCrossFlowBothUnmixed, NTU0, NTU1, Par);
 
@@ -3978,8 +3975,9 @@ namespace HeatRecovery {
         return NTU;
     }
 
-    Real64 GetResidCrossFlowBothUnmixed(Real64 const NTU,          // number of transfer units
-                                        Array1D<Real64> const &Par // par(1) = Eps, par(2) = Z
+    Real64 GetResidCrossFlowBothUnmixed([[maybe_unused]] EnergyPlusData &state,
+                                        Real64 const NTU,                // number of transfer units
+                                        std::array<Real64, 2> const &Par // par(1) = Eps, par(2) = Z
     )
     {
 
@@ -4010,23 +4008,7 @@ namespace HeatRecovery {
         // Return value
         Real64 Residuum; // residual to be minimized to zero
 
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-        Residuum = 1.0 - std::exp((std::exp(-std::pow(NTU, 0.78) * Par(2)) - 1.0) / Par(2) * std::pow(NTU, 0.22)) - Par(1);
+        Residuum = 1.0 - std::exp((std::exp(-std::pow(NTU, 0.78) * Par[1]) - 1.0) / Par[1] * std::pow(NTU, 0.22)) - Par[0];
 
         return Residuum;
     }

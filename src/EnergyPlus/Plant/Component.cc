@@ -68,7 +68,18 @@ namespace DataPlant {
         return false;
     }
 
-    void CompData::simulate(EnergyPlusData &state, bool const FirstHVACIteration, bool &InitLoopEquip, bool const GetCompSizFac)
+    void CompData::initLoopEquip(EnergyPlusData &state, bool const GetCompSizFac)
+    {
+        this->compPtr->onInitLoopEquip(state, this->location);
+        this->compPtr->getDesignCapacities(state, this->location, this->MaxLoad, this->MinLoad, this->OptLoad);
+        this->compPtr->getDesignTemperatures(this->TempDesCondIn, this->TempDesEvapOut);
+
+        if (GetCompSizFac) {
+            this->compPtr->getSizingFactor(this->SizFac);
+        }
+    }
+
+    void CompData::simulate(EnergyPlusData &state, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -114,33 +125,8 @@ namespace DataPlant {
         // If you add a module or new equipment type, you must set up this structure.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        if (this->compPtr != nullptr) {
-            if (InitLoopEquip) {
-                this->compPtr->onInitLoopEquip(state, this->location);
-                this->compPtr->getDesignCapacities(state, this->location, this->MaxLoad, this->MinLoad, this->OptLoad);
-                this->compPtr->getDesignTemperatures(this->TempDesCondIn, this->TempDesEvapOut);
 
-                if (GetCompSizFac) {
-                    this->compPtr->getSizingFactor(this->SizFac);
-                }
-
-                // KLUGEY HACK ALERT!!!
-                // Some components before transition were never checking InitLoopEquip, and each call to SimXYZ would actually just pass through the
-                // calculation Other components, on the other hand, would check InitLoopEquip, do a few things, then exit early without doing any
-                // calculation This may be wrong...but during this transition, it would be very nice to keep no diffs Thus, I will return here for all
-                // components that actually returned after their onInitLoopEquip stuff
-                //   and I will fall through and actually call simulate on the components that did that before
-                // I anticipate the list of components that fall through to be very small, so that is the check I will do.
-                // If std::find returns the .end() iterator, that means it didn't find it in the list, which means it's not one of the ones to fall
-                // through, so RETURN
-                if (std::find(state.dataPlnt->compsToSimAfterInitLoopEquip.begin(),
-                              state.dataPlnt->compsToSimAfterInitLoopEquip.end(),
-                              this->TypeOf_Num) == state.dataPlnt->compsToSimAfterInitLoopEquip.end()) {
-                    return;
-                }
-            }
-            this->compPtr->simulate(state, this->location, FirstHVACIteration, this->MyLoad, this->ON);
-        }
+        this->compPtr->simulate(state, this->location, FirstHVACIteration, this->MyLoad, this->ON);
     }
 
 } // namespace DataPlant
