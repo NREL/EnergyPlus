@@ -120,6 +120,7 @@ namespace Boilers {
         Real64 FaultyBoilerFoulingFactor; // Boiler fouling factor
         std::string EndUseSubcategory;    // identifier use for the end use subcategory
         bool MyEnvrnFlag;
+        bool MyFlag;
 
         Real64 FuelUsed;           // W - Boiler fuel used
         Real64 ParasiticElecPower; // W - Parasitic electrical power (e.g. forced draft fan)
@@ -145,7 +146,7 @@ namespace Boilers {
               OptPartLoadRat(0.0), OperPartLoadRat(0.0), CurveTempMode(TempMode::NOTSET), EfficiencyCurvePtr(0), TempUpLimitBoilerOut(0.0),
               ParasiticElecLoad(0.0), EffCurveOutputError(0), EffCurveOutputIndex(0), CalculatedEffError(0), CalculatedEffIndex(0),
               IsThisSized(false), FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0), MyEnvrnFlag(true),
-              FuelUsed(0.0), ParasiticElecPower(0.0), BoilerLoad(0.0), BoilerMassFlowRate(0.0), BoilerOutletTemp(0.0), BoilerPLR(0.0),
+              MyFlag(true), FuelUsed(0.0), ParasiticElecPower(0.0), BoilerLoad(0.0), BoilerMassFlowRate(0.0), BoilerOutletTemp(0.0), BoilerPLR(0.0),
               BoilerEff(0.0), BoilerEnergy(0.0), FuelConsumed(0.0), BoilerInletTemp(0.0), ParasiticElecConsumption(0.0),
               BoilerFuelTypeForOutputVariable("")
         {
@@ -170,8 +171,6 @@ namespace Boilers {
         void SetupOutputVars(EnergyPlusData &state);
 
         void oneTimeInit(EnergyPlusData &state) override;
-
-        void oneTimeInit_new(EnergyPlusData &state) override;
 
         void initEachEnvironment(EnergyPlusData &state);
 
