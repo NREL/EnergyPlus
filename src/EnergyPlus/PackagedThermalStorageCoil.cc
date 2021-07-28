@@ -70,7 +70,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/HVACDXSystem.hh>
+#include <EnergyPlus/HVACUnitaryBypassVAV.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -1882,8 +1882,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                             "Cooling Coil Operating Mode Index",
                             OutputProcessor::Unit::None,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).CurControlMode,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).Name);
 
         // cCurrentModuleObject = "Coil:Cooling:DX:SingleSpeed:ThermalStorage"
@@ -1891,15 +1891,15 @@ void GetTESCoilInput(EnergyPlusData &state)
                             "Cooling Coil Total Cooling Rate",
                             OutputProcessor::Unit::W,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).EvapTotCoolingRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).Name);
         SetupOutputVariable(state,
                             "Cooling Coil Total Cooling Energy",
                             OutputProcessor::Unit::J,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).EvapTotCoolingEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).Name,
                             _,
                             "ENERGYTRANSFER",
@@ -1910,43 +1910,43 @@ void GetTESCoilInput(EnergyPlusData &state)
                             "Cooling Coil Sensible Cooling Rate",
                             OutputProcessor::Unit::W,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).EvapSensCoolingRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).Name);
         SetupOutputVariable(state,
                             "Cooling Coil Sensible Cooling Energy",
                             OutputProcessor::Unit::J,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).EvapSensCoolingEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).Name);
         SetupOutputVariable(state,
                             "Cooling Coil Latent Cooling Rate",
                             OutputProcessor::Unit::W,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).EvapLatCoolingRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).Name);
         SetupOutputVariable(state,
                             "Cooling Coil Latent Cooling Energy",
                             OutputProcessor::Unit::J,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).EvapLatCoolingEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).Name);
         SetupOutputVariable(state,
                             "Cooling Coil Electricity Rate",
                             OutputProcessor::Unit::W,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).ElecCoolingPower,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).Name);
         SetupOutputVariable(state,
                             "Cooling Coil Electricity Energy",
                             OutputProcessor::Unit::J,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).ElecCoolingEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).Name,
                             _,
                             "Electricity",
@@ -1958,15 +1958,15 @@ void GetTESCoilInput(EnergyPlusData &state)
                             "Cooling Coil Runtime Fraction",
                             OutputProcessor::Unit::None,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).RuntimeFraction,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).Name);
         SetupOutputVariable(state,
                             "Cooling Coil Cold Weather Protection Electricity Energy",
                             OutputProcessor::Unit::J,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).ElectColdWeatherEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).Name,
                             _,
                             "Electricity",
@@ -1977,40 +1977,40 @@ void GetTESCoilInput(EnergyPlusData &state)
                             "Cooling Coil Cold Weather Protection Electricity Rate",
                             OutputProcessor::Unit::W,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).ElectColdWeatherPower,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).Name);
 
         SetupOutputVariable(state,
                             "Cooling Coil Thermal Storage Mechanical Heat Transfer Rate",
                             OutputProcessor::Unit::W,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).QdotTES,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).Name);
 
         SetupOutputVariable(state,
                             "Cooling Coil Thermal Storage Mechanical Heat Transfer Energy",
                             OutputProcessor::Unit::J,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).Q_TES,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).Name);
 
         SetupOutputVariable(state,
                             "Cooling Coil Thermal Storage Ambient Heat Transfer Rate",
                             OutputProcessor::Unit::W,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).QdotAmbient,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).Name);
 
         SetupOutputVariable(state,
                             "Cooling Coil Thermal Storage Ambient Heat Transfer Energy",
                             OutputProcessor::Unit::J,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).Q_Ambient,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).Name);
 
         if (state.dataPackagedThermalStorageCoil->TESCoil(item).TESPlantConnectionAvailable) {
@@ -2018,15 +2018,15 @@ void GetTESCoilInput(EnergyPlusData &state)
                                 "Cooling Coil Thermal Storage Plant Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataPackagedThermalStorageCoil->TESCoil(item).QdotPlant,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPackagedThermalStorageCoil->TESCoil(item).Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Thermal Storage Plant Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataPackagedThermalStorageCoil->TESCoil(item).Q_Plant,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataPackagedThermalStorageCoil->TESCoil(item).Name);
         }
 
@@ -2035,8 +2035,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                                 "Cooling Coil Condenser Inlet Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataPackagedThermalStorageCoil->TESCoil(item).CondInletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPackagedThermalStorageCoil->TESCoil(item).Name);
 
             if (state.dataPackagedThermalStorageCoil->TESCoil(item).EvapWaterSupplyMode == iWaterSupply::WaterSupplyFromMains) {
@@ -2044,8 +2044,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                                     "Cooling Coil Evaporative Condenser Water Volume",
                                     OutputProcessor::Unit::m3,
                                     state.dataPackagedThermalStorageCoil->TESCoil(item).EvapWaterConsump,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     state.dataPackagedThermalStorageCoil->TESCoil(item).Name,
                                     _,
                                     "Water",
@@ -2056,8 +2056,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                                     "Cooling Coil Evaporative Condenser Mains Supply Water Volume",
                                     OutputProcessor::Unit::m3,
                                     state.dataPackagedThermalStorageCoil->TESCoil(item).EvapWaterConsump,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     state.dataPackagedThermalStorageCoil->TESCoil(item).Name,
                                     _,
                                     "MainsWater",
@@ -2069,8 +2069,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                                     "Cooling Coil Evaporative Condenser Storage Tank Water Volume",
                                     OutputProcessor::Unit::m3,
                                     state.dataPackagedThermalStorageCoil->TESCoil(item).EvapWaterConsump,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     state.dataPackagedThermalStorageCoil->TESCoil(item).Name,
                                     _,
                                     "Water",
@@ -2081,8 +2081,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                                     "Cooling Coil Evaporative Condenser Starved Water Volume",
                                     OutputProcessor::Unit::m3,
                                     state.dataPackagedThermalStorageCoil->TESCoil(item).EvapWaterStarvMakup,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     state.dataPackagedThermalStorageCoil->TESCoil(item).Name,
                                     _,
                                     "Water",
@@ -2093,8 +2093,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                                     "Cooling Coil Evaporative Condenser Starved Mains Water Volume",
                                     OutputProcessor::Unit::m3,
                                     state.dataPackagedThermalStorageCoil->TESCoil(item).EvapWaterStarvMakup,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     state.dataPackagedThermalStorageCoil->TESCoil(item).Name,
                                     _,
                                     "MainsWater",
@@ -2107,15 +2107,15 @@ void GetTESCoilInput(EnergyPlusData &state)
                                 "Cooling Coil Evaporative Condenser Pump Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataPackagedThermalStorageCoil->TESCoil(item).EvapCondPumpElecPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPackagedThermalStorageCoil->TESCoil(item).Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Evaporative Condenser Pump Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataPackagedThermalStorageCoil->TESCoil(item).EvapCondPumpElecConsumption,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataPackagedThermalStorageCoil->TESCoil(item).Name,
                                 _,
                                 "Electricity",
@@ -2127,15 +2127,15 @@ void GetTESCoilInput(EnergyPlusData &state)
                                 "Cooling Coil Basin Heater Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataPackagedThermalStorageCoil->TESCoil(item).ElectEvapCondBasinHeaterPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPackagedThermalStorageCoil->TESCoil(item).Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Basin Heater Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataPackagedThermalStorageCoil->TESCoil(item).ElectEvapCondBasinHeaterEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataPackagedThermalStorageCoil->TESCoil(item).Name,
                                 _,
                                 "Electricity",
@@ -2149,8 +2149,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                                 "Cooling Coil Fluid Thermal Storage End Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataPackagedThermalStorageCoil->TESCoil(item).FluidTankTempFinal,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPackagedThermalStorageCoil->TESCoil(item).Name);
 
         } else if (state.dataPackagedThermalStorageCoil->TESCoil(item).StorageMedia == iMedia::IceBased) {
@@ -2158,8 +2158,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                                 "Cooling Coil Ice Thermal Storage End Fraction",
                                 OutputProcessor::Unit::None,
                                 state.dataPackagedThermalStorageCoil->TESCoil(item).IceFracRemain,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPackagedThermalStorageCoil->TESCoil(item).Name);
         }
     }
@@ -4722,23 +4722,23 @@ void CalcTESCoilDischargeOnlyMode(EnergyPlusData &state, int const TESCoilNum, R
 
 void ControlTESIceStorageTankCoil(
     EnergyPlusData &state,
-    std::string const &CoilName,               // child object coil name
-    int CoilIndex,                             // child object coil index
-    std::string SystemType,                    // parent object system type
-    int const FanOpMode,                       // parent object fan operating mode
-    Real64 const DesiredOutletTemp,            // desired outlet temperature [C]
-    Real64 const DesiredOutletHumRat,          // desired outlet humidity ratio [kg/kg]
-    Real64 &PartLoadFrac,                      // value based on coil operation, if possible, as PLR required to meet T or w set point
-    int &TESOpMode,                            // value determined in InitTESCoil and passed back to parent for use in iteration routines
-    HVACDXSystem::DehumidControl &ControlType, // parent object dehumidification control type (e.g., None, Multimode, CoolReheat)
-    int &SensPLRIter,                          // iteration number of Sensible PLR Iteration warning message
-    int &SensPLRIterIndex,                     // index to Sensible PLR Iteration warning message
-    int &SensPLRFail,                          // iteration number of Sensible PLR Iteration fail warning message
-    int &SensPLRFailIndex,                     // index to Sensible PLR Iteration fail warning message
-    int &LatPLRIter,                           // iteration number of Latent PLR Iteration warning message
-    int &LatPLRIterIndex,                      // index to Latent PLR Iteration warning message
-    int &LatPLRFail,                           // iteration number of Latent PLR Iteration fail warning message
-    int &LatPLRFailIndex                       // index to Latent PLR Iteration fail warning message
+    std::string const &CoilName,                       // child object coil name
+    int CoilIndex,                                     // child object coil index
+    std::string SystemType,                            // parent object system type
+    int const FanOpMode,                               // parent object fan operating mode
+    Real64 const DesiredOutletTemp,                    // desired outlet temperature [C]
+    Real64 const DesiredOutletHumRat,                  // desired outlet humidity ratio [kg/kg]
+    Real64 &PartLoadFrac,                              // value based on coil operation, if possible, as PLR required to meet T or w set point
+    int &TESOpMode,                                    // value determined in InitTESCoil and passed back to parent for use in iteration routines
+    HVACUnitaryBypassVAV::DehumidControl &ControlType, // parent object dehumidification control type (e.g., None, Multimode, CoolReheat)
+    int &SensPLRIter,                                  // iteration number of Sensible PLR Iteration warning message
+    int &SensPLRIterIndex,                             // index to Sensible PLR Iteration warning message
+    int &SensPLRFail,                                  // iteration number of Sensible PLR Iteration fail warning message
+    int &SensPLRFailIndex,                             // index to Sensible PLR Iteration fail warning message
+    int &LatPLRIter,                                   // iteration number of Latent PLR Iteration warning message
+    int &LatPLRIterIndex,                              // index to Latent PLR Iteration warning message
+    int &LatPLRFail,                                   // iteration number of Latent PLR Iteration fail warning message
+    int &LatPLRFailIndex                               // index to Latent PLR Iteration fail warning message
 )
 {
 
@@ -4868,7 +4868,8 @@ void ControlTESIceStorageTankCoil(
             // If humidity setpoint is not satisfied and humidity control type is CoolReheat,
             // then overcool to meet moisture load
 
-            if ((OutletHumRatDXCoil > DesiredOutletHumRat) && (PartLoadFrac < 1.0) && (ControlType == HVACDXSystem::DehumidControl::CoolReheat)) {
+            if ((OutletHumRatDXCoil > DesiredOutletHumRat) && (PartLoadFrac < 1.0) &&
+                (ControlType == HVACUnitaryBypassVAV::DehumidControl::CoolReheat)) {
                 //           IF NoLoadHumRatOut is lower than (more dehumidification than required) or very near the DesOutHumRat,
                 //           do not run the compressor
                 if ((NoLoadHumRatOut - DesiredOutletHumRat) < HumRatAcc) {

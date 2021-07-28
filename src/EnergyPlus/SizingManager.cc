@@ -2915,18 +2915,11 @@ void GetZoneSizingInput(EnergyPlusData &state)
                 //      \units C
                 //      \note Zone Cooling Design Supply Air Temperature is only used when Zone Cooling Design
                 //      \note Supply Air Temperature Input Method = SupplyAirTemperature
+                Real64 lowTempLimit = 0.0;
                 if (state.dataIPShortCut->lNumericFieldBlanks(1)) {
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).CoolDesTemp = 0.0;
-                } else if (state.dataIPShortCut->rNumericArgs(1) < 0.0 &&
-                           state.dataSize->ZoneSizingInput(ZoneSizIndex).ZnCoolDgnSAMethod == SupplyAirTemperature) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
-                    ShowContinueError(state,
-                                      format("... incorrect {}=[{:.2R}],  value should not be negative.",
-                                             state.dataIPShortCut->cNumericFieldNames(1),
-                                             state.dataIPShortCut->rNumericArgs(1)));
-                    ErrorsFound = true;
-                } else if (state.dataIPShortCut->rNumericArgs(1) >= 0.0 &&
-                           state.dataSize->ZoneSizingInput(ZoneSizIndex).ZnCoolDgnSAMethod == SupplyAirTemperature) {
+                } else if (state.dataSize->ZoneSizingInput(ZoneSizIndex).ZnCoolDgnSAMethod == SupplyAirTemperature) {
+                    ReportTemperatureInputError(state, cCurrentModuleObject, 1, lowTempLimit, false, ErrorsFound);
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).CoolDesTemp = state.dataIPShortCut->rNumericArgs(1);
                 } else {
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).CoolDesTemp = 0.0;
@@ -2972,16 +2965,10 @@ void GetZoneSizingInput(EnergyPlusData &state)
                 //      \note Supply Air Temperature Input Method = SupplyAirTemperature
                 if (state.dataIPShortCut->lNumericFieldBlanks(3)) {
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).HeatDesTemp = 0.0;
-                } else if (state.dataIPShortCut->rNumericArgs(3) < 0.0 &&
-                           state.dataSize->ZoneSizingInput(ZoneSizIndex).ZnHeatDgnSAMethod == SupplyAirTemperature) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
-                    ShowContinueError(state,
-                                      format("... incorrect {}=[{:.2R}],  value should not be negative.",
-                                             state.dataIPShortCut->cNumericFieldNames(3),
-                                             state.dataIPShortCut->rNumericArgs(3)));
-                    ErrorsFound = true;
-                } else if (state.dataIPShortCut->rNumericArgs(3) >= 0.0 &&
-                           state.dataSize->ZoneSizingInput(ZoneSizIndex).ZnHeatDgnSAMethod == SupplyAirTemperature) {
+                } else if (state.dataSize->ZoneSizingInput(ZoneSizIndex).ZnHeatDgnSAMethod == SupplyAirTemperature) {
+                    ReportTemperatureInputError(state, cCurrentModuleObject, 1, lowTempLimit, false, ErrorsFound);
+                    ReportTemperatureInputError(
+                        state, cCurrentModuleObject, 1, state.dataSize->ZoneSizingInput(ZoneSizIndex).CoolDesTemp, true, ErrorsFound);
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).HeatDesTemp = state.dataIPShortCut->rNumericArgs(3);
                 } else {
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).HeatDesTemp = 0.0;
@@ -3377,6 +3364,32 @@ void GetZoneSizingInput(EnergyPlusData &state)
 
     if (ErrorsFound) {
         ShowFatalError(state, cCurrentModuleObject + ": Errors found in getting input. Program terminates.");
+    }
+}
+
+void ReportTemperatureInputError(
+    EnergyPlusData &state, std::string cObjectName, int const paramNum, Real64 comparisonTemperature, bool const shouldFlagSevere, bool &ErrorsFound)
+{
+    if (state.dataIPShortCut->rNumericArgs(1) < comparisonTemperature) {
+        if (shouldFlagSevere) { // heating supply air temperature is lower than cooling supply air temperature--not allowed
+            ShowSevereError(state, cObjectName + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" has invalid data.");
+            ShowContinueError(state,
+                              format("... incorrect {}=[{:.2R}] is less than {}=[{:.2R}]",
+                                     state.dataIPShortCut->cNumericFieldNames(paramNum),
+                                     state.dataIPShortCut->rNumericArgs(paramNum),
+                                     state.dataIPShortCut->cNumericFieldNames(paramNum - 2),
+                                     state.dataIPShortCut->rNumericArgs(paramNum - 2)));
+            ShowContinueError(state, format("This is not allowed.  Please check and revise your input."));
+            ErrorsFound = true;
+        } else { // then input is lower than comparison tempeature--just produce a warning for user to check input
+            ShowWarningError(state, cObjectName + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" has invalid data.");
+            ShowContinueError(state,
+                              format("... incorrect {}=[{:.2R}] is less than [{:.2R}]",
+                                     state.dataIPShortCut->cNumericFieldNames(paramNum),
+                                     state.dataIPShortCut->rNumericArgs(paramNum),
+                                     comparisonTemperature));
+            ShowContinueError(state, format("Please check your input to make sure this is correct."));
+        }
     }
 }
 
