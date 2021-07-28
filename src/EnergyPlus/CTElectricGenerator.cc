@@ -767,6 +767,7 @@ namespace CTElectricGenerator {
         auto constexpr RoutineName("InitICEngineGenerators");
         bool errFlag;
 
+        if (this->MyPlantScanFlag) { // this flag to be removed
             if (allocated(state.dataPlnt->PlantLoop) && this->HeatRecActive) {
                 errFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(state,
@@ -787,9 +788,15 @@ namespace CTElectricGenerator {
                 }
             }
 
-            this->setupOutputVars(state);
+            this->MyPlantScanFlag = false;
+        }
 
-        if (this->MySizeAndNodeInitFlag && this->HeatRecActive) {
+        if (this->MyFlag) {
+            this->setupOutputVars(state);
+            this->MyFlag = false;
+        }
+
+        if (this->MySizeAndNodeInitFlag && (!this->MyPlantScanFlag) && this->HeatRecActive) {
             int HeatRecInletNode = this->HeatRecInletNodeNum;
             int HeatRecOutletNode = this->HeatRecOutletNodeNum;
 
