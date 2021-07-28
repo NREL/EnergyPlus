@@ -16,11 +16,14 @@
 #include "../src/DirectionalDiffuseCell.hpp"
 #include "../src/LayerSingleComponent.hpp"
 #include "../src/MaterialDescription.hpp"
+#include "../src/Material.hpp"
 #include "../src/OpticalSurface.hpp"
-#include "../src/PerfectDiffuseCellDescription.hpp"
+#include "../src/FlatCellDescription.hpp"
 #include "../src/PerforatedCell.hpp"
 #include "../src/PerforatedCellDescription.hpp"
 #include "../src/ScatteringLayer.hpp"
+#include "../src/SpecularLayer.hpp"
+#include "../src/PhotovoltaicLayer.hpp"
 #include "../src/SpecularBSDFLayer.hpp"
 #include "../src/SpecularCell.hpp"
 #include "../src/SpecularCellDescription.hpp"
@@ -31,5 +34,7 @@
 #include "../src/VenetianSlat.hpp"
 #include "../src/WovenCell.hpp"
 #include "../src/WovenCellDescription.hpp"
+#include "../src/IScatteringLayer.hpp"
+#include "../src/ColorProperties.hpp"
 
 #endif

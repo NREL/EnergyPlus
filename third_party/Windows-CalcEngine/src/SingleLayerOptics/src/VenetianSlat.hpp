@@ -3,44 +3,53 @@
 
 #include <memory>
 
-namespace Viewer {
+namespace Viewer
+{
+    class CGeometry2D;
+    class CSegment2D;
 
-	class CGeometry2D;
-	class CSegment2D;
+}   // namespace Viewer
 
-}
+namespace SingleLayerOptics
+{
+    enum class SegmentsDirection
+    {
+        Positive,
+        Negative
+    };
 
-namespace SingleLayerOptics {
+    class CVenetianSlat
+    {
+    public:
+        CVenetianSlat(const double t_SlatWidth,
+                      const double t_SlatSpacing,
+                      const double t_SlatTiltAngle,
+                      const double t_CurvatureRadius,
+                      const size_t t_NumOfSegments,
+                      SegmentsDirection t_Direction);
 
-	enum class SegmentsDirection { Positive, Negative };
+        // Returns the geometry segments that are slats made of
+        std::shared_ptr<Viewer::CGeometry2D> geometry() const;
 
-	class CVenetianSlat {
-	public:
-		CVenetianSlat( const double t_SlatWidth, const double t_SlatSpacing, const double t_SlatTiltAngle,
-		               const double t_CurvatureRadius, const size_t t_NumOfSegments, SegmentsDirection t_Direction );
+        double slatWidth() const;
+        double slatSpacing() const;
+        double slatTiltAngle() const;
+        double curvatureRadius() const;
+        size_t numberOfSegments() const;
 
-		// Returns the geometry segments that are slats made of
-		std::shared_ptr< Viewer::CGeometry2D > geometry() const;
+    private:
+        void buildSlat();
 
-		double slatWidth() const;
-		double slatSpacing() const;
-		double slatTiltAngle() const;
-		double curvatureRadius() const;
-		size_t numberOfSegments() const;
+        double m_SlatWidth;
+        double m_SlatSpacing;
+        double m_SlatTiltAngle;
+        double m_CurvatureRadius;
+        size_t m_NumOfSlatSegments;
+        SegmentsDirection m_Direction;
 
-	private:
-		void buildSlat();
+        std::shared_ptr<Viewer::CGeometry2D> m_Geometry;
+    };
 
-		double m_SlatWidth;
-		double m_SlatSpacing;
-		double m_SlatTiltAngle;
-		double m_CurvatureRadius;
-		size_t m_NumOfSlatSegments;
-		SegmentsDirection m_Direction;
-
-		std::shared_ptr< Viewer::CGeometry2D > m_Geometry;
-	};
-
-}
+}   // namespace SingleLayerOptics
 
 #endif
