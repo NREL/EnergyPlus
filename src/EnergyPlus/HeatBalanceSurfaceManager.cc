@@ -4953,7 +4953,7 @@ void UpdateThermalHistories(EnergyPlusData &state)
     } // ...end of loop over all (heat transfer) surfaces...
 
     if (state.dataHeatBal->SimpleCTFOnly && !state.dataGlobal->AnyConstrOverridesInModel) {
-        for (int HistTermNum = Construction::MaxCTFTerms; HistTermNum >= 2; --HistTermNum) { // Tuned Linear indexing
+        for (int HistTermNum = state.dataHeatBal->MaxCTFTermsInModel + 1; HistTermNum >= 2; --HistTermNum) {
             state.dataHeatBalSurf->SurfInsideTempHist(HistTermNum) = state.dataHeatBalSurf->SurfInsideTempHist(HistTermNum - 1);
             state.dataHeatBalSurf->SurfOutsideTempHist(HistTermNum) = state.dataHeatBalSurf->SurfOutsideTempHist(HistTermNum - 1);
             state.dataHeatBalSurf->SurfInsideFluxHist(HistTermNum) = state.dataHeatBalSurf->SurfInsideFluxHist(HistTermNum - 1);
