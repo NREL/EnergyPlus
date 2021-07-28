@@ -325,6 +325,14 @@ namespace HeatBalanceManager {
         // Added SV 6/26/2013 to load scheduled surface gains
         GetScheduledSurfaceGains(state, ErrorsFound);
 
+        print(state.files.eio, "{}\n", "! <Representative Surface Assignment>,Surface Name,Representative Surface Name");
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            auto& RepSurfNum = state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum;
+            if (SurfNum != RepSurfNum) {
+                print(state.files.eio, " Representative Surface Assignment,{},{}\n", state.dataSurface->Surface(SurfNum).Name, state.dataSurface->Surface(RepSurfNum).Name);
+            }
+        }
+
         // Added TH 1/9/2009 to create thermochromic window constructions
         CreateTCConstructions(state, ErrorsFound);
 
