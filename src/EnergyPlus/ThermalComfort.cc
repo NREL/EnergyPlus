@@ -2270,7 +2270,7 @@ namespace ThermalComfort {
         }
 
         // If high temperature radiant heater present and on, then must account for this in MRT calculation
-        if (state.dataHeatBalFanSys->QdotRadHVACToPerson(state.dataThermalComforts->ZoneNum)) {
+        if (state.dataHeatBalFanSys->QdotRadHVACToPerson(state.dataThermalComforts->ZoneNum) > 0.0) {
             state.dataThermalComforts->RadTemp += DataGlobalConstants::KelvinConv; // Convert to Kelvin
             state.dataThermalComforts->RadTemp =
                 root_4(pow_4(state.dataThermalComforts->RadTemp) +
