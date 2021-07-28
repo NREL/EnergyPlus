@@ -427,8 +427,10 @@ void BoilerSpecs::SetupOutputVars(EnergyPlusData &state)
     }
 }
 
-void BoilerSpecs::oneTimeInit(EnergyPlusData &state)
+void BoilerSpecs::oneTimeInit_new(EnergyPlusData &state)
 {
+
+    this->SetupOutputVars(state);
     // Locate the boilers on the plant loops for later usage
     bool errFlag = false;
     PlantUtilities::ScanPlantLoopsForObject(state,
@@ -524,11 +526,6 @@ void BoilerSpecs::InitBoiler(EnergyPlusData &state) // number of the current boi
     // Uses the status flags to trigger initializations.
 
     // Init more variables
-    if (this->MyFlag) {
-        this->SetupOutputVars(state);
-        this->oneTimeInit(state);
-        this->MyFlag = false;
-    }
 
     if (this->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
         this->initEachEnvironment(state);
@@ -980,6 +977,10 @@ void BoilerSpecs::UpdateBoilerRecords(EnergyPlusData &state,
     this->BoilerEnergy = this->BoilerLoad * ReportingConstant;
     this->FuelConsumed = this->FuelUsed * ReportingConstant;
     this->ParasiticElecConsumption = this->ParasiticElecPower * ReportingConstant;
+}
+
+void BoilerSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
 }
 
 } // namespace EnergyPlus::Boilers
