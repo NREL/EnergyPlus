@@ -4780,6 +4780,7 @@ void UpdateFinalSurfaceHeatBalance(EnergyPlusData &state)
     bool CoolingPanelSysOn;   // true if a simple cooling panel is running
     bool SwimmingPoolOn;      // true if a pool is present (running)
 
+    ZeroQdotRadHVAC(state);
     UpdateRadSysSourceValAvg(state, LowTempRadSysOn);
     UpdateHTRadSourceValAvg(state, HighTempRadSysOn);
     UpdateBBRadSourceValAvg(state, HWBaseboardSysOn);
@@ -4793,6 +4794,16 @@ void UpdateFinalSurfaceHeatBalance(EnergyPlusData &state)
         // Call the outside and inside surface heat balances
         CalcHeatBalanceOutsideSurf(state);
         CalcHeatBalanceInsideSurf(state);
+    }
+}
+
+void ZeroQdotRadHVAC(EnergyPlusData &state)
+{
+    for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+        state.dataHeatBalSurf->QdotRadHVACInRepPerArea(SurfNum) = 0;
+    }
+    for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+        state.dataHeatBalFanSys->QdotRadHVACToPerson(ZoneNum) = 0;
     }
 }
 

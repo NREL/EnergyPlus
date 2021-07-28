@@ -125,6 +125,8 @@ namespace HeatBalanceSurfaceManager {
 
     void UpdateFinalSurfaceHeatBalance(EnergyPlusData &state);
 
+    void ZeroQdotRadHVAC(EnergyPlusData &state);
+
     void UpdateThermalHistories(EnergyPlusData &state);
 
     void CalculateZoneMRT(EnergyPlusData &state,
