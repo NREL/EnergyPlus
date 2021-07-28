@@ -1175,3 +1175,109 @@ TEST_F(EnergyPlusFixture, Battery_LiIonNmc_Simulate)
     battery.simulate(*state, powerCharge, powerDischarge, charging, discharging, socMax, socMin);
     ASSERT_NEAR(battery.stateOfChargeFraction(), 0.95, 0.1);
 }
+
+TEST_F(EnergyPlusFixture, simulateSimpleBucketModelTest)
+{
+    Real64 powerCharge;
+    Real64 powerDischarge;
+    bool charging;
+    bool discharging;
+    Real64 controlSOCMaxFracLimit;
+    Real64 controlSOCMinFracLimit;
+    Real64 ExpectedResult;
+
+    std::string const idf_objects = delimited_string({
+        "ElectricLoadCenter:Storage:Simple,",
+        "  BatterySimple,  !- Name",
+        "  ,               !- Availability Schedule Name",
+        "  ,               !- Zone Name",
+        "  ,               !- Radiative Fraction for Zone Heat Gains",
+        "  0.7,            !- Nominal Energetic Efficiency for Charging",
+        "  0.7,            !- Nominal Discharging Energetic Efficiency",
+        "  3600000.0,      !- Maximum Storage Capacity {J}",
+        "  10000.0,        !- Maximum Power for Discharging {W}",
+        "  10000.0,        !- Maximum Power for Charging {W}",
+        "  1800000.0;      !- Initial State of Charge {J}",
+    });
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    ElectricStorage battery{*state, "BatterySimple"};
+
+    // Test 1: charging, charging amount zero
+    charging = true;
+    discharging = false;
+    powerCharge = 0.0;
+    powerDischarge = 0.0;
+    controlSOCMinFracLimit = 0.0;
+    controlSOCMaxFracLimit = 1.0;
+    state->dataHVACGlobal->TimeStepSys = 0.25;
+    ExpectedResult = 0.0;
+    battery.simulate(*state, powerCharge, powerDischarge, charging, discharging, controlSOCMaxFracLimit, controlSOCMinFracLimit);
+    EXPECT_NEAR(powerCharge, ExpectedResult, 0.01);
+
+    // Test 2: charging, charging amount less than maximum
+    charging = true;
+    discharging = false;
+    powerCharge = 5000.0;
+    powerDischarge = 0.0;
+    controlSOCMinFracLimit = 0.0;
+    controlSOCMaxFracLimit = 1.0;
+    state->dataHVACGlobal->TimeStepSys = 0.25;
+    ExpectedResult = 5000.0;
+    battery.simulate(*state, powerCharge, powerDischarge, charging, discharging, controlSOCMaxFracLimit, controlSOCMinFracLimit);
+    EXPECT_NEAR(powerCharge, ExpectedResult, 0.01);
+
+    // Test 3: charging, charging amount higher than maximum
+    charging = true;
+    discharging = false;
+    powerCharge = 11000.0;
+    powerDischarge = 0.0;
+    controlSOCMinFracLimit = 0.0;
+    controlSOCMaxFracLimit = 1.0;
+    state->dataHVACGlobal->TimeStepSys = 0.25;
+    ExpectedResult = 5714.29;
+    battery.simulate(*state, powerCharge, powerDischarge, charging, discharging, controlSOCMaxFracLimit, controlSOCMinFracLimit);
+    EXPECT_NEAR(powerCharge, ExpectedResult, 0.01);
+
+    // Test 4: discharging, discharging amount zero
+    state->dataGlobal->HourOfDay = 1;
+    battery.timeCheckAndUpdate(*state);
+    charging = false;
+    discharging = true;
+    powerCharge = 0.0;
+    powerDischarge = 0.0;
+    controlSOCMinFracLimit = 0.0;
+    controlSOCMaxFracLimit = 1.0;
+    state->dataHVACGlobal->TimeStepSys = 0.25;
+    ExpectedResult = 0.0;
+    battery.simulate(*state, powerCharge, powerDischarge, charging, discharging, controlSOCMaxFracLimit, controlSOCMinFracLimit);
+    EXPECT_NEAR(powerDischarge, ExpectedResult, 0.01);
+
+    // Test 5: discharging, discharging amount less than maximum
+    // state->dataGlobal->HourOfDay = 1;
+    // battery.timeCheckAndUpdate(*state);
+    charging = false;
+    discharging = true;
+    powerCharge = 0.0;
+    powerDischarge = 1000.0;
+    controlSOCMinFracLimit = 0.0;
+    controlSOCMaxFracLimit = 1.0;
+    state->dataHVACGlobal->TimeStepSys = 0.25;
+    ExpectedResult = 1000.0;
+    battery.simulate(*state, powerCharge, powerDischarge, charging, discharging, controlSOCMaxFracLimit, controlSOCMinFracLimit);
+    EXPECT_NEAR(powerDischarge, ExpectedResult, 0.01);
+
+    // Test 6: discharging, discharging amount more than maximum
+    state->dataGlobal->HourOfDay = 1;
+    battery.timeCheckAndUpdate(*state);
+    charging = false;
+    discharging = true;
+    powerCharge = 0.0;
+    powerDischarge = 11000.0;
+    controlSOCMinFracLimit = 0.0;
+    controlSOCMaxFracLimit = 1.0;
+    state->dataHVACGlobal->TimeStepSys = 0.25;
+    ExpectedResult = 2800.0;
+    battery.simulate(*state, powerCharge, powerDischarge, charging, discharging, controlSOCMaxFracLimit, controlSOCMinFracLimit);
+    EXPECT_NEAR(powerDischarge, ExpectedResult, 0.01);
+}

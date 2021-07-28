@@ -3984,10 +3984,12 @@ void ElectricStorage::simulateSimpleBucketModel(EnergyPlusData &state,
             powerDischarge = maxPowerDraw_;
         }
         // now check if will empty this timestep, power draw is amplified by energetic effic
-        if ((lastTimeStepStateOfCharge_ - powerDischarge * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour /
-                                              energeticEfficDischarge_) <= (maxEnergyCapacity_ * controlSOCMinFracLimit)) {
-            powerDischarge = (lastTimeStepStateOfCharge_ - (maxEnergyCapacity_ * controlSOCMinFracLimit)) * energeticEfficDischarge_ /
-                             (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+        if (energeticEfficDischarge_ >= minEfficiency) {
+            if ((lastTimeStepStateOfCharge_ - powerDischarge * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour /
+                                                  energeticEfficDischarge_) <= (maxEnergyCapacity_ * controlSOCMinFracLimit)) {
+                powerDischarge = (lastTimeStepStateOfCharge_ - (maxEnergyCapacity_ * controlSOCMinFracLimit)) * energeticEfficDischarge_ /
+                                 (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+            }
         }
     }
 
