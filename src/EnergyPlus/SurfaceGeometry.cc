@@ -2592,14 +2592,12 @@ namespace SurfaceGeometry {
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
             // Initialize run time surface arrays
             state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->Surface(SurfNum).Construction;
+            state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum = SurfNum;
             // Automatic Surface Multipliers: Assign representative heat transfer surfaces
-            bool useAutomaticSurfaceMultipliers = true; // TODO: Replace with user input
-            if (useAutomaticSurfaceMultipliers) {
+            if (state.dataSurface->UseRepresentativeSurfaceCalculations) {
                 // Conditions where surface always needs to be unique
                 bool forceUniqueSurface = state.dataSurface->Surface(SurfNum).HasShadeControl || state.dataSurface->SurfWinAirflowSource(SurfNum);
-                if (forceUniqueSurface) {
-                    state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum = SurfNum;
-                } else {
+                if (!forceUniqueSurface) {
                     // Make hash key for this surface (used to determine uniqueness)
                     state.dataSurface->Surface(SurfNum).make_hash_key(state, SurfNum);
                     // Insert surface key into map. If key already exists, it will not be added.

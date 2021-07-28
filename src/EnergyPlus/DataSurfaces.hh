@@ -1472,6 +1472,9 @@ struct SurfacesData : BaseGlobalStruct
     Real64 GroundLevelZ = 0.0;            // Z value of ground level for solar refl calc (m)
     bool AirflowWindows = false;          // TRUE if one or more airflow windows
     bool ShadingTransmittanceVaries = false;   // overall, shading transmittance varies for the building
+
+    bool UseRepresentativeSurfaceCalculations = false; // Use Representative Surfaces for Calculations
+
     Array1D_int InsideGlassCondensationFlag;   // 1 if innermost glass inside surface temp < zone air dew point;  0 otherwise
     Array1D_int InsideFrameCondensationFlag;   // 1 if frame inside surface temp < zone air dew point; 0 otherwise
     Array1D_int InsideDividerCondensationFlag; // 1 if divider inside surface temp < zone air dew point;  0 otherwise
@@ -1791,6 +1794,7 @@ struct SurfacesData : BaseGlobalStruct
         this->GroundLevelZ = 0.0;
         this->AirflowWindows = false;
         this->ShadingTransmittanceVaries = false;
+        this->UseRepresentativeSurfaceCalculations = false;
         this->InsideGlassCondensationFlag.deallocate();
         this->InsideFrameCondensationFlag.deallocate();
         this->InsideDividerCondensationFlag.deallocate();
