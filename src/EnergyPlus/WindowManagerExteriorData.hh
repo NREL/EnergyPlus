@@ -86,7 +86,7 @@ namespace SingleLayerOptics {
 
 class CBSDFLayer;
 class CScatteringLayer;
-enum class BSDFHemisphere;
+enum class BSDFDirection;
 
 } // namespace SingleLayerOptics
 
@@ -102,7 +102,7 @@ namespace EnergyPlus {
 namespace WindowManager {
 
     // using IGU_BSDFLayers = std::vector< std::shared_ptr< SingleLayerOptics::CBSDFLayer > >;
-    using IGU_Layers = std::vector<std::shared_ptr<SingleLayerOptics::CScatteringLayer>>;
+    using IGU_Layers = std::vector<SingleLayerOptics::CScatteringLayer>;
     // Construction numbers in EnergyPlus are not stored in orders and it can contain wall numbers
     // in between. So we will just use map to store layers so that we get optimized search.
     // using LayersBSDF_Map = std::map< int, std::shared_ptr< IGU_BSDFLayers > >;
@@ -116,10 +116,10 @@ namespace WindowManager {
     std::pair<Real64, Real64> getWCECoordinates(EnergyPlusData &state,
                                                 const int t_SurfNum,
                                                 const DataVectorTypes::Vector &t_Ray,
-                                                const SingleLayerOptics::BSDFHemisphere t_Direction);
+                                                const SingleLayerOptics::BSDFDirection t_Direction);
 
     // Returns Theta and Phi coordinates of surface BSDF for current Sun position
-    std::pair<Real64, Real64> getSunWCEAngles(EnergyPlusData &state, const int t_SurfNum, const SingleLayerOptics::BSDFHemisphere t_Direction);
+    std::pair<Real64, Real64> getSunWCEAngles(EnergyPlusData &state, const int t_SurfNum, const SingleLayerOptics::BSDFDirection t_Direction);
 
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCESpecturmProperties
@@ -129,8 +129,8 @@ namespace WindowManager {
     public:
         static std::shared_ptr<SpectralAveraging::CSpectralSampleData> getSpectralSample(EnergyPlusData &state, int const t_SampleDataPtr);
         static std::shared_ptr<SpectralAveraging::CSpectralSampleData> getSpectralSample(Material::MaterialProperties const &t_MaterialProperties);
-        static std::shared_ptr<FenestrationCommon::CSeries> getDefaultSolarRadiationSpectrum(EnergyPlusData &state);
-        static std::shared_ptr<FenestrationCommon::CSeries> getDefaultVisiblePhotopicResponse(EnergyPlusData &state);
+        static FenestrationCommon::CSeries getDefaultSolarRadiationSpectrum(EnergyPlusData &state);
+        static FenestrationCommon::CSeries getDefaultVisiblePhotopicResponse(EnergyPlusData &state);
     };
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -142,9 +142,7 @@ namespace WindowManager {
     public:
         static CWindowConstructionsSimplified &instance();
 
-        void pushLayer(FenestrationCommon::WavelengthRange const t_Range,
-                       int const t_ConstrNum,
-                       std::shared_ptr<SingleLayerOptics::CScatteringLayer> const &t_Layer);
+        void pushLayer(FenestrationCommon::WavelengthRange const t_Range, int const t_ConstrNum, const SingleLayerOptics::CScatteringLayer &t_Layer);
 
         std::shared_ptr<MultiLayerOptics::CMultiLayerScattered>
         getEquivalentLayer(EnergyPlusData &state, FenestrationCommon::WavelengthRange const t_Range, int const t_ConstrNum);

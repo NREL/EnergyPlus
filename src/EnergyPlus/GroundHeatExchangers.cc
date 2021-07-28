@@ -2631,18 +2631,55 @@ void GetGroundHeatExchangerInput(EnergyPlusData &state)
 
 void GLHEBase::setupOutput(EnergyPlusData &state)
 {
-    SetupOutputVariable(
-        state, "Ground Heat Exchanger Average Borehole Temperature", OutputProcessor::Unit::C, this->bhTemp, "System", "Average", this->name);
-    SetupOutputVariable(state, "Ground Heat Exchanger Heat Transfer Rate", OutputProcessor::Unit::W, this->QGLHE, "System", "Average", this->name);
-    SetupOutputVariable(state, "Ground Heat Exchanger Inlet Temperature", OutputProcessor::Unit::C, this->inletTemp, "System", "Average", this->name);
-    SetupOutputVariable(
-        state, "Ground Heat Exchanger Outlet Temperature", OutputProcessor::Unit::C, this->outletTemp, "System", "Average", this->name);
-    SetupOutputVariable(
-        state, "Ground Heat Exchanger Mass Flow Rate", OutputProcessor::Unit::kg_s, this->massFlowRate, "System", "Average", this->name);
-    SetupOutputVariable(
-        state, "Ground Heat Exchanger Average Fluid Temperature", OutputProcessor::Unit::C, this->aveFluidTemp, "System", "Average", this->name);
-    SetupOutputVariable(
-        state, "Ground Heat Exchanger Farfield Ground Temperature", OutputProcessor::Unit::C, this->tempGround, "System", "Average", this->name);
+    SetupOutputVariable(state,
+                        "Ground Heat Exchanger Average Borehole Temperature",
+                        OutputProcessor::Unit::C,
+                        this->bhTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
+    SetupOutputVariable(state,
+                        "Ground Heat Exchanger Heat Transfer Rate",
+                        OutputProcessor::Unit::W,
+                        this->QGLHE,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
+    SetupOutputVariable(state,
+                        "Ground Heat Exchanger Inlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->inletTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
+    SetupOutputVariable(state,
+                        "Ground Heat Exchanger Outlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->outletTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
+    SetupOutputVariable(state,
+                        "Ground Heat Exchanger Mass Flow Rate",
+                        OutputProcessor::Unit::kg_s,
+                        this->massFlowRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
+    SetupOutputVariable(state,
+                        "Ground Heat Exchanger Average Fluid Temperature",
+                        OutputProcessor::Unit::C,
+                        this->aveFluidTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
+    SetupOutputVariable(state,
+                        "Ground Heat Exchanger Farfield Ground Temperature",
+                        OutputProcessor::Unit::C,
+                        this->tempGround,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
 }
 
 //******************************************************************************
