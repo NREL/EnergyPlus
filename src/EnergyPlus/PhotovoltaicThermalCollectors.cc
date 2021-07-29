@@ -1117,10 +1117,6 @@ namespace PhotovoltaicThermalCollectors {
     }
     void PVTCollectorStruct::oneTimeInit(EnergyPlusData &state)
     {
-    }
-
-    void PVTCollectorStruct::oneTimeInit_new(EnergyPlusData &state)
-    {
 
         this->setupReportVars(state);
 
