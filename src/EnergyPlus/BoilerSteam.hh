@@ -98,6 +98,7 @@ namespace BoilerSteam {
         int PressErrIndex;                          // index pointer for recurring errors
         int FluidIndex;                             // Steam index
         std::string EndUseSubcategory;              // identifier use for the end use subcategory
+        bool myFlag;
         bool myEnvrnFlag;
 
         Real64 FuelUsed;           // W - Boiler fuel used
@@ -118,9 +119,9 @@ namespace BoilerSteam {
               DesMassFlowRate(0.0), MassFlowRate(0.0), NomCap(0.0), NomCapWasAutoSized(false), NomEffic(0.0), MinPartLoadRat(0.0),
               MaxPartLoadRat(0.0), OptPartLoadRat(0.0), OperPartLoadRat(0.0), TempUpLimitBoilerOut(0.0), BoilerMaxOperPress(0.0),
               BoilerPressCheck(0.0), SizFac(0.0), BoilerInletNodeNum(0), BoilerOutletNodeNum(0), FullLoadCoef(3, 0.0), TypeNum(0), LoopNum(0),
-              LoopSideNum(0), BranchNum(0), CompNum(0), PressErrIndex(0), FluidIndex(0), myEnvrnFlag(true), FuelUsed(0.0), BoilerLoad(0.0),
-              BoilerEff(0.0), BoilerMassFlowRate(0.0), BoilerOutletTemp(0.0), BoilerEnergy(0.0), FuelConsumed(0.0), BoilerInletTemp(0.0),
-              BoilerFuelTypeForOutputVariable("")
+              LoopSideNum(0), BranchNum(0), CompNum(0), PressErrIndex(0), FluidIndex(0), myFlag(true), myEnvrnFlag(true), FuelUsed(0.0),
+              BoilerLoad(0.0), BoilerEff(0.0), BoilerMassFlowRate(0.0), BoilerOutletTemp(0.0), BoilerEnergy(0.0), FuelConsumed(0.0),
+              BoilerInletTemp(0.0), BoilerFuelTypeForOutputVariable("")
         {
         }
 
@@ -157,8 +158,6 @@ namespace BoilerSteam {
         void getSizingFactor(Real64 &sizFac) override;
 
         void oneTimeInit(EnergyPlusData &state) override;
-
-        void oneTimeInit_new(EnergyPlusData &state) override;
 
         void initEachEnvironment(EnergyPlusData &state);
 

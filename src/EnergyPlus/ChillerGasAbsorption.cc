@@ -1079,7 +1079,7 @@ void GasAbsorberSpecs::initialize(EnergyPlusData &state)
             state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->HWLoopNum).TempSetPointNodeNum).TempSetPointLo;
     }
 
-    if ((this->isWaterCooled) && ((this->InHeatingMode) || (this->InCoolingMode))) {
+    if ((this->isWaterCooled) && ((this->InHeatingMode) || (this->InCoolingMode)) ) {
         mdot = this->DesCondMassFlowRate;
 
         PlantUtilities::SetComponentFlowRate(

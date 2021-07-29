@@ -310,10 +310,8 @@ namespace BoilerSteam {
         }
     }
 
-    void BoilerSpecs::oneTimeInit_new(EnergyPlusData &state)
+    void BoilerSpecs::oneTimeInit(EnergyPlusData &state)
     {
-        this->setupOutputVars(state);
-
         bool errFlag = false;
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
@@ -412,6 +410,11 @@ namespace BoilerSteam {
         // Uses the status flags to trigger initializations.
 
         // Init more variables
+        if (this->myFlag) {
+            this->setupOutputVars(state);
+            this->oneTimeInit(state);
+            this->myFlag = false;
+        }
 
         if (state.dataGlobal->BeginEnvrnFlag && this->myEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
             this->initEachEnvironment(state);
@@ -888,10 +891,6 @@ namespace BoilerSteam {
         this->BoilerMassFlowRate = state.dataLoopNodes->Node(BoilerOutletNode).MassFlowRate;
         this->BoilerEnergy = this->BoilerLoad * ReportingConstant;
         this->FuelConsumed = this->FuelUsed * ReportingConstant;
-    }
-
-    void BoilerSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
-    {
     }
 
 } // namespace BoilerSteam
