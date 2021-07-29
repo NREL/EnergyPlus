@@ -8052,6 +8052,9 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
 
     } // ...end of main inside heat balance iteration loop (ends when Converged)
 
+    // Reset radiant HVAC heat gain rate output for next timestep
+    state.dataHeatBalSurf->QdotRadHVACInRepPerArea = 0.0;
+
     // Set various surface output variables and other record keeping - after iterations are complete - all HT surfaces
     for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
         int const firstSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceFirst;
