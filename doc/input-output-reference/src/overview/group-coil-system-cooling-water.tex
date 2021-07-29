@@ -85,12 +85,12 @@ This alpha field specifies if the coil system will operate to meet a sensible lo
 
 \paragraph{Field: Run on Latent Load}\label{field-run-on-latent-load-01}
 
-This alpha field specifies if the coil will operate to meet a latent load calculated from the air flow rate through the coil system, coil system entering air humidity ratio and coil system outlet node (control node) maximum humidity ratio setpoint. There are two valid choices, Yes or No. If Yes, the coil will run if there is a latent load. If both a sensible and latent load exist, the system will operate to maintain the temperature set point. When only a latent load exists, the system will operate to meet the maximum humidity ratio set point and requires the use of a heating coil and heating coil outlet node air temperature set point manager downstream of this cooling coil to maintain the temperature set point. If No, the coil will not run if there is only a latent load. The default is No.
+This alpha field specifies if the coil will operate to meet a latent load calculated from the air flow rate through the coil system, coil system entering air humidity ratio and coil system outlet node (control node) maximum humidity ratio setpoint. There are two valid choices, Yes or No. If Yes, the coil will run if there is a latent load. If both a sensible and latent load exist, the system will operate to maintain the temperature set point and then activate dehumidification control if needed. When only a latent load exists, the system will operate to meet the maximum humidity ratio set point and requires the use of a heating coil and heating coil outlet node air temperature set point manager downstream of this cooling coil to maintain the temperature set point. If No, the coil will not run if there is only a latent load. The default is No.
 
 
-\paragraph{Field: Minimum Air To Water Temperature Offset}\label{field-minimum-air-to-water-temperature-offset}
+\paragraph{Field: Minimum Air To Water Temperature Offset [deltaC]}\label{field-minimum-air-to-water-temperature-offset}
 
-The coil system will turn ON as required when coil entering air temperature is above coil entering water temperature by more than the amount of this offset. To model a waterside economizer connected to condenser loop an increased offset as desired. Default is 0.
+The coil system will turn ON as required when coil entering air temperature is above coil entering water temperature by more than the amount of this offset [deltaC]. To model a waterside economizer connected to condenser loop an increased offset as desired. Default is 0.
 
 
 Following is an example input for a coil system cooling water.
@@ -104,30 +104,6 @@ Following is an example input for a coil system cooling water.
     ,                        !- Availability Schedule Name
     Coil:Cooling:Water,      !- Cooling Coil Object Type
     Free Cooling Coil,       !- Cooling Coil Name
-    CoolReheat,              !- Dehumidification Control Type
-    Yes,                     !- Run on Sensible Load
-    Yes,                     !- Run on Latent Load
-    3.0;                     !- Minimum Air To Water Temperature Offset
-	
-  CoilSystem:Cooling:Water,
-    Unitary-Free-Cooling,    !- Name
-    Mixed Air Node,          !- Air Inlet Node Name
-    FreeClgCoil OutletNode,  !- Air Outlet Node Name
-    ,                        !- Availability Schedule Name
-    Coil:Cooling:Water:DetailedGeometry, !- Cooling Coil Object Type
-    Free Cooling Coil,       !- Cooling Coil Name
-    CoolReheat,              !- Dehumidification Control Type
-    Yes,                     !- Run on Sensible Load
-    Yes,                     !- Run on Latent Load
-    3.0;                     !- Minimum Air To Water Temperature Offset
-
-  CoilSystem:Cooling:Water,
-    Unitary-Free-Cooling,    !- Name
-    Mixed Air Node,          !- Air Inlet Node Name
-    DXACFurnace InletNode,   !- Air Outlet Node Name
-    ,                        !- Availability Schedule Name
-    CoilSystem:Cooling:Water:HeatExchangerAssisted, !- Cooling Coil Object Type
-    Free Cooling Coil HXA,   !- Cooling Coil Name
     CoolReheat,              !- Dehumidification Control Type
     Yes,                     !- Run on Sensible Load
     Yes,                     !- Run on Latent Load
