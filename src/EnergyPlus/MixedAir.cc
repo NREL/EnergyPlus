@@ -4519,12 +4519,10 @@ void VentilationMechanicalProps::CalcMechVentController(
                 if (this->SystemOAMethod == SOAM_ProportionalControlSchOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOcc ||
                     this->SystemOAMethod == SOAM_ProportionalControlDesOARate) {
                     SysOA = SysOA / SysEv;
-                } else if (this->SystemOAMethod == SOAM_VRP) {
+                } else if (this->SystemOAMethod == SOAM_VRP && state.dataSze->SysSizingRunDone) {
                     // Limit system OA to design OA minimum flow rate, as per ASHRAE Guideline 36-2018 Section 5.16.3.1
-                    if (state.dataSize->SysSizingRunDone) { // If no system sizing run is done (i.e. no Sizing:System) the design outdoor air flow
-                                                            // rate is not known
-                        SysOA = min(SysOAuc / SysEv, state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow);
-                    }
+                    // If no system sizing run is done (i.e. no Sizing:System) the design outdoor air flow rate is not known
+                    SysOA = min(SysOAuc / SysEv, state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow);
                 } else {
                     SysOA = SysOAuc / SysEv;
                 }
