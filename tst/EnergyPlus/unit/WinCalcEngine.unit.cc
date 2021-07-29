@@ -103,24 +103,27 @@ TEST_F(EnergyPlusFixture, DISABLED_WCEClear)
     auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance();
     auto solarLayer = aWinConstSimp.getEquivalentLayer(*state, FenestrationCommon::WavelengthRange::Solar, 1);
 
+    const auto minLambda{0.3};
+    const auto maxLambda{2.5};
+
     // Transmittance Front
     const auto Tfront = solarLayer->getPropertySimple(
-        FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Front, FenestrationCommon::Scattering::DirectDirect);
+        minLambda, maxLambda, FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Front, FenestrationCommon::Scattering::DirectDirect);
     EXPECT_NEAR(0.8239, Tfront, 1e-6);
 
     // Reflectance Front
     const auto Rfront = solarLayer->getPropertySimple(
-        FenestrationCommon::PropertySimple::R, FenestrationCommon::Side::Front, FenestrationCommon::Scattering::DirectDirect);
+        minLambda, maxLambda, FenestrationCommon::PropertySimple::R, FenestrationCommon::Side::Front, FenestrationCommon::Scattering::DirectDirect);
     EXPECT_NEAR(0.073578, Rfront, 1e-6);
 
     // Transmittance Back
     const auto Tback = solarLayer->getPropertySimple(
-        FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Back, FenestrationCommon::Scattering::DirectDirect);
+        minLambda, maxLambda, FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Back, FenestrationCommon::Scattering::DirectDirect);
     EXPECT_NEAR(0.8239, Tback, 1e-6);
 
     // Reflectance Back
     const auto Rback = solarLayer->getPropertySimple(
-        FenestrationCommon::PropertySimple::R, FenestrationCommon::Side::Back, FenestrationCommon::Scattering::DirectDirect);
+        minLambda, maxLambda, FenestrationCommon::PropertySimple::R, FenestrationCommon::Side::Back, FenestrationCommon::Scattering::DirectDirect);
     EXPECT_NEAR(0.073682, Rback, 1e-6);
 }
 
@@ -193,25 +196,28 @@ TEST_F(EnergyPlusFixture, DISABLED_WCEVenetian)
     auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance();
     auto solarLayer = aWinConstSimp.getEquivalentLayer(*state, FenestrationCommon::WavelengthRange::Solar, 1);
 
+    const auto minLambda{0.3};
+    const auto maxLambda{2.5};
+
     // Transmittance Front
     const auto Tfront = solarLayer->getPropertySimple(
-        FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Front, FenestrationCommon::Scattering::DirectDirect);
-    EXPECT_NEAR(0.047120, Tfront, 1e-6);
+        minLambda, maxLambda, FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Front, FenestrationCommon::Scattering::DirectDirect);
+    EXPECT_NEAR(0.823880, Tfront, 1e-6);
 
     // Reflectance Front
     const auto Rfront = solarLayer->getPropertySimple(
-        FenestrationCommon::PropertySimple::R, FenestrationCommon::Side::Front, FenestrationCommon::Scattering::DirectDirect);
+        minLambda, maxLambda, FenestrationCommon::PropertySimple::R, FenestrationCommon::Side::Front, FenestrationCommon::Scattering::DirectDirect);
     EXPECT_NEAR(0.073578, Rfront, 1e-6);
 
     // Transmittance Back
     const auto Tback = solarLayer->getPropertySimple(
-        FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Back, FenestrationCommon::Scattering::DirectDirect);
-    EXPECT_NEAR(0.047120, Tback, 1e-6);
+        minLambda, maxLambda, FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Back, FenestrationCommon::Scattering::DirectDirect);
+    EXPECT_NEAR(0.823900, Tback, 1e-6);
 
     // Reflectance Back
     const auto Rback = solarLayer->getPropertySimple(
-        FenestrationCommon::PropertySimple::R, FenestrationCommon::Side::Back, FenestrationCommon::Scattering::DirectDirect);
-    EXPECT_NEAR(0.000241, Rback, 1e-6);
+        minLambda, maxLambda, FenestrationCommon::PropertySimple::R, FenestrationCommon::Side::Back, FenestrationCommon::Scattering::DirectDirect);
+    EXPECT_NEAR(0.073680, Rback, 1e-6);
 }
 
 TEST_F(EnergyPlusFixture, DISABLED_WCEShade)
@@ -269,27 +275,30 @@ TEST_F(EnergyPlusFixture, DISABLED_WCEShade)
     auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance();
     auto solarLayer = aWinConstSimp.getEquivalentLayer(*state, FenestrationCommon::WavelengthRange::Solar, 1);
 
+    const auto minLambda{0.3};
+    const auto maxLambda{2.5};
+
     // Transmittance Front
     const auto Tfront_dir_dir = solarLayer->getPropertySimple(
-        FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Front, FenestrationCommon::Scattering::DirectDirect);
+        minLambda, maxLambda, FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Front, FenestrationCommon::Scattering::DirectDirect);
     EXPECT_NEAR(0.0, Tfront_dir_dir, 1e-6);
 
     const auto Tfront_dif = solarLayer->getPropertySimple(
-        FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Front, FenestrationCommon::Scattering::DiffuseDiffuse);
+        minLambda, maxLambda, FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Front, FenestrationCommon::Scattering::DiffuseDiffuse);
     EXPECT_NEAR(0.267510, Tfront_dif, 1e-6);
 
     // Reflectance Front
     const auto Rfront = solarLayer->getPropertySimple(
-        FenestrationCommon::PropertySimple::R, FenestrationCommon::Side::Front, FenestrationCommon::Scattering::DirectDirect);
+        minLambda, maxLambda, FenestrationCommon::PropertySimple::R, FenestrationCommon::Side::Front, FenestrationCommon::Scattering::DirectDirect);
     EXPECT_NEAR(0.073578, Rfront, 1e-6);
 
     // Transmittance Back
     const auto Tback = solarLayer->getPropertySimple(
-        FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Back, FenestrationCommon::Scattering::DirectDirect);
+        minLambda, maxLambda, FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Back, FenestrationCommon::Scattering::DirectDirect);
     EXPECT_NEAR(0.0, Tback, 1e-6);
 
     // Reflectance Back
     const auto Rback = solarLayer->getPropertySimple(
-        FenestrationCommon::PropertySimple::R, FenestrationCommon::Side::Back, FenestrationCommon::Scattering::DirectDirect);
+        minLambda, maxLambda, FenestrationCommon::PropertySimple::R, FenestrationCommon::Side::Back, FenestrationCommon::Scattering::DirectDirect);
     EXPECT_NEAR(0.0, Rback, 1e-6);
 }

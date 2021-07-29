@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 2.8.7 )
+cmake_minimum_required(VERSION 3.5)
 
 set( target_name MultiLayerOptics )
 
@@ -32,7 +32,7 @@ install(TARGETS ${target_name}
 
 if( BUILD_WCE_TESTING )
   include_directories( include )
-	file( GLOB all_test_src RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" tst/*.cpp )
+	file( GLOB all_test_src RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" tst/units/*.cpp )
 	set( test_src ${all_test_src} )
 	CREATE_TEST_TARGETS_WCE( ${target_name} "${test_src}" "" )
 endif ()
