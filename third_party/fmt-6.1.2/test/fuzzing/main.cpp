@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+
 #include "fuzzer_common.h"
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* Data, std::size_t Size);

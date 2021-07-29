@@ -1425,7 +1425,7 @@ namespace SurfaceGroundHeatExchanger {
         this->SurfEnergy = SurfaceArea * (state.dataSurfaceGroundHeatExchangers->TopSurfFlux + state.dataSurfaceGroundHeatExchangers->BtmSurfFlux) *
                            TimeStepSys * DataGlobalConstants::SecInHour;
     }
-    void SurfaceGroundHeatExchangerData::oneTimeInit_new(EnergyPlusData &state)
+    void SurfaceGroundHeatExchangerData::oneTimeInit(EnergyPlusData &state)
     {
         using DataPlant::TypeOf_GrndHtExchgSurface;
         using FluidProperties::GetDensityGlycol;
@@ -1463,9 +1463,6 @@ namespace SurfaceGroundHeatExchanger {
                            this->BranchNum,
                            this->CompNum);
         RegisterPlantCompDesignFlow(state, this->InletNodeNum, this->DesignMassFlowRate / rho);
-    }
-    void SurfaceGroundHeatExchangerData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
-    {
     }
 
 } // namespace SurfaceGroundHeatExchanger

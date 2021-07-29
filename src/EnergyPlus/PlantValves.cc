@@ -505,9 +505,6 @@ namespace PlantValves {
     void TemperValveData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
     {
     }
-    void TemperValveData::oneTimeInit_new([[maybe_unused]] EnergyPlusData &state)
-    {
-    }
 
 } // namespace PlantValves
 

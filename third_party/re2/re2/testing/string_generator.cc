@@ -11,16 +11,15 @@
 #include <string>
 #include <vector>
 
-#include "util/test.h"
-#include "util/logging.h"
 #include "re2/testing/string_generator.h"
+#include "util/logging.h"
+#include "util/test.h"
 
 namespace re2 {
 
 StringGenerator::StringGenerator(int maxlen,
-                                 const std::vector<std::string>& alphabet)
-    : maxlen_(maxlen), alphabet_(alphabet),
-      generate_null_(false),
+                                 const std::vector<std::string> &alphabet)
+    : maxlen_(maxlen), alphabet_(alphabet), generate_null_(false),
       random_(false), nrandom_(0) {
 
   // Degenerate case: no letters, no non-empty strings.
@@ -81,7 +80,7 @@ bool StringGenerator::RandomDigits() {
 // currently described by digits_.  Calls IncrementDigits
 // after computing the string, so that it knows the answer
 // for subsequent HasNext() calls.
-const StringPiece& StringGenerator::Next() {
+const StringPiece &StringGenerator::Next() {
   CHECK(hasnext_);
   if (generate_null_) {
     generate_null_ = false;
@@ -111,4 +110,4 @@ void StringGenerator::GenerateNULL() {
   hasnext_ = true;
 }
 
-}  // namespace re2
+} // namespace re2

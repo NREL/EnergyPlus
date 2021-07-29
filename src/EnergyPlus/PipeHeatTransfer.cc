@@ -910,7 +910,7 @@ void PipeHTData::ValidatePipeConstruction(EnergyPlusData &state,
     }
 }
 
-void PipeHTData::oneTimeInit_new(EnergyPlusData &state)
+void PipeHTData::oneTimeInit(EnergyPlusData &state)
 {
     bool errFlag = false;
     PlantUtilities::ScanPlantLoopsForObject(
@@ -1994,10 +1994,6 @@ Real64 PipeHTData::TBND(EnergyPlusData &state,
     TBND = this->groundTempModel->getGroundTempAtTimeInSeconds(state, z, curSimTime);
 
     return TBND;
-}
-
-void PipeHTData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
-{
 }
 
 //===============================================================================

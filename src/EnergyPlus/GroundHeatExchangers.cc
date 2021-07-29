@@ -3175,7 +3175,7 @@ void GLHEVert::initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 co
 
 //******************************************************************************
 
-void GLHEVert::oneTimeInit_new(EnergyPlusData &state)
+void GLHEVert::oneTimeInit(EnergyPlusData &state)
 {
 
     using DataPlant::TypeOf_GrndHtExchgSystem;
@@ -3188,9 +3188,6 @@ void GLHEVert::oneTimeInit_new(EnergyPlusData &state)
     if (errFlag) {
         ShowFatalError(state, "initGLHESimVars: Program terminated due to previous condition(s).");
     }
-}
-void GLHEVert::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
-{
 }
 
 //******************************************************************************
@@ -3262,7 +3259,7 @@ void GLHESlinky::initEnvironment(EnergyPlusData &state, Real64 const &CurTime)
 
 //******************************************************************************
 
-void GLHESlinky::oneTimeInit_new(EnergyPlusData &state)
+void GLHESlinky::oneTimeInit(EnergyPlusData &state)
 {
     using DataPlant::TypeOf_GrndHtExchgSlinky;
     using PlantUtilities::ScanPlantLoopsForObject;
@@ -3274,9 +3271,6 @@ void GLHESlinky::oneTimeInit_new(EnergyPlusData &state)
     if (errFlag) {
         ShowFatalError(state, "initGLHESimVars: Program terminated due to previous condition(s).");
     }
-}
-void GLHESlinky::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
-{
 }
 
 //******************************************************************************

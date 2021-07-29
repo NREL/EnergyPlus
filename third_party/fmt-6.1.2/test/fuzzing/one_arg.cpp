@@ -1,13 +1,14 @@
 // Copyright (c) 2019, Paul Dreik
 // License: see LICENSE.rst in the fmt root directory
 
+#include <fmt/chrono.h>
 #include <fmt/core.h>
+
 #include <cstdint>
 #include <stdexcept>
 #include <type_traits>
 #include <vector>
 
-#include <fmt/chrono.h>
 #include "fuzzer_common.h"
 
 using fmt_fuzzer::Nfixed;

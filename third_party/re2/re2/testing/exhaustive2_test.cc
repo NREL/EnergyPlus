@@ -4,22 +4,21 @@
 
 // Exhaustive testing of regular expression matching.
 
-#include <stddef.h>
 #include <memory>
+#include <stddef.h>
 #include <string>
 #include <vector>
 
-#include "util/test.h"
 #include "re2/re2.h"
 #include "re2/testing/exhaustive_tester.h"
+#include "util/test.h"
 
 namespace re2 {
 
 // Test empty string matches (aka "(?:)")
 TEST(EmptyString, Exhaustive) {
-  ExhaustiveTest(2, 2, Split(" ", "(?:) a"),
-                 RegexpGenerator::EgrepOps(),
-                 5, Split("", "ab"), "", "");
+  ExhaustiveTest(2, 2, Split(" ", "(?:) a"), RegexpGenerator::EgrepOps(), 5,
+                 Split("", "ab"), "", "");
 }
 
 // Test escaped versions of regexp syntax.
@@ -28,8 +27,8 @@ TEST(Punctuation, Literals) {
   std::vector<std::string> escaped = alphabet;
   for (size_t i = 0; i < escaped.size(); i++)
     escaped[i] = "\\" + escaped[i];
-  ExhaustiveTest(1, 1, escaped, RegexpGenerator::EgrepOps(),
-                 2, alphabet, "", "");
+  ExhaustiveTest(1, 1, escaped, RegexpGenerator::EgrepOps(), 2, alphabet, "",
+                 "");
 }
 
 // Test ^ $ . \A \z in presence of line endings.
@@ -37,8 +36,7 @@ TEST(Punctuation, Literals) {
 // they can be repeated -- PCRE rejects ^* but allows (?:^)*
 TEST(LineEnds, Exhaustive) {
   ExhaustiveTest(2, 2, Split(" ", "(?:^) (?:$) . a \\n (?:\\A) (?:\\z)"),
-                 RegexpGenerator::EgrepOps(),
-                 4, Explode("ab\n"), "", "");
+                 RegexpGenerator::EgrepOps(), 4, Explode("ab\n"), "", "");
 }
 
 // Test what does and does not match \n.
@@ -69,5 +67,4 @@ TEST(LineEnds, Exhaustive) {
 //                  4, Explode("a\n"), "");
 // }
 
-}  // namespace re2
-
+} // namespace re2

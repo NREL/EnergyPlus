@@ -3,10 +3,12 @@
 
 #include <fmt/chrono.h>
 #include <fmt/core.h>
+
 #include <cstdint>
 #include <stdexcept>
 #include <type_traits>
 #include <vector>
+
 #include "fuzzer_common.h"
 
 template <typename Item1>

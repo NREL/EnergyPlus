@@ -24,7 +24,7 @@ struct Options {
   Json::String path;
   Json::Features features;
   bool parseOnly;
-  using writeFuncType = Json::String (*)(Json::Value const&);
+  using writeFuncType = Json::String (*)(Json::Value const &);
   writeFuncType write;
 };
 
@@ -52,15 +52,15 @@ static Json::String normalizeFloatingPointStr(double value) {
   return s;
 }
 
-static Json::String readInputTestFile(const char* path) {
-  FILE* file = fopen(path, "rb");
+static Json::String readInputTestFile(const char *path) {
+  FILE *file = fopen(path, "rb");
   if (!file)
     return "";
   fseek(file, 0, SEEK_END);
   long const size = ftell(file);
   const auto usize = static_cast<size_t>(size);
   fseek(file, 0, SEEK_SET);
-  char* buffer = new char[size + 1];
+  char *buffer = new char[size + 1];
   buffer[size] = 0;
   Json::String text;
   if (fread(buffer, 1, usize, file) == usize)
@@ -70,8 +70,8 @@ static Json::String readInputTestFile(const char* path) {
   return text;
 }
 
-static void printValueTree(FILE* fout, Json::Value& value,
-                           const Json::String& path = ".") {
+static void printValueTree(FILE *fout, Json::Value &value,
+                           const Json::String &path = ".") {
   if (value.hasComment(Json::commentBefore)) {
     fprintf(fout, "%s\n", value.getComment(Json::commentBefore).c_str());
   }
@@ -124,11 +124,11 @@ static void printValueTree(FILE* fout, Json::Value& value,
   }
 }
 
-static int parseAndSaveValueTree(const Json::String& input,
-                                 const Json::String& actual,
-                                 const Json::String& kind,
-                                 const Json::Features& features, bool parseOnly,
-                                 Json::Value* root, bool use_legacy) {
+static int parseAndSaveValueTree(const Json::String &input,
+                                 const Json::String &actual,
+                                 const Json::String &kind,
+                                 const Json::Features &features, bool parseOnly,
+                                 Json::Value *root, bool use_legacy) {
   if (!use_legacy) {
     Json::CharReaderBuilder builder;
 
@@ -163,7 +163,7 @@ static int parseAndSaveValueTree(const Json::String& input,
   }
 
   if (!parseOnly) {
-    FILE* factual = fopen(actual.c_str(), "wt");
+    FILE *factual = fopen(actual.c_str(), "wt");
     if (!factual) {
       std::cerr << "Failed to create '" << kind << "' actual file."
                 << std::endl;
@@ -179,26 +179,26 @@ static int parseAndSaveValueTree(const Json::String& input,
 //   writer.enableYAMLCompatibility();
 //   return writer.write(root);
 // }
-static Json::String useStyledWriter(Json::Value const& root) {
+static Json::String useStyledWriter(Json::Value const &root) {
   Json::StyledWriter writer;
   return writer.write(root);
 }
-static Json::String useStyledStreamWriter(Json::Value const& root) {
+static Json::String useStyledStreamWriter(Json::Value const &root) {
   Json::StyledStreamWriter writer;
   Json::OStringStream sout;
   writer.write(sout, root);
   return sout.str();
 }
-static Json::String useBuiltStyledStreamWriter(Json::Value const& root) {
+static Json::String useBuiltStyledStreamWriter(Json::Value const &root) {
   Json::StreamWriterBuilder builder;
   return Json::writeString(builder, root);
 }
-static int rewriteValueTree(const Json::String& rewritePath,
-                            const Json::Value& root,
+static int rewriteValueTree(const Json::String &rewritePath,
+                            const Json::Value &root,
                             Options::writeFuncType write,
-                            Json::String* rewrite) {
+                            Json::String *rewrite) {
   *rewrite = write(root);
-  FILE* fout = fopen(rewritePath.c_str(), "wt");
+  FILE *fout = fopen(rewritePath.c_str(), "wt");
   if (!fout) {
     std::cerr << "Failed to create rewrite file: " << rewritePath << std::endl;
     return 2;
@@ -208,8 +208,8 @@ static int rewriteValueTree(const Json::String& rewritePath,
   return 0;
 }
 
-static Json::String removeSuffix(const Json::String& path,
-                                 const Json::String& extension) {
+static Json::String removeSuffix(const Json::String &path,
+                                 const Json::String &extension) {
   if (extension.length() >= path.length())
     return Json::String("");
   Json::String suffix = path.substr(path.length() - extension.length());
@@ -227,13 +227,13 @@ static void printConfig() {
 #endif
 }
 
-static int printUsage(const char* argv[]) {
+static int printUsage(const char *argv[]) {
   std::cout << "Usage: " << argv[0] << " [--strict] input-json-file"
             << std::endl;
   return 3;
 }
 
-static int parseCommandLine(int argc, const char* argv[], Options* opts) {
+static int parseCommandLine(int argc, const char *argv[], Options *opts) {
   opts->parseOnly = false;
   opts->write = &useStyledWriter;
   if (argc < 2) {
@@ -270,7 +270,7 @@ static int parseCommandLine(int argc, const char* argv[], Options* opts) {
   return 0;
 }
 
-static int runTest(Options const& opts, bool use_legacy) {
+static int runTest(Options const &opts, bool use_legacy) {
   int exitCode = 0;
 
   Json::String input = readInputTestFile(opts.path.c_str());
@@ -311,7 +311,7 @@ static int runTest(Options const& opts, bool use_legacy) {
   return exitCode;
 }
 
-int main(int argc, const char* argv[]) {
+int main(int argc, const char *argv[]) {
   Options opts;
   try {
     int exitCode = parseCommandLine(argc, argv, &opts);
@@ -331,7 +331,7 @@ int main(int argc, const char* argv[]) {
     if (should_run_legacy) {
       return runTest(opts, true);
     }
-  } catch (const std::exception& e) {
+  } catch (const std::exception &e) {
     std::cerr << "Unhandled exception:" << std::endl << e.what() << std::endl;
     return 1;
   }

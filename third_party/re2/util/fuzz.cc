@@ -7,9 +7,9 @@
 #include <stdlib.h>
 
 // Entry point for libFuzzer.
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size);
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size);
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   uint8_t data[32];
   for (int i = 0; i < 32; i++) {
     for (int j = 0; j < 32; j++) {

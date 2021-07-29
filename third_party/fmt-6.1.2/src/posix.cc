@@ -15,34 +15,34 @@
 #include <climits>
 
 #if FMT_USE_FCNTL
-#include <sys/stat.h>
-#include <sys/types.h>
+#  include <sys/stat.h>
+#  include <sys/types.h>
 
-#ifndef _WIN32
-#  include <unistd.h>
-#else
-#  ifndef WIN32_LEAN_AND_MEAN
-#    define WIN32_LEAN_AND_MEAN
-#  endif
-#  include <io.h>
-#  include <windows.h>
+#  ifndef _WIN32
+#    include <unistd.h>
+#  else
+#    ifndef WIN32_LEAN_AND_MEAN
+#      define WIN32_LEAN_AND_MEAN
+#    endif
+#    include <io.h>
+#    include <windows.h>
 
-#  define O_CREAT _O_CREAT
-#  define O_TRUNC _O_TRUNC
+#    define O_CREAT _O_CREAT
+#    define O_TRUNC _O_TRUNC
 
-#  ifndef S_IRUSR
-#    define S_IRUSR _S_IREAD
-#  endif
+#    ifndef S_IRUSR
+#      define S_IRUSR _S_IREAD
+#    endif
 
-#  ifndef S_IWUSR
-#    define S_IWUSR _S_IWRITE
-#  endif
+#    ifndef S_IWUSR
+#      define S_IWUSR _S_IWRITE
+#    endif
 
-#  ifdef __MINGW32__
-#    define _SH_DENYNO 0x40
-#  endif
-#endif  // _WIN32
-#endif  // FMT_USE_FCNTL
+#    ifdef __MINGW32__
+#      define _SH_DENYNO 0x40
+#    endif
+#  endif  // _WIN32
+#endif    // FMT_USE_FCNTL
 
 #ifdef fileno
 #  undef fileno
@@ -99,12 +99,12 @@ int buffered_file::fileno() const {
 #if FMT_USE_FCNTL
 file::file(cstring_view path, int oflag) {
   int mode = S_IRUSR | S_IWUSR;
-#if defined(_WIN32) && !defined(__MINGW32__)
+#  if defined(_WIN32) && !defined(__MINGW32__)
   fd_ = -1;
   FMT_POSIX_CALL(sopen_s(&fd_, path.c_str(), oflag, _SH_DENYNO, mode));
-#else
+#  else
   FMT_RETRY(fd_, FMT_POSIX_CALL(open(path.c_str(), oflag, mode)));
-#endif
+#  endif
   if (fd_ == -1)
     FMT_THROW(system_error(errno, "cannot open file {}", path.c_str()));
 }
@@ -126,7 +126,7 @@ void file::close() {
 }
 
 long long file::size() const {
-#ifdef _WIN32
+#  ifdef _WIN32
   // Use GetFileSize instead of GetFileSizeEx for the case when _WIN32_WINNT
   // is less than 0x0500 as is the case with some default MinGW builds.
   // Both functions support large file sizes.
@@ -140,7 +140,7 @@ long long file::size() const {
   }
   unsigned long long long_size = size_upper;
   return (long_size << sizeof(DWORD) * CHAR_BIT) | size_lower;
-#else
+#  else
   using Stat = struct stat;
   Stat file_stat = Stat();
   if (FMT_POSIX_CALL(fstat(fd_, &file_stat)) == -1)
@@ -148,7 +148,7 @@ long long file::size() const {
   static_assert(sizeof(long long) >= sizeof(file_stat.st_size),
                 "return type of file::size is not large enough");
   return file_stat.st_size;
-#endif
+#  endif
 }
 
 std::size_t file::read(void* buffer, std::size_t count) {
@@ -195,15 +195,15 @@ void file::pipe(file& read_end, file& write_end) {
   read_end.close();
   write_end.close();
   int fds[2] = {};
-#ifdef _WIN32
+#  ifdef _WIN32
   // Make the default pipe capacity same as on Linux 2.6.11+.
   enum { DEFAULT_CAPACITY = 65536 };
   int result = FMT_POSIX_CALL(pipe(fds, DEFAULT_CAPACITY, _O_BINARY));
-#else
+#  else
   // Don't retry as the pipe function doesn't return EINTR.
   // http://pubs.opengroup.org/onlinepubs/009696799/functions/pipe.html
   int result = FMT_POSIX_CALL(pipe(fds));
-#endif
+#  endif
   if (result != 0) FMT_THROW(system_error(errno, "cannot create pipe"));
   // The following assignments don't throw because read_fd and write_fd
   // are closed.
@@ -223,15 +223,15 @@ buffered_file file::fdopen(const char* mode) {
 }
 
 long getpagesize() {
-#ifdef _WIN32
+#  ifdef _WIN32
   SYSTEM_INFO si;
   GetSystemInfo(&si);
   return si.dwPageSize;
-#else
+#  else
   long size = FMT_POSIX_CALL(sysconf(_SC_PAGESIZE));
   if (size < 0) FMT_THROW(system_error(errno, "cannot get memory page size"));
   return size;
-#endif
+#  endif
 }
 #endif  // FMT_USE_FCNTL
 FMT_END_NAMESPACE

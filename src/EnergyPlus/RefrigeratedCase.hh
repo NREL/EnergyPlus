@@ -573,8 +573,6 @@ namespace RefrigeratedCase {
                       bool RunFlag) override;
 
         void oneTimeInit(EnergyPlusData &state) override;
-
-        void oneTimeInit_new(EnergyPlusData &state) override;
     };
 
     struct RefrigSystemData
@@ -1076,8 +1074,6 @@ namespace RefrigeratedCase {
                       bool RunFlag) override;
 
         void oneTimeInit(EnergyPlusData &state) override;
-
-        void oneTimeInit_new(EnergyPlusData &state) override;
     };
 
     struct RefrigGasCoolerData

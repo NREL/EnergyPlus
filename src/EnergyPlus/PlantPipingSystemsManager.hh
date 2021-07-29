@@ -708,8 +708,6 @@ namespace PlantPipingSystemsManager {
         static Circuit *factory(EnergyPlusData &state, std::string circuit, bool &errorsFound);
 
         void oneTimeInit(EnergyPlusData &state) override;
-
-        void oneTimeInit_new(EnergyPlusData &state) override;
     };
 
     struct ZoneCoupledSurfaceData

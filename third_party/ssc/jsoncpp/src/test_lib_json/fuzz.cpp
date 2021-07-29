@@ -16,7 +16,7 @@ namespace Json {
 class Exception;
 }
 
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   Json::CharReaderBuilder builder;
 
   if (size < sizeof(uint32_t)) {
@@ -45,10 +45,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
 
   Json::Value root;
-  const auto data_str = reinterpret_cast<const char*>(data);
+  const auto data_str = reinterpret_cast<const char *>(data);
   try {
     reader->parse(data_str, data_str + size, &root, nullptr);
-  } catch (Json::Exception const&) {
+  } catch (Json::Exception const &) {
   }
   // Whether it succeeded or not doesn't matter.
   return 0;

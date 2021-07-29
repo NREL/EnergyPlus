@@ -10,6 +10,7 @@
 // {fmt} support for ranges, containers and types tuple interface.
 
 #include "fmt/ranges.h"
+
 #include "gtest.h"
 
 // Check if  'if constexpr' is supported.

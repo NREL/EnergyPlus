@@ -80,14 +80,14 @@ TestResult::TestResult() {
   predicateStackTail_ = &rootPredicateNode_;
 }
 
-void TestResult::setTestName(const Json::String& name) { name_ = name; }
+void TestResult::setTestName(const Json::String &name) { name_ = name; }
 
-TestResult& TestResult::addFailure(const char* file, unsigned int line,
-                                   const char* expr) {
+TestResult &TestResult::addFailure(const char *file, unsigned int line,
+                                   const char *expr) {
   /// Walks the PredicateContext stack adding them to failures_ if not already
   /// added.
   unsigned int nestingLevel = 0;
-  PredicateContext* lastNode = rootPredicateNode_.next_;
+  PredicateContext *lastNode = rootPredicateNode_.next_;
   for (; lastNode != nullptr; lastNode = lastNode->next_) {
     if (lastNode->id_ > lastUsedPredicateId_) // new PredicateContext
     {
@@ -107,8 +107,8 @@ TestResult& TestResult::addFailure(const char* file, unsigned int line,
   return *this;
 }
 
-void TestResult::addFailureInfo(const char* file, unsigned int line,
-                                const char* expr, unsigned int nestingLevel) {
+void TestResult::addFailureInfo(const char *file, unsigned int line,
+                                const char *expr, unsigned int nestingLevel) {
   Failure failure;
   failure.file_ = file;
   failure.line_ = line;
@@ -119,13 +119,13 @@ void TestResult::addFailureInfo(const char* file, unsigned int line,
   failures_.push_back(failure);
 }
 
-TestResult& TestResult::popPredicateContext() {
-  PredicateContext* lastNode = &rootPredicateNode_;
+TestResult &TestResult::popPredicateContext() {
+  PredicateContext *lastNode = &rootPredicateNode_;
   while (lastNode->next_ != nullptr && lastNode->next_->next_ != nullptr) {
     lastNode = lastNode->next_;
   }
   // Set message target to popped failure
-  PredicateContext* tail = lastNode->next_;
+  PredicateContext *tail = lastNode->next_;
   if (tail != nullptr && tail->failure_ != nullptr) {
     messageTarget_ = tail->failure_;
   }
@@ -147,7 +147,7 @@ void TestResult::printFailure(bool printTestName) const {
   }
 
   // Print in reverse to display the callstack in the right order
-  for (const auto& failure : failures_) {
+  for (const auto &failure : failures_) {
     Json::String indent(failure.nestingLevel_ * 2, ' ');
     if (failure.file_) {
       printf("%s%s(%u): ", indent.c_str(), failure.file_, failure.line_);
@@ -164,8 +164,8 @@ void TestResult::printFailure(bool printTestName) const {
   }
 }
 
-Json::String TestResult::indentText(const Json::String& text,
-                                    const Json::String& indent) {
+Json::String TestResult::indentText(const Json::String &text,
+                                    const Json::String &indent) {
   Json::String reindented;
   Json::String::size_type lastIndex = 0;
   while (lastIndex < text.size()) {
@@ -180,22 +180,22 @@ Json::String TestResult::indentText(const Json::String& text,
   return reindented;
 }
 
-TestResult& TestResult::addToLastFailure(const Json::String& message) {
+TestResult &TestResult::addToLastFailure(const Json::String &message) {
   if (messageTarget_ != nullptr) {
     messageTarget_->message_ += message;
   }
   return *this;
 }
 
-TestResult& TestResult::operator<<(Json::Int64 value) {
+TestResult &TestResult::operator<<(Json::Int64 value) {
   return addToLastFailure(Json::valueToString(value));
 }
 
-TestResult& TestResult::operator<<(Json::UInt64 value) {
+TestResult &TestResult::operator<<(Json::UInt64 value) {
   return addToLastFailure(Json::valueToString(value));
 }
 
-TestResult& TestResult::operator<<(bool value) {
+TestResult &TestResult::operator<<(bool value) {
   return addToLastFailure(value ? "true" : "false");
 }
 
@@ -206,7 +206,7 @@ TestCase::TestCase() = default;
 
 TestCase::~TestCase() = default;
 
-void TestCase::run(TestResult& result) {
+void TestCase::run(TestResult &result) {
   result_ = &result;
   runTestCase();
 }
@@ -216,7 +216,7 @@ void TestCase::run(TestResult& result) {
 
 Runner::Runner() = default;
 
-Runner& Runner::add(TestCaseFactory factory) {
+Runner &Runner::add(TestCaseFactory factory) {
   tests_.push_back(factory);
   return *this;
 }
@@ -224,14 +224,14 @@ Runner& Runner::add(TestCaseFactory factory) {
 size_t Runner::testCount() const { return tests_.size(); }
 
 Json::String Runner::testNameAt(size_t index) const {
-  TestCase* test = tests_[index]();
+  TestCase *test = tests_[index]();
   Json::String name = test->testName();
   delete test;
   return name;
 }
 
-void Runner::runTestAt(size_t index, TestResult& result) const {
-  TestCase* test = tests_[index]();
+void Runner::runTestAt(size_t index, TestResult &result) const {
+  TestCase *test = tests_[index]();
   result.setTestName(test->testName());
   printf("Testing %s: ", test->testName());
   fflush(stdout);
@@ -240,13 +240,13 @@ void Runner::runTestAt(size_t index, TestResult& result) const {
 #endif // if JSON_USE_EXCEPTION
     test->run(result);
 #if JSON_USE_EXCEPTION
-  } catch (const std::exception& e) {
+  } catch (const std::exception &e) {
     result.addFailure(__FILE__, __LINE__, "Unexpected exception caught:")
         << e.what();
   }
 #endif // if JSON_USE_EXCEPTION
   delete test;
-  const char* status = result.failed() ? "FAILED" : "OK";
+  const char *status = result.failed() ? "FAILED" : "OK";
   printf("%s\n", status);
   fflush(stdout);
 }
@@ -268,7 +268,7 @@ bool Runner::runAllTest(bool printSummary) const {
     }
     return true;
   } else {
-    for (auto& result : failures) {
+    for (auto &result : failures) {
       result.printFailure(count > 1);
     }
 
@@ -282,7 +282,7 @@ bool Runner::runAllTest(bool printSummary) const {
   }
 }
 
-bool Runner::testIndex(const Json::String& testName, size_t& indexOut) const {
+bool Runner::testIndex(const Json::String &testName, size_t &indexOut) const {
   const size_t count = testCount();
   for (size_t index = 0; index < count; ++index) {
     if (testNameAt(index) == testName) {
@@ -300,7 +300,7 @@ void Runner::listTests() const {
   }
 }
 
-int Runner::runCommandLine(int argc, const char* argv[]) const {
+int Runner::runCommandLine(int argc, const char *argv[]) const {
   // typedef std::deque<String> TestNames;
   Runner subrunner;
   for (int index = 1; index < argc; ++index) {
@@ -340,8 +340,8 @@ int Runner::runCommandLine(int argc, const char* argv[]) const {
 
 #if defined(_MSC_VER) && defined(_DEBUG)
 // Hook MSVCRT assertions to prevent dialog from appearing
-static int msvcrtSilentReportHook(int reportType, char* message,
-                                  int* /*returnValue*/) {
+static int msvcrtSilentReportHook(int reportType, char *message,
+                                  int * /*returnValue*/) {
   // The default CRT handling of error and assertion is to display
   // an error dialog to the user.
   // Instead, when an error or an assertion occurs, we force the
@@ -387,7 +387,7 @@ void Runner::preventDialogOnCrash() {
 #endif // if defined(_WIN32)
 }
 
-void Runner::printUsage(const char* appName) {
+void Runner::printUsage(const char *appName) {
   printf("Usage: %s [options]\n"
          "\n"
          "If --test is not specified, then all the test cases be run.\n"
@@ -404,7 +404,7 @@ void Runner::printUsage(const char* appName) {
 // Assertion functions
 // //////////////////////////////////////////////////////////////////
 
-Json::String ToJsonString(const char* toConvert) {
+Json::String ToJsonString(const char *toConvert) {
   return Json::String(toConvert);
 }
 
@@ -416,9 +416,9 @@ Json::String ToJsonString(std::string in) {
 }
 #endif
 
-TestResult& checkStringEqual(TestResult& result, const Json::String& expected,
-                             const Json::String& actual, const char* file,
-                             unsigned int line, const char* expr) {
+TestResult &checkStringEqual(TestResult &result, const Json::String &expected,
+                             const Json::String &actual, const char *file,
+                             unsigned int line, const char *expr) {
   if (expected != actual) {
     result.addFailure(file, line, expr);
     result << "Expected: '" << expected << "'\n";

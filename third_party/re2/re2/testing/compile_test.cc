@@ -6,10 +6,10 @@
 
 #include <string>
 
-#include "util/test.h"
-#include "util/logging.h"
-#include "re2/regexp.h"
 #include "re2/prog.h"
+#include "re2/regexp.h"
+#include "util/logging.h"
+#include "util/test.h"
 
 namespace re2 {
 
@@ -20,108 +20,86 @@ namespace re2 {
 // that run the compiled code.
 
 struct Test {
-  const char* regexp;
-  const char* code;
+  const char *regexp;
+  const char *code;
 };
 
 static Test tests[] = {
-  { "a",
-    "3. byte [61-61] 0 -> 4\n"
-    "4. match! 0\n" },
-  { "ab",
-    "3. byte [61-61] 0 -> 4\n"
-    "4. byte [62-62] 0 -> 5\n"
-    "5. match! 0\n" },
-  { "a|c",
-    "3+ byte [61-61] 0 -> 5\n"
-    "4. byte [63-63] 0 -> 5\n"
-    "5. match! 0\n" },
-  { "a|b",
-    "3. byte [61-62] 0 -> 4\n"
-    "4. match! 0\n" },
-  { "[ab]",
-    "3. byte [61-62] 0 -> 4\n"
-    "4. match! 0\n" },
-  { "a+",
-    "3. byte [61-61] 0 -> 4\n"
-    "4+ nop -> 3\n"
-    "5. match! 0\n" },
-  { "a+?",
-    "3. byte [61-61] 0 -> 4\n"
-    "4+ match! 0\n"
-    "5. nop -> 3\n" },
-  { "a*",
-    "3+ byte [61-61] 1 -> 3\n"
-    "4. match! 0\n" },
-  { "a*?",
-    "3+ match! 0\n"
-    "4. byte [61-61] 0 -> 3\n" },
-  { "a?",
-    "3+ byte [61-61] 1 -> 5\n"
-    "4. nop -> 5\n"
-    "5. match! 0\n" },
-  { "a??",
-    "3+ nop -> 5\n"
-    "4. byte [61-61] 0 -> 5\n"
-    "5. match! 0\n" },
-  { "a{4}",
-    "3. byte [61-61] 0 -> 4\n"
-    "4. byte [61-61] 0 -> 5\n"
-    "5. byte [61-61] 0 -> 6\n"
-    "6. byte [61-61] 0 -> 7\n"
-    "7. match! 0\n" },
-  { "(a)",
-    "3. capture 2 -> 4\n"
-    "4. byte [61-61] 0 -> 5\n"
-    "5. capture 3 -> 6\n"
-    "6. match! 0\n" },
-  { "(?:a)",
-    "3. byte [61-61] 0 -> 4\n"
-    "4. match! 0\n" },
-  { "",
-    "3. match! 0\n" },
-  { ".",
-    "3+ byte [00-09] 0 -> 5\n"
-    "4. byte [0b-ff] 0 -> 5\n"
-    "5. match! 0\n" },
-  { "[^ab]",
-    "3+ byte [00-09] 0 -> 6\n"
-    "4+ byte [0b-60] 0 -> 6\n"
-    "5. byte [63-ff] 0 -> 6\n"
-    "6. match! 0\n" },
-  { "[Aa]",
-    "3. byte/i [61-61] 0 -> 4\n"
-    "4. match! 0\n" },
-  { "\\C+",
-    "3. byte [00-ff] 0 -> 4\n"
-    "4+ altmatch -> 5 | 6\n"
-    "5+ nop -> 3\n"
-    "6. match! 0\n" },
-  { "\\C*",
-    "3+ altmatch -> 4 | 5\n"
-    "4+ byte [00-ff] 1 -> 3\n"
-    "5. match! 0\n" },
-  { "\\C?",
-    "3+ byte [00-ff] 1 -> 5\n"
-    "4. nop -> 5\n"
-    "5. match! 0\n" },
-  // Issue 20992936
-  { "[[-`]",
-    "3. byte [5b-60] 0 -> 4\n"
-    "4. match! 0\n" },
+    {"a", "3. byte [61-61] 0 -> 4\n"
+          "4. match! 0\n"},
+    {"ab", "3. byte [61-61] 0 -> 4\n"
+           "4. byte [62-62] 0 -> 5\n"
+           "5. match! 0\n"},
+    {"a|c", "3+ byte [61-61] 0 -> 5\n"
+            "4. byte [63-63] 0 -> 5\n"
+            "5. match! 0\n"},
+    {"a|b", "3. byte [61-62] 0 -> 4\n"
+            "4. match! 0\n"},
+    {"[ab]", "3. byte [61-62] 0 -> 4\n"
+             "4. match! 0\n"},
+    {"a+", "3. byte [61-61] 0 -> 4\n"
+           "4+ nop -> 3\n"
+           "5. match! 0\n"},
+    {"a+?", "3. byte [61-61] 0 -> 4\n"
+            "4+ match! 0\n"
+            "5. nop -> 3\n"},
+    {"a*", "3+ byte [61-61] 1 -> 3\n"
+           "4. match! 0\n"},
+    {"a*?", "3+ match! 0\n"
+            "4. byte [61-61] 0 -> 3\n"},
+    {"a?", "3+ byte [61-61] 1 -> 5\n"
+           "4. nop -> 5\n"
+           "5. match! 0\n"},
+    {"a??", "3+ nop -> 5\n"
+            "4. byte [61-61] 0 -> 5\n"
+            "5. match! 0\n"},
+    {"a{4}", "3. byte [61-61] 0 -> 4\n"
+             "4. byte [61-61] 0 -> 5\n"
+             "5. byte [61-61] 0 -> 6\n"
+             "6. byte [61-61] 0 -> 7\n"
+             "7. match! 0\n"},
+    {"(a)", "3. capture 2 -> 4\n"
+            "4. byte [61-61] 0 -> 5\n"
+            "5. capture 3 -> 6\n"
+            "6. match! 0\n"},
+    {"(?:a)", "3. byte [61-61] 0 -> 4\n"
+              "4. match! 0\n"},
+    {"", "3. match! 0\n"},
+    {".", "3+ byte [00-09] 0 -> 5\n"
+          "4. byte [0b-ff] 0 -> 5\n"
+          "5. match! 0\n"},
+    {"[^ab]", "3+ byte [00-09] 0 -> 6\n"
+              "4+ byte [0b-60] 0 -> 6\n"
+              "5. byte [63-ff] 0 -> 6\n"
+              "6. match! 0\n"},
+    {"[Aa]", "3. byte/i [61-61] 0 -> 4\n"
+             "4. match! 0\n"},
+    {"\\C+", "3. byte [00-ff] 0 -> 4\n"
+             "4+ altmatch -> 5 | 6\n"
+             "5+ nop -> 3\n"
+             "6. match! 0\n"},
+    {"\\C*", "3+ altmatch -> 4 | 5\n"
+             "4+ byte [00-ff] 1 -> 3\n"
+             "5. match! 0\n"},
+    {"\\C?", "3+ byte [00-ff] 1 -> 5\n"
+             "4. nop -> 5\n"
+             "5. match! 0\n"},
+    // Issue 20992936
+    {"[[-`]", "3. byte [5b-60] 0 -> 4\n"
+              "4. match! 0\n"},
 };
 
 TEST(TestRegexpCompileToProg, Simple) {
   int failed = 0;
   for (size_t i = 0; i < arraysize(tests); i++) {
-    const re2::Test& t = tests[i];
-    Regexp* re = Regexp::Parse(t.regexp, Regexp::PerlX|Regexp::Latin1, NULL);
+    const re2::Test &t = tests[i];
+    Regexp *re = Regexp::Parse(t.regexp, Regexp::PerlX | Regexp::Latin1, NULL);
     if (re == NULL) {
       LOG(ERROR) << "Cannot parse: " << t.regexp;
       failed++;
       continue;
     }
-    Prog* prog = re->CompileToProg(0);
+    Prog *prog = re->CompileToProg(0);
     if (prog == NULL) {
       LOG(ERROR) << "Cannot compile: " << t.regexp;
       re->Decref();
@@ -143,11 +121,11 @@ TEST(TestRegexpCompileToProg, Simple) {
 }
 
 static void DumpByteMap(StringPiece pattern, Regexp::ParseFlags flags,
-                        std::string* bytemap) {
-  Regexp* re = Regexp::Parse(pattern, flags, NULL);
+                        std::string *bytemap) {
+  Regexp *re = Regexp::Parse(pattern, flags, NULL);
   EXPECT_TRUE(re != NULL);
 
-  Prog* prog = re->CompileToProg(0);
+  Prog *prog = re->CompileToProg(0);
   EXPECT_TRUE(prog != NULL);
   *bytemap = prog->DumpByteMap();
   delete prog;
@@ -160,7 +138,7 @@ TEST(TestCompile, Latin1Ranges) {
 
   std::string bytemap;
 
-  DumpByteMap(".", Regexp::PerlX|Regexp::Latin1, &bytemap);
+  DumpByteMap(".", Regexp::PerlX | Regexp::Latin1, &bytemap);
   EXPECT_EQ("[00-09] -> 0\n"
             "[0a-0a] -> 1\n"
             "[0b-ff] -> 0\n",
@@ -171,7 +149,7 @@ TEST(TestCompile, OtherByteMapTests) {
   std::string bytemap;
 
   // Test that "absent" ranges are mapped to the same byte class.
-  DumpByteMap("[0-9A-Fa-f]+", Regexp::PerlX|Regexp::Latin1, &bytemap);
+  DumpByteMap("[0-9A-Fa-f]+", Regexp::PerlX | Regexp::Latin1, &bytemap);
   EXPECT_EQ("[00-2f] -> 0\n"
             "[30-39] -> 1\n"
             "[3a-40] -> 0\n"
@@ -182,7 +160,7 @@ TEST(TestCompile, OtherByteMapTests) {
             bytemap);
 
   // Test the byte classes for \b.
-  DumpByteMap("\\b", Regexp::LikePerl|Regexp::Latin1, &bytemap);
+  DumpByteMap("\\b", Regexp::LikePerl | Regexp::Latin1, &bytemap);
   EXPECT_EQ("[00-2f] -> 0\n"
             "[30-39] -> 1\n"
             "[3a-40] -> 0\n"
@@ -195,7 +173,7 @@ TEST(TestCompile, OtherByteMapTests) {
             bytemap);
 
   // Bug in the ASCII case-folding optimization created too many byte classes.
-  DumpByteMap("[^_]", Regexp::LikePerl|Regexp::Latin1, &bytemap);
+  DumpByteMap("[^_]", Regexp::LikePerl | Regexp::Latin1, &bytemap);
   EXPECT_EQ("[00-5e] -> 0\n"
             "[5f-5f] -> 1\n"
             "[60-ff] -> 0\n",
@@ -228,11 +206,11 @@ TEST(TestCompile, UTF8Ranges) {
 }
 
 TEST(TestCompile, InsufficientMemory) {
-  Regexp* re = Regexp::Parse(
+  Regexp *re = Regexp::Parse(
       "^(?P<name1>[^\\s]+)\\s+(?P<name2>[^\\s]+)\\s+(?P<name3>.+)$",
       Regexp::LikePerl, NULL);
   EXPECT_TRUE(re != NULL);
-  Prog* prog = re->CompileToProg(920);
+  Prog *prog = re->CompileToProg(920);
   // If the memory budget has been exhausted, compilation should fail
   // and return NULL instead of trying to do anything with NoMatch().
   EXPECT_TRUE(prog == NULL);
@@ -240,19 +218,19 @@ TEST(TestCompile, InsufficientMemory) {
 }
 
 static void Dump(StringPiece pattern, Regexp::ParseFlags flags,
-                 std::string* forward, std::string* reverse) {
-  Regexp* re = Regexp::Parse(pattern, flags, NULL);
+                 std::string *forward, std::string *reverse) {
+  Regexp *re = Regexp::Parse(pattern, flags, NULL);
   EXPECT_TRUE(re != NULL);
 
   if (forward != NULL) {
-    Prog* prog = re->CompileToProg(0);
+    Prog *prog = re->CompileToProg(0);
     EXPECT_TRUE(prog != NULL);
     *forward = prog->Dump();
     delete prog;
   }
 
   if (reverse != NULL) {
-    Prog* prog = re->CompileToReverseProg(0);
+    Prog *prog = re->CompileToReverseProg(0);
     EXPECT_TRUE(prog != NULL);
     *reverse = prog->Dump();
     delete prog;
@@ -322,7 +300,7 @@ TEST(TestCompile, Bug35237384) {
 
   std::string forward;
 
-  Dump("a**{3,}", Regexp::Latin1|Regexp::NeverCapture, &forward, NULL);
+  Dump("a**{3,}", Regexp::Latin1 | Regexp::NeverCapture, &forward, NULL);
   EXPECT_EQ("3+ byte [61-61] 1 -> 3\n"
             "4. nop -> 5\n"
             "5+ byte [61-61] 1 -> 5\n"
@@ -331,7 +309,7 @@ TEST(TestCompile, Bug35237384) {
             "8. match! 0\n",
             forward);
 
-  Dump("(a*|b*)*{3,}", Regexp::Latin1|Regexp::NeverCapture, &forward, NULL);
+  Dump("(a*|b*)*{3,}", Regexp::Latin1 | Regexp::NeverCapture, &forward, NULL);
   EXPECT_EQ("3+ nop -> 6\n"
             "4+ nop -> 8\n"
             "5. nop -> 21\n"
@@ -353,9 +331,10 @@ TEST(TestCompile, Bug35237384) {
             "21+ nop -> 10\n"
             "22+ nop -> 12\n"
             "23. nop -> 18\n",
-      forward);
+            forward);
 
-  Dump("((|S.+)+|(|S.+)+|){2}", Regexp::Latin1|Regexp::NeverCapture, &forward, NULL);
+  Dump("((|S.+)+|(|S.+)+|){2}", Regexp::Latin1 | Regexp::NeverCapture, &forward,
+       NULL);
   EXPECT_EQ("3+ nop -> 36\n"
             "4+ nop -> 31\n"
             "5. nop -> 33\n"
@@ -391,7 +370,7 @@ TEST(TestCompile, Bug35237384) {
             "35. nop -> 28\n"
             "36+ nop -> 33\n"
             "37. byte [53-53] 0 -> 16\n",
-      forward);
+            forward);
 }
 
-}  // namespace re2
+} // namespace re2

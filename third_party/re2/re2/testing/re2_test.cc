@@ -6,67 +6,67 @@
 // TODO: Test extractions for PartialMatch/Consume
 
 #include <errno.h>
+#include <map>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
-#include <map>
 #include <string>
 #include <utility>
 #if !defined(_MSC_VER) && !defined(__CYGWIN__) && !defined(__MINGW32__)
 #include <sys/mman.h>
-#include <unistd.h>  /* for sysconf */
+#include <unistd.h> /* for sysconf */
 #endif
 
-#include "util/test.h"
-#include "util/logging.h"
-#include "util/strutil.h"
 #include "re2/re2.h"
 #include "re2/regexp.h"
+#include "util/logging.h"
+#include "util/strutil.h"
+#include "util/test.h"
 
 namespace re2 {
 
 TEST(RE2, HexTests) {
-#define ASSERT_HEX(type, value)                                         \
-  do {                                                                  \
-    type v;                                                             \
-    ASSERT_TRUE(                                                        \
-        RE2::FullMatch(#value, "([0-9a-fA-F]+)[uUlL]*", RE2::Hex(&v))); \
-    ASSERT_EQ(v, 0x##value);                                            \
-    ASSERT_TRUE(RE2::FullMatch("0x" #value, "([0-9a-fA-FxX]+)[uUlL]*",  \
-                               RE2::CRadix(&v)));                       \
-    ASSERT_EQ(v, 0x##value);                                            \
+#define ASSERT_HEX(type, value)                                                \
+  do {                                                                         \
+    type v;                                                                    \
+    ASSERT_TRUE(                                                               \
+        RE2::FullMatch(#value, "([0-9a-fA-F]+)[uUlL]*", RE2::Hex(&v)));        \
+    ASSERT_EQ(v, 0x##value);                                                   \
+    ASSERT_TRUE(RE2::FullMatch("0x" #value, "([0-9a-fA-FxX]+)[uUlL]*",         \
+                               RE2::CRadix(&v)));                              \
+    ASSERT_EQ(v, 0x##value);                                                   \
   } while (0)
 
-  ASSERT_HEX(short,              2bad);
-  ASSERT_HEX(unsigned short,     2badU);
-  ASSERT_HEX(int,                dead);
-  ASSERT_HEX(unsigned int,       deadU);
-  ASSERT_HEX(long,               7eadbeefL);
-  ASSERT_HEX(unsigned long,      deadbeefUL);
-  ASSERT_HEX(long long,          12345678deadbeefLL);
+  ASSERT_HEX(short, 2bad);
+  ASSERT_HEX(unsigned short, 2badU);
+  ASSERT_HEX(int, dead);
+  ASSERT_HEX(unsigned int, deadU);
+  ASSERT_HEX(long, 7eadbeefL);
+  ASSERT_HEX(unsigned long, deadbeefUL);
+  ASSERT_HEX(long long, 12345678deadbeefLL);
   ASSERT_HEX(unsigned long long, cafebabedeadbeefULL);
 
 #undef ASSERT_HEX
 }
 
 TEST(RE2, OctalTests) {
-#define ASSERT_OCTAL(type, value)                                           \
-  do {                                                                      \
-    type v;                                                                 \
-    ASSERT_TRUE(RE2::FullMatch(#value, "([0-7]+)[uUlL]*", RE2::Octal(&v))); \
-    ASSERT_EQ(v, 0##value);                                                 \
-    ASSERT_TRUE(RE2::FullMatch("0" #value, "([0-9a-fA-FxX]+)[uUlL]*",       \
-                               RE2::CRadix(&v)));                           \
-    ASSERT_EQ(v, 0##value);                                                 \
+#define ASSERT_OCTAL(type, value)                                              \
+  do {                                                                         \
+    type v;                                                                    \
+    ASSERT_TRUE(RE2::FullMatch(#value, "([0-7]+)[uUlL]*", RE2::Octal(&v)));    \
+    ASSERT_EQ(v, 0##value);                                                    \
+    ASSERT_TRUE(RE2::FullMatch("0" #value, "([0-9a-fA-FxX]+)[uUlL]*",          \
+                               RE2::CRadix(&v)));                              \
+    ASSERT_EQ(v, 0##value);                                                    \
   } while (0)
 
-  ASSERT_OCTAL(short,              77777);
-  ASSERT_OCTAL(unsigned short,     177777U);
-  ASSERT_OCTAL(int,                17777777777);
-  ASSERT_OCTAL(unsigned int,       37777777777U);
-  ASSERT_OCTAL(long,               17777777777L);
-  ASSERT_OCTAL(unsigned long,      37777777777UL);
-  ASSERT_OCTAL(long long,          777777777777777777777LL);
+  ASSERT_OCTAL(short, 77777);
+  ASSERT_OCTAL(unsigned short, 177777U);
+  ASSERT_OCTAL(int, 17777777777);
+  ASSERT_OCTAL(unsigned int, 37777777777U);
+  ASSERT_OCTAL(long, 17777777777L);
+  ASSERT_OCTAL(unsigned long, 37777777777UL);
+  ASSERT_OCTAL(long long, 777777777777777777777LL);
   ASSERT_OCTAL(unsigned long long, 1777777777777777777777ULL);
 
 #undef ASSERT_OCTAL
@@ -83,13 +83,13 @@ TEST(RE2, DecimalTests) {
     ASSERT_EQ(v, value);                                                       \
   } while (0)
 
-  ASSERT_DECIMAL(short,              -1);
-  ASSERT_DECIMAL(unsigned short,     9999);
-  ASSERT_DECIMAL(int,                -1000);
-  ASSERT_DECIMAL(unsigned int,       12345U);
-  ASSERT_DECIMAL(long,               -10000000L);
-  ASSERT_DECIMAL(unsigned long,      3083324652U);
-  ASSERT_DECIMAL(long long,          -100000000000000LL);
+  ASSERT_DECIMAL(short, -1);
+  ASSERT_DECIMAL(unsigned short, 9999);
+  ASSERT_DECIMAL(int, -1000);
+  ASSERT_DECIMAL(unsigned int, 12345U);
+  ASSERT_DECIMAL(long, -10000000L);
+  ASSERT_DECIMAL(unsigned long, 3083324652U);
+  ASSERT_DECIMAL(long long, -100000000000000LL);
   ASSERT_DECIMAL(unsigned long long, 1234567890987654321ULL);
 
 #undef ASSERT_DECIMAL
@@ -102,92 +102,42 @@ TEST(RE2, Replace) {
     const char *original;
     const char *single;
     const char *global;
-    int        greplace_count;
+    int greplace_count;
   };
   static const ReplaceTest tests[] = {
-    { "(qu|[b-df-hj-np-tv-z]*)([a-z]+)",
-      "\\2\\1ay",
-      "the quick brown fox jumps over the lazy dogs.",
-      "ethay quick brown fox jumps over the lazy dogs.",
-      "ethay ickquay ownbray oxfay umpsjay overay ethay azylay ogsday.",
-      9 },
-    { "\\w+",
-      "\\0-NOSPAM",
-      "abcd.efghi@google.com",
-      "abcd-NOSPAM.efghi@google.com",
-      "abcd-NOSPAM.efghi-NOSPAM@google-NOSPAM.com-NOSPAM",
-      4 },
-    { "^",
-      "(START)",
-      "foo",
-      "(START)foo",
-      "(START)foo",
-      1 },
-    { "^",
-      "(START)",
-      "",
-      "(START)",
-      "(START)",
-      1 },
-    { "$",
-      "(END)",
-      "",
-      "(END)",
-      "(END)",
-      1 },
-    { "b",
-      "bb",
-      "ababababab",
-      "abbabababab",
-      "abbabbabbabbabb",
-      5 },
-    { "b",
-      "bb",
-      "bbbbbb",
-      "bbbbbbb",
-      "bbbbbbbbbbbb",
-      6 },
-    { "b+",
-      "bb",
-      "bbbbbb",
-      "bb",
-      "bb",
-      1 },
-    { "b*",
-      "bb",
-      "bbbbbb",
-      "bb",
-      "bb",
-      1 },
-    { "b*",
-      "bb",
-      "aaaaa",
-      "bbaaaaa",
-      "bbabbabbabbabbabb",
-      6 },
-    // Check newline handling
-    { "a.*a",
-      "(\\0)",
-      "aba\naba",
-      "(aba)\naba",
-      "(aba)\n(aba)",
-      2 },
-    { "", NULL, NULL, NULL, NULL, 0 }
-  };
+      {"(qu|[b-df-hj-np-tv-z]*)([a-z]+)", "\\2\\1ay",
+       "the quick brown fox jumps over the lazy dogs.",
+       "ethay quick brown fox jumps over the lazy dogs.",
+       "ethay ickquay ownbray oxfay umpsjay overay ethay azylay ogsday.", 9},
+      {"\\w+", "\\0-NOSPAM", "abcd.efghi@google.com",
+       "abcd-NOSPAM.efghi@google.com",
+       "abcd-NOSPAM.efghi-NOSPAM@google-NOSPAM.com-NOSPAM", 4},
+      {"^", "(START)", "foo", "(START)foo", "(START)foo", 1},
+      {"^", "(START)", "", "(START)", "(START)", 1},
+      {"$", "(END)", "", "(END)", "(END)", 1},
+      {"b", "bb", "ababababab", "abbabababab", "abbabbabbabbabb", 5},
+      {"b", "bb", "bbbbbb", "bbbbbbb", "bbbbbbbbbbbb", 6},
+      {"b+", "bb", "bbbbbb", "bb", "bb", 1},
+      {"b*", "bb", "bbbbbb", "bb", "bb", 1},
+      {"b*", "bb", "aaaaa", "bbaaaaa", "bbabbabbabbabbabb", 6},
+      // Check newline handling
+      {"a.*a", "(\\0)", "aba\naba", "(aba)\naba", "(aba)\n(aba)", 2},
+      {"", NULL, NULL, NULL, NULL, 0}};
 
-  for (const ReplaceTest* t = tests; t->original != NULL; t++) {
+  for (const ReplaceTest *t = tests; t->original != NULL; t++) {
     std::string one(t->original);
     ASSERT_TRUE(RE2::Replace(&one, t->regexp, t->rewrite));
     ASSERT_EQ(one, t->single);
     std::string all(t->original);
-    ASSERT_EQ(RE2::GlobalReplace(&all, t->regexp, t->rewrite), t->greplace_count)
-      << "Got: " << all;
+    ASSERT_EQ(RE2::GlobalReplace(&all, t->regexp, t->rewrite),
+              t->greplace_count)
+        << "Got: " << all;
     ASSERT_EQ(all, t->global);
   }
 }
 
-static void TestCheckRewriteString(const char* regexp, const char* rewrite,
-                              bool expect_ok) {
+static void TestCheckRewriteString(const char *regexp, const char *rewrite,
+                                   bool expect_ok) {
   std::string error;
   RE2 exp(regexp);
   bool actual_ok = exp.CheckRewriteString(rewrite, &error);
@@ -224,7 +174,7 @@ TEST(RE2, Extract) {
 }
 
 TEST(RE2, Consume) {
-  RE2 r("\\s*(\\w+)");    // matches a word, possibly proceeded by whitespace
+  RE2 r("\\s*(\\w+)"); // matches a word, possibly proceeded by whitespace
   std::string word;
 
   std::string s("   aaa b!@#$@#$cccc");
@@ -242,10 +192,10 @@ TEST(RE2, ConsumeN) {
   StringPiece input(s);
 
   RE2::Arg argv[2];
-  const RE2::Arg* const args[2] = { &argv[0], &argv[1] };
+  const RE2::Arg *const args[2] = {&argv[0], &argv[1]};
 
   // 0 arg
-  EXPECT_TRUE(RE2::ConsumeN(&input, "\\s*(\\w+)", args, 0));  // Skips "one".
+  EXPECT_TRUE(RE2::ConsumeN(&input, "\\s*(\\w+)", args, 0)); // Skips "one".
 
   // 1 arg
   std::string word;
@@ -262,7 +212,7 @@ TEST(RE2, ConsumeN) {
 }
 
 TEST(RE2, FindAndConsume) {
-  RE2 r("(\\w+)");      // matches a word
+  RE2 r("(\\w+)"); // matches a word
   std::string word;
 
   std::string s("   aaa b!@#$@#$cccc");
@@ -289,10 +239,10 @@ TEST(RE2, FindAndConsumeN) {
   StringPiece input(s);
 
   RE2::Arg argv[2];
-  const RE2::Arg* const args[2] = { &argv[0], &argv[1] };
+  const RE2::Arg *const args[2] = {&argv[0], &argv[1]};
 
   // 0 arg
-  EXPECT_TRUE(RE2::FindAndConsumeN(&input, "(\\w+)", args, 0));  // Skips "one".
+  EXPECT_TRUE(RE2::FindAndConsumeN(&input, "(\\w+)", args, 0)); // Skips "one".
 
   // 1 arg
   std::string word;
@@ -334,7 +284,7 @@ TEST(RE2, MatchNumberPeculiarity) {
 }
 
 TEST(RE2, Match) {
-  RE2 re("((\\w+):([0-9]+))");   // extracts host and port
+  RE2 re("((\\w+):([0-9]+))"); // extracts host and port
   StringPiece group[4];
 
   // No match.
@@ -359,7 +309,7 @@ TEST(RE2, Match) {
   ASSERT_EQ(port, 9000);
 }
 
-static void TestRecursion(int size, const char* pattern) {
+static void TestRecursion(int size, const char *pattern) {
   // Fill up a string repeating the pattern given
   std::string domain;
   domain.resize(size);
@@ -374,8 +324,8 @@ static void TestRecursion(int size, const char* pattern) {
 
 // A meta-quoted string, interpreted as a pattern, should always match
 // the original unquoted string.
-static void TestQuoteMeta(const std::string& unquoted,
-                          const RE2::Options& options = RE2::DefaultOptions) {
+static void TestQuoteMeta(const std::string &unquoted,
+                          const RE2::Options &options = RE2::DefaultOptions) {
   std::string quoted = RE2::QuoteMeta(unquoted);
   RE2 re(quoted, options);
   EXPECT_TRUE(RE2::FullMatch(unquoted, re))
@@ -384,9 +334,10 @@ static void TestQuoteMeta(const std::string& unquoted,
 
 // A meta-quoted string, interpreted as a pattern, should always match
 // the original unquoted string.
-static void NegativeTestQuoteMeta(
-    const std::string& unquoted, const std::string& should_not_match,
-    const RE2::Options& options = RE2::DefaultOptions) {
+static void
+NegativeTestQuoteMeta(const std::string &unquoted,
+                      const std::string &should_not_match,
+                      const RE2::Options &options = RE2::DefaultOptions) {
   std::string quoted = RE2::QuoteMeta(unquoted);
   RE2 re(quoted, options);
   EXPECT_FALSE(RE2::FullMatch(should_not_match, re))
@@ -422,21 +373,19 @@ TEST(QuoteMeta, SimpleNegative) {
   NegativeTestQuoteMeta("((?!)xxx)", "xxx");
 }
 
-TEST(QuoteMeta, Latin1) {
-  TestQuoteMeta("3\xb2 = 9", RE2::Latin1);
-}
+TEST(QuoteMeta, Latin1) { TestQuoteMeta("3\xb2 = 9", RE2::Latin1); }
 
 TEST(QuoteMeta, UTF8) {
   TestQuoteMeta("Plácido Domingo");
-  TestQuoteMeta("xyz");  // No fancy utf8.
-  TestQuoteMeta("\xc2\xb0");  // 2-byte utf8 -- a degree symbol.
-  TestQuoteMeta("27\xc2\xb0 degrees");  // As a middle character.
-  TestQuoteMeta("\xe2\x80\xb3");  // 3-byte utf8 -- a double prime.
-  TestQuoteMeta("\xf0\x9d\x85\x9f");  // 4-byte utf8 -- a music note.
-  TestQuoteMeta("27\xc2\xb0");  // Interpreted as Latin-1, this should
-                                // still work.
+  TestQuoteMeta("xyz");                // No fancy utf8.
+  TestQuoteMeta("\xc2\xb0");           // 2-byte utf8 -- a degree symbol.
+  TestQuoteMeta("27\xc2\xb0 degrees"); // As a middle character.
+  TestQuoteMeta("\xe2\x80\xb3");       // 3-byte utf8 -- a double prime.
+  TestQuoteMeta("\xf0\x9d\x85\x9f");   // 4-byte utf8 -- a music note.
+  TestQuoteMeta("27\xc2\xb0");         // Interpreted as Latin-1, this should
+                                       // still work.
   NegativeTestQuoteMeta("27\xc2\xb0",
-                        "27\\\xc2\\\xb0");  // 2-byte utf8 -- a degree symbol.
+                        "27\\\xc2\\\xb0"); // 2-byte utf8 -- a degree symbol.
 }
 
 TEST(QuoteMeta, HasNull) {
@@ -513,12 +462,8 @@ TEST(ProgramFanout, BigProgram) {
 // causing NULL dereference.  This tests a few empty character sets.
 // (The way to get an empty character set is to negate a full one.)
 TEST(EmptyCharset, Fuzz) {
-  static const char *empties[] = {
-    "[^\\S\\s]",
-    "[^\\S[:space:]]",
-    "[^\\D\\d]",
-    "[^\\D[:digit:]]"
-  };
+  static const char *empties[] = {"[^\\S\\s]", "[^\\S[:space:]]", "[^\\D\\d]",
+                                  "[^\\D[:digit:]]"};
   for (size_t i = 0; i < arraysize(empties); i++)
     ASSERT_FALSE(RE2(empties[i]).Match("abc", 0, 3, RE2::UNANCHORED, NULL, 0));
 }
@@ -527,12 +472,14 @@ TEST(EmptyCharset, Fuzz) {
 // alternations or capture groups have been "compiled away".
 TEST(EmptyCharset, BitstateAssumptions) {
   // Captures trigger use of Bitstate.
-  static const char *nop_empties[] = {
-    "((((()))))" "[^\\S\\s]?",
-    "((((()))))" "([^\\S\\s])?",
-    "((((()))))" "([^\\S\\s]|[^\\S\\s])?",
-    "((((()))))" "(([^\\S\\s]|[^\\S\\s])|)"
-  };
+  static const char *nop_empties[] = {"((((()))))"
+                                      "[^\\S\\s]?",
+                                      "((((()))))"
+                                      "([^\\S\\s])?",
+                                      "((((()))))"
+                                      "([^\\S\\s]|[^\\S\\s])?",
+                                      "((((()))))"
+                                      "(([^\\S\\s]|[^\\S\\s])|)"};
   StringPiece group[6];
   for (size_t i = 0; i < arraysize(nop_empties); i++)
     ASSERT_TRUE(RE2(nop_empties[i]).Match("", 0, 0, RE2::UNANCHORED, group, 6));
@@ -543,19 +490,19 @@ TEST(Capture, NamedGroups) {
   {
     RE2 re("(hello world)");
     ASSERT_EQ(re.NumberOfCapturingGroups(), 1);
-    const std::map<std::string, int>& m = re.NamedCapturingGroups();
+    const std::map<std::string, int> &m = re.NamedCapturingGroups();
     ASSERT_EQ(m.size(), 0);
   }
 
   {
     RE2 re("(?P<A>expr(?P<B>expr)(?P<C>expr))((expr)(?P<D>expr))");
     ASSERT_EQ(re.NumberOfCapturingGroups(), 6);
-    const std::map<std::string, int>& m = re.NamedCapturingGroups();
+    const std::map<std::string, int> &m = re.NamedCapturingGroups();
     ASSERT_EQ(m.size(), 4);
     ASSERT_EQ(m.find("A")->second, 1);
     ASSERT_EQ(m.find("B")->second, 2);
     ASSERT_EQ(m.find("C")->second, 3);
-    ASSERT_EQ(m.find("D")->second, 6);  // $4 and $5 are anonymous
+    ASSERT_EQ(m.find("D")->second, 6); // $4 and $5 are anonymous
   }
 }
 
@@ -569,10 +516,10 @@ TEST(RE2, CapturedGroupTest) {
   RE2::Arg arg2(&args[2]);
   RE2::Arg arg3(&args[3]);
 
-  const RE2::Arg* const matches[4] = {&arg0, &arg1, &arg2, &arg3};
-  EXPECT_TRUE(RE2::FullMatchN("directions from mountain view to san jose",
-                              re, matches, num_groups));
-  const std::map<std::string, int>& named_groups = re.NamedCapturingGroups();
+  const RE2::Arg *const matches[4] = {&arg0, &arg1, &arg2, &arg3};
+  EXPECT_TRUE(RE2::FullMatchN("directions from mountain view to san jose", re,
+                              matches, num_groups));
+  const std::map<std::string, int> &named_groups = re.NamedCapturingGroups();
   EXPECT_TRUE(named_groups.find("S") != named_groups.end());
   EXPECT_TRUE(named_groups.find("D") != named_groups.end());
 
@@ -591,8 +538,8 @@ TEST(RE2, FullMatchWithNoArgs) {
   ASSERT_TRUE(RE2::FullMatch("h", "h"));
   ASSERT_TRUE(RE2::FullMatch("hello", "hello"));
   ASSERT_TRUE(RE2::FullMatch("hello", "h.*o"));
-  ASSERT_FALSE(RE2::FullMatch("othello", "h.*o"));  // Must be anchored at front
-  ASSERT_FALSE(RE2::FullMatch("hello!", "h.*o"));   // Must be anchored at end
+  ASSERT_FALSE(RE2::FullMatch("othello", "h.*o")); // Must be anchored at front
+  ASSERT_FALSE(RE2::FullMatch("hello!", "h.*o"));  // Must be anchored at end
 }
 
 TEST(RE2, PartialMatch) {
@@ -600,12 +547,13 @@ TEST(RE2, PartialMatch) {
   ASSERT_TRUE(RE2::PartialMatch("hello", "h.*o"));
   ASSERT_TRUE(RE2::PartialMatch("othello", "h.*o"));
   ASSERT_TRUE(RE2::PartialMatch("hello!", "h.*o"));
-  ASSERT_TRUE(RE2::PartialMatch("x", "((((((((((((((((((((x))))))))))))))))))))"));
+  ASSERT_TRUE(
+      RE2::PartialMatch("x", "((((((((((((((((((((x))))))))))))))))))))"));
 }
 
 TEST(RE2, PartialMatchN) {
   RE2::Arg argv[2];
-  const RE2::Arg* const args[2] = { &argv[0], &argv[1] };
+  const RE2::Arg *const args[2] = {&argv[0], &argv[1]};
 
   // 0 arg
   EXPECT_TRUE(RE2::PartialMatchN("hello", "e.*o", args, 0));
@@ -636,7 +584,7 @@ TEST(RE2, FullMatchOneArg) {
   int i;
 
   // Single-arg
-  ASSERT_TRUE(RE2::FullMatch("1001", "(\\d+)",   &i));
+  ASSERT_TRUE(RE2::FullMatch("1001", "(\\d+)", &i));
   ASSERT_EQ(i, 1001);
   ASSERT_TRUE(RE2::FullMatch("-123", "(-?\\d+)", &i));
   ASSERT_EQ(i, -123);
@@ -689,7 +637,7 @@ TEST(RE2, FullMatchMultiArg) {
 
 TEST(RE2, FullMatchN) {
   RE2::Arg argv[2];
-  const RE2::Arg* const args[2] = { &argv[0], &argv[1] };
+  const RE2::Arg *const args[2] = {&argv[0], &argv[1]};
 
   // 0 arg
   EXPECT_TRUE(RE2::FullMatchN("hello", "h.*o", args, 0));
@@ -717,7 +665,7 @@ TEST(RE2, FullMatchIgnoredArg) {
 
   // Old-school NULL should be ignored.
   ASSERT_TRUE(
-      RE2::FullMatch("ruby:1234", "(\\w+)(:)(\\d+)", &s, (void*)NULL, &i));
+      RE2::FullMatch("ruby:1234", "(\\w+)(:)(\\d+)", &s, (void *)NULL, &i));
   ASSERT_EQ(s, std::string("ruby"));
   ASSERT_EQ(i, 1234);
 
@@ -731,20 +679,20 @@ TEST(RE2, FullMatchTypedNullArg) {
   std::string s;
 
   // Ignore non-void* NULL arg
-  ASSERT_TRUE(RE2::FullMatch("hello", "he(.*)lo", (char*)NULL));
-  ASSERT_TRUE(RE2::FullMatch("hello", "h(.*)o", (std::string*)NULL));
-  ASSERT_TRUE(RE2::FullMatch("hello", "h(.*)o", (StringPiece*)NULL));
-  ASSERT_TRUE(RE2::FullMatch("1234", "(.*)", (int*)NULL));
-  ASSERT_TRUE(RE2::FullMatch("1234567890123456", "(.*)", (long long*)NULL));
-  ASSERT_TRUE(RE2::FullMatch("123.4567890123456", "(.*)", (double*)NULL));
-  ASSERT_TRUE(RE2::FullMatch("123.4567890123456", "(.*)", (float*)NULL));
+  ASSERT_TRUE(RE2::FullMatch("hello", "he(.*)lo", (char *)NULL));
+  ASSERT_TRUE(RE2::FullMatch("hello", "h(.*)o", (std::string *)NULL));
+  ASSERT_TRUE(RE2::FullMatch("hello", "h(.*)o", (StringPiece *)NULL));
+  ASSERT_TRUE(RE2::FullMatch("1234", "(.*)", (int *)NULL));
+  ASSERT_TRUE(RE2::FullMatch("1234567890123456", "(.*)", (long long *)NULL));
+  ASSERT_TRUE(RE2::FullMatch("123.4567890123456", "(.*)", (double *)NULL));
+  ASSERT_TRUE(RE2::FullMatch("123.4567890123456", "(.*)", (float *)NULL));
 
   // Fail on non-void* NULL arg if the match doesn't parse for the given type.
-  ASSERT_FALSE(RE2::FullMatch("hello", "h(.*)lo", &s, (char*)NULL));
-  ASSERT_FALSE(RE2::FullMatch("hello", "(.*)", (int*)NULL));
-  ASSERT_FALSE(RE2::FullMatch("1234567890123456", "(.*)", (int*)NULL));
-  ASSERT_FALSE(RE2::FullMatch("hello", "(.*)", (double*)NULL));
-  ASSERT_FALSE(RE2::FullMatch("hello", "(.*)", (float*)NULL));
+  ASSERT_FALSE(RE2::FullMatch("hello", "h(.*)lo", &s, (char *)NULL));
+  ASSERT_FALSE(RE2::FullMatch("hello", "(.*)", (int *)NULL));
+  ASSERT_FALSE(RE2::FullMatch("1234567890123456", "(.*)", (int *)NULL));
+  ASSERT_FALSE(RE2::FullMatch("hello", "(.*)", (double *)NULL));
+  ASSERT_FALSE(RE2::FullMatch("hello", "(.*)", (float *)NULL));
 }
 
 // Check that numeric parsing code does not read past the end of
@@ -760,10 +708,10 @@ TEST(RE2, NULTerminated) {
 #ifndef MAP_ANONYMOUS
 #define MAP_ANONYMOUS MAP_ANON
 #endif
-  v = static_cast<char*>(mmap(NULL, 2*pagesize, PROT_READ|PROT_WRITE,
-                              MAP_ANONYMOUS|MAP_PRIVATE, -1, 0));
-  ASSERT_TRUE(v != reinterpret_cast<char*>(-1));
-  LOG(INFO) << "Memory at " << (void*)v;
+  v = static_cast<char *>(mmap(NULL, 2 * pagesize, PROT_READ | PROT_WRITE,
+                               MAP_ANONYMOUS | MAP_PRIVATE, -1, 0));
+  ASSERT_TRUE(v != reinterpret_cast<char *>(-1));
+  LOG(INFO) << "Memory at " << (void *)v;
   ASSERT_EQ(munmap(v + pagesize, pagesize), 0) << " error " << errno;
   v[pagesize - 1] = '1';
 
@@ -788,30 +736,41 @@ TEST(RE2, FullMatchTypeTests) {
   }
   {
     int16_t v;
-    ASSERT_TRUE(RE2::FullMatch("100",     "(-?\\d+)", &v)); ASSERT_EQ(v, 100);
-    ASSERT_TRUE(RE2::FullMatch("-100",    "(-?\\d+)", &v)); ASSERT_EQ(v, -100);
-    ASSERT_TRUE(RE2::FullMatch("32767",   "(-?\\d+)", &v)); ASSERT_EQ(v, 32767);
-    ASSERT_TRUE(RE2::FullMatch("-32768",  "(-?\\d+)", &v)); ASSERT_EQ(v, -32768);
+    ASSERT_TRUE(RE2::FullMatch("100", "(-?\\d+)", &v));
+    ASSERT_EQ(v, 100);
+    ASSERT_TRUE(RE2::FullMatch("-100", "(-?\\d+)", &v));
+    ASSERT_EQ(v, -100);
+    ASSERT_TRUE(RE2::FullMatch("32767", "(-?\\d+)", &v));
+    ASSERT_EQ(v, 32767);
+    ASSERT_TRUE(RE2::FullMatch("-32768", "(-?\\d+)", &v));
+    ASSERT_EQ(v, -32768);
     ASSERT_FALSE(RE2::FullMatch("-32769", "(-?\\d+)", &v));
-    ASSERT_FALSE(RE2::FullMatch("32768",  "(-?\\d+)", &v));
+    ASSERT_FALSE(RE2::FullMatch("32768", "(-?\\d+)", &v));
   }
   {
     uint16_t v;
-    ASSERT_TRUE(RE2::FullMatch("100",    "(\\d+)", &v)); ASSERT_EQ(v, 100);
-    ASSERT_TRUE(RE2::FullMatch("32767",  "(\\d+)", &v)); ASSERT_EQ(v, 32767);
-    ASSERT_TRUE(RE2::FullMatch("65535",  "(\\d+)", &v)); ASSERT_EQ(v, 65535);
+    ASSERT_TRUE(RE2::FullMatch("100", "(\\d+)", &v));
+    ASSERT_EQ(v, 100);
+    ASSERT_TRUE(RE2::FullMatch("32767", "(\\d+)", &v));
+    ASSERT_EQ(v, 32767);
+    ASSERT_TRUE(RE2::FullMatch("65535", "(\\d+)", &v));
+    ASSERT_EQ(v, 65535);
     ASSERT_FALSE(RE2::FullMatch("65536", "(\\d+)", &v));
   }
   {
     int32_t v;
     static const int32_t max = INT32_C(0x7fffffff);
     static const int32_t min = -max - 1;
-    ASSERT_TRUE(RE2::FullMatch("100",          "(-?\\d+)", &v)); ASSERT_EQ(v, 100);
-    ASSERT_TRUE(RE2::FullMatch("-100",         "(-?\\d+)", &v)); ASSERT_EQ(v, -100);
-    ASSERT_TRUE(RE2::FullMatch("2147483647",   "(-?\\d+)", &v)); ASSERT_EQ(v, max);
-    ASSERT_TRUE(RE2::FullMatch("-2147483648",  "(-?\\d+)", &v)); ASSERT_EQ(v, min);
+    ASSERT_TRUE(RE2::FullMatch("100", "(-?\\d+)", &v));
+    ASSERT_EQ(v, 100);
+    ASSERT_TRUE(RE2::FullMatch("-100", "(-?\\d+)", &v));
+    ASSERT_EQ(v, -100);
+    ASSERT_TRUE(RE2::FullMatch("2147483647", "(-?\\d+)", &v));
+    ASSERT_EQ(v, max);
+    ASSERT_TRUE(RE2::FullMatch("-2147483648", "(-?\\d+)", &v));
+    ASSERT_EQ(v, min);
     ASSERT_FALSE(RE2::FullMatch("-2147483649", "(-?\\d+)", &v));
-    ASSERT_FALSE(RE2::FullMatch("2147483648",  "(-?\\d+)", &v));
+    ASSERT_FALSE(RE2::FullMatch("2147483648", "(-?\\d+)", &v));
 
     ASSERT_TRUE(RE2::FullMatch(zeros + "2147483647", "(-?\\d+)", &v));
     ASSERT_EQ(v, max);
@@ -826,12 +785,15 @@ TEST(RE2, FullMatchTypeTests) {
   {
     uint32_t v;
     static const uint32_t max = UINT32_C(0xffffffff);
-    ASSERT_TRUE(RE2::FullMatch("100",         "(\\d+)", &v)); ASSERT_EQ(v, 100);
-    ASSERT_TRUE(RE2::FullMatch("4294967295",  "(\\d+)", &v)); ASSERT_EQ(v, max);
+    ASSERT_TRUE(RE2::FullMatch("100", "(\\d+)", &v));
+    ASSERT_EQ(v, 100);
+    ASSERT_TRUE(RE2::FullMatch("4294967295", "(\\d+)", &v));
+    ASSERT_EQ(v, max);
     ASSERT_FALSE(RE2::FullMatch("4294967296", "(\\d+)", &v));
-    ASSERT_FALSE(RE2::FullMatch("-1",         "(\\d+)", &v));
+    ASSERT_FALSE(RE2::FullMatch("-1", "(\\d+)", &v));
 
-    ASSERT_TRUE(RE2::FullMatch(zeros + "4294967295", "(\\d+)", &v)); ASSERT_EQ(v, max);
+    ASSERT_TRUE(RE2::FullMatch(zeros + "4294967295", "(\\d+)", &v));
+    ASSERT_EQ(v, max);
   }
   {
     int64_t v;
@@ -839,24 +801,28 @@ TEST(RE2, FullMatchTypeTests) {
     static const int64_t min = -max - 1;
     std::string str;
 
-    ASSERT_TRUE(RE2::FullMatch("100",  "(-?\\d+)", &v)); ASSERT_EQ(v, 100);
-    ASSERT_TRUE(RE2::FullMatch("-100", "(-?\\d+)", &v)); ASSERT_EQ(v, -100);
+    ASSERT_TRUE(RE2::FullMatch("100", "(-?\\d+)", &v));
+    ASSERT_EQ(v, 100);
+    ASSERT_TRUE(RE2::FullMatch("-100", "(-?\\d+)", &v));
+    ASSERT_EQ(v, -100);
 
     str = std::to_string(max);
-    ASSERT_TRUE(RE2::FullMatch(str,    "(-?\\d+)", &v)); ASSERT_EQ(v, max);
+    ASSERT_TRUE(RE2::FullMatch(str, "(-?\\d+)", &v));
+    ASSERT_EQ(v, max);
 
     str = std::to_string(min);
-    ASSERT_TRUE(RE2::FullMatch(str,    "(-?\\d+)", &v)); ASSERT_EQ(v, min);
+    ASSERT_TRUE(RE2::FullMatch(str, "(-?\\d+)", &v));
+    ASSERT_EQ(v, min);
 
     str = std::to_string(max);
     ASSERT_NE(str.back(), '9');
     str.back()++;
-    ASSERT_FALSE(RE2::FullMatch(str,   "(-?\\d+)", &v));
+    ASSERT_FALSE(RE2::FullMatch(str, "(-?\\d+)", &v));
 
     str = std::to_string(min);
     ASSERT_NE(str.back(), '9');
     str.back()++;
-    ASSERT_FALSE(RE2::FullMatch(str,   "(-?\\d+)", &v));
+    ASSERT_FALSE(RE2::FullMatch(str, "(-?\\d+)", &v));
   }
   {
     uint64_t v;
@@ -864,15 +830,18 @@ TEST(RE2, FullMatchTypeTests) {
     static const uint64_t max = UINT64_C(0xffffffffffffffff);
     std::string str;
 
-    ASSERT_TRUE(RE2::FullMatch("100",  "(-?\\d+)", &v));  ASSERT_EQ(v, 100);
-    ASSERT_TRUE(RE2::FullMatch("-100", "(-?\\d+)", &v2)); ASSERT_EQ(v2, -100);
+    ASSERT_TRUE(RE2::FullMatch("100", "(-?\\d+)", &v));
+    ASSERT_EQ(v, 100);
+    ASSERT_TRUE(RE2::FullMatch("-100", "(-?\\d+)", &v2));
+    ASSERT_EQ(v2, -100);
 
     str = std::to_string(max);
-    ASSERT_TRUE(RE2::FullMatch(str,    "(-?\\d+)", &v)); ASSERT_EQ(v, max);
+    ASSERT_TRUE(RE2::FullMatch(str, "(-?\\d+)", &v));
+    ASSERT_EQ(v, max);
 
     ASSERT_NE(str.back(), '9');
     str.back()++;
-    ASSERT_FALSE(RE2::FullMatch(str,   "(-?\\d+)", &v));
+    ASSERT_FALSE(RE2::FullMatch(str, "(-?\\d+)", &v));
   }
 }
 
@@ -880,12 +849,16 @@ TEST(RE2, FloatingPointFullMatchTypes) {
   std::string zeros(1000, '0');
   {
     float v;
-    ASSERT_TRUE(RE2::FullMatch("100",   "(.*)", &v)); ASSERT_EQ(v, 100);
-    ASSERT_TRUE(RE2::FullMatch("-100.", "(.*)", &v)); ASSERT_EQ(v, -100);
-    ASSERT_TRUE(RE2::FullMatch("1e23",  "(.*)", &v)); ASSERT_EQ(v, float(1e23));
-    ASSERT_TRUE(RE2::FullMatch(" 100",  "(.*)", &v)); ASSERT_EQ(v, 100);
+    ASSERT_TRUE(RE2::FullMatch("100", "(.*)", &v));
+    ASSERT_EQ(v, 100);
+    ASSERT_TRUE(RE2::FullMatch("-100.", "(.*)", &v));
+    ASSERT_EQ(v, -100);
+    ASSERT_TRUE(RE2::FullMatch("1e23", "(.*)", &v));
+    ASSERT_EQ(v, float(1e23));
+    ASSERT_TRUE(RE2::FullMatch(" 100", "(.*)", &v));
+    ASSERT_EQ(v, 100);
 
-    ASSERT_TRUE(RE2::FullMatch(zeros + "1e23",  "(.*)", &v));
+    ASSERT_TRUE(RE2::FullMatch(zeros + "1e23", "(.*)", &v));
     ASSERT_EQ(v, float(1e23));
 
     // 6700000000081920.1 is an edge case.
@@ -908,14 +881,17 @@ TEST(RE2, FloatingPointFullMatchTypes) {
     ASSERT_EQ(v, 0.1f) << StringPrintf("%.8g != %.8g", v, 0.1f);
     ASSERT_TRUE(RE2::FullMatch("6700000000081920.1", "(.*)", &v));
     ASSERT_EQ(v, 6700000000081920.1f)
-      << StringPrintf("%.8g != %.8g", v, 6700000000081920.1f);
+        << StringPrintf("%.8g != %.8g", v, 6700000000081920.1f);
 #endif
   }
   {
     double v;
-    ASSERT_TRUE(RE2::FullMatch("100",   "(.*)", &v)); ASSERT_EQ(v, 100);
-    ASSERT_TRUE(RE2::FullMatch("-100.", "(.*)", &v)); ASSERT_EQ(v, -100);
-    ASSERT_TRUE(RE2::FullMatch("1e23",  "(.*)", &v)); ASSERT_EQ(v, 1e23);
+    ASSERT_TRUE(RE2::FullMatch("100", "(.*)", &v));
+    ASSERT_EQ(v, 100);
+    ASSERT_TRUE(RE2::FullMatch("-100.", "(.*)", &v));
+    ASSERT_EQ(v, -100);
+    ASSERT_TRUE(RE2::FullMatch("1e23", "(.*)", &v));
+    ASSERT_EQ(v, 1e23);
     ASSERT_TRUE(RE2::FullMatch(zeros + "1e23", "(.*)", &v));
     ASSERT_EQ(v, double(1e23));
 
@@ -923,31 +899,33 @@ TEST(RE2, FloatingPointFullMatchTypes) {
     ASSERT_EQ(v, 0.1) << StringPrintf("%.17g != %.17g", v, 0.1);
     ASSERT_TRUE(RE2::FullMatch("1.00000005960464485", "(.*)", &v));
     ASSERT_EQ(v, 1.0000000596046448)
-      << StringPrintf("%.17g != %.17g", v, 1.0000000596046448);
+        << StringPrintf("%.17g != %.17g", v, 1.0000000596046448);
   }
 }
 
 TEST(RE2, FullMatchAnchored) {
   int i;
   // Check that matching is fully anchored
-  ASSERT_FALSE(RE2::FullMatch("x1001", "(\\d+)",  &i));
-  ASSERT_FALSE(RE2::FullMatch("1001x", "(\\d+)",  &i));
-  ASSERT_TRUE(RE2::FullMatch("x1001",  "x(\\d+)", &i)); ASSERT_EQ(i, 1001);
-  ASSERT_TRUE(RE2::FullMatch("1001x",  "(\\d+)x", &i)); ASSERT_EQ(i, 1001);
+  ASSERT_FALSE(RE2::FullMatch("x1001", "(\\d+)", &i));
+  ASSERT_FALSE(RE2::FullMatch("1001x", "(\\d+)", &i));
+  ASSERT_TRUE(RE2::FullMatch("x1001", "x(\\d+)", &i));
+  ASSERT_EQ(i, 1001);
+  ASSERT_TRUE(RE2::FullMatch("1001x", "(\\d+)x", &i));
+  ASSERT_EQ(i, 1001);
 }
 
 TEST(RE2, FullMatchBraces) {
   // Braces
-  ASSERT_TRUE(RE2::FullMatch("0abcd",  "[0-9a-f+.-]{5,}"));
+  ASSERT_TRUE(RE2::FullMatch("0abcd", "[0-9a-f+.-]{5,}"));
   ASSERT_TRUE(RE2::FullMatch("0abcde", "[0-9a-f+.-]{5,}"));
-  ASSERT_FALSE(RE2::FullMatch("0abc",  "[0-9a-f+.-]{5,}"));
+  ASSERT_FALSE(RE2::FullMatch("0abc", "[0-9a-f+.-]{5,}"));
 }
 
 TEST(RE2, Complicated) {
   // Complicated RE2
   ASSERT_TRUE(RE2::FullMatch("foo", "foo|bar|[A-Z]"));
   ASSERT_TRUE(RE2::FullMatch("bar", "foo|bar|[A-Z]"));
-  ASSERT_TRUE(RE2::FullMatch("X",   "foo|bar|[A-Z]"));
+  ASSERT_TRUE(RE2::FullMatch("X", "foo|bar|[A-Z]"));
   ASSERT_FALSE(RE2::FullMatch("XY", "foo|bar|[A-Z]"));
 }
 
@@ -1064,7 +1042,7 @@ TEST(RE2, Accessors) {
   // Check RE2 error field.
   {
     RE2 re("foo");
-    ASSERT_TRUE(re.error().empty());  // Must have no error
+    ASSERT_TRUE(re.error().empty()); // Must have no error
     ASSERT_TRUE(re.ok());
     ASSERT_EQ(re.error_code(), RE2::NoError);
   }
@@ -1073,18 +1051,12 @@ TEST(RE2, Accessors) {
 TEST(RE2, UTF8) {
   // Check UTF-8 handling
   // Three Japanese characters (nihongo)
-  const char utf8_string[] = {
-       (char)0xe6, (char)0x97, (char)0xa5, // 65e5
-       (char)0xe6, (char)0x9c, (char)0xac, // 627c
-       (char)0xe8, (char)0xaa, (char)0x9e, // 8a9e
-       0
-  };
-  const char utf8_pattern[] = {
-       '.',
-       (char)0xe6, (char)0x9c, (char)0xac, // 627c
-       '.',
-       0
-  };
+  const char utf8_string[] = {(char)0xe6, (char)0x97, (char)0xa5, // 65e5
+                              (char)0xe6, (char)0x9c, (char)0xac, // 627c
+                              (char)0xe8, (char)0xaa, (char)0x9e, // 8a9e
+                              0};
+  const char utf8_pattern[] = {'.', (char)0xe6, (char)0x9c, (char)0xac, // 627c
+                               '.', 0};
 
   // Both should match in either mode, bytes or UTF-8
   RE2 re_test1(".........", RE2::Latin1);
@@ -1120,7 +1092,7 @@ TEST(RE2, UngreedyUTF8) {
   // oughtn't -- see bug 82246.
   {
     // This code always worked.
-    const char* pattern = "\\w+X";
+    const char *pattern = "\\w+X";
     const std::string target = "a aX";
     RE2 match_sentence(pattern, RE2::Latin1);
     RE2 match_sentence_re(pattern);
@@ -1129,7 +1101,7 @@ TEST(RE2, UngreedyUTF8) {
     ASSERT_FALSE(RE2::FullMatch(target, match_sentence_re));
   }
   {
-    const char* pattern = "(?U)\\w+X";
+    const char *pattern = "(?U)\\w+X";
     const std::string target = "a aX";
     RE2 match_sentence(pattern, RE2::Latin1);
     ASSERT_EQ(match_sentence.error(), "");
@@ -1143,7 +1115,8 @@ TEST(RE2, UngreedyUTF8) {
 TEST(RE2, Rejects) {
   {
     RE2 re("a\\1", RE2::Quiet);
-    ASSERT_FALSE(re.ok()); }
+    ASSERT_FALSE(re.ok());
+  }
   {
     RE2 re("a[x", RE2::Quiet);
     ASSERT_FALSE(re.ok());
@@ -1195,7 +1168,7 @@ TEST(RE2, NoCrash) {
 TEST(RE2, Recursion) {
   // Test that recursion is stopped.
   // This test is PCRE-legacy -- there's no recursion in RE2.
-  int bytes = 15 * 1024;  // enough to crash PCRE
+  int bytes = 15 * 1024; // enough to crash PCRE
   TestRecursion(bytes, ".");
   TestRecursion(bytes, "a");
   TestRecursion(bytes, "a.");
@@ -1206,7 +1179,7 @@ TEST(RE2, Recursion) {
 TEST(RE2, BigCountedRepetition) {
   // Test that counted repetition works, given tons of memory.
   RE2::Options opt;
-  opt.set_max_mem(256<<20);
+  opt.set_max_mem(256 << 20);
 
   RE2 re(".{512}x", opt);
   ASSERT_TRUE(re.ok());
@@ -1245,7 +1218,7 @@ TEST(CaseInsensitive, MatchAndConsume) {
 TEST(RE2, ImplicitConversions) {
   std::string re_string(".");
   StringPiece re_stringpiece(".");
-  const char* re_cstring = ".";
+  const char *re_cstring = ".";
   EXPECT_TRUE(RE2::PartialMatch("e", re_string));
   EXPECT_TRUE(RE2::PartialMatch("e", re_stringpiece));
   EXPECT_TRUE(RE2::PartialMatch("e", re_cstring));
@@ -1256,19 +1229,17 @@ TEST(RE2, ImplicitConversions) {
 TEST(RE2, CL8622304) {
   // reported by ingow
   std::string dir;
-  EXPECT_TRUE(RE2::FullMatch("D", "([^\\\\])"));  // ok
-  EXPECT_TRUE(RE2::FullMatch("D", "([^\\\\])", &dir));  // fails
+  EXPECT_TRUE(RE2::FullMatch("D", "([^\\\\])"));       // ok
+  EXPECT_TRUE(RE2::FullMatch("D", "([^\\\\])", &dir)); // fails
 
   // reported by jacobsa
   std::string key, val;
   EXPECT_TRUE(RE2::PartialMatch("bar:1,0x2F,030,4,5;baz:true;fooby:false,true",
-              "(\\w+)(?::((?:[^;\\\\]|\\\\.)*))?;?",
-              &key,
-              &val));
+                                "(\\w+)(?::((?:[^;\\\\]|\\\\.)*))?;?", &key,
+                                &val));
   EXPECT_EQ(key, "bar");
   EXPECT_EQ(val, "1,0x2F,030,4,5");
 }
-
 
 // Check that RE2 returns correct regexp pieces on error.
 // In particular, make sure it returns whole runes
@@ -1278,23 +1249,23 @@ static struct ErrorTest {
   const char *regexp;
   const char *error;
 } error_tests[] = {
-  { "ab\\αcd", "\\α" },
-  { "ef\\x☺01", "\\x☺0" },
-  { "gh\\x1☺01", "\\x1☺" },
-  { "ij\\x1", "\\x1" },
-  { "kl\\x", "\\x" },
-  { "uv\\x{0000☺}", "\\x{0000☺" },
-  { "wx\\p{ABC", "\\p{ABC" },
-  { "yz(?smiUX:abc)", "(?smiUX" },   // used to return (?s but the error is X
-  { "aa(?sm☺i", "(?sm☺" },
-  { "bb[abc", "[abc" },
+    {"ab\\αcd", "\\α"},
+    {"ef\\x☺01", "\\x☺0"},
+    {"gh\\x1☺01", "\\x1☺"},
+    {"ij\\x1", "\\x1"},
+    {"kl\\x", "\\x"},
+    {"uv\\x{0000☺}", "\\x{0000☺"},
+    {"wx\\p{ABC", "\\p{ABC"},
+    {"yz(?smiUX:abc)", "(?smiUX"}, // used to return (?s but the error is X
+    {"aa(?sm☺i", "(?sm☺"},
+    {"bb[abc", "[abc"},
 
-  { "mn\\x1\377", "" },  // no argument string returned for invalid UTF-8
-  { "op\377qr", "" },
-  { "st\\x{00000\377", "" },
-  { "zz\\p{\377}", "" },
-  { "zz\\x{00\377}", "" },
-  { "zz(?P<name\377>abc)", "" },
+    {"mn\\x1\377", ""}, // no argument string returned for invalid UTF-8
+    {"op\377qr", ""},
+    {"st\\x{00000\377", ""},
+    {"zz\\p{\377}", ""},
+    {"zz\\x{00\377}", ""},
+    {"zz(?P<name\377>abc)", ""},
 };
 TEST(RE2, ErrorArgs) {
   for (size_t i = 0; i < arraysize(error_tests); i++) {
@@ -1306,21 +1277,21 @@ TEST(RE2, ErrorArgs) {
 
 // Check that "never match \n" mode never matches \n.
 static struct NeverTest {
-  const char* regexp;
-  const char* text;
-  const char* match;
+  const char *regexp;
+  const char *text;
+  const char *match;
 } never_tests[] = {
-  { "(.*)", "abc\ndef\nghi\n", "abc" },
-  { "(?s)(abc.*def)", "abc\ndef\n", NULL },
-  { "(abc(.|\n)*def)", "abc\ndef\n", NULL },
-  { "(abc[^x]*def)", "abc\ndef\n", NULL },
-  { "(abc[^x]*def)", "abczzzdef\ndef\n", "abczzzdef" },
+    {"(.*)", "abc\ndef\nghi\n", "abc"},
+    {"(?s)(abc.*def)", "abc\ndef\n", NULL},
+    {"(abc(.|\n)*def)", "abc\ndef\n", NULL},
+    {"(abc[^x]*def)", "abc\ndef\n", NULL},
+    {"(abc[^x]*def)", "abczzzdef\ndef\n", "abczzzdef"},
 };
 TEST(RE2, NeverNewline) {
   RE2::Options opt;
   opt.set_never_nl(true);
   for (size_t i = 0; i < arraysize(never_tests); i++) {
-    const NeverTest& t = never_tests[i];
+    const NeverTest &t = never_tests[i];
     RE2 re(t.regexp, opt);
     if (t.match == NULL) {
       EXPECT_FALSE(re.PartialMatch(t.text, re));
@@ -1414,7 +1385,8 @@ TEST(RE2, UnicodeClasses) {
 
   EXPECT_FALSE(RE2::PartialMatch(str, "[^\\p{Lu}\\p{Lo}]"));
 
-  EXPECT_TRUE(RE2::PartialMatch(str, ".*(.).*?([\\p{Lu}\\p{Lo}]).*?(.)", &a, &b, &c));
+  EXPECT_TRUE(
+      RE2::PartialMatch(str, ".*(.).*?([\\p{Lu}\\p{Lo}]).*?(.)", &a, &b, &c));
   EXPECT_EQ("譚", a);
   EXPECT_EQ("永", b);
   EXPECT_EQ("鋒", c);
@@ -1458,10 +1430,10 @@ TEST(RE2, NullVsEmptyStringSubmatches) {
     matches[i] = "bar";
 
   StringPiece null;
-  EXPECT_TRUE(re.Match(null, 0, null.size(), RE2::UNANCHORED,
-                       matches, arraysize(matches)));
+  EXPECT_TRUE(re.Match(null, 0, null.size(), RE2::UNANCHORED, matches,
+                       arraysize(matches)));
   for (size_t i = 0; i < arraysize(matches); i++) {
-    EXPECT_TRUE(matches[i].data() == NULL);  // always null
+    EXPECT_TRUE(matches[i].data() == NULL); // always null
     EXPECT_TRUE(matches[i].empty());
   }
 
@@ -1469,11 +1441,11 @@ TEST(RE2, NullVsEmptyStringSubmatches) {
     matches[i] = "bar";
 
   StringPiece empty("");
-  EXPECT_TRUE(re.Match(empty, 0, empty.size(), RE2::UNANCHORED,
-                       matches, arraysize(matches)));
-  EXPECT_TRUE(matches[0].data() != NULL);  // empty, not null
+  EXPECT_TRUE(re.Match(empty, 0, empty.size(), RE2::UNANCHORED, matches,
+                       arraysize(matches)));
+  EXPECT_TRUE(matches[0].data() != NULL); // empty, not null
   EXPECT_TRUE(matches[0].empty());
-  EXPECT_TRUE(matches[1].data() != NULL);  // empty, not null
+  EXPECT_TRUE(matches[1].data() != NULL); // empty, not null
   EXPECT_TRUE(matches[1].empty());
   EXPECT_TRUE(matches[2].data() == NULL);
   EXPECT_TRUE(matches[2].empty());
@@ -1492,9 +1464,9 @@ TEST(RE2, Bug1816809) {
 // Issue 3061120
 TEST(RE2, Bug3061120) {
   RE2 re("(?i)\\W");
-  EXPECT_FALSE(RE2::PartialMatch("x", re));  // always worked
-  EXPECT_FALSE(RE2::PartialMatch("k", re));  // broke because of kelvin
-  EXPECT_FALSE(RE2::PartialMatch("s", re));  // broke because of latin long s
+  EXPECT_FALSE(RE2::PartialMatch("x", re)); // always worked
+  EXPECT_FALSE(RE2::PartialMatch("k", re)); // broke because of kelvin
+  EXPECT_FALSE(RE2::PartialMatch("s", re)); // broke because of latin long s
 }
 
 TEST(RE2, CapturingGroupNames) {
@@ -1502,7 +1474,7 @@ TEST(RE2, CapturingGroupNames) {
   //      12    3        45   6         7
   RE2 re("((abc)(?P<G2>)|((e+)(?P<G2>.*)(?P<G1>u+)))");
   EXPECT_TRUE(re.ok());
-  const std::map<int, std::string>& have = re.CapturingGroupNames();
+  const std::map<int, std::string> &have = re.CapturingGroupNames();
   std::map<int, std::string> want;
   want[3] = "G2";
   want[6] = "G2";
@@ -1526,7 +1498,8 @@ TEST(RE2, Bug10131674) {
 }
 
 TEST(RE2, Bug18391750) {
-  // Stray write past end of match_ in nfa.cc, caught by fuzzing + address sanitizer.
+  // Stray write past end of match_ in nfa.cc, caught by fuzzing + address
+  // sanitizer.
   const char t[] = {
       (char)0x28, (char)0x28, (char)0xfc, (char)0xfc, (char)0x08, (char)0x08,
       (char)0x26, (char)0x26, (char)0x28, (char)0xc2, (char)0x9b, (char)0xc5,
@@ -1563,7 +1536,10 @@ TEST(RE2, Bug18523943) {
 
   RE2::Options opt;
   const char a[] = {
-      (char)0x29, (char)0x29, (char)0x24, (char)0x00,
+      (char)0x29,
+      (char)0x29,
+      (char)0x24,
+      (char)0x00,
   };
   const char b[] = {
       (char)0x28, (char)0x0a, (char)0x2a, (char)0x2a, (char)0x29, (char)0x00,
@@ -1575,10 +1551,10 @@ TEST(RE2, Bug18523943) {
   opt.set_literal(false);
   opt.set_never_nl(true);
 
-  RE2 re((const char*)b, opt);
+  RE2 re((const char *)b, opt);
   ASSERT_TRUE(re.ok());
   std::string s1;
-  ASSERT_TRUE(RE2::PartialMatch((const char*)a, re, &s1));
+  ASSERT_TRUE(RE2::PartialMatch((const char *)a, re, &s1));
 }
 
 TEST(RE2, Bug21371806) {
@@ -1628,4 +1604,4 @@ TEST(RE2, Issue104) {
   ASSERT_EQ("小人小类小", s);
 }
 
-}  // namespace re2
+} // namespace re2

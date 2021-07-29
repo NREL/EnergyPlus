@@ -7,10 +7,10 @@
 #include <stdint.h>
 #include <string>
 
+#include "re2/testing/regexp_generator.h"
+#include "re2/testing/string_generator.h"
 #include "util/test.h"
 #include "util/utf.h"
-#include "re2/testing/string_generator.h"
-#include "re2/testing/regexp_generator.h"
 
 namespace re2 {
 
@@ -31,7 +31,7 @@ static int64_t IntegerPower(int i, int e) {
 // If all of these hold, the StringGenerator is behaving.
 // Assumes that the alphabet is sorted, so that the generated
 // strings can just be compared lexicographically.
-static void RunTest(int len, const std::string& alphabet, bool donull) {
+static void RunTest(int len, const std::string &alphabet, bool donull) {
   StringGenerator g(len, Explode(alphabet));
 
   int n = 0;
@@ -42,7 +42,7 @@ static void RunTest(int len, const std::string& alphabet, bool donull) {
     g.GenerateNULL();
     EXPECT_TRUE(g.HasNext());
     StringPiece sp = g.Next();
-    EXPECT_EQ(sp.data(), static_cast<const char*>(NULL));
+    EXPECT_EQ(sp.data(), static_cast<const char *>(NULL));
     EXPECT_EQ(sp.size(), 0);
   }
 
@@ -51,7 +51,7 @@ static void RunTest(int len, const std::string& alphabet, bool donull) {
     n++;
 
     // Check that all characters in s appear in alphabet.
-    for (const char *p = s.c_str(); *p != '\0'; ) {
+    for (const char *p = s.c_str(); *p != '\0';) {
       Rune r;
       p += chartorune(&r, p);
       EXPECT_TRUE(utfrune(alphabet.c_str(), r) != NULL);
@@ -72,32 +72,22 @@ static void RunTest(int len, const std::string& alphabet, bool donull) {
   // Check total string count.
   int64_t m = 0;
   int alpha = utflen(alphabet.c_str());
-  if (alpha == 0)  // Degenerate case.
+  if (alpha == 0) // Degenerate case.
     len = 0;
   for (int i = 0; i <= len; i++)
     m += IntegerPower(alpha, i);
   EXPECT_EQ(n, m);
 }
 
-TEST(StringGenerator, NoLength) {
-  RunTest(0, "abc", false);
-}
+TEST(StringGenerator, NoLength) { RunTest(0, "abc", false); }
 
-TEST(StringGenerator, NoLengthNoAlphabet) {
-  RunTest(0, "", false);
-}
+TEST(StringGenerator, NoLengthNoAlphabet) { RunTest(0, "", false); }
 
-TEST(StringGenerator, NoAlphabet) {
-  RunTest(5, "", false);
-}
+TEST(StringGenerator, NoAlphabet) { RunTest(5, "", false); }
 
-TEST(StringGenerator, Simple) {
-  RunTest(3, "abc", false);
-}
+TEST(StringGenerator, Simple) { RunTest(3, "abc", false); }
 
-TEST(StringGenerator, UTF8) {
-  RunTest(4, "abc\xE2\x98\xBA", false);
-}
+TEST(StringGenerator, UTF8) { RunTest(4, "abc\xE2\x98\xBA", false); }
 
 TEST(StringGenerator, GenNULL) {
   RunTest(0, "abc", true);
@@ -107,4 +97,4 @@ TEST(StringGenerator, GenNULL) {
   RunTest(4, "abc\xE2\x98\xBA", true);
 }
 
-}  // namespace re2
+} // namespace re2

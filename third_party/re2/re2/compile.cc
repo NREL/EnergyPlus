@@ -13,13 +13,13 @@
 #include <unordered_map>
 #include <utility>
 
-#include "util/logging.h"
-#include "util/pod_array.h"
-#include "util/utf.h"
 #include "re2/prog.h"
 #include "re2/re2.h"
 #include "re2/regexp.h"
 #include "re2/walker-inl.h"
+#include "util/logging.h"
+#include "util/pod_array.h"
+#include "util/utf.h"
 
 namespace re2 {
 
@@ -52,7 +52,7 @@ struct PatchList {
   static PatchList Append(Prog::Inst *inst0, PatchList l1, PatchList l2);
 };
 
-static PatchList nullPatchList = { 0 };
+static PatchList nullPatchList = {0};
 
 // Returns patch list containing just p.
 PatchList PatchList::Mk(uint32_t p) {
@@ -62,9 +62,9 @@ PatchList PatchList::Mk(uint32_t p) {
 }
 
 // Returns the next pointer pointed at by l.
-PatchList PatchList::Deref(Prog::Inst* inst0, PatchList l) {
-  Prog::Inst* ip = &inst0[l.p>>1];
-  if (l.p&1)
+PatchList PatchList::Deref(Prog::Inst *inst0, PatchList l) {
+  Prog::Inst *ip = &inst0[l.p >> 1];
+  if (l.p & 1)
     l.p = ip->out1();
   else
     l.p = ip->out();
@@ -74,8 +74,8 @@ PatchList PatchList::Deref(Prog::Inst* inst0, PatchList l) {
 // Patches all the entries on l to have value v.
 void PatchList::Patch(Prog::Inst *inst0, PatchList l, uint32_t val) {
   while (l.p != 0) {
-    Prog::Inst* ip = &inst0[l.p>>1];
-    if (l.p&1) {
+    Prog::Inst *ip = &inst0[l.p >> 1];
+    if (l.p & 1) {
       l.p = ip->out1();
       ip->out1_ = val;
     } else {
@@ -86,7 +86,7 @@ void PatchList::Patch(Prog::Inst *inst0, PatchList l, uint32_t val) {
 }
 
 // Appends two patch lists and returns result.
-PatchList PatchList::Append(Prog::Inst* inst0, PatchList l1, PatchList l2) {
+PatchList PatchList::Append(Prog::Inst *inst0, PatchList l1, PatchList l2) {
   if (l1.p == 0)
     return l2;
   if (l2.p == 0)
@@ -100,8 +100,8 @@ PatchList PatchList::Append(Prog::Inst* inst0, PatchList l1, PatchList l2) {
     l = next;
   }
 
-  Prog::Inst* ip = &inst0[l.p>>1];
-  if (l.p&1)
+  Prog::Inst *ip = &inst0[l.p >> 1];
+  if (l.p & 1)
     ip->out1_ = l2.p;
   else
     ip->set_out(l2.p);
@@ -114,18 +114,18 @@ struct Frag {
   uint32_t begin;
   PatchList end;
 
-  Frag() : begin(0) { end.p = 0; }  // needed so Frag can go in vector
+  Frag() : begin(0) { end.p = 0; } // needed so Frag can go in vector
   Frag(uint32_t begin, PatchList end) : begin(begin), end(end) {}
 };
 
 // Input encodings.
 enum Encoding {
-  kEncodingUTF8 = 1,  // UTF-8 (0-10FFFF)
-  kEncodingLatin1,    // Latin-1 (0-FF)
+  kEncodingUTF8 = 1, // UTF-8 (0-10FFFF)
+  kEncodingLatin1,   // Latin-1 (0-FF)
 };
 
 class Compiler : public Regexp::Walker<Frag> {
- public:
+public:
   explicit Compiler();
   ~Compiler();
 
@@ -133,11 +133,11 @@ class Compiler : public Regexp::Walker<Frag> {
   // Caller is responsible for deleting Prog when finished with it.
   // If reversed is true, compiles for walking over the input
   // string backward (reverses all concatenations).
-  static Prog *Compile(Regexp* re, bool reversed, int64_t max_mem);
+  static Prog *Compile(Regexp *re, bool reversed, int64_t max_mem);
 
   // Compiles alternation of all the re to a new Prog.
   // Each re has a match with an id equal to its index in the vector.
-  static Prog* CompileSet(Regexp* re, RE2::Anchor anchor, int64_t max_mem);
+  static Prog *CompileSet(Regexp *re, RE2::Anchor anchor, int64_t max_mem);
 
   // Interface for Regexp::Walker, which helps traverse the Regexp.
   // The walk is purely post-recursive: given the machines for the
@@ -147,10 +147,10 @@ class Compiler : public Regexp::Walker<Frag> {
   // each node in depth-first order.  It invokes PreVisit before
   // visiting the node's children and PostVisit after visiting
   // the children.
-  Frag PreVisit(Regexp* re, Frag parent_arg, bool* stop);
-  Frag PostVisit(Regexp* re, Frag parent_arg, Frag pre_arg, Frag* child_args,
+  Frag PreVisit(Regexp *re, Frag parent_arg, bool *stop);
+  Frag PostVisit(Regexp *re, Frag parent_arg, Frag pre_arg, Frag *child_args,
                  int nchild_args);
-  Frag ShortVisit(Regexp* re, Frag parent_arg);
+  Frag ShortVisit(Regexp *re, Frag parent_arg);
   Frag Copy(Frag arg);
 
   // Given fragment a, returns a+ or a+?; a* or a*?; a? or a??
@@ -226,30 +226,30 @@ class Compiler : public Regexp::Walker<Frag> {
   Frag Literal(Rune r, bool foldcase);
 
   void Setup(Regexp::ParseFlags, int64_t, RE2::Anchor);
-  Prog* Finish();
+  Prog *Finish();
 
   // Returns .* where dot = any byte
   Frag DotStar();
 
- private:
-  Prog* prog_;         // Program being built.
-  bool failed_;        // Did we give up compiling?
-  Encoding encoding_;  // Input encoding
-  bool reversed_;      // Should program run backward over text?
+private:
+  Prog *prog_;        // Program being built.
+  bool failed_;       // Did we give up compiling?
+  Encoding encoding_; // Input encoding
+  bool reversed_;     // Should program run backward over text?
 
   PODArray<Prog::Inst> inst_;
-  int ninst_;          // Number of instructions used.
-  int max_ninst_;      // Maximum number of instructions.
+  int ninst_;     // Number of instructions used.
+  int max_ninst_; // Maximum number of instructions.
 
-  int64_t max_mem_;    // Total memory budget.
+  int64_t max_mem_; // Total memory budget.
 
   std::unordered_map<uint64_t, int> rune_cache_;
   Frag rune_range_;
 
-  RE2::Anchor anchor_;  // anchor mode for RE2::Set
+  RE2::Anchor anchor_; // anchor mode for RE2::Set
 
-  Compiler(const Compiler&) = delete;
-  Compiler& operator=(const Compiler&) = delete;
+  Compiler(const Compiler &) = delete;
+  Compiler &operator=(const Compiler &) = delete;
 };
 
 Compiler::Compiler() {
@@ -258,16 +258,14 @@ Compiler::Compiler() {
   encoding_ = kEncodingUTF8;
   reversed_ = false;
   ninst_ = 0;
-  max_ninst_ = 1;  // make AllocInst for fail instruction okay
+  max_ninst_ = 1; // make AllocInst for fail instruction okay
   max_mem_ = 0;
   int fail = AllocInst(1);
   inst_[fail].InitFail();
-  max_ninst_ = 0;  // Caller must change
+  max_ninst_ = 0; // Caller must change
 }
 
-Compiler::~Compiler() {
-  delete prog_;
-}
+Compiler::~Compiler() { delete prog_; }
 
 int Compiler::AllocInst(int n) {
   if (failed_ || ninst_ + n > max_ninst_) {
@@ -283,8 +281,8 @@ int Compiler::AllocInst(int n) {
       cap *= 2;
     PODArray<Prog::Inst> inst(cap);
     if (inst_.data() != NULL)
-      memmove(inst.data(), inst_.data(), ninst_*sizeof inst_[0]);
-    memset(inst.data() + ninst_, 0, (cap - ninst_)*sizeof inst_[0]);
+      memmove(inst.data(), inst_.data(), ninst_ * sizeof inst_[0]);
+    memset(inst.data() + ninst_, 0, (cap - ninst_) * sizeof inst_[0]);
     inst_ = std::move(inst);
   }
   int id = ninst_;
@@ -297,14 +295,10 @@ int Compiler::AllocInst(int n) {
 // pictures explaining what is going on here.
 
 // Returns an unmatchable fragment.
-Frag Compiler::NoMatch() {
-  return Frag(0, nullPatchList);
-}
+Frag Compiler::NoMatch() { return Frag(0, nullPatchList); }
 
 // Is a an unmatchable fragment?
-static bool IsNoMatch(Frag a) {
-  return a.begin == 0;
-}
+static bool IsNoMatch(Frag a) { return a.begin == 0; }
 
 // Given fragments a and b, returns fragment for ab.
 Frag Compiler::Cat(Frag a, Frag b) {
@@ -312,9 +306,8 @@ Frag Compiler::Cat(Frag a, Frag b) {
     return NoMatch();
 
   // Elide no-op.
-  Prog::Inst* begin = &inst_[a.begin];
-  if (begin->opcode() == kInstNop &&
-      a.end.p == (a.begin << 1) &&
+  Prog::Inst *begin = &inst_[a.begin];
+  if (begin->opcode() == kInstNop && a.end.p == (a.begin << 1) &&
       begin->out() == 0) {
     // in case refs to a somewhere
     PatchList::Patch(inst_.data(), a.end, b.begin);
@@ -438,22 +431,22 @@ Frag Compiler::Capture(Frag a, int n) {
   int id = AllocInst(2);
   if (id < 0)
     return NoMatch();
-  inst_[id].InitCapture(2*n, a.begin);
-  inst_[id+1].InitCapture(2*n+1, 0);
-  PatchList::Patch(inst_.data(), a.end, id+1);
+  inst_[id].InitCapture(2 * n, a.begin);
+  inst_[id + 1].InitCapture(2 * n + 1, 0);
+  PatchList::Patch(inst_.data(), a.end, id + 1);
 
-  return Frag(id, PatchList::Mk((id+1) << 1));
+  return Frag(id, PatchList::Mk((id + 1) << 1));
 }
 
 // A Rune is a name for a Unicode code point.
 // Returns maximum rune encoded by UTF-8 sequence of length len.
 static int MaxRune(int len) {
-  int b;  // number of Rune bits in len-byte UTF-8 sequence (len < UTFmax)
+  int b; // number of Rune bits in len-byte UTF-8 sequence (len < UTFmax)
   if (len == 1)
     b = 7;
   else
-    b = 8-(len+1) + 6*(len-1);
-  return (1<<b) - 1;   // maximum Rune for b bits.
+    b = 8 - (len + 1) + 6 * (len - 1);
+  return (1 << b) - 1; // maximum Rune for b bits.
 }
 
 // The rune range compiler caches common suffix fragments,
@@ -483,9 +476,7 @@ int Compiler::UncachedRuneByteSuffix(uint8_t lo, uint8_t hi, bool foldcase,
 
 static uint64_t MakeRuneCacheKey(uint8_t lo, uint8_t hi, bool foldcase,
                                  int next) {
-  return (uint64_t)next << 17 |
-         (uint64_t)lo   <<  9 |
-         (uint64_t)hi   <<  1 |
+  return (uint64_t)next << 17 | (uint64_t)lo << 9 | (uint64_t)hi << 1 |
          (uint64_t)foldcase;
 }
 
@@ -550,7 +541,7 @@ int Compiler::AddSuffixRecursive(int root, int id) {
   int br;
   if (f.end.p == 0)
     br = root;
-  else if (f.end.p&1)
+  else if (f.end.p & 1)
     br = inst_[f.begin].out1();
   else
     br = inst_[f.begin].out();
@@ -568,7 +559,7 @@ int Compiler::AddSuffixRecursive(int root, int id) {
     br = byterange;
     if (f.end.p == 0)
       root = br;
-    else if (f.end.p&1)
+    else if (f.end.p & 1)
       inst_[f.begin].out1_ = br;
     else
       inst_[f.begin].set_out(br);
@@ -578,7 +569,7 @@ int Compiler::AddSuffixRecursive(int root, int id) {
   if (!IsCachedRuneByteSuffix(id)) {
     // The head should be the instruction most recently allocated, so free it
     // instead of leaving it unreachable.
-    DCHECK_EQ(id, ninst_-1);
+    DCHECK_EQ(id, ninst_ - 1);
     inst_[id].out_opcode_ = 0;
     inst_[id].out1_ = 0;
     ninst_--;
@@ -630,9 +621,7 @@ Frag Compiler::FindByteRange(int root, int id) {
   return NoMatch();
 }
 
-Frag Compiler::EndRange() {
-  return rune_range_;
-}
+Frag Compiler::EndRange() { return rune_range_; }
 
 // Converts rune range lo-hi into a fragment that recognizes
 // the bytes that would make up those runes in the current
@@ -642,13 +631,13 @@ Frag Compiler::EndRange() {
 
 void Compiler::AddRuneRange(Rune lo, Rune hi, bool foldcase) {
   switch (encoding_) {
-    default:
-    case kEncodingUTF8:
-      AddRuneRangeUTF8(lo, hi, foldcase);
-      break;
-    case kEncodingLatin1:
-      AddRuneRangeLatin1(lo, hi, foldcase);
-      break;
+  default:
+  case kEncodingUTF8:
+    AddRuneRangeUTF8(lo, hi, foldcase);
+    break;
+  case kEncodingLatin1:
+    AddRuneRangeLatin1(lo, hi, foldcase);
+    break;
   }
 }
 
@@ -674,29 +663,78 @@ static struct ByteRangeProg {
   int lo;
   int hi;
 } prog_80_10ffff[] = {
-  // Two-byte
-  { -1, 0x80, 0xBF, },  // 0:  80-BF
-  {  0, 0xC2, 0xDF, },  // 1:  C2-DF 80-BF*
+    // Two-byte
+    {
+        -1,
+        0x80,
+        0xBF,
+    }, // 0:  80-BF
+    {
+        0,
+        0xC2,
+        0xDF,
+    }, // 1:  C2-DF 80-BF*
 
-  // Three-byte
-  {  0, 0xA0, 0xBF, },  // 2:  A0-BF 80-BF
-  {  2, 0xE0, 0xE0, },  // 3:  E0 A0-BF 80-BF*
-  {  0, 0x80, 0xBF, },  // 4:  80-BF 80-BF
-  {  4, 0xE1, 0xEF, },  // 5:  E1-EF 80-BF 80-BF*
+    // Three-byte
+    {
+        0,
+        0xA0,
+        0xBF,
+    }, // 2:  A0-BF 80-BF
+    {
+        2,
+        0xE0,
+        0xE0,
+    }, // 3:  E0 A0-BF 80-BF*
+    {
+        0,
+        0x80,
+        0xBF,
+    }, // 4:  80-BF 80-BF
+    {
+        4,
+        0xE1,
+        0xEF,
+    }, // 5:  E1-EF 80-BF 80-BF*
 
-  // Four-byte
-  {  4, 0x90, 0xBF, },  // 6:  90-BF 80-BF 80-BF
-  {  6, 0xF0, 0xF0, },  // 7:  F0 90-BF 80-BF 80-BF*
-  {  4, 0x80, 0xBF, },  // 8:  80-BF 80-BF 80-BF
-  {  8, 0xF1, 0xF3, },  // 9: F1-F3 80-BF 80-BF 80-BF*
-  {  4, 0x80, 0x8F, },  // 10: 80-8F 80-BF 80-BF
-  { 10, 0xF4, 0xF4, },  // 11: F4 80-8F 80-BF 80-BF*
+    // Four-byte
+    {
+        4,
+        0x90,
+        0xBF,
+    }, // 6:  90-BF 80-BF 80-BF
+    {
+        6,
+        0xF0,
+        0xF0,
+    }, // 7:  F0 90-BF 80-BF 80-BF*
+    {
+        4,
+        0x80,
+        0xBF,
+    }, // 8:  80-BF 80-BF 80-BF
+    {
+        8,
+        0xF1,
+        0xF3,
+    }, // 9: F1-F3 80-BF 80-BF 80-BF*
+    {
+        4,
+        0x80,
+        0x8F,
+    }, // 10: 80-8F 80-BF 80-BF
+    {
+        10,
+        0xF4,
+        0xF4,
+    }, // 11: F4 80-8F 80-BF 80-BF*
 };
 
 void Compiler::Add_80_10ffff() {
-  int inst[arraysize(prog_80_10ffff)] = { 0 }; // does not need to be initialized; silences gcc warning
+  int inst[arraysize(prog_80_10ffff)] = {
+      0}; // does not need to be initialized; silences gcc warning
   for (size_t i = 0; i < arraysize(prog_80_10ffff); i++) {
-    const ByteRangeProg& p = prog_80_10ffff[i];
+    const ByteRangeProg &p = prog_80_10ffff[i];
     int next = 0;
     if (p.next >= 0)
       next = inst[p.next];
@@ -723,7 +761,7 @@ void Compiler::AddRuneRangeUTF8(Rune lo, Rune hi, bool foldcase) {
     Rune max = MaxRune(i);
     if (lo <= max && max < hi) {
       AddRuneRangeUTF8(lo, max, foldcase);
-      AddRuneRangeUTF8(max+1, hi, foldcase);
+      AddRuneRangeUTF8(max + 1, hi, foldcase);
       return;
     }
   }
@@ -737,16 +775,16 @@ void Compiler::AddRuneRangeUTF8(Rune lo, Rune hi, bool foldcase) {
 
   // Split range into sections that agree on leading bytes.
   for (int i = 1; i < UTFmax; i++) {
-    uint32_t m = (1<<(6*i)) - 1;  // last i bytes of a UTF-8 sequence
+    uint32_t m = (1 << (6 * i)) - 1; // last i bytes of a UTF-8 sequence
     if ((lo & ~m) != (hi & ~m)) {
       if ((lo & m) != 0) {
-        AddRuneRangeUTF8(lo, lo|m, foldcase);
-        AddRuneRangeUTF8((lo|m)+1, hi, foldcase);
+        AddRuneRangeUTF8(lo, lo | m, foldcase);
+        AddRuneRangeUTF8((lo | m) + 1, hi, foldcase);
         return;
       }
       if ((hi & m) != m) {
-        AddRuneRangeUTF8(lo, (hi&~m)-1, foldcase);
-        AddRuneRangeUTF8(hi&~m, hi, foldcase);
+        AddRuneRangeUTF8(lo, (hi & ~m) - 1, foldcase);
+        AddRuneRangeUTF8(hi & ~m, hi, foldcase);
         return;
       }
     }
@@ -754,9 +792,9 @@ void Compiler::AddRuneRangeUTF8(Rune lo, Rune hi, bool foldcase) {
 
   // Finally.  Generate byte matching equivalent for lo-hi.
   uint8_t ulo[UTFmax], uhi[UTFmax];
-  int n = runetochar(reinterpret_cast<char*>(ulo), &lo);
-  int m = runetochar(reinterpret_cast<char*>(uhi), &hi);
-  (void)m;  // USED(m)
+  int n = runetochar(reinterpret_cast<char *>(ulo), &lo);
+  int m = runetochar(reinterpret_cast<char *>(uhi), &hi);
+  (void)m; // USED(m)
   DCHECK_EQ(n, m);
 
   // The logic below encodes this thinking:
@@ -788,16 +826,16 @@ void Compiler::AddRuneRangeUTF8(Rune lo, Rune hi, bool foldcase) {
     for (int i = 0; i < n; i++) {
       // In reverse UTF-8 mode: cache the leading byte; don't cache the last
       // continuation byte; cache anything else iff it's a single byte (XX-XX).
-      if (i == 0 || (ulo[i] == uhi[i] && i != n-1))
+      if (i == 0 || (ulo[i] == uhi[i] && i != n - 1))
         id = CachedRuneByteSuffix(ulo[i], uhi[i], false, id);
       else
         id = UncachedRuneByteSuffix(ulo[i], uhi[i], false, id);
     }
   } else {
-    for (int i = n-1; i >= 0; i--) {
+    for (int i = n - 1; i >= 0; i--) {
       // In forward UTF-8 mode: don't cache the leading byte; cache the last
       // continuation byte; cache anything else iff it's a byte range (XX-YY).
-      if (i == n-1 || (ulo[i] < uhi[i] && i != 0))
+      if (i == n - 1 || (ulo[i] < uhi[i] && i != 0))
         id = CachedRuneByteSuffix(ulo[i], uhi[i], false, id);
       else
         id = UncachedRuneByteSuffix(ulo[i], uhi[i], false, id);
@@ -816,44 +854,44 @@ Frag Compiler::Copy(Frag arg) {
 
 // Visits a node quickly; called once WalkExponential has
 // decided to cut this walk short.
-Frag Compiler::ShortVisit(Regexp* re, Frag) {
+Frag Compiler::ShortVisit(Regexp *re, Frag) {
   failed_ = true;
   return NoMatch();
 }
 
 // Called before traversing a node's children during the walk.
-Frag Compiler::PreVisit(Regexp* re, Frag, bool* stop) {
+Frag Compiler::PreVisit(Regexp *re, Frag, bool *stop) {
   // Cut off walk if we've already failed.
   if (failed_)
     *stop = true;
 
-  return Frag();  // not used by caller
+  return Frag(); // not used by caller
 }
 
 Frag Compiler::Literal(Rune r, bool foldcase) {
   switch (encoding_) {
-    default:
-      return Frag();
+  default:
+    return Frag();
 
-    case kEncodingLatin1:
+  case kEncodingLatin1:
+    return ByteRange(r, r, foldcase);
+
+  case kEncodingUTF8: {
+    if (r < Runeself) // Make common case fast.
       return ByteRange(r, r, foldcase);
-
-    case kEncodingUTF8: {
-      if (r < Runeself)  // Make common case fast.
-        return ByteRange(r, r, foldcase);
-      uint8_t buf[UTFmax];
-      int n = runetochar(reinterpret_cast<char*>(buf), &r);
-      Frag f = ByteRange((uint8_t)buf[0], buf[0], false);
-      for (int i = 1; i < n; i++)
-        f = Cat(f, ByteRange((uint8_t)buf[i], buf[i], false));
-      return f;
-    }
+    uint8_t buf[UTFmax];
+    int n = runetochar(reinterpret_cast<char *>(buf), &r);
+    Frag f = ByteRange((uint8_t)buf[0], buf[0], false);
+    for (int i = 1; i < n; i++)
+      f = Cat(f, ByteRange((uint8_t)buf[i], buf[i], false));
+    return f;
+  }
   }
 }
 
 // Called after traversing the node's children during the walk.
 // Given their frags, build and return the frag for this re.
-Frag Compiler::PostVisit(Regexp* re, Frag, Frag, Frag* child_frags,
+Frag Compiler::PostVisit(Regexp *re, Frag, Frag, Frag *child_frags,
                          int nchild_frags) {
   // If a child failed, don't bother going forward, especially
   // since the child_frags might contain Frags with NULLs in them.
@@ -862,137 +900,137 @@ Frag Compiler::PostVisit(Regexp* re, Frag, Frag, Frag* child_frags,
 
   // Given the child fragments, return the fragment for this node.
   switch (re->op()) {
-    case kRegexpRepeat:
-      // Should not see; code at bottom of function will print error
-      break;
+  case kRegexpRepeat:
+    // Should not see; code at bottom of function will print error
+    break;
 
-    case kRegexpNoMatch:
-      return NoMatch();
+  case kRegexpNoMatch:
+    return NoMatch();
 
-    case kRegexpEmptyMatch:
+  case kRegexpEmptyMatch:
+    return Nop();
+
+  case kRegexpHaveMatch: {
+    Frag f = Match(re->match_id());
+    if (anchor_ == RE2::ANCHOR_BOTH) {
+      // Append \z or else the subexpression will effectively be unanchored.
+      // Complemented by the UNANCHORED case in CompileSet().
+      f = Cat(EmptyWidth(kEmptyEndText), f);
+    }
+    return f;
+  }
+
+  case kRegexpConcat: {
+    Frag f = child_frags[0];
+    for (int i = 1; i < nchild_frags; i++)
+      f = Cat(f, child_frags[i]);
+    return f;
+  }
+
+  case kRegexpAlternate: {
+    Frag f = child_frags[0];
+    for (int i = 1; i < nchild_frags; i++)
+      f = Alt(f, child_frags[i]);
+    return f;
+  }
+
+  case kRegexpStar:
+    return Star(child_frags[0], (re->parse_flags() & Regexp::NonGreedy) != 0);
+
+  case kRegexpPlus:
+    return Plus(child_frags[0], (re->parse_flags() & Regexp::NonGreedy) != 0);
+
+  case kRegexpQuest:
+    return Quest(child_frags[0], (re->parse_flags() & Regexp::NonGreedy) != 0);
+
+  case kRegexpLiteral:
+    return Literal(re->rune(), (re->parse_flags() & Regexp::FoldCase) != 0);
+
+  case kRegexpLiteralString: {
+    // Concatenation of literals.
+    if (re->nrunes() == 0)
       return Nop();
+    Frag f;
+    for (int i = 0; i < re->nrunes(); i++) {
+      Frag f1 =
+          Literal(re->runes()[i], (re->parse_flags() & Regexp::FoldCase) != 0);
+      if (i == 0)
+        f = f1;
+      else
+        f = Cat(f, f1);
+    }
+    return f;
+  }
 
-    case kRegexpHaveMatch: {
-      Frag f = Match(re->match_id());
-      if (anchor_ == RE2::ANCHOR_BOTH) {
-        // Append \z or else the subexpression will effectively be unanchored.
-        // Complemented by the UNANCHORED case in CompileSet().
-        f = Cat(EmptyWidth(kEmptyEndText), f);
-      }
-      return f;
+  case kRegexpAnyChar:
+    BeginRange();
+    AddRuneRange(0, Runemax, false);
+    return EndRange();
+
+  case kRegexpAnyByte:
+    return ByteRange(0x00, 0xFF, false);
+
+  case kRegexpCharClass: {
+    CharClass *cc = re->cc();
+    if (cc->empty()) {
+      // This can't happen.
+      LOG(DFATAL) << "No ranges in char class";
+      failed_ = true;
+      return NoMatch();
     }
 
-    case kRegexpConcat: {
-      Frag f = child_frags[0];
-      for (int i = 1; i < nchild_frags; i++)
-        f = Cat(f, child_frags[i]);
-      return f;
+    // ASCII case-folding optimization: if the char class
+    // behaves the same on A-Z as it does on a-z,
+    // discard any ranges wholly contained in A-Z
+    // and mark the other ranges as foldascii.
+    // This reduces the size of a program for
+    // (?i)abc from 3 insts per letter to 1 per letter.
+    bool foldascii = cc->FoldsASCII();
+
+    // Character class is just a big OR of the different
+    // character ranges in the class.
+    BeginRange();
+    for (CharClass::iterator i = cc->begin(); i != cc->end(); ++i) {
+      // ASCII case-folding optimization (see above).
+      if (foldascii && 'A' <= i->lo && i->hi <= 'Z')
+        continue;
+
+      // If this range contains all of A-Za-z or none of it,
+      // the fold flag is unnecessary; don't bother.
+      bool fold = foldascii;
+      if ((i->lo <= 'A' && 'z' <= i->hi) || i->hi < 'A' || 'z' < i->lo ||
+          ('Z' < i->lo && i->hi < 'a'))
+        fold = false;
+
+      AddRuneRange(i->lo, i->hi, fold);
     }
+    return EndRange();
+  }
 
-    case kRegexpAlternate: {
-      Frag f = child_frags[0];
-      for (int i = 1; i < nchild_frags; i++)
-        f = Alt(f, child_frags[i]);
-      return f;
-    }
+  case kRegexpCapture:
+    // If this is a non-capturing parenthesis -- (?:foo) --
+    // just use the inner expression.
+    if (re->cap() < 0)
+      return child_frags[0];
+    return Capture(child_frags[0], re->cap());
 
-    case kRegexpStar:
-      return Star(child_frags[0], (re->parse_flags()&Regexp::NonGreedy) != 0);
+  case kRegexpBeginLine:
+    return EmptyWidth(reversed_ ? kEmptyEndLine : kEmptyBeginLine);
 
-    case kRegexpPlus:
-      return Plus(child_frags[0], (re->parse_flags()&Regexp::NonGreedy) != 0);
+  case kRegexpEndLine:
+    return EmptyWidth(reversed_ ? kEmptyBeginLine : kEmptyEndLine);
 
-    case kRegexpQuest:
-      return Quest(child_frags[0], (re->parse_flags()&Regexp::NonGreedy) != 0);
+  case kRegexpBeginText:
+    return EmptyWidth(reversed_ ? kEmptyEndText : kEmptyBeginText);
 
-    case kRegexpLiteral:
-      return Literal(re->rune(), (re->parse_flags()&Regexp::FoldCase) != 0);
+  case kRegexpEndText:
+    return EmptyWidth(reversed_ ? kEmptyBeginText : kEmptyEndText);
 
-    case kRegexpLiteralString: {
-      // Concatenation of literals.
-      if (re->nrunes() == 0)
-        return Nop();
-      Frag f;
-      for (int i = 0; i < re->nrunes(); i++) {
-        Frag f1 = Literal(re->runes()[i],
-                          (re->parse_flags()&Regexp::FoldCase) != 0);
-        if (i == 0)
-          f = f1;
-        else
-          f = Cat(f, f1);
-      }
-      return f;
-    }
+  case kRegexpWordBoundary:
+    return EmptyWidth(kEmptyWordBoundary);
 
-    case kRegexpAnyChar:
-      BeginRange();
-      AddRuneRange(0, Runemax, false);
-      return EndRange();
-
-    case kRegexpAnyByte:
-      return ByteRange(0x00, 0xFF, false);
-
-    case kRegexpCharClass: {
-      CharClass* cc = re->cc();
-      if (cc->empty()) {
-        // This can't happen.
-        LOG(DFATAL) << "No ranges in char class";
-        failed_ = true;
-        return NoMatch();
-      }
-
-      // ASCII case-folding optimization: if the char class
-      // behaves the same on A-Z as it does on a-z,
-      // discard any ranges wholly contained in A-Z
-      // and mark the other ranges as foldascii.
-      // This reduces the size of a program for
-      // (?i)abc from 3 insts per letter to 1 per letter.
-      bool foldascii = cc->FoldsASCII();
-
-      // Character class is just a big OR of the different
-      // character ranges in the class.
-      BeginRange();
-      for (CharClass::iterator i = cc->begin(); i != cc->end(); ++i) {
-        // ASCII case-folding optimization (see above).
-        if (foldascii && 'A' <= i->lo && i->hi <= 'Z')
-          continue;
-
-        // If this range contains all of A-Za-z or none of it,
-        // the fold flag is unnecessary; don't bother.
-        bool fold = foldascii;
-        if ((i->lo <= 'A' && 'z' <= i->hi) || i->hi < 'A' || 'z' < i->lo ||
-            ('Z' < i->lo && i->hi < 'a'))
-          fold = false;
-
-        AddRuneRange(i->lo, i->hi, fold);
-      }
-      return EndRange();
-    }
-
-    case kRegexpCapture:
-      // If this is a non-capturing parenthesis -- (?:foo) --
-      // just use the inner expression.
-      if (re->cap() < 0)
-        return child_frags[0];
-      return Capture(child_frags[0], re->cap());
-
-    case kRegexpBeginLine:
-      return EmptyWidth(reversed_ ? kEmptyEndLine : kEmptyBeginLine);
-
-    case kRegexpEndLine:
-      return EmptyWidth(reversed_ ? kEmptyBeginLine : kEmptyEndLine);
-
-    case kRegexpBeginText:
-      return EmptyWidth(reversed_ ? kEmptyEndText : kEmptyBeginText);
-
-    case kRegexpEndText:
-      return EmptyWidth(reversed_ ? kEmptyBeginText : kEmptyEndText);
-
-    case kRegexpWordBoundary:
-      return EmptyWidth(kEmptyWordBoundary);
-
-    case kRegexpNoWordBoundary:
-      return EmptyWidth(kEmptyNonWordBoundary);
+  case kRegexpNoWordBoundary:
+    return EmptyWidth(kEmptyNonWordBoundary);
   }
   LOG(DFATAL) << "Missing case in Compiler: " << re->op();
   failed_ = true;
@@ -1002,9 +1040,9 @@ Frag Compiler::PostVisit(Regexp* re, Frag, Frag, Frag* child_frags,
 // Is this regexp required to start at the beginning of the text?
 // Only approximate; can return false for complicated regexps like (\Aa|\Ab),
 // but handles (\A(a|b)).  Could use the Walker to write a more exact one.
-static bool IsAnchorStart(Regexp** pre, int depth) {
-  Regexp* re = *pre;
-  Regexp* sub;
+static bool IsAnchorStart(Regexp **pre, int depth) {
+  Regexp *re = *pre;
+  Regexp *sub;
   // The depth limit makes sure that we don't overflow
   // the stack on a deeply nested regexp.  As the comment
   // above says, IsAnchorStart is conservative, so returning
@@ -1012,36 +1050,36 @@ static bool IsAnchorStart(Regexp** pre, int depth) {
   if (re == NULL || depth >= 4)
     return false;
   switch (re->op()) {
-    default:
-      break;
-    case kRegexpConcat:
-      if (re->nsub() > 0) {
-        sub = re->sub()[0]->Incref();
-        if (IsAnchorStart(&sub, depth+1)) {
-          PODArray<Regexp*> subcopy(re->nsub());
-          subcopy[0] = sub;  // already have reference
-          for (int i = 1; i < re->nsub(); i++)
-            subcopy[i] = re->sub()[i]->Incref();
-          *pre = Regexp::Concat(subcopy.data(), re->nsub(), re->parse_flags());
-          re->Decref();
-          return true;
-        }
-        sub->Decref();
-      }
-      break;
-    case kRegexpCapture:
+  default:
+    break;
+  case kRegexpConcat:
+    if (re->nsub() > 0) {
       sub = re->sub()[0]->Incref();
-      if (IsAnchorStart(&sub, depth+1)) {
-        *pre = Regexp::Capture(sub, re->parse_flags(), re->cap());
+      if (IsAnchorStart(&sub, depth + 1)) {
+        PODArray<Regexp *> subcopy(re->nsub());
+        subcopy[0] = sub; // already have reference
+        for (int i = 1; i < re->nsub(); i++)
+          subcopy[i] = re->sub()[i]->Incref();
+        *pre = Regexp::Concat(subcopy.data(), re->nsub(), re->parse_flags());
         re->Decref();
         return true;
       }
       sub->Decref();
-      break;
-    case kRegexpBeginText:
-      *pre = Regexp::LiteralString(NULL, 0, re->parse_flags());
+    }
+    break;
+  case kRegexpCapture:
+    sub = re->sub()[0]->Incref();
+    if (IsAnchorStart(&sub, depth + 1)) {
+      *pre = Regexp::Capture(sub, re->parse_flags(), re->cap());
       re->Decref();
       return true;
+    }
+    sub->Decref();
+    break;
+  case kRegexpBeginText:
+    *pre = Regexp::LiteralString(NULL, 0, re->parse_flags());
+    re->Decref();
+    return true;
   }
   return false;
 }
@@ -1049,9 +1087,9 @@ static bool IsAnchorStart(Regexp** pre, int depth) {
 // Is this regexp required to start at the end of the text?
 // Only approximate; can return false for complicated regexps like (a\z|b\z),
 // but handles ((a|b)\z).  Could use the Walker to write a more exact one.
-static bool IsAnchorEnd(Regexp** pre, int depth) {
-  Regexp* re = *pre;
-  Regexp* sub;
+static bool IsAnchorEnd(Regexp **pre, int depth) {
+  Regexp *re = *pre;
+  Regexp *sub;
   // The depth limit makes sure that we don't overflow
   // the stack on a deeply nested regexp.  As the comment
   // above says, IsAnchorEnd is conservative, so returning
@@ -1059,36 +1097,36 @@ static bool IsAnchorEnd(Regexp** pre, int depth) {
   if (re == NULL || depth >= 4)
     return false;
   switch (re->op()) {
-    default:
-      break;
-    case kRegexpConcat:
-      if (re->nsub() > 0) {
-        sub = re->sub()[re->nsub() - 1]->Incref();
-        if (IsAnchorEnd(&sub, depth+1)) {
-          PODArray<Regexp*> subcopy(re->nsub());
-          subcopy[re->nsub() - 1] = sub;  // already have reference
-          for (int i = 0; i < re->nsub() - 1; i++)
-            subcopy[i] = re->sub()[i]->Incref();
-          *pre = Regexp::Concat(subcopy.data(), re->nsub(), re->parse_flags());
-          re->Decref();
-          return true;
-        }
-        sub->Decref();
-      }
-      break;
-    case kRegexpCapture:
-      sub = re->sub()[0]->Incref();
-      if (IsAnchorEnd(&sub, depth+1)) {
-        *pre = Regexp::Capture(sub, re->parse_flags(), re->cap());
+  default:
+    break;
+  case kRegexpConcat:
+    if (re->nsub() > 0) {
+      sub = re->sub()[re->nsub() - 1]->Incref();
+      if (IsAnchorEnd(&sub, depth + 1)) {
+        PODArray<Regexp *> subcopy(re->nsub());
+        subcopy[re->nsub() - 1] = sub; // already have reference
+        for (int i = 0; i < re->nsub() - 1; i++)
+          subcopy[i] = re->sub()[i]->Incref();
+        *pre = Regexp::Concat(subcopy.data(), re->nsub(), re->parse_flags());
         re->Decref();
         return true;
       }
       sub->Decref();
-      break;
-    case kRegexpEndText:
-      *pre = Regexp::LiteralString(NULL, 0, re->parse_flags());
+    }
+    break;
+  case kRegexpCapture:
+    sub = re->sub()[0]->Incref();
+    if (IsAnchorEnd(&sub, depth + 1)) {
+      *pre = Regexp::Capture(sub, re->parse_flags(), re->cap());
       re->Decref();
       return true;
+    }
+    sub->Decref();
+    break;
+  case kRegexpEndText:
+    *pre = Regexp::LiteralString(NULL, 0, re->parse_flags());
+    re->Decref();
+    return true;
   }
   return false;
 }
@@ -1101,7 +1139,7 @@ void Compiler::Setup(Regexp::ParseFlags flags, int64_t max_mem,
     encoding_ = kEncodingLatin1;
   max_mem_ = max_mem;
   if (max_mem <= 0) {
-    max_ninst_ = 100000;  // more than enough
+    max_ninst_ = 100000; // more than enough
   } else if (static_cast<size_t>(max_mem) <= sizeof(Prog)) {
     // No room for anything.
     max_ninst_ = 0;
@@ -1115,8 +1153,8 @@ void Compiler::Setup(Regexp::ParseFlags flags, int64_t max_mem,
     // (The point of allowing more than 32 bits of memory is to
     // have plenty of room for the DFA states, not to use it up
     // on the program.)
-    if (m >= 1<<24)
-      m = 1<<24;
+    if (m >= 1 << 24)
+      m = 1 << 24;
 
     // Inst imposes its own limit (currently bigger than 2^24 but be safe).
     if (m > Prog::Inst::kMaxInst)
@@ -1133,14 +1171,14 @@ void Compiler::Setup(Regexp::ParseFlags flags, int64_t max_mem,
 // If reversed is true, compiles a program that expects
 // to run over the input string backward (reverses all concatenations).
 // The reversed flag is also recorded in the returned program.
-Prog* Compiler::Compile(Regexp* re, bool reversed, int64_t max_mem) {
+Prog *Compiler::Compile(Regexp *re, bool reversed, int64_t max_mem) {
   Compiler c;
   c.Setup(re->parse_flags(), max_mem, RE2::UNANCHORED /* unused */);
   c.reversed_ = reversed;
 
   // Simplify to remove things like counted repetitions
   // and character classes like \d.
-  Regexp* sre = re->Simplify();
+  Regexp *sre = re->Simplify();
   if (sre == NULL)
     return NULL;
 
@@ -1150,7 +1188,7 @@ Prog* Compiler::Compile(Regexp* re, bool reversed, int64_t max_mem) {
   bool is_anchor_end = IsAnchorEnd(&sre, 0);
 
   // Generate fragment for entire regexp.
-  Frag all = c.WalkExponential(sre, Frag(), 2*c.max_ninst_);
+  Frag all = c.WalkExponential(sre, Frag(), 2 * c.max_ninst_);
   sre->Decref();
   if (c.failed_)
     return NULL;
@@ -1181,7 +1219,7 @@ Prog* Compiler::Compile(Regexp* re, bool reversed, int64_t max_mem) {
   return c.Finish();
 }
 
-Prog* Compiler::Finish() {
+Prog *Compiler::Finish() {
   if (failed_)
     return NULL;
 
@@ -1200,45 +1238,43 @@ Prog* Compiler::Finish() {
 
   // Record remaining memory for DFA.
   if (max_mem_ <= 0) {
-    prog_->set_dfa_mem(1<<20);
+    prog_->set_dfa_mem(1 << 20);
   } else {
     int64_t m = max_mem_ - sizeof(Prog);
-    m -= prog_->size_*sizeof(Prog::Inst);  // account for inst_
+    m -= prog_->size_ * sizeof(Prog::Inst); // account for inst_
     if (prog_->CanBitState())
-      m -= prog_->size_*sizeof(uint16_t);  // account for list_heads_
+      m -= prog_->size_ * sizeof(uint16_t); // account for list_heads_
     if (m < 0)
       m = 0;
     prog_->set_dfa_mem(m);
   }
 
-  Prog* p = prog_;
+  Prog *p = prog_;
   prog_ = NULL;
   return p;
 }
 
 // Converts Regexp to Prog.
-Prog* Regexp::CompileToProg(int64_t max_mem) {
+Prog *Regexp::CompileToProg(int64_t max_mem) {
   return Compiler::Compile(this, false, max_mem);
 }
 
-Prog* Regexp::CompileToReverseProg(int64_t max_mem) {
+Prog *Regexp::CompileToReverseProg(int64_t max_mem) {
   return Compiler::Compile(this, true, max_mem);
 }
 
-Frag Compiler::DotStar() {
-  return Star(ByteRange(0x00, 0xff, false), true);
-}
+Frag Compiler::DotStar() { return Star(ByteRange(0x00, 0xff, false), true); }
 
 // Compiles RE set to Prog.
-Prog* Compiler::CompileSet(Regexp* re, RE2::Anchor anchor, int64_t max_mem) {
+Prog *Compiler::CompileSet(Regexp *re, RE2::Anchor anchor, int64_t max_mem) {
   Compiler c;
   c.Setup(re->parse_flags(), max_mem, anchor);
 
-  Regexp* sre = re->Simplify();
+  Regexp *sre = re->Simplify();
   if (sre == NULL)
     return NULL;
 
-  Frag all = c.WalkExponential(sre, Frag(), 2*c.max_ninst_);
+  Frag all = c.WalkExponential(sre, Frag(), 2 * c.max_ninst_);
   sre->Decref();
   if (c.failed_)
     return NULL;
@@ -1254,7 +1290,7 @@ Prog* Compiler::CompileSet(Regexp* re, RE2::Anchor anchor, int64_t max_mem) {
   c.prog_->set_start(all.begin);
   c.prog_->set_start_unanchored(all.begin);
 
-  Prog* prog = c.Finish();
+  Prog *prog = c.Finish();
   if (prog == NULL)
     return NULL;
 
@@ -1262,8 +1298,8 @@ Prog* Compiler::CompileSet(Regexp* re, RE2::Anchor anchor, int64_t max_mem) {
   // since we're not going to fall back to the NFA.
   bool dfa_failed = false;
   StringPiece sp = "hello, world";
-  prog->SearchDFA(sp, sp, Prog::kAnchored, Prog::kManyMatch,
-                  NULL, &dfa_failed, NULL);
+  prog->SearchDFA(sp, sp, Prog::kAnchored, Prog::kManyMatch, NULL, &dfa_failed,
+                  NULL);
   if (dfa_failed) {
     delete prog;
     return NULL;
@@ -1272,8 +1308,8 @@ Prog* Compiler::CompileSet(Regexp* re, RE2::Anchor anchor, int64_t max_mem) {
   return prog;
 }
 
-Prog* Prog::CompileSet(Regexp* re, RE2::Anchor anchor, int64_t max_mem) {
+Prog *Prog::CompileSet(Regexp *re, RE2::Anchor anchor, int64_t max_mem) {
   return Compiler::CompileSet(re, anchor, max_mem);
 }
 
-}  // namespace re2
+} // namespace re2

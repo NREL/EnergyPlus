@@ -224,8 +224,6 @@ namespace PipeHeatTransfer {
 
         void PushInnerTimeStepArrays();
 
-        void oneTimeInit_new(EnergyPlusData &state) override;
-
         void oneTimeInit(EnergyPlusData &state) override;
 
         void InitPipesHeatTransfer(EnergyPlusData &state, bool FirstHVACIteration);

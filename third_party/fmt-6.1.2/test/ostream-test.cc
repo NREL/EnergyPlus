@@ -21,9 +21,9 @@ template <> struct formatter<test> : formatter<int> {
 };
 }  // namespace fmt
 
-#include "fmt/ostream.h"
-
 #include <sstream>
+
+#include "fmt/ostream.h"
 #include "gmock.h"
 #include "gtest-extra.h"
 #include "util.h"

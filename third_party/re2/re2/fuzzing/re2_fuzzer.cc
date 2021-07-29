@@ -2,11 +2,11 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-#include <stddef.h>
-#include <stdint.h>
 #include <map>
 #include <memory>
 #include <queue>
+#include <stddef.h>
+#include <stdint.h>
 #include <string>
 
 #include "re2/prefilter.h"
@@ -17,7 +17,7 @@ using re2::StringPiece;
 // NOT static, NOT signed.
 uint8_t dummy = 0;
 
-void Test(StringPiece pattern, const RE2::Options& options, StringPiece text) {
+void Test(StringPiece pattern, const RE2::Options &options, StringPiece text) {
   RE2 re(pattern, options);
   if (!re.ok())
     return;
@@ -29,17 +29,17 @@ void Test(StringPiece pattern, const RE2::Options& options, StringPiece text) {
   std::unique_ptr<re2::Prefilter> prefilter(re2::Prefilter::FromRE2(&re));
   if (prefilter == nullptr)
     return;
-  std::queue<re2::Prefilter*> nodes;
+  std::queue<re2::Prefilter *> nodes;
   nodes.push(prefilter.get());
   while (!nodes.empty()) {
-    re2::Prefilter* node = nodes.front();
+    re2::Prefilter *node = nodes.front();
     nodes.pop();
     if (node->op() == re2::Prefilter::ATOM) {
       if (node->atom().size() > 9)
         return;
     } else if (node->op() == re2::Prefilter::AND ||
                node->op() == re2::Prefilter::OR) {
-      for (re2::Prefilter* sub : *node->subs())
+      for (re2::Prefilter *sub : *node->subs())
         nodes.push(sub);
     }
   }
@@ -69,7 +69,7 @@ void Test(StringPiece pattern, const RE2::Options& options, StringPiece text) {
     RE2::FullMatch(sp, re);
     RE2::PartialMatch(sp, re);
     RE2::Consume(&sp, re);
-    sp = text;  // Reset.
+    sp = text; // Reset.
     RE2::FindAndConsume(&sp, re);
   } else {
     // Okay, we have at least one capturing group...
@@ -81,14 +81,14 @@ void Test(StringPiece pattern, const RE2::Options& options, StringPiece text) {
     RE2::PartialMatch(sp, re, &l);
     float f;
     RE2::Consume(&sp, re, &f);
-    sp = text;  // Reset.
+    sp = text; // Reset.
     double d;
     RE2::FindAndConsume(&sp, re, &d);
   }
 
   std::string s = std::string(text);
   RE2::Replace(&s, re, "");
-  s = std::string(text);  // Reset.
+  s = std::string(text); // Reset.
   RE2::GlobalReplace(&s, re, "");
 
   std::string min, max;
@@ -101,7 +101,7 @@ void Test(StringPiece pattern, const RE2::Options& options, StringPiece text) {
 }
 
 // Entry point for libFuzzer.
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   if (size == 0 || size > 999)
     return 0;
 
@@ -113,7 +113,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   // counted repetition is involved - whereas the marginal benefit is zero.
   // TODO(junyer): Handle [:isalnum:] et al. when they start to cause pain.
   int char_class = 0;
-  int backslash_p = 0;  // very expensive, so handle specially
+  int backslash_p = 0; // very expensive, so handle specially
   for (size_t i = 0; i < size; i++) {
     if (data[i] == '.')
       char_class++;
@@ -122,10 +122,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
     i++;
     if (i >= size)
       break;
-    if (data[i] == 'p' || data[i] == 'P' ||
-        data[i] == 'd' || data[i] == 'D' ||
-        data[i] == 's' || data[i] == 'S' ||
-        data[i] == 'w' || data[i] == 'W')
+    if (data[i] == 'p' || data[i] == 'P' || data[i] == 'd' || data[i] == 'D' ||
+        data[i] == 's' || data[i] == 'S' || data[i] == 'w' || data[i] == 'W')
       char_class++;
     if (data[i] == 'p' || data[i] == 'P')
       backslash_p++;
@@ -162,7 +160,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   options.set_word_boundary(hash & 512);
   options.set_one_line(hash & 1024);
 
-  const char* ptr = reinterpret_cast<const char*>(data);
+  const char *ptr = reinterpret_cast<const char *>(data);
   int len = static_cast<int>(size);
 
   StringPiece pattern(ptr, len);

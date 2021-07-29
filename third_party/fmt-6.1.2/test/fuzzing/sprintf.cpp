@@ -2,6 +2,7 @@
 // License: see LICENSE.rst in the fmt root directory
 #include <fmt/format.h>
 #include <fmt/printf.h>
+
 #include <cstdint>
 #include <stdexcept>
 

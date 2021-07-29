@@ -758,7 +758,7 @@ bool FluidCoolerspecs::validateTwoSpeedInputs(EnergyPlusData &state,
     return ErrorsFound;
 }
 
-void FluidCoolerspecs::oneTimeInit_new(EnergyPlusData &state)
+void FluidCoolerspecs::oneTimeInit(EnergyPlusData &state)
 {
     this->setupOutputVars(state);
     bool ErrorsFound = false;
@@ -1958,9 +1958,6 @@ void FluidCoolerspecs::report(EnergyPlusData &state, bool const RunFlag)
         this->InletWaterTemp = state.dataLoopNodes->Node(waterInletNode).Temp;
         this->FanEnergy = this->FanPower * ReportingConstant;
     }
-}
-void FluidCoolerspecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
-{
 }
 
 } // namespace EnergyPlus::FluidCoolers

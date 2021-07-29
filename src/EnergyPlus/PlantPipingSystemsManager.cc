@@ -2350,9 +2350,6 @@ namespace PlantPipingSystemsManager {
     void Circuit::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
     {
     }
-    void Circuit::oneTimeInit_new([[maybe_unused]] EnergyPlusData &state)
-    {
-    }
 
     bool Domain::IsConverged_CurrentToPrevIteration()
     {

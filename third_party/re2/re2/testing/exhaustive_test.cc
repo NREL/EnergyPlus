@@ -4,20 +4,16 @@
 
 // Exhaustive testing of regular expression matching.
 
-#include "util/test.h"
 #include "re2/testing/exhaustive_tester.h"
+#include "util/test.h"
 
 namespace re2 {
 
 // Test very simple expressions.
-TEST(EgrepLiterals, Lowercase) {
-  EgrepTest(3, 2, "abc.", 3, "abc", "");
-}
+TEST(EgrepLiterals, Lowercase) { EgrepTest(3, 2, "abc.", 3, "abc", ""); }
 
 // Test mixed-case expressions.
-TEST(EgrepLiterals, MixedCase) {
-  EgrepTest(3, 2, "AaBb.", 2, "AaBb", "");
-}
+TEST(EgrepLiterals, MixedCase) { EgrepTest(3, 2, "AaBb.", 2, "AaBb", ""); }
 
 // Test mixed-case in case-insensitive mode.
 TEST(EgrepLiterals, FoldCase) {
@@ -28,9 +24,6 @@ TEST(EgrepLiterals, FoldCase) {
 }
 
 // Test very simple expressions.
-TEST(EgrepLiterals, UTF8) {
-  EgrepTest(3, 2, "ab.", 4, "a\xE2\x98\xBA", "");
-}
+TEST(EgrepLiterals, UTF8) { EgrepTest(3, 2, "ab.", 4, "a\xE2\x98\xBA", ""); }
 
-}  // namespace re2
-
+} // namespace re2

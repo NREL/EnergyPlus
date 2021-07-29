@@ -392,8 +392,6 @@ namespace GroundHeatExchangers {
         void initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 const &CurTime) override;
 
         void oneTimeInit(EnergyPlusData &state) override;
-
-        void oneTimeInit_new(EnergyPlusData &state) override;
     };
 
     struct GLHESlinky : GLHEBase // LCOV_EXCL_LINE
@@ -459,8 +457,6 @@ namespace GroundHeatExchangers {
         void initEnvironment(EnergyPlusData &state, Real64 const &CurTime) override;
 
         void oneTimeInit(EnergyPlusData &state) override;
-
-        void oneTimeInit_new(EnergyPlusData &state) override;
     };
 
     void GetGroundHeatExchangerInput(EnergyPlusData &state);
