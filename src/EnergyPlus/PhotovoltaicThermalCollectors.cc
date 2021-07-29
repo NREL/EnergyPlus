@@ -1115,7 +1115,7 @@ namespace PhotovoltaicThermalCollectors {
             }
         }
     }
-    void PVTCollectorStruct::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+    void PVTCollectorStruct::oneTimeInit(EnergyPlusData &state)
     {
     }
 
