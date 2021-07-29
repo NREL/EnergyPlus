@@ -2752,7 +2752,7 @@ namespace SurfaceGeometry {
             // Automatic Surface Multipliers: Assign representative heat transfer surfaces
             if (state.dataSurface->UseRepresentativeSurfaceCalculations) {
                 // Conditions where surface always needs to be unique
-                bool forceUniqueSurface = state.dataSurface->Surface(SurfNum).HasShadeControl || state.dataSurface->SurfWinAirflowSource(SurfNum);
+                bool forceUniqueSurface = state.dataSurface->Surface(SurfNum).HasShadeControl || state.dataSurface->SurfWinAirflowSource(SurfNum) || state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).SourceSinkPresent;
                 if (!forceUniqueSurface) {
                     // Make hash key for this surface (used to determine uniqueness)
                     state.dataSurface->Surface(SurfNum).make_hash_key(state, SurfNum);

@@ -605,7 +605,7 @@ void SurfaceData::make_hash_key(EnergyPlusData &state, const int&  SurfNum)
     calcHashKey.Tilt = round(Tilt * 10.0) / 10.0;
     calcHashKey.Height = round(Height * 10.0) / 10.0;
     calcHashKey.Zone = Zone;
-    calcHashKey.TAirRef = TAirRef;
+    calcHashKey.TAirRef = state.dataSurface->SurfTAirRef(SurfNum);
 
     auto& extBoundCond = state.dataSurface->Surface(SurfNum).ExtBoundCond;
     if (extBoundCond > 0) {
@@ -620,21 +620,21 @@ void SurfaceData::make_hash_key(EnergyPlusData &state, const int&  SurfNum)
     calcHashKey.ViewFactorSky = round(ViewFactorSky * 10.0) / 10.0;
 
     calcHashKey.HeatTransferAlgorithm = HeatTransferAlgorithm;
-    calcHashKey.IntConvCoeff = IntConvCoeff;
-    calcHashKey.ExtConvCoeff = ExtConvCoeff;
+    calcHashKey.IntConvCoeff = state.dataSurface->SurfIntConvCoeffIndex(SurfNum);
+    calcHashKey.ExtConvCoeff = state.dataSurface->SurfExtConvCoeffIndex(SurfNum);
     calcHashKey.OSCPtr = OSCPtr;
     calcHashKey.OSCMPtr = OSCMPtr;
 
     calcHashKey.FrameDivider = FrameDivider;
     calcHashKey.SurfWinStormWinConstr = state.dataSurface->SurfWinStormWinConstr(SurfNum);
 
-    calcHashKey.MaterialMovInsulExt = MaterialMovInsulExt;
-    calcHashKey.MaterialMovInsulInt = MaterialMovInsulInt;
-    calcHashKey.SchedMovInsulExt = SchedMovInsulExt;
-    calcHashKey.SchedMovInsulInt = SchedMovInsulInt;
-    calcHashKey.ExternalShadingSchInd = ExternalShadingSchInd;
-    calcHashKey.SurroundingSurfacesNum = SurroundingSurfacesNum;
-    calcHashKey.LinkedOutAirNode = LinkedOutAirNode;
+    calcHashKey.MaterialMovInsulExt = state.dataSurface->SurfMaterialMovInsulExt(SurfNum);
+    calcHashKey.MaterialMovInsulInt = state.dataSurface->SurfMaterialMovInsulInt(SurfNum);
+    calcHashKey.SchedMovInsulExt = state.dataSurface->SurfSchedMovInsulExt(SurfNum);
+    calcHashKey.SchedMovInsulInt = state.dataSurface->SurfSchedMovInsulInt(SurfNum);
+    calcHashKey.ExternalShadingSchInd = state.dataSurface->SurfExternalShadingSchInd(SurfNum);
+    calcHashKey.SurroundingSurfacesNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
+    calcHashKey.LinkedOutAirNode = state.dataSurface->SurfLinkedOutAirNode(SurfNum);
     calcHashKey.OutsideHeatSourceTermSchedule = OutsideHeatSourceTermSchedule;
     calcHashKey.InsideHeatSourceTermSchedule = InsideHeatSourceTermSchedule;
 
