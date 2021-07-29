@@ -1394,8 +1394,8 @@ void GetAirPathData(EnergyPlusData &state)
                             "Air System Simulation Cycle On Off Status",
                             OutputProcessor::Unit::None,
                             state.dataAirLoop->PriAirSysAvailMgr(AirSysNum).AvailStatus,
-                            "HVAC",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::HVAC,
+                            OutputProcessor::SOVStoreType::Average,
                             PrimaryAirSystems(AirSysNum).Name);
     }
 
@@ -2524,22 +2524,22 @@ void SimAirLoops(EnergyPlusData &state, bool const FirstHVACIteration, bool &Sim
                             "Air System Simulation Maximum Iteration Count",
                             OutputProcessor::Unit::None,
                             state.dataSimAirServingZones->salIterMax,
-                            "HVAC",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::HVAC,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SimAir");
         SetupOutputVariable(state,
                             "Air System Simulation Iteration Count",
                             OutputProcessor::Unit::None,
                             state.dataSimAirServingZones->salIterTot,
-                            "HVAC",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::HVAC,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SimAir");
         SetupOutputVariable(state,
                             "Air System Component Model Simulation Calls",
                             OutputProcessor::Unit::None,
                             state.dataSimAirServingZones->NumCallsTot,
-                            "HVAC",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::HVAC,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SimAir");
         state.dataSimAirServingZones->OutputSetupFlag = true;
     }

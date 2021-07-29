@@ -1,186 +1,409 @@
 #include <cassert>
 #include <algorithm>
 #include <cmath>
+#include <utility>
 
 #include "MultiPaneSpecular.hpp"
-#include "AbsorptancesMultiPane.hpp"
-#include "EquivalentLayerSingleComponentMW.hpp"
 #include "WCESingleLayerOptics.hpp"
 #include "WCECommon.hpp"
 
 using namespace FenestrationCommon;
 using namespace SingleLayerOptics;
 
-namespace MultiLayerOptics {
+namespace MultiLayerOptics
+{
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    //  CEquivalentLayerSingleComponentMWAngle
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    CEquivalentLayerSingleComponentMWAngle::CEquivalentLayerSingleComponentMWAngle(
+      CEquivalentLayerSingleComponentMW t_Layer, CAbsorptancesMultiPane t_Abs, double t_Angle) :
+        m_Layer(std::move(t_Layer)),
+        m_Abs(std::move(t_Abs)),
+        m_Angle(t_Angle)
+    {}
 
-	////////////////////////////////////////////////////////////////////////////////////////////
-	//  CEquivalentLayerSingleComponentMWAngle
-	////////////////////////////////////////////////////////////////////////////////////////////
-	CEquivalentLayerSingleComponentMWAngle::CEquivalentLayerSingleComponentMWAngle(
-		const std::shared_ptr< CEquivalentLayerSingleComponentMW >& t_Layer,
-		const std::shared_ptr< CAbsorptancesMultiPane >& t_Abs, const double t_Angle ) :
-		m_Layer( t_Layer ), m_Abs( t_Abs ), m_Angle( t_Angle ) {
+    double CEquivalentLayerSingleComponentMWAngle::angle() const
+    {
+        return m_Angle;
+    }
 
-	}
+    const CEquivalentLayerSingleComponentMW & CEquivalentLayerSingleComponentMWAngle::layer() const
+    {
+        return m_Layer;
+    }
 
-	double CEquivalentLayerSingleComponentMWAngle::angle() const {
-		return m_Angle;
-	}
+    CSeries CEquivalentLayerSingleComponentMWAngle::getProperties(const Side t_Side,
+                                                                  const Property t_Property)
+    {
+        return m_Layer.getProperties(t_Property, t_Side);
+    }
 
-	std::shared_ptr< CEquivalentLayerSingleComponentMW > CEquivalentLayerSingleComponentMWAngle::layer() const {
-		return m_Layer;
-	}
+    CSeries CEquivalentLayerSingleComponentMWAngle::Abs(size_t const Index)
+    {
+        return m_Abs.Abs(Index);
+    }
 
-	std::shared_ptr< CSeries > CEquivalentLayerSingleComponentMWAngle::getProperties( const Side t_Side, const Property t_Property ) {
-		return m_Layer->getProperties( t_Property, t_Side );
-	}
+    FenestrationCommon::CSeries
+      CEquivalentLayerSingleComponentMWAngle::AbsBySide(size_t Index, FenestrationCommon::Side side)
+    {
+        return m_Abs.Abs(Index, side);
+    }
 
-	std::shared_ptr< CSeries > CEquivalentLayerSingleComponentMWAngle::Abs( size_t const Index ) {
-		return m_Abs->Abs( Index );
-	}
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    //  CMultiPaneSpecular
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    CMultiPaneSpecular::CMultiPaneSpecular(
+      const std::vector<std::shared_ptr<SingleLayerOptics::SpecularLayer>> & layers,
+      const CSeries & t_SolarRadiation,
+      const CSeries & t_DetectorData) :
+        m_Layers(layers),
+        m_SolarRadiation(t_SolarRadiation),
+        m_DetectorData(t_DetectorData)
+    {
+        CCommonWavelengths aCommonWL;
+        for(auto & layer : m_Layers)
+        {
+            aCommonWL.addWavelength(layer->getBandWavelengths());
+        }
 
-	////////////////////////////////////////////////////////////////////////////////////////////
-	//  CMultiPaneSpecular
-	////////////////////////////////////////////////////////////////////////////////////////////
-	CMultiPaneSpecular::CMultiPaneSpecular( std::vector< double > const& t_CommonWavelength,
-	                                        const std::shared_ptr< CSeries >& t_SolarRadiation, const std::shared_ptr< CSpecularCell >& t_Layer ) :
-		m_CommonWavelengths( t_CommonWavelength ), m_SolarRadiation( t_SolarRadiation ) {
-		m_SolarRadiation = m_SolarRadiation->interpolate( m_CommonWavelengths );
-		addLayer( t_Layer );
-	}
+        // Finds combination of two wavelength sets without going outside of wavelenght range for
+        // any of spectral samples.
+        m_CommonWavelengths = aCommonWL.getCombinedWavelengths(Combine::Interpolate);
 
-	void CMultiPaneSpecular::addLayer( const std::shared_ptr< CSpecularCell >& t_Layer ) {
-		t_Layer->setSourceData( m_SolarRadiation );
-		m_Layers.push_back( t_Layer );
-	}
+        m_SolarRadiation = m_SolarRadiation.interpolate(m_CommonWavelengths);
 
-	double CMultiPaneSpecular::getProperty( const Side t_Side, const Property t_Property, const double t_Angle,
-	                                        const double minLambda, const double maxLambda, const IntegrationType t_IntegrationType ) {
+        if(m_DetectorData.size() > 0)
+        {
+            m_DetectorData.interpolate(m_CommonWavelengths);
+        }
 
-		CEquivalentLayerSingleComponentMWAngle& aAngularProperties = *getAngular( t_Angle );
+        for(auto & layer : m_Layers)
+        {
+            layer->setSourceData(m_SolarRadiation);
+        }
+    }
 
-		auto aProperties = aAngularProperties.getProperties( t_Side, t_Property );
+    CMultiPaneSpecular::CMultiPaneSpecular(const std::vector<double> & t_CommonWavelength,
+                                           const CSeries & t_SolarRadiation,
+                                           const std::shared_ptr<SpecularLayer> & t_Layer) :
+        m_CommonWavelengths(t_CommonWavelength),
+        m_SolarRadiation(t_SolarRadiation)
+    {
+        m_SolarRadiation = m_SolarRadiation.interpolate(m_CommonWavelengths);
+        addLayer(t_Layer);
+    }
 
-		auto aMult = aProperties->mMult( *m_SolarRadiation );
+    void CMultiPaneSpecular::addLayer(
+      const std::shared_ptr<SingleLayerOptics::SpecularLayer> & t_Layer)
+    {
+        t_Layer->setSourceData(m_SolarRadiation);
+        m_Layers.push_back(t_Layer);
+    }
 
-		auto iIntegrated = aMult->integrate( t_IntegrationType );
-		
-		double totalProperty = iIntegrated->sum( minLambda, maxLambda );
-		double totalSolar = m_SolarRadiation->integrate( t_IntegrationType )->sum( minLambda, maxLambda );
+    std::unique_ptr<CMultiPaneSpecular> CMultiPaneSpecular::create(
+      const std::vector<std::shared_ptr<SingleLayerOptics::SpecularLayer>> & layers,
+      const CSeries & t_SolarRadiation,
+      const CSeries & t_DetectorData)
+    {
+        return std::unique_ptr<CMultiPaneSpecular>(
+          new CMultiPaneSpecular(layers, t_SolarRadiation, t_DetectorData));
+    }
 
-		assert( totalSolar > 0 );
+    double CMultiPaneSpecular::getPropertySimple(
+      PropertySimple t_Property, Side t_Side, Scattering t_Scattering, double t_Theta, double)
+    {
+        return getPropertySimple(
+          getMinLambda(), getMaxLambda(), t_Property, t_Side, t_Scattering, t_Theta);
+    }
 
-		return totalProperty / totalSolar;
-	}
+    double CMultiPaneSpecular::getPropertySimple(const double minLambda,
+                                                 const double maxLambda,
+                                                 FenestrationCommon::PropertySimple t_Property,
+                                                 FenestrationCommon::Side t_Side,
+                                                 FenestrationCommon::Scattering t_Scattering,
+                                                 double t_Theta,
+                                                 double)
+    {
+        double result(0);
+        const auto prop(toProperty(t_Property));
+        switch(t_Scattering)
+        {
+            case Scattering::DirectDirect:
+                result = getProperty(t_Side, prop, t_Theta, minLambda, maxLambda);
+                break;
+            case Scattering::DiffuseDiffuse:
+                result = getHemisphericalProperty(
+                  t_Side, prop, {0, 10, 20, 30, 40, 50, 60, 70, 80, 90}, minLambda, maxLambda);
+                break;
+            case Scattering::DirectDiffuse:
+                result = 0;
+                break;
+            case Scattering::DirectHemispherical:
+                result = getProperty(t_Side, prop, t_Theta, minLambda, maxLambda);
+                break;
+        }
 
-	double CMultiPaneSpecular::getHemisphericalProperty( const Side t_Side, const Property t_Property,
-	                                                     const std::shared_ptr< const std::vector< double > >& t_Angles,
-	                                                     const double minLambda, const double maxLambda, const IntegrationType t_IntegrationType ) {
-		size_t size = t_Angles->size();
-		std::shared_ptr< CSeries > aAngularProperties = std::make_shared< CSeries >();
-		for ( size_t i = 0; i < size; ++i ) {
-			double angle = ( *t_Angles )[ i ];
-			double aProperty = getProperty( t_Side, t_Property, angle, minLambda, maxLambda, t_IntegrationType );
-			aAngularProperties->addProperty( angle, aProperty );
-		}
-		CHemispherical2DIntegrator aIntegrator = CHemispherical2DIntegrator( *aAngularProperties, t_IntegrationType );
-		return aIntegrator.value();
-	}
+        return result;
+    }
 
-	double CMultiPaneSpecular::Abs( size_t const Index, const double t_Angle,
-	                                const double minLambda, const double maxLambda, const IntegrationType t_IntegrationType ) {
-		CEquivalentLayerSingleComponentMWAngle& aAngularProperties = *getAngular( t_Angle );
-		auto aProperties = aAngularProperties.Abs( Index - 1 );
+    double CMultiPaneSpecular::getMinLambda() const
+    {
+        return m_Layers[0]->getMinLambda();
+    }
 
-		auto aMult = aProperties->mMult( *m_SolarRadiation );
+    double CMultiPaneSpecular::getMaxLambda() const
+    {
+        return m_Layers[0]->getMaxLambda();
+    }
 
-		auto iIntegrated = aMult->integrate( t_IntegrationType );
+    std::vector<double> CMultiPaneSpecular::getWavelengths() const
+    {
+        return m_CommonWavelengths;
+    }
 
-		double totalProperty = iIntegrated->sum( minLambda, maxLambda );
-		double totalSolar = m_SolarRadiation->integrate( t_IntegrationType )->sum( minLambda, maxLambda );
+    double CMultiPaneSpecular::getProperty(const Side t_Side,
+                                           const Property t_Property,
+                                           const double t_Angle,
+                                           const double minLambda,
+                                           const double maxLambda,
+                                           const IntegrationType t_IntegrationType,
+                                           double normalizationCoefficient)
+    {
+        CEquivalentLayerSingleComponentMWAngle aAngularProperties = getAngular(t_Angle);
 
-		assert( totalSolar > 0 );
+        auto aProperties = aAngularProperties.getProperties(t_Side, t_Property);
 
-		return totalProperty / totalSolar;
-	}
+        auto solarRadiation = m_SolarRadiation;
 
-	double CMultiPaneSpecular::AbsHemispherical( size_t const Index,
-	                                             const std::shared_ptr< const std::vector< double > >& t_Angles, const double minLambda, const double maxLambda,
-	                                             const IntegrationType t_IntegrationType ) {
-		size_t size = t_Angles->size();
-		std::shared_ptr< CSeries > aAngularProperties = std::make_shared< CSeries >();
-		for ( size_t i = 0; i < size; ++i ) {
-			double angle = ( *t_Angles )[ i ];
-			double aAbs = Abs( Index, angle, minLambda, maxLambda, t_IntegrationType );
-			aAngularProperties->addProperty( angle, aAbs );
-		}
+        if(m_DetectorData.size() > 0)
+        {
+            solarRadiation = solarRadiation * m_DetectorData;
+        }
 
-		CHemispherical2DIntegrator aIntegrator = CHemispherical2DIntegrator( *aAngularProperties, t_IntegrationType );
-		return aIntegrator.value();
-	}
+        auto aMult = aProperties * solarRadiation;
 
-	std::shared_ptr< CEquivalentLayerSingleComponentMWAngle > CMultiPaneSpecular::getAngular( const double t_Angle ) {
-		std::shared_ptr< CEquivalentLayerSingleComponentMWAngle > aAngularProperties = nullptr;
+        const auto iIntegrated = aMult.integrate(t_IntegrationType, normalizationCoefficient);
 
-		std::vector< std::shared_ptr< CEquivalentLayerSingleComponentMWAngle > >::iterator it;
-		it = find_if( m_EquivalentAngle.begin(), m_EquivalentAngle.end(),
-		              [ &t_Angle ]( const std::shared_ptr< CEquivalentLayerSingleComponentMWAngle >& obj ) {
-		              return std::abs( obj->angle() - t_Angle ) < 1e-6;
-	              } );
+        // TODO: Check detector data here and multiply with it if necessary
 
-		if ( it != m_EquivalentAngle.end() ) {
-			aAngularProperties = ( *it );
-		}
-		else {
-			aAngularProperties = createNewAngular( t_Angle );
-		}
+        const double totalProperty = iIntegrated->sum(minLambda, maxLambda);
 
-		return aAngularProperties;
-	}
+        double totalSolar = solarRadiation.integrate(t_IntegrationType, normalizationCoefficient)
+                              ->sum(minLambda, maxLambda);
 
-	std::shared_ptr< CEquivalentLayerSingleComponentMWAngle > CMultiPaneSpecular::createNewAngular( const double t_Angle ) {
-		// Create direction for specular. It is irrelevant what is Phi angle and it is chosen to be zero in this case
-		CBeamDirection aDirection = CBeamDirection( t_Angle, 0 );
-		std::shared_ptr< CEquivalentLayerSingleComponentMW > aEqLayer = nullptr;
-		std::shared_ptr< CAbsorptancesMultiPane > aAbs = nullptr;
-		for ( size_t i = 0; i < m_Layers.size(); ++i ) {
-			std::vector< double > wl = m_Layers[ i ]->getBandWavelengths();
-			std::vector< double > Tv = m_Layers[ i ]->T_dir_dir_band( Side::Front, aDirection );
-			std::vector< double > Rfv = m_Layers[ i ]->R_dir_dir_band( Side::Front, aDirection );
-			std::vector< double > Rbv = m_Layers[ i ]->R_dir_dir_band( Side::Back, aDirection );
-			std::shared_ptr< CSeries > T = std::make_shared< CSeries >();
-			std::shared_ptr< CSeries > Rf = std::make_shared< CSeries >();
-			std::shared_ptr< CSeries > Rb = std::make_shared< CSeries >();
-			for ( size_t j = 0; j < wl.size(); ++j ) {
-				T->addProperty( wl[ j ], Tv[ j ] );
-				Rf->addProperty( wl[ j ], Rfv[ j ] );
-				Rb->addProperty( wl[ j ], Rbv[ j ] );
-			}
-			T = T->interpolate( m_CommonWavelengths );
-			Rf = Rf->interpolate( m_CommonWavelengths );
-			Rb = Rb->interpolate( m_CommonWavelengths );
-			if ( i == 0 ) {
-				aEqLayer = std::make_shared< CEquivalentLayerSingleComponentMW >( T, T, Rf, Rb );
-				aAbs = std::make_shared< CAbsorptancesMultiPane >( T, Rf, Rb );
-			}
-			else {
-				assert( aEqLayer != nullptr );
-				assert( aAbs != nullptr );
-				aEqLayer->addLayer( T, T, Rf, Rb );
-				aAbs->addLayer( T, Rf, Rb );
-			}
-		}
-		assert( aEqLayer != nullptr );
-		assert( aAbs != nullptr );
+        assert(totalSolar > 0);
 
-		std::shared_ptr< CEquivalentLayerSingleComponentMWAngle > newLayer = std::make_shared< CEquivalentLayerSingleComponentMWAngle >( aEqLayer,
-		                                                                                                                       aAbs, t_Angle );
+        return totalProperty / totalSolar;
+    }
 
-		m_EquivalentAngle.push_back( newLayer );
+    double
+      CMultiPaneSpecular::getHemisphericalProperty(Side t_Side,
+                                                   Property t_Property,
+                                                   const std::vector<double> & t_IntegrationAngles,
+                                                   double minLambda,
+                                                   double maxLambda,
+                                                   IntegrationType t_IntegrationType,
+                                                   double normalizationCoefficient)
+    {
+        size_t size = t_IntegrationAngles.size();
+        std::shared_ptr<CSeries> aAngularProperties = std::make_shared<CSeries>();
+        for(size_t i = 0; i < size; ++i)
+        {
+            double angle = t_IntegrationAngles[i];
+            double aProperty = getProperty(t_Side,
+                                           t_Property,
+                                           angle,
+                                           minLambda,
+                                           maxLambda,
+                                           t_IntegrationType,
+                                           normalizationCoefficient);
+            aAngularProperties->addProperty(angle, aProperty);
+        }
+        CHemispherical2DIntegrator aIntegrator = CHemispherical2DIntegrator(
+          *aAngularProperties, t_IntegrationType, normalizationCoefficient);
+        return aIntegrator.value();
+    }
 
-		return newLayer;
+    double CMultiPaneSpecular::getAbsorptanceLayer(size_t index,
+                                                   FenestrationCommon::Side side,
+                                                   FenestrationCommon::ScatteringSimple scattering,
+                                                   double theta,
+                                                   double)
+    {
+        return getAbsorptanceLayer(getMinLambda(), getMaxLambda(), index, side, scattering, theta);
+    }
 
-	}
+    double CMultiPaneSpecular::getAbsorptanceLayer(double minLambda,
+                                                   double maxLambda,
+                                                   size_t index,
+                                                   FenestrationCommon::Side,
+                                                   FenestrationCommon::ScatteringSimple scattering,
+                                                   double theta,
+                                                   double)
+    {
+        auto result(0.0);
+        if(scattering == ScatteringSimple::Direct)
+        {
+            result = Abs(index, theta, minLambda, maxLambda);
+        }
+        else if(scattering == ScatteringSimple::Diffuse)
+        {
+            result = AbsHemispherical(
+              index, {0, 10, 20, 30, 40, 50, 60, 70, 80, 90}, minLambda, maxLambda);
+        }
+        return result;
+    }
+
+    std::vector<double>
+      CMultiPaneSpecular::getAbsorptanceLayers(double minLambda,
+                                               double maxLambda,
+                                               FenestrationCommon::Side side,
+                                               FenestrationCommon::ScatteringSimple scattering,
+                                               double theta,
+                                               double phi)
+    {
+        std::vector<double> res;
+        for(size_t i = 1u; i <= size(); ++i)
+        {
+            res.push_back(
+              getAbsorptanceLayer(minLambda, maxLambda, i, side, scattering, theta, phi));
+        }
+
+        return res;
+    }
+
+    double CMultiPaneSpecular::Abs(size_t const Index,
+                                   const double t_Angle,
+                                   const double minLambda,
+                                   const double maxLambda,
+                                   const IntegrationType t_IntegrationType,
+                                   double normalizationCoefficient)
+    {
+        CEquivalentLayerSingleComponentMWAngle aAngularProperties = getAngular(t_Angle);
+        auto aProperties = aAngularProperties.Abs(Index - 1);
+
+        auto aMult = aProperties * m_SolarRadiation;
+
+        auto iIntegrated = aMult.integrate(t_IntegrationType, normalizationCoefficient);
+
+        double totalProperty = iIntegrated->sum(minLambda, maxLambda);
+        double totalSolar = m_SolarRadiation.integrate(t_IntegrationType, normalizationCoefficient)
+                              ->sum(minLambda, maxLambda);
+
+        assert(totalSolar > 0);
+
+        return totalProperty / totalSolar;
+    }
+
+    std::vector<double>
+      CMultiPaneSpecular::Absorptances(double t_Angle,
+                                       double minLambda,
+                                       double maxLambda,
+                                       FenestrationCommon::IntegrationType t_IntegrationType,
+                                       double normalizationCoefficient)
+    {
+        std::vector<double> res;
+        for(size_t i = 1u; i <= size(); ++i)
+        {
+            res.push_back(
+              Abs(i, t_Angle, minLambda, maxLambda, t_IntegrationType, normalizationCoefficient));
+        }
+
+        return res;
+    }
+
+    double CMultiPaneSpecular::AbsHemispherical(size_t const Index,
+                                                const std::vector<double> & t_IntegrationAngles,
+                                                const double minLambda,
+                                                const double maxLambda,
+                                                const IntegrationType t_IntegrationType,
+                                                double normalizationCoefficient)
+    {
+        size_t size = t_IntegrationAngles.size();
+        std::shared_ptr<CSeries> aAngularProperties = std::make_shared<CSeries>();
+        for(size_t i = 0; i < size; ++i)
+        {
+            double angle = t_IntegrationAngles[i];
+            double aAbs = Abs(Index, angle, minLambda, maxLambda, t_IntegrationType);
+            aAngularProperties->addProperty(angle, aAbs);
+        }
+
+        CHemispherical2DIntegrator aIntegrator = CHemispherical2DIntegrator(
+          *aAngularProperties, t_IntegrationType, normalizationCoefficient);
+        return aIntegrator.value();
+    }
+
+    CEquivalentLayerSingleComponentMWAngle CMultiPaneSpecular::getAngular(const double t_Angle)
+    {
+        std::vector<CEquivalentLayerSingleComponentMWAngle>::iterator it;
+        it = find_if(m_EquivalentAngle.begin(),
+                     m_EquivalentAngle.end(),
+                     [&t_Angle](const CEquivalentLayerSingleComponentMWAngle & obj) {
+                         return std::abs(obj.angle() - t_Angle) < 1e-6;
+                     });
+
+        return (it != m_EquivalentAngle.end()) ? (*it) : createNewAngular(t_Angle);
+    }
+
+    CEquivalentLayerSingleComponentMWAngle
+      CMultiPaneSpecular::createNewAngular(const double t_Angle)
+    {
+        // Create direction for specular. It is irrelevant what is Phi angle and it is chosen to be
+        // zero in this case
+        CBeamDirection aDirection = CBeamDirection(t_Angle, 0);
+        auto firstLayerResults = getSeriesResults(aDirection, 0);
+        CEquivalentLayerSingleComponentMW aEqLayer{
+          firstLayerResults.T, firstLayerResults.T, firstLayerResults.Rf, firstLayerResults.Rb};
+        CAbsorptancesMultiPane aAbs{
+          firstLayerResults.T, firstLayerResults.Rf, firstLayerResults.Rb};
+        for(size_t i = 1u; i < m_Layers.size(); ++i)
+        {
+            auto layRes = getSeriesResults(aDirection, i);
+            aEqLayer.addLayer(layRes.T, layRes.T, layRes.Rf, layRes.Rb);
+            aAbs.addLayer(layRes.T, layRes.Rf, layRes.Rb);
+        }
+
+        CEquivalentLayerSingleComponentMWAngle newLayer(aEqLayer, aAbs, t_Angle);
+
+        m_EquivalentAngle.push_back(newLayer);
+
+        return newLayer;
+    }
+
+    CMultiPaneSpecular::SeriesResults
+      CMultiPaneSpecular::getSeriesResults(const CBeamDirection & aDirection, size_t layerIndex)
+    {
+        SeriesResults result;
+
+        std::vector<double> wl = m_Layers[layerIndex]->getBandWavelengths();
+        std::vector<double> Tv = m_Layers[layerIndex]->T_dir_dir_band(Side::Front, aDirection);
+        std::vector<double> Rfv = m_Layers[layerIndex]->R_dir_dir_band(Side::Front, aDirection);
+        std::vector<double> Rbv = m_Layers[layerIndex]->R_dir_dir_band(Side::Back, aDirection);
+        for(size_t j = 0; j < wl.size(); ++j)
+        {
+            auto tr = checkRange(Tv[j], Rfv[j]);
+            Tv[j] = tr.T;
+            Rfv[j] = tr.R;
+
+            tr = checkRange(Tv[j], Rbv[j]);
+            Tv[j] = tr.T;
+            Rbv[j] = tr.R;
+            result.T.addProperty(wl[j], Tv[j]);
+            result.Rf.addProperty(wl[j], Rfv[j]);
+            result.Rb.addProperty(wl[j], Rbv[j]);
+        }
+
+        result.T = result.T.interpolate(m_CommonWavelengths);
+        result.Rf = result.Rf.interpolate(m_CommonWavelengths);
+        result.Rb = result.Rb.interpolate(m_CommonWavelengths);
+
+        return result;
+    }
+
+    size_t CMultiPaneSpecular::size() const
+    {
+        return m_Layers.size();
+    }
 
 
-}
+}   // namespace MultiLayerOptics

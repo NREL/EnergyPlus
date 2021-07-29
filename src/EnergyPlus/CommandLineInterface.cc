@@ -161,9 +161,9 @@ namespace CommandLineInterface {
         opt.parse(argCount, &cStrArgs[0]);
 
         // print arguments parsed (useful for debugging)
-        /*std::string pretty;
-        opt.prettyPrint(pretty);
-        std::cout << pretty << std::endl;*/
+        //        std::string pretty;
+        //        opt.prettyPrint(pretty);
+        //        std::cout << pretty << std::endl;
 
         std::string usage;
         opt.getUsage(usage);

@@ -345,13 +345,48 @@ void GetPondGroundHeatExchanger(EnergyPlusData &state)
 
 void PondGroundHeatExchangerData::setupOutputVars(EnergyPlusData &state)
 {
-    SetupOutputVariable(
-        state, "Pond Heat Exchanger Heat Transfer Rate", OutputProcessor::Unit::W, this->HeatTransferRate, "Plant", "Average", this->Name);
-    SetupOutputVariable(state, "Pond Heat Exchanger Heat Transfer Energy", OutputProcessor::Unit::J, this->Energy, "Plant", "Sum", this->Name);
-    SetupOutputVariable(state, "Pond Heat Exchanger Mass Flow Rate", OutputProcessor::Unit::kg_s, this->MassFlowRate, "Plant", "Average", this->Name);
-    SetupOutputVariable(state, "Pond Heat Exchanger Inlet Temperature", OutputProcessor::Unit::C, this->InletTemp, "Plant", "Average", this->Name);
-    SetupOutputVariable(state, "Pond Heat Exchanger Outlet Temperature", OutputProcessor::Unit::C, this->OutletTemp, "Plant", "Average", this->Name);
-    SetupOutputVariable(state, "Pond Heat Exchanger Bulk Temperature", OutputProcessor::Unit::C, this->PondTemp, "Plant", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Pond Heat Exchanger Heat Transfer Rate",
+                        OutputProcessor::Unit::W,
+                        this->HeatTransferRate,
+                        OutputProcessor::SOVTimeStepType::Plant,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Pond Heat Exchanger Heat Transfer Energy",
+                        OutputProcessor::Unit::J,
+                        this->Energy,
+                        OutputProcessor::SOVTimeStepType::Plant,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Pond Heat Exchanger Mass Flow Rate",
+                        OutputProcessor::Unit::kg_s,
+                        this->MassFlowRate,
+                        OutputProcessor::SOVTimeStepType::Plant,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Pond Heat Exchanger Inlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->InletTemp,
+                        OutputProcessor::SOVTimeStepType::Plant,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Pond Heat Exchanger Outlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->OutletTemp,
+                        OutputProcessor::SOVTimeStepType::Plant,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Pond Heat Exchanger Bulk Temperature",
+                        OutputProcessor::Unit::C,
+                        this->PondTemp,
+                        OutputProcessor::SOVTimeStepType::Plant,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 }
 
 void PondGroundHeatExchangerData::InitPondGroundHeatExchanger(EnergyPlusData &state,
