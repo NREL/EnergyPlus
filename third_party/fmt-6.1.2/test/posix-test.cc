@@ -5,12 +5,11 @@
 //
 // For the license information refer to format.h.
 
-#include "fmt/posix.h"
-
 #include <cstdlib>  // std::exit
 #include <cstring>
 #include <memory>
 
+#include "fmt/posix.h"
 #include "gtest-extra.h"
 #include "util.h"
 
@@ -123,17 +122,16 @@ TEST(BufferedFileTest, CloseFileInDtor) {
 
 TEST(BufferedFileTest, CloseErrorInDtor) {
   std::unique_ptr<buffered_file> f(new buffered_file(open_buffered_file()));
-  EXPECT_WRITE(
-      stderr,
-      {
-        // The close function must be called inside EXPECT_WRITE,
-        // otherwise the system may recycle closed file descriptor when
-        // redirecting the output in EXPECT_STDERR and the second close
-        // will break output redirection.
-        FMT_POSIX(close(f->fileno()));
-        SUPPRESS_ASSERT(f.reset(nullptr));
-      },
-      format_system_error(EBADF, "cannot close file") + "\n");
+  EXPECT_WRITE(stderr,
+               {
+                 // The close function must be called inside EXPECT_WRITE,
+                 // otherwise the system may recycle closed file descriptor when
+                 // redirecting the output in EXPECT_STDERR and the second close
+                 // will break output redirection.
+                 FMT_POSIX(close(f->fileno()));
+                 SUPPRESS_ASSERT(f.reset(nullptr));
+               },
+               format_system_error(EBADF, "cannot close file") + "\n");
 }
 
 TEST(BufferedFileTest, Close) {
@@ -153,7 +151,7 @@ TEST(BufferedFileTest, CloseError) {
 
 TEST(BufferedFileTest, Fileno) {
   buffered_file f;
-#  ifndef __COVERITY__
+#ifndef __COVERITY__
   // fileno on a null FILE pointer either crashes or returns an error.
   // Disable Coverity because this is intentional.
   EXPECT_DEATH_IF_SUPPORTED(
@@ -165,7 +163,7 @@ TEST(BufferedFileTest, Fileno) {
         }
       },
       "");
-#  endif
+#endif
   f = open_buffered_file();
   EXPECT_TRUE(f.fileno() != -1);
   file copy = file::dup(f.fileno());
@@ -255,17 +253,16 @@ TEST(FileTest, CloseFileInDtor) {
 
 TEST(FileTest, CloseErrorInDtor) {
   std::unique_ptr<file> f(new file(open_file()));
-  EXPECT_WRITE(
-      stderr,
-      {
-        // The close function must be called inside EXPECT_WRITE,
-        // otherwise the system may recycle closed file descriptor when
-        // redirecting the output in EXPECT_STDERR and the second close
-        // will break output redirection.
-        FMT_POSIX(close(f->descriptor()));
-        SUPPRESS_ASSERT(f.reset(nullptr));
-      },
-      format_system_error(EBADF, "cannot close file") + "\n");
+  EXPECT_WRITE(stderr,
+               {
+                 // The close function must be called inside EXPECT_WRITE,
+                 // otherwise the system may recycle closed file descriptor when
+                 // redirecting the output in EXPECT_STDERR and the second close
+                 // will break output redirection.
+                 FMT_POSIX(close(f->descriptor()));
+                 SUPPRESS_ASSERT(f.reset(nullptr));
+               },
+               format_system_error(EBADF, "cannot close file") + "\n");
 }
 
 TEST(FileTest, Close) {
@@ -318,13 +315,13 @@ TEST(FileTest, Dup) {
   EXPECT_EQ(FILE_CONTENT, read(copy, std::strlen(FILE_CONTENT)));
 }
 
-#  ifndef __COVERITY__
+#ifndef __COVERITY__
 TEST(FileTest, DupError) {
   int value = -1;
   EXPECT_SYSTEM_ERROR_NOASSERT(file::dup(value), EBADF,
                                "cannot duplicate file descriptor -1");
 }
-#  endif
+#endif
 
 TEST(FileTest, Dup2) {
   file f = open_file();
@@ -374,12 +371,12 @@ TEST(FileTest, Fdopen) {
   EXPECT_EQ(read_fd, FMT_POSIX(fileno(read_end.fdopen("r").get())));
 }
 
-#  ifdef FMT_LOCALE
+#ifdef FMT_LOCALE
 TEST(LocaleTest, Strtod) {
   fmt::Locale locale;
   const char *start = "4.2", *ptr = start;
   EXPECT_EQ(4.2, locale.strtod(ptr));
   EXPECT_EQ(start + 3, ptr);
 }
-#  endif
+#endif
 #endif  // FMT_USE_FCNTL

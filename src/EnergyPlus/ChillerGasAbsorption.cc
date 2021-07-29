@@ -833,7 +833,7 @@ void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         ChillerName);
 }
 
-void GasAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
+void GasAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
 {
 
     this->setupOutputVariables(state);
@@ -1079,7 +1079,7 @@ void GasAbsorberSpecs::initialize(EnergyPlusData &state)
             state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->HWLoopNum).TempSetPointNodeNum).TempSetPointLo;
     }
 
-    if ((this->isWaterCooled) && ((this->InHeatingMode) || (this->InCoolingMode))) {
+    if ((this->isWaterCooled) && ((this->InHeatingMode) || (this->InCoolingMode)) ) {
         mdot = this->DesCondMassFlowRate;
 
         PlantUtilities::SetComponentFlowRate(
@@ -2107,6 +2107,10 @@ void GasAbsorberSpecs::updateHeatRecords(EnergyPlusData &state,
     this->HeatFuelEnergy = this->HeatFuelUseRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     this->ElectricEnergy = this->ElectricPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     this->HeatElectricEnergy = this->HeatElectricPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+}
+
+void GasAbsorberSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
 }
 
 } // namespace EnergyPlus::ChillerGasAbsorption

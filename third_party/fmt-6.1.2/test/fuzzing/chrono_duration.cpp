@@ -2,13 +2,11 @@
 // License: see LICENSE.rst in the fmt root directory
 
 #include <fmt/chrono.h>
-
 #include <cstdint>
 #include <limits>
 #include <stdexcept>
 #include <type_traits>
 #include <vector>
-
 #include "fuzzer_common.h"
 
 template <typename Item, typename Ratio>

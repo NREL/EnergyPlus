@@ -2,16 +2,16 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+#include <stddef.h>
 #include <algorithm>
 #include <memory>
-#include <stddef.h>
 #include <string>
 #include <vector>
 
+#include "util/test.h"
+#include "util/logging.h"
 #include "re2/filtered_re2.h"
 #include "re2/re2.h"
-#include "util/logging.h"
-#include "util/test.h"
 
 namespace re2 {
 
@@ -41,7 +41,7 @@ TEST(FilteredRE2Test, EmptyTest) {
 }
 
 TEST(FilteredRE2Test, SmallOrTest) {
-  FilterTestVars v(4); // override the minimum atom length
+  FilterTestVars v(4);  // override the minimum atom length
   int id;
   v.f.Add("(foo|bar)", v.opts, &id);
 
@@ -70,53 +70,82 @@ TEST(FilteredRE2Test, SmallLatinTest) {
 }
 
 struct AtomTest {
-  const char *testname;
+  const char* testname;
   // If any test needs more than this many regexps or atoms, increase
   // the size of the corresponding array.
-  const char *regexps[20];
-  const char *atoms[20];
+  const char* regexps[20];
+  const char* atoms[20];
 };
 
 AtomTest atom_tests[] = {
-    {// This test checks to make sure empty patterns are allowed.
-     "CheckEmptyPattern",
-     {""},
-     {}},
-    {// This test checks that all atoms of length greater than min length
-     // are found, and no atoms that are of smaller length are found.
-     "AllAtomsGtMinLengthFound",
-     {"(abc123|def456|ghi789).*mnop[x-z]+", "abc..yyy..zz", "mnmnpp[a-z]+PPP"},
-     {"abc123", "def456", "ghi789", "mnop", "abc", "yyy", "mnmnpp", "ppp"}},
-    {// Test to make sure that any atoms that have another atom as a
-     // substring in an OR are removed; that is, only the shortest
-     // substring is kept.
-     "SubstrAtomRemovesSuperStrInOr",
-     {"(abc123|abc|ghi789|abc1234).*[x-z]+", "abcd..yyy..yyyzzz",
-      "mnmnpp[a-z]+PPP"},
-     {"abc", "ghi789", "abcd", "yyy", "yyyzzz", "mnmnpp", "ppp"}},
-    {// Test character class expansion.
-     "CharClassExpansion",
-     {"m[a-c][d-f]n.*[x-z]+", "[x-y]bcde[ab]"},
-     {"madn", "maen", "mafn", "mbdn", "mben", "mbfn", "mcdn", "mcen", "mcfn",
-      "xbcdea", "xbcdeb", "ybcdea", "ybcdeb"}},
-    {
-        // Test upper/lower of non-ASCII.
-        "UnicodeLower",
-        {
-            "(?i)ΔδΠϖπΣςσ",
-            "ΛΜΝΟΠ",
-            "ψρστυ",
-        },
-        {
-            "δδπππσσσ",
-            "λμνοπ",
-            "ψρστυ",
-        },
+  {
+    // This test checks to make sure empty patterns are allowed.
+    "CheckEmptyPattern",
+    {""},
+    {}
+  }, {
+    // This test checks that all atoms of length greater than min length
+    // are found, and no atoms that are of smaller length are found.
+    "AllAtomsGtMinLengthFound", {
+      "(abc123|def456|ghi789).*mnop[x-z]+",
+      "abc..yyy..zz",
+      "mnmnpp[a-z]+PPP"
+    }, {
+      "abc123",
+      "def456",
+      "ghi789",
+      "mnop",
+      "abc",
+      "yyy",
+      "mnmnpp",
+      "ppp"
+    }
+  }, {
+    // Test to make sure that any atoms that have another atom as a
+    // substring in an OR are removed; that is, only the shortest
+    // substring is kept.
+    "SubstrAtomRemovesSuperStrInOr", {
+      "(abc123|abc|ghi789|abc1234).*[x-z]+",
+      "abcd..yyy..yyyzzz",
+      "mnmnpp[a-z]+PPP"
+    }, {
+      "abc",
+      "ghi789",
+      "abcd",
+      "yyy",
+      "yyyzzz",
+      "mnmnpp",
+      "ppp"
+    }
+  }, {
+    // Test character class expansion.
+    "CharClassExpansion", {
+      "m[a-c][d-f]n.*[x-z]+",
+      "[x-y]bcde[ab]"
+    }, {
+      "madn", "maen", "mafn",
+      "mbdn", "mben", "mbfn",
+      "mcdn", "mcen", "mcfn",
+      "xbcdea", "xbcdeb",
+      "ybcdea", "ybcdeb"
+    }
+  }, {
+    // Test upper/lower of non-ASCII.
+    "UnicodeLower", {
+      "(?i)ΔδΠϖπΣςσ",
+      "ΛΜΝΟΠ",
+      "ψρστυ",
+    }, {
+      "δδπππσσσ",
+      "λμνοπ",
+      "ψρστυ",
     },
+  },
 };
 
-void AddRegexpsAndCompile(const char *regexps[], size_t n,
-                          struct FilterTestVars *v) {
+void AddRegexpsAndCompile(const char* regexps[],
+                          size_t n,
+                          struct FilterTestVars* v) {
   for (size_t i = 0; i < n; i++) {
     int id;
     v->f.Add(regexps[i], v->opts, &id);
@@ -124,8 +153,10 @@ void AddRegexpsAndCompile(const char *regexps[], size_t n,
   v->f.Compile(&v->atoms);
 }
 
-bool CheckExpectedAtoms(const char *atoms[], size_t n, const char *testname,
-                        struct FilterTestVars *v) {
+bool CheckExpectedAtoms(const char* atoms[],
+                        size_t n,
+                        const char* testname,
+                        struct FilterTestVars* v) {
   std::vector<std::string> expected;
   for (size_t i = 0; i < n; i++)
     expected.push_back(atoms[i]);
@@ -135,7 +166,7 @@ bool CheckExpectedAtoms(const char *atoms[], size_t n, const char *testname,
   std::sort(v->atoms.begin(), v->atoms.end());
   std::sort(expected.begin(), expected.end());
   for (size_t i = 0; pass && i < n; i++)
-    pass = pass && expected[i] == v->atoms[i];
+      pass = pass && expected[i] == v->atoms[i];
 
   if (!pass) {
     LOG(ERROR) << "Failed " << testname;
@@ -154,7 +185,7 @@ TEST(FilteredRE2Test, AtomTests) {
   int nfail = 0;
   for (size_t i = 0; i < arraysize(atom_tests); i++) {
     FilterTestVars v;
-    AtomTest *t = &atom_tests[i];
+    AtomTest* t = &atom_tests[i];
     size_t nregexp, natom;
     for (nregexp = 0; nregexp < arraysize(t->regexps); nregexp++)
       if (t->regexps[nregexp] == NULL)
@@ -169,9 +200,9 @@ TEST(FilteredRE2Test, AtomTests) {
   EXPECT_EQ(0, nfail);
 }
 
-void FindAtomIndices(const std::vector<std::string> &atoms,
-                     const std::vector<std::string> &matched_atoms,
-                     std::vector<int> *atom_indices) {
+void FindAtomIndices(const std::vector<std::string>& atoms,
+                     const std::vector<std::string>& matched_atoms,
+                     std::vector<int>* atom_indices) {
   atom_indices->clear();
   for (size_t i = 0; i < matched_atoms.size(); i++) {
     for (size_t j = 0; j < atoms.size(); j++) {
@@ -185,7 +216,7 @@ void FindAtomIndices(const std::vector<std::string> &atoms,
 
 TEST(FilteredRE2Test, MatchEmptyPattern) {
   FilterTestVars v;
-  AtomTest *t = &atom_tests[0];
+  AtomTest* t = &atom_tests[0];
   // We are using the regexps used in one of the atom tests
   // for this test. Adding the EXPECT here to make sure
   // the index we use for the test is for the correct test.
@@ -203,7 +234,7 @@ TEST(FilteredRE2Test, MatchEmptyPattern) {
 
 TEST(FilteredRE2Test, MatchTests) {
   FilterTestVars v;
-  AtomTest *t = &atom_tests[2];
+  AtomTest* t = &atom_tests[2];
   // We are using the regexps used in one of the atom tests
   // for this test.
   EXPECT_EQ("SubstrAtomRemovesSuperStrInOr", std::string(t->testname));
@@ -252,12 +283,12 @@ TEST(FilteredRE2Test, EmptyStringInStringSetBug) {
   // In order to test this, we have to keep PrefilterTree from discarding
   // the OR entirely, so we have to make the minimum atom length zero.
 
-  FilterTestVars v(0); // override the minimum atom length
-  const char *regexps[] = {"-R.+(|ADD=;AA){12}}"};
-  const char *atoms[] = {"", "-r", "add=;aa", "}"};
+  FilterTestVars v(0);  // override the minimum atom length
+  const char* regexps[] = {"-R.+(|ADD=;AA){12}}"};
+  const char* atoms[] = {"", "-r", "add=;aa", "}"};
   AddRegexpsAndCompile(regexps, arraysize(regexps), &v);
   EXPECT_TRUE(CheckExpectedAtoms(atoms, arraysize(atoms),
                                  "EmptyStringInStringSetBug", &v));
 }
 
-} //  namespace re2
+}  //  namespace re2

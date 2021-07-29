@@ -5,14 +5,12 @@
 //
 // For the license information refer to format.h.
 
-#include "scan.h"
-
 #include <time.h>
-
 #include <climits>
 
 #include "gmock.h"
 #include "gtest-extra.h"
+#include "scan.h"
 
 TEST(ScanTest, ReadText) {
   fmt::string_view s = "foo";

@@ -18,42 +18,59 @@
 
 #include <string>
 
-#include "re2/regexp.h"
-#include "re2/stringpiece.h"
+#include "util/test.h"
 #include "util/logging.h"
 #include "util/strutil.h"
-#include "util/test.h"
 #include "util/utf.h"
+#include "re2/stringpiece.h"
+#include "re2/regexp.h"
 
 // Cause a link error if this file is used outside of testing.
 DECLARE_string(test_tmpdir);
 
 namespace re2 {
 
-static const char *kOpcodeNames[] = {
-    "bad",  "no",  "emp", "lit",   "str", "cat",  "alt", "star",
-    "plus", "que", "rep", "cap",   "dot", "byte", "bol", "eol",
-    "wb",  // kRegexpWordBoundary
-    "nwb", // kRegexpNoWordBoundary
-    "bot",  "eot", "cc",  "match",
+static const char* kOpcodeNames[] = {
+  "bad",
+  "no",
+  "emp",
+  "lit",
+  "str",
+  "cat",
+  "alt",
+  "star",
+  "plus",
+  "que",
+  "rep",
+  "cap",
+  "dot",
+  "byte",
+  "bol",
+  "eol",
+  "wb",   // kRegexpWordBoundary
+  "nwb",  // kRegexpNoWordBoundary
+  "bot",
+  "eot",
+  "cc",
+  "match",
 };
 
 // Create string representation of regexp with explicit structure.
 // Nothing pretty, just for testing.
-static void DumpRegexpAppending(Regexp *re, std::string *s) {
+static void DumpRegexpAppending(Regexp* re, std::string* s) {
   if (re->op() < 0 || re->op() >= arraysize(kOpcodeNames)) {
     *s += StringPrintf("op%d", re->op());
   } else {
     switch (re->op()) {
-    default:
-      break;
-    case kRegexpStar:
-    case kRegexpPlus:
-    case kRegexpQuest:
-    case kRegexpRepeat:
-      if (re->parse_flags() & Regexp::NonGreedy)
-        s->append("n");
-      break;
+      default:
+        break;
+      case kRegexpStar:
+      case kRegexpPlus:
+      case kRegexpQuest:
+      case kRegexpRepeat:
+        if (re->parse_flags() & Regexp::NonGreedy)
+          s->append("n");
+        break;
     }
     s->append(kOpcodeNames[re->op()]);
     if (re->op() == kRegexpLiteral && (re->parse_flags() & Regexp::FoldCase)) {
@@ -61,8 +78,7 @@ static void DumpRegexpAppending(Regexp *re, std::string *s) {
       if ('a' <= r && r <= 'z')
         s->append("fold");
     }
-    if (re->op() == kRegexpLiteralString &&
-        (re->parse_flags() & Regexp::FoldCase)) {
+    if (re->op() == kRegexpLiteralString && (re->parse_flags() & Regexp::FoldCase)) {
       for (int i = 0; i < re->nrunes(); i++) {
         Rune r = re->runes()[i];
         if ('a' <= r && r <= 'z') {
@@ -74,65 +90,65 @@ static void DumpRegexpAppending(Regexp *re, std::string *s) {
   }
   s->append("{");
   switch (re->op()) {
-  default:
-    break;
-  case kRegexpEndText:
-    if (!(re->parse_flags() & Regexp::WasDollar)) {
-      s->append("\\z");
-    }
-    break;
-  case kRegexpLiteral: {
-    Rune r = re->rune();
-    char buf[UTFmax + 1];
-    buf[runetochar(buf, &r)] = 0;
-    s->append(buf);
-    break;
-  }
-  case kRegexpLiteralString:
-    for (int i = 0; i < re->nrunes(); i++) {
-      Rune r = re->runes()[i];
-      char buf[UTFmax + 1];
+    default:
+      break;
+    case kRegexpEndText:
+      if (!(re->parse_flags() & Regexp::WasDollar)) {
+        s->append("\\z");
+      }
+      break;
+    case kRegexpLiteral: {
+      Rune r = re->rune();
+      char buf[UTFmax+1];
       buf[runetochar(buf, &r)] = 0;
       s->append(buf);
+      break;
     }
-    break;
-  case kRegexpConcat:
-  case kRegexpAlternate:
-    for (int i = 0; i < re->nsub(); i++)
-      DumpRegexpAppending(re->sub()[i], s);
-    break;
-  case kRegexpStar:
-  case kRegexpPlus:
-  case kRegexpQuest:
-    DumpRegexpAppending(re->sub()[0], s);
-    break;
-  case kRegexpCapture:
-    if (re->cap() == 0)
-      LOG(DFATAL) << "kRegexpCapture cap() == 0";
-    if (re->name()) {
-      s->append(*re->name());
-      s->append(":");
+    case kRegexpLiteralString:
+      for (int i = 0; i < re->nrunes(); i++) {
+        Rune r = re->runes()[i];
+        char buf[UTFmax+1];
+        buf[runetochar(buf, &r)] = 0;
+        s->append(buf);
+      }
+      break;
+    case kRegexpConcat:
+    case kRegexpAlternate:
+      for (int i = 0; i < re->nsub(); i++)
+        DumpRegexpAppending(re->sub()[i], s);
+      break;
+    case kRegexpStar:
+    case kRegexpPlus:
+    case kRegexpQuest:
+      DumpRegexpAppending(re->sub()[0], s);
+      break;
+    case kRegexpCapture:
+      if (re->cap() == 0)
+        LOG(DFATAL) << "kRegexpCapture cap() == 0";
+      if (re->name()) {
+        s->append(*re->name());
+        s->append(":");
+      }
+      DumpRegexpAppending(re->sub()[0], s);
+      break;
+    case kRegexpRepeat:
+      s->append(StringPrintf("%d,%d ", re->min(), re->max()));
+      DumpRegexpAppending(re->sub()[0], s);
+      break;
+    case kRegexpCharClass: {
+      std::string sep;
+      for (CharClass::iterator it = re->cc()->begin();
+           it != re->cc()->end(); ++it) {
+        RuneRange rr = *it;
+        s->append(sep);
+        if (rr.lo == rr.hi)
+          s->append(StringPrintf("%#x", rr.lo));
+        else
+          s->append(StringPrintf("%#x-%#x", rr.lo, rr.hi));
+        sep = " ";
+      }
+      break;
     }
-    DumpRegexpAppending(re->sub()[0], s);
-    break;
-  case kRegexpRepeat:
-    s->append(StringPrintf("%d,%d ", re->min(), re->max()));
-    DumpRegexpAppending(re->sub()[0], s);
-    break;
-  case kRegexpCharClass: {
-    std::string sep;
-    for (CharClass::iterator it = re->cc()->begin(); it != re->cc()->end();
-         ++it) {
-      RuneRange rr = *it;
-      s->append(sep);
-      if (rr.lo == rr.hi)
-        s->append(StringPrintf("%#x", rr.lo));
-      else
-        s->append(StringPrintf("%#x-%#x", rr.lo, rr.hi));
-      sep = " ";
-    }
-    break;
-  }
   }
   s->append("}");
 }
@@ -150,4 +166,4 @@ std::string Regexp::Dump() {
   return s;
 }
 
-} // namespace re2
+}  // namespace re2

@@ -6,7 +6,6 @@
 // For the license information refer to format.h.
 
 #include <stdint.h>
-
 #include <cctype>
 #include <cfloat>
 #include <climits>
@@ -1873,8 +1872,8 @@ TEST(FormatTest, Dynamic) {
   args.emplace_back(fmt::internal::make_arg<ctx>(1.5f));
 
   std::string result = fmt::vformat(
-      "{} and {} and {}",
-      fmt::basic_format_args<ctx>(args.data(), static_cast<int>(args.size())));
+      "{} and {} and {}", fmt::basic_format_args<ctx>(
+                              args.data(), static_cast<int>(args.size())));
 
   EXPECT_EQ("42 and abc1 and 1.5", result);
 }
@@ -2264,7 +2263,9 @@ struct test_format_specs_handler {
 
   FMT_CONSTEXPR void on_precision(int p) { precision = p; }
   FMT_CONSTEXPR void on_dynamic_precision(fmt::internal::auto_id) {}
-  FMT_CONSTEXPR void on_dynamic_precision(int index) { precision_ref = index; }
+  FMT_CONSTEXPR void on_dynamic_precision(int index) {
+    precision_ref = index;
+  }
   FMT_CONSTEXPR void on_dynamic_precision(string_view) {}
 
   FMT_CONSTEXPR void end_precision() {}

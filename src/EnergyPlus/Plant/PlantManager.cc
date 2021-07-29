@@ -4293,4 +4293,7 @@ void CheckOngoingPlantWarnings(EnergyPlusData &state)
 void EmptyPlantComponent::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
 {
 }
+void EmptyPlantComponent::oneTimeInit_new([[maybe_unused]] EnergyPlusData &state)
+{
+}
 } // namespace EnergyPlus::PlantManager

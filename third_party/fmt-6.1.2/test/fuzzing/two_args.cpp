@@ -1,7 +1,6 @@
 // Copyright (c) 2019, Paul Dreik
 // License: see LICENSE.rst in the fmt root directory
 #include <fmt/format.h>
-
 #include <cstdint>
 #include <stdexcept>
 #include <type_traits>

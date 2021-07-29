@@ -7,17 +7,17 @@
 
 #include "re2/prog.h"
 
-#include <algorithm>
-#include <memory>
 #include <stdint.h>
 #include <string.h>
+#include <algorithm>
+#include <memory>
 #include <utility>
 
-#include "re2/bitmap256.h"
-#include "re2/stringpiece.h"
+#include "util/util.h"
 #include "util/logging.h"
 #include "util/strutil.h"
-#include "util/util.h"
+#include "re2/bitmap256.h"
+#include "re2/stringpiece.h"
 
 namespace re2 {
 
@@ -34,7 +34,7 @@ void Prog::Inst::InitByteRange(int lo, int hi, int foldcase, uint32_t out) {
   set_out_opcode(out, kInstByteRange);
   lo_ = lo & 0xFF;
   hi_ = hi & 0xFF;
-  hint_foldcase_ = foldcase & 1;
+  hint_foldcase_ = foldcase&1;
 }
 
 void Prog::Inst::InitCapture(int cap, uint32_t out) {
@@ -67,42 +67,55 @@ void Prog::Inst::InitFail() {
 
 std::string Prog::Inst::Dump() {
   switch (opcode()) {
-  default:
-    return StringPrintf("opcode %d", static_cast<int>(opcode()));
+    default:
+      return StringPrintf("opcode %d", static_cast<int>(opcode()));
 
-  case kInstAlt:
-    return StringPrintf("alt -> %d | %d", out(), out1_);
+    case kInstAlt:
+      return StringPrintf("alt -> %d | %d", out(), out1_);
 
-  case kInstAltMatch:
-    return StringPrintf("altmatch -> %d | %d", out(), out1_);
+    case kInstAltMatch:
+      return StringPrintf("altmatch -> %d | %d", out(), out1_);
 
-  case kInstByteRange:
-    return StringPrintf("byte%s [%02x-%02x] %d -> %d", foldcase() ? "/i" : "",
-                        lo_, hi_, hint(), out());
+    case kInstByteRange:
+      return StringPrintf("byte%s [%02x-%02x] %d -> %d",
+                          foldcase() ? "/i" : "",
+                          lo_, hi_, hint(), out());
 
-  case kInstCapture:
-    return StringPrintf("capture %d -> %d", cap_, out());
+    case kInstCapture:
+      return StringPrintf("capture %d -> %d", cap_, out());
 
-  case kInstEmptyWidth:
-    return StringPrintf("emptywidth %#x -> %d", static_cast<int>(empty_),
-                        out());
+    case kInstEmptyWidth:
+      return StringPrintf("emptywidth %#x -> %d",
+                          static_cast<int>(empty_), out());
 
-  case kInstMatch:
-    return StringPrintf("match! %d", match_id());
+    case kInstMatch:
+      return StringPrintf("match! %d", match_id());
 
-  case kInstNop:
-    return StringPrintf("nop -> %d", out());
+    case kInstNop:
+      return StringPrintf("nop -> %d", out());
 
-  case kInstFail:
-    return StringPrintf("fail");
+    case kInstFail:
+      return StringPrintf("fail");
   }
 }
 
 Prog::Prog()
-    : anchor_start_(false), anchor_end_(false), reversed_(false),
-      did_flatten_(false), did_onepass_(false), start_(0), start_unanchored_(0),
-      size_(0), bytemap_range_(0), first_byte_(-1), flags_(0), list_count_(0),
-      dfa_mem_(0), dfa_first_(NULL), dfa_longest_(NULL) {}
+  : anchor_start_(false),
+    anchor_end_(false),
+    reversed_(false),
+    did_flatten_(false),
+    did_onepass_(false),
+    start_(0),
+    start_unanchored_(0),
+    size_(0),
+    bytemap_range_(0),
+    first_byte_(-1),
+    flags_(0),
+    list_count_(0),
+    dfa_mem_(0),
+    dfa_first_(NULL),
+    dfa_longest_(NULL) {
+}
 
 Prog::~Prog() {
   DeleteDFA(dfa_longest_);
@@ -111,16 +124,16 @@ Prog::~Prog() {
 
 typedef SparseSet Workq;
 
-static inline void AddToQueue(Workq *q, int id) {
+static inline void AddToQueue(Workq* q, int id) {
   if (id != 0)
     q->insert(id);
 }
 
-static std::string ProgToString(Prog *prog, Workq *q) {
+static std::string ProgToString(Prog* prog, Workq* q) {
   std::string s;
   for (Workq::iterator i = q->begin(); i != q->end(); ++i) {
     int id = *i;
-    Prog::Inst *ip = prog->inst(id);
+    Prog::Inst* ip = prog->inst(id);
     s += StringPrintf("%d. %s\n", id, ip->Dump().c_str());
     AddToQueue(q, ip->out());
     if (ip->opcode() == kInstAlt || ip->opcode() == kInstAltMatch)
@@ -129,10 +142,10 @@ static std::string ProgToString(Prog *prog, Workq *q) {
   return s;
 }
 
-static std::string FlattenedProgToString(Prog *prog, int start) {
+static std::string FlattenedProgToString(Prog* prog, int start) {
   std::string s;
   for (int id = start; id < prog->size(); id++) {
-    Prog::Inst *ip = prog->inst(id);
+    Prog::Inst* ip = prog->inst(id);
     if (ip->last())
       s += StringPrintf("%d. %s\n", id, ip->Dump().c_str());
     else
@@ -164,7 +177,7 @@ std::string Prog::DumpByteMap() {
   for (int c = 0; c < 256; c++) {
     int b = bytemap_[c];
     int lo = c;
-    while (c < 256 - 1 && bytemap_[c + 1] == b)
+    while (c < 256-1 && bytemap_[c+1] == b)
       c++;
     int hi = c;
     map += StringPrintf("[%02x-%02x] -> %d\n", lo, hi, b);
@@ -173,13 +186,13 @@ std::string Prog::DumpByteMap() {
 }
 
 int Prog::first_byte() {
-  std::call_once(
-      first_byte_once_,
-      [](Prog *prog) { prog->first_byte_ = prog->ComputeFirstByte(); }, this);
+  std::call_once(first_byte_once_, [](Prog* prog) {
+    prog->first_byte_ = prog->ComputeFirstByte();
+  }, this);
   return first_byte_;
 }
 
-static bool IsMatch(Prog *, Prog::Inst *);
+static bool IsMatch(Prog*, Prog::Inst*);
 
 // Peep-hole optimizer.
 void Prog::Optimize() {
@@ -192,10 +205,10 @@ void Prog::Optimize() {
   for (Workq::iterator i = q.begin(); i != q.end(); ++i) {
     int id = *i;
 
-    Inst *ip = inst(id);
+    Inst* ip = inst(id);
     int j = ip->out();
-    Inst *jp;
-    while (j != 0 && (jp = inst(j))->opcode() == kInstNop) {
+    Inst* jp;
+    while (j != 0 && (jp=inst(j))->opcode() == kInstNop) {
       j = jp->out();
     }
     ip->set_out(j);
@@ -203,7 +216,7 @@ void Prog::Optimize() {
 
     if (ip->opcode() == kInstAlt) {
       j = ip->out1();
-      while (j != 0 && (jp = inst(j))->opcode() == kInstNop) {
+      while (j != 0 && (jp=inst(j))->opcode() == kInstNop) {
         j = jp->out();
       }
       ip->out1_ = j;
@@ -222,20 +235,22 @@ void Prog::Optimize() {
   AddToQueue(&q, start_);
   for (Workq::iterator i = q.begin(); i != q.end(); ++i) {
     int id = *i;
-    Inst *ip = inst(id);
+    Inst* ip = inst(id);
     AddToQueue(&q, ip->out());
     if (ip->opcode() == kInstAlt)
       AddToQueue(&q, ip->out1());
 
     if (ip->opcode() == kInstAlt) {
-      Inst *j = inst(ip->out());
-      Inst *k = inst(ip->out1());
-      if (j->opcode() == kInstByteRange && j->out() == id && j->lo() == 0x00 &&
-          j->hi() == 0xFF && IsMatch(this, k)) {
+      Inst* j = inst(ip->out());
+      Inst* k = inst(ip->out1());
+      if (j->opcode() == kInstByteRange && j->out() == id &&
+          j->lo() == 0x00 && j->hi() == 0xFF &&
+          IsMatch(this, k)) {
         ip->set_opcode(kInstAltMatch);
         continue;
       }
-      if (IsMatch(this, j) && k->opcode() == kInstByteRange && k->out() == id &&
+      if (IsMatch(this, j) &&
+          k->opcode() == kInstByteRange && k->out() == id &&
           k->lo() == 0x00 && k->hi() == 0xFF) {
         ip->set_opcode(kInstAltMatch);
       }
@@ -244,32 +259,32 @@ void Prog::Optimize() {
 }
 
 // Is ip a guaranteed match at end of text, perhaps after some capturing?
-static bool IsMatch(Prog *prog, Prog::Inst *ip) {
+static bool IsMatch(Prog* prog, Prog::Inst* ip) {
   for (;;) {
     switch (ip->opcode()) {
-    default:
-      LOG(DFATAL) << "Unexpected opcode in IsMatch: " << ip->opcode();
-      return false;
+      default:
+        LOG(DFATAL) << "Unexpected opcode in IsMatch: " << ip->opcode();
+        return false;
 
-    case kInstAlt:
-    case kInstAltMatch:
-    case kInstByteRange:
-    case kInstFail:
-    case kInstEmptyWidth:
-      return false;
+      case kInstAlt:
+      case kInstAltMatch:
+      case kInstByteRange:
+      case kInstFail:
+      case kInstEmptyWidth:
+        return false;
 
-    case kInstCapture:
-    case kInstNop:
-      ip = prog->inst(ip->out());
-      break;
+      case kInstCapture:
+      case kInstNop:
+        ip = prog->inst(ip->out());
+        break;
 
-    case kInstMatch:
-      return true;
+      case kInstMatch:
+        return true;
     }
   }
 }
 
-uint32_t Prog::EmptyFlags(const StringPiece &text, const char *p) {
+uint32_t Prog::EmptyFlags(const StringPiece& text, const char* p) {
   int flags = 0;
 
   // ^ and \A
@@ -320,7 +335,7 @@ uint32_t Prog::EmptyFlags(const StringPiece &text, const char *p) {
 // range, then store the new color (which is now the byte class) in each of the
 // corresponding array elements. Finally, we output the number of byte classes.
 class ByteMapBuilder {
-public:
+ public:
   ByteMapBuilder() {
     // Initial state: the [0-255] range has color 256.
     // This will avoid problems during the second phase,
@@ -332,9 +347,9 @@ public:
 
   void Mark(int lo, int hi);
   void Merge();
-  void Build(uint8_t *bytemap, int *bytemap_range);
+  void Build(uint8_t* bytemap, int* bytemap_range);
 
-private:
+ private:
   int Recolor(int oldcolor);
 
   Bitmap256 splits_;
@@ -343,8 +358,8 @@ private:
   std::vector<std::pair<int, int>> colormap_;
   std::vector<std::pair<int, int>> ranges_;
 
-  ByteMapBuilder(const ByteMapBuilder &) = delete;
-  ByteMapBuilder &operator=(const ByteMapBuilder &) = delete;
+  ByteMapBuilder(const ByteMapBuilder&) = delete;
+  ByteMapBuilder& operator=(const ByteMapBuilder&) = delete;
 };
 
 void ByteMapBuilder::Mark(int lo, int hi) {
@@ -364,35 +379,36 @@ void ByteMapBuilder::Mark(int lo, int hi) {
 
 void ByteMapBuilder::Merge() {
   for (std::vector<std::pair<int, int>>::const_iterator it = ranges_.begin();
-       it != ranges_.end(); ++it) {
-    int lo = it->first - 1;
+       it != ranges_.end();
+       ++it) {
+    int lo = it->first-1;
     int hi = it->second;
 
     if (0 <= lo && !splits_.Test(lo)) {
       splits_.Set(lo);
-      int next = splits_.FindNextSetBit(lo + 1);
+      int next = splits_.FindNextSetBit(lo+1);
       colors_[lo] = colors_[next];
     }
     if (!splits_.Test(hi)) {
       splits_.Set(hi);
-      int next = splits_.FindNextSetBit(hi + 1);
+      int next = splits_.FindNextSetBit(hi+1);
       colors_[hi] = colors_[next];
     }
 
-    int c = lo + 1;
+    int c = lo+1;
     while (c < 256) {
       int next = splits_.FindNextSetBit(c);
       colors_[next] = Recolor(colors_[next]);
       if (next == hi)
         break;
-      c = next + 1;
+      c = next+1;
     }
   }
   colormap_.clear();
   ranges_.clear();
 }
 
-void ByteMapBuilder::Build(uint8_t *bytemap, int *bytemap_range) {
+void ByteMapBuilder::Build(uint8_t* bytemap, int* bytemap_range) {
   // Assign byte classes numbered from 0.
   nextcolor_ = 0;
 
@@ -416,7 +432,7 @@ int ByteMapBuilder::Recolor(int oldcolor) {
   // avoid recoloring a given range more than once per batch.
   std::vector<std::pair<int, int>>::const_iterator it =
       std::find_if(colormap_.begin(), colormap_.end(),
-                   [=](const std::pair<int, int> &kv) -> bool {
+                   [=](const std::pair<int, int>& kv) -> bool {
                      return kv.first == oldcolor || kv.second == oldcolor;
                    });
   if (it != colormap_.end())
@@ -439,7 +455,7 @@ void Prog::ComputeByteMap() {
   bool marked_word_boundaries = false;
 
   for (int id = 0; id < size(); id++) {
-    Inst *ip = inst(id);
+    Inst* ip = inst(id);
     if (ip->opcode() == kInstByteRange) {
       int lo = ip->lo();
       int hi = ip->hi();
@@ -459,26 +475,27 @@ void Prog::ComputeByteMap() {
       }
       // If this Inst is not the last Inst in its list AND the next Inst is
       // also a ByteRange AND the Insts have the same out, defer the merge.
-      if (!ip->last() && inst(id + 1)->opcode() == kInstByteRange &&
-          ip->out() == inst(id + 1)->out())
+      if (!ip->last() &&
+          inst(id+1)->opcode() == kInstByteRange &&
+          ip->out() == inst(id+1)->out())
         continue;
       builder.Merge();
     } else if (ip->opcode() == kInstEmptyWidth) {
-      if (ip->empty() & (kEmptyBeginLine | kEmptyEndLine) &&
+      if (ip->empty() & (kEmptyBeginLine|kEmptyEndLine) &&
           !marked_line_boundaries) {
         builder.Mark('\n', '\n');
         builder.Merge();
         marked_line_boundaries = true;
       }
-      if (ip->empty() & (kEmptyWordBoundary | kEmptyNonWordBoundary) &&
+      if (ip->empty() & (kEmptyWordBoundary|kEmptyNonWordBoundary) &&
           !marked_word_boundaries) {
         // We require two batches here: the first for ranges that are word
         // characters, the second for ranges that are not word characters.
         for (bool isword : {true, false}) {
           int j;
           for (int i = 0; i < 256; i = j) {
-            for (j = i + 1;
-                 j < 256 && Prog::IsWordChar(static_cast<uint8_t>(i)) ==
+            for (j = i + 1; j < 256 &&
+                            Prog::IsWordChar(static_cast<uint8_t>(i)) ==
                                 Prog::IsWordChar(static_cast<uint8_t>(j));
                  j++)
               ;
@@ -494,7 +511,7 @@ void Prog::ComputeByteMap() {
 
   builder.Build(bytemap_, &bytemap_range_);
 
-  if (0) { // For debugging, use trivial bytemap.
+  if (0) {  // For debugging, use trivial bytemap.
     LOG(ERROR) << "Using trivial bytemap.";
     for (int i = 0; i < 256; i++)
       bytemap_[i] = static_cast<uint8_t>(i);
@@ -559,7 +576,8 @@ void Prog::Flatten() {
   SparseArray<int> sorted(rootmap);
   std::sort(sorted.begin(), sorted.end(), sorted.less);
   for (SparseArray<int>::const_iterator i = sorted.end() - 1;
-       i != sorted.begin(); --i) {
+       i != sorted.begin();
+       --i) {
     if (i->index() != start_unanchored() && i->index() != start())
       MarkDominator(i->index(), &rootmap, &predmap, &predvec, &reachable, &stk);
   }
@@ -569,7 +587,8 @@ void Prog::Flatten() {
   std::vector<int> flatmap(rootmap.size());
   std::vector<Inst> flat;
   flat.reserve(size());
-  for (SparseArray<int>::const_iterator i = rootmap.begin(); i != rootmap.end();
+  for (SparseArray<int>::const_iterator i = rootmap.begin();
+       i != rootmap.end();
        ++i) {
     flatmap[i->value()] = static_cast<int>(flat.size());
     EmitList(i->index(), &rootmap, &flat, &reachable, &stk);
@@ -586,8 +605,8 @@ void Prog::Flatten() {
   // Fourth pass: Remaps outs to flat-ids.
   // Counts instructions by opcode.
   for (int id = 0; id < static_cast<int>(flat.size()); id++) {
-    Inst *ip = &flat[id];
-    if (ip->opcode() != kInstAltMatch) // handled in EmitList()
+    Inst* ip = &flat[id];
+    if (ip->opcode() != kInstAltMatch)  // handled in EmitList()
       ip->set_out(flatmap[ip->out()]);
     inst_count_[ip->opcode()]++;
   }
@@ -611,22 +630,23 @@ void Prog::Flatten() {
   // Finally, replace the old instructions with the new instructions.
   size_ = static_cast<int>(flat.size());
   inst_ = PODArray<Inst>(size_);
-  memmove(inst_.data(), flat.data(), size_ * sizeof inst_[0]);
+  memmove(inst_.data(), flat.data(), size_*sizeof inst_[0]);
 
   // Populate the list heads for BitState.
   // 512 instructions limits the memory footprint to 1KiB.
   if (size_ <= 512) {
     list_heads_ = PODArray<uint16_t>(size_);
     // 0xFF makes it more obvious if we try to look up a non-head.
-    memset(list_heads_.data(), 0xFF, size_ * sizeof list_heads_[0]);
+    memset(list_heads_.data(), 0xFF, size_*sizeof list_heads_[0]);
     for (int i = 0; i < list_count_; ++i)
       list_heads_[flatmap[i]] = i;
   }
 }
 
-void Prog::MarkSuccessors(SparseArray<int> *rootmap, SparseArray<int> *predmap,
-                          std::vector<std::vector<int>> *predvec,
-                          SparseSet *reachable, std::vector<int> *stk) {
+void Prog::MarkSuccessors(SparseArray<int>* rootmap,
+                          SparseArray<int>* predmap,
+                          std::vector<std::vector<int>>* predvec,
+                          SparseSet* reachable, std::vector<int>* stk) {
   // Mark the kInstFail instruction.
   rootmap->set_new(0, rootmap->size());
 
@@ -647,50 +667,50 @@ void Prog::MarkSuccessors(SparseArray<int> *rootmap, SparseArray<int> *predmap,
       continue;
     reachable->insert_new(id);
 
-    Inst *ip = inst(id);
+    Inst* ip = inst(id);
     switch (ip->opcode()) {
-    default:
-      LOG(DFATAL) << "unhandled opcode: " << ip->opcode();
-      break;
+      default:
+        LOG(DFATAL) << "unhandled opcode: " << ip->opcode();
+        break;
 
-    case kInstAltMatch:
-    case kInstAlt:
-      // Mark this instruction as a predecessor of each out.
-      for (int out : {ip->out(), ip->out1()}) {
-        if (!predmap->has_index(out)) {
-          predmap->set_new(out, static_cast<int>(predvec->size()));
-          predvec->emplace_back();
+      case kInstAltMatch:
+      case kInstAlt:
+        // Mark this instruction as a predecessor of each out.
+        for (int out : {ip->out(), ip->out1()}) {
+          if (!predmap->has_index(out)) {
+            predmap->set_new(out, static_cast<int>(predvec->size()));
+            predvec->emplace_back();
+          }
+          (*predvec)[predmap->get_existing(out)].emplace_back(id);
         }
-        (*predvec)[predmap->get_existing(out)].emplace_back(id);
-      }
-      stk->push_back(ip->out1());
-      id = ip->out();
-      goto Loop;
+        stk->push_back(ip->out1());
+        id = ip->out();
+        goto Loop;
 
-    case kInstByteRange:
-    case kInstCapture:
-    case kInstEmptyWidth:
-      // Mark the out of this instruction as a "root".
-      if (!rootmap->has_index(ip->out()))
-        rootmap->set_new(ip->out(), rootmap->size());
-      id = ip->out();
-      goto Loop;
+      case kInstByteRange:
+      case kInstCapture:
+      case kInstEmptyWidth:
+        // Mark the out of this instruction as a "root".
+        if (!rootmap->has_index(ip->out()))
+          rootmap->set_new(ip->out(), rootmap->size());
+        id = ip->out();
+        goto Loop;
 
-    case kInstNop:
-      id = ip->out();
-      goto Loop;
+      case kInstNop:
+        id = ip->out();
+        goto Loop;
 
-    case kInstMatch:
-    case kInstFail:
-      break;
+      case kInstMatch:
+      case kInstFail:
+        break;
     }
   }
 }
 
-void Prog::MarkDominator(int root, SparseArray<int> *rootmap,
-                         SparseArray<int> *predmap,
-                         std::vector<std::vector<int>> *predvec,
-                         SparseSet *reachable, std::vector<int> *stk) {
+void Prog::MarkDominator(int root, SparseArray<int>* rootmap,
+                         SparseArray<int>* predmap,
+                         std::vector<std::vector<int>>* predvec,
+                         SparseSet* reachable, std::vector<int>* stk) {
   reachable->clear();
   stk->clear();
   stk->push_back(root);
@@ -707,34 +727,35 @@ void Prog::MarkDominator(int root, SparseArray<int> *rootmap,
       continue;
     }
 
-    Inst *ip = inst(id);
+    Inst* ip = inst(id);
     switch (ip->opcode()) {
-    default:
-      LOG(DFATAL) << "unhandled opcode: " << ip->opcode();
-      break;
+      default:
+        LOG(DFATAL) << "unhandled opcode: " << ip->opcode();
+        break;
 
-    case kInstAltMatch:
-    case kInstAlt:
-      stk->push_back(ip->out1());
-      id = ip->out();
-      goto Loop;
+      case kInstAltMatch:
+      case kInstAlt:
+        stk->push_back(ip->out1());
+        id = ip->out();
+        goto Loop;
 
-    case kInstByteRange:
-    case kInstCapture:
-    case kInstEmptyWidth:
-      break;
+      case kInstByteRange:
+      case kInstCapture:
+      case kInstEmptyWidth:
+        break;
 
-    case kInstNop:
-      id = ip->out();
-      goto Loop;
+      case kInstNop:
+        id = ip->out();
+        goto Loop;
 
-    case kInstMatch:
-    case kInstFail:
-      break;
+      case kInstMatch:
+      case kInstFail:
+        break;
     }
   }
 
-  for (SparseSet::const_iterator i = reachable->begin(); i != reachable->end();
+  for (SparseSet::const_iterator i = reachable->begin();
+       i != reachable->end();
        ++i) {
     int id = *i;
     if (predmap->has_index(id)) {
@@ -750,9 +771,9 @@ void Prog::MarkDominator(int root, SparseArray<int> *rootmap,
   }
 }
 
-void Prog::EmitList(int root, SparseArray<int> *rootmap,
-                    std::vector<Inst> *flat, SparseSet *reachable,
-                    std::vector<int> *stk) {
+void Prog::EmitList(int root, SparseArray<int>* rootmap,
+                    std::vector<Inst>* flat,
+                    SparseSet* reachable, std::vector<int>* stk) {
   reachable->clear();
   stk->clear();
   stk->push_back(root);
@@ -773,41 +794,41 @@ void Prog::EmitList(int root, SparseArray<int> *rootmap,
       continue;
     }
 
-    Inst *ip = inst(id);
+    Inst* ip = inst(id);
     switch (ip->opcode()) {
-    default:
-      LOG(DFATAL) << "unhandled opcode: " << ip->opcode();
-      break;
+      default:
+        LOG(DFATAL) << "unhandled opcode: " << ip->opcode();
+        break;
 
-    case kInstAltMatch:
-      flat->emplace_back();
-      flat->back().set_opcode(kInstAltMatch);
-      flat->back().set_out(static_cast<int>(flat->size()));
-      flat->back().out1_ = static_cast<uint32_t>(flat->size()) + 1;
-      FALLTHROUGH_INTENDED;
+      case kInstAltMatch:
+        flat->emplace_back();
+        flat->back().set_opcode(kInstAltMatch);
+        flat->back().set_out(static_cast<int>(flat->size()));
+        flat->back().out1_ = static_cast<uint32_t>(flat->size())+1;
+        FALLTHROUGH_INTENDED;
 
-    case kInstAlt:
-      stk->push_back(ip->out1());
-      id = ip->out();
-      goto Loop;
+      case kInstAlt:
+        stk->push_back(ip->out1());
+        id = ip->out();
+        goto Loop;
 
-    case kInstByteRange:
-    case kInstCapture:
-    case kInstEmptyWidth:
-      flat->emplace_back();
-      memmove(&flat->back(), ip, sizeof *ip);
-      flat->back().set_out(rootmap->get_existing(ip->out()));
-      break;
+      case kInstByteRange:
+      case kInstCapture:
+      case kInstEmptyWidth:
+        flat->emplace_back();
+        memmove(&flat->back(), ip, sizeof *ip);
+        flat->back().set_out(rootmap->get_existing(ip->out()));
+        break;
 
-    case kInstNop:
-      id = ip->out();
-      goto Loop;
+      case kInstNop:
+        id = ip->out();
+        goto Loop;
 
-    case kInstMatch:
-    case kInstFail:
-      flat->emplace_back();
-      memmove(&flat->back(), ip, sizeof *ip);
-      break;
+      case kInstMatch:
+      case kInstFail:
+        flat->emplace_back();
+        memmove(&flat->back(), ip, sizeof *ip);
+        break;
     }
   }
 }
@@ -820,13 +841,14 @@ void Prog::EmitList(int root, SparseArray<int> *rootmap,
 // colors are instructions and recoloring ranges precisely identifies conflicts
 // between instructions. Iterating backwards over [begin, end) is guaranteed to
 // identify the nearest conflict (if any) with only linear complexity.
-void Prog::ComputeHints(std::vector<Inst> *flat, int begin, int end) {
+void Prog::ComputeHints(std::vector<Inst>* flat, int begin, int end) {
   Bitmap256 splits;
   int colors[256];
 
   bool dirty = false;
   for (int id = end; id >= begin; --id) {
-    if (id == end || (*flat)[id].opcode() != kInstByteRange) {
+    if (id == end ||
+        (*flat)[id].opcode() != kInstByteRange) {
       if (dirty) {
         dirty = false;
         splits.Clear();
@@ -849,16 +871,16 @@ void Prog::ComputeHints(std::vector<Inst> *flat, int begin, int end) {
 
       if (0 <= lo && !splits.Test(lo)) {
         splits.Set(lo);
-        int next = splits.FindNextSetBit(lo + 1);
+        int next = splits.FindNextSetBit(lo+1);
         colors[lo] = colors[next];
       }
       if (!splits.Test(hi)) {
         splits.Set(hi);
-        int next = splits.FindNextSetBit(hi + 1);
+        int next = splits.FindNextSetBit(hi+1);
         colors[hi] = colors[next];
       }
 
-      int c = lo + 1;
+      int c = lo+1;
       while (c < 256) {
         int next = splits.FindNextSetBit(c);
         // Ratchet backwards...
@@ -867,11 +889,11 @@ void Prog::ComputeHints(std::vector<Inst> *flat, int begin, int end) {
         colors[next] = id;
         if (next == hi)
           break;
-        c = next + 1;
+        c = next+1;
       }
     };
 
-    Inst *ip = &(*flat)[id];
+    Inst* ip = &(*flat)[id];
     int lo = ip->lo();
     int hi = ip->hi();
     Recolor(lo, hi);
@@ -891,9 +913,9 @@ void Prog::ComputeHints(std::vector<Inst> *flat, int begin, int end) {
 
     if (first != end) {
       uint16_t hint = static_cast<uint16_t>(std::min(first - id, 32767));
-      ip->hint_foldcase_ |= hint << 1;
+      ip->hint_foldcase_ |= hint<<1;
     }
   }
 }
 
-} // namespace re2
+}  // namespace re2

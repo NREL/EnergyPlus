@@ -1039,7 +1039,9 @@ void SwimmingPoolData::update(EnergyPlusData &state)
     Real64 WaterMassFlow = state.dataLoopNodes->Node(this->WaterInletNode).MassFlowRate; // water mass flow rate
     if (WaterMassFlow > 0.0) state.dataLoopNodes->Node(this->WaterOutletNode).Temp = this->PoolWaterTemp;
 }
-
+void SwimmingPoolData::oneTimeInit_new([[maybe_unused]] EnergyPlusData &state)
+{
+}
 void SwimmingPoolData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
 {
 }

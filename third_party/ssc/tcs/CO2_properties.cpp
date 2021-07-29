@@ -1,177 +1,169 @@
-/*********************************** FIT Carbon Dioxide (NREL v1)
-**********************************
+/*********************************** FIT Carbon Dioxide (NREL v1) **********************************
 —
 Copyright (c) 2016, Northland Numerics LLC
 All rights reserved.
 
-Use of this software in source and binary forms, with or without modification,
-is permitted for Alliance for Sustainable Energy, LLC (the “Licensee”) and for
-third parties that receive this software, with or without modification, directly
-from Licensee.  Licensee is permitted to redistribute this software in source
-and binary forms, with or without modification, provided that redistributions of
-source code must retain the above copyright notice and reservation of rights,
-this paragraph, and the following disclaimer of warranties and liability. Absent
-separate written agreement with Northland Numerics LLC, redistribution of this
-software is not permitted for third parties receiving this software, with or
-without modification, from Licensee or from any other entity or individual.
+Use of this software in source and binary forms, with or without modification, is permitted for
+Alliance for Sustainable Energy, LLC (the “Licensee”) and for third parties that receive this
+software, with or without modification, directly from Licensee.  Licensee is permitted to
+redistribute this software in source and binary forms, with or without modification, provided
+that redistributions of source code must retain the above copyright notice and reservation of
+rights, this paragraph, and the following disclaimer of warranties and liability.  Absent
+separate written agreement with Northland Numerics LLC, redistribution of this software is not
+permitted for third parties receiving this software, with or without modification, from Licensee
+or from any other entity or individual.
 
-THIS SOFTWARE IS PROVIDED BY NORTHLAND NUMERICS LLC "AS IS" AND ANY EXPRESS OR
-IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-MERCHANTABILITY, NONINFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED.  IN NO EVENT SHALL ANY WARRANTY BE CREATED IN CONNECTION WITH THE
-SALE OF THIS SOFTWARE, UNLESS THE WARRANTY WAS CREATED SOLELY AND EXPRESSLY IN A
-SEPARATE WRITTEN AGREEMENT SIGNED BY NORTHLAND NUMERICS LLC.  IN NO EVENT SHALL
-ANY WARRANTY BE IMPUTED OR PRESUMED.  IN NO EVENT SHALL NORTHLAND NUMERICS LLC
-OR CONTRIBUTORS TO THIS SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-BUSINESS INTERRUPTION; PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; OR LOSS OF
-USE, DATA, OR PROFITS), HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
-IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE),
-ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-POSSIBILITY OF SUCH DAMAGE.
+THIS SOFTWARE IS PROVIDED BY NORTHLAND NUMERICS LLC "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, NONINFRINGEMENT AND
+FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL ANY WARRANTY BE CREATED IN
+CONNECTION WITH THE SALE OF THIS SOFTWARE, UNLESS THE WARRANTY WAS CREATED SOLELY AND EXPRESSLY
+IN A SEPARATE WRITTEN AGREEMENT SIGNED BY NORTHLAND NUMERICS LLC.  IN NO EVENT SHALL ANY WARRANTY
+BE IMPUTED OR PRESUMED.  IN NO EVENT SHALL NORTHLAND NUMERICS LLC OR CONTRIBUTORS TO THIS SOFTWARE
+BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, BUSINESS INTERRUPTION; PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+OR LOSS OF USE, DATA, OR PROFITS), HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE), ARISING IN ANY WAY
+OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 —
 
 ***************************************************************************************************/
 
-#include "CO2_properties.h"
 #include <math.h>
+#include "CO2_properties.h"
 
 using namespace N_co2_props;
 
-// const double T_crit = 304.1282;
-// const double P_crit = 7377.3;
-// const double D_crit = 467.6;
-// const double wmm = 44.0098;
-// const double T_lower_limit = 270.0;
-// const double T_upper_limit = 1500.0;
-// const double P_lower_limit = 1.0;
-// const double P_upper_limit = 60000.0;
-// const double T_sat_min = 270.0;
-// const double P_sat_min = 3203.3474;
-// const double D_form_switch = 280.0;
+//const double T_crit = 304.1282;
+//const double P_crit = 7377.3;
+//const double D_crit = 467.6;
+//const double wmm = 44.0098;
+//const double T_lower_limit = 270.0;
+//const double T_upper_limit = 1500.0;
+//const double P_lower_limit = 1.0;
+//const double P_upper_limit = 60000.0;
+//const double T_sat_min = 270.0;
+//const double P_sat_min = 3203.3474;
+//const double D_form_switch = 280.0;
 
-void get_CO2_info(CO2_info *__restrict info) {
-  info->molar_mass = wmm;
-  info->T_critical = T_crit;
-  info->D_critical = D_crit;
-  info->P_critical = P_crit;
-  info->temp_lower_limit = T_lower_limit;
-  info->temp_upper_limit = T_upper_limit;
-  info->pres_lower_limit = P_lower_limit;
-  info->pres_upper_limit = P_upper_limit;
-  info->sat_temp_min = T_sat_min;
-  info->sat_pres_min = P_sat_min;
+
+void get_CO2_info(CO2_info * __restrict info)
+{
+	info->molar_mass = wmm;
+	info->T_critical = T_crit;
+	info->D_critical = D_crit;
+	info->P_critical = P_crit;
+	info->temp_lower_limit = T_lower_limit;
+	info->temp_upper_limit = T_upper_limit;
+	info->pres_lower_limit = P_lower_limit;
+	info->pres_upper_limit = P_upper_limit;
+	info->sat_temp_min = T_sat_min;
+	info->sat_pres_min = P_sat_min;
 }
 
-const char *CO2_error_message(const int error_code) {
-  switch (error_code) {
-  case 0:
-    return "";
-  case 101:
-    return "CO2_TD: specified temperature below minimum value of 270 K";
-  case 102:
-    return "CO2_TD: specified temperature above maximum value of 1,500 K";
-  case 103:
-    return "CO2_TD: specified inputs result in pressure below minimum value of "
-           "1 "
-           "kPa";
-  case 104:
-    return "CO2_TD: specified inputs result in pressure above maximum value of "
-           "60,000 kPa";
-  case 201:
-    return "CO2_TP: specified temperature below minimum value of 270 K";
-  case 202:
-    return "CO2_TP: specified temperature above maximum value of 1,500 K";
-  case 203:
-    return "CO2_TP: specified pressure below minimum value of 1 kPa";
-  case 204:
-    return "CO2_TP: specified pressure above maximum value of 60,000 kPa";
-  case 205:
-    return "CO2_TP: specified temperature and pressure correspond to "
-           "saturation "
-           "point; state is undefined";
-  case 206:
-    return "CO2_TP: an error occurred while solving for the density that "
-           "corresponds to the specified pressure";
-  case 301:
-    return "CO2_PH: specified inputs result in temperature below minimum value "
-           "of "
-           "270 K";
-  case 302:
-    return "CO2_PH: specified inputs result in temperature above maximum value "
-           "of "
-           "1,500 K";
-  case 303:
-    return "CO2_PH: specified pressure below minimum value of 1 kPa";
-  case 304:
-    return "CO2_PH: specified pressure above maximum value of 60,000 kPa";
-  case 305:
-    return "CO2_PH: an error occurred when solving for the T and D that "
-           "corresponds to the specified P and H";
-  case 401:
-    return "CO2_PS: specified inputs result in temperature below minimum value "
-           "of "
-           "270 K";
-  case 402:
-    return "CO2_PS: specified inputs result in temperature above maximum value "
-           "of "
-           "1,500 K";
-  case 403:
-    return "CO2_PS: specified pressure below minimum value of 1 kPa";
-  case 404:
-    return "CO2_PS: specified pressure above maximum value of 60,000 kPa";
-  case 405:
-    return "CO2_PS: an error occurred when solving for the T and D that "
-           "corresponds to the specified P and H";
-  case 505:
-    return "CO2_HS: an error occurred when solving for the T and D that "
-           "corresponds to the specified H and S";
-  case 501:
-    return "CO2_HS: specified inputs result in temperature below minimum value "
-           "of "
-           "270 K";
-  case 502:
-    return "CO2_HS: specified inputs result in temperature above maximum value "
-           "of "
-           "1,500 K";
-  case 503:
-    return "CO2_HS: specified inputs result in pressure below minimum value of "
-           "1 "
-           "kPa";
-  case 504:
-    return "CO2_HS: specified inputs result in pressure above maximum value of "
-           "60,000 kPa";
-  case 601:
-    return "CO2_TQ: specified temperature below minimum saturation value of "
-           "270 K";
-  case 602:
-    return "CO2_TQ: specified temperature greater than or equal to critical "
-           "temperature of 304.1282 K";
-  case 603:
-    return "CO2_TQ: specified quality cannot be less than 0.0 or greater than "
-           "1.0";
-  default:
-    return "an unknown error occurred";
-  }
-}
 
-void N_co2_props::zero_state(CO2_state *__restrict state) {
-  state->temp = 0.0;
-  state->pres = 0.0;
-  state->dens = 0.0;
-  state->qual = 0.0;
-  state->inte = 0.0;
-  state->enth = 0.0;
-  state->entr = 0.0;
-  state->cv = 0.0;
-  state->cp = 0.0;
-  state->ssnd = 0.0;
-  state->sat_vap_dens = 0.0;
-  state->sat_liq_dens = 0.0;
-}
 
-// typedef struct
+const char * CO2_error_message( const int error_code )
+    {
+    switch (error_code)
+        {
+        case 0:
+            return "";
+        case 101:
+            return "CO2_TD: specified temperature below minimum value of 270 K";
+        case 102:
+            return "CO2_TD: specified temperature above maximum value of 1,500 K";
+        case 103:
+            return "CO2_TD: specified inputs result in pressure below minimum value of 1 "
+                   "kPa";
+        case 104:
+            return "CO2_TD: specified inputs result in pressure above maximum value of "
+                   "60,000 kPa";
+        case 201:
+            return "CO2_TP: specified temperature below minimum value of 270 K";
+        case 202:
+            return "CO2_TP: specified temperature above maximum value of 1,500 K";
+        case 203:
+            return "CO2_TP: specified pressure below minimum value of 1 kPa";
+        case 204:
+            return "CO2_TP: specified pressure above maximum value of 60,000 kPa";
+        case 205:
+            return "CO2_TP: specified temperature and pressure correspond to saturation "
+                   "point; state is undefined";
+        case 206:
+            return "CO2_TP: an error occurred while solving for the density that "
+                   "corresponds to the specified pressure";
+        case 301:
+            return "CO2_PH: specified inputs result in temperature below minimum value of "
+                   "270 K";
+        case 302:
+            return "CO2_PH: specified inputs result in temperature above maximum value of "
+                   "1,500 K";
+        case 303:
+            return "CO2_PH: specified pressure below minimum value of 1 kPa";
+        case 304:
+            return "CO2_PH: specified pressure above maximum value of 60,000 kPa";
+        case 305:
+            return "CO2_PH: an error occurred when solving for the T and D that "
+                   "corresponds to the specified P and H";
+        case 401:
+            return "CO2_PS: specified inputs result in temperature below minimum value of "
+                   "270 K";
+        case 402:
+            return "CO2_PS: specified inputs result in temperature above maximum value of "
+                   "1,500 K";
+        case 403:
+            return "CO2_PS: specified pressure below minimum value of 1 kPa";
+        case 404:
+            return "CO2_PS: specified pressure above maximum value of 60,000 kPa";
+        case 405:
+            return "CO2_PS: an error occurred when solving for the T and D that "
+                   "corresponds to the specified P and H";
+        case 505:
+            return "CO2_HS: an error occurred when solving for the T and D that "
+                   "corresponds to the specified H and S";
+        case 501:
+            return "CO2_HS: specified inputs result in temperature below minimum value of "
+                   "270 K";
+        case 502:
+            return "CO2_HS: specified inputs result in temperature above maximum value of "
+                   "1,500 K";
+        case 503:
+            return "CO2_HS: specified inputs result in pressure below minimum value of 1 "
+                   "kPa";
+        case 504:
+            return "CO2_HS: specified inputs result in pressure above maximum value of "
+                   "60,000 kPa";
+        case 601:
+            return "CO2_TQ: specified temperature below minimum saturation value of 270 K";
+        case 602:
+            return "CO2_TQ: specified temperature greater than or equal to critical "
+                   "temperature of 304.1282 K";
+        case 603:
+            return "CO2_TQ: specified quality cannot be less than 0.0 or greater than 1.0";
+        default:
+            return "an unknown error occurred";
+        }
+    }
+
+
+void N_co2_props::zero_state( CO2_state * __restrict state )
+    {
+    state->temp = 0.0;
+    state->pres = 0.0;
+    state->dens = 0.0;
+    state->qual = 0.0;
+    state->inte = 0.0;
+    state->enth = 0.0;
+    state->entr = 0.0;
+    state->cv = 0.0;
+    state->cp = 0.0;
+    state->ssnd = 0.0;
+    state->sat_vap_dens = 0.0;
+    state->sat_liq_dens = 0.0;
+    }
+
+//typedef struct
 //    {
 //    double x_low;
 //    double inv_dx;

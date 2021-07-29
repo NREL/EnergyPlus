@@ -294,7 +294,7 @@ void PlantProfileData::ReportPlantProfile(EnergyPlusData &state)
         this->CoolingEnergy = std::abs(this->Energy);
     }
 }
-void PlantProfileData::oneTimeInit(EnergyPlusData &state)
+void PlantProfileData::oneTimeInit_new(EnergyPlusData &state)
 {
     bool errFlag;
 
@@ -306,6 +306,9 @@ void PlantProfileData::oneTimeInit(EnergyPlusData &state)
             ShowFatalError(state, "InitPlantProfile: Program terminated for previous conditions.");
         }
     }
+}
+void PlantProfileData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
 }
 
 // Functions

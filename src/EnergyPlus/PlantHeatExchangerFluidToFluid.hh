@@ -217,6 +217,8 @@ namespace PlantHeatExchangerFluidToFluid {
                                       Array1D<Real64> const &Par // Par(1) = HX index number
         );
 
+        void oneTimeInit_new(EnergyPlusData &state) override;
+
         void oneTimeInit(EnergyPlusData &state) override;
     };
 

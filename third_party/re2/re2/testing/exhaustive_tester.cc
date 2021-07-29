@@ -13,11 +13,11 @@
 
 #include <stdio.h>
 
-#include "re2/testing/exhaustive_tester.h"
-#include "re2/testing/tester.h"
+#include "util/test.h"
 #include "util/logging.h"
 #include "util/strutil.h"
-#include "util/test.h"
+#include "re2/testing/exhaustive_tester.h"
+#include "re2/testing/tester.h"
 
 // For target `log' in the Makefile.
 #ifndef LOGGING
@@ -32,17 +32,17 @@ DEFINE_int32(max_bad_regexp_inputs, 1,
 
 namespace re2 {
 
-static char *escape(const StringPiece &sp) {
+static char* escape(const StringPiece& sp) {
   static char buf[512];
-  char *p = buf;
+  char* p = buf;
   *p++ = '\"';
   for (size_t i = 0; i < sp.size(); i++) {
-    if (p + 5 >= buf + sizeof buf)
+    if(p+5 >= buf+sizeof buf)
       LOG(FATAL) << "ExhaustiveTester escape: too long";
-    if (sp[i] == '\\' || sp[i] == '\"') {
+    if(sp[i] == '\\' || sp[i] == '\"') {
       *p++ = '\\';
       *p++ = sp[i];
-    } else if (sp[i] == '\n') {
+    } else if(sp[i] == '\n') {
       *p++ = '\\';
       *p++ = 'n';
     } else {
@@ -54,8 +54,7 @@ static char *escape(const StringPiece &sp) {
   return buf;
 }
 
-static void PrintResult(const RE2 &re, const StringPiece &input,
-                        RE2::Anchor anchor, StringPiece *m, int n) {
+static void PrintResult(const RE2& re, const StringPiece& input, RE2::Anchor anchor, StringPiece *m, int n) {
   if (!re.Match(input, 0, input.size(), anchor, m, n)) {
     printf("-");
     return;
@@ -66,15 +65,15 @@ static void PrintResult(const RE2 &re, const StringPiece &input,
     if (m[i].data() == NULL)
       printf("-");
     else
-      printf("%td-%td", m[i].begin() - input.begin(),
-             m[i].end() - input.begin());
+      printf("%td-%td",
+             m[i].begin() - input.begin(), m[i].end() - input.begin());
   }
 }
 
 // Processes a single generated regexp.
 // Compiles it using Regexp interface and PCRE, and then
 // checks that NFA, DFA, and PCRE all return the same results.
-void ExhaustiveTester::HandleRegexp(const std::string &const_regexp) {
+void ExhaustiveTester::HandleRegexp(const std::string& const_regexp) {
   regexps_++;
   std::string regexp = const_regexp;
   if (!topwrapper_.empty())
@@ -90,7 +89,7 @@ void ExhaustiveTester::HandleRegexp(const std::string &const_regexp) {
     // other implementations, such as Go's regexp package.
     if (randomstrings_)
       LOG(ERROR) << "Cannot log with random strings.";
-    if (regexps_ == 1) { // first
+    if (regexps_ == 1) {  // first
       printf("strings\n");
       strgen_.Reset();
       while (strgen_.HasNext())
@@ -103,8 +102,8 @@ void ExhaustiveTester::HandleRegexp(const std::string &const_regexp) {
     RE2::Options longest;
     longest.set_longest_match(true);
     RE2 relongest(regexp, longest);
-    int ngroup = re.NumberOfCapturingGroups() + 1;
-    StringPiece *group = new StringPiece[ngroup];
+    int ngroup = re.NumberOfCapturingGroups()+1;
+    StringPiece* group = new StringPiece[ngroup];
 
     strgen_.Reset();
     while (strgen_.HasNext()) {
@@ -143,10 +142,12 @@ void ExhaustiveTester::HandleRegexp(const std::string &const_regexp) {
 
 // Runs an exhaustive test on the given parameters.
 void ExhaustiveTest(int maxatoms, int maxops,
-                    const std::vector<std::string> &alphabet,
-                    const std::vector<std::string> &ops, int maxstrlen,
-                    const std::vector<std::string> &stralphabet,
-                    const std::string &wrapper, const std::string &topwrapper) {
+                    const std::vector<std::string>& alphabet,
+                    const std::vector<std::string>& ops,
+                    int maxstrlen,
+                    const std::vector<std::string>& stralphabet,
+                    const std::string& wrapper,
+                    const std::string& topwrapper) {
   if (RE2_DEBUG_MODE) {
     if (maxatoms > 1)
       maxatoms--;
@@ -155,28 +156,33 @@ void ExhaustiveTest(int maxatoms, int maxops,
     if (maxstrlen > 1)
       maxstrlen--;
   }
-  ExhaustiveTester t(maxatoms, maxops, alphabet, ops, maxstrlen, stralphabet,
-                     wrapper, topwrapper);
+  ExhaustiveTester t(maxatoms, maxops, alphabet, ops,
+                     maxstrlen, stralphabet, wrapper,
+                     topwrapper);
   t.Generate();
   if (!LOGGING) {
-    printf("%d regexps, %d tests, %d failures [%d/%d str]\n", t.regexps(),
-           t.tests(), t.failures(), maxstrlen, (int)stralphabet.size());
+    printf("%d regexps, %d tests, %d failures [%d/%d str]\n",
+           t.regexps(), t.tests(), t.failures(), maxstrlen, (int)stralphabet.size());
   }
   EXPECT_EQ(0, t.failures());
 }
 
 // Runs an exhaustive test using the given parameters and
 // the basic egrep operators.
-void EgrepTest(int maxatoms, int maxops, const std::string &alphabet,
-               int maxstrlen, const std::string &stralphabet,
-               const std::string &wrapper) {
-  const char *tops[] = {"", "^(?:%s)", "(?:%s)$", "^(?:%s)$"};
+void EgrepTest(int maxatoms, int maxops, const std::string& alphabet,
+               int maxstrlen, const std::string& stralphabet,
+               const std::string& wrapper) {
+  const char* tops[] = { "", "^(?:%s)", "(?:%s)$", "^(?:%s)$" };
 
   for (size_t i = 0; i < arraysize(tops); i++) {
-    ExhaustiveTest(maxatoms, maxops, Split("", alphabet),
-                   RegexpGenerator::EgrepOps(), maxstrlen,
-                   Split("", stralphabet), wrapper, tops[i]);
+    ExhaustiveTest(maxatoms, maxops,
+                   Split("", alphabet),
+                   RegexpGenerator::EgrepOps(),
+                   maxstrlen,
+                   Split("", stralphabet),
+                   wrapper,
+                   tops[i]);
   }
 }
 
-} // namespace re2
+}  // namespace re2

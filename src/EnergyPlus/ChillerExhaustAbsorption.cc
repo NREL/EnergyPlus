@@ -823,135 +823,147 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         ChillerName);
 }
 
-void ExhaustAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
+void ExhaustAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
 {
-    this->setupOutputVariables(state);
+        this->setupOutputVariables(state);
 
-    bool errFlag = false;
-    PlantUtilities::ScanPlantLoopsForObject(state,
-                                            this->Name,
-                                            DataPlant::TypeOf_Chiller_ExhFiredAbsorption,
-                                            this->CWLoopNum,
-                                            this->CWLoopSideNum,
-                                            this->CWBranchNum,
-                                            this->CWCompNum,
-                                            errFlag,
-                                            this->CHWLowLimitTemp,
-                                            _,
-                                            _,
-                                            this->ChillReturnNodeNum,
-                                            _);
-    if (errFlag) {
-        ShowFatalError(state, "InitExhaustAbsorber: Program terminated due to previous condition(s).");
-    }
-
-    PlantUtilities::ScanPlantLoopsForObject(state,
-                                            this->Name,
-                                            DataPlant::TypeOf_Chiller_ExhFiredAbsorption,
-                                            this->HWLoopNum,
-                                            this->HWLoopSideNum,
-                                            this->HWBranchNum,
-                                            this->HWCompNum,
-                                            errFlag,
-                                            _,
-                                            _,
-                                            _,
-                                            this->HeatReturnNodeNum,
-                                            _);
-    if (errFlag) {
-        ShowFatalError(state, "InitExhaustAbsorber: Program terminated due to previous condition(s).");
-    }
-
-    if (this->isWaterCooled) {
+        bool errFlag = false;
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
                                                 DataPlant::TypeOf_Chiller_ExhFiredAbsorption,
-                                                this->CDLoopNum,
-                                                this->CDLoopSideNum,
-                                                this->CDBranchNum,
-                                                this->CDCompNum,
+                                                this->CWLoopNum,
+                                                this->CWLoopSideNum,
+                                                this->CWBranchNum,
+                                                this->CWCompNum,
                                                 errFlag,
+                                                this->CHWLowLimitTemp,
                                                 _,
                                                 _,
-                                                _,
-                                                this->CondReturnNodeNum,
+                                                this->ChillReturnNodeNum,
                                                 _);
         if (errFlag) {
             ShowFatalError(state, "InitExhaustAbsorber: Program terminated due to previous condition(s).");
         }
-        PlantUtilities::InterConnectTwoPlantLoopSides(
-            state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, DataPlant::TypeOf_Chiller_ExhFiredAbsorption, true);
-        PlantUtilities::InterConnectTwoPlantLoopSides(
-            state, this->HWLoopNum, this->HWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, DataPlant::TypeOf_Chiller_ExhFiredAbsorption, true);
-    }
 
-    PlantUtilities::InterConnectTwoPlantLoopSides(
-        state, this->CWLoopNum, this->CWLoopSideNum, this->HWLoopNum, this->HWLoopSideNum, DataPlant::TypeOf_Chiller_ExhFiredAbsorption, true);
+        PlantUtilities::ScanPlantLoopsForObject(state,
+                                                this->Name,
+                                                DataPlant::TypeOf_Chiller_ExhFiredAbsorption,
+                                                this->HWLoopNum,
+                                                this->HWLoopSideNum,
+                                                this->HWBranchNum,
+                                                this->HWCompNum,
+                                                errFlag,
+                                                _,
+                                                _,
+                                                _,
+                                                this->HeatReturnNodeNum,
+                                                _);
+        if (errFlag) {
+            ShowFatalError(state, "InitExhaustAbsorber: Program terminated due to previous condition(s).");
+        }
 
-    // check if outlet node of chilled water side has a setpoint.
-    if ((state.dataLoopNodes->Node(this->ChillSupplyNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
-        (state.dataLoopNodes->Node(this->ChillSupplyNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
-        if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-            if (!this->ChillSetPointErrDone) {
-                ShowWarningError(state, "Missing temperature setpoint on cool side for chiller heater named " + this->Name);
-                ShowContinueError(state, "  A temperature setpoint is needed at the outlet node of this chiller, use a SetpointManager");
-                ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
-                this->ChillSetPointErrDone = true;
-            }
-        } else {
-            // need call to EMS to check node
-            errFlag = false; // but not really fatal yet, but should be.
-            EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->ChillSupplyNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, errFlag);
-            state.dataLoopNodes->NodeSetpointCheck(this->ChillSupplyNodeNum).needsSetpointChecking = false;
+        if (this->isWaterCooled) {
+            PlantUtilities::ScanPlantLoopsForObject(state,
+                                                    this->Name,
+                                                    DataPlant::TypeOf_Chiller_ExhFiredAbsorption,
+                                                    this->CDLoopNum,
+                                                    this->CDLoopSideNum,
+                                                    this->CDBranchNum,
+                                                    this->CDCompNum,
+                                                    errFlag,
+                                                    _,
+                                                    _,
+                                                    _,
+                                                    this->CondReturnNodeNum,
+                                                    _);
             if (errFlag) {
+                ShowFatalError(state, "InitExhaustAbsorber: Program terminated due to previous condition(s).");
+            }
+            PlantUtilities::InterConnectTwoPlantLoopSides(state,
+                                                          this->CWLoopNum,
+                                                          this->CWLoopSideNum,
+                                                          this->CDLoopNum,
+                                                          this->CDLoopSideNum,
+                                                          DataPlant::TypeOf_Chiller_ExhFiredAbsorption,
+                                                          true);
+            PlantUtilities::InterConnectTwoPlantLoopSides(state,
+                                                          this->HWLoopNum,
+                                                          this->HWLoopSideNum,
+                                                          this->CDLoopNum,
+                                                          this->CDLoopSideNum,
+                                                          DataPlant::TypeOf_Chiller_ExhFiredAbsorption,
+                                                          true);
+        }
+
+        PlantUtilities::InterConnectTwoPlantLoopSides(
+            state, this->CWLoopNum, this->CWLoopSideNum, this->HWLoopNum, this->HWLoopSideNum, DataPlant::TypeOf_Chiller_ExhFiredAbsorption, true);
+
+        // check if outlet node of chilled water side has a setpoint.
+        if ((state.dataLoopNodes->Node(this->ChillSupplyNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
+            (state.dataLoopNodes->Node(this->ChillSupplyNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
+            if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 if (!this->ChillSetPointErrDone) {
                     ShowWarningError(state, "Missing temperature setpoint on cool side for chiller heater named " + this->Name);
-                    ShowContinueError(state, "  A temperature setpoint is needed at the outlet node of this chiller evaporator ");
-                    ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node ");
-                    ShowContinueError(state, "  or use an EMS actuator to establish a setpoint at the outlet node ");
+                    ShowContinueError(state, "  A temperature setpoint is needed at the outlet node of this chiller, use a SetpointManager");
                     ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
                     this->ChillSetPointErrDone = true;
                 }
-            }
-        }
-        this->ChillSetPointSetToLoop = true;
-        state.dataLoopNodes->Node(this->ChillSupplyNodeNum).TempSetPoint =
-            state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
-        state.dataLoopNodes->Node(this->ChillSupplyNodeNum).TempSetPointHi =
-            state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
-    }
-    // check if outlet node of hot water side has a setpoint.
-    if ((state.dataLoopNodes->Node(this->HeatSupplyNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
-        (state.dataLoopNodes->Node(this->HeatSupplyNodeNum).TempSetPointLo == DataLoopNode::SensedNodeFlagValue)) {
-        if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-            if (!this->HeatSetPointErrDone) {
-                ShowWarningError(state, "Missing temperature setpoint on heat side for chiller heater named " + this->Name);
-                ShowContinueError(state, "  A temperature setpoint is needed at the outlet node of this chiller, use a SetpointManager");
-                ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
-                this->HeatSetPointErrDone = true;
-            }
-        } else {
-            // need call to EMS to check node
-            errFlag = false; // but not really fatal yet, but should be.
-            EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->HeatSupplyNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, errFlag);
-            state.dataLoopNodes->NodeSetpointCheck(this->HeatSupplyNodeNum).needsSetpointChecking = false;
-            if (errFlag) {
-                if (!this->HeatSetPointErrDone) {
-                    ShowWarningError(state, "Missing temperature setpoint on heat side for chiller heater named " + this->Name);
-                    ShowContinueError(state, "  A temperature setpoint is needed at the outlet node of this chiller heater ");
-                    ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the heater side outlet node ");
-                    ShowContinueError(state, "  or use an EMS actuator to establish a setpoint at the outlet node ");
-                    ShowContinueError(state, "  The overall loop setpoint will be assumed for heater side. The simulation continues ... ");
-                    this->HeatSetPointErrDone = true;
+            } else {
+                // need call to EMS to check node
+                errFlag = false; // but not really fatal yet, but should be.
+                EMSManager::CheckIfNodeSetPointManagedByEMS(
+                    state, this->ChillSupplyNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, errFlag);
+                state.dataLoopNodes->NodeSetpointCheck(this->ChillSupplyNodeNum).needsSetpointChecking = false;
+                if (errFlag) {
+                    if (!this->ChillSetPointErrDone) {
+                        ShowWarningError(state, "Missing temperature setpoint on cool side for chiller heater named " + this->Name);
+                        ShowContinueError(state, "  A temperature setpoint is needed at the outlet node of this chiller evaporator ");
+                        ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node ");
+                        ShowContinueError(state, "  or use an EMS actuator to establish a setpoint at the outlet node ");
+                        ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
+                        this->ChillSetPointErrDone = true;
+                    }
                 }
             }
+            this->ChillSetPointSetToLoop = true;
+            state.dataLoopNodes->Node(this->ChillSupplyNodeNum).TempSetPoint =
+                state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
+            state.dataLoopNodes->Node(this->ChillSupplyNodeNum).TempSetPointHi =
+                state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
         }
-        this->HeatSetPointSetToLoop = true;
-        state.dataLoopNodes->Node(this->HeatSupplyNodeNum).TempSetPoint =
-            state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->HWLoopNum).TempSetPointNodeNum).TempSetPoint;
-        state.dataLoopNodes->Node(this->HeatSupplyNodeNum).TempSetPointLo =
-            state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->HWLoopNum).TempSetPointNodeNum).TempSetPointLo;
-    }
+        // check if outlet node of hot water side has a setpoint.
+        if ((state.dataLoopNodes->Node(this->HeatSupplyNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
+            (state.dataLoopNodes->Node(this->HeatSupplyNodeNum).TempSetPointLo == DataLoopNode::SensedNodeFlagValue)) {
+            if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                if (!this->HeatSetPointErrDone) {
+                    ShowWarningError(state, "Missing temperature setpoint on heat side for chiller heater named " + this->Name);
+                    ShowContinueError(state, "  A temperature setpoint is needed at the outlet node of this chiller, use a SetpointManager");
+                    ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
+                    this->HeatSetPointErrDone = true;
+                }
+            } else {
+                // need call to EMS to check node
+                errFlag = false; // but not really fatal yet, but should be.
+                EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->HeatSupplyNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, errFlag);
+                state.dataLoopNodes->NodeSetpointCheck(this->HeatSupplyNodeNum).needsSetpointChecking = false;
+                if (errFlag) {
+                    if (!this->HeatSetPointErrDone) {
+                        ShowWarningError(state, "Missing temperature setpoint on heat side for chiller heater named " + this->Name);
+                        ShowContinueError(state, "  A temperature setpoint is needed at the outlet node of this chiller heater ");
+                        ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the heater side outlet node ");
+                        ShowContinueError(state, "  or use an EMS actuator to establish a setpoint at the outlet node ");
+                        ShowContinueError(state, "  The overall loop setpoint will be assumed for heater side. The simulation continues ... ");
+                        this->HeatSetPointErrDone = true;
+                    }
+                }
+            }
+            this->HeatSetPointSetToLoop = true;
+            state.dataLoopNodes->Node(this->HeatSupplyNodeNum).TempSetPoint =
+                state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->HWLoopNum).TempSetPointNodeNum).TempSetPoint;
+            state.dataLoopNodes->Node(this->HeatSupplyNodeNum).TempSetPointLo =
+                state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->HWLoopNum).TempSetPointNodeNum).TempSetPointLo;
+        }
+
 }
 
 void ExhaustAbsorberSpecs::initialize(EnergyPlusData &state)
@@ -1077,8 +1089,7 @@ void ExhaustAbsorberSpecs::initialize(EnergyPlusData &state)
             state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->HWLoopNum).TempSetPointNodeNum).TempSetPointLo;
     }
 
-    if ((this->isWaterCooled) &&
-        ((this->InHeatingMode) || (this->InCoolingMode))) { // combining oneTimeInit and plantScanInit could cause a diff here
+    if ((this->isWaterCooled) && ((this->InHeatingMode) || (this->InCoolingMode))) { // combining oneTimeInit and plantScanInit could cause a diff here
         mdot = this->DesCondMassFlowRate;
 
         PlantUtilities::SetComponentFlowRate(
@@ -2252,6 +2263,10 @@ void ExhaustAbsorberSpecs::updateHeatRecords(EnergyPlusData &state, Real64 MyLoa
     this->HeatThermalEnergy = this->HeatThermalEnergyUseRate * RptConstant;
     this->ElectricEnergy = this->ElectricPower * RptConstant;
     this->HeatElectricEnergy = this->HeatElectricPower * RptConstant;
+}
+
+void ExhaustAbsorberSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
 }
 
 } // namespace EnergyPlus::ChillerExhaustAbsorption

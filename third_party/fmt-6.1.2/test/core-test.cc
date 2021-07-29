@@ -15,8 +15,9 @@
 #include <string>
 #include <type_traits>
 
-#include "gmock.h"
 #include "test-assert.h"
+
+#include "gmock.h"
 
 // Check if fmt/core.h compiles with windows.h included before it.
 #ifdef _WIN32
@@ -456,8 +457,7 @@ TEST(CoreTest, HasFormatter) {
   using context = fmt::format_context;
   static_assert(has_formatter<enabled_formatter, context>::value, "");
   static_assert(!has_formatter<disabled_formatter, context>::value, "");
-  static_assert(!has_formatter<disabled_formatter_convertible, context>::value,
-                "");
+  static_assert(!has_formatter<disabled_formatter_convertible, context>::value, "");
 }
 
 struct convertible_to_int {
@@ -616,7 +616,7 @@ TEST(FormatterTest, FormatExplicitlyConvertibleToStringView) {
   EXPECT_EQ("foo", fmt::format("{}", explicitly_convertible_to_string_view()));
 }
 
-#  ifdef FMT_USE_STRING_VIEW
+#ifdef FMT_USE_STRING_VIEW
 struct explicitly_convertible_to_std_string_view {
   explicit operator std::string_view() const { return "foo"; }
 };
@@ -625,7 +625,7 @@ TEST(FormatterTest, FormatExplicitlyConvertibleToStdStringView) {
   EXPECT_EQ("foo",
             fmt::format("{}", explicitly_convertible_to_std_string_view()));
 }
-#  endif
+#endif
 
 struct explicitly_convertible_to_wstring_view {
   explicit operator fmt::wstring_view() const { return L"foo"; }
@@ -639,9 +639,9 @@ TEST(FormatterTest, FormatExplicitlyConvertibleToWStringView) {
 
 struct disabled_rvalue_conversion {
   operator const char*() const& { return "foo"; }
-  operator const char*() & { return "foo"; }
+  operator const char*()& { return "foo"; }
   operator const char*() const&& = delete;
-  operator const char*() && = delete;
+  operator const char*()&& = delete;
 };
 
 TEST(FormatterTest, DisabledRValueConversion) {

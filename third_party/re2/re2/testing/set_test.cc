@@ -6,10 +6,10 @@
 #include <string>
 #include <vector>
 
+#include "util/test.h"
+#include "util/logging.h"
 #include "re2/re2.h"
 #include "re2/set.h"
-#include "util/logging.h"
-#include "util/test.h"
 
 namespace re2 {
 
@@ -201,4 +201,4 @@ TEST(Set, Prefix) {
   ASSERT_EQ(v[0], 0);
 }
 
-} // namespace re2
+}  // namespace re2

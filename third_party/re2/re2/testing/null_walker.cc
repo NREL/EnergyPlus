@@ -2,38 +2,38 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+#include "util/test.h"
+#include "util/logging.h"
 #include "re2/regexp.h"
 #include "re2/walker-inl.h"
-#include "util/logging.h"
-#include "util/test.h"
 
 namespace re2 {
 
 // Null walker.  For benchmarking the walker itself.
 
 class NullWalker : public Regexp::Walker<bool> {
-public:
-  NullWalker() {}
-  bool PostVisit(Regexp *re, bool parent_arg, bool pre_arg, bool *child_args,
-                 int nchild_args);
+ public:
+  NullWalker() { }
+  bool PostVisit(Regexp* re, bool parent_arg, bool pre_arg,
+                 bool* child_args, int nchild_args);
 
-  bool ShortVisit(Regexp *re, bool a) {
+  bool ShortVisit(Regexp* re, bool a) {
     // Should never be called: we use Walk not WalkExponential.
     LOG(DFATAL) << "NullWalker::ShortVisit called";
     return a;
   }
 
-private:
-  NullWalker(const NullWalker &) = delete;
-  NullWalker &operator=(const NullWalker &) = delete;
+ private:
+  NullWalker(const NullWalker&) = delete;
+  NullWalker& operator=(const NullWalker&) = delete;
 };
 
 // Called after visiting re's children.  child_args contains the return
 // value from each of the children's PostVisits (i.e., whether each child
 // can match an empty string).  Returns whether this clause can match an
 // empty string.
-bool NullWalker::PostVisit(Regexp *re, bool parent_arg, bool pre_arg,
-                           bool *child_args, int nchild_args) {
+bool NullWalker::PostVisit(Regexp* re, bool parent_arg, bool pre_arg,
+                                  bool* child_args, int nchild_args) {
   return false;
 }
 
@@ -43,4 +43,4 @@ void Regexp::NullWalk() {
   w.Walk(this, false);
 }
 
-} // namespace re2
+}  // namespace re2

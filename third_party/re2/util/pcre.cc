@@ -9,17 +9,17 @@
 #include <assert.h>
 #include <ctype.h>
 #include <errno.h>
-#include <limits>
 #include <stdlib.h>
 #include <string.h>
+#include <limits>
 #include <string>
 #include <utility>
 
+#include "util/util.h"
 #include "util/flags.h"
 #include "util/logging.h"
 #include "util/pcre.h"
 #include "util/strutil.h"
-#include "util/util.h"
 
 // Silence warnings about the wacky formatting in the operator() functions.
 // Note that we test for Clang first because it defines __GNUC__ as well.
@@ -35,7 +35,7 @@
 // not exceed main thread stacks.  Note that other threads
 // often have smaller stacks, and therefore tightening
 // regexp_stack_limit may frequently be necessary.
-DEFINE_int32(regexp_stack_limit, 256 << 10, "default PCRE stack limit (bytes)");
+DEFINE_int32(regexp_stack_limit, 256<<10, "default PCRE stack limit (bytes)");
 DEFINE_int32(regexp_match_limit, 1000000,
              "default PCRE match limit (function calls)");
 
@@ -58,19 +58,20 @@ struct pcre_extra {
 #define PCRE_ERROR_RECURSIONLIMIT 3
 #define PCRE_INFO_CAPTURECOUNT 0
 
-void pcre_free(void *) {}
+void pcre_free(void*) {
+}
 
-pcre *pcre_compile(const char *, int, const char **, int *,
-                   const unsigned char *) {
+pcre* pcre_compile(const char*, int, const char**, int*, const unsigned char*) {
   return NULL;
 }
 
-int pcre_exec(const pcre *, const pcre_extra *, const char *, int, int, int,
-              int *, int) {
+int pcre_exec(const pcre*, const pcre_extra*, const char*, int, int, int, int*, int) {
   return 0;
 }
 
-int pcre_fullinfo(const pcre *, const pcre_extra *, int, void *) { return 0; }
+int pcre_fullinfo(const pcre*, const pcre_extra*, int, void*) {
+  return 0;
+}
 
 #endif
 
@@ -78,7 +79,7 @@ namespace re2 {
 
 // Maximum number of args we can set
 static const int kMaxArgs = 16;
-static const int kVecSize = (1 + kMaxArgs) * 3; // results + PCRE workspace
+static const int kVecSize = (1 + kMaxArgs) * 3;  // results + PCRE workspace
 
 // Approximate size of a recursive invocation of PCRE's
 // internal "match()" frame.  This varies depending on the
@@ -90,18 +91,18 @@ static const int kVecSize = (1 + kMaxArgs) * 3; // results + PCRE workspace
 static const int kPCREFrameSize = 700;
 
 // Special name for missing C++ arguments.
-PCRE::Arg PCRE::no_more_args((void *)NULL);
+PCRE::Arg PCRE::no_more_args((void*)NULL);
 
-const PCRE::PartialMatchFunctor PCRE::PartialMatch = {};
-const PCRE::FullMatchFunctor PCRE::FullMatch = {};
-const PCRE::ConsumeFunctor PCRE::Consume = {};
-const PCRE::FindAndConsumeFunctor PCRE::FindAndConsume = {};
+const PCRE::PartialMatchFunctor PCRE::PartialMatch = { };
+const PCRE::FullMatchFunctor PCRE::FullMatch = { } ;
+const PCRE::ConsumeFunctor PCRE::Consume = { };
+const PCRE::FindAndConsumeFunctor PCRE::FindAndConsume = { };
 
 // If a regular expression has no error, its error_ field points here
 static const std::string empty_string;
 
-void PCRE::Init(const char *pattern, Option options, int match_limit,
-                int stack_limit, bool report_errors) {
+void PCRE::Init(const char* pattern, Option options, int match_limit,
+              int stack_limit, bool report_errors) {
   pattern_ = pattern;
   options_ = options;
   match_limit_ = match_limit;
@@ -114,8 +115,8 @@ void PCRE::Init(const char *pattern, Option options, int match_limit,
 
   if (options & ~(EnabledCompileOptions | EnabledExecOptions)) {
     error_ = new std::string("illegal regexp option");
-    PCREPORT(ERROR) << "Error compiling '" << pattern
-                    << "': illegal regexp option";
+    PCREPORT(ERROR)
+        << "Error compiling '" << pattern << "': illegal regexp option";
   } else {
     re_partial_ = Compile(UNANCHORED);
     if (re_partial_ != NULL) {
@@ -124,36 +125,35 @@ void PCRE::Init(const char *pattern, Option options, int match_limit,
   }
 }
 
-PCRE::PCRE(const char *pattern) { Init(pattern, None, 0, 0, true); }
-PCRE::PCRE(const char *pattern, Option option) {
+PCRE::PCRE(const char* pattern) {
+  Init(pattern, None, 0, 0, true);
+}
+PCRE::PCRE(const char* pattern, Option option) {
   Init(pattern, option, 0, 0, true);
 }
-PCRE::PCRE(const std::string &pattern) {
+PCRE::PCRE(const std::string& pattern) {
   Init(pattern.c_str(), None, 0, 0, true);
 }
-PCRE::PCRE(const std::string &pattern, Option option) {
+PCRE::PCRE(const std::string& pattern, Option option) {
   Init(pattern.c_str(), option, 0, 0, true);
 }
-PCRE::PCRE(const std::string &pattern, const PCRE_Options &re_option) {
+PCRE::PCRE(const std::string& pattern, const PCRE_Options& re_option) {
   Init(pattern.c_str(), re_option.option(), re_option.match_limit(),
        re_option.stack_limit(), re_option.report_errors());
 }
 
-PCRE::PCRE(const char *pattern, const PCRE_Options &re_option) {
+PCRE::PCRE(const char *pattern, const PCRE_Options& re_option) {
   Init(pattern, re_option.option(), re_option.match_limit(),
        re_option.stack_limit(), re_option.report_errors());
 }
 
 PCRE::~PCRE() {
-  if (re_full_ != NULL)
-    pcre_free(re_full_);
-  if (re_partial_ != NULL)
-    pcre_free(re_partial_);
-  if (error_ != &empty_string)
-    delete error_;
+  if (re_full_ != NULL)         pcre_free(re_full_);
+  if (re_partial_ != NULL)      pcre_free(re_partial_);
+  if (error_ != &empty_string)  delete error_;
 }
 
-pcre *PCRE::Compile(Anchor anchor) {
+pcre* PCRE::Compile(Anchor anchor) {
   // Special treatment for anchoring.  This is needed because at
   // runtime pcre only provides an option for anchoring at the
   // beginning of a string.
@@ -166,24 +166,25 @@ pcre *PCRE::Compile(Anchor anchor) {
   //    ANCHOR_BOTH     Tack a "\z" to the end of the original pattern
   //                    and use a pcre anchored match.
 
-  const char *error = "";
+  const char* error = "";
   int eoffset;
-  pcre *re;
+  pcre* re;
   if (anchor != ANCHOR_BOTH) {
-    re = pcre_compile(pattern_.c_str(), (options_ & EnabledCompileOptions),
+    re = pcre_compile(pattern_.c_str(),
+                      (options_ & EnabledCompileOptions),
                       &error, &eoffset, NULL);
   } else {
     // Tack a '\z' at the end of PCRE.  Parenthesize it first so that
     // the '\z' applies to all top-level alternatives in the regexp.
-    std::string wrapped = "(?:"; // A non-counting grouping operator
+    std::string wrapped = "(?:";  // A non-counting grouping operator
     wrapped += pattern_;
     wrapped += ")\\z";
-    re = pcre_compile(wrapped.c_str(), (options_ & EnabledCompileOptions),
+    re = pcre_compile(wrapped.c_str(),
+                      (options_ & EnabledCompileOptions),
                       &error, &eoffset, NULL);
   }
   if (re == NULL) {
-    if (error_ == &empty_string)
-      error_ = new std::string(error);
+    if (error_ == &empty_string) error_ = new std::string(error);
     PCREPORT(ERROR) << "Error compiling '" << pattern_ << "': " << error;
   }
   return re;
@@ -191,61 +192,42 @@ pcre *PCRE::Compile(Anchor anchor) {
 
 /***** Convenience interfaces *****/
 
-bool PCRE::FullMatchFunctor::operator()(
-    const StringPiece &text, const PCRE &re, const Arg &a0, const Arg &a1,
-    const Arg &a2, const Arg &a3, const Arg &a4, const Arg &a5, const Arg &a6,
-    const Arg &a7, const Arg &a8, const Arg &a9, const Arg &a10, const Arg &a11,
-    const Arg &a12, const Arg &a13, const Arg &a14, const Arg &a15) const {
-  const Arg *args[kMaxArgs];
+bool PCRE::FullMatchFunctor::operator ()(const StringPiece& text,
+                                       const PCRE& re,
+                                       const Arg& a0,
+                                       const Arg& a1,
+                                       const Arg& a2,
+                                       const Arg& a3,
+                                       const Arg& a4,
+                                       const Arg& a5,
+                                       const Arg& a6,
+                                       const Arg& a7,
+                                       const Arg& a8,
+                                       const Arg& a9,
+                                       const Arg& a10,
+                                       const Arg& a11,
+                                       const Arg& a12,
+                                       const Arg& a13,
+                                       const Arg& a14,
+                                       const Arg& a15) const {
+  const Arg* args[kMaxArgs];
   int n = 0;
-  if (&a0 == &no_more_args)
-    goto done;
-  args[n++] = &a0;
-  if (&a1 == &no_more_args)
-    goto done;
-  args[n++] = &a1;
-  if (&a2 == &no_more_args)
-    goto done;
-  args[n++] = &a2;
-  if (&a3 == &no_more_args)
-    goto done;
-  args[n++] = &a3;
-  if (&a4 == &no_more_args)
-    goto done;
-  args[n++] = &a4;
-  if (&a5 == &no_more_args)
-    goto done;
-  args[n++] = &a5;
-  if (&a6 == &no_more_args)
-    goto done;
-  args[n++] = &a6;
-  if (&a7 == &no_more_args)
-    goto done;
-  args[n++] = &a7;
-  if (&a8 == &no_more_args)
-    goto done;
-  args[n++] = &a8;
-  if (&a9 == &no_more_args)
-    goto done;
-  args[n++] = &a9;
-  if (&a10 == &no_more_args)
-    goto done;
-  args[n++] = &a10;
-  if (&a11 == &no_more_args)
-    goto done;
-  args[n++] = &a11;
-  if (&a12 == &no_more_args)
-    goto done;
-  args[n++] = &a12;
-  if (&a13 == &no_more_args)
-    goto done;
-  args[n++] = &a13;
-  if (&a14 == &no_more_args)
-    goto done;
-  args[n++] = &a14;
-  if (&a15 == &no_more_args)
-    goto done;
-  args[n++] = &a15;
+  if (&a0 == &no_more_args)  goto done; args[n++] = &a0;
+  if (&a1 == &no_more_args)  goto done; args[n++] = &a1;
+  if (&a2 == &no_more_args)  goto done; args[n++] = &a2;
+  if (&a3 == &no_more_args)  goto done; args[n++] = &a3;
+  if (&a4 == &no_more_args)  goto done; args[n++] = &a4;
+  if (&a5 == &no_more_args)  goto done; args[n++] = &a5;
+  if (&a6 == &no_more_args)  goto done; args[n++] = &a6;
+  if (&a7 == &no_more_args)  goto done; args[n++] = &a7;
+  if (&a8 == &no_more_args)  goto done; args[n++] = &a8;
+  if (&a9 == &no_more_args)  goto done; args[n++] = &a9;
+  if (&a10 == &no_more_args) goto done; args[n++] = &a10;
+  if (&a11 == &no_more_args) goto done; args[n++] = &a11;
+  if (&a12 == &no_more_args) goto done; args[n++] = &a12;
+  if (&a13 == &no_more_args) goto done; args[n++] = &a13;
+  if (&a14 == &no_more_args) goto done; args[n++] = &a14;
+  if (&a15 == &no_more_args) goto done; args[n++] = &a15;
 done:
 
   size_t consumed;
@@ -253,61 +235,42 @@ done:
   return re.DoMatchImpl(text, ANCHOR_BOTH, &consumed, args, n, vec, kVecSize);
 }
 
-bool PCRE::PartialMatchFunctor::operator()(
-    const StringPiece &text, const PCRE &re, const Arg &a0, const Arg &a1,
-    const Arg &a2, const Arg &a3, const Arg &a4, const Arg &a5, const Arg &a6,
-    const Arg &a7, const Arg &a8, const Arg &a9, const Arg &a10, const Arg &a11,
-    const Arg &a12, const Arg &a13, const Arg &a14, const Arg &a15) const {
-  const Arg *args[kMaxArgs];
+bool PCRE::PartialMatchFunctor::operator ()(const StringPiece& text,
+                                          const PCRE& re,
+                                          const Arg& a0,
+                                          const Arg& a1,
+                                          const Arg& a2,
+                                          const Arg& a3,
+                                          const Arg& a4,
+                                          const Arg& a5,
+                                          const Arg& a6,
+                                          const Arg& a7,
+                                          const Arg& a8,
+                                          const Arg& a9,
+                                          const Arg& a10,
+                                          const Arg& a11,
+                                          const Arg& a12,
+                                          const Arg& a13,
+                                          const Arg& a14,
+                                          const Arg& a15) const {
+  const Arg* args[kMaxArgs];
   int n = 0;
-  if (&a0 == &no_more_args)
-    goto done;
-  args[n++] = &a0;
-  if (&a1 == &no_more_args)
-    goto done;
-  args[n++] = &a1;
-  if (&a2 == &no_more_args)
-    goto done;
-  args[n++] = &a2;
-  if (&a3 == &no_more_args)
-    goto done;
-  args[n++] = &a3;
-  if (&a4 == &no_more_args)
-    goto done;
-  args[n++] = &a4;
-  if (&a5 == &no_more_args)
-    goto done;
-  args[n++] = &a5;
-  if (&a6 == &no_more_args)
-    goto done;
-  args[n++] = &a6;
-  if (&a7 == &no_more_args)
-    goto done;
-  args[n++] = &a7;
-  if (&a8 == &no_more_args)
-    goto done;
-  args[n++] = &a8;
-  if (&a9 == &no_more_args)
-    goto done;
-  args[n++] = &a9;
-  if (&a10 == &no_more_args)
-    goto done;
-  args[n++] = &a10;
-  if (&a11 == &no_more_args)
-    goto done;
-  args[n++] = &a11;
-  if (&a12 == &no_more_args)
-    goto done;
-  args[n++] = &a12;
-  if (&a13 == &no_more_args)
-    goto done;
-  args[n++] = &a13;
-  if (&a14 == &no_more_args)
-    goto done;
-  args[n++] = &a14;
-  if (&a15 == &no_more_args)
-    goto done;
-  args[n++] = &a15;
+  if (&a0 == &no_more_args)  goto done; args[n++] = &a0;
+  if (&a1 == &no_more_args)  goto done; args[n++] = &a1;
+  if (&a2 == &no_more_args)  goto done; args[n++] = &a2;
+  if (&a3 == &no_more_args)  goto done; args[n++] = &a3;
+  if (&a4 == &no_more_args)  goto done; args[n++] = &a4;
+  if (&a5 == &no_more_args)  goto done; args[n++] = &a5;
+  if (&a6 == &no_more_args)  goto done; args[n++] = &a6;
+  if (&a7 == &no_more_args)  goto done; args[n++] = &a7;
+  if (&a8 == &no_more_args)  goto done; args[n++] = &a8;
+  if (&a9 == &no_more_args)  goto done; args[n++] = &a9;
+  if (&a10 == &no_more_args) goto done; args[n++] = &a10;
+  if (&a11 == &no_more_args) goto done; args[n++] = &a11;
+  if (&a12 == &no_more_args) goto done; args[n++] = &a12;
+  if (&a13 == &no_more_args) goto done; args[n++] = &a13;
+  if (&a14 == &no_more_args) goto done; args[n++] = &a14;
+  if (&a15 == &no_more_args) goto done; args[n++] = &a15;
 done:
 
   size_t consumed;
@@ -315,67 +278,48 @@ done:
   return re.DoMatchImpl(text, UNANCHORED, &consumed, args, n, vec, kVecSize);
 }
 
-bool PCRE::ConsumeFunctor::operator()(
-    StringPiece *input, const PCRE &pattern, const Arg &a0, const Arg &a1,
-    const Arg &a2, const Arg &a3, const Arg &a4, const Arg &a5, const Arg &a6,
-    const Arg &a7, const Arg &a8, const Arg &a9, const Arg &a10, const Arg &a11,
-    const Arg &a12, const Arg &a13, const Arg &a14, const Arg &a15) const {
-  const Arg *args[kMaxArgs];
+bool PCRE::ConsumeFunctor::operator ()(StringPiece* input,
+                                     const PCRE& pattern,
+                                     const Arg& a0,
+                                     const Arg& a1,
+                                     const Arg& a2,
+                                     const Arg& a3,
+                                     const Arg& a4,
+                                     const Arg& a5,
+                                     const Arg& a6,
+                                     const Arg& a7,
+                                     const Arg& a8,
+                                     const Arg& a9,
+                                     const Arg& a10,
+                                     const Arg& a11,
+                                     const Arg& a12,
+                                     const Arg& a13,
+                                     const Arg& a14,
+                                     const Arg& a15) const {
+  const Arg* args[kMaxArgs];
   int n = 0;
-  if (&a0 == &no_more_args)
-    goto done;
-  args[n++] = &a0;
-  if (&a1 == &no_more_args)
-    goto done;
-  args[n++] = &a1;
-  if (&a2 == &no_more_args)
-    goto done;
-  args[n++] = &a2;
-  if (&a3 == &no_more_args)
-    goto done;
-  args[n++] = &a3;
-  if (&a4 == &no_more_args)
-    goto done;
-  args[n++] = &a4;
-  if (&a5 == &no_more_args)
-    goto done;
-  args[n++] = &a5;
-  if (&a6 == &no_more_args)
-    goto done;
-  args[n++] = &a6;
-  if (&a7 == &no_more_args)
-    goto done;
-  args[n++] = &a7;
-  if (&a8 == &no_more_args)
-    goto done;
-  args[n++] = &a8;
-  if (&a9 == &no_more_args)
-    goto done;
-  args[n++] = &a9;
-  if (&a10 == &no_more_args)
-    goto done;
-  args[n++] = &a10;
-  if (&a11 == &no_more_args)
-    goto done;
-  args[n++] = &a11;
-  if (&a12 == &no_more_args)
-    goto done;
-  args[n++] = &a12;
-  if (&a13 == &no_more_args)
-    goto done;
-  args[n++] = &a13;
-  if (&a14 == &no_more_args)
-    goto done;
-  args[n++] = &a14;
-  if (&a15 == &no_more_args)
-    goto done;
-  args[n++] = &a15;
+  if (&a0 == &no_more_args)  goto done; args[n++] = &a0;
+  if (&a1 == &no_more_args)  goto done; args[n++] = &a1;
+  if (&a2 == &no_more_args)  goto done; args[n++] = &a2;
+  if (&a3 == &no_more_args)  goto done; args[n++] = &a3;
+  if (&a4 == &no_more_args)  goto done; args[n++] = &a4;
+  if (&a5 == &no_more_args)  goto done; args[n++] = &a5;
+  if (&a6 == &no_more_args)  goto done; args[n++] = &a6;
+  if (&a7 == &no_more_args)  goto done; args[n++] = &a7;
+  if (&a8 == &no_more_args)  goto done; args[n++] = &a8;
+  if (&a9 == &no_more_args)  goto done; args[n++] = &a9;
+  if (&a10 == &no_more_args) goto done; args[n++] = &a10;
+  if (&a11 == &no_more_args) goto done; args[n++] = &a11;
+  if (&a12 == &no_more_args) goto done; args[n++] = &a12;
+  if (&a13 == &no_more_args) goto done; args[n++] = &a13;
+  if (&a14 == &no_more_args) goto done; args[n++] = &a14;
+  if (&a15 == &no_more_args) goto done; args[n++] = &a15;
 done:
 
   size_t consumed;
   int vec[kVecSize] = {};
-  if (pattern.DoMatchImpl(*input, ANCHOR_START, &consumed, args, n, vec,
-                          kVecSize)) {
+  if (pattern.DoMatchImpl(*input, ANCHOR_START, &consumed,
+                          args, n, vec, kVecSize)) {
     input->remove_prefix(consumed);
     return true;
   } else {
@@ -383,67 +327,48 @@ done:
   }
 }
 
-bool PCRE::FindAndConsumeFunctor::operator()(
-    StringPiece *input, const PCRE &pattern, const Arg &a0, const Arg &a1,
-    const Arg &a2, const Arg &a3, const Arg &a4, const Arg &a5, const Arg &a6,
-    const Arg &a7, const Arg &a8, const Arg &a9, const Arg &a10, const Arg &a11,
-    const Arg &a12, const Arg &a13, const Arg &a14, const Arg &a15) const {
-  const Arg *args[kMaxArgs];
+bool PCRE::FindAndConsumeFunctor::operator ()(StringPiece* input,
+                                            const PCRE& pattern,
+                                            const Arg& a0,
+                                            const Arg& a1,
+                                            const Arg& a2,
+                                            const Arg& a3,
+                                            const Arg& a4,
+                                            const Arg& a5,
+                                            const Arg& a6,
+                                            const Arg& a7,
+                                            const Arg& a8,
+                                            const Arg& a9,
+                                            const Arg& a10,
+                                            const Arg& a11,
+                                            const Arg& a12,
+                                            const Arg& a13,
+                                            const Arg& a14,
+                                            const Arg& a15) const {
+  const Arg* args[kMaxArgs];
   int n = 0;
-  if (&a0 == &no_more_args)
-    goto done;
-  args[n++] = &a0;
-  if (&a1 == &no_more_args)
-    goto done;
-  args[n++] = &a1;
-  if (&a2 == &no_more_args)
-    goto done;
-  args[n++] = &a2;
-  if (&a3 == &no_more_args)
-    goto done;
-  args[n++] = &a3;
-  if (&a4 == &no_more_args)
-    goto done;
-  args[n++] = &a4;
-  if (&a5 == &no_more_args)
-    goto done;
-  args[n++] = &a5;
-  if (&a6 == &no_more_args)
-    goto done;
-  args[n++] = &a6;
-  if (&a7 == &no_more_args)
-    goto done;
-  args[n++] = &a7;
-  if (&a8 == &no_more_args)
-    goto done;
-  args[n++] = &a8;
-  if (&a9 == &no_more_args)
-    goto done;
-  args[n++] = &a9;
-  if (&a10 == &no_more_args)
-    goto done;
-  args[n++] = &a10;
-  if (&a11 == &no_more_args)
-    goto done;
-  args[n++] = &a11;
-  if (&a12 == &no_more_args)
-    goto done;
-  args[n++] = &a12;
-  if (&a13 == &no_more_args)
-    goto done;
-  args[n++] = &a13;
-  if (&a14 == &no_more_args)
-    goto done;
-  args[n++] = &a14;
-  if (&a15 == &no_more_args)
-    goto done;
-  args[n++] = &a15;
+  if (&a0 == &no_more_args)  goto done; args[n++] = &a0;
+  if (&a1 == &no_more_args)  goto done; args[n++] = &a1;
+  if (&a2 == &no_more_args)  goto done; args[n++] = &a2;
+  if (&a3 == &no_more_args)  goto done; args[n++] = &a3;
+  if (&a4 == &no_more_args)  goto done; args[n++] = &a4;
+  if (&a5 == &no_more_args)  goto done; args[n++] = &a5;
+  if (&a6 == &no_more_args)  goto done; args[n++] = &a6;
+  if (&a7 == &no_more_args)  goto done; args[n++] = &a7;
+  if (&a8 == &no_more_args)  goto done; args[n++] = &a8;
+  if (&a9 == &no_more_args)  goto done; args[n++] = &a9;
+  if (&a10 == &no_more_args) goto done; args[n++] = &a10;
+  if (&a11 == &no_more_args) goto done; args[n++] = &a11;
+  if (&a12 == &no_more_args) goto done; args[n++] = &a12;
+  if (&a13 == &no_more_args) goto done; args[n++] = &a13;
+  if (&a14 == &no_more_args) goto done; args[n++] = &a14;
+  if (&a15 == &no_more_args) goto done; args[n++] = &a15;
 done:
 
   size_t consumed;
   int vec[kVecSize] = {};
-  if (pattern.DoMatchImpl(*input, UNANCHORED, &consumed, args, n, vec,
-                          kVecSize)) {
+  if (pattern.DoMatchImpl(*input, UNANCHORED, &consumed,
+                          args, n, vec, kVecSize)) {
     input->remove_prefix(consumed);
     return true;
   } else {
@@ -451,8 +376,9 @@ done:
   }
 }
 
-bool PCRE::Replace(std::string *str, const PCRE &pattern,
-                   const StringPiece &rewrite) {
+bool PCRE::Replace(std::string *str,
+                 const PCRE& pattern,
+                 const StringPiece& rewrite) {
   int vec[kVecSize] = {};
   int matches = pattern.TryMatch(*str, 0, UNANCHORED, true, vec, kVecSize);
   if (matches == 0)
@@ -468,8 +394,9 @@ bool PCRE::Replace(std::string *str, const PCRE &pattern,
   return true;
 }
 
-int PCRE::GlobalReplace(std::string *str, const PCRE &pattern,
-                        const StringPiece &rewrite) {
+int PCRE::GlobalReplace(std::string *str,
+                      const PCRE& pattern,
+                      const StringPiece& rewrite) {
   int count = 0;
   int vec[kVecSize] = {};
   std::string out;
@@ -489,8 +416,8 @@ int PCRE::GlobalReplace(std::string *str, const PCRE &pattern,
     //    perl -le '$_ = "aa"; s/b*|aa/@/g; print'
     int matches;
     if (last_match_was_empty_string) {
-      matches =
-          pattern.TryMatch(*str, start, ANCHOR_START, false, vec, kVecSize);
+      matches = pattern.TryMatch(*str, start, ANCHOR_START, false,
+                                 vec, kVecSize);
       if (matches <= 0) {
         if (start < str->size())
           out.push_back((*str)[start]);
@@ -499,7 +426,8 @@ int PCRE::GlobalReplace(std::string *str, const PCRE &pattern,
         continue;
       }
     } else {
-      matches = pattern.TryMatch(*str, start, UNANCHORED, true, vec, kVecSize);
+      matches = pattern.TryMatch(*str, start, UNANCHORED, true,
+                                 vec, kVecSize);
       if (matches <= 0)
         break;
     }
@@ -524,8 +452,10 @@ int PCRE::GlobalReplace(std::string *str, const PCRE &pattern,
   return count;
 }
 
-bool PCRE::Extract(const StringPiece &text, const PCRE &pattern,
-                   const StringPiece &rewrite, std::string *out) {
+bool PCRE::Extract(const StringPiece &text,
+                 const PCRE& pattern,
+                 const StringPiece &rewrite,
+                 std::string *out) {
   int vec[kVecSize] = {};
   int matches = pattern.TryMatch(text, 0, UNANCHORED, true, vec, kVecSize);
   if (matches == 0)
@@ -534,7 +464,7 @@ bool PCRE::Extract(const StringPiece &text, const PCRE &pattern,
   return pattern.Rewrite(out, rewrite, text, vec, matches);
 }
 
-std::string PCRE::QuoteMeta(const StringPiece &unquoted) {
+std::string PCRE::QuoteMeta(const StringPiece& unquoted) {
   std::string result;
   result.reserve(unquoted.size() << 1);
 
@@ -550,12 +480,13 @@ std::string PCRE::QuoteMeta(const StringPiece &unquoted) {
     // 32ns to 58ns:
     if ((unquoted[ii] < 'a' || unquoted[ii] > 'z') &&
         (unquoted[ii] < 'A' || unquoted[ii] > 'Z') &&
-        (unquoted[ii] < '0' || unquoted[ii] > '9') && unquoted[ii] != '_' &&
+        (unquoted[ii] < '0' || unquoted[ii] > '9') &&
+        unquoted[ii] != '_' &&
         // If this is the part of a UTF8 or Latin1 character, we need
         // to copy this byte without escaping.  Experimentally this is
         // what works correctly with the regexp library.
         !(unquoted[ii] & 128)) {
-      if (unquoted[ii] == '\0') { // Special handling for null chars.
+      if (unquoted[ii] == '\0') {  // Special handling for null chars.
         // Can't use "\\0" since the next character might be a digit.
         result += "\\x00";
         continue;
@@ -570,13 +501,21 @@ std::string PCRE::QuoteMeta(const StringPiece &unquoted) {
 
 /***** Actual matching and rewriting code *****/
 
-bool PCRE::HitLimit() { return hit_limit_ != 0; }
+bool PCRE::HitLimit() {
+  return hit_limit_ != 0;
+}
 
-void PCRE::ClearHitLimit() { hit_limit_ = 0; }
+void PCRE::ClearHitLimit() {
+  hit_limit_ = 0;
+}
 
-int PCRE::TryMatch(const StringPiece &text, size_t startpos, Anchor anchor,
-                   bool empty_ok, int *vec, int vecsize) const {
-  pcre *re = (anchor == ANCHOR_BOTH) ? re_full_ : re_partial_;
+int PCRE::TryMatch(const StringPiece& text,
+                   size_t startpos,
+                   Anchor anchor,
+                   bool empty_ok,
+                   int *vec,
+                   int vecsize) const {
+  pcre* re = (anchor == ANCHOR_BOTH) ? re_full_ : re_partial_;
   if (re == NULL) {
     PCREPORT(ERROR) << "Matching against invalid re: " << *error_;
     return 0;
@@ -592,7 +531,7 @@ int PCRE::TryMatch(const StringPiece &text, size_t startpos, Anchor anchor,
     stack_limit = FLAGS_regexp_stack_limit;
   }
 
-  pcre_extra extra = {0};
+  pcre_extra extra = { 0 };
   if (match_limit > 0) {
     extra.flags |= PCRE_EXTRA_MATCH_LIMIT;
     extra.match_limit = match_limit;
@@ -608,10 +547,14 @@ int PCRE::TryMatch(const StringPiece &text, size_t startpos, Anchor anchor,
   if (!empty_ok)
     options |= PCRE_NOTEMPTY;
 
-  int rc = pcre_exec(re, // The regular expression object
-                     &extra, (text.data() == NULL) ? "" : text.data(),
-                     static_cast<int>(text.size()), static_cast<int>(startpos),
-                     options, vec, vecsize);
+  int rc = pcre_exec(re,              // The regular expression object
+                     &extra,
+                     (text.data() == NULL) ? "" : text.data(),
+                     static_cast<int>(text.size()),
+                     static_cast<int>(startpos),
+                     options,
+                     vec,
+                     vecsize);
 
   // Handle errors
   if (rc == 0) {
@@ -622,55 +565,61 @@ int PCRE::TryMatch(const StringPiece &text, size_t startpos, Anchor anchor,
     rc = vecsize / 2;
   } else if (rc < 0) {
     switch (rc) {
-    case PCRE_ERROR_NOMATCH:
-      return 0;
-    case PCRE_ERROR_MATCHLIMIT:
-      // Writing to hit_limit is not safe if multiple threads
-      // are using the PCRE, but the flag is only intended
-      // for use by unit tests anyway, so we let it go.
-      hit_limit_ = true;
-      PCREPORT(WARNING) << "Exceeded match limit of " << match_limit
+      case PCRE_ERROR_NOMATCH:
+        return 0;
+      case PCRE_ERROR_MATCHLIMIT:
+        // Writing to hit_limit is not safe if multiple threads
+        // are using the PCRE, but the flag is only intended
+        // for use by unit tests anyway, so we let it go.
+        hit_limit_ = true;
+        PCREPORT(WARNING) << "Exceeded match limit of " << match_limit
                         << " when matching '" << pattern_ << "'"
                         << " against text that is " << text.size() << " bytes.";
-      return 0;
-    case PCRE_ERROR_RECURSIONLIMIT:
-      // See comment about hit_limit above.
-      hit_limit_ = true;
-      PCREPORT(WARNING) << "Exceeded stack limit of " << stack_limit
+        return 0;
+      case PCRE_ERROR_RECURSIONLIMIT:
+        // See comment about hit_limit above.
+        hit_limit_ = true;
+        PCREPORT(WARNING) << "Exceeded stack limit of " << stack_limit
                         << " when matching '" << pattern_ << "'"
                         << " against text that is " << text.size() << " bytes.";
-      return 0;
-    default:
-      // There are other return codes from pcre.h :
-      // PCRE_ERROR_NULL           (-2)
-      // PCRE_ERROR_BADOPTION      (-3)
-      // PCRE_ERROR_BADMAGIC       (-4)
-      // PCRE_ERROR_UNKNOWN_NODE   (-5)
-      // PCRE_ERROR_NOMEMORY       (-6)
-      // PCRE_ERROR_NOSUBSTRING    (-7)
-      // ...
-      PCREPORT(ERROR) << "Unexpected return code: " << rc << " when matching '"
-                      << pattern_ << "'"
-                      << ", re=" << re << ", text=" << text << ", vec=" << vec
+        return 0;
+      default:
+        // There are other return codes from pcre.h :
+        // PCRE_ERROR_NULL           (-2)
+        // PCRE_ERROR_BADOPTION      (-3)
+        // PCRE_ERROR_BADMAGIC       (-4)
+        // PCRE_ERROR_UNKNOWN_NODE   (-5)
+        // PCRE_ERROR_NOMEMORY       (-6)
+        // PCRE_ERROR_NOSUBSTRING    (-7)
+        // ...
+        PCREPORT(ERROR) << "Unexpected return code: " << rc
+                      << " when matching '" << pattern_ << "'"
+                      << ", re=" << re
+                      << ", text=" << text
+                      << ", vec=" << vec
                       << ", vecsize=" << vecsize;
-      return 0;
+        return 0;
     }
   }
 
   return rc;
 }
 
-bool PCRE::DoMatchImpl(const StringPiece &text, Anchor anchor, size_t *consumed,
-                       const Arg *const *args, int n, int *vec,
+bool PCRE::DoMatchImpl(const StringPiece& text,
+                       Anchor anchor,
+                       size_t* consumed,
+                       const Arg* const* args,
+                       int n,
+                       int* vec,
                        int vecsize) const {
-  assert((1 + n) * 3 <= vecsize); // results + PCRE workspace
+  assert((1 + n) * 3 <= vecsize);  // results + PCRE workspace
   if (NumberOfCapturingGroups() < n) {
     // RE has fewer capturing groups than number of Arg pointers passed in.
     return false;
   }
 
   int matches = TryMatch(text, 0, anchor, true, vec, vecsize);
-  assert(matches >= 0); // TryMatch never returns negatives
+  assert(matches >= 0);  // TryMatch never returns negatives
   if (matches == 0)
     return false;
 
@@ -685,19 +634,19 @@ bool PCRE::DoMatchImpl(const StringPiece &text, Anchor anchor, size_t *consumed,
   // We do not need (can not do) any more checks on the value of 'matches' here
   // -- see the comment for TryMatch.
   for (int i = 0; i < n; i++) {
-    const int start = vec[2 * (i + 1)];
-    const int limit = vec[2 * (i + 1) + 1];
+    const int start = vec[2*(i+1)];
+    const int limit = vec[2*(i+1)+1];
 
     // Avoid invoking undefined behavior when text.data() happens
     // to be null and start happens to be -1, the latter being the
     // case for an unmatched subexpression. Even if text.data() is
     // not null, pointing one byte before was a longstanding bug.
-    const char *addr = NULL;
+    const char* addr = NULL;
     if (start != -1) {
       addr = text.data() + start;
     }
 
-    if (!args[i]->Parse(addr, limit - start)) {
+    if (!args[i]->Parse(addr, limit-start)) {
       // TODO: Should we indicate what the error was?
       return false;
     }
@@ -706,22 +655,25 @@ bool PCRE::DoMatchImpl(const StringPiece &text, Anchor anchor, size_t *consumed,
   return true;
 }
 
-bool PCRE::DoMatch(const StringPiece &text, Anchor anchor, size_t *consumed,
-                   const Arg *const args[], int n) const {
+bool PCRE::DoMatch(const StringPiece& text,
+                   Anchor anchor,
+                   size_t* consumed,
+                   const Arg* const args[],
+                   int n) const {
   assert(n >= 0);
-  const int vecsize = (1 + n) * 3; // results + PCRE workspace
-                                   // (as for kVecSize)
-  int *vec = new int[vecsize];
+  const int vecsize = (1 + n) * 3;  // results + PCRE workspace
+                                    // (as for kVecSize)
+  int* vec = new int[vecsize];
   bool b = DoMatchImpl(text, anchor, consumed, args, n, vec, vecsize);
   delete[] vec;
   return b;
 }
 
 bool PCRE::Rewrite(std::string *out, const StringPiece &rewrite,
-                   const StringPiece &text, int *vec, int veclen) const {
+                 const StringPiece &text, int *vec, int veclen) const {
   int number_of_capturing_groups = NumberOfCapturingGroups();
-  for (const char *s = rewrite.data(), *end = s + rewrite.size(); s < end;
-       s++) {
+  for (const char *s = rewrite.data(), *end = s + rewrite.size();
+       s < end; s++) {
     int c = *s;
     if (c == '\\') {
       c = *++s;
@@ -732,8 +684,8 @@ bool PCRE::Rewrite(std::string *out, const StringPiece &rewrite,
             // unmatched optional capturing group. treat
             // its value as empty string; i.e., nothing to append.
           } else {
-            PCREPORT(ERROR)
-                << "requested group " << n << " in regexp " << rewrite.data();
+            PCREPORT(ERROR) << "requested group " << n
+                          << " in regexp " << rewrite.data();
             return false;
           }
         }
@@ -753,11 +705,11 @@ bool PCRE::Rewrite(std::string *out, const StringPiece &rewrite,
   return true;
 }
 
-bool PCRE::CheckRewriteString(const StringPiece &rewrite,
-                              std::string *error) const {
+bool PCRE::CheckRewriteString(const StringPiece& rewrite,
+                              std::string* error) const {
   int max_token = -1;
-  for (const char *s = rewrite.data(), *end = s + rewrite.size(); s < end;
-       s++) {
+  for (const char *s = rewrite.data(), *end = s + rewrite.size();
+       s < end; s++) {
     int c = *s;
     if (c != '\\') {
       continue;
@@ -791,16 +743,17 @@ bool PCRE::CheckRewriteString(const StringPiece &rewrite,
   return true;
 }
 
+
 // Return the number of capturing subpatterns, or -1 if the
 // regexp wasn't valid on construction.
 int PCRE::NumberOfCapturingGroups() const {
-  if (re_partial_ == NULL)
-    return -1;
+  if (re_partial_ == NULL) return -1;
 
   int result;
-  int rc = pcre_fullinfo(re_partial_, // The regular expression object
-                         NULL,        // We did not study the pattern
-                         PCRE_INFO_CAPTURECOUNT, &result);
+  int rc = pcre_fullinfo(re_partial_,       // The regular expression object
+                         NULL,              // We did not study the pattern
+                         PCRE_INFO_CAPTURECOUNT,
+                         &result);
   if (rc != 0) {
     PCREPORT(ERROR) << "Unexpected return code: " << rc;
     return -1;
@@ -808,51 +761,44 @@ int PCRE::NumberOfCapturingGroups() const {
   return result;
 }
 
+
 /***** Parsers for various types *****/
 
-bool PCRE::Arg::parse_null(const char *str, size_t n, void *dest) {
+bool PCRE::Arg::parse_null(const char* str, size_t n, void* dest) {
   // We fail if somebody asked us to store into a non-NULL void* pointer
   return (dest == NULL);
 }
 
-bool PCRE::Arg::parse_string(const char *str, size_t n, void *dest) {
-  if (dest == NULL)
-    return true;
-  reinterpret_cast<std::string *>(dest)->assign(str, n);
+bool PCRE::Arg::parse_string(const char* str, size_t n, void* dest) {
+  if (dest == NULL) return true;
+  reinterpret_cast<std::string*>(dest)->assign(str, n);
   return true;
 }
 
-bool PCRE::Arg::parse_stringpiece(const char *str, size_t n, void *dest) {
-  if (dest == NULL)
-    return true;
-  *(reinterpret_cast<StringPiece *>(dest)) = StringPiece(str, n);
+bool PCRE::Arg::parse_stringpiece(const char* str, size_t n, void* dest) {
+  if (dest == NULL) return true;
+  *(reinterpret_cast<StringPiece*>(dest)) = StringPiece(str, n);
   return true;
 }
 
-bool PCRE::Arg::parse_char(const char *str, size_t n, void *dest) {
-  if (n != 1)
-    return false;
-  if (dest == NULL)
-    return true;
-  *(reinterpret_cast<char *>(dest)) = str[0];
+bool PCRE::Arg::parse_char(const char* str, size_t n, void* dest) {
+  if (n != 1) return false;
+  if (dest == NULL) return true;
+  *(reinterpret_cast<char*>(dest)) = str[0];
   return true;
 }
 
-bool PCRE::Arg::parse_schar(const char *str, size_t n, void *dest) {
-  if (n != 1)
-    return false;
-  if (dest == NULL)
-    return true;
-  *(reinterpret_cast<signed char *>(dest)) = str[0];
+bool PCRE::Arg::parse_schar(const char* str, size_t n, void* dest) {
+  if (n != 1) return false;
+  if (dest == NULL) return true;
+  *(reinterpret_cast<signed char*>(dest)) = str[0];
   return true;
 }
 
-bool PCRE::Arg::parse_uchar(const char *str, size_t n, void *dest) {
-  if (n != 1)
-    return false;
-  if (dest == NULL)
-    return true;
-  *(reinterpret_cast<unsigned char *>(dest)) = str[0];
+bool PCRE::Arg::parse_uchar(const char* str, size_t n, void* dest) {
+  if (n != 1) return false;
+  if (dest == NULL) return true;
+  *(reinterpret_cast<unsigned char*>(dest)) = str[0];
   return true;
 }
 
@@ -866,7 +812,7 @@ static const int kMaxNumberLength = 32;
 //      a. "str" if no termination is needed
 //      b. "buf" if the string was copied and null-terminated
 //      c. "" if the input was invalid and has no hope of being parsed
-static const char *TerminateNumber(char *buf, const char *str, size_t n) {
+static const char* TerminateNumber(char* buf, const char* str, size_t n) {
   if ((n > 0) && isspace(*str)) {
     // We are less forgiving than the strtoxxx() routines and do not
     // allow leading spaces.
@@ -875,10 +821,10 @@ static const char *TerminateNumber(char *buf, const char *str, size_t n) {
 
   // See if the character right after the input text may potentially
   // look like a digit.
-  if (isdigit(str[n]) || ((str[n] >= 'a') && (str[n] <= 'f')) ||
+  if (isdigit(str[n]) ||
+      ((str[n] >= 'a') && (str[n] <= 'f')) ||
       ((str[n] >= 'A') && (str[n] <= 'F'))) {
-    if (n > kMaxNumberLength)
-      return ""; // Input too big to be a valid number
+    if (n > kMaxNumberLength) return ""; // Input too big to be a valid number
     memcpy(buf, str, n);
     buf[n] = '\0';
     return buf;
@@ -888,30 +834,29 @@ static const char *TerminateNumber(char *buf, const char *str, size_t n) {
   }
 }
 
-bool PCRE::Arg::parse_long_radix(const char *str, size_t n, void *dest,
+bool PCRE::Arg::parse_long_radix(const char* str,
+                                 size_t n,
+                                 void* dest,
                                  int radix) {
-  if (n == 0)
-    return false;
-  char buf[kMaxNumberLength + 1];
+  if (n == 0) return false;
+  char buf[kMaxNumberLength+1];
   str = TerminateNumber(buf, str, n);
-  char *end;
+  char* end;
   errno = 0;
   long r = strtol(str, &end, radix);
-  if (end != str + n)
-    return false; // Leftover junk
-  if (errno)
-    return false;
-  if (dest == NULL)
-    return true;
-  *(reinterpret_cast<long *>(dest)) = r;
+  if (end != str + n) return false;   // Leftover junk
+  if (errno) return false;
+  if (dest == NULL) return true;
+  *(reinterpret_cast<long*>(dest)) = r;
   return true;
 }
 
-bool PCRE::Arg::parse_ulong_radix(const char *str, size_t n, void *dest,
+bool PCRE::Arg::parse_ulong_radix(const char* str,
+                                  size_t n,
+                                  void* dest,
                                   int radix) {
-  if (n == 0)
-    return false;
-  char buf[kMaxNumberLength + 1];
+  if (n == 0) return false;
+  char buf[kMaxNumberLength+1];
   str = TerminateNumber(buf, str, n);
   if (str[0] == '-') {
     // strtoul() will silently accept negative numbers and parse
@@ -919,125 +864,112 @@ bool PCRE::Arg::parse_ulong_radix(const char *str, size_t n, void *dest,
     return false;
   }
 
-  char *end;
+  char* end;
   errno = 0;
   unsigned long r = strtoul(str, &end, radix);
-  if (end != str + n)
-    return false; // Leftover junk
-  if (errno)
-    return false;
-  if (dest == NULL)
-    return true;
-  *(reinterpret_cast<unsigned long *>(dest)) = r;
+  if (end != str + n) return false;   // Leftover junk
+  if (errno) return false;
+  if (dest == NULL) return true;
+  *(reinterpret_cast<unsigned long*>(dest)) = r;
   return true;
 }
 
-bool PCRE::Arg::parse_short_radix(const char *str, size_t n, void *dest,
+bool PCRE::Arg::parse_short_radix(const char* str,
+                                  size_t n,
+                                  void* dest,
                                   int radix) {
   long r;
-  if (!parse_long_radix(str, n, &r, radix))
-    return false; // Could not parse
-  if ((short)r != r)
-    return false; // Out of range
-  if (dest == NULL)
-    return true;
-  *(reinterpret_cast<short *>(dest)) = (short)r;
+  if (!parse_long_radix(str, n, &r, radix)) return false;  // Could not parse
+  if ((short)r != r) return false;                         // Out of range
+  if (dest == NULL) return true;
+  *(reinterpret_cast<short*>(dest)) = (short)r;
   return true;
 }
 
-bool PCRE::Arg::parse_ushort_radix(const char *str, size_t n, void *dest,
+bool PCRE::Arg::parse_ushort_radix(const char* str,
+                                   size_t n,
+                                   void* dest,
                                    int radix) {
   unsigned long r;
-  if (!parse_ulong_radix(str, n, &r, radix))
-    return false; // Could not parse
-  if ((unsigned short)r != r)
-    return false; // Out of range
-  if (dest == NULL)
-    return true;
-  *(reinterpret_cast<unsigned short *>(dest)) = (unsigned short)r;
+  if (!parse_ulong_radix(str, n, &r, radix)) return false;  // Could not parse
+  if ((unsigned short)r != r) return false;                 // Out of range
+  if (dest == NULL) return true;
+  *(reinterpret_cast<unsigned short*>(dest)) = (unsigned short)r;
   return true;
 }
 
-bool PCRE::Arg::parse_int_radix(const char *str, size_t n, void *dest,
+bool PCRE::Arg::parse_int_radix(const char* str,
+                                size_t n,
+                                void* dest,
                                 int radix) {
   long r;
-  if (!parse_long_radix(str, n, &r, radix))
-    return false; // Could not parse
-  if ((int)r != r)
-    return false; // Out of range
-  if (dest == NULL)
-    return true;
-  *(reinterpret_cast<int *>(dest)) = (int)r;
+  if (!parse_long_radix(str, n, &r, radix)) return false;  // Could not parse
+  if ((int)r != r) return false;                           // Out of range
+  if (dest == NULL) return true;
+  *(reinterpret_cast<int*>(dest)) = (int)r;
   return true;
 }
 
-bool PCRE::Arg::parse_uint_radix(const char *str, size_t n, void *dest,
+bool PCRE::Arg::parse_uint_radix(const char* str,
+                                 size_t n,
+                                 void* dest,
                                  int radix) {
   unsigned long r;
-  if (!parse_ulong_radix(str, n, &r, radix))
-    return false; // Could not parse
-  if ((unsigned int)r != r)
-    return false; // Out of range
-  if (dest == NULL)
-    return true;
-  *(reinterpret_cast<unsigned int *>(dest)) = (unsigned int)r;
+  if (!parse_ulong_radix(str, n, &r, radix)) return false;  // Could not parse
+  if ((unsigned int)r != r) return false;                   // Out of range
+  if (dest == NULL) return true;
+  *(reinterpret_cast<unsigned int*>(dest)) = (unsigned int)r;
   return true;
 }
 
-bool PCRE::Arg::parse_longlong_radix(const char *str, size_t n, void *dest,
+bool PCRE::Arg::parse_longlong_radix(const char* str,
+                                     size_t n,
+                                     void* dest,
                                      int radix) {
-  if (n == 0)
-    return false;
-  char buf[kMaxNumberLength + 1];
+  if (n == 0) return false;
+  char buf[kMaxNumberLength+1];
   str = TerminateNumber(buf, str, n);
-  char *end;
+  char* end;
   errno = 0;
   long long r = strtoll(str, &end, radix);
-  if (end != str + n)
-    return false; // Leftover junk
-  if (errno)
-    return false;
-  if (dest == NULL)
-    return true;
-  *(reinterpret_cast<long long *>(dest)) = r;
+  if (end != str + n) return false;   // Leftover junk
+  if (errno) return false;
+  if (dest == NULL) return true;
+  *(reinterpret_cast<long long*>(dest)) = r;
   return true;
 }
 
-bool PCRE::Arg::parse_ulonglong_radix(const char *str, size_t n, void *dest,
+bool PCRE::Arg::parse_ulonglong_radix(const char* str,
+                                      size_t n,
+                                      void* dest,
                                       int radix) {
-  if (n == 0)
-    return false;
-  char buf[kMaxNumberLength + 1];
+  if (n == 0) return false;
+  char buf[kMaxNumberLength+1];
   str = TerminateNumber(buf, str, n);
   if (str[0] == '-') {
     // strtoull() will silently accept negative numbers and parse
     // them.  This module is more strict and treats them as errors.
     return false;
   }
-  char *end;
+  char* end;
   errno = 0;
   unsigned long long r = strtoull(str, &end, radix);
-  if (end != str + n)
-    return false; // Leftover junk
-  if (errno)
-    return false;
-  if (dest == NULL)
-    return true;
-  *(reinterpret_cast<unsigned long long *>(dest)) = r;
+  if (end != str + n) return false;   // Leftover junk
+  if (errno) return false;
+  if (dest == NULL) return true;
+  *(reinterpret_cast<unsigned long long*>(dest)) = r;
   return true;
 }
 
-static bool parse_double_float(const char *str, size_t n, bool isfloat,
-                               void *dest) {
-  if (n == 0)
-    return false;
+static bool parse_double_float(const char* str, size_t n, bool isfloat,
+                               void* dest) {
+  if (n == 0) return false;
   static const int kMaxLength = 200;
   char buf[kMaxLength];
-  if (n >= kMaxLength)
-    return false;
+  if (n >= kMaxLength) return false;
   memcpy(buf, str, n);
   buf[n] = '\0';
-  char *end;
+  char* end;
   errno = 0;
   double r;
   if (isfloat) {
@@ -1051,7 +983,7 @@ static bool parse_double_float(const char *str, size_t n, bool isfloat,
     // handle it explicitly.  Speed is not important here because this
     // code is only called in unit tests.
     bool pos = true;
-    const char *i = buf;
+    const char* i = buf;
     if ('-' == *i) {
       pos = false;
       ++i;
@@ -1068,43 +1000,41 @@ static bool parse_double_float(const char *str, size_t n, bool isfloat,
       return false;
     }
 #else
-    return false; // Leftover junk
+    return false;   // Leftover junk
 #endif
   }
-  if (errno)
-    return false;
-  if (dest == NULL)
-    return true;
+  if (errno) return false;
+  if (dest == NULL) return true;
   if (isfloat) {
-    *(reinterpret_cast<float *>(dest)) = (float)r;
+    *(reinterpret_cast<float*>(dest)) = (float)r;
   } else {
-    *(reinterpret_cast<double *>(dest)) = r;
+    *(reinterpret_cast<double*>(dest)) = r;
   }
   return true;
 }
 
-bool PCRE::Arg::parse_double(const char *str, size_t n, void *dest) {
+bool PCRE::Arg::parse_double(const char* str, size_t n, void* dest) {
   return parse_double_float(str, n, false, dest);
 }
 
-bool PCRE::Arg::parse_float(const char *str, size_t n, void *dest) {
+bool PCRE::Arg::parse_float(const char* str, size_t n, void* dest) {
   return parse_double_float(str, n, true, dest);
 }
 
-#define DEFINE_INTEGER_PARSER(name)                                            \
-  bool PCRE::Arg::parse_##name(const char *str, size_t n, void *dest) {        \
-    return parse_##name##_radix(str, n, dest, 10);                             \
-  }                                                                            \
-  bool PCRE::Arg::parse_##name##_hex(const char *str, size_t n, void *dest) {  \
-    return parse_##name##_radix(str, n, dest, 16);                             \
-  }                                                                            \
-  bool PCRE::Arg::parse_##name##_octal(const char *str, size_t n,              \
-                                       void *dest) {                           \
-    return parse_##name##_radix(str, n, dest, 8);                              \
-  }                                                                            \
-  bool PCRE::Arg::parse_##name##_cradix(const char *str, size_t n,             \
-                                        void *dest) {                          \
-    return parse_##name##_radix(str, n, dest, 0);                              \
+#define DEFINE_INTEGER_PARSER(name)                                           \
+  bool PCRE::Arg::parse_##name(const char* str, size_t n, void* dest) {       \
+    return parse_##name##_radix(str, n, dest, 10);                            \
+  }                                                                           \
+  bool PCRE::Arg::parse_##name##_hex(const char* str, size_t n, void* dest) { \
+    return parse_##name##_radix(str, n, dest, 16);                            \
+  }                                                                           \
+  bool PCRE::Arg::parse_##name##_octal(const char* str, size_t n,             \
+                                       void* dest) {                          \
+    return parse_##name##_radix(str, n, dest, 8);                             \
+  }                                                                           \
+  bool PCRE::Arg::parse_##name##_cradix(const char* str, size_t n,            \
+                                        void* dest) {                         \
+    return parse_##name##_radix(str, n, dest, 0);                             \
   }
 
 DEFINE_INTEGER_PARSER(short);
@@ -1118,4 +1048,4 @@ DEFINE_INTEGER_PARSER(ulonglong);
 
 #undef DEFINE_INTEGER_PARSER
 
-} // namespace re2
+}  // namespace re2
