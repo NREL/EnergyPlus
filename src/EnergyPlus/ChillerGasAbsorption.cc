@@ -833,7 +833,7 @@ void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         ChillerName);
 }
 
-void GasAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
+void GasAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
 {
 
     this->setupOutputVariables(state);
@@ -2107,10 +2107,6 @@ void GasAbsorberSpecs::updateHeatRecords(EnergyPlusData &state,
     this->HeatFuelEnergy = this->HeatFuelUseRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     this->ElectricEnergy = this->ElectricPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     this->HeatElectricEnergy = this->HeatElectricPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-}
-
-void GasAbsorberSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
-{
 }
 
 } // namespace EnergyPlus::ChillerGasAbsorption

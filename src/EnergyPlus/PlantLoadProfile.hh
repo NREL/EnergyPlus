@@ -123,8 +123,6 @@ namespace PlantLoadProfile {
         void ReportPlantProfile(EnergyPlusData &state);
 
         void oneTimeInit(EnergyPlusData &state) override;
-
-        void oneTimeInit_new(EnergyPlusData &state) override;
     };
 
     // This could be static inside the class

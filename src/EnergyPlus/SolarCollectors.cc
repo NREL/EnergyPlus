@@ -2191,7 +2191,7 @@ namespace SolarCollectors {
             VentCavIndex = CavNum;
         }
     }
-    void CollectorData::oneTimeInit_new(EnergyPlusData &state)
+    void CollectorData::oneTimeInit(EnergyPlusData &state)
     {
 
         this->setupOutputVars(state);
@@ -2218,9 +2218,6 @@ namespace SolarCollectors {
                 this->SetLoopIndexFlag = false;
             }
         }
-    }
-    void CollectorData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
-    {
     }
 
 } // namespace SolarCollectors

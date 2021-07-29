@@ -164,8 +164,6 @@ namespace FluidCoolers {
 
         void oneTimeInit(EnergyPlusData &state) override;
 
-        void oneTimeInit_new(EnergyPlusData &state) override;
-
         void initEachEnvironment(EnergyPlusData &state);
 
         void initialize(EnergyPlusData &state);

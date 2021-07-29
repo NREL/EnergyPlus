@@ -227,8 +227,6 @@ namespace ChillerExhaustAbsorption {
 
         void oneTimeInit(EnergyPlusData &state) override;
 
-        void oneTimeInit_new(EnergyPlusData &state) override;
-
         void getDesignTemperatures(Real64 &TempDesCondIn, Real64 &TempDesEvapOut) override;
 
         void initialize(EnergyPlusData &state);

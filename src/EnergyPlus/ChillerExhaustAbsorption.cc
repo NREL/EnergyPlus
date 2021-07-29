@@ -823,7 +823,7 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         ChillerName);
 }
 
-void ExhaustAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
+void ExhaustAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
 {
         this->setupOutputVariables(state);
 
@@ -2263,10 +2263,6 @@ void ExhaustAbsorberSpecs::updateHeatRecords(EnergyPlusData &state, Real64 MyLoa
     this->HeatThermalEnergy = this->HeatThermalEnergyUseRate * RptConstant;
     this->ElectricEnergy = this->ElectricPower * RptConstant;
     this->HeatElectricEnergy = this->HeatElectricPower * RptConstant;
-}
-
-void ExhaustAbsorberSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
-{
 }
 
 } // namespace EnergyPlus::ChillerExhaustAbsorption

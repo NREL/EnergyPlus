@@ -3557,10 +3557,6 @@ void WrapperSpecs::UpdateChillerHeaterRecords(EnergyPlusData &state) // Wrapper 
         this->ChillerHeater(ChillerHeaterNum).Report.CondEnergy = this->ChillerHeater(ChillerHeaterNum).Report.QCond * SecInTimeStep;
     }
 }
-void WrapperSpecs::oneTimeInit_new([[maybe_unused]] EnergyPlusData &state)
-{
-}
-
 void WrapperSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
 {
 }

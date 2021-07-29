@@ -115,7 +115,7 @@ void LocalPipeData::simulate(EnergyPlusData &state,
     PlantUtilities::SafeCopyPlantNode(state, this->InletNodeNum, this->OutletNodeNum, this->LoopNum);
 }
 
-void LocalPipeData::oneTimeInit_new(EnergyPlusData &state)
+void LocalPipeData::oneTimeInit(EnergyPlusData &state)
 {
     int FoundOnLoop = 0;
     bool errFlag = false;
@@ -144,9 +144,6 @@ void LocalPipeData::initEachEnvironment(EnergyPlusData &state) const
                                        this->LoopSide,
                                        this->BranchIndex,
                                        this->CompIndex);
-}
-void LocalPipeData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
-{
 }
 
 void GetPipeInput(EnergyPlusData &state)

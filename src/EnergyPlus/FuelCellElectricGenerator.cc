@@ -3725,7 +3725,7 @@ namespace FuelCellElectricGenerator {
         this->Report.SkinLossConvect = this->QconvZone;
         this->Report.SkinLossRadiat = this->QradZone;
     }
-    void FCDataStruct::oneTimeInit_new(EnergyPlusData &state)
+    void FCDataStruct::oneTimeInit(EnergyPlusData &state)
     {
 
         if (this->MyPlantScanFlag_Init && allocated(state.dataPlnt->PlantLoop)) {
@@ -3752,10 +3752,6 @@ namespace FuelCellElectricGenerator {
             }
             this->MyPlantScanFlag_Init = false;
         }
-    }
-
-    void FCDataStruct::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
-    {
     }
 
 } // namespace FuelCellElectricGenerator
