@@ -208,9 +208,9 @@ namespace DataSurfaces {
     // in SurfaceGeometry.cc, SurfaceWindow%OriginalClass holds the true value)
     // why aren't these sequential
 
-    enum class iHeatTransferModel
+    enum class iHeatTransferModel : int
     {
-        NotSet,
+        NotSet = -1,
         None, // shading surfaces
         CTF,
         EMPD,
@@ -221,7 +221,20 @@ namespace DataSurfaces {
         TDD,                 // tubular daylighting device
         Kiva,                // Kiva ground calculations
         AirBoundaryNoHT,     // Construction:AirBoundary - not IRT or interior window
+        Num,                 // count, always the final element
     };
+
+    constexpr std::array<std::string_view, (int)DataSurfaces::iHeatTransferModel::Num> HeatTransAlgoStrs = {
+        "None",
+        "CTF - ConductionTransferFunction",
+        "EMPD - MoisturePenetrationDepthConductionTransferFunction",
+        "CondFD - ConductionFiniteDifference",
+        "HAMT - CombinedHeatAndMoistureFiniteElement",
+        "Window5 Detailed Fenestration",
+        "Window7 Complex Fenestration",
+        "Tubular Daylighting Device",
+        "KivaFoundation - TwoDimensionalFiniteDifference",
+        "Air Boundary - No Heat Transfer"};
 
     // Parameters to indicate surface roughness for use with the Material
     // derived type:
@@ -235,33 +248,6 @@ namespace DataSurfaces {
         Smooth,
         VerySmooth
     };
-
-    inline std::string HeatTransferModelNames(iHeatTransferModel const &m)
-    {
-        switch (m) {
-        case iHeatTransferModel::CTF:
-            return "CTF - ConductionTransferFunction";
-        case iHeatTransferModel::EMPD:
-            return "EMPD - MoisturePenetrationDepthConductionTransferFunction";
-        case iHeatTransferModel::CondFD:
-            return "CondFD - ConductionFiniteDifference";
-        case iHeatTransferModel::HAMT:
-            return "HAMT - CombinedHeatAndMoistureFiniteElement";
-        case iHeatTransferModel::Window5:
-            return "Window - Detailed layer-by-layer";
-        case iHeatTransferModel::ComplexFenestration:
-            return "Window - ComplexFenestration";
-        case iHeatTransferModel::TDD:
-            return "Tubular daylighting device";
-        case iHeatTransferModel::Kiva:
-            return "KivaFoundation - TwoDimensionalFiniteDifference";
-        case iHeatTransferModel::None:
-        case iHeatTransferModel::AirBoundaryNoHT:
-        case iHeatTransferModel::NotSet:
-        default:
-            return "";
-        }
-    }
 
     // IS_SHADED is the flag to indicate window has no shading device or shading device is off, and no daylight glare control
     // original expression: SHADE_FLAG == ShadeOff || SHADE_FLAG == ShadeOff

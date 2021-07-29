@@ -161,8 +161,6 @@ enum class ConvSurfDeltaT : int
     Num, // count, always the last element
 };
 
-constexpr int NumConvSurfDeltaT{int(ConvSurfDeltaT::Num)};
-
 enum class SurfConvOrientation : int
 {
     Invalid = -1,
@@ -173,8 +171,6 @@ enum class SurfConvOrientation : int
     HorizontalUp,
     Num, // count, always the last element
 };
-
-constexpr int NumSurfConvOrientation{int(SurfConvOrientation::Num)};
 
 // Parameters for fenestration relative location in zone
 enum class InConvWinLoc
@@ -240,13 +236,14 @@ enum class InConvClass
 };
 
 // Parameters to indicate user specified convection coefficients (for surface)
-enum class ConvCoefOverrideType
+enum class ConvCoefOverrideType : int
 {
     Invalid = -1,
     Value,          // User specified "value" as the override type
     Schedule,       // User specified "schedule" as the override type
     UserCurve,      // User specified "UserCurve" as the override type
     SpecifiedModel, // one of the direct named model equation keys
+    Num,            // count, always last element
 };
 
 // parameters, by zone, for flow regimes for adaptive convection on inside face

@@ -60,6 +60,7 @@
 #include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/BITF.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/ConvectionConstants.hh>
@@ -6049,79 +6050,79 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
         }
     }
 
-    constexpr std::array<std::array<ConvectionConstants::InConvClass, ConvectionConstants::NumConvSurfDeltaT>,
-                         ConvectionConstants::NumSurfConvOrientation>
+    constexpr std::array<std::array<ConvectionConstants::InConvClass, (int)ConvectionConstants::ConvSurfDeltaT::Num>,
+                         (int)ConvectionConstants::SurfConvOrientation::Num>
         A1{{
-            ConvectionConstants::InConvClass::A1_StableHoriz,    // HorizontalDown, Positive
-            ConvectionConstants::InConvClass::A1_UnstableHoriz,  // HorizontalDown, Negative
-            ConvectionConstants::InConvClass::A1_StableTilted,   // TiltedDownward, Positive
-            ConvectionConstants::InConvClass::A1_UnstableTilted, // TiltedDownward, Negative
-            ConvectionConstants::InConvClass::A1_VertWalls,      // Vertical, Positive
-            ConvectionConstants::InConvClass::A1_VertWalls,      // Vertical, Negative
-            ConvectionConstants::InConvClass::A1_UnstableTilted, // TiltedUpward, Positive
-            ConvectionConstants::InConvClass::A1_StableTilted,   // TiltedUpward, Negative
-            ConvectionConstants::InConvClass::A1_UnstableHoriz,  // HorizontalUp, Positive
-            ConvectionConstants::InConvClass::A1_StableHoriz,    // HorizontalUp, Negative
+            {ConvectionConstants::InConvClass::A1_StableHoriz,     // HorizontalDown, Positive
+             ConvectionConstants::InConvClass::A1_UnstableHoriz},  // HorizontalDown, Negative
+            {ConvectionConstants::InConvClass::A1_StableTilted,    // TiltedDownward, Positive
+             ConvectionConstants::InConvClass::A1_UnstableTilted}, // TiltedDownward, Negative
+            {ConvectionConstants::InConvClass::A1_VertWalls,       // Vertical, Positive
+             ConvectionConstants::InConvClass::A1_VertWalls},      // Vertical, Negative
+            {ConvectionConstants::InConvClass::A1_UnstableTilted,  // TiltedUpward, Positive
+             ConvectionConstants::InConvClass::A1_StableTilted},   // TiltedUpward, Negative
+            {ConvectionConstants::InConvClass::A1_UnstableHoriz,   // HorizontalUp, Positive
+             ConvectionConstants::InConvClass::A1_StableHoriz}     // HorizontalUp, Negative
         }};
 
-    constexpr std::array<std::array<ConvectionConstants::InConvClass, ConvectionConstants::NumConvSurfDeltaT>,
-                         ConvectionConstants::NumSurfConvOrientation>
+    constexpr std::array<std::array<ConvectionConstants::InConvClass, (int)ConvectionConstants::ConvSurfDeltaT::Num>,
+                         (int)ConvectionConstants::SurfConvOrientation::Num>
         A2{{
-            ConvectionConstants::InConvClass::A2_StableHoriz,        // HorizontalDown, Positive
-            ConvectionConstants::InConvClass::A2_UnstableHoriz,      // HorizontalDown, Negative
-            ConvectionConstants::InConvClass::A2_StableTilted,       // TiltedDownward, Positive
-            ConvectionConstants::InConvClass::A2_UnstableTilted,     // TiltedDownward, Negative
-            ConvectionConstants::InConvClass::A2_VertWallsNonHeated, // Vertical, Positive
-            ConvectionConstants::InConvClass::A2_VertWallsNonHeated, // Vertical, Negative
-            ConvectionConstants::InConvClass::A2_UnstableTilted,     // TiltedUpward, Positive
-            ConvectionConstants::InConvClass::A2_StableTilted,       // TiltedUpward, Negative
-            ConvectionConstants::InConvClass::A2_UnstableHoriz,      // HorizontalUp, Positive
-            ConvectionConstants::InConvClass::A2_StableHoriz,        // HorizontalUp, Negative
+            {ConvectionConstants::InConvClass::A2_StableHoriz,         // HorizontalDown, Positive
+             ConvectionConstants::InConvClass::A2_UnstableHoriz},      // HorizontalDown, Negative
+            {ConvectionConstants::InConvClass::A2_StableTilted,        // TiltedDownward, Positive
+             ConvectionConstants::InConvClass::A2_UnstableTilted},     // TiltedDownward, Negative
+            {ConvectionConstants::InConvClass::A2_VertWallsNonHeated,  // Vertical, Positive
+             ConvectionConstants::InConvClass::A2_VertWallsNonHeated}, // Vertical, Negative
+            {ConvectionConstants::InConvClass::A2_UnstableTilted,      // TiltedUpward, Positive
+             ConvectionConstants::InConvClass::A2_StableTilted},       // TiltedUpward, Negative
+            {ConvectionConstants::InConvClass::A2_UnstableHoriz,       // HorizontalUp, Positive
+             ConvectionConstants::InConvClass::A2_StableHoriz}         // HorizontalUp, Negative
         }};
 
-    constexpr std::array<std::array<ConvectionConstants::InConvClass, ConvectionConstants::NumConvSurfDeltaT>,
-                         ConvectionConstants::NumSurfConvOrientation>
+    constexpr std::array<std::array<ConvectionConstants::InConvClass, (int)ConvectionConstants::ConvSurfDeltaT::Num>,
+                         (int)ConvectionConstants::SurfConvOrientation::Num>
         A3{{
-            ConvectionConstants::InConvClass::A3_StableHoriz,    // HorizontalDown, Positive
-            ConvectionConstants::InConvClass::A3_UnstableHoriz,  // HorizontalDown, Negative
-            ConvectionConstants::InConvClass::A3_StableTilted,   // TiltedDownward, Positive
-            ConvectionConstants::InConvClass::A3_UnstableTilted, // TiltedDownward, Negative
-            ConvectionConstants::InConvClass::A3_VertWalls,      // Vertical, Positive
-            ConvectionConstants::InConvClass::A3_VertWalls,      // Vertical, Negative
-            ConvectionConstants::InConvClass::A3_UnstableTilted, // TiltedUpward, Positive
-            ConvectionConstants::InConvClass::A3_StableTilted,   // TiltedUpward, Negative
-            ConvectionConstants::InConvClass::A3_UnstableHoriz,  // HorizontalUp, Positive
-            ConvectionConstants::InConvClass::A3_StableHoriz,    // HorizontalUp, Negative
+            {ConvectionConstants::InConvClass::A3_StableHoriz,     // HorizontalDown, Positive
+             ConvectionConstants::InConvClass::A3_UnstableHoriz},  // HorizontalDown, Negative
+            {ConvectionConstants::InConvClass::A3_StableTilted,    // TiltedDownward, Positive
+             ConvectionConstants::InConvClass::A3_UnstableTilted}, // TiltedDownward, Negative
+            {ConvectionConstants::InConvClass::A3_VertWalls,       // Vertical, Positive
+             ConvectionConstants::InConvClass::A3_VertWalls},      // Vertical, Negative
+            {ConvectionConstants::InConvClass::A3_UnstableTilted,  // TiltedUpward, Positive
+             ConvectionConstants::InConvClass::A3_StableTilted},   // TiltedUpward, Negative
+            {ConvectionConstants::InConvClass::A3_UnstableHoriz,   // HorizontalUp, Positive
+             ConvectionConstants::InConvClass::A3_StableHoriz}     // HorizontalUp, Negative
         }};
 
-    constexpr std::array<std::array<ConvectionConstants::InConvClass, ConvectionConstants::NumConvSurfDeltaT>,
-                         ConvectionConstants::NumSurfConvOrientation>
+    constexpr std::array<std::array<ConvectionConstants::InConvClass, (int)ConvectionConstants::ConvSurfDeltaT::Num>,
+                         (int)ConvectionConstants::SurfConvOrientation::Num>
         B{{
-            ConvectionConstants::InConvClass::B_StableHoriz,    // HorizontalDown, Positive
-            ConvectionConstants::InConvClass::B_UnstableHoriz,  // HorizontalDown, Negative
-            ConvectionConstants::InConvClass::B_StableTilted,   // TiltedDownward, Positive
-            ConvectionConstants::InConvClass::B_UnstableTilted, // TiltedDownward, Negative
-            ConvectionConstants::InConvClass::B_VertWalls,      // Vertical, Positive
-            ConvectionConstants::InConvClass::B_VertWalls,      // Vertical, Negative
-            ConvectionConstants::InConvClass::B_UnstableTilted, // TiltedUpward, Positive
-            ConvectionConstants::InConvClass::B_StableTilted,   // TiltedUpward, Negative
-            ConvectionConstants::InConvClass::B_UnstableHoriz,  // HorizontalUp, Positive
-            ConvectionConstants::InConvClass::B_StableHoriz,    // HorizontalUp, Negative
+            {ConvectionConstants::InConvClass::B_StableHoriz,     // HorizontalDown, Positive
+             ConvectionConstants::InConvClass::B_UnstableHoriz},  // HorizontalDown, Negative
+            {ConvectionConstants::InConvClass::B_StableTilted,    // TiltedDownward, Positive
+             ConvectionConstants::InConvClass::B_UnstableTilted}, // TiltedDownward, Negative
+            {ConvectionConstants::InConvClass::B_VertWalls,       // Vertical, Positive
+             ConvectionConstants::InConvClass::B_VertWalls},      // Vertical, Negative
+            {ConvectionConstants::InConvClass::B_UnstableTilted,  // TiltedUpward, Positive
+             ConvectionConstants::InConvClass::B_StableTilted},   // TiltedUpward, Negative
+            {ConvectionConstants::InConvClass::B_UnstableHoriz,   // HorizontalUp, Positive
+             ConvectionConstants::InConvClass::B_StableHoriz}     // HorizontalUp, Negative
         }};
 
-    constexpr std::array<std::array<ConvectionConstants::InConvClass, ConvectionConstants::NumConvSurfDeltaT>,
-                         ConvectionConstants::NumSurfConvOrientation>
+    constexpr std::array<std::array<ConvectionConstants::InConvClass, (int)ConvectionConstants::ConvSurfDeltaT::Num>,
+                         (int)ConvectionConstants::SurfConvOrientation::Num>
         D{{
-            ConvectionConstants::InConvClass::D_StableHoriz,    // HorizontalDown, Positive
-            ConvectionConstants::InConvClass::D_UnstableHoriz,  // HorizontalDown, Negative
-            ConvectionConstants::InConvClass::D_StableTilted,   // TiltedDownward, Positive
-            ConvectionConstants::InConvClass::D_UnstableTilted, // TiltedDownward, Negative
-            ConvectionConstants::InConvClass::D_Walls,          // Vertical, Positive
-            ConvectionConstants::InConvClass::D_Walls,          // Vertical, Negative
-            ConvectionConstants::InConvClass::D_UnstableTilted, // TiltedUpward, Positive
-            ConvectionConstants::InConvClass::D_StableTilted,   // TiltedUpward, Negative
-            ConvectionConstants::InConvClass::D_UnstableHoriz,  // HorizontalUp, Positive
-            ConvectionConstants::InConvClass::D_StableHoriz,    // HorizontalUp, Negative
+            {ConvectionConstants::InConvClass::D_StableHoriz,     // HorizontalDown, Positive
+             ConvectionConstants::InConvClass::D_UnstableHoriz},  // HorizontalDown, Negative
+            {ConvectionConstants::InConvClass::D_StableTilted,    // TiltedDownward, Positive
+             ConvectionConstants::InConvClass::D_UnstableTilted}, // TiltedDownward, Negative
+            {ConvectionConstants::InConvClass::D_Walls,           // Vertical, Positive
+             ConvectionConstants::InConvClass::D_Walls},          // Vertical, Negative
+            {ConvectionConstants::InConvClass::D_UnstableTilted,  // TiltedUpward, Positive
+             ConvectionConstants::InConvClass::D_StableTilted},   // TiltedUpward, Negative
+            {ConvectionConstants::InConvClass::D_UnstableHoriz,   // HorizontalUp, Positive
+             ConvectionConstants::InConvClass::D_StableHoriz}     // HorizontalUp, Negative
         }};
 
     auto DeltaTempLambda = [](Real64 surfTemp, Real64 airTemp) {
@@ -8259,10 +8260,11 @@ Real64 CalcGoldsteinNovoselacCeilingDiffuserWindow(EnergyPlusData &state,
     if (ZoneExtPerimLength > 0.0) {
         if (WindWallRatio <= 0.5) {
 
-            if (WindowLocationType != ConvectionConstants::InConvWinLoc::UpperPartOfExteriorWall &&
-                WindowLocationType != ConvectionConstants::InConvWinLoc::LowerPartOfExteriorWall &&
-                WindowLocationType != ConvectionConstants::InConvWinLoc::LargePartOfExteriorWall &&
-                WindowLocationType != ConvectionConstants::InConvWinLoc::NotSet) {
+            if (!BITF_TEST_ANY(BITF(WindowLocationType),
+                               BITF(ConvectionConstants::InConvWinLoc::UpperPartOfExteriorWall) |
+                                   BITF(ConvectionConstants::InConvWinLoc::LowerPartOfExteriorWall) |
+                                   BITF(ConvectionConstants::InConvWinLoc::LargePartOfExteriorWall) |
+                                   BITF(ConvectionConstants::InConvWinLoc::NotSet))) {
                 if (state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX1 == 0) {
                     ShowSevereMessage(state,
                                       "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated (bad relative window location)");
@@ -8342,9 +8344,9 @@ Real64 CalcGoldsteinNovoselacCeilingDiffuserWall(EnergyPlusData &state,
     Real64 AirSystemFlowRate = CalcZoneSystemVolFlowRate(state, ZoneNum);
 
     if (ZoneExtPerimLength > 0.0) {
-        if (WindowLocationType != ConvectionConstants::InConvWinLoc::WindowAboveThis &&
-            WindowLocationType != ConvectionConstants::InConvWinLoc::WindowBelowThis &&
-            WindowLocationType != ConvectionConstants::InConvWinLoc::NotSet) {
+        if (!BITF_TEST_ANY(BITF(WindowLocationType),
+                           BITF(ConvectionConstants::InConvWinLoc::WindowAboveThis) | BITF(ConvectionConstants::InConvWinLoc::WindowBelowThis) |
+                               BITF(ConvectionConstants::InConvWinLoc::NotSet))) {
             if (state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX1 == 0) {
                 ShowSevereMessage(state, "CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated (bad relative window location)");
                 ShowContinueError(state, format("Value for window location = {}", WindowLocationType));
@@ -9219,7 +9221,7 @@ Real64 CalcASTMC1340ConvCoeff(EnergyPlusData &state, int const SurfNum, Real64 c
     return h;
 }
 
-ConvectionConstants::SurfConvOrientation GetSurfConvOrientation(Real64 const &Tilt)
+ConvectionConstants::SurfConvOrientation GetSurfConvOrientation(Real64 const Tilt)
 {
     if (Tilt < 5.0) {
         return ConvectionConstants::SurfConvOrientation::HorizontalDown;
