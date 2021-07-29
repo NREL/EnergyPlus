@@ -418,13 +418,11 @@ namespace HeatBalanceIntRadExchange {
 
             // Automatic Surface Multipliers: Update values of surfaces not simulated
             for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
-                auto& RepSurfNum = state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum;
+                auto &RepSurfNum = state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum;
                 state.dataSurface->SurfWinIRfromParentZone(SurfNum) = state.dataSurface->SurfWinIRfromParentZone(RepSurfNum);
                 NetLWRadToSurf(SurfNum) = NetLWRadToSurf(RepSurfNum);
             }
         }
-
-
 
 #ifdef EP_Detailed_Timings
         epStopTime("CalcInteriorRadExchange=");
@@ -550,7 +548,7 @@ namespace HeatBalanceIntRadExchange {
                     if (surfNum == state.dataSurface->Surface(surfNum).RepresentativeCalcSurfNum) {
                         ++enclosureSurfNum;
                         thisEnclosure.SurfacePtr(enclosureSurfNum) = surfNum;
-                        //enclosureSurfMap[surfNum] = enclosureSurfNum;
+                        // enclosureSurfMap[surfNum] = enclosureSurfNum;
                         thisEnclosure.Area(enclosureSurfNum) = state.dataSurface->Surface(surfNum).Area;
                         thisEnclosure.Emissivity(enclosureSurfNum) =
                             state.dataConstruction->Construct(state.dataSurface->Surface(surfNum).Construction).InsideAbsorpThermal;
@@ -567,8 +565,8 @@ namespace HeatBalanceIntRadExchange {
                         // Automatic Surface Multipliers: search for corresponding enclosure surface number
                         for (int enclSNum = priorZoneTotEnclSurfs + 1; enclSNum <= enclosureSurfNum; ++enclSNum) {
                             if (thisEnclosure.SurfacePtr(enclSNum) == state.dataSurface->Surface(allSurfNum).RepresentativeCalcSurfNum) {
-                                //enclosureSurfMap[allSurfNum] = enclSNum;
-                                // Increase the area for the combined enclosure surface
+                                // enclosureSurfMap[allSurfNum] = enclSNum;
+                                //  Increase the area for the combined enclosure surface
                                 thisEnclosure.Area(enclSNum) += state.dataSurface->Surface(allSurfNum).Area;
                             }
                         }

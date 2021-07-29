@@ -2752,14 +2752,16 @@ namespace SurfaceGeometry {
             // Automatic Surface Multipliers: Assign representative heat transfer surfaces
             if (state.dataSurface->UseRepresentativeSurfaceCalculations) {
                 // Conditions where surface always needs to be unique
-                bool forceUniqueSurface = state.dataSurface->Surface(SurfNum).HasShadeControl || state.dataSurface->SurfWinAirflowSource(SurfNum) || state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).SourceSinkPresent;
+                bool forceUniqueSurface = state.dataSurface->Surface(SurfNum).HasShadeControl || state.dataSurface->SurfWinAirflowSource(SurfNum) ||
+                                          state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).SourceSinkPresent;
                 if (!forceUniqueSurface) {
                     // Make hash key for this surface (used to determine uniqueness)
                     state.dataSurface->Surface(SurfNum).make_hash_key(state, SurfNum);
                     // Insert surface key into map. If key already exists, it will not be added.
-                    state.dataSurface->RepresentativeSurfaceMap.insert({state.dataSurface->Surface(SurfNum).calcHashKey,SurfNum});
+                    state.dataSurface->RepresentativeSurfaceMap.insert({state.dataSurface->Surface(SurfNum).calcHashKey, SurfNum});
                     // Assign the representative surface number based on the first instance of the identical key
-                    state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum = state.dataSurface->RepresentativeSurfaceMap[state.dataSurface->Surface(SurfNum).calcHashKey];
+                    state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum =
+                        state.dataSurface->RepresentativeSurfaceMap[state.dataSurface->Surface(SurfNum).calcHashKey];
                 }
             }
         }

@@ -1189,7 +1189,8 @@ namespace SimulationManager {
                         UtilityRoutines::MakeUPPERCase(AsString(fields.at("zone_radiant_exchange_algorithm"))) == "CARROLLMRT";
                 }
                 if (fields.find("use_representative_surfaces_for_calculations") != fields.end()) {
-                    state.dataSurface->UseRepresentativeSurfaceCalculations = UtilityRoutines::MakeUPPERCase(AsString(fields.at("use_representative_surfaces_for_calculations"))) == "YES";
+                    state.dataSurface->UseRepresentativeSurfaceCalculations =
+                        UtilityRoutines::MakeUPPERCase(AsString(fields.at("use_representative_surfaces_for_calculations"))) == "YES";
                 }
                 bool overrideTimestep(false);
                 bool overrideZoneAirHeatBalAlg(false);

@@ -597,7 +597,7 @@ Real64 SurfaceData::get_average_height(EnergyPlusData &state) const
     return std::abs(averageHeight) / SinTilt;
 }
 
-void SurfaceData::make_hash_key(EnergyPlusData &state, const int&  SurfNum)
+void SurfaceData::make_hash_key(EnergyPlusData &state, const int &SurfNum)
 {
     calcHashKey = SurfaceCalcHashKey();
     calcHashKey.Construction = Construction;
@@ -607,7 +607,7 @@ void SurfaceData::make_hash_key(EnergyPlusData &state, const int&  SurfNum)
     calcHashKey.Zone = Zone;
     calcHashKey.TAirRef = state.dataSurface->SurfTAirRef(SurfNum);
 
-    auto& extBoundCond = state.dataSurface->Surface(SurfNum).ExtBoundCond;
+    auto &extBoundCond = state.dataSurface->Surface(SurfNum).ExtBoundCond;
     if (extBoundCond > 0) {
         calcHashKey.ExtZone = state.dataSurface->Surface(extBoundCond).Zone;
     } else {
@@ -637,7 +637,6 @@ void SurfaceData::make_hash_key(EnergyPlusData &state, const int&  SurfNum)
     calcHashKey.LinkedOutAirNode = state.dataSurface->SurfLinkedOutAirNode(SurfNum);
     calcHashKey.OutsideHeatSourceTermSchedule = OutsideHeatSourceTermSchedule;
     calcHashKey.InsideHeatSourceTermSchedule = InsideHeatSourceTermSchedule;
-
 }
 
 // Functions

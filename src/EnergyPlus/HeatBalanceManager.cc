@@ -333,9 +333,12 @@ namespace HeatBalanceManager {
         if (state.dataSurface->UseRepresentativeSurfaceCalculations) {
             print(state.files.eio, "{}\n", "! <Representative Surface Assignment>,Surface Name,Representative Surface Name");
             for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-                auto& RepSurfNum = state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum;
+                auto &RepSurfNum = state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum;
                 if (SurfNum != RepSurfNum) {
-                    print(state.files.eio, " Representative Surface Assignment,{},{}\n", state.dataSurface->Surface(SurfNum).Name, state.dataSurface->Surface(RepSurfNum).Name);
+                    print(state.files.eio,
+                          " Representative Surface Assignment,{},{}\n",
+                          state.dataSurface->Surface(SurfNum).Name,
+                          state.dataSurface->Surface(RepSurfNum).Name);
                 }
             }
         }
