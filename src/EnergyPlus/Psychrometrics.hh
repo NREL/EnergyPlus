@@ -1751,7 +1751,7 @@ namespace Psychrometrics {
 
 struct PsychrometricsData : BaseGlobalStruct
 {
-    Real64 iconvTol = 0.01;
+    Real64 iconvTol = 0.0001;
     Real64 last_Patm = -99999.0;  // barometric pressure {Pascals}  (last)
     Real64 last_tBoil = -99999.0; // Boiling temperature of water at given pressure (last)
     Real64 Press_Save = -99999.0;
@@ -1764,7 +1764,7 @@ struct PsychrometricsData : BaseGlobalStruct
     void clear_state() override
     {
         iPsyErrIndex.fill(0);
-        iconvTol = 0.01;
+        iconvTol = 0.0001;
         last_Patm = -99999.0;  // barometric pressure {Pascals}  (last)
         last_tBoil = -99999.0; // Boiling temperature of water at given pressure (last)
         Press_Save = -99999.0;
