@@ -62,3 +62,27 @@ See PR [#8891](https://github.com/NREL/EnergyPlus/pull/8891).
 The name of the `VentilationRateProcedure` method was changed to `Standard62.1VentilationRateProcedure` to be consistent with the Standard 62.1 Summary Report. The name of the method has been changed throughout EnergyPlus and is thus reflected in the EIO files.
 
 See PR [#8891](https://github.com/NREL/EnergyPlus/pull/8891).
+
+### Output:Table:Monthly and Output:Table:Annual Column Headers
+
+For both objects `Output:Table:Monthly` and `Output:Table:Annual`
+
+For aggregation types `Maximum`, `Minimum`, `MaximumDuringHoursShown` and `MinimumDuringHoursShown`, a space was missing between the aggregation type and the units
+when writing the tabular report, which wasn't following the convention of other columns with different aggregation types,
+and causing the SQL table `TabularDataWithStrings` to be missing a curly brace. See issue [#8921](https://github.com/NREL/EnergyPlus/issues/8921).
+
+In the HTML file, the column headers will change:
+
+```diff
+-ELECTRICITY:FACILITY {Maximum}[W]
++ELECTRICITY:FACILITY {Maximum} [W]
+ ELECTRICITY:FACILITY {TIMESTAMP}
+```
+
+And in the SQL file, `ColumnName` will as a result change as follows:
+
+```diff
+-ELECTRICITY:FACILITY {MAXIMUM
++ELECTRICITY:FACILITY {MAXMIUM}
+ ELECTRICITY:FACILITY {TIMESTAMP}
+```
