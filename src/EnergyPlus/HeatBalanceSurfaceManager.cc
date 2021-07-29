@@ -7385,6 +7385,9 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
         }
     }
 
+    // Reset radiant HVAC heat gain rate output for next timestep
+    state.dataHeatBalSurf->QdotRadHVACInRepPerArea = 0.0;
+
     // Update SumHmXXXX for non-window EMPD or HAMT surfaces
     if (state.dataHeatBal->AnyEMPD || state.dataHeatBal->AnyHAMT) {
         for (int SurfNum : HTNonWindowSurfs) {
