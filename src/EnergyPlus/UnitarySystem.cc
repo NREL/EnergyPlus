@@ -6299,6 +6299,7 @@ namespace UnitarySystems {
             }
         } else if (this->m_CoolingCoilType_Num != DataHVACGlobals::CoilDX_CoolingHXAssisted &&
                    this->m_CoolingCoilType_Num != DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl &&
+                   this->m_CoolingCoilType_Num != DataHVACGlobals::CoilWater_CoolingHXAssisted &&
                    this->m_DehumidControlType_Num == DehumCtrlType::Multimode) {
             ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
             ShowContinueError(state, "Illegal Dehumidification Control Type = " + loc_dehumm_ControlType);
