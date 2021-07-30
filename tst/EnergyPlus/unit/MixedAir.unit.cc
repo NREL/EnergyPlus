@@ -5362,16 +5362,16 @@ TEST_F(EnergyPlusFixture, MechVentController_VRPCap)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(SOAM_VRP, state->dataMixedAir->VentilationMechanical(1).SystemOAMethod);
 
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(2);             // Necessary for CalcMechVentController
-    state->dataSize->SysSizingRunDone = true;                                 // Indicate that a system sizing run has been performed
-    state->dataHeatBal->Zone(1).TotOccupants = 15;                            // Zone 1 total number of people
-    state->dataHeatBal->Zone(2).TotOccupants = 12;                            // Zone 2 total number of people
-    state->dataHeatBal->Zone(1).FloorArea = 1500;                             // Zone 1 total floor area
-    state->dataHeatBal->Zone(2).FloorArea = 500;                              // Zone 2 total floor area
-    state->dataSize->FinalSysSizing.allocate(1);                              // Create instance of system sizing info
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(2);                // Necessary for CalcMechVentController
+    state->dataSize->SysSizingRunDone = true;                                    // Indicate that a system sizing run has been performed
+    state->dataHeatBal->Zone(1).TotOccupants = 15;                               // Zone 1 total number of people
+    state->dataHeatBal->Zone(2).TotOccupants = 12;                               // Zone 2 total number of people
+    state->dataHeatBal->Zone(1).FloorArea = 1500;                                // Zone 1 total floor area
+    state->dataHeatBal->Zone(2).FloorArea = 500;                                 // Zone 2 total floor area
+    state->dataSize->FinalSysSizing.allocate(1);                                 // Create instance of system sizing info
     state->dataMixedAir->VentilationMechanical(1).SysDesOA = ExpectedOAMassFlow; // Set design outdoor air flow rate
-    state->dataSize->CurSysNum = 1;                                           // Only one system in this instance
-    state->dataEnvrn->StdRhoAir = 1;                                          // Standard air density assumed to be 1 kg/m3 (simplification)
+    state->dataSize->CurSysNum = 1;                                              // Only one system in this instance
+    state->dataEnvrn->StdRhoAir = 1;                                             // Standard air density assumed to be 1 kg/m3 (simplification)
     state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow, OAMassFlow);
 
     EXPECT_NEAR(
