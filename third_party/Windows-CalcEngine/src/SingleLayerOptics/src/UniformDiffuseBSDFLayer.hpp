@@ -5,27 +5,27 @@
 
 #include "BSDFLayer.hpp"
 
-namespace SingleLayerOptics {
+namespace SingleLayerOptics
+{
+    class CUniformDiffuseCell;
 
-	class CUniformDiffuseCell;
+    // All outgoing directions are uniformly distributed in all directions
+    class CUniformDiffuseBSDFLayer : public CBSDFLayer
+    {
+    public:
+        CUniformDiffuseBSDFLayer(const std::shared_ptr<CUniformDiffuseCell> & t_Cell,
+                                 const CBSDFHemisphere & t_Hemisphere);
 
-	// All outgoing directions are uniformly distributed in all directions
-	class CUniformDiffuseBSDFLayer : public CBSDFLayer {
-	public:
-		CUniformDiffuseBSDFLayer( const std::shared_ptr< CUniformDiffuseCell >& t_Cell,
-		                          const std::shared_ptr< const CBSDFHemisphere >& t_Hemisphere );
+    protected:
+        std::shared_ptr<CUniformDiffuseCell> cellAsUniformDiffuse() const;
+        void calcDiffuseDistribution(FenestrationCommon::Side aSide,
+                                     const CBeamDirection & t_Direction,
+                                     size_t t_DirectionIndex) override;
+        void calcDiffuseDistribution_wv(FenestrationCommon::Side aSide,
+                                        const CBeamDirection & t_Direction,
+                                        size_t t_DirectionIndex) override;
+    };
 
-	protected:
-		std::shared_ptr< CUniformDiffuseCell > cellAsUniformDiffuse() const;
-		void calcDiffuseDistribution( const FenestrationCommon::Side aSide,
-		                              const CBeamDirection& t_Direction,
-		                              const size_t t_DirectionIndex );
-		void calcDiffuseDistribution_wv( const FenestrationCommon::Side aSide,
-		                                 const CBeamDirection& t_Direction,
-		                                 const size_t t_DirectionIndex );
-
-	};
-
-}
+}   // namespace SingleLayerOptics
 
 #endif
