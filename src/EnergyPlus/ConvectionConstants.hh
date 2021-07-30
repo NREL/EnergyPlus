@@ -157,6 +157,7 @@ enum class ConvSurfDeltaT : int
 {
     Invalid = -1,
     Positive,
+    Zero,
     Negative,
     Num, // count, always the last element
 };

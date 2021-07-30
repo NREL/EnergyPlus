@@ -6054,14 +6054,19 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                          (int)ConvectionConstants::SurfConvOrientation::Num>
         A1{{
             {ConvectionConstants::InConvClass::A1_StableHoriz,     // HorizontalDown, Positive
+             ConvectionConstants::InConvClass::A1_StableHoriz,     // HorizontalDown, Zero
              ConvectionConstants::InConvClass::A1_UnstableHoriz},  // HorizontalDown, Negative
             {ConvectionConstants::InConvClass::A1_StableTilted,    // TiltedDownward, Positive
+             ConvectionConstants::InConvClass::A1_StableTilted,    // TiltedDownward, Zero
              ConvectionConstants::InConvClass::A1_UnstableTilted}, // TiltedDownward, Negative
             {ConvectionConstants::InConvClass::A1_VertWalls,       // Vertical, Positive
+             ConvectionConstants::InConvClass::A1_VertWalls,       // Vertical, Zero
              ConvectionConstants::InConvClass::A1_VertWalls},      // Vertical, Negative
             {ConvectionConstants::InConvClass::A1_UnstableTilted,  // TiltedUpward, Positive
+             ConvectionConstants::InConvClass::A1_StableTilted,    // TiltedUpward, Zero
              ConvectionConstants::InConvClass::A1_StableTilted},   // TiltedUpward, Negative
             {ConvectionConstants::InConvClass::A1_UnstableHoriz,   // HorizontalUp, Positive
+             ConvectionConstants::InConvClass::A1_StableHoriz,     // HorizontalUp, Zero
              ConvectionConstants::InConvClass::A1_StableHoriz}     // HorizontalUp, Negative
         }};
 
@@ -6069,14 +6074,19 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                          (int)ConvectionConstants::SurfConvOrientation::Num>
         A2{{
             {ConvectionConstants::InConvClass::A2_StableHoriz,         // HorizontalDown, Positive
+             ConvectionConstants::InConvClass::A2_StableHoriz,         // HorizontalDown, Zero
              ConvectionConstants::InConvClass::A2_UnstableHoriz},      // HorizontalDown, Negative
             {ConvectionConstants::InConvClass::A2_StableTilted,        // TiltedDownward, Positive
+             ConvectionConstants::InConvClass::A2_StableTilted,        // TiltedDownward, Zero
              ConvectionConstants::InConvClass::A2_UnstableTilted},     // TiltedDownward, Negative
             {ConvectionConstants::InConvClass::A2_VertWallsNonHeated,  // Vertical, Positive
+             ConvectionConstants::InConvClass::A2_VertWallsNonHeated,  // Vertical, Zero
              ConvectionConstants::InConvClass::A2_VertWallsNonHeated}, // Vertical, Negative
             {ConvectionConstants::InConvClass::A2_UnstableTilted,      // TiltedUpward, Positive
+             ConvectionConstants::InConvClass::A2_StableTilted,        // TiltedUpward, Zero
              ConvectionConstants::InConvClass::A2_StableTilted},       // TiltedUpward, Negative
             {ConvectionConstants::InConvClass::A2_UnstableHoriz,       // HorizontalUp, Positive
+             ConvectionConstants::InConvClass::A2_StableHoriz,         // HorizontalUp, Zero
              ConvectionConstants::InConvClass::A2_StableHoriz}         // HorizontalUp, Negative
         }};
 
@@ -6084,14 +6094,19 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                          (int)ConvectionConstants::SurfConvOrientation::Num>
         A3{{
             {ConvectionConstants::InConvClass::A3_StableHoriz,     // HorizontalDown, Positive
+             ConvectionConstants::InConvClass::A3_StableHoriz,     // HorizontalDown, Zero
              ConvectionConstants::InConvClass::A3_UnstableHoriz},  // HorizontalDown, Negative
             {ConvectionConstants::InConvClass::A3_StableTilted,    // TiltedDownward, Positive
+             ConvectionConstants::InConvClass::A3_StableTilted,    // TiltedDownward, Zero
              ConvectionConstants::InConvClass::A3_UnstableTilted}, // TiltedDownward, Negative
             {ConvectionConstants::InConvClass::A3_VertWalls,       // Vertical, Positive
+             ConvectionConstants::InConvClass::A3_VertWalls,       // Vertical, Zero
              ConvectionConstants::InConvClass::A3_VertWalls},      // Vertical, Negative
             {ConvectionConstants::InConvClass::A3_UnstableTilted,  // TiltedUpward, Positive
+             ConvectionConstants::InConvClass::A3_StableTilted,    // TiltedUpward, Zero
              ConvectionConstants::InConvClass::A3_StableTilted},   // TiltedUpward, Negative
             {ConvectionConstants::InConvClass::A3_UnstableHoriz,   // HorizontalUp, Positive
+             ConvectionConstants::InConvClass::A3_StableHoriz,     // HorizontalUp, Zero
              ConvectionConstants::InConvClass::A3_StableHoriz}     // HorizontalUp, Negative
         }};
 
@@ -6099,14 +6114,19 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                          (int)ConvectionConstants::SurfConvOrientation::Num>
         B{{
             {ConvectionConstants::InConvClass::B_StableHoriz,     // HorizontalDown, Positive
+             ConvectionConstants::InConvClass::B_StableHoriz,     // HorizontalDown, Zero
              ConvectionConstants::InConvClass::B_UnstableHoriz},  // HorizontalDown, Negative
             {ConvectionConstants::InConvClass::B_StableTilted,    // TiltedDownward, Positive
+             ConvectionConstants::InConvClass::B_StableTilted,    // TiltedDownward, Zero
              ConvectionConstants::InConvClass::B_UnstableTilted}, // TiltedDownward, Negative
             {ConvectionConstants::InConvClass::B_VertWalls,       // Vertical, Positive
+             ConvectionConstants::InConvClass::B_VertWalls,       // Vertical, Zero
              ConvectionConstants::InConvClass::B_VertWalls},      // Vertical, Negative
             {ConvectionConstants::InConvClass::B_UnstableTilted,  // TiltedUpward, Positive
+             ConvectionConstants::InConvClass::B_StableTilted,    // TiltedUpward, Zero
              ConvectionConstants::InConvClass::B_StableTilted},   // TiltedUpward, Negative
             {ConvectionConstants::InConvClass::B_UnstableHoriz,   // HorizontalUp, Positive
+             ConvectionConstants::InConvClass::B_StableHoriz,     // HorizontalUp, Zero
              ConvectionConstants::InConvClass::B_StableHoriz}     // HorizontalUp, Negative
         }};
 
@@ -6114,23 +6134,34 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                          (int)ConvectionConstants::SurfConvOrientation::Num>
         D{{
             {ConvectionConstants::InConvClass::D_StableHoriz,     // HorizontalDown, Positive
+             ConvectionConstants::InConvClass::D_StableHoriz,     // HorizontalDown, Zero
              ConvectionConstants::InConvClass::D_UnstableHoriz},  // HorizontalDown, Negative
             {ConvectionConstants::InConvClass::D_StableTilted,    // TiltedDownward, Positive
+             ConvectionConstants::InConvClass::D_StableTilted,    // TiltedDownward, Zero
              ConvectionConstants::InConvClass::D_UnstableTilted}, // TiltedDownward, Negative
             {ConvectionConstants::InConvClass::D_Walls,           // Vertical, Positive
+             ConvectionConstants::InConvClass::D_Walls,           // Vertical, Zero
              ConvectionConstants::InConvClass::D_Walls},          // Vertical, Negative
             {ConvectionConstants::InConvClass::D_UnstableTilted,  // TiltedUpward, Positive
+             ConvectionConstants::InConvClass::D_StableTilted,    // TiltedUpward, Zero
              ConvectionConstants::InConvClass::D_StableTilted},   // TiltedUpward, Negative
             {ConvectionConstants::InConvClass::D_UnstableHoriz,   // HorizontalUp, Positive
+             ConvectionConstants::InConvClass::D_StableHoriz,     // HorizontalUp, Zero
              ConvectionConstants::InConvClass::D_StableHoriz}     // HorizontalUp, Negative
         }};
 
     auto DeltaTempLambda = [](Real64 surfTemp, Real64 airTemp) {
-        return (surfTemp - airTemp) > 0.0 ? int(ConvectionConstants::ConvSurfDeltaT::Positive) : int(ConvectionConstants::ConvSurfDeltaT::Negative);
+        Real64 deltaT = surfTemp - airTemp;
+        if (deltaT > 0.0) {
+            return (int)ConvectionConstants::ConvSurfDeltaT::Positive;
+        } else if (deltaT < 0.0) {
+            return (int)ConvectionConstants::ConvSurfDeltaT::Negative;
+        } else {
+            return (int)ConvectionConstants::ConvSurfDeltaT::Zero;
+        }
     };
 
     // now finish out specific model eq for this surface
-    // Surface(SurfNum)%IntConvClassification = 0 !init/check
 
     int iDeltaTemp = DeltaTempLambda(TH(2, 1, SurfNum), state.dataHeatBalFanSys->MAT(ZoneNum));
     int iConvOrient = int(Surface(SurfNum).ConvOrientation);
@@ -6215,8 +6246,18 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
             break;
         case SurfaceClass::IntMass:
             // assume horizontal upwards.
-            // TODO: investigate, allows convection algorithm selected to be different from actual surface orientation
-            state.dataSurface->SurfIntConvClassification(SurfNum) = A3[int(ConvectionConstants::SurfConvOrientation::HorizontalUp)][iDeltaTemp];
+            // this is an exception for when DT=0 which assumes unstable
+            switch (static_cast<ConvectionConstants::ConvSurfDeltaT>(iDeltaTemp)) {
+            case ConvectionConstants::ConvSurfDeltaT::Positive:
+            case ConvectionConstants::ConvSurfDeltaT::Zero:
+                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::A3_UnstableHoriz;
+                break;
+            case ConvectionConstants::ConvSurfDeltaT::Negative:
+                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::A3_StableHoriz;
+                break;
+            default:
+                assert(false);
+            }
             break;
         case SurfaceClass::Window:
         case SurfaceClass::GlassDoor:
