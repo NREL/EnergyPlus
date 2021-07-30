@@ -2901,7 +2901,6 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ReportIllumMap)
     state->dataDaylightingData->ZoneDaylight.allocate(state->dataGlobal->NumOfZones);
     state->dataDaylightingData->ZoneDaylight(1).TotalDaylRefPoints = 3;
     state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord.allocate(3, state->dataDaylightingData->ZoneDaylight(1).TotalDaylRefPoints);
-    state->dataDaylightingManager->RefPts.allocate(state->dataGlobal->NumOfZones, state->dataDaylightingData->ZoneDaylight(1).TotalDaylRefPoints);
     state->dataDaylightingManager->SavedMnDy.allocate(state->dataDaylightingData->TotIllumMaps);
     state->dataDaylightingData->IllumMap.allocate(state->dataGlobal->NumOfZones);
     state->dataDaylightingData->IllumMap(MapNum).Zone = 1;
@@ -2921,19 +2920,11 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ReportIllumMap)
     state->dataDaylightingData->IllumMap(MapNum).Name = "ThisOne";
     state->dataDaylightingData->IllumMap(MapNum).Z = 23.23;
 
-    std::string ExpectedResult0;
-    std::string ExpectedResult1;
-    std::string ExpectedResult2;
-    std::string ExpectedResult3;
-    ExpectedResult0 = "ThisOne at 23.23m";
-    ExpectedResult1 = "RefPt1=(1.23:2.34:3.45)";
-    ExpectedResult2 = "RefPt2=(4.56:5.67:6.78)";
-    ExpectedResult3 = "RefPt3=(7.89:8.90:9.01)";
+    std::string expectedResultName = "ThisOne at 23.23m";
+    std::string expectedResultPtsHeader = "RefPt1=(1.23:2.34:3.45),RefPt2=(4.56:5.67:6.78),RefPt3=(7.89:8.90:9.01)";
 
     DaylightingManager::ReportIllumMap(*state, MapNum);
 
-    EXPECT_EQ(ExpectedResult0, state->dataDaylightingData->IllumMap(1).Name);
-    EXPECT_EQ(ExpectedResult1, state->dataDaylightingManager->RefPts(1, 1));
-    EXPECT_EQ(ExpectedResult2, state->dataDaylightingManager->RefPts(1, 2));
-    EXPECT_EQ(ExpectedResult3, state->dataDaylightingManager->RefPts(1, 3));
+    EXPECT_EQ(expectedResultName, state->dataDaylightingData->IllumMap(1).Name);
+    EXPECT_EQ(expectedResultPtsHeader, state->dataDaylightingData->IllumMap(MapNum).pointsHeader);
 }

@@ -233,6 +233,7 @@ namespace DataDaylighting {
         SharedFileHandle mapFile;     // Unit number for map output (later merged to final file)
         bool HeaderXLineLengthNeeded; // X header will likely be the longest line in the file
         int HeaderXLineLength;        // actual length of this X header line
+        std::string pointsHeader;     // part of the header that lists the map points
 
         // Default Constructor
         IllumMapData()

@@ -9935,7 +9935,6 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
     auto &FirstTimeMaps = state.dataDaylightingManager->FirstTimeMaps;
     auto &EnvrnPrint = state.dataDaylightingManager->EnvrnPrint;
     auto &SavedMnDy = state.dataDaylightingManager->SavedMnDy;
-    auto &RefPts = state.dataDaylightingManager->RefPts;
     auto &XValue = state.dataDaylightingManager->XValue;
     auto &YValue = state.dataDaylightingManager->YValue;
     auto &IllumValue = state.dataDaylightingManager->IllumValue;
@@ -9953,8 +9952,6 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
         state.dataDaylightingManager->ReportIllumMap_firstTime = false;
         FirstTimeMaps.dimension(state.dataDaylightingData->TotIllumMaps, true);
         EnvrnPrint.dimension(state.dataDaylightingData->TotIllumMaps, true);
-        RefPts.allocate(state.dataGlobal->NumOfZones,
-                        state.dataDaylightingData->ZoneDaylight(state.dataDaylightingData->IllumMap(MapNum).Zone).TotalDaylRefPoints);
         SavedMnDy.allocate(state.dataDaylightingData->TotIllumMaps);
     }
 
@@ -9983,41 +9980,33 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
 
         state.dataDaylightingData->IllumMap(MapNum).Name =
             format("{} at {:.2R}m", state.dataDaylightingData->IllumMap(MapNum).Name, state.dataDaylightingData->IllumMap(MapNum).Z);
-
-        for (R = 1; R <= state.dataDaylightingData->ZoneDaylight(state.dataDaylightingData->IllumMap(MapNum).Zone).TotalDaylRefPoints; ++R) {
-            RefPts(state.dataDaylightingData->IllumMap(MapNum).Zone, R) =
-                format("RefPt{}=({:.2R}:{:.2R}:{:.2R})",
-                       R,
-                       state.dataDaylightingData->ZoneDaylight(state.dataDaylightingData->IllumMap(MapNum).Zone).DaylRefPtAbsCoord(1, R),
-                       state.dataDaylightingData->ZoneDaylight(state.dataDaylightingData->IllumMap(MapNum).Zone).DaylRefPtAbsCoord(2, R),
-                       state.dataDaylightingData->ZoneDaylight(state.dataDaylightingData->IllumMap(MapNum).Zone).DaylRefPtAbsCoord(3, R));
-        }
     }
     if (SavedMnDy(MapNum) != state.dataEnvrn->CurMnDyHr.substr(0, 5)) {
         EnvrnPrint(MapNum) = true;
         SavedMnDy(MapNum) = state.dataEnvrn->CurMnDyHr.substr(0, 5);
     }
-    if (EnvrnPrint(MapNum)) {
-        std::string refPt2;
-        if (state.dataDaylightingData->ZoneDaylight(state.dataDaylightingData->IllumMap(MapNum).Zone).TotalDaylRefPoints > 1) {
-            refPt2 = "";
-            for (int i = 2; i <= state.dataDaylightingData->ZoneDaylight(state.dataDaylightingData->IllumMap(MapNum).Zone).TotalDaylRefPoints; ++i) {
-                refPt2 += RefPts(state.dataDaylightingData->IllumMap(MapNum).Zone, i);
-                if (i < state.dataDaylightingData->ZoneDaylight(state.dataDaylightingData->IllumMap(MapNum).Zone).TotalDaylRefPoints) {
-                    refPt2 += ",";
-                }
-            }
-        } else {
-            refPt2 = format("RefPt{}=({:.2R}:{:.2R}:{:.2R})", 0, 0.00, 0.00, 0.00);
+
+    state.dataDaylightingData->IllumMap(MapNum).pointsHeader = "";
+    for (R = 1; R <= state.dataDaylightingData->ZoneDaylight(state.dataDaylightingData->IllumMap(MapNum).Zone).TotalDaylRefPoints; ++R) {
+        state.dataDaylightingData->IllumMap(MapNum).pointsHeader +=
+            format("RefPt{}=({:.2R}:{:.2R}:{:.2R})",
+                   R,
+                   state.dataDaylightingData->ZoneDaylight(state.dataDaylightingData->IllumMap(MapNum).Zone).DaylRefPtAbsCoord(1, R),
+                   state.dataDaylightingData->ZoneDaylight(state.dataDaylightingData->IllumMap(MapNum).Zone).DaylRefPtAbsCoord(2, R),
+                   state.dataDaylightingData->ZoneDaylight(state.dataDaylightingData->IllumMap(MapNum).Zone).DaylRefPtAbsCoord(3, R));
+        if (R < state.dataDaylightingData->ZoneDaylight(state.dataDaylightingData->IllumMap(MapNum).Zone).TotalDaylRefPoints) {
+            state.dataDaylightingData->IllumMap(MapNum).pointsHeader += ",";
         }
+    }
+
+    if (EnvrnPrint(MapNum)) {
         WriteDaylightMapTitle(state,
                               MapNum,
                               *state.dataDaylightingData->IllumMap(MapNum).mapFile,
                               state.dataDaylightingData->IllumMap(MapNum).Name,
                               state.dataEnvrn->EnvironmentName,
                               state.dataDaylightingData->IllumMap(MapNum).Zone,
-                              RefPts(state.dataDaylightingData->IllumMap(MapNum).Zone, 1),
-                              refPt2,
+                              state.dataDaylightingData->IllumMap(MapNum).pointsHeader,
                               state.dataDaylightingData->IllumMap(MapNum).Z);
         EnvrnPrint(MapNum) = false;
     }
@@ -10901,8 +10890,7 @@ void WriteDaylightMapTitle(EnergyPlusData &state,
                            std::string const &mapName,
                            std::string const &environmentName,
                            int const ZoneNum,
-                           std::string const &refPt1,
-                           std::string const &refPt2,
+                           std::string const &refPts,
                            Real64 const zcoord)
 {
     // SUBROUTINE INFORMATION:
@@ -10917,14 +10905,13 @@ void WriteDaylightMapTitle(EnergyPlusData &state,
     // must add correct number of commas at end
     const auto fullmapName = fmt::format("{}:{}:{} Illuminance [lux] (Hourly)", state.dataHeatBal->Zone(ZoneNum).Name, environmentName, mapName);
     print(mapFile,
-          "Date/Time{Sep}{FullMapName}{Sep}{RefPt1}{Sep}{RefPt2}{Sep}{Sep}\n",
+          "Date/Time{Sep}{FullMapName}{Sep}{RefPts}{Sep}{Sep}\n",
           fmt::arg("Sep", state.dataDaylightingData->MapColSep),
           fmt::arg("FullMapName", fullmapName),
-          fmt::arg("RefPt1", refPt1),
-          fmt::arg("RefPt2", refPt2));
+          fmt::arg("RefPts", refPts));
 
     if (state.dataSQLiteProcedures->sqlite) {
-        state.dataSQLiteProcedures->sqlite->createSQLiteDaylightMapTitle(mapNum, fullmapName, environmentName, ZoneNum, refPt1, refPt2, zcoord);
+        state.dataSQLiteProcedures->sqlite->createSQLiteDaylightMapTitle(mapNum, fullmapName, environmentName, ZoneNum, refPts, zcoord);
     }
 }
 
