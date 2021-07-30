@@ -12427,7 +12427,9 @@ namespace UnitarySystems {
             if ((OutletHumRatDXCoil > (DesOutHumRat + tempHumRatAcc)) && (!unitSys || PartLoadFrac < 1.0) &&
                 (this->m_DehumidControlType_Num == DehumCtrlType::Multimode)) {
 
-                if (CoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) { // CoilSystem:Cooling:DX:HeatExchangerAssisted
+                if ((CoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) ||
+                    (CoilType_Num == DataHVACGlobals::CoilWater_CoolingHXAssisted)) { // CoilSystem:Cooling:DX:HeatExchangerAssisted,
+                                                                                      // CoilSystem:Cooling:Water:HeatExchangerAssisted
                     // Determine required part load when heat exchanger is ON
                     HXUnitOn = true;
                     PartLoadFrac = 1.0;
