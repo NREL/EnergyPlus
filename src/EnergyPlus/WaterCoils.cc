@@ -599,12 +599,10 @@ void GetWaterCoilInput(EnergyPlusData &state)
         } else {
             state.dataWaterCoils->WaterCoil(CoilNum).UseDesignWaterDeltaTemp = false;
         }
-        if (!lNumericBlanks(18)) {
-            state.dataWaterCoils->WaterCoil(CoilNum).DesignInletWaterTemp = NumArray(18);
-            state.dataWaterCoils->WaterCoil(CoilNum).UseDesignInletWaterTemp = true;
-        } else {
-            state.dataWaterCoils->WaterCoil(CoilNum).UseDesignInletWaterTemp = false;
-        }
+        state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp = NumArray(18);
+        if (state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp == AutoSize)
+            state.dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize = true;
+
         state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum = GetOnlySingleNode(state,
                                                                                        AlphArray(3),
                                                                                        ErrorsFound,
@@ -2472,9 +2470,14 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
             CoolingWaterDesWaterInletTempSizer sizerCWDesWaterInTemp;
             sizerCWDesWaterInTemp.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
             state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp = sizerCWDesWaterInTemp.size(state, TempSize, ErrorsFound);
-
-            if (state.dataWaterCoils->WaterCoil(CoilNum).UseDesignInletWaterTemp) {
-                state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp = state.dataWaterCoils->WaterCoil(CoilNum).DesignInletWaterTemp;
+            if (state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp > state.dataSize->DataDesOutletAirTemp) {
+                state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp = state.dataSize->DataDesOutletAirTemp - 5.0;
+                ShowWarningError(state, "Invalid design inlet water temperature for " + CompType + " = " + CompName);
+                ShowContinueError(state,
+                                  format("...design inlet water temperature = {:.3R} C", state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp));
+                ShowContinueError(state, format("...design outlet air temperature = {:.3R} C", state.dataSize->DataDesOutletAirTemp));
+                ShowContinueError(state, "...design inlet water temperature should be less than the design outlet air temperature");
+                ShowContinueError(state, "...design inlet water temperature is set to the design outlet air temperature minus 5.0C");
             }
 
             if (state.dataSize->CurZoneEqNum > 0) { // zone equipment use air inlet humrat to calculate design outlet air temperature

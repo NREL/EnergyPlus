@@ -220,8 +220,6 @@ namespace WaterCoils {
         int ControllerIndex;            // controller index used by water coil
         bool reportCoilFinalSizes;      // one time report of sizes to coil summary report
         bool AirLoopDOASFlag;           // True when this coil is used AirLoopDOAS
-        Real64 DesignInletWaterTemp;    // coil water inlet temperature for coil sizing [C]
-        bool UseDesignInletWaterTemp;   // is true, the UseDesignWaterInletTemp is used for sizing detailed coil design parameters
 
         // Default Constructor
         WaterCoilEquipConditions()
@@ -247,7 +245,7 @@ namespace WaterCoils {
               CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0), CoilPerfInpMeth(0), FaultyCoilFoulingFlag(false),
               FaultyCoilFoulingIndex(0), FaultyCoilFoulingFactor(0.0), DesiccantRegenerationCoil(false), DesiccantDehumNum(0),
               DesignWaterDeltaTemp(0.0), UseDesignWaterDeltaTemp(false), ControllerName(""), ControllerIndex(0), reportCoilFinalSizes(true),
-              AirLoopDOASFlag(false), DesignInletWaterTemp(0.0), UseDesignInletWaterTemp(false)
+              AirLoopDOASFlag(false)
         {
         }
     };
