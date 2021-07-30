@@ -1,21 +1,33 @@
-add_subdirectory( Common )
-set( LINK_TO_Common FenestrationCommon )
+cmake_minimum_required(VERSION 3.5)
 
-add_subdirectory( Gases )
-set( LINK_TO_Gases Gases )
+if( ${BUILD_WCE_COMMON} )
+	add_subdirectory( Common )
+	set( LINK_TO_Common FenestrationCommon )
+endif()
 
-add_subdirectory( Tarcog )
-set( LINK_TO_Tarcog Tarcog )
+if( ${BUILD_WCE_VIEWER} )
+	add_subdirectory( Viewer )
+	set( LINK_TO_Viewer Viewer )
+endif()
 
-add_subdirectory( SpectralAveraging )
-set( LINK_TO_SpectralAveraging SpectralAveraging )
+if( ${BUILD_WCE_GASES} )
+	add_subdirectory( Gases )
+	set( LINK_TO_Gases Gases )
+endif()
 
-add_subdirectory( Viewer )
-set( LINK_TO_Viewer Viewer )
+if( ${BUILD_WCE_THERMAL} )
+	add_subdirectory( Tarcog )
+	set( LINK_TO_Tarcog Tarcog )
+	
+	add_subdirectory( Chromogenics )
+endif()
 
-add_subdirectory( SingleLayerOptics )
-set( LINK_TO_SingleLayerOptics SingleLayerOptics )
-
-add_subdirectory( MultiLayerOptics )
-
-add_subdirectory( Chromogenics )
+if( ${BUILD_WCE_OPTICAL} )
+	add_subdirectory( SpectralAveraging )
+	set( LINK_TO_SpectralAveraging SpectralAveraging )
+	
+	add_subdirectory( SingleLayerOptics )
+	set( LINK_TO_SingleLayerOptics SingleLayerOptics )
+	
+	add_subdirectory( MultiLayerOptics )
+endif()

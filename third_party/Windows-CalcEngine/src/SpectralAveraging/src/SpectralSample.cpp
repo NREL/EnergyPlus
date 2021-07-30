@@ -8,412 +8,393 @@
 
 using namespace FenestrationCommon;
 
-namespace SpectralAveraging {
+namespace SpectralAveraging
+{
+    //////////////////////////////////////////////////////////////////////////////////////
+    ////  CSample
+    //////////////////////////////////////////////////////////////////////////////////////
 
-	//////////////////////////////////////////////////////////////////////////////////////
-	////  CSample
-	//////////////////////////////////////////////////////////////////////////////////////
+    CSample::CSample(const CSeries & t_SourceData,
+                     IntegrationType integrationType,
+                     double t_NormalizationCoefficient) :
+        m_SourceData(t_SourceData),
+        m_WavelengthSet(WavelengthSet::Data),
+        m_IntegrationType(integrationType),
+        m_NormalizationCoefficient(t_NormalizationCoefficient),
+        m_StateCalculated(false)
+    {
+        CSample::reset();
+    }
 
-	CSample::CSample( std::shared_ptr< CSeries > const& t_SourceData ) : m_SourceData( t_SourceData ),
-	                                                                m_WavelengthSet( WavelengthSet::Data ), m_IntegrationType( IntegrationType::Trapezoidal ),
-	                                                                m_StateCalculated( false ) {
-		m_DetectorData = nullptr;
-		CSample::reset();
-	}
+    CSample::CSample() :
+        m_WavelengthSet(WavelengthSet::Data),
+        m_IntegrationType(IntegrationType::Trapezoidal),
+        m_NormalizationCoefficient(1),
+        m_StateCalculated(false)
+    {
+        CSample::reset();
+    }
 
-	CSample::CSample() : m_SourceData( nullptr ), m_DetectorData( nullptr ),
-	                     m_WavelengthSet( WavelengthSet::Data ), m_IntegrationType( IntegrationType::Trapezoidal ), 
-						 m_StateCalculated( false ) {
-		CSample::reset();
-	}
+    CSample & CSample::operator=(const CSample & t_Sample)
+    {
+        m_StateCalculated = t_Sample.m_StateCalculated;
+        m_IntegrationType = t_Sample.m_IntegrationType;
+        m_NormalizationCoefficient = t_Sample.m_NormalizationCoefficient;
+        m_WavelengthSet = t_Sample.m_WavelengthSet;
+        m_IncomingSource = t_Sample.m_IncomingSource;
+        for(const auto & prop : EnumProperty())
+        {
+            for(const auto & side : EnumSide())
+            {
+                m_EnergySource[std::make_pair(prop, side)] =
+                  t_Sample.m_EnergySource.at(std::make_pair(prop, side));
+            }
+        }
 
-	CSample &CSample::operator=( CSample const &t_Sample ) {
-		m_StateCalculated = t_Sample.m_StateCalculated;
-		m_WavelengthSet = t_Sample.m_WavelengthSet;
-		m_IncomingSource = wce::make_unique< CSeries >( *t_Sample.m_IncomingSource );
-		m_TransmittedSource = wce::make_unique< CSeries >( *t_Sample.m_TransmittedSource );
-		m_ReflectedFrontSource = wce::make_unique< CSeries >( *t_Sample.m_ReflectedFrontSource );
-		m_ReflectedBackSource = wce::make_unique< CSeries >( *t_Sample.m_ReflectedBackSource );
-		m_AbsorbedFrontSource = wce::make_unique< CSeries >( *t_Sample.m_AbsorbedFrontSource );
-		m_AbsorbedBackSource = wce::make_unique< CSeries >( *t_Sample.m_AbsorbedBackSource );
+        return *this;
+    }
 
-		return *this;
-	}
+    CSample::CSample(const CSample & t_Sample)
+    {
+        operator=(t_Sample);
+    }
 
-	CSample::CSample( CSample const & t_Sample ) {
-		operator=( t_Sample );
-	}
+    CSeries & CSample::getSourceData()
+    {
+        calculateState();   // must interpolate data to same wavelengths
+        return m_SourceData;
+    }
 
-	std::shared_ptr< CSeries > CSample::getSourceData() {
-		calculateState(); // must interpolate data to same wavelengths
-		return m_SourceData;
-	}
+    void CSample::setSourceData(CSeries & t_SourceData)
+    {
+        m_SourceData = t_SourceData;
+        reset();
+    }
 
-	void CSample::setSourceData( std::shared_ptr< CSeries > t_SourceData ) {
-		m_SourceData = t_SourceData;
-		reset();
-	}
+    void CSample::setDetectorData(const CSeries & t_DetectorData)
+    {
+        m_DetectorData = t_DetectorData;
+        reset();
+    }
 
-	void CSample::setDetectorData( std::shared_ptr< CSeries > const& t_DetectorData ) {
-		m_DetectorData = t_DetectorData;
-		reset();
-	}
+    FenestrationCommon::IntegrationType CSample::getIntegrator() const
+    {
+        return m_IntegrationType;
+    }
 
-	void CSample::assignDetectorAndWavelengths( std::shared_ptr< CSample > const& t_Sample ) {
-		m_DetectorData = t_Sample->m_DetectorData;
-		m_Wavelengths = t_Sample->m_Wavelengths;
-		m_WavelengthSet = t_Sample->m_WavelengthSet;
-	}
+    double CSample::getNormalizationCoeff() const
+    {
+        return m_NormalizationCoefficient;
+    }
 
-	void CSample::setWavelengths( WavelengthSet const t_WavelengthSet,
-	                              std::shared_ptr< std::vector< double > > const& t_Wavelenghts ) {
-		m_WavelengthSet = t_WavelengthSet;
-		switch ( t_WavelengthSet ) {
-		case WavelengthSet::Custom:
-			if ( t_Wavelenghts == nullptr ) {
-				throw std::runtime_error( "Need to provide custom wavelength set." );
-			}
-			m_Wavelengths = *t_Wavelenghts;
-			break;
-		case WavelengthSet::Source:
-			if ( m_SourceData == nullptr ) {
-				throw std::runtime_error( "Cannot extract wavelenghts from source. Source is empty." );
-			}
-			m_Wavelengths = m_SourceData->getXArray();
-			break;
-		case WavelengthSet::Data:
-			m_Wavelengths = getWavelengthsFromSample();
-			break;
-		default:
-			throw std::runtime_error( "Incorrect definition of wavelength set source." );
-			break;
-		}
-		reset();
-	}
+    void CSample::assignDetectorAndWavelengths(std::shared_ptr<CSample> const & t_Sample)
+    {
+        m_DetectorData = t_Sample->m_DetectorData;
+        m_Wavelengths = t_Sample->m_Wavelengths;
+        m_WavelengthSet = t_Sample->m_WavelengthSet;
+    }
 
-	double CSample::getEnergy( double const minLambda, double const maxLambda, Property const t_Property,
-	                           Side const t_Side ) {
-		calculateState();
-		auto Energy = 0.0;
-		switch ( t_Property ) {
-		case Property::T:
-			Energy = m_TransmittedSource->sum( minLambda, maxLambda );
-			break;
-		case Property::R:
-			switch ( t_Side ) {
-			case Side::Front:
-				Energy = m_ReflectedFrontSource->sum( minLambda, maxLambda );
-				break;
-			case Side::Back:
-				Energy = m_ReflectedBackSource->sum( minLambda, maxLambda );
-				break;
-			default:
-				assert("Incorrect selection of sample side.");
-				break;
-			}
-			break;
-		case Property::Abs:
-			switch ( t_Side ) {
-			case Side::Front:
-				Energy = m_AbsorbedFrontSource->sum( minLambda, maxLambda );
-				break;
-			case Side::Back:
-				Energy = m_AbsorbedBackSource->sum( minLambda, maxLambda );
-				break;
-			default:
-				assert("Incorrect selection of sample side.");
-				break;
-			}
-			break;
-		default:
-			assert("Incorrect selection of sample property.");
-			break;
-		}
+    void CSample::setWavelengths(WavelengthSet const t_WavelengthSet,
+                                 const std::vector<double> & t_Wavelenghts)
+    {
+        m_WavelengthSet = t_WavelengthSet;
+        switch(t_WavelengthSet)
+        {
+            case WavelengthSet::Custom:
+                m_Wavelengths = t_Wavelenghts;
+                break;
+            case WavelengthSet::Source:
+                if(m_SourceData.size() == 0)
+                {
+                    throw std::runtime_error(
+                      "Cannot extract wavelenghts from source. Source is empty.");
+                }
+                m_Wavelengths = m_SourceData.getXArray();
+                break;
+            case WavelengthSet::Data:
+                m_Wavelengths = getWavelengthsFromSample();
+                break;
+            default:
+                throw std::runtime_error("Incorrect definition of wavelength set source.");
+                break;
+        }
+        reset();
+    }
 
-		return Energy;
-	}
+    double CSample::getEnergy(double const minLambda,
+                              double const maxLambda,
+                              Property const t_Property,
+                              Side const t_Side)
+    {
+        calculateState();
+        return m_EnergySource.at(std::make_pair(t_Property, t_Side)).sum(minLambda, maxLambda);
+    }
 
-	double CSample::getProperty( double const minLambda, double const maxLambda, Property const t_Property,
-	                             Side const t_Side ) {
-		calculateState();
-		auto Prop = 0.0;
-		// Incoming energy can be calculated only if user has defined incoming source.
-		// Otherwise just assume zero property.
-		if ( m_IncomingSource != nullptr ) {
-			auto incomingEnergy = m_IncomingSource->sum( minLambda, maxLambda );
-			double propertyEnergy = 0;
-			switch ( t_Property ) {
-			case Property::T:
-				propertyEnergy = m_TransmittedSource->sum( minLambda, maxLambda );
-				break;
-			case Property::R:
-				switch ( t_Side ) {
-				case Side::Front:
-					propertyEnergy = m_ReflectedFrontSource->sum( minLambda, maxLambda );
-					break;
-				case Side::Back:
-					propertyEnergy = m_ReflectedBackSource->sum( minLambda, maxLambda );
-					break;
-				default:
-					assert( "Incorrect selection of sample side." );
-					break;
-				}
-				break;
-			case Property::Abs:
-				switch ( t_Side ) {
-				case Side::Front:
-					propertyEnergy = m_AbsorbedFrontSource->sum( minLambda, maxLambda );
-					break;
-				case Side::Back:
-					propertyEnergy = m_AbsorbedBackSource->sum( minLambda, maxLambda );
-					break;
-				default:
-					assert( "Incorrect selection of sample side." );
-					break;
-				}
-				break;
-			default:
-				throw std::runtime_error( "Incorrect selection of sample property." );
-				break;
-			}
+    std::vector<double> CSample::getWavelengths() const
+    {
+        return m_Wavelengths;
+    }
 
-			Prop = propertyEnergy / incomingEnergy;
-		}
-		return Prop;
-	}
+    double CSample::getProperty(double const minLambda,
+                                double const maxLambda,
+                                Property const t_Property,
+                                Side const t_Side)
+    {
+        calculateState();
+        auto Prop = 0.0;
+        // Incoming energy can be calculated only if user has defined incoming source.
+        // Otherwise just assume zero property.
+        if(m_IncomingSource.size() > 0)
+        {
+            auto incomingEnergy = m_IncomingSource.sum(minLambda, maxLambda);
+            double propertyEnergy =
+              m_EnergySource.at(std::make_pair(t_Property, t_Side)).sum(minLambda, maxLambda);
+            Prop = propertyEnergy / incomingEnergy;
+        }
+        return Prop;
+    }
 
-	CSeries* CSample::getEnergyProperties( Property const t_Property, Side const t_Side ) {
-		calculateState();
+    CSeries & CSample::getEnergyProperties(const Property t_Property, const Side t_Side)
+    {
+        calculateState();
+        return m_EnergySource.at(std::make_pair(t_Property, t_Side));
+    }
 
-		CSeries* aProperty = nullptr;
-		switch ( t_Property ) {
-		case Property::T:
-			aProperty = m_TransmittedSource.get();
-			break;
-		case Property::R:
-			switch ( t_Side ) {
-			case Side::Front:
-				aProperty = m_ReflectedFrontSource.get();
-				break;
-			case Side::Back:
-				aProperty = m_ReflectedBackSource.get();
-				break;
-			default:
-				assert("Incorrect selection of sample side.");
-				break;
-			}
-			break;
-		case Property::Abs:
-			switch ( t_Side ) {
-			case Side::Front:
-				aProperty = m_AbsorbedFrontSource.get();
-				break;
-			case Side::Back:
-				aProperty = m_AbsorbedBackSource.get();
-				break;
-			default:
-				assert("Incorrect selection of sample side.");
-				break;
-			}
-			break;
-		default:
-			throw std::runtime_error( "Incorrect selection of sample property." );
-			break;
-		}
+    size_t CSample::getBandSize() const
+    {
+        return m_Wavelengths.size();
+    }
 
-		return aProperty;
-	}
+    void CSample::reset()
+    {
+        m_StateCalculated = false;
+        m_IncomingSource = CSeries();
+        for(const auto & prop : EnumProperty())
+        {
+            for(const auto & side : EnumSide())
+            {
+                m_EnergySource[std::make_pair(prop, side)] = CSeries();
+            }
+        }
+    }
 
-	size_t CSample::getBandSize() const {
-		return m_Wavelengths.size();
-	}
+    void CSample::calculateState()
+    {
+        if(!m_StateCalculated)
+        {
+            if(m_WavelengthSet != WavelengthSet::Custom)
+            {
+                setWavelengths(m_WavelengthSet);
+            }
 
-	void CSample::reset() {
-		m_StateCalculated = false;
-		m_IncomingSource = nullptr;
-		m_TransmittedSource = nullptr;
-		m_ReflectedFrontSource = nullptr;
-		m_ReflectedBackSource = nullptr;
-		m_AbsorbedFrontSource = nullptr;
-		m_AbsorbedBackSource = nullptr;
-	}
-
-	void CSample::calculateState() {
-		if ( !m_StateCalculated ) {
-			if ( m_WavelengthSet != WavelengthSet::Custom ) {
-				setWavelengths( m_WavelengthSet );
-			}
-
-			// In case source data are set then apply solar radiation to the calculations.
-			// Otherwise, just use measured data.
-			if ( m_SourceData != nullptr ) {
-
-				m_IncomingSource = m_SourceData->interpolate( m_Wavelengths );
+            // In case source data are set then apply solar radiation to the calculations.
+            // Otherwise, just use measured data.
+            if(m_SourceData.size() > 0)
+            {
+                m_IncomingSource = m_SourceData.interpolate(m_Wavelengths);
 
 
-				if ( m_DetectorData != nullptr ) {
-					auto interpolatedDetector = *m_DetectorData->interpolate( m_Wavelengths );
-					m_IncomingSource = m_IncomingSource->mMult( interpolatedDetector );
-				}
+                if(m_DetectorData.size() > 0)
+                {
+                    const auto interpolatedDetector = m_DetectorData.interpolate(m_Wavelengths);
+                    m_IncomingSource = m_IncomingSource * interpolatedDetector;
+                }
 
-				calculateProperties();
+                calculateProperties();
 
-				m_IncomingSource = m_IncomingSource->integrate( m_IntegrationType );
-				m_TransmittedSource = m_TransmittedSource->integrate( m_IntegrationType );
-				m_ReflectedFrontSource = m_ReflectedFrontSource->integrate( m_IntegrationType );
-				m_ReflectedBackSource = m_ReflectedBackSource->integrate( m_IntegrationType );
-				m_AbsorbedFrontSource = m_AbsorbedFrontSource->integrate( m_IntegrationType );
-				m_AbsorbedBackSource = m_AbsorbedBackSource->integrate( m_IntegrationType );
+                m_IncomingSource =
+                  *m_IncomingSource.integrate(m_IntegrationType, m_NormalizationCoefficient);
+                for(const auto & prop : EnumProperty())
+                {
+                    for(const auto & side : EnumSide())
+                    {
+                        m_EnergySource[std::make_pair(prop, side)] =
+                          *m_EnergySource.at(std::make_pair(prop, side))
+                             .integrate(m_IntegrationType, m_NormalizationCoefficient);
+                    }
+                }
 
-				m_StateCalculated = true;
-			}
-		}
-	}
+                m_StateCalculated = true;
+            }
+        }
+    }
 
-	//////////////////////////////////////////////////////////////////////////////////////
-	////  CSpectralSample
-	//////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////
+    ////  CSpectralSample
+    //////////////////////////////////////////////////////////////////////////////////////
 
-	CSpectralSample::CSpectralSample( std::shared_ptr< CSpectralSampleData > const& t_SampleData,
-	                                  std::shared_ptr< CSeries > const& t_SourceData ) :
-		CSample( t_SourceData ), m_SampleData( t_SampleData ) {
-		if ( t_SampleData == nullptr ) {
-			throw std::runtime_error( "Sample must have measured data." );
-		}
-		setWavelengths( m_WavelengthSet );
-		m_Transmittance = nullptr;
-		m_RefFront = nullptr;
-		m_RefBack = nullptr;
-		m_AbsFront = nullptr;
-		m_AbsBack = nullptr;
-	}
+    CSpectralSample::CSpectralSample(std::shared_ptr<CSpectralSampleData> const & t_SampleData,
+                                     const CSeries & t_SourceData,
+                                     FenestrationCommon::IntegrationType integrationType,
+                                     double NormalizationCoefficient) :
+        CSample(t_SourceData, integrationType, NormalizationCoefficient),
+        m_SampleData(t_SampleData)
+    {
+        if(t_SampleData == nullptr)
+        {
+            throw std::runtime_error("Sample must have measured data.");
+        }
 
-	CSpectralSample::CSpectralSample( std::shared_ptr< CSpectralSampleData > const& t_SampleData ) :
-		CSample(), m_SampleData( t_SampleData ) {
-		if ( t_SampleData == nullptr ) {
-			throw std::runtime_error( "Sample must have measured data." );
-		}
-		setWavelengths( m_WavelengthSet );
-		m_Transmittance = nullptr;
-		m_RefFront = nullptr;
-		m_RefBack = nullptr;
-		m_AbsFront = nullptr;
-		m_AbsBack = nullptr;
-	}
+        for(const auto & prop : EnumProperty())
+        {
+            for(const auto & side : EnumSide())
+            {
+                m_Property[std::make_pair(prop, side)] = CSeries();
+            }
+        }
+    }
 
-	std::shared_ptr< CSpectralSampleData > CSpectralSample::getMeasuredData() {
-		calculateState(); // Interpolation is needed before returning the data
-		return m_SampleData;
-	}
+    CSpectralSample::CSpectralSample(std::shared_ptr<CSpectralSampleData> const & t_SampleData) :
+        CSample(),
+        m_SampleData(t_SampleData)
+    {
+        if(t_SampleData == nullptr)
+        {
+            throw std::runtime_error("Sample must have measured data.");
+        }
 
-	std::vector< double > CSpectralSample::getWavelengthsFromSample() const {
-		return m_SampleData->getWavelengths();
-	}
+        for(const auto & prop : EnumProperty())
+        {
+            for(const auto & side : EnumSide())
+            {
+                m_Property[std::make_pair(prop, side)] = CSeries();
+            }
+        }
+    }
 
-	std::shared_ptr< CSeries > CSpectralSample::getWavelengthsProperty( Property const t_Property, Side const t_Side ) {
-		calculateState();
-		std::shared_ptr< CSeries > aProperty = nullptr;
-		switch ( t_Property ) {
-		case Property::T:
-			aProperty = m_Transmittance;
-			break;
-		case Property::R:
-			switch ( t_Side ) {
-			case Side::Front:
-				aProperty = m_RefFront;
-				break;
-			case Side::Back:
-				aProperty = m_RefBack;
-				break;
-			default:
-				assert("Incorrect selection of Side.");
-				break;
-			}
-			break;
-		case Property::Abs:
-			switch ( t_Side ) {
-			case Side::Front:
-				aProperty = m_AbsFront;
-				break;
-			case Side::Back:
-				aProperty = m_AbsBack;
-				break;
-			default:
-				assert("Incorrect selection of Side.");
-				break;
-			}
-			break;
-		default:
-			assert("Non existent property requested.");
-			break;
-		}
+    std::shared_ptr<CSpectralSampleData> CSpectralSample::getMeasuredData()
+    {
+        calculateState();   // Interpolation is needed before returning the data
+        return m_SampleData;
+    }
 
-		return aProperty;
-	}
+    std::vector<double> CSpectralSample::getWavelengthsFromSample() const
+    {
+        return m_SampleData->getWavelengths();
+    }
 
-	void CSpectralSample::calculateProperties() {
+    CSeries CSpectralSample::getWavelengthsProperty(const Property t_Property, const Side t_Side)
+    {
+        calculateState();
 
-		// No need to do interpolation if wavelength set is already from the data.
-		if ( m_WavelengthSet == WavelengthSet::Data ) {
-			m_Transmittance = m_SampleData->properties( SampleData::T );
-			m_RefFront = m_SampleData->properties( SampleData::Rf );
-			m_RefBack = m_SampleData->properties( SampleData::Rb );
-			m_AbsFront = m_SampleData->properties( SampleData::AbsF );
-			m_AbsBack = m_SampleData->properties( SampleData::AbsB );
-		}
-		else {
-			m_Transmittance = m_SampleData->properties( SampleData::T )->interpolate( m_Wavelengths );
-			m_RefFront = m_SampleData->properties( SampleData::Rf )->interpolate( m_Wavelengths );
-			m_RefBack = m_SampleData->properties( SampleData::Rb )->interpolate( m_Wavelengths );
-			m_AbsFront = m_SampleData->properties( SampleData::AbsF )->interpolate( m_Wavelengths );
-			m_AbsBack = m_SampleData->properties( SampleData::AbsB )->interpolate( m_Wavelengths );
-		}
+        return m_Property.at(std::make_pair(t_Property, t_Side));
+    }
 
-		assert( m_IncomingSource != nullptr );
+    void CSpectralSample::calculateProperties()
+    {
+        for(const auto & prop : EnumProperty())
+        {
+            for(const auto & side : EnumSide())
+            {
+                m_Property[std::make_pair(prop, side)] = m_SampleData->properties(prop, side);
+                // No need to do interpolation if wavelength set is already from the data.
+                if(m_WavelengthSet != WavelengthSet::Data)
+                {
+                    m_Property[std::make_pair(prop, side)] =
+                      m_Property[std::make_pair(prop, side)].interpolate(m_Wavelengths);
+                }
+            }
+        }
 
-		// Calculation of energy balances
-		m_TransmittedSource = m_Transmittance->mMult( *m_IncomingSource );
-		m_ReflectedFrontSource = m_RefFront->mMult( *m_IncomingSource );
-		m_ReflectedBackSource = m_RefBack->mMult( *m_IncomingSource );
-		m_AbsorbedFrontSource = m_AbsFront->mMult( *m_IncomingSource );
-		m_AbsorbedBackSource = m_AbsBack->mMult( *m_IncomingSource );
-	}
+        // Calculation of energy balances
+        for(const auto & prop : EnumProperty())
+        {
+            for(const auto & side : EnumSide())
+            {
+                m_EnergySource[std::make_pair(prop, side)] =
+                  m_Property.at(std::make_pair(prop, side)) * m_IncomingSource;
+            }
+        }
+    }
 
-	void CSpectralSample::calculateState() {
-		CSample::calculateState();
-		if ( m_SourceData == nullptr ) {
-			// TODO: Make sure that interpolation is necessary here.
-			// It slows down program for quite a bit
+    void CSpectralSample::calculateState()
+    {
+        CSample::calculateState();
+        if(m_SourceData.size() == 0)
+        {
+            for(const auto & prop : EnumProperty())
+            {
+                for(const auto & side : EnumSide())
+                {
+                    m_Property[std::make_pair(prop, side)] = m_SampleData->properties(prop, side);
+                }
+            }
 
-			//m_SampleData->interpolate( *m_Wavelengths );
+            m_StateCalculated = true;
+        }
+    }
 
-			m_Transmittance = m_SampleData->properties( SampleData::T );
-			m_RefFront = m_SampleData->properties( SampleData::Rf );
-			m_RefBack = m_SampleData->properties( SampleData::Rb );
-			m_AbsFront = m_SampleData->properties( SampleData::AbsF );
-			m_AbsBack = m_SampleData->properties( SampleData::AbsB );
+    void CSpectralSample::cutExtraData(const double minLambda, const double maxLambda)
+    {
+        m_SampleData->cutExtraData(minLambda, maxLambda);
+    }
 
-			m_StateCalculated = true;
-		}
-	}
+    void CSpectralSample::Flipped(bool flipped)
+    {
+        m_SampleData->Filpped(flipped);
+    }
 
-	//////////////////////////////////////////////////////////////////////////////////////
-	////  CSpectralAngleSample
-	//////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////
+    /// CPhotovoltaicSample
+    /////////////////////////////////////////////////////////////////////////////////////
 
-	CSpectralAngleSample::CSpectralAngleSample( std::shared_ptr< CSpectralSample > const& t_Sample,
-	                                            double const t_Angle ) :
-		m_Sample( t_Sample ), m_Angle( t_Angle ) {
+    CPhotovoltaicSample::CPhotovoltaicSample(
+      const std::shared_ptr<PhotovoltaicSampleData> & t_PhotovoltaicData,
+      const FenestrationCommon::CSeries & t_SourceData,
+      FenestrationCommon::IntegrationType integrationType,
+      double NormalizationCoefficient) :
+        CSpectralSample(
+          t_PhotovoltaicData, t_SourceData, integrationType, NormalizationCoefficient),
+        m_PCE{{Side::Front, CSeries()}, {Side::Back, CSeries()}},
+        m_W{{Side::Front, CSeries()}, {Side::Back, CSeries()}}
+    {}
 
-	}
+    void CPhotovoltaicSample::calculateState()
+    {
+        CSpectralSample::calculateProperties();
+        for(const auto & side : EnumSide())
+        {
+            const CSeries eqe{getSample()->pvProperty(side, PVM::EQE)};
+            const CSeries voc{getSample()->pvProperty(side, PVM::VOC)};
+            const CSeries ff{getSample()->pvProperty(side, PVM::FF)};
+            const auto transmittance = m_SampleData->properties(Property::T, side);
+            const auto reflectance = m_SampleData->properties(Property::R, side);
+            const auto wl = getWavelengthsFromSample();
+            CSeries pce;
+            CSeries w;
+            for(auto i = 0u; i < wl.size(); ++i)
+            {
+                const double pceVal = pceCalc(wl[i], eqe[i].value(), voc[i].value(), ff[i].value());
+                pce.addProperty(wl[i], pceVal);
+                w.addProperty(wl[i],
+                              1 - pceVal / (1 - transmittance[i].value() - reflectance[i].value()));
+            }
+            m_PCE[side] = pce;
+            m_W[side] = w;
+        }
+    }
 
-	double CSpectralAngleSample::angle() const {
-		return m_Angle;
-	}
+    PhotovoltaicSampleData * CPhotovoltaicSample::getSample() const
+    {
+        return dynamic_cast<PhotovoltaicSampleData *>(m_SampleData.get());
+    }
 
-	std::shared_ptr< CSpectralSample > CSpectralAngleSample::sample() const {
-		return m_Sample;
-	}
+    double CPhotovoltaicSample::pceCalc(double wavelength, double eqe, double voc, double ff)
+    {
+        double const microMeterToMeter{1e-6};
+        return eqe * voc * ff * wavelength * ConstantsData::ELECTRON_CHARGE * microMeterToMeter
+               / (ConstantsData::SPEEDOFLIGHT * ConstantsData::PLANKCONSTANT);
+    }
 
+    FenestrationCommon::CSeries & CPhotovoltaicSample::pce(const FenestrationCommon::Side side)
+    {
+        calculateState();
+        return m_PCE.at(side);
+    }
 
-}
+    FenestrationCommon::CSeries & CPhotovoltaicSample::w(const FenestrationCommon::Side side)
+    {
+        calculateState();
+        return m_W.at(side);
+    }
+}   // namespace SpectralAveraging
