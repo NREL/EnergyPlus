@@ -1195,6 +1195,7 @@ namespace SimulationManager {
                 bool overrideMaxZoneTempDiff(false);
                 bool overrideSystemTimestep(false);
                 bool overrideMaxAllowedDelTemp(false);
+                bool overridePsychTsatFnPb(false);
                 state.dataZoneTempPredictorCorrector->OscillationVariablesNeeded = true;
                 if (fields.find("override_mode") != fields.end()) {
                     overrideModeValue = UtilityRoutines::MakeUPPERCase(AsString(fields.at("override_mode")));
@@ -1226,16 +1227,22 @@ namespace SimulationManager {
                         overrideBeginEnvResetSuppress = true;
                         overrideSystemTimestep = true;
                     } else if (overrideModeValue == "MODE06") {
-                        // Mode06 CSpline interpolation (64 Pa bin size + 20/16 bit)
-                        state.dataPsychrometrics->useInterpolationPsychTsatFnPb = true;
+                        // Mode05 plus cubic spline interpolations in replacement of the original psychrometric function PsychTsatFnPb
+                        overrideTimestep = true;
+                        overrideZoneAirHeatBalAlg = true;
+                        overrideMinNumWarmupDays = true;
+                        overrideBeginEnvResetSuppress = true;
+                        overrideSystemTimestep = true;
+                        overridePsychTsatFnPb = true;
                     } else if (overrideModeValue == "MODE07") {
-                        // Mode05 plus internal variable MaxZoneTempDiff will be set to 1.00
+                        // Mode06 plus internal variable MaxZoneTempDiff will be set to 1.00
                         overrideTimestep = true;
                         overrideZoneAirHeatBalAlg = true;
                         overrideMinNumWarmupDays = true;
                         overrideBeginEnvResetSuppress = true;
                         overrideSystemTimestep = true;
                         overrideMaxZoneTempDiff = true;
+                        overridePsychTsatFnPb = true;
                     } else if (overrideModeValue == "MODE08") {
                         // Mode07 plus internal variable MaxAllowedDelTemp will be set to 0.1
                         overrideTimestep = true;
@@ -1245,6 +1252,7 @@ namespace SimulationManager {
                         overrideSystemTimestep = true;
                         overrideMaxZoneTempDiff = true;
                         overrideMaxAllowedDelTemp = true;
+                        overridePsychTsatFnPb = true;
                     } else if (overrideModeValue == "ADVANCED") {
                         bool advancedModeUsed = false;
                         if (fields.find("maxzonetempdiff") != fields.end()) { // not required field, has default value
@@ -1307,6 +1315,12 @@ namespace SimulationManager {
                         }
                         state.dataConvergeParams->MinTimeStepSys = MinTimeStepSysOverrideValue / 60.0;
                         state.dataHVACGlobal->LimitNumSysSteps = int(state.dataGlobal->TimeStepZone / state.dataConvergeParams->MinTimeStepSys);
+                    }
+                    if (overridePsychTsatFnPb) {
+                        ShowWarningError(
+                            state, "Due to PerformancePrecisionTradeoffs Override Mode, the saturated temperature will be calculated using cubic spline interpolations in replacement of PsychTsatFnPb .");
+                       // Mode06 CSpline interpolation (64 Pa bin size + 20/16 bit)
+                        state.dataPsychrometrics->useInterpolationPsychTsatFnPb = true;
                     }
                     if (overrideMaxZoneTempDiff) {
                         ShowWarningError(

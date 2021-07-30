@@ -707,7 +707,7 @@ TEST_F(EnergyPlusFixture, Psychrometrics_Interpolation_Sample_Test)
         100.7922053, 100.809475,   100.8267359,  100.8439874,  100.8612302,  100.8784641,  100.8956893,  100.9129053,  100.9301125,  100.947311,
         100.9645009, 100.9816821,  100.9988569,  101.0160203,  101.0331752,  101.0503248,  101.067462,   101.0845908,  101.101711,   101.1188265,
         101.1359293};
-    for (i = 0; i < 1651; ++i) {
+    for (i = 1; i < 1651; ++i) {
         tsat_psy = PsyTsatFnPb(*state, tsat_fn_pb_pressure[i]);
         error = max(abs(tsat_psy - tsat_fn_pb_tsat[i]), error);
     }
@@ -722,15 +722,17 @@ TEST_F(EnergyPlusFixture, Psychrometrics_CSpline_Test)
     Real64 tsat_psy;
     Real64 tsat_cspline;
     Real64 Press_test;
+    Real64 Press_test_smallchange;
     Real64 error = 0.0;
     int i;
     for (i = 0; i <= 700; i++) { //Press =50,000 ~ 120,000 Pascal
         state->dataPsychrometrics->useInterpolationPsychTsatFnPb = false;
         Press_test = 50000 + i * 100;
-        tsat_psy = PsyTsatFnPb(*state, Press_test); //Tsat from original psychrometric function for PsychTsatFnPb
+        tsat_psy = PsyTsatFnPb_raw(*state, Press_test); //Tsat from original psychrometric function for PsychTsatFnPb
 
         state->dataPsychrometrics->useInterpolationPsychTsatFnPb = true; //change to cspline
-        tsat_cspline = PsyTsatFnPb(*state, Press_test); //Tsat from cspline interpolation
+        Press_test_smallchange = Press_test + 1e-60;
+        tsat_cspline = PsyTsatFnPb_raw(*state, Press_test_smallchange); //Tsat from cspline interpolation
         error = max(abs(tsat_psy - tsat_cspline), error);
     }
     // check error
