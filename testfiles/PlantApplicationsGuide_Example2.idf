@@ -82,7 +82,7 @@
 ! Utility Tariffs:                Yes, PSI Indiana year 2004.
 !**********************************VERSION IDENTIFIER****************************************
 
-  Version,9.4;
+  Version,9.6;
 
 !********************************************************************************************
 !***********************COMMON PLANT LOOP SCHEDULES AND SCHEDULETYPELIMITS*******************
@@ -4930,8 +4930,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     VAV WITH REHEAT_OA,      !- Name
     VAV WITH REHEAT_OA_Controllers,  !- Controller List Name
-    VAV WITH REHEAT_OA_Equipment,  !- Outdoor Air Equipment List Name
-    VAV WITH REHEAT Availability Manager List;  !- Availability Manager List Name
+    VAV WITH REHEAT_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     VAV WITH REHEAT_OANode List;  !- Node or NodeList Name 1

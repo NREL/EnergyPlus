@@ -88,7 +88,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.4;
+  Version,9.6;
 
   Timestep,20;
 
@@ -239,13 +239,13 @@
     2200,                    !- Liquid State Density {kg/m3}
     2000,                    !- Liquid State Specific Heat {J/kg-K}
     1,                       !- High Temperature Difference of Melting Curve {deltaC}
-    20,                      !- Peak Melting Temperature {C}
+    23,                      !- Peak Melting Temperature {C}
     1,                       !- Low Temperature Difference of Melting Curve {deltaC}
     1.8,                     !- Solid State Thermal Conductivity {W/m-K}
     2300,                    !- Solid State Density {kg/m3}
     2000,                    !- Solid State Specific Heat {J/kg-K}
     1,                       !- High Temperature Difference of Freezing Curve {deltaC}
-    23,                      !- Peak Freezing Temperature {C}
+    20,                      !- Peak Freezing Temperature {C}
     1;                       !- Low Temperature Difference of Freezing Curve {deltaC}
 
   Construction,

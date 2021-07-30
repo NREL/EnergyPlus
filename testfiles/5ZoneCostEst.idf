@@ -37,7 +37,7 @@
 !
 ! WeatherFilename=USA_IL_Chicago-OHare_TMY2.epw
 
-  Version,9.4;
+  Version,9.6;
 
   Timestep,4;
 
@@ -3416,8 +3416,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     VAV SYS 1 OA System,     !- Name
     VAV SYS 1 OA System Controllers,  !- Controller List Name
-    VAV SYS 1 OA System Equipment,  !- Outdoor Air Equipment List Name
-    VAV SYS 1 Availability Managers;  !- Availability Manager List Name
+    VAV SYS 1 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:ControllerList,
     VAV SYS 1 OA System Controllers,  !- Name

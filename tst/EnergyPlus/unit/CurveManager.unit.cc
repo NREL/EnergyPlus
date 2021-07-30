@@ -54,6 +54,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/FileSystem.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -93,18 +94,18 @@ TEST_F(EnergyPlusFixture, QuadraticCurve)
         "Curve:QuadLinear,",
         "  MinDsnWBCurveName, ! Curve Name",
         "  -3.3333,           ! CoefficientC1",
-        "  0.0,               ! CoefficientC2",
+        "  0.1,               ! CoefficientC2",
         "  38.9,              ! CoefficientC3",
-        "  0.,                ! CoefficientC4",
-        "  0.,                ! CoefficientC5",
+        "  0.1,                ! CoefficientC4",
+        "  0.5,                ! CoefficientC5",
         "  -30.,              ! Minimum Value of w",
         "  40.,               ! Maximum Value of w",
         "  0.,                ! Minimum Value of x",
         "  1.,                ! Maximum Value of x",
-        "  10.,               ! Minimum Value of y",
+        "  5.,                ! Minimum Value of y",
         "  38.,               ! Maximum Value of y",
-        "  1E-8,              ! Minimum Value of z",
-        "  8E-8,              ! Maximum Value of z",
+        "  0,                 ! Minimum Value of z",
+        "  20,                ! Maximum Value of z",
         "  0.,                ! Minimum Curve Output",
         "  38.;               ! Maximum Curve Output",
     });
@@ -120,98 +121,142 @@ TEST_F(EnergyPlusFixture, QuadraticCurve)
 
     EXPECT_EQ(0., state->dataCurveManager->PerfCurve(1).CurveMin);
     EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).CurveMinPresent);
+
+    double var1 = 1, var2 = 0.1, var3 = 20, var4 = 10;
+    double expected_value = -3.3333 + (0.1 * 1) + (38.9 * 0.1) + (0.1 * 20) + (0.5 * 10);
+    EXPECT_EQ(expected_value, CurveManager::CurveValue(*state, 1, var1, var2, var3, var4));
+}
+
+TEST_F(EnergyPlusFixture, QuintLinearCurve)
+{
+    std::string const idf_objects = delimited_string({
+        "Curve:QuintLinear,",
+        "  MinDsnWBCurveName, ! Curve Name",
+        "  -3.3333,           ! CoefficientC1",
+        "  0.1,               ! CoefficientC2",
+        "  38.9,              ! CoefficientC3",
+        "  0.1,                ! CoefficientC4",
+        "  0.5,                ! CoefficientC5",
+        "  1.5,                ! CoefficientC6",
+        "  0.,                ! Minimum Value of v",
+        "  10.,               ! Maximum Value of v",
+        "  -30.,              ! Minimum Value of w",
+        "  40.,               ! Maximum Value of w",
+        "  0.,                ! Minimum Value of x",
+        "  1.,                ! Maximum Value of x",
+        "  5.,                ! Minimum Value of y",
+        "  38.,               ! Maximum Value of y",
+        "  0,                 ! Minimum Value of z",
+        "  20,                ! Maximum Value of z",
+        "  0.,                ! Minimum Curve Output",
+        "  38.;               ! Maximum Curve Output",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    EXPECT_EQ(0, state->dataCurveManager->NumCurves);
+    CurveManager::GetCurveInput(*state);
+    state->dataCurveManager->GetCurvesInputFlag = false;
+    ASSERT_EQ(1, state->dataCurveManager->NumCurves);
+
+    EXPECT_EQ(38.0, state->dataCurveManager->PerfCurve(1).CurveMax);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).CurveMaxPresent);
+
+    EXPECT_EQ(0., state->dataCurveManager->PerfCurve(1).CurveMin);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).CurveMinPresent);
+
+    double var1 = 1, var2 = 0.1, var3 = 0.5, var4 = 10, var5 = 15;
+    double expected_value = -3.3333 + (0.1 * 1) + (38.9 * 0.1) + (0.1 * 0.5) + (0.5 * 10) + (1.5 * 15);
+    EXPECT_EQ(expected_value, CurveManager::CurveValue(*state, 1, var1, var2, var3, var4, var5));
 }
 
 TEST_F(EnergyPlusFixture, TableLookup)
 {
-    std::string const idf_objects = delimited_string({
-        "Table:IndependentVariable,",
-        "  SAFlow,                    !- Name",
-        "  Cubic,                     !- Interpolation Method",
-        "  Constant,                  !- Extrapolation Method",
-        "  0.714,                     !- Minimum Value",
-        "  1.2857,                    !- Maximum Value",
-        "  ,                          !- Normalization Reference Value",
-        "  Dimensionless,             !- Unit Type",
-        "  ,                          !- External File Name",
-        "  ,                          !- External File Column Number",
-        "  ,                          !- External File Starting Row Number",
-        "  0.714286,                  !- Value 1",
-        "  1.0,",
-        "  1.2857;",
-        "Table:IndependentVariableList,",
-        "  SAFlow_Variables,          !- Name",
-        "  SAFlow;                    !- Independent Variable 1 Name",
-        "Table:Lookup,",
-        "  CoolCapModFuncOfSAFlow,    !- Name",
-        "  SAFlow_Variables,          !- Independent Variable List Name",
-        "  ,                          !- Normalization Method",
-        "  ,                          !- Normalization Divisor",
-        "  0.8234,                    !- Minimum Output",
-        "  1.1256,                    !- Maximum Output",
-        "  Dimensionless,             !- Output Unit Type",
-        "  ,                          !- External File Name",
-        "  ,                          !- External File Column Number",
-        "  ,                          !- External File Starting Row Number",
-        "  0.823403,                  !- Output Value 1",
-        "  1.0,",
-        "  1.1256;",
-        "Table:Lookup,",
-        "  HeatCapModFuncOfSAFlow,    !- Name",
-        "  SAFlow_Variables,          !- Independent Variable List Name",
-        "  ,                          !- Normalization Method",
-        "  ,                          !- Normalization Divisor",
-        "  0.8554,                    !- Minimum Output",
-        "  1.0778,                    !- Maximum Output",
-        "  Dimensionless,             !- Output Unit Type",
-        "  ,                          !- External File Name",
-        "  ,                          !- External File Column Number",
-        "  ,                          !- External File Starting Row Number",
-        "  0.8554,                    !- Output Value 1",
-        "  1.0,",
-        "  1.0778;",
-        "Table:IndependentVariable,",
-        "  WaterFlow,                 !- Name",
-        "  Cubic,                     !- Interpolation Method",
-        "  Constant,                  !- Extrapolation Method",
-        "  0.0,                       !- Minimum Value",
-        "  1.333333,                  !- Maximum Value",
-        "  ,                          !- Normalization Reference Value",
-        "  Dimensionless,             !- Unit Type",
-        "  ,                          !- External File Name",
-        "  ,                          !- External File Column Number",
-        "  ,                          !- External File Starting Row Number",
-        "  0.0,                       !- Value 1,",
-        "  0.05,",
-        "  0.33333,",
-        "  0.5,",
-        "  0.666667,",
-        "  0.833333,",
-        "  1.0,",
-        "  1.333333;",
-        "Table:IndependentVariableList,",
-        "  WaterFlow_Variables,       !- Name",
-        "  WaterFlow;                 !- Independent Variable 1 Name",
-        "Table:Lookup,",
-        "  CapModFuncOfWaterFlow,     !- Name",
-        "  WaterFlow_Variables,       !- Independent Variable List Name",
-        "  ,                          !- Normalization Method",
-        "  ,                          !- Normalization Divisor",
-        "  0.0,                       !- Minimum Output",
-        "  1.04,                      !- Maximum Output",
-        "  Dimensionless,             !- Output Unit Type",
-        "  ,                          !- External File Name",
-        "  ,                          !- External File Column Number",
-        "  ,                          !- External File Starting Row Number",
-        "  0.0,                       !- Output Value 1",
-        "  0.001,",
-        "  0.71,",
-        "  0.85,",
-        "  0.92,",
-        "  0.97,",
-        "  1.0,",
-        "  1.04;"
-     });
+    std::string const idf_objects = delimited_string({"Table:IndependentVariable,",
+                                                      "  SAFlow,                    !- Name",
+                                                      "  Cubic,                     !- Interpolation Method",
+                                                      "  Constant,                  !- Extrapolation Method",
+                                                      "  0.714,                     !- Minimum Value",
+                                                      "  1.2857,                    !- Maximum Value",
+                                                      "  ,                          !- Normalization Reference Value",
+                                                      "  Dimensionless,             !- Unit Type",
+                                                      "  ,                          !- External File Name",
+                                                      "  ,                          !- External File Column Number",
+                                                      "  ,                          !- External File Starting Row Number",
+                                                      "  0.714286,                  !- Value 1",
+                                                      "  1.0,",
+                                                      "  1.2857;",
+                                                      "Table:IndependentVariableList,",
+                                                      "  SAFlow_Variables,          !- Name",
+                                                      "  SAFlow;                    !- Independent Variable 1 Name",
+                                                      "Table:Lookup,",
+                                                      "  CoolCapModFuncOfSAFlow,    !- Name",
+                                                      "  SAFlow_Variables,          !- Independent Variable List Name",
+                                                      "  ,                          !- Normalization Method",
+                                                      "  ,                          !- Normalization Divisor",
+                                                      "  0.8234,                    !- Minimum Output",
+                                                      "  1.1256,                    !- Maximum Output",
+                                                      "  Dimensionless,             !- Output Unit Type",
+                                                      "  ,                          !- External File Name",
+                                                      "  ,                          !- External File Column Number",
+                                                      "  ,                          !- External File Starting Row Number",
+                                                      "  0.823403,                  !- Output Value 1",
+                                                      "  1.0,",
+                                                      "  1.1256;",
+                                                      "Table:Lookup,",
+                                                      "  HeatCapModFuncOfSAFlow,    !- Name",
+                                                      "  SAFlow_Variables,          !- Independent Variable List Name",
+                                                      "  ,                          !- Normalization Method",
+                                                      "  ,                          !- Normalization Divisor",
+                                                      "  0.8554,                    !- Minimum Output",
+                                                      "  1.0778,                    !- Maximum Output",
+                                                      "  Dimensionless,             !- Output Unit Type",
+                                                      "  ,                          !- External File Name",
+                                                      "  ,                          !- External File Column Number",
+                                                      "  ,                          !- External File Starting Row Number",
+                                                      "  0.8554,                    !- Output Value 1",
+                                                      "  1.0,",
+                                                      "  1.0778;",
+                                                      "Table:IndependentVariable,",
+                                                      "  WaterFlow,                 !- Name",
+                                                      "  Cubic,                     !- Interpolation Method",
+                                                      "  Constant,                  !- Extrapolation Method",
+                                                      "  0.0,                       !- Minimum Value",
+                                                      "  1.333333,                  !- Maximum Value",
+                                                      "  ,                          !- Normalization Reference Value",
+                                                      "  Dimensionless,             !- Unit Type",
+                                                      "  ,                          !- External File Name",
+                                                      "  ,                          !- External File Column Number",
+                                                      "  ,                          !- External File Starting Row Number",
+                                                      "  0.0,                       !- Value 1,",
+                                                      "  0.05,",
+                                                      "  0.33333,",
+                                                      "  0.5,",
+                                                      "  0.666667,",
+                                                      "  0.833333,",
+                                                      "  1.0,",
+                                                      "  1.333333;",
+                                                      "Table:IndependentVariableList,",
+                                                      "  WaterFlow_Variables,       !- Name",
+                                                      "  WaterFlow;                 !- Independent Variable 1 Name",
+                                                      "Table:Lookup,",
+                                                      "  CapModFuncOfWaterFlow,     !- Name",
+                                                      "  WaterFlow_Variables,       !- Independent Variable List Name",
+                                                      "  ,                          !- Normalization Method",
+                                                      "  ,                          !- Normalization Divisor",
+                                                      "  0.0,                       !- Minimum Output",
+                                                      "  1.04,                      !- Maximum Output",
+                                                      "  Dimensionless,             !- Output Unit Type",
+                                                      "  ,                          !- External File Name",
+                                                      "  ,                          !- External File Column Number",
+                                                      "  ,                          !- External File Starting Row Number",
+                                                      "  0.0,                       !- Output Value 1",
+                                                      "  0.001,",
+                                                      "  0.71,",
+                                                      "  0.85,",
+                                                      "  0.92,",
+                                                      "  0.97,",
+                                                      "  1.0,",
+                                                      "  1.04;"});
 
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
@@ -232,28 +277,28 @@ TEST_F(EnergyPlusFixture, TableLookup)
 
 TEST_F(EnergyPlusFixture, DivisorNormalizationNone)
 {
-    /*
-     *  Test: Normalization Method = None
-     *
-     *  The Table:Lookup object constructed in this test corresponds directly to the function:
-     *      f(x_1, x_2) = x_1 * x_2
-     *
-     *  The curve of this data is therefore Linear, making interpolated data points easily calculated
-     *  This idf will default to Cubic interpolation and Linear extrapolation
-     */
+    //    /*
+    //     *  Test: Normalization Method = None
+    //     *
+    //     *  The Table:Lookup object constructed in this test corresponds directly to the function:
+    //     *      f(x_1, x_2) = x_1 * x_2
+    //     *
+    //     *  The curve of this data is therefore Linear, making interpolated data points easily calculated
+    //     *  This idf will default to Cubic interpolation and Linear extrapolation
+    //     */
 
     double expected_curve_min{2.0};
     double expected_curve_max{21.0};
 
     std::vector<std::pair<double, double>> table_data{
-            { 2.0, 1.0 }, // 2.0
-            { 2.0, 2.0 }, // 4.0
-            { 2.0, 3.0 }, // 6.0
-            { 7.0, 1.0 }, // 7.0
-            { 7.0, 2.0 }, // 14.0
-            { 7.0, 3.0 }, // 21.0
-            { 3.0, 3.0 }, // 9.0
-            { 5.0, 2.0 }, // 10.0
+        {2.0, 1.0}, // 2.0
+        {2.0, 2.0}, // 4.0
+        {2.0, 3.0}, // 6.0
+        {7.0, 1.0}, // 7.0
+        {7.0, 2.0}, // 14.0
+        {7.0, 3.0}, // 21.0
+        {3.0, 3.0}, // 9.0
+        {5.0, 2.0}, // 10.0
     };
 
     std::string const idf_objects = delimited_string({
@@ -310,7 +355,7 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationNone)
         "1.0,                                   !- Value 1",
         "2.0,                                   !- Value 2",
         "3.0;                                   !- Value 3",
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
@@ -325,36 +370,36 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationNone)
     EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).CurveMaxPresent);
     EXPECT_EQ(expected_curve_max, state->dataCurveManager->PerfCurve(1).CurveMax);
 
-    for (auto data_point : table_data ){
-        EXPECT_DOUBLE_EQ(data_point.first*data_point.second, CurveManager::CurveValue(*state, 1, data_point.first, data_point.second));
+    for (auto data_point : table_data) {
+        EXPECT_DOUBLE_EQ(data_point.first * data_point.second, CurveManager::CurveValue(*state, 1, data_point.first, data_point.second));
     }
 }
 
 TEST_F(EnergyPlusFixture, DivisorNormalizationDivisorOnly)
 {
-    /*
-     *  Test: Normalization Method = DivisorOnly
-     *
-     *  The Table:Lookup object constructed in this test corresponds directly to the function:
-     *      f(x_1, x_2) = x_1 * x_2
-     *
-     *  The curve of this data is therefore Linear, making interpolated data points easily calculated
-     *  This idf will default to Cubic interpolation and Linear extrapolation
-     */
+    //    /*
+    //     *  Test: Normalization Method = DivisorOnly
+    //     *
+    //     *  The Table:Lookup object constructed in this test corresponds directly to the function:
+    //     *      f(x_1, x_2) = x_1 * x_2
+    //     *
+    //     *  The curve of this data is therefore Linear, making interpolated data points easily calculated
+    //     *  This idf will default to Cubic interpolation and Linear extrapolation
+    //     */
 
     double expected_divisor{3.0};
-    double expected_curve_min{2.0/expected_divisor};
-    double expected_curve_max{21.0/expected_divisor};
+    double expected_curve_min{2.0 / expected_divisor};
+    double expected_curve_max{21.0 / expected_divisor};
 
     std::vector<std::pair<double, double>> table_data{
-            { 2.0, 1.0 }, // 2.0
-            { 2.0, 2.0 }, // 4.0
-            { 2.0, 3.0 }, // 6.0
-            { 7.0, 1.0 }, // 7.0
-            { 7.0, 2.0 }, // 14.0
-            { 7.0, 3.0 }, // 21.0
-            { 3.0, 3.0 }, // 9.0
-            { 5.0, 2.0 }, // 10.0
+        {2.0, 1.0}, // 2.0
+        {2.0, 2.0}, // 4.0
+        {2.0, 3.0}, // 6.0
+        {7.0, 1.0}, // 7.0
+        {7.0, 2.0}, // 14.0
+        {7.0, 3.0}, // 21.0
+        {3.0, 3.0}, // 9.0
+        {5.0, 2.0}, // 10.0
     };
 
     std::string const idf_objects = delimited_string({
@@ -411,7 +456,7 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationDivisorOnly)
         "1.0,                                   !- Value 1",
         "2.0,                                   !- Value 2",
         "3.0;                                   !- Value 3",
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
@@ -426,37 +471,38 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationDivisorOnly)
     EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).CurveMaxPresent);
     EXPECT_EQ(expected_curve_max, state->dataCurveManager->PerfCurve(1).CurveMax);
 
-    for (auto data_point : table_data ){
-        EXPECT_DOUBLE_EQ(data_point.first*data_point.second/expected_divisor, CurveManager::CurveValue(*state, 1, data_point.first, data_point.second));
+    for (auto data_point : table_data) {
+        EXPECT_DOUBLE_EQ(data_point.first * data_point.second / expected_divisor,
+                         CurveManager::CurveValue(*state, 1, data_point.first, data_point.second));
     }
 }
 
 TEST_F(EnergyPlusFixture, DivisorNormalizationAutomaticWithDivisor)
 {
-    /*
-     *  Test: Normalization Method = AutomaticWithDivisor
-     *      Case: Default 'Normalization Divisor' Field
-     *
-     *  The Table:Lookup object constructed in this test corresponds directly to the function:
-     *      f(x_1, x_2) = x_1 * x_2
-     *
-     *  The curve of this data is therefore Linear, making interpolated data points easily calculated
-     *  This idf will default to Cubic interpolation and Linear extrapolation
-     */
+    //    /*
+    //     *  Test: Normalization Method = AutomaticWithDivisor
+    //     *      Case: Default 'Normalization Divisor' Field
+    //     *
+    //     *  The Table:Lookup object constructed in this test corresponds directly to the function:
+    //     *      f(x_1, x_2) = x_1 * x_2
+    //     *
+    //     *  The curve of this data is therefore Linear, making interpolated data points easily calculated
+    //     *  This idf will default to Cubic interpolation and Linear extrapolation
+    //     */
 
     double expected_auto_divisor{6.0};
-    double expected_curve_max{21.0/expected_auto_divisor};
-    double expected_curve_min{2.0/expected_auto_divisor};
+    double expected_curve_max{21.0 / expected_auto_divisor};
+    double expected_curve_min{2.0 / expected_auto_divisor};
 
     std::vector<std::pair<double, double>> table_data{
-            { 2.0, 1.0 }, // 2.0
-            { 2.0, 2.0 }, // 4.0
-            { 2.0, 3.0 }, // 6.0
-            { 7.0, 1.0 }, // 7.0
-            { 7.0, 2.0 }, // 14.0
-            { 7.0, 3.0 }, // 21.0
-            { 3.0, 3.0 }, // 9.0
-            { 5.0, 2.0 }, // 10.0
+        {2.0, 1.0}, // 2.0
+        {2.0, 2.0}, // 4.0
+        {2.0, 3.0}, // 6.0
+        {7.0, 1.0}, // 7.0
+        {7.0, 2.0}, // 14.0
+        {7.0, 3.0}, // 21.0
+        {3.0, 3.0}, // 9.0
+        {5.0, 2.0}, // 10.0
     };
 
     std::string const idf_objects = delimited_string({
@@ -513,7 +559,7 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationAutomaticWithDivisor)
         "1.0,                                   !- Value 1",
         "2.0,                                   !- Value 2",
         "3.0;                                   !- Value 3",
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
@@ -528,23 +574,24 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationAutomaticWithDivisor)
     EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).CurveMaxPresent);
     EXPECT_EQ(expected_curve_max, state->dataCurveManager->PerfCurve(1).CurveMax);
 
-    for (auto data_point : table_data ){
-        EXPECT_DOUBLE_EQ(data_point.first*data_point.second/expected_auto_divisor, CurveManager::CurveValue(*state, 1, data_point.first, data_point.second));
+    for (auto data_point : table_data) {
+        EXPECT_DOUBLE_EQ(data_point.first * data_point.second / expected_auto_divisor,
+                         CurveManager::CurveValue(*state, 1, data_point.first, data_point.second));
     }
 }
 
 TEST_F(EnergyPlusFixture, NormalizationAutomaticWithDivisorAndSpecifiedDivisor)
 {
-    /*
-     *  Test: Normalization Method = AutomaticWithDivisor
-     *      Case: Additionally Specified Divisor in 'Normalization Divisor' Field
-     *
-     *  The Table:Lookup object constructed in this test corresponds directly to the function:
-     *      f(x_1, x_2) = x_1 * x_2
-     *
-     *  The curve of this data is therefore Linear, making interpolated data points easily calculated
-     *  This idf will default to Cubic interpolation and Linear extrapolation
-     */
+    //    /*
+    //     *  Test: Normalization Method = AutomaticWithDivisor
+    //     *      Case: Additionally Specified Divisor in 'Normalization Divisor' Field
+    //     *
+    //     *  The Table:Lookup object constructed in this test corresponds directly to the function:
+    //     *      f(x_1, x_2) = x_1 * x_2
+    //     *
+    //     *  The curve of this data is therefore Linear, making interpolated data points easily calculated
+    //     *  This idf will default to Cubic interpolation and Linear extrapolation
+    //     */
 
     double expected_auto_divisor{6.0};
     double normalization_divisor{4.0};
@@ -640,17 +687,17 @@ TEST_F(EnergyPlusFixture, NormalizationAutomaticWithDivisorAndSpecifiedDivisor)
 TEST_F(EnergyPlusFixture, CSV_CarriageReturns_Handling)
 {
     CurveManager::TableFile testTableFile = CurveManager::TableFile();
-    std::string testCSV = configured_source_directory() + "/tst/EnergyPlus/unit/Resources/TestCarriageReturn.csv";
+    fs::path testCSV = configured_source_directory() / "tst/EnergyPlus/unit/Resources/TestCarriageReturn.csv";
     testTableFile.filePath = testCSV;
     testTableFile.load(*state, testCSV);
     std::vector<double> TestArray;
     std::size_t col = 2;
     std::size_t row = 1;
     std::size_t expected_length = 168;
-    TestArray = testTableFile.getArray(*state, std::make_pair(col,row));
-    EXPECT_EQ(TestArray.size(), expected_length );
+    TestArray = testTableFile.getArray(*state, std::make_pair(col, row));
+    EXPECT_EQ(TestArray.size(), expected_length);
 
-    for (std::size_t i=0; i<TestArray.size(); i++ ){
+    for (std::size_t i = 0; i < TestArray.size(); i++) {
         EXPECT_FALSE(std::isnan(TestArray[i]));
     }
 }

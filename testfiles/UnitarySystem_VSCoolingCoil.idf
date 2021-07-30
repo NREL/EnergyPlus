@@ -102,7 +102,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.4;
+  Version,9.6;
 
   Building,
     NONE,                    !- Name
@@ -1392,8 +1392,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 1,                !- Name
     OA Sys 1 Controllers,    !- Controller List Name
-    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name
-    Outdoor Air 1 Avail List;!- Availability Manager List Name
+    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     OutsideAirInletNodes;    !- Node or NodeList Name 1
@@ -1711,7 +1710,7 @@
     0.5000,                  !- Gross Total Cooling Capacity Fraction
     0.5000,                  !- Evaporator Air Flow Rate Fraction
     ,                        !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
+    0.70,                    !- Gross Sensible Heat Ratio
     1.9,                     !- Gross Cooling COP {W/W}
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
@@ -1732,7 +1731,7 @@
     1.0000,                  !- Gross Total Cooling Capacity Fraction
     1.0000,                  !- Evaporator Air Flow Rate Fraction
     ,                        !- Condenser Air Flow Rate Fraction
-    0.79,                    !- Gross Sensible Heat Ratio
+    0.70,                    !- Gross Sensible Heat Ratio
     3.9,                     !- Gross Cooling COP {W/W}
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}

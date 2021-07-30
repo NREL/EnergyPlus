@@ -86,18 +86,63 @@ TEST_F(EnergyPlusFixture, OutputReportData_getVariableKeys)
     Real64 extLitPow;
     Real64 extLitUse;
 
-    SetupOutputVariable(*state, "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite1", _, "Electricity",
-                        "Exterior Lights", "General");
-    SetupOutputVariable(*state, "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite2", _, "Electricity",
-                        "Exterior Lights", "General");
-    SetupOutputVariable(*state, "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite3", _, "Electricity",
-                        "Exterior Lights", "General");
-    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite1");
-    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite2");
-    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite3");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite1",
+                        _,
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite2",
+                        _,
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite3",
+                        _,
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Power",
+                        OutputProcessor::Unit::W,
+                        extLitPow,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Average,
+                        "Lite1");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Power",
+                        OutputProcessor::Unit::W,
+                        extLitPow,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Average,
+                        "Lite2");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Power",
+                        OutputProcessor::Unit::W,
+                        extLitPow,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Average,
+                        "Lite3");
 
     int keyCount = 0;
-    int typeVar = 0;
+    OutputProcessor::VariableType typeVar = OutputProcessor::VariableType::NotFound;
     OutputProcessor::StoreType avgSumVar;
     OutputProcessor::TimeStepType stepTypeVar;
     OutputProcessor::Unit unitsVar = OutputProcessor::Unit::None;
@@ -159,25 +204,25 @@ TEST_F(EnergyPlusFixture, OutputReportData_Regex)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EXPECT_EQ(DataOutputs::NumConsideredOutputVariables, 10);
+    EXPECT_EQ(state->dataOutput->NumConsideredOutputVariables, 10);
     // FindItemInVariableList is case-insentive, so we also test that
-    EXPECT_TRUE(FindItemInVariableList("Outside Air Inlet Node", "System Node Mass Flow Rate"));
-    EXPECT_TRUE(FindItemInVariableList("OUTSIDE AIR INLET NODE", "System Node Mass Flow Rate"));
-    EXPECT_TRUE(FindItemInVariableList("OutsIDE AiR InLEt NoDE", "System NoDE MaSS FLOw Rate"));
-    EXPECT_TRUE(FindItemInVariableList("OUTSIDE AIR INLET NODE", "System NODE Mass Flow RATE"));
-    EXPECT_TRUE(FindItemInVariableList("Mixed Air Node", "System Node Temperature"));
-    EXPECT_TRUE(FindItemInVariableList("Outside Air Inlet Node", "System Node Temperature"));
-    EXPECT_TRUE(FindItemInVariableList("Outside Air Inlet Node", "Unitary System Compressor Part Load Ratio"));
-    EXPECT_TRUE(FindItemInVariableList("Any Node Here", "Zone Air System Sensible Heating Rate"));
-    EXPECT_TRUE(FindItemInVariableList("Salesfloor Outlet Node", "System Node Temperature"));
-    EXPECT_FALSE(FindItemInVariableList("AnySalesfloor Outlet Node", "System Node Temperature"));
-    EXPECT_FALSE(FindItemInVariableList("AnyOutside Air Inlet Node", "System Node Mass Flow Rate"));
-    EXPECT_TRUE(FindItemInVariableList("BackRoom OUTLET NODE", "System Node Temperature"));
-    EXPECT_TRUE(FindItemInVariableList("BackRoom Inlet NODE", "System Node Temperature"));
-    EXPECT_TRUE(FindItemInVariableList("BackRoom Node", "System Node Temperature"));
-    EXPECT_TRUE(FindItemInVariableList("BackRoom OUTLET NODE", "System Node Humidity Ratio"));
-    EXPECT_TRUE(FindItemInVariableList("BackRoom Inlet NODE", "System Node Humidity Ratio"));
-    EXPECT_TRUE(FindItemInVariableList("BackRoom Any Node", "System Node Humidity Ratio"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "Outside Air Inlet Node", "System Node Mass Flow Rate"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "OUTSIDE AIR INLET NODE", "System Node Mass Flow Rate"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "OutsIDE AiR InLEt NoDE", "System NoDE MaSS FLOw Rate"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "OUTSIDE AIR INLET NODE", "System NODE Mass Flow RATE"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "Mixed Air Node", "System Node Temperature"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "Outside Air Inlet Node", "System Node Temperature"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "Outside Air Inlet Node", "Unitary System Compressor Part Load Ratio"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "Any Node Here", "Zone Air System Sensible Heating Rate"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "Salesfloor Outlet Node", "System Node Temperature"));
+    EXPECT_FALSE(FindItemInVariableList(*state, "AnySalesfloor Outlet Node", "System Node Temperature"));
+    EXPECT_FALSE(FindItemInVariableList(*state, "AnyOutside Air Inlet Node", "System Node Mass Flow Rate"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "BackRoom OUTLET NODE", "System Node Temperature"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "BackRoom Inlet NODE", "System Node Temperature"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "BackRoom Node", "System Node Temperature"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "BackRoom OUTLET NODE", "System Node Humidity Ratio"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "BackRoom Inlet NODE", "System Node Humidity Ratio"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "BackRoom Any Node", "System Node Humidity Ratio"));
 }
 
 TEST_F(EnergyPlusFixture, OutputReportData_Regex_Plus)
@@ -209,16 +254,16 @@ TEST_F(EnergyPlusFixture, OutputReportData_Regex_Plus)
         "timestep;",
     });
     ASSERT_TRUE(process_idf(idf_objects));
-    EXPECT_EQ(DataOutputs::NumConsideredOutputVariables, 6);
-    EXPECT_TRUE(FindItemInVariableList("SalesFloor Inlet Node", "System Node Mass Flow Rate"));
-    EXPECT_TRUE(FindItemInVariableList("SalesFloor INLET Node", "System Node Mass Flow Rate"));
-    EXPECT_FALSE(FindItemInVariableList("Inlet", "System Node Mass Flow Rate"));
-    EXPECT_FALSE(FindItemInVariableList("BackRoom Inlet Node", "System Node Humidity Ratio"));
-    EXPECT_TRUE(FindItemInVariableList("BackRoom Any Node", "Zone Air System Sensible Heating Rate"));
-    EXPECT_TRUE(FindItemInVariableList("Outside Air Inlet Node", "Unitary System Compressor Part Load Ratio"));
-    EXPECT_TRUE(FindItemInVariableList("Outside Air Outlet Node", "Unitary System Load Ratio"));
-    EXPECT_TRUE(FindItemInVariableList("Any Node", "System Node Temperature"));
-    EXPECT_FALSE(FindItemInVariableList("", "System Node Temperature"));
+    EXPECT_EQ(state->dataOutput->NumConsideredOutputVariables, 6);
+    EXPECT_TRUE(FindItemInVariableList(*state, "SalesFloor Inlet Node", "System Node Mass Flow Rate"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "SalesFloor INLET Node", "System Node Mass Flow Rate"));
+    EXPECT_FALSE(FindItemInVariableList(*state, "Inlet", "System Node Mass Flow Rate"));
+    EXPECT_FALSE(FindItemInVariableList(*state, "BackRoom Inlet Node", "System Node Humidity Ratio"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "BackRoom Any Node", "Zone Air System Sensible Heating Rate"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "Outside Air Inlet Node", "Unitary System Compressor Part Load Ratio"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "Outside Air Outlet Node", "Unitary System Load Ratio"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "Any Node", "System Node Temperature"));
+    EXPECT_FALSE(FindItemInVariableList(*state, "", "System Node Temperature"));
 }
 
 TEST_F(EnergyPlusFixture, OutputReportData_Regex_Star)
@@ -255,27 +300,27 @@ TEST_F(EnergyPlusFixture, OutputReportData_Regex_Star)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EXPECT_EQ(DataOutputs::NumConsideredOutputVariables, 7);
-    EXPECT_TRUE(FindItemInVariableList("SalesFloor Inlet Node", "System Node Mass Flow Rate"));
-    EXPECT_TRUE(FindItemInVariableList("SalesFloor INLET Node", "System Node Mass Flow Rate"));
-    EXPECT_TRUE(FindItemInVariableList("Inlet", "System Node Mass Flow Rate"));
-    EXPECT_TRUE(FindItemInVariableList("Inlet Node", "System Node Mass Flow Rate"));
-    EXPECT_FALSE(FindItemInVariableList("BackRoom Inlet Node", "System Node Humidity Ratio"));
-    EXPECT_TRUE(FindItemInVariableList("Inlet", "System Node Humidity Ratio"));
-    EXPECT_TRUE(FindItemInVariableList("Any Inlet", "System Node Humidity Ratio"));
-    EXPECT_TRUE(FindItemInVariableList("BackRoom Any Node", "Zone Air System Sensible Heating Rate"));
-    EXPECT_TRUE(FindItemInVariableList("Node", "Zone Air System Sensible Heating Rate"));
-    EXPECT_TRUE(FindItemInVariableList("NODE", "Zone Air System Sensible Heating Rate"));
-    EXPECT_TRUE(FindItemInVariableList("Outside Air Inlet Node", "Unitary System Compressor Part Load Ratio"));
-    EXPECT_TRUE(FindItemInVariableList("Outside Air Node", "Unitary System Compressor Part Load Ratio"));
-    EXPECT_TRUE(FindItemInVariableList("Outside Air Outlet Node", "Unitary System Compressor Part Load Ratio"));
-    EXPECT_TRUE(FindItemInVariableList("Outside Air Outlet Node", "Unitary System Load Ratio"));
-    EXPECT_TRUE(FindItemInVariableList("Outside Air Node", "Unitary System Load Ratio"));
-    EXPECT_FALSE(FindItemInVariableList("Outside AirNode", "Unitary System Load Ratio"));
-    EXPECT_TRUE(FindItemInVariableList("Any Node", "System Node Temperature"));
-    EXPECT_TRUE(FindItemInVariableList("", "System Node Temperature"));
-    EXPECT_TRUE(FindItemInVariableList("Any Node", "Refrigeration Compressor Rack Electric Power"));
-    EXPECT_TRUE(FindItemInVariableList("", "Refrigeration Compressor Rack Electric Power"));
+    EXPECT_EQ(state->dataOutput->NumConsideredOutputVariables, 7);
+    EXPECT_TRUE(FindItemInVariableList(*state, "SalesFloor Inlet Node", "System Node Mass Flow Rate"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "SalesFloor INLET Node", "System Node Mass Flow Rate"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "Inlet", "System Node Mass Flow Rate"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "Inlet Node", "System Node Mass Flow Rate"));
+    EXPECT_FALSE(FindItemInVariableList(*state, "BackRoom Inlet Node", "System Node Humidity Ratio"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "Inlet", "System Node Humidity Ratio"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "Any Inlet", "System Node Humidity Ratio"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "BackRoom Any Node", "Zone Air System Sensible Heating Rate"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "Node", "Zone Air System Sensible Heating Rate"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "NODE", "Zone Air System Sensible Heating Rate"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "Outside Air Inlet Node", "Unitary System Compressor Part Load Ratio"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "Outside Air Node", "Unitary System Compressor Part Load Ratio"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "Outside Air Outlet Node", "Unitary System Compressor Part Load Ratio"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "Outside Air Outlet Node", "Unitary System Load Ratio"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "Outside Air Node", "Unitary System Load Ratio"));
+    EXPECT_FALSE(FindItemInVariableList(*state, "Outside AirNode", "Unitary System Load Ratio"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "Any Node", "System Node Temperature"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "", "System Node Temperature"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "Any Node", "Refrigeration Compressor Rack Electric Power"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "", "Refrigeration Compressor Rack Electric Power"));
 }
 
 TEST_F(EnergyPlusFixture, OutputReportData_Regex_Pipe)
@@ -300,50 +345,67 @@ TEST_F(EnergyPlusFixture, OutputReportData_Regex_Pipe)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EXPECT_EQ(DataOutputs::NumConsideredOutputVariables, 4);
-    EXPECT_TRUE(FindItemInVariableList("SalesFloor Inlet Node", "System Node Mass Flow Rate"));
-    EXPECT_TRUE(FindItemInVariableList("SalesFloor INLET Node", "System Node Mass Flow Rate"));
-    EXPECT_TRUE(FindItemInVariableList("SalesFloor Outlet Node", "System Node Mass Flow Rate"));
-    EXPECT_TRUE(FindItemInVariableList("SalesFloor OUTLET Node", "System Node Mass Flow Rate"));
-    EXPECT_TRUE(FindItemInVariableList("System Inlet Node", "Unitary System Compressor Part Load Ratio"));
-    EXPECT_TRUE(FindItemInVariableList("System Outlet Node", "Unitary System Compressor Part Load Ratio"));
-    EXPECT_FALSE(FindItemInVariableList("System Another Node", "Unitary System Compressor Part Load Ratio"));
-    EXPECT_TRUE(FindItemInVariableList("BackRoom OUTLET NODE", "System Node Humidity Ratio"));
-    EXPECT_TRUE(FindItemInVariableList("SALESFLOOR OUTLET NODE", "System Node Humidity Ratio"));
-    EXPECT_TRUE(FindItemInVariableList("SalesFloor Outlet Node", "System Node Humidity Ratio"));
-    EXPECT_TRUE(FindItemInVariableList("BACKROOM Outlet Node", "System Node Humidity Ratio"));
+    EXPECT_EQ(state->dataOutput->NumConsideredOutputVariables, 4);
+    EXPECT_TRUE(FindItemInVariableList(*state, "SalesFloor Inlet Node", "System Node Mass Flow Rate"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "SalesFloor INLET Node", "System Node Mass Flow Rate"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "SalesFloor Outlet Node", "System Node Mass Flow Rate"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "SalesFloor OUTLET Node", "System Node Mass Flow Rate"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "System Inlet Node", "Unitary System Compressor Part Load Ratio"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "System Outlet Node", "Unitary System Compressor Part Load Ratio"));
+    EXPECT_FALSE(FindItemInVariableList(*state, "System Another Node", "Unitary System Compressor Part Load Ratio"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "BackRoom OUTLET NODE", "System Node Humidity Ratio"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "SALESFLOOR OUTLET NODE", "System Node Humidity Ratio"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "SalesFloor Outlet Node", "System Node Humidity Ratio"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "BACKROOM Outlet Node", "System Node Humidity Ratio"));
 }
 
 TEST_F(EnergyPlusFixture, OutputReportData_Regex_Brackets)
 {
     std::string const idf_objects = delimited_string({
-        "Output:Variable,", "([A-Za-z] ?)+,", "System Node Mass Flow Rate,",
-        "timestep;",    " Output:Variable,", "[A-Za-z0-9_]+,", "System Node Humidity Ratio,",
-        "timestep;",    " Output:Variable,", "[A-Z]{4},",      "Unitary System Compressor Part Load Ratio,",
-        "timestep;",    " Output:Variable,", "[A-Za-z]{5,6},", "Zone Air System Sensible Heating Rate,",
-        "timestep;",    " Output:Variable,", "[A-Za-z ]{5,},", "Refrigeration Compressor Rack Electric Power,",
-        "timestep;",    " Output:Variable,", "([A-Za-z] ?)+,", "System Node Mass Flow Rate,",
+        "Output:Variable,",
+        "([A-Za-z] ?)+,",
+        "System Node Mass Flow Rate,",
+        "timestep;",
+        " Output:Variable,",
+        "[A-Za-z0-9_]+,",
+        "System Node Humidity Ratio,",
+        "timestep;",
+        " Output:Variable,",
+        "[A-Z]{4},",
+        "Unitary System Compressor Part Load Ratio,",
+        "timestep;",
+        " Output:Variable,",
+        "[A-Za-z]{5,6},",
+        "Zone Air System Sensible Heating Rate,",
+        "timestep;",
+        " Output:Variable,",
+        "[A-Za-z ]{5,},",
+        "Refrigeration Compressor Rack Electric Power,",
+        "timestep;",
+        " Output:Variable,",
+        "([A-Za-z] ?)+,",
+        "System Node Mass Flow Rate,",
         "timestep;",
     });
     EXPECT_FALSE(process_idf(idf_objects, false));
 
-    EXPECT_EQ(DataOutputs::NumConsideredOutputVariables, 6);
-    EXPECT_TRUE(FindItemInVariableList("SalesFloor Inlet Node", "System Node Mass Flow Rate"));
-    EXPECT_TRUE(FindItemInVariableList("Node", "System Node Mass Flow Rate"));
-    EXPECT_FALSE(FindItemInVariableList("", "System Node Mass Flow Rate"));
-    EXPECT_FALSE(FindItemInVariableList("BackRoom OUTLET NODE", "System Node Humidity Ratio"));
-    EXPECT_TRUE(FindItemInVariableList("BackRoom_NODE1", "System Node Humidity Ratio"));
-    EXPECT_TRUE(FindItemInVariableList("NODE", "Unitary System Compressor Part Load Ratio"));
-    EXPECT_TRUE(FindItemInVariableList("Node", "Unitary System Compressor Part Load Ratio"));
-    EXPECT_FALSE(FindItemInVariableList("NOD", "Unitary System Compressor Part Load Ratio"));
+    EXPECT_EQ(state->dataOutput->NumConsideredOutputVariables, 6);
+    EXPECT_TRUE(FindItemInVariableList(*state, "SalesFloor Inlet Node", "System Node Mass Flow Rate"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "Node", "System Node Mass Flow Rate"));
+    EXPECT_FALSE(FindItemInVariableList(*state, "", "System Node Mass Flow Rate"));
+    EXPECT_FALSE(FindItemInVariableList(*state, "BackRoom OUTLET NODE", "System Node Humidity Ratio"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "BackRoom_NODE1", "System Node Humidity Ratio"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "NODE", "Unitary System Compressor Part Load Ratio"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "Node", "Unitary System Compressor Part Load Ratio"));
+    EXPECT_FALSE(FindItemInVariableList(*state, "NOD", "Unitary System Compressor Part Load Ratio"));
     // next 7 test cases are meant for "{,}" type of regexes
-    EXPECT_FALSE(FindItemInVariableList("Inlet", "Zone Air System Sensible Heating Rate"));
-    EXPECT_FALSE(FindItemInVariableList("Outlet", "Zone Air System Sensible Heating Rate"));
-    EXPECT_FALSE(FindItemInVariableList("Any Node", "Zone Air System Sensible Heating Rate"));
-    EXPECT_FALSE(FindItemInVariableList("Inlet", "Refrigeration Compressor Rack Electric Power"));
-    EXPECT_FALSE(FindItemInVariableList("Outlet", "Refrigeration Compressor Rack Electric Power"));
-    EXPECT_FALSE(FindItemInVariableList("Outlet Node", "Refrigeration Compressor Rack Electric Power"));
-    EXPECT_FALSE(FindItemInVariableList("Node", "Refrigeration Compressor Rack Electric Power"));
+    EXPECT_FALSE(FindItemInVariableList(*state, "Inlet", "Zone Air System Sensible Heating Rate"));
+    EXPECT_FALSE(FindItemInVariableList(*state, "Outlet", "Zone Air System Sensible Heating Rate"));
+    EXPECT_FALSE(FindItemInVariableList(*state, "Any Node", "Zone Air System Sensible Heating Rate"));
+    EXPECT_FALSE(FindItemInVariableList(*state, "Inlet", "Refrigeration Compressor Rack Electric Power"));
+    EXPECT_FALSE(FindItemInVariableList(*state, "Outlet", "Refrigeration Compressor Rack Electric Power"));
+    EXPECT_FALSE(FindItemInVariableList(*state, "Outlet Node", "Refrigeration Compressor Rack Electric Power"));
+    EXPECT_FALSE(FindItemInVariableList(*state, "Node", "Refrigeration Compressor Rack Electric Power"));
 }
 
 TEST_F(EnergyPlusFixture, OutputReportData_Regex_SpecChars)
@@ -357,7 +419,7 @@ TEST_F(EnergyPlusFixture, OutputReportData_Regex_SpecChars)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EXPECT_EQ(DataOutputs::NumConsideredOutputVariables, 1);
+    EXPECT_EQ(state->dataOutput->NumConsideredOutputVariables, 1);
 
     // TODO: FIXME: This is failing. The IdfParser probably needs to be double checked and tested.
     // EXPECT_TRUE( FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" ));
@@ -379,12 +441,12 @@ TEST_F(EnergyPlusFixture, OutputReportData_Regex_Carrot)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EXPECT_EQ(DataOutputs::NumConsideredOutputVariables, 2);
-    EXPECT_FALSE(FindItemInVariableList("SalesFloor Inlet Node", "System Node Mass Flow Rate"));
-    EXPECT_TRUE(FindItemInVariableList("Inlet Node", "System Node Mass Flow Rate"));
-    EXPECT_TRUE(FindItemInVariableList("Inlet System Node", "System Node Mass Flow Rate"));
-    EXPECT_FALSE(FindItemInVariableList("SalesFloor1", "System Node Humidity Ratio"));
-    EXPECT_TRUE(FindItemInVariableList("SalesFloor", "System Node Humidity Ratio"));
+    EXPECT_EQ(state->dataOutput->NumConsideredOutputVariables, 2);
+    EXPECT_FALSE(FindItemInVariableList(*state, "SalesFloor Inlet Node", "System Node Mass Flow Rate"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "Inlet Node", "System Node Mass Flow Rate"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "Inlet System Node", "System Node Mass Flow Rate"));
+    EXPECT_FALSE(FindItemInVariableList(*state, "SalesFloor1", "System Node Humidity Ratio"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "SalesFloor", "System Node Humidity Ratio"));
 }
 
 TEST_F(EnergyPlusFixture, OutputReportData_Regex_Dollar)
@@ -397,8 +459,8 @@ TEST_F(EnergyPlusFixture, OutputReportData_Regex_Dollar)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EXPECT_EQ(DataOutputs::NumConsideredOutputVariables, 1);
-    EXPECT_TRUE(FindItemInVariableList("SalesFloor Inlet Node", "System Node Mass Flow Rate"));
-    EXPECT_TRUE(FindItemInVariableList("Outlet Node", "System Node Mass Flow Rate"));
-    EXPECT_FALSE(FindItemInVariableList("Inlet Node1 ", "System Node Mass Flow Rate"));
+    EXPECT_EQ(state->dataOutput->NumConsideredOutputVariables, 1);
+    EXPECT_TRUE(FindItemInVariableList(*state, "SalesFloor Inlet Node", "System Node Mass Flow Rate"));
+    EXPECT_TRUE(FindItemInVariableList(*state, "Outlet Node", "System Node Mass Flow Rate"));
+    EXPECT_FALSE(FindItemInVariableList(*state, "Inlet Node1 ", "System Node Mass Flow Rate"));
 }

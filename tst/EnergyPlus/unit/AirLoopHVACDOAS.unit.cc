@@ -2951,7 +2951,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
         "    100;                     !- Maximum Value of y",
 
         "  AirLoopHVAC,",
-        "    PSZ-AC:1,                !- Name",
+        "    PSZ-ac:1,                !- Name",
         "    ,                        !- Controller List Name",
         "    PSZ-AC:1 Availability Manager List,  !- Availability Manager List Name",
         "    AUTOSIZE,                !- Design Supply Air Flow Rate {m3/s}",
@@ -3413,32 +3413,27 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
         "  AirLoopHVAC:OutdoorAirSystem,",
         "    PSZ-AC:1_OA,             !- Name",
         "    PSZ-AC:1_OA_Controllers, !- Controller List Name",
-        "    PSZ-AC:1_OA_Equipment,   !- Outdoor Air Equipment List Name",
-        "    PSZ-AC:1 Availability Manager List;  !- Availability Manager List Name",
+        "    PSZ-AC:1_OA_Equipment;   !- Outdoor Air Equipment List Name",
 
         "  AirLoopHVAC:OutdoorAirSystem,",
         "    PSZ-AC:2_OA,             !- Name",
         "    PSZ-AC:2_OA_Controllers, !- Controller List Name",
-        "    PSZ-AC:2_OA_Equipment,   !- Outdoor Air Equipment List Name",
-        "    PSZ-AC:2 Availability Manager List;  !- Availability Manager List Name",
+        "    PSZ-AC:2_OA_Equipment;   !- Outdoor Air Equipment List Name",
 
         "  AirLoopHVAC:OutdoorAirSystem,",
         "    PSZ-AC:3_OA,             !- Name",
         "    PSZ-AC:3_OA_Controllers, !- Controller List Name",
-        "    PSZ-AC:3_OA_Equipment,   !- Outdoor Air Equipment List Name",
-        "    PSZ-AC:3 Availability Manager List;  !- Availability Manager List Name",
+        "    PSZ-AC:3_OA_Equipment;   !- Outdoor Air Equipment List Name",
 
         "  AirLoopHVAC:OutdoorAirSystem,",
         "    PSZ-AC:4_OA,             !- Name",
         "    PSZ-AC:4_OA_Controllers, !- Controller List Name",
-        "    PSZ-AC:4_OA_Equipment,   !- Outdoor Air Equipment List Name",
-        "    PSZ-AC:4 Availability Manager List;  !- Availability Manager List Name",
+        "    PSZ-AC:4_OA_Equipment;   !- Outdoor Air Equipment List Name",
 
         "  AirLoopHVAC:OutdoorAirSystem,",
         "    PSZ-AC:5_OA,             !- Name",
         "    PSZ-AC:5_OA_Controllers, !- Controller List Name",
-        "    PSZ-AC:5_OA_Equipment,   !- Outdoor Air Equipment List Name",
-        "    PSZ-AC:5 Availability Manager List;  !- Availability Manager List Name",
+        "    PSZ-AC:5_OA_Equipment;   !- Outdoor Air Equipment List Name",
 
         "  OutdoorAir:NodeList,",
         "    PSZ-AC:1_OANode List;    !- Node or NodeList Name 1",
@@ -3815,7 +3810,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
         "    11.5,                    !- Precool Design Temperature {C}",
         "    0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}",
         "    5,                       !- Number of AirLoopHVAC",
-        "    PSZ-AC:1,                !- AirLoopHVAC 1 Name",
+        "    PSZ-ac:1,                !- AirLoopHVAC 1 Name",
         "    PSZ-AC:2,                !- AirLoopHVAC 2 Name",
         "    PSZ-AC:3,                !- AirLoopHVAC 3 Name",
         "    PSZ-AC:4,                !- AirLoopHVAC 4 Name",
@@ -3868,8 +3863,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
         "  AirLoopHVAC:OutdoorAirSystem,",
         "    AirLoopDOAS OA system,   !- Name",
         "    ,    !- Controller List Name",
-        "    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name",
-        "    OA Sys 1 Avail List;    !- Availability Manager List Name",
+        "    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name",
 
         "  AvailabilityManagerAssignmentList,",
         "    OA Sys 1 Avail List,    !- Name",
@@ -3933,20 +3927,18 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    using namespace EnergyPlus::DataIPShortCuts;
-
-    lNumericFieldBlanks.allocate(1000);
-    lAlphaFieldBlanks.allocate(1000);
-    cAlphaFieldNames.allocate(1000);
-    cNumericFieldNames.allocate(1000);
-    cAlphaArgs.allocate(1000);
-    rNumericArgs.allocate(1000);
-    lNumericFieldBlanks = false;
-    lAlphaFieldBlanks = false;
-    cAlphaFieldNames = " ";
-    cNumericFieldNames = " ";
-    cAlphaArgs = " ";
-    rNumericArgs = 0.0;
+    state->dataIPShortCut->lNumericFieldBlanks.allocate(1000);
+    state->dataIPShortCut->lAlphaFieldBlanks.allocate(1000);
+    state->dataIPShortCut->cAlphaFieldNames.allocate(1000);
+    state->dataIPShortCut->cNumericFieldNames.allocate(1000);
+    state->dataIPShortCut->cAlphaArgs.allocate(1000);
+    state->dataIPShortCut->rNumericArgs.allocate(1000);
+    state->dataIPShortCut->lNumericFieldBlanks = false;
+    state->dataIPShortCut->lAlphaFieldBlanks = false;
+    state->dataIPShortCut->cAlphaFieldNames = " ";
+    state->dataIPShortCut->cNumericFieldNames = " ";
+    state->dataIPShortCut->cAlphaArgs = " ";
+    state->dataIPShortCut->rNumericArgs = 0.0;
 
     bool ErrorsFound = false;
     // Read objects
@@ -3977,52 +3969,52 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
     ZoneEquipmentManager::GetZoneEquipment(*state);
     SimAirServingZones::GetAirPathData(*state);
     // OA inlet node
-    DataLoopNode::Node(2).MassFlowRate = 0.1;
-    DataLoopNode::Node(3).MassFlowRate = 0.1;
-    DataLoopNode::Node(4).MassFlowRate = 0.1;
-    DataLoopNode::Node(5).MassFlowRate = 0.1;
-    DataLoopNode::Node(6).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(2).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(3).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(5).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(6).MassFlowRate = 0.1;
     // OA relief node
-    DataLoopNode::Node(62).MassFlowRate = 0.1;
-    DataLoopNode::Node(63).MassFlowRate = 0.1;
-    DataLoopNode::Node(64).MassFlowRate = 0.1;
-    DataLoopNode::Node(65).MassFlowRate = 0.1;
-    DataLoopNode::Node(66).MassFlowRate = 0.1;
-    DataLoopNode::Node(62).Temp = 23.0;
-    DataLoopNode::Node(63).Temp = 23.0;
-    DataLoopNode::Node(64).Temp = 23.0;
-    DataLoopNode::Node(65).Temp = 23.0;
-    DataLoopNode::Node(66).Temp = 23.0;
-    DataLoopNode::Node(62).HumRat = 0.001;
-    DataLoopNode::Node(63).HumRat = 0.001;
-    DataLoopNode::Node(64).HumRat = 0.001;
-    DataLoopNode::Node(65).HumRat = 0.001;
-    DataLoopNode::Node(66).HumRat = 0.001;
+    state->dataLoopNodes->Node(62).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(63).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(64).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(65).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(66).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(62).Temp = 23.0;
+    state->dataLoopNodes->Node(63).Temp = 23.0;
+    state->dataLoopNodes->Node(64).Temp = 23.0;
+    state->dataLoopNodes->Node(65).Temp = 23.0;
+    state->dataLoopNodes->Node(66).Temp = 23.0;
+    state->dataLoopNodes->Node(62).HumRat = 0.001;
+    state->dataLoopNodes->Node(63).HumRat = 0.001;
+    state->dataLoopNodes->Node(64).HumRat = 0.001;
+    state->dataLoopNodes->Node(65).HumRat = 0.001;
+    state->dataLoopNodes->Node(66).HumRat = 0.001;
 
     auto &thisAirLoopDOASObjec = state->dataAirLoopHVACDOAS->airloopDOAS[0];
 
     int index = 0;
     thisAirLoopDOASObjec.SizingOnceFlag = false;
-    DataLoopNode::Node(11).Temp = -10.0;
-    DataLoopNode::Node(11).HumRat = 0.0008;
-    DataLoopNode::Node(70).TempSetPoint = 4.5;
-    Schedule(1).CurrentValue = 1.0; // set availability and fan schedule to 1
+    state->dataLoopNodes->Node(11).Temp = -10.0;
+    state->dataLoopNodes->Node(11).HumRat = 0.0008;
+    state->dataLoopNodes->Node(70).TempSetPoint = 4.5;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // set availability and fan schedule to 1
     thisAirLoopDOASObjec.SimAirLoopHVACDOAS(*state, true, index);
 
     // Mixer outlet
-    EXPECT_NEAR(23.0, DataLoopNode::Node(68).Temp, 0.0001);
-    EXPECT_NEAR(0.5, DataLoopNode::Node(68).MassFlowRate, 0.0001);
+    EXPECT_NEAR(23.0, state->dataLoopNodes->Node(68).Temp, 0.0001);
+    EXPECT_NEAR(0.5, state->dataLoopNodes->Node(68).MassFlowRate, 0.0001);
     // Outlet of HX
-    EXPECT_NEAR(-8.0710884, DataLoopNode::Node(67).Temp, 0.0001);
+    EXPECT_NEAR(-8.0710884, state->dataLoopNodes->Node(67).Temp, 0.0001);
     // Outlet of Central DOAS
-    EXPECT_NEAR(4.5, DataLoopNode::Node(70).Temp, 0.0001);
-    EXPECT_NEAR(0.5, DataLoopNode::Node(70).MassFlowRate, 0.0001);
+    EXPECT_NEAR(4.5, state->dataLoopNodes->Node(70).Temp, 0.0001);
+    EXPECT_NEAR(0.5, state->dataLoopNodes->Node(70).MassFlowRate, 0.0001);
     // Outlet of splitter
-    EXPECT_NEAR(4.5, DataLoopNode::Node(2).Temp, 0.0001);
-    EXPECT_NEAR(4.5, DataLoopNode::Node(3).Temp, 0.0001);
-    EXPECT_NEAR(4.5, DataLoopNode::Node(4).Temp, 0.0001);
-    EXPECT_NEAR(4.5, DataLoopNode::Node(5).Temp, 0.0001);
-    EXPECT_NEAR(4.5, DataLoopNode::Node(6).Temp, 0.0001);
+    EXPECT_NEAR(4.5, state->dataLoopNodes->Node(2).Temp, 0.0001);
+    EXPECT_NEAR(4.5, state->dataLoopNodes->Node(3).Temp, 0.0001);
+    EXPECT_NEAR(4.5, state->dataLoopNodes->Node(4).Temp, 0.0001);
+    EXPECT_NEAR(4.5, state->dataLoopNodes->Node(5).Temp, 0.0001);
+    EXPECT_NEAR(4.5, state->dataLoopNodes->Node(6).Temp, 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestOACompOutletNodeIndex)
@@ -4093,8 +4085,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestOACompOutletNodeIndex)
         "  AirLoopHVAC:OutdoorAirSystem,",
         "    AirLoopDOAS OA system,   !- Name",
         "    OA Sys 1 Controllers,    !- Controller List Name",
-        "    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name",
-        "    OA Sys 1 Avail List;     !- Availability Manager List Name",
+        "    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name",
 
         "  AvailabilityManagerAssignmentList,",
         "    OA Sys 1 Avail List,     !- Name",
@@ -4182,7 +4173,6 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestOACompOutletNodeIndex)
         "    ,                        !- Motor Loss Zone Name",
         "    ,                        !- Motor Loss Radiative Fraction",
         "    General;                 !- End-Use Subcategory",
-
 
         "  OutdoorAir:NodeList,",
         "    OutsideAirInletNodes;    !- Node or NodeList Name 1",

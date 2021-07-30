@@ -59,7 +59,9 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
 
 namespace EnergyPlus {
 
@@ -76,6 +78,7 @@ namespace MixedAir {
 
     enum class iLockoutType
     {
+        Unassigned = -1,
         NoLockoutPossible,
         LockoutWithHeatingPossible,
         LockoutWithCompressorPossible,
@@ -83,6 +86,7 @@ namespace MixedAir {
 
     enum class iEconoOp
     {
+        Unassigned = -1,
         NoEconomizer,
         FixedDryBulb,
         FixedEnthalpy,
@@ -97,32 +101,6 @@ namespace MixedAir {
     constexpr int On(1);  // normal coil operation
     constexpr int Off(0); // signal coil shouldn't run
 
-    // component types addressed by this module
-    constexpr int OAMixer_Num(1);
-    constexpr int Fan_Simple_CV(2);
-    constexpr int Fan_Simple_VAV(3);
-    constexpr int WaterCoil_SimpleCool(4);
-    constexpr int WaterCoil_Cooling(5);
-    constexpr int WaterCoil_SimpleHeat(6);
-    constexpr int SteamCoil_AirHeat(7);
-    constexpr int WaterCoil_DetailedCool(8);
-    constexpr int Coil_ElectricHeat(9);
-    constexpr int Coil_GasHeat(10);
-    constexpr int WaterCoil_CoolingHXAsst(11);
-    constexpr int DXSystem(12);
-    constexpr int HeatXchngr(13);
-    constexpr int Desiccant(14);
-    constexpr int Unglazed_SolarCollector(15);
-    constexpr int EvapCooler(16);
-    constexpr int PVT_AirBased(17);
-    constexpr int Fan_ComponentModel(18);
-    constexpr int DXHeatPumpSystem(19);
-    constexpr int Coil_UserDefined(20);
-    constexpr int Humidifier(21);
-    constexpr int Fan_System_Object(22);
-    constexpr int UnitarySystemModel(23);
-    constexpr int VRFTerminalUnit(24);
-
     enum class iControllerType
     {
         None,
@@ -133,14 +111,31 @@ namespace MixedAir {
 
     // Parameters below (CMO - Current Module Object.  used primarily in Get Inputs)
     // Multiple Get Input routines in this module or these would be in individual routines.
-    constexpr int CMO_OASystem(1);
-    constexpr int CMO_AirLoopEqList(2);
-    constexpr int CMO_ControllerList(3);
-    constexpr int CMO_SysAvailMgrList(4);
-    constexpr int CMO_OAController(5);
-    constexpr int CMO_ERVController(6);
-    constexpr int CMO_MechVentilation(7);
-    constexpr int CMO_OAMixer(8);
+    enum class CMO
+    {
+        Unassigned = -1,
+        None,
+        OASystem,
+        AirLoopEqList,
+        ControllerList,
+        SysAvailMgrList,
+        OAController,
+        ERVController,
+        MechVentilation,
+        OAMixer
+    };
+
+    // OA Controller Limiting Factor (used for integer output variable values for OAControllerProps::OALimitingFactor
+    constexpr int limitFactorNone = 0;        // No limit other than fixed OA amount
+    constexpr int limitFactorLimits = 1;      // Limits and scheduled limits
+    constexpr int limitFactorEconomizer = 2;  // Economizer operation
+    constexpr int limitFactorExhaust = 3;     // Exhaust flow
+    constexpr int limitFactorMixedAir = 4;    // Mixed air flow rate
+    constexpr int limitFactorHighHum = 5;     // High humidity economizer control
+    constexpr int limitFactorDCV = 6;         // Demand-controlled ventilation
+    constexpr int limitFactorNightVent = 7;   // Night ventilation
+    constexpr int limitFactorDemandLimit = 8; // Demand-limiting
+    constexpr int limitFactorEMS = 9;         // EMS override
 
     extern Array1D_string const CurrentModuleObjects;
 
@@ -175,7 +170,7 @@ namespace MixedAir {
         int EnthalpyCurvePtr; // Electronic Enthalpy Curve Index (max HumRat = f[OAT])
         Real64 MinOA;         // Minimum outside air flow (m3/sec)
         Real64 MaxOA;         // Maximum outside air flow (m3/sec)
-        iEconoOp Econo;            // 0 = NoEconomizer, 1 = FixedDryBulb, 2 = FixedEnthalpy, 3=DifferentialDryBulb,
+        iEconoOp Econo;       // 0 = NoEconomizer, 1 = FixedDryBulb, 2 = FixedEnthalpy, 3=DifferentialDryBulb,
         // 4=DifferentialEnthalpy, 5=FixedDewPointAndDryBulb, 6 = ElectronicEnthalpy,
         // 7 =DifferentialDryBulbAndEnthalpy
         bool EconBypass;      // ModulateFlow =FALSE , MinimumFlowWithBypass =TRUE
@@ -250,28 +245,34 @@ namespace MixedAir {
         int NumFaultyEconomizer;           // total number of economizer faults
         int CountMechVentFrac;             // Count when OA min fraction > mech vent fraction
         int IndexMechVentFrac;             // Index when OA min fraction > mech vent fraction
+        int OALimitingFactor; // OA controller limiting factor: 0=none, 1=limits, 2=exhaust flow, 3=economizer, 4=DCV, 5=high hum, 6=night vent,
+                              // 7=demand limiting, 8=EMS
 
         // Default Constructor
         OAControllerProps()
-            : ControllerType_Num(iControllerType::None), OACtrlIndex(0), Lockout(iLockoutType::NoLockoutPossible), FixedMin(true), TempLim(0.0), TempLowLim(0.0),
-              EnthLim(0.0), DPTempLim(0.0), EnthalpyCurvePtr(0), MinOA(0.0), MaxOA(0.0), Econo(iEconoOp::NoEconomizer), EconBypass(false), MixNode(0),
-              OANode(0), InletNode(0), RelNode(0), RetNode(0), MinOASchPtr(0), RelMassFlow(0.0), OAMassFlow(0.0), ExhMassFlow(0.0), MixMassFlow(0.0),
-              InletTemp(0.0), InletEnth(0.0), InletPress(0.0), InletHumRat(0.0), OATemp(0.0), OAEnth(0.0), OAPress(0.0), OAHumRat(0.0), RetTemp(0.0),
-              RetEnth(0.0), MixSetTemp(0.0), MinOAMassFlowRate(0.0), MaxOAMassFlowRate(0.0), RelTemp(0.0), RelEnth(0.0), RelSensiLossRate(0.0),
-              RelLatentLossRate(0.0), RelTotalLossRate(0.0), ZoneEquipZoneNum(0), VentMechObjectNum(0), HumidistatZoneNum(0),
-              NodeNumofHumidistatZone(0), HighRHOAFlowRatio(1.0), ModifyDuringHighOAMoisture(false), EconomizerOASchedPtr(0), MinOAflowSchPtr(0),
-              MaxOAflowSchPtr(0), EconomizerStatus(0), HeatRecoveryBypassStatus(0), HRHeatingCoilActive(0), MixedAirTempAtMinOAFlow(0.0),
-              HighHumCtrlStatus(0), OAFractionRpt(0.0), MinOAFracLimit(0.0), MechVentOAMassFlowRequest(0.0), EMSOverrideOARate(false),
-              EMSOARateValue(0.0), HeatRecoveryBypassControlType(BypassWhenWithinEconomizerLimits), ManageDemand(false), DemandLimitFlowRate(0.0),
-              MaxOAFracBySetPoint(0), MixedAirSPMNum(0), CoolCoilFreezeCheck(false), EconoActive(false), HighHumCtrlActive(false),
-              EconmizerFaultNum(0), NumFaultyEconomizer(0), CountMechVentFrac(0), IndexMechVentFrac(0)
+            : ControllerType_Num(iControllerType::None), OACtrlIndex(0), Lockout(iLockoutType::NoLockoutPossible), FixedMin(true), TempLim(0.0),
+              TempLowLim(0.0), EnthLim(0.0), DPTempLim(0.0), EnthalpyCurvePtr(0), MinOA(0.0), MaxOA(0.0), Econo(iEconoOp::NoEconomizer),
+              EconBypass(false), MixNode(0), OANode(0), InletNode(0), RelNode(0), RetNode(0), MinOASchPtr(0), RelMassFlow(0.0), OAMassFlow(0.0),
+              ExhMassFlow(0.0), MixMassFlow(0.0), InletTemp(0.0), InletEnth(0.0), InletPress(0.0), InletHumRat(0.0), OATemp(0.0), OAEnth(0.0),
+              OAPress(0.0), OAHumRat(0.0), RetTemp(0.0), RetEnth(0.0), MixSetTemp(0.0), MinOAMassFlowRate(0.0), MaxOAMassFlowRate(0.0), RelTemp(0.0),
+              RelEnth(0.0), RelSensiLossRate(0.0), RelLatentLossRate(0.0), RelTotalLossRate(0.0), ZoneEquipZoneNum(0), VentMechObjectNum(0),
+              HumidistatZoneNum(0), NodeNumofHumidistatZone(0), HighRHOAFlowRatio(1.0), ModifyDuringHighOAMoisture(false), EconomizerOASchedPtr(0),
+              MinOAflowSchPtr(0), MaxOAflowSchPtr(0), EconomizerStatus(0), HeatRecoveryBypassStatus(0), HRHeatingCoilActive(0),
+              MixedAirTempAtMinOAFlow(0.0), HighHumCtrlStatus(0), OAFractionRpt(0.0), MinOAFracLimit(0.0), MechVentOAMassFlowRequest(0.0),
+              EMSOverrideOARate(false), EMSOARateValue(0.0), HeatRecoveryBypassControlType(BypassWhenWithinEconomizerLimits), ManageDemand(false),
+              DemandLimitFlowRate(0.0), MaxOAFracBySetPoint(0), MixedAirSPMNum(0), CoolCoilFreezeCheck(false), EconoActive(false),
+              HighHumCtrlActive(false), EconmizerFaultNum(0), NumFaultyEconomizer(0), CountMechVentFrac(0), IndexMechVentFrac(0), OALimitingFactor(0)
         {
         }
 
         void CalcOAController(EnergyPlusData &state, int const AirLoopNum, bool const FirstHVACIteration);
 
         void CalcOAEconomizer(EnergyPlusData &state,
-            int const AirLoopNum, Real64 const OutAirMinFrac, Real64 &OASignal, bool &HighHumidityOperationFlag, bool const FirstHVACIteration);
+                              int const AirLoopNum,
+                              Real64 const OutAirMinFrac,
+                              Real64 &OASignal,
+                              bool &HighHumidityOperationFlag,
+                              bool const FirstHVACIteration);
 
         void SizeOAController(EnergyPlusData &state);
 
@@ -322,6 +323,13 @@ namespace MixedAir {
         Array1D_int ZoneOAFlowMethod;               // OA flow method for each zone
         Array1D_int ZoneOASchPtr;               // Index to the outdoor air schedule for each zone (from DesignSpecification:OutdoorAir or default)
         Array1D<Real64> OAPropCtlMinRateSchPtr; // Outdoor design OA flow rate schedule from DesignSpecification:OutdoorAir
+        Real64 Ep = 1.0;                        // zone primary air fraction
+        Real64 Er = 0.0;                        // zone secondary recirculation fraction
+        Real64 Fa = 1.0;                        // temporary variable used in multi-path VRP calc
+        Real64 Fb = 1.0;
+        Real64 Fc = 1.0;
+        Real64 Xs = 1.0;  // uncorrected system outdoor air fraction
+        Real64 Evz = 1.0; // zone ventilation efficiency
 
         // Default Constructor
         VentilationMechanicalProps()
@@ -389,15 +397,17 @@ namespace MixedAir {
 
     int GetOAController(EnergyPlusData &state, std::string const &OAName);
 
-    void ManageOutsideAirSystem(EnergyPlusData &state, std::string const &OASysName, bool const FirstHVACIteration, int const AirLoopNum, int &OASysNum);
+    void
+    ManageOutsideAirSystem(EnergyPlusData &state, std::string const &OASysName, bool const FirstHVACIteration, int const AirLoopNum, int &OASysNum);
 
     void SimOutsideAirSys(EnergyPlusData &state, int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum);
 
     void SimOASysComponents(EnergyPlusData &state, int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum);
 
-    void SimOAComponent(EnergyPlusData &state, std::string const &CompType, // the component type
-                        std::string const &CompName, // the component Name
-                        int const CompTypeNum,       // Component Type -- Integerized for this module
+    void SimOAComponent(EnergyPlusData &state,
+                        std::string const &CompType,                    // the component type
+                        std::string const &CompName,                    // the component Name
+                        SimAirServingZones::CompType const CompTypeNum, // Component Type -- Integerized for this module
                         bool const FirstHVACIteration,
                         int &CompIndex,
                         int const AirLoopNum, // air loop index for economizer lockout coordination
@@ -423,7 +433,8 @@ namespace MixedAir {
 
     void GetOAMixerInputs(EnergyPlusData &state);
 
-    void ProcessOAControllerInputs(EnergyPlusData &state, std::string const &CurrentModuleObject,
+    void ProcessOAControllerInputs(EnergyPlusData &state,
+                                   std::string const &CurrentModuleObject,
                                    int const OutAirNum,
                                    Array1D_string const &AlphArray,
                                    int &NumAlphas,
@@ -433,7 +444,7 @@ namespace MixedAir {
                                    Array1D_bool const &lAlphaBlanks,
                                    Array1D_string const &cAlphaFields,
                                    Array1D_string const &cNumericFields, // Unused
-                                   bool &ErrorsFound                    // If errors found in input
+                                   bool &ErrorsFound                     // If errors found in input
     );
 
     // End of Get Input subroutines for the Module
@@ -478,11 +489,13 @@ namespace MixedAir {
     // Beginning Utility Section of the Module
     //******************************************************************************
 
-    Real64 MixedAirControlTempResidual(Real64 const OASignal,     // Relative outside air flow rate (0 to 1)
+    Real64 MixedAirControlTempResidual(EnergyPlusData &state,
+                                       Real64 const OASignal,     // Relative outside air flow rate (0 to 1)
                                        Array1D<Real64> const &Par // par(1) = mixed node number
     );
 
-    Real64 MultiCompControlTempResidual(EnergyPlusData &state, Real64 const OASignal,     // Relative outside air flow rate (0 to 1)
+    Real64 MultiCompControlTempResidual(EnergyPlusData &state,
+                                        Real64 const OASignal,     // Relative outside air flow rate (0 to 1)
                                         Array1D<Real64> const &Par // par(1) = mixed node number
     );
 
@@ -519,28 +532,33 @@ namespace MixedAir {
 
     int GetOAMixerMixedNodeNumber(EnergyPlusData &state, int const OAMixerNumber); // Which Mixer
 
-    bool CheckForControllerWaterCoil(EnergyPlusData &state, std::string const &ControllerType, // should be passed in as UPPERCASE
+    bool CheckForControllerWaterCoil(EnergyPlusData &state,
+                                     std::string const &ControllerType, // should be passed in as UPPERCASE
                                      std::string const &ControllerName  // should be passed in as UPPERCASE
     );
 
     void CheckControllerLists(EnergyPlusData &state, bool &ErrFound);
 
-    void CheckOAControllerName(EnergyPlusData &state, std::string &OAControllerName, std::string const &ObjectType, std::string const &FieldName, bool &ErrorsFound);
+    void CheckOAControllerName(
+        EnergyPlusData &state, std::string &OAControllerName, std::string const &ObjectType, std::string const &FieldName, bool &ErrorsFound);
 
     int GetNumOASystems(EnergyPlusData &state);
 
     int GetOACompListNumber(EnergyPlusData &state, int const OASysNum); // OA Sys Number
 
-    std::string GetOACompName(EnergyPlusData &state, int const OASysNum, // OA Sys Number
+    std::string GetOACompName(EnergyPlusData &state,
+                              int const OASysNum, // OA Sys Number
                               int const InListNum // In-list Number
     );
 
-    std::string GetOACompType(EnergyPlusData &state, int const OASysNum, // OA Sys Number
+    std::string GetOACompType(EnergyPlusData &state,
+                              int const OASysNum, // OA Sys Number
                               int const InListNum // In-list Number
     );
 
-    int GetOACompTypeNum(EnergyPlusData &state, int const OASysNum, // OA Sys Number
-                         int const InListNum // In-list Number
+    SimAirServingZones::CompType GetOACompTypeNum(EnergyPlusData &state,
+                                                  int const OASysNum, // OA Sys Number
+                                                  int const InListNum // In-list Number
     );
 
     int GetOAMixerNumber(EnergyPlusData &state, std::string const &OAMixerName); // must match OA mixer names for the OA mixer type
@@ -550,7 +568,8 @@ namespace MixedAir {
 
 } // namespace MixedAir
 
-struct MixedAirData : BaseGlobalStruct {
+struct MixedAirData : BaseGlobalStruct
+{
 
     int NumControllerLists = 0;     // Number of Controller Lists
     int NumOAControllers = 0;       // Number of OA Controllers (includes ERV controllers)
@@ -572,12 +591,20 @@ struct MixedAirData : BaseGlobalStruct {
     Array1D_string VentMechZoneOrListName;  // Zone or Zone List to apply mechanical ventilation rate
     Array1D_string DesignSpecZoneADObjName; // name of the design specification zone air distribution object
     Array1D_int DesignSpecZoneADObjIndex;   // index of the design specification zone air distribution object
-    Array1D<MixedAir::ControllerListProps> ControllerLists;
-    Array1D<MixedAir::OAControllerProps> OAController;
-    Array1D<MixedAir::OAMixerProps> OAMixer;
-    Array1D<MixedAir::VentilationMechanicalProps> VentilationMechanical;
+    EPVector<MixedAir::ControllerListProps> ControllerLists;
+    EPVector<MixedAir::OAControllerProps> OAController;
+    EPVector<MixedAir::OAMixerProps> OAMixer;
+    EPVector<MixedAir::VentilationMechanicalProps> VentilationMechanical;
     std::unordered_set<std::string> ControllerListUniqueNames;
     std::unordered_map<std::string, std::string> OAControllerUniqueNames;
+    std::string CompType;
+    std::string CompName;
+    std::string CtrlName;
+    Array1D_bool OAControllerMyOneTimeFlag;
+    Array1D_bool OAControllerMyEnvrnFlag;
+    Array1D_bool OAControllerMySizeFlag;
+    Array1D_bool MechVentCheckFlag;
+    Array1D<Real64> Par = Array1D<Real64>(6);
 
     void clear_state() override
     {
@@ -607,6 +634,10 @@ struct MixedAirData : BaseGlobalStruct {
         this->VentilationMechanical.deallocate();
         this->ControllerListUniqueNames.clear();
         this->OAControllerUniqueNames.clear();
+        this->OAControllerMyOneTimeFlag.clear();
+        this->OAControllerMyEnvrnFlag.clear();
+        this->OAControllerMySizeFlag.clear();
+        this->MechVentCheckFlag.clear();
     }
 };
 

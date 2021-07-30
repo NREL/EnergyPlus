@@ -71,7 +71,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.4;
+  Version,9.6;
 
   Output:Diagnostics,
     DisplayExtrawarnings;    !- Key 1
@@ -1922,26 +1922,22 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 1,                !- Name
     OA Sys 1 Controllers,    !- Controller List Name
-    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name
-    Air Loop Avail List;     !- Availability Manager List Name
+    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 2,                !- Name
     OA Sys 2 Controllers,    !- Controller List Name
-    OA Sys 2 Equipment,      !- Outdoor Air Equipment List Name
-    Air Loop Avail List;     !- Availability Manager List Name
+    OA Sys 2 Equipment;      !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 3,                !- Name
     OA Sys 3 Controllers,    !- Controller List Name
-    OA Sys 3 Equipment,      !- Outdoor Air Equipment List Name
-    Air Loop Avail List;     !- Availability Manager List Name
+    OA Sys 3 Equipment;      !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 4,                !- Name
     OA Sys 4 Controllers,    !- Controller List Name
-    OA Sys 4 Equipment,      !- Outdoor Air Equipment List Name
-    Air Loop Avail List;     !- Availability Manager List Name
+    OA Sys 4 Equipment;      !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:ControllerList,
     OA Sys 1 Controllers,    !- Name
@@ -2715,7 +2711,7 @@
     Gap_1_Layer,             !- Gap 2 Name
     ,                        !- Gap 2 Directional Front Absoptance Matrix Name
     ,                        !- Gap 2 Directional Back Absoptance Matrix Name
-    Glass_5012_Layer,        !- Layer 3 Material
+    Glass_5012_Layer,        !- Layer 3 Name
     CFS_Glz_2035_Layer_3_fAbs,  !- Layer 3 Directional Front Absoptance Matrix Name
     CFS_Glz_2035_Layer_3_bAbs;  !- Layer 3 Directional Back Absoptance Matrix Name
 
@@ -9885,7 +9881,7 @@
     Gap_1_Layer,             !- Gap 2 Name
     ,                        !- Gap 2 Directional Front Absoptance Matrix Name
     ,                        !- Gap 2 Directional Back Absoptance Matrix Name
-    Shade_46_Layer,          !- Layer 3 Material
+    Shade_46_Layer,          !- Layer 3 Name
     CFS_Glz_2046_Layer_3_fAbs,  !- Layer 3 Directional Front Absoptance Matrix Name
     CFS_Glz_2046_Layer_3_bAbs;  !- Layer 3 Directional Back Absoptance Matrix Name
 

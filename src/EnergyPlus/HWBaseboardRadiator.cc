@@ -115,8 +115,6 @@ namespace HWBaseboardRadiator {
     // Use statements for data only modules
     // Using/Aliasing
     using DataHVACGlobals::SmallLoad;
-    using DataHVACGlobals::SysTimeElapsed;
-    using DataHVACGlobals::TimeStepSys;
     using DataPlant::TypeOf_Baseboard_Rad_Conv_Water;
     using DataZoneEquipment::CheckZoneEquipmentList;
 
@@ -125,34 +123,8 @@ namespace HWBaseboardRadiator {
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-
     std::string const cCMO_BBRadiator_Water("ZoneHVAC:Baseboard:RadiantConvective:Water");
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    int NumHWBaseboards(0);
-    Array1D<Real64> QBBRadSource;         // Need to keep the last value in case we are still iterating
-    Array1D<Real64> QBBRadSrcAvg;         // Need to keep the last value in case we are still iterating
-    Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
-
-    // Record keeping variables used to calculate QBBRadSrcAvg locally
-    Array1D<Real64> LastQBBRadSrc;      // Need to keep the last value in case we are still iterating
-    Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-    Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
-    Array1D_bool MySizeFlag;
-    Array1D_bool CheckEquipName;
-    Array1D_bool SetLoopIndexFlag; // get loop number flag
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
-
-    // Object Data
-    Array1D<HWBaseboardParams> HWBaseboard;
-    Array1D<HWBaseboardNumericFieldData> HWBaseboardNumericFields;
-
-    // Functions
+    std::string const cCMO_BBRadiator_Water_Design("ZoneHVAC:Baseboard:RadiantConvective:Water:Design");
 
     void SimHWBaseboard(EnergyPlusData &state,
                         std::string const &EquipName,
@@ -173,13 +145,12 @@ namespace HWBaseboardRadiator {
         // This subroutine simulates the Baseboard Radiators.
 
         // Using/Aliasing
-        using DataLoopNode::Node;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int BaseboardNum;               // Index of unit in baseboard array
-        static bool GetInputFlag(true); // One time get input flag
-        Real64 QZnReq;                  // Zone load not yet satisfied
+        int BaseboardNum; // Index of unit in baseboard array
+        auto &GetInputFlag = state.dataHWBaseboardRad->GetInputFlag;
+        Real64 QZnReq; // Zone load not yet satisfied
         Real64 MaxWaterFlow;
         Real64 MinWaterFlow;
 
@@ -187,6 +158,11 @@ namespace HWBaseboardRadiator {
             GetHWBaseboardInput(state);
             GetInputFlag = false;
         }
+
+        auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard;
+        auto &NumHWBaseboards = state.dataHWBaseboardRad->NumHWBaseboards;
+        auto &CheckEquipName = state.dataHWBaseboardRad->CheckEquipName;
+        auto &HWBaseboardDesignObject = state.dataHWBaseboardRad->HWBaseboardDesignObject;
 
         // Find the correct Baseboard Equipment
         if (CompIndex == 0) {
@@ -217,6 +193,8 @@ namespace HWBaseboardRadiator {
         }
 
         if (CompIndex > 0) {
+            HWBaseboardDesignData HWBaseboardDesignDataObject{
+                HWBaseboardDesignObject(HWBaseboard(BaseboardNum).DesignObjectPtr)}; // Contains the data for variable flow hydronic systems
 
             InitHWBaseboard(state, BaseboardNum, ControlledZoneNum, FirstHVACIteration);
 
@@ -228,8 +206,8 @@ namespace HWBaseboardRadiator {
                 MaxWaterFlow = HWBaseboard(BaseboardNum).WaterMassFlowRateMax;
                 MinWaterFlow = 0.0;
             } else {
-                MaxWaterFlow = Node(HWBaseboard(BaseboardNum).WaterInletNode).MassFlowRateMaxAvail;
-                MinWaterFlow = Node(HWBaseboard(BaseboardNum).WaterInletNode).MassFlowRateMinAvail;
+                MaxWaterFlow = state.dataLoopNodes->Node(HWBaseboard(BaseboardNum).WaterInletNode).MassFlowRateMaxAvail;
+                MinWaterFlow = state.dataLoopNodes->Node(HWBaseboard(BaseboardNum).WaterInletNode).MassFlowRateMinAvail;
             }
 
             {
@@ -245,7 +223,7 @@ namespace HWBaseboardRadiator {
                                       HWBaseboard(BaseboardNum).WaterInletNode,
                                       MaxWaterFlow,
                                       MinWaterFlow,
-                                      HWBaseboard(BaseboardNum).Offset,
+                                      HWBaseboardDesignDataObject.Offset,
                                       HWBaseboard(BaseboardNum).ControlCompTypeNum,
                                       HWBaseboard(BaseboardNum).CompErrIndex,
                                       _,
@@ -267,7 +245,7 @@ namespace HWBaseboardRadiator {
 
             UpdateHWBaseboard(state, BaseboardNum);
 
-            ReportHWBaseboard(BaseboardNum);
+            ReportHWBaseboard(state, BaseboardNum);
 
         } else {
             ShowFatalError(state, "SimHWBaseboard: Unit not found=" + EquipName);
@@ -291,25 +269,18 @@ namespace HWBaseboardRadiator {
 
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
-        using DataLoopNode::Node;
-        using DataLoopNode::NodeConnectionType_Inlet;
-        using DataLoopNode::NodeConnectionType_Outlet;
-        using DataLoopNode::NodeType_Water;
         using DataLoopNode::ObjectIsNotParent;
         using DataSizing::AutoSize;
         using DataSizing::CapacityPerFloorArea;
         using DataSizing::FractionOfAutosizedHeatingCapacity;
         using DataSizing::HeatingDesignCapacity;
-        using DataSurfaces::Surface;
-
         using GlobalNames::VerifyUniqueBaseboardName;
         using NodeInputManager::GetOnlySingleNode;
         using ScheduleManager::GetCurrentScheduleValue;
         using ScheduleManager::GetScheduleIndex;
-        using namespace DataIPShortCuts;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetHWBaseboardInput:");
+        static constexpr std::string_view RoutineName("GetHWBaseboardInput:");
         Real64 const MaxFraction(1.0);
         Real64 const MinFraction(0.0);
         Real64 const MaxWaterTempAvg(150.0);        // Maximum limit of average water temperature in degree C
@@ -321,241 +292,356 @@ namespace HWBaseboardRadiator {
         Real64 const WaterMassFlowDefault(0.063);   // Default water mass flow rate in kg/s
         //    INTEGER, PARAMETER   :: MaxDistribSurfaces    = 20         ! Maximum number of surfaces that a baseboard heater can radiate to
         int const MinDistribSurfaces(1);                  // Minimum number of surfaces that a baseboard heater can radiate to
-        int const iHeatCAPMAlphaNum(5);                   // get input index to HW baseboard heating capacity sizing method
+        int const iHeatCAPMAlphaNum(2);                   // get input index to HW baseboard heating capacity sizing method
         int const iHeatDesignCapacityNumericNum(3);       // get input index to HW baseboard heating capacity
-        int const iHeatCapacityPerFloorAreaNumericNum(4); // get input index to HW baseboard heating capacity per floor area sizing
+        int const iHeatCapacityPerFloorAreaNumericNum(1); // get input index to HW baseboard heating capacity per floor area sizing
         int const iHeatFracOfAutosizedCapacityNumericNum(
-            5); //  get input index to HW baseboard heating capacity sizing as fraction of autozized heating capacity
+            2); //  get input index to HW baseboard heating capacity sizing as fraction of autozized heating capacity
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AllFracsSummed; // Sum of the fractions radiant
         int BaseboardNum;      // Baseboard number
-        int NumAlphas;         // Number of Alphas for each GetobjectItem call
-        int NumNumbers;        // Number of Numbers for each GetobjectItem call
-        int SurfNum;           // Surface number Do loop counter
+        int BaseboardDesignNum;
+        int NumAlphas;  // Number of Alphas for each GetobjectItem call
+        int NumNumbers; // Number of Numbers for each GetobjectItem call
+        int SurfNum;    // Surface number Do loop counter
         int IOStat;
-        static bool ErrorsFound(false); // If errors detected in input
+        bool ErrorsFound(false); // If errors detected in input
 
-        NumHWBaseboards = inputProcessor->getNumObjectsFound(state, cCMO_BBRadiator_Water);
+        auto &NumHWBaseboards = state.dataHWBaseboardRad->NumHWBaseboards;
+        auto &NumHWBaseboardDesignObjs = state.dataHWBaseboardRad->NumHWBaseboardDesignObjs;
+        auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard;
+        auto &HWBaseboardDesignObject = state.dataHWBaseboardRad->HWBaseboardDesignObject;
+        auto &CheckEquipName = state.dataHWBaseboardRad->CheckEquipName;
+        auto &HWBaseboardNumericFields = state.dataHWBaseboardRad->HWBaseboardNumericFields;
+        auto &HWBaseboardDesignNumericFields = state.dataHWBaseboardRad->HWBaseboardDesignNumericFields;
+        auto &HWBaseboardDesignNames = state.dataHWBaseboardRad->HWBaseboardDesignNames;
+
+        NumHWBaseboards = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCMO_BBRadiator_Water);
+        NumHWBaseboardDesignObjs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCMO_BBRadiator_Water_Design);
 
         // Count total number of baseboard units
 
         HWBaseboard.allocate(NumHWBaseboards);
+        HWBaseboardDesignObject.allocate(NumHWBaseboardDesignObjs);
         CheckEquipName.allocate(NumHWBaseboards);
         HWBaseboardNumericFields.allocate(NumHWBaseboards);
+        HWBaseboardDesignNumericFields.allocate(NumHWBaseboardDesignObjs);
+        HWBaseboardDesignNames.allocate(NumHWBaseboardDesignObjs);
         CheckEquipName = true;
+
+        // Get the data from the user input related to design data for baseboard heaters
+        for (BaseboardDesignNum = 1; BaseboardDesignNum <= NumHWBaseboardDesignObjs; ++BaseboardDesignNum) {
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cCMO_BBRadiator_Water_Design,
+                                                                     BaseboardDesignNum,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+
+            HWBaseboardDesignNumericFields(BaseboardDesignNum).FieldNames.allocate(NumNumbers);
+            HWBaseboardDesignNumericFields(BaseboardDesignNum).FieldNames = "";
+            HWBaseboardDesignNumericFields(BaseboardDesignNum).FieldNames = state.dataIPShortCut->cNumericFieldNames;
+
+            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
+
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
+            VerifyUniqueBaseboardName(
+                state, cCMO_BBRadiator_Water_Design, state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, cCMO_BBRadiator_Water_Design + " Name");
+
+            HWBaseboardDesignObject(BaseboardDesignNum).designName = state.dataIPShortCut->cAlphaArgs(1); // Name of this baseboard design object
+            HWBaseboardDesignNames(BaseboardDesignNum) = state.dataIPShortCut->cAlphaArgs(1);
+
+            // Determine HW radiant baseboard heating design capacity sizing method
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "HeatingDesignCapacity")) {
+                HWBaseboardDesignObject(BaseboardDesignNum).HeatingCapMethod = HeatingDesignCapacity;
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "CapacityPerFloorArea")) {
+                HWBaseboardDesignObject(BaseboardDesignNum).HeatingCapMethod = CapacityPerFloorArea;
+                if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatCapacityPerFloorAreaNumericNum)) {
+                    HWBaseboardDesignObject(BaseboardDesignNum).ScaledHeatingCapacity =
+                        state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
+                    if (HWBaseboardDesignObject(BaseboardDesignNum).ScaledHeatingCapacity <= 0.0) {
+                        ShowSevereError(state,
+                                        state.dataIPShortCut->cCurrentModuleObject + " = " + HWBaseboardDesignObject(BaseboardDesignNum).designName);
+                        ShowContinueError(state,
+                                          "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
+                                              state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
+                        ShowContinueError(state,
+                                          format("Illegal {} = {:.7T}",
+                                                 state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum),
+                                                 state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum)));
+                        ErrorsFound = true;
+                    } else if (HWBaseboardDesignObject(BaseboardDesignNum).ScaledHeatingCapacity == AutoSize) {
+                        ShowSevereError(state,
+                                        state.dataIPShortCut->cCurrentModuleObject + " = " + HWBaseboardDesignObject(BaseboardDesignNum).designName);
+                        ShowContinueError(state,
+                                          "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
+                                              state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
+                        ShowContinueError(state,
+                                          "Illegal " + state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum) + " = Autosize");
+                        ErrorsFound = true;
+                    }
+                } else {
+                    ShowSevereError(state,
+                                    state.dataIPShortCut->cCurrentModuleObject + " = " + HWBaseboardDesignObject(BaseboardDesignNum).designName);
+                    ShowContinueError(state,
+                                      "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
+                                          state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
+                    ShowContinueError(state,
+                                      "Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum));
+                    ErrorsFound = true;
+                }
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity")) {
+                HWBaseboardDesignObject(BaseboardDesignNum).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
+                if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatFracOfAutosizedCapacityNumericNum)) {
+                    HWBaseboardDesignObject(BaseboardDesignNum).ScaledHeatingCapacity =
+                        state.dataIPShortCut->rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
+                    if (HWBaseboardDesignObject(BaseboardDesignNum).ScaledHeatingCapacity < 0.0) {
+                        ShowSevereError(state,
+                                        state.dataIPShortCut->cCurrentModuleObject + " = " + HWBaseboardDesignObject(BaseboardDesignNum).designName);
+                        ShowContinueError(state,
+                                          format("Illegal {} = {:.7T}",
+                                                 state.dataIPShortCut->cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum),
+                                                 state.dataIPShortCut->rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum)));
+                        ErrorsFound = true;
+                    }
+                } else {
+                    ShowSevereError(state,
+                                    state.dataIPShortCut->cCurrentModuleObject + " = " + HWBaseboardDesignObject(BaseboardDesignNum).designName);
+                    ShowContinueError(state,
+                                      "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
+                                          state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
+                    ShowContinueError(
+                        state, "Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum));
+                    ErrorsFound = true;
+                }
+            }
+
+            HWBaseboardDesignObject(BaseboardDesignNum).Offset = state.dataIPShortCut->rNumericArgs(3);
+            // Set default convergence tolerance
+            if (HWBaseboardDesignObject(BaseboardDesignNum).Offset <= 0.0) {
+                ShowWarningError(state,
+                                 std::string{RoutineName} + cCMO_BBRadiator_Water_Design + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", " +
+                                     state.dataIPShortCut->cNumericFieldNames(3) + " was less than the allowable minimum.");
+                ShowContinueError(state, format("...reset to a default value=[{:.2R}].", MaxFraction));
+                HWBaseboardDesignObject(BaseboardDesignNum).Offset = 0.001;
+            }
+
+            HWBaseboardDesignObject(BaseboardDesignNum).FracRadiant = state.dataIPShortCut->rNumericArgs(4);
+            if (HWBaseboardDesignObject(BaseboardDesignNum).FracRadiant < MinFraction) {
+                ShowWarningError(state,
+                                 std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", " +
+                                     state.dataIPShortCut->cNumericFieldNames(4) + " was lower than the allowable minimum.");
+                ShowContinueError(state, format("...reset to minimum value=[{:.2R}].", MinFraction));
+                HWBaseboardDesignObject(BaseboardDesignNum).FracRadiant = MinFraction;
+            }
+            if (HWBaseboardDesignObject(BaseboardDesignNum).FracRadiant > MaxFraction) {
+                ShowWarningError(state,
+                                 std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", " +
+                                     state.dataIPShortCut->cNumericFieldNames(4) + " was higher than the allowable maximum.");
+                ShowContinueError(state, format("...reset to maximum value=[{:.2R}].", MaxFraction));
+                HWBaseboardDesignObject(BaseboardDesignNum).FracRadiant = MaxFraction;
+            }
+
+            HWBaseboardDesignObject(BaseboardDesignNum).FracDistribPerson = state.dataIPShortCut->rNumericArgs(5);
+            if (HWBaseboardDesignObject(BaseboardDesignNum).FracDistribPerson < MinFraction) {
+                ShowWarningError(state,
+                                 std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", " +
+                                     state.dataIPShortCut->cNumericFieldNames(5) + " was lower than the allowable minimum.");
+                ShowContinueError(state, format("...reset to minimum value=[{:.3R}].", MinFraction));
+                HWBaseboardDesignObject(BaseboardDesignNum).FracDistribPerson = MinFraction;
+            }
+            if (HWBaseboardDesignObject(BaseboardDesignNum).FracDistribPerson > MaxFraction) {
+                ShowWarningError(state,
+                                 std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", " +
+                                     state.dataIPShortCut->cNumericFieldNames(5) + " was higher than the allowable maximum.");
+                ShowContinueError(state, format("...reset to maximum value=[{:.3R}].", MaxFraction));
+                HWBaseboardDesignObject(BaseboardDesignNum).FracDistribPerson = MaxFraction;
+            }
+        }
 
         // Get the data from the user input related to baseboard heaters
         for (BaseboardNum = 1; BaseboardNum <= NumHWBaseboards; ++BaseboardNum) {
 
-            inputProcessor->getObjectItem(state,
-                                          cCMO_BBRadiator_Water,
-                                          BaseboardNum,
-                                          cAlphaArgs,
-                                          NumAlphas,
-                                          rNumericArgs,
-                                          NumNumbers,
-                                          IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cCMO_BBRadiator_Water,
+                                                                     BaseboardNum,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
 
             HWBaseboardNumericFields(BaseboardNum).FieldNames.allocate(NumNumbers);
             HWBaseboardNumericFields(BaseboardNum).FieldNames = "";
-            HWBaseboardNumericFields(BaseboardNum).FieldNames = cNumericFieldNames;
-            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            HWBaseboardNumericFields(BaseboardNum).FieldNames = state.dataIPShortCut->cNumericFieldNames;
+            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueBaseboardName(state, cCMO_BBRadiator_Water, cAlphaArgs(1), ErrorsFound, cCMO_BBRadiator_Water + " Name");
+            VerifyUniqueBaseboardName(
+                state, cCMO_BBRadiator_Water, state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, cCMO_BBRadiator_Water + " Name");
 
-            HWBaseboard(BaseboardNum).EquipID = cAlphaArgs(1);                     // Name of this baseboard
-            HWBaseboard(BaseboardNum).EquipType = TypeOf_Baseboard_Rad_Conv_Water; //'ZoneHVAC:Baseboard:RadiantConvective:Water'
+            HWBaseboard(BaseboardNum).EquipID = state.dataIPShortCut->cAlphaArgs(1); // Name of this baseboard
+            HWBaseboard(BaseboardNum).EquipType = TypeOf_Baseboard_Rad_Conv_Water;   //'ZoneHVAC:Baseboard:RadiantConvective:Water'
+
+            HWBaseboard(BaseboardNum).designObjectName = state.dataIPShortCut->cAlphaArgs(2); // Name of the design object for this baseboard
+            HWBaseboard(BaseboardNum).DesignObjectPtr =
+                UtilityRoutines::FindItemInList(HWBaseboard(BaseboardNum).designObjectName, HWBaseboardDesignNames);
+            HWBaseboardDesignData HWBaseboardDesignDataObject{
+                HWBaseboardDesignObject(HWBaseboard(BaseboardNum).DesignObjectPtr)}; // Contains the data for the design object
 
             // Get schedule
-            HWBaseboard(BaseboardNum).Schedule = cAlphaArgs(2);
-            if (lAlphaFieldBlanks(2)) {
+            HWBaseboard(BaseboardNum).Schedule = state.dataIPShortCut->cAlphaArgs(3);
+            if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 HWBaseboard(BaseboardNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
-                HWBaseboard(BaseboardNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
+                HWBaseboard(BaseboardNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                 if (HWBaseboard(BaseboardNum).SchedPtr == 0) {
-                    ShowSevereError(state, RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(2) + "=\"" +
-                                    cAlphaArgs(2) + "\" not found.");
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\" not found.");
                     ErrorsFound = true;
                 }
             }
 
             // Get inlet node number
             HWBaseboard(BaseboardNum).WaterInletNode = GetOnlySingleNode(state,
-                cAlphaArgs(3), ErrorsFound, cCMO_BBRadiator_Water, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                                                                         state.dataIPShortCut->cAlphaArgs(4),
+                                                                         ErrorsFound,
+                                                                         cCMO_BBRadiator_Water,
+                                                                         state.dataIPShortCut->cAlphaArgs(1),
+                                                                         DataLoopNode::NodeFluidType::Water,
+                                                                         DataLoopNode::NodeConnectionType::Inlet,
+                                                                         NodeInputManager::compFluidStream::Primary,
+                                                                         ObjectIsNotParent);
 
             // Get outlet node number
             HWBaseboard(BaseboardNum).WaterOutletNode = GetOnlySingleNode(state,
-                cAlphaArgs(4), ErrorsFound, cCMO_BBRadiator_Water, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
-            TestCompSet(state, cCMO_BBRadiator_Water, cAlphaArgs(1), cAlphaArgs(3), cAlphaArgs(4), "Hot Water Nodes");
+                                                                          state.dataIPShortCut->cAlphaArgs(5),
+                                                                          ErrorsFound,
+                                                                          cCMO_BBRadiator_Water,
+                                                                          state.dataIPShortCut->cAlphaArgs(1),
+                                                                          DataLoopNode::NodeFluidType::Water,
+                                                                          DataLoopNode::NodeConnectionType::Outlet,
+                                                                          NodeInputManager::compFluidStream::Primary,
+                                                                          ObjectIsNotParent);
+            TestCompSet(state,
+                        cCMO_BBRadiator_Water,
+                        state.dataIPShortCut->cAlphaArgs(1),
+                        state.dataIPShortCut->cAlphaArgs(4),
+                        state.dataIPShortCut->cAlphaArgs(5),
+                        "Hot Water Nodes");
 
-            HWBaseboard(BaseboardNum).WaterTempAvg = rNumericArgs(1);
+            HWBaseboard(BaseboardNum).WaterTempAvg = state.dataIPShortCut->rNumericArgs(1);
             if (HWBaseboard(BaseboardNum).WaterTempAvg > MaxWaterTempAvg + 0.001) {
-                ShowWarningError(state, RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(1) +
-                                 " was higher than the allowable maximum.");
+                ShowWarningError(state,
+                                 std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", " +
+                                     state.dataIPShortCut->cNumericFieldNames(1) + " was higher than the allowable maximum.");
                 ShowContinueError(state, format("...reset to maximum value=[{:.2R}].", MaxWaterTempAvg));
                 HWBaseboard(BaseboardNum).WaterTempAvg = MaxWaterTempAvg;
             } else if (HWBaseboard(BaseboardNum).WaterTempAvg < MinWaterTempAvg - 0.001) {
-                ShowWarningError(state, RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(1) +
-                                 " was lower than the allowable minimum.");
+                ShowWarningError(state,
+                                 std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", " +
+                                     state.dataIPShortCut->cNumericFieldNames(1) + " was lower than the allowable minimum.");
                 ShowContinueError(state, format("...reset to minimum value=[{:.2R}].", MinWaterTempAvg));
                 HWBaseboard(BaseboardNum).WaterTempAvg = MinWaterTempAvg;
             }
 
-            HWBaseboard(BaseboardNum).WaterMassFlowRateStd = rNumericArgs(2);
+            HWBaseboard(BaseboardNum).WaterMassFlowRateStd = state.dataIPShortCut->rNumericArgs(2);
             if (HWBaseboard(BaseboardNum).WaterMassFlowRateStd < LowWaterMassFlowRate - 0.0001 ||
                 HWBaseboard(BaseboardNum).WaterMassFlowRateStd > HighWaterMassFlowRate + 0.0001) {
-                ShowWarningError(state, RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(2) +
-                                 " is an invalid Standard Water mass flow rate.");
+                ShowWarningError(state,
+                                 std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", " +
+                                     state.dataIPShortCut->cNumericFieldNames(2) + " is an invalid Standard Water mass flow rate.");
                 ShowContinueError(state, format("...reset to a default value=[{:.1R}].", WaterMassFlowDefault));
                 HWBaseboard(BaseboardNum).WaterMassFlowRateStd = WaterMassFlowDefault;
             }
 
             // Determine HW radiant baseboard heating design capacity sizing method
-            if (UtilityRoutines::SameString(cAlphaArgs(iHeatCAPMAlphaNum), "HeatingDesignCapacity")) {
-                HWBaseboard(BaseboardNum).HeatingCapMethod = HeatingDesignCapacity;
-
-                if (!lNumericFieldBlanks(iHeatDesignCapacityNumericNum)) {
-                    HWBaseboard(BaseboardNum).ScaledHeatingCapacity = rNumericArgs(iHeatDesignCapacityNumericNum);
+            HWBaseboard(BaseboardNum).HeatingCapMethod = HWBaseboardDesignDataObject.HeatingCapMethod;
+            if (HWBaseboard(BaseboardNum).HeatingCapMethod == HeatingDesignCapacity) {
+                if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatDesignCapacityNumericNum)) {
+                    HWBaseboard(BaseboardNum).ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatDesignCapacityNumericNum);
                     if (HWBaseboard(BaseboardNum).ScaledHeatingCapacity < 0.0 && HWBaseboard(BaseboardNum).ScaledHeatingCapacity != AutoSize) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + HWBaseboard(BaseboardNum).EquipID);
+                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HWBaseboard(BaseboardNum).EquipID);
                         ShowContinueError(state,
                                           format("Illegal {} = {:.7T}",
-                                                 cNumericFieldNames(iHeatDesignCapacityNumericNum),
-                                                 rNumericArgs(iHeatDesignCapacityNumericNum)));
+                                                 state.dataIPShortCut->cNumericFieldNames(iHeatDesignCapacityNumericNum),
+                                                 state.dataIPShortCut->rNumericArgs(iHeatDesignCapacityNumericNum)));
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + HWBaseboard(BaseboardNum).EquipID);
-                    ShowContinueError(state, "Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFieldNames(iHeatDesignCapacityNumericNum));
+                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HWBaseboard(BaseboardNum).EquipID);
+                    ShowContinueError(state,
+                                      "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
+                                          state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
+                    ShowContinueError(state,
+                                      "Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatDesignCapacityNumericNum));
                     ErrorsFound = true;
                 }
-            } else if (UtilityRoutines::SameString(cAlphaArgs(iHeatCAPMAlphaNum), "CapacityPerFloorArea")) {
-                HWBaseboard(BaseboardNum).HeatingCapMethod = CapacityPerFloorArea;
-                if (!lNumericFieldBlanks(iHeatCapacityPerFloorAreaNumericNum)) {
-                    HWBaseboard(BaseboardNum).ScaledHeatingCapacity = rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
-                    if (HWBaseboard(BaseboardNum).ScaledHeatingCapacity <= 0.0) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + HWBaseboard(BaseboardNum).EquipID);
-                        ShowContinueError(state, "Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
-                        ShowContinueError(state,
-                                          format("Illegal {} = {:.7T}",
-                                                 cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum),
-                                                 rNumericArgs(iHeatCapacityPerFloorAreaNumericNum)));
-                        ErrorsFound = true;
-                    } else if (HWBaseboard(BaseboardNum).ScaledHeatingCapacity == AutoSize) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + HWBaseboard(BaseboardNum).EquipID);
-                        ShowContinueError(state, "Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
-                        ShowContinueError(state, "Illegal " + cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum) + " = Autosize");
-                        ErrorsFound = true;
-                    }
-                } else {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + HWBaseboard(BaseboardNum).EquipID);
-                    ShowContinueError(state, "Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum));
-                    ErrorsFound = true;
-                }
-            } else if (UtilityRoutines::SameString(cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity")) {
-                HWBaseboard(BaseboardNum).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
-                if (!lNumericFieldBlanks(iHeatFracOfAutosizedCapacityNumericNum)) {
-                    HWBaseboard(BaseboardNum).ScaledHeatingCapacity = rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
-                    if (HWBaseboard(BaseboardNum).ScaledHeatingCapacity < 0.0) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + HWBaseboard(BaseboardNum).EquipID);
-                        ShowContinueError(state,
-                                          format("Illegal {} = {:.7T}",
-                                                 cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum),
-                                                 rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum)));
-                        ErrorsFound = true;
-                    }
-                } else {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + HWBaseboard(BaseboardNum).EquipID);
-                    ShowContinueError(state, "Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum));
-                    ErrorsFound = true;
-                }
+            } else if (HWBaseboard(BaseboardNum).HeatingCapMethod == CapacityPerFloorArea) {
+                HWBaseboard(BaseboardNum).ScaledHeatingCapacity = HWBaseboardDesignDataObject.ScaledHeatingCapacity;
+
+            } else if (HWBaseboard(BaseboardNum).HeatingCapMethod == FractionOfAutosizedHeatingCapacity) {
+                HWBaseboard(BaseboardNum).ScaledHeatingCapacity = HWBaseboardDesignDataObject.ScaledHeatingCapacity;
+
             } else {
-                ShowSevereError(state, cCurrentModuleObject + " = " + HWBaseboard(BaseboardNum).EquipID);
-                ShowContinueError(state, "Illegal " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HWBaseboard(BaseboardNum).EquipID);
+                ShowContinueError(state,
+                                  "Illegal " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
+                                      state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
                 ErrorsFound = true;
             }
 
-            HWBaseboard(BaseboardNum).WaterVolFlowRateMax = rNumericArgs(6);
+            HWBaseboard(BaseboardNum).WaterVolFlowRateMax = state.dataIPShortCut->rNumericArgs(4);
             if (std::abs(HWBaseboard(BaseboardNum).WaterVolFlowRateMax) <= MinWaterFlowRate) {
-                ShowWarningError(state, RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(6) +
-                                 " was less than the allowable minimum.");
+                ShowWarningError(state,
+                                 std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", " +
+                                     state.dataIPShortCut->cNumericFieldNames(4) + " was less than the allowable minimum.");
                 ShowContinueError(state, format("...reset to minimum value=[{:.2R}].", MinWaterFlowRate));
                 HWBaseboard(BaseboardNum).WaterVolFlowRateMax = MinWaterFlowRate;
             } else if (HWBaseboard(BaseboardNum).WaterVolFlowRateMax > MaxWaterFlowRate) {
-                ShowWarningError(state, RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(6) +
-                                 " was higher than the allowable maximum.");
+                ShowWarningError(state,
+                                 std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", " +
+                                     state.dataIPShortCut->cNumericFieldNames(4) + " was higher than the allowable maximum.");
                 ShowContinueError(state, format("...reset to maximum value=[{:.2R}].", MaxWaterFlowRate));
                 HWBaseboard(BaseboardNum).WaterVolFlowRateMax = MaxWaterFlowRate;
             }
 
-            HWBaseboard(BaseboardNum).Offset = rNumericArgs(7);
-            // Set default convergence tolerance
-            if (HWBaseboard(BaseboardNum).Offset <= 0.0) {
-                ShowWarningError(state, RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(7) +
-                                 " was less than the allowable minimum.");
-                ShowContinueError(state, format("...reset to a default value=[{:.2R}].", MaxFraction));
-                HWBaseboard(BaseboardNum).Offset = 0.001;
-            }
-
-            HWBaseboard(BaseboardNum).FracRadiant = rNumericArgs(8);
-            if (HWBaseboard(BaseboardNum).FracRadiant < MinFraction) {
-                ShowWarningError(state, RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(8) +
-                                 " was lower than the allowable minimum.");
-                ShowContinueError(state, format("...reset to minimum value=[{:.2R}].", MinFraction));
-                HWBaseboard(BaseboardNum).FracRadiant = MinFraction;
-            }
-            if (HWBaseboard(BaseboardNum).FracRadiant > MaxFraction) {
-                ShowWarningError(state, RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(8) +
-                                 " was higher than the allowable maximum.");
-                ShowContinueError(state, format("...reset to maximum value=[{:.2R}].", MaxFraction));
-                HWBaseboard(BaseboardNum).FracRadiant = MaxFraction;
-            }
-
             // Remaining fraction is added to the zone as convective heat transfer
-            AllFracsSummed = HWBaseboard(BaseboardNum).FracRadiant;
+            AllFracsSummed = HWBaseboardDesignDataObject.FracDistribPerson;
             if (AllFracsSummed > MaxFraction) {
-                ShowWarningError(state, RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) +
-                                 "\", Fraction Radiant was higher than the allowable maximum.");
-                HWBaseboard(BaseboardNum).FracRadiant = MaxFraction;
+                ShowWarningError(state,
+                                 std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                     "\", Fraction Radiant was higher than the allowable maximum.");
+                HWBaseboardDesignDataObject.FracRadiant = MaxFraction;
                 HWBaseboard(BaseboardNum).FracConvect = 0.0;
             } else {
                 HWBaseboard(BaseboardNum).FracConvect = 1.0 - AllFracsSummed;
             }
 
-            HWBaseboard(BaseboardNum).FracDistribPerson = rNumericArgs(9);
-            if (HWBaseboard(BaseboardNum).FracDistribPerson < MinFraction) {
-                ShowWarningError(state, RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(9) +
-                                 " was lower than the allowable minimum.");
-                ShowContinueError(state, format("...reset to minimum value=[{:.3R}].", MinFraction));
-                HWBaseboard(BaseboardNum).FracDistribPerson = MinFraction;
-            }
-            if (HWBaseboard(BaseboardNum).FracDistribPerson > MaxFraction) {
-                ShowWarningError(state, RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(9) +
-                                 " was higher than the allowable maximum.");
-                ShowContinueError(state, format("...reset to maximum value=[{:.3R}].", MaxFraction));
-                HWBaseboard(BaseboardNum).FracDistribPerson = MaxFraction;
-            }
-
-            HWBaseboard(BaseboardNum).TotSurfToDistrib = NumNumbers - 9;
+            HWBaseboard(BaseboardNum).TotSurfToDistrib = NumNumbers - 4;
             //      IF (HWBaseboard(BaseboardNum)%TotSurfToDistrib > MaxDistribSurfaces) THEN
-            //        CALL ShowWarningError(state, RoutineName//cCMO_BBRadiator_Water//'="'//TRIM(cAlphaArgs(1))// &
+            //        CALL ShowWarningError(state, RoutineName//cCMO_BBRadiator_Water//'="'//TRIM(state.dataIPShortCut->cAlphaArgs(1))// &
             //          '", the number of surface/radiant fraction groups entered was higher than the allowable maximum.')
             //        CALL ShowContinueError(state, '...only the maximum value=['//TRIM(RoundSigDigits(MaxDistribSurfaces))// &
             //           '] will be processed.')
             //        HWBaseboard(BaseboardNum)%TotSurfToDistrib = MaxDistribSurfaces
             //      END IF
-            if ((HWBaseboard(BaseboardNum).TotSurfToDistrib < MinDistribSurfaces) && (HWBaseboard(BaseboardNum).FracRadiant > MinFraction)) {
-                ShowSevereError(state, RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) +
-                                "\", the number of surface/radiant fraction groups entered was less than the allowable minimum.");
+            if ((HWBaseboard(BaseboardNum).TotSurfToDistrib < MinDistribSurfaces) && (HWBaseboardDesignDataObject.FracRadiant > MinFraction)) {
+                ShowSevereError(state,
+                                std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                    "\", the number of surface/radiant fraction groups entered was less than the allowable minimum.");
                 ShowContinueError(state, format("...the minimum that must be entered=[{}].", MinDistribSurfaces));
                 ErrorsFound = true;
                 HWBaseboard(BaseboardNum).TotSurfToDistrib = 0; // error
@@ -578,85 +664,96 @@ namespace HWBaseboardRadiator {
                 }
             }
             if (HWBaseboard(BaseboardNum).ZonePtr <= 0) {
-                ShowSevereError(state, RoutineName + cCMO_BBRadiator_Water + "=\"" + HWBaseboard(BaseboardNum).EquipID +
-                                "\" is not on any ZoneHVAC:EquipmentList.");
+                ShowSevereError(state,
+                                std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + HWBaseboard(BaseboardNum).EquipID +
+                                    "\" is not on any ZoneHVAC:EquipmentList.");
                 ErrorsFound = true;
                 continue;
             }
 
-            AllFracsSummed = HWBaseboard(BaseboardNum).FracDistribPerson;
+            AllFracsSummed = HWBaseboardDesignDataObject.FracDistribPerson;
             for (SurfNum = 1; SurfNum <= HWBaseboard(BaseboardNum).TotSurfToDistrib; ++SurfNum) {
-                HWBaseboard(BaseboardNum).SurfaceName(SurfNum) = cAlphaArgs(SurfNum + 5);
+                HWBaseboard(BaseboardNum).SurfaceName(SurfNum) = state.dataIPShortCut->cAlphaArgs(SurfNum + 5);
                 HWBaseboard(BaseboardNum).SurfacePtr(SurfNum) =
-                    HeatBalanceIntRadExchange::GetRadiantSystemSurface(state, cCMO_BBRadiator_Water,
+                    HeatBalanceIntRadExchange::GetRadiantSystemSurface(state,
+                                                                       cCMO_BBRadiator_Water,
                                                                        HWBaseboard(BaseboardNum).EquipID,
                                                                        HWBaseboard(BaseboardNum).ZonePtr,
                                                                        HWBaseboard(BaseboardNum).SurfaceName(SurfNum),
                                                                        ErrorsFound);
-                HWBaseboard(BaseboardNum).FracDistribToSurf(SurfNum) = rNumericArgs(SurfNum + 9);
+                HWBaseboard(BaseboardNum).FracDistribToSurf(SurfNum) = state.dataIPShortCut->rNumericArgs(SurfNum + 4);
                 if (HWBaseboard(BaseboardNum).FracDistribToSurf(SurfNum) > MaxFraction) {
-                    ShowWarningError(state, RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(SurfNum + 9) +
-                                     "was greater than the allowable maximum.");
+                    ShowWarningError(state,
+                                     std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", " +
+                                         state.dataIPShortCut->cNumericFieldNames(SurfNum + 4) + "was greater than the allowable maximum.");
                     ShowContinueError(state, format("...reset to maximum value=[{:.2R}].", MaxFraction));
                     HWBaseboard(BaseboardNum).TotSurfToDistrib = MaxFraction;
                 }
                 if (HWBaseboard(BaseboardNum).FracDistribToSurf(SurfNum) < MinFraction) {
-                    ShowWarningError(state, RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(SurfNum + 9) +
-                                     "was less than the allowable minimum.");
+                    ShowWarningError(state,
+                                     std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", " +
+                                         state.dataIPShortCut->cNumericFieldNames(SurfNum + 4) + "was less than the allowable minimum.");
                     ShowContinueError(state, format("...reset to maximum value=[{:.2R}].", MinFraction));
                     HWBaseboard(BaseboardNum).TotSurfToDistrib = MinFraction;
                 }
                 if (HWBaseboard(BaseboardNum).SurfacePtr(SurfNum) != 0) {
-                    Surface(HWBaseboard(BaseboardNum).SurfacePtr(SurfNum)).IntConvSurfGetsRadiantHeat = true;
+                    state.dataSurface->SurfIntConvSurfGetsRadiantHeat(HWBaseboard(BaseboardNum).SurfacePtr(SurfNum)) = true;
                 }
 
                 AllFracsSummed += HWBaseboard(BaseboardNum).FracDistribToSurf(SurfNum);
             } // Surfaces
 
             if (AllFracsSummed > (MaxFraction + 0.01)) {
-                ShowSevereError(state, RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) +
-                                "\", Summed radiant fractions for people + surface groups > 1.0");
+                ShowSevereError(state,
+                                std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                    "\", Summed radiant fractions for people + surface groups > 1.0");
                 ErrorsFound = true;
             }
             if ((AllFracsSummed < (MaxFraction - 0.01)) &&
-                (HWBaseboard(BaseboardNum).FracRadiant > MinFraction)) { // User didn't distribute all of the | radiation warn that some will be lost
-                ShowWarningError(state, RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) +
-                                 "\", Summed radiant fractions for people + surface groups < 1.0");
+                (HWBaseboardDesignDataObject.FracRadiant >
+                 MinFraction)) { // User didn't distribute all of the | radiation warn that some will be lost
+                ShowWarningError(state,
+                                 std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                     "\", Summed radiant fractions for people + surface groups < 1.0");
                 ShowContinueError(state, "The rest of the radiant energy delivered by the baseboard heater will be lost");
             }
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + cCMO_BBRadiator_Water + "Errors found getting input. Program terminates.");
+            ShowFatalError(state, std::string{RoutineName} + cCMO_BBRadiator_Water + "Errors found getting input. Program terminates.");
         }
 
         // Setup Report variables for the Coils
         for (BaseboardNum = 1; BaseboardNum <= NumHWBaseboards; ++BaseboardNum) {
             // CurrentModuleObject='ZoneHVAC:Baseboard:RadiantConvective:Water'
-            SetupOutputVariable(state, "Baseboard Total Heating Rate",
+            SetupOutputVariable(state,
+                                "Baseboard Total Heating Rate",
                                 OutputProcessor::Unit::W,
                                 HWBaseboard(BaseboardNum).TotPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 HWBaseboard(BaseboardNum).EquipID);
 
-            SetupOutputVariable(state, "Baseboard Convective Heating Rate",
+            SetupOutputVariable(state,
+                                "Baseboard Convective Heating Rate",
                                 OutputProcessor::Unit::W,
                                 HWBaseboard(BaseboardNum).ConvPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 HWBaseboard(BaseboardNum).EquipID);
-            SetupOutputVariable(state, "Baseboard Radiant Heating Rate",
+            SetupOutputVariable(state,
+                                "Baseboard Radiant Heating Rate",
                                 OutputProcessor::Unit::W,
                                 HWBaseboard(BaseboardNum).RadPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 HWBaseboard(BaseboardNum).EquipID);
-            SetupOutputVariable(state, "Baseboard Total Heating Energy",
+            SetupOutputVariable(state,
+                                "Baseboard Total Heating Energy",
                                 OutputProcessor::Unit::J,
                                 HWBaseboard(BaseboardNum).TotEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 HWBaseboard(BaseboardNum).EquipID,
                                 _,
                                 "ENERGYTRANSFER",
@@ -664,64 +761,73 @@ namespace HWBaseboardRadiator {
                                 _,
                                 "System");
 
-            SetupOutputVariable(state, "Baseboard Convective Heating Energy",
+            SetupOutputVariable(state,
+                                "Baseboard Convective Heating Energy",
                                 OutputProcessor::Unit::J,
                                 HWBaseboard(BaseboardNum).ConvEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 HWBaseboard(BaseboardNum).EquipID);
-            SetupOutputVariable(state, "Baseboard Radiant Heating Energy",
+            SetupOutputVariable(state,
+                                "Baseboard Radiant Heating Energy",
                                 OutputProcessor::Unit::J,
                                 HWBaseboard(BaseboardNum).RadEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 HWBaseboard(BaseboardNum).EquipID);
-            SetupOutputVariable(state, "Baseboard Hot Water Energy",
+            SetupOutputVariable(state,
+                                "Baseboard Hot Water Energy",
                                 OutputProcessor::Unit::J,
                                 HWBaseboard(BaseboardNum).Energy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 HWBaseboard(BaseboardNum).EquipID,
                                 _,
                                 "PLANTLOOPHEATINGDEMAND",
                                 "BASEBOARD",
                                 _,
                                 "System");
-            SetupOutputVariable(state, "Baseboard Hot Water Mass Flow Rate",
+            SetupOutputVariable(state,
+                                "Baseboard Hot Water Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 HWBaseboard(BaseboardNum).WaterMassFlowRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 HWBaseboard(BaseboardNum).EquipID);
-            SetupOutputVariable(state, "Baseboard Air Mass Flow Rate",
+            SetupOutputVariable(state,
+                                "Baseboard Air Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 HWBaseboard(BaseboardNum).AirMassFlowRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 HWBaseboard(BaseboardNum).EquipID);
-            SetupOutputVariable(state, "Baseboard Air Inlet Temperature",
+            SetupOutputVariable(state,
+                                "Baseboard Air Inlet Temperature",
                                 OutputProcessor::Unit::C,
                                 HWBaseboard(BaseboardNum).AirInletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 HWBaseboard(BaseboardNum).EquipID);
-            SetupOutputVariable(state, "Baseboard Air Outlet Temperature",
+            SetupOutputVariable(state,
+                                "Baseboard Air Outlet Temperature",
                                 OutputProcessor::Unit::C,
                                 HWBaseboard(BaseboardNum).AirOutletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 HWBaseboard(BaseboardNum).EquipID);
-            SetupOutputVariable(state, "Baseboard Water Inlet Temperature",
+            SetupOutputVariable(state,
+                                "Baseboard Water Inlet Temperature",
                                 OutputProcessor::Unit::C,
                                 HWBaseboard(BaseboardNum).WaterInletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 HWBaseboard(BaseboardNum).EquipID);
-            SetupOutputVariable(state, "Baseboard Water Outlet Temperature",
+            SetupOutputVariable(state,
+                                "Baseboard Water Outlet Temperature",
                                 OutputProcessor::Unit::C,
                                 HWBaseboard(BaseboardNum).WaterOutletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 HWBaseboard(BaseboardNum).EquipID);
         }
     }
@@ -754,7 +860,6 @@ namespace HWBaseboardRadiator {
         // and Indirect Fired Water Heaters, January 2007 Edition
 
         // Using/Aliasing
-        using DataLoopNode::Node;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
 
@@ -764,7 +869,7 @@ namespace HWBaseboardRadiator {
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const Constant(0.0062); // Constant of linear equation for air mass flow rate
         Real64 const Coeff(0.0000275); // Correlation coefficient to capacity
-        static std::string const RoutineName("BaseboardRadiatorWater:InitHWBaseboard");
+        static constexpr std::string_view RoutineName("BaseboardRadiatorWater:InitHWBaseboard");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -773,9 +878,9 @@ namespace HWBaseboardRadiator {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(true);
-        static bool ZoneEquipmentListChecked(false);
-        static Array1D_bool MyEnvrnFlag;
+        auto &MyOneTimeFlag = state.dataHWBaseboardRad->MyOneTimeFlag;
+        auto &ZoneEquipmentListChecked = state.dataHWBaseboardRad->ZoneEquipmentListChecked;
+        auto &MyEnvrnFlag = state.dataHWBaseboardRad->MyEnvrnFlag;
         int Loop;
         int WaterInletNode;
         int ZoneNode;
@@ -784,6 +889,17 @@ namespace HWBaseboardRadiator {
         Real64 rho; // local fluid density
         Real64 Cp;  // local fluid specific heat
         bool errFlag;
+
+        auto &MySizeFlag = state.dataHWBaseboardRad->MySizeFlag;
+        auto &ZeroSourceSumHATsurf = state.dataHWBaseboardRad->ZeroSourceSumHATsurf;
+        auto &QBBRadSource = state.dataHWBaseboardRad->QBBRadSource;
+        auto &QBBRadSrcAvg = state.dataHWBaseboardRad->QBBRadSrcAvg;
+        auto &LastQBBRadSrc = state.dataHWBaseboardRad->LastQBBRadSrc;
+        auto &LastSysTimeElapsed = state.dataHWBaseboardRad->LastSysTimeElapsed;
+        auto &LastTimeStepSys = state.dataHWBaseboardRad->LastTimeStepSys;
+        auto &SetLoopIndexFlag = state.dataHWBaseboardRad->SetLoopIndexFlag;
+        auto &NumHWBaseboards = state.dataHWBaseboardRad->NumHWBaseboards;
+        auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard;
 
         // Do the one time initializations
         if (MyOneTimeFlag) {
@@ -809,15 +925,17 @@ namespace HWBaseboardRadiator {
             }
         }
 
-        if (HWBaseboard(BaseboardNum).ZonePtr <= 0) HWBaseboard(BaseboardNum).ZonePtr = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
+        if (HWBaseboard(BaseboardNum).ZonePtr <= 0)
+            HWBaseboard(BaseboardNum).ZonePtr = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
 
         // Need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
         if (!ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= NumHWBaseboards; ++Loop) {
                 if (CheckZoneEquipmentList(state, cCMO_BBRadiator_Water, HWBaseboard(Loop).EquipID)) continue;
-                ShowSevereError(state, "InitBaseboard: Unit=[" + cCMO_BBRadiator_Water + ',' + HWBaseboard(Loop).EquipID +
-                                "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
+                ShowSevereError(state,
+                                "InitBaseboard: Unit=[" + cCMO_BBRadiator_Water + ',' + HWBaseboard(Loop).EquipID +
+                                    "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
             }
         }
 
@@ -864,7 +982,8 @@ namespace HWBaseboardRadiator {
 
             HWBaseboard(BaseboardNum).WaterMassFlowRateMax = rho * HWBaseboard(BaseboardNum).WaterVolFlowRateMax;
 
-            InitComponentNodes(0.0,
+            InitComponentNodes(state,
+                               0.0,
                                HWBaseboard(BaseboardNum).WaterMassFlowRateMax,
                                HWBaseboard(BaseboardNum).WaterInletNode,
                                HWBaseboard(BaseboardNum).WaterOutletNode,
@@ -873,18 +992,18 @@ namespace HWBaseboardRadiator {
                                HWBaseboard(BaseboardNum).BranchNum,
                                HWBaseboard(BaseboardNum).CompNum);
 
-            Node(WaterInletNode).Temp = 60.0;
+            state.dataLoopNodes->Node(WaterInletNode).Temp = 60.0;
 
             Cp = GetSpecificHeatGlycol(state,
                                        state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
-                                       Node(WaterInletNode).Temp,
+                                       state.dataLoopNodes->Node(WaterInletNode).Temp,
                                        state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
                                        RoutineName);
 
-            Node(WaterInletNode).Enthalpy = Cp * Node(WaterInletNode).Temp;
-            Node(WaterInletNode).Quality = 0.0;
-            Node(WaterInletNode).Press = 0.0;
-            Node(WaterInletNode).HumRat = 0.0;
+            state.dataLoopNodes->Node(WaterInletNode).Enthalpy = Cp * state.dataLoopNodes->Node(WaterInletNode).Temp;
+            state.dataLoopNodes->Node(WaterInletNode).Quality = 0.0;
+            state.dataLoopNodes->Node(WaterInletNode).Press = 0.0;
+            state.dataLoopNodes->Node(WaterInletNode).HumRat = 0.0;
 
             ZeroSourceSumHATsurf = 0.0;
             QBBRadSource = 0.0;
@@ -902,7 +1021,7 @@ namespace HWBaseboardRadiator {
 
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
             ZoneNum = HWBaseboard(BaseboardNum).ZonePtr;
-            ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum);
+            ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(state, ZoneNum);
             QBBRadSrcAvg(BaseboardNum) = 0.0;
             LastQBBRadSrc(BaseboardNum) = 0.0;
             LastSysTimeElapsed(BaseboardNum) = 0.0;
@@ -912,11 +1031,11 @@ namespace HWBaseboardRadiator {
         // Do the every time step initializations
         WaterInletNode = HWBaseboard(BaseboardNum).WaterInletNode;
         ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ZoneNode;
-        HWBaseboard(BaseboardNum).WaterMassFlowRate = Node(WaterInletNode).MassFlowRate;
-        HWBaseboard(BaseboardNum).WaterInletTemp = Node(WaterInletNode).Temp;
-        HWBaseboard(BaseboardNum).WaterInletEnthalpy = Node(WaterInletNode).Enthalpy;
-        HWBaseboard(BaseboardNum).AirInletTemp = Node(ZoneNode).Temp;
-        HWBaseboard(BaseboardNum).AirInletHumRat = Node(ZoneNode).HumRat;
+        HWBaseboard(BaseboardNum).WaterMassFlowRate = state.dataLoopNodes->Node(WaterInletNode).MassFlowRate;
+        HWBaseboard(BaseboardNum).WaterInletTemp = state.dataLoopNodes->Node(WaterInletNode).Temp;
+        HWBaseboard(BaseboardNum).WaterInletEnthalpy = state.dataLoopNodes->Node(WaterInletNode).Enthalpy;
+        HWBaseboard(BaseboardNum).AirInletTemp = state.dataLoopNodes->Node(ZoneNode).Temp;
+        HWBaseboard(BaseboardNum).AirInletHumRat = state.dataLoopNodes->Node(ZoneNode).HumRat;
 
         HWBaseboard(BaseboardNum).TotPower = 0.0;
         HWBaseboard(BaseboardNum).Power = 0.0;
@@ -950,9 +1069,7 @@ namespace HWBaseboardRadiator {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataHeatBalance::Zone;
         using DataHVACGlobals::HeatingCapacitySizing;
-        using DataLoopNode::Node;
 
         using PlantUtilities::RegisterPlantCompDesignFlow;
 
@@ -964,14 +1081,8 @@ namespace HWBaseboardRadiator {
         Real64 const CPAirStd(1005.0);      // Average specific heat of air at between 25C and 40C in J/kg-k
         Real64 const Constant(0.0062);      // Constant of linear equation for air mass flow rate
         Real64 const Coeff(0.0000275);      // Correlation coefficient to capacity
-        static std::string const RoutineName("SizeHWBaseboard");
-        static std::string const RoutineNameFull("BaseboardRadiatorWater:SizeHWBaseboard");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
+        static constexpr std::string_view RoutineName("SizeHWBaseboard");
+        static constexpr std::string_view RoutineNameFull("BaseboardRadiatorWater:SizeHWBaseboard");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizNum;     // do loop index for plant sizing
@@ -1014,43 +1125,50 @@ namespace HWBaseboardRadiator {
         WaterVolFlowRateMaxDes = 0.0;
         WaterVolFlowRateMaxUser = 0.0;
         RatedCapacityDes = 0.0;
-        DataScalableCapSizingON = false;
+        state.dataSize->DataScalableCapSizingON = false;
 
-        if (CurZoneEqNum > 0) {
+        auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
+        auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard;
+        auto &HWBaseboardNumericFields = state.dataHWBaseboardRad->HWBaseboardNumericFields;
+
+        if (state.dataSize->CurZoneEqNum > 0) {
 
             CompType = cCMO_BBRadiator_Water;
             CompName = HWBaseboard(BaseboardNum).EquipID;
-            DataHeatSizeRatio = 1.0;
-            DataFracOfAutosizedHeatingCapacity = 1.0;
-            DataZoneNumber = HWBaseboard(BaseboardNum).ZonePtr;
+            state.dataSize->DataHeatSizeRatio = 1.0;
+            state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
+            state.dataSize->DataZoneNumber = HWBaseboard(BaseboardNum).ZonePtr;
             SizingMethod = HeatingCapacitySizing;
             FieldNum = 3;
             PrintFlag = false;
             SizingString = HWBaseboardNumericFields(BaseboardNum).FieldNames(FieldNum) + " [W]";
             CapSizingMethod = HWBaseboard(BaseboardNum).HeatingCapMethod;
-            ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
+            ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
             if (CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
                 CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
                 if (CapSizingMethod == HeatingDesignCapacity) {
                     if (HWBaseboard(BaseboardNum).ScaledHeatingCapacity == AutoSize) {
                         CheckZoneSizing(state, CompType, CompName);
-                        ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
-                        ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
+                        ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
+                        ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad =
+                            state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
                     }
                     TempSize = HWBaseboard(BaseboardNum).ScaledHeatingCapacity;
 
                 } else if (CapSizingMethod == CapacityPerFloorArea) {
-                    ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
-                    ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = HWBaseboard(BaseboardNum).ScaledHeatingCapacity * Zone(DataZoneNumber).FloorArea;
-                    TempSize = ZoneEqSizing(CurZoneEqNum).DesHeatingLoad;
-                    DataScalableCapSizingON = true;
+                    ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
+                    ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad =
+                        HWBaseboard(BaseboardNum).ScaledHeatingCapacity * state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
+                    TempSize = ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad;
+                    state.dataSize->DataScalableCapSizingON = true;
                 } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
                     CheckZoneSizing(state, CompType, CompName);
-                    ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
-                    DataFracOfAutosizedHeatingCapacity = HWBaseboard(BaseboardNum).ScaledHeatingCapacity;
-                    ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
+                    ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
+                    state.dataSize->DataFracOfAutosizedHeatingCapacity = HWBaseboard(BaseboardNum).ScaledHeatingCapacity;
+                    ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad =
+                        state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
                     TempSize = AutoSize;
-                    DataScalableCapSizingON = true;
+                    state.dataSize->DataScalableCapSizingON = true;
                 } else {
                     TempSize = HWBaseboard(BaseboardNum).ScaledHeatingCapacity;
                 }
@@ -1065,7 +1183,7 @@ namespace HWBaseboardRadiator {
                     HWBaseboard(BaseboardNum).RatedCapacity = TempSize;
                 }
                 RatedCapacityDes = TempSize;
-                DataScalableCapSizingON = false;
+                state.dataSize->DataScalableCapSizingON = false;
             }
         }
 
@@ -1073,14 +1191,15 @@ namespace HWBaseboardRadiator {
         PltSizHeatNum = state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).LoopNum).PlantSizNum;
 
         if (PltSizHeatNum > 0) {
-            if (CurZoneEqNum > 0) {
+            if (state.dataSize->CurZoneEqNum > 0) {
 
                 if (HWBaseboard(BaseboardNum).WaterVolFlowRateMax == AutoSize) {
                     FlowAutoSize = true;
                 }
-                if (!FlowAutoSize && !ZoneSizingRunDone) { // Simulation continue
+                if (!FlowAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation continue
                     if (HWBaseboard(BaseboardNum).WaterVolFlowRateMax > 0.0) {
-                        BaseSizer::reportSizerOutput(state, cCMO_BBRadiator_Water,
+                        BaseSizer::reportSizerOutput(state,
+                                                     cCMO_BBRadiator_Water,
                                                      HWBaseboard(BaseboardNum).EquipID,
                                                      "User-Specified Maximum Water Flow Rate [m3/s]",
                                                      HWBaseboard(BaseboardNum).WaterVolFlowRateMax);
@@ -1099,21 +1218,23 @@ namespace HWBaseboardRadiator {
                                                DataGlobalConstants::HWInitConvTemp,
                                                state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
                                                RoutineName);
-                        WaterVolFlowRateMaxDes = DesCoilLoad / (PlantSizData(PltSizHeatNum).DeltaT * Cp * rho);
+                        WaterVolFlowRateMaxDes = DesCoilLoad / (state.dataSize->PlantSizData(PltSizHeatNum).DeltaT * Cp * rho);
                     } else {
                         WaterVolFlowRateMaxDes = 0.0;
                     }
 
                     if (FlowAutoSize) {
                         HWBaseboard(BaseboardNum).WaterVolFlowRateMax = WaterVolFlowRateMaxDes;
-                        BaseSizer::reportSizerOutput(state, cCMO_BBRadiator_Water,
+                        BaseSizer::reportSizerOutput(state,
+                                                     cCMO_BBRadiator_Water,
                                                      HWBaseboard(BaseboardNum).EquipID,
                                                      "Design Size Maximum Water Flow Rate [m3/s]",
                                                      WaterVolFlowRateMaxDes);
                     } else { // Hard-sized with sizing data
                         if (HWBaseboard(BaseboardNum).WaterVolFlowRateMax > 0.0 && WaterVolFlowRateMaxDes > 0.0) {
                             WaterVolFlowRateMaxUser = HWBaseboard(BaseboardNum).WaterVolFlowRateMax;
-                            BaseSizer::reportSizerOutput(state, cCMO_BBRadiator_Water,
+                            BaseSizer::reportSizerOutput(state,
+                                                         cCMO_BBRadiator_Water,
                                                          HWBaseboard(BaseboardNum).EquipID,
                                                          "Design Size Maximum Water Flow Rate [m3/s]",
                                                          WaterVolFlowRateMaxDes,
@@ -1121,10 +1242,11 @@ namespace HWBaseboardRadiator {
                                                          WaterVolFlowRateMaxUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(WaterVolFlowRateMaxDes - WaterVolFlowRateMaxUser) / WaterVolFlowRateMaxUser) >
-                                    AutoVsHardSizingThreshold) {
-                                    ShowMessage(state,
+                                    state.dataSize->AutoVsHardSizingThreshold) {
+                                    ShowMessage(
+                                        state,
                                         "SizeHWBaseboard: Potential issue with equipment sizing for ZoneHVAC:Baseboard:RadiantConvective:Water=\"" +
-                                        HWBaseboard(BaseboardNum).EquipID + "\".");
+                                            HWBaseboard(BaseboardNum).EquipID + "\".");
                                     ShowContinueError(state,
                                                       format("User-Specified Maximum Water Flow Rate of {:.5R} [m3/s]", WaterVolFlowRateMaxUser));
                                     ShowContinueError(
@@ -1165,7 +1287,8 @@ namespace HWBaseboardRadiator {
                     HWBaseboard(BaseboardNum).AirMassFlowRateStd = AirMassFlowRate;
                     // Check Ta,out < Tw,in
                     if (AirOutletTempStd >= WaterInletTempStd) {
-                        ShowSevereError(state, "SizeHWBaseboard: ZoneHVAC:Baseboard:RadiantConvective:Water=\"" + HWBaseboard(BaseboardNum).EquipID + "\".");
+                        ShowSevereError(state,
+                                        "SizeHWBaseboard: ZoneHVAC:Baseboard:RadiantConvective:Water=\"" + HWBaseboard(BaseboardNum).EquipID + "\".");
                         ShowContinueError(state, "...Air Outlet temperature must be below the Water Inlet temperature");
                         ShowContinueError(
                             state,
@@ -1175,7 +1298,8 @@ namespace HWBaseboardRadiator {
                     }
                     // Check Tw,out < Ta,in
                     if (AirInletTempStd >= WaterOutletTempStd) {
-                        ShowSevereError(state, "SizeHWBaseboard: ZoneHVAC:Baseboard:RadiantConvective:Water=\"" + HWBaseboard(BaseboardNum).EquipID + "\".");
+                        ShowSevereError(state,
+                                        "SizeHWBaseboard: ZoneHVAC:Baseboard:RadiantConvective:Water=\"" + HWBaseboard(BaseboardNum).EquipID + "\".");
                         ShowContinueError(state, "...Water Outlet temperature must be below the Air Inlet temperature");
                         ShowContinueError(
                             state,
@@ -1192,8 +1316,8 @@ namespace HWBaseboardRadiator {
                     HWBaseboard(BaseboardNum).UA = 0.0;
                 }
                 // Report an UA value
-                BaseSizer::reportSizerOutput(state,
-                    cCMO_BBRadiator_Water, HWBaseboard(BaseboardNum).EquipID, "U-Factor times Area [W/C]", HWBaseboard(BaseboardNum).UA);
+                BaseSizer::reportSizerOutput(
+                    state, cCMO_BBRadiator_Water, HWBaseboard(BaseboardNum).EquipID, "U-Factor times Area [W/C]", HWBaseboard(BaseboardNum).UA);
             }
         } else {
             // if there is no heating Sizing:Plant object and autosizng was requested, issue an error message
@@ -1223,7 +1347,8 @@ namespace HWBaseboardRadiator {
 
                 // Check Ta,out < Tw,in
                 if (AirOutletTempStd >= WaterInletTempStd) {
-                    ShowSevereError(state, "SizeHWBaseboard: ZoneHVAC:Baseboard:RadiantConvective:Water=\"" + HWBaseboard(BaseboardNum).EquipID + "\".");
+                    ShowSevereError(state,
+                                    "SizeHWBaseboard: ZoneHVAC:Baseboard:RadiantConvective:Water=\"" + HWBaseboard(BaseboardNum).EquipID + "\".");
                     ShowContinueError(state, "...Air Outlet temperature must be below the Water Inlet temperature");
                     ShowContinueError(
                         state, format("...Air Outlet Temperature=[{:.2R}], Water Inlet Temperature=[{:.2R}].", AirOutletTempStd, WaterInletTempStd));
@@ -1232,7 +1357,8 @@ namespace HWBaseboardRadiator {
                 }
                 // Check Tw,out < Ta,in
                 if (AirInletTempStd >= WaterOutletTempStd) {
-                    ShowSevereError(state, "SizeHWBaseboard: ZoneHVAC:Baseboard:RadiantConvective:Water=\"" + HWBaseboard(BaseboardNum).EquipID + "\".");
+                    ShowSevereError(state,
+                                    "SizeHWBaseboard: ZoneHVAC:Baseboard:RadiantConvective:Water=\"" + HWBaseboard(BaseboardNum).EquipID + "\".");
                     ShowContinueError(state, "...Water Outlet temperature must be below the Air Inlet temperature");
                     ShowContinueError(
                         state, format("...Air Inlet Temperature=[{:.2R}], Water Outlet Temperature=[{:.2R}].", AirInletTempStd, WaterOutletTempStd));
@@ -1248,11 +1374,11 @@ namespace HWBaseboardRadiator {
                 HWBaseboard(BaseboardNum).UA = 0.0;
             }
             // Report an UA value
-            BaseSizer::reportSizerOutput(state,
-                cCMO_BBRadiator_Water, HWBaseboard(BaseboardNum).EquipID, "U-Factor times Area [W/C]", HWBaseboard(BaseboardNum).UA);
+            BaseSizer::reportSizerOutput(
+                state, cCMO_BBRadiator_Water, HWBaseboard(BaseboardNum).EquipID, "U-Factor times Area [W/C]", HWBaseboard(BaseboardNum).UA);
         }
         // save the design water flow rate for use by the water loop sizing algorithms
-        RegisterPlantCompDesignFlow(HWBaseboard(BaseboardNum).WaterInletNode, HWBaseboard(BaseboardNum).WaterVolFlowRateMax);
+        RegisterPlantCompDesignFlow(state, HWBaseboard(BaseboardNum).WaterInletNode, HWBaseboard(BaseboardNum).WaterVolFlowRateMax);
 
         if (ErrorsFound) {
             ShowFatalError(state, "Preceding sizing errors cause program termination");
@@ -1272,7 +1398,7 @@ namespace HWBaseboardRadiator {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine calculates both the convective and radiant heat transfer rate
         // in a hot water baseboard heater.  The heater is assumed to be crossflowwith
-        // both fluids unmixed.  The air flow is bouyancy driven and a constant airflow
+        // both fluids unmixed.  The air flow is buoyancy driven and a constant airflow
         // and a constant airflow velocity of 0.5m/s is assumed.
 
         // METHODOLOGY EMPLOYED:
@@ -1284,7 +1410,6 @@ namespace HWBaseboardRadiator {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataLoopNode::Node;
         using PlantUtilities::SetActuatedBranchFlowRate;
         using ScheduleManager::GetCurrentScheduleValue;
 
@@ -1293,7 +1418,7 @@ namespace HWBaseboardRadiator {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const MinFrac(0.0005); // Minimum fraction that delivers radiant heats to surfaces
-        static std::string const RoutineName("CalcHWBaseboard");
+        static constexpr std::string_view RoutineName("CalcHWBaseboard");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1323,6 +1448,10 @@ namespace HWBaseboardRadiator {
         Real64 CC;
         Real64 QZnReq;
         Real64 Cp;
+        auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard;
+        auto &HWBaseboardDesignObject = state.dataHWBaseboardRad->HWBaseboardDesignObject;
+        auto &QBBRadSource = state.dataHWBaseboardRad->QBBRadSource;
+        auto &ZeroSourceSumHATsurf = state.dataHWBaseboardRad->ZeroSourceSumHATsurf;
 
         ZoneNum = HWBaseboard(BaseboardNum).ZonePtr;
         QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
@@ -1330,10 +1459,12 @@ namespace HWBaseboardRadiator {
         AirOutletTemp = AirInletTemp;
         WaterInletTemp = HWBaseboard(BaseboardNum).WaterInletTemp;
         WaterOutletTemp = WaterInletTemp;
-        WaterMassFlowRate = Node(HWBaseboard(BaseboardNum).WaterInletNode).MassFlowRate;
+        WaterMassFlowRate = state.dataLoopNodes->Node(HWBaseboard(BaseboardNum).WaterInletNode).MassFlowRate;
+        HWBaseboardDesignData HWBaseboardDesignDataObject{
+            HWBaseboardDesignObject(HWBaseboard(BaseboardNum).DesignObjectPtr)}; // Contains the data for the design object
 
-        if (QZnReq > SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) && (GetCurrentScheduleValue(state, HWBaseboard(BaseboardNum).SchedPtr) > 0) &&
-            (WaterMassFlowRate > 0.0)) {
+        if (QZnReq > SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) &&
+            (GetCurrentScheduleValue(state, HWBaseboard(BaseboardNum).SchedPtr) > 0) && (WaterMassFlowRate > 0.0)) {
             // Calculate air mass flow rate
             AirMassFlowRate = HWBaseboard(BaseboardNum).AirMassFlowRateStd * (WaterMassFlowRate / HWBaseboard(BaseboardNum).WaterMassFlowRateMax);
             CapacitanceAir = PsyCpAirFnW(HWBaseboard(BaseboardNum).AirInletHumRat) * AirMassFlowRate;
@@ -1369,10 +1500,10 @@ namespace HWBaseboardRadiator {
             AirOutletTemp = AirInletTemp + Effectiveness * CapacitanceMin * (WaterInletTemp - AirInletTemp) / CapacitanceAir;
             WaterOutletTemp = WaterInletTemp - CapacitanceAir * (AirOutletTemp - AirInletTemp) / CapacitanceWater;
             BBHeat = CapacitanceWater * (WaterInletTemp - WaterOutletTemp);
-            RadHeat = BBHeat * HWBaseboard(BaseboardNum).FracRadiant;
+            RadHeat = BBHeat * HWBaseboardDesignDataObject.FracRadiant;
             QBBRadSource(BaseboardNum) = RadHeat;
 
-            if (HWBaseboard(BaseboardNum).FracRadiant <= MinFrac) {
+            if (HWBaseboardDesignDataObject.FracRadiant <= MinFrac) {
                 LoadMet = BBHeat;
             } else {
 
@@ -1391,8 +1522,8 @@ namespace HWBaseboardRadiator {
                 // that all energy radiated to people is converted to convective energy is
                 // not very precise, but at least it conserves energy. The system impact to heat balance
                 // should include this.
-                LoadMet = (SumHATsurf(ZoneNum) - ZeroSourceSumHATsurf(ZoneNum)) + (BBHeat * HWBaseboard(BaseboardNum).FracConvect) +
-                          (RadHeat * HWBaseboard(BaseboardNum).FracDistribPerson);
+                LoadMet = (SumHATsurf(state, ZoneNum) - ZeroSourceSumHATsurf(ZoneNum)) + (BBHeat * HWBaseboard(BaseboardNum).FracConvect) +
+                          (RadHeat * HWBaseboardDesignDataObject.FracDistribPerson);
             }
             HWBaseboard(BaseboardNum).WaterOutletEnthalpy = HWBaseboard(BaseboardNum).WaterInletEnthalpy - BBHeat / WaterMassFlowRate;
         } else {
@@ -1410,7 +1541,8 @@ namespace HWBaseboardRadiator {
             AirMassFlowRate = 0.0;
             QBBRadSource(BaseboardNum) = 0.0;
             HWBaseboard(BaseboardNum).WaterOutletEnthalpy = HWBaseboard(BaseboardNum).WaterInletEnthalpy;
-            SetActuatedBranchFlowRate(state, WaterMassFlowRate,
+            SetActuatedBranchFlowRate(state,
+                                      WaterMassFlowRate,
                                       HWBaseboard(BaseboardNum).WaterInletNode,
                                       HWBaseboard(BaseboardNum).LoopNum,
                                       HWBaseboard(BaseboardNum).LoopSideNum,
@@ -1449,7 +1581,6 @@ namespace HWBaseboardRadiator {
         // na
 
         // Using/Aliasing
-        using DataLoopNode::Node;
         using PlantUtilities::SafeCopyPlantNode;
 
         // Locals
@@ -1467,27 +1598,33 @@ namespace HWBaseboardRadiator {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WaterInletNode;
         int WaterOutletNode;
-        static int Iter(0);
-        static bool MyEnvrnFlag(true);
+        auto &Iter = state.dataHWBaseboardRad->Iter;
+        auto &MyEnvrnFlag2 = state.dataHWBaseboardRad->MyEnvrnFlag2;
+        auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard;
+        auto &LastSysTimeElapsed = state.dataHWBaseboardRad->LastSysTimeElapsed;
+        auto &QBBRadSrcAvg = state.dataHWBaseboardRad->QBBRadSrcAvg;
+        auto &LastQBBRadSrc = state.dataHWBaseboardRad->LastQBBRadSrc;
+        auto &QBBRadSource = state.dataHWBaseboardRad->QBBRadSource;
+        auto &LastTimeStepSys = state.dataHWBaseboardRad->LastTimeStepSys;
 
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag2) {
             Iter = 0;
-            MyEnvrnFlag = false;
+            MyEnvrnFlag2 = false;
         }
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            MyEnvrnFlag = true;
+            MyEnvrnFlag2 = true;
         }
 
         // First, update the running average if necessary...
-        if (LastSysTimeElapsed(BaseboardNum) == SysTimeElapsed) {
+        if (LastSysTimeElapsed(BaseboardNum) == state.dataHVACGlobal->SysTimeElapsed) {
             QBBRadSrcAvg(BaseboardNum) -= LastQBBRadSrc(BaseboardNum) * LastTimeStepSys(BaseboardNum) / state.dataGlobal->TimeStepZone;
         }
         // Update the running average and the "last" values with the current values of the appropriate variables
-        QBBRadSrcAvg(BaseboardNum) += QBBRadSource(BaseboardNum) * TimeStepSys / state.dataGlobal->TimeStepZone;
+        QBBRadSrcAvg(BaseboardNum) += QBBRadSource(BaseboardNum) * state.dataHVACGlobal->TimeStepSys / state.dataGlobal->TimeStepZone;
 
         LastQBBRadSrc(BaseboardNum) = QBBRadSource(BaseboardNum);
-        LastSysTimeElapsed(BaseboardNum) = SysTimeElapsed;
-        LastTimeStepSys(BaseboardNum) = TimeStepSys;
+        LastSysTimeElapsed(BaseboardNum) = state.dataHVACGlobal->SysTimeElapsed;
+        LastTimeStepSys(BaseboardNum) = state.dataHVACGlobal->TimeStepSys;
 
         WaterInletNode = HWBaseboard(BaseboardNum).WaterInletNode;
         WaterOutletNode = HWBaseboard(BaseboardNum).WaterOutletNode;
@@ -1495,8 +1632,8 @@ namespace HWBaseboardRadiator {
         // Set the outlet air nodes of the Baseboard
         // Set the outlet water nodes for the Coil
         SafeCopyPlantNode(state, WaterInletNode, WaterOutletNode);
-        Node(WaterOutletNode).Temp = HWBaseboard(BaseboardNum).WaterOutletTemp;
-        Node(WaterOutletNode).Enthalpy = HWBaseboard(BaseboardNum).WaterOutletEnthalpy;
+        state.dataLoopNodes->Node(WaterOutletNode).Temp = HWBaseboard(BaseboardNum).WaterOutletTemp;
+        state.dataLoopNodes->Node(WaterOutletNode).Enthalpy = HWBaseboard(BaseboardNum).WaterOutletEnthalpy;
     }
 
     void UpdateBBRadSourceValAvg(EnergyPlusData &state, bool &HWBaseboardSysOn) // .TRUE. if the radiant system has run this zone time step
@@ -1542,21 +1679,20 @@ namespace HWBaseboardRadiator {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int BaseboardNum; // DO loop counter for surface index
 
-
         HWBaseboardSysOn = false;
 
         // If this was never allocated, then there are no radiant systems in this input file (just RETURN)
-        if (!allocated(QBBRadSrcAvg)) return;
+        if (!allocated(state.dataHWBaseboardRad->QBBRadSrcAvg)) return;
 
         // If it was allocated, then we have to check to see if this was running at all...
-        for (BaseboardNum = 1; BaseboardNum <= NumHWBaseboards; ++BaseboardNum) {
-            if (QBBRadSrcAvg(BaseboardNum) != 0.0) {
+        for (BaseboardNum = 1; BaseboardNum <= state.dataHWBaseboardRad->NumHWBaseboards; ++BaseboardNum) {
+            if (state.dataHWBaseboardRad->QBBRadSrcAvg(BaseboardNum) != 0.0) {
                 HWBaseboardSysOn = true;
                 break; // DO loop
             }
         }
 
-        QBBRadSource = QBBRadSrcAvg;
+        state.dataHWBaseboardRad->QBBRadSource = state.dataHWBaseboardRad->QBBRadSrcAvg;
 
         DistributeBBRadGains(state); // QBBRadSource has been modified so we need to redistribute gains
     }
@@ -1582,27 +1718,11 @@ namespace HWBaseboardRadiator {
         // Note that the energy radiated to people is assumed to affect them
         // but them it is assumed to be convected to the air.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
-        using DataHeatBalance::Zone;
         using DataHeatBalFanSys::MaxRadHeatFlux;
-        using DataHeatBalFanSys::QHWBaseboardSurf;
-        using DataHeatBalFanSys::QHWBaseboardToPerson;
-        using DataSurfaces::Surface;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int RadSurfNum;           // Counter for surfaces receiving radiation from radiant heater
@@ -1611,28 +1731,34 @@ namespace HWBaseboardRadiator {
         int ZoneNum;              // Pointer to the Zone derived type
         Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
 
+        auto &NumHWBaseboards = state.dataHWBaseboardRad->NumHWBaseboards;
+        auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard;
+        auto &HWBaseboardDesignObject = state.dataHWBaseboardRad->HWBaseboardDesignObject;
+        auto &QBBRadSource = state.dataHWBaseboardRad->QBBRadSource;
 
         // Initialize arrays
-        QHWBaseboardSurf = 0.0;
-        QHWBaseboardToPerson = 0.0;
+        state.dataHeatBalFanSys->QHWBaseboardSurf = 0.0;
+        state.dataHeatBalFanSys->QHWBaseboardToPerson = 0.0;
 
         for (BaseboardNum = 1; BaseboardNum <= NumHWBaseboards; ++BaseboardNum) {
 
+            HWBaseboardDesignData HWBaseboardDesignDataObject{
+                HWBaseboardDesignObject(HWBaseboard(BaseboardNum).DesignObjectPtr)}; // Contains the data for the design object
             ZoneNum = HWBaseboard(BaseboardNum).ZonePtr;
             if (ZoneNum <= 0) continue;
-            QHWBaseboardToPerson(ZoneNum) += QBBRadSource(BaseboardNum) * HWBaseboard(BaseboardNum).FracDistribPerson;
+            state.dataHeatBalFanSys->QHWBaseboardToPerson(ZoneNum) += QBBRadSource(BaseboardNum) * HWBaseboardDesignDataObject.FracDistribPerson;
 
             for (RadSurfNum = 1; RadSurfNum <= HWBaseboard(BaseboardNum).TotSurfToDistrib; ++RadSurfNum) {
                 SurfNum = HWBaseboard(BaseboardNum).SurfacePtr(RadSurfNum);
-                if (Surface(SurfNum).Area > SmallestArea) {
-                    ThisSurfIntensity =
-                        (QBBRadSource(BaseboardNum) * HWBaseboard(BaseboardNum).FracDistribToSurf(RadSurfNum) / Surface(SurfNum).Area);
-                    QHWBaseboardSurf(SurfNum) += ThisSurfIntensity;
+                if (state.dataSurface->Surface(SurfNum).Area > SmallestArea) {
+                    ThisSurfIntensity = (QBBRadSource(BaseboardNum) * HWBaseboard(BaseboardNum).FracDistribToSurf(RadSurfNum) /
+                                         state.dataSurface->Surface(SurfNum).Area);
+                    state.dataHeatBalFanSys->QHWBaseboardSurf(SurfNum) += ThisSurfIntensity;
                     // CR 8074, trap for excessive intensity (throws off surface balance )
                     if (ThisSurfIntensity > MaxRadHeatFlux) {
                         ShowSevereError(state, "DistributeBBRadGains:  excessive thermal radiation heat flux intensity detected");
-                        ShowContinueError(state, "Surface = " + Surface(SurfNum).Name);
-                        ShowContinueError(state, format("Surface area = {:.3R} [m2]", Surface(SurfNum).Area));
+                        ShowContinueError(state, "Surface = " + state.dataSurface->Surface(SurfNum).Name);
+                        ShowContinueError(state, format("Surface area = {:.3R} [m2]", state.dataSurface->Surface(SurfNum).Area));
                         ShowContinueError(state, "Occurs in " + cCMO_BBRadiator_Water + " = " + HWBaseboard(BaseboardNum).EquipID);
                         ShowContinueError(state, format("Radiation intensity = {:.2R} [W/m2]", ThisSurfIntensity));
                         ShowContinueError(state, "Assign a larger surface area or more surfaces in " + cCMO_BBRadiator_Water);
@@ -1640,8 +1766,8 @@ namespace HWBaseboardRadiator {
                     }
                 } else {
                     ShowSevereError(state, "DistributeBBRadGains:  surface not large enough to receive thermal radiation heat flux");
-                    ShowContinueError(state, "Surface = " + Surface(SurfNum).Name);
-                    ShowContinueError(state, format("Surface area = {:.3R} [m2]", Surface(SurfNum).Area));
+                    ShowContinueError(state, "Surface = " + state.dataSurface->Surface(SurfNum).Name);
+                    ShowContinueError(state, format("Surface area = {:.3R} [m2]", state.dataSurface->Surface(SurfNum).Area));
                     ShowContinueError(state, "Occurs in " + cCMO_BBRadiator_Water + " = " + HWBaseboard(BaseboardNum).EquipID);
                     ShowContinueError(state, "Assign a larger surface area or more surfaces in " + cCMO_BBRadiator_Water);
                     ShowFatalError(state, "DistributeBBRadGains:  surface not large enough to receive thermal radiation heat flux");
@@ -1650,7 +1776,7 @@ namespace HWBaseboardRadiator {
         }
     }
 
-    void ReportHWBaseboard(int const BaseboardNum)
+    void ReportHWBaseboard(EnergyPlusData &state, int const BaseboardNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1658,40 +1784,16 @@ namespace HWBaseboardRadiator {
         //       DATE WRITTEN   Aug 2007
         //       MODIFIED       na
         //       RE-ENGINEERED  na
+        auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard;
 
-        // PURPOSE OF THIS SUBROUTINE: This subroutine
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataLoopNode::Node;
-        using DataSurfaces::Surface;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        HWBaseboard(BaseboardNum).TotEnergy = HWBaseboard(BaseboardNum).TotPower * TimeStepSys * DataGlobalConstants::SecInHour;
-        HWBaseboard(BaseboardNum).Energy = HWBaseboard(BaseboardNum).Power * TimeStepSys * DataGlobalConstants::SecInHour;
-        HWBaseboard(BaseboardNum).ConvEnergy = HWBaseboard(BaseboardNum).ConvPower * TimeStepSys * DataGlobalConstants::SecInHour;
-        HWBaseboard(BaseboardNum).RadEnergy = HWBaseboard(BaseboardNum).RadPower * TimeStepSys * DataGlobalConstants::SecInHour;
+        HWBaseboard(BaseboardNum).TotEnergy = HWBaseboard(BaseboardNum).TotPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        HWBaseboard(BaseboardNum).Energy = HWBaseboard(BaseboardNum).Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        HWBaseboard(BaseboardNum).ConvEnergy =
+            HWBaseboard(BaseboardNum).ConvPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        HWBaseboard(BaseboardNum).RadEnergy = HWBaseboard(BaseboardNum).RadPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
-    Real64 SumHATsurf(int const ZoneNum) // Zone number
+    Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum) // Zone number
     {
 
         // FUNCTION INFORMATION:
@@ -1714,7 +1816,6 @@ namespace HWBaseboardRadiator {
         // Using/Aliasing
         using namespace DataSurfaces;
         using namespace DataHeatBalance;
-        using namespace DataHeatBalSurface;
 
         // Return value
         Real64 SumHATsurf;
@@ -1726,35 +1827,32 @@ namespace HWBaseboardRadiator {
         int SurfNum; // Surface number
         Real64 Area; // Effective surface area
 
-
         SumHATsurf = 0.0;
 
-        for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
-            if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
+        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
+            Area = state.dataSurface->Surface(SurfNum).Area;
 
-            Area = Surface(SurfNum).Area;
-
-            if (Surface(SurfNum).Class == SurfaceClass::Window) {
-                if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn) {
+            if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) {
+                if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                     // The area is the shade or blind area = the sum of the glazing area and the divider area (which is zero if no divider)
-                    Area += SurfWinDividerArea(SurfNum);
+                    Area += state.dataSurface->SurfWinDividerArea(SurfNum);
                 }
 
-                if (SurfWinFrameArea(SurfNum) > 0.0) {
+                if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
-                    SumHATsurf += HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) *
-                                  SurfWinFrameTempSurfIn(SurfNum);
+                    SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
+                                  (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) * state.dataSurface->SurfWinFrameTempIn(SurfNum);
                 }
 
-                if (SurfWinDividerArea(SurfNum) > 0.0 && SurfWinShadingFlag(SurfNum) != IntShadeOn &&
-                    SurfWinShadingFlag(SurfNum) != IntBlindOn) {
+                if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 &&
+                    !ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    SumHATsurf += HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
-                                  SurfWinDividerTempSurfIn(SurfNum);
+                    SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
+                                  (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) * state.dataSurface->SurfWinDividerTempIn(SurfNum);
                 }
             }
 
-            SumHATsurf += HConvIn(SurfNum) * Area * TempSurfInTmp(SurfNum);
+            SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area * state.dataHeatBalSurf->SurfTempInTmp(SurfNum);
         }
 
         return SumHATsurf;
@@ -1791,6 +1889,8 @@ namespace HWBaseboardRadiator {
         using PlantUtilities::PullCompInterconnectTrigger;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard;
+        auto &NumHWBaseboards = state.dataHWBaseboardRad->NumHWBaseboards;
 
         int BaseboardNum;
 
@@ -1835,7 +1935,8 @@ namespace HWBaseboardRadiator {
             return;
         }
 
-        PullCompInterconnectTrigger(state, HWBaseboard(BaseboardNum).LoopNum,
+        PullCompInterconnectTrigger(state,
+                                    HWBaseboard(BaseboardNum).LoopNum,
                                     HWBaseboard(BaseboardNum).LoopSideNum,
                                     HWBaseboard(BaseboardNum).BranchNum,
                                     HWBaseboard(BaseboardNum).CompNum,
@@ -1845,7 +1946,8 @@ namespace HWBaseboardRadiator {
                                     DataPlant::iCriteriaType::HeatTransferRate,
                                     HWBaseboard(BaseboardNum).Power);
 
-        PullCompInterconnectTrigger(state, HWBaseboard(BaseboardNum).LoopNum,
+        PullCompInterconnectTrigger(state,
+                                    HWBaseboard(BaseboardNum).LoopNum,
                                     HWBaseboard(BaseboardNum).LoopSideNum,
                                     HWBaseboard(BaseboardNum).BranchNum,
                                     HWBaseboard(BaseboardNum).CompNum,
@@ -1855,7 +1957,8 @@ namespace HWBaseboardRadiator {
                                     DataPlant::iCriteriaType::MassFlowRate,
                                     HWBaseboard(BaseboardNum).WaterMassFlowRate);
 
-        PullCompInterconnectTrigger(state, HWBaseboard(BaseboardNum).LoopNum,
+        PullCompInterconnectTrigger(state,
+                                    HWBaseboard(BaseboardNum).LoopNum,
                                     HWBaseboard(BaseboardNum).LoopSideNum,
                                     HWBaseboard(BaseboardNum).BranchNum,
                                     HWBaseboard(BaseboardNum).CompNum,

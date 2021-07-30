@@ -1,3 +1,58 @@
+# EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University
+# of Illinois, The Regents of the University of California, through Lawrence
+# Berkeley National Laboratory (subject to receipt of any required approvals
+# from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
+# Battelle, Alliance for Sustainable Energy, LLC, and other contributors. All
+# rights reserved.
+#
+# NOTICE: This Software was developed under funding from the U.S. Department of
+# Energy and the U.S. Government consequently retains certain rights. As such,
+# the U.S. Government has been granted for itself and others acting on its
+# behalf a paid-up, nonexclusive, irrevocable, worldwide license in the
+# Software to reproduce, distribute copies to the public, prepare derivative
+# works, and perform publicly and display publicly, and to permit others to do
+# so.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# (1) Redistributions of source code must retain the above copyright notice,
+#     this list of conditions and the following disclaimer.
+#
+# (2) Redistributions in binary form must reproduce the above copyright notice,
+#     this list of conditions and the following disclaimer in the documentation
+#     and/or other materials provided with the distribution.
+#
+# (3) Neither the name of the University of California, Lawrence Berkeley
+#     National Laboratory, the University of Illinois, U.S. Dept. of Energy nor
+#     the names of its contributors may be used to endorse or promote products
+#     derived from this software without specific prior written permission.
+#
+# (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in
+#     stand-alone form without changes from the version obtained under this
+#     License, or (ii) Licensee makes a reference solely to the software
+#     portion of its product, Licensee must refer to the software as
+#     "EnergyPlus version X" software, where "X" is the version number Licensee
+#     obtained under this License and may not use a different name for the
+#     software. Except as specifically required in this Section (4), Licensee
+#     shall not use in a company name, a product name, in advertising,
+#     publicity, or other promotional activities any name, trade name,
+#     trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or
+#     confusingly similar designation, without the U.S. Department of Energy's
+#     prior written consent.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
 from ctypes import cdll, c_int, c_char_p, c_void_p
 from pyenergyplus.common import RealEP, EnergyPlusException, is_number
 from typing import Union
@@ -190,6 +245,8 @@ class DataExchange:
         self.api.tomorrowWeatherAlbedoAtTime.restype = RealEP
         self.api.tomorrowWeatherLiquidPrecipitationAtTime.argtypes = [c_void_p, c_int, c_int]
         self.api.tomorrowWeatherLiquidPrecipitationAtTime.restype = RealEP
+        self.api.currentSimTime.argtypes = [c_void_p]
+        self.api.currentSimTime.restype = RealEP
 
     def list_available_api_data_csv(self, state: c_void_p) -> bytes:
         """
@@ -236,7 +293,8 @@ class DataExchange:
         """
         self.api.resetErrorFlag(state)
 
-    def get_num_nodes_in_cond_fd_surf_layer(self, state: c_void_p, surface_name: Union[str, bytes], material_name: Union[str, bytes]) -> None:
+    def get_num_nodes_in_cond_fd_surf_layer(self, state: c_void_p, surface_name: Union[str, bytes],
+                                            material_name: Union[str, bytes]) -> None:
         """
         Get the number of nodes in CondFD surface layer.
 
@@ -261,7 +319,8 @@ class DataExchange:
                 "'{}'".format(material_name))
         return self.api.getNumNodesInCondFDSurfaceLayer(state, surface_name, material_name)
 
-    def request_variable(self, state: c_void_p, variable_name: Union[str, bytes], variable_key: Union[str, bytes]) -> None:
+    def request_variable(self, state: c_void_p, variable_name: Union[str, bytes],
+                         variable_key: Union[str, bytes]) -> None:
         """
         Request output variables so they can be accessed during a simulation.
 
@@ -293,7 +352,8 @@ class DataExchange:
                 "'{}'".format(variable_key))
         self.api.requestVariable(state, variable_name, variable_key)
 
-    def get_variable_handle(self, state: c_void_p, variable_name: Union[str, bytes], variable_key: Union[str, bytes]) -> int:
+    def get_variable_handle(self, state: c_void_p, variable_name: Union[str, bytes],
+                            variable_key: Union[str, bytes]) -> int:
         """
         Get a handle to an output variable in a running simulation.
 
@@ -484,7 +544,8 @@ class DataExchange:
                 "'{}'".format(actuator_handle))
         return self.api.getActuatorValue(state, actuator_handle)
 
-    def get_internal_variable_handle(self, state: c_void_p, variable_type: Union[str, bytes], variable_key: Union[str, bytes]) -> int:
+    def get_internal_variable_handle(self, state: c_void_p, variable_type: Union[str, bytes],
+                                     variable_key: Union[str, bytes]) -> int:
         """
         Get a handle to an internal variable in a running simulation.
 
@@ -1099,7 +1160,8 @@ class DataExchange:
         """
         return self.api.todayWeatherOutDewPointAtTime(state, hour, time_step_number)
 
-    def today_weather_outdoor_barometric_pressure_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
+    def today_weather_outdoor_barometric_pressure_at_time(self, state: c_void_p, hour: int,
+                                                          time_step_number: int) -> float:
         """
         Gets the specified weather data at the specified hour and time step index within that hour
 
@@ -1110,7 +1172,8 @@ class DataExchange:
         """
         return self.api.todayWeatherOutBarometricPressureAtTime(state, hour, time_step_number)
 
-    def today_weather_outdoor_relative_humidity_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
+    def today_weather_outdoor_relative_humidity_at_time(self, state: c_void_p, hour: int,
+                                                        time_step_number: int) -> float:
         """
         Gets the specified weather data at the specified hour and time step index within that hour
 
@@ -1253,7 +1316,8 @@ class DataExchange:
         """
         return self.api.tomorrowWeatherOutDewPointAtTime(state, hour, time_step_number)
 
-    def tomorrow_weather_outdoor_barometric_pressure_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
+    def tomorrow_weather_outdoor_barometric_pressure_at_time(self, state: c_void_p, hour: int,
+                                                             time_step_number: int) -> float:
         """
         Gets the specified weather data at the specified hour and time step index within that hour
 
@@ -1264,7 +1328,8 @@ class DataExchange:
         """
         return self.api.tomorrowWeatherOutBarometricPressureAtTime(state, hour, time_step_number)
 
-    def tomorrow_weather_outdoor_relative_humidity_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
+    def tomorrow_weather_outdoor_relative_humidity_at_time(self, state: c_void_p, hour: int,
+                                                           time_step_number: int) -> float:
         """
         Gets the specified weather data at the specified hour and time step index within that hour
 
@@ -1362,3 +1427,12 @@ class DataExchange:
         :return: Value of the weather condition at the specified time
         """
         return self.api.tomorrowWeatherLiquidPrecipitationAtTime(state, hour, time_step_number)
+
+    def current_sim_time(self, state: c_void_p) -> float:
+        """
+        Returns the cumulative simulation time from the start of the environment, in hours
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :return: Value of the simulation time from the start of the environment in fractional hours
+        """
+        return self.api.currentSimTime(state)

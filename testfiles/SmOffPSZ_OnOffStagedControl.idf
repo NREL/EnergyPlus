@@ -70,7 +70,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.4;
+  Version,9.6;
 
   Building,
     Building,                !- Name
@@ -1953,26 +1953,22 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 1,                !- Name
     OA Sys 1 Controllers,    !- Controller List Name
-    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name
-    Air Loop Avail List;     !- Availability Manager List Name
+    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 2,                !- Name
     OA Sys 2 Controllers,    !- Controller List Name
-    OA Sys 2 Equipment,      !- Outdoor Air Equipment List Name
-    Air Loop Avail List;     !- Availability Manager List Name
+    OA Sys 2 Equipment;      !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 3,                !- Name
     OA Sys 3 Controllers,    !- Controller List Name
-    OA Sys 3 Equipment,      !- Outdoor Air Equipment List Name
-    Air Loop Avail List;     !- Availability Manager List Name
+    OA Sys 3 Equipment;      !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 4,                !- Name
     OA Sys 4 Controllers,    !- Controller List Name
-    OA Sys 4 Equipment,      !- Outdoor Air Equipment List Name
-    Air Loop Avail List;     !- Availability Manager List Name
+    OA Sys 4 Equipment;      !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:ControllerList,
     OA Sys 1 Controllers,    !- Name

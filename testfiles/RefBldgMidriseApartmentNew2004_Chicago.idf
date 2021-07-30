@@ -69,7 +69,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 27
 
-  Version,9.4;
+  Version,9.6;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -13294,146 +13294,122 @@
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:01_OA,     !- Name
     SPLITSYSTEMAC:01_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:01_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:01_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:02_OA,     !- Name
     SPLITSYSTEMAC:02_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:02_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:02_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:03_OA,     !- Name
     SPLITSYSTEMAC:03_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:03_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:03_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:04_OA,     !- Name
     SPLITSYSTEMAC:04_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:04_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:04_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:05_OA,     !- Name
     SPLITSYSTEMAC:05_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:05_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:05_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:06_OA,     !- Name
     SPLITSYSTEMAC:06_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:06_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:06_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:07_OA,     !- Name
     SPLITSYSTEMAC:07_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:07_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:07_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:08_OA,     !- Name
     SPLITSYSTEMAC:08_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:08_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:08_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:09_OA,     !- Name
     SPLITSYSTEMAC:09_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:09_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:09_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:10_OA,     !- Name
     SPLITSYSTEMAC:10_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:10_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:10_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:11_OA,     !- Name
     SPLITSYSTEMAC:11_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:11_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:11_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:12_OA,     !- Name
     SPLITSYSTEMAC:12_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:12_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:12_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:13_OA,     !- Name
     SPLITSYSTEMAC:13_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:13_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:13_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:14_OA,     !- Name
     SPLITSYSTEMAC:14_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:14_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:14_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:15_OA,     !- Name
     SPLITSYSTEMAC:15_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:15_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:15_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:16_OA,     !- Name
     SPLITSYSTEMAC:16_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:16_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:16_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:17_OA,     !- Name
     SPLITSYSTEMAC:17_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:17_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:17_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:18_OA,     !- Name
     SPLITSYSTEMAC:18_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:18_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:18_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:19_OA,     !- Name
     SPLITSYSTEMAC:19_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:19_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:19_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:20_OA,     !- Name
     SPLITSYSTEMAC:20_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:20_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:20_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:21_OA,     !- Name
     SPLITSYSTEMAC:21_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:21_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:21_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:22_OA,     !- Name
     SPLITSYSTEMAC:22_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:22_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:22_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:23_OA,     !- Name
     SPLITSYSTEMAC:23_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:23_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:23_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SPLITSYSTEMAC:24_OA,     !- Name
     SPLITSYSTEMAC:24_OA_Controllers,  !- Controller List Name
-    SPLITSYSTEMAC:24_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    SPLITSYSTEMAC:24_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     SPLITSYSTEMAC:01_OANode List;  !- Node or NodeList Name 1

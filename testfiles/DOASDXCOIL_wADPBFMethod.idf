@@ -99,7 +99,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.4;
+  Version,9.6;
 
   Building,
     VRF TU with DOAS RH Control,  !- Name
@@ -2708,10 +2708,9 @@
     DOAS Outdoor Air Inlet;  !- Node or NodeList Name 1
 
   AirLoopHVAC:OutdoorAirSystem,
-    DOAS OA System,          !- Name
+    DOAS OA System,              !- Name
     DOAS OA System Controllers,  !- Controller List Name
-    DOAS OA System Equipment,!- Outdoor Air Equipment List Name
-    DOAS Availability Managers;  !- Availability Manager List Name
+    DOAS OA System Equipment;    !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:ControllerList,
     DOAS OA System Controllers,  !- Name

@@ -54,8 +54,8 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 
 namespace EnergyPlus {
 
@@ -64,7 +64,8 @@ struct EnergyPlusData;
 
 namespace PlantManager {
 
-    void ManagePlantLoops(EnergyPlusData &state, bool FirstHVACIteration,
+    void ManagePlantLoops(EnergyPlusData &state,
+                          bool FirstHVACIteration,
                           bool &SimAirLoops,         // True when the air loops need to be (re)simulated
                           bool &SimZoneEquipment,    // True when zone equipment components need to be (re)simulated
                           bool &SimNonZoneEquipment, // True when non-zone equipment components need to be (re)simulated
@@ -82,13 +83,14 @@ namespace PlantManager {
 
     void ReInitPlantLoopsAtFirstHVACIteration(EnergyPlusData &state);
 
-    void UpdateNodeThermalHistory();
+    void UpdateNodeThermalHistory(EnergyPlusData &state);
 
     void CheckPlantOnAbort(EnergyPlusData &state);
 
     void InitOneTimePlantSizingInfo(EnergyPlusData &state, int LoopNum); // loop being initialized for sizing
 
-    void SizePlantLoop(EnergyPlusData &state, int LoopNum, // Supply side loop being simulated
+    void SizePlantLoop(EnergyPlusData &state,
+                       int LoopNum, // Supply side loop being simulated
                        bool OkayToFinish);
 
     void ResizePlantLoopLevelSizes(EnergyPlusData &state, int LoopNum);
@@ -105,17 +107,50 @@ namespace PlantManager {
 
     void CheckOngoingPlantWarnings(EnergyPlusData &state);
 
+    struct EmptyPlantComponent : PlantComponent
+    {
+        // this is for purely air side equipment or similar that dont need anything at all done on plant for now
+        // this could be a placeholder until those components are more integrated with plant side calcs.
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      [[maybe_unused]] const PlantLocation &calledFromLocation,
+                      [[maybe_unused]] bool FirstHVACIteration,
+                      [[maybe_unused]] Real64 &CurLoad,
+                      [[maybe_unused]] bool RunFlag) override
+        {
+            // this is empty on purpose
+        }
+
+        void oneTimeInit(EnergyPlusData &state) override;
+    };
+
 } // namespace PlantManager
 
-struct PlantMgrData : BaseGlobalStruct {
+struct PlantMgrData : BaseGlobalStruct
+{
 
-    bool InitLoopEquip = true;
     bool GetCompSizFac = true;
+    bool SupplyEnvrnFlag = true;
+    bool MySetPointCheckFlag = true;
+    Array1D_bool PlantLoopSetPointInitFlag;
+    bool MyEnvrnFlag = true;
+    int OtherLoopCallingIndex = 0;
+    int OtherLoopDemandSideCallingIndex = 0;
+    int NewOtherDemandSideCallingIndex = 0;
+    int newCallingIndex = 0;
+    PlantManager::EmptyPlantComponent dummyPlantComponent;
 
     void clear_state() override
     {
-        this->InitLoopEquip = true;
         this->GetCompSizFac = true;
+        this->SupplyEnvrnFlag = true;
+        this->MySetPointCheckFlag = true;
+        this->PlantLoopSetPointInitFlag.clear();
+        this->MyEnvrnFlag = true;
+        this->OtherLoopCallingIndex = 0;
+        this->OtherLoopDemandSideCallingIndex = 0;
+        this->NewOtherDemandSideCallingIndex = 0;
+        this->newCallingIndex = 0;
+        this->dummyPlantComponent = {};
     }
 };
 

@@ -68,47 +68,32 @@ namespace DualDuct {
 
     // Data
     // MODULE PARAMETER DEFINITIONS
-    extern int const DualDuct_ConstantVolume;
-    extern int const DualDuct_VariableVolume;
-    extern int const DualDuct_OutdoorAir;
-    extern std::string const cCMO_DDConstantVolume;
-    extern std::string const cCMO_DDVariableVolume;
-    extern std::string const cCMO_DDVarVolOA;
+    enum class DualDuctDamper
+    {
+        Unassigned,
+        ConstantVolume,
+        VariableVolume,
+        OutdoorAir
+    };
 
-    extern int const DD_OA_ConstantOAMode;
-    extern int const DD_OA_ScheduleOAMode;
-    extern int const DD_OA_DynamicOAMode;
+    enum class DualDuctOAMode
+    {
+        Unassigned,
+        ConstantOAMode = 11,
+        ScheduleOAMode = 12,
+        DynamicOAMode = 13
+    };
 
-    extern int const PerPersonModeNotSet;
-    extern int const PerPersonDCVByCurrentLevel;
-    extern int const PerPersonByDesignLevel;
+    enum class PerPersonMode
+    {
+        ModeNotSet = 20,
+        DCVByCurrentLevel = 21,
+        ByDesignLevel = 22
+    };
 
     // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
-    extern Array1D_bool CheckEquipName;
-
-    extern int NumDDAirTerminal; // The Number of dual duct air terminals found in the Input
-    extern int NumDualDuctConstVolDampers;
-    extern int NumDualDuctVarVolDampers;
-    extern int NumDualDuctVarVolOA;
-    extern Real64 MassFlowSetToler;
-    extern bool GetDualDuctInputFlag; // Flag set to make sure you get input once
-
-    // Subroutine Specifications for the Module
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Algorithms for the module
-
-    // Update routine to check convergence and update nodes
-
-    // Reporting routines for module
-
-    // Types
 
     struct DualDuctAirTerminalFlowConditions
     {
@@ -128,7 +113,7 @@ namespace DualDuct {
         // Default Constructor
         DualDuctAirTerminalFlowConditions()
             : AirMassFlowRate(0.0), AirMassFlowRateMaxAvail(0.0), AirMassFlowRateMinAvail(0.0), AirMassFlowRateMax(0.0), AirTemp(0.0), AirHumRat(0.0),
-            AirEnthalpy(0.0), AirMassFlowRateHist1(0.0), AirMassFlowRateHist2(0.0), AirMassFlowRateHist3(0.0), AirMassFlowDiffMag(0.0)
+              AirEnthalpy(0.0), AirMassFlowRateHist1(0.0), AirMassFlowRateHist2(0.0), AirMassFlowRateHist3(0.0), AirMassFlowDiffMag(0.0)
         {
         }
     };
@@ -136,8 +121,8 @@ namespace DualDuct {
     struct DualDuctAirTerminal
     {
         // Members
-        std::string Name; // Name of the Damper
-        int DamperType;            // Type of Damper ie. VAV, Mixing, Inducing, etc.
+        std::string Name;          // Name of the Damper
+        DualDuctDamper DamperType; // Type of Damper ie. VAV, Mixing, Inducing, etc.
         std::string Schedule;      // Damper Operation Schedule
         int SchedPtr;              // Pointer to the correct schedule
         Real64 MaxAirVolFlowRate;  // Max Specified Volume Flow Rate of Damper [m3/sec]
@@ -145,35 +130,35 @@ namespace DualDuct {
         int HotAirInletNodeNum;
         int ColdAirInletNodeNum;
         int OutletNodeNum;
-        Real64 ZoneMinAirFracDes;        // Fraction of supply air used as design minimum flow
-        Real64 ZoneMinAirFrac;           // Fraction of supply air used as current minimum flow
+        Real64 ZoneMinAirFracDes; // Fraction of supply air used as design minimum flow
+        Real64 ZoneMinAirFrac;    // Fraction of supply air used as current minimum flow
         Real64 ColdAirDamperPosition;
         Real64 HotAirDamperPosition;
-        int OAInletNodeNum;              // Alternate Node for VAV:OutdoorAir for Outdoor Air
-        int RecircAirInletNodeNum;       // Alternate Node for VAV:OutdoorAir for Recirc Air
-        bool RecircIsUsed;               // if true. then not using recirc duct, which is okay
-        Real64 DesignOAFlowRate;         // Terminal Outdoor Air Design Flow Rate for VAV:OutdoorAir, m3/s
-        Real64 DesignRecircFlowRate;     // Terminal Recirc Air Design Flow Rate for VAV:OutdoorAir, m3/s
-        int OAControlMode;               // Choice of scheduled, constant, or dynamic for VAV:OutdoorAir
-        Real64 RecircAirDamperPosition;  // Alternate Damper Pos Output for VAV:OutdoorAir for Recirc Air
-        Real64 OADamperPosition;         // Alternate Damper Pos Output for VAV:OutdoorAir for Recirc Air
-        Real64 OAFraction;               // Outdoor Air Fraction for VAV:OutdoorAir
-        int ADUNum;                      // index of corresponding air distribution unit ZoneHVAC:AirdistributionUnit
-        int CtrlZoneNum;                 // Pointer to CtrlZone data structure
-        int CtrlZoneInNodeIndex;         // which controlled zone inlet node number corresponds with this unit
-        int ActualZoneNum;               // Pointer to Zone data Structure
-        Real64 OutdoorAirFlowRate;       // report variable for TU outdoor air flow rate
-        bool NoOAFlowInputFromUser;      // avoids OA calculation if no input specified by user
-        int OARequirementsPtr;           // - Index to DesignSpecification:OutdoorAir object
-        int OAPerPersonMode;             // mode for how per person rates are determined, DCV or design.
-        Real64 OAPerPersonByDesignLevel; // store sum of people and per person rate, constant, m3/s
-        int AirLoopNum;                  // index to airloop that this terminal unit is connected to
+        int OAInletNodeNum;                  // Alternate Node for VAV:OutdoorAir for Outdoor Air
+        int RecircAirInletNodeNum;           // Alternate Node for VAV:OutdoorAir for Recirc Air
+        bool RecircIsUsed;                   // if true. then not using recirc duct, which is okay
+        Real64 DesignOAFlowRate;             // Terminal Outdoor Air Design Flow Rate for VAV:OutdoorAir, m3/s
+        Real64 DesignRecircFlowRate;         // Terminal Recirc Air Design Flow Rate for VAV:OutdoorAir, m3/s
+        int OAControlMode;                   // Choice of scheduled, constant, or dynamic for VAV:OutdoorAir
+        Real64 RecircAirDamperPosition;      // Alternate Damper Pos Output for VAV:OutdoorAir for Recirc Air
+        Real64 OADamperPosition;             // Alternate Damper Pos Output for VAV:OutdoorAir for Recirc Air
+        Real64 OAFraction;                   // Outdoor Air Fraction for VAV:OutdoorAir
+        int ADUNum;                          // index of corresponding air distribution unit ZoneHVAC:AirdistributionUnit
+        int CtrlZoneNum;                     // Pointer to CtrlZone data structure
+        int CtrlZoneInNodeIndex;             // which controlled zone inlet node number corresponds with this unit
+        int ActualZoneNum;                   // Pointer to Zone data Structure
+        Real64 OutdoorAirFlowRate;           // report variable for TU outdoor air flow rate
+        bool NoOAFlowInputFromUser;          // avoids OA calculation if no input specified by user
+        int OARequirementsPtr;               // - Index to DesignSpecification:OutdoorAir object
+        PerPersonMode OAPerPersonMode;       // mode for how per person rates are determined, DCV or design.
+        Real64 OAPerPersonByDesignLevel;     // store sum of people and per person rate, constant, m3/s
+        int AirLoopNum;                      // index to airloop that this terminal unit is connected to
         int ZoneTurndownMinAirFracSchPtr;    // pointer to the schedule for turndown minimum airflow fraction
         Real64 ZoneTurndownMinAirFrac;       // turndown minimum airflow fraction value, multiplier of zone design minimum air flow
         bool ZoneTurndownMinAirFracSchExist; // if true, if zone turndown min air frac schedule exist
-        bool MyEnvrnFlag;            // environment flag
-        bool MySizeFlag;             // sizing flag
-        bool MyAirLoopFlag;          // airloop flag
+        bool MyEnvrnFlag;                    // environment flag
+        bool MySizeFlag;                     // sizing flag
+        bool MyAirLoopFlag;                  // airloop flag
         DualDuctAirTerminalFlowConditions dd_airterminalHotAirInlet;
         DualDuctAirTerminalFlowConditions dd_airterminalColdAirInlet;
         DualDuctAirTerminalFlowConditions dd_airterminalOutlet;
@@ -182,13 +167,13 @@ namespace DualDuct {
 
         // Default Constructor
         DualDuctAirTerminal()
-            : DamperType(0), SchedPtr(0), MaxAirVolFlowRate(0.0), MaxAirMassFlowRate(0.0), HotAirInletNodeNum(0), ColdAirInletNodeNum(0),
-              OutletNodeNum(0), ZoneMinAirFracDes(0.0), ZoneMinAirFrac(0.0), ColdAirDamperPosition(0.0), HotAirDamperPosition(0.0), OAInletNodeNum(0),
-              RecircAirInletNodeNum(0), RecircIsUsed(true), DesignOAFlowRate(0.0), DesignRecircFlowRate(0.0), OAControlMode(0),
-              RecircAirDamperPosition(0.0), OADamperPosition(0.0), OAFraction(0.0), ADUNum(0), CtrlZoneNum(0), CtrlZoneInNodeIndex(0),
-              ActualZoneNum(0), OutdoorAirFlowRate(0.0), NoOAFlowInputFromUser(true), OARequirementsPtr(0), OAPerPersonMode(PerPersonModeNotSet),
-              OAPerPersonByDesignLevel(0.0), AirLoopNum(0), ZoneTurndownMinAirFracSchPtr(0), ZoneTurndownMinAirFrac(1.0), ZoneTurndownMinAirFracSchExist(false),
-              MyEnvrnFlag(true), MySizeFlag(true), MyAirLoopFlag(true)
+            : DamperType(DualDuctDamper::Unassigned), SchedPtr(0), MaxAirVolFlowRate(0.0), MaxAirMassFlowRate(0.0), HotAirInletNodeNum(0),
+              ColdAirInletNodeNum(0), OutletNodeNum(0), ZoneMinAirFracDes(0.0), ZoneMinAirFrac(0.0), ColdAirDamperPosition(0.0),
+              HotAirDamperPosition(0.0), OAInletNodeNum(0), RecircAirInletNodeNum(0), RecircIsUsed(true), DesignOAFlowRate(0.0),
+              DesignRecircFlowRate(0.0), OAControlMode(0), RecircAirDamperPosition(0.0), OADamperPosition(0.0), OAFraction(0.0), ADUNum(0),
+              CtrlZoneNum(0), CtrlZoneInNodeIndex(0), ActualZoneNum(0), OutdoorAirFlowRate(0.0), NoOAFlowInputFromUser(true), OARequirementsPtr(0),
+              OAPerPersonMode(PerPersonMode::ModeNotSet), OAPerPersonByDesignLevel(0.0), AirLoopNum(0), ZoneTurndownMinAirFracSchPtr(0),
+              ZoneTurndownMinAirFrac(1.0), ZoneTurndownMinAirFracSchExist(false), MyEnvrnFlag(true), MySizeFlag(true), MyAirLoopFlag(true)
         {
         }
 
@@ -235,15 +220,12 @@ namespace DualDuct {
         // *****************************************************************************
 
         void ReportDualDuct(); // unused1208
-
     };
-
-    // Object Data
-    extern Array1D<DualDuctAirTerminal> dd_airterminal;
 
     // Functions
 
-    void SimulateDualDuct(EnergyPlusData &state, std::string const &CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex);
+    void SimulateDualDuct(
+        EnergyPlusData &state, std::string_view CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex);
 
     // Get Input Section of the Module
     //******************************************************************************
@@ -255,22 +237,55 @@ namespace DualDuct {
 
     void ReportDualDuctConnections(EnergyPlusData &state);
 
-    void GetDualDuctOutdoorAirRecircUse(EnergyPlusData &state, std::string const &CompTypeName, std::string const &CompName, bool &RecircIsUsed);
+    void GetDualDuctOutdoorAirRecircUse(EnergyPlusData &state, std::string const &CompTypeName, std::string_view CompName, bool &RecircIsUsed);
 
     //        End of Reporting subroutines for the Damper Module
     // *****************************************************************************
 
     // Clears the global data in DualDuct.
     // Needed for unit tests, should not be normally called.
-    void clear_state();
 
 } // namespace DualDuct
 
-struct DualDuctData : BaseGlobalStruct {
+struct DualDuctData : BaseGlobalStruct
+{
+
+    Array1D_bool CheckEquipName;
+    int NumDDAirTerminal = 0; // The Number of Dampers found in the Input //Autodesk Poss used uninitialized in ReportDualDuctConnections
+    int NumDualDuctConstVolDampers = 0;
+    int NumDualDuctVarVolDampers = 0;
+    int NumDualDuctVarVolOA = 0;
+    Real64 MassFlowSetToler = 0.0;
+    bool GetDualDuctInputFlag = true; // Flag set to make sure you get input once
+    Array1D<DualDuct::DualDuctAirTerminal> dd_airterminal;
+    std::unordered_map<std::string, std::string> UniqueDualDuctAirTerminalNames;
+    bool InitDualDuctMyOneTimeFlag = true;
+    bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
+    bool GetDualDuctOutdoorAirRecircUseFirstTimeOnly = true;
+
+    std::string const cCMO_DDConstantVolume = "AirTerminal:DualDuct:ConstantVolume";
+    std::string const cCMO_DDVariableVolume = "AirTerminal:DualDuct:VAV";
+    std::string const cCMO_DDVarVolOA = "AirTerminal:DualDuct:VAV:OutdoorAir";
+
+    Array1D_bool RecircIsUsedARR;
+    Array1D_string DamperNamesARR;
 
     void clear_state() override
     {
-
+        this->CheckEquipName.clear();
+        this->NumDDAirTerminal = 0;
+        this->NumDualDuctConstVolDampers = 0;
+        this->NumDualDuctVarVolDampers = 0;
+        this->NumDualDuctVarVolOA = 0;
+        this->MassFlowSetToler = 0.0;
+        this->GetDualDuctInputFlag = true;
+        this->dd_airterminal.clear();
+        this->UniqueDualDuctAirTerminalNames.clear();
+        this->InitDualDuctMyOneTimeFlag = true;
+        this->ZoneEquipmentListChecked = false;
+        this->GetDualDuctOutdoorAirRecircUseFirstTimeOnly = true;
+        this->RecircIsUsedARR.clear();
+        this->DamperNamesARR.clear();
     }
 };
 

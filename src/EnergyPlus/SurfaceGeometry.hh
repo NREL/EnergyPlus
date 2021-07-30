@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/HeatBalanceKivaManager.hh>
+#include <EnergyPlus/Vectors.hh>
 
 // C++ Headers
 #include <map>
@@ -69,9 +70,9 @@ struct EnergyPlusData;
 namespace SurfaceGeometry {
 
     // Using/Aliasing
+    using DataSurfaces::SurfaceClass;
     using DataSurfaces::SurfaceData;
     using DataVectorTypes::Vector;
-    using DataSurfaces::SurfaceClass;
 
     enum enclosureType
     {
@@ -81,13 +82,14 @@ namespace SurfaceGeometry {
 
     void SetupZoneGeometry(EnergyPlusData &state, bool &ErrorsFound);
 
-    void AllocateModuleArrays(EnergyPlusData &state);
+    void AllocateSurfaceArrays(EnergyPlusData &state);
 
-    void AllocateSurfaceWindows(int NumSurfaces);
+    void AllocateSurfaceWindows(EnergyPlusData &state, int NumSurfaces);
 
     void GetSurfaceData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
-    void checkSubSurfAzTiltNorm(EnergyPlusData &state, SurfaceData &baseSurface, // Base surface data (in)
+    void checkSubSurfAzTiltNorm(EnergyPlusData &state,
+                                SurfaceData &baseSurface, // Base surface data (in)
                                 SurfaceData &subSurface,  // Subsurface data (in)
                                 bool &surfaceError        // True if there is subsurface error that requires a fatal
     );
@@ -109,32 +111,32 @@ namespace SurfaceGeometry {
     );
 
     void GetHTSurfaceData(EnergyPlusData &state,
-                          bool &ErrorsFound,                // Error flag indicator (true if errors found)
-                          int &SurfNum,                     // Count of Current SurfaceNumber
-                          int const TotHTSurfs,             // Number of Heat Transfer Base Surfaces to obtain
-                          int const TotDetailedWalls,       // Number of Wall:Detailed items to obtain
-                          int const TotDetailedRoofs,       // Number of RoofCeiling:Detailed items to obtain
-                          int const TotDetailedFloors,      // Number of Floor:Detailed items to obtain
+                          bool &ErrorsFound,                 // Error flag indicator (true if errors found)
+                          int &SurfNum,                      // Count of Current SurfaceNumber
+                          int const TotHTSurfs,              // Number of Heat Transfer Base Surfaces to obtain
+                          int const TotDetailedWalls,        // Number of Wall:Detailed items to obtain
+                          int const TotDetailedRoofs,        // Number of RoofCeiling:Detailed items to obtain
+                          int const TotDetailedFloors,       // Number of Floor:Detailed items to obtain
                           const Array1D_string &BaseSurfCls, // Valid Classes for Base Surfaces
                           const Array1D<SurfaceClass> &BaseSurfIDs,
                           int &NeedToAddSurfaces // Number of surfaces to add, based on unentered IZ surfaces
     );
 
     void GetRectSurfaces(EnergyPlusData &state,
-                         bool &ErrorsFound,             // Error flag indicator (true if errors found)
-                         int &SurfNum,                  // Count of Current SurfaceNumber
-                         int const TotRectExtWalls,     // Number of Exterior Walls to obtain
-                         int const TotRectIntWalls,     // Number of Adiabatic Walls to obtain
-                         int const TotRectIZWalls,      // Number of Interzone Walls to obtain
-                         int const TotRectUGWalls,      // Number of Underground to obtain
-                         int const TotRectRoofs,        // Number of Roofs to obtain
-                         int const TotRectCeilings,     // Number of Adiabatic Ceilings to obtain
-                         int const TotRectIZCeilings,   // Number of Interzone Ceilings to obtain
-                         int const TotRectGCFloors,     // Number of Floors with Ground Contact to obtain
-                         int const TotRectIntFloors,    // Number of Adiabatic Walls to obtain
-                         int const TotRectIZFloors,     // Number of Interzone Floors to obtain
+                         bool &ErrorsFound,                        // Error flag indicator (true if errors found)
+                         int &SurfNum,                             // Count of Current SurfaceNumber
+                         int const TotRectExtWalls,                // Number of Exterior Walls to obtain
+                         int const TotRectIntWalls,                // Number of Adiabatic Walls to obtain
+                         int const TotRectIZWalls,                 // Number of Interzone Walls to obtain
+                         int const TotRectUGWalls,                 // Number of Underground to obtain
+                         int const TotRectRoofs,                   // Number of Roofs to obtain
+                         int const TotRectCeilings,                // Number of Adiabatic Ceilings to obtain
+                         int const TotRectIZCeilings,              // Number of Interzone Ceilings to obtain
+                         int const TotRectGCFloors,                // Number of Floors with Ground Contact to obtain
+                         int const TotRectIntFloors,               // Number of Adiabatic Walls to obtain
+                         int const TotRectIZFloors,                // Number of Interzone Floors to obtain
                          const Array1D<SurfaceClass> &BaseSurfIDs, // ID Assignments for valid surface classes
-                         int &NeedToAddSurfaces         // Number of surfaces to add, based on unentered IZ surfaces
+                         int &NeedToAddSurfaces                    // Number of surfaces to add, based on unentered IZ surfaces
     );
 
     void MakeRectangularVertices(EnergyPlusData &state,
@@ -147,38 +149,38 @@ namespace SurfaceGeometry {
                                  bool const SurfWorldCoordSystem);
 
     void GetHTSubSurfaceData(EnergyPlusData &state,
-                             bool &ErrorsFound,               // Error flag indicator (true if errors found)
-                             int &SurfNum,                    // Count of Current SurfaceNumber
-                             int const TotHTSubs,             // Number of Heat Transfer SubSurfaces to obtain
-                             const Array1D_string &SubSurfCls, // Valid Classes for Sub Surfaces
-                             const Array1D<SurfaceClass> &SubSurfIDs,    // ID Assignments for valid sub surface classes
-                             int &AddedSubSurfaces,           // Subsurfaces added when windows reference Window5
-                             int &NeedToAddSurfaces           // Number of surfaces to add, based on unentered IZ surfaces
+                             bool &ErrorsFound,                       // Error flag indicator (true if errors found)
+                             int &SurfNum,                            // Count of Current SurfaceNumber
+                             int const TotHTSubs,                     // Number of Heat Transfer SubSurfaces to obtain
+                             const Array1D_string &SubSurfCls,        // Valid Classes for Sub Surfaces
+                             const Array1D<SurfaceClass> &SubSurfIDs, // ID Assignments for valid sub surface classes
+                             int &AddedSubSurfaces,                   // Subsurfaces added when windows reference Window5
+                             int &NeedToAddSurfaces                   // Number of surfaces to add, based on unentered IZ surfaces
     );
 
     void GetRectSubSurfaces(EnergyPlusData &state,
-                            bool &ErrorsFound,            // Error flag indicator (true if errors found)
-                            int &SurfNum,                 // Count of Current SurfaceNumber
-                            int const TotWindows,         // Number of Window SubSurfaces to obtain
-                            int const TotDoors,           // Number of Door SubSurfaces to obtain
-                            int const TotGlazedDoors,     // Number of Glass Door SubSurfaces to obtain
-                            int const TotIZWindows,       // Number of Interzone Window SubSurfaces to obtain
-                            int const TotIZDoors,         // Number of Interzone Door SubSurfaces to obtain
-                            int const TotIZGlazedDoors,   // Number of Interzone Glass Door SubSurfaces to obtain
+                            bool &ErrorsFound,                       // Error flag indicator (true if errors found)
+                            int &SurfNum,                            // Count of Current SurfaceNumber
+                            int const TotWindows,                    // Number of Window SubSurfaces to obtain
+                            int const TotDoors,                      // Number of Door SubSurfaces to obtain
+                            int const TotGlazedDoors,                // Number of Glass Door SubSurfaces to obtain
+                            int const TotIZWindows,                  // Number of Interzone Window SubSurfaces to obtain
+                            int const TotIZDoors,                    // Number of Interzone Door SubSurfaces to obtain
+                            int const TotIZGlazedDoors,              // Number of Interzone Glass Door SubSurfaces to obtain
                             const Array1D<SurfaceClass> &SubSurfIDs, // ID Assignments for valid sub surface classes
-                            int &AddedSubSurfaces,        // Subsurfaces added when windows reference Window5
-                            int &NeedToAddSubSurfaces     // Number of surfaces to add, based on unentered IZ surfaces
+                            int &AddedSubSurfaces,                   // Subsurfaces added when windows reference Window5
+                            int &NeedToAddSubSurfaces                // Number of surfaces to add, based on unentered IZ surfaces
     );
 
     void CheckWindowShadingControlFrameDivider(EnergyPlusData &state,
-                                               std::string const &cRoutineName, // routine name calling this one (for error messages)
-                                               bool &ErrorsFound,               // true if errors have been found or are found here
-                                               int const SurfNum,               // current surface number
-                                               int const FrameField             // field number for frame/divider
+                                               std::string_view const cRoutineName, // routine name calling this one (for error messages)
+                                               bool &ErrorsFound,                   // true if errors have been found or are found here
+                                               int const SurfNum,                   // current surface number
+                                               int const FrameField                 // field number for frame/divider
     );
 
     void CheckSubSurfaceMiscellaneous(EnergyPlusData &state,
-                                      std::string const &cRoutineName,           // routine name calling this one (for error messages)
+                                      std::string_view const cRoutineName,       // routine name calling this one (for error messages)
                                       bool &ErrorsFound,                         // true if errors have been found or are found here
                                       int const SurfNum,                         // current surface number
                                       std::string const &SubSurfaceName,         // name of the surface
@@ -193,7 +195,8 @@ namespace SurfaceGeometry {
                                          Real64 const Length,
                                          Real64 const Height);
 
-    void MakeEquivalentRectangle(int const SurfNum, // Surface number
+    void MakeEquivalentRectangle(EnergyPlusData &state,
+                                 int const SurfNum, // Surface number
                                  bool &ErrorsFound  // Error flag indicator (true if errors found)
     );
 
@@ -263,9 +266,9 @@ namespace SurfaceGeometry {
 
     void FinalAssociateWindowShadingControlFenestration(EnergyPlusData &state, bool &ErrorsFound);
 
-    void CheckWindowShadingControlSimilarForWindow(EnergyPlusData &state, bool& ErrorsFound);
+    void CheckWindowShadingControlSimilarForWindow(EnergyPlusData &state, bool &ErrorsFound);
 
-    bool isWindowShadingControlSimilar(int a, int b);
+    bool isWindowShadingControlSimilar(EnergyPlusData &state, int a, int b);
 
     void GetStormWindowData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
@@ -306,17 +309,20 @@ namespace SurfaceGeometry {
 
     void insertVertexOnFace(DataVectorTypes::Face &face, int const &indexBefore, DataVectorTypes::Vector const &vertexToInsert);
 
-    bool areFloorAndCeilingSame(DataVectorTypes::Polyhedron const &zonePoly);
+    bool areFloorAndCeilingSame(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly);
 
-    bool areWallHeightSame(DataVectorTypes::Polyhedron const &zonePoly);
+    bool areWallHeightSame(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly);
 
-    std::tuple<bool, bool, bool> areSurfaceHorizAndVert(DataVectorTypes::Polyhedron const &zonePoly);
+    std::tuple<bool, bool, bool> areSurfaceHorizAndVert(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly);
 
-    bool areOppositeWallsSame(DataVectorTypes::Polyhedron const &zonePoly, Real64 &oppositeWallArea, Real64 &distanceBetweenOppositeWalls);
+    bool areOppositeWallsSame(EnergyPlusData &state,
+                              DataVectorTypes::Polyhedron const &zonePoly,
+                              Real64 &oppositeWallArea,
+                              Real64 &distanceBetweenOppositeWalls);
 
-    std::vector<int> listOfFacesFacingAzimuth(DataVectorTypes::Polyhedron const &zonePoly, Real64 const &azimuth);
+    std::vector<int> listOfFacesFacingAzimuth(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly, Real64 const &azimuth);
 
-    int findPossibleOppositeFace(DataVectorTypes::Polyhedron const &zonePoly, int const &faceIndex);
+    int findPossibleOppositeFace(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly, int const &faceIndex);
 
     bool areCornersEquidistant(DataVectorTypes::Polyhedron const &zonePoly, int const &faceIndex, int const &opFaceIndex, Real64 &distanceBetween);
 
@@ -338,16 +344,16 @@ namespace SurfaceGeometry {
     );
 
     void CreateShadedWindowConstruction(EnergyPlusData &state,
-                                        int const SurfNum, // Surface number
-                                        int const WSCPtr,  // Pointer to WindowShadingControl for SurfNum
-                                        int const ShDevNum, // Shading device material number for WSCptr
+                                        int const SurfNum,          // Surface number
+                                        int const WSCPtr,           // Pointer to WindowShadingControl for SurfNum
+                                        int const ShDevNum,         // Shading device material number for WSCptr
                                         int const shadeControlIndex // index to the Surface().windowShadingControlList,
-                                              // Surface().shadedConstructionList, and Surface().shadedStormWinConstructionList
+                                                                    // Surface().shadedConstructionList, and Surface().shadedStormWinConstructionList
     );
 
     void CreateStormWindowConstructions(EnergyPlusData &state);
 
-    int createAirMaterialFromDistance(EnergyPlusData &state, Real64 distance, std::string namePrefix); //return new material number
+    int createAirMaterialFromDistance(EnergyPlusData &state, Real64 distance, std::string namePrefix); // return new material number
 
     // create a new construction with storm based on an old construction and storm and gap materials
     int createConstructionWithStorm(EnergyPlusData &state, int oldConstruction, std::string name, int stormMaterial, int gapMaterial);
@@ -378,11 +384,12 @@ namespace SurfaceGeometry {
                                          SurfaceGeometry::enclosureType const &EnclosureType,                       // Radiant or Solar
                                          bool &ErrorsFound);                                                        // Set to true if errors found
 
-    void CheckConvexity(EnergyPlusData &state, int const SurfNum, // Current surface number
+    void CheckConvexity(EnergyPlusData &state,
+                        int const SurfNum, // Current surface number
                         int const NSides   // Number of sides to figure
     );
 
-    bool isRectangle(int const ThisSurf // Current surface number
+    bool isRectangle(EnergyPlusData &state, int const ThisSurf // Current surface number
     );
 
     void CheckForReversedLayers(EnergyPlusData &state,
@@ -394,23 +401,25 @@ namespace SurfaceGeometry {
 
 } // namespace SurfaceGeometry
 
-struct SurfaceGeometryData : BaseGlobalStruct {
+struct SurfaceGeometryData : BaseGlobalStruct
+{
 
-    Real64 CosBldgRelNorth = 0.0;     // Cosine of the building rotation (relative north) (includes appendix G rotation)
-    Real64 SinBldgRelNorth = 0.0;     // Sine of the building rotation (relative north)   (includes appendix G rotation)
-    Real64 CosBldgRotAppGonly = 0.0;  // Cosine of the building rotation for appendix G only(relative north)
-    Real64 SinBldgRotAppGonly = 0.0;  // Sine of the building rotation for appendix G only (relative north)
+    Real64 CosBldgRelNorth = 0.0;    // Cosine of the building rotation (relative north) (includes appendix G rotation)
+    Real64 SinBldgRelNorth = 0.0;    // Sine of the building rotation (relative north)   (includes appendix G rotation)
+    Real64 CosBldgRotAppGonly = 0.0; // Cosine of the building rotation for appendix G only(relative north)
+    Real64 SinBldgRotAppGonly = 0.0; // Sine of the building rotation for appendix G only (relative north)
     Array1D<Real64> CosZoneRelNorth; // Cosine of the zone rotation (relative north)
     Array1D<Real64> SinZoneRelNorth; // Sine of the zone rotation (relative north)
 
-    bool NoGroundTempObjWarning = true; // This will cause a warning to be issued if surfaces with "Ground"
-                                       // outside environment are used but no ground temperature object was input.
+    bool NoGroundTempObjWarning = true;   // This will cause a warning to be issued if surfaces with "Ground"
+                                          // outside environment are used but no ground temperature object was input.
     bool NoFCGroundTempObjWarning = true; // This will cause a warning to be issued if surfaces with "GroundFCfactorMethod"
-                                         // outside environment are used but no FC ground temperatures was input.
-    bool RectSurfRefWorldCoordSystem = false; // GlobalGeometryRules:Field Rectangular Surface Coordinate System (A5) = World (true) or Relative (false)
-    int Warning1Count = 0;                   // counts of Modify Window 5/6 windows
-    int Warning2Count = 0;                   // counts of overriding exterior windows with Window 5/6 glazing systems
-    int Warning3Count = 0;                   // counts of overriding interior windows with Window 5/6 glazing systems
+                                          // outside environment are used but no FC ground temperatures was input.
+    bool RectSurfRefWorldCoordSystem =
+        false;             // GlobalGeometryRules:Field Rectangular Surface Coordinate System (A5) = World (true) or Relative (false)
+    int Warning1Count = 0; // counts of Modify Window 5/6 windows
+    int Warning2Count = 0; // counts of overriding exterior windows with Window 5/6 glazing systems
+    int Warning3Count = 0; // counts of overriding interior windows with Window 5/6 glazing systems
 
     bool ProcessSurfaceVerticesOneTimeFlag = true;
     int checkSubSurfAzTiltNormErrCount = 0;
@@ -429,12 +438,33 @@ struct SurfaceGeometryData : BaseGlobalStruct {
     Array1D<DataSurfaces::SurfaceClass> const BaseSurfIDs;
     Array1D<DataSurfaces::SurfaceClass> const SubSurfIDs;
     int const UnenteredAdjacentZoneSurface = -998; // allows users to enter one zone surface ("Zone")
-                                                  // referencing another in adjacent zone
-    int const UnreconciledZoneSurface = -999; // interim value between entering surfaces ("Surface") and reconciling
+                                                   // referencing another in adjacent zone
+    int const UnreconciledZoneSurface = -999;      // interim value between entering surfaces ("Surface") and reconciling
 
     Array1D<SurfaceGeometry::SurfaceData> SurfaceTmp; // Allocated/Deallocated during input processing
     HeatBalanceKivaManager::KivaManager kivaManager;
     SurfaceGeometry::ExposedFoundationPerimeter exposedFoundationPerimeter;
+
+    int ErrCount = 0;
+    bool WarningDisplayed = false;
+    int ErrCount2 = 0;
+    int ErrCount3 = 0;
+    int ErrCount4 = 0; // counts of interzone area mismatches.
+    bool ShowZoneSurfaceHeaders = true;
+    int ErrCount5 = 0;
+    Real64 OldAspectRatio;
+    Real64 NewAspectRatio;
+    std::string transformPlane;
+    Array1D<Vectors::Vector> Triangle1 = Array1D<Vectors::Vector>(3); // working struct for a 3-sided surface
+    Array1D<Vectors::Vector> Triangle2 = Array1D<Vectors::Vector>(3); // working struct for a 3-sided surface
+    Array1D<Real64> X;                                                // containers for x,y,z vertices of the surface
+    Array1D<Real64> Y;
+    Array1D<Real64> Z;
+    Array1D<Real64> A; // containers for convexity test
+    Array1D<Real64> B;
+    Array1D_int SurfCollinearVerts; // Array containing indices of collinear vertices
+    int VertSize;                   // size of X,Y,Z,A,B arrays
+    Real64 ACosZero;                // set on firstTime
 
     void clear_state() override
     {
@@ -463,15 +493,29 @@ struct SurfaceGeometryData : BaseGlobalStruct {
         firstTime = true;
         noTransform = true;
         CheckConvexityFirstTime = true;
+        ErrCount = 0;
+        WarningDisplayed = false;
+        ErrCount2 = 0;
+        ErrCount3 = 0;
+        ErrCount4 = 0;
+        ErrCount5 = 0;
+        ShowZoneSurfaceHeaders = true;
     }
 
     // Default Constructor
-    SurfaceGeometryData() :
-        BaseSurfCls(3, {"WALL", "FLOOR", "ROOF"}),
-        SubSurfCls(6, {"WINDOW", "DOOR", "GLASSDOOR", "SHADING", "TUBULARDAYLIGHTDOME", "TUBULARDAYLIGHTDIFFUSER"}),
-        BaseSurfIDs(3, {DataSurfaces::SurfaceClass::Wall, DataSurfaces::SurfaceClass::Floor, DataSurfaces::SurfaceClass::Roof}),
-        SubSurfIDs(6, {DataSurfaces::SurfaceClass::Window, DataSurfaces::SurfaceClass::Door, DataSurfaces::SurfaceClass::GlassDoor, DataSurfaces::SurfaceClass::Shading, DataSurfaces::SurfaceClass::TDD_Dome, DataSurfaces::SurfaceClass::TDD_Diffuser})
-    {}
+    SurfaceGeometryData()
+        : BaseSurfCls(3, {"WALL", "FLOOR", "ROOF"}),
+          SubSurfCls(6, {"WINDOW", "DOOR", "GLASSDOOR", "SHADING", "TUBULARDAYLIGHTDOME", "TUBULARDAYLIGHTDIFFUSER"}),
+          BaseSurfIDs(3, {DataSurfaces::SurfaceClass::Wall, DataSurfaces::SurfaceClass::Floor, DataSurfaces::SurfaceClass::Roof}),
+          SubSurfIDs(6,
+                     {DataSurfaces::SurfaceClass::Window,
+                      DataSurfaces::SurfaceClass::Door,
+                      DataSurfaces::SurfaceClass::GlassDoor,
+                      DataSurfaces::SurfaceClass::Shading,
+                      DataSurfaces::SurfaceClass::TDD_Dome,
+                      DataSurfaces::SurfaceClass::TDD_Diffuser})
+    {
+    }
 };
 } // namespace EnergyPlus
 

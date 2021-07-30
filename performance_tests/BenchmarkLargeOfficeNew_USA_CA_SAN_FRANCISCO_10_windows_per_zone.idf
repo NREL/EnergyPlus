@@ -66,7 +66,7 @@
 ! ExtWallConstruction=Mass
 ! End SimMetaData
 
-  Version,9.4;
+  Version,9.6;
 
 !
 !- Run Controls sections
@@ -7401,8 +7401,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     VAV WITH REHEAT_OA,      !- Name
     VAV WITH REHEAT_OA_Controllers,  !- Controller List Name
-    VAV WITH REHEAT_OA_Equipment,  !- Outdoor Air Equipment List Name
-    VAV WITH REHEAT Availability Manager List;  !- Availability Manager List Name
+    VAV WITH REHEAT_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     VAV WITH REHEAT_OANode List;  !- Node or NodeList Name 1

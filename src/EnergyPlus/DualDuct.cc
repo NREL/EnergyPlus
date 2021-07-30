@@ -103,56 +103,8 @@ namespace DualDuct {
     using namespace DataSizing;
     using namespace ScheduleManager;
 
-    // MODULE PARAMETER DEFINITIONS
-    int const DualDuct_ConstantVolume(1);
-    int const DualDuct_VariableVolume(2);
-    int const DualDuct_OutdoorAir(3);
-    std::string const cCMO_DDConstantVolume("AirTerminal:DualDuct:ConstantVolume");
-    std::string const cCMO_DDVariableVolume("AirTerminal:DualDuct:VAV");
-    std::string const cCMO_DDVarVolOA("AirTerminal:DualDuct:VAV:OutdoorAir");
-
-    int const DD_OA_ConstantOAMode(11);
-    int const DD_OA_ScheduleOAMode(12);
-    int const DD_OA_DynamicOAMode(13);
-
-    int const PerPersonModeNotSet(20);
-    int const PerPersonDCVByCurrentLevel(21);
-    int const PerPersonByDesignLevel(22);
-
-    // MODULE VARIABLE DECLARATIONS:
-    Array1D_bool CheckEquipName;
-
-    int NumDDAirTerminal(0); // The Number of Dampers found in the Input //Autodesk Poss used uninitialized in ReportDualDuctConnections
-    int NumDualDuctConstVolDampers;
-    int NumDualDuctVarVolDampers;
-    int NumDualDuctVarVolOA;
-    Real64 MassFlowSetToler;
-    bool GetDualDuctInputFlag(true); // Flag set to make sure you get input once
-
-    // Object Data
-    Array1D<DualDuctAirTerminal> dd_airterminal;
-    std::unordered_map<std::string, std::string> UniqueDualDuctAirTerminalNames;
-    bool InitDualDuctMyOneTimeFlag(true);
-    bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
-    bool GetDualDuctOutdoorAirRecircUseFirstTimeOnly(true);
-
-    void clear_state()
-    {
-        CheckEquipName.clear();
-        NumDDAirTerminal = 0;
-        NumDualDuctConstVolDampers = 0;
-        NumDualDuctVarVolDampers = 0;
-        NumDualDuctVarVolOA = 0;
-        MassFlowSetToler = 0.0;
-        GetDualDuctInputFlag = true;
-        dd_airterminal.clear();
-        UniqueDualDuctAirTerminalNames.clear();
-        InitDualDuctMyOneTimeFlag = true;
-        ZoneEquipmentListChecked = false;
-        GetDualDuctOutdoorAirRecircUseFirstTimeOnly = true;
-    }
-
-    void SimulateDualDuct(EnergyPlusData &state, std::string const &CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex)
+    void SimulateDualDuct(
+        EnergyPlusData &state, std::string_view CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex)
     {
 
         // SUBROUTINE INFORMATION:
@@ -171,46 +123,44 @@ namespace DualDuct {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int DDNum; // The Damper that you are currently loading input into
 
-
-
         // Obtains and Allocates Damper related parameters from input file
-        if (GetDualDuctInputFlag) { // First time subroutine has been entered
+        if (state.dataDualDuct->GetDualDuctInputFlag) { // First time subroutine has been entered
             GetDualDuctInput(state);
-            GetDualDuctInputFlag = false;
+            state.dataDualDuct->GetDualDuctInputFlag = false;
         }
 
         // Find the correct DDNumber with the AirLoop & CompNum from AirLoop Derived Type
         if (CompIndex == 0) {
-            DDNum = UtilityRoutines::FindItemInList(CompName, dd_airterminal, &DualDuctAirTerminal::Name);
+            DDNum = UtilityRoutines::FindItemInList(CompName, state.dataDualDuct->dd_airterminal, &DualDuctAirTerminal::Name);
             if (DDNum == 0) {
-                ShowFatalError(state, "SimulateDualDuct: Damper not found=" + CompName);
+                ShowFatalError(state, "SimulateDualDuct: Damper not found=" + std::string{CompName});
             }
             CompIndex = DDNum;
         } else {
             DDNum = CompIndex;
-            if (DDNum > NumDDAirTerminal || DDNum < 1) {
+            if (DDNum > state.dataDualDuct->NumDDAirTerminal || DDNum < 1) {
                 ShowFatalError(state,
                                format("SimulateDualDuct: Invalid CompIndex passed={}, Number of Dampers={}, Damper name={}",
                                       CompIndex,
-                                      NumDDAirTerminal,
+                                      state.dataDualDuct->NumDDAirTerminal,
                                       CompName));
             }
-            if (CheckEquipName(DDNum)) {
-                if (CompName != dd_airterminal(DDNum).Name) {
+            if (state.dataDualDuct->CheckEquipName(DDNum)) {
+                if (CompName != state.dataDualDuct->dd_airterminal(DDNum).Name) {
                     ShowFatalError(state,
                                    format("SimulateDualDuct: Invalid CompIndex passed={}, Damper name={}, stored Damper Name for that index={}",
                                           CompIndex,
                                           CompName,
-                                          dd_airterminal(DDNum).Name));
+                                          state.dataDualDuct->dd_airterminal(DDNum).Name));
                 }
-                CheckEquipName(DDNum) = false;
+                state.dataDualDuct->CheckEquipName(DDNum) = false;
             }
         }
 
-        auto &thisDualDuct(dd_airterminal(DDNum));
+        auto &thisDualDuct(state.dataDualDuct->dd_airterminal(DDNum));
 
         if (CompIndex > 0) {
-            DataSizing::CurTermUnitSizingNum = state.dataDefineEquipment->AirDistUnit(thisDualDuct.ADUNum).TermUnitSizingNum;
+            state.dataSize->CurTermUnitSizingNum = state.dataDefineEquipment->AirDistUnit(thisDualDuct.ADUNum).TermUnitSizingNum;
             // With the correct DDNum Initialize
             thisDualDuct.InitDualDuct(state, FirstHVACIteration); // Initialize all Damper related parameters
 
@@ -218,15 +168,15 @@ namespace DualDuct {
             {
                 auto const SELECT_CASE_var(thisDualDuct.DamperType);
 
-                if (SELECT_CASE_var == DualDuct_ConstantVolume) { // 'AirTerminal:DualDuct:ConstantVolume'
+                if (SELECT_CASE_var == DualDuctDamper::ConstantVolume) { // 'AirTerminal:DualDuct:ConstantVolume'
 
                     thisDualDuct.SimDualDuctConstVol(state, ZoneNum, ZoneNodeNum);
 
-                } else if (SELECT_CASE_var == DualDuct_VariableVolume) { // 'AirTerminal:DualDuct:VAV'
+                } else if (SELECT_CASE_var == DualDuctDamper::VariableVolume) { // 'AirTerminal:DualDuct:VAV'
 
                     thisDualDuct.SimDualDuctVarVol(state, ZoneNum, ZoneNodeNum);
 
-                } else if (SELECT_CASE_var == DualDuct_OutdoorAir) {
+                } else if (SELECT_CASE_var == DualDuctDamper::OutdoorAir) {
 
                     thisDualDuct.SimDualDuctVAVOutdoorAir(state, ZoneNum, ZoneNodeNum); // 'AirTerminal:DualDuct:VAV:OutdoorAir'
                 }
@@ -238,7 +188,7 @@ namespace DualDuct {
             // Report the current Damper
             thisDualDuct.ReportDualDuct();
         } else {
-            ShowFatalError(state, "SimulateDualDuct: Damper not found=" + CompName);
+            ShowFatalError(state, "SimulateDualDuct: Damper not found=" + std::string{CompName});
         }
     }
 
@@ -266,7 +216,7 @@ namespace DualDuct {
         using namespace DataHeatBalance;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetDualDuctInput: "); // include trailing bla
+        static constexpr std::string_view RoutineName("GetDualDuctInput: "); // include trailing bla
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -275,121 +225,132 @@ namespace DualDuct {
         int NumAlphas;
         int NumNums;
         int IOStat;
-        static Array1D<Real64> NumArray(2, 0.0);
-        static Array1D_string AlphArray(7);
-        static Array1D_string cAlphaFields(7);       // Alpha field names
-        static Array1D_string cNumericFields(2);     // Numeric field names
-        static Array1D_bool lAlphaBlanks(7, true);   // Logical array, alpha field input BLANK = .TRUE.
-        static Array1D_bool lNumericBlanks(2, true); // Logical array, numeric field input BLANK = .TRUE.
-        std::string CurrentModuleObject;             // for ease in getting objects
-        static bool ErrorsFound(false);              // If errors detected in input
-        int CtrlZone;                                // controlled zone do loop index
-        int SupAirIn;                                // controlled zone supply air inlet index
-        int ADUNum;                                  // loop control to search Air Distribution Units
-        static Real64 DummyOAFlow(0.0);
+        Array1D<Real64> NumArray(2, 0.0);
+        Array1D_string AlphArray(7);
+        Array1D_string cAlphaFields(7);       // Alpha field names
+        Array1D_string cNumericFields(2);     // Numeric field names
+        Array1D_bool lAlphaBlanks(7, true);   // Logical array, alpha field input BLANK = .TRUE.
+        Array1D_bool lNumericBlanks(2, true); // Logical array, numeric field input BLANK = .TRUE.
+        std::string CurrentModuleObject;      // for ease in getting objects
+        bool ErrorsFound(false);              // If errors detected in input
+        int CtrlZone;                         // controlled zone do loop index
+        int SupAirIn;                         // controlled zone supply air inlet index
+        int ADUNum;                           // loop control to search Air Distribution Units
+        Real64 DummyOAFlow(0.0);
 
-        // Flow
-        NumDualDuctConstVolDampers = inputProcessor->getNumObjectsFound(state, cCMO_DDConstantVolume);
-        NumDualDuctVarVolDampers = inputProcessor->getNumObjectsFound(state, cCMO_DDVariableVolume);
-        NumDualDuctVarVolOA = inputProcessor->getNumObjectsFound(state, cCMO_DDVarVolOA);
-        NumDDAirTerminal = NumDualDuctConstVolDampers + NumDualDuctVarVolDampers + NumDualDuctVarVolOA;
-        dd_airterminal.allocate(NumDDAirTerminal);
-        UniqueDualDuctAirTerminalNames.reserve(NumDDAirTerminal);
-        CheckEquipName.dimension(NumDDAirTerminal, true);
+        state.dataDualDuct->NumDualDuctConstVolDampers =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataDualDuct->cCMO_DDConstantVolume);
+        state.dataDualDuct->NumDualDuctVarVolDampers =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataDualDuct->cCMO_DDVariableVolume);
+        state.dataDualDuct->NumDualDuctVarVolOA =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataDualDuct->cCMO_DDVarVolOA);
+        state.dataDualDuct->NumDDAirTerminal =
+            state.dataDualDuct->NumDualDuctConstVolDampers + state.dataDualDuct->NumDualDuctVarVolDampers + state.dataDualDuct->NumDualDuctVarVolOA;
+        state.dataDualDuct->dd_airterminal.allocate(state.dataDualDuct->NumDDAirTerminal);
+        state.dataDualDuct->UniqueDualDuctAirTerminalNames.reserve(state.dataDualDuct->NumDDAirTerminal);
+        state.dataDualDuct->CheckEquipName.dimension(state.dataDualDuct->NumDDAirTerminal, true);
 
-        if (NumDualDuctConstVolDampers > 0) {
-            for (DamperIndex = 1; DamperIndex <= NumDualDuctConstVolDampers; ++DamperIndex) {
+        if (state.dataDualDuct->NumDualDuctConstVolDampers > 0) {
+            for (DamperIndex = 1; DamperIndex <= state.dataDualDuct->NumDualDuctConstVolDampers; ++DamperIndex) {
 
                 // Load the info from the damper
-                CurrentModuleObject = cCMO_DDConstantVolume;
+                CurrentModuleObject = state.dataDualDuct->cCMO_DDConstantVolume;
 
-                inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
-                                              DamperIndex,
-                                              AlphArray,
-                                              NumAlphas,
-                                              NumArray,
-                                              NumNums,
-                                              IOStat,
-                                              lNumericBlanks,
-                                              lAlphaBlanks,
-                                              cAlphaFields,
-                                              cNumericFields);
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                         CurrentModuleObject,
+                                                                         DamperIndex,
+                                                                         AlphArray,
+                                                                         NumAlphas,
+                                                                         NumArray,
+                                                                         NumNums,
+                                                                         IOStat,
+                                                                         lNumericBlanks,
+                                                                         lAlphaBlanks,
+                                                                         cAlphaFields,
+                                                                         cNumericFields);
 
                 // Anything below this line in this control block should use DDNum
                 DDNum = DamperIndex;
-                GlobalNames::VerifyUniqueInterObjectName(state,
-                    UniqueDualDuctAirTerminalNames, AlphArray(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
-                dd_airterminal(DDNum).Name = AlphArray(1);
-                dd_airterminal(DDNum).DamperType = DualDuct_ConstantVolume;
-                dd_airterminal(DDNum).Schedule = AlphArray(2);
+                GlobalNames::VerifyUniqueInterObjectName(
+                    state, state.dataDualDuct->UniqueDualDuctAirTerminalNames, AlphArray(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+                state.dataDualDuct->dd_airterminal(DDNum).Name = AlphArray(1);
+                state.dataDualDuct->dd_airterminal(DDNum).DamperType = DualDuctDamper::ConstantVolume;
+                state.dataDualDuct->dd_airterminal(DDNum).Schedule = AlphArray(2);
                 if (lAlphaBlanks(2)) {
-                    dd_airterminal(DDNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                    state.dataDualDuct->dd_airterminal(DDNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
-                    dd_airterminal(DDNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
-                    if (dd_airterminal(DDNum).SchedPtr == 0) {
-                        ShowSevereError(state, CurrentModuleObject + ", \"" + dd_airterminal(DDNum).Name + "\" " + cAlphaFields(2) + " = " + AlphArray(2) +
-                                        " not found.");
+                    state.dataDualDuct->dd_airterminal(DDNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
+                    if (state.dataDualDuct->dd_airterminal(DDNum).SchedPtr == 0) {
+                        ShowSevereError(state,
+                                        CurrentModuleObject + ", \"" + state.dataDualDuct->dd_airterminal(DDNum).Name + "\" " + cAlphaFields(2) +
+                                            " = " + AlphArray(2) + " not found.");
                         ErrorsFound = true;
                     }
                 }
-                dd_airterminal(DDNum).OutletNodeNum = GetOnlySingleNode(state, AlphArray(3),
-                                                                        ErrorsFound,
-                                                                        CurrentModuleObject,
-                                                                        AlphArray(1),
-                                                                        NodeType_Air,
-                                                                        NodeConnectionType_Outlet,
-                                                                        1,
-                                                                        ObjectIsNotParent,
-                                                                        cAlphaFields(3));
-                dd_airterminal(DDNum).HotAirInletNodeNum = GetOnlySingleNode(state, AlphArray(4),
-                                                                             ErrorsFound,
-                                                                             CurrentModuleObject,
-                                                                             AlphArray(1),
-                                                                             NodeType_Air,
-                                                                             NodeConnectionType_Inlet,
-                                                                             1,
-                                                                             ObjectIsNotParent,
-                                                                             cAlphaFields(4));
-                dd_airterminal(DDNum).ColdAirInletNodeNum = GetOnlySingleNode(state, AlphArray(5),
-                                                                              ErrorsFound,
-                                                                              CurrentModuleObject,
-                                                                              AlphArray(1),
-                                                                              NodeType_Air,
-                                                                              NodeConnectionType_Inlet,
-                                                                              1,
-                                                                              ObjectIsNotParent,
-                                                                              cAlphaFields(5));
+                state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum = GetOnlySingleNode(state,
+                                                                                            AlphArray(3),
+                                                                                            ErrorsFound,
+                                                                                            CurrentModuleObject,
+                                                                                            AlphArray(1),
+                                                                                            DataLoopNode::NodeFluidType::Air,
+                                                                                            DataLoopNode::NodeConnectionType::Outlet,
+                                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                                            ObjectIsNotParent,
+                                                                                            cAlphaFields(3));
+                state.dataDualDuct->dd_airterminal(DDNum).HotAirInletNodeNum = GetOnlySingleNode(state,
+                                                                                                 AlphArray(4),
+                                                                                                 ErrorsFound,
+                                                                                                 CurrentModuleObject,
+                                                                                                 AlphArray(1),
+                                                                                                 DataLoopNode::NodeFluidType::Air,
+                                                                                                 DataLoopNode::NodeConnectionType::Inlet,
+                                                                                                 NodeInputManager::compFluidStream::Primary,
+                                                                                                 ObjectIsNotParent,
+                                                                                                 cAlphaFields(4));
+                state.dataDualDuct->dd_airterminal(DDNum).ColdAirInletNodeNum = GetOnlySingleNode(state,
+                                                                                                  AlphArray(5),
+                                                                                                  ErrorsFound,
+                                                                                                  CurrentModuleObject,
+                                                                                                  AlphArray(1),
+                                                                                                  DataLoopNode::NodeFluidType::Air,
+                                                                                                  DataLoopNode::NodeConnectionType::Inlet,
+                                                                                                  NodeInputManager::compFluidStream::Primary,
+                                                                                                  ObjectIsNotParent,
+                                                                                                  cAlphaFields(5));
 
-                dd_airterminal(DDNum).MaxAirVolFlowRate = NumArray(1);
-                dd_airterminal(DDNum).ZoneMinAirFracDes = 0.0;
+                state.dataDualDuct->dd_airterminal(DDNum).MaxAirVolFlowRate = NumArray(1);
+                state.dataDualDuct->dd_airterminal(DDNum).ZoneMinAirFracDes = 0.0;
 
                 // Register component set data - one for heat and one for cool
-                TestCompSet(state, CurrentModuleObject + ":HEAT", dd_airterminal(DDNum).Name, AlphArray(4), AlphArray(3), "Air Nodes");
-                TestCompSet(state, CurrentModuleObject + ":COOL", dd_airterminal(DDNum).Name, AlphArray(5), AlphArray(3), "Air Nodes");
+                TestCompSet(
+                    state, CurrentModuleObject + ":HEAT", state.dataDualDuct->dd_airterminal(DDNum).Name, AlphArray(4), AlphArray(3), "Air Nodes");
+                TestCompSet(
+                    state, CurrentModuleObject + ":COOL", state.dataDualDuct->dd_airterminal(DDNum).Name, AlphArray(5), AlphArray(3), "Air Nodes");
 
                 for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
-                    if (dd_airterminal(DDNum).OutletNodeNum == state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
-                        state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum = dd_airterminal(DDNum).ColdAirInletNodeNum;
-                        state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum2 = dd_airterminal(DDNum).HotAirInletNodeNum;
-                        dd_airterminal(DDNum).ADUNum = ADUNum;
+                    if (state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum == state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
+                        state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum = state.dataDualDuct->dd_airterminal(DDNum).ColdAirInletNodeNum;
+                        state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum2 = state.dataDualDuct->dd_airterminal(DDNum).HotAirInletNodeNum;
+                        state.dataDualDuct->dd_airterminal(DDNum).ADUNum = ADUNum;
                     }
                 }
                 // one assumes if there isn't one assigned, it's an error?
-                if (dd_airterminal(DDNum).ADUNum == 0) {
+                if (state.dataDualDuct->dd_airterminal(DDNum).ADUNum == 0) {
                     // convenient String
-                    if (dd_airterminal(DDNum).DamperType == DualDuct_ConstantVolume) {
+                    if (state.dataDualDuct->dd_airterminal(DDNum).DamperType == DualDuctDamper::ConstantVolume) {
                         CurrentModuleObject = "ConstantVolume";
-                    } else if (dd_airterminal(DDNum).DamperType == DualDuct_VariableVolume) {
+                    } else if (state.dataDualDuct->dd_airterminal(DDNum).DamperType == DualDuctDamper::VariableVolume) {
                         CurrentModuleObject = "VAV";
-                    } else if (dd_airterminal(DDNum).DamperType == DualDuct_OutdoorAir) {
+                    } else if (state.dataDualDuct->dd_airterminal(DDNum).DamperType == DualDuctDamper::OutdoorAir) {
                         CurrentModuleObject = "VAV:OutdoorAir";
                     } else {
                         CurrentModuleObject = "*invalid*";
                     }
-                    ShowSevereError(state, RoutineName + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" + CurrentModuleObject + ',' +
-                                    dd_airterminal(DDNum).Name + "].");
-                    ShowContinueError(state, "...should have outlet node=" + NodeID(dd_airterminal(DDNum).OutletNodeNum));
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" +
+                                        CurrentModuleObject + ',' + state.dataDualDuct->dd_airterminal(DDNum).Name + "].");
+                    ShowContinueError(
+                        state, "...should have outlet node=" + state.dataLoopNodes->NodeID(state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum));
                     ErrorsFound = true;
                 } else {
 
@@ -397,140 +358,160 @@ namespace DualDuct {
                     for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                         if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
                         for (SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
-                            if (dd_airterminal(DDNum).OutletNodeNum == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
+                            if (state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum ==
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
                                 if (state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode > 0) {
                                     ShowSevereError(state, "Error in connecting a terminal unit to a zone");
-                                    ShowContinueError(state, NodeID(dd_airterminal(DDNum).OutletNodeNum) + " already connects to another zone");
-                                    ShowContinueError(state, "Occurs for terminal unit " + CurrentModuleObject + " = " + dd_airterminal(DDNum).Name);
+                                    ShowContinueError(state,
+                                                      state.dataLoopNodes->NodeID(state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum) +
+                                                          " already connects to another zone");
+                                    ShowContinueError(state,
+                                                      "Occurs for terminal unit " + CurrentModuleObject + " = " +
+                                                          state.dataDualDuct->dd_airterminal(DDNum).Name);
                                     ShowContinueError(state, "Check terminal unit node names for errors");
                                     ErrorsFound = true;
                                 } else {
-                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = dd_airterminal(DDNum).ColdAirInletNodeNum;
-                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitHeat(SupAirIn).InNode = dd_airterminal(DDNum).HotAirInletNodeNum;
-                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = dd_airterminal(DDNum).OutletNodeNum;
-                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitHeat(SupAirIn).OutNode = dd_airterminal(DDNum).OutletNodeNum;
-                                    state.dataDefineEquipment->AirDistUnit(dd_airterminal(DDNum).ADUNum).TermUnitSizingNum =
+                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode =
+                                        state.dataDualDuct->dd_airterminal(DDNum).ColdAirInletNodeNum;
+                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitHeat(SupAirIn).InNode =
+                                        state.dataDualDuct->dd_airterminal(DDNum).HotAirInletNodeNum;
+                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode =
+                                        state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum;
+                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitHeat(SupAirIn).OutNode =
+                                        state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum;
+                                    state.dataDefineEquipment->AirDistUnit(state.dataDualDuct->dd_airterminal(DDNum).ADUNum).TermUnitSizingNum =
                                         state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
-                                    state.dataDefineEquipment->AirDistUnit(dd_airterminal(DDNum).ADUNum).ZoneEqNum = CtrlZone;
+                                    state.dataDefineEquipment->AirDistUnit(state.dataDualDuct->dd_airterminal(DDNum).ADUNum).ZoneEqNum = CtrlZone;
                                 }
-                                dd_airterminal(DDNum).CtrlZoneNum = CtrlZone;
-                                dd_airterminal(DDNum).ActualZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
-                                dd_airterminal(DDNum).CtrlZoneInNodeIndex = SupAirIn;
+                                state.dataDualDuct->dd_airterminal(DDNum).CtrlZoneNum = CtrlZone;
+                                state.dataDualDuct->dd_airterminal(DDNum).ActualZoneNum =
+                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
+                                state.dataDualDuct->dd_airterminal(DDNum).CtrlZoneInNodeIndex = SupAirIn;
                             }
                         }
                     }
                 }
                 // Setup the Average damper Position output variable
                 // CurrentModuleObject='AirTerminal:DualDuct:ConstantVolume'
-                SetupOutputVariable(state, "Zone Air Terminal Cold Supply Duct Damper Position",
+                SetupOutputVariable(state,
+                                    "Zone Air Terminal Cold Supply Duct Damper Position",
                                     OutputProcessor::Unit::None,
-                                    dd_airterminal(DDNum).ColdAirDamperPosition,
-                                    "System",
-                                    "Average",
-                                    dd_airterminal(DDNum).Name);
-                SetupOutputVariable(state, "Zone Air Terminal Hot Supply Duct Damper Position",
+                                    state.dataDualDuct->dd_airterminal(DDNum).ColdAirDamperPosition,
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataDualDuct->dd_airterminal(DDNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Air Terminal Hot Supply Duct Damper Position",
                                     OutputProcessor::Unit::None,
-                                    dd_airterminal(DDNum).HotAirDamperPosition,
-                                    "System",
-                                    "Average",
-                                    dd_airterminal(DDNum).Name);
+                                    state.dataDualDuct->dd_airterminal(DDNum).HotAirDamperPosition,
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataDualDuct->dd_airterminal(DDNum).Name);
 
             } // end Number of Damper Loop
         }
 
-        if (NumDualDuctVarVolDampers > 0) {
-            for (DamperIndex = 1; DamperIndex <= NumDualDuctVarVolDampers; ++DamperIndex) {
+        if (state.dataDualDuct->NumDualDuctVarVolDampers > 0) {
+            for (DamperIndex = 1; DamperIndex <= state.dataDualDuct->NumDualDuctVarVolDampers; ++DamperIndex) {
 
                 // Load the info from the damper
-                CurrentModuleObject = cCMO_DDVariableVolume;
+                CurrentModuleObject = state.dataDualDuct->cCMO_DDVariableVolume;
 
-                inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
-                                              DamperIndex,
-                                              AlphArray,
-                                              NumAlphas,
-                                              NumArray,
-                                              NumNums,
-                                              IOStat,
-                                              lNumericBlanks,
-                                              lAlphaBlanks,
-                                              cAlphaFields,
-                                              cNumericFields);
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                         CurrentModuleObject,
+                                                                         DamperIndex,
+                                                                         AlphArray,
+                                                                         NumAlphas,
+                                                                         NumArray,
+                                                                         NumNums,
+                                                                         IOStat,
+                                                                         lNumericBlanks,
+                                                                         lAlphaBlanks,
+                                                                         cAlphaFields,
+                                                                         cNumericFields);
 
                 // Anything below this line in this control block should use DDNum
-                DDNum = DamperIndex + NumDualDuctConstVolDampers;
-                GlobalNames::VerifyUniqueInterObjectName(state,
-                    UniqueDualDuctAirTerminalNames, AlphArray(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
-                dd_airterminal(DDNum).Name = AlphArray(1);
-                dd_airterminal(DDNum).DamperType = DualDuct_VariableVolume;
-                dd_airterminal(DDNum).Schedule = AlphArray(2);
+                DDNum = DamperIndex + state.dataDualDuct->NumDualDuctConstVolDampers;
+                GlobalNames::VerifyUniqueInterObjectName(
+                    state, state.dataDualDuct->UniqueDualDuctAirTerminalNames, AlphArray(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+                state.dataDualDuct->dd_airterminal(DDNum).Name = AlphArray(1);
+                state.dataDualDuct->dd_airterminal(DDNum).DamperType = DualDuctDamper::VariableVolume;
+                state.dataDualDuct->dd_airterminal(DDNum).Schedule = AlphArray(2);
                 if (lAlphaBlanks(2)) {
-                    dd_airterminal(DDNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                    state.dataDualDuct->dd_airterminal(DDNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
-                    dd_airterminal(DDNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
-                    if (dd_airterminal(DDNum).SchedPtr == 0) {
-                        ShowSevereError(state, CurrentModuleObject + ", \"" + dd_airterminal(DDNum).Name + "\" " + cAlphaFields(2) + " = " + AlphArray(2) +
-                                        " not found.");
+                    state.dataDualDuct->dd_airterminal(DDNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
+                    if (state.dataDualDuct->dd_airterminal(DDNum).SchedPtr == 0) {
+                        ShowSevereError(state,
+                                        CurrentModuleObject + ", \"" + state.dataDualDuct->dd_airterminal(DDNum).Name + "\" " + cAlphaFields(2) +
+                                            " = " + AlphArray(2) + " not found.");
                         ErrorsFound = true;
                     }
                 }
-                dd_airterminal(DDNum).OutletNodeNum = GetOnlySingleNode(state, AlphArray(3),
-                                                                        ErrorsFound,
-                                                                        CurrentModuleObject,
-                                                                        AlphArray(1),
-                                                                        NodeType_Air,
-                                                                        NodeConnectionType_Outlet,
-                                                                        1,
-                                                                        ObjectIsNotParent,
-                                                                        cAlphaFields(3));
-                dd_airterminal(DDNum).HotAirInletNodeNum = GetOnlySingleNode(state, AlphArray(4),
-                                                                             ErrorsFound,
-                                                                             CurrentModuleObject,
-                                                                             AlphArray(1),
-                                                                             NodeType_Air,
-                                                                             NodeConnectionType_Inlet,
-                                                                             1,
-                                                                             ObjectIsNotParent,
-                                                                             cAlphaFields(4));
-                dd_airterminal(DDNum).ColdAirInletNodeNum = GetOnlySingleNode(state, AlphArray(5),
-                                                                              ErrorsFound,
-                                                                              CurrentModuleObject,
-                                                                              AlphArray(1),
-                                                                              NodeType_Air,
-                                                                              NodeConnectionType_Inlet,
-                                                                              1,
-                                                                              ObjectIsNotParent,
-                                                                              cAlphaFields(5));
+                state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum = GetOnlySingleNode(state,
+                                                                                            AlphArray(3),
+                                                                                            ErrorsFound,
+                                                                                            CurrentModuleObject,
+                                                                                            AlphArray(1),
+                                                                                            DataLoopNode::NodeFluidType::Air,
+                                                                                            DataLoopNode::NodeConnectionType::Outlet,
+                                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                                            ObjectIsNotParent,
+                                                                                            cAlphaFields(3));
+                state.dataDualDuct->dd_airterminal(DDNum).HotAirInletNodeNum = GetOnlySingleNode(state,
+                                                                                                 AlphArray(4),
+                                                                                                 ErrorsFound,
+                                                                                                 CurrentModuleObject,
+                                                                                                 AlphArray(1),
+                                                                                                 DataLoopNode::NodeFluidType::Air,
+                                                                                                 DataLoopNode::NodeConnectionType::Inlet,
+                                                                                                 NodeInputManager::compFluidStream::Primary,
+                                                                                                 ObjectIsNotParent,
+                                                                                                 cAlphaFields(4));
+                state.dataDualDuct->dd_airterminal(DDNum).ColdAirInletNodeNum = GetOnlySingleNode(state,
+                                                                                                  AlphArray(5),
+                                                                                                  ErrorsFound,
+                                                                                                  CurrentModuleObject,
+                                                                                                  AlphArray(1),
+                                                                                                  DataLoopNode::NodeFluidType::Air,
+                                                                                                  DataLoopNode::NodeConnectionType::Inlet,
+                                                                                                  NodeInputManager::compFluidStream::Primary,
+                                                                                                  ObjectIsNotParent,
+                                                                                                  cAlphaFields(5));
 
-                dd_airterminal(DDNum).MaxAirVolFlowRate = NumArray(1);
-                dd_airterminal(DDNum).ZoneMinAirFracDes = NumArray(2);
+                state.dataDualDuct->dd_airterminal(DDNum).MaxAirVolFlowRate = NumArray(1);
+                state.dataDualDuct->dd_airterminal(DDNum).ZoneMinAirFracDes = NumArray(2);
 
                 // Register component set data - one for heat and one for cool
-                TestCompSet(state, CurrentModuleObject + ":HEAT", dd_airterminal(DDNum).Name, AlphArray(4), AlphArray(3), "Air Nodes");
-                TestCompSet(state, CurrentModuleObject + ":COOL", dd_airterminal(DDNum).Name, AlphArray(5), AlphArray(3), "Air Nodes");
+                TestCompSet(
+                    state, CurrentModuleObject + ":HEAT", state.dataDualDuct->dd_airterminal(DDNum).Name, AlphArray(4), AlphArray(3), "Air Nodes");
+                TestCompSet(
+                    state, CurrentModuleObject + ":COOL", state.dataDualDuct->dd_airterminal(DDNum).Name, AlphArray(5), AlphArray(3), "Air Nodes");
 
                 for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
-                    if (dd_airterminal(DDNum).OutletNodeNum == state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
-                        state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum = dd_airterminal(DDNum).ColdAirInletNodeNum;
-                        state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum2 = dd_airterminal(DDNum).HotAirInletNodeNum;
-                        dd_airterminal(DDNum).ADUNum = ADUNum;
+                    if (state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum == state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
+                        state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum = state.dataDualDuct->dd_airterminal(DDNum).ColdAirInletNodeNum;
+                        state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum2 = state.dataDualDuct->dd_airterminal(DDNum).HotAirInletNodeNum;
+                        state.dataDualDuct->dd_airterminal(DDNum).ADUNum = ADUNum;
                     }
                 }
                 // one assumes if there isn't one assigned, it's an error?
-                if (dd_airterminal(DDNum).ADUNum == 0) {
+                if (state.dataDualDuct->dd_airterminal(DDNum).ADUNum == 0) {
                     // convenient String
-                    if (dd_airterminal(DDNum).DamperType == DualDuct_ConstantVolume) {
+                    if (state.dataDualDuct->dd_airterminal(DDNum).DamperType == DualDuctDamper::ConstantVolume) {
                         CurrentModuleObject = "ConstantVolume";
-                    } else if (dd_airterminal(DDNum).DamperType == DualDuct_VariableVolume) {
+                    } else if (state.dataDualDuct->dd_airterminal(DDNum).DamperType == DualDuctDamper::VariableVolume) {
                         CurrentModuleObject = "VAV";
-                    } else if (dd_airterminal(DDNum).DamperType == DualDuct_OutdoorAir) {
+                    } else if (state.dataDualDuct->dd_airterminal(DDNum).DamperType == DualDuctDamper::OutdoorAir) {
                         CurrentModuleObject = "VAV:OutdoorAir";
                     } else {
                         CurrentModuleObject = "*invalid*";
                     }
-                    ShowSevereError(state, RoutineName + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" + CurrentModuleObject + ',' +
-                                    dd_airterminal(DDNum).Name + "].");
-                    ShowContinueError(state, "...should have outlet node=" + NodeID(dd_airterminal(DDNum).OutletNodeNum));
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" +
+                                        CurrentModuleObject + ',' + state.dataDualDuct->dd_airterminal(DDNum).Name + "].");
+                    ShowContinueError(
+                        state, "...should have outlet node=" + state.dataLoopNodes->NodeID(state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum));
                     ErrorsFound = true;
                 } else {
 
@@ -538,181 +519,211 @@ namespace DualDuct {
                     for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                         if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
                         for (SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
-                            if (dd_airterminal(DDNum).OutletNodeNum == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
-                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = dd_airterminal(DDNum).ColdAirInletNodeNum;
-                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitHeat(SupAirIn).InNode = dd_airterminal(DDNum).HotAirInletNodeNum;
-                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = dd_airterminal(DDNum).OutletNodeNum;
-                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitHeat(SupAirIn).OutNode = dd_airterminal(DDNum).OutletNodeNum;
-                                state.dataDefineEquipment->AirDistUnit(dd_airterminal(DDNum).ADUNum).TermUnitSizingNum =
+                            if (state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum ==
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode =
+                                    state.dataDualDuct->dd_airterminal(DDNum).ColdAirInletNodeNum;
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitHeat(SupAirIn).InNode =
+                                    state.dataDualDuct->dd_airterminal(DDNum).HotAirInletNodeNum;
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode =
+                                    state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum;
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitHeat(SupAirIn).OutNode =
+                                    state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum;
+                                state.dataDefineEquipment->AirDistUnit(state.dataDualDuct->dd_airterminal(DDNum).ADUNum).TermUnitSizingNum =
                                     state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
-                                state.dataDefineEquipment->AirDistUnit(dd_airterminal(DDNum).ADUNum).ZoneEqNum = CtrlZone;
+                                state.dataDefineEquipment->AirDistUnit(state.dataDualDuct->dd_airterminal(DDNum).ADUNum).ZoneEqNum = CtrlZone;
 
-                                dd_airterminal(DDNum).CtrlZoneNum = CtrlZone;
-                                dd_airterminal(DDNum).ActualZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
-                                dd_airterminal(DDNum).CtrlZoneInNodeIndex = SupAirIn;
+                                state.dataDualDuct->dd_airterminal(DDNum).CtrlZoneNum = CtrlZone;
+                                state.dataDualDuct->dd_airterminal(DDNum).ActualZoneNum =
+                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
+                                state.dataDualDuct->dd_airterminal(DDNum).CtrlZoneInNodeIndex = SupAirIn;
                             }
                         }
                     }
                 }
                 if (!lAlphaBlanks(6)) {
-                    dd_airterminal(DDNum).OARequirementsPtr = UtilityRoutines::FindItemInList(AlphArray(6), OARequirements);
-                    if (dd_airterminal(DDNum).OARequirementsPtr == 0) {
+                    state.dataDualDuct->dd_airterminal(DDNum).OARequirementsPtr =
+                        UtilityRoutines::FindItemInList(AlphArray(6), state.dataSize->OARequirements);
+                    if (state.dataDualDuct->dd_airterminal(DDNum).OARequirementsPtr == 0) {
                         ShowSevereError(state, cAlphaFields(6) + " = " + AlphArray(6) + " not found.");
-                        ShowContinueError(state, "Occurs in " + cCMO_DDVariableVolume + " = " + dd_airterminal(DDNum).Name);
+                        ShowContinueError(
+                            state, "Occurs in " + state.dataDualDuct->cCMO_DDVariableVolume + " = " + state.dataDualDuct->dd_airterminal(DDNum).Name);
                         ErrorsFound = true;
                     } else {
-                        dd_airterminal(DDNum).NoOAFlowInputFromUser = false;
+                        state.dataDualDuct->dd_airterminal(DDNum).NoOAFlowInputFromUser = false;
                     }
                 }
 
                 if (lAlphaBlanks(7)) {
-                    dd_airterminal(DDNum).ZoneTurndownMinAirFrac = 1.0;
-                    dd_airterminal(DDNum).ZoneTurndownMinAirFracSchExist = false;
+                    state.dataDualDuct->dd_airterminal(DDNum).ZoneTurndownMinAirFrac = 1.0;
+                    state.dataDualDuct->dd_airterminal(DDNum).ZoneTurndownMinAirFracSchExist = false;
                 } else {
-                    dd_airterminal(DDNum).ZoneTurndownMinAirFracSchPtr = GetScheduleIndex(state, AlphArray(7));
-                    if (dd_airterminal(DDNum).ZoneTurndownMinAirFracSchPtr == 0) {
+                    state.dataDualDuct->dd_airterminal(DDNum).ZoneTurndownMinAirFracSchPtr = GetScheduleIndex(state, AlphArray(7));
+                    if (state.dataDualDuct->dd_airterminal(DDNum).ZoneTurndownMinAirFracSchPtr == 0) {
                         ShowSevereError(state, cAlphaFields(7) + " = " + AlphArray(7) + " not found.");
-                        ShowContinueError(state, "Occurs in " + cCMO_DDVariableVolume + " = " + dd_airterminal(DDNum).Name);
+                        ShowContinueError(
+                            state, "Occurs in " + state.dataDualDuct->cCMO_DDVariableVolume + " = " + state.dataDualDuct->dd_airterminal(DDNum).Name);
                         ErrorsFound = true;
                     }
-                    dd_airterminal(DDNum).ZoneTurndownMinAirFracSchExist = true;
+                    state.dataDualDuct->dd_airterminal(DDNum).ZoneTurndownMinAirFracSchExist = true;
                 }
 
                 // Setup the Average damper Position output variable
                 // CurrentModuleObject='AirTerminal:DualDuct:VAV'
-                SetupOutputVariable(state, "Zone Air Terminal Cold Supply Duct Damper Position",
+                SetupOutputVariable(state,
+                                    "Zone Air Terminal Cold Supply Duct Damper Position",
                                     OutputProcessor::Unit::None,
-                                    dd_airterminal(DDNum).ColdAirDamperPosition,
-                                    "System",
-                                    "Average",
-                                    dd_airterminal(DDNum).Name);
-                SetupOutputVariable(state, "Zone Air Terminal Hot Supply Duct Damper Position",
+                                    state.dataDualDuct->dd_airterminal(DDNum).ColdAirDamperPosition,
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataDualDuct->dd_airterminal(DDNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Air Terminal Hot Supply Duct Damper Position",
                                     OutputProcessor::Unit::None,
-                                    dd_airterminal(DDNum).HotAirDamperPosition,
-                                    "System",
-                                    "Average",
-                                    dd_airterminal(DDNum).Name);
-                SetupOutputVariable(state, "Zone Air Terminal Outdoor Air Volume Flow Rate",
+                                    state.dataDualDuct->dd_airterminal(DDNum).HotAirDamperPosition,
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataDualDuct->dd_airterminal(DDNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Air Terminal Outdoor Air Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
-                                    dd_airterminal(DDNum).OutdoorAirFlowRate,
-                                    "System",
-                                    "Average",
-                                    dd_airterminal(DDNum).Name);
+                                    state.dataDualDuct->dd_airterminal(DDNum).OutdoorAirFlowRate,
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataDualDuct->dd_airterminal(DDNum).Name);
             } // end Number of Damper Loop
         }
 
-        if (NumDualDuctVarVolOA > 0) {
-            for (DamperIndex = 1; DamperIndex <= NumDualDuctVarVolOA; ++DamperIndex) {
+        if (state.dataDualDuct->NumDualDuctVarVolOA > 0) {
+            for (DamperIndex = 1; DamperIndex <= state.dataDualDuct->NumDualDuctVarVolOA; ++DamperIndex) {
 
                 // Load the info from the damper
-                CurrentModuleObject = cCMO_DDVarVolOA;
+                CurrentModuleObject = state.dataDualDuct->cCMO_DDVarVolOA;
 
-                inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
-                                              DamperIndex,
-                                              AlphArray,
-                                              NumAlphas,
-                                              NumArray,
-                                              NumNums,
-                                              IOStat,
-                                              lNumericBlanks,
-                                              lAlphaBlanks,
-                                              cAlphaFields,
-                                              cNumericFields);
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                         CurrentModuleObject,
+                                                                         DamperIndex,
+                                                                         AlphArray,
+                                                                         NumAlphas,
+                                                                         NumArray,
+                                                                         NumNums,
+                                                                         IOStat,
+                                                                         lNumericBlanks,
+                                                                         lAlphaBlanks,
+                                                                         cAlphaFields,
+                                                                         cNumericFields);
 
                 // Anything below this line in this control block should use DDNum
-                DDNum = DamperIndex + NumDualDuctConstVolDampers + NumDualDuctVarVolDampers;
-                GlobalNames::VerifyUniqueInterObjectName(state,
-                    UniqueDualDuctAirTerminalNames, AlphArray(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
-                dd_airterminal(DDNum).Name = AlphArray(1);
-                dd_airterminal(DDNum).DamperType = DualDuct_OutdoorAir;
-                dd_airterminal(DDNum).Schedule = AlphArray(2);
+                DDNum = DamperIndex + state.dataDualDuct->NumDualDuctConstVolDampers + state.dataDualDuct->NumDualDuctVarVolDampers;
+                GlobalNames::VerifyUniqueInterObjectName(
+                    state, state.dataDualDuct->UniqueDualDuctAirTerminalNames, AlphArray(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+                state.dataDualDuct->dd_airterminal(DDNum).Name = AlphArray(1);
+                state.dataDualDuct->dd_airterminal(DDNum).DamperType = DualDuctDamper::OutdoorAir;
+                state.dataDualDuct->dd_airterminal(DDNum).Schedule = AlphArray(2);
                 if (lAlphaBlanks(2)) {
-                    dd_airterminal(DDNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                    state.dataDualDuct->dd_airterminal(DDNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
-                    dd_airterminal(DDNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
-                    if (dd_airterminal(DDNum).SchedPtr == 0) {
-                        ShowSevereError(state, CurrentModuleObject + ", \"" + dd_airterminal(DDNum).Name + "\" " + cAlphaFields(2) + " = " + AlphArray(2) +
-                                        " not found.");
+                    state.dataDualDuct->dd_airterminal(DDNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
+                    if (state.dataDualDuct->dd_airterminal(DDNum).SchedPtr == 0) {
+                        ShowSevereError(state,
+                                        CurrentModuleObject + ", \"" + state.dataDualDuct->dd_airterminal(DDNum).Name + "\" " + cAlphaFields(2) +
+                                            " = " + AlphArray(2) + " not found.");
                         ErrorsFound = true;
                     }
                 }
-                dd_airterminal(DDNum).OutletNodeNum = GetOnlySingleNode(state, AlphArray(3),
-                                                                        ErrorsFound,
-                                                                        CurrentModuleObject,
-                                                                        AlphArray(1),
-                                                                        NodeType_Air,
-                                                                        NodeConnectionType_Outlet,
-                                                                        1,
-                                                                        ObjectIsNotParent,
-                                                                        cAlphaFields(3));
-                dd_airterminal(DDNum).OAInletNodeNum = GetOnlySingleNode(state, AlphArray(4),
-                                                                         ErrorsFound,
-                                                                         CurrentModuleObject,
-                                                                         AlphArray(1),
-                                                                         NodeType_Air,
-                                                                         NodeConnectionType_Inlet,
-                                                                         1,
-                                                                         ObjectIsNotParent,
-                                                                         cAlphaFields(4));
+                state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum = GetOnlySingleNode(state,
+                                                                                            AlphArray(3),
+                                                                                            ErrorsFound,
+                                                                                            CurrentModuleObject,
+                                                                                            AlphArray(1),
+                                                                                            DataLoopNode::NodeFluidType::Air,
+                                                                                            DataLoopNode::NodeConnectionType::Outlet,
+                                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                                            ObjectIsNotParent,
+                                                                                            cAlphaFields(3));
+                state.dataDualDuct->dd_airterminal(DDNum).OAInletNodeNum = GetOnlySingleNode(state,
+                                                                                             AlphArray(4),
+                                                                                             ErrorsFound,
+                                                                                             CurrentModuleObject,
+                                                                                             AlphArray(1),
+                                                                                             DataLoopNode::NodeFluidType::Air,
+                                                                                             DataLoopNode::NodeConnectionType::Inlet,
+                                                                                             NodeInputManager::compFluidStream::Primary,
+                                                                                             ObjectIsNotParent,
+                                                                                             cAlphaFields(4));
 
                 if (!lAlphaBlanks(5)) {
-                    dd_airterminal(DDNum).RecircAirInletNodeNum = GetOnlySingleNode(state, AlphArray(5),
-                                                                                    ErrorsFound,
-                                                                                    CurrentModuleObject,
-                                                                                    AlphArray(1),
-                                                                                    NodeType_Air,
-                                                                                    NodeConnectionType_Inlet,
-                                                                                    1,
-                                                                                    ObjectIsNotParent,
-                                                                                    cAlphaFields(5));
+                    state.dataDualDuct->dd_airterminal(DDNum).RecircAirInletNodeNum = GetOnlySingleNode(state,
+                                                                                                        AlphArray(5),
+                                                                                                        ErrorsFound,
+                                                                                                        CurrentModuleObject,
+                                                                                                        AlphArray(1),
+                                                                                                        DataLoopNode::NodeFluidType::Air,
+                                                                                                        DataLoopNode::NodeConnectionType::Inlet,
+                                                                                                        NodeInputManager::compFluidStream::Primary,
+                                                                                                        ObjectIsNotParent,
+                                                                                                        cAlphaFields(5));
                 } else {
                     // for this model, we intentionally allow not using the recirc side
-                    dd_airterminal(DDNum).RecircIsUsed = false;
+                    state.dataDualDuct->dd_airterminal(DDNum).RecircIsUsed = false;
                 }
 
-                dd_airterminal(DDNum).MaxAirVolFlowRate = NumArray(1);
-                dd_airterminal(DDNum).MaxAirMassFlowRate = dd_airterminal(DDNum).MaxAirVolFlowRate * state.dataEnvrn->StdRhoAir;
+                state.dataDualDuct->dd_airterminal(DDNum).MaxAirVolFlowRate = NumArray(1);
+                state.dataDualDuct->dd_airterminal(DDNum).MaxAirMassFlowRate =
+                    state.dataDualDuct->dd_airterminal(DDNum).MaxAirVolFlowRate * state.dataEnvrn->StdRhoAir;
 
                 // Register component set data - one for OA and one for RA
-                TestCompSet(state, CurrentModuleObject + ":OutdoorAir", dd_airterminal(DDNum).Name, AlphArray(4), AlphArray(3), "Air Nodes");
-                if (dd_airterminal(DDNum).RecircIsUsed) {
-                    TestCompSet(state, CurrentModuleObject + ":RecirculatedAir", dd_airterminal(DDNum).Name, AlphArray(5), AlphArray(3), "Air Nodes");
+                TestCompSet(state,
+                            CurrentModuleObject + ":OutdoorAir",
+                            state.dataDualDuct->dd_airterminal(DDNum).Name,
+                            AlphArray(4),
+                            AlphArray(3),
+                            "Air Nodes");
+                if (state.dataDualDuct->dd_airterminal(DDNum).RecircIsUsed) {
+                    TestCompSet(state,
+                                CurrentModuleObject + ":RecirculatedAir",
+                                state.dataDualDuct->dd_airterminal(DDNum).Name,
+                                AlphArray(5),
+                                AlphArray(3),
+                                "Air Nodes");
                 }
 
                 {
                     auto const SELECT_CASE_var(AlphArray(7));
                     if (SELECT_CASE_var == "CURRENTOCCUPANCY") {
-                        dd_airterminal(DDNum).OAPerPersonMode = PerPersonDCVByCurrentLevel;
+                        state.dataDualDuct->dd_airterminal(DDNum).OAPerPersonMode = PerPersonMode::DCVByCurrentLevel;
 
                     } else if (SELECT_CASE_var == "DESIGNOCCUPANCY") {
-                        dd_airterminal(DDNum).OAPerPersonMode = PerPersonByDesignLevel;
+                        state.dataDualDuct->dd_airterminal(DDNum).OAPerPersonMode = PerPersonMode::ByDesignLevel;
                     }
                 }
                 // checks on this are done later
 
                 for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
-                    if (dd_airterminal(DDNum).OutletNodeNum == state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
-                        state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum = dd_airterminal(DDNum).OAInletNodeNum;
-                        state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum2 = dd_airterminal(DDNum).RecircAirInletNodeNum;
-                        dd_airterminal(DDNum).ADUNum = ADUNum;
+                    if (state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum == state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
+                        state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum = state.dataDualDuct->dd_airterminal(DDNum).OAInletNodeNum;
+                        state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum2 =
+                            state.dataDualDuct->dd_airterminal(DDNum).RecircAirInletNodeNum;
+                        state.dataDualDuct->dd_airterminal(DDNum).ADUNum = ADUNum;
                     }
                 }
                 // one assumes if there isn't one assigned, it's an error?
-                if (dd_airterminal(DDNum).ADUNum == 0) {
+                if (state.dataDualDuct->dd_airterminal(DDNum).ADUNum == 0) {
                     // convenient String
-                    if (dd_airterminal(DDNum).DamperType == DualDuct_ConstantVolume) {
+                    if (state.dataDualDuct->dd_airterminal(DDNum).DamperType == DualDuctDamper::ConstantVolume) {
                         CurrentModuleObject = "ConstantVolume";
-                    } else if (dd_airterminal(DDNum).DamperType == DualDuct_VariableVolume) {
+                    } else if (state.dataDualDuct->dd_airterminal(DDNum).DamperType == DualDuctDamper::VariableVolume) {
                         CurrentModuleObject = "VAV";
-                    } else if (dd_airterminal(DDNum).DamperType == DualDuct_OutdoorAir) {
+                    } else if (state.dataDualDuct->dd_airterminal(DDNum).DamperType == DualDuctDamper::OutdoorAir) {
                         CurrentModuleObject = "VAV:OutdoorAir";
                     } else {
                         CurrentModuleObject = "*invalid*";
                     }
-                    ShowSevereError(state, RoutineName + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" + CurrentModuleObject + ',' +
-                                    dd_airterminal(DDNum).Name + "].");
-                    ShowContinueError(state, "...should have outlet node=" + NodeID(dd_airterminal(DDNum).OutletNodeNum));
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" +
+                                        CurrentModuleObject + ',' + state.dataDualDuct->dd_airterminal(DDNum).Name + "].");
+                    ShowContinueError(
+                        state, "...should have outlet node=" + state.dataLoopNodes->NodeID(state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum));
                     ErrorsFound = true;
                 } else {
 
@@ -720,108 +731,131 @@ namespace DualDuct {
                     for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                         if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
                         for (SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
-                            if (dd_airterminal(DDNum).OutletNodeNum == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
-                                if (dd_airterminal(DDNum).RecircIsUsed) {
-                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = dd_airterminal(DDNum).RecircAirInletNodeNum;
+                            if (state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum ==
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
+                                if (state.dataDualDuct->dd_airterminal(DDNum).RecircIsUsed) {
+                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode =
+                                        state.dataDualDuct->dd_airterminal(DDNum).RecircAirInletNodeNum;
                                 } else {
-                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = dd_airterminal(DDNum).OAInletNodeNum;
+                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode =
+                                        state.dataDualDuct->dd_airterminal(DDNum).OAInletNodeNum;
                                 }
-                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitHeat(SupAirIn).InNode = dd_airterminal(DDNum).OAInletNodeNum;
-                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = dd_airterminal(DDNum).OutletNodeNum;
-                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitHeat(SupAirIn).OutNode = dd_airterminal(DDNum).OutletNodeNum;
-                                state.dataDefineEquipment->AirDistUnit(dd_airterminal(DDNum).ADUNum).TermUnitSizingNum =
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitHeat(SupAirIn).InNode =
+                                    state.dataDualDuct->dd_airterminal(DDNum).OAInletNodeNum;
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode =
+                                    state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum;
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitHeat(SupAirIn).OutNode =
+                                    state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum;
+                                state.dataDefineEquipment->AirDistUnit(state.dataDualDuct->dd_airterminal(DDNum).ADUNum).TermUnitSizingNum =
                                     state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
-                                state.dataDefineEquipment->AirDistUnit(dd_airterminal(DDNum).ADUNum).ZoneEqNum = CtrlZone;
+                                state.dataDefineEquipment->AirDistUnit(state.dataDualDuct->dd_airterminal(DDNum).ADUNum).ZoneEqNum = CtrlZone;
 
-                                dd_airterminal(DDNum).CtrlZoneNum = CtrlZone;
-                                dd_airterminal(DDNum).ActualZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
-                                dd_airterminal(DDNum).CtrlZoneInNodeIndex = SupAirIn;
+                                state.dataDualDuct->dd_airterminal(DDNum).CtrlZoneNum = CtrlZone;
+                                state.dataDualDuct->dd_airterminal(DDNum).ActualZoneNum =
+                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
+                                state.dataDualDuct->dd_airterminal(DDNum).CtrlZoneInNodeIndex = SupAirIn;
                             }
                         }
                     }
                 }
-                dd_airterminal(DDNum).OARequirementsPtr = UtilityRoutines::FindItemInList(AlphArray(6), OARequirements);
-                if (dd_airterminal(DDNum).OARequirementsPtr == 0) {
+                state.dataDualDuct->dd_airterminal(DDNum).OARequirementsPtr =
+                    UtilityRoutines::FindItemInList(AlphArray(6), state.dataSize->OARequirements);
+                if (state.dataDualDuct->dd_airterminal(DDNum).OARequirementsPtr == 0) {
                     ShowSevereError(state, cAlphaFields(6) + " = " + AlphArray(6) + " not found.");
-                    ShowContinueError(state, "Occurs in " + cCMO_DDVarVolOA + " = " + dd_airterminal(DDNum).Name);
+                    ShowContinueError(state,
+                                      "Occurs in " + state.dataDualDuct->cCMO_DDVarVolOA + " = " + state.dataDualDuct->dd_airterminal(DDNum).Name);
                     ErrorsFound = true;
                 } else {
-                    dd_airterminal(DDNum).NoOAFlowInputFromUser = false;
+                    state.dataDualDuct->dd_airterminal(DDNum).NoOAFlowInputFromUser = false;
 
                     // now fill design OA rate
-                    dd_airterminal(DDNum).CalcOAOnlyMassFlow(state, DummyOAFlow, dd_airterminal(DDNum).DesignOAFlowRate);
+                    state.dataDualDuct->dd_airterminal(DDNum).CalcOAOnlyMassFlow(
+                        state, DummyOAFlow, state.dataDualDuct->dd_airterminal(DDNum).DesignOAFlowRate);
 
-                    if (dd_airterminal(DDNum).MaxAirVolFlowRate != AutoSize) {
-                        BaseSizer::reportSizerOutput(state, CurrentModuleObject,
-                                                     dd_airterminal(DDNum).Name,
+                    if (state.dataDualDuct->dd_airterminal(DDNum).MaxAirVolFlowRate != AutoSize) {
+                        BaseSizer::reportSizerOutput(state,
+                                                     CurrentModuleObject,
+                                                     state.dataDualDuct->dd_airterminal(DDNum).Name,
                                                      "Maximum Outdoor Air Flow Rate [m3/s]",
-                                                     dd_airterminal(DDNum).DesignOAFlowRate);
+                                                     state.dataDualDuct->dd_airterminal(DDNum).DesignOAFlowRate);
 
-                        if (dd_airterminal(DDNum).RecircIsUsed) {
-                            dd_airterminal(DDNum).DesignRecircFlowRate =
-                                dd_airterminal(DDNum).MaxAirVolFlowRate - dd_airterminal(DDNum).DesignOAFlowRate;
-                            dd_airterminal(DDNum).DesignRecircFlowRate = max(0.0, dd_airterminal(DDNum).DesignRecircFlowRate);
-                            BaseSizer::reportSizerOutput(state, CurrentModuleObject,
-                                                         dd_airterminal(DDNum).Name,
+                        if (state.dataDualDuct->dd_airterminal(DDNum).RecircIsUsed) {
+                            state.dataDualDuct->dd_airterminal(DDNum).DesignRecircFlowRate =
+                                state.dataDualDuct->dd_airterminal(DDNum).MaxAirVolFlowRate -
+                                state.dataDualDuct->dd_airterminal(DDNum).DesignOAFlowRate;
+                            state.dataDualDuct->dd_airterminal(DDNum).DesignRecircFlowRate =
+                                max(0.0, state.dataDualDuct->dd_airterminal(DDNum).DesignRecircFlowRate);
+                            BaseSizer::reportSizerOutput(state,
+                                                         CurrentModuleObject,
+                                                         state.dataDualDuct->dd_airterminal(DDNum).Name,
                                                          "Maximum Recirculated Air Flow Rate [m3/s]",
-                                                         dd_airterminal(DDNum).DesignRecircFlowRate);
+                                                         state.dataDualDuct->dd_airterminal(DDNum).DesignRecircFlowRate);
                         } else {
-                            if (dd_airterminal(DDNum).MaxAirVolFlowRate < dd_airterminal(DDNum).DesignOAFlowRate) {
+                            if (state.dataDualDuct->dd_airterminal(DDNum).MaxAirVolFlowRate <
+                                state.dataDualDuct->dd_airterminal(DDNum).DesignOAFlowRate) {
                                 ShowSevereError(state,
                                                 format("The value {:.5R} in {}is lower than the outdoor air requirement.",
-                                                       dd_airterminal(DDNum).MaxAirVolFlowRate,
+                                                       state.dataDualDuct->dd_airterminal(DDNum).MaxAirVolFlowRate,
                                                        cNumericFields(1)));
-                                ShowContinueError(state, "Occurs in " + cCMO_DDVarVolOA + " = " + dd_airterminal(DDNum).Name);
                                 ShowContinueError(state,
-                                                  format("The design outdoor air requirement is {:.5R}", dd_airterminal(DDNum).DesignOAFlowRate));
+                                                  "Occurs in " + state.dataDualDuct->cCMO_DDVarVolOA + " = " +
+                                                      state.dataDualDuct->dd_airterminal(DDNum).Name);
+                                ShowContinueError(state,
+                                                  format("The design outdoor air requirement is {:.5R}",
+                                                         state.dataDualDuct->dd_airterminal(DDNum).DesignOAFlowRate));
                                 ErrorsFound = true;
                             }
                         }
                     }
                 }
 
-                if (dd_airterminal(DDNum).OAPerPersonMode == PerPersonModeNotSet) {
-                    DummyOAFlow = OARequirements(dd_airterminal(DDNum).OARequirementsPtr).OAFlowPerPerson;
+                if (state.dataDualDuct->dd_airterminal(DDNum).OAPerPersonMode == PerPersonMode::ModeNotSet) {
+                    DummyOAFlow = state.dataSize->OARequirements(state.dataDualDuct->dd_airterminal(DDNum).OARequirementsPtr).OAFlowPerPerson;
                     if ((DummyOAFlow == 0.0) && (lAlphaBlanks(7))) {       // no worries
                                                                            // do nothing, okay since no per person requirement involved
                     } else if ((DummyOAFlow > 0.0) && (lAlphaBlanks(7))) { // missing input
                         ShowSevereError(state, cAlphaFields(7) + " was blank.");
-                        ShowContinueError(state, "Occurs in " + cCMO_DDVarVolOA + " = " + dd_airterminal(DDNum).Name);
+                        ShowContinueError(
+                            state, "Occurs in " + state.dataDualDuct->cCMO_DDVarVolOA + " = " + state.dataDualDuct->dd_airterminal(DDNum).Name);
                         ShowContinueError(state, "Valid choices are \"CurrentOccupancy\" or \"DesignOccupancy\"");
                         ErrorsFound = true;
                     } else if ((DummyOAFlow > 0.0) && !(lAlphaBlanks(7))) { // incorrect input
                         ShowSevereError(state, cAlphaFields(7) + " = " + AlphArray(7) + " not a valid key choice.");
-                        ShowContinueError(state, "Occurs in " + cCMO_DDVarVolOA + " = " + dd_airterminal(DDNum).Name);
+                        ShowContinueError(
+                            state, "Occurs in " + state.dataDualDuct->cCMO_DDVarVolOA + " = " + state.dataDualDuct->dd_airterminal(DDNum).Name);
                         ShowContinueError(state, "Valid choices are \"CurrentOccupancy\" or \"DesignOccupancy\"");
                         ErrorsFound = true;
                     }
                 }
 
                 // Setup the Average damper Position output variable
-                SetupOutputVariable(state, "Zone Air Terminal Outdoor Air Duct Damper Position",
+                SetupOutputVariable(state,
+                                    "Zone Air Terminal Outdoor Air Duct Damper Position",
                                     OutputProcessor::Unit::None,
-                                    dd_airterminal(DDNum).OADamperPosition,
-                                    "System",
-                                    "Average",
-                                    dd_airterminal(DDNum).Name);
-                SetupOutputVariable(state, "Zone Air Terminal Recirculated Air Duct Damper Position",
+                                    state.dataDualDuct->dd_airterminal(DDNum).OADamperPosition,
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataDualDuct->dd_airterminal(DDNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Air Terminal Recirculated Air Duct Damper Position",
                                     OutputProcessor::Unit::None,
-                                    dd_airterminal(DDNum).RecircAirDamperPosition,
-                                    "System",
-                                    "Average",
-                                    dd_airterminal(DDNum).Name);
-                SetupOutputVariable(state, "Zone Air Terminal Outdoor Air Fraction",
+                                    state.dataDualDuct->dd_airterminal(DDNum).RecircAirDamperPosition,
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataDualDuct->dd_airterminal(DDNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Air Terminal Outdoor Air Fraction",
                                     OutputProcessor::Unit::None,
-                                    dd_airterminal(DDNum).OAFraction,
-                                    "System",
-                                    "Average",
-                                    dd_airterminal(DDNum).Name);
+                                    state.dataDualDuct->dd_airterminal(DDNum).OAFraction,
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataDualDuct->dd_airterminal(DDNum).Name);
 
             } // end Number of Damper Loop
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in input.  Preceding condition(s) cause termination.");
+            ShowFatalError(state, std::string{RoutineName} + "Errors found in input.  Preceding condition(s) cause termination.");
         }
     }
 
@@ -847,8 +881,6 @@ namespace DualDuct {
         // Uses the status flags to trigger events.
 
         // Using/Aliasing
-        using DataHeatBalance::People;
-        using DataHeatBalance::TotPeople;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
@@ -864,34 +896,38 @@ namespace DualDuct {
         int Loop;          // Loop checking control variable
         Real64 PeopleFlow; // local sum variable, m3/s
 
-
         // Do the Begin Simulation initializations
-        if (InitDualDuctMyOneTimeFlag) {
+        if (state.dataDualDuct->InitDualDuctMyOneTimeFlag) {
 
             // MyEnvrnFlag.allocate(NumDDAirTerminal);
             // MySizeFlag.allocate(NumDDAirTerminal);
             // MyAirLoopFlag.dimension(NumDDAirTerminal, true);
             // MyEnvrnFlag = true;
             // MySizeFlag = true;
-            MassFlowSetToler = DataConvergParams::HVACFlowRateToler * 0.00001;
+            state.dataDualDuct->MassFlowSetToler = DataConvergParams::HVACFlowRateToler * 0.00001;
 
-            InitDualDuctMyOneTimeFlag = false;
+            state.dataDualDuct->InitDualDuctMyOneTimeFlag = false;
         }
 
-        if (!ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
-            ZoneEquipmentListChecked = true;
+        if (!state.dataDualDuct->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
+            state.dataDualDuct->ZoneEquipmentListChecked = true;
             // Check to see if there is a Air Distribution Unit on the Zone Equipment List
-            for (Loop = 1; Loop <= NumDDAirTerminal; ++Loop) {
+            for (Loop = 1; Loop <= state.dataDualDuct->NumDDAirTerminal; ++Loop) {
                 if (this->ADUNum == 0) continue;
-                if (CheckZoneEquipmentList(state, "ZONEHVAC:AIRDISTRIBUTIONUNIT", state.dataDefineEquipment->AirDistUnit(this->ADUNum).Name)) continue;
-                ShowSevereError(state, "InitDualDuct: ADU=[Air Distribution Unit," + state.dataDefineEquipment->AirDistUnit(this->ADUNum).Name +
-                                "] is not on any ZoneHVAC:EquipmentList.");
-                if (this->DamperType == DualDuct_ConstantVolume) {
-                    ShowContinueError(state, "...Dual Duct Damper=[" + cCMO_DDConstantVolume + ',' + this->Name + "] will not be simulated.");
-                } else if (this->DamperType == DualDuct_VariableVolume) {
-                    ShowContinueError(state, "...Dual Duct Damper=[" + cCMO_DDVariableVolume + ',' + this->Name + "] will not be simulated.");
-                } else if (this->DamperType == DualDuct_OutdoorAir) {
-                    ShowContinueError(state, "...Dual Duct Damper=[" + cCMO_DDVarVolOA + ',' + this->Name + "] will not be simulated.");
+                if (CheckZoneEquipmentList(state, "ZONEHVAC:AIRDISTRIBUTIONUNIT", state.dataDefineEquipment->AirDistUnit(this->ADUNum).Name))
+                    continue;
+                ShowSevereError(state,
+                                "InitDualDuct: ADU=[Air Distribution Unit," + state.dataDefineEquipment->AirDistUnit(this->ADUNum).Name +
+                                    "] is not on any ZoneHVAC:EquipmentList.");
+                if (this->DamperType == DualDuctDamper::ConstantVolume) {
+                    ShowContinueError(
+                        state, "...Dual Duct Damper=[" + state.dataDualDuct->cCMO_DDConstantVolume + ',' + this->Name + "] will not be simulated.");
+                } else if (this->DamperType == DualDuctDamper::VariableVolume) {
+                    ShowContinueError(
+                        state, "...Dual Duct Damper=[" + state.dataDualDuct->cCMO_DDVariableVolume + ',' + this->Name + "] will not be simulated.");
+                } else if (this->DamperType == DualDuctDamper::OutdoorAir) {
+                    ShowContinueError(state,
+                                      "...Dual Duct Damper=[" + state.dataDualDuct->cCMO_DDVarVolOA + ',' + this->Name + "] will not be simulated.");
                 } else {
                     ShowContinueError(state, "...Dual Duct Damper=[unknown/invalid," + this->Name + "] will not be simulated.");
                 }
@@ -908,55 +944,57 @@ namespace DualDuct {
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag) {
 
-            if (this->DamperType == DualDuct_ConstantVolume || this->DamperType == DualDuct_VariableVolume) {
+            if (this->DamperType == DualDuctDamper::ConstantVolume || this->DamperType == DualDuctDamper::VariableVolume) {
                 OutNode = this->OutletNodeNum;
                 HotInNode = this->HotAirInletNodeNum;
                 ColdInNode = this->ColdAirInletNodeNum;
-                Node(OutNode).MassFlowRateMax = this->MaxAirVolFlowRate * state.dataEnvrn->StdRhoAir;
-                if (this->DamperType == DualDuct_ConstantVolume) {
-                    Node(OutNode).MassFlowRateMin = 0.0;
-                } else if (this->DamperType == DualDuct_VariableVolume) {
+                state.dataLoopNodes->Node(OutNode).MassFlowRateMax = this->MaxAirVolFlowRate * state.dataEnvrn->StdRhoAir;
+                if (this->DamperType == DualDuctDamper::ConstantVolume) {
+                    state.dataLoopNodes->Node(OutNode).MassFlowRateMin = 0.0;
+                } else if (this->DamperType == DualDuctDamper::VariableVolume) {
                     // get dual duct air terminal box minimum flow fraction value
                     if (this->ZoneTurndownMinAirFracSchExist) {
                         this->ZoneTurndownMinAirFrac = ScheduleManager::GetScheduleMinValue(state, this->ZoneTurndownMinAirFracSchPtr);
                     } else {
                         this->ZoneTurndownMinAirFrac = 1.0;
                     }
-                    Node(OutNode).MassFlowRateMin = Node(OutNode).MassFlowRateMax * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac;
+                    state.dataLoopNodes->Node(OutNode).MassFlowRateMin =
+                        state.dataLoopNodes->Node(OutNode).MassFlowRateMax * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac;
                 } else {
-                    Node(OutNode).MassFlowRateMin = 0.0;
+                    state.dataLoopNodes->Node(OutNode).MassFlowRateMin = 0.0;
                 }
-                this->dd_airterminalHotAirInlet.AirMassFlowRateMax = Node(OutNode).MassFlowRateMax;
-                this->dd_airterminalColdAirInlet.AirMassFlowRateMax = Node(OutNode).MassFlowRateMax;
-                Node(HotInNode).MassFlowRateMax = Node(OutNode).MassFlowRateMax;
-                Node(ColdInNode).MassFlowRateMax = Node(OutNode).MassFlowRateMax;
-                Node(HotInNode).MassFlowRateMin = 0.0;
-                Node(ColdInNode).MassFlowRateMin = 0.0;
+                this->dd_airterminalHotAirInlet.AirMassFlowRateMax = state.dataLoopNodes->Node(OutNode).MassFlowRateMax;
+                this->dd_airterminalColdAirInlet.AirMassFlowRateMax = state.dataLoopNodes->Node(OutNode).MassFlowRateMax;
+                state.dataLoopNodes->Node(HotInNode).MassFlowRateMax = state.dataLoopNodes->Node(OutNode).MassFlowRateMax;
+                state.dataLoopNodes->Node(ColdInNode).MassFlowRateMax = state.dataLoopNodes->Node(OutNode).MassFlowRateMax;
+                state.dataLoopNodes->Node(HotInNode).MassFlowRateMin = 0.0;
+                state.dataLoopNodes->Node(ColdInNode).MassFlowRateMin = 0.0;
                 this->MyEnvrnFlag = false;
 
-            } else if (this->DamperType == DualDuct_OutdoorAir) {
+            } else if (this->DamperType == DualDuctDamper::OutdoorAir) {
                 // Initialize for DualDuct:VAV:OutdoorAir
                 OutNode = this->OutletNodeNum;
                 OAInNode = this->OAInletNodeNum;
                 if (this->RecircIsUsed) RAInNode = this->RecircAirInletNodeNum;
-                Node(OutNode).MassFlowRateMax = this->MaxAirMassFlowRate;
-                Node(OutNode).MassFlowRateMin = 0.0;
+                state.dataLoopNodes->Node(OutNode).MassFlowRateMax = this->MaxAirMassFlowRate;
+                state.dataLoopNodes->Node(OutNode).MassFlowRateMin = 0.0;
                 this->dd_airterminalOAInlet.AirMassFlowRateMax = this->DesignOAFlowRate * state.dataEnvrn->StdRhoAir;
                 if (this->RecircIsUsed) {
                     this->dd_airterminalRecircAirInlet.AirMassFlowRateMax = this->MaxAirMassFlowRate - this->dd_airterminalOAInlet.AirMassFlowRateMax;
-                    Node(RAInNode).MassFlowRateMax = this->dd_airterminalRecircAirInlet.AirMassFlowRateMax;
-                    Node(RAInNode).MassFlowRateMin = 0.0;
+                    state.dataLoopNodes->Node(RAInNode).MassFlowRateMax = this->dd_airterminalRecircAirInlet.AirMassFlowRateMax;
+                    state.dataLoopNodes->Node(RAInNode).MassFlowRateMin = 0.0;
                     this->dd_airterminalRecircAirInlet.AirMassFlowDiffMag = 1.0e-10 * this->dd_airterminalRecircAirInlet.AirMassFlowRateMax;
                 }
-                Node(OAInNode).MassFlowRateMax = this->dd_airterminalOAInlet.AirMassFlowRateMax;
-                Node(OAInNode).MassFlowRateMin = 0.0;
+                state.dataLoopNodes->Node(OAInNode).MassFlowRateMax = this->dd_airterminalOAInlet.AirMassFlowRateMax;
+                state.dataLoopNodes->Node(OAInNode).MassFlowRateMin = 0.0;
                 // figure per person by design level for the OA duct.
                 PeopleFlow = 0.0;
-                for (Loop = 1; Loop <= TotPeople; ++Loop) {
-                    if (People(Loop).ZonePtr != this->ActualZoneNum) continue;
-                    int damperOAFlowMethod = OARequirements(this->OARequirementsPtr).OAFlowMethod;
+                for (Loop = 1; Loop <= state.dataHeatBal->TotPeople; ++Loop) {
+                    if (state.dataHeatBal->People(Loop).ZonePtr != this->ActualZoneNum) continue;
+                    int damperOAFlowMethod = state.dataSize->OARequirements(this->OARequirementsPtr).OAFlowMethod;
                     if (damperOAFlowMethod == OAFlowPPer || damperOAFlowMethod == OAFlowSum || damperOAFlowMethod == OAFlowMax) {
-                        PeopleFlow += People(Loop).NumberOfPeople * OARequirements(this->OARequirementsPtr).OAFlowPerPerson;
+                        PeopleFlow +=
+                            state.dataHeatBal->People(Loop).NumberOfPeople * state.dataSize->OARequirements(this->OARequirementsPtr).OAFlowPerPerson;
                     }
                 }
                 this->OAPerPersonByDesignLevel = PeopleFlow;
@@ -983,11 +1021,11 @@ namespace DualDuct {
         }
 
         // Initialize the Inlet Nodes of the Sys
-        if (this->DamperType == DualDuct_ConstantVolume || this->DamperType == DualDuct_VariableVolume) {
+        if (this->DamperType == DualDuctDamper::ConstantVolume || this->DamperType == DualDuctDamper::VariableVolume) {
             HotInNode = this->HotAirInletNodeNum;
             ColdInNode = this->ColdAirInletNodeNum;
             OutNode = this->OutletNodeNum;
-        } else if (this->DamperType == DualDuct_OutdoorAir) {
+        } else if (this->DamperType == DualDuctDamper::OutdoorAir) {
             OAInNode = this->OAInletNodeNum;
             if (this->RecircIsUsed) RAInNode = this->RecircAirInletNodeNum;
             OutNode = this->OutletNodeNum;
@@ -997,27 +1035,27 @@ namespace DualDuct {
             //     CALL DisplayString('Init First HVAC Iteration {'//TRIM(  dd_airterminal(DDNum)%DamperName)//'}') !-For debugging - REMOVE
             // The first time through set the mass flow rate to the Max
             // Take care of the flow rates first. For Const Vol and VAV.
-            if (this->DamperType == DualDuct_ConstantVolume || this->DamperType == DualDuct_VariableVolume) {
-                if ((Node(HotInNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
-                    Node(HotInNode).MassFlowRate = this->dd_airterminalHotAirInlet.AirMassFlowRateMax;
+            if (this->DamperType == DualDuctDamper::ConstantVolume || this->DamperType == DualDuctDamper::VariableVolume) {
+                if ((state.dataLoopNodes->Node(HotInNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
+                    state.dataLoopNodes->Node(HotInNode).MassFlowRate = this->dd_airterminalHotAirInlet.AirMassFlowRateMax;
                 } else {
-                    Node(HotInNode).MassFlowRate = 0.0;
+                    state.dataLoopNodes->Node(HotInNode).MassFlowRate = 0.0;
                 }
-                if ((Node(ColdInNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
-                    Node(ColdInNode).MassFlowRate = this->dd_airterminalColdAirInlet.AirMassFlowRateMax;
+                if ((state.dataLoopNodes->Node(ColdInNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
+                    state.dataLoopNodes->Node(ColdInNode).MassFlowRate = this->dd_airterminalColdAirInlet.AirMassFlowRateMax;
                 } else {
-                    Node(ColdInNode).MassFlowRate = 0.0;
+                    state.dataLoopNodes->Node(ColdInNode).MassFlowRate = 0.0;
                 }
                 // Next take care of the Max Avail Flow Rates
-                if ((Node(HotInNode).MassFlowRateMaxAvail > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
-                    Node(HotInNode).MassFlowRateMaxAvail = this->dd_airterminalHotAirInlet.AirMassFlowRateMax;
+                if ((state.dataLoopNodes->Node(HotInNode).MassFlowRateMaxAvail > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
+                    state.dataLoopNodes->Node(HotInNode).MassFlowRateMaxAvail = this->dd_airterminalHotAirInlet.AirMassFlowRateMax;
                 } else {
-                    Node(HotInNode).MassFlowRateMaxAvail = 0.0;
+                    state.dataLoopNodes->Node(HotInNode).MassFlowRateMaxAvail = 0.0;
                 }
-                if ((Node(ColdInNode).MassFlowRateMaxAvail > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
-                    Node(ColdInNode).MassFlowRateMaxAvail = this->dd_airterminalColdAirInlet.AirMassFlowRateMax;
+                if ((state.dataLoopNodes->Node(ColdInNode).MassFlowRateMaxAvail > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
+                    state.dataLoopNodes->Node(ColdInNode).MassFlowRateMaxAvail = this->dd_airterminalColdAirInlet.AirMassFlowRateMax;
                 } else {
-                    Node(ColdInNode).MassFlowRateMaxAvail = 0.0;
+                    state.dataLoopNodes->Node(ColdInNode).MassFlowRateMaxAvail = 0.0;
                 }
                 // get current time step air terminal box turndown minimum flow fraction
                 if (this->ZoneTurndownMinAirFracSchExist) {
@@ -1028,29 +1066,31 @@ namespace DualDuct {
                 // update to the current dual duct minimum air flow fraction
                 this->ZoneMinAirFrac = this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac;
                 // The last item is to take care of the Min Avail Flow Rates
-                if ((Node(HotInNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
-                    Node(HotInNode).MassFlowRateMinAvail = this->dd_airterminalHotAirInlet.AirMassFlowRateMax * this->ZoneMinAirFrac;
+                if ((state.dataLoopNodes->Node(HotInNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
+                    state.dataLoopNodes->Node(HotInNode).MassFlowRateMinAvail =
+                        this->dd_airterminalHotAirInlet.AirMassFlowRateMax * this->ZoneMinAirFrac;
                 } else {
-                    Node(HotInNode).MassFlowRateMinAvail = 0.0;
+                    state.dataLoopNodes->Node(HotInNode).MassFlowRateMinAvail = 0.0;
                 }
-                if ((Node(ColdInNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
-                    Node(ColdInNode).MassFlowRateMinAvail = this->dd_airterminalColdAirInlet.AirMassFlowRateMax * this->ZoneMinAirFrac;
+                if ((state.dataLoopNodes->Node(ColdInNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
+                    state.dataLoopNodes->Node(ColdInNode).MassFlowRateMinAvail =
+                        this->dd_airterminalColdAirInlet.AirMassFlowRateMax * this->ZoneMinAirFrac;
                 } else {
-                    Node(ColdInNode).MassFlowRateMinAvail = 0.0;
+                    state.dataLoopNodes->Node(ColdInNode).MassFlowRateMinAvail = 0.0;
                 }
 
-            } else if (this->DamperType == DualDuct_OutdoorAir) {
+            } else if (this->DamperType == DualDuctDamper::OutdoorAir) {
                 // The first time through set the mass flow rate to the Max for VAV:OutdoorAir
-                if ((Node(OAInNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
-                    Node(OAInNode).MassFlowRate = this->dd_airterminalOAInlet.AirMassFlowRateMax;
+                if ((state.dataLoopNodes->Node(OAInNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
+                    state.dataLoopNodes->Node(OAInNode).MassFlowRate = this->dd_airterminalOAInlet.AirMassFlowRateMax;
                 } else {
-                    Node(OAInNode).MassFlowRate = 0.0;
+                    state.dataLoopNodes->Node(OAInNode).MassFlowRate = 0.0;
                 }
                 if (this->RecircIsUsed) {
-                    if ((Node(RAInNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
-                        Node(RAInNode).MassFlowRate = this->dd_airterminalRecircAirInlet.AirMassFlowRateMax;
+                    if ((state.dataLoopNodes->Node(RAInNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
+                        state.dataLoopNodes->Node(RAInNode).MassFlowRate = this->dd_airterminalRecircAirInlet.AirMassFlowRateMax;
                     } else {
-                        Node(RAInNode).MassFlowRate = 0.0;
+                        state.dataLoopNodes->Node(RAInNode).MassFlowRate = 0.0;
                     }
                     // clear flow history
                     this->dd_airterminalRecircAirInlet.AirMassFlowRateHist1 = 0.0;
@@ -1058,66 +1098,70 @@ namespace DualDuct {
                     this->dd_airterminalRecircAirInlet.AirMassFlowRateHist3 = 0.0;
                 }
                 // Next take care of the Max Avail Flow Rates
-                if ((Node(OAInNode).MassFlowRateMaxAvail > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
-                    Node(OAInNode).MassFlowRateMaxAvail = this->dd_airterminalOAInlet.AirMassFlowRateMax;
+                if ((state.dataLoopNodes->Node(OAInNode).MassFlowRateMaxAvail > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
+                    state.dataLoopNodes->Node(OAInNode).MassFlowRateMaxAvail = this->dd_airterminalOAInlet.AirMassFlowRateMax;
                 } else {
-                    Node(OAInNode).MassFlowRateMaxAvail = 0.0;
+                    state.dataLoopNodes->Node(OAInNode).MassFlowRateMaxAvail = 0.0;
                 }
                 if (this->RecircIsUsed) {
-                    if ((Node(RAInNode).MassFlowRateMaxAvail > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
-                        Node(RAInNode).MassFlowRateMaxAvail = this->dd_airterminalRecircAirInlet.AirMassFlowRateMax;
+                    if ((state.dataLoopNodes->Node(RAInNode).MassFlowRateMaxAvail > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
+                        state.dataLoopNodes->Node(RAInNode).MassFlowRateMaxAvail = this->dd_airterminalRecircAirInlet.AirMassFlowRateMax;
                     } else {
-                        Node(RAInNode).MassFlowRateMaxAvail = 0.0;
+                        state.dataLoopNodes->Node(RAInNode).MassFlowRateMaxAvail = 0.0;
                     }
                 }
                 // The last item is to take care of the Min Avail Flow Rates. VAV:OutdoorAir
-                Node(OAInNode).MassFlowRateMinAvail = 0.0;
-                if (this->RecircIsUsed) Node(RAInNode).MassFlowRateMinAvail = 0.0;
+                state.dataLoopNodes->Node(OAInNode).MassFlowRateMinAvail = 0.0;
+                if (this->RecircIsUsed) state.dataLoopNodes->Node(RAInNode).MassFlowRateMinAvail = 0.0;
             }
         }
 
         // Initialize the Inlet Nodes of the Dampers for Const. Vol and VAV
-        if (this->DamperType == DualDuct_ConstantVolume || this->DamperType == DualDuct_VariableVolume) {
+        if (this->DamperType == DualDuctDamper::ConstantVolume || this->DamperType == DualDuctDamper::VariableVolume) {
 
-            this->dd_airterminalHotAirInlet.AirMassFlowRateMaxAvail = min(Node(OutNode).MassFlowRateMax, Node(HotInNode).MassFlowRateMaxAvail);
+            this->dd_airterminalHotAirInlet.AirMassFlowRateMaxAvail =
+                min(state.dataLoopNodes->Node(OutNode).MassFlowRateMax, state.dataLoopNodes->Node(HotInNode).MassFlowRateMaxAvail);
             this->dd_airterminalHotAirInlet.AirMassFlowRateMinAvail =
-                min(max(Node(OutNode).MassFlowRateMin, Node(HotInNode).MassFlowRateMinAvail), Node(HotInNode).MassFlowRateMaxAvail);
+                min(max(state.dataLoopNodes->Node(OutNode).MassFlowRateMin, state.dataLoopNodes->Node(HotInNode).MassFlowRateMinAvail),
+                    state.dataLoopNodes->Node(HotInNode).MassFlowRateMaxAvail);
 
-            this->dd_airterminalColdAirInlet.AirMassFlowRateMaxAvail = min(Node(OutNode).MassFlowRateMax, Node(ColdInNode).MassFlowRateMaxAvail);
+            this->dd_airterminalColdAirInlet.AirMassFlowRateMaxAvail =
+                min(state.dataLoopNodes->Node(OutNode).MassFlowRateMax, state.dataLoopNodes->Node(ColdInNode).MassFlowRateMaxAvail);
             this->dd_airterminalColdAirInlet.AirMassFlowRateMinAvail =
-                min(max(Node(OutNode).MassFlowRateMin, Node(ColdInNode).MassFlowRateMinAvail), Node(ColdInNode).MassFlowRateMaxAvail);
+                min(max(state.dataLoopNodes->Node(OutNode).MassFlowRateMin, state.dataLoopNodes->Node(ColdInNode).MassFlowRateMinAvail),
+                    state.dataLoopNodes->Node(ColdInNode).MassFlowRateMaxAvail);
 
             // Do the following initializations (every time step): This should be the info from
             // the previous components outlets or the node data in this section.
             // Load the node data in this section for the component simulation
-            this->dd_airterminalHotAirInlet.AirMassFlowRate = Node(HotInNode).MassFlowRate;
-            this->dd_airterminalHotAirInlet.AirTemp = Node(HotInNode).Temp;
-            this->dd_airterminalHotAirInlet.AirHumRat = Node(HotInNode).HumRat;
-            this->dd_airterminalHotAirInlet.AirEnthalpy = Node(HotInNode).Enthalpy;
-            this->dd_airterminalColdAirInlet.AirMassFlowRate = Node(ColdInNode).MassFlowRate;
-            this->dd_airterminalColdAirInlet.AirTemp = Node(ColdInNode).Temp;
-            this->dd_airterminalColdAirInlet.AirHumRat = Node(ColdInNode).HumRat;
-            this->dd_airterminalColdAirInlet.AirEnthalpy = Node(ColdInNode).Enthalpy;
+            this->dd_airterminalHotAirInlet.AirMassFlowRate = state.dataLoopNodes->Node(HotInNode).MassFlowRate;
+            this->dd_airterminalHotAirInlet.AirTemp = state.dataLoopNodes->Node(HotInNode).Temp;
+            this->dd_airterminalHotAirInlet.AirHumRat = state.dataLoopNodes->Node(HotInNode).HumRat;
+            this->dd_airterminalHotAirInlet.AirEnthalpy = state.dataLoopNodes->Node(HotInNode).Enthalpy;
+            this->dd_airterminalColdAirInlet.AirMassFlowRate = state.dataLoopNodes->Node(ColdInNode).MassFlowRate;
+            this->dd_airterminalColdAirInlet.AirTemp = state.dataLoopNodes->Node(ColdInNode).Temp;
+            this->dd_airterminalColdAirInlet.AirHumRat = state.dataLoopNodes->Node(ColdInNode).HumRat;
+            this->dd_airterminalColdAirInlet.AirEnthalpy = state.dataLoopNodes->Node(ColdInNode).Enthalpy;
 
             // Initialize the Inlet Nodes of the Dampers for VAV:OutdoorAir
-        } else if (this->DamperType == DualDuct_OutdoorAir) {
-            this->dd_airterminalOAInlet.AirMassFlowRateMaxAvail = Node(OAInNode).MassFlowRateMaxAvail;
-            this->dd_airterminalOAInlet.AirMassFlowRateMinAvail = Node(OAInNode).MassFlowRateMinAvail;
+        } else if (this->DamperType == DualDuctDamper::OutdoorAir) {
+            this->dd_airterminalOAInlet.AirMassFlowRateMaxAvail = state.dataLoopNodes->Node(OAInNode).MassFlowRateMaxAvail;
+            this->dd_airterminalOAInlet.AirMassFlowRateMinAvail = state.dataLoopNodes->Node(OAInNode).MassFlowRateMinAvail;
 
             // Do the following initializations (every time step): This should be the info from
             // the previous components outlets or the node data in this section.
             // Load the node data in this section for the component simulation
-            this->dd_airterminalOAInlet.AirMassFlowRate = Node(OAInNode).MassFlowRate;
-            this->dd_airterminalOAInlet.AirTemp = Node(OAInNode).Temp;
-            this->dd_airterminalOAInlet.AirHumRat = Node(OAInNode).HumRat;
-            this->dd_airterminalOAInlet.AirEnthalpy = Node(OAInNode).Enthalpy;
+            this->dd_airterminalOAInlet.AirMassFlowRate = state.dataLoopNodes->Node(OAInNode).MassFlowRate;
+            this->dd_airterminalOAInlet.AirTemp = state.dataLoopNodes->Node(OAInNode).Temp;
+            this->dd_airterminalOAInlet.AirHumRat = state.dataLoopNodes->Node(OAInNode).HumRat;
+            this->dd_airterminalOAInlet.AirEnthalpy = state.dataLoopNodes->Node(OAInNode).Enthalpy;
             if (this->RecircIsUsed) {
-                this->dd_airterminalRecircAirInlet.AirMassFlowRateMaxAvail = Node(RAInNode).MassFlowRateMaxAvail;
-                this->dd_airterminalRecircAirInlet.AirMassFlowRateMinAvail = Node(RAInNode).MassFlowRateMinAvail;
-                this->dd_airterminalRecircAirInlet.AirMassFlowRate = Node(RAInNode).MassFlowRate;
-                this->dd_airterminalRecircAirInlet.AirTemp = Node(RAInNode).Temp;
-                this->dd_airterminalRecircAirInlet.AirHumRat = Node(RAInNode).HumRat;
-                this->dd_airterminalRecircAirInlet.AirEnthalpy = Node(RAInNode).Enthalpy;
+                this->dd_airterminalRecircAirInlet.AirMassFlowRateMaxAvail = state.dataLoopNodes->Node(RAInNode).MassFlowRateMaxAvail;
+                this->dd_airterminalRecircAirInlet.AirMassFlowRateMinAvail = state.dataLoopNodes->Node(RAInNode).MassFlowRateMinAvail;
+                this->dd_airterminalRecircAirInlet.AirMassFlowRate = state.dataLoopNodes->Node(RAInNode).MassFlowRate;
+                this->dd_airterminalRecircAirInlet.AirTemp = state.dataLoopNodes->Node(RAInNode).Temp;
+                this->dd_airterminalRecircAirInlet.AirHumRat = state.dataLoopNodes->Node(RAInNode).HumRat;
+                this->dd_airterminalRecircAirInlet.AirEnthalpy = state.dataLoopNodes->Node(RAInNode).Enthalpy;
             }
         }
     }
@@ -1143,23 +1187,24 @@ namespace DualDuct {
 
         if (this->MaxAirVolFlowRate == AutoSize) {
 
-            if ((CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
-                if (this->DamperType == DualDuct_ConstantVolume) {
-                    DamperType = cCMO_DDConstantVolume;
-                } else if (this->DamperType == DualDuct_VariableVolume) {
-                    DamperType = cCMO_DDVariableVolume;
-                } else if (this->DamperType == DualDuct_OutdoorAir) {
-                    DamperType = cCMO_DDVarVolOA;
+            if ((state.dataSize->CurZoneEqNum > 0) && (state.dataSize->CurTermUnitSizingNum > 0)) {
+                if (this->DamperType == DualDuctDamper::ConstantVolume) {
+                    DamperType = state.dataDualDuct->cCMO_DDConstantVolume;
+                } else if (this->DamperType == DualDuctDamper::VariableVolume) {
+                    DamperType = state.dataDualDuct->cCMO_DDVariableVolume;
+                } else if (this->DamperType == DualDuctDamper::OutdoorAir) {
+                    DamperType = state.dataDualDuct->cCMO_DDVarVolOA;
                 } else {
                     DamperType = "Invalid/Unknown";
                 }
                 CheckZoneSizing(state, DamperType, this->Name);
-                this->MaxAirVolFlowRate =
-                    max(TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolVolFlow, TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatVolFlow);
-                if (this->DamperType == DualDuct_OutdoorAir) {
+                this->MaxAirVolFlowRate = max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolVolFlow,
+                                              state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlow);
+                if (this->DamperType == DualDuctDamper::OutdoorAir) {
                     if (this->RecircIsUsed) {
-                        this->DesignRecircFlowRate = max(TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolVolFlow,
-                                                         TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatVolFlow);
+                        this->DesignRecircFlowRate =
+                            max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolVolFlow,
+                                state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlow);
                         this->MaxAirVolFlowRate = this->DesignRecircFlowRate + this->DesignOAFlowRate;
                     } else {
                         this->MaxAirVolFlowRate = this->DesignOAFlowRate;
@@ -1175,10 +1220,11 @@ namespace DualDuct {
                     this->DesignRecircFlowRate = 0.0;
                 }
                 BaseSizer::reportSizerOutput(state, DamperType, this->Name, "Maximum Air Flow Rate [m3/s]", this->MaxAirVolFlowRate);
-                if (this->DamperType == DualDuct_OutdoorAir) {
+                if (this->DamperType == DualDuctDamper::OutdoorAir) {
                     BaseSizer::reportSizerOutput(state, DamperType, this->Name, "Maximum Outdoor Air Flow Rate [m3/s]", this->DesignOAFlowRate);
                     if (this->RecircIsUsed) {
-                        BaseSizer::reportSizerOutput(state, DamperType, this->Name, "Maximum Recirculated Air Flow Rate [m3/s]", this->DesignRecircFlowRate);
+                        BaseSizer::reportSizerOutput(
+                            state, DamperType, this->Name, "Maximum Recirculated Air Flow Rate [m3/s]", this->DesignRecircFlowRate);
                     }
                 }
             }
@@ -1250,8 +1296,8 @@ namespace DualDuct {
         // If there is massflow then need to provide the correct amount of total
         //  required zone energy
         if (MassFlow > SmallMassFlow) {
-            CpAirZn = PsyCpAirFnW(Node(ZoneNodeNum).HumRat);
-            QZnReq = QTotLoad + MassFlow * CpAirZn * Node(ZoneNodeNum).Temp;
+            CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneNodeNum).HumRat);
+            QZnReq = QTotLoad + MassFlow * CpAirZn * state.dataLoopNodes->Node(ZoneNodeNum).Temp;
             // If the enthalpy is the same for the hot and cold duct then there would be a
             //  divide by zero so for heating or cooling set the damper to one max flow
             //  or the other.
@@ -1379,7 +1425,7 @@ namespace DualDuct {
         // The calculated load from the Heat Balance
         QTotLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
         // Calculate all of the required Cp's
-        CpAirZn = PsyCpAirFnW(Node(ZoneNodeNum).HumRat);
+        CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneNodeNum).HumRat);
         // CpAirSysHot = PsyCpAirFnW(DamperHotAirInlet(DDNum)%AirHumRat,DamperHotAirInlet(DDNum)%AirTemp)
         // CpAirSysCold= PsyCpAirFnW(DamperColdAirInlet(DDNum)%AirHumRat,DamperColdAirInlet(DDNum)%AirTemp)
         CpAirSysHot = CpAirZn;
@@ -1399,8 +1445,10 @@ namespace DualDuct {
         } else if ((QTotLoad > 0.0) && (this->dd_airterminalHotAirInlet.AirMassFlowRateMaxAvail > 0.0)) {
             // Then heating is needed
             // Next check for the denominator equal to zero
-            if (std::abs((CpAirSysHot * this->dd_airterminalHotAirInlet.AirTemp) - (CpAirZn * Node(ZoneNodeNum).Temp)) / CpAirZn > SmallTempDiff) {
-                MassFlow = QTotLoad / (CpAirSysHot * this->dd_airterminalHotAirInlet.AirTemp - CpAirZn * Node(ZoneNodeNum).Temp);
+            if (std::abs((CpAirSysHot * this->dd_airterminalHotAirInlet.AirTemp) - (CpAirZn * state.dataLoopNodes->Node(ZoneNodeNum).Temp)) /
+                    CpAirZn >
+                SmallTempDiff) {
+                MassFlow = QTotLoad / (CpAirSysHot * this->dd_airterminalHotAirInlet.AirTemp - CpAirZn * state.dataLoopNodes->Node(ZoneNodeNum).Temp);
             } else {
                 // If denominator tends to zero then mass flow would go to infinity thus set to the max for this iteration
                 MassFlow = this->dd_airterminalHotAirInlet.AirMassFlowRateMaxAvail;
@@ -1424,8 +1472,11 @@ namespace DualDuct {
         } else if ((QTotLoad < 0.0) && (this->dd_airterminalColdAirInlet.AirMassFlowRateMaxAvail > 0.0)) {
             // Then cooling is required
             // Next check for the denominator equal to zero
-            if (std::abs((CpAirSysCold * this->dd_airterminalColdAirInlet.AirTemp) - (CpAirZn * Node(ZoneNodeNum).Temp)) / CpAirZn > SmallTempDiff) {
-                MassFlow = QTotLoad / (CpAirSysCold * this->dd_airterminalColdAirInlet.AirTemp - CpAirZn * Node(ZoneNodeNum).Temp);
+            if (std::abs((CpAirSysCold * this->dd_airterminalColdAirInlet.AirTemp) - (CpAirZn * state.dataLoopNodes->Node(ZoneNodeNum).Temp)) /
+                    CpAirZn >
+                SmallTempDiff) {
+                MassFlow =
+                    QTotLoad / (CpAirSysCold * this->dd_airterminalColdAirInlet.AirTemp - CpAirZn * state.dataLoopNodes->Node(ZoneNodeNum).Temp);
             } else {
                 // If denominator tends to zero then mass flow would go to infinity thus set to the max for this iteration
                 MassFlow = this->dd_airterminalColdAirInlet.AirMassFlowRateMaxAvail;
@@ -1475,7 +1526,7 @@ namespace DualDuct {
         // Eqns.  Of course we have to make sure that we are within the Min and Max flow conditions.
         if (MassFlow > SmallMassFlow) {
             // Determine the enthalpy required from Zone enthalpy and the zone load.
-            QZnReq = QTotLoad + MassFlow * CpAirZn * Node(ZoneNodeNum).Temp;
+            QZnReq = QTotLoad + MassFlow * CpAirZn * state.dataLoopNodes->Node(ZoneNodeNum).Temp;
             // Using the known enthalpies the cold air inlet mass flow is determined.  If the enthalpy of the hot and cold
             // air streams are equal the IF-Then block handles that condition.
             if (std::abs(this->dd_airterminalColdAirInlet.AirTemp - this->dd_airterminalHotAirInlet.AirTemp) > SmallTempDiff) {
@@ -1502,10 +1553,10 @@ namespace DualDuct {
             // Using Mass Continuity to determine the other duct flow quantity
             this->dd_airterminalHotAirInlet.AirMassFlowRate = MassFlow - this->dd_airterminalColdAirInlet.AirMassFlowRate;
 
-            if (this->dd_airterminalHotAirInlet.AirMassFlowRate < MassFlowSetToler) {
+            if (this->dd_airterminalHotAirInlet.AirMassFlowRate < state.dataDualDuct->MassFlowSetToler) {
                 this->dd_airterminalHotAirInlet.AirMassFlowRate = 0.0;
                 this->dd_airterminalColdAirInlet.AirMassFlowRate = MassFlow;
-            } else if (this->dd_airterminalColdAirInlet.AirMassFlowRate < MassFlowSetToler) {
+            } else if (this->dd_airterminalColdAirInlet.AirMassFlowRate < state.dataDualDuct->MassFlowSetToler) {
                 this->dd_airterminalColdAirInlet.AirMassFlowRate = 0.0;
                 this->dd_airterminalHotAirInlet.AirMassFlowRate = MassFlow;
             }
@@ -1570,11 +1621,9 @@ namespace DualDuct {
 
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
+        using DataHVACGlobals::SmallTempDiff;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyTdbFnHW;
-        using DataHeatBalFanSys::ZoneThermostatSetPointHi;
-        using DataHeatBalFanSys::ZoneThermostatSetPointLo;
-        using DataHVACGlobals::SmallTempDiff;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1624,9 +1673,9 @@ namespace DualDuct {
         QtoCoolSPRemain = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
 
         // Calculate all of the required Cp's
-        CpAirZn = PsyCpAirFnW(Node(ZoneNodeNum).HumRat);
-        CpAirSysOA = PsyCpAirFnW(Node(OAInletNodeNum).HumRat);
-        if (this->RecircIsUsed) CpAirSysRA = PsyCpAirFnW(Node(RecircInletNodeNum).HumRat);
+        CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneNodeNum).HumRat);
+        CpAirSysOA = PsyCpAirFnW(state.dataLoopNodes->Node(OAInletNodeNum).HumRat);
+        if (this->RecircIsUsed) CpAirSysRA = PsyCpAirFnW(state.dataLoopNodes->Node(RecircInletNodeNum).HumRat);
 
         // Set the OA Damper to the calculated ventilation flow rate
         this->dd_airterminalOAInlet.AirMassFlowRate = OAMassFlow;
@@ -1638,14 +1687,15 @@ namespace DualDuct {
         }
 
         //..Find the amount of load that the OAMassFlow accounted for
-        if (std::abs((CpAirSysOA * this->dd_airterminalOAInlet.AirTemp) - (CpAirZn * Node(ZoneNodeNum).Temp)) / CpAirZn > SmallTempDiff) {
-            QOALoad =
-                this->dd_airterminalOAInlet.AirMassFlowRate * (CpAirSysOA * this->dd_airterminalOAInlet.AirTemp - CpAirZn * Node(ZoneNodeNum).Temp);
+        if (std::abs((CpAirSysOA * this->dd_airterminalOAInlet.AirTemp) - (CpAirZn * state.dataLoopNodes->Node(ZoneNodeNum).Temp)) / CpAirZn >
+            SmallTempDiff) {
+            QOALoad = this->dd_airterminalOAInlet.AirMassFlowRate *
+                      (CpAirSysOA * this->dd_airterminalOAInlet.AirTemp - CpAirZn * state.dataLoopNodes->Node(ZoneNodeNum).Temp);
 
-            QOALoadToHeatSP = this->dd_airterminalOAInlet.AirMassFlowRate *
-                              (CpAirSysOA * this->dd_airterminalOAInlet.AirTemp - CpAirZn * ZoneThermostatSetPointLo(ZoneNum));
-            QOALoadToCoolSP = this->dd_airterminalOAInlet.AirMassFlowRate *
-                              (CpAirSysOA * this->dd_airterminalOAInlet.AirTemp - CpAirZn * ZoneThermostatSetPointHi(ZoneNum));
+            QOALoadToHeatSP = this->dd_airterminalOAInlet.AirMassFlowRate * (CpAirSysOA * this->dd_airterminalOAInlet.AirTemp -
+                                                                             CpAirZn * state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum));
+            QOALoadToCoolSP = this->dd_airterminalOAInlet.AirMassFlowRate * (CpAirSysOA * this->dd_airterminalOAInlet.AirTemp -
+                                                                             CpAirZn * state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum));
 
         } else {
             QOALoad = 0.0;
@@ -1680,13 +1730,15 @@ namespace DualDuct {
             //    QRALoad = QTotRemainAdjust
             //  ENDIF
 
-            if (QRALoad < 0.0) {                                                                    // cooling
-                if ((this->dd_airterminalRecircAirInlet.AirTemp - Node(ZoneNodeNum).Temp) < -0.5) { // can cool
+            if (QRALoad < 0.0) {                                                                                         // cooling
+                if ((this->dd_airterminalRecircAirInlet.AirTemp - state.dataLoopNodes->Node(ZoneNodeNum).Temp) < -0.5) { // can cool
                     //  Find the Mass Flow Rate of the RA Stream needed to meet the zone cooling load
-                    if (std::abs((CpAirSysRA * this->dd_airterminalRecircAirInlet.AirTemp) - (CpAirZn * Node(ZoneNodeNum).Temp)) / CpAirZn >
+                    if (std::abs((CpAirSysRA * this->dd_airterminalRecircAirInlet.AirTemp) -
+                                 (CpAirZn * state.dataLoopNodes->Node(ZoneNodeNum).Temp)) /
+                            CpAirZn >
                         SmallTempDiff) {
-                        this->dd_airterminalRecircAirInlet.AirMassFlowRate =
-                            QRALoad / (CpAirSysRA * this->dd_airterminalRecircAirInlet.AirTemp - CpAirZn * Node(ZoneNodeNum).Temp);
+                        this->dd_airterminalRecircAirInlet.AirMassFlowRate = QRALoad / (CpAirSysRA * this->dd_airterminalRecircAirInlet.AirTemp -
+                                                                                        CpAirZn * state.dataLoopNodes->Node(ZoneNodeNum).Temp);
                     }
                 } else {
                     this->dd_airterminalRecircAirInlet.AirMassFlowRate = 0.0;
@@ -1895,7 +1947,6 @@ namespace DualDuct {
 
         // FUNCTION PARAMETER DEFINITIONS:
         bool const UseMinOASchFlag(true); // Always use min OA schedule in calculations.
-        static std::string const RoutineName("HVACDualDuctSystem:CalcOAOnlyMassFlow");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1914,19 +1965,19 @@ namespace DualDuct {
 
         // If no additional input from user, RETURN from subroutine
         if (this->NoOAFlowInputFromUser) {
-            ShowSevereError(state, "CalcOAOnlyMassFlow: Problem in AirTerminal:DualDuct:VAV:OutdoorAir = " + this->Name +
-                            ", check outdoor air specification");
+            ShowSevereError(
+                state, "CalcOAOnlyMassFlow: Problem in AirTerminal:DualDuct:VAV:OutdoorAir = " + this->Name + ", check outdoor air specification");
             if (present(MaxOAVolFlow)) MaxOAVolFlow = 0.0;
             return;
         }
 
-        if (this->OAPerPersonMode == PerPersonDCVByCurrentLevel) {
+        if (this->OAPerPersonMode == PerPersonMode::DCVByCurrentLevel) {
             UseOccSchFlag = true;
             PerPersonNotSet = false;
         } else {
             UseOccSchFlag = false;
             PerPersonNotSet = false;
-            if (this->OAPerPersonMode == PerPersonModeNotSet) PerPersonNotSet = true;
+            if (this->OAPerPersonMode == PerPersonMode::ModeNotSet) PerPersonNotSet = true;
         }
 
         OAVolumeFlowRate =
@@ -1969,95 +2020,103 @@ namespace DualDuct {
         int OAInletNode; // Outdoor Air Duct Inlet Node - for DualDuctOutdoorAir
         int RAInletNode; // Recirculated Air Duct Inlet Node - for DualDuctOutdoorAir
 
-        if (this->DamperType == DualDuct_ConstantVolume || this->DamperType == DualDuct_VariableVolume) {
+        if (this->DamperType == DualDuctDamper::ConstantVolume || this->DamperType == DualDuctDamper::VariableVolume) {
 
             OutletNode = this->OutletNodeNum;
             HotInletNode = this->HotAirInletNodeNum;
             ColdInletNode = this->ColdAirInletNodeNum;
 
             // Set the outlet air nodes of the Damper
-            Node(HotInletNode).MassFlowRate = this->dd_airterminalHotAirInlet.AirMassFlowRate;
-            Node(ColdInletNode).MassFlowRate = this->dd_airterminalColdAirInlet.AirMassFlowRate;
-            Node(OutletNode).MassFlowRate = this->dd_airterminalOutlet.AirMassFlowRate;
-            Node(OutletNode).MassFlowRateMaxAvail = this->dd_airterminalOutlet.AirMassFlowRate;
-            Node(OutletNode).MassFlowRateMinAvail = this->dd_airterminalOutlet.AirMassFlowRateMinAvail;
-            Node(OutletNode).Temp = this->dd_airterminalOutlet.AirTemp;
-            Node(OutletNode).HumRat = this->dd_airterminalOutlet.AirHumRat;
-            Node(OutletNode).Enthalpy = this->dd_airterminalOutlet.AirEnthalpy;
+            state.dataLoopNodes->Node(HotInletNode).MassFlowRate = this->dd_airterminalHotAirInlet.AirMassFlowRate;
+            state.dataLoopNodes->Node(ColdInletNode).MassFlowRate = this->dd_airterminalColdAirInlet.AirMassFlowRate;
+            state.dataLoopNodes->Node(OutletNode).MassFlowRate = this->dd_airterminalOutlet.AirMassFlowRate;
+            state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail = this->dd_airterminalOutlet.AirMassFlowRate;
+            state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail = this->dd_airterminalOutlet.AirMassFlowRateMinAvail;
+            state.dataLoopNodes->Node(OutletNode).Temp = this->dd_airterminalOutlet.AirTemp;
+            state.dataLoopNodes->Node(OutletNode).HumRat = this->dd_airterminalOutlet.AirHumRat;
+            state.dataLoopNodes->Node(OutletNode).Enthalpy = this->dd_airterminalOutlet.AirEnthalpy;
             // Set the outlet nodes for properties that just pass through & not used
             // FIX THIS LATER!!!!
-            Node(OutletNode).Quality = Node(HotInletNode).Quality;
-            Node(OutletNode).Press = Node(HotInletNode).Press;
+            state.dataLoopNodes->Node(OutletNode).Quality = state.dataLoopNodes->Node(HotInletNode).Quality;
+            state.dataLoopNodes->Node(OutletNode).Press = state.dataLoopNodes->Node(HotInletNode).Press;
 
             if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                if (Node(OutletNode).MassFlowRate > 0.0) {
-                    Node(OutletNode).CO2 =
-                        (Node(HotInletNode).CO2 * Node(HotInletNode).MassFlowRate + Node(ColdInletNode).CO2 * Node(ColdInletNode).MassFlowRate) /
-                        Node(OutletNode).MassFlowRate;
+                if (state.dataLoopNodes->Node(OutletNode).MassFlowRate > 0.0) {
+                    state.dataLoopNodes->Node(OutletNode).CO2 =
+                        (state.dataLoopNodes->Node(HotInletNode).CO2 * state.dataLoopNodes->Node(HotInletNode).MassFlowRate +
+                         state.dataLoopNodes->Node(ColdInletNode).CO2 * state.dataLoopNodes->Node(ColdInletNode).MassFlowRate) /
+                        state.dataLoopNodes->Node(OutletNode).MassFlowRate;
                 } else {
-                    Node(OutletNode).CO2 = max(Node(HotInletNode).CO2, Node(ColdInletNode).CO2);
+                    state.dataLoopNodes->Node(OutletNode).CO2 =
+                        max(state.dataLoopNodes->Node(HotInletNode).CO2, state.dataLoopNodes->Node(ColdInletNode).CO2);
                 }
             }
             if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                if (Node(OutletNode).MassFlowRate > 0.0) {
-                    Node(OutletNode).GenContam = (Node(HotInletNode).GenContam * Node(HotInletNode).MassFlowRate +
-                                                  Node(ColdInletNode).GenContam * Node(ColdInletNode).MassFlowRate) /
-                                                 Node(OutletNode).MassFlowRate;
+                if (state.dataLoopNodes->Node(OutletNode).MassFlowRate > 0.0) {
+                    state.dataLoopNodes->Node(OutletNode).GenContam =
+                        (state.dataLoopNodes->Node(HotInletNode).GenContam * state.dataLoopNodes->Node(HotInletNode).MassFlowRate +
+                         state.dataLoopNodes->Node(ColdInletNode).GenContam * state.dataLoopNodes->Node(ColdInletNode).MassFlowRate) /
+                        state.dataLoopNodes->Node(OutletNode).MassFlowRate;
                 } else {
-                    Node(OutletNode).GenContam = max(Node(HotInletNode).GenContam, Node(ColdInletNode).GenContam);
+                    state.dataLoopNodes->Node(OutletNode).GenContam =
+                        max(state.dataLoopNodes->Node(HotInletNode).GenContam, state.dataLoopNodes->Node(ColdInletNode).GenContam);
                 }
             }
 
             this->CalcOutdoorAirVolumeFlowRate(state);
 
-        } else if (this->DamperType == DualDuct_OutdoorAir) {
+        } else if (this->DamperType == DualDuctDamper::OutdoorAir) {
 
             OutletNode = this->OutletNodeNum;
             OAInletNode = this->OAInletNodeNum;
             if (this->RecircIsUsed) {
                 RAInletNode = this->RecircAirInletNodeNum;
-                Node(RAInletNode).MassFlowRate = this->dd_airterminalRecircAirInlet.AirMassFlowRate;
+                state.dataLoopNodes->Node(RAInletNode).MassFlowRate = this->dd_airterminalRecircAirInlet.AirMassFlowRate;
             }
             // Set the outlet air nodes of the Damper
-            Node(OAInletNode).MassFlowRate = this->dd_airterminalOAInlet.AirMassFlowRate;
-            Node(OutletNode).MassFlowRate = this->dd_airterminalOutlet.AirMassFlowRate;
-            Node(OutletNode).MassFlowRateMaxAvail = this->dd_airterminalOutlet.AirMassFlowRate;
-            Node(OutletNode).MassFlowRateMinAvail = this->dd_airterminalOutlet.AirMassFlowRateMinAvail;
-            Node(OutletNode).Temp = this->dd_airterminalOutlet.AirTemp;
-            Node(OutletNode).HumRat = this->dd_airterminalOutlet.AirHumRat;
-            Node(OutletNode).Enthalpy = this->dd_airterminalOutlet.AirEnthalpy;
+            state.dataLoopNodes->Node(OAInletNode).MassFlowRate = this->dd_airterminalOAInlet.AirMassFlowRate;
+            state.dataLoopNodes->Node(OutletNode).MassFlowRate = this->dd_airterminalOutlet.AirMassFlowRate;
+            state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail = this->dd_airterminalOutlet.AirMassFlowRate;
+            state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail = this->dd_airterminalOutlet.AirMassFlowRateMinAvail;
+            state.dataLoopNodes->Node(OutletNode).Temp = this->dd_airterminalOutlet.AirTemp;
+            state.dataLoopNodes->Node(OutletNode).HumRat = this->dd_airterminalOutlet.AirHumRat;
+            state.dataLoopNodes->Node(OutletNode).Enthalpy = this->dd_airterminalOutlet.AirEnthalpy;
             // Set the outlet nodes for properties that just pass through & not used
             // FIX THIS LATER!!!!
-            Node(OutletNode).Quality = Node(OAInletNode).Quality;
-            Node(OutletNode).Press = Node(OAInletNode).Press;
+            state.dataLoopNodes->Node(OutletNode).Quality = state.dataLoopNodes->Node(OAInletNode).Quality;
+            state.dataLoopNodes->Node(OutletNode).Press = state.dataLoopNodes->Node(OAInletNode).Press;
 
             if (this->RecircIsUsed) {
-                if (Node(OutletNode).MassFlowRate > 0.0) {
+                if (state.dataLoopNodes->Node(OutletNode).MassFlowRate > 0.0) {
                     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                        Node(OutletNode).CO2 =
-                            (Node(OAInletNode).CO2 * Node(OAInletNode).MassFlowRate + Node(RAInletNode).CO2 * Node(RAInletNode).MassFlowRate) /
-                            Node(OutletNode).MassFlowRate;
+                        state.dataLoopNodes->Node(OutletNode).CO2 =
+                            (state.dataLoopNodes->Node(OAInletNode).CO2 * state.dataLoopNodes->Node(OAInletNode).MassFlowRate +
+                             state.dataLoopNodes->Node(RAInletNode).CO2 * state.dataLoopNodes->Node(RAInletNode).MassFlowRate) /
+                            state.dataLoopNodes->Node(OutletNode).MassFlowRate;
                     }
                     if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                        Node(OutletNode).GenContam = (Node(OAInletNode).GenContam * Node(OAInletNode).MassFlowRate +
-                                                      Node(RAInletNode).GenContam * Node(RAInletNode).MassFlowRate) /
-                                                     Node(OutletNode).MassFlowRate;
+                        state.dataLoopNodes->Node(OutletNode).GenContam =
+                            (state.dataLoopNodes->Node(OAInletNode).GenContam * state.dataLoopNodes->Node(OAInletNode).MassFlowRate +
+                             state.dataLoopNodes->Node(RAInletNode).GenContam * state.dataLoopNodes->Node(RAInletNode).MassFlowRate) /
+                            state.dataLoopNodes->Node(OutletNode).MassFlowRate;
                     }
                 } else {
                     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                        Node(OutletNode).CO2 = max(Node(OAInletNode).CO2, Node(RAInletNode).CO2);
+                        state.dataLoopNodes->Node(OutletNode).CO2 =
+                            max(state.dataLoopNodes->Node(OAInletNode).CO2, state.dataLoopNodes->Node(RAInletNode).CO2);
                     }
                     if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                        Node(OutletNode).GenContam = max(Node(OAInletNode).GenContam, Node(RAInletNode).GenContam);
+                        state.dataLoopNodes->Node(OutletNode).GenContam =
+                            max(state.dataLoopNodes->Node(OAInletNode).GenContam, state.dataLoopNodes->Node(RAInletNode).GenContam);
                     }
                 }
 
             } else {
                 if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                    Node(OutletNode).CO2 = Node(OAInletNode).CO2;
+                    state.dataLoopNodes->Node(OutletNode).CO2 = state.dataLoopNodes->Node(OAInletNode).CO2;
                 }
                 if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                    Node(OutletNode).GenContam = Node(OAInletNode).GenContam;
+                    state.dataLoopNodes->Node(OutletNode).GenContam = state.dataLoopNodes->Node(OAInletNode).GenContam;
                 }
             }
         }
@@ -2120,24 +2179,25 @@ namespace DualDuct {
         // Report dual duct damper connections to the BND file.
 
         // Using/Aliasing
-        using DataHVACGlobals::NumPrimaryAirSys;
+        auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
         // Formats
-        static constexpr auto Format_100("! <#Dual Duct Damper Connections>,<Number of Dual Duct Damper Connections>");
-        static constexpr auto Format_102("! <Dual Duct Damper>,<Dual Duct Damper Count>,<Dual Duct Damper Name>,<Inlet Node>,<Outlet Node>,<Inlet "
-                                         "Node Type>,<AirLoopHVAC Name>");
+        static constexpr fmt::string_view Format_100("! <#Dual Duct Damper Connections>,<Number of Dual Duct Damper Connections>");
+        static constexpr fmt::string_view Format_102(
+            "! <Dual Duct Damper>,<Dual Duct Damper Count>,<Dual Duct Damper Name>,<Inlet Node>,<Outlet Node>,<Inlet "
+            "Node Type>,<AirLoopHVAC Name>");
 
-        if (!allocated(dd_airterminal))
+        if (!allocated(state.dataDualDuct->dd_airterminal))
             return; // Autodesk Bug: Can arrive here with Damper unallocated (SimulateDualDuct not yet called) with NumDDAirTerminal either set >0 or
                     // uninitialized
 
         // Report Dual Duct Dampers to BND File
         print(state.files.bnd, "{}\n", "! ===============================================================");
         print(state.files.bnd, "{}\n", Format_100);
-        print(state.files.bnd, " #Dual Duct Damper Connections,{}\n", NumDDAirTerminal * 2);
+        print(state.files.bnd, " #Dual Duct Damper Connections,{}\n", state.dataDualDuct->NumDDAirTerminal * 2);
         print(state.files.bnd, "{}\n", Format_102);
 
-        for (int Count1 = 1; Count1 <= NumDDAirTerminal; ++Count1) {
+        for (int Count1 = 1; Count1 <= state.dataDualDuct->NumDDAirTerminal; ++Count1) {
 
             // Determine if this damper is connected to a supply air path
             int Found = 0;
@@ -2146,10 +2206,17 @@ namespace DualDuct {
                 SupplyAirPathNum = Count2;
                 Found = 0;
                 for (int Count3 = 1; Count3 <= state.dataZoneEquip->SupplyAirPath(Count2).NumOutletNodes; ++Count3) {
-                    if (dd_airterminal(Count1).HotAirInletNodeNum == state.dataZoneEquip->SupplyAirPath(Count2).OutletNode(Count3)) Found = Count3;
-                    if (dd_airterminal(Count1).ColdAirInletNodeNum == state.dataZoneEquip->SupplyAirPath(Count2).OutletNode(Count3)) Found = Count3;
-                    if (dd_airterminal(Count1).OAInletNodeNum == state.dataZoneEquip->SupplyAirPath(Count2).OutletNode(Count3)) Found = Count3;
-                    if (dd_airterminal(Count1).RecircAirInletNodeNum == state.dataZoneEquip->SupplyAirPath(Count2).OutletNode(Count3)) Found = Count3;
+                    if (state.dataDualDuct->dd_airterminal(Count1).HotAirInletNodeNum ==
+                        state.dataZoneEquip->SupplyAirPath(Count2).OutletNode(Count3))
+                        Found = Count3;
+                    if (state.dataDualDuct->dd_airterminal(Count1).ColdAirInletNodeNum ==
+                        state.dataZoneEquip->SupplyAirPath(Count2).OutletNode(Count3))
+                        Found = Count3;
+                    if (state.dataDualDuct->dd_airterminal(Count1).OAInletNodeNum == state.dataZoneEquip->SupplyAirPath(Count2).OutletNode(Count3))
+                        Found = Count3;
+                    if (state.dataDualDuct->dd_airterminal(Count1).RecircAirInletNodeNum ==
+                        state.dataZoneEquip->SupplyAirPath(Count2).OutletNode(Count3))
+                        Found = Count3;
                 }
                 if (Found != 0) break;
             }
@@ -2163,12 +2230,22 @@ namespace DualDuct {
                 Found = 0;
                 for (int Count3 = 1; Count3 <= state.dataAirLoop->AirToZoneNodeInfo(Count2).NumSupplyNodes; ++Count3) {
                     if (SupplyAirPathNum != 0) {
-                        if (state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).InletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3)) Found = Count3;
+                        if (state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).InletNodeNum ==
+                            state.dataAirLoop->AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3))
+                            Found = Count3;
                     } else {
-                        if (dd_airterminal(Count1).HotAirInletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3)) Found = Count3;
-                        if (dd_airterminal(Count1).ColdAirInletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3)) Found = Count3;
-                        if (dd_airterminal(Count1).OAInletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3)) Found = Count3;
-                        if (dd_airterminal(Count1).RecircAirInletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3)) Found = Count3;
+                        if (state.dataDualDuct->dd_airterminal(Count1).HotAirInletNodeNum ==
+                            state.dataAirLoop->AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3))
+                            Found = Count3;
+                        if (state.dataDualDuct->dd_airterminal(Count1).ColdAirInletNodeNum ==
+                            state.dataAirLoop->AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3))
+                            Found = Count3;
+                        if (state.dataDualDuct->dd_airterminal(Count1).OAInletNodeNum ==
+                            state.dataAirLoop->AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3))
+                            Found = Count3;
+                        if (state.dataDualDuct->dd_airterminal(Count1).RecircAirInletNodeNum ==
+                            state.dataAirLoop->AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3))
+                            Found = Count3;
                     }
                 }
                 if (Found != 0) break;
@@ -2176,51 +2253,52 @@ namespace DualDuct {
             if (Found == 0) ChrName = "**Unknown**";
 
             std::string DamperType;
-            if (dd_airterminal(Count1).DamperType == DualDuct_ConstantVolume) {
-                DamperType = cCMO_DDConstantVolume;
-            } else if (dd_airterminal(Count1).DamperType == DualDuct_VariableVolume) {
-                DamperType = cCMO_DDVariableVolume;
-            } else if (dd_airterminal(Count1).DamperType == DualDuct_OutdoorAir) {
-                DamperType = cCMO_DDVarVolOA;
+            if (state.dataDualDuct->dd_airterminal(Count1).DamperType == DualDuctDamper::ConstantVolume) {
+                DamperType = state.dataDualDuct->cCMO_DDConstantVolume;
+            } else if (state.dataDualDuct->dd_airterminal(Count1).DamperType == DualDuctDamper::VariableVolume) {
+                DamperType = state.dataDualDuct->cCMO_DDVariableVolume;
+            } else if (state.dataDualDuct->dd_airterminal(Count1).DamperType == DualDuctDamper::OutdoorAir) {
+                DamperType = state.dataDualDuct->cCMO_DDVarVolOA;
             } else {
                 DamperType = "Invalid/Unknown";
             }
 
-            if ((dd_airterminal(Count1).DamperType == DualDuct_ConstantVolume) || (dd_airterminal(Count1).DamperType == DualDuct_VariableVolume)) {
+            if ((state.dataDualDuct->dd_airterminal(Count1).DamperType == DualDuctDamper::ConstantVolume) ||
+                (state.dataDualDuct->dd_airterminal(Count1).DamperType == DualDuctDamper::VariableVolume)) {
                 print(state.files.bnd,
                       " Dual Duct Damper,{},{},{},{},{},Hot Air,{}\n",
                       Count1,
                       DamperType,
-                      dd_airterminal(Count1).Name,
-                      NodeID(dd_airterminal(Count1).HotAirInletNodeNum),
-                      NodeID(dd_airterminal(Count1).OutletNodeNum),
+                      state.dataDualDuct->dd_airterminal(Count1).Name,
+                      state.dataLoopNodes->NodeID(state.dataDualDuct->dd_airterminal(Count1).HotAirInletNodeNum),
+                      state.dataLoopNodes->NodeID(state.dataDualDuct->dd_airterminal(Count1).OutletNodeNum),
                       ChrName);
 
                 print(state.files.bnd,
                       " Dual Duct Damper,{},{},{},{},{},Cold Air,{}\n",
                       Count1,
                       DamperType,
-                      dd_airterminal(Count1).Name,
-                      NodeID(dd_airterminal(Count1).ColdAirInletNodeNum),
-                      NodeID(dd_airterminal(Count1).OutletNodeNum),
+                      state.dataDualDuct->dd_airterminal(Count1).Name,
+                      state.dataLoopNodes->NodeID(state.dataDualDuct->dd_airterminal(Count1).ColdAirInletNodeNum),
+                      state.dataLoopNodes->NodeID(state.dataDualDuct->dd_airterminal(Count1).OutletNodeNum),
                       ChrName);
 
-            } else if (dd_airterminal(Count1).DamperType == DualDuct_OutdoorAir) {
+            } else if (state.dataDualDuct->dd_airterminal(Count1).DamperType == DualDuctDamper::OutdoorAir) {
                 print(state.files.bnd,
                       "Dual Duct Damper, {},{},{},{},{},Outdoor Air,{}\n",
                       Count1,
                       DamperType,
-                      dd_airterminal(Count1).Name,
-                      NodeID(dd_airterminal(Count1).OAInletNodeNum),
-                      NodeID(dd_airterminal(Count1).OutletNodeNum),
+                      state.dataDualDuct->dd_airterminal(Count1).Name,
+                      state.dataLoopNodes->NodeID(state.dataDualDuct->dd_airterminal(Count1).OAInletNodeNum),
+                      state.dataLoopNodes->NodeID(state.dataDualDuct->dd_airterminal(Count1).OutletNodeNum),
                       ChrName);
                 print(state.files.bnd,
                       "Dual Duct Damper, {},{},{},{},{},Recirculated Air,{}\n",
                       Count1,
                       DamperType,
-                      dd_airterminal(Count1).Name,
-                      NodeID(dd_airterminal(Count1).RecircAirInletNodeNum),
-                      NodeID(dd_airterminal(Count1).OutletNodeNum),
+                      state.dataDualDuct->dd_airterminal(Count1).Name,
+                      state.dataLoopNodes->NodeID(state.dataDualDuct->dd_airterminal(Count1).RecircAirInletNodeNum),
+                      state.dataLoopNodes->NodeID(state.dataDualDuct->dd_airterminal(Count1).OutletNodeNum),
                       ChrName);
             }
         }
@@ -2228,7 +2306,7 @@ namespace DualDuct {
 
     void GetDualDuctOutdoorAirRecircUse(EnergyPlusData &state,
                                         [[maybe_unused]] std::string const &CompTypeName,
-                                        std::string const &CompName,
+                                        std::string_view CompName,
                                         bool &RecircIsUsed)
     {
 
@@ -2242,16 +2320,9 @@ namespace DualDuct {
         // get routine to learn if a dual duct outdoor air unit is using its recirc deck
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D_bool RecircIsUsedARR;
-        static Array1D_string DamperNamesARR;
         int DamperIndex;                 // Loop index to Damper that you are currently loading input into
         std::string CurrentModuleObject; // for ease in getting objects
-        static Array1D<Real64> NumArray(2, 0.0);
-        static Array1D_string AlphArray(7);
-        static Array1D_string cAlphaFields(7);       // Alpha field names
-        static Array1D_string cNumericFields(2);     // Numeric field names
-        static Array1D_bool lAlphaBlanks(7, true);   // Logical array, alpha field input BLANK = .TRUE.
-        static Array1D_bool lNumericBlanks(2, true); // Logical array, numeric field input BLANK = .TRUE.
+
         int NumAlphas;
         int NumNums;
         int IOStat;
@@ -2264,41 +2335,48 @@ namespace DualDuct {
         //    GetDualDuctInputFlag=.FALSE.
         //  END IF
 
-        if (GetDualDuctOutdoorAirRecircUseFirstTimeOnly) {
-            NumDualDuctVarVolOA = inputProcessor->getNumObjectsFound(state, cCMO_DDVarVolOA);
-            RecircIsUsedARR.allocate(NumDualDuctVarVolOA);
-            DamperNamesARR.allocate(NumDualDuctVarVolOA);
-            if (NumDualDuctVarVolOA > 0) {
-                for (DamperIndex = 1; DamperIndex <= NumDualDuctVarVolOA; ++DamperIndex) {
+        if (state.dataDualDuct->GetDualDuctOutdoorAirRecircUseFirstTimeOnly) {
+            state.dataDualDuct->NumDualDuctVarVolOA =
+                state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataDualDuct->cCMO_DDVarVolOA);
+            state.dataDualDuct->RecircIsUsedARR.allocate(state.dataDualDuct->NumDualDuctVarVolOA);
+            state.dataDualDuct->DamperNamesARR.allocate(state.dataDualDuct->NumDualDuctVarVolOA);
+            if (state.dataDualDuct->NumDualDuctVarVolOA > 0) {
+                Array1D<Real64> NumArray(2, 0.0);
+                Array1D_string AlphArray(7);
+                Array1D_string cAlphaFields(7);       // Alpha field names
+                Array1D_string cNumericFields(2);     // Numeric field names
+                Array1D_bool lAlphaBlanks(7, true);   // Logical array, alpha field input BLANK = .TRUE.
+                Array1D_bool lNumericBlanks(2, true); // Logical array, numeric field input BLANK = .TRUE.
+                for (DamperIndex = 1; DamperIndex <= state.dataDualDuct->NumDualDuctVarVolOA; ++DamperIndex) {
 
-                    CurrentModuleObject = cCMO_DDVarVolOA;
+                    CurrentModuleObject = state.dataDualDuct->cCMO_DDVarVolOA;
 
-                    inputProcessor->getObjectItem(state,
-                                                  CurrentModuleObject,
-                                                  DamperIndex,
-                                                  AlphArray,
-                                                  NumAlphas,
-                                                  NumArray,
-                                                  NumNums,
-                                                  IOStat,
-                                                  lNumericBlanks,
-                                                  lAlphaBlanks,
-                                                  cAlphaFields,
-                                                  cNumericFields);
-                    DamperNamesARR(DamperIndex) = AlphArray(1);
+                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                             CurrentModuleObject,
+                                                                             DamperIndex,
+                                                                             AlphArray,
+                                                                             NumAlphas,
+                                                                             NumArray,
+                                                                             NumNums,
+                                                                             IOStat,
+                                                                             lNumericBlanks,
+                                                                             lAlphaBlanks,
+                                                                             cAlphaFields,
+                                                                             cNumericFields);
+                    state.dataDualDuct->DamperNamesARR(DamperIndex) = AlphArray(1);
                     if (!lAlphaBlanks(5)) {
-                        RecircIsUsedARR(DamperIndex) = true;
+                        state.dataDualDuct->RecircIsUsedARR(DamperIndex) = true;
                     } else {
-                        RecircIsUsedARR(DamperIndex) = false;
+                        state.dataDualDuct->RecircIsUsedARR(DamperIndex) = false;
                     }
                 }
             }
-            GetDualDuctOutdoorAirRecircUseFirstTimeOnly = false;
+            state.dataDualDuct->GetDualDuctOutdoorAirRecircUseFirstTimeOnly = false;
         }
 
-        DamperIndex = UtilityRoutines::FindItemInList(CompName, DamperNamesARR, NumDualDuctVarVolOA);
+        DamperIndex = UtilityRoutines::FindItemInList(CompName, state.dataDualDuct->DamperNamesARR, state.dataDualDuct->NumDualDuctVarVolOA);
         if (DamperIndex > 0) {
-            RecircIsUsed = RecircIsUsedARR(DamperIndex);
+            RecircIsUsed = state.dataDualDuct->RecircIsUsedARR(DamperIndex);
         }
     }
 
@@ -2306,7 +2384,8 @@ namespace DualDuct {
     {
         // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
         if (this->AirLoopNum > 0) {
-            this->OutdoorAirFlowRate = (this->dd_airterminalOutlet.AirMassFlowRate / state.dataEnvrn->StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
+            this->OutdoorAirFlowRate =
+                (this->dd_airterminalOutlet.AirMassFlowRate / state.dataEnvrn->StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
         } else {
             // do nothing for now
         }

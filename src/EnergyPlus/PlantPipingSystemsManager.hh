@@ -84,18 +84,21 @@ namespace PlantPipingSystemsManager {
     // Using/Aliasing
     using namespace GroundTemperatureManager;
 
-    enum class SegmentFlow {
+    enum class SegmentFlow
+    {
         IncreasingZ,
         DecreasingZ
     };
 
-    enum class MeshDistribution {
+    enum class MeshDistribution
+    {
         Uniform,
         SymmetricGeometric,
         Geometric
     };
 
-    enum class RegionType {
+    enum class RegionType
+    {
         Pipe,
         BasementWall,
         BasementFloor,
@@ -113,7 +116,8 @@ namespace PlantPipingSystemsManager {
         VertInsLowerEdge
     };
 
-    enum class Direction {
+    enum class Direction
+    {
         PositiveY,
         NegativeY,
         PositiveX,
@@ -122,7 +126,8 @@ namespace PlantPipingSystemsManager {
         NegativeZ
     };
 
-    enum class PartitionType {
+    enum class PartitionType
+    {
         BasementWall,
         BasementFloor,
         Pipe,
@@ -138,7 +143,8 @@ namespace PlantPipingSystemsManager {
         HorizInsZSide
     };
 
-    enum class CellType {
+    enum class CellType
+    {
         Unknown,
         Pipe,
         GeneralField,
@@ -154,7 +160,8 @@ namespace PlantPipingSystemsManager {
         ZoneGroundInterface
     };
 
-    struct BaseThermalPropertySet {
+    struct BaseThermalPropertySet
+    {
         // Members
         Real64 Conductivity = 0.0; // W/mK
         Real64 Density = 0.0;      // kg/m3
@@ -163,22 +170,24 @@ namespace PlantPipingSystemsManager {
         // Default Constructor
         BaseThermalPropertySet() = default;
 
-        Real64 inline diffusivity() const {
+        Real64 inline diffusivity() const
+        {
             return this->Conductivity / (this->Density * this->SpecificHeat);
         }
     };
 
-    struct ExtendedFluidProperties : BaseThermalPropertySet {
+    struct ExtendedFluidProperties : BaseThermalPropertySet
+    {
         // Members
         Real64 Viscosity = 0.0; // kg/m-s
         Real64 Prandtl = 0.0;   // -
 
         // Default Constructor
         ExtendedFluidProperties() = default;
-
     };
 
-    struct BaseCell {
+    struct BaseCell
+    {
         // Members
         Real64 Temperature = 0.0;               // C
         Real64 Temperature_PrevIteration = 0.0; // C
@@ -190,7 +199,8 @@ namespace PlantPipingSystemsManager {
         BaseCell() = default;
     };
 
-    struct RadialSizing {
+    struct RadialSizing
+    {
         // Members
         Real64 InnerDia = 0.0;
         Real64 OuterDia = 0.0;
@@ -198,12 +208,14 @@ namespace PlantPipingSystemsManager {
         // Default Constructor
         RadialSizing() = default;
 
-        Real64 inline thickness() const {
+        Real64 inline thickness() const
+        {
             return (this->OuterDia - this->InnerDia) / 2.0;
         }
     };
 
-    struct RadialCellInformation : BaseCell {
+    struct RadialCellInformation : BaseCell
+    {
         // Members
         Real64 RadialCentroid = 0.0;
         Real64 InnerRadius = 0.0;
@@ -213,19 +225,22 @@ namespace PlantPipingSystemsManager {
         RadialCellInformation() = default;
 
         // Member Constructor
-        RadialCellInformation(Real64 const m_RadialCentroid, Real64 const m_MinRadius, Real64 const m_MaxRadius) {
+        RadialCellInformation(Real64 const m_RadialCentroid, Real64 const m_MinRadius, Real64 const m_MaxRadius)
+        {
             RadialCentroid = m_RadialCentroid;
             InnerRadius = m_MinRadius;
             OuterRadius = m_MaxRadius;
         }
 
         // Get the XY cross sectional area of the radial cell
-        Real64 inline XY_CrossSectArea() const {
+        Real64 inline XY_CrossSectArea() const
+        {
             return DataGlobalConstants::Pi * (pow_2(this->OuterRadius) - pow_2(this->InnerRadius));
         }
     };
 
-    struct FluidCellInformation : BaseCell {
+    struct FluidCellInformation : BaseCell
+    {
         // Members
         Real64 Volume = 0.0;
         ExtendedFluidProperties Properties;
@@ -234,7 +249,8 @@ namespace PlantPipingSystemsManager {
         FluidCellInformation() = default;
 
         // Member Constructor
-        FluidCellInformation(Real64 const m_PipeInnerRadius, Real64 const m_CellDepth) {
+        FluidCellInformation(Real64 const m_PipeInnerRadius, Real64 const m_CellDepth)
+        {
             this->Volume = DataGlobalConstants::Pi * pow_2(m_PipeInnerRadius) * m_CellDepth;
         }
     };
@@ -253,15 +269,16 @@ namespace PlantPipingSystemsManager {
         CartesianPipeCellInformation() = default;
 
         CartesianPipeCellInformation(Real64 GridCellWidth,
-                         RadialSizing const &PipeSizes,
-                         int NumRadialNodes,
-                         Real64 CellDepth,
-                         Real64 InsulationThickness,
-                         Real64 RadialGridExtent,
-                         bool SimHasInsulation);
+                                     RadialSizing const &PipeSizes,
+                                     int NumRadialNodes,
+                                     Real64 CellDepth,
+                                     Real64 InsulationThickness,
+                                     Real64 RadialGridExtent,
+                                     bool SimHasInsulation);
     };
 
-    struct Point {
+    struct Point
+    {
         // Members
         int X = 0;
         int Y = 0;
@@ -270,11 +287,13 @@ namespace PlantPipingSystemsManager {
         Point() = default;
 
         // Member Constructor
-        Point(int const X, int const Y) : X(X), Y(Y) {
+        Point(int const X, int const Y) : X(X), Y(Y)
+        {
         }
     };
 
-    struct PointF {
+    struct PointF
+    {
         // Members
         Real64 X = 0.0;
         Real64 Y = 0.0;
@@ -283,11 +302,13 @@ namespace PlantPipingSystemsManager {
         PointF() = default;
 
         // Member Constructor
-        PointF(Real64 const X, Real64 const Y) : X(X), Y(Y) {
+        PointF(Real64 const X, Real64 const Y) : X(X), Y(Y)
+        {
         }
     };
 
-    struct Point3DInteger {
+    struct Point3DInteger
+    {
         // Members
         int X = 0;
         int Y = 0;
@@ -297,11 +318,13 @@ namespace PlantPipingSystemsManager {
         Point3DInteger() = default;
 
         // Member Constructor
-        Point3DInteger(int const X, int const Y, int const Z) : X(X), Y(Y), Z(Z) {
+        Point3DInteger(int const X, int const Y, int const Z) : X(X), Y(Y), Z(Z)
+        {
         }
     };
 
-    struct Point3DReal {
+    struct Point3DReal
+    {
         // Members
         Real64 X = 0.0;
         Real64 Y = 0.0;
@@ -311,11 +334,13 @@ namespace PlantPipingSystemsManager {
         Point3DReal() = default;
 
         // Member Constructor
-        Point3DReal(Real64 const X, Real64 const Y, Real64 const Z) : X(X), Y(Y), Z(Z) {
+        Point3DReal(Real64 const X, Real64 const Y, Real64 const Z) : X(X), Y(Y), Z(Z)
+        {
         }
     };
 
-    struct MeshPartition {
+    struct MeshPartition
+    {
         // Members
         Real64 rDimension = 0.0;
         PartitionType partitionType = PartitionType::Pipe;
@@ -330,18 +355,20 @@ namespace PlantPipingSystemsManager {
         MeshPartition(Real64 const rDimension,
                       PartitionType const partitionType, // From Enum: ParitionType
                       Real64 const TotalWidth)
-                : rDimension(rDimension), partitionType(partitionType), TotalWidth(TotalWidth) {
+            : rDimension(rDimension), partitionType(partitionType), TotalWidth(TotalWidth)
+        {
         }
 #pragma clang diagnostic pop
 
         // used to allow std::find to see if a MeshPartition matches a float (rDimension) value
-        bool operator==(Real64 a) {
+        bool operator==(Real64 a)
+        {
             return this->rDimension == a;
         }
-
     };
 
-    struct GridRegion {
+    struct GridRegion
+    {
         // Members
         Real64 Min = 0.0;
         Real64 Max = 0.0;
@@ -353,11 +380,13 @@ namespace PlantPipingSystemsManager {
 
         // Member Constructor
         GridRegion(Real64 Min, Real64 Max, RegionType thisRegionType, std::vector<Real64> CellWidths)
-                : Min(Min), Max(Max), thisRegionType(thisRegionType), CellWidths(std::move(CellWidths)) {
+            : Min(Min), Max(Max), thisRegionType(thisRegionType), CellWidths(std::move(CellWidths))
+        {
         }
     };
 
-    struct RectangleF {
+    struct RectangleF
+    {
         // Members
         Real64 X_min = 0.0;
         Real64 Y_min = 0.0;
@@ -369,16 +398,18 @@ namespace PlantPipingSystemsManager {
 
         // Member Constructor
         RectangleF(Real64 const X_min, Real64 const Y_min, Real64 const Width, Real64 const Height)
-                : X_min(X_min), Y_min(Y_min), Width(Width), Height(Height) {
+            : X_min(X_min), Y_min(Y_min), Width(Width), Height(Height)
+        {
         }
 
-        bool inline contains(PointF const &p) const {
-            return ((this->X_min <= p.X) && (p.X < (this->X_min + this->Width)) && (this->Y_min <= p.Y) &&
-                    (p.Y < (this->Y_min + this->Height)));
+        bool inline contains(PointF const &p) const
+        {
+            return ((this->X_min <= p.X) && (p.X < (this->X_min + this->Width)) && (this->Y_min <= p.Y) && (p.Y < (this->Y_min + this->Height)));
         }
     };
 
-    struct NeighborInformation {
+    struct NeighborInformation
+    {
         // Members
         Real64 ThisCentroidToNeighborWall = 0.0;
         Real64 ThisWallToNeighborCentroid = 0.0;
@@ -389,7 +420,8 @@ namespace PlantPipingSystemsManager {
         NeighborInformation() = default;
     };
 
-    struct CartesianCell : BaseCell {
+    struct CartesianCell : BaseCell
+    {
         // Members
         int X_index = 0;
         int Y_index = 0;
@@ -408,41 +440,48 @@ namespace PlantPipingSystemsManager {
         // Default Constructor
         CartesianCell() = default;
 
-        Real64 inline width() const {
+        Real64 inline width() const
+        {
             return this->X_max - this->X_min;
         }
 
-        Real64 inline height() const {
+        Real64 inline height() const
+        {
             return this->Y_max - this->Y_min;
         }
 
-        Real64 inline depth() const {
+        Real64 inline depth() const
+        {
             return this->Z_max - this->Z_min;
         }
 
-        Real64 inline XNormalArea() const {
+        Real64 inline XNormalArea() const
+        {
             return this->depth() * this->height();
         }
 
-        Real64 inline YNormalArea() const {
+        Real64 inline YNormalArea() const
+        {
             return this->depth() * this->width();
         }
 
-        Real64 inline ZNormalArea() const {
+        Real64 inline ZNormalArea() const
+        {
             return this->width() * this->height();
         }
 
-        Real64 inline volume() const {
+        Real64 inline volume() const
+        {
             return this->width() * this->depth() * this->height();
         }
 
         Real64 normalArea(Direction direction) const;
 
         void EvaluateNeighborCoordinates(Direction CurDirection, int &NX, int &NY, int &NZ);
-
     };
 
-    struct MeshExtents {
+    struct MeshExtents
+    {
         // Members
         Real64 xMax = 0.0;
         Real64 yMax = 0.0;
@@ -452,24 +491,27 @@ namespace PlantPipingSystemsManager {
         MeshExtents() = default;
 
         // Member Constructor
-        MeshExtents(Real64 const xMax, Real64 const yMax, Real64 const zMax) : xMax(xMax), yMax(yMax), zMax(zMax) {
+        MeshExtents(Real64 const xMax, Real64 const yMax, Real64 const zMax) : xMax(xMax), yMax(yMax), zMax(zMax)
+        {
         }
     };
 
-    struct CellExtents : MeshExtents {
+    struct CellExtents : MeshExtents
+    {
         // Members
         Real64 Xmin;
         Real64 Ymin;
         Real64 Zmin;
 
         // Member Constructor
-        CellExtents(Real64 const Xmax, Real64 const Ymax, Real64 const Zmax, Real64 const Xmin,
-                     Real64 const Ymin, Real64 const Zmin)
-                : MeshExtents(Xmax, Ymax, Zmax), Xmin(Xmin), Ymin(Ymin), Zmin(Zmin) {
+        CellExtents(Real64 const Xmax, Real64 const Ymax, Real64 const Zmax, Real64 const Xmin, Real64 const Ymin, Real64 const Zmin)
+            : MeshExtents(Xmax, Ymax, Zmax), Xmin(Xmin), Ymin(Ymin), Zmin(Zmin)
+        {
         }
     };
 
-    struct DistributionStructure {
+    struct DistributionStructure
+    {
         // Members
         MeshDistribution thisMeshDistribution = MeshDistribution::Uniform;
         int RegionMeshCount = 0;
@@ -479,7 +521,8 @@ namespace PlantPipingSystemsManager {
         DistributionStructure() = default;
     };
 
-    struct MeshProperties {
+    struct MeshProperties
+    {
         // Members
         DistributionStructure X;
         DistributionStructure Y;
@@ -489,7 +532,8 @@ namespace PlantPipingSystemsManager {
         MeshProperties() = default;
     };
 
-    struct SimulationControl {
+    struct SimulationControl
+    {
         // Members
         Real64 MinimumTemperatureLimit = -1000;
         Real64 MaximumTemperatureLimit = 1000;
@@ -500,7 +544,8 @@ namespace PlantPipingSystemsManager {
         SimulationControl() = default;
     };
 
-    struct BasementZoneInfo {
+    struct BasementZoneInfo
+    {
         // Members
         Real64 Depth = 0;  // m
         Real64 Width = 0;  // m
@@ -519,7 +564,8 @@ namespace PlantPipingSystemsManager {
         BasementZoneInfo() = default;
     };
 
-    struct MeshPartitions {
+    struct MeshPartitions
+    {
         // Members
         std::vector<MeshPartition> X;
         std::vector<MeshPartition> Y;
@@ -529,7 +575,8 @@ namespace PlantPipingSystemsManager {
         MeshPartitions() = default;
     };
 
-    struct MoistureInfo {
+    struct MoistureInfo
+    {
         // Members
         Real64 Theta_liq = 0.3; // volumetric moisture content of the soil
         Real64 Theta_sat = 0.5; // volumetric moisture content of soil at saturation
@@ -543,7 +590,8 @@ namespace PlantPipingSystemsManager {
         MoistureInfo() = default;
     };
 
-    struct CurSimConditionsInfo {
+    struct CurSimConditionsInfo
+    {
         // Members
         // Simulation conditions
         Real64 PrevSimTimeSeconds = -1.0;
@@ -559,7 +607,8 @@ namespace PlantPipingSystemsManager {
         CurSimConditionsInfo() = default;
     };
 
-    struct Segment {
+    struct Segment
+    {
         // Members
         // ID
         std::string Name;
@@ -581,14 +630,16 @@ namespace PlantPipingSystemsManager {
 
         void initPipeCells(int x, int y);
 
-        bool operator==(std::string const & a) {
+        bool operator==(std::string const &a)
+        {
             return this->Name == a;
         }
 
         static Segment *factory(EnergyPlusData &state, std::string segmentName);
     };
 
-    struct Circuit : public PlantComponent {
+    struct Circuit : public PlantComponent
+    {
 
         // Members
         // ID
@@ -643,17 +694,24 @@ namespace PlantPipingSystemsManager {
 
         static PlantComponent *factory(EnergyPlusData &state, int, std::string objectName);
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
                       bool RunFlag) override;
 
-        bool operator==(std::string const & a) {
+        bool operator==(std::string const &a)
+        {
             return this->Name == a;
         }
 
-        static Circuit *factory(EnergyPlusData &state, std::string circuit, bool & errorsFound);
+        static Circuit *factory(EnergyPlusData &state, std::string circuit, bool &errorsFound);
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
-    struct ZoneCoupledSurfaceData {
+    struct ZoneCoupledSurfaceData
+    {
         // Members
         // ID
         std::string Name;
@@ -671,13 +729,14 @@ namespace PlantPipingSystemsManager {
 
         // Default Constructor
         ZoneCoupledSurfaceData()
-                : IndexInSurfaceArray(0), SurfaceArea(0.0), Width(0.0), Length(0.0), Depth(0.0), Conductivity(0.0),
-                  Density(0.0),
-                  InsulationConductivity(0.0), InsulationDensity(0.0), Zone(0) {
+            : IndexInSurfaceArray(0), SurfaceArea(0.0), Width(0.0), Length(0.0), Depth(0.0), Conductivity(0.0), Density(0.0),
+              InsulationConductivity(0.0), InsulationDensity(0.0), Zone(0)
+        {
         }
     };
 
-    struct Domain {
+    struct Domain
+    {
         // Members
         // ID
         std::string Name;
@@ -778,26 +837,18 @@ namespace PlantPipingSystemsManager {
 
         // Default Constructor
         Domain()
-                : MaxIterationsPerTS(10), OneTimeInit(true), BeginSimInit(true), BeginSimEnvironment(true),
-                  DomainNeedsSimulation(true),
-                  DomainNeedsToBeMeshed(true), IsActuallyPartOfAHorizontalTrench(false), HasAPipeCircuit(true),
-                  HasZoneCoupledSlab(false),
-                  HasZoneCoupledBasement(false), HasBasement(false), ZoneCoupledOSCMIndex(0), PerimeterOffset(0.0),
-                  SlabInGradeFlag(false),
-                  SlabMaterialNum(0), SlabArea(0.0), SlabWidth(0.0), SlabLength(0.0), SlabThickness(0.0), XIndex(0),
-                  YIndex(0), ZIndex(0), x_max_index(0),
-                  y_max_index(0), z_max_index(0), HorizInsPresentFlag(false), HorizInsMaterialNum(0),
-                  HorizInsThickness(0.0254), HorizInsWidth(0.0),
-                  HeatFlux(0.0), WallHeatFlux(0.0), FloorHeatFlux(0.0), AggregateHeatFlux(0.0),
-                  AggregateWallHeatFlux(0.0), AggregateFloorHeatFlux(0.0),
-                  NumHeatFlux(0), ResetHeatFluxFlag(true), ConvectionCoefficient(0.0), FullHorizInsPresent(false),
-                  VertInsPresentFlag(false), VertInsMaterialNum(0),
-                  VertInsThickness(0.0254), VertInsDepth(0.0), XWallIndex(0), YFloorIndex(0), ZWallIndex(0),
-                  InsulationXIndex(0), InsulationYIndex(0),
-                  InsulationZIndex(0), SimTimeStepFlag(false), SimHourlyFlag(false), SimDailyFlag(false),
-                  ZoneCoupledSurfaceTemp(0.0),
-                  BasementWallTemp(0.0), BasementFloorTemp(0.0), NumDomainCells(0), NumGroundSurfCells(0),
-                  NumInsulationCells(0), NumSlabCells(0) {
+            : MaxIterationsPerTS(10), OneTimeInit(true), BeginSimInit(true), BeginSimEnvironment(true), DomainNeedsSimulation(true),
+              DomainNeedsToBeMeshed(true), IsActuallyPartOfAHorizontalTrench(false), HasAPipeCircuit(true), HasZoneCoupledSlab(false),
+              HasZoneCoupledBasement(false), HasBasement(false), ZoneCoupledOSCMIndex(0), PerimeterOffset(0.0), SlabInGradeFlag(false),
+              SlabMaterialNum(0), SlabArea(0.0), SlabWidth(0.0), SlabLength(0.0), SlabThickness(0.0), XIndex(0), YIndex(0), ZIndex(0), x_max_index(0),
+              y_max_index(0), z_max_index(0), HorizInsPresentFlag(false), HorizInsMaterialNum(0), HorizInsThickness(0.0254), HorizInsWidth(0.0),
+              HeatFlux(0.0), WallHeatFlux(0.0), FloorHeatFlux(0.0), AggregateHeatFlux(0.0), AggregateWallHeatFlux(0.0), AggregateFloorHeatFlux(0.0),
+              NumHeatFlux(0), ResetHeatFluxFlag(true), ConvectionCoefficient(0.0), FullHorizInsPresent(false), VertInsPresentFlag(false),
+              VertInsMaterialNum(0), VertInsThickness(0.0254), VertInsDepth(0.0), XWallIndex(0), YFloorIndex(0), ZWallIndex(0), InsulationXIndex(0),
+              InsulationYIndex(0), InsulationZIndex(0), SimTimeStepFlag(false), SimHourlyFlag(false), SimDailyFlag(false),
+              ZoneCoupledSurfaceTemp(0.0), BasementWallTemp(0.0), BasementFloorTemp(0.0), NumDomainCells(0), NumGroundSurfCells(0),
+              NumInsulationCells(0), NumSlabCells(0)
+        {
             NeighborFieldCells.resize(6);
             NeighborBoundaryCells.resize(6);
         }
@@ -806,7 +857,8 @@ namespace PlantPipingSystemsManager {
 
         void createPartitionCenterList(EnergyPlusData &state);
 
-        std::vector<GridRegion> createPartitionRegionList(EnergyPlusData &state, std::vector<MeshPartition> const &ThesePartitionCenters,
+        std::vector<GridRegion> createPartitionRegionList(EnergyPlusData &state,
+                                                          std::vector<MeshPartition> const &ThesePartitionCenters,
                                                           bool PartitionsExist,
                                                           Real64 DirExtentMax);
 
@@ -827,7 +879,8 @@ namespace PlantPipingSystemsManager {
                               Optional_int ZWallIndex = _,
                               Optional_int InsulationZIndex = _);
 
-        void createCellArray(std::vector<Real64> const &XBoundaryPoints, std::vector<Real64> const &YBoundaryPoints,
+        void createCellArray(std::vector<Real64> const &XBoundaryPoints,
+                             std::vector<Real64> const &YBoundaryPoints,
                              std::vector<Real64> const &ZBoundaryPoints);
 
         void setupCellNeighbors();
@@ -846,13 +899,13 @@ namespace PlantPipingSystemsManager {
                                     Real64 ThisWallToNeighborCentroid,
                                     Real64 ThisAdiabaticMultiplier);
 
-        Real64 GetBasementWallHeatFlux();
+        Real64 GetBasementWallHeatFlux(EnergyPlusData &state);
 
-        Real64 GetBasementFloorHeatFlux();
+        Real64 GetBasementFloorHeatFlux(EnergyPlusData &state);
 
         void UpdateBasementSurfaceTemperatures(EnergyPlusData &state);
 
-        Real64 GetZoneInterfaceHeatFlux();
+        Real64 GetZoneInterfaceHeatFlux(EnergyPlusData &state);
 
         void UpdateZoneSurfaceTemperatures(EnergyPlusData &state);
 
@@ -870,30 +923,26 @@ namespace PlantPipingSystemsManager {
 
         bool CheckForOutOfRangeTemps();
 
-        void EvaluateNeighborCharacteristics(CartesianCell &ThisCell,
-                                             Direction CurDirection,
-                                             Real64 &NeighborTemp,
-                                             Real64 &Resistance,
-                                             Real64 &AdiabaticMultiplier);
+        void EvaluateNeighborCharacteristics(
+            CartesianCell &ThisCell, Direction CurDirection, Real64 &NeighborTemp, Real64 &Resistance, Real64 &AdiabaticMultiplier);
 
         void EvaluateCellNeighborDirections(CartesianCell const &cell, int &NumFieldCells, int &NumBoundaryCells);
 
         void DoEndOfIterationOperations(EnergyPlusData &state, bool &Finished);
 
-        void DoOneTimeInitializations(EnergyPlusData &state, Circuit * thisCircuit);
+        void DoOneTimeInitializations(EnergyPlusData &state, Circuit *thisCircuit);
 
         void DoStartOfTimeStepInitializations(EnergyPlusData &state);
 
-        void DoStartOfTimeStepInitializations(EnergyPlusData &state, Circuit * thisCircuit);
+        void DoStartOfTimeStepInitializations(EnergyPlusData &state, Circuit *thisCircuit);
 
         Real64 GetFarfieldTemp(EnergyPlusData &state, CartesianCell const &cell);
 
-        void PreparePipeCircuitSimulation(Circuit * thisCircuit);
+        void PreparePipeCircuitSimulation(Circuit *thisCircuit);
 
-        void PerformPipeCircuitSimulation(EnergyPlusData &state, Circuit * thisCircuit);
+        void PerformPipeCircuitSimulation(EnergyPlusData &state, Circuit *thisCircuit);
 
-        void
-        PerformPipeCellSimulation(Circuit * thisCircuit, CartesianCell &ThisCell, Real64 FlowRate, Real64 EnteringTemp);
+        void PerformPipeCellSimulation(Circuit *thisCircuit, CartesianCell &ThisCell, Real64 FlowRate, Real64 EnteringTemp);
 
         void SimulateRadialToCartesianInterface(CartesianCell &ThisCell);
 
@@ -903,25 +952,24 @@ namespace PlantPipingSystemsManager {
 
         Real64 EvaluateGroundSurfaceTemperature(EnergyPlusData &state, CartesianCell &cell);
 
-        Real64 EvaluateBasementCellTemperature(CartesianCell &cell);
+        Real64 EvaluateBasementCellTemperature(EnergyPlusData &state, CartesianCell &cell);
 
         Real64 EvaluateZoneInterfaceTemperature(CartesianCell &cell);
 
         Real64 EvaluateFarfieldBoundaryTemperature(EnergyPlusData &state, CartesianCell &cell);
 
-        void EvaluateFarfieldCharacteristics(EnergyPlusData &state, CartesianCell &cell, Direction direction, Real64 &neighbortemp,
-                                             Real64 &resistance, Real64 &adiabaticMultiplier);
+        void EvaluateFarfieldCharacteristics(
+            EnergyPlusData &state, CartesianCell &cell, Direction direction, Real64 &neighbortemp, Real64 &resistance, Real64 &adiabaticMultiplier);
 
         void PerformIterationLoop(EnergyPlusData &state);
 
-        void PerformIterationLoop(EnergyPlusData &state, Circuit * thisCircuit);
+        void PerformIterationLoop(EnergyPlusData &state, Circuit *thisCircuit);
 
-        void InitPipingSystems(EnergyPlusData &state, Circuit * thisCircuit);
+        void InitPipingSystems(EnergyPlusData &state, Circuit *thisCircuit);
 
-        void UpdatePipingSystems(Circuit * thisCircuit);
+        void UpdatePipingSystems(EnergyPlusData &state, Circuit *thisCircuit);
 
         void SetupZoneCoupledOutputVariables(EnergyPlusData &state);
-
     };
 
     void SimulateGroundDomains(EnergyPlusData &state, bool initOnly);
@@ -938,10 +986,10 @@ namespace PlantPipingSystemsManager {
 
     void ReadBasementInputs(EnergyPlusData &state, const int StartingDomainNumForBasement, const int NumBasements, bool &ErrorsFound);
 
-    bool SiteGroundDomainUsingNoMassMat(EnergyPlusData &state, Real64 const MaterialThickness,
-                                        int const MaterialNum);
+    bool SiteGroundDomainUsingNoMassMat(EnergyPlusData &state, Real64 const MaterialThickness, int const MaterialNum);
 
-    void SiteGroundDomainNoMassMatError(EnergyPlusData &state, std::string const &FieldName,
+    void SiteGroundDomainNoMassMatError(EnergyPlusData &state,
+                                        std::string_view FieldName,
                                         std::string const &UserInputField,
                                         std::string const &ObjectName);
 
@@ -956,58 +1004,62 @@ namespace PlantPipingSystemsManager {
 
     void SetupPipingSystemOutputVariables(EnergyPlusData &state);
 
-    void IssueSevereInputFieldError(EnergyPlusData &state, std::string const &RoutineName,
+    void IssueSevereInputFieldError(EnergyPlusData &state,
+                                    std::string_view const RoutineName,
                                     std::string const &ObjectName,
                                     std::string const &InstanceName,
-                                    std::string const &FieldName,
+                                    std::string_view FieldName,
                                     std::string const &FieldEntry,
                                     std::string const &Condition,
                                     bool &ErrorsFound);
 
-    void IssueSevereInputFieldError(EnergyPlusData &state, std::string const &RoutineName,
+    void IssueSevereInputFieldError(EnergyPlusData &state,
+                                    std::string_view const RoutineName,
                                     std::string const &ObjectName,
                                     std::string const &InstanceName,
-                                    std::string const &FieldName,
+                                    std::string_view FieldName,
                                     Real64 FieldEntry,
                                     std::string const &Condition,
                                     bool &ErrorsFound);
 
-    int GetSurfaceCountForOSCM(int OSCMIndex);
+    int GetSurfaceCountForOSCM(EnergyPlusData &state, int OSCMIndex);
 
-    std::vector<int> GetSurfaceIndecesForOSCM(int OSCMIndex);
+    std::vector<int> GetSurfaceIndecesForOSCM(EnergyPlusData &state, int OSCMIndex);
 
-    std::vector<ZoneCoupledSurfaceData> GetSurfaceDataForOSCM(int OSCMIndex);
+    std::vector<ZoneCoupledSurfaceData> GetSurfaceDataForOSCM(EnergyPlusData &state, int OSCMIndex);
 
-    bool inline IsInRangeReal(Real64 const r, Real64 const lower, Real64 const upper) {
+    bool inline IsInRangeReal(Real64 const r, Real64 const lower, Real64 const upper)
+    {
         return ((r >= lower) && (r <= upper));
     }
 
-    bool inline IsInRange_BasementModel(Real64 const r, Real64 const lower, Real64 const upper) {
+    bool inline IsInRange_BasementModel(Real64 const r, Real64 const lower, Real64 const upper)
+    {
         return ((r >= lower) && (r < upper));
     }
 
     void ShiftPipeTemperaturesForNewIteration(CartesianCell &ThisPipeCell);
 
-    std::vector<Real64>
-    CreateBoundaryList(std::vector<GridRegion> const &RegionList, Real64 DirExtentMax, RegionType DirDirection);
+    std::vector<Real64> CreateBoundaryList(std::vector<GridRegion> const &RegionList, Real64 DirExtentMax, RegionType DirDirection);
 
-    void SimulateOuterMostRadialSoilSlice(Circuit * thisCircuit, CartesianCell &ThisCell);
+    void SimulateOuterMostRadialSoilSlice(Circuit *thisCircuit, CartesianCell &ThisCell);
 
     void SimulateAllInteriorRadialSoilSlices(CartesianCell &ThisCell);
 
-    void SimulateInnerMostRadialSoilSlice(Circuit * thisCircuit, CartesianCell &ThisCell);
+    void SimulateInnerMostRadialSoilSlice(Circuit *thisCircuit, CartesianCell &ThisCell);
 
     void SimulateRadialInsulationCell(CartesianCell &ThisCell);
 
-    void SimulateRadialPipeCell(Circuit * thisCircuit, CartesianCell &ThisCell);
+    void SimulateRadialPipeCell(Circuit *thisCircuit, CartesianCell &ThisCell);
 
-    void SimulateFluidCell(Circuit * thisCircuit, CartesianCell &ThisCell, Real64 FlowRate, Real64 EnteringFluidTemp);
+    void SimulateFluidCell(Circuit *thisCircuit, CartesianCell &ThisCell, Real64 FlowRate, Real64 EnteringFluidTemp);
 
-    bool IsConverged_PipeCurrentToPrevIteration(Circuit * thisCircuit, CartesianCell const &CellToCheck);
+    bool IsConverged_PipeCurrentToPrevIteration(Circuit *thisCircuit, CartesianCell const &CellToCheck);
 
 } // namespace PlantPipingSystemsManager
 
-struct PlantPipingSysMgrData : BaseGlobalStruct {
+struct PlantPipingSysMgrData : BaseGlobalStruct
+{
 
     bool GetInputFlag = true;
     bool GetSegmentInputFlag = true;

@@ -1068,10 +1068,11 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
     OutputReportPredefined::SetPredefinedTables(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
-    OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-    OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
+    OutputProcessor::SetupTimePointers(
+        *state, OutputProcessor::SOVTimeStepType::Zone, state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+    OutputProcessor::SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, state->dataHVACGlobal->TimeStepSys);
     PlantManager::CheckIfAnyPlant(*state);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = true;
@@ -1115,7 +1116,8 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
                 state->dataGlobal->BeginHourFlag = true;
                 state->dataGlobal->EndHourFlag = false;
 
-                for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour; ++state->dataGlobal->TimeStep) {
+                for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour;
+                     ++state->dataGlobal->TimeStep) {
 
                     state->dataGlobal->BeginTimeStepFlag = true;
 
@@ -1158,7 +1160,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
 
     } // ... End environment loop.
 
-    EXPECT_NEAR(DataLoopNode::Node(4).Temp, 20.0, 0.01);
+    EXPECT_NEAR(state->dataLoopNodes->Node(4).Temp, 20.0, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
@@ -2159,10 +2161,11 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
     OutputReportPredefined::SetPredefinedTables(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
-    OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-    OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
+    OutputProcessor::SetupTimePointers(
+        *state, OutputProcessor::SOVTimeStepType::Zone, state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+    OutputProcessor::SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, state->dataHVACGlobal->TimeStepSys);
     PlantManager::CheckIfAnyPlant(*state);
-    createFacilityElectricPowerServiceObject();
+    createFacilityElectricPowerServiceObject(*state);
     BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = true;
@@ -2206,7 +2209,8 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
                 state->dataGlobal->BeginHourFlag = true;
                 state->dataGlobal->EndHourFlag = false;
 
-                for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour; ++state->dataGlobal->TimeStep) {
+                for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour;
+                     ++state->dataGlobal->TimeStep) {
 
                     state->dataGlobal->BeginTimeStepFlag = true;
 
@@ -2252,7 +2256,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
 
     // Index 4 corresponds to NodeNumOut of "TRANSFER SUPPLY OUTLET PIPE", which is a component of
     // "TRANSFER SUPPLY OUTLET BRANCH" in "TRANSFER SUPPLY BRANCHES" OF "TRANSFER LOOP" (part of PlantLoop data)
-    EXPECT_NEAR(DataLoopNode::Node(4).Temp, 20.0, 0.01);
+    EXPECT_NEAR(state->dataLoopNodes->Node(4).Temp, 20.0, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
@@ -2269,7 +2273,7 @@ TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
     state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
@@ -2282,24 +2286,24 @@ TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
     state->dataPlantHXFluidToFluid->FluidHX(1).AvailSchedNum = -1;
 
     // setup four plant nodes for HX
-    DataLoopNode::Node.allocate(4);
+    state->dataLoopNodes->Node.allocate(4);
     state->dataPlantHXFluidToFluid->FluidHX(1).SupplySideLoop.inletNodeNum = 1;
     state->dataPlantHXFluidToFluid->FluidHX(1).SupplySideLoop.outletNodeNum = 3;
-    DataLoopNode::Node(1).Temp = 18.0;
-    DataLoopNode::Node(1).MassFlowRateMaxAvail = 2.0;
-    DataLoopNode::Node(1).MassFlowRateMax = 2.0;
-    DataLoopNode::Node(3).MassFlowRateMaxAvail = 2.0;
-    DataLoopNode::Node(3).MassFlowRateMax = 2.0;
+    state->dataLoopNodes->Node(1).Temp = 18.0;
+    state->dataLoopNodes->Node(1).MassFlowRateMaxAvail = 2.0;
+    state->dataLoopNodes->Node(1).MassFlowRateMax = 2.0;
+    state->dataLoopNodes->Node(3).MassFlowRateMaxAvail = 2.0;
+    state->dataLoopNodes->Node(3).MassFlowRateMax = 2.0;
 
     state->dataPlantHXFluidToFluid->FluidHX(1).SupplySideLoop.InletTemp = 18.0;
 
     state->dataPlantHXFluidToFluid->FluidHX(1).DemandSideLoop.inletNodeNum = 2;
     state->dataPlantHXFluidToFluid->FluidHX(1).DemandSideLoop.outletNodeNum = 4;
-    DataLoopNode::Node(2).Temp = 19.0;
-    DataLoopNode::Node(2).MassFlowRateMaxAvail = 2.0;
-    DataLoopNode::Node(2).MassFlowRateMax = 2.0;
-    DataLoopNode::Node(4).MassFlowRateMaxAvail = 2.0;
-    DataLoopNode::Node(4).MassFlowRateMax = 2.0;
+    state->dataLoopNodes->Node(2).Temp = 19.0;
+    state->dataLoopNodes->Node(2).MassFlowRateMaxAvail = 2.0;
+    state->dataLoopNodes->Node(2).MassFlowRateMax = 2.0;
+    state->dataLoopNodes->Node(4).MassFlowRateMaxAvail = 2.0;
+    state->dataLoopNodes->Node(4).MassFlowRateMax = 2.0;
     state->dataPlantHXFluidToFluid->FluidHX(1).DemandSideLoop.InletTemp = 19.0;
 
     state->dataPlantHXFluidToFluid->FluidHX(1).ControlMode = PlantHeatExchangerFluidToFluid::iCtrlType::CoolingDifferentialOnOff;
@@ -2349,12 +2353,12 @@ TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
     bool testFirstHVACIteration = true;
     state->dataPlantHXFluidToFluid->FluidHX(1).control(*state, 1, -1000.0, testFirstHVACIteration);
 
-    EXPECT_NEAR(DataLoopNode::Node(2).MassFlowRate, state->dataPlantHXFluidToFluid->FluidHX(1).DemandSideLoop.MassFlowRateMax, 0.001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(2).MassFlowRate, state->dataPlantHXFluidToFluid->FluidHX(1).DemandSideLoop.MassFlowRateMax, 0.001);
 
     // when FirstHVACIteration is false, mass flow should be zero
     testFirstHVACIteration = false;
     state->dataPlantHXFluidToFluid->FluidHX(1).control(*state, 1, -1000.0, testFirstHVACIteration);
-    EXPECT_NEAR(DataLoopNode::Node(2).MassFlowRate, 0.0, 0.001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(2).MassFlowRate, 0.0, 0.001);
 }
 
 TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverride)
@@ -2368,7 +2372,7 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
     state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
@@ -2381,27 +2385,27 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
     state->dataPlantHXFluidToFluid->FluidHX(1).AvailSchedNum = -1;
 
     // setup four plant nodes for HX
-    DataLoopNode::Node.allocate(6);
+    state->dataLoopNodes->Node.allocate(6);
     state->dataPlantHXFluidToFluid->FluidHX(1).SupplySideLoop.inletNodeNum = 1;
     state->dataPlantHXFluidToFluid->FluidHX(1).SupplySideLoop.outletNodeNum = 3;
     state->dataPlantHXFluidToFluid->FluidHX(1).SetPointNodeNum = 3;
     state->dataPlantHXFluidToFluid->FluidHX(1).SupplySideLoop.MassFlowRateMax = 2.0;
 
-    DataLoopNode::Node(1).Temp = 18.0;
-    DataLoopNode::Node(1).MassFlowRateMaxAvail = 2.0;
-    DataLoopNode::Node(1).MassFlowRateMax = 2.0;
-    DataLoopNode::Node(3).MassFlowRateMaxAvail = 2.0;
-    DataLoopNode::Node(3).MassFlowRateMax = 2.0;
+    state->dataLoopNodes->Node(1).Temp = 18.0;
+    state->dataLoopNodes->Node(1).MassFlowRateMaxAvail = 2.0;
+    state->dataLoopNodes->Node(1).MassFlowRateMax = 2.0;
+    state->dataLoopNodes->Node(3).MassFlowRateMaxAvail = 2.0;
+    state->dataLoopNodes->Node(3).MassFlowRateMax = 2.0;
 
     state->dataPlantHXFluidToFluid->FluidHX(1).SupplySideLoop.InletTemp = 18.0;
 
     state->dataPlantHXFluidToFluid->FluidHX(1).DemandSideLoop.inletNodeNum = 2;
     state->dataPlantHXFluidToFluid->FluidHX(1).DemandSideLoop.outletNodeNum = 4;
-    DataLoopNode::Node(2).Temp = 19.0;
-    DataLoopNode::Node(2).MassFlowRateMaxAvail = 2.0;
-    DataLoopNode::Node(2).MassFlowRateMax = 2.0;
-    DataLoopNode::Node(4).MassFlowRateMaxAvail = 2.0;
-    DataLoopNode::Node(4).MassFlowRateMax = 2.0;
+    state->dataLoopNodes->Node(2).Temp = 19.0;
+    state->dataLoopNodes->Node(2).MassFlowRateMaxAvail = 2.0;
+    state->dataLoopNodes->Node(2).MassFlowRateMax = 2.0;
+    state->dataLoopNodes->Node(4).MassFlowRateMaxAvail = 2.0;
+    state->dataLoopNodes->Node(4).MassFlowRateMax = 2.0;
     state->dataPlantHXFluidToFluid->FluidHX(1).DemandSideLoop.InletTemp = 19.0;
 
     state->dataPlantHXFluidToFluid->FluidHX(1).ControlMode = PlantHeatExchangerFluidToFluid::iCtrlType::CoolingSetPointOnOffWithComponentOverride;
@@ -2467,7 +2471,7 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(2).Comp(1).HowLoadServed = DataPlant::HowMet_ByNominalCap;
     state->dataEnvrn->OutDryBulbTemp = 9.0;
     state->dataPlantHXFluidToFluid->FluidHX(1).TempControlTol = 0.0;
-    DataLoopNode::Node(3).TempSetPoint = 11.0;
+    state->dataLoopNodes->Node(3).TempSetPoint = 11.0;
 
     // now call the init routine
     state->dataPlantHXFluidToFluid->FluidHX(1).initialize(*state);

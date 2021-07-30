@@ -53,48 +53,48 @@
 
 namespace EnergyPlus::TARCOGDeflection {
 
-    void PanesDeflection(int DeflectionStandard,
-                         Real64 W,
-                         Real64 H,
-                         int nlayer,
-                         Real64 Pa,
-                         Real64 Pini,
-                         Real64 Tini,
-                         const Array1D<Real64> &PaneThickness,
-                         const Array1D<Real64> &NonDeflectedGapWidth,
-                         Array1D<Real64> &DeflectedGapWidthMax,
-                         Array1D<Real64> &DeflectedGapWidthMean,
-                         const Array1D<Real64> &PanelTemps,
-                         const Array1D<Real64> &YoungsMod,
-                         const Array1D<Real64> &PoissonsRat,
-                         Array1D<Real64> &LayerDeflection,
-                         int &nperr,
-                         std::string &ErrorMessage);
+void PanesDeflection(TARCOGParams::DeflectionCalculation DeflectionStandard,
+                     Real64 W,
+                     Real64 H,
+                     int nlayer,
+                     Real64 Pa,
+                     Real64 Pini,
+                     Real64 Tini,
+                     const Array1D<Real64> &PaneThickness,
+                     const Array1D<Real64> &NonDeflectedGapWidth,
+                     Array1D<Real64> &DeflectedGapWidthMax,
+                     Array1D<Real64> &DeflectedGapWidthMean,
+                     const Array1D<Real64> &PanelTemps,
+                     const Array1D<Real64> &YoungsMod,
+                     const Array1D<Real64> &PoissonsRat,
+                     Array1D<Real64> &LayerDeflection,
+                     int &nperr,
+                     std::string &ErrorMessage);
 
-    void DeflectionTemperatures(int nlayer,
-                                Real64 W,
-                                Real64 H,
-                                Real64 Pa,
-                                Real64 Pini,
-                                Real64 Tini,
-                                const Array1D<Real64> &NonDeflectedGapWidth,
-                                Array1D<Real64> &DeflectedGapWidthMax,
-                                Array1D<Real64> &DeflectedGapWidthMean,
-                                const Array1D<Real64> &PanelTemps,
-                                Array1D<Real64> &DCoeff,
-                                Array1D<Real64> &LayerDeflection,
-                                int &nperr,
-                                std::string &ErrorMessage);
+void DeflectionTemperatures(int nlayer,
+                            Real64 W,
+                            Real64 H,
+                            Real64 Pa,
+                            Real64 Pini,
+                            Real64 Tini,
+                            const Array1D<Real64> &NonDeflectedGapWidth,
+                            Array1D<Real64> &DeflectedGapWidthMax,
+                            Array1D<Real64> &DeflectedGapWidthMean,
+                            const Array1D<Real64> &PanelTemps,
+                            Array1D<Real64> &DCoeff,
+                            Array1D<Real64> &LayerDeflection,
+                            int &nperr,
+                            std::string &ErrorMessage);
 
-    void DeflectionWidths(int nlayer,
-                          Real64 W,
-                          Real64 H,
-                          Array1D<Real64> &DCoeff,
-                          const Array1D<Real64> &NonDeflectedGapWidth,
-                          const Array1D<Real64> &DeflectedGapWidthMax,
-                          Array1D<Real64> &DeflectedGapWidthMean,
-                          Array1D<Real64> &LayerDeflection);
+void DeflectionWidths(int nlayer,
+                      Real64 W,
+                      Real64 H,
+                      Array1D<Real64> &DCoeff,
+                      const Array1D<Real64> &NonDeflectedGapWidth,
+                      const Array1D<Real64> &DeflectedGapWidthMax,
+                      Array1D<Real64> &DeflectedGapWidthMean,
+                      Array1D<Real64> &LayerDeflection);
 
-} // namespace EnergyPlus
+} // namespace EnergyPlus::TARCOGDeflection
 
 #endif

@@ -92,8 +92,12 @@ int callparser(const char *fmuFilNam, const char *tmpPat)
     // Clean up memory
     // free(xmlPat); // Done above
     free(tmp);
+#ifdef _MSC_VER
+    // https://man7.org/linux/man-pages/man3/basename.3.html
+    // Both dirname() and basename() return pointers to null-terminated strings.  (Do not pass these pointers to free(3).)
     free(filNam);
     free(ext);
+#endif
     return 0;
 }
 
@@ -222,6 +226,9 @@ int main(int argc, char *argv[])
         case opt_delete:
             printError("No FMU folder is given.\n");
             break;
+        case opt_help:
+            // we know we cannot hit this block
+            break;
         }
 
         if (IS_WINDOWS) {
@@ -311,6 +318,9 @@ int main(int argc, char *argv[])
             } else
                 printDebug("Successfully printed the idf file.\n");
         }
+        break;
+    case opt_help:
+        // Nothing to do here
         break;
     }
 

@@ -104,7 +104,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.4;
+  Version,9.6;
 
   Building,
     Building,                !- Name
@@ -476,13 +476,17 @@
     0.6500000,               !- Solar Absorptance
     0.6500000;               !- Visible Absorptance
 
-  Construction:InternalSource,
-    Outside Surface Construction,  !- Name
+  ConstructionProperty:InternalHeatSource,
+    Internal Source,         !- Name
+    Outside Surface Construction,  !- Construction Name
     1,                       !- Source Present After Layer Number
     1,                       !- Temperature Calculation Requested After Layer Number
     1,                       !- Dimensions for the CTF Calculation
     0.1524,                  !- Tube Spacing {m}
-    0.0,                     !- Two-Dimensional Temperature Calculation Position {dimensionless}
+    0.0;                     !- Two-Dimensional Temperature Calculation Position {dimensionless}
+
+  Construction,
+    Outside Surface Construction,  !- Name
     4 IN HW CONCRETE,        !- Outside Layer
     4 IN HW CONCRETE;        !- Layer 2
 
@@ -2191,8 +2195,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 1,                !- Name
     OA Sys 1 Controllers,    !- Controller List Name
-    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name
-    VAV Sys 1 Avail List;    !- Availability Manager List Name
+    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     OutsideAirInletNodes;    !- Node or NodeList Name 1

@@ -124,31 +124,9 @@ namespace PlantComponentTemperatureSources {
         // Uses the status flags to trigger initializations.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitWaterSource");
+        static constexpr std::string_view RoutineName("InitWaterSource");
 
-        if (this->MyFlag) {
-            // setup output variables once here
-            this->setupOutputVars(state);
-            // Locate the component on the plant loops for later usage
-            bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    DataPlant::TypeOf_WaterSource,
-                                                    this->Location.loopNum,
-                                                    this->Location.loopSideNum,
-                                                    this->Location.branchNum,
-                                                    this->Location.compNum,
-                                                    errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    this->InletNodeNum,
-                                                    _);
-            if (errFlag) {
-                ShowFatalError(state, RoutineName + ": Program terminated due to previous condition(s).");
-            }
-            this->MyFlag = false;
-        }
+        this->oneTimeInit(state);
 
         // Initialize critical Demand Side Variables at the beginning of each environment
         if (this->MyEnvironFlag && state.dataGlobal->BeginEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
@@ -159,7 +137,8 @@ namespace PlantComponentTemperatureSources {
                                                            state.dataPlnt->PlantLoop(this->Location.loopNum).FluidIndex,
                                                            RoutineName);
             this->MassFlowRateMax = this->DesVolFlowRate * rho;
-            PlantUtilities::InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(state,
+                                               0.0,
                                                this->MassFlowRateMax,
                                                this->InletNodeNum,
                                                this->OutletNodeNum,
@@ -176,7 +155,7 @@ namespace PlantComponentTemperatureSources {
         }
 
         // OK, so we can set up the inlet and boundary temperatures now
-        this->InletTemp = DataLoopNode::Node(this->InletNodeNum).Temp;
+        this->InletTemp = state.dataLoopNodes->Node(this->InletNodeNum).Temp;
         if (this->TempSpecType == iTempSpecType::Schedule) {
             this->BoundaryTemp = ScheduleManager::GetCurrentScheduleValue(state, this->TempSpecScheduleNum);
         }
@@ -242,19 +221,50 @@ namespace PlantComponentTemperatureSources {
     {
 
         SetupOutputVariable(state,
-            "Plant Temperature Source Component Mass Flow Rate", OutputProcessor::Unit::kg_s, this->MassFlowRate, "System", "Average", this->Name);
+                            "Plant Temperature Source Component Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->MassFlowRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
         SetupOutputVariable(state,
-            "Plant Temperature Source Component Inlet Temperature", OutputProcessor::Unit::C, this->InletTemp, "System", "Average", this->Name);
+                            "Plant Temperature Source Component Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->InletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
         SetupOutputVariable(state,
-            "Plant Temperature Source Component Outlet Temperature", OutputProcessor::Unit::C, this->OutletTemp, "System", "Average", this->Name);
+                            "Plant Temperature Source Component Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->OutletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
         SetupOutputVariable(state,
-            "Plant Temperature Source Component Source Temperature", OutputProcessor::Unit::C, this->BoundaryTemp, "System", "Average", this->Name);
+                            "Plant Temperature Source Component Source Temperature",
+                            OutputProcessor::Unit::C,
+                            this->BoundaryTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
         SetupOutputVariable(state,
-            "Plant Temperature Source Component Heat Transfer Rate", OutputProcessor::Unit::W, this->HeatRate, "System", "Average", this->Name);
+                            "Plant Temperature Source Component Heat Transfer Rate",
+                            OutputProcessor::Unit::W,
+                            this->HeatRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
         SetupOutputVariable(state,
-            "Plant Temperature Source Component Heat Transfer Energy", OutputProcessor::Unit::J, this->HeatEnergy, "System", "Sum", this->Name);
+                            "Plant Temperature Source Component Heat Transfer Energy",
+                            OutputProcessor::Unit::J,
+                            this->HeatEnergy,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->Name);
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-            SetupEMSActuator(state, "PlantComponent:TemperatureSource",
+            SetupEMSActuator(state,
+                             "PlantComponent:TemperatureSource",
                              this->Name,
                              "Maximum Mass Flow Rate",
                              "[kg/s]",
@@ -285,8 +295,8 @@ namespace PlantComponentTemperatureSources {
         int PltSizNum = state.dataPlnt->PlantLoop(this->Location.loopNum).PlantSizNum;
 
         if (PltSizNum > 0) {
-            if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
-                tmpVolFlowRate = DataSizing::PlantSizData(PltSizNum).DesVolFlowRate; //* WaterSource(SourceNum)%SizFac
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                tmpVolFlowRate = state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate; //* WaterSource(SourceNum)%SizFac
                 if (!this->DesVolFlowRateWasAutoSized) tmpVolFlowRate = this->DesVolFlowRate;
             } else {
                 if (this->DesVolFlowRateWasAutoSized) tmpVolFlowRate = 0.0;
@@ -295,26 +305,32 @@ namespace PlantComponentTemperatureSources {
                 if (this->DesVolFlowRateWasAutoSized) {
                     this->DesVolFlowRate = tmpVolFlowRate;
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(state,
-                            "PlantComponent:TemperatureSource", this->Name, "Design Size Design Fluid Flow Rate [m3/s]", tmpVolFlowRate);
+                        BaseSizer::reportSizerOutput(
+                            state, "PlantComponent:TemperatureSource", this->Name, "Design Size Design Fluid Flow Rate [m3/s]", tmpVolFlowRate);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(state,
-                            "PlantComponent:TemperatureSource", this->Name, "Initial Design Size Design Fluid Flow Rate [m3/s]", tmpVolFlowRate);
+                                                     "PlantComponent:TemperatureSource",
+                                                     this->Name,
+                                                     "Initial Design Size Design Fluid Flow Rate [m3/s]",
+                                                     tmpVolFlowRate);
                     }
                 } else {
                     if (this->DesVolFlowRate > 0.0 && tmpVolFlowRate > 0.0) {
                         DesVolFlowRateUser = this->DesVolFlowRate;
                         if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(state, "PlantComponent:TemperatureSource",
+                            BaseSizer::reportSizerOutput(state,
+                                                         "PlantComponent:TemperatureSource",
                                                          this->Name,
                                                          "Design Size Design Fluid Flow Rate [m3/s]",
                                                          tmpVolFlowRate,
                                                          "User-Specified Design Fluid Flow Rate [m3/s]",
                                                          DesVolFlowRateUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
-                                if ((std::abs(tmpVolFlowRate - DesVolFlowRateUser) / DesVolFlowRateUser) > DataSizing::AutoVsHardSizingThreshold) {
-                                    ShowMessage(state, "SizePlantComponentTemperatureSource: Potential issue with equipment sizing for " + this->Name);
+                                if ((std::abs(tmpVolFlowRate - DesVolFlowRateUser) / DesVolFlowRateUser) >
+                                    state.dataSize->AutoVsHardSizingThreshold) {
+                                    ShowMessage(state,
+                                                "SizePlantComponentTemperatureSource: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, format("User-Specified Design Fluid Flow Rate of {:.5R} [m3/s]", DesVolFlowRateUser));
                                     ShowContinueError(state,
                                                       format("differs from Design Size Design Fluid Flow Rate of {:.5R} [m3/s]", tmpVolFlowRate));
@@ -335,13 +351,13 @@ namespace PlantComponentTemperatureSources {
             }
             if (!this->DesVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport) {
                 if (this->DesVolFlowRate > 0.0) {
-                    BaseSizer::reportSizerOutput(state,
-                        "PlantComponent:TemperatureSource", this->Name, "User-Specified Design Fluid Flow Rate [m3/s]", this->DesVolFlowRate);
+                    BaseSizer::reportSizerOutput(
+                        state, "PlantComponent:TemperatureSource", this->Name, "User-Specified Design Fluid Flow Rate [m3/s]", this->DesVolFlowRate);
                 }
             }
         }
 
-        PlantUtilities::RegisterPlantCompDesignFlow(this->InletNodeNum, tmpVolFlowRate);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNodeNum, tmpVolFlowRate);
 
         if (ErrorsFound) {
             ShowFatalError(state, "Preceding sizing errors cause program termination");
@@ -357,7 +373,7 @@ namespace PlantComponentTemperatureSources {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        static std::string const RoutineName("CalcWaterSource");
+        static constexpr std::string_view RoutineName("CalcWaterSource");
 
         if (this->MassFlowRate > 0.0) {
             this->OutletTemp = this->BoundaryTemp;
@@ -367,7 +383,7 @@ namespace PlantComponentTemperatureSources {
                                                                state.dataPlnt->PlantLoop(this->Location.loopNum).FluidIndex,
                                                                RoutineName);
             this->HeatRate = this->MassFlowRate * Cp * (this->OutletTemp - this->InletTemp);
-            this->HeatEnergy = this->HeatRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+            this->HeatEnergy = this->HeatRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         } else {
             this->OutletTemp = this->BoundaryTemp;
             this->HeatRate = 0.0;
@@ -375,9 +391,9 @@ namespace PlantComponentTemperatureSources {
         }
     }
 
-    void WaterSourceSpecs::update()
+    void WaterSourceSpecs::update(EnergyPlusData &state)
     {
-        DataLoopNode::Node(this->OutletNodeNum).Temp = this->OutletTemp;
+        state.dataLoopNodes->Node(this->OutletNodeNum).Temp = this->OutletTemp;
     }
 
     void WaterSourceSpecs::simulate(EnergyPlusData &state,
@@ -388,7 +404,7 @@ namespace PlantComponentTemperatureSources {
     {
         this->initialize(state, CurLoad);
         this->calculate(state);
-        this->update();
+        this->update(state);
     }
 
     void WaterSourceSpecs::getDesignCapacities(
@@ -410,6 +426,34 @@ namespace PlantComponentTemperatureSources {
         Real64 myLoad = 0.0;
         this->initialize(state, myLoad);
         this->autosize(state);
+    }
+    void WaterSourceSpecs::oneTimeInit(EnergyPlusData &state)
+    {
+        static std::string const RoutineName("InitWaterSource");
+
+        if (this->MyFlag) {
+            // setup output variables once here
+            this->setupOutputVars(state);
+            // Locate the component on the plant loops for later usage
+            bool errFlag = false;
+            PlantUtilities::ScanPlantLoopsForObject(state,
+                                                    this->Name,
+                                                    DataPlant::TypeOf_WaterSource,
+                                                    this->Location.loopNum,
+                                                    this->Location.loopSideNum,
+                                                    this->Location.branchNum,
+                                                    this->Location.compNum,
+                                                    errFlag,
+                                                    _,
+                                                    _,
+                                                    _,
+                                                    this->InletNodeNum,
+                                                    _);
+            if (errFlag) {
+                ShowFatalError(state, RoutineName + ": Program terminated due to previous condition(s).");
+            }
+            this->MyFlag = false;
+        }
     }
 
     void GetWaterSourceInput(EnergyPlusData &state)
@@ -435,18 +479,16 @@ namespace PlantComponentTemperatureSources {
         //  N2 , \field Boundary Temperature
         //  A5 ; \field Source Temperature Schedule Name
 
-        // Using/Aliasing
-        using namespace DataIPShortCuts; // Data for field names, blank numerics
-
         // LOCAL VARIABLES:
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
         int IOStat;    // IO Status when calling get input subroutine
         bool ErrorsFound(false);
+        auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         // GET NUMBER OF ALL EQUIPMENT TYPES
         cCurrentModuleObject = "PlantComponent:TemperatureSource";
-        state.dataPlantCompTempSrc->NumSources = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataPlantCompTempSrc->NumSources = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataPlantCompTempSrc->NumSources <= 0) {
             ShowSevereError(state, "No " + cCurrentModuleObject + " equipment specified in input file");
@@ -459,61 +501,74 @@ namespace PlantComponentTemperatureSources {
 
         // fill arrays
         for (int SourceNum = 1; SourceNum <= state.dataPlantCompTempSrc->NumSources; ++SourceNum) {
-            inputProcessor->getObjectItem(state,
-                                          cCurrentModuleObject,
-                                          SourceNum,
-                                          cAlphaArgs,
-                                          NumAlphas,
-                                          rNumericArgs,
-                                          NumNums,
-                                          IOStat,
-                                          _,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cCurrentModuleObject,
+                                                                     SourceNum,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNums,
+                                                                     IOStat,
+                                                                     _,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            state.dataPlantCompTempSrc->WaterSource(SourceNum).Name = cAlphaArgs(1);
+            state.dataPlantCompTempSrc->WaterSource(SourceNum).Name = state.dataIPShortCut->cAlphaArgs(1);
 
-            state.dataPlantCompTempSrc->WaterSource(SourceNum).InletNodeNum = NodeInputManager::GetOnlySingleNode(state, cAlphaArgs(2),
-                                                                                      ErrorsFound,
-                                                                                      cCurrentModuleObject,
-                                                                                      cAlphaArgs(1),
-                                                                                      DataLoopNode::NodeType_Water,
-                                                                                      DataLoopNode::NodeConnectionType_Inlet,
-                                                                                      1,
-                                                                                      DataLoopNode::ObjectIsNotParent);
-            state.dataPlantCompTempSrc->WaterSource(SourceNum).OutletNodeNum = NodeInputManager::GetOnlySingleNode(state, cAlphaArgs(3),
-                                                                                       ErrorsFound,
-                                                                                       cCurrentModuleObject,
-                                                                                       cAlphaArgs(1),
-                                                                                       DataLoopNode::NodeType_Water,
-                                                                                       DataLoopNode::NodeConnectionType_Outlet,
-                                                                                       1,
-                                                                                       DataLoopNode::ObjectIsNotParent);
-            BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Chilled Water Nodes");
+            state.dataPlantCompTempSrc->WaterSource(SourceNum).InletNodeNum =
+                NodeInputManager::GetOnlySingleNode(state,
+                                                    state.dataIPShortCut->cAlphaArgs(2),
+                                                    ErrorsFound,
+                                                    cCurrentModuleObject,
+                                                    state.dataIPShortCut->cAlphaArgs(1),
+                                                    DataLoopNode::NodeFluidType::Water,
+                                                    DataLoopNode::NodeConnectionType::Inlet,
+                                                    NodeInputManager::compFluidStream::Primary,
+                                                    DataLoopNode::ObjectIsNotParent);
+            state.dataPlantCompTempSrc->WaterSource(SourceNum).OutletNodeNum =
+                NodeInputManager::GetOnlySingleNode(state,
+                                                    state.dataIPShortCut->cAlphaArgs(3),
+                                                    ErrorsFound,
+                                                    cCurrentModuleObject,
+                                                    state.dataIPShortCut->cAlphaArgs(1),
+                                                    DataLoopNode::NodeFluidType::Water,
+                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                    NodeInputManager::compFluidStream::Primary,
+                                                    DataLoopNode::ObjectIsNotParent);
+            BranchNodeConnections::TestCompSet(state,
+                                               cCurrentModuleObject,
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cAlphaArgs(2),
+                                               state.dataIPShortCut->cAlphaArgs(3),
+                                               "Chilled Water Nodes");
 
-            state.dataPlantCompTempSrc->WaterSource(SourceNum).DesVolFlowRate = rNumericArgs(1);
+            state.dataPlantCompTempSrc->WaterSource(SourceNum).DesVolFlowRate = state.dataIPShortCut->rNumericArgs(1);
             if (state.dataPlantCompTempSrc->WaterSource(SourceNum).DesVolFlowRate == DataSizing::AutoSize) {
                 state.dataPlantCompTempSrc->WaterSource(SourceNum).DesVolFlowRateWasAutoSized = true;
             }
 
-            if (cAlphaArgs(4) == "CONSTANT") {
+            if (state.dataIPShortCut->cAlphaArgs(4) == "CONSTANT") {
                 state.dataPlantCompTempSrc->WaterSource(SourceNum).TempSpecType = iTempSpecType::Constant;
-                state.dataPlantCompTempSrc->WaterSource(SourceNum).BoundaryTemp = rNumericArgs(2);
-            } else if (cAlphaArgs(4) == "SCHEDULED") {
+                state.dataPlantCompTempSrc->WaterSource(SourceNum).BoundaryTemp = state.dataIPShortCut->rNumericArgs(2);
+            } else if (state.dataIPShortCut->cAlphaArgs(4) == "SCHEDULED") {
                 state.dataPlantCompTempSrc->WaterSource(SourceNum).TempSpecType = iTempSpecType::Schedule;
-                state.dataPlantCompTempSrc->WaterSource(SourceNum).TempSpecScheduleName = cAlphaArgs(5);
-                state.dataPlantCompTempSrc->WaterSource(SourceNum).TempSpecScheduleNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(5));
+                state.dataPlantCompTempSrc->WaterSource(SourceNum).TempSpecScheduleName = state.dataIPShortCut->cAlphaArgs(5);
+                state.dataPlantCompTempSrc->WaterSource(SourceNum).TempSpecScheduleNum =
+                    ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(5));
                 if (state.dataPlantCompTempSrc->WaterSource(SourceNum).TempSpecScheduleNum == 0) {
-                    ShowSevereError(state, "Input error for " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                    ShowContinueError(state, "Invalid schedule name in field " + cAlphaFieldNames(5) + '=' + cAlphaArgs(5));
+                    ShowSevereError(state, "Input error for " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowContinueError(state,
+                                      "Invalid schedule name in field " + state.dataIPShortCut->cAlphaFieldNames(5) + '=' +
+                                          state.dataIPShortCut->cAlphaArgs(5));
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, "Input error for " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                ShowContinueError(state, R"(Invalid temperature specification type.  Expected either "Constant" or "Scheduled". Encountered ")" +
-                                  cAlphaArgs(4) + "\"");
+                ShowSevereError(state, "Input error for " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state,
+                                  R"(Invalid temperature specification type.  Expected either "Constant" or "Scheduled". Encountered ")" +
+                                      state.dataIPShortCut->cAlphaArgs(4) + "\"");
                 ErrorsFound = true;
             }
         }

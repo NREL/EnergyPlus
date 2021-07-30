@@ -89,153 +89,153 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     int FurnaceNum(1);
     Real64 OnOffAirFlowRatio; // This is a return value
     Real64 PartLoadRatio(1.0);
-    Node.allocate(10);
+    state->dataLoopNodes->Node.allocate(10);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
-    Schedule.allocate(1);
+    state->dataScheduleMgr->Schedule.allocate(1);
 
-    MSHPMassFlowRateLow = 0.0;
-    MSHPMassFlowRateHigh = 0.0;
+    state->dataHVACGlobal->MSHPMassFlowRateLow = 0.0;
+    state->dataHVACGlobal->MSHPMassFlowRateHigh = 0.0;
 
-    Furnace.allocate(1);
+    state->dataFurnaces->Furnace.allocate(1);
 
-    Furnace(FurnaceNum).FurnaceType_Num = UnitarySys_HeatCool;
+    state->dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num = UnitarySys_HeatCool;
 
-    Furnace(FurnaceNum).FurnaceInletNodeNum = 1;
-    Furnace(FurnaceNum).FurnaceOutletNodeNum = 2;
-    Furnace(FurnaceNum).ControlZoneNum = 1;
+    state->dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum = 1;
+    state->dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum = 2;
+    state->dataFurnaces->Furnace(FurnaceNum).ControlZoneNum = 1;
 
-    Furnace(FurnaceNum).MaxHeatAirMassFlow = 0.5;
-    Furnace(FurnaceNum).MaxCoolAirMassFlow = 0.75;
+    state->dataFurnaces->Furnace(FurnaceNum).MaxHeatAirMassFlow = 0.5;
+    state->dataFurnaces->Furnace(FurnaceNum).MaxCoolAirMassFlow = 0.75;
 
-    Furnace(FurnaceNum).HeatMassFlowRate.allocate(3);
-    Furnace(FurnaceNum).CoolMassFlowRate.allocate(3);
-    Furnace(FurnaceNum).MSHeatingSpeedRatio.allocate(3);
-    Furnace(FurnaceNum).MSCoolingSpeedRatio.allocate(3);
+    state->dataFurnaces->Furnace(FurnaceNum).HeatMassFlowRate.allocate(3);
+    state->dataFurnaces->Furnace(FurnaceNum).CoolMassFlowRate.allocate(3);
+    state->dataFurnaces->Furnace(FurnaceNum).MSHeatingSpeedRatio.allocate(3);
+    state->dataFurnaces->Furnace(FurnaceNum).MSCoolingSpeedRatio.allocate(3);
 
-    Furnace(FurnaceNum).LastMode = Furnaces::ModeOfOperation::HeatingMode;
-    Furnace(FurnaceNum).IdleMassFlowRate = 0.2;
-    Furnace(FurnaceNum).IdleSpeedRatio = 0.2;
-    Furnace(FurnaceNum).FanAvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
-    Furnace(FurnaceNum).FurnaceInletNodeNum = 1;
+    state->dataFurnaces->Furnace(FurnaceNum).LastMode = Furnaces::ModeOfOperation::HeatingMode;
+    state->dataFurnaces->Furnace(FurnaceNum).IdleMassFlowRate = 0.2;
+    state->dataFurnaces->Furnace(FurnaceNum).IdleSpeedRatio = 0.2;
+    state->dataFurnaces->Furnace(FurnaceNum).FanAvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    state->dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum = 1;
 
-    Furnace(FurnaceNum).HeatMassFlowRate(1) = 0.25;
-    Furnace(FurnaceNum).MSHeatingSpeedRatio(1) = 0.25;
-    Furnace(FurnaceNum).HeatMassFlowRate(2) = 0.5;
-    Furnace(FurnaceNum).MSHeatingSpeedRatio(2) = 0.5;
-    Furnace(FurnaceNum).HeatMassFlowRate(3) = 1.0;
-    Furnace(FurnaceNum).MSHeatingSpeedRatio(3) = 1.0;
+    state->dataFurnaces->Furnace(FurnaceNum).HeatMassFlowRate(1) = 0.25;
+    state->dataFurnaces->Furnace(FurnaceNum).MSHeatingSpeedRatio(1) = 0.25;
+    state->dataFurnaces->Furnace(FurnaceNum).HeatMassFlowRate(2) = 0.5;
+    state->dataFurnaces->Furnace(FurnaceNum).MSHeatingSpeedRatio(2) = 0.5;
+    state->dataFurnaces->Furnace(FurnaceNum).HeatMassFlowRate(3) = 1.0;
+    state->dataFurnaces->Furnace(FurnaceNum).MSHeatingSpeedRatio(3) = 1.0;
 
-    Furnace(FurnaceNum).CoolMassFlowRate(1) = 0.3;
-    Furnace(FurnaceNum).MSCoolingSpeedRatio(1) = 0.3;
-    Furnace(FurnaceNum).CoolMassFlowRate(2) = 0.6;
-    Furnace(FurnaceNum).MSCoolingSpeedRatio(2) = 0.6;
-    Furnace(FurnaceNum).CoolMassFlowRate(3) = 1.2;
-    Furnace(FurnaceNum).MSCoolingSpeedRatio(3) = 1.2;
+    state->dataFurnaces->Furnace(FurnaceNum).CoolMassFlowRate(1) = 0.3;
+    state->dataFurnaces->Furnace(FurnaceNum).MSCoolingSpeedRatio(1) = 0.3;
+    state->dataFurnaces->Furnace(FurnaceNum).CoolMassFlowRate(2) = 0.6;
+    state->dataFurnaces->Furnace(FurnaceNum).MSCoolingSpeedRatio(2) = 0.6;
+    state->dataFurnaces->Furnace(FurnaceNum).CoolMassFlowRate(3) = 1.2;
+    state->dataFurnaces->Furnace(FurnaceNum).MSCoolingSpeedRatio(3) = 1.2;
 
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
 
-    Furnace(FurnaceNum).OpMode = CycFanCycCoil;
+    state->dataFurnaces->Furnace(FurnaceNum).OpMode = CycFanCycCoil;
     // heating air flow at various speeds
 
-    Furnace(FurnaceNum).NumOfSpeedHeating = 0;
-    Furnace(FurnaceNum).NumOfSpeedCooling = 0;
+    state->dataFurnaces->Furnace(FurnaceNum).NumOfSpeedHeating = 0;
+    state->dataFurnaces->Furnace(FurnaceNum).NumOfSpeedCooling = 0;
     //	Furnace( FurnaceNum ).SchedPtr = 0; // denotes incorrect schedule name in Furnace input ( returns 0.0 )
-    Furnace(FurnaceNum).SchedPtr = -1; // denotes missing schedule name in Furnace input ( returns 1.0 )
-    HeatingLoad = true;
-    CoolingLoad = false;
+    state->dataFurnaces->Furnace(FurnaceNum).SchedPtr = -1; // denotes missing schedule name in Furnace input ( returns 1.0 )
+    state->dataFurnaces->HeatingLoad = true;
+    state->dataFurnaces->CoolingLoad = false;
     SetVSHPAirFlow(*state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
 
-    EXPECT_DOUBLE_EQ(0.0, CompOffMassFlow);
-    EXPECT_DOUBLE_EQ(0.5, CompOnMassFlow);
+    EXPECT_DOUBLE_EQ(0.0, state->dataFurnaces->CompOffMassFlow);
+    EXPECT_DOUBLE_EQ(0.5, state->dataFurnaces->CompOnMassFlow);
     EXPECT_DOUBLE_EQ(1.0, OnOffAirFlowRatio);
-    EXPECT_DOUBLE_EQ(0.5, Node(Furnace(FurnaceNum).FurnaceInletNodeNum).MassFlowRate);
+    EXPECT_DOUBLE_EQ(0.5, state->dataLoopNodes->Node(state->dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum).MassFlowRate);
 
-    Furnace(FurnaceNum).NumOfSpeedHeating = 1;
-    Furnace(FurnaceNum).NumOfSpeedCooling = 0;
-    HeatingLoad = true;
-    CoolingLoad = false;
+    state->dataFurnaces->Furnace(FurnaceNum).NumOfSpeedHeating = 1;
+    state->dataFurnaces->Furnace(FurnaceNum).NumOfSpeedCooling = 0;
+    state->dataFurnaces->HeatingLoad = true;
+    state->dataFurnaces->CoolingLoad = false;
     SetVSHPAirFlow(*state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
-    EXPECT_DOUBLE_EQ(0.25, MSHPMassFlowRateLow);
-    EXPECT_DOUBLE_EQ(0.25, MSHPMassFlowRateHigh);
-    EXPECT_DOUBLE_EQ(0.0, CompOffMassFlow);
-    EXPECT_DOUBLE_EQ(0.25, CompOnMassFlow);
+    EXPECT_DOUBLE_EQ(0.25, state->dataHVACGlobal->MSHPMassFlowRateLow);
+    EXPECT_DOUBLE_EQ(0.25, state->dataHVACGlobal->MSHPMassFlowRateHigh);
+    EXPECT_DOUBLE_EQ(0.0, state->dataFurnaces->CompOffMassFlow);
+    EXPECT_DOUBLE_EQ(0.25, state->dataFurnaces->CompOnMassFlow);
     EXPECT_DOUBLE_EQ(1.0, OnOffAirFlowRatio);
-    EXPECT_DOUBLE_EQ(0.25, Node(Furnace(FurnaceNum).FurnaceInletNodeNum).MassFlowRate);
+    EXPECT_DOUBLE_EQ(0.25, state->dataLoopNodes->Node(state->dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum).MassFlowRate);
 
-    Furnace(FurnaceNum).NumOfSpeedHeating = 2;
-    Furnace(FurnaceNum).NumOfSpeedCooling = 0;
-    HeatingLoad = true;
-    CoolingLoad = false;
+    state->dataFurnaces->Furnace(FurnaceNum).NumOfSpeedHeating = 2;
+    state->dataFurnaces->Furnace(FurnaceNum).NumOfSpeedCooling = 0;
+    state->dataFurnaces->HeatingLoad = true;
+    state->dataFurnaces->CoolingLoad = false;
     SetVSHPAirFlow(*state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
-    EXPECT_DOUBLE_EQ(0.5, MSHPMassFlowRateLow);
-    EXPECT_DOUBLE_EQ(0.5, MSHPMassFlowRateHigh);
-    EXPECT_DOUBLE_EQ(0.0, CompOffMassFlow);
-    EXPECT_DOUBLE_EQ(0.5, CompOnMassFlow);
+    EXPECT_DOUBLE_EQ(0.5, state->dataHVACGlobal->MSHPMassFlowRateLow);
+    EXPECT_DOUBLE_EQ(0.5, state->dataHVACGlobal->MSHPMassFlowRateHigh);
+    EXPECT_DOUBLE_EQ(0.0, state->dataFurnaces->CompOffMassFlow);
+    EXPECT_DOUBLE_EQ(0.5, state->dataFurnaces->CompOnMassFlow);
     EXPECT_DOUBLE_EQ(1.0, OnOffAirFlowRatio);
-    EXPECT_DOUBLE_EQ(0.5, Node(Furnace(FurnaceNum).FurnaceInletNodeNum).MassFlowRate);
+    EXPECT_DOUBLE_EQ(0.5, state->dataLoopNodes->Node(state->dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum).MassFlowRate);
 
-    Furnace(FurnaceNum).NumOfSpeedHeating = 3;
-    Furnace(FurnaceNum).NumOfSpeedCooling = 0;
-    HeatingLoad = true;
-    CoolingLoad = false;
+    state->dataFurnaces->Furnace(FurnaceNum).NumOfSpeedHeating = 3;
+    state->dataFurnaces->Furnace(FurnaceNum).NumOfSpeedCooling = 0;
+    state->dataFurnaces->HeatingLoad = true;
+    state->dataFurnaces->CoolingLoad = false;
     SetVSHPAirFlow(*state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
-    EXPECT_DOUBLE_EQ(1.0, MSHPMassFlowRateLow);
-    EXPECT_DOUBLE_EQ(1.0, MSHPMassFlowRateHigh);
-    EXPECT_DOUBLE_EQ(0.0, CompOffMassFlow);
-    EXPECT_DOUBLE_EQ(1.0, CompOnMassFlow);
+    EXPECT_DOUBLE_EQ(1.0, state->dataHVACGlobal->MSHPMassFlowRateLow);
+    EXPECT_DOUBLE_EQ(1.0, state->dataHVACGlobal->MSHPMassFlowRateHigh);
+    EXPECT_DOUBLE_EQ(0.0, state->dataFurnaces->CompOffMassFlow);
+    EXPECT_DOUBLE_EQ(1.0, state->dataFurnaces->CompOnMassFlow);
     EXPECT_DOUBLE_EQ(1.0, OnOffAirFlowRatio);
-    EXPECT_DOUBLE_EQ(1.0, Node(Furnace(FurnaceNum).FurnaceInletNodeNum).MassFlowRate);
+    EXPECT_DOUBLE_EQ(1.0, state->dataLoopNodes->Node(state->dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum).MassFlowRate);
 
-    Furnace(FurnaceNum).NumOfSpeedHeating = 0;
-    Furnace(FurnaceNum).NumOfSpeedCooling = 1;
-    HeatingLoad = false;
-    CoolingLoad = true;
+    state->dataFurnaces->Furnace(FurnaceNum).NumOfSpeedHeating = 0;
+    state->dataFurnaces->Furnace(FurnaceNum).NumOfSpeedCooling = 1;
+    state->dataFurnaces->HeatingLoad = false;
+    state->dataFurnaces->CoolingLoad = true;
     SetVSHPAirFlow(*state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
-    EXPECT_DOUBLE_EQ(0.3, MSHPMassFlowRateLow);
-    EXPECT_DOUBLE_EQ(0.3, MSHPMassFlowRateHigh);
-    EXPECT_DOUBLE_EQ(0.0, CompOffMassFlow);
-    EXPECT_DOUBLE_EQ(0.3, CompOnMassFlow);
+    EXPECT_DOUBLE_EQ(0.3, state->dataHVACGlobal->MSHPMassFlowRateLow);
+    EXPECT_DOUBLE_EQ(0.3, state->dataHVACGlobal->MSHPMassFlowRateHigh);
+    EXPECT_DOUBLE_EQ(0.0, state->dataFurnaces->CompOffMassFlow);
+    EXPECT_DOUBLE_EQ(0.3, state->dataFurnaces->CompOnMassFlow);
     EXPECT_DOUBLE_EQ(1.0, OnOffAirFlowRatio);
-    EXPECT_DOUBLE_EQ(0.3, Node(Furnace(FurnaceNum).FurnaceInletNodeNum).MassFlowRate);
+    EXPECT_DOUBLE_EQ(0.3, state->dataLoopNodes->Node(state->dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum).MassFlowRate);
 
-    Furnace(FurnaceNum).NumOfSpeedHeating = 0;
-    Furnace(FurnaceNum).NumOfSpeedCooling = 2;
-    HeatingLoad = false;
-    CoolingLoad = true;
+    state->dataFurnaces->Furnace(FurnaceNum).NumOfSpeedHeating = 0;
+    state->dataFurnaces->Furnace(FurnaceNum).NumOfSpeedCooling = 2;
+    state->dataFurnaces->HeatingLoad = false;
+    state->dataFurnaces->CoolingLoad = true;
     SetVSHPAirFlow(*state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
-    EXPECT_DOUBLE_EQ(0.6, MSHPMassFlowRateLow);
-    EXPECT_DOUBLE_EQ(0.6, MSHPMassFlowRateHigh);
-    EXPECT_DOUBLE_EQ(0.0, CompOffMassFlow);
-    EXPECT_DOUBLE_EQ(0.6, CompOnMassFlow);
+    EXPECT_DOUBLE_EQ(0.6, state->dataHVACGlobal->MSHPMassFlowRateLow);
+    EXPECT_DOUBLE_EQ(0.6, state->dataHVACGlobal->MSHPMassFlowRateHigh);
+    EXPECT_DOUBLE_EQ(0.0, state->dataFurnaces->CompOffMassFlow);
+    EXPECT_DOUBLE_EQ(0.6, state->dataFurnaces->CompOnMassFlow);
     EXPECT_DOUBLE_EQ(1.0, OnOffAirFlowRatio);
-    EXPECT_DOUBLE_EQ(0.6, Node(Furnace(FurnaceNum).FurnaceInletNodeNum).MassFlowRate);
+    EXPECT_DOUBLE_EQ(0.6, state->dataLoopNodes->Node(state->dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum).MassFlowRate);
 
-    Furnace(FurnaceNum).NumOfSpeedHeating = 0;
-    Furnace(FurnaceNum).NumOfSpeedCooling = 3;
-    HeatingLoad = false;
-    CoolingLoad = true;
+    state->dataFurnaces->Furnace(FurnaceNum).NumOfSpeedHeating = 0;
+    state->dataFurnaces->Furnace(FurnaceNum).NumOfSpeedCooling = 3;
+    state->dataFurnaces->HeatingLoad = false;
+    state->dataFurnaces->CoolingLoad = true;
     SetVSHPAirFlow(*state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
-    EXPECT_DOUBLE_EQ(1.2, MSHPMassFlowRateLow);
-    EXPECT_DOUBLE_EQ(1.2, MSHPMassFlowRateHigh);
-    EXPECT_DOUBLE_EQ(0.0, CompOffMassFlow);
-    EXPECT_DOUBLE_EQ(1.2, CompOnMassFlow);
+    EXPECT_DOUBLE_EQ(1.2, state->dataHVACGlobal->MSHPMassFlowRateLow);
+    EXPECT_DOUBLE_EQ(1.2, state->dataHVACGlobal->MSHPMassFlowRateHigh);
+    EXPECT_DOUBLE_EQ(0.0, state->dataFurnaces->CompOffMassFlow);
+    EXPECT_DOUBLE_EQ(1.2, state->dataFurnaces->CompOnMassFlow);
     EXPECT_DOUBLE_EQ(1.0, OnOffAirFlowRatio);
-    EXPECT_DOUBLE_EQ(1.2, Node(Furnace(FurnaceNum).FurnaceInletNodeNum).MassFlowRate);
+    EXPECT_DOUBLE_EQ(1.2, state->dataLoopNodes->Node(state->dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum).MassFlowRate);
 
     // constant fan mode should drop to idle flow rate
-    Furnace(FurnaceNum).OpMode = ContFanCycCoil;
+    state->dataFurnaces->Furnace(FurnaceNum).OpMode = ContFanCycCoil;
 
-    Furnace(FurnaceNum).NumOfSpeedHeating = 0;
-    Furnace(FurnaceNum).NumOfSpeedCooling = 0;
-    HeatingLoad = true;
-    CoolingLoad = false;
+    state->dataFurnaces->Furnace(FurnaceNum).NumOfSpeedHeating = 0;
+    state->dataFurnaces->Furnace(FurnaceNum).NumOfSpeedCooling = 0;
+    state->dataFurnaces->HeatingLoad = true;
+    state->dataFurnaces->CoolingLoad = false;
     SetVSHPAirFlow(*state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
-    EXPECT_EQ(0.0, MSHPMassFlowRateLow);
-    EXPECT_EQ(0.0, MSHPMassFlowRateHigh);
-    EXPECT_DOUBLE_EQ(0.2, CompOffMassFlow);
-    EXPECT_DOUBLE_EQ(0.5, CompOnMassFlow);
+    EXPECT_EQ(0.0, state->dataHVACGlobal->MSHPMassFlowRateLow);
+    EXPECT_EQ(0.0, state->dataHVACGlobal->MSHPMassFlowRateHigh);
+    EXPECT_DOUBLE_EQ(0.2, state->dataFurnaces->CompOffMassFlow);
+    EXPECT_DOUBLE_EQ(0.5, state->dataFurnaces->CompOnMassFlow);
     EXPECT_DOUBLE_EQ(1.0, OnOffAirFlowRatio);
-    EXPECT_DOUBLE_EQ(0.5, Node(Furnace(FurnaceNum).FurnaceInletNodeNum).MassFlowRate);
+    EXPECT_DOUBLE_EQ(0.5, state->dataLoopNodes->Node(state->dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum).MassFlowRate);
 
     bool firstHVACIteration = true;
     int compOp = 1;
@@ -247,23 +247,23 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     bool hXUnitOn = false;
 
     state->dataEnvrn->OutDryBulbTemp = 35.0;
-    Furnace(FurnaceNum).WatertoAirHPType = 1; // switch to water to air heat pump
-    Furnace(FurnaceNum).FurnaceType_Num = 6;
-    Furnace(FurnaceNum).NodeNumOfControlledZone = 1; // use inlet node as surrogate for zone node number
+    state->dataFurnaces->Furnace(FurnaceNum).WatertoAirHPType = 1; // switch to water to air heat pump
+    state->dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num = 6;
+    state->dataFurnaces->Furnace(FurnaceNum).NodeNumOfControlledZone = 1; // use inlet node as surrogate for zone node number
 
-    Furnaces::HeatingLoad = false;
-    Furnaces::CoolingLoad = false;
+    state->dataFurnaces->HeatingLoad = false;
+    state->dataFurnaces->CoolingLoad = false;
 
-    CalcNewZoneHeatCoolFlowRates(*state,
-        FurnaceNum, firstHVACIteration, compOp, zoneLoad, moistureLoad, heatCoilLoad, reheatCoilLoad, onOffAirFlowRatio, hXUnitOn);
-    EXPECT_EQ(Furnace(1).MdotFurnace, 0.5); // CompOnMassFlow rate
-    EXPECT_EQ(DataLoopNode::Node(1).MassFlowRate, 0.5); // furnace inlet node mass flow rate
-    EXPECT_EQ(Furnace(1).CoolPartLoadRatio, 0.0);
-    EXPECT_EQ(Furnace(1).HeatPartLoadRatio, 0.0);
+    CalcNewZoneHeatCoolFlowRates(
+        *state, FurnaceNum, firstHVACIteration, compOp, zoneLoad, moistureLoad, heatCoilLoad, reheatCoilLoad, onOffAirFlowRatio, hXUnitOn);
+    EXPECT_EQ(state->dataFurnaces->Furnace(1).MdotFurnace, 0.5); // CompOnMassFlow rate
+    EXPECT_EQ(state->dataLoopNodes->Node(1).MassFlowRate, 0.5);  // furnace inlet node mass flow rate
+    EXPECT_EQ(state->dataFurnaces->Furnace(1).CoolPartLoadRatio, 0.0);
+    EXPECT_EQ(state->dataFurnaces->Furnace(1).HeatPartLoadRatio, 0.0);
 
     firstHVACIteration = false; // now the coils will be called
-    Furnace(FurnaceNum).CoolingCoilIndex = 1;
-    Furnace(FurnaceNum).HeatingCoilIndex = 2;
+    state->dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex = 1;
+    state->dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex = 2;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP.allocate(2);
     state->dataWaterToAirHeatPumpSimple->NumWatertoAirHPs = 2;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).Name = "WATERCOOLINGCOIL";
@@ -293,7 +293,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataPlnt->TotNumLoops = 2;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
-    for ( int loopindex = 1; loopindex <= state->dataPlnt->TotNumLoops; ++loopindex ) {
+    for (int loopindex = 1; loopindex <= state->dataPlnt->TotNumLoops; ++loopindex) {
         auto &loop(state->dataPlnt->PlantLoop(loopindex));
         loop.LoopSide.allocate(2);
         auto &loopside(state->dataPlnt->PlantLoop(loopindex).LoopSide(1));
@@ -316,23 +316,21 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWAHPHeatingEquationFit;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = "WATERHEATINGCOIL";
 
-    DataHeatBalance::HeatReclaimSimple_WAHPCoil.allocate(2);
+    state->dataHeatBal->HeatReclaimSimple_WAHPCoil.allocate(2);
 
     state->dataWaterToAirHeatPumpSimple->GetCoilsInputFlag = false; // turn off water source coil GetInput
-    CalcNewZoneHeatCoolFlowRates(*state,
-        FurnaceNum, firstHVACIteration, compOp, zoneLoad, moistureLoad, heatCoilLoad, reheatCoilLoad, onOffAirFlowRatio, hXUnitOn);
-    EXPECT_EQ(Furnace(1).MdotFurnace, 0.2); // flow rate is at idle speed flow rate
-    EXPECT_EQ(DataLoopNode::Node(1).MassFlowRate, 0.2); // furnace inlet node mass flow rate is at idle speed flow rate
-    EXPECT_EQ(Furnace(1).CoolPartLoadRatio, 0.0);
-    EXPECT_EQ(Furnace(1).HeatPartLoadRatio, 0.0);
+    CalcNewZoneHeatCoolFlowRates(
+        *state, FurnaceNum, firstHVACIteration, compOp, zoneLoad, moistureLoad, heatCoilLoad, reheatCoilLoad, onOffAirFlowRatio, hXUnitOn);
+    EXPECT_EQ(state->dataFurnaces->Furnace(1).MdotFurnace, 0.2); // flow rate is at idle speed flow rate
+    EXPECT_EQ(state->dataLoopNodes->Node(1).MassFlowRate, 0.2);  // furnace inlet node mass flow rate is at idle speed flow rate
+    EXPECT_EQ(state->dataFurnaces->Furnace(1).CoolPartLoadRatio, 0.0);
+    EXPECT_EQ(state->dataFurnaces->Furnace(1).HeatPartLoadRatio, 0.0);
 
-    Furnace(1).HeatPartLoadRatio = 1.0;
-    Furnaces::HeatingLoad = true;
-    CalcNewZoneHeatCoolFlowRates(*state,
-        FurnaceNum, firstHVACIteration, compOp, zoneLoad, moistureLoad, heatCoilLoad, reheatCoilLoad, onOffAirFlowRatio, hXUnitOn);
-    EXPECT_EQ(Furnace(1).HeatPartLoadRatio, 1.0);
-
-
+    state->dataFurnaces->Furnace(1).HeatPartLoadRatio = 1.0;
+    state->dataFurnaces->HeatingLoad = true;
+    CalcNewZoneHeatCoolFlowRates(
+        *state, FurnaceNum, firstHVACIteration, compOp, zoneLoad, moistureLoad, heatCoilLoad, reheatCoilLoad, onOffAirFlowRatio, hXUnitOn);
+    EXPECT_EQ(state->dataFurnaces->Furnace(1).HeatPartLoadRatio, 1.0);
 }
 
 TEST_F(EnergyPlusFixture, FurnaceTest_PartLoadRatioTest)
@@ -344,18 +342,18 @@ TEST_F(EnergyPlusFixture, FurnaceTest_PartLoadRatioTest)
     int FurnaceNum;
 
     FurnaceNum = 1;
-    Furnace.allocate(1);
-    Furnace(FurnaceNum).FurnaceType_Num = UnitarySys_HeatPump_AirToAir;
+    state->dataFurnaces->Furnace.allocate(1);
+    state->dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num = UnitarySys_HeatPump_AirToAir;
 
-    CompOnMassFlow = 2.0;
-    CompOffMassFlow = 0.0;
-    Furnace(FurnaceNum).OpMode = 1;
-    Furnace(FurnaceNum).MdotFurnace = 2.0;
-    Furnace(FurnaceNum).DesignMassFlowRate = 2.2;
-    Furnace(FurnaceNum).HeatPartLoadRatio = 1.0;
-    Furnace(FurnaceNum).CoolPartLoadRatio = 0.0;
+    state->dataFurnaces->CompOnMassFlow = 2.0;
+    state->dataFurnaces->CompOffMassFlow = 0.0;
+    state->dataFurnaces->Furnace(FurnaceNum).OpMode = 1;
+    state->dataFurnaces->Furnace(FurnaceNum).MdotFurnace = 2.0;
+    state->dataFurnaces->Furnace(FurnaceNum).DesignMassFlowRate = 2.2;
+    state->dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio = 1.0;
+    state->dataFurnaces->Furnace(FurnaceNum).CoolPartLoadRatio = 0.0;
 
-    AirflowNetwork::SimulateAirflowNetwork = AirflowNetwork::AirflowNetworkControlMultiADS;
+    state->dataAirflowNetwork->SimulateAirflowNetwork = AirflowNetwork::AirflowNetworkControlMultiADS;
     ReportFurnace(*state, FurnaceNum, 1);
 
     EXPECT_EQ(2.0, state->dataAirLoop->AirLoopAFNInfo(1).LoopSystemOnMassFlowrate);
@@ -363,18 +361,18 @@ TEST_F(EnergyPlusFixture, FurnaceTest_PartLoadRatioTest)
     EXPECT_EQ(1.0, state->dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode);
     EXPECT_EQ(1.0, state->dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio);
 
-    Furnace(FurnaceNum).FurnaceType_Num = UnitarySys_HeatCool;
-    Furnace(FurnaceNum).HeatPartLoadRatio = 0.0;
-    Furnace(FurnaceNum).CoolPartLoadRatio = 0.0;
-    Furnace(FurnaceNum).MaxCoolAirMassFlow = 2.2;
-    Furnace(FurnaceNum).MaxHeatAirMassFlow = 2.0;
+    state->dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num = UnitarySys_HeatCool;
+    state->dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio = 0.0;
+    state->dataFurnaces->Furnace(FurnaceNum).CoolPartLoadRatio = 0.0;
+    state->dataFurnaces->Furnace(FurnaceNum).MaxCoolAirMassFlow = 2.2;
+    state->dataFurnaces->Furnace(FurnaceNum).MaxHeatAirMassFlow = 2.0;
 
     ReportFurnace(*state, FurnaceNum, 1);
 
     EXPECT_EQ(1.0, state->dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio);
 
-    AirflowNetwork::SimulateAirflowNetwork = 0;
-    Furnace.deallocate();
+    state->dataAirflowNetwork->SimulateAirflowNetwork = 0;
+    state->dataFurnaces->Furnace.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, UnitaryHeatPumpAirToAir_MaxSuppAirTempTest)
@@ -953,8 +951,7 @@ TEST_F(EnergyPlusFixture, UnitaryHeatPumpAirToAir_MaxSuppAirTempTest)
         "  AirLoopHVAC:OutdoorAirSystem,",
         "    OA Sys 1,                !- Name",
         "    OA Sys 1 Controllers,    !- Controller List Name",
-        "    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name",
-        "    Outdoor Air 1 Avail List;!- Availability Manager List Name",
+        "    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name",
 
         "  OutdoorAir:NodeList,",
         "    Outside Air Inlet Node;  !- Node or NodeList Name 1",
@@ -1164,17 +1161,17 @@ TEST_F(EnergyPlusFixture, UnitaryHeatPumpAirToAir_MaxSuppAirTempTest)
     // OutputProcessor::TimeValue.allocate(2);
     ManageSimulation(*state);
     // check the design max air outlet temperature
-    EXPECT_DOUBLE_EQ(45.0, Furnace(1).DesignMaxOutletTemp);
+    EXPECT_DOUBLE_EQ(45.0, state->dataFurnaces->Furnace(1).DesignMaxOutletTemp);
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP(1) = 25000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP(1) = 25000.0;
-    SimFurnace(*state, Furnace(1).Name, FirstHVACIteration, AirLoopNum, CompIndex);
+    SimFurnace(*state, state->dataFurnaces->Furnace(1).Name, FirstHVACIteration, AirLoopNum, CompIndex);
     // check the heating mode is On
-    EXPECT_TRUE(Furnaces::HeatingLoad);
+    EXPECT_TRUE(state->dataFurnaces->HeatingLoad);
     // check the cooling mode is Off
-    EXPECT_FALSE(Furnaces::CoolingLoad);
+    EXPECT_FALSE(state->dataFurnaces->CoolingLoad);
     // check if the air-to-air heat pump outlet temperature is capped at 45.0C
-    EXPECT_NEAR(45.0, Node(Furnace(1).FurnaceOutletNodeNum).Temp, 0.000001);
+    EXPECT_NEAR(45.0, state->dataLoopNodes->Node(state->dataFurnaces->Furnace(1).FurnaceOutletNodeNum).Temp, 0.000001);
 }
 
 } // namespace EnergyPlus

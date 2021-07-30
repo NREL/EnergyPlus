@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -235,7 +236,7 @@ namespace IntegratedHeatPump {
     };
 
     void SimIHP(EnergyPlusData &state,
-                std::string const &CompName,   // Coil Name
+                std::string_view CompName,     // Coil Name
                 int &CompIndex,                // Index for Component name
                 int const CyclingScheme,       // Continuous fan OR cycling compressor
                 Real64 &MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
@@ -342,7 +343,7 @@ struct IntegratedHeatPumpGlobalData : BaseGlobalStruct
 {
 
     bool GetCoilsInputFlag = true;
-    Array1D<IntegratedHeatPump::IntegratedHeatPumpData> IntegratedHeatPumps;
+    EPVector<IntegratedHeatPump::IntegratedHeatPumpData> IntegratedHeatPumps;
 
     void clear_state() override
     {

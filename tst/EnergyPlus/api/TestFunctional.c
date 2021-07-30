@@ -45,24 +45,28 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <stdio.h>
-#include <EnergyPlus/api/func.h>
 #include <EnergyPlus/api/TypeDefs.h>
+#include <EnergyPlus/api/func.h>
 #include <EnergyPlus/api/state.h>
+#include <stdio.h>
 
 int errorsOccurred = 0;
-void errorHandler(int errortype, const char * message) {
+void errorHandler(int errortype, const char *message)
+{
+    (void)errortype;
+    (void)message;
     errorsOccurred++;
 }
 
-int main() {
+int main()
+{
     EnergyPlusState state = stateNew();
     initializeFunctionalAPI(state);
 
     // GLYCOLS
     Glycol glycol = NULL;
     glycol = glycolNew(state, "WatEr");
-    for (int temp=5; temp<35; temp+=10) {
+    for (int temp = 5; temp < 35; temp += 10) {
         Real64 thisTemp = (float)temp;
         Real64 specificHeat = glycolSpecificHeat(state, glycol, thisTemp);
         Real64 density = glycolDensity(state, glycol, thisTemp);
@@ -80,15 +84,16 @@ int main() {
     Real64 thisPress = 100000;
     Real64 satTemp = refrigerantSaturationTemperature(state, refrig, thisPress); // expecting about 100 degC
     printf("C API Test: Saturated Properties: At 100C, Psat=%8.4f; at 100000Pa, Tsat=%8.4f\n", satPress, satTemp);
-    Real64 satLiqDens = refrigerantSaturatedDensity(state, refrig, temperature, 0.0); // liq = 958 kg/m3
+    Real64 satLiqDens = refrigerantSaturatedDensity(state, refrig, temperature, 0.0);    // liq = 958 kg/m3
     Real64 satLiqCp = refrigerantSaturatedSpecificHeat(state, refrig, temperature, 0.0); // liq = 4,216 J/kgK
     Real64 satLiqEnth = refrigerantSaturatedEnthalpy(state, refrig, temperature, 0.0);
     printf("C API Test: Sat Liq at 100C: rho=%8.4f, Cp=%8.4f, h=%8.4f\n", satLiqDens, satLiqCp, satLiqEnth);
-    Real64 satVapDens = refrigerantSaturatedDensity(state, refrig, temperature, 1.0); // vap = 1/1.6718 ~~ 0.59 kg/m3
+    Real64 satVapDens = refrigerantSaturatedDensity(state, refrig, temperature, 1.0);    // vap = 1/1.6718 ~~ 0.59 kg/m3
     Real64 satVapCp = refrigerantSaturatedSpecificHeat(state, refrig, temperature, 1.0); // vap = 2,080 J/kgK
     Real64 satVapEnth = refrigerantSaturatedEnthalpy(state, refrig, temperature, 1.0);
     printf("C API Test: Sat Vap at 100C: rho=%8.4f, Cp=%8.4f, h=%8.4f\n", satVapDens, satVapCp, satVapEnth);
-    Real64 enthDifference = satVapEnth - satLiqEnth; // vap-liq = 2,675,570-419,170 ~ 2,256,400 J/kg
+    // Real64 enthDifference = satVapEnth - satLiqEnth; // vap-liq = 2,675,570-419,170 ~ 2,256,400 J/kg
+
     // superheated properties aren't working, I think there is a bug in the FluidProperties module
     //    temperature = 150;
     //    Real64 supEnth = refrigerantSuperHeatedEnthalpy(refrig, temperature, thisPress);

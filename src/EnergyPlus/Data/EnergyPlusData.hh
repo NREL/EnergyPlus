@@ -64,7 +64,8 @@ namespace EnergyPlus {
 struct AirLoopHVACDOASData;
 struct AirSystemsData;
 struct AirflowNetworkBalanceManagerData;
-struct AutoSizingBaseData;
+struct AirflowNetworkData;
+struct AirflowNetworkSolverData;
 struct BSDFWindowData;
 struct BaseSizerWithFanHeatInputsData;
 struct BaseSizerWithScalableInputsData;
@@ -94,11 +95,13 @@ struct CrossVentMgrData;
 struct CurveManagerData;
 struct DXCoilsData;
 struct DXFEarClippingData;
+struct DataAFNProps;
 struct DataAirLoopData;
 struct DataBranchAirLoopPlantData;
 struct DataDaylightingDevicesData;
 struct DataGlobal;
 struct DataGlobalConstantsData;
+struct DataInputProcessing;
 struct DataPlantData;
 struct DataStringGlobalsData;
 struct DataTimingsData;
@@ -147,7 +150,6 @@ struct HVACControllersData;
 struct HVACCooledBeamData;
 struct HVACCtrlData;
 struct HVACDXHeatPumpSystemData;
-struct HVACDXSystemData;
 struct HVACDuctData;
 struct HVACFanData;
 struct HVACGlobalsData;
@@ -206,6 +208,7 @@ struct OutputProcessorData;
 struct OutputReportPredefinedData;
 struct OutputReportTabularAnnualData;
 struct OutputReportTabularData;
+struct OutputReportsData;
 struct OutputsData;
 struct OutsideEnergySourcesData;
 struct PVWattsData;
@@ -232,6 +235,7 @@ struct PollutionModuleData;
 struct PondGroundHeatExchangerData;
 struct PoweredInductionUnitsData;
 struct PsychrometricsData;
+struct PsychrometricCacheData;
 struct PumpsData;
 struct PurchasedAirManagerData;
 struct RefrigeratedCaseData;
@@ -243,6 +247,7 @@ struct RoomAirModelAirflowNetworkData;
 struct RoomAirModelData;
 struct RoomAirModelManagerData;
 struct RoomAirModelUserTempPatternData;
+struct RootFindingData;
 struct RuntimeLanguageData;
 struct RuntimeLanguageProcessorData;
 struct SQLiteProceduresData;
@@ -270,9 +275,14 @@ struct SystemAirFlowSizerData;
 struct SystemAvailabilityManagerData;
 struct SystemReportsData;
 struct SystemVarsData;
+struct TARCOGCommonData;
 struct TARCOGOutputData;
 struct ThermalChimneysData;
 struct ThermalComfortsData;
+struct ThermalISO15099CalcData;
+struct TARCOGGasses90Data;
+struct TARCOGMainData;
+struct TarcogShadingData;
 struct TranspiredCollectorData;
 struct UCSDSharedData;
 struct UFADManagerData;
@@ -282,6 +292,7 @@ struct UnitarySystemsData;
 struct UserDefinedComponentsData;
 struct UtilityRoutinesData;
 struct VariableSpeedCoilsData;
+struct VectorsData;
 struct VentilatedSlabData;
 struct ViewFactorInfoData;
 struct WaterCoilsData;
@@ -304,7 +315,9 @@ struct ZoneEquipmentManagerData;
 struct ZonePlenumData;
 struct ZoneTempPredictorCorrectorData;
 
-struct EnergyPlusData : BaseGlobalStruct {
+struct EnergyPlusData : BaseGlobalStruct
+{
+    bool ready = true;
 
     IOFiles files;
 
@@ -312,7 +325,8 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<AirLoopHVACDOASData> dataAirLoopHVACDOAS;
     std::unique_ptr<AirSystemsData> dataAirSystemsData;
     std::unique_ptr<AirflowNetworkBalanceManagerData> dataAirflowNetworkBalanceManager;
-    std::unique_ptr<AutoSizingBaseData> dataAutoSizingBase;
+    std::unique_ptr<AirflowNetworkData> dataAirflowNetwork;
+    std::unique_ptr<AirflowNetworkSolverData> dataAFNSolver;
     std::unique_ptr<BSDFWindowData> dataBSDFWindow;
     std::unique_ptr<BaseSizerWithFanHeatInputsData> dataBaseSizerFanHeatInputs;
     std::unique_ptr<BaseSizerWithScalableInputsData> dataBaseSizerScalableInputs;
@@ -342,11 +356,13 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<CurveManagerData> dataCurveManager;
     std::unique_ptr<DXCoilsData> dataDXCoils;
     std::unique_ptr<DXFEarClippingData> dataDXFEarClipping;
+    std::unique_ptr<DataAFNProps> dataAFNProps;
     std::unique_ptr<DataAirLoopData> dataAirLoop;
     std::unique_ptr<DataBranchAirLoopPlantData> dataBranchAirLoopPlant;
     std::unique_ptr<DataDaylightingDevicesData> dataDaylightingDevicesData;
     std::unique_ptr<DataGlobal> dataGlobal;
     std::unique_ptr<DataGlobalConstantsData> dataGlobalConst;
+    std::unique_ptr<DataInputProcessing> dataInputProcessing;
     std::unique_ptr<DataPlantData> dataPlnt;
     std::unique_ptr<DataStringGlobalsData> dataStrGlobals;
     std::unique_ptr<DataTimingsData> dataTimingsData;
@@ -395,7 +411,6 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<HVACCooledBeamData> dataHVACCooledBeam;
     std::unique_ptr<HVACCtrlData> dataHVACCtrl;
     std::unique_ptr<HVACDXHeatPumpSystemData> dataHVACDXHeatPumpSys;
-    std::unique_ptr<HVACDXSystemData> dataHVACDXSys;
     std::unique_ptr<HVACDuctData> dataHVACDuct;
     std::unique_ptr<HVACFanData> dataHVACFan;
     std::unique_ptr<HVACGlobalsData> dataHVACGlobal;
@@ -438,7 +453,7 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<LoopNodeData> dataLoopNodes;
     std::unique_ptr<LowTempRadiantSystemData> dataLowTempRadSys;
     std::unique_ptr<MaterialData> dataMaterial;
-    std::unique_ptr<MatrixDataManagerData> dataMatrixDataMgr;
+    std::unique_ptr<MatrixDataManagerData> dataMatrixDataManager;
     std::unique_ptr<MicroCHPElectricGeneratorData> dataCHPElectGen;
     std::unique_ptr<MicroturbineElectricGeneratorData> dataMircoturbElectGen;
     std::unique_ptr<MixedAirData> dataMixedAir;
@@ -454,6 +469,7 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<OutputReportPredefinedData> dataOutRptPredefined;
     std::unique_ptr<OutputReportTabularAnnualData> dataOutputReportTabularAnnual;
     std::unique_ptr<OutputReportTabularData> dataOutRptTab;
+    std::unique_ptr<OutputReportsData> dataOutputReports;
     std::unique_ptr<OutputsData> dataOutput;
     std::unique_ptr<OutsideEnergySourcesData> dataOutsideEnergySrcs;
     std::unique_ptr<PVWattsData> dataPVWatts;
@@ -480,6 +496,7 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<PondGroundHeatExchangerData> dataPondGHE;
     std::unique_ptr<PoweredInductionUnitsData> dataPowerInductionUnits;
     std::unique_ptr<PsychrometricsData> dataPsychrometrics;
+    std::unique_ptr<PsychrometricCacheData> dataPsychCache;
     std::unique_ptr<PumpsData> dataPumps;
     std::unique_ptr<PurchasedAirManagerData> dataPurchasedAirMgr;
     std::unique_ptr<RefrigeratedCaseData> dataRefrigCase;
@@ -491,6 +508,7 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<RoomAirModelData> dataRoomAirMod;
     std::unique_ptr<RoomAirModelManagerData> dataRoomAirModelMgr;
     std::unique_ptr<RoomAirModelUserTempPatternData> dataRoomAirModelTempPattern;
+    std::unique_ptr<RootFindingData> dataRootFinder;
     std::unique_ptr<RuntimeLanguageData> dataRuntimeLang;
     std::unique_ptr<RuntimeLanguageProcessorData> dataRuntimeLangProcessor;
     std::unique_ptr<SQLiteProceduresData> dataSQLiteProcedures;
@@ -518,9 +536,14 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<SystemAvailabilityManagerData> dataSystemAvailabilityManager;
     std::unique_ptr<SystemReportsData> dataSysRpts;
     std::unique_ptr<SystemVarsData> dataSysVars;
+    std::unique_ptr<TARCOGCommonData> dataTARCOGCommon;
     std::unique_ptr<TARCOGOutputData> dataTARCOGOutputs;
     std::unique_ptr<ThermalChimneysData> dataThermalChimneys;
     std::unique_ptr<ThermalComfortsData> dataThermalComforts;
+    std::unique_ptr<ThermalISO15099CalcData> dataThermalISO15099Calc;
+    std::unique_ptr<TARCOGGasses90Data> dataTARCOGGasses90;
+    std::unique_ptr<TARCOGMainData> dataTARCOGMain;
+    std::unique_ptr<TarcogShadingData> dataTarcogShading;
     std::unique_ptr<TranspiredCollectorData> dataTranspiredCollector;
     std::unique_ptr<UCSDSharedData> dataUCSDShared;
     std::unique_ptr<UFADManagerData> dataUFADManager;
@@ -530,6 +553,7 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<UserDefinedComponentsData> dataUserDefinedComponents;
     std::unique_ptr<UtilityRoutinesData> dataUtilityRoutines;
     std::unique_ptr<VariableSpeedCoilsData> dataVariableSpeedCoils;
+    std::unique_ptr<VectorsData> dataVectors;
     std::unique_ptr<VentilatedSlabData> dataVentilatedSlab;
     std::unique_ptr<ViewFactorInfoData> dataViewFactor;
     std::unique_ptr<WaterCoilsData> dataWaterCoils;
@@ -560,8 +584,7 @@ struct EnergyPlusData : BaseGlobalStruct {
     EnergyPlusData(EnergyPlusData &&) = delete;
 
     void clear_state() override;
-
 };
 
-}
+} // namespace EnergyPlus
 #endif

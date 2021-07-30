@@ -59,13 +59,13 @@ Several levels of actuators are available for on/off supervisory control of Plan
 
 \subsection{Outdoor Air System Node Conditions}\label{outdoor-air-system-node-conditions}
 
-Actuators called ``Outdoor Air System Node'' are available with control types called ``Drybulb Temperature'' and ``Wetbulb Temperature.''~ The units are degrees Celsius. These actuators are available for all system nodes that are listed in either an OutdoorAir:Node or OutdoorAir:NodeList input object. You should probably set both the drybulb and wetbulb temperatures to ensure a full description of the moist air conditions.
+Actuators called ``Outdoor Air System Node'' are available with control types called ``Drybulb Temperature'' and ``Wetbulb Temperature.''~ The units are degrees Celsius. These actuators are available for all system nodes that are listed in either an OutdoorAir:Node or OutdoorAir:NodeList input object. You should probably set both the drybulb and wetbulb temperatures to ensure a full description of the moist air conditions.  In addition, there are also actuators for "Wind Speed" and "Wind Direction" with the units of meters/second and degrees, respectively.
 
 The air system and many component models require you to specify a node as an outdoor air node to obtain values for the outdoor conditions. For example, outdoor air nodes are used at the inlet to an outdoor air mixer or at the inlet of the heat rejection side of a component model. Typically this is the weather data value for outdoor conditions. But local variations in microclimate may shift the local outdoor air temperature to differ slightly from the weather data. (Currently the only local variation model for this effect in EnergyPlus varies the outdoor air conditions as a function of height.)~ If you want to experiment with other models for local variations in outdoor air conditions, this EMS actuator allows you to override the outdoor temperature at a particular system node with any model that can be implemented in an Erl program. For example (although better models for the changes in conditions may need be developed), this actuator could be used to examine the energy impacts of warmer outdoor air temperatures experienced by a rooftop packaged HVAC system sitting on a black roof or the cooler conditions experienced by a unit that is located on the shaded side of a building.~ Another example is to make use of a separate model, outside of EnergyPlus, for some unique type of component (such as a labyrinth or earth-tube) that preconditions outdoor air; the results of that model could be fed into the air system model in EnergyPlus using these actuators.
 
 \subsection{AirLoopHVAC Availability Status}\label{airloophvac-availability-status}
 
-This actuator is available in all models with central, or primary, air systems that are entered with the object ``AirLoopHVAC.''~ Various availability managers use the air loop's availability status to override control of the central air system fan. The fan may be scheduled to be unavailable during certain times to shut down the system when it is not needed. However, there may be times when the air system should be started to protect from freezing, for example. This actuator can force an air system to start up or shut down.
+This actuator is available in all models with central, or primary, air systems that are entered with the object ``AirLoopHVAC'' using the control type called ``Availability Status.''~ Various availability managers use the air loop's availability status to override control of the central air system fan. The fan may be scheduled to be unavailable during certain times to shut down the system when it is not needed. However, there may be times when the air system should be started to protect from freezing, for example. This actuator can force an air system to start up or shut down.
 
 The control is actuated by setting values for the availability status. The settings are numeric, but represent discrete states the status can take. The following settings are valid:
 
@@ -94,7 +94,26 @@ An actuator is also available for overriding the autosize value for the fan's de
 
 \subsection{DX Cooling Coils}\label{dx-cooling-coils}
 
-Actuators are available for overriding the autosize values related to the size of single speed DX coils.~ Actuators called ``Coil:Cooling:DX:SingleSpeed'' are available with control types ``Autosized Rated Air Flow Rate'' (in m3/s), ``Autosized Rated Sensible Heat Ratio'' (in W/W), and ``Autosized Rated Total Cooling Capacity'' (in W).~ These are only useful from the calling point named AfterComponentInputReadIn.
+Actuators are available for overriding the autosize rated airflow rate and total cooling capacity of the Coil:Cooling:DX object.~ Actuators called ``Coil:Cooling:DX:SingleSpeed'' are available with control types ``Autosized Rated Air Flow Rate'' (in m3/s), ``Autosized Rated Total Cooling Capacity'' (in W), and ``Autosized Rated Sensible Heat Ratio'' (in W/W).~ These are only useful from the calling point named AfterComponentInputReadIn.
+
+\subsection{DX Thermal Storage Coils}\label{dx-thermal-storage-coils}
+
+There is an actuator that is available for overriding the operating mode of the DX thermal storage coil object.~ The actuator is called ``Coil:Cooling:DX:SingleSpeed:ThermalStorage'' and is available with the control type ``Operating Mode.''  The operating mode has the following states/values:
+
+\begin{itemize}
+\item
+0 = Off Mode
+\item
+1 = Cooling Only Mode
+\item
+2 = Cooling and Charge Mode
+\item
+3 = Cooling and Discharge Mode
+\item
+4 = Charge Only Mode
+\item
+5 = Discharge Only Mode
+\end{itemize}
 
 \subsection{Unitary Equipment}\label{unitary-equipment}
 
@@ -108,7 +127,7 @@ Actuators are available for overriding the autosize values related to supply air
 \item
   An actuator called ``AirLoopHVAC:UnitaryHeatOnly'' is available with control type ``Autosized Supply Air Flow Rate.''
 \item
-  Actuators called ``AirLoopHVAC:Unitary:Furnace:HeatCool'' and ``AirLoopHVAC:UnitaryHeatCool''are available with control types ``Autosized Supply Air Flow Rate,''~ ``Autosized Supply Air Flow Rate During Cooling Operation,'' ``Autosized Supply Air Flow Rate During Heating Operation,'' and ``Autosized Supply Air Flow Rate During No Heating or Cooling Operation.''
+  Actuators called ``AirLoopHVAC:Unitary:Furnace:HeatCool,''  ``AirLoopHVAC:UnitaryHeatCool,'' and ``UnitarySystem'' are available with control types ``Autosized Supply Air Flow Rate,''~ ``Autosized Supply Air Flow Rate During Cooling Operation,'' ``Autosized Supply Air Flow Rate During Heating Operation,'' and ``Autosized Supply Air Flow Rate During No Heating or Cooling Operation.''
 \item
   An actuator called ``AirLoopHVAC:UnitaryHeatPump:AirToAir'' is available with control type ``Autosized Supply Air Flow Rate.''
 \item
@@ -122,6 +141,10 @@ An actuator called ``AirTerminal:SingleDuct:ConstantVolume:NoReheat'' is availab
 \subsection{Outdoor Air Controller}\label{outdoor-air-controller}
 
 An actuator called ``Outdoor Air Controller'' is available with the control type called ``Air Mass Flow Rate.'' ~This provides override control over the rate of outdoor air. The units are kg/s. The unique identifier is the name of the Controller:OutdoorAir input object. The actuated mass flow rate is not allowed to be greater than the current system mixed air flow rate.
+
+\subsection{Plant Equipment Operation}\label{plant-equipment-operation}
+
+An actuator called ``Plant Equipment Operation'' is available with a control type called ``Distributed Load Rate.''~ The units are Watts.  This allows the override of the assigned distributed load for plant equipment.
 
 \subsection{Plant Load Profile}\label{plant-load-profile}
 

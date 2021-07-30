@@ -63,28 +63,29 @@ namespace FuelCellElectricGenerator {
 
     struct FCPowerModuleStruct
     {
-        std::string Name;           // name of this PowerModule data
-        DataGenerators::CurveMode EffMode;                // mode for efficiency curves
-        int EffCurveID;             // pointer to curve for efficiency
-        Real64 NomEff;              // nominal efficiency
-        Real64 NomPel;              // nominal power rate at rating point
-        int NumCycles;              // number of start stop cycles
-        Real64 CyclingDegradRat;    // rate of degradation from cycles
-        Real64 NumRunHours;         // number of hours of operation
-        Real64 OperateDegradRat;    // rate of degradation from run time (per hour)
-        Real64 ThreshRunHours;      // number of hours before degradation starts
-        Real64 UpTranLimit;         // power up transient limit
-        Real64 DownTranLimit;       // power down tran limit
-        Real64 StartUpTime;         // time for start up [hours]
-        Real64 StartUpFuel;         // fuel use during start up
-        Real64 StartUpElectConsum;  // electricity used during start up
-        Real64 StartUpElectProd;    // electricity produced during start up
-        Real64 ShutDownTime;        // time to shut down [hours]
-        Real64 ShutDownFuel;        // fuel consumed during shut down
-        Real64 ShutDownElectConsum; // Elect consumed during shut down
-        Real64 ANC0;                // Ancilliary Loads constant term
-        Real64 ANC1;                // Ancilliary Loads linear term
-        DataGenerators::SkinLoss SkinLossMode;           // how are skin losses determined
+        std::string Name;                      // name of this PowerModule data
+        DataGenerators::CurveMode EffMode;     // mode for efficiency curves
+        int EffCurveID;                        // pointer to curve for efficiency
+        Real64 NomEff;                         // nominal efficiency
+        Real64 NomPel;                         // nominal power rate at rating point
+        int NumCyclesAtStart;                  // number of start stop cycles at beggining of simulation (user input)
+        int NumCycles;                         // number of start stop cycles
+        Real64 CyclingDegradRat;               // rate of degradation from cycles
+        Real64 NumRunHours;                    // number of hours of operation
+        Real64 OperateDegradRat;               // rate of degradation from run time (per hour)
+        Real64 ThreshRunHours;                 // number of hours before degradation starts
+        Real64 UpTranLimit;                    // power up transient limit
+        Real64 DownTranLimit;                  // power down tran limit
+        Real64 StartUpTime;                    // time for start up [hours]
+        Real64 StartUpFuel;                    // fuel use during start up
+        Real64 StartUpElectConsum;             // electricity used during start up
+        Real64 StartUpElectProd;               // electricity produced during start up
+        Real64 ShutDownTime;                   // time to shut down [hours]
+        Real64 ShutDownFuel;                   // fuel consumed during shut down
+        Real64 ShutDownElectConsum;            // Elect consumed during shut down
+        Real64 ANC0;                           // Ancilliary Loads constant term
+        Real64 ANC1;                           // Ancilliary Loads linear term
+        DataGenerators::SkinLoss SkinLossMode; // how are skin losses determined
         std::string ZoneName;
         int ZoneID; // "pointer" to zone with component in it
         Real64 RadiativeFract;
@@ -131,32 +132,32 @@ namespace FuelCellElectricGenerator {
 
         // Default Constructor
         FCPowerModuleStruct()
-            : EffMode(DataGenerators::CurveMode::Unassigned), EffCurveID(0), NomEff(0.0), NomPel(0.0), NumCycles(0), CyclingDegradRat(0.0), NumRunHours(0.0), OperateDegradRat(0.0),
-              ThreshRunHours(0.0), UpTranLimit(0.0), DownTranLimit(0.0), StartUpTime(0.0), StartUpFuel(0.0), StartUpElectConsum(0.0),
-              StartUpElectProd(0.0), ShutDownTime(0.0), ShutDownFuel(0.0), ShutDownElectConsum(0.0), ANC0(0.0), ANC1(0.0), SkinLossMode(DataGenerators::SkinLoss::Unassigned), ZoneID(0),
-              RadiativeFract(0.0), QdotSkin(0.0), UAskin(0.0), SkinLossCurveID(0), WaterSupplyCurveID(0), NdotDilutionAir(0.0),
-              StackHeatLossToDilution(0.0), DilutionInletNode(0), DilutionExhaustNode(0), PelMin(0.0), PelMax(0.0), Pel(0.0), PelLastTimeStep(0.0),
-              Eel(0.0), QdotStackCool(0.0), FractionalDayofLastStartUp(0.0), FractionalDayofLastShutDown(0.0), HasBeenOn(true), DuringShutDown(false),
-              DuringStartUp(false), NdotFuel(0.0), TotFuelInEnthalphy(0.0), NdotProdGas(0.0), ConstitMolalFract(14, 0.0), GasLibID(14, 0),
-              TprodGasLeavingFCPM(0.0), NdotAir(0.0), TotAirInEnthalphy(0.0), NdotLiqwater(0.0), TwaterInlet(0.0), WaterInEnthalpy(0.0),
-              DilutionAirInEnthalpy(0.0), DilutionAirOutEnthalpy(0.0), PelancillariesAC(0.0), TotProdGasEnthalphy(0.0), WaterOutEnthalpy(0.0),
-              SeqSubstitIter(0), RegulaFalsiIter(0)
+            : EffMode(DataGenerators::CurveMode::Unassigned), EffCurveID(0), NomEff(0.0), NomPel(0.0), NumCycles(0), CyclingDegradRat(0.0),
+              NumRunHours(0.0), OperateDegradRat(0.0), ThreshRunHours(0.0), UpTranLimit(0.0), DownTranLimit(0.0), StartUpTime(0.0), StartUpFuel(0.0),
+              StartUpElectConsum(0.0), StartUpElectProd(0.0), ShutDownTime(0.0), ShutDownFuel(0.0), ShutDownElectConsum(0.0), ANC0(0.0), ANC1(0.0),
+              SkinLossMode(DataGenerators::SkinLoss::Unassigned), ZoneID(0), RadiativeFract(0.0), QdotSkin(0.0), UAskin(0.0), SkinLossCurveID(0),
+              WaterSupplyCurveID(0), NdotDilutionAir(0.0), StackHeatLossToDilution(0.0), DilutionInletNode(0), DilutionExhaustNode(0), PelMin(0.0),
+              PelMax(0.0), Pel(0.0), PelLastTimeStep(0.0), Eel(0.0), QdotStackCool(0.0), FractionalDayofLastStartUp(0.0),
+              FractionalDayofLastShutDown(0.0), HasBeenOn(true), DuringShutDown(false), DuringStartUp(false), NdotFuel(0.0), TotFuelInEnthalphy(0.0),
+              NdotProdGas(0.0), ConstitMolalFract(14, 0.0), GasLibID(14, 0), TprodGasLeavingFCPM(0.0), NdotAir(0.0), TotAirInEnthalphy(0.0),
+              NdotLiqwater(0.0), TwaterInlet(0.0), WaterInEnthalpy(0.0), DilutionAirInEnthalpy(0.0), DilutionAirOutEnthalpy(0.0),
+              PelancillariesAC(0.0), TotProdGasEnthalphy(0.0), WaterOutEnthalpy(0.0), SeqSubstitIter(0), RegulaFalsiIter(0)
         {
         }
     };
 
     struct FCAirSupplyDataStruct
     {
-        std::string Name;            // name of this
-        std::string NodeName;        // Air supply node name
-        int SupNodeNum;              // Air supply node ID
-        int BlowerPowerCurveID;      // "pointer" to blower power quadratic
-        Real64 BlowerHeatLossFactor; // alpha for blower heat loss fraction
-        DataGenerators::AirSupRateMode AirSupRateMode;          // control for modeling method used to deterime supply air flow rate
-        Real64 Stoics;               // excess air ratio
-        int AirFuncPelCurveID;       // "pointer" to curve for air as function of power
-        Real64 AirTempCoeff;         // coeff a3 in equ 16.
-        int AirFuncNdotCurveID;      // "pointer" to curve for air as function of fuel flow rate
+        std::string Name;                              // name of this
+        std::string NodeName;                          // Air supply node name
+        int SupNodeNum;                                // Air supply node ID
+        int BlowerPowerCurveID;                        // "pointer" to blower power quadratic
+        Real64 BlowerHeatLossFactor;                   // alpha for blower heat loss fraction
+        DataGenerators::AirSupRateMode AirSupRateMode; // control for modeling method used to deterime supply air flow rate
+        Real64 Stoics;                                 // excess air ratio
+        int AirFuncPelCurveID;                         // "pointer" to curve for air as function of power
+        Real64 AirTempCoeff;                           // coeff a3 in equ 16.
+        int AirFuncNdotCurveID;                        // "pointer" to curve for air as function of fuel flow rate
         DataGenerators::RecoverMode IntakeRecoveryMode;
         DataGenerators::ConstituentMode ConstituentMode; // how are air data input
         int NumConstituents;
@@ -173,24 +174,25 @@ namespace FuelCellElectricGenerator {
 
         // Default Constructor
         FCAirSupplyDataStruct()
-            : SupNodeNum(0), BlowerPowerCurveID(0), BlowerHeatLossFactor(0.0), AirSupRateMode(DataGenerators::AirSupRateMode::Unassigned), Stoics(0.0), AirFuncPelCurveID(0),
-              AirTempCoeff(0.0), AirFuncNdotCurveID(0), IntakeRecoveryMode(DataGenerators::RecoverMode::Unassigned), ConstituentMode(DataGenerators::ConstituentMode::Unassigned), NumConstituents(0), ConstitName(14),
-              ConstitMolalFract(14, 0.0), GasLibID(14, 0), O2fraction(0.0), TairIntoBlower(0.0), TairIntoFCPM(0.0), PairCompEl(0.0), QskinLoss(0.0),
-              QintakeRecovery(0.0)
+            : SupNodeNum(0), BlowerPowerCurveID(0), BlowerHeatLossFactor(0.0), AirSupRateMode(DataGenerators::AirSupRateMode::Unassigned),
+              Stoics(0.0), AirFuncPelCurveID(0), AirTempCoeff(0.0), AirFuncNdotCurveID(0),
+              IntakeRecoveryMode(DataGenerators::RecoverMode::Unassigned), ConstituentMode(DataGenerators::ConstituentMode::Unassigned),
+              NumConstituents(0), ConstitName(14), ConstitMolalFract(14, 0.0), GasLibID(14, 0), O2fraction(0.0), TairIntoBlower(0.0),
+              TairIntoFCPM(0.0), PairCompEl(0.0), QskinLoss(0.0), QintakeRecovery(0.0)
         {
         }
     };
 
     struct FCWaterSupplyDataStruct
     {
-        std::string Name;          // name of this water supply module
-        DataGenerators::WaterTemperatureMode WaterTempMode;         // temperature of water inlet determination
-        std::string NodeName;      // node name for temperature at input
-        int NodeNum;               // node number for temperature at input
-        int SchedNum;              // water temperature at input
-        int WaterSupRateCurveID;   // "pointer" to water flow rate curve as a function of fuel rate
-        int PmpPowerCurveID;       // "pointer to Pump power curve as a function of water flow Rate
-        Real64 PmpPowerLossFactor; // Pump heat loss factor
+        std::string Name;                                   // name of this water supply module
+        DataGenerators::WaterTemperatureMode WaterTempMode; // temperature of water inlet determination
+        std::string NodeName;                               // node name for temperature at input
+        int NodeNum;                                        // node number for temperature at input
+        int SchedNum;                                       // water temperature at input
+        int WaterSupRateCurveID;                            // "pointer" to water flow rate curve as a function of fuel rate
+        int PmpPowerCurveID;                                // "pointer to Pump power curve as a function of water flow Rate
+        Real64 PmpPowerLossFactor;                          // Pump heat loss factor
         // calculated data
         bool IsModeled;
         Real64 TwaterIntoCompress; // inlet Water Temperature
@@ -200,8 +202,8 @@ namespace FuelCellElectricGenerator {
 
         // Default Constructor
         FCWaterSupplyDataStruct()
-            : WaterTempMode(DataGenerators::WaterTemperatureMode::Unassigned), NodeNum(0), SchedNum(0), WaterSupRateCurveID(0), PmpPowerCurveID(0), PmpPowerLossFactor(0.0), IsModeled(true),
-              TwaterIntoCompress(0.0), TwaterIntoFCPM(0.0), PwaterCompEl(0.0), QskinLoss(0.0)
+            : WaterTempMode(DataGenerators::WaterTemperatureMode::Unassigned), NodeNum(0), SchedNum(0), WaterSupRateCurveID(0), PmpPowerCurveID(0),
+              PmpPowerLossFactor(0.0), IsModeled(true), TwaterIntoCompress(0.0), TwaterIntoFCPM(0.0), PwaterCompEl(0.0), QskinLoss(0.0)
         {
         }
     };
@@ -231,42 +233,42 @@ namespace FuelCellElectricGenerator {
 
         // Default Constructor
         FCAuxilHeatDataStruct()
-            : ZoneID(0), UASkin(0.0), ExcessAirRAT(0.0), ANC0(0.0), ANC1(0.0), SkinLossDestination(DataGenerators::LossDestination::Unassigned), MaxPowerW(0.0), MinPowerW(0.0),
-              MaxPowerkmolperSec(0.0), MinPowerkmolperSec(0.0), NumConstituents(0), TauxMix(0.0), NdotAuxMix(0.0), ConstitMolalFract(14, 0.0),
-              GasLibID(14, 0), QskinLoss(0.0), QairIntake(0.0)
+            : ZoneID(0), UASkin(0.0), ExcessAirRAT(0.0), ANC0(0.0), ANC1(0.0), SkinLossDestination(DataGenerators::LossDestination::Unassigned),
+              MaxPowerW(0.0), MinPowerW(0.0), MaxPowerkmolperSec(0.0), MinPowerkmolperSec(0.0), NumConstituents(0), TauxMix(0.0), NdotAuxMix(0.0),
+              ConstitMolalFract(14, 0.0), GasLibID(14, 0), QskinLoss(0.0), QairIntake(0.0)
         {
         }
     };
 
     struct FCExhaustHXDataStruct
     {
-        std::string Name;                 // name of this exhaust gas heat recovery
-        std::string WaterInNodeName;      // HR Water Inlet Node
-        int WaterInNode;                  // HR Water Outlet Node ID
-        std::string WaterOutNodeName;     // HR water outlet Node name
-        int WaterOutNode;                 // HR Water outlet Node ID
-        Real64 WaterVolumeFlowMax;        // HR water flow rate max avail
-        std::string ExhaustOutNodeName;   // air node for exhaust flow
-        int ExhaustOutNode;               // Exhaust Air node ID
-        DataGenerators::ExhaustGasHX HXmodelMode;                  // Heat Exchanger Calculation Method
-        Real64 HXEffect;                  // Heat Exchanger Effectiveness (method 1)
-        Real64 hxs0;                      // (method 2)
-        Real64 hxs1;                      // (method 2)
-        Real64 hxs2;                      // (method 2)
-        Real64 hxs3;                      // (method 2)
-        Real64 hxs4;                      // (method 2)
-        Real64 h0gas;                     // (method 3)
-        Real64 NdotGasRef;                // (method 3)
-        Real64 nCoeff;                    // (method 3)
-        Real64 AreaGas;                   // (method 3)
-        Real64 h0Water;                   // (method 3)
-        Real64 NdotWaterRef;              // (method 3)
-        Real64 mCoeff;                    // (method 3)
-        Real64 AreaWater;                 // (method 3)
-        Real64 Fadjust;                   // (method 3)
-        Real64 l1Coeff;                   // (method 4)
-        Real64 l2Coeff;                   // (method 4)
-        Real64 CondensationThresholdTemp; // (method 4) [degrees C]
+        std::string Name;                         // name of this exhaust gas heat recovery
+        std::string WaterInNodeName;              // HR Water Inlet Node
+        int WaterInNode;                          // HR Water Outlet Node ID
+        std::string WaterOutNodeName;             // HR water outlet Node name
+        int WaterOutNode;                         // HR Water outlet Node ID
+        Real64 WaterVolumeFlowMax;                // HR water flow rate max avail
+        std::string ExhaustOutNodeName;           // air node for exhaust flow
+        int ExhaustOutNode;                       // Exhaust Air node ID
+        DataGenerators::ExhaustGasHX HXmodelMode; // Heat Exchanger Calculation Method
+        Real64 HXEffect;                          // Heat Exchanger Effectiveness (method 1)
+        Real64 hxs0;                              // (method 2)
+        Real64 hxs1;                              // (method 2)
+        Real64 hxs2;                              // (method 2)
+        Real64 hxs3;                              // (method 2)
+        Real64 hxs4;                              // (method 2)
+        Real64 h0gas;                             // (method 3)
+        Real64 NdotGasRef;                        // (method 3)
+        Real64 nCoeff;                            // (method 3)
+        Real64 AreaGas;                           // (method 3)
+        Real64 h0Water;                           // (method 3)
+        Real64 NdotWaterRef;                      // (method 3)
+        Real64 mCoeff;                            // (method 3)
+        Real64 AreaWater;                         // (method 3)
+        Real64 Fadjust;                           // (method 3)
+        Real64 l1Coeff;                           // (method 4)
+        Real64 l2Coeff;                           // (method 4)
+        Real64 CondensationThresholdTemp;         // (method 4) [degrees C]
         // calculated
         Real64 qHX;                     // heat flow from gas stream to water
         Real64 THXexh;                  // temperature of exhaust gases leaving heat exchanger.
@@ -283,11 +285,11 @@ namespace FuelCellElectricGenerator {
 
         // Default Constructor
         FCExhaustHXDataStruct()
-            : WaterInNode(0), WaterOutNode(0), WaterVolumeFlowMax(0.0), ExhaustOutNode(0), HXmodelMode(DataGenerators::ExhaustGasHX::Unassigned), HXEffect(0.0), hxs0(0.0), hxs1(0.0),
-              hxs2(0.0), hxs3(0.0), hxs4(0.0), h0gas(0.0), NdotGasRef(0.0), nCoeff(0.0), AreaGas(0.0), h0Water(0.0), NdotWaterRef(0.0), mCoeff(0.0),
-              AreaWater(0.0), Fadjust(0.0), l1Coeff(0.0), l2Coeff(0.0), CondensationThresholdTemp(0.0), qHX(0.0), THXexh(0.0),
-              WaterMassFlowRateDesign(0.0), WaterMassFlowRate(0.0), WaterInletTemp(0.0), WaterVaporFractExh(0.0), CondensateRate(0.0),
-              ConstitMolalFract(14, 0.0), GasLibID(14, 0), NdotHXleaving(0.0), WaterOutletTemp(0.0), WaterOutletEnthalpy(0.0)
+            : WaterInNode(0), WaterOutNode(0), WaterVolumeFlowMax(0.0), ExhaustOutNode(0), HXmodelMode(DataGenerators::ExhaustGasHX::Unassigned),
+              HXEffect(0.0), hxs0(0.0), hxs1(0.0), hxs2(0.0), hxs3(0.0), hxs4(0.0), h0gas(0.0), NdotGasRef(0.0), nCoeff(0.0), AreaGas(0.0),
+              h0Water(0.0), NdotWaterRef(0.0), mCoeff(0.0), AreaWater(0.0), Fadjust(0.0), l1Coeff(0.0), l2Coeff(0.0), CondensationThresholdTemp(0.0),
+              qHX(0.0), THXexh(0.0), WaterMassFlowRateDesign(0.0), WaterMassFlowRate(0.0), WaterInletTemp(0.0), WaterVaporFractExh(0.0),
+              CondensateRate(0.0), ConstitMolalFract(14, 0.0), GasLibID(14, 0), NdotHXleaving(0.0), WaterOutletTemp(0.0), WaterOutletEnthalpy(0.0)
         {
         }
     };
@@ -339,17 +341,18 @@ namespace FuelCellElectricGenerator {
 
         // Default Constructor
         FCElecStorageDataStruct()
-            : StorageModelMode(DataGenerators::ElectricalStorage::Unassigned), StartingEnergyStored(0.0), EnergeticEfficCharge(0.0), EnergeticEfficDischarge(0.0), MaxPowerDraw(0.0),
-              MaxPowerStore(0.0), NominalVoltage(0.0), NominalEnergyCapacity(0.0), ThisTimeStepStateOfCharge(0.0), LastTimeStepStateOfCharge(0.0),
-              PelNeedFromStorage(0.0), IdesiredDischargeCurrent(0.0), PelFromStorage(0.0), IfromStorage(0.0), PelIntoStorage(0.0), QairIntake(0.0)
+            : StorageModelMode(DataGenerators::ElectricalStorage::Unassigned), StartingEnergyStored(0.0), EnergeticEfficCharge(0.0),
+              EnergeticEfficDischarge(0.0), MaxPowerDraw(0.0), MaxPowerStore(0.0), NominalVoltage(0.0), NominalEnergyCapacity(0.0),
+              ThisTimeStepStateOfCharge(0.0), LastTimeStepStateOfCharge(0.0), PelNeedFromStorage(0.0), IdesiredDischargeCurrent(0.0),
+              PelFromStorage(0.0), IfromStorage(0.0), PelIntoStorage(0.0), QairIntake(0.0)
         {
         }
     };
 
     struct FCInverterDataStruct
     {
-        std::string Name; // name of this inverter
-        DataGenerators::InverterEfficiencyMode EffMode;      // efficiency calculation mode
+        std::string Name;                               // name of this inverter
+        DataGenerators::InverterEfficiencyMode EffMode; // efficiency calculation mode
         Real64 ConstEff;
         int EffQuadraticCurveID;
         // calculated and from elsewhere
@@ -357,7 +360,8 @@ namespace FuelCellElectricGenerator {
         Real64 QairIntake;
 
         // Default Constructor
-        FCInverterDataStruct() : EffMode(DataGenerators::InverterEfficiencyMode::Unassigned), ConstEff(0.0), EffQuadraticCurveID(0), PCUlosses(0.0), QairIntake(0.0)
+        FCInverterDataStruct()
+            : EffMode(DataGenerators::InverterEfficiencyMode::Unassigned), ConstEff(0.0), EffQuadraticCurveID(0), PCUlosses(0.0), QairIntake(0.0)
         {
         }
     };
@@ -437,6 +441,8 @@ namespace FuelCellElectricGenerator {
         Real64 ThermalEfficiency;
         Real64 OverallEfficiency;
         Real64 ExergyEfficiency;
+        int NumCycles;       // Number of start-stop cycles
+        Real64 FCPMSkinLoss; // Power module skin losses [W]
 
         // Default Constructor
         FCReportDataStruct()
@@ -450,7 +456,8 @@ namespace FuelCellElectricGenerator {
               WaterVaporFractExh(0.0), CondensateRate(0.0), SeqSubstIterations(0), RegulaFalsiIterations(0), ACancillariesPower(0.0),
               ACancillariesEnergy(0.0), PCUlosses(0.0), DCPowerGen(0.0), DCPowerEff(0.0), ElectEnergyinStorage(0.0), StoredPower(0.0),
               StoredEnergy(0.0), DrawnPower(0.0), DrawnEnergy(0.0), SkinLossPower(0.0), SkinLossEnergy(0.0), SkinLossConvect(0.0),
-              SkinLossRadiat(0.0), ElectEfficiency(0.0), ThermalEfficiency(0.0), OverallEfficiency(0.0), ExergyEfficiency(0.0)
+              SkinLossRadiat(0.0), ElectEfficiency(0.0), ThermalEfficiency(0.0), OverallEfficiency(0.0), ExergyEfficiency(0.0), NumCycles(0),
+              FCPMSkinLoss(0.0)
         {
         }
     };
@@ -533,10 +540,16 @@ namespace FuelCellElectricGenerator {
         bool MyWarmupFlag_Init;
         bool MyPlantScanFlag_Init;
 
+        int SolverErr_Type1_Iter;      // Iteration counter for Fuel Cell solver root finding Type 1 error warning messages
+        int SolverErr_Type1_IterIndex; // Index for Fuel Cell solver root finding Type 1 error warning messages
+        int SolverErr_Type2_Iter;      // Iteration counter for Fuel Cell solver root finding Type 2 error warning messages
+        int SolverErr_Type2_IterIndex; // Index for Fuel Cell solver root finding Type 2 error warning messages
+
         // Default Constructor
         FCDataStruct()
             : TypeOf(0), FuelSupNum(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), ACPowerGen(0.0), QconvZone(0.0), QradZone(0.0),
-              DynamicsControlID(0), TimeElapsed(0.0), MyEnvrnFlag_Init(true), MyWarmupFlag_Init(false), MyPlantScanFlag_Init(true)
+              DynamicsControlID(0), TimeElapsed(0.0), MyEnvrnFlag_Init(true), MyWarmupFlag_Init(false), MyPlantScanFlag_Init(true),
+              SolverErr_Type1_Iter(0), SolverErr_Type1_IterIndex(0), SolverErr_Type2_Iter(0), SolverErr_Type2_IterIndex(0)
         {
         }
 
@@ -546,29 +559,32 @@ namespace FuelCellElectricGenerator {
 
         void initialize(EnergyPlusData &state);
 
-        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(
+            EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void setupOutputVars(EnergyPlusData &state);
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
 
         void FigureAirHeatCap(EnergyPlusData &state, Real64 FluidTemp, Real64 &Cp);
 
         void FigureAirEnthalpy(EnergyPlusData &state, Real64 FluidTemp, Real64 &Hair);
 
-        void FigureFuelHeatCap(EnergyPlusData &state, Real64 FluidTemp, Real64 &Cp);
+        void FigureFuelHeatCap(EnergyPlusData &state, Real64 FluidTemp, Real64 &Cp) const;
 
-        void FigureFuelEnthalpy(EnergyPlusData &state, Real64 FluidTemp, Real64 &Hfuel);
+        void FigureFuelEnthalpy(EnergyPlusData &state, Real64 FluidTemp, Real64 &Hfuel) const;
 
         void FigureProductGasesEnthalpy(EnergyPlusData &state, Real64 FluidTemp, Real64 &HProdGases);
-
-        void FigureProductGasHeatCap(EnergyPlusData &state, Real64 FluidTemp, Real64 &Cp);
 
         void FigureAuxilHeatGasHeatCap(EnergyPlusData &state, Real64 FluidTemp, Real64 &Cp);
 
         void FigureACAncillaries(EnergyPlusData &state, Real64 &PacAncill);
 
-        void FigurePowerConditioningLosses(EnergyPlusData &state, Real64 Pdemand, Real64 &PpcuLosses);
+        void FigurePowerConditioningLosses(EnergyPlusData &state, Real64 Pdemand, Real64 &PpcuLosses) const;
 
         void FigureTransientConstraints(EnergyPlusData &state,
                                         Real64 &Pel,       // DC power control setting for power module
@@ -576,7 +592,7 @@ namespace FuelCellElectricGenerator {
                                         Real64 &PelDiff    // if constrained then this is the difference, positive
         );
 
-        Real64 FuelCellProductGasEnthResidual(EnergyPlusData &state, Real64 TprodGas, Array1D<Real64> const &Par);
+        Real64 FuelCellProductGasEnthResidual(EnergyPlusData &state, Real64 TprodGas, std::array<Real64, 2> const &Par);
 
         static void FigureGaseousWaterEnthalpy(Real64 FluidTemp, Real64 &HGasWater);
 
@@ -590,7 +606,7 @@ namespace FuelCellElectricGenerator {
 
         void CalcFuelCellGeneratorModel(EnergyPlusData &state, bool RunFlag, Real64 MyLoad, bool FirstHVACIteration);
 
-        void CalcUpdateHeatRecovery(EnergyPlusData &state, bool FirstHVACIteration);
+        void CalcUpdateHeatRecovery(EnergyPlusData &state, bool FirstHVACIteration) const;
 
         void ManageElectStorInteractions(EnergyPlusData &state,
                                          Real64 Pdemand,
@@ -606,6 +622,8 @@ namespace FuelCellElectricGenerator {
                                   bool FirstHVACIteration);
 
         void UpdateFuelCellGeneratorRecords(EnergyPlusData &state);
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     void getFuelCellInput(EnergyPlusData &state);
@@ -614,7 +632,8 @@ namespace FuelCellElectricGenerator {
 
 } // namespace FuelCellElectricGenerator
 
-struct FuelCellElectricGeneratorData : BaseGlobalStruct {
+struct FuelCellElectricGeneratorData : BaseGlobalStruct
+{
 
     int NumFuelCellGenerators = 0;
     bool getFuelCellInputFlag = true;

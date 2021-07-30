@@ -116,45 +116,12 @@ namespace HeatRecovery {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    Real64 const KELVZERO(273.16);
-    Real64 const SMALL(1.e-10);
 
     // Heat exchanger performance data type
-    int const BALANCEDHX_PERFDATATYPE1(1);
-
-    // Heat exchanger configurations
-    int const Counter_Flow(1);
-    int const Parallel_Flow(2);
-    int const Cross_Flow_Both_Unmixed(3);
-    int const Cross_Flow_Other(4);
-
-    // Heat exchanger configuration types
-    int const Plate(1);
-    int const Rotary(2);
-
-    // Economizer lockout operation
-    int const EconoLockOut_No(0);
-    int const EconoLockOut_Yes(1);
-
-    namespace {
-        bool MyOneTimeAllocate(true);
-    }
 
     // DERIVED TYPE DEFINITIONS:
 
     // MODULE VARIABLE DECLARATIONS:
-    int NumHeatExchangers(0);           // number of heat exchangers
-    int NumAirToAirPlateExchs(0);       // number of air to air plate heat exchangers
-    int NumAirToAirGenericExchs(0);     // number of air to air generic heat exchangers
-    int NumDesiccantBalancedExchs(0);   // number of desiccant balanced heat exchangers
-    int NumDesBalExchsPerfDataType1(0); // number of desiccant balanced heat exchanger performance data maps
-    Real64 FullLoadOutAirTemp(0.0);     // Used with desiccant HX empirical model, water coils use inlet node condition
-    // DX coils use DXCoilFullLoadOutAirTemp when coil is ON otherwise inlet node
-    Real64 FullLoadOutAirHumRat(0.0); // Used with desiccant HX empirical model, water coils use inlet node condition
-    // DX coils use DXCoilFullLoadOutAirHumRat when coil is ON otherwise inlet node
-    bool GetInputFlag(true);           // First time, input is "gotten"
-    bool CalledFromParentObject(true); // Indicates that HX is called from parent object (this object is not on a branch)
-    Array1D_bool CheckEquipName;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE:
 
@@ -172,37 +139,10 @@ namespace HeatRecovery {
 
     // External function calls
 
-    // Object Data
-    Array1D<HeatExchCond> ExchCond;
-    std::unordered_map<std::string, std::string> HeatExchangerUniqueNames;
-    Array1D<BalancedDesDehumPerfData> BalDesDehumPerfData;
-    Array1D<HeatExchCondNumericFieldData> HeatExchCondNumericFields;
-    Array1D<HeatExchCondNumericFieldData> BalDesDehumPerfNumericFields;
-
     // Functions
 
-    void clear_state()
-    {
-        NumHeatExchangers = 0;
-        NumAirToAirPlateExchs = 0;
-        NumAirToAirGenericExchs = 0;
-        NumDesiccantBalancedExchs = 0;
-        NumDesBalExchsPerfDataType1 = 0;
-        FullLoadOutAirTemp = 0.0;
-        FullLoadOutAirHumRat = 0.0;
-        GetInputFlag = true;
-        CalledFromParentObject = true;
-        CheckEquipName.deallocate();
-        ExchCond.deallocate();
-        BalDesDehumPerfData.deallocate();
-        MyOneTimeAllocate = true;
-        HeatExchCondNumericFields.deallocate();
-        BalDesDehumPerfNumericFields.deallocate();
-        HeatExchangerUniqueNames.clear();
-    }
-
     void SimHeatRecovery(EnergyPlusData &state,
-                         std::string const &CompName,             // name of the heat exchanger unit
+                         std::string_view CompName,               // name of the heat exchanger unit
                          bool const FirstHVACIteration,           // TRUE if 1st HVAC simulation of system timestep
                          int &CompIndex,                          // Pointer to Component
                          int const FanOpMode,                     // Supply air fan operating mode
@@ -235,36 +175,36 @@ namespace HeatRecovery {
         bool RegInIsOANode;   // local variable to set RegenInletIsOANode optional argument
         int CompanionCoilNum; // Index to companion cooling coil
 
-        if (GetInputFlag) {
+        if (state.dataHeatRecovery->GetInputFlag) {
             GetHeatRecoveryInput(state);
-            GetInputFlag = false;
+            state.dataHeatRecovery->GetInputFlag = false;
         }
 
         // Find the correct unit index
         if (CompIndex == 0) {
-            HeatExchNum = UtilityRoutines::FindItemInList(CompName, ExchCond);
+            HeatExchNum = UtilityRoutines::FindItemInList(CompName, state.dataHeatRecovery->ExchCond);
             if (HeatExchNum == 0) {
-                ShowFatalError(state, "SimHeatRecovery: Unit not found=" + CompName);
+                ShowFatalError(state, "SimHeatRecovery: Unit not found=" + std::string{CompName});
             }
             CompIndex = HeatExchNum;
         } else {
             HeatExchNum = CompIndex;
-            if (HeatExchNum > NumHeatExchangers || HeatExchNum < 1) {
+            if (HeatExchNum > state.dataHeatRecovery->NumHeatExchangers || HeatExchNum < 1) {
                 ShowFatalError(state,
                                format("SimHeatRecovery:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
                                       HeatExchNum,
-                                      NumHeatExchangers,
+                                      state.dataHeatRecovery->NumHeatExchangers,
                                       CompName));
             }
-            if (CheckEquipName(HeatExchNum)) {
-                if (CompName != ExchCond(HeatExchNum).Name) {
+            if (state.dataHeatRecovery->CheckEquipName(HeatExchNum)) {
+                if (CompName != state.dataHeatRecovery->ExchCond(HeatExchNum).Name) {
                     ShowFatalError(state,
                                    format("SimHeatRecovery: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
                                           HeatExchNum,
                                           CompName,
-                                          ExchCond(HeatExchNum).Name));
+                                          state.dataHeatRecovery->ExchCond(HeatExchNum).Name));
                 }
-                CheckEquipName(HeatExchNum) = false;
+                state.dataHeatRecovery->CheckEquipName(HeatExchNum) = false;
             }
         }
 
@@ -283,22 +223,22 @@ namespace HeatRecovery {
 
         if (present(HXUnitEnable)) {
             HXUnitOn = HXUnitEnable;
-            //   When CalledFromParentObject is TRUE, this SIM routine was called by a parent object that passed in HXUnitEnable.
-            //   HX will use the DX coil part-load ratio (optional CompanionCoilIndex must be present) or PLR passed in if
-            //   not used with DX coil (optional CompanionCoilIndex must not be present).
-            CalledFromParentObject = true;
+            //   When state.dataHeatRecovery->CalledFromParentObject is TRUE, this SIM routine was called by a parent object that passed in
+            //   HXUnitEnable. HX will use the DX coil part-load ratio (optional CompanionCoilIndex must be present) or PLR passed in if not used with
+            //   DX coil (optional CompanionCoilIndex must not be present).
+            state.dataHeatRecovery->CalledFromParentObject = true;
         } else {
             //   HX is placed on a BRANCH, optional arguments are not passed in from SimAirServingZones.
             //   HX will calculate its own part-load ratio if optional HXUnitEnable flag is not present
             HXUnitOn = true;
-            CalledFromParentObject = false;
+            state.dataHeatRecovery->CalledFromParentObject = false;
         }
 
         InitHeatRecovery(state, HeatExchNum, CompanionCoilNum, companionCoilType);
 
         // call the correct heat exchanger calculation routine
         {
-            auto const SELECT_CASE_var(ExchCond(HeatExchNum).ExchTypeNum);
+            auto const SELECT_CASE_var(state.dataHeatRecovery->ExchCond(HeatExchNum).ExchTypeNum);
 
             if (SELECT_CASE_var == HX_AIRTOAIR_FLATPLATE) {
 
@@ -306,7 +246,8 @@ namespace HeatRecovery {
 
             } else if (SELECT_CASE_var == HX_AIRTOAIR_GENERIC) {
 
-                CalcAirToAirGenericHeatExch(state, HeatExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag, HXPartLoadRatio);
+                CalcAirToAirGenericHeatExch(
+                    state, HeatExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag, HXPartLoadRatio);
 
             } else if (SELECT_CASE_var == HX_DESICCANT_BALANCED) {
 
@@ -322,7 +263,8 @@ namespace HeatRecovery {
                     RegInIsOANode = false;
                 }
 
-                CalcDesiccantBalancedHeatExch(state, HeatExchNum,
+                CalcDesiccantBalancedHeatExch(state,
+                                              HeatExchNum,
                                               HXUnitOn,
                                               FirstHVACIteration,
                                               FanOpMode,
@@ -336,7 +278,7 @@ namespace HeatRecovery {
 
         UpdateHeatRecovery(state, HeatExchNum);
 
-        ReportHeatRecovery(HeatExchNum);
+        ReportHeatRecovery(state, HeatExchNum);
     }
 
     void GetHeatRecoveryInput(EnergyPlusData &state)
@@ -358,331 +300,458 @@ namespace HeatRecovery {
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
         using NodeInputManager::GetOnlySingleNode;
-        using namespace DataIPShortCuts;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ExchIndex;                                                  // loop index
-        int ExchNum;                                                    // current heat exchanger number
-        int PerfDataIndex;                                              // desiccant balance heat exchanger performance data loop index
-        int PerfDataNum;                                                // current desiccant balanced heat exchanger performance data set number
-        int NumAlphas;                                                  // Number of Alphas for each GetObjectItem call
-        int NumNumbers;                                                 // Number of Numbers for each GetObjectItem call
-        int IOStatus;                                                   // Used in GetObjectItem
-        static bool ErrorsFound(false);                                 // Set to true if errors in input, fatal at end of routine
-        static std::string HeatExchPerfType;                            // Desiccant balanced heat exchanger performance data type
-        static std::string const RoutineName("GetHeatRecoveryInput: "); // include trailing blank space
+        int ExchIndex;                                               // loop index
+        int ExchNum;                                                 // current heat exchanger number
+        int PerfDataIndex;                                           // desiccant balance heat exchanger performance data loop index
+        int PerfDataNum;                                             // current desiccant balanced heat exchanger performance data set number
+        int NumAlphas;                                               // Number of Alphas for each GetObjectItem call
+        int NumNumbers;                                              // Number of Numbers for each GetObjectItem call
+        int IOStatus;                                                // Used in GetObjectItem
+        bool ErrorsFound(false);                                     // Set to true if errors in input, fatal at end of routine
+        std::string HeatExchPerfType;                                // Desiccant balanced heat exchanger performance data type
+        constexpr const char *RoutineName("GetHeatRecoveryInput: "); // include trailing blank space
+        auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
-        NumAirToAirPlateExchs = inputProcessor->getNumObjectsFound(state, "HeatExchanger:AirToAir:FlatPlate");
-        NumAirToAirGenericExchs = inputProcessor->getNumObjectsFound(state, "HeatExchanger:AirToAir:SensibleAndLatent");
-        NumDesiccantBalancedExchs = inputProcessor->getNumObjectsFound(state, "HeatExchanger:Desiccant:BalancedFlow");
-        NumDesBalExchsPerfDataType1 = inputProcessor->getNumObjectsFound(state, "HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1");
-        NumHeatExchangers = NumAirToAirPlateExchs + NumAirToAirGenericExchs + NumDesiccantBalancedExchs;
+        state.dataHeatRecovery->NumAirToAirPlateExchs =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "HeatExchanger:AirToAir:FlatPlate");
+        state.dataHeatRecovery->NumAirToAirGenericExchs =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "HeatExchanger:AirToAir:SensibleAndLatent");
+        state.dataHeatRecovery->NumDesiccantBalancedExchs =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "HeatExchanger:Desiccant:BalancedFlow");
+        state.dataHeatRecovery->NumDesBalExchsPerfDataType1 =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1");
+        state.dataHeatRecovery->NumHeatExchangers = state.dataHeatRecovery->NumAirToAirPlateExchs + state.dataHeatRecovery->NumAirToAirGenericExchs +
+                                                    state.dataHeatRecovery->NumDesiccantBalancedExchs;
 
         // allocate the data array
-        ExchCond.allocate(NumHeatExchangers);
-        HeatExchangerUniqueNames.reserve(NumHeatExchangers);
-        CheckEquipName.dimension(NumHeatExchangers, true);
-        HeatExchCondNumericFields.allocate(NumHeatExchangers);
+        state.dataHeatRecovery->ExchCond.allocate(state.dataHeatRecovery->NumHeatExchangers);
+        state.dataHeatRecovery->HeatExchangerUniqueNames.reserve(state.dataHeatRecovery->NumHeatExchangers);
+        state.dataHeatRecovery->CheckEquipName.dimension(state.dataHeatRecovery->NumHeatExchangers, true);
+        state.dataHeatRecovery->HeatExchCondNumericFields.allocate(state.dataHeatRecovery->NumHeatExchangers);
 
-        if (NumDesBalExchsPerfDataType1 > 0) {
-            BalDesDehumPerfData.allocate(NumDesBalExchsPerfDataType1);
-            BalDesDehumPerfNumericFields.allocate(NumDesBalExchsPerfDataType1);
+        if (state.dataHeatRecovery->NumDesBalExchsPerfDataType1 > 0) {
+            state.dataHeatRecovery->BalDesDehumPerfData.allocate(state.dataHeatRecovery->NumDesBalExchsPerfDataType1);
+            state.dataHeatRecovery->BalDesDehumPerfNumericFields.allocate(state.dataHeatRecovery->NumDesBalExchsPerfDataType1);
         }
 
         // loop over the air to air plate heat exchangers and load their input data
-        for (ExchIndex = 1; ExchIndex <= NumAirToAirPlateExchs; ++ExchIndex) {
+        for (ExchIndex = 1; ExchIndex <= state.dataHeatRecovery->NumAirToAirPlateExchs; ++ExchIndex) {
             cCurrentModuleObject = "HeatExchanger:AirToAir:FlatPlate";
-            inputProcessor->getObjectItem(state,
-                                          cCurrentModuleObject,
-                                          ExchIndex,
-                                          cAlphaArgs,
-                                          NumAlphas,
-                                          rNumericArgs,
-                                          NumNumbers,
-                                          IOStatus,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cCurrentModuleObject,
+                                                                     ExchIndex,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             ExchNum = ExchIndex;
 
-            HeatExchCondNumericFields(ExchNum).NumericFieldNames.allocate(NumNumbers);
-            HeatExchCondNumericFields(ExchNum).NumericFieldNames = "";
-            HeatExchCondNumericFields(ExchNum).NumericFieldNames = cNumericFieldNames;
+            state.dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames.allocate(NumNumbers);
+            state.dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames = "";
+            state.dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames = state.dataIPShortCut->cNumericFieldNames;
 
-            GlobalNames::VerifyUniqueInterObjectName(state, HeatExchangerUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state,
+                                                     state.dataHeatRecovery->HeatExchangerUniqueNames,
+                                                     state.dataIPShortCut->cAlphaArgs(1),
+                                                     cCurrentModuleObject,
+                                                     state.dataIPShortCut->cAlphaFieldNames(1),
+                                                     ErrorsFound);
 
-            ExchCond(ExchNum).Name = cAlphaArgs(1);
-            ExchCond(ExchNum).ExchTypeNum = HX_AIRTOAIR_FLATPLATE;
-            if (lAlphaFieldBlanks(2)) {
-                ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+            state.dataHeatRecovery->ExchCond(ExchNum).Name = state.dataIPShortCut->cAlphaArgs(1);
+            state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum = HX_AIRTOAIR_FLATPLATE;
+            if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
+                state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
-                ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
-                if (ExchCond(ExchNum).SchedPtr == 0) {
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
-                                    cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
+                state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
+                if (state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr == 0) {
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
+                                        " entered =" + state.dataIPShortCut->cAlphaArgs(2) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) +
+                                        '=' + state.dataIPShortCut->cAlphaArgs(1));
                     ErrorsFound = true;
                 }
             }
             {
-                auto const SELECT_CASE_var(cAlphaArgs(3));
+                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(3));
                 if (SELECT_CASE_var == "COUNTERFLOW") {
-                    ExchCond(ExchNum).FlowArr = Counter_Flow;
+                    state.dataHeatRecovery->ExchCond(ExchNum).FlowArr = HXConfiguration::CounterFlow;
                 } else if (SELECT_CASE_var == "PARALLELFLOW") {
-                    ExchCond(ExchNum).FlowArr = Parallel_Flow;
+                    state.dataHeatRecovery->ExchCond(ExchNum).FlowArr = HXConfiguration::ParallelFlow;
                 } else if (SELECT_CASE_var == "CROSSFLOWBOTHUNMIXED") {
-                    ExchCond(ExchNum).FlowArr = Cross_Flow_Both_Unmixed;
+                    state.dataHeatRecovery->ExchCond(ExchNum).FlowArr = HXConfiguration::CrossFlowBothUnmixed;
                 } else {
-                    ShowSevereError(state, cCurrentModuleObject + ": incorrect flow arrangement: " + cAlphaArgs(3));
+                    ShowSevereError(state, cCurrentModuleObject + ": incorrect flow arrangement: " + state.dataIPShortCut->cAlphaArgs(3));
                     ErrorsFound = true;
                 }
             }
             {
-                auto const SELECT_CASE_var(cAlphaArgs(4));
+                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(4));
                 if (SELECT_CASE_var == "YES") {
-                    ExchCond(ExchNum).EconoLockOut = EconoLockOut_Yes;
+                    state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconomizerLockout::Yes;
                 } else if (SELECT_CASE_var == "NO") {
-                    ExchCond(ExchNum).EconoLockOut = EconoLockOut_No;
+                    state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconomizerLockout::No;
                 } else {
-                    if (lAlphaFieldBlanks(4)) {
-                        ExchCond(ExchNum).EconoLockOut = EconoLockOut_Yes;
+                    if (state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+                        state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconomizerLockout::Yes;
                     } else {
-                        ShowSevereError(state, cCurrentModuleObject + ": incorrect econo lockout: " + cAlphaArgs(4));
+                        ShowSevereError(state, cCurrentModuleObject + ": incorrect econo lockout: " + state.dataIPShortCut->cAlphaArgs(4));
                         ErrorsFound = true;
                     }
                 }
             }
-            ExchCond(ExchNum).hARatio = rNumericArgs(1);
-            ExchCond(ExchNum).NomSupAirVolFlow = rNumericArgs(2);
-            ExchCond(ExchNum).NomSupAirInTemp = rNumericArgs(3);
-            ExchCond(ExchNum).NomSupAirOutTemp = rNumericArgs(4);
-            ExchCond(ExchNum).NomSecAirVolFlow = rNumericArgs(5);
-            ExchCond(ExchNum).NomSecAirInTemp = rNumericArgs(6);
-            ExchCond(ExchNum).NomElecPower = rNumericArgs(7);
-            ExchCond(ExchNum).SupInletNode = GetOnlySingleNode(state,
-                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-            ExchCond(ExchNum).SupOutletNode = GetOnlySingleNode(state,
-                cAlphaArgs(6), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
-            ExchCond(ExchNum).SecInletNode = GetOnlySingleNode(state,
-                cAlphaArgs(7), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
-            ExchCond(ExchNum).SecOutletNode = GetOnlySingleNode(state,
-                cAlphaArgs(8), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
+            state.dataHeatRecovery->ExchCond(ExchNum).hARatio = state.dataIPShortCut->rNumericArgs(1);
+            state.dataHeatRecovery->ExchCond(ExchNum).NomSupAirVolFlow = state.dataIPShortCut->rNumericArgs(2);
+            state.dataHeatRecovery->ExchCond(ExchNum).NomSupAirInTemp = state.dataIPShortCut->rNumericArgs(3);
+            state.dataHeatRecovery->ExchCond(ExchNum).NomSupAirOutTemp = state.dataIPShortCut->rNumericArgs(4);
+            state.dataHeatRecovery->ExchCond(ExchNum).NomSecAirVolFlow = state.dataIPShortCut->rNumericArgs(5);
+            state.dataHeatRecovery->ExchCond(ExchNum).NomSecAirInTemp = state.dataIPShortCut->rNumericArgs(6);
+            state.dataHeatRecovery->ExchCond(ExchNum).NomElecPower = state.dataIPShortCut->rNumericArgs(7);
+            state.dataHeatRecovery->ExchCond(ExchNum).SupInletNode = GetOnlySingleNode(state,
+                                                                                       state.dataIPShortCut->cAlphaArgs(5),
+                                                                                       ErrorsFound,
+                                                                                       cCurrentModuleObject,
+                                                                                       state.dataIPShortCut->cAlphaArgs(1),
+                                                                                       DataLoopNode::NodeFluidType::Air,
+                                                                                       DataLoopNode::NodeConnectionType::Inlet,
+                                                                                       NodeInputManager::compFluidStream::Primary,
+                                                                                       ObjectIsNotParent);
+            state.dataHeatRecovery->ExchCond(ExchNum).SupOutletNode = GetOnlySingleNode(state,
+                                                                                        state.dataIPShortCut->cAlphaArgs(6),
+                                                                                        ErrorsFound,
+                                                                                        cCurrentModuleObject,
+                                                                                        state.dataIPShortCut->cAlphaArgs(1),
+                                                                                        DataLoopNode::NodeFluidType::Air,
+                                                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                                                        NodeInputManager::compFluidStream::Primary,
+                                                                                        ObjectIsNotParent);
+            state.dataHeatRecovery->ExchCond(ExchNum).SecInletNode = GetOnlySingleNode(state,
+                                                                                       state.dataIPShortCut->cAlphaArgs(7),
+                                                                                       ErrorsFound,
+                                                                                       cCurrentModuleObject,
+                                                                                       state.dataIPShortCut->cAlphaArgs(1),
+                                                                                       DataLoopNode::NodeFluidType::Air,
+                                                                                       DataLoopNode::NodeConnectionType::Inlet,
+                                                                                       NodeInputManager::compFluidStream::Secondary,
+                                                                                       ObjectIsNotParent);
+            state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode = GetOnlySingleNode(state,
+                                                                                        state.dataIPShortCut->cAlphaArgs(8),
+                                                                                        ErrorsFound,
+                                                                                        cCurrentModuleObject,
+                                                                                        state.dataIPShortCut->cAlphaArgs(1),
+                                                                                        DataLoopNode::NodeFluidType::Air,
+                                                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                                                        NodeInputManager::compFluidStream::Secondary,
+                                                                                        ObjectIsNotParent);
 
-            TestCompSet(state, cHXTypes(ExchCond(ExchNum).ExchTypeNum), ExchCond(ExchNum).Name, cAlphaArgs(5), cAlphaArgs(6), "Process Air Nodes");
+            TestCompSet(state,
+                        cHXTypes(state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum),
+                        state.dataHeatRecovery->ExchCond(ExchNum).Name,
+                        state.dataIPShortCut->cAlphaArgs(5),
+                        state.dataIPShortCut->cAlphaArgs(6),
+                        "Process Air Nodes");
 
         } // end of input loop over air to air plate heat exchangers
 
         // loop over the air to air generic heat exchangers and load their input data
-        for (ExchIndex = 1; ExchIndex <= NumAirToAirGenericExchs; ++ExchIndex) {
+        for (ExchIndex = 1; ExchIndex <= state.dataHeatRecovery->NumAirToAirGenericExchs; ++ExchIndex) {
             cCurrentModuleObject = "HeatExchanger:AirToAir:SensibleAndLatent";
-            inputProcessor->getObjectItem(state,
-                                          cCurrentModuleObject,
-                                          ExchIndex,
-                                          cAlphaArgs,
-                                          NumAlphas,
-                                          rNumericArgs,
-                                          NumNumbers,
-                                          IOStatus,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            ExchNum = ExchIndex + NumAirToAirPlateExchs;
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cCurrentModuleObject,
+                                                                     ExchIndex,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            ExchNum = ExchIndex + state.dataHeatRecovery->NumAirToAirPlateExchs;
 
-            HeatExchCondNumericFields(ExchNum).NumericFieldNames.allocate(NumNumbers);
-            HeatExchCondNumericFields(ExchNum).NumericFieldNames = "";
-            HeatExchCondNumericFields(ExchNum).NumericFieldNames = cNumericFieldNames;
+            state.dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames.allocate(NumNumbers);
+            state.dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames = "";
+            state.dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames = state.dataIPShortCut->cNumericFieldNames;
 
-            GlobalNames::VerifyUniqueInterObjectName(state, HeatExchangerUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state,
+                                                     state.dataHeatRecovery->HeatExchangerUniqueNames,
+                                                     state.dataIPShortCut->cAlphaArgs(1),
+                                                     cCurrentModuleObject,
+                                                     state.dataIPShortCut->cAlphaFieldNames(1),
+                                                     ErrorsFound);
 
-            ExchCond(ExchNum).Name = cAlphaArgs(1);
-            ExchCond(ExchNum).ExchTypeNum = HX_AIRTOAIR_GENERIC;
-            if (lAlphaFieldBlanks(2)) {
-                ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+            state.dataHeatRecovery->ExchCond(ExchNum).Name = state.dataIPShortCut->cAlphaArgs(1);
+            state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum = HX_AIRTOAIR_GENERIC;
+            if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
+                state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
-                ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
-                if (ExchCond(ExchNum).SchedPtr == 0) {
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
-                                    cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
+                state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
+                if (state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr == 0) {
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
+                                        " entered =" + state.dataIPShortCut->cAlphaArgs(2) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) +
+                                        '=' + state.dataIPShortCut->cAlphaArgs(1));
                     ErrorsFound = true;
                 }
             }
-            ExchCond(ExchNum).NomSupAirVolFlow = rNumericArgs(1);
-            ExchCond(ExchNum).HeatEffectSensible100 = rNumericArgs(2);
-            ExchCond(ExchNum).HeatEffectLatent100 = rNumericArgs(3);
-            ExchCond(ExchNum).HeatEffectSensible75 = rNumericArgs(4);
-            ExchCond(ExchNum).HeatEffectLatent75 = rNumericArgs(5);
-            if (ExchCond(ExchNum).HeatEffectSensible75 < ExchCond(ExchNum).HeatEffectSensible100) {
-                ShowWarningError(state, cCurrentModuleObject + " \"" + ExchCond(ExchNum).Name +
-                                 "\" sensible heating effectiveness at 75% rated flow is less than at 100% rated flow.");
+            state.dataHeatRecovery->ExchCond(ExchNum).NomSupAirVolFlow = state.dataIPShortCut->rNumericArgs(1);
+            state.dataHeatRecovery->ExchCond(ExchNum).HeatEffectSensible100 = state.dataIPShortCut->rNumericArgs(2);
+            state.dataHeatRecovery->ExchCond(ExchNum).HeatEffectLatent100 = state.dataIPShortCut->rNumericArgs(3);
+            state.dataHeatRecovery->ExchCond(ExchNum).HeatEffectSensible75 = state.dataIPShortCut->rNumericArgs(4);
+            state.dataHeatRecovery->ExchCond(ExchNum).HeatEffectLatent75 = state.dataIPShortCut->rNumericArgs(5);
+            if (state.dataHeatRecovery->ExchCond(ExchNum).HeatEffectSensible75 < state.dataHeatRecovery->ExchCond(ExchNum).HeatEffectSensible100) {
+                ShowWarningError(state,
+                                 cCurrentModuleObject + " \"" + state.dataHeatRecovery->ExchCond(ExchNum).Name +
+                                     "\" sensible heating effectiveness at 75% rated flow is less than at 100% rated flow.");
                 ShowContinueError(state, "Sensible heating effectiveness at 75% rated flow is usually greater than at 100% rated flow.");
             }
-            if (ExchCond(ExchNum).HeatEffectLatent75 < ExchCond(ExchNum).HeatEffectLatent100) {
-                ShowWarningError(state, cCurrentModuleObject + " \"" + ExchCond(ExchNum).Name +
-                                 "\" latent heating effectiveness at 75% rated flow is less than at 100% rated flow.");
+            if (state.dataHeatRecovery->ExchCond(ExchNum).HeatEffectLatent75 < state.dataHeatRecovery->ExchCond(ExchNum).HeatEffectLatent100) {
+                ShowWarningError(state,
+                                 cCurrentModuleObject + " \"" + state.dataHeatRecovery->ExchCond(ExchNum).Name +
+                                     "\" latent heating effectiveness at 75% rated flow is less than at 100% rated flow.");
                 ShowContinueError(state, "Latent heating effectiveness at 75% rated flow is usually greater than at 100% rated flow.");
             }
-            ExchCond(ExchNum).CoolEffectSensible100 = rNumericArgs(6);
-            ExchCond(ExchNum).CoolEffectLatent100 = rNumericArgs(7);
-            ExchCond(ExchNum).CoolEffectSensible75 = rNumericArgs(8);
-            ExchCond(ExchNum).CoolEffectLatent75 = rNumericArgs(9);
-            if (ExchCond(ExchNum).CoolEffectSensible75 < ExchCond(ExchNum).CoolEffectSensible100) {
-                ShowWarningError(state, cCurrentModuleObject + " \"" + ExchCond(ExchNum).Name +
-                                 "\" sensible cooling effectiveness at 75% rated flow is less than at 100% rated flow.");
+            state.dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible100 = state.dataIPShortCut->rNumericArgs(6);
+            state.dataHeatRecovery->ExchCond(ExchNum).CoolEffectLatent100 = state.dataIPShortCut->rNumericArgs(7);
+            state.dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible75 = state.dataIPShortCut->rNumericArgs(8);
+            state.dataHeatRecovery->ExchCond(ExchNum).CoolEffectLatent75 = state.dataIPShortCut->rNumericArgs(9);
+            if (state.dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible75 < state.dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible100) {
+                ShowWarningError(state,
+                                 cCurrentModuleObject + " \"" + state.dataHeatRecovery->ExchCond(ExchNum).Name +
+                                     "\" sensible cooling effectiveness at 75% rated flow is less than at 100% rated flow.");
                 ShowContinueError(state, "Sensible cooling effectiveness at 75% rated flow is usually greater than at 100% rated flow.");
             }
-            if (ExchCond(ExchNum).CoolEffectLatent75 < ExchCond(ExchNum).CoolEffectLatent100) {
-                ShowWarningError(state, cCurrentModuleObject + " \"" + ExchCond(ExchNum).Name +
-                                 "\" latent cooling effectiveness at 75% rated flow is less than at 100% rated flow.");
+            if (state.dataHeatRecovery->ExchCond(ExchNum).CoolEffectLatent75 < state.dataHeatRecovery->ExchCond(ExchNum).CoolEffectLatent100) {
+                ShowWarningError(state,
+                                 cCurrentModuleObject + " \"" + state.dataHeatRecovery->ExchCond(ExchNum).Name +
+                                     "\" latent cooling effectiveness at 75% rated flow is less than at 100% rated flow.");
                 ShowContinueError(state, "Latent cooling effectiveness at 75% rated flow is usually greater than at 100% rated flow.");
             }
-            ExchCond(ExchNum).SupInletNode = GetOnlySingleNode(state,
-                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-            ExchCond(ExchNum).SupOutletNode = GetOnlySingleNode(state,
-                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
-            ExchCond(ExchNum).SecInletNode = GetOnlySingleNode(state,
-                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
-            ExchCond(ExchNum).SecOutletNode = GetOnlySingleNode(state,
-                cAlphaArgs(6), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
+            state.dataHeatRecovery->ExchCond(ExchNum).SupInletNode = GetOnlySingleNode(state,
+                                                                                       state.dataIPShortCut->cAlphaArgs(3),
+                                                                                       ErrorsFound,
+                                                                                       cCurrentModuleObject,
+                                                                                       state.dataIPShortCut->cAlphaArgs(1),
+                                                                                       DataLoopNode::NodeFluidType::Air,
+                                                                                       DataLoopNode::NodeConnectionType::Inlet,
+                                                                                       NodeInputManager::compFluidStream::Primary,
+                                                                                       ObjectIsNotParent);
+            state.dataHeatRecovery->ExchCond(ExchNum).SupOutletNode = GetOnlySingleNode(state,
+                                                                                        state.dataIPShortCut->cAlphaArgs(4),
+                                                                                        ErrorsFound,
+                                                                                        cCurrentModuleObject,
+                                                                                        state.dataIPShortCut->cAlphaArgs(1),
+                                                                                        DataLoopNode::NodeFluidType::Air,
+                                                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                                                        NodeInputManager::compFluidStream::Primary,
+                                                                                        ObjectIsNotParent);
+            state.dataHeatRecovery->ExchCond(ExchNum).SecInletNode = GetOnlySingleNode(state,
+                                                                                       state.dataIPShortCut->cAlphaArgs(5),
+                                                                                       ErrorsFound,
+                                                                                       cCurrentModuleObject,
+                                                                                       state.dataIPShortCut->cAlphaArgs(1),
+                                                                                       DataLoopNode::NodeFluidType::Air,
+                                                                                       DataLoopNode::NodeConnectionType::Inlet,
+                                                                                       NodeInputManager::compFluidStream::Secondary,
+                                                                                       ObjectIsNotParent);
+            state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode = GetOnlySingleNode(state,
+                                                                                        state.dataIPShortCut->cAlphaArgs(6),
+                                                                                        ErrorsFound,
+                                                                                        cCurrentModuleObject,
+                                                                                        state.dataIPShortCut->cAlphaArgs(1),
+                                                                                        DataLoopNode::NodeFluidType::Air,
+                                                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                                                        NodeInputManager::compFluidStream::Secondary,
+                                                                                        ObjectIsNotParent);
 
-            ExchCond(ExchNum).NomElecPower = rNumericArgs(10);
+            state.dataHeatRecovery->ExchCond(ExchNum).NomElecPower = state.dataIPShortCut->rNumericArgs(10);
 
-            if (UtilityRoutines::SameString(cAlphaArgs(7), "Yes")) {
-                ExchCond(ExchNum).ControlToTemperatureSetPoint = true;
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "Yes")) {
+                state.dataHeatRecovery->ExchCond(ExchNum).ControlToTemperatureSetPoint = true;
             } else {
-                if (!UtilityRoutines::SameString(cAlphaArgs(7), "No")) {
+                if (!UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "No")) {
                     ShowSevereError(state, "Rotary HX Speed Modulation or Plate Bypass for Temperature Control for ");
-                    ShowContinueError(state, ExchCond(ExchNum).Name + " must be set to Yes or No");
+                    ShowContinueError(state, state.dataHeatRecovery->ExchCond(ExchNum).Name + " must be set to Yes or No");
                     ErrorsFound = true;
                 }
             }
 
-            if (UtilityRoutines::SameString(cAlphaArgs(8), "Plate")) {
-                ExchCond(ExchNum).ExchConfigNum = Plate;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(8), "Rotary")) {
-                ExchCond(ExchNum).ExchConfigNum = Rotary;
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), "Plate")) {
+                state.dataHeatRecovery->ExchCond(ExchNum).ExchConfig = HXConfigurationType::Plate;
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), "Rotary")) {
+                state.dataHeatRecovery->ExchCond(ExchNum).ExchConfig = HXConfigurationType::Rotary;
             } else {
-                ShowSevereError(state, cCurrentModuleObject + " configuration not found= " + cAlphaArgs(8));
+                ShowSevereError(state, cCurrentModuleObject + " configuration not found= " + state.dataIPShortCut->cAlphaArgs(8));
                 ShowContinueError(state, "HX configuration must be either Plate or Rotary");
                 ErrorsFound = true;
             }
 
             // Added additional inputs for frost control
-            ExchCond(ExchNum).FrostControlType = cAlphaArgs(9);
-            if (!UtilityRoutines::SameString(ExchCond(ExchNum).FrostControlType, "None")) {
-                if (!UtilityRoutines::SameString(ExchCond(ExchNum).FrostControlType, "ExhaustOnly")) {
-                    if (!UtilityRoutines::SameString(ExchCond(ExchNum).FrostControlType, "ExhaustAirRecirculation")) {
-                        if (!UtilityRoutines::SameString(ExchCond(ExchNum).FrostControlType, "MinimumExhaustTemperature")) {
-                            ShowSevereError(state, "Invalid Frost Control method for " + ExchCond(ExchNum).Name + " =  " + cAlphaArgs(9));
+            state.dataHeatRecovery->ExchCond(ExchNum).FrostControlType = state.dataIPShortCut->cAlphaArgs(9);
+            if (!UtilityRoutines::SameString(state.dataHeatRecovery->ExchCond(ExchNum).FrostControlType, "None")) {
+                if (!UtilityRoutines::SameString(state.dataHeatRecovery->ExchCond(ExchNum).FrostControlType, "ExhaustOnly")) {
+                    if (!UtilityRoutines::SameString(state.dataHeatRecovery->ExchCond(ExchNum).FrostControlType, "ExhaustAirRecirculation")) {
+                        if (!UtilityRoutines::SameString(state.dataHeatRecovery->ExchCond(ExchNum).FrostControlType, "MinimumExhaustTemperature")) {
+                            ShowSevereError(state,
+                                            "Invalid Frost Control method for " + state.dataHeatRecovery->ExchCond(ExchNum).Name + " =  " +
+                                                state.dataIPShortCut->cAlphaArgs(9));
                             ErrorsFound = true;
                         }
                     }
                 }
             }
 
-            if (!UtilityRoutines::SameString(cAlphaArgs(9), "None")) {
-                ExchCond(ExchNum).ThresholdTemperature = rNumericArgs(11);
-                ExchCond(ExchNum).InitialDefrostTime = rNumericArgs(12);
-                ExchCond(ExchNum).RateofDefrostTimeIncrease = rNumericArgs(13);
+            if (!UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "None")) {
+                state.dataHeatRecovery->ExchCond(ExchNum).ThresholdTemperature = state.dataIPShortCut->rNumericArgs(11);
+                state.dataHeatRecovery->ExchCond(ExchNum).InitialDefrostTime = state.dataIPShortCut->rNumericArgs(12);
+                state.dataHeatRecovery->ExchCond(ExchNum).RateofDefrostTimeIncrease = state.dataIPShortCut->rNumericArgs(13);
             }
 
             {
-                auto const SELECT_CASE_var(cAlphaArgs(10));
+                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(10));
                 if (SELECT_CASE_var == "YES") {
-                    ExchCond(ExchNum).EconoLockOut = EconoLockOut_Yes;
+                    state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconomizerLockout::Yes;
                 } else if (SELECT_CASE_var == "NO") {
-                    ExchCond(ExchNum).EconoLockOut = EconoLockOut_No;
+                    state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconomizerLockout::No;
                 } else {
-                    if (lAlphaFieldBlanks(10)) {
-                        ExchCond(ExchNum).EconoLockOut = EconoLockOut_Yes;
+                    if (state.dataIPShortCut->lAlphaFieldBlanks(10)) {
+                        state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconomizerLockout::Yes;
                     } else {
-                        ShowSevereError(state, cCurrentModuleObject + ": incorrect econo lockout: " + cAlphaArgs(10));
+                        ShowSevereError(state, cCurrentModuleObject + ": incorrect econo lockout: " + state.dataIPShortCut->cAlphaArgs(10));
                         ErrorsFound = true;
                     }
                 }
             }
 
-            TestCompSet(state, cHXTypes(ExchCond(ExchNum).ExchTypeNum), ExchCond(ExchNum).Name, cAlphaArgs(3), cAlphaArgs(4), "Process Air Nodes");
+            TestCompSet(state,
+                        cHXTypes(state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum),
+                        state.dataHeatRecovery->ExchCond(ExchNum).Name,
+                        state.dataIPShortCut->cAlphaArgs(3),
+                        state.dataIPShortCut->cAlphaArgs(4),
+                        "Process Air Nodes");
         } // end of input loop over air to air generic heat exchangers
 
         // loop over the desiccant balanced heat exchangers and load their input data
-        for (ExchIndex = 1; ExchIndex <= NumDesiccantBalancedExchs; ++ExchIndex) {
+        for (ExchIndex = 1; ExchIndex <= state.dataHeatRecovery->NumDesiccantBalancedExchs; ++ExchIndex) {
             cCurrentModuleObject = "HeatExchanger:Desiccant:BalancedFlow";
-            inputProcessor->getObjectItem(state,
-                                          cCurrentModuleObject,
-                                          ExchIndex,
-                                          cAlphaArgs,
-                                          NumAlphas,
-                                          rNumericArgs,
-                                          NumNumbers,
-                                          IOStatus,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            ExchNum = ExchIndex + NumAirToAirPlateExchs + NumAirToAirGenericExchs;
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cCurrentModuleObject,
+                                                                     ExchIndex,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            ExchNum = ExchIndex + state.dataHeatRecovery->NumAirToAirPlateExchs + state.dataHeatRecovery->NumAirToAirGenericExchs;
 
-            HeatExchCondNumericFields(ExchNum).NumericFieldNames.allocate(NumNumbers);
-            HeatExchCondNumericFields(ExchNum).NumericFieldNames = "";
-            HeatExchCondNumericFields(ExchNum).NumericFieldNames = cNumericFieldNames;
+            state.dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames.allocate(NumNumbers);
+            state.dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames = "";
+            state.dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames = state.dataIPShortCut->cNumericFieldNames;
 
-            GlobalNames::VerifyUniqueInterObjectName(state, HeatExchangerUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state,
+                                                     state.dataHeatRecovery->HeatExchangerUniqueNames,
+                                                     state.dataIPShortCut->cAlphaArgs(1),
+                                                     cCurrentModuleObject,
+                                                     state.dataIPShortCut->cAlphaFieldNames(1),
+                                                     ErrorsFound);
 
-            ExchCond(ExchNum).Name = cAlphaArgs(1);
-            ExchCond(ExchNum).ExchTypeNum = HX_DESICCANT_BALANCED;
-            if (lAlphaFieldBlanks(2)) {
-                ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+            state.dataHeatRecovery->ExchCond(ExchNum).Name = state.dataIPShortCut->cAlphaArgs(1);
+            state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum = HX_DESICCANT_BALANCED;
+            if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
+                state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
-                ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
-                if (ExchCond(ExchNum).SchedPtr == 0) {
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
-                                    cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
+                state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
+                if (state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr == 0) {
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
+                                        " entered =" + state.dataIPShortCut->cAlphaArgs(2) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) +
+                                        '=' + state.dataIPShortCut->cAlphaArgs(1));
                     ErrorsFound = true;
                 }
             }
             // desiccant HX's usually refer to process and regeneration air streams
             // In this module, Sup = Regeneration nodes and Sec = Process nodes
             // regeneration air inlet and outlet nodes
-            ExchCond(ExchNum).SupInletNode = GetOnlySingleNode(state,
-                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-            ExchCond(ExchNum).SupOutletNode = GetOnlySingleNode(state,
-                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+            state.dataHeatRecovery->ExchCond(ExchNum).SupInletNode = GetOnlySingleNode(state,
+                                                                                       state.dataIPShortCut->cAlphaArgs(3),
+                                                                                       ErrorsFound,
+                                                                                       cCurrentModuleObject,
+                                                                                       state.dataIPShortCut->cAlphaArgs(1),
+                                                                                       DataLoopNode::NodeFluidType::Air,
+                                                                                       DataLoopNode::NodeConnectionType::Inlet,
+                                                                                       NodeInputManager::compFluidStream::Primary,
+                                                                                       ObjectIsNotParent);
+            state.dataHeatRecovery->ExchCond(ExchNum).SupOutletNode = GetOnlySingleNode(state,
+                                                                                        state.dataIPShortCut->cAlphaArgs(4),
+                                                                                        ErrorsFound,
+                                                                                        cCurrentModuleObject,
+                                                                                        state.dataIPShortCut->cAlphaArgs(1),
+                                                                                        DataLoopNode::NodeFluidType::Air,
+                                                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                                                        NodeInputManager::compFluidStream::Primary,
+                                                                                        ObjectIsNotParent);
             // process air inlet and outlet nodes
-            ExchCond(ExchNum).SecInletNode = GetOnlySingleNode(state,
-                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
-            ExchCond(ExchNum).SecOutletNode = GetOnlySingleNode(state,
-                cAlphaArgs(6), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
+            state.dataHeatRecovery->ExchCond(ExchNum).SecInletNode = GetOnlySingleNode(state,
+                                                                                       state.dataIPShortCut->cAlphaArgs(5),
+                                                                                       ErrorsFound,
+                                                                                       cCurrentModuleObject,
+                                                                                       state.dataIPShortCut->cAlphaArgs(1),
+                                                                                       DataLoopNode::NodeFluidType::Air,
+                                                                                       DataLoopNode::NodeConnectionType::Inlet,
+                                                                                       NodeInputManager::compFluidStream::Secondary,
+                                                                                       ObjectIsNotParent);
+            state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode = GetOnlySingleNode(state,
+                                                                                        state.dataIPShortCut->cAlphaArgs(6),
+                                                                                        ErrorsFound,
+                                                                                        cCurrentModuleObject,
+                                                                                        state.dataIPShortCut->cAlphaArgs(1),
+                                                                                        DataLoopNode::NodeFluidType::Air,
+                                                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                                                        NodeInputManager::compFluidStream::Secondary,
+                                                                                        ObjectIsNotParent);
 
             // Set up the component set for the process side of the HX (Sec = Process)
-            TestCompSet(state, cHXTypes(ExchCond(ExchNum).ExchTypeNum),
-                        ExchCond(ExchNum).Name,
-                        NodeID(ExchCond(ExchNum).SecInletNode),
-                        NodeID(ExchCond(ExchNum).SecOutletNode),
+            TestCompSet(state,
+                        cHXTypes(state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum),
+                        state.dataHeatRecovery->ExchCond(ExchNum).Name,
+                        state.dataLoopNodes->NodeID(state.dataHeatRecovery->ExchCond(ExchNum).SecInletNode),
+                        state.dataLoopNodes->NodeID(state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode),
                         "Process Air Nodes");
 
-            HeatExchPerfType = cAlphaArgs(7);
+            HeatExchPerfType = state.dataIPShortCut->cAlphaArgs(7);
             if (UtilityRoutines::SameString(HeatExchPerfType, "HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1")) {
-                ExchCond(ExchNum).HeatExchPerfTypeNum = BALANCEDHX_PERFDATATYPE1;
+                state.dataHeatRecovery->ExchCond(ExchNum).HeatExchPerfTypeNum = BALANCEDHX_PERFDATATYPE1;
             } else {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + ExchCond(ExchNum).Name + "\"");
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->ExchCond(ExchNum).Name + "\"");
                 ShowContinueError(state, "Invalid performance data type selected.");
                 ShowContinueError(state, "...performance data type selected = " + HeatExchPerfType);
                 ErrorsFound = true;
             }
 
-            ExchCond(ExchNum).HeatExchPerfName = cAlphaArgs(8);
+            state.dataHeatRecovery->ExchCond(ExchNum).HeatExchPerfName = state.dataIPShortCut->cAlphaArgs(8);
 
             {
-                auto const SELECT_CASE_var(cAlphaArgs(9));
+                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(9));
                 if (SELECT_CASE_var == "YES") {
-                    ExchCond(ExchNum).EconoLockOut = EconoLockOut_Yes;
+                    state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconomizerLockout::Yes;
                 } else if (SELECT_CASE_var == "NO") {
-                    ExchCond(ExchNum).EconoLockOut = EconoLockOut_No;
+                    state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconomizerLockout::No;
                 } else {
-                    if (lAlphaFieldBlanks(9)) {
-                        ExchCond(ExchNum).EconoLockOut = EconoLockOut_No;
+                    if (state.dataIPShortCut->lAlphaFieldBlanks(9)) {
+                        state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconomizerLockout::No;
                     } else {
-                        ShowSevereError(state, cCurrentModuleObject + ": incorrect econo lockout: " + cAlphaArgs(9));
+                        ShowSevereError(state, cCurrentModuleObject + ": incorrect econo lockout: " + state.dataIPShortCut->cAlphaArgs(9));
                         ErrorsFound = true;
                     }
                 }
@@ -692,522 +761,632 @@ namespace HeatRecovery {
 
         // get performance data set for balanced desiccant heat exchanger
 
-        for (PerfDataIndex = 1; PerfDataIndex <= NumDesBalExchsPerfDataType1; ++PerfDataIndex) {
+        for (PerfDataIndex = 1; PerfDataIndex <= state.dataHeatRecovery->NumDesBalExchsPerfDataType1; ++PerfDataIndex) {
             cCurrentModuleObject = "HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1";
-            inputProcessor->getObjectItem(state,
-                                          cCurrentModuleObject,
-                                          PerfDataIndex,
-                                          cAlphaArgs,
-                                          NumAlphas,
-                                          rNumericArgs,
-                                          NumNumbers,
-                                          IOStatus,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cCurrentModuleObject,
+                                                                     PerfDataIndex,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             PerfDataNum = PerfDataIndex;
 
-            BalDesDehumPerfNumericFields(PerfDataNum).NumericFieldNames.allocate(NumNumbers);
-            BalDesDehumPerfNumericFields(PerfDataNum).NumericFieldNames = "";
-            BalDesDehumPerfNumericFields(PerfDataNum).NumericFieldNames = cNumericFieldNames;
+            state.dataHeatRecovery->BalDesDehumPerfNumericFields(PerfDataNum).NumericFieldNames.allocate(NumNumbers);
+            state.dataHeatRecovery->BalDesDehumPerfNumericFields(PerfDataNum).NumericFieldNames = "";
+            state.dataHeatRecovery->BalDesDehumPerfNumericFields(PerfDataNum).NumericFieldNames = state.dataIPShortCut->cNumericFieldNames;
 
-            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            BalDesDehumPerfData(PerfDataNum).Name = cAlphaArgs(1);
-            BalDesDehumPerfData(PerfDataNum).PerfType = cCurrentModuleObject;
-            BalDesDehumPerfData(PerfDataNum).NomSupAirVolFlow = rNumericArgs(1);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name = state.dataIPShortCut->cAlphaArgs(1);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).PerfType = cCurrentModuleObject;
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).NomSupAirVolFlow = state.dataIPShortCut->rNumericArgs(1);
             // check validity
-            if (BalDesDehumPerfData(PerfDataNum).NomSupAirVolFlow <= 0.0 &&
-                BalDesDehumPerfData(PerfDataNum).NomSupAirVolFlow != DataSizing::AutoSize) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).NomSupAirVolFlow <= 0.0 &&
+                state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).NomSupAirVolFlow != DataSizing::AutoSize) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Nominal air flow rate must be greater than zero.");
-                ShowContinueError(state, format("... value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).NomSupAirVolFlow));
+                ShowContinueError(state,
+                                  format("... value entered = {:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).NomSupAirVolFlow));
                 ErrorsFound = true;
             }
 
-            BalDesDehumPerfData(PerfDataNum).NomProcAirFaceVel = rNumericArgs(2);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).NomProcAirFaceVel = state.dataIPShortCut->rNumericArgs(2);
             // check validity
-            if ((BalDesDehumPerfData(PerfDataNum).NomProcAirFaceVel <= 0.0 &&
-                 BalDesDehumPerfData(PerfDataNum).NomProcAirFaceVel != DataSizing::AutoSize) ||
-                BalDesDehumPerfData(PerfDataNum).NomProcAirFaceVel > 6.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            if ((state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).NomProcAirFaceVel <= 0.0 &&
+                 state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).NomProcAirFaceVel != DataSizing::AutoSize) ||
+                state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).NomProcAirFaceVel > 6.0) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Nominal air face velocity cannot be less than or equal to zero or greater than 6 m/s.");
-                ShowContinueError(state, format("... value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).NomProcAirFaceVel));
+                ShowContinueError(state,
+                                  format("... value entered = {:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).NomProcAirFaceVel));
                 ErrorsFound = true;
             }
-            BalDesDehumPerfData(PerfDataNum).NomElecPower = rNumericArgs(3);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).NomElecPower = state.dataIPShortCut->rNumericArgs(3);
             // check validity
-            if (BalDesDehumPerfData(PerfDataNum).NomElecPower < 0.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).NomElecPower < 0.0) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Nominal electric power cannot be less than zero.");
-                ShowContinueError(state, format("... value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).NomElecPower));
+                ShowContinueError(state, format("... value entered = {:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).NomElecPower));
                 ErrorsFound = true;
             }
 
             // regen outlet temp variables
-            BalDesDehumPerfData(PerfDataNum).B1 = rNumericArgs(4);
-            BalDesDehumPerfData(PerfDataNum).B2 = rNumericArgs(5);
-            BalDesDehumPerfData(PerfDataNum).B3 = rNumericArgs(6);
-            BalDesDehumPerfData(PerfDataNum).B4 = rNumericArgs(7);
-            BalDesDehumPerfData(PerfDataNum).B5 = rNumericArgs(8);
-            BalDesDehumPerfData(PerfDataNum).B6 = rNumericArgs(9);
-            BalDesDehumPerfData(PerfDataNum).B7 = rNumericArgs(10);
-            BalDesDehumPerfData(PerfDataNum).B8 = rNumericArgs(11);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).B1 = state.dataIPShortCut->rNumericArgs(4);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).B2 = state.dataIPShortCut->rNumericArgs(5);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).B3 = state.dataIPShortCut->rNumericArgs(6);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).B4 = state.dataIPShortCut->rNumericArgs(7);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).B5 = state.dataIPShortCut->rNumericArgs(8);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).B6 = state.dataIPShortCut->rNumericArgs(9);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).B7 = state.dataIPShortCut->rNumericArgs(10);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).B8 = state.dataIPShortCut->rNumericArgs(11);
 
             //     Check that the minimum is not greater than or equal to the maximum for each of the following model boundaries
-            BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInHumRat = rNumericArgs(12);
-            BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInHumRat = rNumericArgs(13);
-            if (BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInHumRat >= BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInHumRat) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInHumRat = state.dataIPShortCut->rNumericArgs(12);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInHumRat = state.dataIPShortCut->rNumericArgs(13);
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInHumRat >=
+                state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInHumRat) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the minimum value of regeneration inlet air humidity ratio must be less than the maximum.");
                 ShowContinueError(state,
-                                  format("... minimum value entered by user = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInHumRat));
+                                  format("... minimum value entered by user = {:.6R}",
+                                         state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInHumRat));
                 ShowContinueError(state,
-                                  format("... maximum value entered by user = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInHumRat));
+                                  format("... maximum value entered by user = {:.6R}",
+                                         state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInHumRat));
                 ErrorsFound = true;
             }
-            if (BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInHumRat < 0.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInHumRat < 0.0) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the minimum value of regeneration inlet air humidity ratio must be greater than or equal to 0.");
                 ShowContinueError(state,
-                                  format("... minimum value entered by user = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInHumRat));
+                                  format("... minimum value entered by user = {:.6R}",
+                                         state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInHumRat));
                 ErrorsFound = true;
             }
-            if (BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInHumRat > 1.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInHumRat > 1.0) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in max boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the maximum value of regeneration inlet air humidity ratio must be less than or equal to 1.");
                 ShowContinueError(state,
-                                  format("... maximum value entered by user = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInHumRat));
+                                  format("... maximum value entered by user = {:.6R}",
+                                         state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInHumRat));
                 ErrorsFound = true;
             }
 
-            BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInTemp = rNumericArgs(14);
-            BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInTemp = rNumericArgs(15);
-            if (BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInTemp >= BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInTemp) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInTemp = state.dataIPShortCut->rNumericArgs(14);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInTemp = state.dataIPShortCut->rNumericArgs(15);
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInTemp >=
+                state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInTemp) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the minimum value of regeneration inlet air temperature must be less than the maximum.");
-                ShowContinueError(state, format("... minimum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInTemp));
-                ShowContinueError(state, format("... maximum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInTemp));
+                ShowContinueError(
+                    state,
+                    format("... minimum value entered = {:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInTemp));
+                ShowContinueError(
+                    state,
+                    format("... maximum value entered = {:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInTemp));
                 ErrorsFound = true;
             }
 
-            BalDesDehumPerfData(PerfDataNum).T_MinProcAirInHumRat = rNumericArgs(16);
-            BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInHumRat = rNumericArgs(17);
-            if (BalDesDehumPerfData(PerfDataNum).T_MinProcAirInHumRat >= BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInHumRat) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinProcAirInHumRat = state.dataIPShortCut->rNumericArgs(16);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInHumRat = state.dataIPShortCut->rNumericArgs(17);
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinProcAirInHumRat >=
+                state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInHumRat) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the minimum value of process inlet air humidity ratio must be less than the maximum.");
-                ShowContinueError(state, format("... minimum value entered by user = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MinProcAirInHumRat));
-                ShowContinueError(state, format("... maximum value entered by user = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInHumRat));
+                ShowContinueError(state,
+                                  format("... minimum value entered by user = {:.6R}",
+                                         state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinProcAirInHumRat));
+                ShowContinueError(state,
+                                  format("... maximum value entered by user = {:.6R}",
+                                         state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInHumRat));
                 ErrorsFound = true;
             }
-            if (BalDesDehumPerfData(PerfDataNum).T_MinProcAirInHumRat < 0.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinProcAirInHumRat < 0.0) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the minimum value of process inlet air humidity ratio must be greater than or equal to 0.");
-                ShowContinueError(state, format("... minimum value entered by user = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MinProcAirInHumRat));
+                ShowContinueError(state,
+                                  format("... minimum value entered by user = {:.6R}",
+                                         state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinProcAirInHumRat));
                 ErrorsFound = true;
             }
-            if (BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInHumRat > 1.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInHumRat > 1.0) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in max boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the maximum value of process inlet air humidity ratio must be less than or equal to 1.");
-                ShowContinueError(state, format("... maximum value entered by user = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInHumRat));
+                ShowContinueError(state,
+                                  format("... maximum value entered by user = {:.6R}",
+                                         state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInHumRat));
                 ErrorsFound = true;
             }
 
-            BalDesDehumPerfData(PerfDataNum).T_MinProcAirInTemp = rNumericArgs(18);
-            BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInTemp = rNumericArgs(19);
-            if (BalDesDehumPerfData(PerfDataNum).T_MinProcAirInTemp >= BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInTemp) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinProcAirInTemp = state.dataIPShortCut->rNumericArgs(18);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInTemp = state.dataIPShortCut->rNumericArgs(19);
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinProcAirInTemp >=
+                state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInTemp) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the minimum value of process inlet air temperature must be less than the maximum.");
-                ShowContinueError(state, format("... minimum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MinProcAirInTemp));
-                ShowContinueError(state, format("... maximum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInTemp));
+                ShowContinueError(
+                    state, format("... minimum value entered = {:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinProcAirInTemp));
+                ShowContinueError(
+                    state, format("... maximum value entered = {:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInTemp));
                 ErrorsFound = true;
             }
 
-            BalDesDehumPerfData(PerfDataNum).T_MinFaceVel = rNumericArgs(20);
-            BalDesDehumPerfData(PerfDataNum).T_MaxFaceVel = rNumericArgs(21);
-            if (BalDesDehumPerfData(PerfDataNum).T_MinFaceVel >= BalDesDehumPerfData(PerfDataNum).T_MaxFaceVel) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinFaceVel = state.dataIPShortCut->rNumericArgs(20);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxFaceVel = state.dataIPShortCut->rNumericArgs(21);
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinFaceVel >=
+                state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxFaceVel) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the minimum value of regen air velocity must be less than the maximum.");
-                ShowContinueError(state, format("... minimum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MinFaceVel));
-                ShowContinueError(state, format("... maximum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MaxFaceVel));
+                ShowContinueError(
+                    state, format("... minimum value entered = {:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinFaceVel));
+                ShowContinueError(
+                    state, format("... maximum value entered = {:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxFaceVel));
                 ErrorsFound = true;
             }
 
-            BalDesDehumPerfData(PerfDataNum).MinRegenAirOutTemp = rNumericArgs(22);
-            BalDesDehumPerfData(PerfDataNum).MaxRegenAirOutTemp = rNumericArgs(23);
-            if (BalDesDehumPerfData(PerfDataNum).MinRegenAirOutTemp >= BalDesDehumPerfData(PerfDataNum).MaxRegenAirOutTemp) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).MinRegenAirOutTemp = state.dataIPShortCut->rNumericArgs(22);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).MaxRegenAirOutTemp = state.dataIPShortCut->rNumericArgs(23);
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).MinRegenAirOutTemp >=
+                state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).MaxRegenAirOutTemp) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the minimum value of regen outlet air temperature must be less than the maximum.");
-                ShowContinueError(state, format("... minimum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).MinRegenAirOutTemp));
-                ShowContinueError(state, format("... maximum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).MaxRegenAirOutTemp));
+                ShowContinueError(
+                    state, format("... minimum value entered = {:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).MinRegenAirOutTemp));
+                ShowContinueError(
+                    state, format("... maximum value entered = {:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).MaxRegenAirOutTemp));
                 ErrorsFound = true;
             }
 
-            BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInRelHum = rNumericArgs(24) / 100.0;
-            BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInRelHum = rNumericArgs(25) / 100.0;
-            if (BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInRelHum >= BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInRelHum) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInRelHum = state.dataIPShortCut->rNumericArgs(24) / 100.0;
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInRelHum = state.dataIPShortCut->rNumericArgs(25) / 100.0;
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInRelHum >=
+                state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInRelHum) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the minimum value of regen inlet air relative humidity must be less than the maximum.");
                 ShowContinueError(state,
-                                  format("... minimum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInRelHum * 100.0));
+                                  format("... minimum value entered = {:.6R}",
+                                         state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInRelHum * 100.0));
                 ShowContinueError(state,
-                                  format("... maximum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInRelHum * 100.0));
+                                  format("... maximum value entered = {:.6R}",
+                                         state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInRelHum * 100.0));
                 ErrorsFound = true;
             }
-            if (BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInRelHum < 0.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInRelHum < 0.0) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the minimum value of regen inlet air relative humidity must be greater than or equal to 0.");
                 ShowContinueError(state,
-                                  format("... minimum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInRelHum * 100.0));
+                                  format("... minimum value entered = {:.6R}",
+                                         state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInRelHum * 100.0));
                 ErrorsFound = true;
             }
-            if (BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInRelHum > 1.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInRelHum > 1.0) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in max boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the maximum value of regen inlet air relative humidity must be less than or equal to 100.");
                 ShowContinueError(state,
-                                  format("... maximum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInRelHum * 100.0));
+                                  format("... maximum value entered = {:.6R}",
+                                         state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInRelHum * 100.0));
                 ErrorsFound = true;
             }
 
-            BalDesDehumPerfData(PerfDataNum).T_MinProcAirInRelHum = rNumericArgs(26) / 100.0;
-            BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInRelHum = rNumericArgs(27) / 100.0;
-            if (BalDesDehumPerfData(PerfDataNum).T_MinProcAirInRelHum >= BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInRelHum) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinProcAirInRelHum = state.dataIPShortCut->rNumericArgs(26) / 100.0;
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInRelHum = state.dataIPShortCut->rNumericArgs(27) / 100.0;
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinProcAirInRelHum >=
+                state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInRelHum) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the minimum value of process inlet air relative humidity must be less than the maximum.");
-                ShowContinueError(state, format("... minimum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MinProcAirInRelHum * 100.0));
-                ShowContinueError(state, format("... maximum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInRelHum * 100.0));
+                ShowContinueError(state,
+                                  format("... minimum value entered = {:.6R}",
+                                         state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinProcAirInRelHum * 100.0));
+                ShowContinueError(state,
+                                  format("... maximum value entered = {:.6R}",
+                                         state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInRelHum * 100.0));
                 ErrorsFound = true;
             }
-            if (BalDesDehumPerfData(PerfDataNum).T_MinProcAirInRelHum < 0.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinProcAirInRelHum < 0.0) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the minimum value of process inlet air relative humidity must be greater than or equal to 0.");
-                ShowContinueError(state, format("... minimum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MinProcAirInRelHum * 100.0));
+                ShowContinueError(state,
+                                  format("... minimum value entered = {:.6R}",
+                                         state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MinProcAirInRelHum * 100.0));
                 ErrorsFound = true;
             }
-            if (BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInRelHum > 1.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInRelHum > 1.0) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in max boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the maximum value of process inlet air relative humidity must be less than or equal to 100.");
-                ShowContinueError(state, format("... maximum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInRelHum * 100.0));
+                ShowContinueError(state,
+                                  format("... maximum value entered = {:.6R}",
+                                         state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).T_MaxProcAirInRelHum * 100.0));
                 ErrorsFound = true;
             }
 
             // regen outlet humidity ratio variables
-            BalDesDehumPerfData(PerfDataNum).C1 = rNumericArgs(28);
-            BalDesDehumPerfData(PerfDataNum).C2 = rNumericArgs(29);
-            BalDesDehumPerfData(PerfDataNum).C3 = rNumericArgs(30);
-            BalDesDehumPerfData(PerfDataNum).C4 = rNumericArgs(31);
-            BalDesDehumPerfData(PerfDataNum).C5 = rNumericArgs(32);
-            BalDesDehumPerfData(PerfDataNum).C6 = rNumericArgs(33);
-            BalDesDehumPerfData(PerfDataNum).C7 = rNumericArgs(34);
-            BalDesDehumPerfData(PerfDataNum).C8 = rNumericArgs(35);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).C1 = state.dataIPShortCut->rNumericArgs(28);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).C2 = state.dataIPShortCut->rNumericArgs(29);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).C3 = state.dataIPShortCut->rNumericArgs(30);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).C4 = state.dataIPShortCut->rNumericArgs(31);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).C5 = state.dataIPShortCut->rNumericArgs(32);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).C6 = state.dataIPShortCut->rNumericArgs(33);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).C7 = state.dataIPShortCut->rNumericArgs(34);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).C8 = state.dataIPShortCut->rNumericArgs(35);
 
             //     Check that the minimum is not greater than or equal to the maximum for each of the following model boundaries
-            BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInHumRat = rNumericArgs(36);
-            BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInHumRat = rNumericArgs(37);
-            if (BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInHumRat >= BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInHumRat) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInHumRat = state.dataIPShortCut->rNumericArgs(36);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInHumRat = state.dataIPShortCut->rNumericArgs(37);
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInHumRat >=
+                state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInHumRat) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the minimum value of regeneration inlet air humidity ratio must be less than the maximum.");
                 ShowContinueError(state,
-                                  format("... minimum value entered by user = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInHumRat));
+                                  format("... minimum value entered by user = {:.6R}",
+                                         state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInHumRat));
                 ShowContinueError(state,
-                                  format("... maximum value entered by user = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInHumRat));
+                                  format("... maximum value entered by user = {:.6R}",
+                                         state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInHumRat));
                 ErrorsFound = true;
             }
-            if (BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInHumRat < 0.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInHumRat < 0.0) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the minimum value of regeneration inlet air humidity ratio must be greater than or equal to 0.");
                 ShowContinueError(state,
-                                  format("... minimum value entered by user = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInHumRat));
+                                  format("... minimum value entered by user = {:.6R}",
+                                         state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInHumRat));
                 ErrorsFound = true;
             }
-            if (BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInHumRat > 1.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInHumRat > 1.0) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in max boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the maximum value of regeneration inlet air humidity ratio must be less than or equal to 1.");
                 ShowContinueError(state,
-                                  format("... maximum value entered by user = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInHumRat));
+                                  format("... maximum value entered by user = {:.6R}",
+                                         state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInHumRat));
                 ErrorsFound = true;
             }
 
-            BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInTemp = rNumericArgs(38);
-            BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInTemp = rNumericArgs(39);
-            if (BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInTemp >= BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInTemp) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInTemp = state.dataIPShortCut->rNumericArgs(38);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInTemp = state.dataIPShortCut->rNumericArgs(39);
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInTemp >=
+                state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInTemp) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the minimum value of regeneration inlet air temperature must be less than the maximum.");
-                ShowContinueError(state, format("... minimum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInTemp));
-                ShowContinueError(state, format("... maximum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInTemp));
+                ShowContinueError(
+                    state,
+                    format("... minimum value entered = {:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInTemp));
+                ShowContinueError(
+                    state,
+                    format("... maximum value entered = {:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInTemp));
                 ErrorsFound = true;
             }
 
-            BalDesDehumPerfData(PerfDataNum).H_MinProcAirInHumRat = rNumericArgs(40);
-            BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInHumRat = rNumericArgs(41);
-            if (BalDesDehumPerfData(PerfDataNum).H_MinProcAirInHumRat >= BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInHumRat) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinProcAirInHumRat = state.dataIPShortCut->rNumericArgs(40);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInHumRat = state.dataIPShortCut->rNumericArgs(41);
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinProcAirInHumRat >=
+                state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInHumRat) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the minimum value of process inlet air humidity ratio must be less than the maximum.");
-                ShowContinueError(state, format("... minimum value entered by user = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MinProcAirInHumRat));
-                ShowContinueError(state, format("... maximum value entered by user = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInHumRat));
+                ShowContinueError(state,
+                                  format("... minimum value entered by user = {:.6R}",
+                                         state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinProcAirInHumRat));
+                ShowContinueError(state,
+                                  format("... maximum value entered by user = {:.6R}",
+                                         state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInHumRat));
                 ErrorsFound = true;
             }
-            if (BalDesDehumPerfData(PerfDataNum).H_MinProcAirInHumRat < 0.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinProcAirInHumRat < 0.0) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the minimum value of process inlet air humidity ratio must be greater than or equal to 0.");
-                ShowContinueError(state, format("... minimum value entered by user = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MinProcAirInHumRat));
+                ShowContinueError(state,
+                                  format("... minimum value entered by user = {:.6R}",
+                                         state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinProcAirInHumRat));
                 ErrorsFound = true;
             }
-            if (BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInHumRat > 1.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInHumRat > 1.0) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in max boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the maximum value of process inlet air humidity ratio must be less than or equal to 1.");
-                ShowContinueError(state, format("... maximum value entered by user = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInHumRat));
+                ShowContinueError(state,
+                                  format("... maximum value entered by user = {:.6R}",
+                                         state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInHumRat));
                 ErrorsFound = true;
             }
 
-            BalDesDehumPerfData(PerfDataNum).H_MinProcAirInTemp = rNumericArgs(42);
-            BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInTemp = rNumericArgs(43);
-            if (BalDesDehumPerfData(PerfDataNum).H_MinProcAirInTemp >= BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInTemp) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinProcAirInTemp = state.dataIPShortCut->rNumericArgs(42);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInTemp = state.dataIPShortCut->rNumericArgs(43);
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinProcAirInTemp >=
+                state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInTemp) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the minimum value of process inlet air temperature must be less than the maximum.");
-                ShowContinueError(state, format("... minimum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MinProcAirInTemp));
-                ShowContinueError(state, format("... maximum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInTemp));
+                ShowContinueError(
+                    state, format("... minimum value entered = {:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinProcAirInTemp));
+                ShowContinueError(
+                    state, format("... maximum value entered = {:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInTemp));
                 ErrorsFound = true;
             }
 
-            BalDesDehumPerfData(PerfDataNum).H_MinFaceVel = rNumericArgs(44);
-            BalDesDehumPerfData(PerfDataNum).H_MaxFaceVel = rNumericArgs(45);
-            if (BalDesDehumPerfData(PerfDataNum).H_MinFaceVel >= BalDesDehumPerfData(PerfDataNum).H_MaxFaceVel) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinFaceVel = state.dataIPShortCut->rNumericArgs(44);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxFaceVel = state.dataIPShortCut->rNumericArgs(45);
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinFaceVel >=
+                state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxFaceVel) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the minimum value of regen air velocity must be less than the maximum.");
-                ShowContinueError(state, format("... minimum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MinFaceVel));
-                ShowContinueError(state, format("... maximum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MaxFaceVel));
+                ShowContinueError(
+                    state, format("... minimum value entered = {:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinFaceVel));
+                ShowContinueError(
+                    state, format("... maximum value entered = {:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxFaceVel));
                 ErrorsFound = true;
             }
 
-            BalDesDehumPerfData(PerfDataNum).MinRegenAirOutHumRat = rNumericArgs(46);
-            BalDesDehumPerfData(PerfDataNum).MaxRegenAirOutHumRat = rNumericArgs(47);
-            if (BalDesDehumPerfData(PerfDataNum).MinRegenAirOutHumRat >= BalDesDehumPerfData(PerfDataNum).MaxRegenAirOutHumRat) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).MinRegenAirOutHumRat = state.dataIPShortCut->rNumericArgs(46);
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).MaxRegenAirOutHumRat = state.dataIPShortCut->rNumericArgs(47);
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).MinRegenAirOutHumRat >=
+                state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).MaxRegenAirOutHumRat) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the minimum value of regen outlet air humidity ratio must be less than the maximum.");
-                ShowContinueError(state, format("... minimum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).MinRegenAirOutHumRat));
-                ShowContinueError(state, format("... maximum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).MaxRegenAirOutHumRat));
+                ShowContinueError(
+                    state,
+                    format("... minimum value entered = {:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).MinRegenAirOutHumRat));
+                ShowContinueError(
+                    state,
+                    format("... maximum value entered = {:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).MaxRegenAirOutHumRat));
                 ErrorsFound = true;
             }
-            if (BalDesDehumPerfData(PerfDataNum).MinRegenAirOutHumRat < 0.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).MinRegenAirOutHumRat < 0.0) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the minimum value of regen outlet air humidity ratio must be greater than or equal to 0.");
-                ShowContinueError(state, format("... minimum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).MinRegenAirOutHumRat));
+                ShowContinueError(
+                    state,
+                    format("... minimum value entered = {:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).MinRegenAirOutHumRat));
                 ErrorsFound = true;
             }
-            if (BalDesDehumPerfData(PerfDataNum).MaxRegenAirOutHumRat > 1.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).MaxRegenAirOutHumRat > 1.0) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in max boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the maximum value of regen outlet air humidity ratio must be less or equal to 1.");
-                ShowContinueError(state, format("... maximum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).MaxRegenAirOutHumRat));
+                ShowContinueError(
+                    state,
+                    format("... maximum value entered = {:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).MaxRegenAirOutHumRat));
                 ErrorsFound = true;
             }
 
-            BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInRelHum = rNumericArgs(48) / 100.0;
-            BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInRelHum = rNumericArgs(49) / 100.0;
-            if (BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInRelHum >= BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInRelHum) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInRelHum = state.dataIPShortCut->rNumericArgs(48) / 100.0;
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInRelHum = state.dataIPShortCut->rNumericArgs(49) / 100.0;
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInRelHum >=
+                state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInRelHum) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the minimum value of regen inlet air relative humidity must be less than the maximum.");
                 ShowContinueError(state,
-                                  format("... minimum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInRelHum * 100.0));
+                                  format("... minimum value entered = {:.6R}",
+                                         state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInRelHum * 100.0));
                 ShowContinueError(state,
-                                  format("... maximum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInRelHum * 100.0));
+                                  format("... maximum value entered = {:.6R}",
+                                         state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInRelHum * 100.0));
                 ErrorsFound = true;
             }
-            if (BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInRelHum < 0.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInRelHum < 0.0) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the minimum value of regen inlet air relative humidity must be greater than or equal to 0.");
                 ShowContinueError(state,
-                                  format("... minimum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInRelHum * 100.0));
+                                  format("... minimum value entered = {:.6R}",
+                                         state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInRelHum * 100.0));
                 ErrorsFound = true;
             }
-            if (BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInRelHum > 1.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInRelHum > 1.0) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in max boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the maximum value of regen inlet air relative humidity must be less or equal to 100.");
                 ShowContinueError(state,
-                                  format("... maximum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInRelHum * 100.0));
+                                  format("... maximum value entered = {:.6R}",
+                                         state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInRelHum * 100.0));
                 ErrorsFound = true;
             }
 
-            BalDesDehumPerfData(PerfDataNum).H_MinProcAirInRelHum = rNumericArgs(50) / 100.0;
-            BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInRelHum = rNumericArgs(51) / 100.0;
-            if (BalDesDehumPerfData(PerfDataNum).H_MinProcAirInRelHum >= BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInRelHum) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinProcAirInRelHum = state.dataIPShortCut->rNumericArgs(50) / 100.0;
+            state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInRelHum = state.dataIPShortCut->rNumericArgs(51) / 100.0;
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinProcAirInRelHum >=
+                state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInRelHum) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the minimum value of process inlet air relative humidity must be less than the maximum.");
-                ShowContinueError(state, format("... minimum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MinProcAirInRelHum * 100.0));
-                ShowContinueError(state, format("... maximum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInRelHum * 100.0));
+                ShowContinueError(state,
+                                  format("... minimum value entered = {:.6R}",
+                                         state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinProcAirInRelHum * 100.0));
+                ShowContinueError(state,
+                                  format("... maximum value entered = {:.6R}",
+                                         state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInRelHum * 100.0));
                 ErrorsFound = true;
             }
-            if (BalDesDehumPerfData(PerfDataNum).H_MinProcAirInRelHum < 0.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinProcAirInRelHum < 0.0) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the minimum value of process inlet air relative humidity must be greater than or equal to 0.");
-                ShowContinueError(state, format("... minimum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MinProcAirInRelHum * 100.0));
+                ShowContinueError(state,
+                                  format("... minimum value entered = {:.6R}",
+                                         state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MinProcAirInRelHum * 100.0));
                 ErrorsFound = true;
             }
-            if (BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInRelHum > 1.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
+            if (state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInRelHum > 1.0) {
+                ShowSevereError(state, cCurrentModuleObject + " \"" + state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in max boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the maximum value of process inlet air relative humidity must be less than or equal to 100.");
-                ShowContinueError(state, format("... maximum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInRelHum * 100.0));
+                ShowContinueError(state,
+                                  format("... maximum value entered = {:.6R}",
+                                         state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).H_MaxProcAirInRelHum * 100.0));
                 ErrorsFound = true;
             }
         }
         // getting performance data set for balanced desiccant heat exchanger ends
 
         // match desiccant heat exchanger index to performance data index
-        for (ExchIndex = 1; ExchIndex <= NumDesiccantBalancedExchs; ++ExchIndex) {
-            ExchNum = ExchIndex + NumAirToAirPlateExchs + NumAirToAirGenericExchs;
-            for (PerfDataNum = 1; PerfDataNum <= NumDesBalExchsPerfDataType1; ++PerfDataNum) {
-                if (UtilityRoutines::SameString(ExchCond(ExchNum).HeatExchPerfName, BalDesDehumPerfData(PerfDataNum).Name)) {
-                    ExchCond(ExchNum).PerfDataIndex = PerfDataNum;
+        for (ExchIndex = 1; ExchIndex <= state.dataHeatRecovery->NumDesiccantBalancedExchs; ++ExchIndex) {
+            ExchNum = ExchIndex + state.dataHeatRecovery->NumAirToAirPlateExchs + state.dataHeatRecovery->NumAirToAirGenericExchs;
+            for (PerfDataNum = 1; PerfDataNum <= state.dataHeatRecovery->NumDesBalExchsPerfDataType1; ++PerfDataNum) {
+                if (UtilityRoutines::SameString(state.dataHeatRecovery->ExchCond(ExchNum).HeatExchPerfName,
+                                                state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name)) {
+                    state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex = PerfDataNum;
                     break;
                 }
             }
-            if (ExchCond(ExchNum).PerfDataIndex == 0) {
-                ShowSevereError(state, cHXTypes(ExchCond(ExchNum).ExchTypeNum) + " \"" + ExchCond(ExchNum).Name + "\"");
-                ShowContinueError(state, "... Performance data set not found = " + ExchCond(ExchNum).HeatExchPerfName);
+            if (state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex == 0) {
+                ShowSevereError(state,
+                                cHXTypes(state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum) + " \"" +
+                                    state.dataHeatRecovery->ExchCond(ExchNum).Name + "\"");
+                ShowContinueError(state, "... Performance data set not found = " + state.dataHeatRecovery->ExchCond(ExchNum).HeatExchPerfName);
                 ErrorsFound = true;
             } else {
                 if (!ErrorsFound) {
-                    ExchCond(ExchNum).FaceArea = BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).NomSupAirVolFlow /
-                                                 (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).NomProcAirFaceVel);
+                    state.dataHeatRecovery->ExchCond(ExchNum).FaceArea =
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).NomSupAirVolFlow /
+                        (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).NomProcAirFaceVel);
                 }
             }
         }
         // matching done
 
         // setup common report variables for heat exchangers
-        for (ExchIndex = 1; ExchIndex <= NumHeatExchangers; ++ExchIndex) {
+        for (ExchIndex = 1; ExchIndex <= state.dataHeatRecovery->NumHeatExchangers; ++ExchIndex) {
             ExchNum = ExchIndex;
             // CurrentModuleObject='HeatExchanger:AirToAir:FlatPlate/AirToAir:SensibleAndLatent/Desiccant:BalancedFlow')
-            SetupOutputVariable(state, "Heat Exchanger Sensible Heating Rate",
+            SetupOutputVariable(state,
+                                "Heat Exchanger Sensible Heating Rate",
                                 OutputProcessor::Unit::W,
-                                ExchCond(ExchNum).SensHeatingRate,
-                                "System",
-                                "Average",
-                                ExchCond(ExchNum).Name);
-            SetupOutputVariable(state, "Heat Exchanger Sensible Heating Energy",
+                                state.dataHeatRecovery->ExchCond(ExchNum).SensHeatingRate,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatRecovery->ExchCond(ExchNum).Name);
+            SetupOutputVariable(state,
+                                "Heat Exchanger Sensible Heating Energy",
                                 OutputProcessor::Unit::J,
-                                ExchCond(ExchNum).SensHeatingEnergy,
-                                "System",
-                                "Sum",
-                                ExchCond(ExchNum).Name);
-            SetupOutputVariable(state, "Heat Exchanger Latent Gain Rate",
+                                state.dataHeatRecovery->ExchCond(ExchNum).SensHeatingEnergy,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatRecovery->ExchCond(ExchNum).Name);
+            SetupOutputVariable(state,
+                                "Heat Exchanger Latent Gain Rate",
                                 OutputProcessor::Unit::W,
-                                ExchCond(ExchNum).LatHeatingRate,
-                                "System",
-                                "Average",
-                                ExchCond(ExchNum).Name);
-            SetupOutputVariable(state, "Heat Exchanger Latent Gain Energy",
+                                state.dataHeatRecovery->ExchCond(ExchNum).LatHeatingRate,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatRecovery->ExchCond(ExchNum).Name);
+            SetupOutputVariable(state,
+                                "Heat Exchanger Latent Gain Energy",
                                 OutputProcessor::Unit::J,
-                                ExchCond(ExchNum).LatHeatingEnergy,
-                                "System",
-                                "Sum",
-                                ExchCond(ExchNum).Name);
-            SetupOutputVariable(state, "Heat Exchanger Total Heating Rate",
+                                state.dataHeatRecovery->ExchCond(ExchNum).LatHeatingEnergy,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatRecovery->ExchCond(ExchNum).Name);
+            SetupOutputVariable(state,
+                                "Heat Exchanger Total Heating Rate",
                                 OutputProcessor::Unit::W,
-                                ExchCond(ExchNum).TotHeatingRate,
-                                "System",
-                                "Average",
-                                ExchCond(ExchNum).Name);
-            SetupOutputVariable(state, "Heat Exchanger Total Heating Energy",
+                                state.dataHeatRecovery->ExchCond(ExchNum).TotHeatingRate,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatRecovery->ExchCond(ExchNum).Name);
+            SetupOutputVariable(state,
+                                "Heat Exchanger Total Heating Energy",
                                 OutputProcessor::Unit::J,
-                                ExchCond(ExchNum).TotHeatingEnergy,
-                                "System",
-                                "Sum",
-                                ExchCond(ExchNum).Name,
+                                state.dataHeatRecovery->ExchCond(ExchNum).TotHeatingEnergy,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatRecovery->ExchCond(ExchNum).Name,
                                 _,
                                 "ENERGYTRANSFER",
                                 "HEAT RECOVERY FOR HEATING",
                                 _,
                                 "System");
-            SetupOutputVariable(state, "Heat Exchanger Sensible Cooling Rate",
+            SetupOutputVariable(state,
+                                "Heat Exchanger Sensible Cooling Rate",
                                 OutputProcessor::Unit::W,
-                                ExchCond(ExchNum).SensCoolingRate,
-                                "System",
-                                "Average",
-                                ExchCond(ExchNum).Name);
-            SetupOutputVariable(state, "Heat Exchanger Sensible Cooling Energy",
+                                state.dataHeatRecovery->ExchCond(ExchNum).SensCoolingRate,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatRecovery->ExchCond(ExchNum).Name);
+            SetupOutputVariable(state,
+                                "Heat Exchanger Sensible Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                ExchCond(ExchNum).SensCoolingEnergy,
-                                "System",
-                                "Sum",
-                                ExchCond(ExchNum).Name);
-            SetupOutputVariable(state, "Heat Exchanger Latent Cooling Rate",
+                                state.dataHeatRecovery->ExchCond(ExchNum).SensCoolingEnergy,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatRecovery->ExchCond(ExchNum).Name);
+            SetupOutputVariable(state,
+                                "Heat Exchanger Latent Cooling Rate",
                                 OutputProcessor::Unit::W,
-                                ExchCond(ExchNum).LatCoolingRate,
-                                "System",
-                                "Average",
-                                ExchCond(ExchNum).Name);
-            SetupOutputVariable(state, "Heat Exchanger Latent Cooling Energy",
+                                state.dataHeatRecovery->ExchCond(ExchNum).LatCoolingRate,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatRecovery->ExchCond(ExchNum).Name);
+            SetupOutputVariable(state,
+                                "Heat Exchanger Latent Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                ExchCond(ExchNum).LatCoolingEnergy,
-                                "System",
-                                "Sum",
-                                ExchCond(ExchNum).Name);
-            SetupOutputVariable(state, "Heat Exchanger Total Cooling Rate",
+                                state.dataHeatRecovery->ExchCond(ExchNum).LatCoolingEnergy,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatRecovery->ExchCond(ExchNum).Name);
+            SetupOutputVariable(state,
+                                "Heat Exchanger Total Cooling Rate",
                                 OutputProcessor::Unit::W,
-                                ExchCond(ExchNum).TotCoolingRate,
-                                "System",
-                                "Average",
-                                ExchCond(ExchNum).Name);
-            SetupOutputVariable(state, "Heat Exchanger Total Cooling Energy",
+                                state.dataHeatRecovery->ExchCond(ExchNum).TotCoolingRate,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatRecovery->ExchCond(ExchNum).Name);
+            SetupOutputVariable(state,
+                                "Heat Exchanger Total Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                ExchCond(ExchNum).TotCoolingEnergy,
-                                "System",
-                                "Sum",
-                                ExchCond(ExchNum).Name,
+                                state.dataHeatRecovery->ExchCond(ExchNum).TotCoolingEnergy,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatRecovery->ExchCond(ExchNum).Name,
                                 _,
                                 "ENERGYTRANSFER",
                                 "HEAT RECOVERY FOR COOLING",
                                 _,
                                 "System");
 
-            SetupOutputVariable(state, "Heat Exchanger Electricity Rate",
+            SetupOutputVariable(state,
+                                "Heat Exchanger Electricity Rate",
                                 OutputProcessor::Unit::W,
-                                ExchCond(ExchNum).ElecUseRate,
-                                "System",
-                                "Average",
-                                ExchCond(ExchNum).Name);
-            SetupOutputVariable(state, "Heat Exchanger Electricity Energy",
+                                state.dataHeatRecovery->ExchCond(ExchNum).ElecUseRate,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatRecovery->ExchCond(ExchNum).Name);
+            SetupOutputVariable(state,
+                                "Heat Exchanger Electricity Energy",
                                 OutputProcessor::Unit::J,
-                                ExchCond(ExchNum).ElecUseEnergy,
-                                "System",
-                                "Sum",
-                                ExchCond(ExchNum).Name,
+                                state.dataHeatRecovery->ExchCond(ExchNum).ElecUseEnergy,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatRecovery->ExchCond(ExchNum).Name,
                                 _,
                                 "ELECTRICITY",
                                 "HEATRECOVERY",
@@ -1216,44 +1395,49 @@ namespace HeatRecovery {
         }
 
         // setup additional report variables for generic heat exchangers
-        for (ExchIndex = 1; ExchIndex <= NumAirToAirGenericExchs; ++ExchIndex) {
+        for (ExchIndex = 1; ExchIndex <= state.dataHeatRecovery->NumAirToAirGenericExchs; ++ExchIndex) {
             // generic heat exchangers are read in after flat plate heat exchanger objects (index needs to be set correctly)
             // CurrentModuleObject=HeatExchanger:AirToAir:SensibleAndLatent
-            ExchNum = ExchIndex + NumAirToAirPlateExchs;
-            SetupOutputVariable(state, "Heat Exchanger Sensible Effectiveness",
+            ExchNum = ExchIndex + state.dataHeatRecovery->NumAirToAirPlateExchs;
+            SetupOutputVariable(state,
+                                "Heat Exchanger Sensible Effectiveness",
                                 OutputProcessor::Unit::None,
-                                ExchCond(ExchNum).SensEffectiveness,
-                                "System",
-                                "Average",
-                                ExchCond(ExchNum).Name);
-            SetupOutputVariable(state, "Heat Exchanger Latent Effectiveness",
+                                state.dataHeatRecovery->ExchCond(ExchNum).SensEffectiveness,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatRecovery->ExchCond(ExchNum).Name);
+            SetupOutputVariable(state,
+                                "Heat Exchanger Latent Effectiveness",
                                 OutputProcessor::Unit::None,
-                                ExchCond(ExchNum).LatEffectiveness,
-                                "System",
-                                "Average",
-                                ExchCond(ExchNum).Name);
-            SetupOutputVariable(state, "Heat Exchanger Supply Air Bypass Mass Flow Rate",
+                                state.dataHeatRecovery->ExchCond(ExchNum).LatEffectiveness,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatRecovery->ExchCond(ExchNum).Name);
+            SetupOutputVariable(state,
+                                "Heat Exchanger Supply Air Bypass Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                ExchCond(ExchNum).SupBypassMassFlow,
-                                "System",
-                                "Average",
-                                ExchCond(ExchNum).Name);
-            SetupOutputVariable(state, "Heat Exchanger Exhaust Air Bypass Mass Flow Rate",
+                                state.dataHeatRecovery->ExchCond(ExchNum).SupBypassMassFlow,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatRecovery->ExchCond(ExchNum).Name);
+            SetupOutputVariable(state,
+                                "Heat Exchanger Exhaust Air Bypass Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                ExchCond(ExchNum).SecBypassMassFlow,
-                                "System",
-                                "Average",
-                                ExchCond(ExchNum).Name);
-            SetupOutputVariable(state, "Heat Exchanger Defrost Time Fraction",
+                                state.dataHeatRecovery->ExchCond(ExchNum).SecBypassMassFlow,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatRecovery->ExchCond(ExchNum).Name);
+            SetupOutputVariable(state,
+                                "Heat Exchanger Defrost Time Fraction",
                                 OutputProcessor::Unit::None,
-                                ExchCond(ExchNum).DefrostFraction,
-                                "System",
-                                "Average",
-                                ExchCond(ExchNum).Name);
+                                state.dataHeatRecovery->ExchCond(ExchNum).DefrostFraction,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatRecovery->ExchCond(ExchNum).Name);
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in input.  Program terminates.");
+            ShowFatalError(state, format("{}Errors found in input.  Program terminates.", RoutineName));
         }
     }
 
@@ -1291,35 +1475,33 @@ namespace HeatRecovery {
         Real64 CpAir;  // heat capacity of air
         // of humidity ratio and temperature
         //////////// hoisted into namespace ////////////////////////////////////////////////
-        // static bool MyOneTimeAllocate( true );
+        // static bool state.dataHeatRecovery->MyOneTimeAllocate( true );
         ////////////////////////////////////////////////////////////////////////////////////
-        static Array1D_bool MySetPointTest;
-        static Array1D_bool MySizeFlag;
         int ErrStat;            // error status returned by CalculateNTUfromEpsAndZ
         bool FatalError;        // fatal error flag
         bool LocalWarningError; // warning error flag
         Real64 Z;               // Min/max flow ratio
         //  LOGICAL,SAVE        :: ZoneEquipmentListChecked = .FALSE.  ! True after the Zone Equipment List has been checked for items
 
-        if (MyOneTimeAllocate) {
-            MySetPointTest.allocate(NumHeatExchangers);
-            MySizeFlag.allocate(NumHeatExchangers);
-            MySetPointTest = true;
-            MySizeFlag = true;
-            MyOneTimeAllocate = false;
+        if (state.dataHeatRecovery->MyOneTimeAllocate) {
+            state.dataHeatRecovery->MySetPointTest.allocate(state.dataHeatRecovery->NumHeatExchangers);
+            state.dataHeatRecovery->MySizeFlag.allocate(state.dataHeatRecovery->NumHeatExchangers);
+            state.dataHeatRecovery->MySetPointTest = true;
+            state.dataHeatRecovery->MySizeFlag = true;
+            state.dataHeatRecovery->MyOneTimeAllocate = false;
         }
 
-        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(ExchNum)) {
+        if (!state.dataGlobal->SysSizingCalc && state.dataHeatRecovery->MySizeFlag(ExchNum)) {
 
             SizeHeatRecovery(state, ExchNum);
-            MySizeFlag(ExchNum) = false;
+            state.dataHeatRecovery->MySizeFlag(ExchNum) = false;
         }
 
         FatalError = false;
         LocalWarningError = false;
 
         // Do the Begin Environment initializations
-        if (state.dataGlobal->BeginEnvrnFlag && ExchCond(ExchNum).myEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataHeatRecovery->ExchCond(ExchNum).myEnvrnFlag) {
             // I believe that all of these initializations should be taking place at the SCFM conditions
             RhoAir = state.dataEnvrn->StdRhoAir;
             //    RhoAir = PsyRhoAirFnPbTdbW(101325.0,20.0,0.0)  do we want standard air density at sea level for generic ERVs per ARI 1060?
@@ -1328,88 +1510,94 @@ namespace HeatRecovery {
             ExIndex = ExchNum; // this replaces the loop that went over multiple at once
 
             {
-                auto const SELECT_CASE_var(ExchCond(ExIndex).ExchTypeNum);
+                auto const SELECT_CASE_var(state.dataHeatRecovery->ExchCond(ExIndex).ExchTypeNum);
 
                 if (SELECT_CASE_var == HX_AIRTOAIR_FLATPLATE) {
 
-                    ExchCond(ExIndex).NomSupAirMassFlow = RhoAir * ExchCond(ExIndex).NomSupAirVolFlow;
-                    ExchCond(ExIndex).NomSecAirMassFlow = RhoAir * ExchCond(ExIndex).NomSecAirVolFlow;
+                    state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirMassFlow = RhoAir * state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirVolFlow;
+                    state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirMassFlow = RhoAir * state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirVolFlow;
                     // Note: the capacity stream is here simply the mass flow
                     //       since the thermal capacity can be assumed to be
                     //       equal for both streams
-                    if (ExchCond(ExIndex).NomSupAirMassFlow > ExchCond(ExIndex).NomSecAirMassFlow) {
-                        CMin0 = ExchCond(ExIndex).NomSecAirMassFlow;
-                        CMax0 = ExchCond(ExIndex).NomSupAirMassFlow;
+                    if (state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirMassFlow > state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirMassFlow) {
+                        CMin0 = state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirMassFlow;
+                        CMax0 = state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirMassFlow;
                     } else {
-                        CMin0 = ExchCond(ExIndex).NomSupAirMassFlow;
-                        CMax0 = ExchCond(ExIndex).NomSecAirMassFlow;
+                        CMin0 = state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirMassFlow;
+                        CMax0 = state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirMassFlow;
                     }
 
-                    Eps0 = ExchCond(ExIndex).NomSupAirMassFlow *
-                           SafeDiv(ExchCond(ExIndex).NomSupAirOutTemp - ExchCond(ExIndex).NomSupAirInTemp,
-                                   CMin0 * (ExchCond(ExIndex).NomSecAirInTemp - ExchCond(ExIndex).NomSupAirInTemp));
+                    Eps0 = state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirMassFlow *
+                           SafeDiv(state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirOutTemp -
+                                       state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirInTemp,
+                                   CMin0 * (state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirInTemp -
+                                            state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirInTemp));
                     Z = CMin0 / CMax0;
 
                     ErrStat = 0;
-                    CalculateNTUfromEpsAndZ(state, NTU0, ErrStat, Z, ExchCond(ExIndex).FlowArr, Eps0);
+                    CalculateNTUfromEpsAndZ(state, NTU0, ErrStat, Z, state.dataHeatRecovery->ExchCond(ExIndex).FlowArr, Eps0);
 
                     if (ErrStat == 1) {
 
                         FatalError = true;
-                        ShowSevereError(state, "In the HeatExchanger:AirToAir:FlatPlate component " + ExchCond(ExIndex).Name);
+                        ShowSevereError(state, "In the HeatExchanger:AirToAir:FlatPlate component " + state.dataHeatRecovery->ExchCond(ExIndex).Name);
                         ShowContinueError(state, "  the mass flow ratio is out of bounds");
                         ShowContinueError(state, format("The mass flow ratio is (Min_Mass_Flow_Rate / Max_Mass_Flow_Rate) = {:.2R}", Z));
                         ShowContinueError(state, "The mass flow ratio should be >= 0.0 and <= 1.0");
                         ShowContinueError(state,
                                           format("Min_Mass_Flow_Rate = {:.2R} [air density] * {:.1R} [Min_Vol_Flow_Rate]",
                                                  RhoAir,
-                                                 min(ExchCond(ExIndex).NomSupAirVolFlow, ExchCond(ExIndex).NomSecAirVolFlow)));
+                                                 min(state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirVolFlow,
+                                                     state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirVolFlow)));
                         ShowContinueError(state,
                                           format("Max_Mass_Flow_Rate = {:.2R} [air density] * {:.1R} [Max_Vol_Flow_Rate]",
                                                  RhoAir,
-                                                 max(ExchCond(ExIndex).NomSupAirVolFlow, ExchCond(ExIndex).NomSecAirVolFlow)));
+                                                 max(state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirVolFlow,
+                                                     state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirVolFlow)));
                     } else if (ErrStat == 2) {
                         FatalError = true;
-                        ShowSevereError(state, "In the HeatExchanger:AirToAir:FlatPlate component " + ExchCond(ExIndex).Name);
+                        ShowSevereError(state, "In the HeatExchanger:AirToAir:FlatPlate component " + state.dataHeatRecovery->ExchCond(ExIndex).Name);
                         ShowContinueError(state, "  the calculated nominal effectiveness is out of bounds");
                         ShowContinueError(state, format("The effectiveness is {:.3R}", Eps0));
                         ShowContinueError(state, format("The effectiveness should be >= 0.0 and <= {:.3R}", 1.0 / (1.0 + Z)));
-                        ShowContinueError(state,
-                            "Eff = (Nom_Sup_Mass_Flow_Rate/Min_Mass_Flow_Rate)*(T_nom_sup_out-T_nom_sup_in)/(T_nom_sec_in-T_nom_sup_in)");
+                        ShowContinueError(
+                            state, "Eff = (Nom_Sup_Mass_Flow_Rate/Min_Mass_Flow_Rate)*(T_nom_sup_out-T_nom_sup_in)/(T_nom_sec_in-T_nom_sup_in)");
                         ShowContinueError(state, "The temperatures are user inputs. The mass flow rates are user input volume flow rates");
                         ShowContinueError(state, format("  times the density of air [{:.2R} kg/m3]", RhoAir));
                         ShowContinueError(state, "Change these inputs to obtain a physically realizable heat exchanger effectiveness");
                     } else if (ErrStat == 3) {
                         FatalError = true;
-                        ShowSevereError(state, "In the HeatExchanger:AirToAir:FlatPlate component " + ExchCond(ExIndex).Name);
+                        ShowSevereError(state, "In the HeatExchanger:AirToAir:FlatPlate component " + state.dataHeatRecovery->ExchCond(ExIndex).Name);
                         ShowContinueError(state, "  the calculated nominal effectiveness is out of bounds");
                         ShowContinueError(state, format("The effectiveness is {:.3R}", Eps0));
                         ShowContinueError(state, format("The effectiveness should be >= 0.0 and <= {:.3R}", (1.0 - std::exp(-Z)) / Z));
-                        ShowContinueError(state,
-                            "Eff = (Nom_Sup_Mass_Flow_Rate/Min_Mass_Flow_Rate)*(T_nom_sup_out-T_nom_sup_in)/(T_nom_sec_in-T_nom_sup_in)");
+                        ShowContinueError(
+                            state, "Eff = (Nom_Sup_Mass_Flow_Rate/Min_Mass_Flow_Rate)*(T_nom_sup_out-T_nom_sup_in)/(T_nom_sec_in-T_nom_sup_in)");
                         ShowContinueError(state, "The temperatures are user inputs. The mass flow rates are user input volume flow rates");
                         ShowContinueError(state, format("  times the density of air [{:.2R} kg/m3]", RhoAir));
                         ShowContinueError(state, "Change these inputs to obtain a physically realizable heat exchanger effectiveness");
                     } else if (ErrStat == 4) {
                         FatalError = true;
-                        ShowSevereError(state, "In the HeatExchanger:AirToAir:FlatPlate component " + ExchCond(ExIndex).Name);
+                        ShowSevereError(state, "In the HeatExchanger:AirToAir:FlatPlate component " + state.dataHeatRecovery->ExchCond(ExIndex).Name);
                         ShowContinueError(state, "  the quantity Eff_nom*(Min_Mass_Flow_Rate / Max_Mass_Flow_Rate) is out of bounds");
                         ShowContinueError(state, format("The value is {:.3R}", Eps0 * Z));
                         ShowContinueError(state, format("The value should be >= 0.0 and <= {:.3R}", 1.0 - std::exp(Z * (SMALL - 1.0))));
-                        ShowContinueError(state,
+                        ShowContinueError(
+                            state,
                             "Eff_nom = (Nom_Sup_Mass_Flow_Rate/Min_Mass_Flow_Rate) * (T_nom_sup_out - T_nom_sup_in)/(T_nom_sec_in - T_nom_sup_in)");
                         ShowContinueError(state, "The temperatures are user inputs. The mass flow rates are user input volume flow rates");
                         ShowContinueError(state, format("  times the density of air [{:.2R} kg/m3]", RhoAir));
-                        ShowContinueError(state, "Change these inputs to obtain a physically realizable product of effectiveness times min/max mass ratio "
+                        ShowContinueError(state,
+                                          "Change these inputs to obtain a physically realizable product of effectiveness times min/max mass ratio "
                                           "for this heat exchanger");
                     } else if (ErrStat == 5) {
                         FatalError = true;
-                        ShowSevereError(state, "In the HeatExchanger:AirToAir:FlatPlate component " + ExchCond(ExIndex).Name);
+                        ShowSevereError(state, "In the HeatExchanger:AirToAir:FlatPlate component " + state.dataHeatRecovery->ExchCond(ExIndex).Name);
                         ShowContinueError(state, "  the calculated nominal effectiveness is out of bounds");
                         ShowContinueError(state, format("The effectiveness is {:.3R}", Eps0));
                         ShowContinueError(state, "The effectiveness should be >= 0.0 and <= 1.0");
-                        ShowContinueError(state,
-                            "Eff = (Nom_Sup_Mass_Flow_Rate/Min_Mass_Flow_Rate)*(T_nom_sup_out-T_nom_sup_in)/(T_nom_sec_in-T_nom_sup_in)");
+                        ShowContinueError(
+                            state, "Eff = (Nom_Sup_Mass_Flow_Rate/Min_Mass_Flow_Rate)*(T_nom_sup_out-T_nom_sup_in)/(T_nom_sec_in-T_nom_sup_in)");
                         ShowContinueError(state, "The temperatures are user inputs. The mass flow rates are user input volume flow rates");
                         ShowContinueError(state, format("  times the density of air [{:.2R} kg/m3]", RhoAir));
                         ShowContinueError(state, "Change these inputs to obtain a physically realizable heat exchanger effectiveness");
@@ -1419,20 +1607,23 @@ namespace HeatRecovery {
                         ShowFatalError(state, "Heat exchanger design calculation caused fatal error: program terminated.");
                     }
 
-                    ExchCond(ExIndex).UA0 = NTU0 * CMin0 * CpAir;
-                    ExchCond(ExIndex).mTSup0 = ExchCond(ExIndex).NomSupAirMassFlow * (ExchCond(ExIndex).NomSupAirInTemp + KELVZERO);
-                    ExchCond(ExIndex).mTSec0 = ExchCond(ExIndex).NomSecAirMassFlow * (ExchCond(ExIndex).NomSecAirInTemp + KELVZERO);
+                    state.dataHeatRecovery->ExchCond(ExIndex).UA0 = NTU0 * CMin0 * CpAir;
+                    state.dataHeatRecovery->ExchCond(ExIndex).mTSup0 = state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirMassFlow *
+                                                                       (state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirInTemp + KELVZERO);
+                    state.dataHeatRecovery->ExchCond(ExIndex).mTSec0 = state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirMassFlow *
+                                                                       (state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirInTemp + KELVZERO);
 
                     // check validity
-                    if (ExchCond(ExIndex).NomSupAirMassFlow * ExchCond(ExIndex).NomSecAirMassFlow < SmallMassFlow * SmallMassFlow) {
+                    if (state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirMassFlow * state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirMassFlow <
+                        SmallMassFlow * SmallMassFlow) {
                         ShowFatalError(state, "Mass flow in HeatExchanger:AirToAir:FlatPlate too small in initialization.");
                     }
 
-                    if (ExchCond(ExIndex).mTSup0 < SmallMassFlow) {
+                    if (state.dataHeatRecovery->ExchCond(ExIndex).mTSup0 < SmallMassFlow) {
                         ShowFatalError(state, "(m*T)Sup,in in HeatExchanger:AirToAir:FlatPlate too small in initialization.");
                     }
 
-                    if (ExchCond(ExIndex).mTSec0 < SmallMassFlow) {
+                    if (state.dataHeatRecovery->ExchCond(ExIndex).mTSec0 < SmallMassFlow) {
                         ShowFatalError(state, "(m*T)Sec,in in HeatExchanger:AirToAir:FlatPlate too small in initialization.");
                     }
 
@@ -1442,23 +1633,33 @@ namespace HeatRecovery {
 
                 } else if (SELECT_CASE_var == HX_AIRTOAIR_GENERIC) {
 
-                    if (ExchCond(ExIndex).SupOutletNode > 0 && ExchCond(ExIndex).ControlToTemperatureSetPoint) {
-                        if (Node(ExchCond(ExIndex).SupOutletNode).TempSetPoint == SensedNodeFlagValue) {
+                    if (state.dataHeatRecovery->ExchCond(ExIndex).SupOutletNode > 0 &&
+                        state.dataHeatRecovery->ExchCond(ExIndex).ControlToTemperatureSetPoint) {
+                        if (state.dataLoopNodes->Node(state.dataHeatRecovery->ExchCond(ExIndex).SupOutletNode).TempSetPoint == SensedNodeFlagValue) {
                             if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                                ShowSevereError(state, "Missing temperature setpoint for " + cHXTypes(ExchCond(ExIndex).ExchTypeNum) + " \"" +
-                                                ExchCond(ExIndex).Name + "\" :");
-                                ShowContinueError(state,
-                                    "  use a Setpoint Manager to establish a setpoint at the supply air outlet node of the Heat Exchanger.");
+                                ShowSevereError(state,
+                                                "Missing temperature setpoint for " +
+                                                    cHXTypes(state.dataHeatRecovery->ExchCond(ExIndex).ExchTypeNum) + " \"" +
+                                                    state.dataHeatRecovery->ExchCond(ExIndex).Name + "\" :");
+                                ShowContinueError(
+                                    state, "  use a Setpoint Manager to establish a setpoint at the supply air outlet node of the Heat Exchanger.");
                                 ShowFatalError(state, " Previous condition causes program termination.");
                             } else {
                                 // need call to EMS to check node
-                                CheckIfNodeSetPointManagedByEMS(state, ExchCond(ExIndex).SupOutletNode, EMSManager::SPControlType::iTemperatureSetPoint, FatalError);
+                                CheckIfNodeSetPointManagedByEMS(state,
+                                                                state.dataHeatRecovery->ExchCond(ExIndex).SupOutletNode,
+                                                                EMSManager::SPControlType::iTemperatureSetPoint,
+                                                                FatalError);
                                 if (FatalError) {
-                                    ShowSevereError(state, "Missing temperature setpoint for " + cHXTypes(ExchCond(ExIndex).ExchTypeNum) + " \"" +
-                                                    ExchCond(ExIndex).Name + "\" :");
-                                    ShowContinueError(state,
+                                    ShowSevereError(state,
+                                                    "Missing temperature setpoint for " +
+                                                        cHXTypes(state.dataHeatRecovery->ExchCond(ExIndex).ExchTypeNum) + " \"" +
+                                                        state.dataHeatRecovery->ExchCond(ExIndex).Name + "\" :");
+                                    ShowContinueError(
+                                        state,
                                         "  use a Setpoint Manager to establish a setpoint at the supply air outlet node of the Heat Exchanger.");
-                                    ShowContinueError(state,
+                                    ShowContinueError(
+                                        state,
                                         "  or use an EMS actuator to establish a setpoint at the supply air outlet node of the Heat Exchanger.");
                                     ShowFatalError(state, " Previous condition causes program termination.");
                                 }
@@ -1473,51 +1674,52 @@ namespace HeatRecovery {
                 }
             }
 
-            ExchCond(ExchNum).myEnvrnFlag = false;
+            state.dataHeatRecovery->ExchCond(ExchNum).myEnvrnFlag = false;
         }
 
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            ExchCond(ExchNum).myEnvrnFlag = true;
+            state.dataHeatRecovery->ExchCond(ExchNum).myEnvrnFlag = true;
         }
 
         // Do these initializations every time step
-        SupInNode = ExchCond(ExchNum).SupInletNode;
-        SecInNode = ExchCond(ExchNum).SecInletNode;
+        SupInNode = state.dataHeatRecovery->ExchCond(ExchNum).SupInletNode;
+        SecInNode = state.dataHeatRecovery->ExchCond(ExchNum).SecInletNode;
 
         // Get information from inlet nodes
-        ExchCond(ExchNum).SupInTemp = Node(SupInNode).Temp;
-        ExchCond(ExchNum).SupInHumRat = Node(SupInNode).HumRat;
-        ExchCond(ExchNum).SupInEnth = Node(SupInNode).Enthalpy;
-        ExchCond(ExchNum).SupInMassFlow = Node(SupInNode).MassFlowRate;
-        ExchCond(ExchNum).SecInTemp = Node(SecInNode).Temp;
-        ExchCond(ExchNum).SecInHumRat = Node(SecInNode).HumRat;
-        ExchCond(ExchNum).SecInEnth = Node(SecInNode).Enthalpy;
-        ExchCond(ExchNum).SecInMassFlow = Node(SecInNode).MassFlowRate;
+
+        state.dataHeatRecovery->ExchCond(ExchNum).SupInTemp = state.dataLoopNodes->Node(SupInNode).Temp;
+        state.dataHeatRecovery->ExchCond(ExchNum).SupInHumRat = state.dataLoopNodes->Node(SupInNode).HumRat;
+        state.dataHeatRecovery->ExchCond(ExchNum).SupInEnth = state.dataLoopNodes->Node(SupInNode).Enthalpy;
+        state.dataHeatRecovery->ExchCond(ExchNum).SupInMassFlow = state.dataLoopNodes->Node(SupInNode).MassFlowRate;
+        state.dataHeatRecovery->ExchCond(ExchNum).SecInTemp = state.dataLoopNodes->Node(SecInNode).Temp;
+        state.dataHeatRecovery->ExchCond(ExchNum).SecInHumRat = state.dataLoopNodes->Node(SecInNode).HumRat;
+        state.dataHeatRecovery->ExchCond(ExchNum).SecInEnth = state.dataLoopNodes->Node(SecInNode).Enthalpy;
+        state.dataHeatRecovery->ExchCond(ExchNum).SecInMassFlow = state.dataLoopNodes->Node(SecInNode).MassFlowRate;
 
         // initialize the output variables
-        ExchCond(ExchNum).SensHeatingRate = 0.0;
-        ExchCond(ExchNum).SensHeatingEnergy = 0.0;
-        ExchCond(ExchNum).LatHeatingRate = 0.0;
-        ExchCond(ExchNum).LatHeatingEnergy = 0.0;
-        ExchCond(ExchNum).TotHeatingRate = 0.0;
-        ExchCond(ExchNum).TotHeatingEnergy = 0.0;
-        ExchCond(ExchNum).SensCoolingRate = 0.0;
-        ExchCond(ExchNum).SensCoolingEnergy = 0.0;
-        ExchCond(ExchNum).LatCoolingRate = 0.0;
-        ExchCond(ExchNum).LatCoolingEnergy = 0.0;
-        ExchCond(ExchNum).TotCoolingRate = 0.0;
-        ExchCond(ExchNum).TotCoolingEnergy = 0.0;
-        ExchCond(ExchNum).ElecUseRate = 0.0;
-        ExchCond(ExchNum).ElecUseEnergy = 0.0;
-        ExchCond(ExchNum).SensEffectiveness = 0.0;
-        ExchCond(ExchNum).LatEffectiveness = 0.0;
-        ExchCond(ExchNum).SupBypassMassFlow = 0.0;
-        ExchCond(ExchNum).SecBypassMassFlow = 0.0;
+        state.dataHeatRecovery->ExchCond(ExchNum).SensHeatingRate = 0.0;
+        state.dataHeatRecovery->ExchCond(ExchNum).SensHeatingEnergy = 0.0;
+        state.dataHeatRecovery->ExchCond(ExchNum).LatHeatingRate = 0.0;
+        state.dataHeatRecovery->ExchCond(ExchNum).LatHeatingEnergy = 0.0;
+        state.dataHeatRecovery->ExchCond(ExchNum).TotHeatingRate = 0.0;
+        state.dataHeatRecovery->ExchCond(ExchNum).TotHeatingEnergy = 0.0;
+        state.dataHeatRecovery->ExchCond(ExchNum).SensCoolingRate = 0.0;
+        state.dataHeatRecovery->ExchCond(ExchNum).SensCoolingEnergy = 0.0;
+        state.dataHeatRecovery->ExchCond(ExchNum).LatCoolingRate = 0.0;
+        state.dataHeatRecovery->ExchCond(ExchNum).LatCoolingEnergy = 0.0;
+        state.dataHeatRecovery->ExchCond(ExchNum).TotCoolingRate = 0.0;
+        state.dataHeatRecovery->ExchCond(ExchNum).TotCoolingEnergy = 0.0;
+        state.dataHeatRecovery->ExchCond(ExchNum).ElecUseRate = 0.0;
+        state.dataHeatRecovery->ExchCond(ExchNum).ElecUseEnergy = 0.0;
+        state.dataHeatRecovery->ExchCond(ExchNum).SensEffectiveness = 0.0;
+        state.dataHeatRecovery->ExchCond(ExchNum).LatEffectiveness = 0.0;
+        state.dataHeatRecovery->ExchCond(ExchNum).SupBypassMassFlow = 0.0;
+        state.dataHeatRecovery->ExchCond(ExchNum).SecBypassMassFlow = 0.0;
 
         //  Initialize inlet conditions
 
         {
-            auto const SELECT_CASE_var(ExchCond(ExchNum).ExchTypeNum);
+            auto const SELECT_CASE_var(state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum);
 
             if (SELECT_CASE_var == HX_AIRTOAIR_FLATPLATE) {
 
@@ -1525,35 +1727,48 @@ namespace HeatRecovery {
 
             } else if (SELECT_CASE_var == HX_DESICCANT_BALANCED) {
 
-                if (MySetPointTest(ExchNum)) {
-                    if (!state.dataGlobal->SysSizingCalc && DoSetPointTest) {
-                        if (!CalledFromParentObject) {
-                            if (Node(ExchCond(ExchNum).SecOutletNode).HumRatMax == SensedNodeFlagValue) {
+                if (state.dataHeatRecovery->MySetPointTest(ExchNum)) {
+                    if (!state.dataGlobal->SysSizingCalc && state.dataHVACGlobal->DoSetPointTest) {
+                        if (!state.dataHeatRecovery->CalledFromParentObject) {
+                            if (state.dataLoopNodes->Node(state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode).HumRatMax == SensedNodeFlagValue) {
                                 if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                                    ShowWarningError(state, "Missing optional HumRatMax setpoint for " + cHXTypes(ExchCond(ExchNum).ExchTypeNum) + " \"" +
-                                                     ExchCond(ExchNum).Name + "\"");
-                                    ShowContinueError(state, "...the simulation will continue without control of the desiccant heat exchanger to a maximum "
+                                    ShowWarningError(state,
+                                                     "Missing optional HumRatMax setpoint for " +
+                                                         cHXTypes(state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum) + " \"" +
+                                                         state.dataHeatRecovery->ExchCond(ExchNum).Name + "\"");
+                                    ShowContinueError(state,
+                                                      "...the simulation will continue without control of the desiccant heat exchanger to a maximum "
                                                       "humidity ratio setpoint.");
-                                    ShowContinueError(state, "...use a Setpoint Manager to establish a setpoint at the process air outlet node of the "
+                                    ShowContinueError(state,
+                                                      "...use a Setpoint Manager to establish a setpoint at the process air outlet node of the "
                                                       "desiccant Heat Exchanger if control is desired.");
                                 } else {
                                     // need call to EMS to check node
-                                    CheckIfNodeSetPointManagedByEMS(state, ExchCond(ExchNum).SecOutletNode, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, LocalWarningError);
-                                    DataLoopNode::NodeSetpointCheck(ExchCond(ExchNum).SecOutletNode).needsSetpointChecking = false;
+                                    CheckIfNodeSetPointManagedByEMS(state,
+                                                                    state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode,
+                                                                    EMSManager::SPControlType::iHumidityRatioMaxSetPoint,
+                                                                    LocalWarningError);
+                                    state.dataLoopNodes->NodeSetpointCheck(state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode)
+                                        .needsSetpointChecking = false;
                                     if (LocalWarningError) {
-                                        ShowWarningError(state, "Missing optional HumRatMax setpoint for " + cHXTypes(ExchCond(ExchNum).ExchTypeNum) +
-                                                         " \"" + ExchCond(ExchNum).Name + "\"");
-                                        ShowContinueError(state, "...the simulation will continue without control of the desiccant heat exchanger to a "
+                                        ShowWarningError(state,
+                                                         "Missing optional HumRatMax setpoint for " +
+                                                             cHXTypes(state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum) + " \"" +
+                                                             state.dataHeatRecovery->ExchCond(ExchNum).Name + "\"");
+                                        ShowContinueError(state,
+                                                          "...the simulation will continue without control of the desiccant heat exchanger to a "
                                                           "maximum humidity ratio setpoint.");
-                                        ShowContinueError(state, "...use a Setpoint Manager to establish a setpoint at the process air outlet node of the "
+                                        ShowContinueError(state,
+                                                          "...use a Setpoint Manager to establish a setpoint at the process air outlet node of the "
                                                           "desiccant Heat Exchanger if control is desired.");
-                                        ShowContinueError(state, "...or use an EMS Actuator to establish a maximum humidity ratio setpoint at the process "
+                                        ShowContinueError(state,
+                                                          "...or use an EMS Actuator to establish a maximum humidity ratio setpoint at the process "
                                                           "air outlet node of the desiccant Heat Exchanger if control is desired.");
                                     }
                                 }
                             }
                         }
-                        MySetPointTest(ExchNum) = false;
+                        state.dataHeatRecovery->MySetPointTest(ExchNum) = false;
                     }
                 }
 
@@ -1561,26 +1776,27 @@ namespace HeatRecovery {
 
                     if (CompanionCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
                         CompanionCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
-                        if (state.dataDXCoils->DXCoilFullLoadOutAirTemp(CompanionCoilIndex) == 0.0 || state.dataDXCoils->DXCoilFullLoadOutAirHumRat(CompanionCoilIndex) == 0.0) {
+                        if (state.dataDXCoils->DXCoilFullLoadOutAirTemp(CompanionCoilIndex) == 0.0 ||
+                            state.dataDXCoils->DXCoilFullLoadOutAirHumRat(CompanionCoilIndex) == 0.0) {
                             //       DX Coil is OFF, read actual inlet conditions
-                            FullLoadOutAirTemp = ExchCond(ExchNum).SecInTemp;
-                            FullLoadOutAirHumRat = ExchCond(ExchNum).SecInHumRat;
+                            state.dataHeatRecovery->FullLoadOutAirTemp = state.dataHeatRecovery->ExchCond(ExchNum).SecInTemp;
+                            state.dataHeatRecovery->FullLoadOutAirHumRat = state.dataHeatRecovery->ExchCond(ExchNum).SecInHumRat;
                         } else {
                             //       DX Coil is ON, read full load DX coil outlet conditions (conditions HX sees when ON)
-                            FullLoadOutAirTemp = state.dataDXCoils->DXCoilFullLoadOutAirTemp(CompanionCoilIndex);
-                            FullLoadOutAirHumRat = state.dataDXCoils->DXCoilFullLoadOutAirHumRat(CompanionCoilIndex);
+                            state.dataHeatRecovery->FullLoadOutAirTemp = state.dataDXCoils->DXCoilFullLoadOutAirTemp(CompanionCoilIndex);
+                            state.dataHeatRecovery->FullLoadOutAirHumRat = state.dataDXCoils->DXCoilFullLoadOutAirHumRat(CompanionCoilIndex);
                         }
                     } else if (CompanionCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
                         // how to support VS dx coil here?
-                        FullLoadOutAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(CompanionCoilIndex).OutletAirDBTemp;
-                        FullLoadOutAirHumRat = state.dataVariableSpeedCoils->VarSpeedCoil(CompanionCoilIndex).OutletAirHumRat;
+                        state.dataHeatRecovery->FullLoadOutAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(CompanionCoilIndex).OutletAirDBTemp;
+                        state.dataHeatRecovery->FullLoadOutAirHumRat = state.dataVariableSpeedCoils->VarSpeedCoil(CompanionCoilIndex).OutletAirHumRat;
                     }
 
                 } else {
 
                     //     HX only (not used in conjunction with DX coil), read inlet conditions
-                    FullLoadOutAirTemp = ExchCond(ExchNum).SecInTemp;
-                    FullLoadOutAirHumRat = ExchCond(ExchNum).SecInHumRat;
+                    state.dataHeatRecovery->FullLoadOutAirTemp = state.dataHeatRecovery->ExchCond(ExchNum).SecInTemp;
+                    state.dataHeatRecovery->FullLoadOutAirHumRat = state.dataHeatRecovery->ExchCond(ExchNum).SecInHumRat;
                 }
 
             } else {
@@ -1610,7 +1826,7 @@ namespace HeatRecovery {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeHeatRecovery");
+        constexpr const char *RoutineName("SizeHeatRecovery");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool PrintFlag;           // true when sizing information is reported in the eio file
@@ -1622,110 +1838,118 @@ namespace HeatRecovery {
         std::string CompType;     // component type
         std::string SizingString; // input field sizing description
 
-        HRFlowSizingFlag = true;
+        auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
+
+        state.dataSize->HRFlowSizingFlag = true;
         PrintFlag = true;
         FieldNum = 0;
-        if (ExchCond(ExchNum).ExchTypeNum == HX_DESICCANT_BALANCED) {
+        if (state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum == HX_DESICCANT_BALANCED) {
             PrintFlag = false;
-        } else if (ExchCond(ExchNum).ExchTypeNum == HX_AIRTOAIR_GENERIC) {
+        } else if (state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum == HX_AIRTOAIR_GENERIC) {
             FieldNum = 1;
-        } else if (ExchCond(ExchNum).ExchTypeNum == HX_AIRTOAIR_FLATPLATE) {
+        } else if (state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum == HX_AIRTOAIR_FLATPLATE) {
             FieldNum = 2;
         } else {
             assert(0);
         }
 
-        CompName = ExchCond(ExchNum).Name;
-        CompType = cHXTypes(ExchCond(ExchNum).ExchTypeNum);
+        CompName = state.dataHeatRecovery->ExchCond(ExchNum).Name;
+        CompType = cHXTypes(state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum);
         if (FieldNum > 0) {
-            SizingString = HeatExchCondNumericFields(ExchNum).NumericFieldNames(FieldNum) + " [m3/s]";
+            SizingString = state.dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames(FieldNum) + " [m3/s]";
         } else {
             SizingString = "Nominal Supply Air Flow Rate [m3/s]"; // desiccant balanced flow does not have an input for air volume flow rate
         }
-        if (CurZoneEqNum > 0) {
-            if (ExchCond(ExchNum).NomSupAirVolFlow == AutoSize) {
+        if (state.dataSize->CurZoneEqNum > 0) {
+            if (state.dataHeatRecovery->ExchCond(ExchNum).NomSupAirVolFlow == AutoSize) {
                 SizingMethod = AutoCalculateSizing;
-                if (ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent) {
+                if (ZoneEqSizing(state.dataSize->CurZoneEqNum).DesignSizeFromParent) {
                     // Heat recovery heat exchanger in zoneHVAC equipment should have been sized to OA flow in the parent equipment
-                    DataConstantUsedForSizing = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
+                    state.dataSize->DataConstantUsedForSizing = ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow;
                 } else {
-                    DataConstantUsedForSizing = std::max(FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow);
+                    state.dataSize->DataConstantUsedForSizing =
+                        std::max(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow,
+                                 state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow);
                 }
-                DataFractionUsedForSizing = 1.0;
+                state.dataSize->DataFractionUsedForSizing = 1.0;
             } else {
-                if (ZoneSizingRunDone) {
+                if (state.dataSize->ZoneSizingRunDone) {
                     SizingMethod = AutoCalculateSizing;
-                    if (ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent) {
+                    if (ZoneEqSizing(state.dataSize->CurZoneEqNum).DesignSizeFromParent) {
                         // Heat recovery heat exchanger in zoneHVAC equipment should have been sized to OA flow in the parent equipment
-                        DataConstantUsedForSizing = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
+                        state.dataSize->DataConstantUsedForSizing = ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow;
                     } else {
-                        DataConstantUsedForSizing =
-                            std::max(FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow);
+                        state.dataSize->DataConstantUsedForSizing =
+                            std::max(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow,
+                                     state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow);
                     }
-                    DataFractionUsedForSizing = 1.0;
+                    state.dataSize->DataFractionUsedForSizing = 1.0;
                 }
             }
         }
-        TempSize = ExchCond(ExchNum).NomSupAirVolFlow;
+        TempSize = state.dataHeatRecovery->ExchCond(ExchNum).NomSupAirVolFlow;
         bool errorsFound = false;
         SystemAirFlowSizer sizerSystemAirFlow;
         sizerSystemAirFlow.overrideSizingString(SizingString);
         // sizerSystemAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
         sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-        ExchCond(ExchNum).NomSupAirVolFlow = sizerSystemAirFlow.size(state, TempSize, errorsFound);
-        DataConstantUsedForSizing = 0.0;
-        DataFractionUsedForSizing = 0.0;
-        if (ExchCond(ExchNum).ExchTypeNum == HX_AIRTOAIR_FLATPLATE) {
+        state.dataHeatRecovery->ExchCond(ExchNum).NomSupAirVolFlow = sizerSystemAirFlow.size(state, TempSize, errorsFound);
+        state.dataSize->DataConstantUsedForSizing = 0.0;
+        state.dataSize->DataFractionUsedForSizing = 0.0;
+        if (state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum == HX_AIRTOAIR_FLATPLATE) {
             PrintFlag = true;
             FieldNum = 5;
-            CompName = ExchCond(ExchNum).Name;
-            CompType = cHXTypes(ExchCond(ExchNum).ExchTypeNum);
-            SizingString = HeatExchCondNumericFields(ExchNum).NumericFieldNames(FieldNum) + " [m3/s]";
-            if (ExchCond(ExchNum).NomSecAirVolFlow == AutoSize) {
-                DataConstantUsedForSizing = ExchCond(ExchNum).NomSupAirVolFlow;
-                DataFractionUsedForSizing = 1.0;
+            CompName = state.dataHeatRecovery->ExchCond(ExchNum).Name;
+            CompType = cHXTypes(state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum);
+            SizingString = state.dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames(FieldNum) + " [m3/s]";
+            if (state.dataHeatRecovery->ExchCond(ExchNum).NomSecAirVolFlow == AutoSize) {
+                state.dataSize->DataConstantUsedForSizing = state.dataHeatRecovery->ExchCond(ExchNum).NomSupAirVolFlow;
+                state.dataSize->DataFractionUsedForSizing = 1.0;
             } else {
-                if (ZoneSizingRunDone || SysSizingRunDone) {
-                    DataConstantUsedForSizing = ExchCond(ExchNum).NomSupAirVolFlow;
-                    DataFractionUsedForSizing = 1.0;
+                if (state.dataSize->ZoneSizingRunDone || state.dataSize->SysSizingRunDone) {
+                    state.dataSize->DataConstantUsedForSizing = state.dataHeatRecovery->ExchCond(ExchNum).NomSupAirVolFlow;
+                    state.dataSize->DataFractionUsedForSizing = 1.0;
                 }
             }
-            TempSize = ExchCond(ExchNum).NomSecAirVolFlow;
+            TempSize = state.dataHeatRecovery->ExchCond(ExchNum).NomSecAirVolFlow;
             bool errorsFound = false;
             SystemAirFlowSizer sizerSystemAirFlow2;
             sizerSystemAirFlow2.overrideSizingString(SizingString);
             // sizerSystemAirFlow2.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
             sizerSystemAirFlow2.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-            ExchCond(ExchNum).NomSecAirVolFlow = sizerSystemAirFlow2.size(state, TempSize, errorsFound);
-            DataConstantUsedForSizing = 0.0;
-            DataFractionUsedForSizing = 0.0;
+            state.dataHeatRecovery->ExchCond(ExchNum).NomSecAirVolFlow = sizerSystemAirFlow2.size(state, TempSize, errorsFound);
+            state.dataSize->DataConstantUsedForSizing = 0.0;
+            state.dataSize->DataFractionUsedForSizing = 0.0;
         }
-        HRFlowSizingFlag = false;
-        if (ExchCond(ExchNum).ExchTypeNum == HX_DESICCANT_BALANCED && ExchCond(ExchNum).HeatExchPerfTypeNum == BALANCEDHX_PERFDATATYPE1) {
+        state.dataSize->HRFlowSizingFlag = false;
+        if (state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum == HX_DESICCANT_BALANCED &&
+            state.dataHeatRecovery->ExchCond(ExchNum).HeatExchPerfTypeNum == BALANCEDHX_PERFDATATYPE1) {
 
-            BalDesDehumPerfIndex = ExchCond(ExchNum).PerfDataIndex;
+            BalDesDehumPerfIndex = state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex;
 
             FieldNum = 1;
             PrintFlag = true;
-            CompName = BalDesDehumPerfData(BalDesDehumPerfIndex).Name;
-            CompType = BalDesDehumPerfData(BalDesDehumPerfIndex).PerfType;
-            SizingString = BalDesDehumPerfNumericFields(BalDesDehumPerfIndex).NumericFieldNames(FieldNum) + " [m3/s]";
-            TempSize = BalDesDehumPerfData(BalDesDehumPerfIndex).NomSupAirVolFlow;
+            CompName = state.dataHeatRecovery->BalDesDehumPerfData(BalDesDehumPerfIndex).Name;
+            CompType = state.dataHeatRecovery->BalDesDehumPerfData(BalDesDehumPerfIndex).PerfType;
+            SizingString = state.dataHeatRecovery->BalDesDehumPerfNumericFields(BalDesDehumPerfIndex).NumericFieldNames(FieldNum) + " [m3/s]";
+            TempSize = state.dataHeatRecovery->BalDesDehumPerfData(BalDesDehumPerfIndex).NomSupAirVolFlow;
             bool errorsFound = false;
             SystemAirFlowSizer sizerSystemAirFlow3;
             sizerSystemAirFlow3.overrideSizingString(SizingString);
             // sizerSystemAirFlow3.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
             sizerSystemAirFlow3.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-            BalDesDehumPerfData(BalDesDehumPerfIndex).NomSupAirVolFlow = sizerSystemAirFlow3.size(state, TempSize, errorsFound);
+            state.dataHeatRecovery->BalDesDehumPerfData(BalDesDehumPerfIndex).NomSupAirVolFlow =
+                sizerSystemAirFlow3.size(state, TempSize, errorsFound);
 
-            DataAirFlowUsedForSizing = BalDesDehumPerfData(BalDesDehumPerfIndex).NomSupAirVolFlow;
-            TempSize = BalDesDehumPerfData(BalDesDehumPerfIndex).NomProcAirFaceVel;
+            state.dataSize->DataAirFlowUsedForSizing = state.dataHeatRecovery->BalDesDehumPerfData(BalDesDehumPerfIndex).NomSupAirVolFlow;
+            TempSize = state.dataHeatRecovery->BalDesDehumPerfData(BalDesDehumPerfIndex).NomProcAirFaceVel;
             bool ErrorsFound = false;
             DesiccantDehumidifierBFPerfDataFaceVelocitySizer sizerDesDehumBFFaceVel;
             sizerDesDehumBFFaceVel.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-            BalDesDehumPerfData(BalDesDehumPerfIndex).NomProcAirFaceVel = sizerDesDehumBFFaceVel.size(state, TempSize, ErrorsFound);
+            state.dataHeatRecovery->BalDesDehumPerfData(BalDesDehumPerfIndex).NomProcAirFaceVel =
+                sizerDesDehumBFFaceVel.size(state, TempSize, ErrorsFound);
 
-            DataAirFlowUsedForSizing = 0.0;
+            state.dataSize->DataAirFlowUsedForSizing = 0.0;
         }
     }
 
@@ -1829,34 +2053,36 @@ namespace HeatRecovery {
             HighHumCtrlActiveFlag = false;
         }
 
-        if ((EconomizerActiveFlag || HighHumCtrlActiveFlag) && ExchCond(ExNum).EconoLockOut == EconoLockOut_Yes) {
+        if ((EconomizerActiveFlag || HighHumCtrlActiveFlag) && state.dataHeatRecovery->ExchCond(ExNum).EconoLockOut == EconomizerLockout::Yes) {
             UnitSupMassFlow = 0.0; // set HX supply flow to 0, all supply air will go through supply bypass
             UnitSecMassFlow = 0.0; // set HX secondary flow to 0, all secondary air will got through secondary bypass
             UnitOn = false;        // turn off HX calculations when in economizer mode
         } else {
             // if economizer operation is not allowed, air always passes through HX
             // if CompanionCoilNum > 0, air always passes through HX (no economizer operation allowed)
-            UnitSupMassFlow = min(ExchCond(ExNum).NomSupAirMassFlow, ExchCond(ExNum).SupInMassFlow);
-            UnitSecMassFlow = min(ExchCond(ExNum).NomSecAirMassFlow, ExchCond(ExNum).SecInMassFlow);
+            UnitSupMassFlow = min(state.dataHeatRecovery->ExchCond(ExNum).NomSupAirMassFlow, state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow);
+            UnitSecMassFlow = min(state.dataHeatRecovery->ExchCond(ExNum).NomSecAirMassFlow, state.dataHeatRecovery->ExchCond(ExNum).SecInMassFlow);
         }
 
-        SupBypassMassFlow = max(0.0, ExchCond(ExNum).SupInMassFlow - UnitSupMassFlow);
-        SecBypassMassFlow = max(0.0, ExchCond(ExNum).SecInMassFlow - UnitSecMassFlow);
-        if (GetCurrentScheduleValue(state, ExchCond(ExNum).SchedPtr) <= 0.0) UnitOn = false;
-        if (ExchCond(ExNum).SupInMassFlow <= SmallMassFlow) UnitOn = false;
-        if (ExchCond(ExNum).SecInMassFlow <= SmallMassFlow) UnitOn = false;
+        SupBypassMassFlow = max(0.0, state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow - UnitSupMassFlow);
+        SecBypassMassFlow = max(0.0, state.dataHeatRecovery->ExchCond(ExNum).SecInMassFlow - UnitSecMassFlow);
+        if (GetCurrentScheduleValue(state, state.dataHeatRecovery->ExchCond(ExNum).SchedPtr) <= 0.0) UnitOn = false;
+        if (state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow <= SmallMassFlow) UnitOn = false;
+        if (state.dataHeatRecovery->ExchCond(ExNum).SecInMassFlow <= SmallMassFlow) UnitOn = false;
         if (!HXUnitOn) UnitOn = false;
 
         if (UnitOn) {
             // unit is on
             // calculate the UA for this time step
-            QuotSup = SafeDiv(ExchCond(ExNum).mTSup0, UnitSupMassFlow * (ExchCond(ExNum).SupInTemp + KELVZERO));
-            QuotExh = SafeDiv(ExchCond(ExNum).mTSec0, UnitSecMassFlow * (ExchCond(ExNum).SecInTemp + KELVZERO));
-            Deno = std::pow(QuotSup, 0.78) + ExchCond(ExNum).hARatio * std::pow(QuotExh, 0.78);
-            UA = ExchCond(ExNum).UA0 * (ExchCond(ExNum).hARatio + 1.0) / Deno;
+            QuotSup = SafeDiv(state.dataHeatRecovery->ExchCond(ExNum).mTSup0,
+                              UnitSupMassFlow * (state.dataHeatRecovery->ExchCond(ExNum).SupInTemp + KELVZERO));
+            QuotExh = SafeDiv(state.dataHeatRecovery->ExchCond(ExNum).mTSec0,
+                              UnitSecMassFlow * (state.dataHeatRecovery->ExchCond(ExNum).SecInTemp + KELVZERO));
+            Deno = std::pow(QuotSup, 0.78) + state.dataHeatRecovery->ExchCond(ExNum).hARatio * std::pow(QuotExh, 0.78);
+            UA = state.dataHeatRecovery->ExchCond(ExNum).UA0 * (state.dataHeatRecovery->ExchCond(ExNum).hARatio + 1.0) / Deno;
             // calculate the NTU
-            CSup = UnitSupMassFlow * PsyCpAirFnW(ExchCond(ExNum).SupInHumRat);
-            CSec = UnitSecMassFlow * PsyCpAirFnW(ExchCond(ExNum).SecInHumRat);
+            CSup = UnitSupMassFlow * PsyCpAirFnW(state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat);
+            CSec = UnitSecMassFlow * PsyCpAirFnW(state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat);
             // note: no C can be zero since otherwise we wouldn't be here
             if (CSup < CSec) {
                 CMin = CSup;
@@ -1867,12 +2093,13 @@ namespace HeatRecovery {
             }
             NTU = UA / CMin;
             // Get the effectiveness
-            CalculateEpsFromNTUandZ(state, NTU, Z, ExchCond(ExNum).FlowArr, Eps);
+            CalculateEpsFromNTUandZ(state, NTU, Z, state.dataHeatRecovery->ExchCond(ExNum).FlowArr, Eps);
             // use the effectiveness to calculate the unit outlet conditions
-            TempSupOut = ExchCond(ExNum).SupInTemp + Eps * CMin / CSup * (ExchCond(ExNum).SecInTemp - ExchCond(ExNum).SupInTemp);
-            QTrans = CSup * (TempSupOut - ExchCond(ExNum).SupInTemp);
-            TempSecOut = ExchCond(ExNum).SecInTemp - QTrans / CSec;
-            HumRatSupOut = ExchCond(ExNum).SupInHumRat;
+            TempSupOut = state.dataHeatRecovery->ExchCond(ExNum).SupInTemp +
+                         Eps * CMin / CSup * (state.dataHeatRecovery->ExchCond(ExNum).SecInTemp - state.dataHeatRecovery->ExchCond(ExNum).SupInTemp);
+            QTrans = CSup * (TempSupOut - state.dataHeatRecovery->ExchCond(ExNum).SupInTemp);
+            TempSecOut = state.dataHeatRecovery->ExchCond(ExNum).SecInTemp - QTrans / CSec;
+            HumRatSupOut = state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat;
             EnthSupOut = PsyHFnTdbW(TempSupOut, HumRatSupOut);
             // check for saturation in supply outlet
             TempSupOutSat = PsyTsatFnHPb(state, EnthSupOut, state.dataEnvrn->OutBaroPress);
@@ -1880,7 +2107,7 @@ namespace HeatRecovery {
                 TempSupOut = TempSupOutSat;
                 HumRatSupOut = PsyWFnTdbH(state, TempSupOut, EnthSupOut);
             }
-            HumRatSecOut = ExchCond(ExNum).SecInHumRat;
+            HumRatSecOut = state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat;
             EnthSecOut = PsyHFnTdbW(TempSecOut, HumRatSecOut);
             // check for saturation in secondary outlet
             TempSecOutSat = PsyTsatFnHPb(state, EnthSecOut, state.dataEnvrn->OutBaroPress);
@@ -1890,59 +2117,66 @@ namespace HeatRecovery {
             }
             // calculate outlet conditions by mixing bypass air stream with air that went through the
             // heat exchanger core.
-            ExchCond(ExNum).SupOutEnth =
-                (UnitSupMassFlow * EnthSupOut + SupBypassMassFlow * ExchCond(ExNum).SupInEnth) / ExchCond(ExNum).SupInMassFlow;
-            ExchCond(ExNum).SupOutHumRat =
-                (UnitSupMassFlow * HumRatSupOut + SupBypassMassFlow * ExchCond(ExNum).SupInHumRat) / ExchCond(ExNum).SupInMassFlow;
-            ExchCond(ExNum).SupOutTemp = PsyTdbFnHW(ExchCond(ExNum).SupOutEnth, ExchCond(ExNum).SupOutHumRat);
-            ExchCond(ExNum).SupOutMassFlow = ExchCond(ExNum).SupInMassFlow;
-            ExchCond(ExNum).SecOutEnth =
-                (UnitSecMassFlow * EnthSecOut + SecBypassMassFlow * ExchCond(ExNum).SecInEnth) / ExchCond(ExNum).SecInMassFlow;
-            ExchCond(ExNum).SecOutHumRat =
-                (UnitSecMassFlow * HumRatSecOut + SecBypassMassFlow * ExchCond(ExNum).SecInHumRat) / ExchCond(ExNum).SecInMassFlow;
-            ExchCond(ExNum).SecOutTemp = PsyTdbFnHW(ExchCond(ExNum).SecOutEnth, ExchCond(ExNum).SecOutHumRat);
-            ExchCond(ExNum).SecOutMassFlow = ExchCond(ExNum).SecInMassFlow;
-            ElecCons = ExchCond(ExNum).NomElecPower;
+            state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth =
+                (UnitSupMassFlow * EnthSupOut + SupBypassMassFlow * state.dataHeatRecovery->ExchCond(ExNum).SupInEnth) /
+                state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow;
+            state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat =
+                (UnitSupMassFlow * HumRatSupOut + SupBypassMassFlow * state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat) /
+                state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow;
+            state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp =
+                PsyTdbFnHW(state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth, state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat);
+            state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow = state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow;
+            state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth =
+                (UnitSecMassFlow * EnthSecOut + SecBypassMassFlow * state.dataHeatRecovery->ExchCond(ExNum).SecInEnth) /
+                state.dataHeatRecovery->ExchCond(ExNum).SecInMassFlow;
+            state.dataHeatRecovery->ExchCond(ExNum).SecOutHumRat =
+                (UnitSecMassFlow * HumRatSecOut + SecBypassMassFlow * state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat) /
+                state.dataHeatRecovery->ExchCond(ExNum).SecInMassFlow;
+            state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp =
+                PsyTdbFnHW(state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth, state.dataHeatRecovery->ExchCond(ExNum).SecOutHumRat);
+            state.dataHeatRecovery->ExchCond(ExNum).SecOutMassFlow = state.dataHeatRecovery->ExchCond(ExNum).SecInMassFlow;
+            ElecCons = state.dataHeatRecovery->ExchCond(ExNum).NomElecPower;
 
         } else {
             // the unit is off. Pass through the air streams with no change
-            ExchCond(ExNum).SupOutEnth = ExchCond(ExNum).SupInEnth;
-            ExchCond(ExNum).SupOutHumRat = ExchCond(ExNum).SupInHumRat;
-            ExchCond(ExNum).SupOutTemp = ExchCond(ExNum).SupInTemp;
-            ExchCond(ExNum).SupOutMassFlow = ExchCond(ExNum).SupInMassFlow;
-            ExchCond(ExNum).SecOutEnth = ExchCond(ExNum).SecInEnth;
-            ExchCond(ExNum).SecOutHumRat = ExchCond(ExNum).SecInHumRat;
-            ExchCond(ExNum).SecOutTemp = ExchCond(ExNum).SecInTemp;
-            ExchCond(ExNum).SecOutMassFlow = ExchCond(ExNum).SecInMassFlow;
+            state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth = state.dataHeatRecovery->ExchCond(ExNum).SupInEnth;
+            state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat = state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat;
+            state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp = state.dataHeatRecovery->ExchCond(ExNum).SupInTemp;
+            state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow = state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow;
+            state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth = state.dataHeatRecovery->ExchCond(ExNum).SecInEnth;
+            state.dataHeatRecovery->ExchCond(ExNum).SecOutHumRat = state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat;
+            state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp = state.dataHeatRecovery->ExchCond(ExNum).SecInTemp;
+            state.dataHeatRecovery->ExchCond(ExNum).SecOutMassFlow = state.dataHeatRecovery->ExchCond(ExNum).SecInMassFlow;
         }
-        CSup = ExchCond(ExNum).SupInMassFlow * PsyCpAirFnW(ExchCond(ExNum).SupInHumRat);
-        SensHeatRecRate = CSup * (ExchCond(ExNum).SupOutTemp - ExchCond(ExNum).SupInTemp);
-        TotHeatRecRate = ExchCond(ExNum).SupOutMassFlow * (ExchCond(ExNum).SupOutEnth - ExchCond(ExNum).SupInEnth);
+        CSup = state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow * PsyCpAirFnW(state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat);
+        SensHeatRecRate = CSup * (state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp - state.dataHeatRecovery->ExchCond(ExNum).SupInTemp);
+        TotHeatRecRate = state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow *
+                         (state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth - state.dataHeatRecovery->ExchCond(ExNum).SupInEnth);
         LatHeatRecRate = TotHeatRecRate - SensHeatRecRate;
 
         if (SensHeatRecRate > 0.0) {
-            ExchCond(ExNum).SensHeatingRate = SensHeatRecRate;
-            ExchCond(ExNum).SensCoolingRate = 0.0;
+            state.dataHeatRecovery->ExchCond(ExNum).SensHeatingRate = SensHeatRecRate;
+            state.dataHeatRecovery->ExchCond(ExNum).SensCoolingRate = 0.0;
         } else {
-            ExchCond(ExNum).SensHeatingRate = 0.0;
-            ExchCond(ExNum).SensCoolingRate = std::abs(SensHeatRecRate);
+            state.dataHeatRecovery->ExchCond(ExNum).SensHeatingRate = 0.0;
+            state.dataHeatRecovery->ExchCond(ExNum).SensCoolingRate = std::abs(SensHeatRecRate);
         }
         if (LatHeatRecRate > 0.0) {
-            ExchCond(ExNum).LatHeatingRate = LatHeatRecRate;
-            ExchCond(ExNum).LatCoolingRate = 0.0;
+            state.dataHeatRecovery->ExchCond(ExNum).LatHeatingRate = LatHeatRecRate;
+            state.dataHeatRecovery->ExchCond(ExNum).LatCoolingRate = 0.0;
         } else {
-            ExchCond(ExNum).LatHeatingRate = 0.0;
-            ExchCond(ExNum).LatCoolingRate = std::abs(LatHeatRecRate);
+            state.dataHeatRecovery->ExchCond(ExNum).LatHeatingRate = 0.0;
+            state.dataHeatRecovery->ExchCond(ExNum).LatCoolingRate = std::abs(LatHeatRecRate);
         }
         if (TotHeatRecRate > 0.0) {
-            ExchCond(ExNum).TotHeatingRate = TotHeatRecRate;
-            ExchCond(ExNum).TotCoolingRate = 0.0;
+            state.dataHeatRecovery->ExchCond(ExNum).TotHeatingRate = TotHeatRecRate;
+            state.dataHeatRecovery->ExchCond(ExNum).TotCoolingRate = 0.0;
         } else {
-            ExchCond(ExNum).TotHeatingRate = 0.0;
-            ExchCond(ExNum).TotCoolingRate = std::abs(TotHeatRecRate);
+            state.dataHeatRecovery->ExchCond(ExNum).TotHeatingRate = 0.0;
+            state.dataHeatRecovery->ExchCond(ExNum).TotCoolingRate = std::abs(TotHeatRecRate);
         }
 
-        ExchCond(ExNum).ElecUseRate = ElecCons;
+        state.dataHeatRecovery->ExchCond(ExNum).ElecUseRate = ElecCons;
     }
 
     void CalcAirToAirGenericHeatExch(EnergyPlusData &state,
@@ -2040,18 +2274,18 @@ namespace HeatRecovery {
         FrostControlFlag = false;
         QSensTrans = 0.0;
         QTotTrans = 0.0;
-        ExchCond(ExNum).DefrostFraction = 0.0;
-        ExchCond(ExNum).SensEffectiveness = 0.0;
-        ExchCond(ExNum).LatEffectiveness = 0.0;
-        ExchCond(ExNum).ElecUseRate = 0.0;
-        ExchCond(ExNum).SupOutTemp = ExchCond(ExNum).SupInTemp;
-        ExchCond(ExNum).SecOutTemp = ExchCond(ExNum).SecInTemp;
-        ExchCond(ExNum).SupOutHumRat = ExchCond(ExNum).SupInHumRat;
-        ExchCond(ExNum).SecOutHumRat = ExchCond(ExNum).SecInHumRat;
-        ExchCond(ExNum).SupOutEnth = ExchCond(ExNum).SupInEnth;
-        ExchCond(ExNum).SecOutEnth = ExchCond(ExNum).SecInEnth;
-        SupOutNode = ExchCond(ExNum).SupOutletNode;
-        HXTempSetPoint = Node(SupOutNode).TempSetPoint;
+        state.dataHeatRecovery->ExchCond(ExNum).DefrostFraction = 0.0;
+        state.dataHeatRecovery->ExchCond(ExNum).SensEffectiveness = 0.0;
+        state.dataHeatRecovery->ExchCond(ExNum).LatEffectiveness = 0.0;
+        state.dataHeatRecovery->ExchCond(ExNum).ElecUseRate = 0.0;
+        state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp = state.dataHeatRecovery->ExchCond(ExNum).SupInTemp;
+        state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp = state.dataHeatRecovery->ExchCond(ExNum).SecInTemp;
+        state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat = state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat;
+        state.dataHeatRecovery->ExchCond(ExNum).SecOutHumRat = state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat;
+        state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth = state.dataHeatRecovery->ExchCond(ExNum).SupInEnth;
+        state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth = state.dataHeatRecovery->ExchCond(ExNum).SecInEnth;
+        SupOutNode = state.dataHeatRecovery->ExchCond(ExNum).SupOutletNode;
+        HXTempSetPoint = state.dataLoopNodes->Node(SupOutNode).TempSetPoint;
 
         if (present(EconomizerFlag)) {
             EconomizerActiveFlag = EconomizerFlag;
@@ -2066,29 +2300,29 @@ namespace HeatRecovery {
         }
 
         // Determine mass flow through heat exchanger and mass flow being bypassed (only flat plate bypasses flow)
-        if (((EconomizerActiveFlag || HighHumCtrlActiveFlag) && ExchCond(ExNum).EconoLockOut == EconoLockOut_Yes) &&
-            ExchCond(ExNum).ExchConfigNum == Plate) {
-            ExchCond(ExNum).SupBypassMassFlow = ExchCond(ExNum).SupInMassFlow;
-            ExchCond(ExNum).SupOutMassFlow = ExchCond(ExNum).SupInMassFlow;
-            ExchCond(ExNum).SecBypassMassFlow = ExchCond(ExNum).SecInMassFlow;
-            ExchCond(ExNum).SecOutMassFlow = ExchCond(ExNum).SecInMassFlow;
+        if (((EconomizerActiveFlag || HighHumCtrlActiveFlag) && state.dataHeatRecovery->ExchCond(ExNum).EconoLockOut == EconomizerLockout::Yes) &&
+            state.dataHeatRecovery->ExchCond(ExNum).ExchConfig == HXConfigurationType::Plate) {
+            state.dataHeatRecovery->ExchCond(ExNum).SupBypassMassFlow = state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow;
+            state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow = state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow;
+            state.dataHeatRecovery->ExchCond(ExNum).SecBypassMassFlow = state.dataHeatRecovery->ExchCond(ExNum).SecInMassFlow;
+            state.dataHeatRecovery->ExchCond(ExNum).SecOutMassFlow = state.dataHeatRecovery->ExchCond(ExNum).SecInMassFlow;
         } else { // No bypass mass flow
-            ExchCond(ExNum).SupOutMassFlow = ExchCond(ExNum).SupInMassFlow;
-            ExchCond(ExNum).SecOutMassFlow = ExchCond(ExNum).SecInMassFlow;
-            ExchCond(ExNum).SupBypassMassFlow = 0.0;
-            ExchCond(ExNum).SecBypassMassFlow = 0.0;
+            state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow = state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow;
+            state.dataHeatRecovery->ExchCond(ExNum).SecOutMassFlow = state.dataHeatRecovery->ExchCond(ExNum).SecInMassFlow;
+            state.dataHeatRecovery->ExchCond(ExNum).SupBypassMassFlow = 0.0;
+            state.dataHeatRecovery->ExchCond(ExNum).SecBypassMassFlow = 0.0;
         }
         // Unit is scheduled OFF, so bypass heat exchange calcs
-        if (GetCurrentScheduleValue(state, ExchCond(ExNum).SchedPtr) <= 0.0) UnitOn = false;
+        if (GetCurrentScheduleValue(state, state.dataHeatRecovery->ExchCond(ExNum).SchedPtr) <= 0.0) UnitOn = false;
         //! Economizer is active, so bypass heat exchange calcs. This applies to both flat plate and rotary HX's
-        if ((EconomizerActiveFlag || HighHumCtrlActiveFlag) && ExchCond(ExNum).EconoLockOut == EconoLockOut_Yes) {
+        if ((EconomizerActiveFlag || HighHumCtrlActiveFlag) && state.dataHeatRecovery->ExchCond(ExNum).EconoLockOut == EconomizerLockout::Yes) {
             UnitOn = false;
         }
         // Determine if unit is ON or OFF based on air mass flow through the supply and secondary airstreams and operation flag
-        if (ExchCond(ExNum).SupInMassFlow <= SmallMassFlow) UnitOn = false;
-        if (ExchCond(ExNum).SecInMassFlow <= SmallMassFlow) UnitOn = false;
+        if (state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow <= SmallMassFlow) UnitOn = false;
+        if (state.dataHeatRecovery->ExchCond(ExNum).SecInMassFlow <= SmallMassFlow) UnitOn = false;
         if (!HXUnitOn) UnitOn = false;
-        if (ExchCond(ExNum).NomSupAirVolFlow == 0.0) UnitOn = false;
+        if (state.dataHeatRecovery->ExchCond(ExNum).NomSupAirVolFlow == 0.0) UnitOn = false;
 
         if (UnitOn) {
             // Unit is on.
@@ -2103,33 +2337,36 @@ namespace HeatRecovery {
             }
 
             if (FanOpMode == DataHVACGlobals::CycFanCycCoil) {
-                ExchCond(ExNum).SupInMassFlow /= AirSidePLR;
-                ExchCond(ExNum).SupOutMassFlow /= AirSidePLR;
-                ExchCond(ExNum).SecInMassFlow /= AirSidePLR;
-                ExchCond(ExNum).SecOutMassFlow /= AirSidePLR;
-                ExchCond(ExNum).SupBypassMassFlow /= AirSidePLR;
-                ExchCond(ExNum).SecBypassMassFlow /= AirSidePLR;
+                state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow /= AirSidePLR;
+                state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow /= AirSidePLR;
+                state.dataHeatRecovery->ExchCond(ExNum).SecInMassFlow /= AirSidePLR;
+                state.dataHeatRecovery->ExchCond(ExNum).SecOutMassFlow /= AirSidePLR;
+                state.dataHeatRecovery->ExchCond(ExNum).SupBypassMassFlow /= AirSidePLR;
+                state.dataHeatRecovery->ExchCond(ExNum).SecBypassMassFlow /= AirSidePLR;
             }
 
             // In the future, use actual node pressures in the following air density calls
             RhoStd = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, 20.0, 0.0);
-            HXSupAirVolFlowRate = ExchCond(ExNum).SupOutMassFlow / RhoStd; // volume flow using standard density
-            HXSecAirVolFlowRate = ExchCond(ExNum).SecOutMassFlow / RhoStd;
+            HXSupAirVolFlowRate = state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow / RhoStd; // volume flow using standard density
+            HXSecAirVolFlowRate = state.dataHeatRecovery->ExchCond(ExNum).SecOutMassFlow / RhoStd;
             // Limit unbalanced volumetric flow ratio to 2:1
             if (!state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
                 if (HXSupAirVolFlowRate != 0.0 && HXSecAirVolFlowRate != 0.0) {
                     if (((HXSupAirVolFlowRate / HXSecAirVolFlowRate) > 2.0) || ((HXSecAirVolFlowRate / HXSupAirVolFlowRate) > 2.0)) {
-                        ++ExchCond(ExNum).UnBalancedErrCount;
-                        if (ExchCond(ExNum).UnBalancedErrCount <= 2) {
-                            ShowSevereError(state, cHXTypes(ExchCond(ExNum).ExchTypeNum) + ": \"" + ExchCond(ExNum).Name +
-                                            "\" unbalanced air volume flow ratio through the heat exchanger is greater than 2:1.");
+                        ++state.dataHeatRecovery->ExchCond(ExNum).UnBalancedErrCount;
+                        if (state.dataHeatRecovery->ExchCond(ExNum).UnBalancedErrCount <= 2) {
+                            ShowSevereError(state,
+                                            cHXTypes(state.dataHeatRecovery->ExchCond(ExNum).ExchTypeNum) + ": \"" +
+                                                state.dataHeatRecovery->ExchCond(ExNum).Name +
+                                                "\" unbalanced air volume flow ratio through the heat exchanger is greater than 2:1.");
                             ShowContinueErrorTimeStamp(
                                 state, format("...HX Supply air to Exhaust air flow ratio = {:.5R}.", HXSupAirVolFlowRate / HXSecAirVolFlowRate));
                         } else {
-                            ShowRecurringWarningErrorAtEnd(state,
-                                cHXTypes(ExchCond(ExNum).ExchTypeNum) + " \"" + ExchCond(ExNum).Name +
+                            ShowRecurringWarningErrorAtEnd(
+                                state,
+                                cHXTypes(state.dataHeatRecovery->ExchCond(ExNum).ExchTypeNum) + " \"" + state.dataHeatRecovery->ExchCond(ExNum).Name +
                                     "\":  Unbalanced air volume flow ratio exceeds 2:1 warning continues. HX flow ratio statistics follow.",
-                                ExchCond(ExNum).UnBalancedErrIndex,
+                                state.dataHeatRecovery->ExchCond(ExNum).UnBalancedErrIndex,
                                 HXSupAirVolFlowRate / HXSecAirVolFlowRate,
                                 HXSupAirVolFlowRate / HXSecAirVolFlowRate);
                         }
@@ -2138,20 +2375,23 @@ namespace HeatRecovery {
             }
             // Calculate average volumetric flow rate of the two air streams
             HXAvgAirVolFlowRate = (HXSecAirVolFlowRate + HXSupAirVolFlowRate) / 2.0;
-            HXAirVolFlowRatio = HXAvgAirVolFlowRate / ExchCond(ExNum).NomSupAirVolFlow;
+            HXAirVolFlowRatio = HXAvgAirVolFlowRate / state.dataHeatRecovery->ExchCond(ExNum).NomSupAirVolFlow;
             // Average air volume flow rate must be between 50% and 130% of nominal supply air volume flow
             if (HXAirVolFlowRatio > 1.3 || HXAirVolFlowRatio < 0.5) {
                 if (!state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
-                    ++ExchCond(ExNum).LowFlowErrCount;
-                    if (ExchCond(ExNum).LowFlowErrCount == 1) {
-                        ShowWarningError(state, cHXTypes(ExchCond(ExNum).ExchTypeNum) + " \"" + ExchCond(ExNum).Name + "\"");
+                    ++state.dataHeatRecovery->ExchCond(ExNum).LowFlowErrCount;
+                    if (state.dataHeatRecovery->ExchCond(ExNum).LowFlowErrCount == 1) {
+                        ShowWarningError(state,
+                                         cHXTypes(state.dataHeatRecovery->ExchCond(ExNum).ExchTypeNum) + " \"" +
+                                             state.dataHeatRecovery->ExchCond(ExNum).Name + "\"");
                         ShowContinueError(state, "Average air volume flow rate is <50% or >130% of the nominal HX supply air volume flow rate.");
                         ShowContinueErrorTimeStamp(state, format("Air volume flow rate ratio = {:.3R}.", HXAirVolFlowRatio));
                     } else {
-                        ShowRecurringWarningErrorAtEnd(state,
-                            cHXTypes(ExchCond(ExNum).ExchTypeNum) + " \"" + ExchCond(ExNum).Name +
+                        ShowRecurringWarningErrorAtEnd(
+                            state,
+                            cHXTypes(state.dataHeatRecovery->ExchCond(ExNum).ExchTypeNum) + " \"" + state.dataHeatRecovery->ExchCond(ExNum).Name +
                                 "\":  Average air volume flow rate is <50% or >130% warning continues. Air flow rate ratio statistics follow.",
-                            ExchCond(ExNum).LowFlowErrIndex,
+                            state.dataHeatRecovery->ExchCond(ExNum).LowFlowErrIndex,
                             HXAirVolFlowRatio,
                             HXAirVolFlowRatio);
                     }
@@ -2160,116 +2400,152 @@ namespace HeatRecovery {
 
             // Determine heat exchanger effectiveness using avg air volume flow rate based on actual inlet air density
             // Linearly interpolate and extrapolate (within limits) from effectiveness input values
-            RhoSup = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ExchCond(ExNum).SupInTemp, ExchCond(ExNum).SupInHumRat);
-            RhoSec = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ExchCond(ExNum).SecInTemp, ExchCond(ExNum).SecInHumRat);
-            HXSupAirVolFlowRate = ExchCond(ExNum).SupOutMassFlow / RhoSup;
-            HXSecAirVolFlowRate = ExchCond(ExNum).SecOutMassFlow / RhoSec;
+            RhoSup = PsyRhoAirFnPbTdbW(state,
+                                       state.dataEnvrn->OutBaroPress,
+                                       state.dataHeatRecovery->ExchCond(ExNum).SupInTemp,
+                                       state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat);
+            RhoSec = PsyRhoAirFnPbTdbW(state,
+                                       state.dataEnvrn->OutBaroPress,
+                                       state.dataHeatRecovery->ExchCond(ExNum).SecInTemp,
+                                       state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat);
+            HXSupAirVolFlowRate = state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow / RhoSup;
+            HXSecAirVolFlowRate = state.dataHeatRecovery->ExchCond(ExNum).SecOutMassFlow / RhoSec;
             HXAvgAirVolFlowRate = (HXSecAirVolFlowRate + HXSupAirVolFlowRate) / 2.0;
-            HXAirVolFlowRatio = HXAvgAirVolFlowRate / ExchCond(ExNum).NomSupAirVolFlow;
+            HXAirVolFlowRatio = HXAvgAirVolFlowRate / state.dataHeatRecovery->ExchCond(ExNum).NomSupAirVolFlow;
 
-            if (ExchCond(ExNum).SupInTemp < ExchCond(ExNum).SecInTemp) {
+            if (state.dataHeatRecovery->ExchCond(ExNum).SupInTemp < state.dataHeatRecovery->ExchCond(ExNum).SecInTemp) {
                 // Use heating effectiveness values
-                ExchCond(ExNum).SensEffectiveness =
-                    ExchCond(ExNum).HeatEffectSensible75 +
-                    (ExchCond(ExNum).HeatEffectSensible100 - ExchCond(ExNum).HeatEffectSensible75) * (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
-                ExchCond(ExNum).LatEffectiveness =
-                    ExchCond(ExNum).HeatEffectLatent75 +
-                    (ExchCond(ExNum).HeatEffectLatent100 - ExchCond(ExNum).HeatEffectLatent75) * (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
+                state.dataHeatRecovery->ExchCond(ExNum).SensEffectiveness =
+                    state.dataHeatRecovery->ExchCond(ExNum).HeatEffectSensible75 +
+                    (state.dataHeatRecovery->ExchCond(ExNum).HeatEffectSensible100 - state.dataHeatRecovery->ExchCond(ExNum).HeatEffectSensible75) *
+                        (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
+                state.dataHeatRecovery->ExchCond(ExNum).LatEffectiveness =
+                    state.dataHeatRecovery->ExchCond(ExNum).HeatEffectLatent75 +
+                    (state.dataHeatRecovery->ExchCond(ExNum).HeatEffectLatent100 - state.dataHeatRecovery->ExchCond(ExNum).HeatEffectLatent75) *
+                        (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
             } else {
                 // Use cooling effectiveness values
-                ExchCond(ExNum).SensEffectiveness =
-                    ExchCond(ExNum).CoolEffectSensible75 +
-                    (ExchCond(ExNum).CoolEffectSensible100 - ExchCond(ExNum).CoolEffectSensible75) * (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
-                ExchCond(ExNum).LatEffectiveness =
-                    ExchCond(ExNum).CoolEffectLatent75 +
-                    (ExchCond(ExNum).CoolEffectLatent100 - ExchCond(ExNum).CoolEffectLatent75) * (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
+                state.dataHeatRecovery->ExchCond(ExNum).SensEffectiveness =
+                    state.dataHeatRecovery->ExchCond(ExNum).CoolEffectSensible75 +
+                    (state.dataHeatRecovery->ExchCond(ExNum).CoolEffectSensible100 - state.dataHeatRecovery->ExchCond(ExNum).CoolEffectSensible75) *
+                        (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
+                state.dataHeatRecovery->ExchCond(ExNum).LatEffectiveness =
+                    state.dataHeatRecovery->ExchCond(ExNum).CoolEffectLatent75 +
+                    (state.dataHeatRecovery->ExchCond(ExNum).CoolEffectLatent100 - state.dataHeatRecovery->ExchCond(ExNum).CoolEffectLatent75) *
+                        (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
             }
 
             //     Keep effectiveness between 0 and 1.0 ??
             //     HXOpSensEffect = MAX(MIN(HXOpSensEffect,1.0),0.0)
             //     HXOpLatEffect =  MAX(MIN(HXOpLatEffect,1.0),0.0)
-            if (ExchCond(ExNum).SensEffectiveness < 0.0) {
+            if (state.dataHeatRecovery->ExchCond(ExNum).SensEffectiveness < 0.0) {
                 //   The model should at least guard against negative numbers
-                ExchCond(ExNum).SensEffectiveness = 0.0;
-                if (!ExchCond(ExNum).SensEffectivenessFlag) {
-                    ShowWarningError(state, "HeatExchanger:AirToAir:SensibleAndLatent =\"" + ExchCond(ExNum).Name + "\"" +
-                                     " sensible effectiveness is less than zero. Check the following inputs.");
-                    if (ExchCond(ExNum).SupInTemp < ExchCond(ExNum).SecInTemp) {
-                        ShowContinueError(
-                            state, format("...Sensible Effectiveness at 100% Heating Air Flow = {:.2R}", ExchCond(ExNum).HeatEffectSensible100));
+                state.dataHeatRecovery->ExchCond(ExNum).SensEffectiveness = 0.0;
+                if (!state.dataHeatRecovery->ExchCond(ExNum).SensEffectivenessFlag) {
+                    ShowWarningError(state,
+                                     "HeatExchanger:AirToAir:SensibleAndLatent =\"" + state.dataHeatRecovery->ExchCond(ExNum).Name + "\"" +
+                                         " sensible effectiveness is less than zero. Check the following inputs.");
+                    if (state.dataHeatRecovery->ExchCond(ExNum).SupInTemp < state.dataHeatRecovery->ExchCond(ExNum).SecInTemp) {
                         ShowContinueError(state,
-                                          format("...Sensible Effectiveness at 75% Heating Air Flow = {:.2R}", ExchCond(ExNum).HeatEffectSensible75));
+                                          format("...Sensible Effectiveness at 100% Heating Air Flow = {:.2R}",
+                                                 state.dataHeatRecovery->ExchCond(ExNum).HeatEffectSensible100));
+                        ShowContinueError(state,
+                                          format("...Sensible Effectiveness at 75% Heating Air Flow = {:.2R}",
+                                                 state.dataHeatRecovery->ExchCond(ExNum).HeatEffectSensible75));
                         ShowContinueError(state, "...Sensible effectiveness reset to zero and the simulation continues.");
                     } else {
-                        ShowContinueError(
-                            state, format("...Sensible Effectiveness at 100% Cooling Air Flow = {:.2R}", ExchCond(ExNum).CoolEffectSensible100));
                         ShowContinueError(state,
-                                          format("...Sensible Effectiveness at 75% Cooling Air Flow = {:.2R}", ExchCond(ExNum).CoolEffectSensible75));
+                                          format("...Sensible Effectiveness at 100% Cooling Air Flow = {:.2R}",
+                                                 state.dataHeatRecovery->ExchCond(ExNum).CoolEffectSensible100));
+                        ShowContinueError(state,
+                                          format("...Sensible Effectiveness at 75% Cooling Air Flow = {:.2R}",
+                                                 state.dataHeatRecovery->ExchCond(ExNum).CoolEffectSensible75));
                         ShowContinueError(state, "...Sensible effectiveness reset to zero and the simulation continues.");
                     }
                     ShowContinueError(state, format("...Heat Exchanger Air Volume Flow Ratio = {:.2R}", HXAirVolFlowRatio));
-                    ExchCond(ExNum).SensEffectivenessFlag = true;
+                    state.dataHeatRecovery->ExchCond(ExNum).SensEffectivenessFlag = true;
                 }
             }
-            if (ExchCond(ExNum).LatEffectiveness < 0.0) {
+            if (state.dataHeatRecovery->ExchCond(ExNum).LatEffectiveness < 0.0) {
                 // The model should at least guard against negative numbers
-                ExchCond(ExNum).LatEffectiveness = 0.0;
-                if (!ExchCond(ExNum).LatEffectivenessFlag) {
-                    ShowWarningError(state, "HeatExchanger:AirToAir:SensibleAndLatent =\"" + ExchCond(ExNum).Name + "\"" +
-                                     " latent effectiveness is less than zero. Check the following inputs.");
-                    if (ExchCond(ExNum).SupInTemp < ExchCond(ExNum).SecInTemp) {
+                state.dataHeatRecovery->ExchCond(ExNum).LatEffectiveness = 0.0;
+                if (!state.dataHeatRecovery->ExchCond(ExNum).LatEffectivenessFlag) {
+                    ShowWarningError(state,
+                                     "HeatExchanger:AirToAir:SensibleAndLatent =\"" + state.dataHeatRecovery->ExchCond(ExNum).Name + "\"" +
+                                         " latent effectiveness is less than zero. Check the following inputs.");
+                    if (state.dataHeatRecovery->ExchCond(ExNum).SupInTemp < state.dataHeatRecovery->ExchCond(ExNum).SecInTemp) {
                         ShowContinueError(state,
-                                          format("...Latent Effectiveness at 100% Heating Air Flow = {:.2R}", ExchCond(ExNum).HeatEffectLatent100));
+                                          format("...Latent Effectiveness at 100% Heating Air Flow = {:.2R}",
+                                                 state.dataHeatRecovery->ExchCond(ExNum).HeatEffectLatent100));
                         ShowContinueError(state,
-                                          format("...Latent Effectiveness at 75% Heating Air Flow = {:.2R}", ExchCond(ExNum).HeatEffectLatent75));
+                                          format("...Latent Effectiveness at 75% Heating Air Flow = {:.2R}",
+                                                 state.dataHeatRecovery->ExchCond(ExNum).HeatEffectLatent75));
                         ShowContinueError(state, "...Latent effectiveness reset to zero and the simulation continues.");
                     } else {
                         ShowContinueError(state,
-                                          format("...Latent Effectiveness at 100% Cooling Air Flow = {:.2R}", ExchCond(ExNum).CoolEffectLatent100));
+                                          format("...Latent Effectiveness at 100% Cooling Air Flow = {:.2R}",
+                                                 state.dataHeatRecovery->ExchCond(ExNum).CoolEffectLatent100));
                         ShowContinueError(state,
-                                          format("...Latent Effectiveness at 75% Cooling Air Flow = {:.2R}", ExchCond(ExNum).CoolEffectLatent75));
+                                          format("...Latent Effectiveness at 75% Cooling Air Flow = {:.2R}",
+                                                 state.dataHeatRecovery->ExchCond(ExNum).CoolEffectLatent75));
                         ShowContinueError(state, "...Latent effectiveness reset to zero and the simulation continues.");
                     }
                     ShowContinueError(state, format("...Heat Exchanger Air Volume Flow Ratio = {:.2R}", HXAirVolFlowRatio));
-                    ExchCond(ExNum).LatEffectivenessFlag = true;
+                    state.dataHeatRecovery->ExchCond(ExNum).LatEffectivenessFlag = true;
                 }
             }
             // Use the effectiveness to calculate the air conditions exiting the heat exchanger (all air flow through the HX)
             // Include EATR and OACF in the following calculations at some point
 
-            CSup = ExchCond(ExNum).SupOutMassFlow * PsyCpAirFnW(ExchCond(ExNum).SupInHumRat);
-            CSec = ExchCond(ExNum).SecOutMassFlow * PsyCpAirFnW(ExchCond(ExNum).SecInHumRat);
+            CSup = state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow * PsyCpAirFnW(state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat);
+            CSec = state.dataHeatRecovery->ExchCond(ExNum).SecOutMassFlow * PsyCpAirFnW(state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat);
             CMin = min(CSup, CSec);
 
-            ExchCond(ExNum).SupOutTemp =
-                ExchCond(ExNum).SupInTemp + ExchCond(ExNum).SensEffectiveness * CMin / CSup * (ExchCond(ExNum).SecInTemp - ExchCond(ExNum).SupInTemp);
-            ExchCond(ExNum).SupOutHumRat = ExchCond(ExNum).SupInHumRat + ExchCond(ExNum).LatEffectiveness * CMin / CSup *
-                                                                             (ExchCond(ExNum).SecInHumRat - ExchCond(ExNum).SupInHumRat);
-            ExchCond(ExNum).SupOutEnth = PsyHFnTdbW(ExchCond(ExNum).SupOutTemp, ExchCond(ExNum).SupOutHumRat);
+            state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp =
+                state.dataHeatRecovery->ExchCond(ExNum).SupInTemp +
+                state.dataHeatRecovery->ExchCond(ExNum).SensEffectiveness * CMin / CSup *
+                    (state.dataHeatRecovery->ExchCond(ExNum).SecInTemp - state.dataHeatRecovery->ExchCond(ExNum).SupInTemp);
+            state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat =
+                state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat +
+                state.dataHeatRecovery->ExchCond(ExNum).LatEffectiveness * CMin / CSup *
+                    (state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat - state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat);
+            state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth =
+                PsyHFnTdbW(state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp, state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat);
 
             //   Check for saturation in supply outlet and reset temp, then humidity ratio at constant enthalpy
-            if (PsyTsatFnHPb(state, ExchCond(ExNum).SupOutEnth, state.dataEnvrn->OutBaroPress) > ExchCond(ExNum).SupOutTemp) {
-                ExchCond(ExNum).SupOutTemp = PsyTsatFnHPb(state, ExchCond(ExNum).SupOutEnth, state.dataEnvrn->OutBaroPress);
-                ExchCond(ExNum).SupOutHumRat = PsyWFnTdbH(state, ExchCond(ExNum).SupOutTemp, ExchCond(ExNum).SupOutEnth);
+            if (PsyTsatFnHPb(state, state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth, state.dataEnvrn->OutBaroPress) >
+                state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp) {
+                state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp =
+                    PsyTsatFnHPb(state, state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth, state.dataEnvrn->OutBaroPress);
+                state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat =
+                    PsyWFnTdbH(state, state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp, state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth);
             }
-            QSensTrans = CSup * (ExchCond(ExNum).SupInTemp - ExchCond(ExNum).SupOutTemp);
-            ExchCond(ExNum).SecOutTemp = ExchCond(ExNum).SecInTemp + QSensTrans / CSec;
-            QTotTrans = ExchCond(ExNum).SupOutMassFlow * (ExchCond(ExNum).SupInEnth - ExchCond(ExNum).SupOutEnth);
-            ExchCond(ExNum).SecOutEnth = ExchCond(ExNum).SecInEnth + QTotTrans / ExchCond(ExNum).SecOutMassFlow;
-            ExchCond(ExNum).SecOutHumRat = PsyWFnTdbH(state, ExchCond(ExNum).SecOutTemp, ExchCond(ExNum).SecOutEnth);
+            QSensTrans = CSup * (state.dataHeatRecovery->ExchCond(ExNum).SupInTemp - state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp);
+            state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp = state.dataHeatRecovery->ExchCond(ExNum).SecInTemp + QSensTrans / CSec;
+            QTotTrans = state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow *
+                        (state.dataHeatRecovery->ExchCond(ExNum).SupInEnth - state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth);
+            state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth =
+                state.dataHeatRecovery->ExchCond(ExNum).SecInEnth + QTotTrans / state.dataHeatRecovery->ExchCond(ExNum).SecOutMassFlow;
+            state.dataHeatRecovery->ExchCond(ExNum).SecOutHumRat =
+                PsyWFnTdbH(state, state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp, state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth);
             //   Control the supply air outlet temperature to a setpoint for Heating Mode only
             //   (ControlFraction = 0 HX fully bypassed, ControlFraction = 1 air passed entirely through HX)
             //   (supply air stream bypass mass flow rate proportional to ControlFraction except when frost control is active)
-            if (ExchCond(ExNum).ControlToTemperatureSetPoint) {
-                if ((ExchCond(ExNum).SupInTemp - ExchCond(ExNum).SupOutTemp) != 0.0) {
-                    if ((ExchCond(ExNum).SupInTemp < HXTempSetPoint && ExchCond(ExNum).SupOutTemp > HXTempSetPoint) ||
-                        (ExchCond(ExNum).SupInTemp > HXTempSetPoint && ExchCond(ExNum).SupOutTemp < HXTempSetPoint)) {
+            if (state.dataHeatRecovery->ExchCond(ExNum).ControlToTemperatureSetPoint) {
+                if ((state.dataHeatRecovery->ExchCond(ExNum).SupInTemp - state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp) != 0.0) {
+                    if ((state.dataHeatRecovery->ExchCond(ExNum).SupInTemp < HXTempSetPoint &&
+                         state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp > HXTempSetPoint) ||
+                        (state.dataHeatRecovery->ExchCond(ExNum).SupInTemp > HXTempSetPoint &&
+                         state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp < HXTempSetPoint)) {
                         ControlFraction = max(
                             0.0,
                             min(1.0,
-                                std::abs((ExchCond(ExNum).SupInTemp - HXTempSetPoint) / (ExchCond(ExNum).SupInTemp - ExchCond(ExNum).SupOutTemp))));
-                    } else if ((ExchCond(ExNum).SupInTemp < ExchCond(ExNum).SupOutTemp && ExchCond(ExNum).SupOutTemp < HXTempSetPoint) ||
-                               (ExchCond(ExNum).SupInTemp > ExchCond(ExNum).SupOutTemp && ExchCond(ExNum).SupOutTemp > HXTempSetPoint)) {
+                                std::abs((state.dataHeatRecovery->ExchCond(ExNum).SupInTemp - HXTempSetPoint) /
+                                         (state.dataHeatRecovery->ExchCond(ExNum).SupInTemp - state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp))));
+                    } else if ((state.dataHeatRecovery->ExchCond(ExNum).SupInTemp < state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp &&
+                                state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp < HXTempSetPoint) ||
+                               (state.dataHeatRecovery->ExchCond(ExNum).SupInTemp > state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp &&
+                                state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp > HXTempSetPoint)) {
                         ControlFraction = 1.0;
                     } else {
                         ControlFraction = 0.0;
@@ -2278,99 +2554,107 @@ namespace HeatRecovery {
                     //     ELSE fully bypass HX to maintain supply outlet temp as high as possible
                     ControlFraction = 0.0;
                 }
-                if (ExchCond(ExNum).ExchConfigNum == Rotary) {
+                if (state.dataHeatRecovery->ExchCond(ExNum).ExchConfig == HXConfigurationType::Rotary) {
                     //       Rotory HX's never get bypassed, rotational speed is modulated
-                    ExchCond(ExNum).SensEffectiveness *= ControlFraction;
-                    ExchCond(ExNum).LatEffectiveness *= ControlFraction;
+                    state.dataHeatRecovery->ExchCond(ExNum).SensEffectiveness *= ControlFraction;
+                    state.dataHeatRecovery->ExchCond(ExNum).LatEffectiveness *= ControlFraction;
                 } else { // HX is a plate heat exchanger, bypass air to control SA temperature
                     Error = 1.0;
                     Iter = 0.0;
-                    MassFlowSupIn = ExchCond(ExNum).SupInMassFlow;
-                    MassFlowSupOut = ExchCond(ExNum).SupOutMassFlow;
-                    MassFlowSupBypass = ExchCond(ExNum).SupBypassMassFlow;
-                    MassFlowSecIn = ExchCond(ExNum).SecInMassFlow;
-                    TempSupIn = ExchCond(ExNum).SupInTemp;
-                    TempSupOut = ExchCond(ExNum).SupOutTemp;
-                    HumRatSupIn = ExchCond(ExNum).SupInHumRat;
-                    TempSecIn = ExchCond(ExNum).SecInTemp;
+                    MassFlowSupIn = state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow;
+                    MassFlowSupOut = state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow;
+                    MassFlowSupBypass = state.dataHeatRecovery->ExchCond(ExNum).SupBypassMassFlow;
+                    MassFlowSecIn = state.dataHeatRecovery->ExchCond(ExNum).SecInMassFlow;
+                    TempSupIn = state.dataHeatRecovery->ExchCond(ExNum).SupInTemp;
+                    TempSupOut = state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp;
+                    HumRatSupIn = state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat;
+                    TempSecIn = state.dataHeatRecovery->ExchCond(ExNum).SecInTemp;
                     while ((std::abs(Error) > ErrorTol && Iter < 10 && ControlFraction < 1.0) || Iter == 1) {
                         MassFlowSupOut = MassFlowSupIn * ControlFraction;
                         MassFlowSupBypass = MassFlowSupIn * (1.0 - ControlFraction);
                         HXSupAirVolFlowRate = MassFlowSupOut / RhoSup;
                         HXAvgAirVolFlowRate = (HXSecAirVolFlowRate + HXSupAirVolFlowRate) / 2.0;
-                        HXAirVolFlowRatio = HXAvgAirVolFlowRate / ExchCond(ExNum).NomSupAirVolFlow;
+                        HXAirVolFlowRatio = HXAvgAirVolFlowRate / state.dataHeatRecovery->ExchCond(ExNum).NomSupAirVolFlow;
                         CSup = MassFlowSupOut * PsyCpAirFnW(HumRatSupIn);
                         CMin = min(CSup, CSec);
                         if (TempSupIn < TempSecIn) {
                             //          Use heating effectiveness values
-                            ExchCond(ExNum).SensEffectiveness = ExchCond(ExNum).HeatEffectSensible75 +
-                                                                (ExchCond(ExNum).HeatEffectSensible100 - ExchCond(ExNum).HeatEffectSensible75) *
-                                                                    (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
-                            ExchCond(ExNum).LatEffectiveness =
-                                ExchCond(ExNum).HeatEffectLatent75 + (ExchCond(ExNum).HeatEffectLatent100 - ExchCond(ExNum).HeatEffectLatent75) *
-                                                                         (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
+                            state.dataHeatRecovery->ExchCond(ExNum).SensEffectiveness =
+                                state.dataHeatRecovery->ExchCond(ExNum).HeatEffectSensible75 +
+                                (state.dataHeatRecovery->ExchCond(ExNum).HeatEffectSensible100 -
+                                 state.dataHeatRecovery->ExchCond(ExNum).HeatEffectSensible75) *
+                                    (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
+                            state.dataHeatRecovery->ExchCond(ExNum).LatEffectiveness = state.dataHeatRecovery->ExchCond(ExNum).HeatEffectLatent75 +
+                                                                                       (state.dataHeatRecovery->ExchCond(ExNum).HeatEffectLatent100 -
+                                                                                        state.dataHeatRecovery->ExchCond(ExNum).HeatEffectLatent75) *
+                                                                                           (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
                         } else {
                             //          Use cooling effectiveness values
-                            ExchCond(ExNum).SensEffectiveness = ExchCond(ExNum).CoolEffectSensible75 +
-                                                                (ExchCond(ExNum).CoolEffectSensible100 - ExchCond(ExNum).CoolEffectSensible75) *
-                                                                    (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
-                            ExchCond(ExNum).LatEffectiveness =
-                                ExchCond(ExNum).CoolEffectLatent75 + (ExchCond(ExNum).CoolEffectLatent100 - ExchCond(ExNum).CoolEffectLatent75) *
-                                                                         (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
+                            state.dataHeatRecovery->ExchCond(ExNum).SensEffectiveness =
+                                state.dataHeatRecovery->ExchCond(ExNum).CoolEffectSensible75 +
+                                (state.dataHeatRecovery->ExchCond(ExNum).CoolEffectSensible100 -
+                                 state.dataHeatRecovery->ExchCond(ExNum).CoolEffectSensible75) *
+                                    (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
+                            state.dataHeatRecovery->ExchCond(ExNum).LatEffectiveness = state.dataHeatRecovery->ExchCond(ExNum).CoolEffectLatent75 +
+                                                                                       (state.dataHeatRecovery->ExchCond(ExNum).CoolEffectLatent100 -
+                                                                                        state.dataHeatRecovery->ExchCond(ExNum).CoolEffectLatent75) *
+                                                                                           (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
                         }
 
-                        if (ExchCond(ExNum).SensEffectiveness < 0.0) {
+                        if (state.dataHeatRecovery->ExchCond(ExNum).SensEffectiveness < 0.0) {
                             //   The model should at least guard against negative numbers
-                            ExchCond(ExNum).SensEffectiveness = 0.0;
-                            if (!ExchCond(ExNum).SensEffectivenessFlag) {
-                                ShowWarningError(state, "HeatExchanger:AirToAir:SensibleAndLatent =\"" + ExchCond(ExNum).Name + "\"" +
-                                                 " sensible effectiveness is less than zero. Check the following inputs.");
-                                if (ExchCond(ExNum).SupInTemp < ExchCond(ExNum).SecInTemp) {
-                                    ShowContinueError(
-                                        state,
-                                        format("...Sensible Effectiveness at 100% Heating Air Flow = {:.2R}", ExchCond(ExNum).HeatEffectSensible100));
-                                    ShowContinueError(
-                                        state,
-                                        format("...Sensible Effectiveness at 75% Heating Air Flow = {:.2R}", ExchCond(ExNum).HeatEffectSensible75));
+                            state.dataHeatRecovery->ExchCond(ExNum).SensEffectiveness = 0.0;
+                            if (!state.dataHeatRecovery->ExchCond(ExNum).SensEffectivenessFlag) {
+                                ShowWarningError(state,
+                                                 "HeatExchanger:AirToAir:SensibleAndLatent =\"" + state.dataHeatRecovery->ExchCond(ExNum).Name +
+                                                     "\"" + " sensible effectiveness is less than zero. Check the following inputs.");
+                                if (state.dataHeatRecovery->ExchCond(ExNum).SupInTemp < state.dataHeatRecovery->ExchCond(ExNum).SecInTemp) {
+                                    ShowContinueError(state,
+                                                      format("...Sensible Effectiveness at 100% Heating Air Flow = {:.2R}",
+                                                             state.dataHeatRecovery->ExchCond(ExNum).HeatEffectSensible100));
+                                    ShowContinueError(state,
+                                                      format("...Sensible Effectiveness at 75% Heating Air Flow = {:.2R}",
+                                                             state.dataHeatRecovery->ExchCond(ExNum).HeatEffectSensible75));
                                     ShowContinueError(state, "...Sensible effectiveness reset to zero and the simulation continues.");
                                 } else {
-                                    ShowContinueError(
-                                        state,
-                                        format("...Sensible Effectiveness at 100% Cooling Air Flow = {:.2R}", ExchCond(ExNum).CoolEffectSensible100));
-                                    ShowContinueError(
-                                        state,
-                                        format("...Sensible Effectiveness at 75% Cooling Air Flow = {:.2R}", ExchCond(ExNum).CoolEffectSensible75));
+                                    ShowContinueError(state,
+                                                      format("...Sensible Effectiveness at 100% Cooling Air Flow = {:.2R}",
+                                                             state.dataHeatRecovery->ExchCond(ExNum).CoolEffectSensible100));
+                                    ShowContinueError(state,
+                                                      format("...Sensible Effectiveness at 75% Cooling Air Flow = {:.2R}",
+                                                             state.dataHeatRecovery->ExchCond(ExNum).CoolEffectSensible75));
                                     ShowContinueError(state, "...Sensible effectiveness reset to zero and the simulation continues.");
                                 }
                                 ShowContinueError(state, format("...Heat Exchanger Air Volume Flow Ratio = {:.2R}", HXAirVolFlowRatio));
-                                ExchCond(ExNum).SensEffectivenessFlag = true;
+                                state.dataHeatRecovery->ExchCond(ExNum).SensEffectivenessFlag = true;
                             }
                         }
-                        if (ExchCond(ExNum).LatEffectiveness < 0.0) {
+                        if (state.dataHeatRecovery->ExchCond(ExNum).LatEffectiveness < 0.0) {
                             // The model should at least guard against negative numbers
-                            ExchCond(ExNum).LatEffectiveness = 0.0;
-                            if (!ExchCond(ExNum).LatEffectivenessFlag) {
-                                ShowWarningError(state, "HeatExchanger:AirToAir:SensibleAndLatent =\"" + ExchCond(ExNum).Name + "\"" +
-                                                 " latent effectiveness is less than zero. Check the following inputs.");
-                                if (ExchCond(ExNum).SupInTemp < ExchCond(ExNum).SecInTemp) {
-                                    ShowContinueError(
-                                        state,
-                                        format("...Latent Effectiveness at 100% Heating Air Flow = {:.2R}", ExchCond(ExNum).HeatEffectLatent100));
-                                    ShowContinueError(
-                                        state,
-                                        format("...Latent Effectiveness at 75% Heating Air Flow = {:.2R}", ExchCond(ExNum).HeatEffectLatent75));
+                            state.dataHeatRecovery->ExchCond(ExNum).LatEffectiveness = 0.0;
+                            if (!state.dataHeatRecovery->ExchCond(ExNum).LatEffectivenessFlag) {
+                                ShowWarningError(state,
+                                                 "HeatExchanger:AirToAir:SensibleAndLatent =\"" + state.dataHeatRecovery->ExchCond(ExNum).Name +
+                                                     "\"" + " latent effectiveness is less than zero. Check the following inputs.");
+                                if (state.dataHeatRecovery->ExchCond(ExNum).SupInTemp < state.dataHeatRecovery->ExchCond(ExNum).SecInTemp) {
+                                    ShowContinueError(state,
+                                                      format("...Latent Effectiveness at 100% Heating Air Flow = {:.2R}",
+                                                             state.dataHeatRecovery->ExchCond(ExNum).HeatEffectLatent100));
+                                    ShowContinueError(state,
+                                                      format("...Latent Effectiveness at 75% Heating Air Flow = {:.2R}",
+                                                             state.dataHeatRecovery->ExchCond(ExNum).HeatEffectLatent75));
                                     ShowContinueError(state, "...Latent effectiveness reset to zero and the simulation continues.");
                                 } else {
-                                    ShowContinueError(
-                                        state,
-                                        format("...Latent Effectiveness at 100% Cooling Air Flow = {:.2R}", ExchCond(ExNum).CoolEffectLatent100));
-                                    ShowContinueError(
-                                        state,
-                                        format("...Latent Effectiveness at 75% Cooling Air Flow = {:.2R}", ExchCond(ExNum).CoolEffectLatent75));
+                                    ShowContinueError(state,
+                                                      format("...Latent Effectiveness at 100% Cooling Air Flow = {:.2R}",
+                                                             state.dataHeatRecovery->ExchCond(ExNum).CoolEffectLatent100));
+                                    ShowContinueError(state,
+                                                      format("...Latent Effectiveness at 75% Cooling Air Flow = {:.2R}",
+                                                             state.dataHeatRecovery->ExchCond(ExNum).CoolEffectLatent75));
                                     ShowContinueError(state, "...Latent effectiveness reset to zero and the simulation continues.");
                                 }
                                 ShowContinueError(state, format("...Heat Exchanger Air Volume Flow Ratio = {:.2R}", HXAirVolFlowRatio));
-                                ExchCond(ExNum).LatEffectivenessFlag = true;
+                                state.dataHeatRecovery->ExchCond(ExNum).LatEffectivenessFlag = true;
                             }
                         }
 
@@ -2380,7 +2664,8 @@ namespace HeatRecovery {
                             CMin = 0.0;
                             break;
                         }
-                        TempSupOut = (MassFlowSupOut * (TempSupIn + ExchCond(ExNum).SensEffectiveness * CMin / CSup * (TempSecIn - TempSupIn)) +
+                        TempSupOut = (MassFlowSupOut * (TempSupIn + state.dataHeatRecovery->ExchCond(ExNum).SensEffectiveness * CMin / CSup *
+                                                                        (TempSecIn - TempSupIn)) +
                                       MassFlowSupBypass * TempSupIn) /
                                      MassFlowSupIn;
                         Error = (TempSupOut - HXTempSetPoint);
@@ -2403,66 +2688,85 @@ namespace HeatRecovery {
                         ++Iter;
                     }
 
-                    ExchCond(ExNum).SupInMassFlow = MassFlowSupIn;
-                    ExchCond(ExNum).SupOutMassFlow = MassFlowSupOut;
-                    ExchCond(ExNum).SupBypassMassFlow = MassFlowSupBypass;
-                    ExchCond(ExNum).SecInMassFlow = MassFlowSecIn;
-                    ExchCond(ExNum).SupInTemp = TempSupIn;
-                    ExchCond(ExNum).SupOutTemp = TempSupOut;
-                    ExchCond(ExNum).SupInHumRat = HumRatSupIn;
-                    ExchCond(ExNum).SecInTemp = TempSecIn;
+                    state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow = MassFlowSupIn;
+                    state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow = MassFlowSupOut;
+                    state.dataHeatRecovery->ExchCond(ExNum).SupBypassMassFlow = MassFlowSupBypass;
+                    state.dataHeatRecovery->ExchCond(ExNum).SecInMassFlow = MassFlowSecIn;
+                    state.dataHeatRecovery->ExchCond(ExNum).SupInTemp = TempSupIn;
+                    state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp = TempSupOut;
+                    state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat = HumRatSupIn;
+                    state.dataHeatRecovery->ExchCond(ExNum).SecInTemp = TempSecIn;
 
-                } // ENDIF for "IF (ExchCond(ExNum)%ExchConfig == 'ROTARY') THEN"
-                ExchCond(ExNum).SupOutTemp = ExchCond(ExNum).SupInTemp + ExchCond(ExNum).SensEffectiveness * CMin / CSup *
-                                                                             (ExchCond(ExNum).SecInTemp - ExchCond(ExNum).SupInTemp);
-                ExchCond(ExNum).SupOutHumRat = ExchCond(ExNum).SupInHumRat + ExchCond(ExNum).LatEffectiveness * CMin / CSup *
-                                                                                 (ExchCond(ExNum).SecInHumRat - ExchCond(ExNum).SupInHumRat);
-                ExchCond(ExNum).SupOutEnth = PsyHFnTdbW(ExchCond(ExNum).SupOutTemp, ExchCond(ExNum).SupOutHumRat);
+                } // ENDIF for "IF (state.dataHeatRecovery->ExchCond(ExNum)%ExchConfig == 'ROTARY') THEN"
+                state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp =
+                    state.dataHeatRecovery->ExchCond(ExNum).SupInTemp +
+                    state.dataHeatRecovery->ExchCond(ExNum).SensEffectiveness * CMin / CSup *
+                        (state.dataHeatRecovery->ExchCond(ExNum).SecInTemp - state.dataHeatRecovery->ExchCond(ExNum).SupInTemp);
+                state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat =
+                    state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat +
+                    state.dataHeatRecovery->ExchCond(ExNum).LatEffectiveness * CMin / CSup *
+                        (state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat - state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat);
+                state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth =
+                    PsyHFnTdbW(state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp, state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat);
 
                 //     Check for saturation in supply outlet and reset temp, then humidity ratio at constant enthalpy
-                if (PsyTsatFnHPb(state, ExchCond(ExNum).SupOutEnth, state.dataEnvrn->OutBaroPress) > ExchCond(ExNum).SupOutTemp) {
-                    ExchCond(ExNum).SupOutTemp = PsyTsatFnHPb(state, ExchCond(ExNum).SupOutEnth, state.dataEnvrn->OutBaroPress);
-                    ExchCond(ExNum).SupOutHumRat = PsyWFnTdbH(state, ExchCond(ExNum).SupOutTemp, ExchCond(ExNum).SupOutEnth);
+                if (PsyTsatFnHPb(state, state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth, state.dataEnvrn->OutBaroPress) >
+                    state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp) {
+                    state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp =
+                        PsyTsatFnHPb(state, state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth, state.dataEnvrn->OutBaroPress);
+                    state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat =
+                        PsyWFnTdbH(state, state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp, state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth);
                 }
 
-                QSensTrans = CSup * (ExchCond(ExNum).SupInTemp - ExchCond(ExNum).SupOutTemp);
-                ExchCond(ExNum).SecOutTemp = ExchCond(ExNum).SecInTemp + QSensTrans / CSec;
-                QTotTrans = ExchCond(ExNum).SupOutMassFlow * (ExchCond(ExNum).SupInEnth - ExchCond(ExNum).SupOutEnth);
-                ExchCond(ExNum).SecOutEnth = ExchCond(ExNum).SecInEnth + QTotTrans / ExchCond(ExNum).SecOutMassFlow;
-                ExchCond(ExNum).SecOutHumRat = PsyWFnTdbH(state, ExchCond(ExNum).SecOutTemp, ExchCond(ExNum).SecOutEnth);
+                QSensTrans = CSup * (state.dataHeatRecovery->ExchCond(ExNum).SupInTemp - state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp);
+                state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp = state.dataHeatRecovery->ExchCond(ExNum).SecInTemp + QSensTrans / CSec;
+                QTotTrans = state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow *
+                            (state.dataHeatRecovery->ExchCond(ExNum).SupInEnth - state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth);
+                state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth =
+                    state.dataHeatRecovery->ExchCond(ExNum).SecInEnth + QTotTrans / state.dataHeatRecovery->ExchCond(ExNum).SecOutMassFlow;
+                state.dataHeatRecovery->ExchCond(ExNum).SecOutHumRat =
+                    PsyWFnTdbH(state, state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp, state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth);
 
-            } // ENDIF for "IF(ExchCond(ExNum)%ControlToTemperatureSetPoint .AND... THEN, ELSE"
+            } // ENDIF for "IF(state.dataHeatRecovery->ExchCond(ExNum)%ControlToTemperatureSetPoint .AND... THEN, ELSE"
 
             if (FanOpMode == DataHVACGlobals::CycFanCycCoil) {
-                ExchCond(ExNum).SupInMassFlow *= AirSidePLR;
-                ExchCond(ExNum).SupOutMassFlow *= AirSidePLR;
-                ExchCond(ExNum).SecInMassFlow *= AirSidePLR;
-                ExchCond(ExNum).SecOutMassFlow *= AirSidePLR;
-                ExchCond(ExNum).SupBypassMassFlow *= AirSidePLR;
-                ExchCond(ExNum).SecBypassMassFlow *= AirSidePLR;
+                state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow *= AirSidePLR;
+                state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow *= AirSidePLR;
+                state.dataHeatRecovery->ExchCond(ExNum).SecInMassFlow *= AirSidePLR;
+                state.dataHeatRecovery->ExchCond(ExNum).SecOutMassFlow *= AirSidePLR;
+                state.dataHeatRecovery->ExchCond(ExNum).SupBypassMassFlow *= AirSidePLR;
+                state.dataHeatRecovery->ExchCond(ExNum).SecBypassMassFlow *= AirSidePLR;
             } else if (FanOpMode == DataHVACGlobals::ContFanCycCoil) {
-                ExchCond(ExNum).SupOutTemp = ExchCond(ExNum).SupOutTemp * AirSidePLR + ExchCond(ExNum).SupInTemp * (1.0 - AirSidePLR);
-                ExchCond(ExNum).SupOutHumRat = ExchCond(ExNum).SupOutHumRat * AirSidePLR + ExchCond(ExNum).SupInHumRat * (1.0 - AirSidePLR);
-                ExchCond(ExNum).SupOutEnth = ExchCond(ExNum).SupOutEnth * AirSidePLR + ExchCond(ExNum).SupOutEnth * (1.0 - AirSidePLR);
-                ExchCond(ExNum).SecOutTemp = ExchCond(ExNum).SecOutTemp * AirSidePLR + ExchCond(ExNum).SecInTemp * (1.0 - AirSidePLR);
-                ExchCond(ExNum).SecOutHumRat = ExchCond(ExNum).SecOutHumRat * AirSidePLR + ExchCond(ExNum).SecInHumRat * (1.0 - AirSidePLR);
-                ExchCond(ExNum).SecOutEnth = ExchCond(ExNum).SecOutEnth * AirSidePLR + ExchCond(ExNum).SecOutEnth * (1.0 - AirSidePLR);
+                state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp = state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp * AirSidePLR +
+                                                                     state.dataHeatRecovery->ExchCond(ExNum).SupInTemp * (1.0 - AirSidePLR);
+                state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat = state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat * AirSidePLR +
+                                                                       state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat * (1.0 - AirSidePLR);
+                state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth = state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth * AirSidePLR +
+                                                                     state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth * (1.0 - AirSidePLR);
+                state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp = state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp * AirSidePLR +
+                                                                     state.dataHeatRecovery->ExchCond(ExNum).SecInTemp * (1.0 - AirSidePLR);
+                state.dataHeatRecovery->ExchCond(ExNum).SecOutHumRat = state.dataHeatRecovery->ExchCond(ExNum).SecOutHumRat * AirSidePLR +
+                                                                       state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat * (1.0 - AirSidePLR);
+                state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth = state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth * AirSidePLR +
+                                                                     state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth * (1.0 - AirSidePLR);
             }
 
-            if ((ExchCond(ExNum).FrostControlType == "MINIMUMEXHAUSTTEMPERATURE" &&
-                 ExchCond(ExNum).SecOutTemp < ExchCond(ExNum).ThresholdTemperature) ||
-                (ExchCond(ExNum).FrostControlType == "EXHAUSTAIRRECIRCULATION" &&
-                 ExchCond(ExNum).SupInTemp <= ExchCond(ExNum).ThresholdTemperature) ||
-                (ExchCond(ExNum).FrostControlType == "EXHAUSTONLY" && ExchCond(ExNum).SupInTemp <= ExchCond(ExNum).ThresholdTemperature)) {
+            if ((state.dataHeatRecovery->ExchCond(ExNum).FrostControlType == "MINIMUMEXHAUSTTEMPERATURE" &&
+                 state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp < state.dataHeatRecovery->ExchCond(ExNum).ThresholdTemperature) ||
+                (state.dataHeatRecovery->ExchCond(ExNum).FrostControlType == "EXHAUSTAIRRECIRCULATION" &&
+                 state.dataHeatRecovery->ExchCond(ExNum).SupInTemp <= state.dataHeatRecovery->ExchCond(ExNum).ThresholdTemperature) ||
+                (state.dataHeatRecovery->ExchCond(ExNum).FrostControlType == "EXHAUSTONLY" &&
+                 state.dataHeatRecovery->ExchCond(ExNum).SupInTemp <= state.dataHeatRecovery->ExchCond(ExNum).ThresholdTemperature)) {
                 FrostControl(state, ExNum);
                 FrostControlFlag = true;
             }
 
             // check for saturation in secondary outlet
-            TempSecOutSat = PsyTsatFnHPb(state, ExchCond(ExNum).SecOutEnth, state.dataEnvrn->OutBaroPress);
-            if (TempSecOutSat > ExchCond(ExNum).SecOutTemp) {
-                ExchCond(ExNum).SecOutTemp = TempSecOutSat;
-                ExchCond(ExNum).SecOutHumRat = PsyWFnTdbH(state, ExchCond(ExNum).SecOutTemp, ExchCond(ExNum).SecOutEnth);
+            TempSecOutSat = PsyTsatFnHPb(state, state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth, state.dataEnvrn->OutBaroPress);
+            if (TempSecOutSat > state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp) {
+                state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp = TempSecOutSat;
+                state.dataHeatRecovery->ExchCond(ExNum).SecOutHumRat =
+                    PsyWFnTdbH(state, state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp, state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth);
             }
 
             // calculate outlet conditions by mixing bypass air stream with air that went through the
@@ -2470,55 +2774,62 @@ namespace HeatRecovery {
             // heat exchanger is not in frost control mode.  Mixing similar to this is performed
             // in the frost control subroutine when in frost control mode.
             if (!FrostControlFlag) {
-                ExchCond(ExNum).SupOutEnth =
-                    (ExchCond(ExNum).SupOutMassFlow * ExchCond(ExNum).SupOutEnth + ExchCond(ExNum).SupBypassMassFlow * ExchCond(ExNum).SupInEnth) /
-                    ExchCond(ExNum).SupInMassFlow;
-                ExchCond(ExNum).SupOutHumRat = (ExchCond(ExNum).SupOutMassFlow * ExchCond(ExNum).SupOutHumRat +
-                                                ExchCond(ExNum).SupBypassMassFlow * ExchCond(ExNum).SupInHumRat) /
-                                               ExchCond(ExNum).SupInMassFlow;
-                ExchCond(ExNum).SupOutTemp = PsyTdbFnHW(ExchCond(ExNum).SupOutEnth, ExchCond(ExNum).SupOutHumRat);
-                ExchCond(ExNum).SupOutMassFlow = ExchCond(ExNum).SupInMassFlow;
-                ExchCond(ExNum).SecOutEnth =
-                    (ExchCond(ExNum).SecOutMassFlow * ExchCond(ExNum).SecOutEnth + ExchCond(ExNum).SecBypassMassFlow * ExchCond(ExNum).SecInEnth) /
-                    ExchCond(ExNum).SecInMassFlow;
-                ExchCond(ExNum).SecOutHumRat = (ExchCond(ExNum).SecOutMassFlow * ExchCond(ExNum).SecOutHumRat +
-                                                ExchCond(ExNum).SecBypassMassFlow * ExchCond(ExNum).SecInHumRat) /
-                                               ExchCond(ExNum).SecInMassFlow;
-                ExchCond(ExNum).SecOutTemp = PsyTdbFnHW(ExchCond(ExNum).SecOutEnth, ExchCond(ExNum).SecOutHumRat);
-                ExchCond(ExNum).SecOutMassFlow = ExchCond(ExNum).SecInMassFlow;
+                state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth =
+                    (state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow * state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth +
+                     state.dataHeatRecovery->ExchCond(ExNum).SupBypassMassFlow * state.dataHeatRecovery->ExchCond(ExNum).SupInEnth) /
+                    state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow;
+                state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat =
+                    (state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow * state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat +
+                     state.dataHeatRecovery->ExchCond(ExNum).SupBypassMassFlow * state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat) /
+                    state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow;
+                state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp =
+                    PsyTdbFnHW(state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth, state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat);
+                state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow = state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow;
+                state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth =
+                    (state.dataHeatRecovery->ExchCond(ExNum).SecOutMassFlow * state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth +
+                     state.dataHeatRecovery->ExchCond(ExNum).SecBypassMassFlow * state.dataHeatRecovery->ExchCond(ExNum).SecInEnth) /
+                    state.dataHeatRecovery->ExchCond(ExNum).SecInMassFlow;
+                state.dataHeatRecovery->ExchCond(ExNum).SecOutHumRat =
+                    (state.dataHeatRecovery->ExchCond(ExNum).SecOutMassFlow * state.dataHeatRecovery->ExchCond(ExNum).SecOutHumRat +
+                     state.dataHeatRecovery->ExchCond(ExNum).SecBypassMassFlow * state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat) /
+                    state.dataHeatRecovery->ExchCond(ExNum).SecInMassFlow;
+                state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp =
+                    PsyTdbFnHW(state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth, state.dataHeatRecovery->ExchCond(ExNum).SecOutHumRat);
+                state.dataHeatRecovery->ExchCond(ExNum).SecOutMassFlow = state.dataHeatRecovery->ExchCond(ExNum).SecInMassFlow;
             }
 
-            ExchCond(ExNum).ElecUseRate = ExchCond(ExNum).NomElecPower;
+            state.dataHeatRecovery->ExchCond(ExNum).ElecUseRate = state.dataHeatRecovery->ExchCond(ExNum).NomElecPower;
 
         } // ENDIF for "IF (UnitOn) THEN"
 
         // Calculate heat transfer from the unit using the final supply inlet and supply outlet air conditions
-        CSup = ExchCond(ExNum).SupOutMassFlow * PsyCpAirFnW(ExchCond(ExNum).SupInHumRat);
-        SensHeatRecRate = CSup * (ExchCond(ExNum).SupOutTemp - ExchCond(ExNum).SupInTemp);
-        TotHeatRecRate = ExchCond(ExNum).SupOutMassFlow * (ExchCond(ExNum).SupOutEnth - ExchCond(ExNum).SupInEnth);
+        CSup = state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow * PsyCpAirFnW(state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat);
+        SensHeatRecRate = CSup * (state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp - state.dataHeatRecovery->ExchCond(ExNum).SupInTemp);
+        TotHeatRecRate = state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow *
+                         (state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth - state.dataHeatRecovery->ExchCond(ExNum).SupInEnth);
         LatHeatRecRate = TotHeatRecRate - SensHeatRecRate;
 
         // Set report variables based on sign of recovery rate
         if (SensHeatRecRate > 0.0) {
-            ExchCond(ExNum).SensHeatingRate = SensHeatRecRate;
-            ExchCond(ExNum).SensCoolingRate = 0.0;
+            state.dataHeatRecovery->ExchCond(ExNum).SensHeatingRate = SensHeatRecRate;
+            state.dataHeatRecovery->ExchCond(ExNum).SensCoolingRate = 0.0;
         } else {
-            ExchCond(ExNum).SensHeatingRate = 0.0;
-            ExchCond(ExNum).SensCoolingRate = std::abs(SensHeatRecRate);
+            state.dataHeatRecovery->ExchCond(ExNum).SensHeatingRate = 0.0;
+            state.dataHeatRecovery->ExchCond(ExNum).SensCoolingRate = std::abs(SensHeatRecRate);
         }
         if (LatHeatRecRate > 0.0) {
-            ExchCond(ExNum).LatHeatingRate = LatHeatRecRate;
-            ExchCond(ExNum).LatCoolingRate = 0.0;
+            state.dataHeatRecovery->ExchCond(ExNum).LatHeatingRate = LatHeatRecRate;
+            state.dataHeatRecovery->ExchCond(ExNum).LatCoolingRate = 0.0;
         } else {
-            ExchCond(ExNum).LatHeatingRate = 0.0;
-            ExchCond(ExNum).LatCoolingRate = std::abs(LatHeatRecRate);
+            state.dataHeatRecovery->ExchCond(ExNum).LatHeatingRate = 0.0;
+            state.dataHeatRecovery->ExchCond(ExNum).LatCoolingRate = std::abs(LatHeatRecRate);
         }
         if (TotHeatRecRate > 0.0) {
-            ExchCond(ExNum).TotHeatingRate = TotHeatRecRate;
-            ExchCond(ExNum).TotCoolingRate = 0.0;
+            state.dataHeatRecovery->ExchCond(ExNum).TotHeatingRate = TotHeatRecRate;
+            state.dataHeatRecovery->ExchCond(ExNum).TotCoolingRate = 0.0;
         } else {
-            ExchCond(ExNum).TotHeatingRate = 0.0;
-            ExchCond(ExNum).TotCoolingRate = std::abs(TotHeatRecRate);
+            state.dataHeatRecovery->ExchCond(ExNum).TotHeatingRate = 0.0;
+            state.dataHeatRecovery->ExchCond(ExNum).TotCoolingRate = std::abs(TotHeatRecRate);
         }
     }
 
@@ -2609,13 +2920,12 @@ namespace HeatRecovery {
         Real64 MinHumRatNeeded;         // minimum humidity ratio setpoint for balanced desiccant HX [kg/kg]
         Real64 HXPartLoadRatio;         // local heat exchanger part-load ratio
         Real64 TestSaturationEnthalpy;  // enthalpy used to test for regeneration outlet condition over saturation curve (J/kg)
-        static std::string const ThisSub("CalcDesiccantBalancedHeatExch:  "); // Used to pass to Psyc routines
-        static std::string const ThisSubTSat("CalcDesiccantBalancedHeatExch:   TSat");
-        static std::string const ThisSubTSatFullLoadOutTemp("CalcDesiccantBalancedHeatExch:   TSat-FullLoadOutTemp");
-        static std::string const ThisSubTSatFullLoadOutHumRat("CalcDesiccantBalancedHeatExch:   TSat-FullLoadOutHumRat");
-        static std::string const ThisSubSecOutHumRat("CalcDesiccantBalancedHeatExch:   SecOutHumRat");
-        static std::string const ThisSubTestSatSec("CalcDesiccantBalancedHeatExch:   TestSatSec");
-        static std::string const ThisSubTSatSecOutHumRat("CalcDesiccantBalancedHeatExch:   TSat-SecOutHumRat");
+        constexpr const char *ThisSubTSat("CalcDesiccantBalancedHeatExch:   TSat");
+        constexpr const char *ThisSubTSatFullLoadOutTemp("CalcDesiccantBalancedHeatExch:   TSat-FullLoadOutTemp");
+        constexpr const char *ThisSubTSatFullLoadOutHumRat("CalcDesiccantBalancedHeatExch:   TSat-FullLoadOutHumRat");
+        constexpr const char *ThisSubSecOutHumRat("CalcDesiccantBalancedHeatExch:   SecOutHumRat");
+        constexpr const char *ThisSubTestSatSec("CalcDesiccantBalancedHeatExch:   TestSatSec");
+        constexpr const char *ThisSubTSatSecOutHumRat("CalcDesiccantBalancedHeatExch:   TSat-SecOutHumRat");
 
         Real64 AverageMassFlowRate; // average of supply (regen) and secondary (process) mass flow rates [kg/s]
         bool EconomizerActiveFlag;  // local representing the economizer status when PRESENT
@@ -2626,17 +2936,17 @@ namespace HeatRecovery {
         SensHeatRecRate = 0.0;
         TotHeatRecRate = 0.0;
         HXPartLoadRatio = PartLoadRatio;
-        ExchCond(ExNum).DefrostFraction = 0.0;
-        ExchCond(ExNum).ElecUseRate = 0.0;
-        ExchCond(ExNum).SupOutTemp = ExchCond(ExNum).SupInTemp;
-        ExchCond(ExNum).SecOutTemp = ExchCond(ExNum).SecInTemp;
-        ExchCond(ExNum).SupOutHumRat = ExchCond(ExNum).SupInHumRat;
-        ExchCond(ExNum).SecOutHumRat = ExchCond(ExNum).SecInHumRat;
-        ExchCond(ExNum).SupOutEnth = ExchCond(ExNum).SupInEnth;
-        ExchCond(ExNum).SecOutEnth = ExchCond(ExNum).SecInEnth;
-        ExchCond(ExNum).SupOutMassFlow = ExchCond(ExNum).SupInMassFlow;
-        ExchCond(ExNum).SecOutMassFlow = ExchCond(ExNum).SecInMassFlow;
-        AverageMassFlowRate = (ExchCond(ExNum).SupOutMassFlow + ExchCond(ExNum).SecOutMassFlow) / 2.0;
+        state.dataHeatRecovery->ExchCond(ExNum).DefrostFraction = 0.0;
+        state.dataHeatRecovery->ExchCond(ExNum).ElecUseRate = 0.0;
+        state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp = state.dataHeatRecovery->ExchCond(ExNum).SupInTemp;
+        state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp = state.dataHeatRecovery->ExchCond(ExNum).SecInTemp;
+        state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat = state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat;
+        state.dataHeatRecovery->ExchCond(ExNum).SecOutHumRat = state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat;
+        state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth = state.dataHeatRecovery->ExchCond(ExNum).SupInEnth;
+        state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth = state.dataHeatRecovery->ExchCond(ExNum).SecInEnth;
+        state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow = state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow;
+        state.dataHeatRecovery->ExchCond(ExNum).SecOutMassFlow = state.dataHeatRecovery->ExchCond(ExNum).SecInMassFlow;
+        AverageMassFlowRate = (state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow + state.dataHeatRecovery->ExchCond(ExNum).SecOutMassFlow) / 2.0;
 
         if (present(EconomizerFlag)) {
             EconomizerActiveFlag = EconomizerFlag;
@@ -2651,19 +2961,20 @@ namespace HeatRecovery {
         }
 
         // Unit is scheduled OFF, so bypass heat exchange calcs
-        if (GetCurrentScheduleValue(state, ExchCond(ExNum).SchedPtr) <= 0.0) UnitOn = false;
+        if (GetCurrentScheduleValue(state, state.dataHeatRecovery->ExchCond(ExNum).SchedPtr) <= 0.0) UnitOn = false;
         // Determine if unit is ON or OFF based on air mass flow through the supply and secondary airstreams and operation flag
-        if (ExchCond(ExNum).SupInMassFlow <= SmallMassFlow) UnitOn = false;
-        if (ExchCond(ExNum).SecInMassFlow <= SmallMassFlow) UnitOn = false;
+        if (state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow <= SmallMassFlow) UnitOn = false;
+        if (state.dataHeatRecovery->ExchCond(ExNum).SecInMassFlow <= SmallMassFlow) UnitOn = false;
         if (HXPartLoadRatio == 0.0) UnitOn = false;
         if (!HXUnitOn) UnitOn = false;
-        if ((EconomizerActiveFlag || HighHumCtrlActiveFlag) && ExchCond(ExNum).EconoLockOut == EconoLockOut_Yes) UnitOn = false;
+        if ((EconomizerActiveFlag || HighHumCtrlActiveFlag) && state.dataHeatRecovery->ExchCond(ExNum).EconoLockOut == EconomizerLockout::Yes)
+            UnitOn = false;
 
         if (UnitOn) {
 
             //   Use local variables to perform checks
-            SecInMassFlow = ExchCond(ExNum).SecInMassFlow;
-            SupInMassFlow = ExchCond(ExNum).SupInMassFlow;
+            SecInMassFlow = state.dataHeatRecovery->ExchCond(ExNum).SecInMassFlow;
+            SupInMassFlow = state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow;
 
             // In constant fan mode, process air mass flow rate is full flow and supply (regen) air cycles based on PLR.
             // If supply (regen) inlet is OA node, regen mass flow rate is proportional to PLR.
@@ -2681,27 +2992,27 @@ namespace HeatRecovery {
             CheckForBalancedFlow(state, ExNum, SecInMassFlow, SupInMassFlow, FirstHVACIteration);
 
             {
-                auto const SELECT_CASE_var(ExchCond(ExNum).HeatExchPerfTypeNum);
+                auto const SELECT_CASE_var(state.dataHeatRecovery->ExchCond(ExNum).HeatExchPerfTypeNum);
 
                 if (SELECT_CASE_var == BALANCEDHX_PERFDATATYPE1) {
 
-                    Coeff1 = BalDesDehumPerfData(ExchCond(ExNum).PerfDataIndex).B1;
-                    Coeff2 = BalDesDehumPerfData(ExchCond(ExNum).PerfDataIndex).B2;
-                    Coeff3 = BalDesDehumPerfData(ExchCond(ExNum).PerfDataIndex).B3;
-                    Coeff4 = BalDesDehumPerfData(ExchCond(ExNum).PerfDataIndex).B4;
-                    Coeff5 = BalDesDehumPerfData(ExchCond(ExNum).PerfDataIndex).B5;
-                    Coeff6 = BalDesDehumPerfData(ExchCond(ExNum).PerfDataIndex).B6;
-                    Coeff7 = BalDesDehumPerfData(ExchCond(ExNum).PerfDataIndex).B7;
-                    Coeff8 = BalDesDehumPerfData(ExchCond(ExNum).PerfDataIndex).B8;
+                    Coeff1 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).B1;
+                    Coeff2 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).B2;
+                    Coeff3 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).B3;
+                    Coeff4 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).B4;
+                    Coeff5 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).B5;
+                    Coeff6 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).B6;
+                    Coeff7 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).B7;
+                    Coeff8 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).B8;
 
-                    T_ProcInTemp = FullLoadOutAirTemp;
-                    T_ProcInHumRat = FullLoadOutAirHumRat;
-                    T_RegenInTemp = ExchCond(ExNum).SupInTemp;
-                    T_RegenInHumRat = ExchCond(ExNum).SupInHumRat;
+                    T_ProcInTemp = state.dataHeatRecovery->FullLoadOutAirTemp;
+                    T_ProcInHumRat = state.dataHeatRecovery->FullLoadOutAirHumRat;
+                    T_RegenInTemp = state.dataHeatRecovery->ExchCond(ExNum).SupInTemp;
+                    T_RegenInHumRat = state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat;
 
                     // Must use the same density used to convert volumetric flow rate to mass flow rate to get back to velocity
                     RhoStd = state.dataEnvrn->StdRhoAir; // PsyRhoAirFnPbTdbW(StdBaroPress,20.0d0, 0.0d0)
-                    BalFaceVelActual = SupInMassFlow / (RhoStd * ExchCond(ExNum).FaceArea);
+                    BalFaceVelActual = SupInMassFlow / (RhoStd * state.dataHeatRecovery->ExchCond(ExNum).FaceArea);
 
                     T_FaceVel = BalFaceVelActual;
 
@@ -2718,25 +3029,26 @@ namespace HeatRecovery {
                                              Coeff8 * T_FaceVel;
 
                         // Check model boundary for supply (regen) temp and do not cap value if out of bounds, check that supply in temp > out temp
-                        CheckModelBoundOutput_Temp(state, ExNum, ExchCond(ExNum).SupInTemp, FullLoadSupOutTemp, FirstHVACIteration);
-                        FullLoadDeltaT = FullLoadSupOutTemp - ExchCond(ExNum).SupInTemp;
+                        CheckModelBoundOutput_Temp(
+                            state, ExNum, state.dataHeatRecovery->ExchCond(ExNum).SupInTemp, FullLoadSupOutTemp, FirstHVACIteration);
+                        FullLoadDeltaT = FullLoadSupOutTemp - state.dataHeatRecovery->ExchCond(ExNum).SupInTemp;
                     } else {
                         FullLoadDeltaT = 0.0;
                     }
 
-                    Coeff1 = BalDesDehumPerfData(ExchCond(ExNum).PerfDataIndex).C1;
-                    Coeff2 = BalDesDehumPerfData(ExchCond(ExNum).PerfDataIndex).C2;
-                    Coeff3 = BalDesDehumPerfData(ExchCond(ExNum).PerfDataIndex).C3;
-                    Coeff4 = BalDesDehumPerfData(ExchCond(ExNum).PerfDataIndex).C4;
-                    Coeff5 = BalDesDehumPerfData(ExchCond(ExNum).PerfDataIndex).C5;
-                    Coeff6 = BalDesDehumPerfData(ExchCond(ExNum).PerfDataIndex).C6;
-                    Coeff7 = BalDesDehumPerfData(ExchCond(ExNum).PerfDataIndex).C7;
-                    Coeff8 = BalDesDehumPerfData(ExchCond(ExNum).PerfDataIndex).C8;
+                    Coeff1 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).C1;
+                    Coeff2 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).C2;
+                    Coeff3 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).C3;
+                    Coeff4 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).C4;
+                    Coeff5 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).C5;
+                    Coeff6 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).C6;
+                    Coeff7 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).C7;
+                    Coeff8 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).C8;
 
-                    H_ProcInTemp = FullLoadOutAirTemp;
-                    H_ProcInHumRat = FullLoadOutAirHumRat;
-                    H_RegenInTemp = ExchCond(ExNum).SupInTemp;
-                    H_RegenInHumRat = ExchCond(ExNum).SupInHumRat;
+                    H_ProcInTemp = state.dataHeatRecovery->FullLoadOutAirTemp;
+                    H_ProcInHumRat = state.dataHeatRecovery->FullLoadOutAirHumRat;
+                    H_RegenInTemp = state.dataHeatRecovery->ExchCond(ExNum).SupInTemp;
+                    H_RegenInHumRat = state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat;
                     H_FaceVel = BalFaceVelActual;
 
                     //     Call model check routines only when HX is active, if coil is off these checks do not apply (no potential for heat transfer)
@@ -2744,7 +3056,8 @@ namespace HeatRecovery {
 
                     CheckModelBoundsRH_HumRatEq(state, ExNum, H_RegenInTemp, H_RegenInHumRat, H_ProcInTemp, H_ProcInHumRat, FirstHVACIteration);
                     //     Check model boundaries and cap empirical model independent variables as needed (H_* may be modified on return from sub)
-                    CheckModelBoundsHumRatEq(state, ExNum, H_RegenInTemp, H_RegenInHumRat, H_ProcInTemp, H_ProcInHumRat, H_FaceVel, FirstHVACIteration);
+                    CheckModelBoundsHumRatEq(
+                        state, ExNum, H_RegenInTemp, H_RegenInHumRat, H_ProcInTemp, H_ProcInHumRat, H_FaceVel, FirstHVACIteration);
 
                     //     Calc curve
                     if (H_ProcInTemp != 0.0 && H_RegenInTemp != 0.0) {
@@ -2753,8 +3066,9 @@ namespace HeatRecovery {
                                                Coeff7 * (H_ProcInHumRat / H_ProcInTemp) + Coeff8 * H_FaceVel;
 
                         // Check model boundary for supply (regen) hum rat and do not cap value if out of bounds, check that supply in HR < out HR
-                        CheckModelBoundOutput_HumRat(state, ExNum, ExchCond(ExNum).SupInHumRat, FullLoadSupOutHumRat, FirstHVACIteration);
-                        FullLoadDeltaW = FullLoadSupOutHumRat - ExchCond(ExNum).SupInHumRat;
+                        CheckModelBoundOutput_HumRat(
+                            state, ExNum, state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat, FullLoadSupOutHumRat, FirstHVACIteration);
+                        FullLoadDeltaW = FullLoadSupOutHumRat - state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat;
                     } else {
                         FullLoadDeltaW = 0.0;
                     }
@@ -2765,22 +3079,22 @@ namespace HeatRecovery {
                     if (PsyTsatFnHPb(state, TestSaturationEnthalpy, state.dataEnvrn->OutBaroPress, ThisSubTSat) > FullLoadSupOutTemp) {
                         FullLoadSupOutTemp = PsyTsatFnHPb(state, TestSaturationEnthalpy, state.dataEnvrn->OutBaroPress, ThisSubTSatFullLoadOutTemp);
                         FullLoadSupOutHumRat = PsyWFnTdbH(state, FullLoadSupOutTemp, TestSaturationEnthalpy, ThisSubTSatFullLoadOutHumRat);
-                        FullLoadDeltaT = FullLoadSupOutTemp - ExchCond(ExNum).SupInTemp;
-                        FullLoadDeltaW = FullLoadSupOutHumRat - ExchCond(ExNum).SupInHumRat;
+                        FullLoadDeltaT = FullLoadSupOutTemp - state.dataHeatRecovery->ExchCond(ExNum).SupInTemp;
+                        FullLoadDeltaW = FullLoadSupOutHumRat - state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat;
                     }
 
-                    if (!CalledFromParentObject) {
+                    if (!state.dataHeatRecovery->CalledFromParentObject) {
                         //       calculate part-load ratio for HX
-                        MaxHumRatNeeded = Node(ExchCond(ExNum).SecOutletNode).HumRatMax;
-                        MinHumRatNeeded = Node(ExchCond(ExNum).SecOutletNode).HumRatMin;
+                        MaxHumRatNeeded = state.dataLoopNodes->Node(state.dataHeatRecovery->ExchCond(ExNum).SecOutletNode).HumRatMax;
+                        MinHumRatNeeded = state.dataLoopNodes->Node(state.dataHeatRecovery->ExchCond(ExNum).SecOutletNode).HumRatMin;
                         // Calculate partload fraction of dehumidification capacity required to meet setpoint
 
                         //       check the model output, if the regen delta W is positive, the process air stream is dehumidified
                         if (FullLoadDeltaW > 0) {
                             //         check for a setpoint, if no setpoint then PLR remains at 1
                             if (MaxHumRatNeeded != SensedNodeFlagValue) {
-                                if (ExchCond(ExNum).SecInHumRat > MaxHumRatNeeded && MaxHumRatNeeded > 0.0) {
-                                    HXPartLoadRatio = (ExchCond(ExNum).SecInHumRat - MaxHumRatNeeded) / FullLoadDeltaW;
+                                if (state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat > MaxHumRatNeeded && MaxHumRatNeeded > 0.0) {
+                                    HXPartLoadRatio = (state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat - MaxHumRatNeeded) / FullLoadDeltaW;
                                 } else {
                                     HXPartLoadRatio = 0.0;
                                 }
@@ -2789,8 +3103,8 @@ namespace HeatRecovery {
                         } else if (FullLoadDeltaW < 0) {
                             //         check for a setpoint, if no setpoint then PLR remains at 1
                             if (MinHumRatNeeded != SensedNodeFlagValue) {
-                                if (ExchCond(ExNum).SecInHumRat < MinHumRatNeeded && MinHumRatNeeded > 0.0) {
-                                    HXPartLoadRatio = (ExchCond(ExNum).SecInHumRat - MinHumRatNeeded) / FullLoadDeltaW;
+                                if (state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat < MinHumRatNeeded && MinHumRatNeeded > 0.0) {
+                                    HXPartLoadRatio = (state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat - MinHumRatNeeded) / FullLoadDeltaW;
                                 } else {
                                     HXPartLoadRatio = 0.0;
                                 }
@@ -2808,45 +3122,60 @@ namespace HeatRecovery {
                     if (FanOpMode == CycFanCycCoil || RegenInletIsOANode) {
                         //       Supply (regen) air stream mass flow rate is cycling and proportional to PLR, outlet conditions are full load
                         //       conditions
-                        ExchCond(ExNum).SupOutTemp = ExchCond(ExNum).SupInTemp + FullLoadDeltaT;
-                        ExchCond(ExNum).SupOutHumRat = min(1.0, max(1.e-5, ExchCond(ExNum).SupInHumRat + FullLoadDeltaW));
+                        state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp = state.dataHeatRecovery->ExchCond(ExNum).SupInTemp + FullLoadDeltaT;
+                        state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat =
+                            min(1.0, max(1.e-5, state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat + FullLoadDeltaW));
                     } else {
                         //       Supply (regen) air stream mass flow rate is constant and outlet conditions are averaged
-                        ExchCond(ExNum).SupOutTemp = ExchCond(ExNum).SupInTemp + (FullLoadDeltaT * HXPartLoadRatio);
-                        ExchCond(ExNum).SupOutHumRat = min(1.0, max(1.e-5, ExchCond(ExNum).SupInHumRat + (FullLoadDeltaW * HXPartLoadRatio)));
+                        state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp =
+                            state.dataHeatRecovery->ExchCond(ExNum).SupInTemp + (FullLoadDeltaT * HXPartLoadRatio);
+                        state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat =
+                            min(1.0, max(1.e-5, state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat + (FullLoadDeltaW * HXPartLoadRatio)));
                     }
 
                     //     for a balanced flow HX, use average mass flow rate and actual node conditions to calculate CSup and CSec
                     //     the mass flow rate on the process and secondary side of HX may be imbalanced when the HX is used in the OA branch
                     //     use the average mass flow rate to avoid psych warnings, mass flow rates will converge at the end of the iteration
                     //     if the air mass flow rates do not converge, this model should not be used
-                    CSup = AverageMassFlowRate * PsyCpAirFnW(ExchCond(ExNum).SupInHumRat);
-                    CSec = AverageMassFlowRate * PsyCpAirFnW(ExchCond(ExNum).SecInHumRat);
+                    CSup = AverageMassFlowRate * PsyCpAirFnW(state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat);
+                    CSec = AverageMassFlowRate * PsyCpAirFnW(state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat);
 
-                    ExchCond(ExNum).SupOutEnth = PsyHFnTdbW(ExchCond(ExNum).SupOutTemp, ExchCond(ExNum).SupOutHumRat);
+                    state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth =
+                        PsyHFnTdbW(state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp, state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat);
 
-                    SensHeatRecRate = CSup * (ExchCond(ExNum).SupOutTemp - ExchCond(ExNum).SupInTemp);
+                    SensHeatRecRate = CSup * (state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp - state.dataHeatRecovery->ExchCond(ExNum).SupInTemp);
 
-                    TotHeatRecRate = AverageMassFlowRate * (ExchCond(ExNum).SupOutEnth - ExchCond(ExNum).SupInEnth);
+                    TotHeatRecRate = AverageMassFlowRate *
+                                     (state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth - state.dataHeatRecovery->ExchCond(ExNum).SupInEnth);
 
                     //     now calculate process side heat transfer
 
-                    ExchCond(ExNum).SecOutEnth = ExchCond(ExNum).SecInEnth - TotHeatRecRate / AverageMassFlowRate;
+                    state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth =
+                        state.dataHeatRecovery->ExchCond(ExNum).SecInEnth - TotHeatRecRate / AverageMassFlowRate;
 
-                    ExchCond(ExNum).SecOutTemp = ExchCond(ExNum).SecInTemp - SensHeatRecRate / CSec;
+                    state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp = state.dataHeatRecovery->ExchCond(ExNum).SecInTemp - SensHeatRecRate / CSec;
 
-                    ExchCond(ExNum).SecOutHumRat = PsyWFnTdbH(state, ExchCond(ExNum).SecOutTemp, ExchCond(ExNum).SecOutEnth, ThisSubSecOutHumRat);
+                    state.dataHeatRecovery->ExchCond(ExNum).SecOutHumRat = PsyWFnTdbH(state,
+                                                                                      state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp,
+                                                                                      state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth,
+                                                                                      ThisSubSecOutHumRat);
 
                     // check for saturation in process (secondary) outlet
                     // The process outlet conditions should never be over the saturation curve for the balanced desiccant model
                     // although this may occur during warmup. This check is included here for consistency.
-                    TempSecOutSat = PsyTsatFnHPb(state, ExchCond(ExNum).SecOutEnth, state.dataEnvrn->OutBaroPress, ThisSubTestSatSec);
-                    if (TempSecOutSat > ExchCond(ExNum).SecOutTemp) {
-                        ExchCond(ExNum).SecOutTemp = TempSecOutSat;
-                        ExchCond(ExNum).SecOutHumRat = PsyWFnTdbH(state, ExchCond(ExNum).SecOutTemp, ExchCond(ExNum).SecOutEnth, ThisSubTSatSecOutHumRat);
+                    TempSecOutSat =
+                        PsyTsatFnHPb(state, state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth, state.dataEnvrn->OutBaroPress, ThisSubTestSatSec);
+                    if (TempSecOutSat > state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp) {
+                        state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp = TempSecOutSat;
+                        state.dataHeatRecovery->ExchCond(ExNum).SecOutHumRat = PsyWFnTdbH(state,
+                                                                                          state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp,
+                                                                                          state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth,
+                                                                                          ThisSubTSatSecOutHumRat);
                     }
 
-                    ExchCond(ExNum).ElecUseRate = BalDesDehumPerfData(ExchCond(ExNum).PerfDataIndex).NomElecPower * HXPartLoadRatio;
+                    state.dataHeatRecovery->ExchCond(ExNum).ElecUseRate =
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).NomElecPower *
+                        HXPartLoadRatio;
 
                 } else {
                 }
@@ -2855,34 +3184,35 @@ namespace HeatRecovery {
         } // ENDIF for "IF (UnitOn) THEN"
 
         // Report the process side heat transfer
-        CSec = AverageMassFlowRate * PsyCpAirFnW(ExchCond(ExNum).SecInHumRat);
-        ProcessSensHeatRecRate = CSec * (ExchCond(ExNum).SecOutTemp - ExchCond(ExNum).SecInTemp);
+        CSec = AverageMassFlowRate * PsyCpAirFnW(state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat);
+        ProcessSensHeatRecRate = CSec * (state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp - state.dataHeatRecovery->ExchCond(ExNum).SecInTemp);
 
-        ProcessTotHeatRecRate = ExchCond(ExNum).SecOutMassFlow * (ExchCond(ExNum).SecOutEnth - ExchCond(ExNum).SecInEnth);
+        ProcessTotHeatRecRate = state.dataHeatRecovery->ExchCond(ExNum).SecOutMassFlow *
+                                (state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth - state.dataHeatRecovery->ExchCond(ExNum).SecInEnth);
 
         ProcessLatHeatRecRate = ProcessTotHeatRecRate - ProcessSensHeatRecRate;
 
         // Set report variables based on sign of recovery rate
         if (ProcessSensHeatRecRate > 0.0) {
-            ExchCond(ExNum).SensHeatingRate = ProcessSensHeatRecRate;
-            ExchCond(ExNum).SensCoolingRate = 0.0;
+            state.dataHeatRecovery->ExchCond(ExNum).SensHeatingRate = ProcessSensHeatRecRate;
+            state.dataHeatRecovery->ExchCond(ExNum).SensCoolingRate = 0.0;
         } else {
-            ExchCond(ExNum).SensHeatingRate = 0.0;
-            ExchCond(ExNum).SensCoolingRate = std::abs(ProcessSensHeatRecRate);
+            state.dataHeatRecovery->ExchCond(ExNum).SensHeatingRate = 0.0;
+            state.dataHeatRecovery->ExchCond(ExNum).SensCoolingRate = std::abs(ProcessSensHeatRecRate);
         }
         if (ProcessLatHeatRecRate > 0.0) {
-            ExchCond(ExNum).LatHeatingRate = ProcessLatHeatRecRate;
-            ExchCond(ExNum).LatCoolingRate = 0.0;
+            state.dataHeatRecovery->ExchCond(ExNum).LatHeatingRate = ProcessLatHeatRecRate;
+            state.dataHeatRecovery->ExchCond(ExNum).LatCoolingRate = 0.0;
         } else {
-            ExchCond(ExNum).LatHeatingRate = 0.0;
-            ExchCond(ExNum).LatCoolingRate = std::abs(ProcessLatHeatRecRate);
+            state.dataHeatRecovery->ExchCond(ExNum).LatHeatingRate = 0.0;
+            state.dataHeatRecovery->ExchCond(ExNum).LatCoolingRate = std::abs(ProcessLatHeatRecRate);
         }
         if (ProcessTotHeatRecRate > 0.0) {
-            ExchCond(ExNum).TotHeatingRate = ProcessTotHeatRecRate;
-            ExchCond(ExNum).TotCoolingRate = 0.0;
+            state.dataHeatRecovery->ExchCond(ExNum).TotHeatingRate = ProcessTotHeatRecRate;
+            state.dataHeatRecovery->ExchCond(ExNum).TotCoolingRate = 0.0;
         } else {
-            ExchCond(ExNum).TotHeatingRate = 0.0;
-            ExchCond(ExNum).TotCoolingRate = std::abs(ProcessTotHeatRecRate);
+            state.dataHeatRecovery->ExchCond(ExNum).TotHeatingRate = 0.0;
+            state.dataHeatRecovery->ExchCond(ExNum).TotCoolingRate = std::abs(ProcessTotHeatRecRate);
         }
     }
 
@@ -2948,102 +3278,128 @@ namespace HeatRecovery {
         Real64 TempSecOut;          // secondary side temperature of air leaving HX core
         Real64 TempThreshold;       // threshold temperature below which frost control is active
 
-        ExchCond(ExNum).SupOutMassFlow = ExchCond(ExNum).SupInMassFlow;
-        ExchCond(ExNum).SecOutMassFlow = ExchCond(ExNum).SecInMassFlow;
-        ExchCond(ExNum).SupBypassMassFlow = 0.0;
-        ExchCond(ExNum).SecBypassMassFlow = 0.0;
-        RhoSup = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ExchCond(ExNum).SupInTemp, ExchCond(ExNum).SupInHumRat);
-        RhoSec = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ExchCond(ExNum).SecInTemp, ExchCond(ExNum).SecInHumRat);
-        CSup = ExchCond(ExNum).SupOutMassFlow * PsyCpAirFnW(ExchCond(ExNum).SupInHumRat);
-        CSec = ExchCond(ExNum).SecOutMassFlow * PsyCpAirFnW(ExchCond(ExNum).SecInHumRat);
+        state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow = state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow;
+        state.dataHeatRecovery->ExchCond(ExNum).SecOutMassFlow = state.dataHeatRecovery->ExchCond(ExNum).SecInMassFlow;
+        state.dataHeatRecovery->ExchCond(ExNum).SupBypassMassFlow = 0.0;
+        state.dataHeatRecovery->ExchCond(ExNum).SecBypassMassFlow = 0.0;
+        RhoSup = PsyRhoAirFnPbTdbW(state,
+                                   state.dataEnvrn->OutBaroPress,
+                                   state.dataHeatRecovery->ExchCond(ExNum).SupInTemp,
+                                   state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat);
+        RhoSec = PsyRhoAirFnPbTdbW(state,
+                                   state.dataEnvrn->OutBaroPress,
+                                   state.dataHeatRecovery->ExchCond(ExNum).SecInTemp,
+                                   state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat);
+        CSup = state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow * PsyCpAirFnW(state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat);
+        CSec = state.dataHeatRecovery->ExchCond(ExNum).SecOutMassFlow * PsyCpAirFnW(state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat);
         CMin = min(CSup, CSec);
-        TempThreshold = ExchCond(ExNum).ThresholdTemperature;
+        TempThreshold = state.dataHeatRecovery->ExchCond(ExNum).ThresholdTemperature;
 
-        if (ExchCond(ExNum).ControlToTemperatureSetPoint) {
+        if (state.dataHeatRecovery->ExchCond(ExNum).ControlToTemperatureSetPoint) {
             // Recalculate HX outlet conditions as if control to temperature setpoint was not activated,
             // because defrost will override those results
 
-            HXSupAirVolFlowRate = ExchCond(ExNum).SupOutMassFlow / RhoSup;
-            HXSecAirVolFlowRate = ExchCond(ExNum).SecOutMassFlow / RhoSec;
+            HXSupAirVolFlowRate = state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow / RhoSup;
+            HXSecAirVolFlowRate = state.dataHeatRecovery->ExchCond(ExNum).SecOutMassFlow / RhoSec;
             HXAvgAirVolFlowRate = (HXSecAirVolFlowRate + HXSupAirVolFlowRate) / 2.0;
-            HXAirVolFlowRatio = HXAvgAirVolFlowRate / ExchCond(ExNum).NomSupAirVolFlow;
-            ExchCond(ExNum).SensEffectiveness =
-                ExchCond(ExNum).HeatEffectSensible75 +
-                (ExchCond(ExNum).HeatEffectSensible100 - ExchCond(ExNum).HeatEffectSensible75) * (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
-            ExchCond(ExNum).LatEffectiveness =
-                ExchCond(ExNum).HeatEffectLatent75 +
-                (ExchCond(ExNum).HeatEffectLatent100 - ExchCond(ExNum).HeatEffectLatent75) * (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
-            ExchCond(ExNum).SupOutTemp =
-                ExchCond(ExNum).SupInTemp + ExchCond(ExNum).SensEffectiveness * CMin / CSup * (ExchCond(ExNum).SecInTemp - ExchCond(ExNum).SupInTemp);
-            ExchCond(ExNum).SupOutHumRat = ExchCond(ExNum).SupInHumRat + ExchCond(ExNum).LatEffectiveness * CMin / CSup *
-                                                                             (ExchCond(ExNum).SecInHumRat - ExchCond(ExNum).SupInHumRat);
-            ExchCond(ExNum).SupOutEnth = PsyHFnTdbW(ExchCond(ExNum).SupOutTemp, ExchCond(ExNum).SupOutHumRat);
+            HXAirVolFlowRatio = HXAvgAirVolFlowRate / state.dataHeatRecovery->ExchCond(ExNum).NomSupAirVolFlow;
+            state.dataHeatRecovery->ExchCond(ExNum).SensEffectiveness =
+                state.dataHeatRecovery->ExchCond(ExNum).HeatEffectSensible75 +
+                (state.dataHeatRecovery->ExchCond(ExNum).HeatEffectSensible100 - state.dataHeatRecovery->ExchCond(ExNum).HeatEffectSensible75) *
+                    (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
+            state.dataHeatRecovery->ExchCond(ExNum).LatEffectiveness =
+                state.dataHeatRecovery->ExchCond(ExNum).HeatEffectLatent75 +
+                (state.dataHeatRecovery->ExchCond(ExNum).HeatEffectLatent100 - state.dataHeatRecovery->ExchCond(ExNum).HeatEffectLatent75) *
+                    (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
+            state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp =
+                state.dataHeatRecovery->ExchCond(ExNum).SupInTemp +
+                state.dataHeatRecovery->ExchCond(ExNum).SensEffectiveness * CMin / CSup *
+                    (state.dataHeatRecovery->ExchCond(ExNum).SecInTemp - state.dataHeatRecovery->ExchCond(ExNum).SupInTemp);
+            state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat =
+                state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat +
+                state.dataHeatRecovery->ExchCond(ExNum).LatEffectiveness * CMin / CSup *
+                    (state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat - state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat);
+            state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth =
+                PsyHFnTdbW(state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp, state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat);
 
             //   Check for saturation in supply outlet and reset temp, then humidity ratio at constant enthalpy
-            if (PsyTsatFnHPb(state, ExchCond(ExNum).SupOutEnth, state.dataEnvrn->OutBaroPress) > ExchCond(ExNum).SupOutTemp) {
-                ExchCond(ExNum).SupOutTemp = PsyTsatFnHPb(state, ExchCond(ExNum).SupOutEnth, state.dataEnvrn->OutBaroPress);
-                ExchCond(ExNum).SupOutHumRat = PsyWFnTdbH(state, ExchCond(ExNum).SupOutTemp, ExchCond(ExNum).SupOutEnth);
+            if (PsyTsatFnHPb(state, state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth, state.dataEnvrn->OutBaroPress) >
+                state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp) {
+                state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp =
+                    PsyTsatFnHPb(state, state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth, state.dataEnvrn->OutBaroPress);
+                state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat =
+                    PsyWFnTdbH(state, state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp, state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth);
             }
 
-            QSensTrans = CSup * (ExchCond(ExNum).SupInTemp - ExchCond(ExNum).SupOutTemp);
-            ExchCond(ExNum).SecOutTemp = ExchCond(ExNum).SecInTemp + QSensTrans / CSec;
-            QTotTrans = ExchCond(ExNum).SupOutMassFlow * (ExchCond(ExNum).SupInEnth - ExchCond(ExNum).SupOutEnth);
-            ExchCond(ExNum).SecOutEnth = ExchCond(ExNum).SecInEnth + QTotTrans / ExchCond(ExNum).SecOutMassFlow;
-            ExchCond(ExNum).SecOutHumRat = PsyWFnTdbH(state, ExchCond(ExNum).SecOutTemp, ExchCond(ExNum).SecOutEnth);
+            QSensTrans = CSup * (state.dataHeatRecovery->ExchCond(ExNum).SupInTemp - state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp);
+            state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp = state.dataHeatRecovery->ExchCond(ExNum).SecInTemp + QSensTrans / CSec;
+            QTotTrans = state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow *
+                        (state.dataHeatRecovery->ExchCond(ExNum).SupInEnth - state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth);
+            state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth =
+                state.dataHeatRecovery->ExchCond(ExNum).SecInEnth + QTotTrans / state.dataHeatRecovery->ExchCond(ExNum).SecOutMassFlow;
+            state.dataHeatRecovery->ExchCond(ExNum).SecOutHumRat =
+                PsyWFnTdbH(state, state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp, state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth);
         }
 
         // Check frost control by type
 
-        if (ExchCond(ExNum).FrostControlType == "MINIMUMEXHAUSTTEMPERATURE") {
+        if (state.dataHeatRecovery->ExchCond(ExNum).FrostControlType == "MINIMUMEXHAUSTTEMPERATURE") {
             //   A plate HX will bypass air on the supply side to keep exhaust temp above a
             //   threshold temperature and requires recalculating effectiveness based on
             //   the reduced air flow rate. A rotary HX modulates rotational speed to try to keep the
             //   exhaust air temperature above the threshold temperature. Assume that
             //   sensible and latent effectiveness decrease proportionally with rotary HX speed.
 
-            DFFraction =
-                max(0.0, min(1.0, SafeDiv((TempThreshold - ExchCond(ExNum).SecOutTemp), (ExchCond(ExNum).SecInTemp - ExchCond(ExNum).SecOutTemp))));
-            if (ExchCond(ExNum).ExchConfigNum == Rotary) {
-                ExchCond(ExNum).SensEffectiveness *= (1.0 - DFFraction);
-                ExchCond(ExNum).LatEffectiveness *= (1.0 - DFFraction);
+            DFFraction = max(0.0,
+                             min(1.0,
+                                 SafeDiv((TempThreshold - state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp),
+                                         (state.dataHeatRecovery->ExchCond(ExNum).SecInTemp - state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp))));
+            if (state.dataHeatRecovery->ExchCond(ExNum).ExchConfig == HXConfigurationType::Rotary) {
+                state.dataHeatRecovery->ExchCond(ExNum).SensEffectiveness *= (1.0 - DFFraction);
+                state.dataHeatRecovery->ExchCond(ExNum).LatEffectiveness *= (1.0 - DFFraction);
             } else { // HX is a plate heat exchanger, bypass air to eliminate frost
                 Error = 1.0;
                 Iter = 0.0;
-                MassFlowSupIn = ExchCond(ExNum).SupInMassFlow;
-                MassFlowSupOut = ExchCond(ExNum).SupOutMassFlow;
-                MassFlowSupBypass = ExchCond(ExNum).SupBypassMassFlow;
-                TempSupIn = ExchCond(ExNum).SupInTemp;
-                HumRatSupIn = ExchCond(ExNum).SupInHumRat;
-                TempSecIn = ExchCond(ExNum).SecInTemp;
+                MassFlowSupIn = state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow;
+                MassFlowSupOut = state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow;
+                MassFlowSupBypass = state.dataHeatRecovery->ExchCond(ExNum).SupBypassMassFlow;
+                TempSupIn = state.dataHeatRecovery->ExchCond(ExNum).SupInTemp;
+                HumRatSupIn = state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat;
+                TempSecIn = state.dataHeatRecovery->ExchCond(ExNum).SecInTemp;
 
                 while (std::abs(Error) > ErrorTol && Iter < 10) {
                     MassFlowSupOut = MassFlowSupIn * (1.0 - DFFraction);
                     MassFlowSupBypass = MassFlowSupIn * DFFraction;
                     HXSupAirVolFlowRate = MassFlowSupOut / RhoSup;
-                    HXSecAirVolFlowRate = ExchCond(ExNum).SecOutMassFlow / RhoSec;
+                    HXSecAirVolFlowRate = state.dataHeatRecovery->ExchCond(ExNum).SecOutMassFlow / RhoSec;
                     HXAvgAirVolFlowRate = (HXSecAirVolFlowRate + HXSupAirVolFlowRate) / 2.0;
-                    HXAirVolFlowRatio = HXAvgAirVolFlowRate / ExchCond(ExNum).NomSupAirVolFlow;
+                    HXAirVolFlowRatio = HXAvgAirVolFlowRate / state.dataHeatRecovery->ExchCond(ExNum).NomSupAirVolFlow;
                     CSup = MassFlowSupOut * PsyCpAirFnW(HumRatSupIn);
                     CMin = min(CSup, CSec);
                     if (TempSupIn < TempSecIn) {
                         //         Use heating effectiveness values
-                        ExchCond(ExNum).SensEffectiveness =
-                            ExchCond(ExNum).HeatEffectSensible75 + (ExchCond(ExNum).HeatEffectSensible100 - ExchCond(ExNum).HeatEffectSensible75) *
-                                                                       (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
-                        ExchCond(ExNum).LatEffectiveness =
-                            ExchCond(ExNum).HeatEffectLatent75 +
-                            (ExchCond(ExNum).HeatEffectLatent100 - ExchCond(ExNum).HeatEffectLatent75) * (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
+                        state.dataHeatRecovery->ExchCond(ExNum).SensEffectiveness = state.dataHeatRecovery->ExchCond(ExNum).HeatEffectSensible75 +
+                                                                                    (state.dataHeatRecovery->ExchCond(ExNum).HeatEffectSensible100 -
+                                                                                     state.dataHeatRecovery->ExchCond(ExNum).HeatEffectSensible75) *
+                                                                                        (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
+                        state.dataHeatRecovery->ExchCond(ExNum).LatEffectiveness = state.dataHeatRecovery->ExchCond(ExNum).HeatEffectLatent75 +
+                                                                                   (state.dataHeatRecovery->ExchCond(ExNum).HeatEffectLatent100 -
+                                                                                    state.dataHeatRecovery->ExchCond(ExNum).HeatEffectLatent75) *
+                                                                                       (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
                     } else {
                         //         Use cooling effectiveness values
-                        ExchCond(ExNum).SensEffectiveness =
-                            ExchCond(ExNum).CoolEffectSensible75 + (ExchCond(ExNum).CoolEffectSensible100 - ExchCond(ExNum).CoolEffectSensible75) *
-                                                                       (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
-                        ExchCond(ExNum).LatEffectiveness =
-                            ExchCond(ExNum).CoolEffectLatent75 +
-                            (ExchCond(ExNum).CoolEffectLatent100 - ExchCond(ExNum).CoolEffectLatent75) * (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
+                        state.dataHeatRecovery->ExchCond(ExNum).SensEffectiveness = state.dataHeatRecovery->ExchCond(ExNum).CoolEffectSensible75 +
+                                                                                    (state.dataHeatRecovery->ExchCond(ExNum).CoolEffectSensible100 -
+                                                                                     state.dataHeatRecovery->ExchCond(ExNum).CoolEffectSensible75) *
+                                                                                        (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
+                        state.dataHeatRecovery->ExchCond(ExNum).LatEffectiveness = state.dataHeatRecovery->ExchCond(ExNum).CoolEffectLatent75 +
+                                                                                   (state.dataHeatRecovery->ExchCond(ExNum).CoolEffectLatent100 -
+                                                                                    state.dataHeatRecovery->ExchCond(ExNum).CoolEffectLatent75) *
+                                                                                       (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
                     }
                     //         calculation of local variable Csup can be 0, gaurd against divide by 0.
-                    TempSupOut = TempSupIn + ExchCond(ExNum).SensEffectiveness * SafeDiv(CMin, CSup) * (TempSecIn - TempSupIn);
+                    TempSupOut =
+                        TempSupIn + state.dataHeatRecovery->ExchCond(ExNum).SensEffectiveness * SafeDiv(CMin, CSup) * (TempSecIn - TempSupIn);
                     QSensTrans = CSup * (TempSupIn - TempSupOut);
                     //         Csec cannot be 0 in this subroutine
                     TempSecOut = TempSecIn + QSensTrans / CSec;
@@ -3052,124 +3408,159 @@ namespace HeatRecovery {
                     DFFraction = max(0.0, min(1.0, DFFraction * SafeDiv((TempSecIn - TempSecOut), (TempSecIn - TempThreshold))));
                     ++Iter;
                 }
-                ExchCond(ExNum).SupInMassFlow = MassFlowSupIn;
-                ExchCond(ExNum).SupOutMassFlow = MassFlowSupOut;
-                ExchCond(ExNum).SupBypassMassFlow = MassFlowSupBypass;
+                state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow = MassFlowSupIn;
+                state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow = MassFlowSupOut;
+                state.dataHeatRecovery->ExchCond(ExNum).SupBypassMassFlow = MassFlowSupBypass;
             }
-            ExchCond(ExNum).SupOutTemp = ExchCond(ExNum).SupInTemp + ExchCond(ExNum).SensEffectiveness * SafeDiv(CMin, CSup) *
-                                                                         (ExchCond(ExNum).SecInTemp - ExchCond(ExNum).SupInTemp);
-            ExchCond(ExNum).SupOutHumRat = ExchCond(ExNum).SupInHumRat + ExchCond(ExNum).LatEffectiveness * SafeDiv(CMin, CSup) *
-                                                                             (ExchCond(ExNum).SecInHumRat - ExchCond(ExNum).SupInHumRat);
-            ExchCond(ExNum).SupOutEnth = PsyHFnTdbW(ExchCond(ExNum).SupOutTemp, ExchCond(ExNum).SupOutHumRat);
+            state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp =
+                state.dataHeatRecovery->ExchCond(ExNum).SupInTemp +
+                state.dataHeatRecovery->ExchCond(ExNum).SensEffectiveness * SafeDiv(CMin, CSup) *
+                    (state.dataHeatRecovery->ExchCond(ExNum).SecInTemp - state.dataHeatRecovery->ExchCond(ExNum).SupInTemp);
+            state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat =
+                state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat +
+                state.dataHeatRecovery->ExchCond(ExNum).LatEffectiveness * SafeDiv(CMin, CSup) *
+                    (state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat - state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat);
+            state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth =
+                PsyHFnTdbW(state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp, state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat);
 
             //   Check for saturation in supply outlet and reset temp, then humidity ratio at constant enthalpy
-            if (PsyTsatFnHPb(state, ExchCond(ExNum).SupOutEnth, state.dataEnvrn->OutBaroPress) > ExchCond(ExNum).SupOutTemp) {
-                ExchCond(ExNum).SupOutTemp = PsyTsatFnHPb(state, ExchCond(ExNum).SupOutEnth, state.dataEnvrn->OutBaroPress);
-                ExchCond(ExNum).SupOutHumRat = PsyWFnTdbH(state, ExchCond(ExNum).SupOutTemp, ExchCond(ExNum).SupOutEnth);
+            if (PsyTsatFnHPb(state, state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth, state.dataEnvrn->OutBaroPress) >
+                state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp) {
+                state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp =
+                    PsyTsatFnHPb(state, state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth, state.dataEnvrn->OutBaroPress);
+                state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat =
+                    PsyWFnTdbH(state, state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp, state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth);
             }
 
-            QSensTrans = CSup * (ExchCond(ExNum).SupInTemp - ExchCond(ExNum).SupOutTemp);
-            ExchCond(ExNum).SecOutTemp = ExchCond(ExNum).SecInTemp + QSensTrans / CSec;
-            QTotTrans = ExchCond(ExNum).SupOutMassFlow * (ExchCond(ExNum).SupInEnth - ExchCond(ExNum).SupOutEnth);
-            ExchCond(ExNum).SecOutEnth = ExchCond(ExNum).SecInEnth + QTotTrans / ExchCond(ExNum).SecOutMassFlow;
-            ExchCond(ExNum).SecOutHumRat = PsyWFnTdbH(state, ExchCond(ExNum).SecOutTemp, ExchCond(ExNum).SecOutEnth);
+            QSensTrans = CSup * (state.dataHeatRecovery->ExchCond(ExNum).SupInTemp - state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp);
+            state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp = state.dataHeatRecovery->ExchCond(ExNum).SecInTemp + QSensTrans / CSec;
+            QTotTrans = state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow *
+                        (state.dataHeatRecovery->ExchCond(ExNum).SupInEnth - state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth);
+            state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth =
+                state.dataHeatRecovery->ExchCond(ExNum).SecInEnth + QTotTrans / state.dataHeatRecovery->ExchCond(ExNum).SecOutMassFlow;
+            state.dataHeatRecovery->ExchCond(ExNum).SecOutHumRat =
+                PsyWFnTdbH(state, state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp, state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth);
 
             //   Perform mixing of core air stream and bypass air stream and set mass flow rates at outlet nodes
-            ExchCond(ExNum).SupOutEnth =
-                (ExchCond(ExNum).SupOutMassFlow * ExchCond(ExNum).SupOutEnth + ExchCond(ExNum).SupBypassMassFlow * ExchCond(ExNum).SupInEnth) /
-                ExchCond(ExNum).SupInMassFlow;
-            ExchCond(ExNum).SupOutHumRat =
-                (ExchCond(ExNum).SupOutMassFlow * ExchCond(ExNum).SupOutHumRat + ExchCond(ExNum).SupBypassMassFlow * ExchCond(ExNum).SupInHumRat) /
-                ExchCond(ExNum).SupInMassFlow;
-            ExchCond(ExNum).SupOutTemp = PsyTdbFnHW(ExchCond(ExNum).SupOutEnth, ExchCond(ExNum).SupOutHumRat);
-            ExchCond(ExNum).SupOutMassFlow = ExchCond(ExNum).SupInMassFlow;
-            ExchCond(ExNum).SecOutEnth =
-                (ExchCond(ExNum).SecOutMassFlow * ExchCond(ExNum).SecOutEnth + ExchCond(ExNum).SecBypassMassFlow * ExchCond(ExNum).SecInEnth) /
-                ExchCond(ExNum).SecInMassFlow;
-            ExchCond(ExNum).SecOutHumRat =
-                (ExchCond(ExNum).SecOutMassFlow * ExchCond(ExNum).SecOutHumRat + ExchCond(ExNum).SecBypassMassFlow * ExchCond(ExNum).SecInHumRat) /
-                ExchCond(ExNum).SecInMassFlow;
-            ExchCond(ExNum).SecOutTemp = PsyTdbFnHW(ExchCond(ExNum).SecOutEnth, ExchCond(ExNum).SecOutHumRat);
-            ExchCond(ExNum).SecOutMassFlow = ExchCond(ExNum).SecInMassFlow;
+            state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth =
+                (state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow * state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth +
+                 state.dataHeatRecovery->ExchCond(ExNum).SupBypassMassFlow * state.dataHeatRecovery->ExchCond(ExNum).SupInEnth) /
+                state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow;
+            state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat =
+                (state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow * state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat +
+                 state.dataHeatRecovery->ExchCond(ExNum).SupBypassMassFlow * state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat) /
+                state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow;
+            state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp =
+                PsyTdbFnHW(state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth, state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat);
+            state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow = state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow;
+            state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth =
+                (state.dataHeatRecovery->ExchCond(ExNum).SecOutMassFlow * state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth +
+                 state.dataHeatRecovery->ExchCond(ExNum).SecBypassMassFlow * state.dataHeatRecovery->ExchCond(ExNum).SecInEnth) /
+                state.dataHeatRecovery->ExchCond(ExNum).SecInMassFlow;
+            state.dataHeatRecovery->ExchCond(ExNum).SecOutHumRat =
+                (state.dataHeatRecovery->ExchCond(ExNum).SecOutMassFlow * state.dataHeatRecovery->ExchCond(ExNum).SecOutHumRat +
+                 state.dataHeatRecovery->ExchCond(ExNum).SecBypassMassFlow * state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat) /
+                state.dataHeatRecovery->ExchCond(ExNum).SecInMassFlow;
+            state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp =
+                PsyTdbFnHW(state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth, state.dataHeatRecovery->ExchCond(ExNum).SecOutHumRat);
+            state.dataHeatRecovery->ExchCond(ExNum).SecOutMassFlow = state.dataHeatRecovery->ExchCond(ExNum).SecInMassFlow;
 
         } // End of IF (Minimum Exhaust Temperature)
 
-        if (ExchCond(ExNum).FrostControlType == "EXHAUSTAIRRECIRCULATION") {
+        if (state.dataHeatRecovery->ExchCond(ExNum).FrostControlType == "EXHAUSTAIRRECIRCULATION") {
             // Directing exhaust outlet air back across the HX core on the supply side
             // Assume no heat exchange when in frost control mode, full heat exchange otherwise
-            DFFraction = max(
-                0.0,
-                min((ExchCond(ExNum).InitialDefrostTime + ExchCond(ExNum).RateofDefrostTimeIncrease * (TempThreshold - ExchCond(ExNum).SupInTemp)),
-                    1.0));
+            DFFraction = max(0.0,
+                             min((state.dataHeatRecovery->ExchCond(ExNum).InitialDefrostTime +
+                                  state.dataHeatRecovery->ExchCond(ExNum).RateofDefrostTimeIncrease *
+                                      (TempThreshold - state.dataHeatRecovery->ExchCond(ExNum).SupInTemp)),
+                                 1.0));
 
             //    Calculate derated heat transfer using outlet air conditions assuming no defrost (calculated earlier)
             //    and (1-DefrostFraction)
-            QSensTrans = (1.0 - DFFraction) * CSup * (ExchCond(ExNum).SupInTemp - ExchCond(ExNum).SupOutTemp);
-            QTotTrans = (1.0 - DFFraction) * ExchCond(ExNum).SupOutMassFlow * (ExchCond(ExNum).SupInEnth - ExchCond(ExNum).SupOutEnth);
+            QSensTrans =
+                (1.0 - DFFraction) * CSup * (state.dataHeatRecovery->ExchCond(ExNum).SupInTemp - state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp);
+            QTotTrans = (1.0 - DFFraction) * state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow *
+                        (state.dataHeatRecovery->ExchCond(ExNum).SupInEnth - state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth);
 
-            ExchCond(ExNum).SupOutMassFlow = (1.0 - DFFraction) * ExchCond(ExNum).SupInMassFlow + DFFraction * ExchCond(ExNum).SecInMassFlow;
+            state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow = (1.0 - DFFraction) * state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow +
+                                                                     DFFraction * state.dataHeatRecovery->ExchCond(ExNum).SecInMassFlow;
 
             //    Blend supply outlet condition of HX core with exhaust air inlet to get final supply air outlet conditions
-            ExchCond(ExNum).SupOutTemp = ((1.0 - DFFraction) * ExchCond(ExNum).SupInMassFlow * ExchCond(ExNum).SupOutTemp +
-                                          DFFraction * ExchCond(ExNum).SecInMassFlow * ExchCond(ExNum).SecInTemp) /
-                                         ExchCond(ExNum).SupOutMassFlow;
+            state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp =
+                ((1.0 - DFFraction) * state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow * state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp +
+                 DFFraction * state.dataHeatRecovery->ExchCond(ExNum).SecInMassFlow * state.dataHeatRecovery->ExchCond(ExNum).SecInTemp) /
+                state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow;
 
-            ExchCond(ExNum).SupOutHumRat = ((1.0 - DFFraction) * ExchCond(ExNum).SupInMassFlow * ExchCond(ExNum).SupOutHumRat +
-                                            DFFraction * ExchCond(ExNum).SecInMassFlow * ExchCond(ExNum).SecInHumRat) /
-                                           ExchCond(ExNum).SupOutMassFlow;
+            state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat =
+                ((1.0 - DFFraction) * state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow * state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat +
+                 DFFraction * state.dataHeatRecovery->ExchCond(ExNum).SecInMassFlow * state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat) /
+                state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow;
 
-            ExchCond(ExNum).SupOutEnth = PsyHFnTdbW(ExchCond(ExNum).SupOutTemp, ExchCond(ExNum).SupOutHumRat);
+            state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth =
+                PsyHFnTdbW(state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp, state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat);
             //    No need to check for saturation after SA out and EA inlet are blended
 
             //    Derate effectiveness based on frost control time fraction for reporting purposes
-            ExchCond(ExNum).SensEffectiveness *= (1.0 - DFFraction);
-            ExchCond(ExNum).LatEffectiveness *= (1.0 - DFFraction);
+            state.dataHeatRecovery->ExchCond(ExNum).SensEffectiveness *= (1.0 - DFFraction);
+            state.dataHeatRecovery->ExchCond(ExNum).LatEffectiveness *= (1.0 - DFFraction);
 
             //    Secondary air outlet conditions are previously calculated as the conditions when not
             //    in defrost, and this is what we want to report so no changes here.
             //    Average SupInMassFlow and SecOutMassFlow rates have been reduced due to frost control
             //      Equipment attached to the supply inlet node may have problems with our setting the
             //      mass flow rate in the next statement. This is done only to simulate exhaust air recirc.
-            Node(ExchCond(ExNum).SupInletNode).MassFlowRate = ExchCond(ExNum).SupInMassFlow * (1.0 - DFFraction);
-            ExchCond(ExNum).SecOutMassFlow *= (1.0 - DFFraction);
+            state.dataLoopNodes->Node(state.dataHeatRecovery->ExchCond(ExNum).SupInletNode).MassFlowRate =
+                state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow * (1.0 - DFFraction);
+            state.dataHeatRecovery->ExchCond(ExNum).SecOutMassFlow *= (1.0 - DFFraction);
 
         } // End of IF (Exhaust Air Recirculation)
 
-        if (ExchCond(ExNum).FrostControlType == "EXHAUSTONLY") {
+        if (state.dataHeatRecovery->ExchCond(ExNum).FrostControlType == "EXHAUSTONLY") {
 
             //   Perform frost control by bypassing the supply air around the HX core during the defrost
             //   time period. HX heat transfer is reduced proportionally to (1 - defrosttimefraction)
 
-            DFFraction = max(
-                0.0,
-                min((ExchCond(ExNum).InitialDefrostTime + ExchCond(ExNum).RateofDefrostTimeIncrease * (TempThreshold - ExchCond(ExNum).SupInTemp)),
-                    1.0));
+            DFFraction = max(0.0,
+                             min((state.dataHeatRecovery->ExchCond(ExNum).InitialDefrostTime +
+                                  state.dataHeatRecovery->ExchCond(ExNum).RateofDefrostTimeIncrease *
+                                      (TempThreshold - state.dataHeatRecovery->ExchCond(ExNum).SupInTemp)),
+                                 1.0));
 
             //   Calculate derated heat transfer based on defrost time
-            QSensTrans = (1.0 - DFFraction) * CSup * (ExchCond(ExNum).SupInTemp - ExchCond(ExNum).SupOutTemp);
-            QTotTrans = (1.0 - DFFraction) * ExchCond(ExNum).SupOutMassFlow * (ExchCond(ExNum).SupInEnth - ExchCond(ExNum).SupOutEnth);
+            QSensTrans =
+                (1.0 - DFFraction) * CSup * (state.dataHeatRecovery->ExchCond(ExNum).SupInTemp - state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp);
+            QTotTrans = (1.0 - DFFraction) * state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow *
+                        (state.dataHeatRecovery->ExchCond(ExNum).SupInEnth - state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth);
 
             //   Calculate the air conditions leaving heat exchanger unit
             //   Heat exchanger effectiveness is not derated, HX is fully bypassed during frost control
 
-            ExchCond(ExNum).SupBypassMassFlow = ExchCond(ExNum).SupInMassFlow * DFFraction;
-            ExchCond(ExNum).SupOutTemp = ExchCond(ExNum).SupInTemp - QSensTrans / CSup;
-            ExchCond(ExNum).SupOutEnth = ExchCond(ExNum).SupInEnth - QTotTrans / ExchCond(ExNum).SupOutMassFlow;
-            ExchCond(ExNum).SupOutHumRat = PsyWFnTdbH(state, ExchCond(ExNum).SupOutTemp, ExchCond(ExNum).SupOutEnth);
+            state.dataHeatRecovery->ExchCond(ExNum).SupBypassMassFlow = state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow * DFFraction;
+            state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp = state.dataHeatRecovery->ExchCond(ExNum).SupInTemp - QSensTrans / CSup;
+            state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth =
+                state.dataHeatRecovery->ExchCond(ExNum).SupInEnth - QTotTrans / state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow;
+            state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat =
+                PsyWFnTdbH(state, state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp, state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth);
 
-            if (PsyTsatFnHPb(state, ExchCond(ExNum).SupOutEnth, state.dataEnvrn->OutBaroPress) > ExchCond(ExNum).SupOutTemp) {
-                ExchCond(ExNum).SupOutTemp = PsyTsatFnHPb(state, ExchCond(ExNum).SupOutEnth, state.dataEnvrn->OutBaroPress);
-                ExchCond(ExNum).SupOutHumRat = PsyWFnTdbH(state, ExchCond(ExNum).SupOutTemp, ExchCond(ExNum).SupOutEnth);
-                QSensTrans = CSup * (ExchCond(ExNum).SupInTemp - ExchCond(ExNum).SupOutTemp);
+            if (PsyTsatFnHPb(state, state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth, state.dataEnvrn->OutBaroPress) >
+                state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp) {
+                state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp =
+                    PsyTsatFnHPb(state, state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth, state.dataEnvrn->OutBaroPress);
+                state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat =
+                    PsyWFnTdbH(state, state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp, state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth);
+                QSensTrans = CSup * (state.dataHeatRecovery->ExchCond(ExNum).SupInTemp - state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp);
                 // Should we be updating the sensible and latent effectiveness values also?
             }
 
-            ExchCond(ExNum).SecOutEnth = ExchCond(ExNum).SecInEnth + QTotTrans / ExchCond(ExNum).SecOutMassFlow;
-            ExchCond(ExNum).SecOutTemp = ExchCond(ExNum).SecInTemp + QSensTrans / CSec;
-            ExchCond(ExNum).SecOutHumRat = PsyWFnTdbH(state, ExchCond(ExNum).SecOutTemp, ExchCond(ExNum).SecOutEnth);
+            state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth =
+                state.dataHeatRecovery->ExchCond(ExNum).SecInEnth + QTotTrans / state.dataHeatRecovery->ExchCond(ExNum).SecOutMassFlow;
+            state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp = state.dataHeatRecovery->ExchCond(ExNum).SecInTemp + QSensTrans / CSec;
+            state.dataHeatRecovery->ExchCond(ExNum).SecOutHumRat =
+                PsyWFnTdbH(state, state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp, state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth);
         } // End of IF (Exhaust Only)
 
-        ExchCond(ExNum).DefrostFraction = DFFraction;
+        state.dataHeatRecovery->ExchCond(ExNum).DefrostFraction = DFFraction;
     }
 
     void UpdateHeatRecovery(EnergyPlusData &state, int const ExNum) // number of the current heat exchanger being simulated
@@ -3190,46 +3581,46 @@ namespace HeatRecovery {
         int SecInNode;  // secondary inlet node number
         int SecOutNode; // secondary outlet node number
 
-        SupInNode = ExchCond(ExNum).SupInletNode;
-        SupOutNode = ExchCond(ExNum).SupOutletNode;
-        SecInNode = ExchCond(ExNum).SecInletNode;
-        SecOutNode = ExchCond(ExNum).SecOutletNode;
+        SupInNode = state.dataHeatRecovery->ExchCond(ExNum).SupInletNode;
+        SupOutNode = state.dataHeatRecovery->ExchCond(ExNum).SupOutletNode;
+        SecInNode = state.dataHeatRecovery->ExchCond(ExNum).SecInletNode;
+        SecOutNode = state.dataHeatRecovery->ExchCond(ExNum).SecOutletNode;
 
         // Set the outlet air nodes of the heat exchanger
-        Node(SupOutNode).Temp = ExchCond(ExNum).SupOutTemp;
-        Node(SupOutNode).HumRat = ExchCond(ExNum).SupOutHumRat;
-        Node(SupOutNode).Enthalpy = ExchCond(ExNum).SupOutEnth;
-        Node(SupOutNode).MassFlowRate = ExchCond(ExNum).SupOutMassFlow;
-        Node(SecOutNode).Temp = ExchCond(ExNum).SecOutTemp;
-        Node(SecOutNode).HumRat = ExchCond(ExNum).SecOutHumRat;
-        Node(SecOutNode).Enthalpy = ExchCond(ExNum).SecOutEnth;
-        Node(SecOutNode).MassFlowRate = ExchCond(ExNum).SecOutMassFlow;
+        state.dataLoopNodes->Node(SupOutNode).Temp = state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp;
+        state.dataLoopNodes->Node(SupOutNode).HumRat = state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat;
+        state.dataLoopNodes->Node(SupOutNode).Enthalpy = state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth;
+        state.dataLoopNodes->Node(SupOutNode).MassFlowRate = state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow;
+        state.dataLoopNodes->Node(SecOutNode).Temp = state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp;
+        state.dataLoopNodes->Node(SecOutNode).HumRat = state.dataHeatRecovery->ExchCond(ExNum).SecOutHumRat;
+        state.dataLoopNodes->Node(SecOutNode).Enthalpy = state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth;
+        state.dataLoopNodes->Node(SecOutNode).MassFlowRate = state.dataHeatRecovery->ExchCond(ExNum).SecOutMassFlow;
 
         // Set the outlet nodes for properties that just pass through & not used
-        Node(SupOutNode).Quality = Node(SupInNode).Quality;
-        Node(SupOutNode).Press = Node(SupInNode).Press;
-        Node(SupOutNode).MassFlowRateMin = Node(SupInNode).MassFlowRateMin;
-        Node(SupOutNode).MassFlowRateMax = Node(SupInNode).MassFlowRateMax;
-        Node(SupOutNode).MassFlowRateMinAvail = Node(SupInNode).MassFlowRateMinAvail;
-        Node(SupOutNode).MassFlowRateMaxAvail = Node(SupInNode).MassFlowRateMaxAvail;
-        Node(SecOutNode).Quality = Node(SecInNode).Quality;
-        Node(SecOutNode).Press = Node(SecInNode).Press;
-        Node(SecOutNode).MassFlowRateMin = Node(SecInNode).MassFlowRateMin;
-        Node(SecOutNode).MassFlowRateMax = Node(SecInNode).MassFlowRateMax;
-        Node(SecOutNode).MassFlowRateMinAvail = Node(SecInNode).MassFlowRateMinAvail;
-        Node(SecOutNode).MassFlowRateMaxAvail = Node(SecInNode).MassFlowRateMaxAvail;
+        state.dataLoopNodes->Node(SupOutNode).Quality = state.dataLoopNodes->Node(SupInNode).Quality;
+        state.dataLoopNodes->Node(SupOutNode).Press = state.dataLoopNodes->Node(SupInNode).Press;
+        state.dataLoopNodes->Node(SupOutNode).MassFlowRateMin = state.dataLoopNodes->Node(SupInNode).MassFlowRateMin;
+        state.dataLoopNodes->Node(SupOutNode).MassFlowRateMax = state.dataLoopNodes->Node(SupInNode).MassFlowRateMax;
+        state.dataLoopNodes->Node(SupOutNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(SupInNode).MassFlowRateMinAvail;
+        state.dataLoopNodes->Node(SupOutNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(SupInNode).MassFlowRateMaxAvail;
+        state.dataLoopNodes->Node(SecOutNode).Quality = state.dataLoopNodes->Node(SecInNode).Quality;
+        state.dataLoopNodes->Node(SecOutNode).Press = state.dataLoopNodes->Node(SecInNode).Press;
+        state.dataLoopNodes->Node(SecOutNode).MassFlowRateMin = state.dataLoopNodes->Node(SecInNode).MassFlowRateMin;
+        state.dataLoopNodes->Node(SecOutNode).MassFlowRateMax = state.dataLoopNodes->Node(SecInNode).MassFlowRateMax;
+        state.dataLoopNodes->Node(SecOutNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(SecInNode).MassFlowRateMinAvail;
+        state.dataLoopNodes->Node(SecOutNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(SecInNode).MassFlowRateMaxAvail;
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-            Node(SupOutNode).CO2 = Node(SupInNode).CO2;
-            Node(SecOutNode).CO2 = Node(SecInNode).CO2;
+            state.dataLoopNodes->Node(SupOutNode).CO2 = state.dataLoopNodes->Node(SupInNode).CO2;
+            state.dataLoopNodes->Node(SecOutNode).CO2 = state.dataLoopNodes->Node(SecInNode).CO2;
         }
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-            Node(SupOutNode).GenContam = Node(SupInNode).GenContam;
-            Node(SecOutNode).GenContam = Node(SecInNode).GenContam;
+            state.dataLoopNodes->Node(SupOutNode).GenContam = state.dataLoopNodes->Node(SupInNode).GenContam;
+            state.dataLoopNodes->Node(SecOutNode).GenContam = state.dataLoopNodes->Node(SecInNode).GenContam;
         }
     }
 
-    void ReportHeatRecovery(int const ExNum) // number of the current heat exchanger being simulated
+    void ReportHeatRecovery(EnergyPlusData &state, int const ExNum) // number of the current heat exchanger being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -3248,8 +3639,7 @@ namespace HeatRecovery {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::AirToAirHXElecPower;
-        using DataHVACGlobals::TimeStepSys;
+        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3267,15 +3657,15 @@ namespace HeatRecovery {
         Real64 ReportingConstant;
 
         ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
-        ExchCond(ExNum).ElecUseEnergy = ExchCond(ExNum).ElecUseRate * ReportingConstant;
-        ExchCond(ExNum).SensHeatingEnergy = ExchCond(ExNum).SensHeatingRate * ReportingConstant;
-        ExchCond(ExNum).LatHeatingEnergy = ExchCond(ExNum).LatHeatingRate * ReportingConstant;
-        ExchCond(ExNum).TotHeatingEnergy = ExchCond(ExNum).TotHeatingRate * ReportingConstant;
-        ExchCond(ExNum).SensCoolingEnergy = ExchCond(ExNum).SensCoolingRate * ReportingConstant;
-        ExchCond(ExNum).LatCoolingEnergy = ExchCond(ExNum).LatCoolingRate * ReportingConstant;
-        ExchCond(ExNum).TotCoolingEnergy = ExchCond(ExNum).TotCoolingRate * ReportingConstant;
+        state.dataHeatRecovery->ExchCond(ExNum).ElecUseEnergy = state.dataHeatRecovery->ExchCond(ExNum).ElecUseRate * ReportingConstant;
+        state.dataHeatRecovery->ExchCond(ExNum).SensHeatingEnergy = state.dataHeatRecovery->ExchCond(ExNum).SensHeatingRate * ReportingConstant;
+        state.dataHeatRecovery->ExchCond(ExNum).LatHeatingEnergy = state.dataHeatRecovery->ExchCond(ExNum).LatHeatingRate * ReportingConstant;
+        state.dataHeatRecovery->ExchCond(ExNum).TotHeatingEnergy = state.dataHeatRecovery->ExchCond(ExNum).TotHeatingRate * ReportingConstant;
+        state.dataHeatRecovery->ExchCond(ExNum).SensCoolingEnergy = state.dataHeatRecovery->ExchCond(ExNum).SensCoolingRate * ReportingConstant;
+        state.dataHeatRecovery->ExchCond(ExNum).LatCoolingEnergy = state.dataHeatRecovery->ExchCond(ExNum).LatCoolingRate * ReportingConstant;
+        state.dataHeatRecovery->ExchCond(ExNum).TotCoolingEnergy = state.dataHeatRecovery->ExchCond(ExNum).TotCoolingRate * ReportingConstant;
 
-        AirToAirHXElecPower = ExchCond(ExNum).ElecUseRate;
+        state.dataHVACGlobal->AirToAirHXElecPower = state.dataHeatRecovery->ExchCond(ExNum).ElecUseRate;
     }
 
     Real64 SafeDiv(Real64 const a, Real64 const b)
@@ -3326,10 +3716,10 @@ namespace HeatRecovery {
     }
 
     void CalculateEpsFromNTUandZ(EnergyPlusData &state,
-                                 Real64 const NTU,  // number of transfer units
-                                 Real64 const Z,    // capacity rate ratio
-                                 int const FlowArr, // flow arrangement
-                                 Real64 &Eps        // heat exchanger effectiveness
+                                 Real64 const NTU,              // number of transfer units
+                                 Real64 const Z,                // capacity rate ratio
+                                 HXConfiguration const FlowArr, // flow arrangement
+                                 Real64 &Eps                    // heat exchanger effectiveness
     )
     {
 
@@ -3390,20 +3780,20 @@ namespace HeatRecovery {
         } else {
             {
                 auto const SELECT_CASE_var(FlowArr);
-                if (SELECT_CASE_var == Counter_Flow) { // COUNTER FLOW
+                if (SELECT_CASE_var == HXConfiguration::CounterFlow) { // COUNTER FLOW
                     if (std::abs(Z - 1.0) < SMALL) {
                         Eps = NTU / (NTU + 1.0);
                     } else {
                         Temp = std::exp(-NTU * (1.0 - Z));
                         Eps = (1.0 - Temp) / (1.0 - Z * Temp);
                     }
-                } else if (SELECT_CASE_var == Parallel_Flow) { // PARALLEL FLOW
+                } else if (SELECT_CASE_var == HXConfiguration::ParallelFlow) { // PARALLEL FLOW
                     Temp = (1.0 + Z);
                     Eps = (1.0 - std::exp(-NTU * Temp)) / Temp;
-                } else if (SELECT_CASE_var == Cross_Flow_Both_Unmixed) { // CROSS FLOW BOTH UNMIXED
+                } else if (SELECT_CASE_var == HXConfiguration::CrossFlowBothUnmixed) { // CROSS FLOW BOTH UNMIXED
                     Temp = Z * std::pow(NTU, -0.22);
                     Eps = 1.0 - std::exp((std::exp(-NTU * Temp) - 1.0) / Temp);
-                } else if (SELECT_CASE_var == Cross_Flow_Other) { // CROSS FLOW, Cmax MIXED, Cmin UNMIXED
+                } else if (SELECT_CASE_var == HXConfiguration::CrossFlowOther) { // CROSS FLOW, Cmax MIXED, Cmin UNMIXED
                     Eps = (1.0 - std::exp(-Z * (1.0 - std::exp(-NTU)))) / Z;
                 } else {
                     ShowFatalError(state, format("HeatRecovery: Illegal flow arrangement in CalculateEpsFromNTUandZ, Value={}", FlowArr));
@@ -3413,11 +3803,11 @@ namespace HeatRecovery {
     }
 
     void CalculateNTUfromEpsAndZ(EnergyPlusData &state,
-                                 Real64 &NTU,       // number of transfer units
-                                 int &Err,          // error indicator
-                                 Real64 const Z,    // capacity rate ratio
-                                 int const FlowArr, // flow arrangement
-                                 Real64 const Eps   // heat exchanger effectiveness
+                                 Real64 &NTU,                   // number of transfer units
+                                 int &Err,                      // error indicator
+                                 Real64 const Z,                // capacity rate ratio
+                                 HXConfiguration const FlowArr, // flow arrangement
+                                 Real64 const Eps               // heat exchanger effectiveness
     )
     {
 
@@ -3471,12 +3861,12 @@ namespace HeatRecovery {
             return;
         }
 
-        if (FlowArr == Parallel_Flow) {
+        if (FlowArr == HXConfiguration::ParallelFlow) {
             if (Eps < 0.0 || Eps > 1.0 / (1.0 + Z)) {
                 Err = 2;
                 return;
             }
-        } else if (FlowArr == Cross_Flow_Other) {
+        } else if (FlowArr == HXConfiguration::CrossFlowOther) {
             if (Eps < 0.0 || Eps > (1.0 - std::exp(-Z)) / Z) {
                 Err = 3;
                 return;
@@ -3502,17 +3892,17 @@ namespace HeatRecovery {
             // calculate based on configuration
             {
                 auto const SELECT_CASE_var(FlowArr);
-                if (SELECT_CASE_var == Counter_Flow) { // COUNTER FLOW
+                if (SELECT_CASE_var == HXConfiguration::CounterFlow) { // COUNTER FLOW
                     if (std::abs(Z - 1.0) < SMALL) {
                         NTU = Eps / (1.0 - Eps);
                     } else {
                         NTU = 1.0 / (Z - 1.0) * std::log((1.0 - Eps) / (1.0 - Eps * Z));
                     }
-                } else if (SELECT_CASE_var == Parallel_Flow) { // PARALLEL FLOW
+                } else if (SELECT_CASE_var == HXConfiguration::ParallelFlow) { // PARALLEL FLOW
                     NTU = -std::log(-Eps - Eps * Z + 1.0) / (Z + 1.0);
-                } else if (SELECT_CASE_var == Cross_Flow_Both_Unmixed) { // CROSS FLOW BOTH UNMIXED
+                } else if (SELECT_CASE_var == HXConfiguration::CrossFlowBothUnmixed) { // CROSS FLOW BOTH UNMIXED
                     NTU = GetNTUforCrossFlowBothUnmixed(state, Eps, Z);
-                } else if (SELECT_CASE_var == Cross_Flow_Other) { // CROSS FLOW, Cmax MIXED, Cmin UNMIXED
+                } else if (SELECT_CASE_var == HXConfiguration::CrossFlowOther) { // CROSS FLOW, Cmax MIXED, Cmin UNMIXED
                     NTU = -std::log(1.0 + std::log(1.0 - Eps * Z) / Z);
                 } else {
                     ShowFatalError(state, format("HeatRecovery: Illegal flow arrangement in CalculateNTUfromEpsAndZ, Value={}", FlowArr));
@@ -3569,15 +3959,12 @@ namespace HeatRecovery {
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-        int SolFla;               // Flag of solver
-        static Real64 NTU0(0.0);  // lower bound for NTU
-        static Real64 NTU1(50.0); // upper bound for NTU
-        Array1D<Real64> Par(2);
+        int SolFla;              // Flag of solver
+        Real64 const NTU0(0.0);  // lower bound for NTU
+        Real64 const NTU1(50.0); // upper bound for NTU
+        std::array<Real64, 2> Par = {Eps, Z};
 
-        Par(1) = Eps;
-        Par(2) = Z;
-
-        SolveRoot(Acc, MaxIte, SolFla, NTU, GetResidCrossFlowBothUnmixed, NTU0, NTU1, Par);
+        SolveRoot(state, Acc, MaxIte, SolFla, NTU, GetResidCrossFlowBothUnmixed, NTU0, NTU1, Par);
 
         if (SolFla == -2) {
             ShowFatalError(state, "HeatRecovery: Bad initial bounds for NTU in GetNTUforCrossFlowBothUnmixed");
@@ -3588,8 +3975,9 @@ namespace HeatRecovery {
         return NTU;
     }
 
-    Real64 GetResidCrossFlowBothUnmixed(Real64 const NTU,          // number of transfer units
-                                        Array1D<Real64> const &Par // par(1) = Eps, par(2) = Z
+    Real64 GetResidCrossFlowBothUnmixed([[maybe_unused]] EnergyPlusData &state,
+                                        Real64 const NTU,                // number of transfer units
+                                        std::array<Real64, 2> const &Par // par(1) = Eps, par(2) = Z
     )
     {
 
@@ -3620,23 +4008,7 @@ namespace HeatRecovery {
         // Return value
         Real64 Residuum; // residual to be minimized to zero
 
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-        Residuum = 1.0 - std::exp((std::exp(-std::pow(NTU, 0.78) * Par(2)) - 1.0) / Par(2) * std::pow(NTU, 0.22)) - Par(1);
+        Residuum = 1.0 - std::exp((std::exp(-std::pow(NTU, 0.78) * Par[1]) - 1.0) / Par[1] * std::pow(NTU, 0.22)) - Par[0];
 
         return Residuum;
     }
@@ -3672,8 +4044,8 @@ namespace HeatRecovery {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
         // Locals
@@ -3690,13 +4062,13 @@ namespace HeatRecovery {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static std::string OutputChar;         // character string for warning messages
-        static std::string OutputCharLo;       // character string for warning messages
-        static std::string OutputCharHi;       // character string for warning messages
-        static std::string CharValue;          // character string for warning messages
-        static Real64 TimeStepSysLast(0.0);    // last system time step (used to check for downshifting)
-        static Real64 CurrentEndTime(0.0);     // end time of time step for current simulation time step
-        static Real64 CurrentEndTimeLast(0.0); // end time of time step for last simulation time step
+        auto &OutputChar = state.dataHeatRecovery->OutputChar;
+        auto &OutputCharLo = state.dataHeatRecovery->OutputCharLo;
+        auto &OutputCharHi = state.dataHeatRecovery->OutputCharHi;
+        auto &CharValue = state.dataHeatRecovery->CharValue;
+        auto &TimeStepSysLast = state.dataHeatRecovery->TimeStepSysLast;
+        auto &CurrentEndTime = state.dataHeatRecovery->CurrentEndTime;
+        auto &CurrentEndTimeLast = state.dataHeatRecovery->CurrentEndTimeLast;
         // current end time is compared with last to see if time step changed
 
         //   calculate end time of current time step
@@ -3710,98 +4082,139 @@ namespace HeatRecovery {
 
             // print error for variables of regeneration outlet temperature equation
             // Regen inlet temp for temp eqn
-            if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintT_RegenInTempMessage) {
-                ++BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_RegenInTempErrorCount;
-                if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_RegenInTempErrorCount < 2) {
-                    ShowWarningError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_RegenInTempBuffer1);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_RegenInTempBuffer2);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_RegenInTempBuffer3);
-                    ShowContinueError(state, "...Using regeneration inlet air temperatures that are outside the regeneration outlet air temperature "
+            if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintT_RegenInTempMessage) {
+                ++state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_RegenInTempErrorCount;
+                if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_RegenInTempErrorCount <
+                    2) {
+                    ShowWarningError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_RegenInTempBuffer1);
+                    ShowContinueError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_RegenInTempBuffer2);
+                    ShowContinueError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_RegenInTempBuffer3);
+                    ShowContinueError(state,
+                                      "...Using regeneration inlet air temperatures that are outside the regeneration outlet air temperature "
                                       "equation model boundaries may adversely affect desiccant model performance.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(state,
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
-                            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
+                    ShowRecurringWarningErrorAtEnd(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
                             "\" - Regeneration inlet air temp used in regen outlet air temperature equation is out of range error continues...",
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_RegenInTempErrIndex,
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_RegenInTempLast,
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_RegenInTempLast);
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_RegenInTempErrIndex,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_RegenInTempLast,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_RegenInTempLast);
                 }
             }
             // Regen inlet humidity ratio for temp eqn
-            if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintT_RegenInHumRatMessage) {
-                ++BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_RegenInHumRatErrorCount;
-                if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_RegenInHumRatErrorCount < 2) {
-                    ShowWarningError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_RegenInHumRatBuffer1);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_RegenInHumRatBuffer2);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_RegenInHumRatBuffer3);
-                    ShowContinueError(state, "...Using regeneration inlet air humidity ratios that are outside the regeneration outlet air temperature "
+            if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintT_RegenInHumRatMessage) {
+                ++state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_RegenInHumRatErrorCount;
+                if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_RegenInHumRatErrorCount <
+                    2) {
+                    ShowWarningError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_RegenInHumRatBuffer1);
+                    ShowContinueError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_RegenInHumRatBuffer2);
+                    ShowContinueError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_RegenInHumRatBuffer3);
+                    ShowContinueError(state,
+                                      "...Using regeneration inlet air humidity ratios that are outside the regeneration outlet air temperature "
                                       "equation model boundaries may adversely affect desiccant model performance.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(state,
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
-                            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
+                    ShowRecurringWarningErrorAtEnd(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
                             "\" - Regeneration inlet air humidity ratio used in regen outlet temperature equation is out of range error continues...",
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_RegenInHumRatErrIndex,
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_RegenInHumRatLast,
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_RegenInHumRatLast);
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_RegenInHumRatErrIndex,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_RegenInHumRatLast,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_RegenInHumRatLast);
                 }
             }
             // Process inlet temp for temp eqn
-            if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintT_ProcInTempMessage) {
-                ++BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_ProcInTempErrorCount;
-                if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_ProcInTempErrorCount < 2) {
-                    ShowWarningError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_ProcInTempBuffer1);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_ProcInTempBuffer2);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_ProcInTempBuffer3);
-                    ShowContinueError(state, "...Using process inlet air temperatures that are outside the regeneration outlet air temperature equation "
+            if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintT_ProcInTempMessage) {
+                ++state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_ProcInTempErrorCount;
+                if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_ProcInTempErrorCount < 2) {
+                    ShowWarningError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_ProcInTempBuffer1);
+                    ShowContinueError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_ProcInTempBuffer2);
+                    ShowContinueError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_ProcInTempBuffer3);
+                    ShowContinueError(state,
+                                      "...Using process inlet air temperatures that are outside the regeneration outlet air temperature equation "
                                       "model boundaries may adversely affect desiccant model performance.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(state,
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
-                            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
+                    ShowRecurringWarningErrorAtEnd(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
                             "\" - Process inlet air temperature used in regen outlet temperature equation is out of range error continues...",
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_ProcInTempErrIndex,
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_ProcInTempLast,
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_ProcInTempLast);
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_ProcInTempErrIndex,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_ProcInTempLast,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_ProcInTempLast);
                 }
             }
             // Process inlet humidity ratio for temp eqn
-            if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintT_ProcInHumRatMessage) {
-                ++BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_ProcInHumRatErrorCount;
-                if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_ProcInHumRatErrorCount < 2) {
-                    ShowWarningError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_ProcInHumRatBuffer1);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_ProcInHumRatBuffer2);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_ProcInHumRatBuffer3);
-                    ShowContinueError(state, "...Using process inlet air humidity ratios that are outside the regeneratoin outlet air temperature equation "
+            if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintT_ProcInHumRatMessage) {
+                ++state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_ProcInHumRatErrorCount;
+                if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_ProcInHumRatErrorCount <
+                    2) {
+                    ShowWarningError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_ProcInHumRatBuffer1);
+                    ShowContinueError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_ProcInHumRatBuffer2);
+                    ShowContinueError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_ProcInHumRatBuffer3);
+                    ShowContinueError(state,
+                                      "...Using process inlet air humidity ratios that are outside the regeneratoin outlet air temperature equation "
                                       "model boundaries may adversely affect desiccant model performance.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(state,
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
-                            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
+                    ShowRecurringWarningErrorAtEnd(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
                             "\" - Process inlet air humidity ratio used in regen outlet temperature equation is out of range error continues...",
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_ProcInHumRatErrIndex,
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_ProcInHumRatLast,
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_ProcInHumRatLast);
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_ProcInHumRatErrIndex,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_ProcInHumRatLast,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_ProcInHumRatLast);
                 }
             }
             // Process and regeneration face velocity for temp eqn
-            if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintT_FaceVelMessage) {
-                ++BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_FaceVelErrorCount;
-                if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_FaceVelErrorCount < 2) {
-                    ShowWarningError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_FaceVelBuffer1);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_FaceVelBuffer2);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_FaceVelBuffer3);
-                    ShowContinueError(state, "...Using process and regeneration face velocities that are outside the regeneration outlet air temperature "
+            if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintT_FaceVelMessage) {
+                ++state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_FaceVelErrorCount;
+                if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_FaceVelErrorCount < 2) {
+                    ShowWarningError(
+                        state, state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_FaceVelBuffer1);
+                    ShowContinueError(
+                        state, state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_FaceVelBuffer2);
+                    ShowContinueError(
+                        state, state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_FaceVelBuffer3);
+                    ShowContinueError(state,
+                                      "...Using process and regeneration face velocities that are outside the regeneration outlet air temperature "
                                       "equation model boundaries may adversely affect desiccant model performance.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
-                                                       BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
-                                                       "\" - Process and regen inlet air face velocity used in regen outlet temperature equation is "
-                                                       "out of range error continues...",
-                                                   BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_FaceVelocityErrIndex,
-                                                   BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_FaceVelLast,
-                                                   BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_FaceVelLast);
+                    ShowRecurringWarningErrorAtEnd(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
+                            "\" - Process and regen inlet air face velocity used in regen outlet temperature equation is "
+                            "out of range error continues...",
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_FaceVelocityErrIndex,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_FaceVelLast,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_FaceVelLast);
                 }
             }
         } // IF(CurrentEndTime .GT. CurrentEndTimeLast .AND. TimeStepSys .GE. TimeStepSysLast)THEN
@@ -3812,181 +4225,221 @@ namespace HeatRecovery {
 
         //   If regen and procees inlet temperatures are the same the coil is off, do not print out of bounds warning for this case
         if (std::abs(T_RegenInTemp - T_ProcInTemp) < SMALL) {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintT_RegenInTempMessage = false;
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintT_RegenInHumRatMessage = false;
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintT_ProcInTempMessage = false;
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintT_ProcInHumRatMessage = false;
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintT_FaceVelMessage = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintT_RegenInTempMessage = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintT_RegenInHumRatMessage = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintT_ProcInTempMessage = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintT_ProcInHumRatMessage = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintT_FaceVelMessage = false;
             return;
         }
 
         //   check boundaries of independent variables and post warnings to individual buffers to print at end of time step
         // checking model bounds for variables of regeneration outlet temperature equation
         // Regen inlet temp
-        if (T_RegenInTemp < BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MinRegenAirInTemp ||
-            T_RegenInTemp > BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MaxRegenAirInTemp) {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_RegenInTempLast = T_RegenInTemp;
+        if (T_RegenInTemp <
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MinRegenAirInTemp ||
+            T_RegenInTemp >
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MaxRegenAirInTemp) {
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_RegenInTempLast = T_RegenInTemp;
             OutputChar = format("{:.2R}", T_RegenInTemp);
-            OutputCharLo = format("{:.2R}", BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MinRegenAirInTemp);
-            OutputCharHi = format("{:.2R}", BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MaxRegenAirInTemp);
-            if (T_RegenInTemp < BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MinRegenAirInTemp) {
-                T_RegenInTemp = BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MinRegenAirInTemp;
+            OutputCharLo = format(
+                "{:.2R}", state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MinRegenAirInTemp);
+            OutputCharHi = format(
+                "{:.2R}", state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MaxRegenAirInTemp);
+            if (T_RegenInTemp <
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MinRegenAirInTemp) {
+                T_RegenInTemp =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MinRegenAirInTemp;
             }
-            if (T_RegenInTemp > BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MaxRegenAirInTemp) {
-                T_RegenInTemp = BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MaxRegenAirInTemp;
+            if (T_RegenInTemp >
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MaxRegenAirInTemp) {
+                T_RegenInTemp =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MaxRegenAirInTemp;
             }
             if (!state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintT_RegenInTempMessage = true;
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_RegenInTempBuffer1 =
-                    BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
-                    BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintT_RegenInTempMessage = true;
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_RegenInTempBuffer1 =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
                     "\" - Regeneration inlet air temperature used in regen outlet air temperature equation is outside model boundaries at " +
                     OutputChar + '.';
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_RegenInTempBuffer2 = "...Valid range = " + OutputCharLo + " to " +
-                                                                                            OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName +
-                                                                                            ", " + state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state);
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_RegenInTempBuffer2 =
+                    "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " +
+                    state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state);
                 CharValue = format("{:.6R}", T_RegenInTemp);
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_RegenInTempBuffer3 =
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_RegenInTempBuffer3 =
                     "...Regeneration outlet air temperature equation: regeneration inlet air temperature passed to the model = " + CharValue;
             } else {
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintT_RegenInTempMessage = false;
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintT_RegenInTempMessage =
+                    false;
             }
         } else {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintT_RegenInTempMessage = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintT_RegenInTempMessage = false;
         }
         // regen inlet humidity ratio
-        if (T_RegenInHumRat < BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MinRegenAirInHumRat ||
-            T_RegenInHumRat > BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MaxRegenAirInHumRat) {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_RegenInHumRatLast = T_RegenInHumRat;
+        if (T_RegenInHumRat <
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MinRegenAirInHumRat ||
+            T_RegenInHumRat >
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MaxRegenAirInHumRat) {
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_RegenInHumRatLast =
+                T_RegenInHumRat;
             OutputChar = format("{:.6R}", T_RegenInHumRat);
-            OutputCharLo = format("{:.6R}", BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MinRegenAirInHumRat);
-            OutputCharHi = format("{:.6R}", BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MaxRegenAirInHumRat);
-            if (T_RegenInHumRat < BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MinRegenAirInHumRat) {
-                T_RegenInHumRat = BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MinRegenAirInHumRat;
+            OutputCharLo = format(
+                "{:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MinRegenAirInHumRat);
+            OutputCharHi = format(
+                "{:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MaxRegenAirInHumRat);
+            if (T_RegenInHumRat <
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MinRegenAirInHumRat) {
+                T_RegenInHumRat =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MinRegenAirInHumRat;
             }
-            if (T_RegenInHumRat > BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MaxRegenAirInHumRat) {
-                T_RegenInHumRat = BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MaxRegenAirInHumRat;
+            if (T_RegenInHumRat >
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MaxRegenAirInHumRat) {
+                T_RegenInHumRat =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MaxRegenAirInHumRat;
             }
             if (!state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintT_RegenInHumRatMessage = true;
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_RegenInHumRatBuffer1 =
-                    BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
-                    BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintT_RegenInHumRatMessage =
+                    true;
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_RegenInHumRatBuffer1 =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
                     "\" - Regeneration inlet air humidity ratio used in regen outlet air temperature equation is outside model boundaries at " +
                     OutputChar + '.';
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_RegenInHumRatBuffer2 =
-                    "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + ' ' +
-                    CreateSysTimeIntervalString(state);
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_RegenInHumRatBuffer2 =
+                    "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " +
+                    state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state);
                 CharValue = format("{:.6R}", T_RegenInHumRat);
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_RegenInHumRatBuffer3 =
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_RegenInHumRatBuffer3 =
                     "...Regeneration outlet air temperature equation: regeneration inlet air humidity ratio passed to the model = " + CharValue;
             } else {
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintT_RegenInHumRatMessage = false;
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintT_RegenInHumRatMessage =
+                    false;
             }
         } else {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintT_RegenInHumRatMessage = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintT_RegenInHumRatMessage = false;
         }
         // process inlet temp
-        if (T_ProcInTemp < BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MinProcAirInTemp ||
-            T_ProcInTemp > BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MaxProcAirInTemp) {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_ProcInTempLast = T_ProcInTemp;
+        if (T_ProcInTemp < state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MinProcAirInTemp ||
+            T_ProcInTemp > state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MaxProcAirInTemp) {
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_ProcInTempLast = T_ProcInTemp;
             OutputChar = format("{:.2R}", T_ProcInTemp);
-            OutputCharLo = format("{:.2R}", BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MinProcAirInTemp);
-            OutputCharHi = format("{:.2R}", BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MaxProcAirInTemp);
-            if (T_ProcInTemp < BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MinProcAirInTemp) {
-                T_ProcInTemp = BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MinProcAirInTemp;
+            OutputCharLo = format(
+                "{:.2R}", state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MinProcAirInTemp);
+            OutputCharHi = format(
+                "{:.2R}", state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MaxProcAirInTemp);
+            if (T_ProcInTemp <
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MinProcAirInTemp) {
+                T_ProcInTemp =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MinProcAirInTemp;
             }
-            if (T_ProcInTemp > BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MaxProcAirInTemp) {
-                T_ProcInTemp = BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MaxProcAirInTemp;
+            if (T_ProcInTemp >
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MaxProcAirInTemp) {
+                T_ProcInTemp =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MaxProcAirInTemp;
             }
             if (!state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintT_ProcInTempMessage = true;
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintT_ProcInTempMessage = true;
                 //       Suppress warning message when process inlet temperature = 0 (DX coil is off)
-                if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_ProcInTempLast == 0.0)
-                    BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintT_ProcInTempMessage = false;
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_ProcInTempBuffer1 =
-                    BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
-                    BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
+                if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_ProcInTempLast == 0.0)
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintT_ProcInTempMessage =
+                        false;
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_ProcInTempBuffer1 =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
                     "\" - Process inlet air temperature used in regen outlet air temperature equation is outside model boundaries at " + OutputChar +
                     '.';
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_ProcInTempBuffer2 = "...Valid range = " + OutputCharLo + " to " +
-                                                                                           OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName +
-                                                                                           ',' + state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state);
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_ProcInTempBuffer2 =
+                    "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ',' +
+                    state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state);
                 CharValue = format("{:.6R}", T_ProcInTemp);
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_ProcInTempBuffer3 =
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_ProcInTempBuffer3 =
                     "...Regeneration outlet air temperature equation: process inlet air temperature passed to the model = " + CharValue;
             } else {
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintT_ProcInTempMessage = false;
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintT_ProcInTempMessage = false;
             }
         } else {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintT_ProcInTempMessage = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintT_ProcInTempMessage = false;
         }
         // process inlet humidity ratio
-        if (T_ProcInHumRat < BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MinProcAirInHumRat ||
-            T_ProcInHumRat > BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MaxProcAirInHumRat) {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_ProcInHumRatLast = T_ProcInHumRat;
+        if (T_ProcInHumRat <
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MinProcAirInHumRat ||
+            T_ProcInHumRat >
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MaxProcAirInHumRat) {
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_ProcInHumRatLast = T_ProcInHumRat;
             OutputChar = format("{:.6R}", T_ProcInHumRat);
-            OutputCharLo = format("{:.6R}", BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MinProcAirInHumRat);
-            OutputCharHi = format("{:.6R}", BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MaxProcAirInHumRat);
-            if (T_ProcInHumRat < BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MinProcAirInHumRat) {
-                T_ProcInHumRat = BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MinProcAirInHumRat;
+            OutputCharLo = format(
+                "{:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MinProcAirInHumRat);
+            OutputCharHi = format(
+                "{:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MaxProcAirInHumRat);
+            if (T_ProcInHumRat <
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MinProcAirInHumRat) {
+                T_ProcInHumRat =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MinProcAirInHumRat;
             }
-            if (T_ProcInHumRat > BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MaxProcAirInHumRat) {
-                T_ProcInHumRat = BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MaxProcAirInHumRat;
+            if (T_ProcInHumRat >
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MaxProcAirInHumRat) {
+                T_ProcInHumRat =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MaxProcAirInHumRat;
             }
             if (!state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintT_ProcInHumRatMessage = true;
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintT_ProcInHumRatMessage =
+                    true;
                 //       Suppress warning message when process inlet humrat = 0 (DX coil is off)
-                if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_ProcInHumRatLast == 0.0)
-                    BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintT_ProcInHumRatMessage = false;
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_ProcInHumRatBuffer1 =
-                    BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
-                    BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
+                if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_ProcInHumRatLast == 0.0)
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintT_ProcInHumRatMessage =
+                        false;
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_ProcInHumRatBuffer1 =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
                     "\" - Process inlet air humidity ratio used in regen outlet air temperature equation is outside model boundaries at " +
                     OutputChar + '.';
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_ProcInHumRatBuffer2 = "...Valid range = " + OutputCharLo + " to " +
-                                                                                             OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName +
-                                                                                             ", " + state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state);
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_ProcInHumRatBuffer2 =
+                    "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " +
+                    state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state);
                 CharValue = format("{:.6R}", T_ProcInHumRat);
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_ProcInHumRatBuffer3 =
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_ProcInHumRatBuffer3 =
                     "...Regeneration outlet air temperature equation: process inlet air humidity ratio passed to the model = " + CharValue;
             } else {
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintT_ProcInHumRatMessage = false;
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintT_ProcInHumRatMessage =
+                    false;
             }
         } else {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintT_ProcInHumRatMessage = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintT_ProcInHumRatMessage = false;
         }
         // regeneration and process face velocity
-        if (T_FaceVel < BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MinFaceVel ||
-            T_FaceVel > BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MaxFaceVel) {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_FaceVelLast = T_FaceVel;
+        if (T_FaceVel < state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MinFaceVel ||
+            T_FaceVel > state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MaxFaceVel) {
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_FaceVelLast = T_FaceVel;
             OutputChar = format("{:.6R}", T_FaceVel);
-            OutputCharLo = format("{:.6R}", BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MinFaceVel);
-            OutputCharHi = format("{:.6R}", BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MaxFaceVel);
-            if (T_FaceVel < BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MinFaceVel) {
-                T_FaceVel = BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MinFaceVel;
+            OutputCharLo =
+                format("{:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MinFaceVel);
+            OutputCharHi =
+                format("{:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MaxFaceVel);
+            if (T_FaceVel < state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MinFaceVel) {
+                T_FaceVel = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MinFaceVel;
             }
-            if (T_FaceVel > BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MaxFaceVel) {
-                T_FaceVel = BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MaxFaceVel;
+            if (T_FaceVel > state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MaxFaceVel) {
+                T_FaceVel = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MaxFaceVel;
             }
             if (!state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintT_FaceVelMessage = true;
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_FaceVelBuffer1 =
-                    BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
-                    BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintT_FaceVelMessage = true;
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_FaceVelBuffer1 =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
                     "\" - Process and regen inlet air face velocity used in regen outlet air temperature equation is outside model boundaries at " +
                     OutputChar + '.';
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_FaceVelBuffer2 = "...Valid range = " + OutputCharLo + " to " + OutputCharHi +
-                                                                                        ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy +
-                                                                                        ' ' + CreateSysTimeIntervalString(state);
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_FaceVelBuffer2 =
+                    "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " +
+                    state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state);
                 CharValue = format("{:.6R}", T_FaceVel);
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_FaceVelBuffer3 =
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_FaceVelBuffer3 =
                     "...Regeneration outlet air temperature equation: process and regen face velocity passed to the model = " + CharValue;
             } else {
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintT_FaceVelMessage = false;
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintT_FaceVelMessage = false;
             }
         } else {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintT_FaceVelMessage = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintT_FaceVelMessage = false;
         }
     }
 
@@ -4021,8 +4474,8 @@ namespace HeatRecovery {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
         // Locals
@@ -4039,13 +4492,14 @@ namespace HeatRecovery {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static std::string OutputChar;         // character string for warning messages
-        static std::string OutputCharLo;       // character string for warning messages
-        static std::string OutputCharHi;       // character string for warning messages
-        static std::string CharValue;          // character string for warning messages
-        static Real64 TimeStepSysLast(0.0);    // last system time step (used to check for downshifting)
-        static Real64 CurrentEndTime(0.0);     // end time of time step for current simulation time step
-        static Real64 CurrentEndTimeLast(0.0); // end time of time step for last simulation time step
+        auto &OutputChar = state.dataHeatRecovery->OutputChar2;
+        auto &OutputCharLo = state.dataHeatRecovery->OutputCharLo2;
+        auto &OutputCharHi = state.dataHeatRecovery->OutputCharHi2;
+        auto &CharValue = state.dataHeatRecovery->CharValue2;
+        auto &TimeStepSysLast = state.dataHeatRecovery->TimeStepSysLast2;
+        auto &CurrentEndTime = state.dataHeatRecovery->CurrentEndTime2;
+        auto &CurrentEndTimeLast = state.dataHeatRecovery->CurrentEndTimeLast2;
+
         // current end time is compared with last to see if time step changed
 
         //   calculate end time of current time step
@@ -4059,98 +4513,142 @@ namespace HeatRecovery {
 
             // print error for variables of regeneration outlet humidity ratio equation
             // Regen inlet temp for humidity ratio eqn
-            if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintH_RegenInTempMessage) {
-                ++BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_RegenInTempErrorCount;
-                if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_RegenInTempErrorCount < 2) {
-                    ShowWarningError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_RegenInTempBuffer1);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_RegenInTempBuffer2);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_RegenInTempBuffer3);
-                    ShowContinueError(state, "...Using regeneration inlet air temperatures that are outside the regeneration inlet air temperature equation "
+            if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintH_RegenInTempMessage) {
+                ++state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_RegenInTempErrorCount;
+                if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_RegenInTempErrorCount <
+                    2) {
+                    ShowWarningError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_RegenInTempBuffer1);
+                    ShowContinueError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_RegenInTempBuffer2);
+                    ShowContinueError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_RegenInTempBuffer3);
+                    ShowContinueError(state,
+                                      "...Using regeneration inlet air temperatures that are outside the regeneration inlet air temperature equation "
                                       "model boundaries may adversely affect desiccant model performance.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
-                                                       BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
-                                                       "\" - Regeneration inlet air temperature used in regen outlet air humidity ratio equation is "
-                                                       "out of range error continues...",
-                                                   BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_RegenInTempErrIndex,
-                                                   BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_RegenInTempLast,
-                                                   BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_RegenInTempLast);
+                    ShowRecurringWarningErrorAtEnd(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
+                            "\" - Regeneration inlet air temperature used in regen outlet air humidity ratio equation is "
+                            "out of range error continues...",
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_RegenInTempErrIndex,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_RegenInTempLast,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_RegenInTempLast);
                 }
             }
             // Regen inlet humidity ratio for humidity ratio eqn
-            if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintH_RegenInHumRatMessage) {
-                ++BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_RegenInHumRatErrorCount;
-                if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_RegenInHumRatErrorCount < 2) {
-                    ShowWarningError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_RegenInHumRatBuffer1);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_RegenInHumRatBuffer2);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_RegenInHumRatBuffer3);
-                    ShowContinueError(state, "...Using regeneration inlet air humidity ratios that are outside the regeneration outlet air humidity ratio "
+            if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintH_RegenInHumRatMessage) {
+                ++state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_RegenInHumRatErrorCount;
+                if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_RegenInHumRatErrorCount <
+                    2) {
+                    ShowWarningError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_RegenInHumRatBuffer1);
+                    ShowContinueError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_RegenInHumRatBuffer2);
+                    ShowContinueError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_RegenInHumRatBuffer3);
+                    ShowContinueError(state,
+                                      "...Using regeneration inlet air humidity ratios that are outside the regeneration outlet air humidity ratio "
                                       "equation model boundaries may adversely affect desiccant model performance.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
-                                                       BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
-                                                       "\" - Regeneration inlet air humidity ratio used in regen outlet air humidity ratio equation "
-                                                       "is out of range error continues...",
-                                                   BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_RegenInHumRatErrIndex,
-                                                   BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_RegenInHumRatLast,
-                                                   BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_RegenInHumRatLast);
+                    ShowRecurringWarningErrorAtEnd(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
+                            "\" - Regeneration inlet air humidity ratio used in regen outlet air humidity ratio equation "
+                            "is out of range error continues...",
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_RegenInHumRatErrIndex,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_RegenInHumRatLast,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_RegenInHumRatLast);
                 }
             }
             // Process inlet temp for humidity ratio eqn
-            if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintH_ProcInTempMessage) {
-                ++BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_ProcInTempErrorCount;
-                if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_ProcInTempErrorCount < 2) {
-                    ShowWarningError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_ProcInTempBuffer1);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_ProcInTempBuffer2);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_ProcInTempBuffer3);
-                    ShowContinueError(state, "...Using process inlet air temperatures that are outside the regeneration outlet air humidity ratio equation "
+            if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintH_ProcInTempMessage) {
+                ++state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_ProcInTempErrorCount;
+                if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_ProcInTempErrorCount < 2) {
+                    ShowWarningError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_ProcInTempBuffer1);
+                    ShowContinueError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_ProcInTempBuffer2);
+                    ShowContinueError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_ProcInTempBuffer3);
+                    ShowContinueError(state,
+                                      "...Using process inlet air temperatures that are outside the regeneration outlet air humidity ratio equation "
                                       "model may adversely affect desiccant model performance.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(state,
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
-                            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
+                    ShowRecurringWarningErrorAtEnd(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
                             "\" - Process inlet air temperature used in regen outlet air humidity ratio equation is out of range error continues...",
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_ProcInTempErrIndex,
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_ProcInTempLast,
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_ProcInTempLast);
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_ProcInTempErrIndex,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_ProcInTempLast,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_ProcInTempLast);
                 }
             }
             // Process inlet humidity ratio for humidity ratio eqn
-            if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintH_ProcInHumRatMessage) {
-                ++BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_ProcInHumRatErrorCount;
-                if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_ProcInHumRatErrorCount < 2) {
-                    ShowWarningError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_ProcInHumRatBuffer1);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_ProcInHumRatBuffer2);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_ProcInHumRatBuffer3);
-                    ShowContinueError(state, "...Using process inlet air humidity ratios that are outside the regeneration outlet humidity ratio equation "
+            if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintH_ProcInHumRatMessage) {
+                ++state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_ProcInHumRatErrorCount;
+                if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_ProcInHumRatErrorCount <
+                    2) {
+                    ShowWarningError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_ProcInHumRatBuffer1);
+                    ShowContinueError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_ProcInHumRatBuffer2);
+                    ShowContinueError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_ProcInHumRatBuffer3);
+                    ShowContinueError(state,
+                                      "...Using process inlet air humidity ratios that are outside the regeneration outlet humidity ratio equation "
                                       "model boundaries may adversely affect desiccant model performance.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
-                                                       BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
-                                                       "\" - Process inlet air humidity ratio used in regen outlet air humidity ratio equation is "
-                                                       "out of range error continues...",
-                                                   BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_ProcInHumRatErrIndex,
-                                                   BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_ProcInHumRatLast,
-                                                   BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_ProcInHumRatLast);
+                    ShowRecurringWarningErrorAtEnd(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
+                            "\" - Process inlet air humidity ratio used in regen outlet air humidity ratio equation is "
+                            "out of range error continues...",
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_ProcInHumRatErrIndex,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_ProcInHumRatLast,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_ProcInHumRatLast);
                 }
             }
             // Process and regeneration face velocity for humidity ratio eqn
-            if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintH_FaceVelMessage) {
-                ++BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_FaceVelErrorCount;
-                if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_FaceVelErrorCount < 2) {
-                    ShowWarningError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_FaceVelBuffer1);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_FaceVelBuffer2);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_FaceVelBuffer3);
-                    ShowContinueError(state, "...Using process and regeneration face velocities that are outside the regeneration outlet air humidity ratio "
+            if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintH_FaceVelMessage) {
+                ++state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_FaceVelErrorCount;
+                if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_FaceVelErrorCount < 2) {
+                    ShowWarningError(
+                        state, state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_FaceVelBuffer1);
+                    ShowContinueError(
+                        state, state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_FaceVelBuffer2);
+                    ShowContinueError(
+                        state, state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_FaceVelBuffer3);
+                    ShowContinueError(state,
+                                      "...Using process and regeneration face velocities that are outside the regeneration outlet air humidity ratio "
                                       "equation model boundaries may adversely affect desiccant model performance.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
-                                                       BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
-                                                       "\" - Process and regen face velocity used in regen outlet air humidity ratio equation is out "
-                                                       "of range error continues...",
-                                                   BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_FaceVelocityErrIndex,
-                                                   BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_FaceVelLast,
-                                                   BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_FaceVelLast);
+                    ShowRecurringWarningErrorAtEnd(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
+                            "\" - Process and regen face velocity used in regen outlet air humidity ratio equation is out "
+                            "of range error continues...",
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_FaceVelocityErrIndex,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_FaceVelLast,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_FaceVelLast);
                 }
             }
         } // IF(CurrentEndTime .GT. CurrentEndTimeLast .AND. TimeStepSys .GE. TimeStepSysLast)THEN
@@ -4161,182 +4659,222 @@ namespace HeatRecovery {
 
         //   If regen and procees inlet temperatures are the same the coil is off, do not print out of bounds warning for this case
         if (std::abs(H_RegenInTemp - H_ProcInTemp) < SMALL) {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintH_RegenInTempMessage = false;
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintH_RegenInHumRatMessage = false;
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintH_ProcInTempMessage = false;
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintH_ProcInHumRatMessage = false;
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintH_FaceVelMessage = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintH_RegenInTempMessage = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintH_RegenInHumRatMessage = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintH_ProcInTempMessage = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintH_ProcInHumRatMessage = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintH_FaceVelMessage = false;
             return;
         }
 
         //   check boundaries of independent variables and post warnings to individual buffers to print at end of time step
         // checking model bounds for variables of regeneration outlet humidity ratio equation
         // Regen inlet temp
-        if (H_RegenInTemp < BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MinRegenAirInTemp ||
-            H_RegenInTemp > BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MaxRegenAirInTemp) {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_RegenInTempLast = H_RegenInTemp;
+        if (H_RegenInTemp <
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MinRegenAirInTemp ||
+            H_RegenInTemp >
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MaxRegenAirInTemp) {
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_RegenInTempLast = H_RegenInTemp;
             OutputChar = format("{:.2R}", H_RegenInTemp);
-            OutputCharLo = format("{:.2R}", BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MinRegenAirInTemp);
-            OutputCharHi = format("{:.2R}", BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MaxRegenAirInTemp);
-            if (H_RegenInTemp < BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MinRegenAirInTemp) {
-                H_RegenInTemp = BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MinRegenAirInTemp;
+            OutputCharLo = format(
+                "{:.2R}", state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MinRegenAirInTemp);
+            OutputCharHi = format(
+                "{:.2R}", state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MaxRegenAirInTemp);
+            if (H_RegenInTemp <
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MinRegenAirInTemp) {
+                H_RegenInTemp =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MinRegenAirInTemp;
             }
-            if (H_RegenInTemp > BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MaxRegenAirInTemp) {
-                H_RegenInTemp = BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MaxRegenAirInTemp;
+            if (H_RegenInTemp >
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MaxRegenAirInTemp) {
+                H_RegenInTemp =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MaxRegenAirInTemp;
             }
             if (!state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintH_RegenInTempMessage = true;
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_RegenInTempBuffer1 =
-                    BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
-                    BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintH_RegenInTempMessage = true;
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_RegenInTempBuffer1 =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
                     "\" - Regeneration inlet air temperature used in regen outlet air humidity ratio equation is outside model boundaries at " +
                     OutputChar + '.';
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_RegenInTempBuffer2 = "...Valid range = " + OutputCharLo + " to " +
-                                                                                            OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName +
-                                                                                            ", " + state.dataEnvrn->CurMnDy + " , " + CreateSysTimeIntervalString(state);
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_RegenInTempBuffer2 =
+                    "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " +
+                    state.dataEnvrn->CurMnDy + " , " + CreateSysTimeIntervalString(state);
                 CharValue = format("{:.2R}", H_RegenInTemp);
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_RegenInTempBuffer3 =
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_RegenInTempBuffer3 =
                     "...Regeneration outlet air humidity ratio equation: regeneration inlet air temperature passed to the model = " + CharValue;
             } else {
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintH_RegenInTempMessage = false;
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintH_RegenInTempMessage =
+                    false;
             }
         } else {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintH_RegenInTempMessage = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintH_RegenInTempMessage = false;
         }
         // regen inlet humidity ratio
-        if (H_RegenInHumRat < BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MinRegenAirInHumRat ||
-            H_RegenInHumRat > BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MaxRegenAirInHumRat) {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_RegenInHumRatLast = H_RegenInHumRat;
+        if (H_RegenInHumRat <
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MinRegenAirInHumRat ||
+            H_RegenInHumRat >
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MaxRegenAirInHumRat) {
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_RegenInHumRatLast =
+                H_RegenInHumRat;
             OutputChar = format("{:.6R}", H_RegenInHumRat);
-            OutputCharLo = format("{:.6R}", BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MinRegenAirInHumRat);
-            OutputCharHi = format("{:.6R}", BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MaxRegenAirInHumRat);
-            if (H_RegenInHumRat < BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MinRegenAirInHumRat) {
-                H_RegenInHumRat = BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MinRegenAirInHumRat;
+            OutputCharLo = format(
+                "{:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MinRegenAirInHumRat);
+            OutputCharHi = format(
+                "{:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MaxRegenAirInHumRat);
+            if (H_RegenInHumRat <
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MinRegenAirInHumRat) {
+                H_RegenInHumRat =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MinRegenAirInHumRat;
             }
-            if (H_RegenInHumRat > BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MaxRegenAirInHumRat) {
-                H_RegenInHumRat = BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MaxRegenAirInHumRat;
+            if (H_RegenInHumRat >
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MaxRegenAirInHumRat) {
+                H_RegenInHumRat =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MaxRegenAirInHumRat;
             }
             if (!state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintH_RegenInHumRatMessage = true;
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_RegenInHumRatBuffer1 =
-                    BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
-                    BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintH_RegenInHumRatMessage =
+                    true;
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_RegenInHumRatBuffer1 =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
                     "\" - Regeneration inlet air humidity ratio used in regen outlet air humidity ratio equation is outside model boundaries at " +
                     OutputChar + '.';
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_RegenInHumRatBuffer2 =
-                    "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + ' ' +
-                    CreateSysTimeIntervalString(state);
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_RegenInHumRatBuffer2 =
+                    "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " +
+                    state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state);
                 CharValue = format("{:.6R}", H_RegenInHumRat);
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_RegenInHumRatBuffer3 =
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_RegenInHumRatBuffer3 =
                     "...Regeneration outlet air humidity ratio equation: regeneration inlet air humidity ratio passed to the model = " + CharValue;
             } else {
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintH_RegenInHumRatMessage = false;
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintH_RegenInHumRatMessage =
+                    false;
             }
         } else {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintH_RegenInHumRatMessage = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintH_RegenInHumRatMessage = false;
         }
         // process inlet temp
-        if (H_ProcInTemp < BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MinProcAirInTemp ||
-            H_ProcInTemp > BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MaxProcAirInTemp) {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_ProcInTempLast = H_ProcInTemp;
+        if (H_ProcInTemp < state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MinProcAirInTemp ||
+            H_ProcInTemp > state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MaxProcAirInTemp) {
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_ProcInTempLast = H_ProcInTemp;
             OutputChar = format("{:.2R}", H_ProcInTemp);
-            OutputCharLo = format("{:.2R}", BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MinProcAirInTemp);
-            OutputCharHi = format("{:.2R}", BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MaxProcAirInTemp);
-            if (H_ProcInTemp < BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MinProcAirInTemp) {
-                H_ProcInTemp = BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MinProcAirInTemp;
+            OutputCharLo = format(
+                "{:.2R}", state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MinProcAirInTemp);
+            OutputCharHi = format(
+                "{:.2R}", state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MaxProcAirInTemp);
+            if (H_ProcInTemp <
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MinProcAirInTemp) {
+                H_ProcInTemp =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MinProcAirInTemp;
             }
-            if (H_ProcInTemp > BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MaxProcAirInTemp) {
-                H_ProcInTemp = BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MaxProcAirInTemp;
+            if (H_ProcInTemp >
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MaxProcAirInTemp) {
+                H_ProcInTemp =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MaxProcAirInTemp;
             }
             if (!state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintH_ProcInTempMessage = true;
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintH_ProcInTempMessage = true;
                 //       Suppress warning message when process inlet temperature = 0 (DX coil is off)
-                if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_ProcInTempLast == 0.0)
-                    BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintH_ProcInTempMessage = false;
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_ProcInTempBuffer1 =
-                    BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
-                    BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
+                if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_ProcInTempLast == 0.0)
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintH_ProcInTempMessage =
+                        false;
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_ProcInTempBuffer1 =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
                     "\" - Process inlet air temperature used in regen outlet air humidity ratio equation is outside model boundaries at " +
                     OutputChar + '.';
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_ProcInTempBuffer2 = "...Valid range = " + OutputCharLo + " to " +
-                                                                                           OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName +
-                                                                                           ", " + state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state);
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_ProcInTempBuffer2 =
+                    "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " +
+                    state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state);
                 CharValue = format("{:.6R}", H_ProcInTemp);
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_ProcInTempBuffer3 =
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_ProcInTempBuffer3 =
                     "...Regeneration outlet air humidity ratio equation: process inlet air temperature passed to the model = " + CharValue;
             } else {
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintH_ProcInTempMessage = false;
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintH_ProcInTempMessage = false;
             }
         } else {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintH_ProcInTempMessage = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintH_ProcInTempMessage = false;
         }
         // process inlet humidity ratio
-        if (H_ProcInHumRat < BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MinProcAirInHumRat ||
-            H_ProcInHumRat > BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MaxProcAirInHumRat) {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_ProcInHumRatLast = H_ProcInHumRat;
+        if (H_ProcInHumRat <
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MinProcAirInHumRat ||
+            H_ProcInHumRat >
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MaxProcAirInHumRat) {
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_ProcInHumRatLast = H_ProcInHumRat;
             OutputChar = format("{:.6R}", H_ProcInHumRat);
-            OutputCharLo = format("{:.6R}", BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MinProcAirInHumRat);
-            OutputCharHi = format("{:.6R}", BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MaxProcAirInHumRat);
-            if (H_ProcInHumRat < BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MinProcAirInHumRat) {
-                H_ProcInHumRat = BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MinProcAirInHumRat;
+            OutputCharLo = format(
+                "{:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MinProcAirInHumRat);
+            OutputCharHi = format(
+                "{:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MaxProcAirInHumRat);
+            if (H_ProcInHumRat <
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MinProcAirInHumRat) {
+                H_ProcInHumRat =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MinProcAirInHumRat;
             }
-            if (H_ProcInHumRat > BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MaxProcAirInHumRat) {
-                H_ProcInHumRat = BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MaxProcAirInHumRat;
+            if (H_ProcInHumRat >
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MaxProcAirInHumRat) {
+                H_ProcInHumRat =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MaxProcAirInHumRat;
             }
             if (!state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintH_ProcInHumRatMessage = true;
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintH_ProcInHumRatMessage =
+                    true;
                 //       Suppress warning message when process inlet humrat = 0 (DX coil is off)
-                if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_ProcInHumRatLast == 0.0)
-                    BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintH_ProcInHumRatMessage = false;
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_ProcInHumRatBuffer1 =
-                    BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
-                    BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
+                if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_ProcInHumRatLast == 0.0)
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintH_ProcInHumRatMessage =
+                        false;
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_ProcInHumRatBuffer1 =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
                     "\" - Process inlet air humidity ratio used in regen outlet air humidity ratio equation is outside model boundaries at " +
                     OutputChar + '.';
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_ProcInHumRatBuffer2 = "...Valid range = " + OutputCharLo + " to " +
-                                                                                             OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName +
-                                                                                             ", " + state.dataEnvrn->CurMnDy + ", " + CreateSysTimeIntervalString(state);
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_ProcInHumRatBuffer2 =
+                    "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " +
+                    state.dataEnvrn->CurMnDy + ", " + CreateSysTimeIntervalString(state);
                 CharValue = format("{:.6R}", H_ProcInHumRat);
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_ProcInHumRatBuffer3 =
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_ProcInHumRatBuffer3 =
                     "...Regeneration outlet air humidity ratio equation: process inlet air humidity ratio passed to the model = " + CharValue;
             } else {
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintH_ProcInHumRatMessage = false;
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintH_ProcInHumRatMessage =
+                    false;
             }
         } else {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintH_ProcInHumRatMessage = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintH_ProcInHumRatMessage = false;
         }
         // regeneration and process face velocity
-        if (H_FaceVel < BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MinFaceVel ||
-            H_FaceVel > BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MaxFaceVel) {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_FaceVelLast = H_FaceVel;
+        if (H_FaceVel < state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MinFaceVel ||
+            H_FaceVel > state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MaxFaceVel) {
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_FaceVelLast = H_FaceVel;
             OutputChar = format("{:.6R}", H_FaceVel);
-            OutputCharLo = format("{:.6R}", BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MinFaceVel);
-            OutputCharHi = format("{:.6R}", BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MaxFaceVel);
-            if (H_FaceVel < BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MinFaceVel) {
-                H_FaceVel = BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MinFaceVel;
+            OutputCharLo =
+                format("{:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MinFaceVel);
+            OutputCharHi =
+                format("{:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MaxFaceVel);
+            if (H_FaceVel < state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MinFaceVel) {
+                H_FaceVel = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MinFaceVel;
             }
-            if (H_FaceVel > BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MaxFaceVel) {
-                H_FaceVel = BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MaxFaceVel;
+            if (H_FaceVel > state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MaxFaceVel) {
+                H_FaceVel = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MaxFaceVel;
             }
             if (!state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintH_FaceVelMessage = true;
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_FaceVelBuffer1 =
-                    BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
-                    BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintH_FaceVelMessage = true;
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_FaceVelBuffer1 =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
                     "\" - Process and regen inlet air face velocity used in regen outlet air humidity ratio equation is outside model boundaries "
                     "at " +
                     OutputChar + '.';
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_FaceVelBuffer2 = "...Valid range = " + OutputCharLo + " to " + OutputCharHi +
-                                                                                        ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy +
-                                                                                        ", " + CreateSysTimeIntervalString(state);
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_FaceVelBuffer2 =
+                    "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " +
+                    state.dataEnvrn->CurMnDy + ", " + CreateSysTimeIntervalString(state);
                 CharValue = format("{:.6R}", H_FaceVel);
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_FaceVelBuffer3 =
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_FaceVelBuffer3 =
                     "...Regeneration outlet air humidity ratio equation: process and regeneration face velocity passed to the model = " + CharValue;
             } else {
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintH_FaceVelMessage = false;
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintH_FaceVelMessage = false;
             }
         } else {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintH_FaceVelMessage = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintH_FaceVelMessage = false;
         }
     }
 
@@ -4368,8 +4906,8 @@ namespace HeatRecovery {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
         // Locals
@@ -4385,13 +4923,13 @@ namespace HeatRecovery {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static std::string OutputChar;         // character string for warning messages
-        static std::string OutputCharLo;       // character string for warning messages
-        static std::string OutputCharHi;       // character string for warning messages
-        static std::string CharValue;          // character string for warning messages
-        static Real64 TimeStepSysLast(0.0);    // last system time step (used to check for downshifting)
-        static Real64 CurrentEndTime(0.0);     // end time of time step for current simulation time step
-        static Real64 CurrentEndTimeLast(0.0); // end time of time step for last simulation time step
+        auto &OutputChar = state.dataHeatRecovery->OutputChar3;
+        auto &OutputCharLo = state.dataHeatRecovery->OutputCharLo3;
+        auto &OutputCharHi = state.dataHeatRecovery->OutputCharHi3;
+        auto &CharValue = state.dataHeatRecovery->CharValue3;
+        auto &TimeStepSysLast = state.dataHeatRecovery->TimeStepSysLast3;
+        auto &CurrentEndTime = state.dataHeatRecovery->CurrentEndTime3;
+        auto &CurrentEndTimeLast = state.dataHeatRecovery->CurrentEndTimeLast3;
         // current end time is compared with last to see if time step changed
 
         //   calculate end time of current time step
@@ -4404,41 +4942,57 @@ namespace HeatRecovery {
         if (CurrentEndTime > CurrentEndTimeLast && TimeStepSys >= TimeStepSysLast) {
 
             // print error when regeneration outlet temperature is greater than regen inlet temperature
-            if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintRegenOutTempFailedMessage) {
-                ++BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutTempFailedErrorCount;
-                if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutTempFailedErrorCount < 2) {
-                    ShowWarningError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutTempFailedBuffer1);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutTempFailedBuffer2);
-                    ShowContinueError(state, "...Regeneration outlet air temperature should always be less than or equal to regen inlet air temperature. "
+            if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintRegenOutTempFailedMessage) {
+                ++state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutTempFailedErrorCount;
+                if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex)
+                        .RegenOutTempFailedErrorCount < 2) {
+                    ShowWarningError(state,
+                                     state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex)
+                                         .RegenOutTempFailedBuffer1);
+                    ShowContinueError(state,
+                                      state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex)
+                                          .RegenOutTempFailedBuffer2);
+                    ShowContinueError(state,
+                                      "...Regeneration outlet air temperature should always be less than or equal to regen inlet air temperature. "
                                       "Verify correct model coefficients.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(state,
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
-                            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
+                    ShowRecurringWarningErrorAtEnd(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
                             "\" - Regeneration outlet air temperature above regen inlet air temperature error continues...",
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutTempFailedErrIndex,
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutTempFailedLast,
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutTempFailedLast);
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex)
+                            .RegenOutTempFailedErrIndex,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutTempFailedLast,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutTempFailedLast);
                 }
             }
 
             // print error for variables of regeneration outlet temperature
-            if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintRegenOutTempMessage) {
-                ++BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutTempErrorCount;
-                if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutTempErrorCount < 2) {
-                    ShowWarningError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutTempBuffer1);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutTempBuffer2);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutTempBuffer3);
-                    ShowContinueError(state, "...Regeneration outlet air temperature should always be less than or equal to regen inlet air temperature. "
+            if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintRegenOutTempMessage) {
+                ++state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutTempErrorCount;
+                if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutTempErrorCount < 2) {
+                    ShowWarningError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutTempBuffer1);
+                    ShowContinueError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutTempBuffer2);
+                    ShowContinueError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutTempBuffer3);
+                    ShowContinueError(state,
+                                      "...Regeneration outlet air temperature should always be less than or equal to regen inlet air temperature. "
                                       "Verify correct model coefficients.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(state,
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
-                            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
+                    ShowRecurringWarningErrorAtEnd(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
                             "\" - Regeneration outlet air temperature should be less than regen inlet air temperature error continues...",
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutTempErrIndex,
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutTempLast,
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutTempLast);
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutTempErrIndex,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutTempLast,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutTempLast);
                 }
             }
         } // IF(CurrentEndTime .GT. CurrentEndTimeLast .AND. TimeStepSys .GE. TimeStepSysLast)THEN
@@ -4449,62 +5003,70 @@ namespace HeatRecovery {
 
         // checking model regeneration outlet temperature to always be less than or equal to regeneration inlet temperature
         if (RegenOutTemp > RegenInTemp) {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutTempFailedLast = RegenOutTemp;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutTempFailedLast =
+                RegenOutTemp;
             OutputChar = format("{:.2R}", RegenOutTemp);
             OutputCharHi = format("{:.2R}", RegenInTemp);
             //      IF(RegenOutTemp .GT. RegenInTemp)THEN
             //        RegenOutTemp = RegenInTemp
             //      END IF
             if (!state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintRegenOutTempFailedMessage = true;
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutTempFailedBuffer1 =
-                    BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
-                    BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintRegenOutTempFailedMessage =
+                    true;
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutTempFailedBuffer1 =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
                     "\" - Regeneration outlet air temperature is greater than inlet temperature at " + OutputChar + '.';
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutTempFailedBuffer2 = "...Regen inlet air temperature = " + OutputCharHi +
-                                                                                                 ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " +
-                                                                                                 state.dataEnvrn->CurMnDy + ", " + CreateSysTimeIntervalString(state);
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutTempFailedBuffer2 =
+                    "...Regen inlet air temperature = " + OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " +
+                    state.dataEnvrn->CurMnDy + ", " + CreateSysTimeIntervalString(state);
                 CharValue = format("{:.6R}", RegenOutTemp);
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutTempFailedBuffer3 =
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutTempFailedBuffer3 =
                     "...Regen outlet air temperature equation: regeneration outlet air temperature allowed from the model = " + CharValue;
             } else {
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintRegenOutTempMessage = false;
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintRegenOutTempMessage = false;
             }
         } else {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintRegenOutTempMessage = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintRegenOutTempMessage = false;
         }
 
         //   check boundaries of regen outlet temperature and post warnings to individual buffers to print at end of time step
         // checking model bounds for regeneration outlet temperature
-        if (RegenOutTemp < BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).MinRegenAirOutTemp ||
-            RegenOutTemp > BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).MaxRegenAirOutTemp) {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutTempLast = RegenOutTemp;
+        if (RegenOutTemp < state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).MinRegenAirOutTemp ||
+            RegenOutTemp > state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).MaxRegenAirOutTemp) {
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutTempLast = RegenOutTemp;
             OutputChar = format("{:.2R}", RegenOutTemp);
-            OutputCharLo = format("{:.2R}", BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).MinRegenAirOutTemp);
-            OutputCharHi = format("{:.2R}", BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).MaxRegenAirOutTemp);
-            if (RegenOutTemp < BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).MinRegenAirOutTemp) {
-                RegenOutTemp = BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).MinRegenAirOutTemp;
+            OutputCharLo = format(
+                "{:.2R}", state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).MinRegenAirOutTemp);
+            OutputCharHi = format(
+                "{:.2R}", state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).MaxRegenAirOutTemp);
+            if (RegenOutTemp <
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).MinRegenAirOutTemp) {
+                RegenOutTemp =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).MinRegenAirOutTemp;
             }
-            if (RegenOutTemp > BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).MaxRegenAirOutTemp) {
-                RegenOutTemp = BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).MaxRegenAirOutTemp;
+            if (RegenOutTemp >
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).MaxRegenAirOutTemp) {
+                RegenOutTemp =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).MaxRegenAirOutTemp;
             }
             if (!state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintRegenOutTempMessage = true;
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutTempBuffer1 =
-                    BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
-                    BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintRegenOutTempMessage = true;
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutTempBuffer1 =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
                     "\" - Regeneration outlet air temperature equation is outside model boundaries at " + OutputChar + '.';
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutTempBuffer2 = "...Valid range = " + OutputCharLo + " to " +
-                                                                                           OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName +
-                                                                                           ", " + state.dataEnvrn->CurMnDy + ", " + CreateSysTimeIntervalString(state);
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutTempBuffer2 =
+                    "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " +
+                    state.dataEnvrn->CurMnDy + ", " + CreateSysTimeIntervalString(state);
                 CharValue = format("{:.6R}", RegenOutTemp);
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutTempBuffer3 =
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutTempBuffer3 =
                     "...Regen outlet air temperature equation: regeneration outlet air temperature allowed from the model = " + CharValue;
             } else {
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintRegenOutTempMessage = false;
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintRegenOutTempMessage = false;
             }
         } else {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintRegenOutTempMessage = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintRegenOutTempMessage = false;
         }
     }
 
@@ -4536,8 +5098,8 @@ namespace HeatRecovery {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
         // Locals
@@ -4553,13 +5115,13 @@ namespace HeatRecovery {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static std::string OutputChar;         // character string for warning messages
-        static std::string OutputCharLo;       // character string for warning messages
-        static std::string OutputCharHi;       // character string for warning messages
-        static std::string CharValue;          // character string for warning messages
-        static Real64 TimeStepSysLast(0.0);    // last system time step (used to check for downshifting)
-        static Real64 CurrentEndTime(0.0);     // end time of time step for current simulation time step
-        static Real64 CurrentEndTimeLast(0.0); // end time of time step for last simulation time step
+        auto &OutputChar = state.dataHeatRecovery->OutputChar4;
+        auto &OutputCharLo = state.dataHeatRecovery->OutputCharLo4;
+        auto &OutputCharHi = state.dataHeatRecovery->OutputCharHi4;
+        auto &CharValue = state.dataHeatRecovery->CharValue4;
+        auto &TimeStepSysLast = state.dataHeatRecovery->TimeStepSysLast4;
+        auto &CurrentEndTime = state.dataHeatRecovery->CurrentEndTime4;
+        auto &CurrentEndTimeLast = state.dataHeatRecovery->CurrentEndTimeLast4;
         // current end time is compared with last to see if time step changed
 
         //   calculate end time of current time step
@@ -4572,40 +5134,59 @@ namespace HeatRecovery {
         if (CurrentEndTime > CurrentEndTimeLast && TimeStepSys >= TimeStepSysLast) {
 
             // print error when regeneration outlet humidity ratio is less than regeneration inlet humidity ratio
-            if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintRegenOutHumRatFailedMess) {
-                ++BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatFailedErrorCount;
-                if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatFailedErrorCount < 2) {
-                    ShowWarningError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatFailedBuffer1);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatFailedBuffer2);
-                    ShowContinueError(state, "...Regeneration outlet air humidity ratio should always be greater than or equal to regen inlet air humidity "
+            if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintRegenOutHumRatFailedMess) {
+                ++state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatFailedErrorCount;
+                if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex)
+                        .RegenOutHumRatFailedErrorCount < 2) {
+                    ShowWarningError(state,
+                                     state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex)
+                                         .RegenOutHumRatFailedBuffer1);
+                    ShowContinueError(state,
+                                      state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex)
+                                          .RegenOutHumRatFailedBuffer2);
+                    ShowContinueError(state,
+                                      "...Regeneration outlet air humidity ratio should always be greater than or equal to regen inlet air humidity "
                                       "ratio. Verify correct model coefficients.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(state,
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
-                            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
+                    ShowRecurringWarningErrorAtEnd(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
                             "\" - Regeneration outlet air humidity ratio should be greater than regen inlet air humidity ratio error continues...",
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatFailedErrIndex,
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatFailedLast,
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatFailedLast);
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex)
+                            .RegenOutHumRatFailedErrIndex,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatFailedLast,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex)
+                            .RegenOutHumRatFailedLast);
                 }
             }
 
             // print error for regeneration outlet humidity ratio
-            if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintRegenOutHumRatMessage) {
-                ++BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatErrorCount;
-                if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatErrorCount < 2) {
-                    ShowWarningError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatBuffer1);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatBuffer2);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatBuffer3);
-                    ShowContinueError(state,
+            if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintRegenOutHumRatMessage) {
+                ++state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatErrorCount;
+                if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatErrorCount <
+                    2) {
+                    ShowWarningError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatBuffer1);
+                    ShowContinueError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatBuffer2);
+                    ShowContinueError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatBuffer3);
+                    ShowContinueError(
+                        state,
                         "...Regeneration outlet air humidity ratio outside model boundaries may adversely affect desiccant model performance.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
-                                                       BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
-                                                       "\" - Regeneration outlet air humidity ratio is out of range error continues...",
-                                                   BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatErrIndex,
-                                                   BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatLast,
-                                                   BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatLast);
+                    ShowRecurringWarningErrorAtEnd(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
+                            "\" - Regeneration outlet air humidity ratio is out of range error continues...",
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatErrIndex,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatLast,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatLast);
                 }
             }
         } // IF(CurrentEndTime .GT. CurrentEndTimeLast .AND. TimeStepSys .GE. TimeStepSysLast)THEN
@@ -4616,62 +5197,76 @@ namespace HeatRecovery {
 
         // checking for regeneration outlet humidity ratio less than or equal to regeneration inlet humidity ratio
         if (RegenOutHumRat < RegenInHumRat) {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatFailedLast = RegenOutHumRat;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatFailedLast =
+                RegenOutHumRat;
             OutputChar = format("{:.6R}", RegenOutHumRat);
             OutputCharHi = format("{:.6R}", RegenInHumRat);
             //      IF(RegenOutHumRat .LT. RegenInHumRat)THEN
             //        RegenOutHumRat = RegenInHumRat
             //      END IF
             if (!state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintRegenOutHumRatFailedMess = true;
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatFailedBuffer1 =
-                    BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
-                    BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintRegenOutHumRatFailedMess =
+                    true;
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatFailedBuffer1 =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
                     "\" - Regeneration outlet air humidity ratio is less than the inlet air humidity ratio at " + OutputChar + '.';
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatFailedBuffer2 =
-                    "...Regen inlet air humidity ratio = " + OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + ", " +
-                    CreateSysTimeIntervalString(state);
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatFailedBuffer2 =
+                    "...Regen inlet air humidity ratio = " + OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " +
+                    state.dataEnvrn->CurMnDy + ", " + CreateSysTimeIntervalString(state);
                 CharValue = format("{:.6R}", RegenOutHumRat);
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatFailedBuffer3 =
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatFailedBuffer3 =
                     "...Regen outlet air humidity ratio equation: regeneration outlet air humidity ratio allowed from the model = " + CharValue;
             } else {
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintRegenOutHumRatFailedMess = false;
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintRegenOutHumRatFailedMess =
+                    false;
             }
         } else {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintRegenOutHumRatFailedMess = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintRegenOutHumRatFailedMess =
+                false;
         }
 
         //   check boundaries of regen outlet humrat and post warnings to individual buffers to print at end of time step
         // checking model bounds for regeneration outlet humidity ratio
-        if (RegenOutHumRat < BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).MinRegenAirOutHumRat ||
-            RegenOutHumRat > BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).MaxRegenAirOutHumRat) {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatLast = RegenOutHumRat;
+        if (RegenOutHumRat <
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).MinRegenAirOutHumRat ||
+            RegenOutHumRat >
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).MaxRegenAirOutHumRat) {
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatLast = RegenOutHumRat;
             OutputChar = format("{:.6R}", RegenOutHumRat);
-            OutputCharLo = format("{:.6R}", BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).MinRegenAirOutHumRat);
-            OutputCharHi = format("{:.6R}", BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).MaxRegenAirOutHumRat);
-            if (RegenOutHumRat < BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).MinRegenAirOutHumRat) {
-                RegenOutHumRat = BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).MinRegenAirOutHumRat;
+            OutputCharLo = format(
+                "{:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).MinRegenAirOutHumRat);
+            OutputCharHi = format(
+                "{:.6R}", state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).MaxRegenAirOutHumRat);
+            if (RegenOutHumRat <
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).MinRegenAirOutHumRat) {
+                RegenOutHumRat =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).MinRegenAirOutHumRat;
             }
-            if (RegenOutHumRat > BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).MaxRegenAirOutHumRat) {
-                RegenOutHumRat = BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).MaxRegenAirOutHumRat;
+            if (RegenOutHumRat >
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).MaxRegenAirOutHumRat) {
+                RegenOutHumRat =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).MaxRegenAirOutHumRat;
             }
             if (!state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintRegenOutHumRatMessage = true;
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatBuffer1 =
-                    BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
-                    BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintRegenOutHumRatMessage =
+                    true;
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatBuffer1 =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
                     "\" - Regeneration outlet air humidity ratio is outside model boundaries at " + OutputChar + '.';
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatBuffer2 = "...Valid range = " + OutputCharLo + " to " +
-                                                                                             OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName +
-                                                                                             ", " + state.dataEnvrn->CurMnDy + ", " + CreateSysTimeIntervalString(state);
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatBuffer2 =
+                    "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " +
+                    state.dataEnvrn->CurMnDy + ", " + CreateSysTimeIntervalString(state);
                 CharValue = format("{:.6R}", RegenOutHumRat);
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatBuffer3 =
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenOutHumRatBuffer3 =
                     "...Regen outlet air humidity ratio equation: regeneration outlet air humidity ratio allowed from the model = " + CharValue;
             } else {
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintRegenOutHumRatMessage = false;
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintRegenOutHumRatMessage =
+                    false;
             }
         } else {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintRegenOutHumRatMessage = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintRegenOutHumRatMessage = false;
         }
     }
 
@@ -4705,33 +5300,20 @@ namespace HeatRecovery {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
         using Psychrometrics::PsyRhFnTdbWPb;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        //  CHARACTER(len=*), PARAMETER :: OutputFormat  ='(F10.6)'
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Real64 RegenInletRH(0.0);       // Regeneration inlet air relative humidity
-        static Real64 ProcInletRH(0.0);        // Process inlet air relative humidity
-        static std::string OutputChar;         // character string for warning messages
-        static std::string OutputCharLo;       // character string for warning messages
-        static std::string OutputCharHi;       // character string for warning messages
-        static Real64 TimeStepSysLast(0.0);    // last system time step (used to check for downshifting)
-        static Real64 CurrentEndTime(0.0);     // end time of time step for current simulation time step
-        static Real64 CurrentEndTimeLast(0.0); // end time of time step for last simulation time step
+        auto &RegenInletRH = state.dataHeatRecovery->RegenInletRH2;
+        auto &ProcInletRH = state.dataHeatRecovery->ProcInletRH2;
+        auto &OutputChar = state.dataHeatRecovery->OutputChar6;
+        auto &OutputCharLo = state.dataHeatRecovery->OutputCharLo6;
+        auto &OutputCharHi = state.dataHeatRecovery->OutputCharHi6;
+        auto &TimeStepSysLast = state.dataHeatRecovery->TimeStepSysLast6;
+        auto &CurrentEndTime = state.dataHeatRecovery->CurrentEndTime6;
+        auto &CurrentEndTimeLast = state.dataHeatRecovery->CurrentEndTimeLast6;
         // current end time is compared with last to see if time step changed
 
         if (state.dataGlobal->WarmupFlag || FirstHVACIteration) return;
@@ -4746,43 +5328,64 @@ namespace HeatRecovery {
         if (CurrentEndTime > CurrentEndTimeLast && TimeStepSys >= TimeStepSysLast) {
 
             // print error when regeneration inlet relative humidity is outside model boundaries
-            if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintRegenInRelHumTempMess) {
-                ++BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenInRelHumTempErrorCount;
-                if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenInRelHumTempErrorCount < 2) {
-                    ShowWarningError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenInRelHumTempBuffer1);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenInRelHumTempBuffer2);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenInRelHumTempBuffer3);
-                    ShowContinueError(state, "...Using regeneration inlet air relative humidities that are outside the regeneration outlet temperature "
+            if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintRegenInRelHumTempMess) {
+                ++state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenInRelHumTempErrorCount;
+                if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenInRelHumTempErrorCount <
+                    2) {
+                    ShowWarningError(state,
+                                     state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex)
+                                         .RegenInRelHumTempBuffer1);
+                    ShowContinueError(state,
+                                      state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex)
+                                          .RegenInRelHumTempBuffer2);
+                    ShowContinueError(state,
+                                      state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex)
+                                          .RegenInRelHumTempBuffer3);
+                    ShowContinueError(state,
+                                      "...Using regeneration inlet air relative humidities that are outside the regeneration outlet temperature "
                                       "equation model boundaries may adversely affect desiccant model performance. Verify correct model "
                                       "coefficients.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
-                                                       BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
-                                                       "\" - Regeneration inlet air relative humidity related to regen outlet air temperature "
-                                                       "equation is outside model boundaries error continues...",
-                                                   BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenInRelHumTempErrIndex,
-                                                   BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenInRelHumTempLast,
-                                                   BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenInRelHumTempLast);
+                    ShowRecurringWarningErrorAtEnd(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
+                            "\" - Regeneration inlet air relative humidity related to regen outlet air temperature "
+                            "equation is outside model boundaries error continues...",
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex)
+                            .RegenInRelHumTempErrIndex,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenInRelHumTempLast,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenInRelHumTempLast);
                 }
             }
 
             // print error when process inlet relative humidity is outside model boundaries
-            if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintProcInRelHumTempMess) {
-                ++BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ProcInRelHumTempErrorCount;
-                if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ProcInRelHumTempErrorCount < 2) {
-                    ShowWarningError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ProcInRelHumTempBuffer1);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ProcInRelHumTempBuffer2);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ProcInRelHumTempBuffer3);
-                    ShowContinueError(state, "...Using process inlet air relative humidities that are outside the regeneration outlet temperature equation "
+            if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintProcInRelHumTempMess) {
+                ++state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).ProcInRelHumTempErrorCount;
+                if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).ProcInRelHumTempErrorCount <
+                    2) {
+                    ShowWarningError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).ProcInRelHumTempBuffer1);
+                    ShowContinueError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).ProcInRelHumTempBuffer2);
+                    ShowContinueError(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).ProcInRelHumTempBuffer3);
+                    ShowContinueError(state,
+                                      "...Using process inlet air relative humidities that are outside the regeneration outlet temperature equation "
                                       "model boundaries may adversely affect desiccant model performance. Verify correct model coefficients.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
-                                                       BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
-                                                       "\" - Process inlet air relative humidity related to regen outlet air temperature equation is "
-                                                       "outside model boundaries error continues...",
-                                                   BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ProcInRelHumTempErrIndex,
-                                                   BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ProcInRelHumTempLast,
-                                                   BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ProcInRelHumTempLast);
+                    ShowRecurringWarningErrorAtEnd(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
+                            "\" - Process inlet air relative humidity related to regen outlet air temperature equation is "
+                            "outside model boundaries error continues...",
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).ProcInRelHumTempErrIndex,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).ProcInRelHumTempLast,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).ProcInRelHumTempLast);
                 }
             }
 
@@ -4802,17 +5405,18 @@ namespace HeatRecovery {
         //               *  |
         //                  |
         //                T_Temp
-        if (T_RegenInHumRat > PsyWFnTdpPb(state, T_RegenInTemp, state.dataEnvrn->OutBaroPress) || T_ProcInHumRat > PsyWFnTdpPb(state, T_ProcInTemp, state.dataEnvrn->OutBaroPress)) {
+        if (T_RegenInHumRat > PsyWFnTdpPb(state, T_RegenInTemp, state.dataEnvrn->OutBaroPress) ||
+            T_ProcInHumRat > PsyWFnTdpPb(state, T_ProcInTemp, state.dataEnvrn->OutBaroPress)) {
             //       reset RH print flags just in case
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintRegenInRelHumTempMess = false;
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintProcInRelHumTempMess = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintRegenInRelHumTempMess = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintProcInRelHumTempMess = false;
             return;
         }
 
         //     If regen and procees inlet temperatures are the same the coil is off, do not print out of bounds warning for this case
         if (std::abs(T_RegenInTemp - T_ProcInTemp) < SMALL) {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintRegenInRelHumTempMess = false;
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintProcInRelHumTempMess = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintRegenInRelHumTempMess = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintProcInRelHumTempMess = false;
             return;
         }
 
@@ -4820,45 +5424,61 @@ namespace HeatRecovery {
         ProcInletRH = min(1.0, PsyRhFnTdbWPb(state, T_ProcInTemp, T_ProcInHumRat, state.dataEnvrn->OutBaroPress));
 
         // checking if regeneration inlet relative humidity is within model boundaries
-        if (RegenInletRH < BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MinRegenAirInRelHum ||
-            RegenInletRH > BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MaxRegenAirInRelHum) {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenInRelHumTempLast = RegenInletRH * 100.0;
+        if (RegenInletRH <
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MinRegenAirInRelHum ||
+            RegenInletRH >
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MaxRegenAirInRelHum) {
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenInRelHumTempLast =
+                RegenInletRH * 100.0;
             OutputChar = format("{:.1R}", RegenInletRH * 100.0);
-            OutputCharLo = format("{:.1R}", BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MinRegenAirInRelHum * 100.0);
-            OutputCharHi = format("{:.1R}", BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MaxRegenAirInRelHum * 100.0);
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintRegenInRelHumTempMess = true;
+            OutputCharLo = format(
+                "{:.1R}",
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MinRegenAirInRelHum * 100.0);
+            OutputCharHi = format(
+                "{:.1R}",
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MaxRegenAirInRelHum * 100.0);
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintRegenInRelHumTempMess = true;
 
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenInRelHumTempBuffer1 =
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" + BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenInRelHumTempBuffer1 =
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
                 "\" - Regeneration inlet air relative humidity related to regen outlet air temperature equation is outside model boundaries at " +
                 OutputChar + '.';
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenInRelHumTempBuffer2 =
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenInRelHumTempBuffer2 =
                 "...Model limit on regeneration inlet air relative humidity is " + OutputCharLo + " to " + OutputCharHi + '.';
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenInRelHumTempBuffer3 =
-                "...Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + ", " + CreateSysTimeIntervalString(state);
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenInRelHumTempBuffer3 =
+                "...Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + ", " +
+                CreateSysTimeIntervalString(state);
         } else {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintRegenInRelHumTempMess = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintRegenInRelHumTempMess = false;
         }
 
         // checking if process inlet relative humidity is within model boundaries
-        if (ProcInletRH < BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MinProcAirInRelHum ||
-            ProcInletRH > BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MaxProcAirInRelHum) {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ProcInRelHumTempLast = ProcInletRH * 100.0;
+        if (ProcInletRH < state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MinProcAirInRelHum ||
+            ProcInletRH > state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MaxProcAirInRelHum) {
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).ProcInRelHumTempLast =
+                ProcInletRH * 100.0;
             OutputChar = format("{:.1R}", ProcInletRH * 100.0);
-            OutputCharLo = format("{:.1R}", BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MinProcAirInRelHum * 100.0);
-            OutputCharHi = format("{:.1R}", BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MaxProcAirInRelHum * 100.0);
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintProcInRelHumTempMess = true;
+            OutputCharLo = format(
+                "{:.1R}",
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MinProcAirInRelHum * 100.0);
+            OutputCharHi = format(
+                "{:.1R}",
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).T_MaxProcAirInRelHum * 100.0);
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintProcInRelHumTempMess = true;
 
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ProcInRelHumTempBuffer1 =
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" + BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).ProcInRelHumTempBuffer1 =
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
                 "\" - Process inlet air relative humidity related to regen outlet air temperature equation is outside model boundaries at " +
                 OutputChar + '.';
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ProcInRelHumTempBuffer2 =
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).ProcInRelHumTempBuffer2 =
                 "...Model limit on process inlet air relative humidity is " + OutputCharLo + " to " + OutputCharHi + '.';
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ProcInRelHumTempBuffer3 =
-                "...Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + ", " + CreateSysTimeIntervalString(state);
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).ProcInRelHumTempBuffer3 =
+                "...Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + ", " +
+                CreateSysTimeIntervalString(state);
         } else {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintProcInRelHumTempMess = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintProcInRelHumTempMess = false;
         }
     }
 
@@ -4892,8 +5512,8 @@ namespace HeatRecovery {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
         using Psychrometrics::PsyRhFnTdbWPb;
@@ -4911,14 +5531,14 @@ namespace HeatRecovery {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Real64 RegenInletRH(0.0);       // Regeneration inlet air relative humidity
-        static Real64 ProcInletRH(0.0);        // Process inlet air relative humidity
-        static std::string OutputChar;         // character string for warning messages
-        static std::string OutputCharLo;       // character string for warning messages
-        static std::string OutputCharHi;       // character string for warning messages
-        static Real64 TimeStepSysLast(0.0);    // last system time step (used to check for downshifting)
-        static Real64 CurrentEndTime(0.0);     // end time of time step for current simulation time step
-        static Real64 CurrentEndTimeLast(0.0); // end time of time step for last simulation time step
+        auto &RegenInletRH = state.dataHeatRecovery->RegenInletRH;
+        auto &ProcInletRH = state.dataHeatRecovery->ProcInletRH;
+        auto &OutputChar = state.dataHeatRecovery->OutputChar5;
+        auto &OutputCharLo = state.dataHeatRecovery->OutputCharLo5;
+        auto &OutputCharHi = state.dataHeatRecovery->OutputCharHi5;
+        auto &TimeStepSysLast = state.dataHeatRecovery->TimeStepSysLast5;
+        auto &CurrentEndTime = state.dataHeatRecovery->CurrentEndTime5;
+        auto &CurrentEndTimeLast = state.dataHeatRecovery->CurrentEndTimeLast5;
         // current end time is compared with last to see if time step changed
 
         if (state.dataGlobal->WarmupFlag || FirstHVACIteration) return;
@@ -4933,44 +5553,66 @@ namespace HeatRecovery {
         if (CurrentEndTime > CurrentEndTimeLast && TimeStepSys >= TimeStepSysLast) {
 
             // print error when regeneration inlet relative humidity is outside model boundaries
-            if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintRegenInRelHumHumRatMess) {
-                ++BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenInRelHumHumRatErrorCount;
-                if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenInRelHumHumRatErrorCount < 2) {
-                    ShowWarningError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenInRelHumHumRatBuffer1);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenInRelHumHumRatBuffer2);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenInRelHumHumRatBuffer3);
-                    ShowContinueError(state, "...Using regeneration inlet air relative humidities that are outside the regeneration outlet humidity ratio "
+            if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintRegenInRelHumHumRatMess) {
+                ++state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenInRelHumHumRatErrorCount;
+                if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex)
+                        .RegenInRelHumHumRatErrorCount < 2) {
+                    ShowWarningError(state,
+                                     state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex)
+                                         .RegenInRelHumHumRatBuffer1);
+                    ShowContinueError(state,
+                                      state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex)
+                                          .RegenInRelHumHumRatBuffer2);
+                    ShowContinueError(state,
+                                      state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex)
+                                          .RegenInRelHumHumRatBuffer3);
+                    ShowContinueError(state,
+                                      "...Using regeneration inlet air relative humidities that are outside the regeneration outlet humidity ratio "
                                       "equation model boundaries may adversely affect desiccant model performance. Verify correct model "
                                       "coefficients.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
-                                                       BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
-                                                       "\" - Regeneration inlet air relative humidity related to regen outlet air humidity ratio "
-                                                       "equation is outside model boundaries error continues...",
-                                                   BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenInRelHumHumRatErrIndex,
-                                                   BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenInRelHumHumRatLast,
-                                                   BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenInRelHumHumRatLast);
+                    ShowRecurringWarningErrorAtEnd(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
+                            "\" - Regeneration inlet air relative humidity related to regen outlet air humidity ratio "
+                            "equation is outside model boundaries error continues...",
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex)
+                            .RegenInRelHumHumRatErrIndex,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenInRelHumHumRatLast,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenInRelHumHumRatLast);
                 }
             }
 
             // print error when process inlet relative humidity is outside model boundaries
-            if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintProcInRelHumHumRatMess) {
-                ++BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ProcInRelHumHumRatErrorCount;
-                if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ProcInRelHumHumRatErrorCount < 2) {
-                    ShowWarningError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ProcInRelHumHumRatBuffer1);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ProcInRelHumHumRatBuffer2);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ProcInRelHumHumRatBuffer3);
-                    ShowContinueError(state, "...Using process inlet air relative humidities that are outside the regeneration outlet humidity ratio "
+            if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintProcInRelHumHumRatMess) {
+                ++state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).ProcInRelHumHumRatErrorCount;
+                if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex)
+                        .ProcInRelHumHumRatErrorCount < 2) {
+                    ShowWarningError(state,
+                                     state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex)
+                                         .ProcInRelHumHumRatBuffer1);
+                    ShowContinueError(state,
+                                      state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex)
+                                          .ProcInRelHumHumRatBuffer2);
+                    ShowContinueError(state,
+                                      state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex)
+                                          .ProcInRelHumHumRatBuffer3);
+                    ShowContinueError(state,
+                                      "...Using process inlet air relative humidities that are outside the regeneration outlet humidity ratio "
                                       "equation model boundaries may adversely affect desiccant model performance. Verify correct model "
                                       "coefficients.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
-                                                       BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
-                                                       "\" - Process inlet air relative humidity related to regen outlet air humidity ratio equation "
-                                                       "is outside model boundaries error continues...",
-                                                   BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ProcInRelHumHumRatErrIndex,
-                                                   BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ProcInRelHumHumRatLast,
-                                                   BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ProcInRelHumHumRatLast);
+                    ShowRecurringWarningErrorAtEnd(
+                        state,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
+                            "\" - Process inlet air relative humidity related to regen outlet air humidity ratio equation "
+                            "is outside model boundaries error continues...",
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex)
+                            .ProcInRelHumHumRatErrIndex,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).ProcInRelHumHumRatLast,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).ProcInRelHumHumRatLast);
                 }
             }
 
@@ -4990,17 +5632,18 @@ namespace HeatRecovery {
         //               *  |
         //                  |
         //                H_Temp
-        if (H_RegenInHumRat > PsyWFnTdpPb(state, H_RegenInTemp, state.dataEnvrn->OutBaroPress) || H_ProcInHumRat > PsyWFnTdpPb(state, H_ProcInTemp, state.dataEnvrn->OutBaroPress)) {
+        if (H_RegenInHumRat > PsyWFnTdpPb(state, H_RegenInTemp, state.dataEnvrn->OutBaroPress) ||
+            H_ProcInHumRat > PsyWFnTdpPb(state, H_ProcInTemp, state.dataEnvrn->OutBaroPress)) {
             //       reset RH print flags just in case
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintRegenInRelHumHumRatMess = false;
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintProcInRelHumHumRatMess = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintRegenInRelHumHumRatMess = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintProcInRelHumHumRatMess = false;
             return;
         }
 
         //     If regen and procees inlet temperatures are the same the coil is off, do not print out of bounds warning for this case
         if (std::abs(H_RegenInTemp - H_ProcInTemp) < SMALL) {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintRegenInRelHumHumRatMess = false;
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintProcInRelHumHumRatMess = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintRegenInRelHumHumRatMess = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintProcInRelHumHumRatMess = false;
             return;
         }
 
@@ -5008,45 +5651,61 @@ namespace HeatRecovery {
         ProcInletRH = min(1.0, PsyRhFnTdbWPb(state, H_ProcInTemp, H_ProcInHumRat, state.dataEnvrn->OutBaroPress));
 
         // checking if regeneration inlet relative humidity is within model boundaries
-        if (RegenInletRH < BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MinRegenAirInRelHum ||
-            RegenInletRH > BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MaxRegenAirInRelHum) {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenInRelHumHumRatLast = RegenInletRH * 100.0;
+        if (RegenInletRH <
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MinRegenAirInRelHum ||
+            RegenInletRH >
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MaxRegenAirInRelHum) {
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenInRelHumHumRatLast =
+                RegenInletRH * 100.0;
             OutputChar = format("{:.1R}", RegenInletRH * 100.0);
-            OutputCharLo = format("{:.1R}", BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MinRegenAirInRelHum * 100.0);
-            OutputCharHi = format("{:.1R}", BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MaxRegenAirInRelHum * 100.0);
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintRegenInRelHumHumRatMess = true;
+            OutputCharLo = format(
+                "{:.1R}",
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MinRegenAirInRelHum * 100.0);
+            OutputCharHi = format(
+                "{:.1R}",
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MaxRegenAirInRelHum * 100.0);
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintRegenInRelHumHumRatMess = true;
 
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenInRelHumHumRatBuffer1 =
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" + BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenInRelHumHumRatBuffer1 =
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
                 "\" - Regeneration inlet air relative humidity related to regen outlet air humidity ratio equation is outside model boundaries at " +
                 OutputChar + '.';
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenInRelHumHumRatBuffer2 =
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenInRelHumHumRatBuffer2 =
                 "...Model limit on regeneration inlet air relative humidity is " + OutputCharLo + " to " + OutputCharHi + '.';
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).RegenInRelHumHumRatBuffer3 =
-                "...Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + ", " + CreateSysTimeIntervalString(state);
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).RegenInRelHumHumRatBuffer3 =
+                "...Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + ", " +
+                CreateSysTimeIntervalString(state);
         } else {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintRegenInRelHumHumRatMess = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintRegenInRelHumHumRatMess = false;
         }
 
         // checking if process inlet relative humidity is within model boundaries
-        if (ProcInletRH < BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MinProcAirInRelHum ||
-            ProcInletRH > BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MaxProcAirInRelHum) {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ProcInRelHumHumRatLast = ProcInletRH * 100.0;
+        if (ProcInletRH < state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MinProcAirInRelHum ||
+            ProcInletRH > state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MaxProcAirInRelHum) {
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).ProcInRelHumHumRatLast =
+                ProcInletRH * 100.0;
             OutputChar = format("{:.1R}", ProcInletRH * 100.0);
-            OutputCharLo = format("{:.1R}", BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MinProcAirInRelHum * 100.0);
-            OutputCharHi = format("{:.1R}", BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MaxProcAirInRelHum * 100.0);
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintProcInRelHumHumRatMess = true;
+            OutputCharLo = format(
+                "{:.1R}",
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MinProcAirInRelHum * 100.0);
+            OutputCharHi = format(
+                "{:.1R}",
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).H_MaxProcAirInRelHum * 100.0);
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintProcInRelHumHumRatMess = true;
 
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ProcInRelHumHumRatBuffer1 =
-                BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" + BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).Name +
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).ProcInRelHumHumRatBuffer1 =
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PerfType + " \"" +
+                state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).Name +
                 "\" - Process inlet air relative humidity related to regen outlet air humidity ratio equation is outside model boundaries at " +
                 OutputChar + '.';
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ProcInRelHumHumRatBuffer2 =
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).ProcInRelHumHumRatBuffer2 =
                 "...Model limit on process inlet air relative humidity is " + OutputCharLo + " to " + OutputCharHi + '.';
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ProcInRelHumHumRatBuffer3 =
-                "...Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + ", " + CreateSysTimeIntervalString(state);
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).ProcInRelHumHumRatBuffer3 =
+                "...Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + ", " +
+                CreateSysTimeIntervalString(state);
         } else {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintProcInRelHumHumRatMess = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintProcInRelHumHumRatMess = false;
         }
     }
 
@@ -5073,28 +5732,16 @@ namespace HeatRecovery {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
+        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS
+        auto &OutputCharProc = state.dataHeatRecovery->OutputCharProc;
+        auto &OutputCharRegen = state.dataHeatRecovery->OutputCharRegen;
+        auto &TimeStepSysLast = state.dataHeatRecovery->TimeStepSysLast7;
+        auto &CurrentEndTime = state.dataHeatRecovery->CurrentEndTime7;
+        auto &CurrentEndTimeLast = state.dataHeatRecovery->CurrentEndTimeLast7;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        //  CHARACTER(len=*), PARAMETER :: OutputFormat  ='(F10.6)'
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static std::string OutputCharProc;     // character string for warning messages
-        static std::string OutputCharRegen;    // character string for warning messages
-        static Real64 TimeStepSysLast(0.0);    // last system time step (used to check for downshifting)
-        static Real64 CurrentEndTime(0.0);     // end time of time step for current simulation time step
-        static Real64 CurrentEndTimeLast(0.0); // end time of time step for last simulation time step
         // current end time is compared with last to see if time step changed
         Real64 ABSImbalancedFlow; // absolute value of process and regeneration air flow imbalance fraction
 
@@ -5110,22 +5757,31 @@ namespace HeatRecovery {
         if (CurrentEndTime > CurrentEndTimeLast && TimeStepSys >= TimeStepSysLast) {
 
             // print error when regeneration inlet relative humidity is outside model boundaries
-            if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintImbalancedMassFlowMess) {
-                ++BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ImbalancedMassFlowErrorCount;
-                if (BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ImbalancedMassFlowErrorCount < 2) {
-                    ShowWarningError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ImbalancedMassFlowBuffer1);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ImbalancedMassFlowBuffer2);
-                    ShowContinueError(state, BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ImbalancedMassFlowBuffer3);
-                    //           CALL ShowContinueError(state, '...Using regeneration inlet air relative humidities that are outside the regeneration '&
+            if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintImbalancedMassFlowMess) {
+                ++state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).ImbalancedMassFlowErrorCount;
+                if (state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex)
+                        .ImbalancedMassFlowErrorCount < 2) {
+                    ShowWarningError(state,
+                                     state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex)
+                                         .ImbalancedMassFlowBuffer1);
+                    ShowContinueError(state,
+                                      state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex)
+                                          .ImbalancedMassFlowBuffer2);
+                    ShowContinueError(state,
+                                      state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex)
+                                          .ImbalancedMassFlowBuffer3);
+                    //           CALL ShowContinueError(state, '...Using regeneration inlet air relative humidities that are outside the regeneration
+                    //           '&
                     //                 //'outlet humidity ratio equation model boundaries may adversely affect desiccant model performance. '&
                     //                 //'Verify correct model coefficients.')
                 } else {
-                    ShowRecurringWarningErrorAtEnd(state,
-                        cHXTypes(ExchCond(ExchNum).ExchTypeNum) + " \"" + ExchCond(ExchNum).Name +
+                    ShowRecurringWarningErrorAtEnd(
+                        state,
+                        cHXTypes(state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum) + " \"" + state.dataHeatRecovery->ExchCond(ExchNum).Name +
                             "\" - unbalanced air flow rate is limited to 2% error continues with the imbalanced fraction statistics reported...",
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ImbalancedFlowErrIndex,
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ABSImbalancedFlow,
-                        BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ABSImbalancedFlow);
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).ImbalancedFlowErrIndex,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).ABSImbalancedFlow,
+                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).ABSImbalancedFlow);
                 }
             }
 
@@ -5138,24 +5794,27 @@ namespace HeatRecovery {
         // checking if regeneration inlet relative humidity is within model boundaries
         ABSImbalancedFlow = std::abs(RegenInMassFlow - ProcessInMassFlow) / RegenInMassFlow;
         if (ABSImbalancedFlow > 0.02) {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ABSImbalancedFlow = ABSImbalancedFlow;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).ABSImbalancedFlow =
+                ABSImbalancedFlow;
             OutputCharRegen = format("{:.6R}", RegenInMassFlow);
             OutputCharProc = format("{:.6R}", ProcessInMassFlow);
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintImbalancedMassFlowMess = true;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintImbalancedMassFlowMess = true;
 
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ImbalancedMassFlowBuffer1 =
-                cHXTypes(ExchCond(ExchNum).ExchTypeNum) + " \"" + ExchCond(ExchNum).Name + "\" - unbalanced air flow rate is limited to 2%.";
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ImbalancedMassFlowBuffer2 =
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).ImbalancedMassFlowBuffer1 =
+                cHXTypes(state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum) + " \"" + state.dataHeatRecovery->ExchCond(ExchNum).Name +
+                "\" - unbalanced air flow rate is limited to 2%.";
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).ImbalancedMassFlowBuffer2 =
                 "...Regeneration air mass flow rate is " + OutputCharRegen + " and process air mass flow rate is " + OutputCharProc + '.';
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).ImbalancedMassFlowBuffer3 =
-                "...Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + ", " + CreateSysTimeIntervalString(state);
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).ImbalancedMassFlowBuffer3 =
+                "...Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + ", " +
+                CreateSysTimeIntervalString(state);
         } else {
-            BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintImbalancedMassFlowMess = false;
+            state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex).PrintImbalancedMassFlowMess = false;
         }
     }
 
     int GetSupplyInletNode(EnergyPlusData &state,
-                           std::string const &HXName, // must match HX names for the ExchCond type
+                           std::string const &HXName, // must match HX names for the state.dataHeatRecovery->ExchCond type
                            bool &ErrorsFound          // set to true if problem
     )
     {
@@ -5177,14 +5836,14 @@ namespace HeatRecovery {
         int WhichHX;
 
         // Obtains and Allocates heat exchanger related parameters from input file
-        if (GetInputFlag) { // First time subroutine has been entered
+        if (state.dataHeatRecovery->GetInputFlag) { // First time subroutine has been entered
             GetHeatRecoveryInput(state);
-            GetInputFlag = false;
+            state.dataHeatRecovery->GetInputFlag = false;
         }
 
-        WhichHX = UtilityRoutines::FindItemInList(HXName, ExchCond);
+        WhichHX = UtilityRoutines::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
         if (WhichHX != 0) {
-            GetSupplyInletNode = ExchCond(WhichHX).SupInletNode;
+            GetSupplyInletNode = state.dataHeatRecovery->ExchCond(WhichHX).SupInletNode;
         } else {
             ShowSevereError(state, "GetSupplyInletNode: Could not find heat exchanger = \"" + HXName + "\"");
             ErrorsFound = true;
@@ -5195,7 +5854,7 @@ namespace HeatRecovery {
     }
 
     int GetSupplyOutletNode(EnergyPlusData &state,
-                            std::string const &HXName, // must match HX names for the ExchCond type
+                            std::string const &HXName, // must match HX names for the state.dataHeatRecovery->ExchCond type
                             bool &ErrorsFound          // set to true if problem
     )
     {
@@ -5217,14 +5876,14 @@ namespace HeatRecovery {
         int WhichHX;
 
         // Obtains and Allocates heat exchanger related parameters from input file
-        if (GetInputFlag) { // First time subroutine has been entered
+        if (state.dataHeatRecovery->GetInputFlag) { // First time subroutine has been entered
             GetHeatRecoveryInput(state);
-            GetInputFlag = false;
+            state.dataHeatRecovery->GetInputFlag = false;
         }
 
-        WhichHX = UtilityRoutines::FindItemInList(HXName, ExchCond);
+        WhichHX = UtilityRoutines::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
         if (WhichHX != 0) {
-            GetSupplyOutletNode = ExchCond(WhichHX).SupOutletNode;
+            GetSupplyOutletNode = state.dataHeatRecovery->ExchCond(WhichHX).SupOutletNode;
         } else {
             ShowSevereError(state, "GetSupplyOutletNode: Could not find heat exchanger = \"" + HXName + "\"");
             ErrorsFound = true;
@@ -5235,7 +5894,7 @@ namespace HeatRecovery {
     }
 
     int GetSecondaryInletNode(EnergyPlusData &state,
-                              std::string const &HXName, // must match HX names for the ExchCond type
+                              std::string const &HXName, // must match HX names for the state.dataHeatRecovery->ExchCond type
                               bool &ErrorsFound          // set to true if problem
     )
     {
@@ -5257,14 +5916,14 @@ namespace HeatRecovery {
         int WhichHX;
 
         // Obtains and Allocates heat exchanger related parameters from input file
-        if (GetInputFlag) { // First time subroutine has been entered
+        if (state.dataHeatRecovery->GetInputFlag) { // First time subroutine has been entered
             GetHeatRecoveryInput(state);
-            GetInputFlag = false;
+            state.dataHeatRecovery->GetInputFlag = false;
         }
 
-        WhichHX = UtilityRoutines::FindItemInList(HXName, ExchCond);
+        WhichHX = UtilityRoutines::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
         if (WhichHX != 0) {
-            GetSecondaryInletNode = ExchCond(WhichHX).SecInletNode;
+            GetSecondaryInletNode = state.dataHeatRecovery->ExchCond(WhichHX).SecInletNode;
         } else {
             ShowSevereError(state, "GetSecondaryInletNode: Could not find heat exchanger = \"" + HXName + "\"");
             ErrorsFound = true;
@@ -5275,7 +5934,7 @@ namespace HeatRecovery {
     }
 
     int GetSecondaryOutletNode(EnergyPlusData &state,
-                               std::string const &HXName, // must match HX names for the ExchCond type
+                               std::string const &HXName, // must match HX names for the state.dataHeatRecovery->ExchCond type
                                bool &ErrorsFound          // set to true if problem
     )
     {
@@ -5297,14 +5956,14 @@ namespace HeatRecovery {
         int WhichHX;
 
         // Obtains and Allocates heat exchanger related parameters from input file
-        if (GetInputFlag) { // First time subroutine has been entered
+        if (state.dataHeatRecovery->GetInputFlag) { // First time subroutine has been entered
             GetHeatRecoveryInput(state);
-            GetInputFlag = false;
+            state.dataHeatRecovery->GetInputFlag = false;
         }
 
-        WhichHX = UtilityRoutines::FindItemInList(HXName, ExchCond);
+        WhichHX = UtilityRoutines::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
         if (WhichHX != 0) {
-            GetSecondaryOutletNode = ExchCond(WhichHX).SecOutletNode;
+            GetSecondaryOutletNode = state.dataHeatRecovery->ExchCond(WhichHX).SecOutletNode;
         } else {
             ShowSevereError(state, "GetSecondaryOutletNode: Could not find heat exchanger = \"" + HXName + "\"");
             ErrorsFound = true;
@@ -5315,7 +5974,7 @@ namespace HeatRecovery {
     }
 
     Real64 GetSupplyAirFlowRate(EnergyPlusData &state,
-                                std::string const &HXName, // must match HX names for the ExchCond type
+                                std::string const &HXName, // must match HX names for the state.dataHeatRecovery->ExchCond type
                                 bool &ErrorsFound          // set to true if problem
     )
     {
@@ -5337,14 +5996,14 @@ namespace HeatRecovery {
         int WhichHX;
 
         // Obtains and Allocates heat exchanger related parameters from input file
-        if (GetInputFlag) { // First time subroutine has been entered
+        if (state.dataHeatRecovery->GetInputFlag) { // First time subroutine has been entered
             GetHeatRecoveryInput(state);
-            GetInputFlag = false;
+            state.dataHeatRecovery->GetInputFlag = false;
         }
 
-        WhichHX = UtilityRoutines::FindItemInList(HXName, ExchCond);
+        WhichHX = UtilityRoutines::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
         if (WhichHX != 0) {
-            GetSupplyAirFlowRate = ExchCond(WhichHX).NomSupAirVolFlow;
+            GetSupplyAirFlowRate = state.dataHeatRecovery->ExchCond(WhichHX).NomSupAirVolFlow;
         } else {
             ShowSevereError(state, "GetSupplyAirFlowRate: Could not find heat exchanger = \"" + HXName + "\"");
             ShowContinueError(state, "... Supply Air Flow Rate returned as 0.");
@@ -5356,7 +6015,7 @@ namespace HeatRecovery {
     }
 
     int GetHeatExchangerObjectTypeNum(EnergyPlusData &state,
-                                      std::string const &HXName, // must match HX names for the ExchCond type
+                                      std::string const &HXName, // must match HX names for the state.dataHeatRecovery->ExchCond type
                                       bool &ErrorsFound          // set to true if problem
     )
     {
@@ -5378,14 +6037,14 @@ namespace HeatRecovery {
         int WhichHX;
 
         // Obtains and Allocates heat exchanger related parameters from input file
-        if (GetInputFlag) { // First time subroutine has been entered
+        if (state.dataHeatRecovery->GetInputFlag) { // First time subroutine has been entered
             GetHeatRecoveryInput(state);
-            GetInputFlag = false;
+            state.dataHeatRecovery->GetInputFlag = false;
         }
 
-        WhichHX = UtilityRoutines::FindItemInList(HXName, ExchCond);
+        WhichHX = UtilityRoutines::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
         if (WhichHX != 0) {
-            GetHeatExchangerObjectTypeNum = ExchCond(WhichHX).ExchTypeNum;
+            GetHeatExchangerObjectTypeNum = state.dataHeatRecovery->ExchCond(WhichHX).ExchTypeNum;
         } else {
             ShowSevereError(state, "GetHeatExchangerObjectTypeNum: Could not find heat exchanger = \"" + HXName + "\"");
             ErrorsFound = true;
@@ -5439,29 +6098,29 @@ namespace HeatRecovery {
         int WhichHX; // index to generic HX
 
         // Obtains and Allocates heat exchanger related parameters from input file
-        if (GetInputFlag) { // First time subroutine has been entered
+        if (state.dataHeatRecovery->GetInputFlag) { // First time subroutine has been entered
             GetHeatRecoveryInput(state);
-            GetInputFlag = false;
+            state.dataHeatRecovery->GetInputFlag = false;
         }
 
         if (HXNum == 0) {
-            WhichHX = UtilityRoutines::FindItemInList(HXName, ExchCond);
+            WhichHX = UtilityRoutines::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
         } else {
             WhichHX = HXNum;
         }
 
-        if (WhichHX <= 0 || WhichHX > NumHeatExchangers) {
+        if (WhichHX <= 0 || WhichHX > state.dataHeatRecovery->NumHeatExchangers) {
             ShowSevereError(state, "SetHeatExchangerData: Could not find heat exchanger = \"" + HXName + "\"");
             ErrorsFound = true;
             return;
         }
 
         if (present(SupplyAirVolFlow)) {
-            ExchCond(WhichHX).NomSupAirVolFlow = SupplyAirVolFlow;
+            state.dataHeatRecovery->ExchCond(WhichHX).NomSupAirVolFlow = SupplyAirVolFlow;
         }
 
         if (present(SecondaryAirVolFlow)) {
-            ExchCond(WhichHX).NomSecAirVolFlow = SecondaryAirVolFlow;
+            state.dataHeatRecovery->ExchCond(WhichHX).NomSecAirVolFlow = SecondaryAirVolFlow;
         }
     }
 

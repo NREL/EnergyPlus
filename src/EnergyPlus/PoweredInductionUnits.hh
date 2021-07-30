@@ -161,11 +161,11 @@ namespace PoweredInductionUnits {
     };
 
     void SimPIU(EnergyPlusData &state,
-                std::string const &CompName, // name of the PIU
-                bool FirstHVACIteration,     // TRUE if first HVAC iteration in time step
-                int ZoneNum,                 // index of zone served by PIU
-                int ZoneNodeNum,             // zone node number of zone served by PIU
-                int &CompIndex               // PIU Index in PIU names
+                std::string_view CompName, // name of the PIU
+                bool FirstHVACIteration,   // TRUE if first HVAC iteration in time step
+                int ZoneNum,               // index of zone served by PIU
+                int ZoneNodeNum,           // zone node number of zone served by PIU
+                int &CompIndex             // PIU Index in PIU names
     );
 
     void GetPIUs(EnergyPlusData &state);
@@ -195,7 +195,7 @@ namespace PoweredInductionUnits {
 
     // ===================== Utilities =====================================
 
-    bool PIUnitHasMixer(EnergyPlusData &state, std::string const &CompName); // component (mixer) name
+    bool PIUnitHasMixer(EnergyPlusData &state, std::string_view CompName); // component (mixer) name
 
     void PIUInducesPlenumAir(EnergyPlusData &state, int NodeNum); // induced air node number
 
@@ -213,6 +213,9 @@ struct PoweredInductionUnitsData : BaseGlobalStruct
     int NumParallelPIUs = 0;
     Array1D<PoweredInductionUnits::PowIndUnitData> PIU;
     std::unordered_map<std::string, std::string> PiuUniqueNames;
+    Array1D_bool MyEnvrnFlag;
+    Array1D_bool MySizeFlag;
+    Array1D_bool MyPlantScanFlag;
 
     void clear_state() override
     {
@@ -225,6 +228,9 @@ struct PoweredInductionUnitsData : BaseGlobalStruct
         this->NumParallelPIUs = 0;
         this->PIU.deallocate();
         this->PiuUniqueNames.clear();
+        this->MyEnvrnFlag.clear();
+        this->MySizeFlag.clear();
+        this->MyPlantScanFlag.clear();
     }
 };
 

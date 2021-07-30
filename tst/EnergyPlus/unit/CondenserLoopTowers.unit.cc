@@ -496,9 +496,10 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelNoCooling)
     OutputReportPredefined::SetPredefinedTables(*state);
 
     // OutputProcessor::TimeValue.allocate(2);
-    OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-    OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    OutputProcessor::SetupTimePointers(
+        *state, OutputProcessor::SOVTimeStepType::Zone, state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+    OutputProcessor::SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, state->dataHVACGlobal->TimeStepSys);
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
     BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
@@ -516,10 +517,10 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelNoCooling)
     Real64 MyLoad = 0.0;
     state->dataCondenserLoopTowers->towers(1).calculateMerkelVariableSpeedTower(*state, MyLoad);
     state->dataCondenserLoopTowers->towers(1).update(*state);
-    state->dataCondenserLoopTowers->towers(1).report(true);
+    state->dataCondenserLoopTowers->towers(1).report(*state, true);
 
     // test that tower is really not cooling with no load so temp in and out is the same issue #4927
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(9).Temp, DataLoopNode::Node(10).Temp);
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(9).Temp, state->dataLoopNodes->Node(10).Temp);
 }
 
 TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
@@ -888,9 +889,10 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
     OutputReportPredefined::SetPredefinedTables(*state);
 
     // OutputProcessor::TimeValue.allocate(2);
-    OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-    OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    OutputProcessor::SetupTimePointers(
+        *state, OutputProcessor::SOVTimeStepType::Zone, state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+    OutputProcessor::SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, state->dataHVACGlobal->TimeStepSys);
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
     BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
@@ -907,24 +909,26 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
     state->dataCondenserLoopTowers->towers(1).initialize(*state);
     state->dataCondenserLoopTowers->towers(1).calculateSingleSpeedTower(*state);
     state->dataCondenserLoopTowers->towers(1).update(*state);
-    state->dataCondenserLoopTowers->towers(1).report(true);
+    state->dataCondenserLoopTowers->towers(1).report(*state, true);
 
     // test that tower outlet temperature = set point temperature
     int inletNodeIndex = 0;
     int outletNodeIndex = 0;
-    auto inletNode = std::find(DataLoopNode::NodeID.begin(), DataLoopNode::NodeID.end(), "TOWERWATERSYS PUMP-TOWERWATERSYS COOLTOWERNODE");
-    ASSERT_TRUE(inletNode != DataLoopNode::NodeID.end());
-    if (inletNode != DataLoopNode::NodeID.end()) {
-        inletNodeIndex = std::distance(DataLoopNode::NodeID.begin(), inletNode);
+    auto inletNode =
+        std::find(state->dataLoopNodes->NodeID.begin(), state->dataLoopNodes->NodeID.end(), "TOWERWATERSYS PUMP-TOWERWATERSYS COOLTOWERNODE");
+    ASSERT_TRUE(inletNode != state->dataLoopNodes->NodeID.end());
+    if (inletNode != state->dataLoopNodes->NodeID.end()) {
+        inletNodeIndex = std::distance(state->dataLoopNodes->NodeID.begin(), inletNode);
     }
-    auto outletNode = std::find(DataLoopNode::NodeID.begin(), DataLoopNode::NodeID.end(), "TOWERWATERSYS SUPPLY EQUIPMENT OUTLET NODE");
-    ASSERT_TRUE(outletNode != DataLoopNode::NodeID.end());
-    if (outletNode != DataLoopNode::NodeID.end()) {
-        outletNodeIndex = std::distance(DataLoopNode::NodeID.begin(), outletNode);
+    auto outletNode =
+        std::find(state->dataLoopNodes->NodeID.begin(), state->dataLoopNodes->NodeID.end(), "TOWERWATERSYS SUPPLY EQUIPMENT OUTLET NODE");
+    ASSERT_TRUE(outletNode != state->dataLoopNodes->NodeID.end());
+    if (outletNode != state->dataLoopNodes->NodeID.end()) {
+        outletNodeIndex = std::distance(state->dataLoopNodes->NodeID.begin(), outletNode);
     }
     // TODO: FIXME: This is failing. Actual is -10.409381032746095, expected is 30.
-     EXPECT_GT( DataLoopNode::Node( inletNodeIndex ).Temp, 30.0 ); // inlet node temperature
-     EXPECT_DOUBLE_EQ( 30.0, DataLoopNode::Node( outletNodeIndex ).Temp ); // outlet node temperature
+    EXPECT_GT(state->dataLoopNodes->Node(inletNodeIndex).Temp, 30.0);         // inlet node temperature
+    EXPECT_DOUBLE_EQ(30.0, state->dataLoopNodes->Node(outletNodeIndex).Temp); // outlet node temperature
 
     // input not needed for sizing (WasAutoSized = false) using NominalCapacity method but this variable should still size
     EXPECT_FALSE(state->dataCondenserLoopTowers->towers(1).HighSpeedTowerUAWasAutoSized);
@@ -934,7 +938,8 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
     // input not needed for sizing (WasAutoSized = false) using NominalCapacity method but this variable should still size
     EXPECT_FALSE(state->dataCondenserLoopTowers->towers(1).DesignWaterFlowRateWasAutoSized);
     EXPECT_GT(state->dataCondenserLoopTowers->towers(1).DesignWaterFlowRate, 10000000.0);
-    EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).DesignWaterFlowRate, 5.382e-8 * state->dataCondenserLoopTowers->towers(1).TowerNominalCapacity);
+    EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).DesignWaterFlowRate,
+                     5.382e-8 * state->dataCondenserLoopTowers->towers(1).TowerNominalCapacity);
 
     // autosized input
     EXPECT_TRUE(state->dataCondenserLoopTowers->towers(1).HighSpeedAirFlowRateWasAutoSized);
@@ -945,13 +950,15 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
     // autosized input
     EXPECT_TRUE(state->dataCondenserLoopTowers->towers(1).HighSpeedFanPowerWasAutoSized);
     EXPECT_GT(state->dataCondenserLoopTowers->towers(1).HighSpeedFanPower, 10000000.0);
-    EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).HighSpeedFanPower, 0.0105 * state->dataCondenserLoopTowers->towers(1).TowerNominalCapacity);
+    EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).HighSpeedFanPower,
+                     0.0105 * state->dataCondenserLoopTowers->towers(1).TowerNominalCapacity);
 
     // autocalculate input
     EXPECT_TRUE(state->dataCondenserLoopTowers->towers(1).FreeConvAirFlowRateWasAutoSized);
     EXPECT_GT(state->dataCondenserLoopTowers->towers(1).FreeConvAirFlowRate, 10000000.0);
     EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).FreeConvAirFlowRate,
-                     state->dataCondenserLoopTowers->towers(1).FreeConvAirFlowRateSizingFactor * state->dataCondenserLoopTowers->towers(1).HighSpeedAirFlowRate);
+                     state->dataCondenserLoopTowers->towers(1).FreeConvAirFlowRateSizingFactor *
+                         state->dataCondenserLoopTowers->towers(1).HighSpeedAirFlowRate);
 }
 
 TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUserInputTowerSizing)
@@ -1319,9 +1326,10 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUserInputTowerSizing)
     OutputReportPredefined::SetPredefinedTables(*state);
 
     // OutputProcessor::TimeValue.allocate(2);
-    OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-    OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    OutputProcessor::SetupTimePointers(
+        *state, OutputProcessor::SOVTimeStepType::Zone, state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+    OutputProcessor::SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, state->dataHVACGlobal->TimeStepSys);
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
     BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
@@ -1338,12 +1346,14 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUserInputTowerSizing)
 
     // input not needed for sizing
     EXPECT_FALSE(state->dataCondenserLoopTowers->towers(1).HighSpeedTowerUAWasAutoSized);
-    EXPECT_NEAR(state->dataCondenserLoopTowers->towers(1).HighSpeedTowerUA, 9595.0, 1.0); // nominal capacity input was 100 kW, approach, 3.9K, range 5.5K
+    EXPECT_NEAR(
+        state->dataCondenserLoopTowers->towers(1).HighSpeedTowerUA, 9595.0, 1.0); // nominal capacity input was 100 kW, approach, 3.9K, range 5.5K
 
     // input not needed for sizing
     EXPECT_FALSE(state->dataCondenserLoopTowers->towers(1).DesignWaterFlowRateWasAutoSized);
     EXPECT_NEAR(state->dataCondenserLoopTowers->towers(1).DesignWaterFlowRate, 0.005382, 0.00001);
-    EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).DesignWaterFlowRate, 5.382e-8 * state->dataCondenserLoopTowers->towers(1).TowerNominalCapacity);
+    EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).DesignWaterFlowRate,
+                     5.382e-8 * state->dataCondenserLoopTowers->towers(1).TowerNominalCapacity);
 
     // autosized input
     EXPECT_TRUE(state->dataCondenserLoopTowers->towers(1).HighSpeedAirFlowRateWasAutoSized);
@@ -1354,13 +1364,15 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUserInputTowerSizing)
     // autosized input
     EXPECT_TRUE(state->dataCondenserLoopTowers->towers(1).HighSpeedFanPowerWasAutoSized);
     EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).HighSpeedFanPower, 1050);
-    EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).HighSpeedFanPower, 0.0105 * state->dataCondenserLoopTowers->towers(1).TowerNominalCapacity);
+    EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).HighSpeedFanPower,
+                     0.0105 * state->dataCondenserLoopTowers->towers(1).TowerNominalCapacity);
 
     // autocalculate input
     EXPECT_TRUE(state->dataCondenserLoopTowers->towers(1).FreeConvAirFlowRateWasAutoSized);
     EXPECT_NEAR(state->dataCondenserLoopTowers->towers(1).FreeConvAirFlowRate, 0.28262, 0.00001);
     EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).FreeConvAirFlowRate,
-                     state->dataCondenserLoopTowers->towers(1).FreeConvAirFlowRateSizingFactor * state->dataCondenserLoopTowers->towers(1).HighSpeedAirFlowRate);
+                     state->dataCondenserLoopTowers->towers(1).FreeConvAirFlowRateSizingFactor *
+                         state->dataCondenserLoopTowers->towers(1).HighSpeedAirFlowRate);
 }
 
 TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedUserInputTowerSizing)
@@ -1734,9 +1746,10 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedUserInputTowerSizing)
     OutputReportPredefined::SetPredefinedTables(*state);
 
     // OutputProcessor::TimeValue.allocate(2);
-    OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-    OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    OutputProcessor::SetupTimePointers(
+        *state, OutputProcessor::SOVTimeStepType::Zone, state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+    OutputProcessor::SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, state->dataHVACGlobal->TimeStepSys);
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
     BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
@@ -1753,12 +1766,14 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedUserInputTowerSizing)
 
     // input not needed for sizing (NOT WasAutoSized)
     EXPECT_FALSE(state->dataCondenserLoopTowers->towers(1).HighSpeedTowerUAWasAutoSized);
-    EXPECT_NEAR(state->dataCondenserLoopTowers->towers(1).HighSpeedTowerUA, 9595.55, 1.0); // nominal capacity input was 100 kW, approach, 3.9K, range 5.5K
+    EXPECT_NEAR(
+        state->dataCondenserLoopTowers->towers(1).HighSpeedTowerUA, 9595.55, 1.0); // nominal capacity input was 100 kW, approach, 3.9K, range 5.5K
 
     // input not needed for sizing (NOT WasAutoSized)
     EXPECT_FALSE(state->dataCondenserLoopTowers->towers(1).DesignWaterFlowRateWasAutoSized);
     EXPECT_NEAR(state->dataCondenserLoopTowers->towers(1).DesignWaterFlowRate, 0.005382, 0.00001);
-    EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).DesignWaterFlowRate, 5.382e-8 * state->dataCondenserLoopTowers->towers(1).TowerNominalCapacity);
+    EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).DesignWaterFlowRate,
+                     5.382e-8 * state->dataCondenserLoopTowers->towers(1).TowerNominalCapacity);
 
     // autosized input
     EXPECT_TRUE(state->dataCondenserLoopTowers->towers(1).HighSpeedAirFlowRateWasAutoSized);
@@ -1769,13 +1784,15 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedUserInputTowerSizing)
     // autosized input
     EXPECT_TRUE(state->dataCondenserLoopTowers->towers(1).HighSpeedFanPowerWasAutoSized);
     EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).HighSpeedFanPower, 1050);
-    EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).HighSpeedFanPower, 0.0105 * state->dataCondenserLoopTowers->towers(1).TowerNominalCapacity);
+    EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).HighSpeedFanPower,
+                     0.0105 * state->dataCondenserLoopTowers->towers(1).TowerNominalCapacity);
 
     // autosized input
     EXPECT_TRUE(state->dataCondenserLoopTowers->towers(1).LowSpeedAirFlowRateWasAutoSized);
     EXPECT_NEAR(state->dataCondenserLoopTowers->towers(1).LowSpeedAirFlowRate, 1.4131, 0.0001);
     EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).LowSpeedAirFlowRate,
-                     state->dataCondenserLoopTowers->towers(1).HighSpeedAirFlowRate * state->dataCondenserLoopTowers->towers(1).LowSpeedAirFlowRateSizingFactor);
+                     state->dataCondenserLoopTowers->towers(1).HighSpeedAirFlowRate *
+                         state->dataCondenserLoopTowers->towers(1).LowSpeedAirFlowRateSizingFactor);
 
     // autosized input
     EXPECT_TRUE(state->dataCondenserLoopTowers->towers(1).LowSpeedTowerUAWasAutoSized);
@@ -1785,7 +1802,8 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedUserInputTowerSizing)
     EXPECT_TRUE(state->dataCondenserLoopTowers->towers(1).LowSpeedFanPowerWasAutoSized);
     EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).LowSpeedFanPower, 168);
     EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).LowSpeedFanPower,
-                     state->dataCondenserLoopTowers->towers(1).LowSpeedFanPowerSizingFactor * state->dataCondenserLoopTowers->towers(1).HighSpeedFanPower);
+                     state->dataCondenserLoopTowers->towers(1).LowSpeedFanPowerSizingFactor *
+                         state->dataCondenserLoopTowers->towers(1).HighSpeedFanPower);
 
     // autosized input
     EXPECT_TRUE(state->dataCondenserLoopTowers->towers(1).FreeConvTowerUAWasAutoSized);
@@ -2218,9 +2236,10 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelUserInputTowerSizing)
     OutputReportPredefined::SetPredefinedTables(*state);
 
     // OutputProcessor::TimeValue.allocate(2);
-    OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-    OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    OutputProcessor::SetupTimePointers(
+        *state, OutputProcessor::SOVTimeStepType::Zone, state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+    OutputProcessor::SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, state->dataHVACGlobal->TimeStepSys);
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
     BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
@@ -2237,29 +2256,34 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelUserInputTowerSizing)
 
     // input not needed for sizing (NOT WasAutoSized)
     EXPECT_FALSE(state->dataCondenserLoopTowers->towers(1).HighSpeedTowerUAWasAutoSized);
-    EXPECT_NEAR(state->dataCondenserLoopTowers->towers(1).HighSpeedTowerUA, 9770.0, 1.0); // nominal capacity input was 100 kW, approach, 3.9K, range 5.5K
+    EXPECT_NEAR(
+        state->dataCondenserLoopTowers->towers(1).HighSpeedTowerUA, 9770.0, 1.0); // nominal capacity input was 100 kW, approach, 3.9K, range 5.5K
 
     // input not needed for sizing (NOT WasAutoSized)
     EXPECT_TRUE(state->dataCondenserLoopTowers->towers(1).DesignWaterFlowRateWasAutoSized);
     EXPECT_NEAR(state->dataCondenserLoopTowers->towers(1).DesignWaterFlowRate, 0.005382, 0.00001);
-    EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).DesignWaterFlowRate, 5.382e-8 * state->dataCondenserLoopTowers->towers(1).TowerNominalCapacity);
+    EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).DesignWaterFlowRate,
+                     5.382e-8 * state->dataCondenserLoopTowers->towers(1).TowerNominalCapacity);
 
     // autosized input
     EXPECT_TRUE(state->dataCondenserLoopTowers->towers(1).HighSpeedAirFlowRateWasAutoSized);
     EXPECT_NEAR(state->dataCondenserLoopTowers->towers(1).HighSpeedAirFlowRate, 2.7632, 0.0001);
     EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).HighSpeedAirFlowRate,
-                     state->dataCondenserLoopTowers->towers(1).TowerNominalCapacity * state->dataCondenserLoopTowers->towers(1).DesignAirFlowPerUnitNomCap);
+                     state->dataCondenserLoopTowers->towers(1).TowerNominalCapacity *
+                         state->dataCondenserLoopTowers->towers(1).DesignAirFlowPerUnitNomCap);
 
     // autosized input
     EXPECT_TRUE(state->dataCondenserLoopTowers->towers(1).HighSpeedFanPowerWasAutoSized);
     EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).HighSpeedFanPower, 1050);
-    EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).HighSpeedFanPower, 0.0105 * state->dataCondenserLoopTowers->towers(1).TowerNominalCapacity);
+    EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).HighSpeedFanPower,
+                     0.0105 * state->dataCondenserLoopTowers->towers(1).TowerNominalCapacity);
 
     // input not needed for sizing (NOT WasAutoSized)
     EXPECT_TRUE(state->dataCondenserLoopTowers->towers(1).FreeConvAirFlowRateWasAutoSized);
     EXPECT_NEAR(state->dataCondenserLoopTowers->towers(1).FreeConvAirFlowRate, 0.27632, 0.00001);
     EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).FreeConvAirFlowRate,
-                     state->dataCondenserLoopTowers->towers(1).FreeConvAirFlowRateSizingFactor * state->dataCondenserLoopTowers->towers(1).HighSpeedAirFlowRate);
+                     state->dataCondenserLoopTowers->towers(1).FreeConvAirFlowRateSizingFactor *
+                         state->dataCondenserLoopTowers->towers(1).HighSpeedAirFlowRate);
 
     // autosized input
     EXPECT_FALSE(state->dataCondenserLoopTowers->towers(1).FreeConvTowerUAWasAutoSized);
@@ -2645,9 +2669,10 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedTowerLowSpeedNomCapSizing)
     OutputReportPredefined::SetPredefinedTables(*state);
 
     // OutputProcessor::TimeValue.allocate(2);
-    OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-    OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    OutputProcessor::SetupTimePointers(
+        *state, OutputProcessor::SOVTimeStepType::Zone, state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+    OutputProcessor::SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, state->dataHVACGlobal->TimeStepSys);
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
     BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
@@ -2668,7 +2693,8 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedTowerLowSpeedNomCapSizing)
     // autosized other input fields of cooling tower
     state->dataCondenserLoopTowers->towers(1).SizeTower(*state);
     // size low speed nominal capacity
-    LowSpeedCoolTowerNomCap = state->dataCondenserLoopTowers->towers(1).TowerNominalCapacity * state->dataCondenserLoopTowers->towers(1).TowerLowSpeedNomCapSizingFactor;
+    LowSpeedCoolTowerNomCap =
+        state->dataCondenserLoopTowers->towers(1).TowerNominalCapacity * state->dataCondenserLoopTowers->towers(1).TowerLowSpeedNomCapSizingFactor;
     EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).TowerLowSpeedNomCap, LowSpeedCoolTowerNomCap);
     // check the low speed nominal capacity is higher than that of free convection nominal capacity
     EXPECT_GT(state->dataCondenserLoopTowers->towers(1).TowerLowSpeedNomCap, state->dataCondenserLoopTowers->towers(1).TowerFreeConvNomCap);
@@ -3032,9 +3058,10 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_Sizing
     OutputReportPredefined::SetPredefinedTables(*state);
 
     // OutputProcessor::TimeValue.allocate(2);
-    OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-    OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    OutputProcessor::SetupTimePointers(
+        *state, OutputProcessor::SOVTimeStepType::Zone, state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+    OutputProcessor::SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, state->dataHVACGlobal->TimeStepSys);
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
 
@@ -3045,10 +3072,9 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_Sizing
     SizingManager::GetPlantSizingInput(*state);
     PlantManager::InitOneTimePlantSizingInfo(*state, 1);
     PlantManager::SizePlantLoop(*state, 1, true);
-    state->dataPlantMgr->InitLoopEquip = true;
 
     // Fake having more than small load
-    DataSizing::PlantSizData(1).DesVolFlowRate = 1000.0;
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 1000.0;
 
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = true;
@@ -3424,9 +3450,10 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_UserSp
     OutputReportPredefined::SetPredefinedTables(*state);
 
     // OutputProcessor::TimeValue.allocate(2);
-    OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-    OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    OutputProcessor::SetupTimePointers(
+        *state, OutputProcessor::SOVTimeStepType::Zone, state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+    OutputProcessor::SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, state->dataHVACGlobal->TimeStepSys);
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
 
@@ -3437,10 +3464,8 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_UserSp
     SizingManager::GetPlantSizingInput(*state);
     PlantManager::InitOneTimePlantSizingInfo(*state, 1);
     PlantManager::SizePlantLoop(*state, 1, true);
-    state->dataPlantMgr->InitLoopEquip = true;
 
     // Fake having more than small load
-    // DataSizing::PlantSizData(1).DesVolFlowRate = 1000.0;
 
     // SizingManager::ManageSizing();
 
@@ -3481,415 +3506,415 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_UserSp
 
 TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
 {
-    std::string const idf_objects = delimited_string({
-        "  Site:Location,",
-        "    USA IL-CHICAGO-OHARE,    !- Name",
-        "    41.77,                   !- Latitude {deg}",
-        "    -87.75,                  !- Longitude {deg}",
-        "    -6.00,                   !- Time Zone {hr}",
-        "    190;                     !- Elevation {m}",
+    std::string const idf_objects =
+        delimited_string({"  Site:Location,",
+                          "    USA IL-CHICAGO-OHARE,    !- Name",
+                          "    41.77,                   !- Latitude {deg}",
+                          "    -87.75,                  !- Longitude {deg}",
+                          "    -6.00,                   !- Time Zone {hr}",
+                          "    190;                     !- Elevation {m}",
 
-        "  SizingPeriod:DesignDay,",
-        "    CHICAGO Ann Htg 99.6% Condns DB,  !- Name",
-        "    1,                       !- Month",
-        "    21,                      !- Day of Month",
-        "    WinterDesignDay,         !- Day Type",
-        "    -20.6,                   !- Maximum Dry-Bulb Temperature {C}",
-        "    0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}",
-        "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
-        "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
-        "    Wetbulb,                 !- Humidity Condition Type",
-        "    -20.6,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
-        "    ,                        !- Humidity Condition Day Schedule Name",
-        "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
-        "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
-        "    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
-        "    99063.,                  !- Barometric Pressure {Pa}",
-        "    4.9,                     !- Wind Speed {m/s}",
-        "    270,                     !- Wind Direction {deg}",
-        "    No,                      !- Rain Indicator",
-        "    No,                      !- Snow Indicator",
-        "    No,                      !- Daylight Saving Time Indicator",
-        "    ASHRAEClearSky,          !- Solar Model Indicator",
-        "    ,                        !- Beam Solar Day Schedule Name",
-        "    ,                        !- Diffuse Solar Day Schedule Name",
-        "    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
-        "    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
-        "    0.00;                    !- Sky Clearness",
+                          "  SizingPeriod:DesignDay,",
+                          "    CHICAGO Ann Htg 99.6% Condns DB,  !- Name",
+                          "    1,                       !- Month",
+                          "    21,                      !- Day of Month",
+                          "    WinterDesignDay,         !- Day Type",
+                          "    -20.6,                   !- Maximum Dry-Bulb Temperature {C}",
+                          "    0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}",
+                          "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
+                          "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+                          "    Wetbulb,                 !- Humidity Condition Type",
+                          "    -20.6,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+                          "    ,                        !- Humidity Condition Day Schedule Name",
+                          "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+                          "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+                          "    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+                          "    99063.,                  !- Barometric Pressure {Pa}",
+                          "    4.9,                     !- Wind Speed {m/s}",
+                          "    270,                     !- Wind Direction {deg}",
+                          "    No,                      !- Rain Indicator",
+                          "    No,                      !- Snow Indicator",
+                          "    No,                      !- Daylight Saving Time Indicator",
+                          "    ASHRAEClearSky,          !- Solar Model Indicator",
+                          "    ,                        !- Beam Solar Day Schedule Name",
+                          "    ,                        !- Diffuse Solar Day Schedule Name",
+                          "    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+                          "    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+                          "    0.00;                    !- Sky Clearness",
 
-        "  SizingPeriod:DesignDay,",
-        "    CHICAGO Ann Clg .4% Condns WB=>MDB,  !- Name",
-        "    7,                       !- Month",
-        "    21,                      !- Day of Month",
-        "    SummerDesignDay,         !- Day Type",
-        "    31.2,                    !- Maximum Dry-Bulb Temperature {C}",
-        "    10.7,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
-        "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
-        "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
-        "    Wetbulb,                 !- Humidity Condition Type",
-        "    25.5,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
-        "    ,                        !- Humidity Condition Day Schedule Name",
-        "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
-        "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
-        "    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
-        "    99063.,                  !- Barometric Pressure {Pa}",
-        "    5.3,                     !- Wind Speed {m/s}",
-        "    230,                     !- Wind Direction {deg}",
-        "    No,                      !- Rain Indicator",
-        "    No,                      !- Snow Indicator",
-        "    No,                      !- Daylight Saving Time Indicator",
-        "    ASHRAEClearSky,          !- Solar Model Indicator",
-        "    ,                        !- Beam Solar Day Schedule Name",
-        "    ,                        !- Diffuse Solar Day Schedule Name",
-        "    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
-        "    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
-        "    1.00;                    !- Sky Clearness",
+                          "  SizingPeriod:DesignDay,",
+                          "    CHICAGO Ann Clg .4% Condns WB=>MDB,  !- Name",
+                          "    7,                       !- Month",
+                          "    21,                      !- Day of Month",
+                          "    SummerDesignDay,         !- Day Type",
+                          "    31.2,                    !- Maximum Dry-Bulb Temperature {C}",
+                          "    10.7,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
+                          "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
+                          "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+                          "    Wetbulb,                 !- Humidity Condition Type",
+                          "    25.5,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+                          "    ,                        !- Humidity Condition Day Schedule Name",
+                          "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+                          "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+                          "    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+                          "    99063.,                  !- Barometric Pressure {Pa}",
+                          "    5.3,                     !- Wind Speed {m/s}",
+                          "    230,                     !- Wind Direction {deg}",
+                          "    No,                      !- Rain Indicator",
+                          "    No,                      !- Snow Indicator",
+                          "    No,                      !- Daylight Saving Time Indicator",
+                          "    ASHRAEClearSky,          !- Solar Model Indicator",
+                          "    ,                        !- Beam Solar Day Schedule Name",
+                          "    ,                        !- Diffuse Solar Day Schedule Name",
+                          "    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+                          "    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+                          "    1.00;                    !- Sky Clearness",
 
-        "    SimulationControl,",
-        "    no,                     !- Do Zone Sizing Calculation",
-        "    no,                     !- Do System Sizing Calculation",
-        "    no,                     !- Do Plant Sizing Calculation",
-        "    Yes,                    !- Run Simulation for Sizing Periods",
-        "    no;                     !- Run Simulation for Weather File Run Periods",
+                          "    SimulationControl,",
+                          "    no,                     !- Do Zone Sizing Calculation",
+                          "    no,                     !- Do System Sizing Calculation",
+                          "    no,                     !- Do Plant Sizing Calculation",
+                          "    Yes,                    !- Run Simulation for Sizing Periods",
+                          "    no;                     !- Run Simulation for Weather File Run Periods",
 
-        "  Timestep,6;",
+                          "  Timestep,6;",
 
-        "  ScheduleTypeLimits,",
-        "    Any Number;              !- Name",
+                          "  ScheduleTypeLimits,",
+                          "    Any Number;              !- Name",
 
-        "  Schedule:Compact,",
-        "    ALWAYS_ON,               !- Name",
-        "    On/Off,                  !- Schedule Type Limits Name",
-        "    Through: 12/31,          !- Field 1",
-        "    For: AllDays,            !- Field 2",
-        "    Until: 24:00,1;          !- Field 3",
+                          "  Schedule:Compact,",
+                          "    ALWAYS_ON,               !- Name",
+                          "    On/Off,                  !- Schedule Type Limits Name",
+                          "    Through: 12/31,          !- Field 1",
+                          "    For: AllDays,            !- Field 2",
+                          "    Until: 24:00,1;          !- Field 3",
 
-        "  ScheduleTypeLimits,",
-        "    On/Off,                  !- Name",
-        "    0,                       !- Lower Limit Value",
-        "    1,                       !- Upper Limit Value",
-        "    DISCRETE;                !- Numeric Type",
+                          "  ScheduleTypeLimits,",
+                          "    On/Off,                  !- Name",
+                          "    0,                       !- Lower Limit Value",
+                          "    1,                       !- Upper Limit Value",
+                          "    DISCRETE;                !- Numeric Type",
 
-        "  CoolingTower:VariableSpeed,",
-        "    CoolingTower Variable Speed,  !- Name",
-        "    Tower Inlet Node,        !- Water Inlet Node Name",
-        "    Tower Outlet Node,       !- Water Outlet Node Name",
-        "    CoolToolsCrossFlow,      !- Model Type",
-        "    ,                        !- Model Coefficient Name",
-        "    23.25,                   !- Design Inlet Air Wet-Bulb Temperature {C}",
-        "    3.88888888888889,        !- Design Approach Temperature {deltaC}",
-        "    5.55555555555556,        !- Design Range Temperature {deltaC}",
-        "    0.02,                    !- Design Water Flow Rate {m3/s}",
-        "    10.0,                    !- Design Air Flow Rate {m3/s}",
-        "    1000.0,                  !- Design Fan Power {W}",
-        "    CoolingTower Variable Speed Fan Power Ratio Curve,  !- Fan Power Ratio Function of Air Flow Rate Ratio Curve Name",
-        "    0.2,                     !- Minimum Air Flow Rate Ratio",
-        "    0.125,                   !- Fraction of Tower Capacity in Free Convection Regime",
-        "    0,                       !- Basin Heater Capacity {W/K}",
-        "    2,                       !- Basin Heater Setpoint Temperature {C}",
-        "    ,                        !- Basin Heater Operating Schedule Name",
-        "    SaturatedExit,           !- Evaporation Loss Mode",
-        "    0.2,                     !- Evaporation Loss Factor {percent/K}",
-        "    0.008,                   !- Drift Loss Percent {percent}",
-        "    ConcentrationRatio,      !- Blowdown Calculation Mode",
-        "    3,                       !- Blowdown Concentration Ratio",
-        "    ,                        !- Blowdown Makeup Water Usage Schedule Name",
-        "    ,                        !- Supply Water Storage Tank Name",
-        "    ,                        !- Outdoor Air Inlet Node Name",
-        "    ,                        !- Number of Cells",
-        "    ,                        !- Cell Control",
-        "    ,                        !- Cell Minimum  Water Flow Rate Fraction",
-        "    ,                        !- Cell Maximum Water Flow Rate Fraction",
-        "    2.0,                     !- Sizing Factor",
-        "    General;                 !- End-Use Subcategory",
+                          "  CoolingTower:VariableSpeed,",
+                          "    CoolingTower Variable Speed,  !- Name",
+                          "    Tower Inlet Node,        !- Water Inlet Node Name",
+                          "    Tower Outlet Node,       !- Water Outlet Node Name",
+                          "    CoolToolsCrossFlow,      !- Model Type",
+                          "    ,                        !- Model Coefficient Name",
+                          "    23.25,                   !- Design Inlet Air Wet-Bulb Temperature {C}",
+                          "    3.88888888888889,        !- Design Approach Temperature {deltaC}",
+                          "    5.55555555555556,        !- Design Range Temperature {deltaC}",
+                          "    0.02,                    !- Design Water Flow Rate {m3/s}",
+                          "    10.0,                    !- Design Air Flow Rate {m3/s}",
+                          "    1000.0,                  !- Design Fan Power {W}",
+                          "    CoolingTower Variable Speed Fan Power Ratio Curve,  !- Fan Power Ratio Function of Air Flow Rate Ratio Curve Name",
+                          "    0.2,                     !- Minimum Air Flow Rate Ratio",
+                          "    0.125,                   !- Fraction of Tower Capacity in Free Convection Regime",
+                          "    0,                       !- Basin Heater Capacity {W/K}",
+                          "    2,                       !- Basin Heater Setpoint Temperature {C}",
+                          "    ,                        !- Basin Heater Operating Schedule Name",
+                          "    SaturatedExit,           !- Evaporation Loss Mode",
+                          "    0.2,                     !- Evaporation Loss Factor {percent/K}",
+                          "    0.008,                   !- Drift Loss Percent {percent}",
+                          "    ConcentrationRatio,      !- Blowdown Calculation Mode",
+                          "    3,                       !- Blowdown Concentration Ratio",
+                          "    ,                        !- Blowdown Makeup Water Usage Schedule Name",
+                          "    ,                        !- Supply Water Storage Tank Name",
+                          "    ,                        !- Outdoor Air Inlet Node Name",
+                          "    ,                        !- Number of Cells",
+                          "    ,                        !- Cell Control",
+                          "    ,                        !- Cell Minimum  Water Flow Rate Fraction",
+                          "    ,                        !- Cell Maximum Water Flow Rate Fraction",
+                          "    2.0,                     !- Sizing Factor",
+                          "    General;                 !- End-Use Subcategory",
 
-        "  Curve:Cubic,",
-        "    CoolingTower Variable Speed Fan Power Ratio Curve,  !- Name",
-        "    -0.0093,                 !- Coefficient1 Constant",
-        "    0.0512,                  !- Coefficient2 x",
-        "    -0.0838,                 !- Coefficient3 x**2",
-        "    1.0419,                  !- Coefficient4 x**3",
-        "    0.15,                    !- Minimum Value of x",
-        "    1;                       !- Maximum Value of x",
+                          "  Curve:Cubic,",
+                          "    CoolingTower Variable Speed Fan Power Ratio Curve,  !- Name",
+                          "    -0.0093,                 !- Coefficient1 Constant",
+                          "    0.0512,                  !- Coefficient2 x",
+                          "    -0.0838,                 !- Coefficient3 x**2",
+                          "    1.0419,                  !- Coefficient4 x**3",
+                          "    0.15,                    !- Minimum Value of x",
+                          "    1;                       !- Maximum Value of x",
 
-        "  Pump:VariableSpeed,",
-        "    CoolingTower Pump,         !- Name",
-        "    CoolingTower Supply Inlet Node,  !- Inlet Node Name",
-        "    CoolingTower Pump-CoolingTower CoolTowerNodeviaConnector,  !- Outlet Node Name",
-        "      0.03,                    !- Design Maximum Flow Rate {m3/s}",
-        "      134508,                  !- Design Pump Head {Pa}",
-        "      20000.0,                 !- Design Power Consumption {W}",
-        "      0.9,                     !- Motor Efficiency",
-        "      0,                       !- Fraction of Motor Inefficiencies to Fluid Stream",
-        "      0,                       !- Coefficient 1 of the Part Load Performance Curve",
-        "      0.0216,                  !- Coefficient 2 of the Part Load Performance Curve",
-        "      -0.0325,                 !- Coefficient 3 of the Part Load Performance Curve",
-        "      1.0095,                  !- Coefficient 4 of the Part Load Performance Curve",
-        "      0,                       !- Design Minimum Flow Rate {m3/s}",
-        "      Intermittent,            !- Pump Control Type",
-        "      ,                        !- Pump Flow Rate Schedule Name",
-        "      ,                        !- Pump Curve Name",
-        "      ,                        !- Impeller Diameter {m}",
-        "      ,                        !- VFD Control Type",
-        "      ,                        !- Pump RPM Schedule Name",
-        "      ,                        !- Minimum Pressure Schedule",
-        "      ,                        !- Maximum Pressure Schedule",
-        "      ,                        !- Minimum RPM Schedule",
-        "      ,                        !- Maximum RPM Schedule",
-        "      ,                        !- Zone Name",
-        "      0.5,                     !- Skin Loss Radiative Fraction",
-        "      PowerPerFlowPerPressure, !- Design Power Sizing Method",
-        "      348701.1,                !- Design Electric Power per Unit Flow Rate {W/(m3/s)}",
-        "      1.282051282,             !- Design Shaft Power per Unit Flow Rate per Unit Head {W/((m3/s)-Pa)}",
-        "      0,                       !- Design Minimum Flow Rate Fraction",
-        "      General;                 !- End-Use Subcategory",
+                          "  Pump:VariableSpeed,",
+                          "    CoolingTower Pump,         !- Name",
+                          "    CoolingTower Supply Inlet Node,  !- Inlet Node Name",
+                          "    CoolingTower Pump-CoolingTower CoolTowerNodeviaConnector,  !- Outlet Node Name",
+                          "      0.03,                    !- Design Maximum Flow Rate {m3/s}",
+                          "      134508,                  !- Design Pump Head {Pa}",
+                          "      20000.0,                 !- Design Power Consumption {W}",
+                          "      0.9,                     !- Motor Efficiency",
+                          "      0,                       !- Fraction of Motor Inefficiencies to Fluid Stream",
+                          "      0,                       !- Coefficient 1 of the Part Load Performance Curve",
+                          "      0.0216,                  !- Coefficient 2 of the Part Load Performance Curve",
+                          "      -0.0325,                 !- Coefficient 3 of the Part Load Performance Curve",
+                          "      1.0095,                  !- Coefficient 4 of the Part Load Performance Curve",
+                          "      0,                       !- Design Minimum Flow Rate {m3/s}",
+                          "      Intermittent,            !- Pump Control Type",
+                          "      ,                        !- Pump Flow Rate Schedule Name",
+                          "      ,                        !- Pump Curve Name",
+                          "      ,                        !- Impeller Diameter {m}",
+                          "      ,                        !- VFD Control Type",
+                          "      ,                        !- Pump RPM Schedule Name",
+                          "      ,                        !- Minimum Pressure Schedule",
+                          "      ,                        !- Maximum Pressure Schedule",
+                          "      ,                        !- Minimum RPM Schedule",
+                          "      ,                        !- Maximum RPM Schedule",
+                          "      ,                        !- Zone Name",
+                          "      0.5,                     !- Skin Loss Radiative Fraction",
+                          "      PowerPerFlowPerPressure, !- Design Power Sizing Method",
+                          "      348701.1,                !- Design Electric Power per Unit Flow Rate {W/(m3/s)}",
+                          "      1.282051282,             !- Design Shaft Power per Unit Flow Rate per Unit Head {W/((m3/s)-Pa)}",
+                          "      0,                       !- Design Minimum Flow Rate Fraction",
+                          "      General;                 !- End-Use Subcategory",
 
-        "  PlantEquipmentList,",
-        "    CoolingTower Equipment List,  !- Name",
-        "    CoolingTower:VariableSpeed,    !- Equipment 1 Object Type",
-        "    CoolingTower Variable Speed;  !- Equipment 1 Name",
+                          "  PlantEquipmentList,",
+                          "    CoolingTower Equipment List,  !- Name",
+                          "    CoolingTower:VariableSpeed,    !- Equipment 1 Object Type",
+                          "    CoolingTower Variable Speed;  !- Equipment 1 Name",
 
-        "  PlantLoop,",
-        "    CoolingTower Loop,       !- Name",
-        "    Water,                   !- Fluid Type",
-        "    ,                        !- User Defined Fluid Type",
-        "    CoolingTower Loop Operation Scheme List,  !- Condenser Equipment Operation Scheme Name",
-        "    CoolingTower Supply Outlet Node,  !- Condenser Loop Temperature Setpoint Node Name",
-        "    80.0,                    !- Maximum Loop Temperature {C}",
-        "    5.0,                     !- Minimum Loop Temperature {C}",
-        "    0.03,                    !- Maximum Loop Flow Rate {m3/s}",
-        "    0.0,                     !- Minimum Loop Flow Rate {m3/s}",
-        "    Autocalculate,                     !- Condenser Loop Volume {m3}",
-        "    CoolingTower Supply Inlet Node,  !- Condenser Side Inlet Node Name",
-        "    CoolingTower Supply Outlet Node,  !- Condenser Side Outlet Node Name",
-        "    CoolingTower Supply Branches,  !- Condenser Side Branch List Name",
-        "    CoolingTower Supply Connectors,  !- Condenser Side Connector List Name",
-        "    CoolingTower Demand Inlet Node,  !- Demand Side Inlet Node Name",
-        "    CoolingTower Demand Outlet Node,  !- Demand Side Outlet Node Name",
-        "    CoolingTower Demand Branches,  !- Condenser Demand Side Branch List Name",
-        "    CoolingTower Demand Connectors,  !- Condenser Demand Side Connector List Name",
-        "    Optimal,                 !- Load Distribution Scheme",
-        "    ,                        !- Availability Manager List Name",
-        "    SingleSetpoint;          !- Plant Loop Demand Calculation Scheme",
+                          "  PlantLoop,",
+                          "    CoolingTower Loop,       !- Name",
+                          "    Water,                   !- Fluid Type",
+                          "    ,                        !- User Defined Fluid Type",
+                          "    CoolingTower Loop Operation Scheme List,  !- Condenser Equipment Operation Scheme Name",
+                          "    CoolingTower Supply Outlet Node,  !- Condenser Loop Temperature Setpoint Node Name",
+                          "    80.0,                    !- Maximum Loop Temperature {C}",
+                          "    5.0,                     !- Minimum Loop Temperature {C}",
+                          "    0.03,                    !- Maximum Loop Flow Rate {m3/s}",
+                          "    0.0,                     !- Minimum Loop Flow Rate {m3/s}",
+                          "    Autocalculate,                     !- Condenser Loop Volume {m3}",
+                          "    CoolingTower Supply Inlet Node,  !- Condenser Side Inlet Node Name",
+                          "    CoolingTower Supply Outlet Node,  !- Condenser Side Outlet Node Name",
+                          "    CoolingTower Supply Branches,  !- Condenser Side Branch List Name",
+                          "    CoolingTower Supply Connectors,  !- Condenser Side Connector List Name",
+                          "    CoolingTower Demand Inlet Node,  !- Demand Side Inlet Node Name",
+                          "    CoolingTower Demand Outlet Node,  !- Demand Side Outlet Node Name",
+                          "    CoolingTower Demand Branches,  !- Condenser Demand Side Branch List Name",
+                          "    CoolingTower Demand Connectors,  !- Condenser Demand Side Connector List Name",
+                          "    Optimal,                 !- Load Distribution Scheme",
+                          "    ,                        !- Availability Manager List Name",
+                          "    SingleSetpoint;          !- Plant Loop Demand Calculation Scheme",
 
-        "  Sizing:Plant,",
-        "    CoolingTower Loop,       !- Plant or Condenser Loop Name",
-        "    Condenser,               !- Loop Type",
-        "    30,                      !- Design Loop Exit Temperature {C}",
-        "    5.55555555555556,        !- Loop Design Temperature Difference {deltaC}",
-        "    NonCoincident,           !- Sizing Option",
-        "    1,                       !- Zone Timesteps in Averaging Window",
-        "    None;                    !- Coincident Sizing Factor Mode",
+                          "  Sizing:Plant,",
+                          "    CoolingTower Loop,       !- Plant or Condenser Loop Name",
+                          "    Condenser,               !- Loop Type",
+                          "    30,                      !- Design Loop Exit Temperature {C}",
+                          "    5.55555555555556,        !- Loop Design Temperature Difference {deltaC}",
+                          "    NonCoincident,           !- Sizing Option",
+                          "    1,                       !- Zone Timesteps in Averaging Window",
+                          "    None;                    !- Coincident Sizing Factor Mode",
 
-        "  PlantEquipmentOperationSchemes,",
-        "    CoolingTower Loop Operation Scheme List,  !- Name",
-        "    PlantEquipmentOperation:CoolingLoad,  !- Control Scheme 1 Object Type",
-        "    CoolingTower Operation Scheme,  !- Control Scheme 1 Name",
-        "    ALWAYS_ON,                      !- Control Scheme 1 Schedule Name",
-        "    PlantEquipmentOperation:ComponentSetpoint,  !- Control Scheme 3 Object Type",
-        "    CoolingTower Loop Setpoint Operation Scheme,  !- Control Scheme 3 Name",
-        "    ALWAYS_ON;      !- Control Scheme 3 Schedule Name",
+                          "  PlantEquipmentOperationSchemes,",
+                          "    CoolingTower Loop Operation Scheme List,  !- Name",
+                          "    PlantEquipmentOperation:CoolingLoad,  !- Control Scheme 1 Object Type",
+                          "    CoolingTower Operation Scheme,  !- Control Scheme 1 Name",
+                          "    ALWAYS_ON,                      !- Control Scheme 1 Schedule Name",
+                          "    PlantEquipmentOperation:ComponentSetpoint,  !- Control Scheme 3 Object Type",
+                          "    CoolingTower Loop Setpoint Operation Scheme,  !- Control Scheme 3 Name",
+                          "    ALWAYS_ON;      !- Control Scheme 3 Schedule Name",
 
-        "  PlantEquipmentOperation:ComponentSetpoint,",
-        "    CoolingTower Loop Setpoint Operation Scheme,  !- Name",
-        "    CoolingTower:VariableSpeed,    !- Equipment 1 Object Type",
-        "    CoolingTower Variable Speed,   !- Equipment 1 Name",
-        "    CoolingTower Inlet Node,       !- Demand Calculation 1 Node Name",
-        "    CoolingTower Outlet Node,      !- Setpoint 1 Node Name",
-        "    0.03,                          !- Component 1 Flow Rate {m3/s}",
-        "    Cooling;                       !- Operation 1 Type",
+                          "  PlantEquipmentOperation:ComponentSetpoint,",
+                          "    CoolingTower Loop Setpoint Operation Scheme,  !- Name",
+                          "    CoolingTower:VariableSpeed,    !- Equipment 1 Object Type",
+                          "    CoolingTower Variable Speed,   !- Equipment 1 Name",
+                          "    CoolingTower Inlet Node,       !- Demand Calculation 1 Node Name",
+                          "    CoolingTower Outlet Node,      !- Setpoint 1 Node Name",
+                          "    0.03,                          !- Component 1 Flow Rate {m3/s}",
+                          "    Cooling;                       !- Operation 1 Type",
 
-        "  PlantEquipmentOperation:CoolingLoad,",
-        "    CoolingTower Operation Scheme, !- Name",
-        "    0.0,                           !- Load Range 1 Lower Limit {W}",
-        "    1000000000000,                 !- Load Range 1 Upper Limit {W}",
-        "    CoolingTower Equipment List;   !- Range 1 Equipment List Name",
+                          "  PlantEquipmentOperation:CoolingLoad,",
+                          "    CoolingTower Operation Scheme, !- Name",
+                          "    0.0,                           !- Load Range 1 Lower Limit {W}",
+                          "    1000000000000,                 !- Load Range 1 Upper Limit {W}",
+                          "    CoolingTower Equipment List;   !- Range 1 Equipment List Name",
 
-        "  SetpointManager:Scheduled,",
-        "    CoolingTower Setpoint Manager,  !- Name",
-        "    Temperature,                 !- Control Variable",
-        "    CoolingTower Temp Sch,       !- Schedule Name",
-        "    CoolingTower Control Node List;   !- Setpoint Node or NodeList Name",
+                          "  SetpointManager:Scheduled,",
+                          "    CoolingTower Setpoint Manager,  !- Name",
+                          "    Temperature,                 !- Control Variable",
+                          "    CoolingTower Temp Sch,       !- Schedule Name",
+                          "    CoolingTower Control Node List;   !- Setpoint Node or NodeList Name",
 
-        "  NodeList,",
-        "    CoolingTower Control Node List,   !- Name",
-        "    CoolingTower Outlet Node,         !- Node 1 Name",
-        "    CoolingTower Supply Outlet Node;  !- Node 2 Name",
+                          "  NodeList,",
+                          "    CoolingTower Control Node List,   !- Name",
+                          "    CoolingTower Outlet Node,         !- Node 1 Name",
+                          "    CoolingTower Supply Outlet Node;  !- Node 2 Name",
 
-        "  Schedule:Compact,",
-        "    CoolingTower Temp Sch,   !- Name",
-        "    Any Number,              !- Schedule Type Limits Name",
-        "    THROUGH: 12/31,          !- Field 1",
-        "    FOR: AllDays,            !- Field 2",
-        "    UNTIL: 24:00,30.0;       !- Field 3",
+                          "  Schedule:Compact,",
+                          "    CoolingTower Temp Sch,   !- Name",
+                          "    Any Number,              !- Schedule Type Limits Name",
+                          "    THROUGH: 12/31,          !- Field 1",
+                          "    FOR: AllDays,            !- Field 2",
+                          "    UNTIL: 24:00,30.0;       !- Field 3",
 
-        "  BranchList,",
-        "    CoolingTower Demand Branches,  !- Name",
-        "    CoolingTower Demand Inlet Branch,  !- Branch 1 Name",
-        "    CoolingTower Demand Load Branch 1,  !- Branch 2 Name",
-        "    CoolingTower Demand Bypass Branch,  !- Branch 4 Name",
-        "    CoolingTower Demand Outlet Branch;  !- Branch 5 Name",
+                          "  BranchList,",
+                          "    CoolingTower Demand Branches,  !- Name",
+                          "    CoolingTower Demand Inlet Branch,  !- Branch 1 Name",
+                          "    CoolingTower Demand Load Branch 1,  !- Branch 2 Name",
+                          "    CoolingTower Demand Bypass Branch,  !- Branch 4 Name",
+                          "    CoolingTower Demand Outlet Branch;  !- Branch 5 Name",
 
-        "  BranchList,",
-        "    CoolingTower Supply Branches,  !- Name",
-        "    CoolingTower Supply Inlet Branch,  !- Branch 1 Name",
-        "    CoolingTower Supply Equipment Branch 1,  !- Branch 2 Name",
-        "    CoolingTower Supply Equipment Bypass Branch,  !- Branch 4 Name",
-        "    CoolingTower Supply Outlet Branch;  !- Branch 5 Name",
+                          "  BranchList,",
+                          "    CoolingTower Supply Branches,  !- Name",
+                          "    CoolingTower Supply Inlet Branch,  !- Branch 1 Name",
+                          "    CoolingTower Supply Equipment Branch 1,  !- Branch 2 Name",
+                          "    CoolingTower Supply Equipment Bypass Branch,  !- Branch 4 Name",
+                          "    CoolingTower Supply Outlet Branch;  !- Branch 5 Name",
 
-        "  Branch,",
-        "    CoolingTower Demand Bypass Branch,  !- Name",
-        "    ,                        !- Pressure Drop Curve Name",
-        "    Pipe:Adiabatic,          !- Component 1 Object Type",
-        "    CoolingTower Demand Bypass Pipe,  !- Component 1 Name",
-        "    CoolingTower Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name",
-        "    CoolingTower Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name",
+                          "  Branch,",
+                          "    CoolingTower Demand Bypass Branch,  !- Name",
+                          "    ,                        !- Pressure Drop Curve Name",
+                          "    Pipe:Adiabatic,          !- Component 1 Object Type",
+                          "    CoolingTower Demand Bypass Pipe,  !- Component 1 Name",
+                          "    CoolingTower Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name",
+                          "    CoolingTower Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name",
 
-        "  Branch,",
-        "    CoolingTower Demand Inlet Branch,  !- Name",
-        "    ,                        !- Pressure Drop Curve Name",
-        "    Pipe:Adiabatic,          !- Component 1 Object Type",
-        "    CoolingTower Demand Inlet Pipe,  !- Component 1 Name",
-        "    CoolingTower Demand Inlet Node,  !- Component 1 Inlet Node Name",
-        "    CoolingTower Demand Inlet Pipe-CoolingTower Demand Mixer;  !- Component 1 Outlet Node Name",
+                          "  Branch,",
+                          "    CoolingTower Demand Inlet Branch,  !- Name",
+                          "    ,                        !- Pressure Drop Curve Name",
+                          "    Pipe:Adiabatic,          !- Component 1 Object Type",
+                          "    CoolingTower Demand Inlet Pipe,  !- Component 1 Name",
+                          "    CoolingTower Demand Inlet Node,  !- Component 1 Inlet Node Name",
+                          "    CoolingTower Demand Inlet Pipe-CoolingTower Demand Mixer;  !- Component 1 Outlet Node Name",
 
-        "  Branch,",
-        "    CoolingTower Demand Load Branch 1,  !- Name",
-        "    ,                        !- Pressure Drop Curve Name",
-        "    LoadProfile:Plant,  !- Component 1 Object Type",
-        "    Load Profile 1,      !- Component 1 Name",
-        "    Demand Load Profile 1 Inlet Node,  !- Component 1 Inlet Node Name",
-        "    Demand Load Profile 1 Outlet Node;  !- Component 1 Outlet Node Name",
+                          "  Branch,",
+                          "    CoolingTower Demand Load Branch 1,  !- Name",
+                          "    ,                        !- Pressure Drop Curve Name",
+                          "    LoadProfile:Plant,  !- Component 1 Object Type",
+                          "    Load Profile 1,      !- Component 1 Name",
+                          "    Demand Load Profile 1 Inlet Node,  !- Component 1 Inlet Node Name",
+                          "    Demand Load Profile 1 Outlet Node;  !- Component 1 Outlet Node Name",
 
-        "  LoadProfile:Plant,",
-        "    Load Profile 1,          !- Name",
-        "    Demand Load Profile 1 Inlet Node,  !- Inlet Node Name",
-        "    Demand Load Profile 1 Outlet Node,  !- Outlet Node Name",
-        "    Load Profile 1 Load Schedule,  !- Load Schedule Name",
-        "    0.010,                    !- Peak Flow Rate {m3/s}",
-        "    Load Profile 1 Flow Frac Schedule;  !- Flow Rate Fraction Schedule Name",
+                          "  LoadProfile:Plant,",
+                          "    Load Profile 1,          !- Name",
+                          "    Demand Load Profile 1 Inlet Node,  !- Inlet Node Name",
+                          "    Demand Load Profile 1 Outlet Node,  !- Outlet Node Name",
+                          "    Load Profile 1 Load Schedule,  !- Load Schedule Name",
+                          "    0.010,                    !- Peak Flow Rate {m3/s}",
+                          "    Load Profile 1 Flow Frac Schedule;  !- Flow Rate Fraction Schedule Name",
 
-        "  Schedule:Compact,",
-        "    Load Profile 1 Load Schedule,  !- Name",
-        "    Any Number,              !- Schedule Type Limits Name",
-        "    THROUGH: 12/31,          !- Field 1",
-        "    FOR: AllDays,            !- Field 2",
-        "    UNTIL: 24:00,0.0;        !- Field 3",
+                          "  Schedule:Compact,",
+                          "    Load Profile 1 Load Schedule,  !- Name",
+                          "    Any Number,              !- Schedule Type Limits Name",
+                          "    THROUGH: 12/31,          !- Field 1",
+                          "    FOR: AllDays,            !- Field 2",
+                          "    UNTIL: 24:00,0.0;        !- Field 3",
 
-        "  Schedule:Compact,",
-        "    Load Profile 1 Flow Frac Schedule,  !- Name",
-        "    Any Number,              !- Schedule Type Limits Name",
-        "    THROUGH: 12/31,          !- Field 1",
-        "    FOR: AllDays,            !- Field 2",
-        "    UNTIL: 24:00,1.0;        !- Field 3",
+                          "  Schedule:Compact,",
+                          "    Load Profile 1 Flow Frac Schedule,  !- Name",
+                          "    Any Number,              !- Schedule Type Limits Name",
+                          "    THROUGH: 12/31,          !- Field 1",
+                          "    FOR: AllDays,            !- Field 2",
+                          "    UNTIL: 24:00,1.0;        !- Field 3",
 
-        "  Branch,",
-        "    CoolingTower Demand Outlet Branch,  !- Name",
-        "    ,                        !- Pressure Drop Curve Name",
-        "    Pipe:Adiabatic,          !- Component 1 Object Type",
-        "    CoolingTower Demand Outlet Pipe,  !- Component 1 Name",
-        "    CoolingTower Demand Mixer-CoolingTower Demand Outlet Pipe,  !- Component 1 Inlet Node Name",
-        "    CoolingTower Demand Outlet Node;  !- Component 1 Outlet Node Name",
+                          "  Branch,",
+                          "    CoolingTower Demand Outlet Branch,  !- Name",
+                          "    ,                        !- Pressure Drop Curve Name",
+                          "    Pipe:Adiabatic,          !- Component 1 Object Type",
+                          "    CoolingTower Demand Outlet Pipe,  !- Component 1 Name",
+                          "    CoolingTower Demand Mixer-CoolingTower Demand Outlet Pipe,  !- Component 1 Inlet Node Name",
+                          "    CoolingTower Demand Outlet Node;  !- Component 1 Outlet Node Name",
 
-        "  Branch,",
-        "    CoolingTower Supply Equipment Branch 1,  !- Name",
-        "    ,                            !- Pressure Drop Curve Name",
-        "    CoolingTower:VariableSpeed,  !- Component 1 Object Type",
-        "    CoolingTower Variable Speed, !- Component 1 Name",
-        "    CoolingTower Inlet Node,     !- Component 1 Inlet Node Name",
-        "    CoolingTower Outlet Node;    !- Component 1 Outlet Node Name",
+                          "  Branch,",
+                          "    CoolingTower Supply Equipment Branch 1,  !- Name",
+                          "    ,                            !- Pressure Drop Curve Name",
+                          "    CoolingTower:VariableSpeed,  !- Component 1 Object Type",
+                          "    CoolingTower Variable Speed, !- Component 1 Name",
+                          "    CoolingTower Inlet Node,     !- Component 1 Inlet Node Name",
+                          "    CoolingTower Outlet Node;    !- Component 1 Outlet Node Name",
 
-        "  Branch,",
-        "    CoolingTower Supply Equipment Bypass Branch,  !- Name",
-        "    ,                        !- Pressure Drop Curve Name",
-        "    Pipe:Adiabatic,          !- Component 1 Object Type",
-        "    CoolingTower Supply Equipment Bypass Pipe,  !- Component 1 Name",
-        "    CoolingTower Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name",
-        "    CoolingTower Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name",
+                          "  Branch,",
+                          "    CoolingTower Supply Equipment Bypass Branch,  !- Name",
+                          "    ,                        !- Pressure Drop Curve Name",
+                          "    Pipe:Adiabatic,          !- Component 1 Object Type",
+                          "    CoolingTower Supply Equipment Bypass Pipe,  !- Component 1 Name",
+                          "    CoolingTower Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name",
+                          "    CoolingTower Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name",
 
-        "  Branch,",
-        "    CoolingTower Supply Inlet Branch,  !- Name",
-        "    ,                        !- Pressure Drop Curve Name",
-        "    Pump:VariableSpeed,      !- Component 1 Object Type",
-        "    CoolingTower Pump,       !- Component 1 Name",
-        "    CoolingTower Supply Inlet Node,  !- Component 1 Inlet Node Name",
-        "    CoolingTower Pump-CoolingTower CoolTowerNodeviaConnector;  !- Component 1 Outlet Node Name",
+                          "  Branch,",
+                          "    CoolingTower Supply Inlet Branch,  !- Name",
+                          "    ,                        !- Pressure Drop Curve Name",
+                          "    Pump:VariableSpeed,      !- Component 1 Object Type",
+                          "    CoolingTower Pump,       !- Component 1 Name",
+                          "    CoolingTower Supply Inlet Node,  !- Component 1 Inlet Node Name",
+                          "    CoolingTower Pump-CoolingTower CoolTowerNodeviaConnector;  !- Component 1 Outlet Node Name",
 
-        "  Branch,",
-        "    CoolingTower Supply Outlet Branch,  !- Name",
-        "    ,                        !- Pressure Drop Curve Name",
-        "    Pipe:Adiabatic,          !- Component 1 Object Type",
-        "    CoolingTower Supply Outlet Pipe,  !- Component 1 Name",
-        "    CoolingTower Supply Mixer-CoolingTower Supply Outlet Pipe,  !- Component 1 Inlet Node Name",
-        "    CoolingTower Supply Outlet Node;  !- Component 1 Outlet Node Name",
+                          "  Branch,",
+                          "    CoolingTower Supply Outlet Branch,  !- Name",
+                          "    ,                        !- Pressure Drop Curve Name",
+                          "    Pipe:Adiabatic,          !- Component 1 Object Type",
+                          "    CoolingTower Supply Outlet Pipe,  !- Component 1 Name",
+                          "    CoolingTower Supply Mixer-CoolingTower Supply Outlet Pipe,  !- Component 1 Inlet Node Name",
+                          "    CoolingTower Supply Outlet Node;  !- Component 1 Outlet Node Name",
 
-        "  OutdoorAir:Node,",
-        "    CoolingTower CoolTower OA ref Node;  !- Name",
+                          "  OutdoorAir:Node,",
+                          "    CoolingTower CoolTower OA ref Node;  !- Name",
 
-        "  ConnectorList,",
-        "    CoolingTower Demand Connectors,  !- Name",
-        "    Connector:Splitter,          !- Connector 1 Object Type",
-        "    CoolingTower Demand Splitter,  !- Connector 1 Name",
-        "    Connector:Mixer,             !- Connector 2 Object Type",
-        "    CoolingTower Demand Mixer;  !- Connector 2 Name",
+                          "  ConnectorList,",
+                          "    CoolingTower Demand Connectors,  !- Name",
+                          "    Connector:Splitter,          !- Connector 1 Object Type",
+                          "    CoolingTower Demand Splitter,  !- Connector 1 Name",
+                          "    Connector:Mixer,             !- Connector 2 Object Type",
+                          "    CoolingTower Demand Mixer;  !- Connector 2 Name",
 
-        "  ConnectorList,",
-        "    CoolingTower Supply Connectors,  !- Name",
-        "    Connector:Splitter,      !- Connector 1 Object Type",
-        "    CoolingTower Supply Splitter,  !- Connector 1 Name",
-        "    Connector:Mixer,         !- Connector 2 Object Type",
-        "    CoolingTower Supply Mixer;  !- Connector 2 Name",
+                          "  ConnectorList,",
+                          "    CoolingTower Supply Connectors,  !- Name",
+                          "    Connector:Splitter,      !- Connector 1 Object Type",
+                          "    CoolingTower Supply Splitter,  !- Connector 1 Name",
+                          "    Connector:Mixer,         !- Connector 2 Object Type",
+                          "    CoolingTower Supply Mixer;  !- Connector 2 Name",
 
-        "  Connector:Splitter,",
-        "    CoolingTower Demand Splitter,  !- Name",
-        "    CoolingTower Demand Inlet Branch,  !- Inlet Branch Name",
-        "    CoolingTower Demand Load Branch 1,  !- Outlet Branch 1 Name",
-        "    CoolingTower Demand Bypass Branch;  !- Outlet Branch 3 Name",
+                          "  Connector:Splitter,",
+                          "    CoolingTower Demand Splitter,  !- Name",
+                          "    CoolingTower Demand Inlet Branch,  !- Inlet Branch Name",
+                          "    CoolingTower Demand Load Branch 1,  !- Outlet Branch 1 Name",
+                          "    CoolingTower Demand Bypass Branch;  !- Outlet Branch 3 Name",
 
-        "  Connector:Splitter,",
-        "    CoolingTower Supply Splitter,  !- Name",
-        "    CoolingTower Supply Inlet Branch,  !- Inlet Branch Name",
-        "    CoolingTower Supply Equipment Branch 1,  !- Outlet Branch 1 Name",
-        "    CoolingTower Supply Equipment Bypass Branch;  !- Outlet Branch 3 Name",
+                          "  Connector:Splitter,",
+                          "    CoolingTower Supply Splitter,  !- Name",
+                          "    CoolingTower Supply Inlet Branch,  !- Inlet Branch Name",
+                          "    CoolingTower Supply Equipment Branch 1,  !- Outlet Branch 1 Name",
+                          "    CoolingTower Supply Equipment Bypass Branch;  !- Outlet Branch 3 Name",
 
-        "  Connector:Mixer,",
-        "    CoolingTower Demand Mixer,  !- Name",
-        "    CoolingTower Demand Outlet Branch,  !- Outlet Branch Name",
-        "    CoolingTower Demand Load Branch 1,  !- Inlet Branch 1 Name",
-        "    CoolingTower Demand Bypass Branch;  !- Inlet Branch 3 Name",
+                          "  Connector:Mixer,",
+                          "    CoolingTower Demand Mixer,  !- Name",
+                          "    CoolingTower Demand Outlet Branch,  !- Outlet Branch Name",
+                          "    CoolingTower Demand Load Branch 1,  !- Inlet Branch 1 Name",
+                          "    CoolingTower Demand Bypass Branch;  !- Inlet Branch 3 Name",
 
-        "  Connector:Mixer,",
-        "    CoolingTower Supply Mixer,  !- Name",
-        "    CoolingTower Supply Outlet Branch,  !- Outlet Branch Name",
-        "    CoolingTower Supply Equipment Branch 1,  !- Inlet Branch 1 Name",
-        "    CoolingTower Supply Equipment Bypass Branch;  !- Inlet Branch 3 Name",
+                          "  Connector:Mixer,",
+                          "    CoolingTower Supply Mixer,  !- Name",
+                          "    CoolingTower Supply Outlet Branch,  !- Outlet Branch Name",
+                          "    CoolingTower Supply Equipment Branch 1,  !- Inlet Branch 1 Name",
+                          "    CoolingTower Supply Equipment Bypass Branch;  !- Inlet Branch 3 Name",
 
-        "  Pipe:Adiabatic,",
-        "    CoolingTower Demand Bypass Pipe,  !- Name",
-        "    CoolingTower Demand Bypass Pipe Inlet Node,  !- Inlet Node Name",
-        "    CoolingTower Demand Bypass Pipe Outlet Node;  !- Outlet Node Name",
+                          "  Pipe:Adiabatic,",
+                          "    CoolingTower Demand Bypass Pipe,  !- Name",
+                          "    CoolingTower Demand Bypass Pipe Inlet Node,  !- Inlet Node Name",
+                          "    CoolingTower Demand Bypass Pipe Outlet Node;  !- Outlet Node Name",
 
-        "  Pipe:Adiabatic,",
-        "    CoolingTower Demand Inlet Pipe,  !- Name",
-        "    CoolingTower Demand Inlet Node,  !- Inlet Node Name",
-        "    CoolingTower Demand Inlet Pipe-CoolingTower Demand Mixer;  !- Outlet Node Name",
+                          "  Pipe:Adiabatic,",
+                          "    CoolingTower Demand Inlet Pipe,  !- Name",
+                          "    CoolingTower Demand Inlet Node,  !- Inlet Node Name",
+                          "    CoolingTower Demand Inlet Pipe-CoolingTower Demand Mixer;  !- Outlet Node Name",
 
-        "  Pipe:Adiabatic,",
-        "    CoolingTower Demand Outlet Pipe,  !- Name",
-        "    CoolingTower Demand Mixer-CoolingTower Demand Outlet Pipe,  !- Inlet Node Name",
-        "    CoolingTower Demand Outlet Node;  !- Outlet Node Name",
+                          "  Pipe:Adiabatic,",
+                          "    CoolingTower Demand Outlet Pipe,  !- Name",
+                          "    CoolingTower Demand Mixer-CoolingTower Demand Outlet Pipe,  !- Inlet Node Name",
+                          "    CoolingTower Demand Outlet Node;  !- Outlet Node Name",
 
-        "  Pipe:Adiabatic,",
-        "    CoolingTower Supply Equipment Bypass Pipe,  !- Name",
-        "    CoolingTower Supply Equip Bypass Inlet Node,  !- Inlet Node Name",
-        "    CoolingTower Supply Equip Bypass Outlet Node;  !- Outlet Node Name",
+                          "  Pipe:Adiabatic,",
+                          "    CoolingTower Supply Equipment Bypass Pipe,  !- Name",
+                          "    CoolingTower Supply Equip Bypass Inlet Node,  !- Inlet Node Name",
+                          "    CoolingTower Supply Equip Bypass Outlet Node;  !- Outlet Node Name",
 
-        "  Pipe:Adiabatic,",
-        "    CoolingTower Supply Outlet Pipe,  !- Name",
-        "    CoolingTower Supply Mixer-CoolingTower Supply Outlet Pipe,  !- Inlet Node Name",
-        "    CoolingTower Supply Outlet Node;  !- Outlet Node Name"
+                          "  Pipe:Adiabatic,",
+                          "    CoolingTower Supply Outlet Pipe,  !- Name",
+                          "    CoolingTower Supply Mixer-CoolingTower Supply Outlet Pipe,  !- Inlet Node Name",
+                          "    CoolingTower Supply Outlet Node;  !- Outlet Node Name"
 
-    });
+        });
 
     ASSERT_TRUE(process_idf(idf_objects));
     SimulationManager::PostIPProcessing(*state);
@@ -3898,9 +3923,9 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     SimulationManager::GetProjectData(*state);
     OutputReportPredefined::SetPredefinedTables(*state);
 
-    OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone);
-    OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    OutputProcessor::SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, state->dataGlobal->TimeStepZone);
+    OutputProcessor::SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, state->dataHVACGlobal->TimeStepSys);
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
     BranchInputManager::ManageBranchInput(*state);
@@ -3911,7 +3936,6 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     SizingManager::GetPlantSizingInput(*state);
     PlantManager::InitOneTimePlantSizingInfo(*state, 1);
     PlantManager::SizePlantLoop(*state, 1, true);
-    state->dataPlantMgr->InitLoopEquip = true;
 
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = true;
@@ -3928,7 +3952,7 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->OutHumRat =
         Psychrometrics::PsyWFnTdbTwbPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutWetBulbTemp, state->dataEnvrn->OutBaroPress);
-    DataLoopNode::Node(VSTower.WaterInletNodeNum).Temp = 35.0;
+    state->dataLoopNodes->Node(VSTower.WaterInletNodeNum).Temp = 35.0;
 
     VSTower.initialize(*state);
     state->dataGlobal->BeginEnvrnFlag = false;

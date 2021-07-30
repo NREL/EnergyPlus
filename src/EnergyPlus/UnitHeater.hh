@@ -146,7 +146,8 @@ namespace UnitHeater {
         }
     };
 
-    void SimUnitHeater(EnergyPlusData &state, std::string const &CompName,   // name of the fan coil unit
+    void SimUnitHeater(EnergyPlusData &state,
+                       std::string_view CompName,     // name of the fan coil unit
                        int const ZoneNum,             // number of zone being served
                        bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                        Real64 &PowerMet,              // Sensible power supplied (W)
@@ -155,21 +156,24 @@ namespace UnitHeater {
 
     void GetUnitHeaterInput(EnergyPlusData &state);
 
-    void InitUnitHeater(EnergyPlusData &state, int const UnitHeatNum,        // index for the current unit heater
+    void InitUnitHeater(EnergyPlusData &state,
+                        int const UnitHeatNum,        // index for the current unit heater
                         int const ZoneNum,            // number of zone being served
                         bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     );
 
     void SizeUnitHeater(EnergyPlusData &state, int const UnitHeatNum);
 
-    void CalcUnitHeater(EnergyPlusData &state, int &UnitHeatNum,              // number of the current fan coil unit being simulated
+    void CalcUnitHeater(EnergyPlusData &state,
+                        int &UnitHeatNum,              // number of the current fan coil unit being simulated
                         int const ZoneNum,             // number of zone being served
                         bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                         Real64 &PowerMet,              // Sensible power supplied (W)
                         Real64 &LatOutputProvided      // Latent power supplied (kg/s), negative = dehumidification
     );
 
-    void CalcUnitHeaterComponents(EnergyPlusData &state, int const UnitHeatNum,                   // Unit index in unit heater array
+    void CalcUnitHeaterComponents(EnergyPlusData &state,
+                                  int const UnitHeatNum,                   // Unit index in unit heater array
                                   bool const FirstHVACIteration,           // flag for 1st HVAV iteration in the time step
                                   Real64 &LoadMet,                         // load met by unit (watts)
                                   Optional_int_const OpMode = _,           // fan operating mode
@@ -185,13 +189,15 @@ namespace UnitHeater {
 
     void ReportUnitHeater(EnergyPlusData &state, int const UnitHeatNum); // Unit index in unit heater array
 
-    Real64 CalcUnitHeaterResidual(EnergyPlusData &state, Real64 const PartLoadRatio, // heating coil part load ratio
+    Real64 CalcUnitHeaterResidual(EnergyPlusData &state,
+                                  Real64 const PartLoadRatio, // heating coil part load ratio
                                   Array1D<Real64> const &Par  // Function parameters
     );
 
 } // namespace UnitHeater
 
-struct UnitHeatersData : BaseGlobalStruct {
+struct UnitHeatersData : BaseGlobalStruct
+{
 
     // MODULE PARAMETER DEFINITIONS
     std::string const cMO_UnitHeater = "ZoneHVAC:UnitHeater";
@@ -214,22 +220,32 @@ struct UnitHeatersData : BaseGlobalStruct {
     bool SetMassFlowRateToZero = false;    // TRUE when mass flow rates need to be set to zero
 
     // Object Data
-    Array1D<UnitHeater::UnitHeaterData> UnitHeat;
-    Array1D<UnitHeater::UnitHeatNumericFieldData> UnitHeatNumericFields;
+    EPVector<UnitHeater::UnitHeaterData> UnitHeat;
+    EPVector<UnitHeater::UnitHeatNumericFieldData> UnitHeatNumericFields;
+
+    Array1D_bool MyEnvrnFlag;
+    Array1D_bool MyPlantScanFlag;
+    Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
+
+    int RefrigIndex = 0;
 
     void clear_state() override
     {
-        HCoilOn = false;
-        NumOfUnitHeats = 0;
-        QZnReq = 0.0;
-        MySizeFlag.deallocate();
-        CheckEquipName.deallocate();
-        UnitHeat.deallocate();
-        UnitHeatNumericFields.deallocate();
-        InitUnitHeaterOneTimeFlag = true;
-        GetUnitHeaterInputFlag = true;
-        ZoneEquipmentListChecked = false;
-        SetMassFlowRateToZero = false;
+        this->HCoilOn = false;
+        this->NumOfUnitHeats = 0;
+        this->QZnReq = 0.0;
+        this->MySizeFlag.deallocate();
+        this->CheckEquipName.deallocate();
+        this->UnitHeat.deallocate();
+        this->UnitHeatNumericFields.deallocate();
+        this->InitUnitHeaterOneTimeFlag = true;
+        this->GetUnitHeaterInputFlag = true;
+        this->ZoneEquipmentListChecked = false;
+        this->SetMassFlowRateToZero = false;
+        this->MyEnvrnFlag.deallocate();
+        this->MyPlantScanFlag.deallocate();
+        this->MyZoneEqFlag.deallocate();
+        this->RefrigIndex = 0;
     }
 
     // Default Constructor

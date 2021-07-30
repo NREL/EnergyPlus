@@ -146,7 +146,8 @@ namespace SteamCoils {
         }
     };
 
-    void SimulateSteamCoilComponents(EnergyPlusData &state, std::string const &CompName,
+    void SimulateSteamCoilComponents(EnergyPlusData &state,
+                                     std::string_view CompName,
                                      bool const FirstHVACIteration,
                                      int &CompIndex,
                                      Optional<Real64 const> QCoilReq = _, // coil load to be met
@@ -178,7 +179,7 @@ namespace SteamCoils {
                           bool &ErrorsFound            // set to true if problem
     );
 
-    void CheckSteamCoilSchedule(EnergyPlusData &state, std::string const &CompType, std::string const &CompName, Real64 &Value, int &CompIndex);
+    void CheckSteamCoilSchedule(EnergyPlusData &state, std::string const &CompType, std::string_view CompName, Real64 &Value, int &CompIndex);
 
     Real64 GetCoilMaxWaterFlowRate(EnergyPlusData &state,
                                    std::string const &CoilType, // must match coil types in this module
@@ -233,7 +234,8 @@ namespace SteamCoils {
                                bool &ErrorsFound            // set to true if problem
     );
 
-    Real64 GetCoilCapacity([[maybe_unused]] EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilCapacity([[maybe_unused]] EnergyPlusData &state,
+                           std::string const &CoilType, // must match coil types in this module
                            std::string const &CoilName, // must match coil names for the coil type
                            bool &ErrorsFound            // set to true if problem
     );
@@ -267,7 +269,8 @@ namespace SteamCoils {
 
 } // namespace SteamCoils
 
-struct SteamCoilsData : BaseGlobalStruct {
+struct SteamCoilsData : BaseGlobalStruct
+{
 
     int const SteamCoil_AirHeating = 2;
     int const TemperatureSetPointControl = 1;
@@ -280,7 +283,9 @@ struct SteamCoilsData : BaseGlobalStruct {
     Array1D_bool CheckEquipName;
     bool GetSteamCoilsInputFlag = true; // Flag set to make sure you get input once
     bool MyOneTimeFlag = true;          // one time initialization flag
-
+    Array1D_bool MyEnvrnFlag;
+    Array1D_bool MyPlantScanFlag;
+    int ErrCount = 0;
     Array1D<SteamCoils::SteamCoilEquipConditions> SteamCoil;
 
     void clear_state() override
@@ -292,6 +297,9 @@ struct SteamCoilsData : BaseGlobalStruct {
         MySizeFlag.deallocate();
         CoilWarningOnceFlag.deallocate();
         CheckEquipName.deallocate();
+        this->MyEnvrnFlag.clear();
+        this->MyPlantScanFlag.clear();
+        this->ErrCount = 0;
     }
 
     // Default Constructor

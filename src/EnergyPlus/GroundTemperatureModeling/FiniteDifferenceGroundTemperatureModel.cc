@@ -69,16 +69,11 @@
 
 namespace EnergyPlus {
 
-int simDay = 0;
-int numIterYears = 0;
-int const maxYearsToIterate = 10;
-Real64 finalTempConvergenceCriteria = 0.05;
-Real64 iterationTempConvergenceCriteria = 0.00001;
-
 //******************************************************************************
 
 // Finite difference model factory
-std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(EnergyPlusData &state, int objectType, std::string objectName)
+std::shared_ptr<FiniteDiffGroundTempsModel>
+FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(EnergyPlusData &state, GroundTempObjType objectType, std::string objectName)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -90,7 +85,6 @@ std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDi
     // Read input and creates instance of finite difference ground temp model
 
     // USE STATEMENTS:
-    using namespace DataIPShortCuts;
     using namespace GroundTemperatureManager;
 
     // Locals
@@ -105,24 +99,26 @@ std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDi
     std::shared_ptr<FiniteDiffGroundTempsModel> thisModel(new FiniteDiffGroundTempsModel());
 
     // Search through finite diff models here
-    std::string const cCurrentModuleObject = CurrentModuleObjects(objectType_FiniteDiffGroundTemp);
-    int numCurrModels = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    std::string const cCurrentModuleObject =
+        state.dataGrndTempModelMgr->CurrentModuleObjects(static_cast<int>(GroundTempObjType::FiniteDiffGroundTemp));
+    int numCurrModels = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     for (int modelNum = 1; modelNum <= numCurrModels; ++modelNum) {
 
-        inputProcessor->getObjectItem(state, cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+        state.dataInputProcessing->inputProcessor->getObjectItem(
+            state, cCurrentModuleObject, modelNum, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
 
-        if (objectName == cAlphaArgs(1)) {
+        if (objectName == state.dataIPShortCut->cAlphaArgs(1)) {
             // Read input into object here
 
             thisModel->objectType = objectType;
-            thisModel->objectName = cAlphaArgs(1);
-            thisModel->baseConductivity = rNumericArgs(1);
-            thisModel->baseDensity = rNumericArgs(2);
-            thisModel->baseSpecificHeat = rNumericArgs(3);
-            thisModel->waterContent = rNumericArgs(4) / 100.0;
-            thisModel->saturatedWaterContent = rNumericArgs(5) / 100.0;
-            thisModel->evapotransCoeff = rNumericArgs(6);
+            thisModel->objectName = state.dataIPShortCut->cAlphaArgs(1);
+            thisModel->baseConductivity = state.dataIPShortCut->rNumericArgs(1);
+            thisModel->baseDensity = state.dataIPShortCut->rNumericArgs(2);
+            thisModel->baseSpecificHeat = state.dataIPShortCut->rNumericArgs(3);
+            thisModel->waterContent = state.dataIPShortCut->rNumericArgs(4) / 100.0;
+            thisModel->saturatedWaterContent = state.dataIPShortCut->rNumericArgs(5) / 100.0;
+            thisModel->evapotransCoeff = state.dataIPShortCut->rNumericArgs(6);
 
             found = true;
             break;
@@ -130,7 +126,7 @@ std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDi
     }
 
     if (found && !ErrorsFound) {
-        groundTempModels.push_back(thisModel);
+        state.dataGrndTempModelMgr->groundTempModels.push_back(thisModel);
 
         // Simulate
         thisModel->initAndSim(state);
@@ -179,7 +175,6 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
 
     // USE STATEMENTS:
     using namespace DataEnvironment;
-    using namespace DataReportingFlags;
 
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -204,7 +199,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     bool WarmupFlag_reset = state.dataGlobal->WarmupFlag;
     int DayOfSim_reset = state.dataGlobal->DayOfSim;
     std::string DayOfSimChr_reset = state.dataGlobal->DayOfSimChr;
-    int NumOfWarmupDays_reset = NumOfWarmupDays;
+    int NumOfWarmupDays_reset = state.dataReportFlag->NumOfWarmupDays;
     bool BeginDayFlag_reset = state.dataGlobal->BeginDayFlag;
     bool EndDayFlag_reset = state.dataGlobal->EndDayFlag;
     bool BeginHourFlag_reset = state.dataGlobal->BeginHourFlag;
@@ -212,7 +207,8 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
 
     if (!state.dataWeatherManager->WeatherFileExists) {
         ShowSevereError(state, "Site:GroundTemperature:Undisturbed:FiniteDifference -- using this model requires specification of a weather file.");
-        ShowContinueError(state, "Either place in.epw in the working directory or specify a weather file on the command line using -w /path/to/weather.epw");
+        ShowContinueError(state,
+                          "Either place in.epw in the working directory or specify a weather file on the command line using -w /path/to/weather.epw");
         ShowFatalError(state, "Simulation halted due to input error in ground temperature model.");
     }
 
@@ -226,7 +222,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     state.dataWeatherManager->RPReadAllWeatherData = true;
     state.dataGlobal->WeathSimReq = true;
     // RunPeriod is initialized to be one year of simulation
-    //RunPeriodInput(TotRunPers).monWeekDay = 0; // Why do this?
+    // RunPeriodInput(TotRunPers).monWeekDay = 0; // Why do this?
 
     WeatherManager::SetupEnvironmentTypes(state);
 
@@ -252,7 +248,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     state.dataGlobal->WarmupFlag = false;
     state.dataGlobal->DayOfSim = 0;
     state.dataGlobal->DayOfSimChr = "0";
-    NumOfWarmupDays = 0;
+    state.dataReportFlag->NumOfWarmupDays = 0;
 
     annualAveAirTemp_num = 0.0;
 
@@ -305,7 +301,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
                 airDensity_num += state.dataEnvrn->OutAirDensity;
                 relHum_num += state.dataEnvrn->OutRelHumValue;
                 windSpeed_num += state.dataEnvrn->WindSpeed;
-                horizSolarRad_num += state.dataEnvrn->BeamSolarRad + state.dataEnvrn->DifSolarRad;
+                horizSolarRad_num += max(state.dataEnvrn->SOLCOS(3), 0.0) * state.dataEnvrn->BeamSolarRad + state.dataEnvrn->DifSolarRad;
 
                 state.dataGlobal->BeginHourFlag = false;
                 state.dataGlobal->BeginDayFlag = false;
@@ -341,7 +337,6 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
 
     } // ... End day loop.
 
-
     annualAveAirTemp = annualAveAirTemp_num / state.dataWeatherManager->NumDaysInYear; // Used for initalizing domain
 
     // Reset Envrionment when done reading data
@@ -360,7 +355,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     state.dataGlobal->WarmupFlag = WarmupFlag_reset;
     state.dataGlobal->DayOfSim = DayOfSim_reset;
     state.dataGlobal->DayOfSimChr = DayOfSimChr_reset;
-    NumOfWarmupDays = NumOfWarmupDays_reset;
+    state.dataReportFlag->NumOfWarmupDays = NumOfWarmupDays_reset;
     state.dataGlobal->BeginDayFlag = BeginDayFlag_reset;
     state.dataGlobal->EndDayFlag = EndDayFlag_reset;
     state.dataGlobal->BeginHourFlag = BeginHourFlag_reset;
@@ -477,7 +472,7 @@ void FiniteDiffGroundTempsModel::performSimulation(EnergyPlusData &state)
     do {
 
         // loop over all days
-        for (simDay = 1; simDay <= state.dataWeatherManager->NumDaysInYear; ++simDay) {
+        for (state.dataGlobal->FDsimDay = 1; state.dataGlobal->FDsimDay <= state.dataWeatherManager->NumDaysInYear; ++state.dataGlobal->FDsimDay) {
 
             bool iterationConverged = false;
 
@@ -490,7 +485,7 @@ void FiniteDiffGroundTempsModel::performSimulation(EnergyPlusData &state)
                 for (int cell = 1; cell <= totalNumCells; ++cell) {
 
                     if (cell == 1) {
-                        updateSurfaceCellTemperature();
+                        updateSurfaceCellTemperature(state);
                     } else if (cell > 1 && cell < totalNumCells) {
                         updateGeneralDomainCellTemperature(cell);
                     } else if (cell == totalNumCells) {
@@ -509,18 +504,18 @@ void FiniteDiffGroundTempsModel::performSimulation(EnergyPlusData &state)
             } while (!iterationConverged);
 
             // Shift temperatures for next timestep
-            updateTimeStepTemperatures();
+            updateTimeStepTemperatures(state);
         }
 
         // Check final temperature convergence
-        convergedFinal = checkFinalTemperatureConvergence();
+        convergedFinal = checkFinalTemperatureConvergence(state);
 
     } while (!convergedFinal);
 }
 
 //******************************************************************************
 
-void FiniteDiffGroundTempsModel::updateSurfaceCellTemperature()
+void FiniteDiffGroundTempsModel::updateSurfaceCellTemperature(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -565,7 +560,7 @@ void FiniteDiffGroundTempsModel::updateSurfaceCellTemperature()
 
     auto &thisCell = cellArray(1);
     auto &cellBelow_thisCell = cellArray(2);
-    auto &cwd = weatherDataArray(simDay); // "Current Weather Day"
+    auto &cwd = weatherDataArray(state.dataGlobal->FDsimDay); // "Current Weather Day"
 
     // Add effect from previous time step
     numerator += thisCell.temperature_prevTimeStep;
@@ -721,8 +716,8 @@ void FiniteDiffGroundTempsModel::updateBottomCellTemperature()
 
     // REFERENCES:
     // Fridleifsson, I.B., R. Bertani, E.Huenges, J.W. Lund, A. Ragnarsson, L. Rybach. 2008
-    //	'The possible role and contribution of geothermal energy to the mitigation of climate change.'
-    //	IPCC scoping meeting on renewable energy sources: 59-80.
+    //  'The possible role and contribution of geothermal energy to the mitigation of climate change.'
+    //  IPCC scoping meeting on renewable energy sources: 59-80.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 numerator(0.0);
@@ -755,7 +750,7 @@ void FiniteDiffGroundTempsModel::updateBottomCellTemperature()
 
 //******************************************************************************
 
-bool FiniteDiffGroundTempsModel::checkFinalTemperatureConvergence()
+bool FiniteDiffGroundTempsModel::checkFinalTemperatureConvergence(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -768,8 +763,9 @@ bool FiniteDiffGroundTempsModel::checkFinalTemperatureConvergence()
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool converged = true;
+    Real64 const finalTempConvergenceCriteria = 0.05;
 
-    if (numIterYears == maxYearsToIterate) return converged;
+    if (state.dataGlobal->FDnumIterYears == maxYearsToIterate) return converged;
 
     for (int cell = 1; cell <= totalNumCells; ++cell) {
 
@@ -782,7 +778,7 @@ bool FiniteDiffGroundTempsModel::checkFinalTemperatureConvergence()
         thisCell.temperature_finalConvergence = thisCell.temperature;
     }
 
-    ++numIterYears;
+    ++state.dataGlobal->FDnumIterYears;
 
     return converged;
 }
@@ -802,6 +798,7 @@ bool FiniteDiffGroundTempsModel::checkIterationTemperatureConvergence()
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool converged = true;
+    Real64 const iterationTempConvergenceCriteria = 0.00001;
 
     for (int cell = 1; cell <= totalNumCells; ++cell) {
 
@@ -837,14 +834,14 @@ void FiniteDiffGroundTempsModel::initDomain(EnergyPlusData &state)
     std::unique_ptr<KusudaGroundTempsModel> tempModel(new KusudaGroundTempsModel());
 
     tempModel->objectName = "KAModelForFDModel";
-    tempModel->objectType = objectType_KusudaGroundTemp;
+    tempModel->objectType = GroundTempObjType::KusudaGroundTemp;
     tempModel->aveGroundTemp = annualAveAirTemp;
     tempModel->aveGroundTempAmplitude =
         (maxDailyAirTemp - minDailyAirTemp) / 4.0; // Rough estimate here. Ground temps will not swing as far as the air temp.
     tempModel->phaseShiftInSecs = dayOfMinDailyAirTemp * DataGlobalConstants::SecsInDay;
     tempModel->groundThermalDiffisivity = baseConductivity / (baseDensity * baseSpecificHeat);
 
-    // Intialize temperatures and volume
+    // Initialize temperatures and volume
     for (int cell = 1; cell <= totalNumCells; ++cell) {
         auto &thisCell = cellArray(cell);
 
@@ -891,7 +888,7 @@ void FiniteDiffGroundTempsModel::updateIterationTemperatures()
 
 //******************************************************************************
 
-void FiniteDiffGroundTempsModel::updateTimeStepTemperatures()
+void FiniteDiffGroundTempsModel::updateTimeStepTemperatures(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -909,7 +906,7 @@ void FiniteDiffGroundTempsModel::updateTimeStepTemperatures()
         thisCell.temperature_prevTimeStep = thisCell.temperature;
 
         // Log temps for later use
-        groundTemps(simDay, cell) = thisCell.temperature;
+        groundTemps(state.dataGlobal->FDsimDay, cell) = thisCell.temperature;
     }
 }
 
@@ -1133,19 +1130,15 @@ void FiniteDiffGroundTempsModel::evaluateSoilRhoCp(Optional<int const> cell, Opt
     // Evaluates the soil properties
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    static Real64 Theta_ice;
-    static Real64 Theta_liq;
-    static Real64 Theta_sat;
-    static Real64 rho_ice;
-    static Real64 rho_liq;
-    static Real64 rhoCp_soil_liq_1;
-    static Real64 CP_liq;
-    static Real64 CP_ice;
-    static Real64 Lat_fus;
-    static Real64 Cp_transient;
-    static Real64 rhoCP_soil_liq;
-    static Real64 rhoCP_soil_transient;
-    static Real64 rhoCP_soil_ice;
+    Real64 Theta_ice;
+    Real64 Theta_liq;
+    Real64 Theta_sat;
+    Real64 rho_ice;
+    Real64 rho_liq;
+    Real64 CP_liq;
+    Real64 CP_ice;
+    Real64 Lat_fus;
+    Real64 Cp_transient;
     // other variables
     Real64 frzAllIce;
     Real64 frzIceTrans;

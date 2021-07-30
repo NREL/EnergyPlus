@@ -194,7 +194,11 @@ namespace MicroturbineElectricGenerator {
         {
         }
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
 
         void getDesignCapacities(EnergyPlusData &state,
                                  [[maybe_unused]] const PlantLocation &calledFromLocation,
@@ -212,22 +216,25 @@ namespace MicroturbineElectricGenerator {
                                   Real64 MyLoad // Generator demand (W)
         );
 
-        void UpdateMTGeneratorRecords();
+        void UpdateMTGeneratorRecords(EnergyPlusData &state);
 
         void setupOutputVars(EnergyPlusData &state);
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     void GetMTGeneratorInput(EnergyPlusData &state);
 
 } // namespace MicroturbineElectricGenerator
 
-struct MicroturbineElectricGeneratorData : BaseGlobalStruct {
+struct MicroturbineElectricGeneratorData : BaseGlobalStruct
+{
 
     int NumMTGenerators = 0;
     bool GetMTInput = true;
-    Array1D<MicroturbineElectricGenerator::MTGeneratorSpecs> MTGenerator;
+    EPVector<MicroturbineElectricGenerator::MTGeneratorSpecs> MTGenerator;
 
     void clear_state() override
     {

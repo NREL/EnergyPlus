@@ -73,33 +73,37 @@ namespace FaultsManager {
     // MODULE VARIABLE TYPE DECLARATIONS:
 
     // ControllerTypeEnum
-    extern int const iController_AirEconomizer;
+    int constexpr iController_AirEconomizer = 1001;
 
     // Input methods for fouling coils
-    extern int const iFouledCoil_UARated;
-    extern int const iFouledCoil_FoulingFactor;
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int const NumFaultTypes;
-    extern int const NumFaultTypesEconomizer;
+    enum class FouledCoil
+    {
+        Unassigned = -1,
+        UARated,
+        FoulingFactor
+    };
 
     // FaultTypeEnum
-    extern int const iFault_TemperatureSensorOffset_OutdoorAir;
-    extern int const iFault_HumiditySensorOffset_OutdoorAir;
-    extern int const iFault_EnthalpySensorOffset_OutdoorAir;
-    extern int const iFault_TemperatureSensorOffset_ReturnAir;
-    extern int const iFault_EnthalpySensorOffset_ReturnAir;
-    extern int const iFault_Fouling_Coil;
-    extern int const iFault_ThermostatOffset;
-    extern int const iFault_HumidistatOffset;
-    extern int const iFault_Fouling_AirFilter;
-    extern int const iFault_TemperatureSensorOffset_ChillerSupplyWater;
-    extern int const iFault_TemperatureSensorOffset_CondenserSupplyWater;
-    extern int const iFault_TemperatureSensorOffset_CoilSupplyAir;
-    extern int const iFault_Fouling_Tower;
-    extern int const iFault_Fouling_Boiler;
-    extern int const iFault_Fouling_Chiller;
-    extern int const iFault_Fouling_EvapCooler;
+    enum class Fault
+    {
+        Unassigned = -1,
+        TemperatureSensorOffset_OutdoorAir,
+        HumiditySensorOffset_OutdoorAir,
+        EnthalpySensorOffset_OutdoorAir,
+        TemperatureSensorOffset_ReturnAir,
+        EnthalpySensorOffset_ReturnAir,
+        Fouling_Coil,
+        ThermostatOffset,
+        HumidistatOffset,
+        Fouling_AirFilter,
+        TemperatureSensorOffset_ChillerSupplyWater,
+        TemperatureSensorOffset_CondenserSupplyWater,
+        Fouling_Tower,
+        TemperatureSensorOffset_CoilSupplyAir,
+        Fouling_Boiler,
+        Fouling_Chiller,
+        Fouling_EvapCooler
+    };
 
     // Types of faults under Group Operational Faults in IDD
     //  1. Temperature sensor offset (FY14)
@@ -122,7 +126,6 @@ namespace FaultsManager {
     //  Pressure sensor offset
     //  more
 
-    extern Array1D_string const cFaults;
     //      'FaultModel:PressureSensorOffset:OutdoorAir   ', &
     //      'FaultModel:TemperatureSensorOffset:SupplyAir ', &
     //      'FaultModel:TemperatureSensorOffset:ZoneAir   ', &
@@ -133,23 +136,6 @@ namespace FaultsManager {
     //      'FaultModel:Fouling:CoolingTower              ', &
     //      'FaultModel:DamperLeakage:ReturnAir           ', &
     //      'FaultModel:DamperLeakage:OutdoorAir          ' /)
-
-    extern Array1D_int const iFaultTypeEnums;
-
-    extern bool AnyFaultsInModel;           // True if there are operational faults in the model
-    extern int NumFaults;                   // Total number of all faults
-    extern int NumFaultyEconomizer;         // Total number of faults related with the economizer
-    extern int NumFouledCoil;               // Total number of fouled coils
-    extern int NumFaultyThermostat;         // Total number of faulty thermostat with offset
-    extern int NumFaultyHumidistat;         // Total number of faulty humidistat with offset
-    extern int NumFaultyAirFilter;          // Total number of fouled air filters
-    extern int NumFaultyChillerSWTSensor;   // Total number of faulty Chillers Supply Water Temperature Sensor
-    extern int NumFaultyCondenserSWTSensor; // Total number of faulty Condenser Supply Water Temperature Sensor
-    extern int NumFaultyTowerFouling;       // Total number of faulty Towers with Scaling
-    extern int NumFaultyCoilSATSensor;      // Total number of faulty Coil Supply Air Temperature Sensor
-    extern int NumFaultyBoilerFouling;      // Total number of faulty Boilers with Fouling
-    extern int NumFaultyChillerFouling;     // Total number of faulty Chillers with Fouling
-    extern int NumFaultyEvapCoolerFouling;  // Total number of faulty Evaporative Coolers with Fouling
 
     // SUBROUTINE SPECIFICATIONS:
 
@@ -162,7 +148,7 @@ namespace FaultsManager {
         std::string FaultType;        // Fault type
         std::string AvaiSchedule;     // Availability schedule
         std::string SeveritySchedule; // Severity schedule, multipliers to the Offset
-        int FaultTypeEnum;
+        Fault FaultTypeEnum;
         int AvaiSchedPtr;
         int SeveritySchedPtr;
         Real64 Offset; // offset, + means sensor reading is higher than actual value
@@ -170,8 +156,8 @@ namespace FaultsManager {
 
         // Default Constructor
         FaultProperties()
-            : Name(""), FaultType(""), AvaiSchedule(""), SeveritySchedule(""), FaultTypeEnum(0), AvaiSchedPtr(0), SeveritySchedPtr(0), Offset(0.0),
-              Status(false)
+            : Name(""), FaultType(""), AvaiSchedule(""), SeveritySchedule(""), FaultTypeEnum(Fault::Unassigned), AvaiSchedPtr(0), SeveritySchedPtr(0),
+              Offset(0.0), Status(false)
         {
         }
 
@@ -232,26 +218,27 @@ namespace FaultsManager {
     struct FaultPropertiesFoulingCoil : public FaultProperties // Class for FaultModel:Fouling:Coil
     {
         // Members
-        std::string FouledCoilName; // The fouled coil name
-        int FouledCoiledType;       // Type of coil that's fouled
-        int FouledCoilNum;          // The "FouledUARated" implies having to use the Coil's UA, which could be autosized, so have to use this index
-        int FoulingInputMethod;     // Coil fouling input method
-        Real64 UAFouled;            // Fouling coil UA under rating conditions
-        Real64 Rfw;                 // Water side fouling factor
-        Real64 Rfa;                 // Air side fouling factor
-        Real64 Aout;                // Coil outside surface area
-        Real64 Aratio;              // Inside to outside surface area ratio
+        std::string FouledCoilName;    // The fouled coil name
+        int FouledCoiledType;          // Type of coil that's fouled
+        int FouledCoilNum;             // The "FouledUARated" implies having to use the Coil's UA, which could be autosized, so have to use this index
+        FouledCoil FoulingInputMethod; // Coil fouling input method
+        Real64 UAFouled;               // Fouling coil UA under rating conditions
+        Real64 Rfw;                    // Water side fouling factor
+        Real64 Rfa;                    // Air side fouling factor
+        Real64 Aout;                   // Coil outside surface area
+        Real64 Aratio;                 // Inside to outside surface area ratio
 
         // Default Constructor
         FaultPropertiesFoulingCoil()
-            : FouledCoilName(""), FouledCoiledType(0), FouledCoilNum(0), FoulingInputMethod(0),
-              UAFouled(0.0), Rfw(0.0), Rfa(0.0), Aout(0.0), Aratio(0.0)
+            : FouledCoilName(""), FouledCoiledType(0), FouledCoilNum(0), FoulingInputMethod(FouledCoil::Unassigned), UAFouled(0.0), Rfw(0.0),
+              Rfa(0.0), Aout(0.0), Aratio(0.0)
         {
         }
 
         // Destructor
         virtual ~FaultPropertiesFoulingCoil() = default;
-      public:
+
+    public:
         // Calculate the fouling thermal insulance factor (the reciprocal of a heat transfert coefficient) due to fouling in a coil
         // Real64 CalFaultyCoilFoulingFactor();
 
@@ -401,35 +388,75 @@ namespace FaultsManager {
         }
     };
 
-    // Object Data
-    extern Array1D<FaultPropertiesEconomizer> FaultsEconomizer;
-    extern Array1D<FaultPropertiesFoulingCoil> FouledCoils;
-    extern Array1D<FaultPropertiesThermostat> FaultsThermostatOffset;
-    extern Array1D<FaultPropertiesHumidistat> FaultsHumidistatOffset;
-    extern Array1D<FaultPropertiesAirFilter> FaultsFouledAirFilters;
-    extern Array1D<FaultPropertiesChillerSWT> FaultsChillerSWTSensor;
-    extern Array1D<FaultPropertiesCondenserSWT> FaultsCondenserSWTSensor;
-    extern Array1D<FaultPropertiesTowerFouling> FaultsTowerFouling;
-    extern Array1D<FaultPropertiesCoilSAT> FaultsCoilSATSensor;
-    extern Array1D<FaultPropertiesBoilerFouling> FaultsBoilerFouling;
-    extern Array1D<FaultPropertiesChillerFouling> FaultsChillerFouling;
-    extern Array1D<FaultPropertiesEvapCoolerFouling> FaultsEvapCoolerFouling;
-
     // Functions
 
     void CheckAndReadFaults(EnergyPlusData &state);
 
-    void clear_state();
-
-    void SetFaultyCoilSATSensor(std::string const &CompType, std::string const &CompName, bool &FaultyCoilSATFlag, int &FaultyCoilSATIndex);
+    void SetFaultyCoilSATSensor(
+        EnergyPlusData &state, std::string const &CompType, std::string_view CompName, bool &FaultyCoilSATFlag, int &FaultyCoilSATIndex);
 
 } // namespace FaultsManager
 
-struct FaultsManagerData : BaseGlobalStruct {
+struct FaultsManagerData : BaseGlobalStruct
+{
+
+    bool RunFaultMgrOnceFlag = false; // True if CheckAndReadFaults is already done
+    bool ErrorsFound = false;         // True if errors detected in input
+
+    bool AnyFaultsInModel = false;       // True if there are operational faults in the model
+    int NumFaults = 0;                   // Number of faults (include multiple faults of same type) in the model
+    int NumFaultyEconomizer = 0;         // Total number of faults related with the economizer
+    int NumFouledCoil = 0;               // Total number of fouled coils
+    int NumFaultyThermostat = 0;         // Total number of faulty thermostat with offset
+    int NumFaultyHumidistat = 0;         // Total number of faulty humidistat with offset
+    int NumFaultyAirFilter = 0;          // Total number of fouled air filters
+    int NumFaultyChillerSWTSensor = 0;   // Total number of faulty Chillers Supply Water Temperature Sensor
+    int NumFaultyCondenserSWTSensor = 0; // Total number of faulty Condenser Supply Water Temperature Sensor
+    int NumFaultyTowerFouling = 0;       // Total number of faulty Towers with Scaling
+    int NumFaultyCoilSATSensor = 0;      // Total number of faulty Coil Supply Air Temperature Sensor
+    int NumFaultyBoilerFouling = 0;      // Total number of faulty Boilers with Fouling
+    int NumFaultyChillerFouling = 0;     // Total number of faulty Chillers with Fouling
+    int NumFaultyEvapCoolerFouling = 0;  // Total number of faulty Evaporative Coolers with Fouling
+
+    // Object Data
+    Array1D<FaultsManager::FaultPropertiesEconomizer> FaultsEconomizer;
+    Array1D<FaultsManager::FaultPropertiesFoulingCoil> FouledCoils;
+    Array1D<FaultsManager::FaultPropertiesThermostat> FaultsThermostatOffset;
+    Array1D<FaultsManager::FaultPropertiesHumidistat> FaultsHumidistatOffset;
+    Array1D<FaultsManager::FaultPropertiesAirFilter> FaultsFouledAirFilters;
+    Array1D<FaultsManager::FaultPropertiesChillerSWT> FaultsChillerSWTSensor;
+    Array1D<FaultsManager::FaultPropertiesCondenserSWT> FaultsCondenserSWTSensor;
+    Array1D<FaultsManager::FaultPropertiesTowerFouling> FaultsTowerFouling;
+    Array1D<FaultsManager::FaultPropertiesCoilSAT> FaultsCoilSATSensor;
+    Array1D<FaultsManager::FaultPropertiesBoilerFouling> FaultsBoilerFouling;
+    Array1D<FaultsManager::FaultPropertiesChillerFouling> FaultsChillerFouling;
+    Array1D<FaultsManager::FaultPropertiesEvapCoolerFouling> FaultsEvapCoolerFouling;
 
     void clear_state() override
     {
+        RunFaultMgrOnceFlag = false;
+        ErrorsFound = false;
+        AnyFaultsInModel = false;
+        NumFaults = 0;
+        NumFaultyEconomizer = 0;
+        NumFouledCoil = 0;
+        NumFaultyThermostat = 0;
+        NumFaultyHumidistat = 0;
+        NumFaultyAirFilter = 0;
+        NumFaultyChillerSWTSensor = 0;
+        NumFaultyCondenserSWTSensor = 0;
+        NumFaultyTowerFouling = 0;
+        NumFaultyCoilSATSensor = 0;
 
+        FaultsEconomizer.deallocate();
+        FouledCoils.deallocate();
+        FaultsThermostatOffset.deallocate();
+        FaultsHumidistatOffset.deallocate();
+        FaultsFouledAirFilters.deallocate();
+        FaultsChillerSWTSensor.deallocate();
+        FaultsCondenserSWTSensor.deallocate();
+        FaultsTowerFouling.deallocate();
+        FaultsCoilSATSensor.deallocate();
     }
 };
 

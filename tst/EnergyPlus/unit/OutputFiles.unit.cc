@@ -147,8 +147,6 @@ TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
 
     EXPECT_EQ(format("{:.2R}", -0.0), "0.00");
 
-
-
     // kept in the code for the sake of documentation
     // code is expected to not round up with the old version, but clearly it should
     // EXPECT_EQ(format("{:.3R}", 6.41750000000000013576E-005), "6.417E-005");
@@ -166,9 +164,9 @@ TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
     EXPECT_EQ(format("{:20.8N}", 0.213608134), "      0.21360813    ");
     EXPECT_EQ(format("{:13.6N}", 0.803434E+09), " 0.803434E+09");
     EXPECT_EQ(format("{:N}", 2.06944444444444), "2.06944444444444    ");
-//    EXPECT_EQ(format("{:N}", 999.9), "           999.9    ");
+    //    EXPECT_EQ(format("{:N}", 999.9), "           999.9    ");
     EXPECT_EQ(format("{:N}", 61677162.0987027), "61677162.0987027    ");
-    
+
     //    EXPECT_EQ(format("{:20.8N}", -0.23111252), "     -0.23111252    ");
     //    EXPECT_EQ(format("{:20.8N}", -0.23111252), "     -0.23111252    ");
 
@@ -177,12 +175,12 @@ TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
     EXPECT_EQ(format("{:.3T}", 1.28349999999999948505E-004), "1.283E-004");
     EXPECT_EQ(format("{:.3T}", 2.56700000000000005430E-004), "2.567E-004");
     EXPECT_EQ(format("{:.3T}", 0.15159450340364988286), "0.151");
+    EXPECT_EQ(format("{:.3T}", 0.0), "0.000");
 
     EXPECT_EQ(format("{:.3T}", 2.14633893312000043063E-002), "2.146E-002");
     EXPECT_EQ(format("{:.3T}", 8.55666666666666278192E-005), "8.556E-005");
     EXPECT_EQ(format("{:.3T}", 6.41749999999999878051E-005), "6.417E-005");
     EXPECT_EQ(format("{:.3T}", 0.10106298657208269420), "0.101");
-
 
     EXPECT_EQ(format("{:.4T}", 0.14999999999999999445), "0.1500");
     EXPECT_EQ(format("{:.3T}", 4500.0), "4500.000");
@@ -196,5 +194,22 @@ TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
     // for the case of "Trim"
     // EXPECT_EQ(format("{:.4T}", 0.096970000000000000639), "9.6969E-002");
 
+    // Z formatting matches Fortran's 'E' format
+    // This is the output of running a test in Fortran by issuing `PRINT "(E12.1)", 100.0`
+    //                                     "123456789xyz"   // This is properly size 12
+    EXPECT_EQ(format("{:12.1Z}", 100.0), "     0.1E+03");
+    EXPECT_EQ(format("{:12.2Z}", 100.0), "    0.10E+03"); // Why not 1E02
+    EXPECT_EQ(format("{:12.3Z}", 100.0), "   0.100E+03");
+    EXPECT_EQ(format("{:12.4Z}", 100.0), "  0.1000E+03");
+
+    EXPECT_EQ(format("{:12.1Z}", 123.456), "     0.1E+03");
+    EXPECT_EQ(format("{:12.2Z}", 123.456), "    0.12E+03"); // Why not 12E
+    EXPECT_EQ(format("{:12.3Z}", 123.456), "   0.123E+03");
+    EXPECT_EQ(format("{:12.4Z}", 123.456), "  0.1235E+03");
+
+    EXPECT_EQ(format("{:12.1Z}", 0.0), "     0.0E+00");
+    EXPECT_EQ(format("{:12.2Z}", 0.0), "    0.00E+00"); // Why not 12E
+    EXPECT_EQ(format("{:12.3Z}", 0.0), "   0.000E+00");
+    EXPECT_EQ(format("{:12.4Z}", 0.0), "  0.0000E+00");
 }
 } // namespace EnergyPlus

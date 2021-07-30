@@ -62,6 +62,7 @@
 #include <EnergyPlus/SimulationManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
+#include "Fixtures/SQLiteFixture.hh"
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::EconomicTariff;
@@ -228,7 +229,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GetInput_Test)
     EXPECT_EQ(1, state->dataEconTariff->numComputation);
 }
 
-/** Test that if a meter is a water meter, and no conversion choice is give, it defaults to m3 **/
+// /** Test that if a meter is a water meter, and no conversion choice is give, it defaults to m3 **/
 TEST_F(EnergyPlusFixture, EconomicTariff_Water_DefaultConv_Test)
 {
     std::string const idf_objects = delimited_string({
@@ -279,7 +280,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Water_DefaultConv_Test)
     EXPECT_EQ(10, state->dataEconTariff->tariff(1).monthChgVal);
 }
 
-/** Test that if a meter is a water meter, and CCF is used, it uses the right conversion (not the gas one) **/
+// /** Test that if a meter is a water meter, and CCF is used, it uses the right conversion (not the gas one) **/
 TEST_F(EnergyPlusFixture, EconomicTariff_Water_CCF_Test)
 {
     std::string const idf_objects = delimited_string({
@@ -304,7 +305,8 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Water_CCF_Test)
     state->dataOutputProcessor->EnergyMeters(1).Name = "WATER:FACILITY";
     state->dataOutputProcessor->EnergyMeters(1).ResourceType = "WATER";
 
-    UpdateUtilityBills(*state);;
+    UpdateUtilityBills(*state);
+    ;
 
     // tariff
     EXPECT_EQ(1, state->dataEconTariff->numTariff);
@@ -316,10 +318,10 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Water_CCF_Test)
 
     // Check conversion choice
     EXPECT_EQ(iEconConv::CCF, state->dataEconTariff->tariff(1).convChoice);
-    ASSERT_FLOAT_EQ(0.35314666721488586, state->dataEconTariff->tariff(1).energyConv);
+    ASSERT_DOUBLE_EQ(0.35314666721488586, state->dataEconTariff->tariff(1).energyConv);
 }
 
-/** Test that if a meter is a gas meter, and CCF is used, it uses the right conversion (not the water one) **/
+// /** Test that if a meter is a gas meter, and CCF is used, it uses the right conversion (not the water one) **/
 TEST_F(EnergyPlusFixture, EconomicTariff_Gas_CCF_Test)
 {
     std::string const idf_objects = delimited_string({
@@ -344,7 +346,8 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Gas_CCF_Test)
     state->dataOutputProcessor->EnergyMeters(1).Name = "NATURALGAS:FACILITY";
     state->dataOutputProcessor->EnergyMeters(1).ResourceType = "NATURALGAS";
 
-    UpdateUtilityBills(*state);;
+    UpdateUtilityBills(*state);
+    ;
 
     // tariff
     EXPECT_EQ(1, state->dataEconTariff->numTariff);
@@ -357,10 +360,10 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Gas_CCF_Test)
     // Check conversion choice
 
     EXPECT_EQ(iEconConv::CCF, state->dataEconTariff->tariff(1).convChoice);
-    ASSERT_FLOAT_EQ(9.4781712e-9, state->dataEconTariff->tariff(1).energyConv);
+    ASSERT_DOUBLE_EQ(9.4781712e-9, state->dataEconTariff->tariff(1).energyConv);
 }
 
-/** Test that if a meter is an Electric meter, and CCF is used, it still defaults to kWh (not allowed) **/
+// /** Test that if a meter is an Electric meter, and CCF is used, it still defaults to kWh (not allowed) **/
 TEST_F(EnergyPlusFixture, EconomicTariff_Electric_CCF_Test)
 {
     std::string const idf_objects = delimited_string({
@@ -385,7 +388,8 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Electric_CCF_Test)
     state->dataOutputProcessor->EnergyMeters(1).Name = "ELECTRICITY:FACILITY";
     state->dataOutputProcessor->EnergyMeters(1).ResourceType = "ELECTRICITY";
 
-    UpdateUtilityBills(*state);;
+    UpdateUtilityBills(*state);
+    ;
 
     // tariff
     EXPECT_EQ(1, state->dataEconTariff->numTariff);
@@ -398,8 +402,8 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Electric_CCF_Test)
 
     // Check conversion choice, should force back to kWh
     EXPECT_EQ(iEconConv::KWH, state->dataEconTariff->tariff(1).convChoice);
-    ASSERT_FLOAT_EQ(0.0000002778, state->dataEconTariff->tariff(1).energyConv);
-    ASSERT_FLOAT_EQ(0.001, state->dataEconTariff->tariff(1).demandConv);
+    ASSERT_DOUBLE_EQ(0.0000002778, state->dataEconTariff->tariff(1).energyConv);
+    ASSERT_DOUBLE_EQ(0.001, state->dataEconTariff->tariff(1).demandConv);
 }
 
 TEST_F(EnergyPlusFixture, EconomicTariff_LEEDtariffReporting_Test)
@@ -424,6 +428,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_LEEDtariffReporting_Test)
     state->dataEconTariff->tariff(2).isSelected = true;
     state->dataEconTariff->tariff(2).totalAnnualCost = 415.56;
     state->dataEconTariff->tariff(2).totalAnnualEnergy = 0.00;
+    state->dataEconTariff->tariff(2).kindGasMtr = 1;
     state->dataEconTariff->tariff(2).reportMeterIndx = 2;
 
     state->dataEconTariff->tariff(3).tariffName = "DistrictCoolingUnit";
@@ -581,8 +586,8 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    state->dataGlobal->NumOfTimeStepInHour = 4;    // must initialize this to get schedules initialized
-    state->dataGlobal->MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
+    state->dataGlobal->NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
     state->dataGlobal->TimeStepZone = 0.25;
     state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
 
@@ -591,9 +596,9 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     EXPECT_EQ(1, state->dataExteriorEnergyUse->NumExteriorLights);
     EXPECT_EQ(1000, state->dataExteriorEnergyUse->ExteriorLights(1).DesignLevel);
 
-
     // This will only do the get input routines
-    EconomicTariff::UpdateUtilityBills(*state);;
+    EconomicTariff::UpdateUtilityBills(*state);
+    ;
 
     // tariff
     EXPECT_EQ(1, state->dataEconTariff->numTariff);
@@ -604,7 +609,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
 
     int seasonSchPtr = state->dataEconTariff->tariff(1).seasonSchIndex;
     EXPECT_GT(seasonSchPtr, 0);
-    EXPECT_EQ("ELECTRICITY SEASON SCHEDULE", ScheduleManager::Schedule(seasonSchPtr).Name);
+    EXPECT_EQ("ELECTRICITY SEASON SCHEDULE", state->dataScheduleMgr->Schedule(seasonSchPtr).Name);
 
     // Two Simple Charges
     EXPECT_EQ(2, state->dataEconTariff->numChargeSimple);
@@ -635,22 +640,23 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     ScheduleManager::UpdateScheduleValues(*state);
     EXPECT_EQ(1.0, ScheduleManager::LookUpScheduleValue(*state, 1, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep));
     EXPECT_EQ(1.0, ScheduleManager::GetCurrentScheduleValue(*state, state->dataEconTariff->tariff(1).seasonSchIndex));
-    EXPECT_EQ(1.0, ScheduleManager::Schedule(seasonSchPtr).CurrentValue);
+    EXPECT_EQ(1.0, state->dataScheduleMgr->Schedule(seasonSchPtr).CurrentValue);
 
     ExteriorEnergyUse::ManageExteriorEnergyUse(*state);
 
     EXPECT_EQ(1000.0, state->dataExteriorEnergyUse->ExteriorLights(1).Power);
-    EXPECT_EQ(state->dataExteriorEnergyUse->ExteriorLights(1).Power * state->dataGlobal->TimeStepZoneSec, state->dataExteriorEnergyUse->ExteriorLights(1).CurrentUse);
+    EXPECT_EQ(state->dataExteriorEnergyUse->ExteriorLights(1).Power * state->dataGlobal->TimeStepZoneSec,
+              state->dataExteriorEnergyUse->ExteriorLights(1).CurrentUse);
 
     int curPeriod = 1;
     EXPECT_EQ(0, state->dataEconTariff->tariff(1).gatherEnergy(state->dataEnvrn->Month, curPeriod));
 
     // This Should now call GatherForEconomics
     state->dataGlobal->DoOutputReporting = true;
-    EconomicTariff::UpdateUtilityBills(*state);;
+    EconomicTariff::UpdateUtilityBills(*state);
+    ;
     EXPECT_EQ(1, state->dataEconTariff->tariff(1).seasonForMonth(5));
     EXPECT_EQ(0, state->dataEconTariff->tariff(1).seasonForMonth(6));
-
 
     state->dataEnvrn->Month = 5;
     state->dataEnvrn->DayOfMonth = 31;
@@ -669,11 +675,820 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     ExteriorEnergyUse::ManageExteriorEnergyUse(*state);
 
     EXPECT_EQ(1000.0, state->dataExteriorEnergyUse->ExteriorLights(1).Power);
-    EXPECT_EQ(state->dataExteriorEnergyUse->ExteriorLights(1).Power * state->dataGlobal->TimeStepZoneSec, state->dataExteriorEnergyUse->ExteriorLights(1).CurrentUse);
+    EXPECT_EQ(state->dataExteriorEnergyUse->ExteriorLights(1).Power * state->dataGlobal->TimeStepZoneSec,
+              state->dataExteriorEnergyUse->ExteriorLights(1).CurrentUse);
 
     // This Should now call GatherForEconomics
-    EconomicTariff::UpdateUtilityBills(*state);;
+    EconomicTariff::UpdateUtilityBills(*state);
+    ;
     EXPECT_EQ(1, state->dataEconTariff->tariff(1).seasonForMonth(5));
     EXPECT_EQ(3, state->dataEconTariff->tariff(1).seasonForMonth(6));
+}
 
+TEST_F(EnergyPlusFixture, InputEconomics_UtilityCost_Variable_Test0)
+{
+    // Tests for PR #8456 and Issue #8455 ... Case 0 of Cases 0-3
+    // to ensure UtilityCost:Variable inputs being procesed properly
+
+    std::string const idf_objects = delimited_string({
+
+        "Schedule:Compact,",
+        "  Electricity Season Schedule,  !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        "  Through: 5/31,           !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,            !- Field 3",
+        "  1,                       !- Field 4",
+        "  Through: 9/30,           !- Field 5",
+        "  For: AllDays,            !- Field 6",
+        "  Until: 24:00,            !- Field 7",
+        "  3,                       !- Field 8",
+        "  Through: 12/31,          !- Field 9",
+        "  For: AllDays,            !- Field 10",
+        "  Until: 24:00,            !- Field 11",
+        "  1;                       !- Field 12",
+
+        "UtilityCost:Tariff,",
+        "  ExampleAWithVariableMonthlyCharge,     !- Name",
+        "  ElectricityNet:Facility, !- Output Meter Name",
+        "  kWh,                     !- Conversion Factor Choice",
+        "  ,                        !- Energy Conversion Factor",
+        "  ,                        !- Demand Conversion Factor",
+        "  ,                        !- Time of Use Period Schedule Name",
+        "  Electricity Season Schedule,  !- Season Schedule Name",
+        "  ,                        !- Month Schedule Name",
+        "  ,                        !- Demand Window Length",
+        "  0,                       !- Monthly Charge or Variable Name",
+        "  ,                        !- Minimum Monthly Charge or Variable Name",
+        "  ,                        !- Real Time Pricing Charge Schedule Name",
+        "  ,                        !- Customer Baseline Load Schedule Name",
+        "  ,                        !- Group Name",
+        "  NetMetering;             !- Buy Or Sell",
+
+        "UtilityCost:Variable,",
+        "VariableFixedCharge, !-Name",
+        "ExampleAWithVariableMonthlyCharge, !-Tariff Name",
+        "Demand, !-Variable Type",
+        "1.00, !-January Value",
+        "2.00, !-February Value",
+        "3.00, !-March Value",
+        "4.00, !-April Value",
+        "5.00, !-May Value",
+        "6.00, !-June Value",
+        "7.00, !-July Value",
+        "8.00, !-August Value",
+        "9.00, !-September Value",
+        "10.00, !-October Value",
+        "11.00, !-November Value",
+        "12.00; !-December Value"});
+
+    bool ErrorsFound = false;
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetInputEconomicsVariable(*state, ErrorsFound);
+
+    // Make sure the "Demand" UtilityCost:Variable is now processed correctly
+    EXPECT_EQ(state->dataEconTariff->econVar(1).varUnitType, varUnitTypeDemand);
+
+    // Make sure the numerical inputs after A3 is still being processed correctly
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(1), 1.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(2), 2.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(3), 3.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(4), 4.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(5), 5.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(6), 6.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(7), 7.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(8), 8.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(9), 9.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(10), 10.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(11), 11.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(12), 12.00);
+}
+
+TEST_F(EnergyPlusFixture, InputEconomics_UtilityCost_Variable_Test1)
+{
+    // Tests for PR #8456 and Issue #8455 ... Case 1 of Cases 0-3
+    // to ensure UtilityCost:Variable inputs being procesed properly
+
+    std::string const idf_objects1 = delimited_string({
+
+        "Schedule:Compact,",
+        "  Electricity Season Schedule,  !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        "  Through: 5/31,           !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,            !- Field 3",
+        "  1,                       !- Field 4",
+        "  Through: 9/30,           !- Field 5",
+        "  For: AllDays,            !- Field 6",
+        "  Until: 24:00,            !- Field 7",
+        "  3,                       !- Field 8",
+        "  Through: 12/31,          !- Field 9",
+        "  For: AllDays,            !- Field 10",
+        "  Until: 24:00,            !- Field 11",
+        "  1;                       !- Field 12",
+
+        "UtilityCost:Tariff,",
+        "  ExampleAWithVariableMonthlyCharge,     !- Name",
+        "  ElectricityNet:Facility, !- Output Meter Name",
+        "  kWh,                     !- Conversion Factor Choice",
+        "  ,                        !- Energy Conversion Factor",
+        "  ,                        !- Demand Conversion Factor",
+        "  ,                        !- Time of Use Period Schedule Name",
+        "  Electricity Season Schedule,  !- Season Schedule Name",
+        "  ,                        !- Month Schedule Name",
+        "  ,                        !- Demand Window Length",
+        "  0,                       !- Monthly Charge or Variable Name",
+        "  ,                        !- Minimum Monthly Charge or Variable Name",
+        "  ,                        !- Real Time Pricing Charge Schedule Name",
+        "  ,                        !- Customer Baseline Load Schedule Name",
+        "  ,                        !- Group Name",
+        "  NetMetering;             !- Buy Or Sell",
+
+        "UtilityCost:Variable,",
+        "VariableFixedCharge, !-Name",
+        "ExampleAWithVariableMonthlyCharge, !-Tariff Name",
+        "Energy, !-Variable Type",
+        "1.00, !-January Value",
+        "2.00, !-February Value",
+        "3.00, !-March Value",
+        "4.00, !-April Value",
+        "5.00, !-May Value",
+        "6.00, !-June Value",
+        "7.00, !-July Value",
+        "8.00, !-August Value",
+        "9.00, !-September Value",
+        "10.00, !-October Value",
+        "11.00, !-November Value",
+        "12.00; !-December Value"});
+
+    bool ErrorsFound = false;
+
+    ASSERT_TRUE(process_idf(idf_objects1));
+    GetInputEconomicsVariable(*state, ErrorsFound);
+
+    // Make sure variable input type "Energy" is processed as expected
+    EXPECT_EQ(state->dataEconTariff->econVar(1).varUnitType, varUnitTypeEnergy);
+    // Make sure the numerical inputs after A3 is still being processed correctly
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(1), 1.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(2), 2.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(3), 3.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(4), 4.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(5), 5.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(6), 6.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(7), 7.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(8), 8.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(9), 9.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(10), 10.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(11), 11.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(12), 12.00);
+}
+
+TEST_F(EnergyPlusFixture, InputEconomics_UtilityCost_Variable_Test2)
+{
+    // Tests for PR #8456 and Issue #8455 ... Case 2 of Cases 0-3
+    // to ensure UtilityCost:Variable inputs being procesed properly
+
+    std::string const idf_objects2 = delimited_string({
+
+        "Schedule:Compact,",
+        "  Electricity Season Schedule,  !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        "  Through: 5/31,           !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,            !- Field 3",
+        "  1,                       !- Field 4",
+        "  Through: 9/30,           !- Field 5",
+        "  For: AllDays,            !- Field 6",
+        "  Until: 24:00,            !- Field 7",
+        "  3,                       !- Field 8",
+        "  Through: 12/31,          !- Field 9",
+        "  For: AllDays,            !- Field 10",
+        "  Until: 24:00,            !- Field 11",
+        "  1;                       !- Field 12",
+
+        "UtilityCost:Tariff,",
+        "  ExampleAWithVariableMonthlyCharge,     !- Name",
+        "  ElectricityNet:Facility, !- Output Meter Name",
+        "  kWh,                     !- Conversion Factor Choice",
+        "  ,                        !- Energy Conversion Factor",
+        "  ,                        !- Demand Conversion Factor",
+        "  ,                        !- Time of Use Period Schedule Name",
+        "  Electricity Season Schedule,  !- Season Schedule Name",
+        "  ,                        !- Month Schedule Name",
+        "  ,                        !- Demand Window Length",
+        "  0,                       !- Monthly Charge or Variable Name",
+        "  ,                        !- Minimum Monthly Charge or Variable Name",
+        "  ,                        !- Real Time Pricing Charge Schedule Name",
+        "  ,                        !- Customer Baseline Load Schedule Name",
+        "  ,                        !- Group Name",
+        "  NetMetering;             !- Buy Or Sell",
+
+        "UtilityCost:Variable,",
+        "VariableFixedCharge, !-Name",
+        "ExampleAWithVariableMonthlyCharge, !-Tariff Name",
+        "Dimensionless, !-Variable Type",
+        "1.00, !-January Value",
+        "2.00, !-February Value",
+        "3.00, !-March Value",
+        "4.00, !-April Value",
+        "5.00, !-May Value",
+        "6.00, !-June Value",
+        "7.00, !-July Value",
+        "8.00, !-August Value",
+        "9.00, !-September Value",
+        "10.00, !-October Value",
+        "11.00, !-November Value",
+        "12.00; !-December Value"});
+
+    bool ErrorsFound = false;
+    ASSERT_TRUE(process_idf(idf_objects2));
+    GetInputEconomicsVariable(*state, ErrorsFound);
+
+    // Make sure variable input type "Dimensionless" is processed as expected
+    EXPECT_EQ(state->dataEconTariff->econVar(1).varUnitType, varUnitTypeDimensionless);
+    // Make sure the numerical inputs after A3 is still being processed correctly
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(1), 1.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(2), 2.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(3), 3.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(4), 4.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(5), 5.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(6), 6.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(7), 7.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(8), 8.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(9), 9.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(10), 10.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(11), 11.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(12), 12.00);
+}
+
+TEST_F(EnergyPlusFixture, InputEconomics_UtilityCost_Variable_Test3)
+{
+    // Tests for PR #8456 and Issue #8455 ... Case 3 of Cases 0-3
+    // to ensure UtilityCost:Variable inputs being procesed properly
+
+    std::string const idf_objects3 = delimited_string({
+
+        "Schedule:Compact,",
+        "  Electricity Season Schedule,  !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        "  Through: 5/31,           !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,            !- Field 3",
+        "  1,                       !- Field 4",
+        "  Through: 9/30,           !- Field 5",
+        "  For: AllDays,            !- Field 6",
+        "  Until: 24:00,            !- Field 7",
+        "  3,                       !- Field 8",
+        "  Through: 12/31,          !- Field 9",
+        "  For: AllDays,            !- Field 10",
+        "  Until: 24:00,            !- Field 11",
+        "  1;                       !- Field 12",
+
+        "UtilityCost:Tariff,",
+        "  ExampleAWithVariableMonthlyCharge,     !- Name",
+        "  ElectricityNet:Facility, !- Output Meter Name",
+        "  kWh,                     !- Conversion Factor Choice",
+        "  ,                        !- Energy Conversion Factor",
+        "  ,                        !- Demand Conversion Factor",
+        "  ,                        !- Time of Use Period Schedule Name",
+        "  Electricity Season Schedule,  !- Season Schedule Name",
+        "  ,                        !- Month Schedule Name",
+        "  ,                        !- Demand Window Length",
+        "  0,                       !- Monthly Charge or Variable Name",
+        "  ,                        !- Minimum Monthly Charge or Variable Name",
+        "  ,                        !- Real Time Pricing Charge Schedule Name",
+        "  ,                        !- Customer Baseline Load Schedule Name",
+        "  ,                        !- Group Name",
+        "  NetMetering;             !- Buy Or Sell",
+
+        "UtilityCost:Variable,",
+        "VariableFixedCharge, !-Name",
+        "ExampleAWithVariableMonthlyCharge, !-Tariff Name",
+        "Currency, !-Variable Type",
+        "1.00, !-January Value",
+        "2.00, !-February Value",
+        "3.00, !-March Value",
+        "4.00, !-April Value",
+        "5.00, !-May Value",
+        "6.00, !-June Value",
+        "7.00, !-July Value",
+        "8.00, !-August Value",
+        "9.00, !-September Value",
+        "10.00, !-October Value",
+        "11.00, !-November Value",
+        "12.00; !-December Value"});
+
+    bool ErrorsFound = false;
+    ASSERT_TRUE(process_idf(idf_objects3));
+    GetInputEconomicsVariable(*state, ErrorsFound);
+
+    // Make sure variable input type "Currency" is processed as expected
+    EXPECT_EQ(state->dataEconTariff->econVar(1).varUnitType, varUnitTypeCurrency);
+    // Make sure the numerical inputs after A3 is still being processed correctly
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(1), 1.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(2), 2.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(3), 3.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(4), 4.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(5), 5.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(6), 6.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(7), 7.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(8), 8.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(9), 9.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(10), 10.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(11), 11.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(12), 12.00);
+}
+
+TEST_F(SQLiteFixture, WriteEconomicTariffTable_DualUnits)
+{
+    std::string const idf_objects = delimited_string({
+
+        "RunPeriodControl:DaylightSavingTime,",
+        "  2nd Sunday in March,     !- Start Date",
+        "  1st Sunday in November;  !- End Date",
+
+        "SimulationControl,",
+        "  Yes,                     !- Do Zone Sizing Calculation",
+        "  Yes,                     !- Do System Sizing Calculation",
+        "  No,                      !- Do Plant Sizing Calculation",
+        "  No,                      !- Run Simulation for Sizing Periods",
+        "  YES;                     !- Run Simulation for Weather File Run Periods",
+
+        "Building,",
+        "  Mid-Rise Apartment,      !- Name",
+        "  0,                       !- North Axis {deg}",
+        "  City,                    !- Terrain",
+        "  0.04,                    !- Loads Convergence Tolerance Value",
+        "  0.4,                     !- Temperature Convergence Tolerance Value {deltaC}",
+        "  FullExterior,            !- Solar Distribution",
+        "  25,                      !- Maximum Number of Warmup Days",
+        "  6;                       !- Minimum Number of Warmup Days",
+
+        "Timestep,",
+        "  4;                       !- Number of Timesteps per Hour",
+
+        "RunPeriod,",
+        "  Annual,                  !- Name",
+        "  1,                       !- Begin Month",
+        "  1,                       !- Begin Day of Month",
+        "  ,                        !- Begin Year",
+        "  12,                      !- End Month",
+        "  31,                      !- End Day of Month",
+        "  ,                        !- End Year",
+        "  Sunday,                  !- Day of Week for Start Day",
+        "  No,                      !- Use Weather File Holidays and Special Days",
+        "  No,                      !- Use Weather File Daylight Saving Period",
+        "  Yes,                     !- Apply Weekend Holiday Rule",
+        "  Yes,                     !- Use Weather File Rain Indicators",
+        "  Yes;                     !- Use Weather File Snow Indicators",
+
+        "GlobalGeometryRules,",
+        "  LowerLeftCorner,         !- Starting Vertex Position",
+        "  Clockwise,               !- Vertex Entry Direction",
+        "  Relative;                !- Coordinate System",
+
+        "ScheduleTypeLimits,",
+        "  Any Number;              !- Name",
+
+        "Schedule:Constant,",
+        "  Always On Discrete,      !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        "  1;                       !- Hourly Value",
+
+        "Exterior:Lights,",
+        "  Exterior Facade Lighting,!- Name",
+        "  Always On Discrete,      !- Schedule Name",
+        "  1000.00,                 !- Design Level {W}",
+        "  ScheduleNameOnly,        !- Control Option",
+        "  Exterior Facade Lighting;!- End-Use Subcategory",
+
+        "Schedule:Compact,",
+        "  Electricity Season Schedule,  !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        "  Through: 5/31,           !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,            !- Field 3",
+        "  1,                       !- Field 4",
+        "  Through: 9/30,           !- Field 5",
+        "  For: AllDays,            !- Field 6",
+        "  Until: 24:00,            !- Field 7",
+        "  3,                       !- Field 8",
+        "  Through: 12/31,          !- Field 9",
+        "  For: AllDays,            !- Field 10",
+        "  Until: 24:00,            !- Field 11",
+        "  1;                       !- Field 12",
+
+        "UtilityCost:Tariff,",
+        "  Seasonal_Tariff,         !- Name",
+        "  ElectricityNet:Facility, !- Output Meter Name",
+        "  kWh,                     !- Conversion Factor Choice",
+        "  ,                        !- Energy Conversion Factor",
+        "  ,                        !- Demand Conversion Factor",
+        "  ,                        !- Time of Use Period Schedule Name",
+        "  Electricity Season Schedule,  !- Season Schedule Name",
+        "  ,                        !- Month Schedule Name",
+        "  ,                        !- Demand Window Length",
+        "  0,                       !- Monthly Charge or Variable Name",
+        "  ,                        !- Minimum Monthly Charge or Variable Name",
+        "  ,                        !- Real Time Pricing Charge Schedule Name",
+        "  ,                        !- Customer Baseline Load Schedule Name",
+        "  ,                        !- Group Name",
+        "  NetMetering;             !- Buy Or Sell",
+
+        "UtilityCost:Charge:Simple,",
+        "  Seasonal_Tariff_Winter_Charge, !- Utility Cost Charge Simple Name",
+        "  Seasonal_Tariff,         !- Tariff Name",
+        "  totalEnergy,             !- Source Variable",
+        "  Winter,                  !- Season",
+        "  EnergyCharges,           !- Category Variable Name",
+        "  0.02;                    !- Cost per Unit Value or Variable Name",
+
+        "UtilityCost:Charge:Simple,",
+        "  Seasonal_Tariff_Summer_Charge, !- Utility Cost Charge Simple Name",
+        "  Seasonal_Tariff,         !- Tariff Name",
+        "  totalEnergy,             !- Source Variable",
+        "  Summer,                  !- Season",
+        "  EnergyCharges,           !- Category Variable Name",
+        "  0.04;                    !- Cost per Unit Value or Variable Name",
+
+        "Output:Table:SummaryReports,",
+        "  TariffReport;            !- Report 1 Name",
+
+        "OutputControl:Table:Style,",
+        "  HTML;                                   !- Column Separator",
+
+        "Output:SQLite,",
+        "  SimpleAndTabular;                       !- Option Type",
+
+        "Output:Meter,Electricity:Facility,timestep;"
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataGlobal->NumOfTimeStepInHour = 4;
+    state->dataGlobal->MinutesPerTimeStep = 15;
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
+
+    ScheduleManager::ProcessScheduleInput(*state);
+    ExteriorEnergyUse::ManageExteriorEnergyUse(*state);
+
+    state->dataSQLiteProcedures->sqlite->sqliteBegin();
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+
+    state->dataOutRptTab->displayTabularBEPS = true;
+    state->dataOutRptTab->displayDemandEndUse = true;
+    state->dataOutRptTab->displayLEEDSummary = true;
+
+    state->dataOutRptTab->WriteTabularFiles = true;
+
+    OutputReportTabular::SetupUnitConversions(*state);
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::JtoKWH;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::JtoKWH;
+    Real64 enerConv = OutputReportTabular::getSpecificUnitDivider(*state, "m2", "ft2");
+    EXPECT_NEAR(enerConv, 0.092903, 0.001); // 0.092893973326981863
+
+    ExteriorEnergyUse::ManageExteriorEnergyUse(*state);
+    EconomicTariff::UpdateUtilityBills(*state);
+    state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather;
+
+    state->dataEnvrn->Month = 5;
+    state->dataEnvrn->DayOfMonth = 31;
+    state->dataGlobal->HourOfDay = 23;
+    state->dataEnvrn->DSTIndicator = 1;
+    state->dataEnvrn->MonthTomorrow = 6;
+    state->dataEnvrn->DayOfWeek = 4;
+    state->dataEnvrn->DayOfWeekTomorrow = 5;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataGlobal->TimeStep = 4;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+
+    ScheduleManager::UpdateScheduleValues(*state);
+    ExteriorEnergyUse::ManageExteriorEnergyUse(*state);
+
+    state->dataGlobal->DoOutputReporting = true;
+    EconomicTariff::UpdateUtilityBills(*state);
+
+    state->dataOutRptTab->buildingGrossFloorArea = 200.0;
+    state->dataOutRptTab->buildingConditionedFloorArea = 100.0;
+    state->dataOutRptTab->displayEconomicResultSummary = true;
+
+    state->dataEconTariff->chargeBlock.allocate(1);
+    state->dataEconTariff->tariff(1).totalAnnualCost = 2000.0;
+    state->dataEconTariff->tariff(1).isSelected = true;
+    EconomicTariff::WriteTabularTariffReports(*state);
+
+    EXPECT_EQ(state->dataEconTariff->tariff(1).totalAnnualCost, 2000.0);
+
+    // Now test the dual-unit reporting:
+    // First case single unit:
+    const std::string reportName = "Economics Results Summary Report";
+    const std::string tableName = "Annual Cost";
+
+    std::vector<std::tuple<std::string, std::string, std::string, Real64>> results0(
+        {{"Total", "Cost", "~~$~~", 2000.0},
+         {"Total", "Cost per Total Building Area", "~~$~~/m2", 10.0},
+         {"Total", "Cost per Net Conditioned Building Area", "~~$~~/m2", 20.0}});
+
+    for (auto &v : results0) {
+
+        std::string columnName = std::get<0>(v);
+        std::string rowName = std::get<1>(v);
+        std::string unitName = std::get<2>(v);
+        Real64 expectedValue = std::get<3>(v);
+
+        // for (auto &rowe : rowName) {
+        std::string query("SELECT Value From TabularDataWithStrings"
+                          "  WHERE ReportName = '" +
+                          reportName +
+                          "'"
+                          "  AND TableName = '" +
+                          tableName +
+                          "'"
+                          "  AND RowName = '" +
+                          rowName +
+                          "'"
+                          "  AND ColumnName = '" +
+                          columnName +
+                          "'"
+                          "  AND Units = '" +
+                          unitName + "'");
+
+        Real64 return_val = execAndReturnFirstDouble(query);
+
+        // Add informative message if failed
+        EXPECT_NEAR(expectedValue, return_val, 0.01) << "Failed for TableName=" << tableName << "; RowName=" << rowName;
+    }
+
+    // Second case dual-unit:
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::JtoKWH;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::InchPound;
+
+    EconomicTariff::WriteTabularTariffReports(*state);
+
+    EXPECT_EQ(state->dataEconTariff->tariff(1).totalAnnualCost, 2000.0);
+
+    std::vector<std::tuple<std::string, std::string, std::string, Real64>> results1(
+        {{"Total", "Cost", "~~$~~", 2000.0},
+         {"Total", "Cost per Total Building Area", "~~$~~/ft2", 10.0 * enerConv},
+         {"Total", "Cost per Net Conditioned Building Area", "~~$~~/ft2", 20.0 * enerConv}});
+
+    for (auto &v : results1) {
+
+        std::string columnName = std::get<0>(v);
+        std::string rowName = std::get<1>(v);
+        std::string unitName = std::get<2>(v);
+        Real64 expectedValue = std::get<3>(v);
+
+        // for (auto &rowe : rowName) {
+        std::string query("SELECT Value From TabularDataWithStrings"
+                          "  WHERE ReportName = '" +
+                          reportName +
+                          "'"
+                          "  AND TableName = '" +
+                          tableName +
+                          "'"
+                          "  AND RowName = '" +
+                          rowName +
+                          "'"
+                          "  AND ColumnName = '" +
+                          columnName +
+                          "'"
+                          "  AND Units = '" +
+                          unitName + "'");
+
+        Real64 return_val = execAndReturnFirstDouble(query);
+
+        // Add informative message if failed
+        EXPECT_NEAR(expectedValue, return_val, 0.01) << "Failed for TableName=" << tableName << "; RowName=" << rowName;
+    }
+
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
+}
+
+TEST_F(EnergyPlusFixture, EconomicTariff_LEEDtariff_with_Custom_Meter)
+{
+    std::string const idf_objects = delimited_string({
+
+        "Meter:Custom,",
+        "    Building Natural Gas,    !- Name",
+        "    NaturalGas,              !- Resource Type",
+        "    ,                        !- Key Name 1",
+        "    NaturalGas:Facility;     !- Output Variable or Meter Name 1",
+
+        "UtilityCost:Tariff,",
+        "    Sample with All Utilities_NGas,  !- Name",
+        "    Building Natural Gas,    !- Output Meter Name",
+        "    Therm,                   !- Conversion Factor Choice",
+        "    ,                        !- Energy Conversion Factor",
+        "    ,                        !- Demand Conversion Factor",
+        "    ,                        !- Time of Use Period Schedule Name",
+        "    ,                        !- Season Schedule Name",
+        "    ,                        !- Month Schedule Name",
+        "    ,                        !- Demand Window Length",
+        "    ,                        !- Monthly Charge or Variable Name",
+        "    ,                        !- Minimum Monthly Charge or Variable Name",
+        "    ,                        !- Real Time Pricing Charge Schedule Name",
+        "    ,                        !- Customer Baseline Load Schedule Name",
+        "    ,                        !- Group Name",
+        "    BuyFromUtility;          !- Buy Or Sell",
+
+        "UtilityCost:Charge:Simple,",
+        "    FlatEnergyCharge-Gas_Custom,  !- Utility Cost Charge Simple Name",
+        "    Sample with All Utilities_NGas,  !- Tariff Name",
+        "    totalEnergy,             !- Source Variable",
+        "    Annual,                  !- Season",
+        "    EnergyCharges,           !- Category Variable Name",
+        "    0.50;                    !- Cost per Unit Value or Variable Name",
+
+        "UtilityCost:Tariff,                                                 ",
+        "    ExampleA,                !- Name                                ",
+        "    ElectricityPurchased:Facility,  !- Output Meter Name            ",
+        "    kWh,                     !- Conversion Factor Choice            ",
+        "    ,                        !- Energy Conversion Factor            ",
+        "    ,                        !- Demand Conversion Factor            ",
+        "    ,                        !- Time of Use Period Schedule Name    ",
+        "    ,                        !- Season Schedule Name                ",
+        "    ,                        !- Month Schedule Name                 ",
+        "    ,                        !- Demand Window Length                ",
+        "    2.51;                    !- Monthly Charge or Variable Name     ",
+
+        "UtilityCost:Charge:Simple,                                          ",
+        "    FlatEnergyCharge,        !- Utility Cost Charge Simple Name     ",
+        "    ExampleA,                !- Tariff Name                         ",
+        "    totalEnergy,             !- Source Variable                     ",
+        "    Annual,                  !- Season                              ",
+        "    EnergyCharges,           !- Category Variable Name              ",
+        "    0.055342;                !- Cost per Unit Value or Variable Name",
+
+        "UtilityCost:Tariff,                                                      ",
+        "    ExampleI-Sell,           !- Name                                     ",
+        "    ElectricitySurplusSold:Facility,  !- Output Meter Name               ",
+        "    kWh,                     !- Conversion Factor Choice                 ",
+        "    ,                        !- Energy Conversion Factor                 ",
+        "    ,                        !- Demand Conversion Factor                 ",
+        "    ,                        !- Time of Use Period Schedule Name         ",
+        "    ,                        !- Season Schedule Name                     ",
+        "    ,                        !- Month Schedule Name                      ",
+        "    ,                        !- Demand Window Length                     ",
+        "    ,                        !- Monthly Charge or Variable Name          ",
+        "    ,                        !- Minimum Monthly Charge or Variable Name  ",
+        "    ,                        !- Real Time Pricing Charge Schedule Name   ",
+        "    ,                        !- Customer Baseline Load Schedule Name     ",
+        "    ,                        !- Group Name                               ",
+        "    sellToUtility;           !- Buy Or Sell                              ",
+
+        "UtilityCost:Charge:Simple,                                               ",
+        "    GeneratedElectricSold,   !- Utility Cost Charge Simple Name          ",
+        "    ExampleI-Sell,           !- Tariff Name                              ",
+        "    totalEnergy,             !- Source Variable                          ",
+        "    Annual,                  !- Season                                   ",
+        "    EnergyCharges,           !- Category Variable Name                   ",
+        "    -0.02;                   !- Cost per Unit Value or Variable Name     ",
+
+        "UtilityCost:Tariff,                                             ",
+        "    ExampleA-Gas,            !- Name                            ",
+        "    NaturalGas:Facility,     !- Output Meter Name               ",
+        "    Therm,                   !- Conversion Factor Choice        ",
+        "    ,                        !- Energy Conversion Factor        ",
+        "    ,                        !- Demand Conversion Factor        ",
+        "    ,                        !- Time of Use Period Schedule Name",
+        "    ,                        !- Season Schedule Name            ",
+        "    ,                        !- Month Schedule Name             ",
+        "    ,                        !- Demand Window Length            ",
+        "    15.;                     !- Monthly Charge or Variable Name ",
+
+        "UtilityCost:Charge:Simple,                                          ",
+        "    FlatEnergyCharge-Gas,    !- Utility Cost Charge Simple Name     ",
+        "    ExampleA-Gas,            !- Tariff Name                         ",
+        "    totalEnergy,             !- Source Variable                     ",
+        "    Annual,                  !- Season                              ",
+        "    EnergyCharges,           !- Category Variable Name              ",
+        "    0.50;                    !- Cost per Unit Value or Variable Name",
+
+        "UtilityCost:Tariff,                                                 ",
+        "    Water Tariff,            !- Name                                ",
+        "    Water:Facility,          !- Output Meter Name                   ",
+        "    UserDefined,             !- Conversion Factor Choice            ",
+        "    1,                       !- Energy Conversion Factor            ",
+        "    ,                        !- Demand Conversion Factor            ",
+        "    ,                        !- Time of Use Period Schedule Name    ",
+        "    ,                        !- Season Schedule Name                ",
+        "    ,                        !- Month Schedule Name                 ",
+        "    ,                        !- Demand Window Length                ",
+        "    0.0;                     !- Monthly Charge or Variable Name     ",
+
+        "UtilityCost:Charge:Simple,                                          ",
+        "    WaterTariffEnergyCharge, !- Utility Cost Charge Simple Name     ",
+        "    Water Tariff,            !- Tariff Name                         ",
+        "    totalEnergy,             !- Source Variable                     ",
+        "    Annual,                  !- Season                              ",
+        "    EnergyCharges,           !- Category Variable Name              ",
+        "    7.0;                     !- Cost per Unit Value or Variable Name",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool errors_found = false;
+
+    GetCustomMeterInput(*state, errors_found);
+
+    EXPECT_FALSE(errors_found);
+
+    state->dataOutputProcessor->NumEnergyMeters = 7;
+    state->dataOutputProcessor->EnergyMeters.allocate(state->dataOutputProcessor->NumEnergyMeters);
+    state->dataOutputProcessor->EnergyMeters(1).Name = "ELECTRICITY:FACILITY";
+    state->dataOutputProcessor->EnergyMeters(2).Name = "ElectricitySurplusSold:Facility";
+
+    state->dataOutputProcessor->EnergyMeters(3).Name = "NATURALGAS:FACILITY";
+    state->dataOutputProcessor->EnergyMeters(4).Name = "DISTRICTCOOLING:FACILITY";
+    state->dataOutputProcessor->EnergyMeters(5).Name = "DISTRICTHEATING:FACILITY";
+    state->dataOutputProcessor->EnergyMeters(6).Name = "WATER:FACILITY";
+    state->dataOutputProcessor->EnergyMeters(7).Name = "Building Natural Gas";
+
+    // int elecFacilMeter = GetMeterIndex(*state, "ELECTRICITY:FACILITY");
+    // int gasFacilMeter = GetMeterIndex(*state, "NATURALGAS:FACILITY");
+    // int distCoolFacilMeter = GetMeterIndex(*state, "DISTRICTCOOLING:FACILITY");
+    // int distHeatFacilMeter = GetMeterIndex(*state, "DISTRICTHEATING:FACILITY");
+
+    state->dataEconTariff->numTariff = 7;
+    state->dataEconTariff->tariff.allocate(state->dataEconTariff->numTariff);
+    state->dataEconTariff->tariff(1).tariffName = "ExampleA";
+    state->dataEconTariff->tariff(1).isSelected = true;
+    state->dataEconTariff->tariff(1).totalAnnualCost = 1000.0;
+    state->dataEconTariff->tariff(1).totalAnnualEnergy = 10000.0;
+    state->dataEconTariff->tariff(1).kindElectricMtr = 3;
+    state->dataEconTariff->tariff(1).reportMeterIndx = 1;
+
+    state->dataEconTariff->tariff(2).tariffName = "ExampleI-Sell";
+    state->dataEconTariff->tariff(2).isSelected = true;
+    state->dataEconTariff->tariff(2).totalAnnualCost = -40.0;
+    state->dataEconTariff->tariff(2).totalAnnualEnergy = 2000.0;
+    state->dataEconTariff->tariff(2).kindElectricMtr = 4;
+    state->dataEconTariff->tariff(2).kindGasMtr = 0;
+    state->dataEconTariff->tariff(2).reportMeterIndx = 2;
+
+    state->dataEconTariff->tariff(3).tariffName = "ExampleA-Gas";
+    state->dataEconTariff->tariff(3).isSelected = true;
+    state->dataEconTariff->tariff(3).totalAnnualCost = 1500.0;
+    state->dataEconTariff->tariff(3).totalAnnualEnergy = 3000.0;
+    state->dataEconTariff->tariff(3).kindElectricMtr = 0;
+    state->dataEconTariff->tariff(3).kindGasMtr = 1;
+    state->dataEconTariff->tariff(3).reportMeterIndx = 3;
+
+    state->dataEconTariff->tariff(4).tariffName = "DistrictCoolingUnit";
+    state->dataEconTariff->tariff(4).isSelected = true;
+    state->dataEconTariff->tariff(4).totalAnnualCost = 50.0;
+    state->dataEconTariff->tariff(4).totalAnnualEnergy = 10.0;
+    state->dataEconTariff->tariff(4).reportMeterIndx = 4;
+
+    state->dataEconTariff->tariff(5).tariffName = "DistrictHeatingUnit";
+    state->dataEconTariff->tariff(5).isSelected = true;
+    state->dataEconTariff->tariff(5).totalAnnualCost = 168;
+    state->dataEconTariff->tariff(5).totalAnnualEnergy = 15;
+    state->dataEconTariff->tariff(5).reportMeterIndx = 5;
+
+    state->dataEconTariff->tariff(6).tariffName = "Water Tariff";
+    state->dataEconTariff->tariff(6).isSelected = true;
+    state->dataEconTariff->tariff(6).totalAnnualCost = 1050;
+    state->dataEconTariff->tariff(6).totalAnnualEnergy = 150;
+    state->dataEconTariff->tariff(6).kindWaterMtr = 1;
+    state->dataEconTariff->tariff(6).reportMeterIndx = 6;
+
+    state->dataEconTariff->tariff(7).tariffName = "Sample with All Utilities_NGas";
+    state->dataEconTariff->tariff(7).isSelected = true;
+    state->dataEconTariff->tariff(7).totalAnnualCost = 1500.0;
+    state->dataEconTariff->tariff(7).totalAnnualEnergy = 3000.0;
+    state->dataEconTariff->tariff(7).kindElectricMtr = 0;
+    state->dataEconTariff->tariff(7).kindGasMtr = 1;
+    state->dataEconTariff->tariff(7).reportMeterIndx = 7;
+
+    SetPredefinedTables(*state); // setup the predefined table entry numbers first
+
+    LEEDtariffReporting(*state);
+
+    EXPECT_EQ("ExampleA ExampleI-Sell", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsRtNm, "Electricity"));
+
+    EXPECT_EQ("ExampleA-Gas Sample with All Utilities_NGas",
+              RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsRtNm, "Natural Gas"));
+
+    EXPECT_EQ("DistrictCoolingUnit", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsRtNm, "District Cooling"));
+
+    EXPECT_EQ("DistrictHeatingUnit", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsRtNm, "District Heating"));
+
+    EXPECT_EQ("", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsRtNm, "Other"));
+
+    EXPECT_EQ("0.096", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsVirt, "Electricity"));
+
+    EXPECT_EQ("1.000", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsVirt, "Natural Gas"));
+
+    EXPECT_EQ("5.000", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsVirt, "District Cooling"));
+
+    EXPECT_EQ("11.200", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsVirt, "District Heating"));
+
+    EXPECT_EQ("NOT FOUND", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsVirt, "Other"));
 }

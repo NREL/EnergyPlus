@@ -54,82 +54,85 @@
 
 namespace EnergyPlus {
 
-    void BaseSizerWithFanHeatInputs::initializeWithinEP(EnergyPlusData &state, const std::string &_compType,
-                                                        const std::string &_compName, const bool &_printWarningFlag,
-                                                        const std::string &_callingRoutine) {
-        BaseSizer::initializeWithinEP(state, _compType, _compName, _printWarningFlag, _callingRoutine);
-        this->dataDesAccountForFanHeat = DataSizing::DataDesAccountForFanHeat;
-        // water coils on main branch have no parent object to set DataFan* variables
-        if (int(this->primaryAirSystem.size() > 0) && this->curSysNum > 0 && this->curOASysNum == 0) {
-            if (this->primaryAirSystem(this->curSysNum).supFanModelTypeEnum == DataAirSystems::structArrayLegacyFanModels) {
-                this->dataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
-                this->dataFanIndex = this->primaryAirSystem(this->curSysNum).SupFanNum;
-            } else if (this->primaryAirSystem(this->curSysNum).supFanModelTypeEnum == DataAirSystems::objectVectorOOFanSystemModel) {
-                this->dataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
-                this->dataFanIndex = this->primaryAirSystem(this->curSysNum).supFanVecIndex;
-            }
+void BaseSizerWithFanHeatInputs::initializeWithinEP(EnergyPlusData &state,
+                                                    std::string_view const _compType,
+                                                    std::string_view const _compName,
+                                                    bool const &_printWarningFlag,
+                                                    std::string_view _callingRoutine)
+{
+    BaseSizer::initializeWithinEP(state, _compType, _compName, _printWarningFlag, _callingRoutine);
+    this->dataDesAccountForFanHeat = state.dataSize->DataDesAccountForFanHeat;
+    // water coils on main branch have no parent object to set DataFan* variables
+    if (int(this->primaryAirSystem.size() > 0) && this->curSysNum > 0 && this->curOASysNum == 0) {
+        if (this->primaryAirSystem(this->curSysNum).supFanModelTypeEnum == DataAirSystems::structArrayLegacyFanModels) {
+            this->dataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+            this->dataFanIndex = this->primaryAirSystem(this->curSysNum).SupFanNum;
+        } else if (this->primaryAirSystem(this->curSysNum).supFanModelTypeEnum == DataAirSystems::objectVectorOOFanSystemModel) {
+            this->dataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+            this->dataFanIndex = this->primaryAirSystem(this->curSysNum).supFanVecIndex;
         }
-        this->getFanInputsForDesHeatGain(state,
-                                         this->dataFanEnumType,
-                                         this->dataFanIndex,
-                                         this->deltaP,
-                                         this->motEff,
-                                         this->totEff,
-                                         this->motInAirFrac,
-                                         this->fanShaftPow,
-                                         this->motInPower,
-                                         this->fanCompModel);
     }
-
-
-    Real64 BaseSizerWithFanHeatInputs::calcFanDesHeatGain(Real64 &airVolFlow)
-    {
-        Real64 designHeatGain = 0.0;
-        if (this->dataFanEnumType < 0 || this->dataFanIndex < 0) return designHeatGain;
-        if (this->dataFanEnumType == DataAirSystems::fanModelTypeNotYetSet) return designHeatGain;
-        if (this->dataFanEnumType == DataAirSystems::structArrayLegacyFanModels && this->dataFanIndex == 0) return designHeatGain;
-        if (this->fanCompModel) {
-            designHeatGain = this->fanShaftPow + (this->motInPower - this->fanShaftPow) * this->motInAirFrac;
-        } else {
-            Real64 fanPowerTot = (airVolFlow * this->deltaP) / this->totEff;
-            designHeatGain = this->motEff * fanPowerTot + (fanPowerTot - this->motEff * fanPowerTot) * this->motInAirFrac;
-        }
-        return designHeatGain;
-    }
-
-    void BaseSizerWithFanHeatInputs::getFanInputsForDesHeatGain(EnergyPlusData &state,
-                                               int const &fanEnumType,
-                                               int const &fanIndex,
-                                               Real64 &deltaP,
-                                               Real64 &motEff,
-                                               Real64 &totEff,
-                                               Real64 &motInAirFrac,
-                                               Real64 &fanShaftPow,
-                                               Real64 &motInPower,
-                                               bool &fanCompModel)
-    {
-        // if fan unknown or air flow sizing (recursive call to size fan) then return
-        if (fanEnumType < 0 || fanIndex < 0 || this->isFanReportObject) return;
-
-        switch (fanEnumType) {
-            case DataAirSystems::structArrayLegacyFanModels: {
-                Fans::FanInputsForDesHeatGain(state, fanIndex, deltaP, motEff, totEff, motInAirFrac, fanShaftPow, motInPower, fanCompModel);
-                break;
-            }
-            case DataAirSystems::objectVectorOOFanSystemModel: {
-                HVACFan::fanObjs[fanIndex]->FanInputsForDesignHeatGain(state, deltaP, motEff, totEff, motInAirFrac);
-                break;
-            }
-            case DataAirSystems::fanModelTypeNotYetSet: {
-                // do nothing
-                break;
-            }
-        } // end switch
-        return;
-    }
-
-    void BaseSizerWithFanHeatInputs::setDataDesAccountForFanHeat(bool flag)         {
-        DataSizing::DataDesAccountForFanHeat = flag;
-    }
-
+    this->getFanInputsForDesHeatGain(state,
+                                     this->dataFanEnumType,
+                                     this->dataFanIndex,
+                                     this->deltaP,
+                                     this->motEff,
+                                     this->totEff,
+                                     this->motInAirFrac,
+                                     this->fanShaftPow,
+                                     this->motInPower,
+                                     this->fanCompModel);
 }
+
+Real64 BaseSizerWithFanHeatInputs::calcFanDesHeatGain(Real64 &airVolFlow)
+{
+    Real64 designHeatGain = 0.0;
+    if (this->dataFanEnumType < 0 || this->dataFanIndex < 0) return designHeatGain;
+    if (this->dataFanEnumType == DataAirSystems::fanModelTypeNotYetSet) return designHeatGain;
+    if (this->dataFanEnumType == DataAirSystems::structArrayLegacyFanModels && this->dataFanIndex == 0) return designHeatGain;
+    if (this->fanCompModel) {
+        designHeatGain = this->fanShaftPow + (this->motInPower - this->fanShaftPow) * this->motInAirFrac;
+    } else {
+        Real64 fanPowerTot = (airVolFlow * this->deltaP) / this->totEff;
+        designHeatGain = this->motEff * fanPowerTot + (fanPowerTot - this->motEff * fanPowerTot) * this->motInAirFrac;
+    }
+    return designHeatGain;
+}
+
+void BaseSizerWithFanHeatInputs::getFanInputsForDesHeatGain(EnergyPlusData &state,
+                                                            int const &fanEnumType,
+                                                            int const &fanIndex,
+                                                            Real64 &deltaP,
+                                                            Real64 &motEff,
+                                                            Real64 &totEff,
+                                                            Real64 &motInAirFrac,
+                                                            Real64 &fanShaftPow,
+                                                            Real64 &motInPower,
+                                                            bool &fanCompModel)
+{
+    // if fan unknown or air flow sizing (recursive call to size fan) then return
+    if (fanEnumType < 0 || fanIndex < 0 || this->isFanReportObject) return;
+
+    switch (fanEnumType) {
+    case DataAirSystems::structArrayLegacyFanModels: {
+        Fans::FanInputsForDesHeatGain(state, fanIndex, deltaP, motEff, totEff, motInAirFrac, fanShaftPow, motInPower, fanCompModel);
+        break;
+    }
+    case DataAirSystems::objectVectorOOFanSystemModel: {
+        state.dataHVACFan->fanObjs[fanIndex]->FanInputsForDesignHeatGain(state, deltaP, motEff, totEff, motInAirFrac);
+        break;
+    }
+    case DataAirSystems::fanModelTypeNotYetSet: {
+        // do nothing
+        break;
+    }
+    } // end switch
+    return;
+}
+
+void BaseSizerWithFanHeatInputs::setDataDesAccountForFanHeat(EnergyPlusData &state, bool flag)
+{
+    state.dataSize->DataDesAccountForFanHeat = flag;
+}
+
+} // namespace EnergyPlus

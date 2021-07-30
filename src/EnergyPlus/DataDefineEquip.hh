@@ -66,7 +66,8 @@ namespace DataDefineEquip {
     constexpr int MaxZoneAirComponents = 1;
 
     // Equipment Types covered by ZoneAirLoopEquipment:
-    enum class iZnAirLoopEquipType {
+    enum class iZnAirLoopEquipType
+    {
         Unassigned,
         DualDuctConstVolume,
         DualDuctVAV,
@@ -130,19 +131,20 @@ namespace DataDefineEquip {
         // Default Constructor
         ZoneAirEquip()
             : OutletNodeNum(0), NumComponents(0), NumControls(0), EquipType(MaxZoneAirComponents),
-              EquipType_Num(MaxZoneAirComponents, DataDefineEquip::iZnAirLoopEquipType::Unassigned),
-              airTerminalPtr(nullptr), EquipName(MaxZoneAirComponents), EquipIndex(MaxZoneAirComponents, 0), AirTerminalSizingSpecIndex(0),
-              TermUnitSizingNum(0), UpStreamLeakFrac(0.0), DownStreamLeakFrac(0.0), MassFlowRateUpStrLk(0.0), MassFlowRateDnStrLk(0.0),
-              MassFlowRateTU(0.0), MassFlowRateZSup(0.0), MassFlowRateSup(0.0), MassFlowRatePlenInd(0.0), MaxAvailDelta(0.0), MinAvailDelta(0.0),
-              InletNodeNum(0), InletNodeNum2(0), ZoneEqNum(0), AirLoopNum(0), LeakLoadMult(0.0), UpStreamLeak(false), DownStreamLeak(false),
-              RetPlenumNum(0), ZoneNum(0), AccountForDOAS(false), HeatRate(0.0), CoolRate(0.0), HeatGain(0.0), CoolGain(0.0)
+              EquipType_Num(MaxZoneAirComponents, DataDefineEquip::iZnAirLoopEquipType::Unassigned), airTerminalPtr(nullptr),
+              EquipName(MaxZoneAirComponents), EquipIndex(MaxZoneAirComponents, 0), AirTerminalSizingSpecIndex(0), TermUnitSizingNum(0),
+              UpStreamLeakFrac(0.0), DownStreamLeakFrac(0.0), MassFlowRateUpStrLk(0.0), MassFlowRateDnStrLk(0.0), MassFlowRateTU(0.0),
+              MassFlowRateZSup(0.0), MassFlowRateSup(0.0), MassFlowRatePlenInd(0.0), MaxAvailDelta(0.0), MinAvailDelta(0.0), InletNodeNum(0),
+              InletNodeNum2(0), ZoneEqNum(0), AirLoopNum(0), LeakLoadMult(0.0), UpStreamLeak(false), DownStreamLeak(false), RetPlenumNum(0),
+              ZoneNum(0), AccountForDOAS(false), HeatRate(0.0), CoolRate(0.0), HeatGain(0.0), CoolGain(0.0)
         {
         }
     };
 
 } // namespace DataDefineEquip
 
-struct DefineEquipData : BaseGlobalStruct {
+struct DefineEquipData : BaseGlobalStruct
+{
 
     int NumAirDistUnits = 0;
     Array1D<DataDefineEquip::ZoneAirEquip> AirDistUnit; // Used to specify zone related

@@ -52,11 +52,29 @@
 #include <ObjexxFCL/Array2A.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/BITF.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/TARCOGParams.hh>
 
-namespace EnergyPlus::TARCOGCommon {
+namespace EnergyPlus {
 
-    bool IsShadingLayer(int layertype);
+// Fwd decl
+struct EnergyPlusData;
+
+namespace TARCOGCommon {
+
+    int constexpr NMAX(500);
+
+    constexpr bool IsShadingLayer(TARCOGParams::TARCOGLayerType const layertype)
+    {
+        // Using/Aliasing
+        using namespace TARCOGParams;
+
+        return BITF_TEST_ANY(BITF(layertype),
+                             BITF(TARCOGLayerType::VENETBLIND_HORIZ) | BITF(TARCOGLayerType::VENETBLIND_VERT) | BITF(TARCOGLayerType::WOVSHADE) |
+                                 BITF(TARCOGLayerType::PERFORATED) | BITF(TARCOGLayerType::BSDF) | BITF(TARCOGLayerType::DIFFSHADE));
+    }
 
     Real64 LDSumMax(Real64 Width, Real64 Height);
 
@@ -66,8 +84,8 @@ namespace EnergyPlus::TARCOGCommon {
                      Array1D<Real64> const &qv,    // Heat flow from ventilation [W/m2]
                      Array1D<Real64> const &hcv,   // Convective heat flow coefficient due to ventilation
                      Array1D<Real64> &hcgapMod,    // Modified heat flow coefficient for gap
-                     int nlayer,             // Number of layers
-                     Real64 edgeGlCorrFac    // Edge of glass correction factor
+                     int nlayer,                   // Number of layers
+                     Real64 edgeGlCorrFac          // Edge of glass correction factor
     );
 
     void matrixQBalance(int nlayer,
@@ -89,13 +107,25 @@ namespace EnergyPlus::TARCOGCommon {
                         Array1D<Real64> const &emis,
                         Real64 edgeGlCorrFac);
 
-    void EquationsSolver(Array2<Real64> &a, Array1D<Real64> &b, int n, int &nperr, std::string &ErrorMessage);
+    void EquationsSolver(EnergyPlusData &state, Array2<Real64> &a, Array1D<Real64> &b, int n, int &nperr, std::string &ErrorMessage);
 
-    void ludcmp(Array2<Real64> &a, int n, Array1D_int &indx, Real64 &d, int &nperr, std::string &ErrorMessage);
+    void ludcmp(EnergyPlusData &state, Array2<Real64> &a, int n, Array1D_int &indx, Real64 &d, int &nperr, std::string &ErrorMessage);
 
     void lubksb(Array2A<Real64> a, int n, const Array1D_int &indx, Array1D<Real64> &b);
 
     Real64 pos(Real64 x);
+
+} // namespace TARCOGCommon
+
+struct TARCOGCommonData : BaseGlobalStruct
+{
+    Array1D<Real64> vv = Array1D<Real64>(TARCOGCommon::NMAX);
+
+    void clear_state() override
+    {
+        this->vv = Array1D<Real64>(TARCOGCommon::NMAX);
+    }
+};
 
 } // namespace EnergyPlus
 

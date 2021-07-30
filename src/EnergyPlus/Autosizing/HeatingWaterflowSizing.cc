@@ -83,10 +83,10 @@ Real64 HeatingWaterflowSizer::size(EnergyPlusData &state, Real64 _originalValue,
                     } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
                         DesMassFlow = this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow * state.dataEnvrn->StdRhoAir;
                     }
-                    Real64 CoilInTemp =
-                        this->setHeatCoilInletTempForZoneEqSizing(this->setOAFracForZoneEqSizing(state, DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
-                                                                  this->zoneEqSizing(this->curZoneEqNum),
-                                                                  this->finalZoneSizing(this->curZoneEqNum));
+                    Real64 CoilInTemp = this->setHeatCoilInletTempForZoneEqSizing(
+                        this->setOAFracForZoneEqSizing(state, DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
+                        this->zoneEqSizing(this->curZoneEqNum),
+                        this->finalZoneSizing(this->curZoneEqNum));
                     Real64 CoilOutTemp = this->finalZoneSizing(this->curZoneEqNum).HeatDesTemp;
                     Real64 CoilOutHumRat = this->finalZoneSizing(this->curZoneEqNum).HeatDesHumRat;
                     Real64 DesCoilLoad = Psychrometrics::PsyCpAirFnW(CoilOutHumRat) * DesMassFlow * (CoilOutTemp - CoilInTemp);
@@ -155,13 +155,15 @@ Real64 HeatingWaterflowSizer::size(EnergyPlusData &state, Real64 _originalValue,
     }
     this->selectSizerOutput(state, errorsFound);
     if (this->isCoilReportObject) {
-        coilSelectionReportObj->setCoilWaterFlowPltSizNum(
+        state.dataRptCoilSelection->coilSelectionReportObj->setCoilWaterFlowPltSizNum(
             state, this->compName, this->compType, this->autoSizedValue, this->wasAutoSized, this->dataPltSizHeatNum, this->dataWaterLoopNum);
-        coilSelectionReportObj->setCoilEntWaterTemp(state, this->compName, this->compType, DataGlobalConstants::HWInitConvTemp);
+        state.dataRptCoilSelection->coilSelectionReportObj->setCoilEntWaterTemp(
+            state, this->compName, this->compType, DataGlobalConstants::HWInitConvTemp);
         if (this->plantSizData.size() > 0 && this->dataPltSizHeatNum > 0) {
-            coilSelectionReportObj->setCoilWaterDeltaT(state, this->compName, this->compType, this->plantSizData(this->dataPltSizHeatNum).DeltaT);
-            coilSelectionReportObj->setCoilLvgWaterTemp(state,
-                this->compName, this->compType, DataGlobalConstants::HWInitConvTemp - this->plantSizData(this->dataPltSizHeatNum).DeltaT);
+            state.dataRptCoilSelection->coilSelectionReportObj->setCoilWaterDeltaT(
+                state, this->compName, this->compType, this->plantSizData(this->dataPltSizHeatNum).DeltaT);
+            state.dataRptCoilSelection->coilSelectionReportObj->setCoilLvgWaterTemp(
+                state, this->compName, this->compType, DataGlobalConstants::HWInitConvTemp - this->plantSizData(this->dataPltSizHeatNum).DeltaT);
         }
     }
     return this->autoSizedValue;

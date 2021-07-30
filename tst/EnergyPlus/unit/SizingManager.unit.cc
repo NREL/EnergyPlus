@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
@@ -77,7 +78,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
 
     std::string CurrentModuleObject = "DesignSpecification:OutdoorAir";
     int NumOARequirements = 6;
-    OARequirements.allocate(NumOARequirements);
+    state->dataSize->OARequirements.allocate(NumOARequirements);
 
     Array1D_string Alphas;         // Alpha input items for object
     Array1D_string cAlphaFields;   // Alpha field names
@@ -103,16 +104,26 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(*state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
-                               cNumericFields, ErrorsFound);
+    ProcessInputOARequirements(*state,
+                               CurrentModuleObject,
+                               OAIndex,
+                               Alphas,
+                               NumAlphas,
+                               Numbers,
+                               NumNumbers,
+                               lNumericBlanks,
+                               lAlphaBlanks,
+                               cAlphaFields,
+                               cNumericFields,
+                               ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(OAFlowPerArea, OARequirements(OAIndex).OAFlowMethod);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowPerPerson);
-    EXPECT_EQ(0.2, OARequirements(OAIndex).OAFlowPerArea);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowPerZone);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowACH);
+    EXPECT_EQ(OAFlowPerArea, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerPerson);
+    EXPECT_EQ(0.2, state->dataSize->OARequirements(OAIndex).OAFlowPerArea);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerZone);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowACH);
 
     // Flow/Person
     OAIndex = 2;
@@ -124,16 +135,26 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(*state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
-                               cNumericFields, ErrorsFound);
+    ProcessInputOARequirements(*state,
+                               CurrentModuleObject,
+                               OAIndex,
+                               Alphas,
+                               NumAlphas,
+                               Numbers,
+                               NumNumbers,
+                               lNumericBlanks,
+                               lAlphaBlanks,
+                               cAlphaFields,
+                               cNumericFields,
+                               ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(OAFlowPPer, OARequirements(OAIndex).OAFlowMethod);
-    EXPECT_EQ(0.1, OARequirements(OAIndex).OAFlowPerPerson);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowPerArea);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowPerZone);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowACH);
+    EXPECT_EQ(OAFlowPPer, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
+    EXPECT_EQ(0.1, state->dataSize->OARequirements(OAIndex).OAFlowPerPerson);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerArea);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerZone);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowACH);
 
     // Flow/Zone
     OAIndex = 3;
@@ -145,16 +166,26 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(*state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
-                               cNumericFields, ErrorsFound);
+    ProcessInputOARequirements(*state,
+                               CurrentModuleObject,
+                               OAIndex,
+                               Alphas,
+                               NumAlphas,
+                               Numbers,
+                               NumNumbers,
+                               lNumericBlanks,
+                               lAlphaBlanks,
+                               cAlphaFields,
+                               cNumericFields,
+                               ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(OAFlow, OARequirements(OAIndex).OAFlowMethod);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowPerPerson);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowPerArea);
-    EXPECT_EQ(0.3, OARequirements(OAIndex).OAFlowPerZone);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowACH);
+    EXPECT_EQ(OAFlow, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerPerson);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerArea);
+    EXPECT_EQ(0.3, state->dataSize->OARequirements(OAIndex).OAFlowPerZone);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowACH);
 
     // Flow/Zone
     OAIndex = 4;
@@ -166,16 +197,26 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;              // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(*state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
-                               cNumericFields, ErrorsFound);
+    ProcessInputOARequirements(*state,
+                               CurrentModuleObject,
+                               OAIndex,
+                               Alphas,
+                               NumAlphas,
+                               Numbers,
+                               NumNumbers,
+                               lNumericBlanks,
+                               lAlphaBlanks,
+                               cAlphaFields,
+                               cNumericFields,
+                               ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(OAFlowACH, OARequirements(OAIndex).OAFlowMethod);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowPerPerson);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowPerArea);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowPerZone);
-    EXPECT_EQ(0.4, OARequirements(OAIndex).OAFlowACH);
+    EXPECT_EQ(OAFlowACH, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerPerson);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerArea);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerZone);
+    EXPECT_EQ(0.4, state->dataSize->OARequirements(OAIndex).OAFlowACH);
 
     // Sum
     OAIndex = 5;
@@ -187,16 +228,26 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(*state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
-                               cNumericFields, ErrorsFound);
+    ProcessInputOARequirements(*state,
+                               CurrentModuleObject,
+                               OAIndex,
+                               Alphas,
+                               NumAlphas,
+                               Numbers,
+                               NumNumbers,
+                               lNumericBlanks,
+                               lAlphaBlanks,
+                               cAlphaFields,
+                               cNumericFields,
+                               ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(OAFlowSum, OARequirements(OAIndex).OAFlowMethod);
-    EXPECT_EQ(0.1, OARequirements(OAIndex).OAFlowPerPerson);
-    EXPECT_EQ(0.2, OARequirements(OAIndex).OAFlowPerArea);
-    EXPECT_EQ(0.3, OARequirements(OAIndex).OAFlowPerZone);
-    EXPECT_EQ(0.4, OARequirements(OAIndex).OAFlowACH);
+    EXPECT_EQ(OAFlowSum, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
+    EXPECT_EQ(0.1, state->dataSize->OARequirements(OAIndex).OAFlowPerPerson);
+    EXPECT_EQ(0.2, state->dataSize->OARequirements(OAIndex).OAFlowPerArea);
+    EXPECT_EQ(0.3, state->dataSize->OARequirements(OAIndex).OAFlowPerZone);
+    EXPECT_EQ(0.4, state->dataSize->OARequirements(OAIndex).OAFlowACH);
 
     // Maximum
     OAIndex = 6;
@@ -208,19 +259,29 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(*state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
-                               cNumericFields, ErrorsFound);
+    ProcessInputOARequirements(*state,
+                               CurrentModuleObject,
+                               OAIndex,
+                               Alphas,
+                               NumAlphas,
+                               Numbers,
+                               NumNumbers,
+                               lNumericBlanks,
+                               lAlphaBlanks,
+                               cAlphaFields,
+                               cNumericFields,
+                               ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(OAFlowMax, OARequirements(OAIndex).OAFlowMethod);
-    EXPECT_EQ(0.1, OARequirements(OAIndex).OAFlowPerPerson);
-    EXPECT_EQ(0.2, OARequirements(OAIndex).OAFlowPerArea);
-    EXPECT_EQ(0.3, OARequirements(OAIndex).OAFlowPerZone);
-    EXPECT_EQ(0.4, OARequirements(OAIndex).OAFlowACH);
+    EXPECT_EQ(OAFlowMax, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
+    EXPECT_EQ(0.1, state->dataSize->OARequirements(OAIndex).OAFlowPerPerson);
+    EXPECT_EQ(0.2, state->dataSize->OARequirements(OAIndex).OAFlowPerArea);
+    EXPECT_EQ(0.3, state->dataSize->OARequirements(OAIndex).OAFlowPerZone);
+    EXPECT_EQ(0.4, state->dataSize->OARequirements(OAIndex).OAFlowACH);
 
     // Clean up
-    OARequirements.deallocate();
+    state->dataSize->OARequirements.deallocate();
     Alphas.deallocate();
     cAlphaFields.deallocate();
     cNumericFields.deallocate();
@@ -300,7 +361,7 @@ TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationT
         "	0.00236,              !- Outdoor Air Flow per Person { m3/s-person }",
         "	0.000305,             !- Outdoor Air Flow per Zone Floor Area { m3/s-m2 }",
         "	0.0;                  !- Outdoor Air Flow per Zone { m3/s }",
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -309,15 +370,15 @@ TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationT
     ASSERT_FALSE(ErrorsFound);
     SizingManager::GetOARequirements(*state);
     SizingManager::GetZoneSizingInput(*state);
-    ASSERT_EQ(1, NumZoneSizingInput);
-    ASSERT_EQ(DOANeutralSup, ZoneSizingInput(1).DOASControlStrategy);
-    ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASLowSetpoint);
-    ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASHighSetpoint);
+    ASSERT_EQ(1, state->dataSize->NumZoneSizingInput);
+    ASSERT_EQ(DOANeutralSup, state->dataSize->ZoneSizingInput(1).DOASControlStrategy);
+    ASSERT_EQ(DataSizing::AutoSize, state->dataSize->ZoneSizingInput(1).DOASLowSetpoint);
+    ASSERT_EQ(DataSizing::AutoSize, state->dataSize->ZoneSizingInput(1).DOASHighSetpoint);
     // set default DOAS control strategy setpoint values
     ZoneEquipmentManager::AutoCalcDOASControlStrategy(*state);
     // check default low and high set point values
-    ASSERT_EQ(21.1, ZoneSizingInput(1).DOASLowSetpoint);
-    ASSERT_EQ(23.9, ZoneSizingInput(1).DOASHighSetpoint);
+    ASSERT_EQ(21.1, state->dataSize->ZoneSizingInput(1).DOASLowSetpoint);
+    ASSERT_EQ(23.9, state->dataSize->ZoneSizingInput(1).DOASHighSetpoint);
 }
 
 TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationTest2)
@@ -369,7 +430,7 @@ TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationT
         "	0.00236,              !- Outdoor Air Flow per Person { m3/s-person }",
         "	0.000305,             !- Outdoor Air Flow per Zone Floor Area { m3/s-m2 }",
         "	0.0;                  !- Outdoor Air Flow per Zone { m3/s }",
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -378,15 +439,15 @@ TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationT
     ASSERT_FALSE(ErrorsFound);
     SizingManager::GetOARequirements(*state);
     SizingManager::GetZoneSizingInput(*state);
-    ASSERT_EQ(1, NumZoneSizingInput);
-    ASSERT_EQ(DOANeutralSup, ZoneSizingInput(1).DOASControlStrategy);
-    ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASLowSetpoint);
-    ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASHighSetpoint);
+    ASSERT_EQ(1, state->dataSize->NumZoneSizingInput);
+    ASSERT_EQ(DOANeutralSup, state->dataSize->ZoneSizingInput(1).DOASControlStrategy);
+    ASSERT_EQ(DataSizing::AutoSize, state->dataSize->ZoneSizingInput(1).DOASLowSetpoint);
+    ASSERT_EQ(DataSizing::AutoSize, state->dataSize->ZoneSizingInput(1).DOASHighSetpoint);
     // set default DOAS control strategy setpoint values
     ZoneEquipmentManager::AutoCalcDOASControlStrategy(*state);
     // check default low and high set point values
-    ASSERT_EQ(21.1, ZoneSizingInput(1).DOASLowSetpoint);
-    ASSERT_EQ(23.9, ZoneSizingInput(1).DOASHighSetpoint);
+    ASSERT_EQ(21.1, state->dataSize->ZoneSizingInput(1).DOASLowSetpoint);
+    ASSERT_EQ(23.9, state->dataSize->ZoneSizingInput(1).DOASHighSetpoint);
 }
 
 TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
@@ -398,9 +459,9 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     int HourNum;
     int TimeStepNum;
 
-    //Tests for when to do a pulse test for the Load Component Output Report
+    // Tests for when to do a pulse test for the Load Component Output Report
 
-    //Test 1a: Everything as it should be to set this to true-->result should be true
+    // Test 1a: Everything as it should be to set this to true-->result should be true
     PulseSizing = true;
     WarmupFlag = false;
     HourNum = 10;
@@ -410,7 +471,7 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_TRUE(Answer);
 
-    //Test 16: Everything as it should be to set this to true-->result should be true
+    // Test 16: Everything as it should be to set this to true-->result should be true
     PulseSizing = true;
     WarmupFlag = false;
     HourNum = 10;
@@ -420,7 +481,7 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_TRUE(Answer);
 
-    //Test 2: PulseSizing is false-->result should be false
+    // Test 2: PulseSizing is false-->result should be false
     PulseSizing = false;
     WarmupFlag = false;
     HourNum = 10;
@@ -430,7 +491,7 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_FALSE(Answer);
 
-    //Test 3: Warmup is true-->result should be false
+    // Test 3: Warmup is true-->result should be false
     PulseSizing = false;
     WarmupFlag = true;
     HourNum = 10;
@@ -440,7 +501,7 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_FALSE(Answer);
 
-    //Test 4: HourNum not 10-->result should be false
+    // Test 4: HourNum not 10-->result should be false
     PulseSizing = true;
     WarmupFlag = false;
     HourNum = 7;
@@ -450,7 +511,7 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_FALSE(Answer);
 
-    //Test 5: TimeStepNum not 1-->result should be false
+    // Test 5: TimeStepNum not 1-->result should be false
     PulseSizing = true;
     WarmupFlag = false;
     HourNum = 10;
@@ -460,7 +521,7 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_FALSE(Answer);
 
-    //Test 6: DayOfSim not 1 and KindSim not weather file period --> result should be false
+    // Test 6: DayOfSim not 1 and KindSim not weather file period --> result should be false
     PulseSizing = true;
     WarmupFlag = false;
     HourNum = 10;
@@ -470,7 +531,7 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_FALSE(Answer);
 
-    //Test 7: everything set to make the answer false
+    // Test 7: everything set to make the answer false
     PulseSizing = false;
     WarmupFlag = true;
     HourNum = 2;
@@ -479,5 +540,55 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     state->dataGlobal->DayOfSim = 2;
     Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_FALSE(Answer);
+}
 
+TEST_F(EnergyPlusFixture, SizingManager_ReportTemperatureInputError)
+{
+
+    std::string objectName = "Sizing:Zone";
+    int paramNum = 1;
+    state->dataIPShortCut->cAlphaArgs.allocate(3);
+    state->dataIPShortCut->cNumericFieldNames.allocate(3);
+    state->dataIPShortCut->rNumericArgs.allocate(3);
+    state->dataIPShortCut->cAlphaArgs(paramNum) = "SPACE1-1";
+    state->dataIPShortCut->cNumericFieldNames(paramNum) = "Zone Cooling Design Supply Air Temperature";
+    state->dataIPShortCut->rNumericArgs(paramNum) = 14.0;
+    Real64 lowTempLimit = 0.0;
+    bool errorsFound = false;
+
+    // Test 1: No problems, no errors, both parameters
+    ReportTemperatureInputError(*state, objectName, paramNum, lowTempLimit, false, errorsFound);
+    ASSERT_FALSE(errorsFound);
+    paramNum = 3;
+    state->dataIPShortCut->cNumericFieldNames(paramNum) = "Zone Heating Design Supply Air Temperature";
+    state->dataIPShortCut->rNumericArgs(paramNum) = 50.0;
+    ReportTemperatureInputError(*state, objectName, paramNum, lowTempLimit, false, errorsFound);
+    ASSERT_FALSE(errorsFound);
+
+    // Test 2: Temperature is less than the lower limit allowed, but it's not a severe (check for both parameters)
+    paramNum = 1;
+    state->dataIPShortCut->rNumericArgs(paramNum) = -1.0;
+    ReportTemperatureInputError(*state, objectName, paramNum, lowTempLimit, false, errorsFound);
+    ASSERT_FALSE(errorsFound);
+    EXPECT_TRUE(
+        compare_err_stream(delimited_string({"   ** Warning ** Sizing:Zone=\"SPACE1-1\" has invalid data.",
+                                             "   **   ~~~   ** ... incorrect Zone Cooling Design Supply Air Temperature=[-1.00] is less than [0.00]",
+                                             "   **   ~~~   ** Please check your input to make sure this is correct."})));
+    paramNum = 3;
+    state->dataIPShortCut->rNumericArgs(paramNum) = -1.0;
+    ReportTemperatureInputError(*state, objectName, paramNum, lowTempLimit, false, errorsFound);
+    ASSERT_FALSE(errorsFound);
+    EXPECT_TRUE(
+        compare_err_stream(delimited_string({"   ** Warning ** Sizing:Zone=\"SPACE1-1\" has invalid data.",
+                                             "   **   ~~~   ** ... incorrect Zone Heating Design Supply Air Temperature=[-1.00] is less than [0.00]",
+                                             "   **   ~~~   ** Please check your input to make sure this is correct."})));
+
+    // Test 3: Heating Temperature is lower Cooling Temperature--this should become a severe error
+    state->dataIPShortCut->rNumericArgs(paramNum) = -2.0;
+    ReportTemperatureInputError(*state, objectName, paramNum, lowTempLimit, true, errorsFound);
+    ASSERT_TRUE(errorsFound);
+    EXPECT_TRUE(compare_err_stream(delimited_string({"   ** Severe  ** Sizing:Zone=\"SPACE1-1\" has invalid data.",
+                                                     "   **   ~~~   ** ... incorrect Zone Heating Design Supply Air Temperature=[-2.00] is less than "
+                                                     "Zone Cooling Design Supply Air Temperature=[-1.00]",
+                                                     "   **   ~~~   ** This is not allowed.  Please check and revise your input."})));
 }

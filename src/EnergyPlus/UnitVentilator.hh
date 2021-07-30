@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -206,7 +207,8 @@ namespace UnitVentilator {
         }
     };
 
-    void SimUnitVentilator(EnergyPlusData &state, std::string const &CompName,   // name of the fan coil unit
+    void SimUnitVentilator(EnergyPlusData &state,
+                           std::string_view CompName,     // name of the fan coil unit
                            int const ZoneNum,             // number of zone being served
                            bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                            Real64 &PowerMet,              // Sensible power supplied (W)
@@ -215,28 +217,32 @@ namespace UnitVentilator {
 
     void GetUnitVentilatorInput(EnergyPlusData &state);
 
-    void InitUnitVentilator(EnergyPlusData &state, int const UnitVentNum,         // index for the current unit ventilator
+    void InitUnitVentilator(EnergyPlusData &state,
+                            int const UnitVentNum,         // index for the current unit ventilator
                             bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                             int const ZoneNum              // number of zone being served
     );
 
     void SizeUnitVentilator(EnergyPlusData &state, int const UnitVentNum);
 
-    void CalcUnitVentilator(EnergyPlusData &state, int &UnitVentNum,              // number of the current fan coil unit being simulated
+    void CalcUnitVentilator(EnergyPlusData &state,
+                            int &UnitVentNum,              // number of the current fan coil unit being simulated
                             int const ZoneNum,             // number of zone being served
                             bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                             Real64 &PowerMet,              // Sensible power supplied (W)
                             Real64 &LatOutputProvided      // Latent power supplied (kg/s), negative = dehumidification
     );
 
-    void CalcUnitVentilatorComponents(EnergyPlusData &state, int const UnitVentNum,                  // Unit index in unit ventilator array
+    void CalcUnitVentilatorComponents(EnergyPlusData &state,
+                                      int const UnitVentNum,                  // Unit index in unit ventilator array
                                       bool const FirstHVACIteration,          // flag for 1st HVAV iteration in the time step
                                       Real64 &LoadMet,                        // load met by unit (watts)
                                       Optional_int_const OpMode = _,          // Fan Type
                                       Optional<Real64 const> PartLoadFrac = _ // Part Load Ratio of coil and fan
     );
 
-    void SimUnitVentOAMixer(EnergyPlusData &state, int const UnitVentNum, // Unit index in unit ventilator array
+    void SimUnitVentOAMixer(EnergyPlusData &state,
+                            int const UnitVentNum, // Unit index in unit ventilator array
                             int const FanOpMode    // unit ventilator fan operating mode
     );
 
@@ -257,29 +263,32 @@ namespace UnitVentilator {
 
     int GetUnitVentilatorReturnAirNode(EnergyPlusData &state, int const UnitVentNum);
 
-    Real64 CalcUnitVentilatorResidual(EnergyPlusData &state, Real64 const PartLoadRatio, // Coil Part Load Ratio
+    Real64 CalcUnitVentilatorResidual(EnergyPlusData &state,
+                                      Real64 const PartLoadRatio, // Coil Part Load Ratio
                                       Array1D<Real64> const &Par  // Function parameters
     );
 
-    Real64 SetOAMassFlowRateForCoolingVariablePercent(EnergyPlusData &state, int const UnitVentNum,        // Unit Ventilator index number
-                                                      Real64 const MinOAFrac,       // Minimum Outside Air Fraction
-                                                      Real64 const MassFlowRate,    // Design Outside Air Mass Flow Rate
-                                                      Real64 const MaxOAFrac,       // Maximum Outside Air Fraction
-                                                      Real64 const Tinlet,          // Inlet Temperature to Unit or Zone Temperature
-                                                      Real64 const Toutdoor         // Outdoor Air Temperature
+    Real64 SetOAMassFlowRateForCoolingVariablePercent(EnergyPlusData &state,
+                                                      int const UnitVentNum,     // Unit Ventilator index number
+                                                      Real64 const MinOAFrac,    // Minimum Outside Air Fraction
+                                                      Real64 const MassFlowRate, // Design Outside Air Mass Flow Rate
+                                                      Real64 const MaxOAFrac,    // Maximum Outside Air Fraction
+                                                      Real64 const Tinlet,       // Inlet Temperature to Unit or Zone Temperature
+                                                      Real64 const Toutdoor      // Outdoor Air Temperature
     );
 
-    void CalcMdotCCoilCycFan(EnergyPlusData &state, Real64 &mdot,                  // mass flow rate
-                             Real64 &QCoilReq,              // Remaining cooling coil load
-                             Real64 const QZnReq,           // Zone load to setpoint
-                               int const UnitVentNum,       // Unit Ventilator index
-                               Real64 const PartLoadRatio   // Part load ratio for unit ventilator
+    void CalcMdotCCoilCycFan(EnergyPlusData &state,
+                             Real64 &mdot,              // mass flow rate
+                             Real64 &QCoilReq,          // Remaining cooling coil load
+                             Real64 const QZnReq,       // Zone load to setpoint
+                             int const UnitVentNum,     // Unit Ventilator index
+                             Real64 const PartLoadRatio // Part load ratio for unit ventilator
     );
 
 } // namespace UnitVentilator
 
-struct UnitVentilatorsData : BaseGlobalStruct {
-
+struct UnitVentilatorsData : BaseGlobalStruct
+{
 
     // Currrent Module Unit type
     std::string const cMO_UnitVentilator = "ZoneHVAC:UnitVentilator";
@@ -312,25 +321,44 @@ struct UnitVentilatorsData : BaseGlobalStruct {
     bool GetUnitVentilatorInputFlag = true; // First time, input is "gotten"
     Array1D_bool CheckEquipName;
 
-    Array1D<UnitVentilator::UnitVentilatorData> UnitVent;
-    Array1D<UnitVentilator::UnitVentNumericFieldData> UnitVentNumericFields;
+    EPVector<UnitVentilator::UnitVentilatorData> UnitVent;
+    EPVector<UnitVentilator::UnitVentNumericFieldData> UnitVentNumericFields;
 
     bool MyOneTimeFlag = true;
     bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
 
+    Array1D_bool MyEnvrnFlag;
+    Array1D_bool MyPlantScanFlag;
+    Array1D_bool MyZoneEqFlag;
+
+    int RefrigIndex = 0;
+    int DummyWaterIndex = 1;
+
+    int ATMixOutNode = 0;   // outlet node of ATM Mixer
+    int ATMixerPriNode = 0; // primary air node of ATM Mixer
+    int ZoneNode = 0;       // zone node
+
     void clear_state() override
     {
-        HCoilOn = false;
-        NumOfUnitVents = 0;
-        OAMassFlowRate = 0.0;
-        QZnReq = 0.0;
-        GetUnitVentilatorInputFlag = true;
-        MySizeFlag.deallocate();
-        CheckEquipName.deallocate();
-        UnitVent.deallocate();
-        UnitVentNumericFields.deallocate();
-        MyOneTimeFlag = true;
-        ZoneEquipmentListChecked = false;
+        this->HCoilOn = false;
+        this->NumOfUnitVents = 0;
+        this->OAMassFlowRate = 0.0;
+        this->QZnReq = 0.0;
+        this->GetUnitVentilatorInputFlag = true;
+        this->MySizeFlag.deallocate();
+        this->CheckEquipName.deallocate();
+        this->UnitVent.deallocate();
+        this->UnitVentNumericFields.deallocate();
+        this->MyOneTimeFlag = true;
+        this->ZoneEquipmentListChecked = false;
+        this->MyEnvrnFlag.deallocate();
+        this->MyPlantScanFlag.deallocate();
+        this->MyZoneEqFlag.deallocate();
+        this->RefrigIndex = 0;
+        this->DummyWaterIndex = 1;
+        this->ATMixOutNode = 0;
+        this->ATMixerPriNode = 0;
+        this->ZoneNode = 0;
     }
 
     // Default Constructor

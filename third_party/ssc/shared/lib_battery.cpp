@@ -30,14 +30,17 @@ Define Thermal Model
 */
 
 void thermal_t::initialize() {
-    if (params->cap_vs_temp.nrows() < 2 || params->cap_vs_temp.ncols() != 2) {
+    if (params->en_cap_vs_temp && (params->cap_vs_temp.nrows() < 2 || params->cap_vs_temp.ncols() != 2)) {
         throw std::runtime_error("thermal_t: capacity vs temperature matrix must have two columns and at least two rows");
     }
 
-    size_t n = params->cap_vs_temp.nrows();
-    for (int i = 0; i < (int) n; i++) {
-        params->cap_vs_temp(i, 0);
+    if (params->en_cap_vs_temp) {
+        size_t n = params->cap_vs_temp.nrows();
+        for (int i = 0; i < (int) n; i++) {
+            params->cap_vs_temp(i, 0);
+        }
     }
+
     state = std::make_shared<thermal_state>();
     if (params->option == thermal_params::SCHEDULE)
         state->T_room = params->T_room_schedule[0];
@@ -48,12 +51,12 @@ void thermal_t::initialize() {
     state->T_batt_prev = state->T_room;
     state->heat_dissipated = 0;
     state->q_relative_thermal = 100;
-    dt_sec = params->dt_hour * 3600;
+    dt_sec = params->dt_hr * 3600;
 }
 
 thermal_t::thermal_t(double dt_hour, double mass, double surface_area, double R, double Cp, double h,
                      const util::matrix_t<double> &c_vs_t, std::vector<double> T_room_C) {
-    params = std::shared_ptr<thermal_params>(new thermal_params({dt_hour, mass, surface_area, Cp, h, R, c_vs_t}));
+    params = std::shared_ptr<thermal_params>(new thermal_params({dt_hour, mass, surface_area, Cp, h, R, true, c_vs_t}));
     params->option = thermal_params::SCHEDULE;
     params->T_room_schedule = std::move(T_room_C);
     initialize();
@@ -62,10 +65,27 @@ thermal_t::thermal_t(double dt_hour, double mass, double surface_area, double R,
 
 thermal_t::thermal_t(double dt_hour, double mass, double surface_area, double R, double Cp, double h,
                      const util::matrix_t<double> &c_vs_t, double T_room_C) {
-    params = std::shared_ptr<thermal_params>(new thermal_params({dt_hour, mass, surface_area, Cp, h, R, c_vs_t}));
+    params = std::shared_ptr<thermal_params>(new thermal_params({dt_hour, mass, surface_area, Cp, h, R, true, c_vs_t}));
     params->option = thermal_params::VALUE;
     params->T_room_init = T_room_C;
     initialize();
+}
+
+thermal_t::thermal_t(double dt_hour, double mass, double surface_area, double R, double Cp, double h,
+                     double T_room_C) {
+    params = std::shared_ptr<thermal_params>(new thermal_params({dt_hour, mass, surface_area, Cp, h, R, false, util::matrix_t<double>()}));
+    params->option = thermal_params::VALUE;
+    params->T_room_init = T_room_C;
+    initialize();
+}
+
+thermal_t::thermal_t(double dt_hour, double mass, double surface_area, double R, double Cp, double h,
+                     std::vector<double> T_room_C) {
+    params = std::shared_ptr<thermal_params>(new thermal_params({ dt_hour, mass, surface_area, Cp, h, R, false, util::matrix_t<double>()}));
+    params->option = thermal_params::SCHEDULE;
+    params->T_room_schedule = std::move(T_room_C);
+    initialize();
+    state->T_room = params->T_room_schedule[0];
 }
 
 thermal_t::thermal_t(std::shared_ptr<thermal_params> p) {
@@ -101,7 +121,12 @@ void thermal_t::replace_battery(size_t lifetimeIndex) {
 }
 
 void thermal_t::calc_capacity() {
-    double percent = util::linterp_col(params->cap_vs_temp, 0, state->T_batt, 1);
+    double percent = 100;
+
+    // if using en_cap_vs_temp, it is done in the life model
+    if (params->en_cap_vs_temp) {
+        percent = util::linterp_col(params->cap_vs_temp, 0, state->T_batt, 1);
+    }
 
     if (std::isnan(percent) || percent < 0 || percent > 100) {
         percent = 100;
@@ -117,7 +142,6 @@ void thermal_t::updateTemperature(double I, size_t lifetimeIndex) {
     }
 
     // the battery temp is the average temp over that step, starting with temp from end of last timestep
-
     double T_steady_state = I * I * params->resistance / (params->surface_area * params->h) + state->T_room;
     double diffusion = exp(-params->surface_area * params->h * dt_sec / params->mass / params->Cp);
     double coeff_avg = params->mass * params->Cp / params->surface_area / params->h / dt_sec;
@@ -167,7 +191,7 @@ void losses_t::initialize() {
         fail:
         throw std::runtime_error("losses_t error: loss arrays length must be 1 or 12 for monthly input mode");
     }
-    else if (params->loss_choice == losses_params::SCHEDULE) {
+    else {
         if (params->schedule_loss.empty()) {
             throw std::runtime_error("losses_t error: loss length must be greater than 0 for schedule mode");
         }
@@ -322,7 +346,7 @@ battery_params::battery_params(const std::shared_ptr<capacity_params> &cap, cons
                                const std::shared_ptr<lifetime_params> &life,
                                const std::shared_ptr<losses_params> &loss) {
     chem = -1;
-    dt_hour = 0.;
+    dt_hr = 0.;
     nominal_energy = 0;
     nominal_voltage = 0;
     capacity = cap;
@@ -340,7 +364,7 @@ battery_params::battery_params(const battery_params& rhs) {
 battery_params &battery_params::operator=(const battery_params &rhs) {
     if (this != &rhs) {
         chem = rhs.chem;
-        dt_hour = rhs.dt_hour;
+        dt_hr = rhs.dt_hr;
         nominal_voltage = rhs.nominal_voltage;
         nominal_energy = rhs.nominal_energy;
         if (capacity)
@@ -389,9 +413,13 @@ void battery_t::initialize() {
     else if (params->chem == battery_params::VANADIUM_REDOX) {
         voltage = std::unique_ptr<voltage_t>(new voltage_vanadium_redox_t(params->voltage));
     }
+    voltage->set_initial_SOC(capacity->state->SOC);
 
     // lifetime
-    lifetime = std::unique_ptr<lifetime_t>(new lifetime_t(params->lifetime));
+    if (params->lifetime->model_choice == lifetime_params::CALCYC)
+        lifetime = std::unique_ptr<lifetime_calendar_cycle_t>(new lifetime_calendar_cycle_t(params->lifetime));
+    else
+        lifetime = std::unique_ptr<lifetime_nmc_t>(new lifetime_nmc_t(params->lifetime));
 
     // thermal
     thermal = std::unique_ptr<thermal_t>(new thermal_t(params->thermal));
@@ -408,11 +436,15 @@ battery_t::battery_t(double dt_hr, int chem, capacity_t *capacity_model, voltage
     voltage = std::unique_ptr<voltage_t>(voltage_model);
     lifetime = std::unique_ptr<lifetime_t>(lifetime_model);
     thermal = std::unique_ptr<thermal_t>(thermal_model);
-    losses = std::unique_ptr<losses_t>(losses_model);
+    if (losses_model == nullptr) {
+        losses = std::unique_ptr<losses_t>(new losses_t());
+    } else {
+        losses = std::unique_ptr<losses_t>(losses_model);
+    }
 
     state = std::make_shared<battery_state>(capacity->state, voltage->state, thermal->state, lifetime->state, losses->state);
     params = std::make_shared<battery_params>(capacity->params, voltage->params, thermal->params, lifetime->params, losses->params);
-    params->dt_hour = dt_hr;
+    params->dt_hr = dt_hr;
     params->chem = chem;
     params->nominal_voltage = params->voltage->Vnom_default * params->voltage->num_cells_series;
     params->nominal_energy = params->nominal_voltage * params->voltage->num_strings * params->voltage->dynamic.Qfull * 1e-3;
@@ -424,36 +456,13 @@ battery_t::battery_t(double dt_hr, int chem, capacity_t *capacity_model, voltage
 battery_t::battery_t(std::shared_ptr<battery_params> p):
         params(std::move(p)) {
     initialize();
-
-    // initial conditions
-    voltage->set_initial_SOC(capacity->state->SOC);
 }
 
 battery_t::battery_t(const battery_t &rhs) {
     params = std::make_shared<battery_params>();
-    operator=(rhs);
-}
-
-battery_t &battery_t::operator=(const battery_t& rhs) {
-    if (this != &rhs) {
-        *params = *rhs.params;
-        capacity = std::unique_ptr<capacity_t>(rhs.capacity->clone());
-        voltage = std::unique_ptr<voltage_t>(rhs.voltage->clone());
-        thermal = std::unique_ptr<thermal_t>(new thermal_t(*rhs.thermal));
-        lifetime = std::unique_ptr<lifetime_t>(new lifetime_t(*rhs.lifetime));
-        losses = std::unique_ptr<losses_t>(new losses_t(*rhs.losses));
-        state = std::make_shared<battery_state>(capacity->state, voltage->state, thermal->state, lifetime->state, losses->state);
-        *state->replacement = *rhs.state->replacement;
-        state->last_idx = rhs.state->last_idx;
-        state->Q = rhs.state->Q;
-        state->Q_max = rhs.state->Q_max;
-        state->I = rhs.state->I;
-        state->P = rhs.state->P;
-        state->P_chargeable = rhs.state->P_chargeable;
-        state->P_dischargeable = rhs.state->P_dischargeable;
-        state->V = rhs.state->V;
-    }
-    return *this;
+    *params = *rhs.params;
+    initialize();
+    *state = *rhs.state;
 }
 
 void battery_t::setupReplacements(double capacity_percent) {
@@ -525,7 +534,7 @@ double battery_t::calculate_max_discharge_kw(double *max_current_A) {
     double current = 0;
     size_t its = 0;
     while (fabs(power_W - voltage->calculate_max_discharge_w(q, qmax, thermal->T_battery(), &current)) > tolerance
-           && its++ < 10) {
+           && its++ < 5) {
         power_W = voltage->calculate_max_discharge_w(q, qmax, thermal->T_battery(), &current);
         thermal->updateTemperature(current, state->last_idx + 1);
         qmax = capacity->qmax() * thermal->capacity_percent()  * 0.01 * SOC_ratio;
@@ -534,6 +543,28 @@ double battery_t::calculate_max_discharge_kw(double *max_current_A) {
         *max_current_A = current;
     *thermal->state = thermal_initial;
     return power_W / 1000.;
+}
+
+void battery_t::ChangeTimestep(double dt_hr) {
+    if (dt_hr <= 0)
+        throw std::runtime_error("battery_t timestep must be greater than 0 hour");
+    if (dt_hr > 1)
+        throw std::runtime_error("battery_t timestep must be less than or equal to 1 hour");
+
+    auto old_hr = (double)state->last_idx * params->dt_hr;
+    state->last_idx = (size_t)(old_hr / dt_hr);
+    /*
+    if (fabs(old_hr / dt_hr - state->last_idx) > 1e-7)
+        throw std::runtime_error("battery_t dt_hr step size can only be changed to a higher step size when the current time step"
+                                 " is at a time step common to both the previous and new step size. For instance, if running"
+                                 " 30-min steps, step size can only be increased to 60-min step at the hour.");
+    */
+    params->dt_hr = dt_hr;
+    params->capacity->dt_hr = dt_hr;
+    params->voltage->dt_hr = dt_hr;
+    params->thermal->dt_hr = dt_hr;
+    thermal->dt_sec = dt_hr * 3600;
+    params->lifetime->dt_hr = dt_hr;
 }
 
 double battery_t::run(size_t lifetimeIndex, double &I) {
@@ -547,7 +578,8 @@ double battery_t::run(size_t lifetimeIndex, double &I) {
         runThermalModel(I, lifetimeIndex);
         runCapacityModel(I);
 
-        if (fabs(I - I_initial) / fabs(I_initial) > tolerance) {
+        double numerator = fabs(I - I_initial);
+        if ((numerator > 0.0) && (numerator / fabs(I_initial) > tolerance)) {
             *thermal->state = thermal_initial;
             *capacity->state = capacity_initial;
             I_initial = I;
@@ -588,11 +620,11 @@ void battery_t::runCapacityModel(double &I) {
         // Need to first update capacity model to ensure temperature accounted for
         capacity->updateCapacityForThermal(thermal->capacity_percent());
     }
-    capacity->updateCapacity(I, params->dt_hour);
+    capacity->updateCapacity(I, params->dt_hr);
 }
 
 void battery_t::runVoltageModel() {
-    voltage->updateVoltage(capacity->q0(), capacity->qmax(), capacity->I(), thermal->T_battery(), params->dt_hour);
+    voltage->updateVoltage(capacity->q0(), capacity->qmax(), capacity->I(), thermal->T_battery(), params->dt_hr);
 }
 
 void battery_t::runLifetimeModel(size_t lifetimeIndex) {
@@ -604,7 +636,7 @@ void battery_t::runLifetimeModel(size_t lifetimeIndex) {
 
 void battery_t::runLossesModel(size_t idx) {
     if (idx > state->last_idx || idx == 0) {
-        losses->run_losses(idx, params->dt_hour, capacity->charge_operation());
+        losses->run_losses(idx, params->dt_hr, capacity->charge_operation());
         state->last_idx = idx;
     }
 }
@@ -634,7 +666,7 @@ void battery_t::runReplacement(size_t year, size_t hour, size_t step) {
 
     if (replace) {
         state->replacement->n_replacements++;
-        state->replacement->indices_replaced.push_back(util::lifetimeIndex(year, hour, step, (size_t) (1 / params->dt_hour)));
+        state->replacement->indices_replaced.push_back(util::lifetimeIndex(year, hour, step, (size_t) (1 / params->dt_hr)));
         lifetime->replaceBattery(percent);
         capacity->replace_battery(percent);
         thermal->replace_battery(year);
@@ -691,7 +723,7 @@ double battery_t::energy_available(double SOC_min) {
 
 double battery_t::power_to_fill(double SOC_max) {
     // in one time step
-    return (this->energy_to_fill(SOC_max) / params->dt_hour);
+    return (this->energy_to_fill(SOC_max) / params->dt_hr);
 }
 
 double battery_t::charge_total() { return capacity->q0(); }
@@ -711,8 +743,8 @@ double battery_t::SOC() { return capacity->SOC(); }
 double battery_t::I() { return capacity->I(); }
 
 double battery_t::calculate_loss(double power, size_t lifetimeIndex) {
-    size_t indexYearOne = util::yearOneIndex(params->dt_hour, lifetimeIndex);
-    auto hourOfYear = (size_t)std::floor(indexYearOne * params->dt_hour);
+    size_t indexYearOne = util::yearOneIndex(params->dt_hr, lifetimeIndex);
+    auto hourOfYear = (size_t)std::floor(indexYearOne * params->dt_hr);
     size_t monthIndex = (size_t) util::month_of((double)(hourOfYear)) - 1;
 
     if (params->losses->loss_choice == losses_params::MONTHLY) {
@@ -727,7 +759,7 @@ double battery_t::calculate_loss(double power, size_t lifetimeIndex) {
         }
 
     }
-    else if (params->losses->loss_choice == losses_params::SCHEDULE) {
+    else {
         return params->losses->schedule_loss[lifetimeIndex % params->losses->schedule_loss.size()];
     }
 }

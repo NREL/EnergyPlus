@@ -134,7 +134,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.4;
+  Version,9.6;
 
   Building,
     Small Office with AirflowNetwork model,  !- Name
@@ -1847,8 +1847,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 1,                !- Name
     OA Sys 1 Controllers,    !- Controller List Name
-    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name
-    Reheat System 1 Avail List;  !- Availability Manager List Name
+    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     OutsideAirInletNodes;    !- Node or NodeList Name 1
@@ -3359,6 +3358,14 @@
 
   Output:Variable,*,AFN Zone Infiltration Latent Heat Loss Energy,timestep;
 
+  Output:Variable,*,AFN Zone Ventilation Latent Heat Gain Rate,timestep;
+
+  Output:Variable,*,AFN Zone Ventilation Latent Heat Gain Energy,timestep;
+
+  Output:Variable,*,AFN Zone Ventilation Latent Heat Loss Rate,timestep;
+
+  Output:Variable,*,AFN Zone Ventilation Latent Heat Loss Energy,timestep;
+
   Output:Variable,*,AFN Zone Mixing Latent Heat Gain Rate,timestep;
 
   Output:Variable,*,AFN Zone Mixing Latent Heat Gain Energy,timestep;
@@ -3897,8 +3904,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     Heat Pump 1 OA System,   !- Name
     Heat Pump 1 OA System Controllers,  !- Controller List Name
-    Heat Pump 1 OA System Equipment,  !- Outdoor Air Equipment List Name
-    Heat Pump 1 Availability Managers;  !- Availability Manager List Name
+    Heat Pump 1 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:ControllerList,
     Heat Pump 1 OA System Controllers,  !- Name

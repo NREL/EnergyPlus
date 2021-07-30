@@ -326,6 +326,10 @@ This is the aspect ratio of a rectangular footprint. It is given by the width of
 
 This is an optional field. Input is Yes or No. The default is No. Yes is that external node temperature is dependent on node height. No means that external node temperature is calculated with zero height.
 
+\paragraph{Field: Allow Unsupported Zone Equipment}\label{allow-unsupported-zone-equipment}
+
+This is an optional field. Input is Yes or No. The default is No. Set this input to Yes to have zone equipment that are currently unsupported in the AirflowNetwork model allowed in the simulation. Setting this field to Yes, allows the following equipment to be modeled along an AirflowNetwork model: ZoneHVAC:Dehumidifier, ZoneHVAC:EnergyRecoveryVentilator, WaterHeater:HeatPump:*. The AirflowNetwork model will exclude mass balance in these equipment objects and assume the mass flows are self-balanced in the equipment objects.
+
 An IDF example is shown below:
 
 \begin{lstlisting}
@@ -343,6 +347,29 @@ AirflowNetwork:SimulationControl,
       -0.5,                    !- Convergence Acceleration Limit {dimensionless}
       0.0,                     !- Azimuth Angle of Long Axis of Building {deg}
       1.0;                     !- Ratio of Building Width Along Short Axis to Width Along Long Axis
+\end{lstlisting}
+
+If the AirflowNetwork:SimulationControl object is not provided in an input file, the default input object will be created by the program internally, as long as following conditions are satisfied:
+\begin{itemize}
+\item The number of AirflowNetwork:MultiZone:Zone objects >= 1
+\item The number of AirflowNetwork:MultiZone:Surface objects >= 2
+\end{itemize}
+The default input object is shown below:
+
+\begin{lstlisting}
+AirflowNetwork:SimulationControl,
+    AFNDefaultControl,          !- Name
+    MultizoneWithoutDistribution,  !- AirflowNetwork Control
+    SurfaceAverageCalculation,  !- Wind Pressure Coefficient Type
+    OpeningHeight,           !- Height Selection for Local Wind Pressure Calculation
+    LOWRISE,                 !- Building Type
+    500,                     !- Maximum Number of Iterations {dimensionless}
+    ZeroNodePressures,       !- Initialization Type
+    1.0E-04,                 !- Relative Airflow Convergence Tolerance {dimensionless}
+    1.0E-06,                 !- Absolute Airflow Convergence Tolerance {kg/s}
+    -0.5,                    !- Convergence Acceleration Limit {dimensionless}
+    0.0,                     !- Azimuth Angle of Long Axis of Building {deg}
+    1.0;                     !- Ratio of Building Width Along Short Axis to Width Along Long Axis
 \end{lstlisting}
 
 AirflowNetwork:MultiZone data objects are used to calculate multizone airflows. This section describes the input requirements for the following objects:
@@ -1644,20 +1671,22 @@ The first section presents the input object for distribution system nodes. Altho
 \subsection{AirflowNetwork:Distribution:DuctViewFactors}\label{airflownetworkdistributionductviewfactor}
 The AirflowNetwork:Distribution:DuctViewFactors object is used to represent the information needed for simplified surface-to-duct radiation heat transfer. View factors from each duct object to each referenced surface are provided by the user. EnergyPlus calculates the heat gain to the duct from the referenced surfaces. If the object is included, radiation is calculated for the referenced duct; radiation is neglected of the object is omitted.
 
-\subsubsection{Field: Name of Linkage}\label{field-name-of-linkage}
+\paragraph{Field: Name of Linkage}\label{field-name-of-linkage}
 Name of the linkage object in which the view factors are applied.
 
-\subsubsection{Field: Surface Exposure Fraction}\label{field-surface-exposure-fraction}
+\paragraph{Field: Surface Exposure Fraction}\label{field-surface-exposure-fraction}
 The fraction, range 0 to 1, of the duct surface that is exposed to the zone for a partially buried duct (dimensionless).
 
-\subsubsection{Field: Surface Emittance}\label{field-surface-emittance}
+\paragraph{Field: Surface Emittance}\label{field-surface-emittance}
 The air duct surface emittance factor in the range 0 to 1 based on the material properties (dimensionless).
 
-\subsubsection{Field: Surface 1 Name}\label{field-suface-1-name}
-This field specifies the name of the surface seen by the duct. Field is extensible to accommodate as many surfaces as required.
+\paragraph{Field: Surface \textless{}\#\textgreater{} Name}\label{field-suface-1-name}
+This field specifies the name of the surface seen by the duct.
 
-\subsubsection{Field: View Factor 1}\label{field-surface-1-view-factor}
-This field specifies the view factor from the duct to surface 1. Field is extensible to accommodate as many surfaces as required.
+\paragraph{Field: View Factor \textless{}\#\textgreater{}}\label{field-surface-1-view-factor}
+This field specifies the view factor from the duct to the surface.
+
+This object is extensible, so additional pairs of the last two fields can be added to the end of this object.
 
 An IDF example is provided below:
 
@@ -2569,6 +2598,12 @@ The AirflowNetwork linkage used in following output variables includes surfaces 
 \item
   HVAC,Average,AFN Zone Infiltration Air Change Rate {[}ach{]}
 \item
+  HVAC,Sum,AFN Zone Ventilation Volume {[}m3{]}
+\item
+  HVAC,Sum,AFN Zone Ventilation Mass {[}kg{]}
+\item
+  HVAC,Average,AFN Zone Ventilation Air Change Rate {[}ach{]}
+\item
   HVAC,Sum,AFN Zone Mixing Volume {[}m3{]}
 \item
   HVAC,Sum,AFN Zone Mixing Mass {[}kg{]}
@@ -3109,15 +3144,27 @@ The total convective sensible heat loss, in Joules to the zone air corresponding
 
 \paragraph{AFN Zone Infiltration Volume {[}m3{]}}\label{afn-zone-infiltration-volume-m3}
 
-The volume of outdoor air flow into the zone from window/door openings and cracks in the exterior surfaces of the zone (i.e., the sum of ventilation and crack flows from the exterior into the zone). The zone air density is used to calculate the zone infiltration volume based on the mass flow rate. Note that AirflowNetwork Zone Infiltration Volume will be zero if all of the flows through the zone's exterior surfaces are out of the zone. When a Fan:OnOff object is used, the reported value is weighted by the system fan part-load ratio using the infiltration volume calculated during the fan on and off periods for the simulation timestep.
+The volume of outdoor air flow into the zone from window/door cracks in the exterior surfaces of the zone from both AirflowNetwork:MultiZone:Surface:Crack and AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea only averaged over the reporting period (i.e., the sum of infiltration and crack flows from the exterior into the zone). The zone air density is used to calculate the zone infiltration volume based on the mass flow rate. Note that AirflowNetwork Zone Infiltration Volume will be zero if all of the flows through the zone's exterior surfaces are out of the zone. When a Fan:OnOff object is used, the reported value is weighted by the system fan part-load ratio using the infiltration volume calculated during the fan on and off periods for the simulation timestep.
 
 \paragraph{AFN Zone Infiltration Mass {[}kg{]}}\label{afn-zone-infiltration-mass-kg}
 
-The mass of air corresponding to the AirflowNetwork Zone Infiltration Volume. When a Fan:OnOff object is used, the reported value is weighted by the system fan part-load ratio using the infiltration mass calculated during the fan on and off periods for the simulation timestep.
+The mass of air corresponding to the AirflowNetwork Zone Infiltration Volume from both AirflowNetwork:MultiZone:Surface:Crack and AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea only averaged over the reporting period. When a Fan:OnOff object is used, the reported value is weighted by the system fan part-load ratio using the infiltration mass calculated during the fan on and off periods for the simulation timestep.
 
 \paragraph{AFN Zone Infiltration Air Change Rate {[}ach{]}}\label{afn-zone-infiltration-air-change-rate-ach}
 
-The number of air changes per hour produced by outdoor air flow into the zone from window/door openings and cracks in the exterior surfaces of the zone (i.e.~the sum of ventilation and crack flows from the exterior into the zone). The target zone air density is used to calculate the zone infiltration air change rate based on the mass flow rate Note that, like Zone Infiltration Volume, Zone Infiltration Air Change Rate will be zero if all flows through the zone's exterior surfaces are out of the zone. When a Fan:OnOff object is used, the reported value is weighted by the system fan part-load ratio using the infiltration air change rate calculated during the fan on and off periods for the simulation timestep.
+The number of air changes per hour produced by outdoor air flow into the zone from window/door cracks in the exterior surfaces of the zone from both AirflowNetwork:MultiZone:Surface:Crack and AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea only averaged over the reporting period (i.e.~the sum of infiltration and crack flows from the exterior into the zone). The target zone air density is used to calculate the zone infiltration air change rate based on the mass flow rate Note that, like Zone Infiltration Volume, Zone Infiltration Air Change Rate will be zero if all flows through the zone's exterior surfaces are out of the zone. When a Fan:OnOff object is used, the reported value is weighted by the system fan part-load ratio using the infiltration air change rate calculated during the fan on and off periods for the simulation timestep.
+
+\paragraph{AFN Zone Ventilation Volume {[}m3{]}}\label{afn-zone-ventilation-volume-m3}
+
+The volume of outdoor air flow into the zone from window/door openings in the exterior surfaces of the zone from AirflowNetwork:MultiZone:Component:DetailedOpening, AirflowNetwork:MultiZone:Component:SimpleOpening, and AirflowNetwork:MultiZone:Component:HorizontalOpening only averaged over the reporting period (i.e., the sum of ventilation and opening flows from the exterior into the zone). The zone air density is used to calculate the zone ventilation volume based on the mass flow rate. Note that AirflowNetwork Zone Ventilation Volume will be zero if all of the flows through the zone's exterior surfaces are out of the zone. When a Fan:OnOff object is used, the reported value is weighted by the system fan part-load ratio using the ventilation volume calculated during the fan on and off periods for the simulation timestep.
+
+\paragraph{AFN Zone Ventilation Mass {[}kg{]}}\label{afn-zone-ventilation-mass-kg}
+
+The mass of air corresponding to the AirflowNetwork Zone Ventilation Volume from AirflowNetwork:MultiZone:Component:DetailedOpening, AirflowNetwork:MultiZone:Component:SimpleOpening, and AirflowNetwork:MultiZone:Component:HorizontalOpening only averaged over the reporting period. When a Fan:OnOff object is used, the reported value is weighted by the system fan part-load ratio using the ventilation mass calculated during the fan on and off periods for the simulation timestep.
+
+\paragraph{AFN Zone Ventilation Air Change Rate {[}ach{]}}\label{afn-zone-ventilation-air-change-rate-ach}
+
+The number of air changes per hour produced by outdoor air flow into the zone from window/door openings in the exterior surfaces of the zone from AirflowNetwork:MultiZone:Component:DetailedOpening, AirflowNetwork:MultiZone:Component:SimpleOpening, and AirflowNetwork:MultiZone:Component:HorizontalOpening only averaged over the reporting period (i.e.~the sum of ventilation and opening flows from the exterior into the zone). The target zone air density is used to calculate the zone ventilation air change rate based on the mass flow rate Note that, like Zone Ventilation Volume, Zone Ventilation Air Change Rate will be zero if all flows through the zone's exterior surfaces are out of the zone. When a Fan:OnOff object is used, the reported value is weighted by the system fan part-load ratio using the ventilation air change rate calculated during the fan on and off periods for the simulation timestep.
 
 \paragraph{AFN Zone Mixing Volume {[}m3{]}}\label{afn-zone-mixing-volume-m3}
 

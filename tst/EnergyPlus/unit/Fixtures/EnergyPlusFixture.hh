@@ -55,6 +55,7 @@
 //#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 #include <memory>
@@ -101,7 +102,7 @@ private:
 class EnergyPlusFixture : public testing::Test
 {
 protected:
-    static void SetUpTestCase();
+    // static void SetUpTestCase();
     static void TearDownTestCase()
     {
     }
@@ -147,7 +148,7 @@ protected:
     std::string delimited_string(std::vector<std::string> const &strings, std::string const &delimiter = "\n");
 
     // This function reads all the lines in the supplied filePath. It puts each line into the vector.
-    std::vector<std::string> read_lines_in_file(std::string const &filePath);
+    std::vector<std::string> read_lines_in_file(fs::path const &filePath);
 
     // Compare an expected string against the ESO stream. The default is to reset the ESO stream after every call.
     // It is easier to test successive functions if the ESO stream is 'empty' before the next call.
@@ -243,7 +244,6 @@ protected:
     // Will return true if string matches the stream and false if it does not
     bool match_err_stream(std::string const &expected_match, bool use_regex = false, bool reset_stream = false);
 
-
     // This function processes an idf snippet and defaults to using the idd cache for the fixture.
     // The cache should be used for nearly all calls to this function.
     // This more or less replicates inputProcessor->processInput() but in a more usable fashion for unit testing
@@ -271,7 +271,7 @@ protected:
     void openOutputFiles(EnergyPlusData &state);
 
 public:
-    EnergyPlusData* state;
+    EnergyPlusData *state;
 
 private:
     friend class InputProcessorFixture;
@@ -284,7 +284,7 @@ private:
     // if it makes sense for the unit test to continue after retrning from function.
     // Will return false if no errors found and true if errors found
 
-    static bool process_idd(std::string const &idd, bool &errors_found);
+    //    static bool process_idd(std::string const &idd, bool &errors_found);
 
     // Note that these are non-owning raw pointers. The `state` object owns the underlying streams.
     std::ostringstream *json_stream;

@@ -46,7 +46,7 @@ Zone floor area is used in many places within EnergyPlus. EnergyPlus automatical
 
 \paragraph{Field: Zone Inside Convection Algorithm}\label{field-zone-inside-convection-algorithm}
 
-The Zone Inside Convection Algorithm field is optional. This field specifies the convection model to be used for the inside face of heat transfer surfaces associated with this zone. The choices are: \textbf{Simple} (constant natural convection - ASHRAE), \textbf{TARP} (combines natural and wind-driven convection correlations from laboratory measurements on flat plates), \textbf{CeilingDiffuser} (ACH based forced and mixed convection correlations for ceiling diffuser configuration with simple natural convection limit), \textbf{AdaptiveConvectionAlgorithm} (complex arrangement of various models that adapt to various zone conditions and can be customized) and \textbf{TrombeWall} (variable natural convection in an enclosed rectangular cavity). See the Inside Convection Algorithm object for further descriptions of the available models.
+The Zone Inside Convection Algorithm field is optional. This field specifies the convection model to be used for the inside face of heat transfer surfaces associated with this zone. The choices are: \textbf{Simple} (constant natural convection - ASHRAE), \textbf{TARP} (combines natural and wind-driven convection correlations from laboratory measurements on flat plates), \textbf{CeilingDiffuser} (ACH based forced and mixed convection correlations for ceiling diffuser configuration with simple natural convection limit), \textbf{AdaptiveConvectionAlgorithm} (complex arrangement of various models that adapt to various zone conditions and can be customized), \textbf{TrombeWall} (variable natural convection in an enclosed rectangular cavity), and \textbf{ASTMC1340} (mixed convection coefficients specified for attic zone). See the Inside Convection Algorithm object for further descriptions of the available models.
 
 If omitted or blank, the algorithm specified in the \hyperref[surfaceconvectionalgorithminside]{SurfaceConvectionAlgorithm:Inside} object is the default.
 
@@ -358,9 +358,9 @@ Zone lists are not exclusive. A zone can be referenced be more than one ZoneList
 
 The name of the ZoneList object. Must be unique across ZoneLists.
 
-\paragraph{Field: Zone 1 - Zone 20 Name}\label{field-zone-1---zone-20-name}
+\paragraph{Field: Zone \textless{}\#\textgreater{} Name}\label{field-zone-1---zone-20-name}
 
-Reference to a Zone object. This field is extensible; for greater than 20 zones, edit the IDD to add more \emph{Zone Name} fields.
+Reference to a Zone object. This object is extensible, so additional fields of this type can be added to the end of this object.
 
 \begin{lstlisting}
 
@@ -1604,7 +1604,7 @@ Each of the following surfaces:
   \hyperref[shadingzonedetailed-000]{Shading:Zone:Detailed}
 \end{itemize}
 
-use the same vertex input. The numeric parameters indicated below are taken from the \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} definition; the others may not be exactly the same but are identical in configuration. They are also ``extensible'' -- so, if you want more vertices for these surfaces, you may add to the IDD definition as indicated in the ``extensible'' comment or, as EnergyPlus is ``auto-extensible'' just add the number of vertices into your input file.. Note that \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} is not extensible and is limited to 4 (max) vertices. If you leave the Number of Surface Vertex groups blank or enter \textbf{autocalculate}, EnergyPlus looks at the number of groups entered and figures out how many coordinate groups are entered.
+use the same vertex input. The numeric parameters indicated below are taken from the \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} definition; the others may not be exactly the same but are identical in configuration. They are also ``extensible'' -- so, to define more vertices for these surfaces, simply add the required number of vertices (X, Y, and Z coordinates for each vertex) to the input file. Note that \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} is not extensible and is limited to 4 (max) vertices. If the Number of Surface Vertex groups is left blank or entered as \textbf{autocalculate}, EnergyPlus looks at the number of groups entered and figures out how many coordinate groups are entered.
 
 \begin{callout}
 \warning{Note that the resolution on the surface vertex input is 1 millimeter (.001 meter). Therefore, using vertices that are very close together (\textless{} 1 mm) may result in invalid dot product and fatal errors during shading calculations.}
@@ -2522,7 +2522,7 @@ Zone,Average, Surface Inside Face Beam Solar Radiation Heat Gain Rate [W]
 
 \subsection{Window Output Variables}\label{window-output-variables}
 
-Output variables applicable only to exterior windows and glass doors:
+Output variables applicable to exterior windows and glass doors:
 
 \begin{lstlisting}
 Zone,Average,Zone Windows Total Transmitted Solar Radiation Rate [W]
@@ -2614,11 +2614,21 @@ Zone,Average,Surface Window Inside Face Shade Zone Convection Heat Gain Rate [W]
 Zone,Average,Surface Window Inside Face Shade Net Infrared Heat Transfer Rate [W]
 \end{lstlisting}
 
-Output variables applicable only to interior windows and glass doors:
+Output variables applicable to interior windows and glass doors:
 
 \begin{lstlisting}
-Zone,Average, Surface Window Transmitted Beam Solar Radiation Rate [W]
+Zone,Average,Surface Window Transmitted Solar Radiation Rate [W]
+Zone,Sum,Surface Window Transmitted Solar Radiation Energy [J]
+Zone,Average,Surface Window Transmitted Beam Solar Radiation Rate [W]
 Zone,Sum,Surface Window Transmitted Beam Solar Radiation Energy [J]
+Zone,Average,Surface Window Transmitted Beam to Beam Solar Radiation Rate [W]
+Zone,Sum,Surface Window Transmitted Beam to Beam Solar Radiation Energy [J]
+Zone,Average,Surface Window Transmitted Diffuse Solar Radiation Rate [W]
+Zone,Sum,Surface Window Transmitted Diffuse Solar Radiation Energy [J]
+Zone,Average,Surface Window Heat Gain Rate [W]
+Zone,Sum,Surface Window Heat Gain Energy [J]
+Zone,Average,Surface Window Heat Loss Rate [W]
+Zone,Sum,Surface Window Heat Loss Energy [J]
 \end{lstlisting}
 
 If the user requests to display advanced report/output variables (e.g.~see \hyperref[outputdiagnostics]{Output:Diagnostics} keyword DisplayAdvancedReportVariables) the the following additional output variable is available for Equivalent Layer Window;
@@ -4229,9 +4239,13 @@ The following control types can be used to reduce zone cooling load. They are ap
 
 \emph{OnNightAndOnDayIfCoolingAndHighSolarOnWindow}: Shading is on at night. Shading is on during the day if the solar radiation incident on the window exceeds SetPoint (W/m\(^{2}\)) and if the zone cooling rate in the previous timestep is non-zero. Day and night shading is subject to schedule, if specified. (This Shading Control Type is the same as the previous one, except the shading is on at night rather than off.)
 
-\emph{OnIfHighOutdoorAirTempAndHighSolarOnWindow:} Shading is on if the outside air temperature exceeds the Setpoint (C) and if if the solar radiation incident on the window exceeds SetPoint 2 (W/m\(^{2}\)).
+\emph{OnIfHighOutdoorAirTempAndHighSolarOnWindow:} Shading is on if the outside air temperature exceeds the Setpoint (C) and if the solar radiation incident on the window exceeds SetPoint 2 (W/m\(^{2}\)).
 
-\emph{OnIfHighOutdoorAirTempAndHighHorizontalSolar:} Shading is on if the outside air temperature exceeds the Setpoint (C) and if if the horizontal solar radiation exceeds SetPoint 2 (W/m\(^{2}\)).
+\emph{OnIfHighOutdoorAirTempAndHighHorizontalSolar:} Shading is on if the outside air temperature exceeds the Setpoint (C) and if the horizontal solar radiation exceeds SetPoint 2 (W/m\(^{2}\)).
+
+\emph{OnIfHighZoneAirTempAndHighSolarOnWindow:} Shading is on if the zone air temperature exceeds the Setpoint (C) and if the solar radiation incident on the window exceeds SetPoint 2 (W/m\(^{2}\)).
+
+\emph{OnIfHighZoneAirTempAndHighHorizontalSolar:} Shading is on if the zone air temperature exceeds the Setpoint (C) and if the horizontal solar radiation exceeds SetPoint 2 (W/m\(^{2}\)).
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-007}
 
@@ -4292,7 +4306,7 @@ This is the name of a schedule of slat angles that is used when Type of Slat Ang
 
 \paragraph{Field: Setpoint 2}\label{field-setpoint-2}
 
-Used only as the second setpoint for the following two-setpoint control types: OnIfHighOutdoorAirTempAndHighSolarOnWindow, OnIfHighOutdoorAirTempAndHighHorizontalSolar, OnIfHighZoneAirTempAndHighSolarOnWindow, and OnIfHighZoneAirTempAndHighHorizontalSolar
+Used only as the second setpoint for the following setpoint control types: OnIfHighOutdoorAirTempAndHighSolarOnWindow, OnIfHighOutdoorAirTempAndHighHorizontalSolar, OnIfHighZoneAirTempAndHighSolarOnWindow, and OnIfHighZoneAirTempAndHighHorizontalSolar
 
 \paragraph{Field: Daylighting Controls Object Name}\label{field-daylighting-controls-object-name}
 
@@ -4308,7 +4322,7 @@ The field can have one of two options:
 
 \paragraph{Field: Fenestration Surface <n> Name}\label{field-fenestration-surface1-name}
 
-The name of a \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed}, Window, or \hyperref[glazeddoor]{GlazedDoor} object controlled by this WindowShadingControl. This field can be repeated to apply the same shading control to more than one fenestration surface. When Multiple Surface Control Type is set to Sequential, the order of the Fenestration Surface Names is the order that the shades will be deployed. The object is extensible so that additional fields of fenestration surface names can be added to the object. All of the fenestration surfaces must be either in the zone specified in the Zone Name field or in an adjacent zone connected by an interior window.
+The name of a \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed}, Window, or \hyperref[glazeddoor]{GlazedDoor} object controlled by this WindowShadingControl. This field can be repeated to apply the same shading control to more than one fenestration surface. When Multiple Surface Control Type is set to Sequential, the order of the Fenestration Surface Names is the order that the shades will be deployed. The object is extensible so additional fields of fenestration surface names can be added to the object. All of the fenestration surfaces must be either in the zone specified in the Zone Name field or in an adjacent zone connected by an interior window.
 
 An IDF example: window with interior roll shade that is deployed when solar incident on the window exceeds 50 W/m\(^{2}\).
 

@@ -48,13 +48,14 @@
 #ifndef IOFiles_hh_INCLUDED
 #define IOFiles_hh_INCLUDED
 
-#include <fstream>
+#include <EnergyPlus/FileSystem.hh>
+#include <cassert>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
+#include <fstream>
 #include <iostream>
 #include <ostream>
 #include <vector>
-#include <cassert>
 
 namespace EnergyPlus {
 
@@ -64,15 +65,18 @@ struct EnergyPlusData;
 class InputFile
 {
 public:
-    template<typename Type>
-    struct ReadResult {
-        ReadResult(Type data_, bool eof_, bool good_) : data{std::move(data_)}, eof{eof_}, good{good_} {}
+    template <typename Type> struct ReadResult
+    {
+        ReadResult(Type data_, bool eof_, bool good_) : data{std::move(data_)}, eof{eof_}, good{good_}
+        {
+        }
 
         // Update the current eof/good state from the incoming value
         // but only update the `data` member if the state is good
         // The idea is to keep consistency with the operator>> that was used
         // from gio
-        void update(ReadResult &&other) {
+        void update(ReadResult &&other)
+        {
             eof = other.eof;
             good = other.good;
             if (good) {
@@ -90,7 +94,7 @@ public:
 
     bool is_open() const noexcept;
 
-    void backspace () noexcept;
+    void backspace() noexcept;
 
     std::string error_state_to_string() const;
 
@@ -99,11 +103,12 @@ public:
     InputFile &ensure_open(EnergyPlusData &state, const std::string &caller, bool output_to_file = true);
     std::istream::iostate rdstate() const noexcept;
 
-    std::string fileName;
+    fs::path filePath;
     void open(bool = false, bool = true);
     std::fstream::pos_type position() const noexcept;
 
-    void rewind() noexcept {
+    void rewind() noexcept
+    {
         if (is) {
             is->clear(); // clear eofbit and potentially failbit
             is->seekg(0, std::ios::beg);
@@ -112,8 +117,8 @@ public:
 
     ReadResult<std::string> readLine() noexcept;
 
-    template<typename T>
-    ReadResult<T> read() noexcept {
+    template <typename T> ReadResult<T> read() noexcept
+    {
         if (is) {
             T result;
             *is >> result;
@@ -123,7 +128,7 @@ public:
         }
     }
 
-    explicit InputFile(std::string FileName);
+    explicit InputFile(fs::path FilePath);
 
 private:
     std::unique_ptr<std::istream> is;
@@ -133,7 +138,7 @@ private:
 class InputOutputFile
 {
 public:
-    std::string fileName;
+    fs::path filePath;
     bool defaultToStdOut = false;
 
     void close();
@@ -150,36 +155,36 @@ public:
     void open_as_stringstream();
     std::string get_output();
     void flush();
-    explicit InputOutputFile(std::string FileName, const bool DefaultToStdOut = false);
+    explicit InputOutputFile(fs::path FilePath, const bool DefaultToStdOut = false);
 
 private:
     std::unique_ptr<std::iostream> os;
     bool print_to_dev_null = false;
     template <typename... Args> friend void print(InputOutputFile &of, fmt::string_view format_str, const Args &... args);
-    template <class InputIterator> friend void print(InputIterator first, InputIterator last, InputOutputFile &outputFile, const char * delim);
+    template <class InputIterator> friend void print(InputIterator first, InputIterator last, InputOutputFile &outputFile, const char *delim);
     template <class InputIterator> friend void print(InputIterator first, InputIterator last, InputOutputFile &outputFile);
     friend class IOFiles;
 };
 
-template <typename FileType> struct IOFileName
+template <typename FileType> struct IOFilePath
 {
-    std::string fileName;
+    fs::path filePath;
     FileType open(EnergyPlusData &state, const std::string &caller, bool output_to_file = true)
     {
-        FileType file{fileName};
+        FileType file{filePath};
         file.ensure_open(state, caller, output_to_file);
         return file;
     }
     FileType try_open(bool output_to_file = true)
     {
-        FileType file{fileName};
+        FileType file{filePath};
         file.open(false, output_to_file);
         return file;
     }
 };
 
-using InputOutputFileName = IOFileName<InputOutputFile>;
-using InputFileName = IOFileName<InputFile>;
+using InputOutputFilePath = IOFilePath<InputOutputFile>;
+using InputFilePath = IOFilePath<InputFile>;
 
 struct JsonOutputStreams
 {
@@ -211,39 +216,38 @@ struct JsonOutputStreams
     std::unique_ptr<std::ostream> msgpack_SMstream;
     std::unique_ptr<std::ostream> msgpack_YRstream;
 
-    std::string outputJsonFileName;
-    std::string outputTSHvacJsonFileName;
-    std::string outputTSZoneJsonFileName;
-    std::string outputTSJsonFileName;
-    std::string outputYRJsonFileName;
-    std::string outputMNJsonFileName;
-    std::string outputDYJsonFileName;
-    std::string outputHRJsonFileName;
-    std::string outputSMJsonFileName;
-    std::string outputCborFileName;
-    std::string outputTSHvacCborFileName;
-    std::string outputTSZoneCborFileName;
-    std::string outputTSCborFileName;
-    std::string outputYRCborFileName;
-    std::string outputMNCborFileName;
-    std::string outputDYCborFileName;
-    std::string outputHRCborFileName;
-    std::string outputSMCborFileName;
-    std::string outputMsgPackFileName;
-    std::string outputTSHvacMsgPackFileName;
-    std::string outputTSZoneMsgPackFileName;
-    std::string outputTSMsgPackFileName;
-    std::string outputYRMsgPackFileName;
-    std::string outputMNMsgPackFileName;
-    std::string outputDYMsgPackFileName;
-    std::string outputHRMsgPackFileName;
-    std::string outputSMMsgPackFileName;
+    fs::path outputJsonFilePath;
+    fs::path outputTSHvacJsonFilePath;
+    fs::path outputTSZoneJsonFilePath;
+    fs::path outputTSJsonFilePath;
+    fs::path outputYRJsonFilePath;
+    fs::path outputMNJsonFilePath;
+    fs::path outputDYJsonFilePath;
+    fs::path outputHRJsonFilePath;
+    fs::path outputSMJsonFilePath;
+    fs::path outputCborFilePath;
+    fs::path outputTSHvacCborFilePath;
+    fs::path outputTSZoneCborFilePath;
+    fs::path outputTSCborFilePath;
+    fs::path outputYRCborFilePath;
+    fs::path outputMNCborFilePath;
+    fs::path outputDYCborFilePath;
+    fs::path outputHRCborFilePath;
+    fs::path outputSMCborFilePath;
+    fs::path outputMsgPackFilePath;
+    fs::path outputTSHvacMsgPackFilePath;
+    fs::path outputTSZoneMsgPackFilePath;
+    fs::path outputTSMsgPackFilePath;
+    fs::path outputYRMsgPackFilePath;
+    fs::path outputMNMsgPackFilePath;
+    fs::path outputDYMsgPackFilePath;
+    fs::path outputHRMsgPackFilePath;
+    fs::path outputSMMsgPackFilePath;
 };
 
 class IOFiles
 {
 public:
-
     struct OutputControl
     {
         OutputControl() = default;
@@ -290,19 +294,19 @@ public:
     InputOutputFile eso{"eplusout.eso"}; // (hourly data only)
 
     InputOutputFile zsz{""};
-    std::string outputZszCsvFileName{"epluszsz.csv"};
-    std::string outputZszTabFileName{"epluszsz.tab"};
-    std::string outputZszTxtFileName{"epluszsz.txt"};
+    fs::path outputZszCsvFilePath{"epluszsz.csv"};
+    fs::path outputZszTabFilePath{"epluszsz.tab"};
+    fs::path outputZszTxtFilePath{"epluszsz.txt"};
 
     InputOutputFile ssz{""};
-    std::string outputSszCsvFileName{"eplusssz.csv"};
-    std::string outputSszTabFileName{"eplusssz.tab"};
-    std::string outputSszTxtFileName{"eplusssz.txt"};
+    fs::path outputSszCsvFilePath{"eplusssz.csv"};
+    fs::path outputSszTabFilePath{"eplusssz.tab"};
+    fs::path outputSszTxtFilePath{"eplusssz.txt"};
 
     InputOutputFile map{""};
-    std::string outputMapCsvFileName{"eplusmap.csv"};
-    std::string outputMapTabFileName{"eplusmap.tab"};
-    std::string outputMapTxtFileName{"eplusmap.txt"};
+    fs::path outputMapCsvFilePath{"eplusmap.csv"};
+    fs::path outputMapTabFilePath{"eplusmap.tab"};
+    fs::path outputMapTxtFilePath{"eplusmap.txt"};
 
     InputOutputFile mtr{"eplusout.mtr"};
     InputOutputFile bnd{"eplusout.bnd"};
@@ -313,12 +317,12 @@ public:
 
     InputOutputFile dfs{"eplusout.dfs"};
 
-    InputOutputFileName sln{"eplusout.sln"};
-    InputOutputFileName dxf{"eplusout.dxf"};
-    InputOutputFileName sci{"eplusout.sci"};
-    InputOutputFileName wrl{"eplusout.wrl"};
+    InputOutputFilePath sln{"eplusout.sln"};
+    InputOutputFilePath dxf{"eplusout.dxf"};
+    InputOutputFilePath sci{"eplusout.sci"};
+    InputOutputFilePath wrl{"eplusout.wrl"};
 
-    InputOutputFileName delightIn{"eplusout.delightin"};
+    InputOutputFilePath delightIn{"eplusout.delightin"};
 
     InputOutputFile mtd{"eplusout.mtd"};
     InputOutputFile edd{"eplusout.edd", true}; // write to stdout if no file never opened
@@ -327,39 +331,32 @@ public:
     InputOutputFile csv{"eplusout.csv"};
     InputOutputFile mtr_csv{"eplusmtr.csv"};
 
-    InputOutputFileName screenCsv{"eplusscreen.csv"};
-    InputOutputFileName endFile{"eplusout.end"};
+    InputOutputFilePath screenCsv{"eplusscreen.csv"};
+    InputOutputFilePath endFile{"eplusout.end"};
 
-    InputFileName iniFile{"EnergyPlus.ini"};
+    InputFilePath iniFile{"EnergyPlus.ini"};
 
-    InputFileName outputDelightEldmpFileName{"eplusout.delighteldmp"};
-    InputFileName outputDelightDfdmpFileName{"eplusout.delightdfdmp"};
+    InputFilePath outputDelightEldmpFilePath{"eplusout.delighteldmp"};
+    InputFilePath outputDelightDfdmpFilePath{"eplusout.delightdfdmp"};
 
     // for transient uses of weather files
     // also, keeper of the currently set input weather file name
-    InputFileName inputWeatherFileName{""};
+    InputFilePath inputWeatherFilePath{""};
 
     // for the persistent weather simulation, using the EPW
-    // uses the file name set in `inputWeatherFileName`
+    // uses the file name set in `inputWeatherFilePath`
     InputFile inputWeatherFile{""};
 
-    InputFileName TempFullFileName{""};
-    InputFileName inStatFileName{""};
+    InputFilePath TempFullFilePath{""};
+    InputFilePath inStatFilePath{""};
 
-    std::string outputErrFileName{"eplusout.err"};
+    fs::path outputErrFilePath{"eplusout.err"};
     std::unique_ptr<std::ostream> err_stream;
-
-    static IOFiles &getSingleton();
-    static void setSingleton(IOFiles *newSingleton) noexcept;
-
-    static bool hasSingleton() { return getSingletonInternal() != nullptr; }
 
     JsonOutputStreams json; // Internal streams used for json outputs
 
-private:
-    static IOFiles *&getSingletonInternal();
+    void flushAll(); // For RunningEnergyPlusViaAPI only
 };
-
 
 class SharedFileHandle
 {
@@ -432,7 +429,7 @@ template <typename... Args> void print(InputOutputFile &outputFile, fmt::string_
     EnergyPlus::vprint(*outputStream, format_str, fmt::make_format_args(args...), sizeof...(Args));
 }
 
-template <class InputIterator> void print(InputIterator first, InputIterator last, InputOutputFile &outputFile, const char * delim)
+template <class InputIterator> void print(InputIterator first, InputIterator last, InputOutputFile &outputFile, const char *delim)
 {
     auto *outputStream = [&]() -> std::ostream * {
         if (outputFile.os) {

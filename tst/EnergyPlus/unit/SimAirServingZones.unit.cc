@@ -88,9 +88,9 @@ TEST_F(EnergyPlusFixture, SimAirServingZones_ReheatCoilSizing)
     int CtrlZoneNum;          // index of zones
 
     // Allocate
-    CalcSysSizing.allocate(NumPrimaryAirSys);
-    FinalSysSizing.allocate(NumPrimaryAirSys);
-    FinalZoneSizing.allocate(NumPrimaryAirSys);
+    state->dataSize->CalcSysSizing.allocate(NumPrimaryAirSys);
+    state->dataSize->FinalSysSizing.allocate(NumPrimaryAirSys);
+    state->dataSize->FinalZoneSizing.allocate(NumPrimaryAirSys);
     state->dataAirSystemsData->PrimaryAirSystems.allocate(NumPrimaryAirSys);
 
     // Inputs: system configurations:
@@ -116,58 +116,58 @@ TEST_F(EnergyPlusFixture, SimAirServingZones_ReheatCoilSizing)
 
     // Inputs: sizing parameters
     for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
-        FinalSysSizing(AirLoopNum).DesOutAirVolFlow = 0.25;
-        FinalSysSizing(AirLoopNum).DesHeatVolFlow = 0.50;
+        state->dataSize->FinalSysSizing(AirLoopNum).DesOutAirVolFlow = 0.25;
+        state->dataSize->FinalSysSizing(AirLoopNum).DesHeatVolFlow = 0.50;
 
-        FinalSysSizing(AirLoopNum).PreheatTemp = 7;
-        FinalSysSizing(AirLoopNum).HeatRetTemp = 22;
-        FinalSysSizing(AirLoopNum).HeatMixTemp = 10;
-        CalcSysSizing(AirLoopNum).HeatSupTemp = 17;
+        state->dataSize->FinalSysSizing(AirLoopNum).PreheatTemp = 7;
+        state->dataSize->FinalSysSizing(AirLoopNum).HeatRetTemp = 22;
+        state->dataSize->FinalSysSizing(AirLoopNum).HeatMixTemp = 10;
+        state->dataSize->CalcSysSizing(AirLoopNum).HeatSupTemp = 17;
 
-        FinalSysSizing(AirLoopNum).PreheatHumRat = 0.003;
-        FinalSysSizing(AirLoopNum).HeatRetHumRat = 0.008;
-        FinalSysSizing(AirLoopNum).HeatMixHumRat = 0.004;
-        CalcSysSizing(AirLoopNum).HeatSupHumRat = 0.006;
+        state->dataSize->FinalSysSizing(AirLoopNum).PreheatHumRat = 0.003;
+        state->dataSize->FinalSysSizing(AirLoopNum).HeatRetHumRat = 0.008;
+        state->dataSize->FinalSysSizing(AirLoopNum).HeatMixHumRat = 0.004;
+        state->dataSize->CalcSysSizing(AirLoopNum).HeatSupHumRat = 0.006;
     }
 
     // Run
     for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
         CtrlZoneNum = AirLoopNum;
 
-        FinalZoneSizing(CtrlZoneNum).DesHeatCoilInTempTU = GetHeatingSATempForSizing(*state, AirLoopNum);
-        FinalZoneSizing(CtrlZoneNum).DesHeatCoilInHumRatTU = GetHeatingSATempHumRatForSizing(*state, AirLoopNum);
+        state->dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatCoilInTempTU = GetHeatingSATempForSizing(*state, AirLoopNum);
+        state->dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatCoilInHumRatTU = GetHeatingSATempHumRatForSizing(*state, AirLoopNum);
     }
 
     // Check
-    EXPECT_EQ(17.0, FinalZoneSizing(1).DesHeatCoilInTempTU);
-    EXPECT_NEAR(14.5, FinalZoneSizing(2).DesHeatCoilInTempTU, 0.05);
-    EXPECT_NEAR(14.5, FinalZoneSizing(3).DesHeatCoilInTempTU, 0.05);
-    EXPECT_EQ(10.0, FinalZoneSizing(4).DesHeatCoilInTempTU);
-    EXPECT_EQ(0.006, FinalZoneSizing(1).DesHeatCoilInHumRatTU);
-    EXPECT_EQ(0.0055, FinalZoneSizing(2).DesHeatCoilInHumRatTU);
-    EXPECT_EQ(0.0055, FinalZoneSizing(3).DesHeatCoilInHumRatTU);
-    EXPECT_EQ(0.004, FinalZoneSizing(4).DesHeatCoilInHumRatTU);
+    EXPECT_EQ(17.0, state->dataSize->FinalZoneSizing(1).DesHeatCoilInTempTU);
+    EXPECT_NEAR(14.5, state->dataSize->FinalZoneSizing(2).DesHeatCoilInTempTU, 0.05);
+    EXPECT_NEAR(14.5, state->dataSize->FinalZoneSizing(3).DesHeatCoilInTempTU, 0.05);
+    EXPECT_EQ(10.0, state->dataSize->FinalZoneSizing(4).DesHeatCoilInTempTU);
+    EXPECT_EQ(0.006, state->dataSize->FinalZoneSizing(1).DesHeatCoilInHumRatTU);
+    EXPECT_EQ(0.0055, state->dataSize->FinalZoneSizing(2).DesHeatCoilInHumRatTU);
+    EXPECT_EQ(0.0055, state->dataSize->FinalZoneSizing(3).DesHeatCoilInHumRatTU);
+    EXPECT_EQ(0.004, state->dataSize->FinalZoneSizing(4).DesHeatCoilInHumRatTU);
 
     // Clean up
-    CalcSysSizing.deallocate();
-    FinalSysSizing.deallocate();
-    FinalZoneSizing.deallocate();
+    state->dataSize->CalcSysSizing.deallocate();
+    state->dataSize->FinalSysSizing.deallocate();
+    state->dataSize->FinalZoneSizing.deallocate();
     state->dataAirSystemsData->PrimaryAirSystems.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, SimAirServingZones_LimitZoneVentEff)
 {
     int CtrlZoneNum = 1;
-    TermUnitFinalZoneSizing.allocate(1);
+    state->dataSize->TermUnitFinalZoneSizing.allocate(1);
 
     // Test case 1, low OA, low zoneventilationeff, no change in SysCoolingEv
     Real64 StartingDesCoolVolFlow = 1.0;
     Real64 StartingDesCoolVolFlowMin = 0.2;
     Real64 UncorrectedOAFlow = 0.1;
-    TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow = StartingDesCoolVolFlow;
-    TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlowMin = StartingDesCoolVolFlowMin;
-    TermUnitFinalZoneSizing(CtrlZoneNum).ZoneSecondaryRecirculation = 0.0;
-    TermUnitFinalZoneSizing(CtrlZoneNum).ZoneVentilationEff = 0.5;
+    state->dataSize->TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow = StartingDesCoolVolFlow;
+    state->dataSize->TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlowMin = StartingDesCoolVolFlowMin;
+    state->dataSize->TermUnitFinalZoneSizing(CtrlZoneNum).ZoneSecondaryRecirculation = 0.0;
+    state->dataSize->TermUnitFinalZoneSizing(CtrlZoneNum).ZoneVentilationEff = 0.5;
     Real64 Xs = 0.25;                                                  // uncorrected system outdoor air fraction
     Real64 VozClg = UncorrectedOAFlow;                                 // corrected (for ventilation efficiency) zone outside air flow rate [m3/s]
     Real64 ZoneOAFrac = UncorrectedOAFlow / StartingDesCoolVolFlowMin; // zone OA fraction
@@ -177,17 +177,17 @@ TEST_F(EnergyPlusFixture, SimAirServingZones_LimitZoneVentEff)
     Real64 StartingSysCoolingEv = SysCoolingEv;
     LimitZoneVentEff(*state, Xs, VozClg, CtrlZoneNum, SysCoolingEv);
     EXPECT_EQ(StartingSysCoolingEv, SysCoolingEv);
-    EXPECT_EQ(StartingDesCoolVolFlow, TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow);
-    EXPECT_EQ(StartingDesCoolVolFlowMin, TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlowMin);
+    EXPECT_EQ(StartingDesCoolVolFlow, state->dataSize->TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow);
+    EXPECT_EQ(StartingDesCoolVolFlowMin, state->dataSize->TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlowMin);
 
     // Test case 2, low OA, high zoneventilationeff, increase SysCoolingEv and DesCoolVolFlowMin
     StartingDesCoolVolFlow = 1.0;
     StartingDesCoolVolFlowMin = 0.2;
     UncorrectedOAFlow = 0.1;
-    TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow = StartingDesCoolVolFlow;
-    TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlowMin = StartingDesCoolVolFlowMin;
-    TermUnitFinalZoneSizing(CtrlZoneNum).ZoneSecondaryRecirculation = 0.0;
-    TermUnitFinalZoneSizing(CtrlZoneNum).ZoneVentilationEff = 0.9;
+    state->dataSize->TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow = StartingDesCoolVolFlow;
+    state->dataSize->TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlowMin = StartingDesCoolVolFlowMin;
+    state->dataSize->TermUnitFinalZoneSizing(CtrlZoneNum).ZoneSecondaryRecirculation = 0.0;
+    state->dataSize->TermUnitFinalZoneSizing(CtrlZoneNum).ZoneVentilationEff = 0.9;
     Xs = 0.25;                                                  // uncorrected system outdoor air fraction
     VozClg = UncorrectedOAFlow;                                 // corrected (for ventilation efficiency) zone outside air flow rate [m3/s]
     ZoneOAFrac = UncorrectedOAFlow / StartingDesCoolVolFlowMin; // zone OA fraction
@@ -196,18 +196,18 @@ TEST_F(EnergyPlusFixture, SimAirServingZones_LimitZoneVentEff)
                                           // call to LimitZoneVentEff)
     StartingSysCoolingEv = SysCoolingEv;
     LimitZoneVentEff(*state, Xs, VozClg, CtrlZoneNum, SysCoolingEv);
-    EXPECT_EQ(TermUnitFinalZoneSizing(CtrlZoneNum).ZoneVentilationEff, SysCoolingEv);
-    EXPECT_EQ(StartingDesCoolVolFlow, TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow);
-    EXPECT_NEAR(0.2857, TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlowMin, 0.001);
+    EXPECT_EQ(state->dataSize->TermUnitFinalZoneSizing(CtrlZoneNum).ZoneVentilationEff, SysCoolingEv);
+    EXPECT_EQ(StartingDesCoolVolFlow, state->dataSize->TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow);
+    EXPECT_NEAR(0.2857, state->dataSize->TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlowMin, 0.001);
 
     // Test case 3, high OA, high zoneventilationeff, increase SysCoolingEv, DesCoolVolFlowMin, and DesCoolVolFlow
     StartingDesCoolVolFlow = 1.0;
     StartingDesCoolVolFlowMin = 0.8;
     UncorrectedOAFlow = 0.8;
-    TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow = StartingDesCoolVolFlow;
-    TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlowMin = StartingDesCoolVolFlowMin;
-    TermUnitFinalZoneSizing(CtrlZoneNum).ZoneSecondaryRecirculation = 0.0;
-    TermUnitFinalZoneSizing(CtrlZoneNum).ZoneVentilationEff = 0.9;
+    state->dataSize->TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow = StartingDesCoolVolFlow;
+    state->dataSize->TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlowMin = StartingDesCoolVolFlowMin;
+    state->dataSize->TermUnitFinalZoneSizing(CtrlZoneNum).ZoneSecondaryRecirculation = 0.0;
+    state->dataSize->TermUnitFinalZoneSizing(CtrlZoneNum).ZoneVentilationEff = 0.9;
     Xs = 0.25;                                                  // uncorrected system outdoor air fraction
     VozClg = UncorrectedOAFlow;                                 // corrected (for ventilation efficiency) zone outside air flow rate [m3/s]
     ZoneOAFrac = UncorrectedOAFlow / StartingDesCoolVolFlowMin; // zone OA fraction
@@ -216,9 +216,9 @@ TEST_F(EnergyPlusFixture, SimAirServingZones_LimitZoneVentEff)
                                           // call to LimitZoneVentEff)
     StartingSysCoolingEv = SysCoolingEv;
     LimitZoneVentEff(*state, Xs, VozClg, CtrlZoneNum, SysCoolingEv);
-    EXPECT_EQ(TermUnitFinalZoneSizing(CtrlZoneNum).ZoneVentilationEff, SysCoolingEv);
-    EXPECT_NEAR(2.2857, TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow, 0.001);
-    EXPECT_NEAR(2.2857, TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlowMin, 0.001);
+    EXPECT_EQ(state->dataSize->TermUnitFinalZoneSizing(CtrlZoneNum).ZoneVentilationEff, SysCoolingEv);
+    EXPECT_NEAR(2.2857, state->dataSize->TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow, 0.001);
+    EXPECT_NEAR(2.2857, state->dataSize->TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlowMin, 0.001);
 }
 
 TEST_F(EnergyPlusFixture, SizingSystem_FlowPerCapacityMethodTest1)
@@ -230,32 +230,34 @@ TEST_F(EnergyPlusFixture, SizingSystem_FlowPerCapacityMethodTest1)
     Real64 ScaledHeatDesignFlowRate(0.0); // system heating design flow rate
 
     AirLoopNum = 1;
-    CalcSysSizing.allocate(AirLoopNum);
-    FinalSysSizing.allocate(AirLoopNum);
+    state->dataSize->CalcSysSizing.allocate(AirLoopNum);
+    state->dataSize->FinalSysSizing.allocate(AirLoopNum);
 
     // set system flow sizing method for cooling
-    FinalSysSizing(AirLoopNum).ScaleCoolSAFMethod = FlowPerCoolingCapacity;
-    FinalSysSizing(AirLoopNum).CoolingCapMethod = CoolingDesignCapacity;
-    FinalSysSizing(AirLoopNum).ScaledCoolingCapacity = 12500.0;
-    FinalSysSizing(AirLoopNum).FlowPerCoolingCapacity = 0.00006041;
+    state->dataSize->FinalSysSizing(AirLoopNum).ScaleCoolSAFMethod = FlowPerCoolingCapacity;
+    state->dataSize->FinalSysSizing(AirLoopNum).CoolingCapMethod = CoolingDesignCapacity;
+    state->dataSize->FinalSysSizing(AirLoopNum).ScaledCoolingCapacity = 12500.0;
+    state->dataSize->FinalSysSizing(AirLoopNum).FlowPerCoolingCapacity = 0.00006041;
     // scale cooling flow rate using user input capacity
-    ScaledCoolDesignFlowRate = FinalSysSizing(AirLoopNum).ScaledCoolingCapacity * FinalSysSizing(AirLoopNum).FlowPerCoolingCapacity;
+    ScaledCoolDesignFlowRate =
+        state->dataSize->FinalSysSizing(AirLoopNum).ScaledCoolingCapacity * state->dataSize->FinalSysSizing(AirLoopNum).FlowPerCoolingCapacity;
     // do scalable flow sizing
     UpdateSysSizingForScalableInputs(*state, AirLoopNum);
     EXPECT_DOUBLE_EQ(0.755125, ScaledCoolDesignFlowRate);
-    EXPECT_DOUBLE_EQ(0.755125, FinalSysSizing(AirLoopNum).InpDesCoolAirFlow);
+    EXPECT_DOUBLE_EQ(0.755125, state->dataSize->FinalSysSizing(AirLoopNum).InpDesCoolAirFlow);
 
     // set system flow sizing method for heating
-    FinalSysSizing(AirLoopNum).ScaleHeatSAFMethod = FlowPerHeatingCapacity;
-    FinalSysSizing(AirLoopNum).HeatingCapMethod = HeatingDesignCapacity;
-    FinalSysSizing(AirLoopNum).ScaledHeatingCapacity = 14400.0;
-    FinalSysSizing(AirLoopNum).FlowPerHeatingCapacity = 0.00006041;
+    state->dataSize->FinalSysSizing(AirLoopNum).ScaleHeatSAFMethod = FlowPerHeatingCapacity;
+    state->dataSize->FinalSysSizing(AirLoopNum).HeatingCapMethod = HeatingDesignCapacity;
+    state->dataSize->FinalSysSizing(AirLoopNum).ScaledHeatingCapacity = 14400.0;
+    state->dataSize->FinalSysSizing(AirLoopNum).FlowPerHeatingCapacity = 0.00006041;
     // scale heating flow rate using user input capacity
-    ScaledHeatDesignFlowRate = FinalSysSizing(AirLoopNum).ScaledHeatingCapacity * FinalSysSizing(AirLoopNum).FlowPerHeatingCapacity;
+    ScaledHeatDesignFlowRate =
+        state->dataSize->FinalSysSizing(AirLoopNum).ScaledHeatingCapacity * state->dataSize->FinalSysSizing(AirLoopNum).FlowPerHeatingCapacity;
     // do scalable flow sizing
     UpdateSysSizingForScalableInputs(*state, AirLoopNum);
     EXPECT_DOUBLE_EQ(0.869904, ScaledHeatDesignFlowRate);
-    EXPECT_DOUBLE_EQ(0.869904, FinalSysSizing(AirLoopNum).InpDesHeatAirFlow);
+    EXPECT_DOUBLE_EQ(0.869904, state->dataSize->FinalSysSizing(AirLoopNum).InpDesHeatAirFlow);
 }
 
 TEST_F(EnergyPlusFixture, SizingSystem_FlowPerCapacityMethodTest2)
@@ -269,36 +271,38 @@ TEST_F(EnergyPlusFixture, SizingSystem_FlowPerCapacityMethodTest2)
     Real64 ScaledHeatDesignCapacity(0.0); // system heating design capacity
 
     AirLoopNum = 1;
-    CalcSysSizing.allocate(AirLoopNum);
-    FinalSysSizing.allocate(AirLoopNum);
+    state->dataSize->CalcSysSizing.allocate(AirLoopNum);
+    state->dataSize->FinalSysSizing.allocate(AirLoopNum);
 
     // set system flow sizing method for cooling
-    FinalSysSizing(AirLoopNum).ScaleCoolSAFMethod = FlowPerCoolingCapacity;
-    FinalSysSizing(AirLoopNum).CoolingCapMethod = CapacityPerFloorArea;
-    FinalSysSizing(AirLoopNum).ScaledCoolingCapacity = 10.4732; // Watts per m2 floor area
-    FinalSysSizing(AirLoopNum).FlowPerCoolingCapacity = 0.00006041;
-    FinalSysSizing(AirLoopNum).FloorAreaOnAirLoopCooled = 61.450534421531373;
+    state->dataSize->FinalSysSizing(AirLoopNum).ScaleCoolSAFMethod = FlowPerCoolingCapacity;
+    state->dataSize->FinalSysSizing(AirLoopNum).CoolingCapMethod = CapacityPerFloorArea;
+    state->dataSize->FinalSysSizing(AirLoopNum).ScaledCoolingCapacity = 10.4732; // Watts per m2 floor area
+    state->dataSize->FinalSysSizing(AirLoopNum).FlowPerCoolingCapacity = 0.00006041;
+    state->dataSize->FinalSysSizing(AirLoopNum).FloorAreaOnAirLoopCooled = 61.450534421531373;
     // scale cooling capacity using floor area
-    ScaledCoolDesignCapacity = FinalSysSizing(AirLoopNum).ScaledCoolingCapacity * FinalSysSizing(AirLoopNum).FloorAreaOnAirLoopCooled;
-    ScaledCoolDesignFlowRate = FinalSysSizing(AirLoopNum).FlowPerCoolingCapacity * ScaledCoolDesignCapacity;
+    ScaledCoolDesignCapacity =
+        state->dataSize->FinalSysSizing(AirLoopNum).ScaledCoolingCapacity * state->dataSize->FinalSysSizing(AirLoopNum).FloorAreaOnAirLoopCooled;
+    ScaledCoolDesignFlowRate = state->dataSize->FinalSysSizing(AirLoopNum).FlowPerCoolingCapacity * ScaledCoolDesignCapacity;
     // do scalable flow sizing
     UpdateSysSizingForScalableInputs(*state, AirLoopNum);
     EXPECT_DOUBLE_EQ(0.038878893558427413, ScaledCoolDesignFlowRate);
-    EXPECT_DOUBLE_EQ(0.038878893558427413, FinalSysSizing(AirLoopNum).InpDesCoolAirFlow);
+    EXPECT_DOUBLE_EQ(0.038878893558427413, state->dataSize->FinalSysSizing(AirLoopNum).InpDesCoolAirFlow);
 
     // set system flow sizing method for heating
-    FinalSysSizing(AirLoopNum).ScaleHeatSAFMethod = FlowPerHeatingCapacity;
-    FinalSysSizing(AirLoopNum).HeatingCapMethod = CapacityPerFloorArea;
-    FinalSysSizing(AirLoopNum).ScaledHeatingCapacity = 32.0050; // Watts per m2 floor area
-    FinalSysSizing(AirLoopNum).FlowPerHeatingCapacity = 0.00006041;
-    FinalSysSizing(AirLoopNum).FloorAreaOnAirLoopCooled = 61.450534421531373;
+    state->dataSize->FinalSysSizing(AirLoopNum).ScaleHeatSAFMethod = FlowPerHeatingCapacity;
+    state->dataSize->FinalSysSizing(AirLoopNum).HeatingCapMethod = CapacityPerFloorArea;
+    state->dataSize->FinalSysSizing(AirLoopNum).ScaledHeatingCapacity = 32.0050; // Watts per m2 floor area
+    state->dataSize->FinalSysSizing(AirLoopNum).FlowPerHeatingCapacity = 0.00006041;
+    state->dataSize->FinalSysSizing(AirLoopNum).FloorAreaOnAirLoopCooled = 61.450534421531373;
     // scale heating capacity using floor area
-    ScaledHeatDesignCapacity = FinalSysSizing(AirLoopNum).ScaledHeatingCapacity * FinalSysSizing(AirLoopNum).FloorAreaOnAirLoopCooled;
-    ScaledHeatDesignFlowRate = FinalSysSizing(AirLoopNum).FlowPerHeatingCapacity * ScaledHeatDesignCapacity;
+    ScaledHeatDesignCapacity =
+        state->dataSize->FinalSysSizing(AirLoopNum).ScaledHeatingCapacity * state->dataSize->FinalSysSizing(AirLoopNum).FloorAreaOnAirLoopCooled;
+    ScaledHeatDesignFlowRate = state->dataSize->FinalSysSizing(AirLoopNum).FlowPerHeatingCapacity * ScaledHeatDesignCapacity;
     // do scalable flow sizing
     UpdateSysSizingForScalableInputs(*state, AirLoopNum);
     EXPECT_DOUBLE_EQ(0.11880981823487276, ScaledHeatDesignFlowRate);
-    EXPECT_DOUBLE_EQ(0.11880981823487276, FinalSysSizing(AirLoopNum).InpDesHeatAirFlow);
+    EXPECT_DOUBLE_EQ(0.11880981823487276, state->dataSize->FinalSysSizing(AirLoopNum).InpDesHeatAirFlow);
 }
 
 TEST_F(EnergyPlusFixture, GetAirPathData_ControllerLockout1)
@@ -1645,7 +1649,6 @@ TEST_F(EnergyPlusFixture, AirLoop_ReturnFan_MinFlow)
         "  0.455,                                  !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
         "  2.05;                                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
 
-
         "ScheduleTypeLimits,",
         "  Any Number;                             !- Name",
 
@@ -1813,7 +1816,6 @@ TEST_F(EnergyPlusFixture, AirLoop_ReturnFan_MinFlow)
         "  0, 10, 2.5,                             !- X,Y,Z Vertex 3 {m}",
         "  0, 0, 2.5;                              !- X,Y,Z Vertex 4 {m}",
 
-
         "ZoneHVAC:EquipmentConnections,",
         "  Zone1,                                  !- Zone Name",
         "  Zone1 Equipment List,                   !- Zone Conditioning Equipment List Name",
@@ -1854,7 +1856,7 @@ TEST_F(EnergyPlusFixture, AirLoop_ReturnFan_MinFlow)
         "  ATU VAV No Reheat Inlet Node,           !- Air Inlet Node Name",
         "  1.0,                                    !- Maximum Air Flow Rate {m3/s}",
         "  Constant,                               !- Zone Minimum Air Flow Input Method",
-        "  0;                                      !- Constant Minimum Air Flow Fraction",               // IMPORTANT
+        "  0;                                      !- Constant Minimum Air Flow Fraction", // IMPORTANT
 
         "OutdoorAir:Node,",
         "  Model Outdoor Air Node;                 !- Name",
@@ -1916,8 +1918,8 @@ TEST_F(EnergyPlusFixture, AirLoop_ReturnFan_MinFlow)
         "  0.6045,                                 !- Fan Total Efficiency",
         "  1017.592,                               !- Pressure Rise {Pa}",
         "  1.0,                                    !- Maximum Flow Rate {m3/s}",
-        "  Fraction,                               !- Fan Power Minimum Flow Rate Input Method",         // IMPORTANT
-        "  0.3,                                    !- Fan Power Minimum Flow Fraction",                  // IMPORTANT
+        "  Fraction,                               !- Fan Power Minimum Flow Rate Input Method", // IMPORTANT
+        "  0.3,                                    !- Fan Power Minimum Flow Fraction",          // IMPORTANT
         "  0,                                      !- Fan Power Minimum Air Flow Rate {m3/s}",
         "  0.93,                                   !- Motor Efficiency",
         "  1,                                      !- Motor In Airstream Fraction",
@@ -1941,8 +1943,7 @@ TEST_F(EnergyPlusFixture, AirLoop_ReturnFan_MinFlow)
         "AirLoopHVAC:OutdoorAirSystem,",
         "  Mixing Box,                             !- Name",
         "  Mixing Box Controller List,             !- Controller List Name",
-        "  Mixing Box Equipment List,              !- Outdoor Air Equipment List Name",
-        "  Mixing Box Availability Manager List;   !- Availability Manager List Name",
+        "  Mixing Box Equipment List;              !- Outdoor Air Equipment List Name",
 
         "AirLoopHVAC:ControllerList,",
         "  Mixing Box Controller List,             !- Name",
@@ -2077,16 +2078,17 @@ TEST_F(EnergyPlusFixture, AirLoop_ReturnFan_MinFlow)
 
     SimulationManager::ManageSimulation(*state); // run the design days
 
-    int returnFanNode = UtilityRoutines::FindItemInList("VSD RETURN FAN OUTLET TO MIXING BOX NODE", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
+    int returnFanNode =
+        UtilityRoutines::FindItemInList("VSD RETURN FAN OUTLET TO MIXING BOX NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
     EXPECT_GT(returnFanNode, 0);
-    int supplyOutletNode = UtilityRoutines::FindItemInList("SUPPLY SIDE OUTLET NODE", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
+    int supplyOutletNode = UtilityRoutines::FindItemInList("SUPPLY SIDE OUTLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
     EXPECT_GT(returnFanNode, 0);
     EXPECT_GT(supplyOutletNode, 0);
 
-    EXPECT_EQ(0, DataLoopNode::Node(returnFanNode).MassFlowRateMin);
-    EXPECT_EQ(0, DataLoopNode::Node(supplyOutletNode).MassFlowRateMin);
-    EXPECT_EQ(0, DataLoopNode::Node(returnFanNode).MassFlowRate);
-    EXPECT_EQ(0, DataLoopNode::Node(supplyOutletNode).MassFlowRate);
+    EXPECT_EQ(0, state->dataLoopNodes->Node(returnFanNode).MassFlowRateMin);
+    EXPECT_EQ(0, state->dataLoopNodes->Node(supplyOutletNode).MassFlowRateMin);
+    EXPECT_EQ(0, state->dataLoopNodes->Node(returnFanNode).MassFlowRate);
+    EXPECT_EQ(0, state->dataLoopNodes->Node(supplyOutletNode).MassFlowRate);
 }
 
 } // namespace EnergyPlus

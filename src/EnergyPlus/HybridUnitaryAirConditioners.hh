@@ -69,8 +69,8 @@ namespace HybridUnitaryAirConditioners {
 
     // MODULE PARAMETER DEFINITIONS
     void SimZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
-                                             std::string const &CompName,    // name of the packaged terminal heat pump
-                                             int ZoneNum,              // number of zone being served
+                                             std::string_view CompName,      // name of the packaged terminal heat pump
+                                             int ZoneNum,                    // number of zone being served
                                              Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
                                              Real64 &LatentOutputProvided,   // Latent add/removal  (kg/s), dehumid = negative
                                              int &CompIndex                  // index to zone hvac unit
@@ -84,8 +84,8 @@ namespace HybridUnitaryAirConditioners {
     );
 
     void CalcZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
-                                              int UnitNum,              // unit number
-                                              int ZoneNum,              // number of zone being served
+                                              int UnitNum,                    // unit number
+                                              int ZoneNum,                    // number of zone being served
                                               Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
                                               Real64 &LatentOutputProvided    // Latent add/removal  (kg/s), dehumid = negative
     );
@@ -100,14 +100,19 @@ namespace HybridUnitaryAirConditioners {
 
 } // namespace HybridUnitaryAirConditioners
 
-struct HybridUnitaryAirConditionersData : BaseGlobalStruct {
+struct HybridUnitaryAirConditionersData : BaseGlobalStruct
+{
 
     int NumZoneHybridEvap = 0;
     bool GetInputZoneHybridEvap = true;
     bool ZoneEquipmentListChecked = false;
     bool HybridCoolOneTimeFlag = true;
     Array1D_bool CheckZoneHybridEvapName;
-    Array1D<HybridUnitaryAirConditioners::Model> ZoneHybridUnitaryAirConditioner;
+    EPVector<HybridUnitaryAirConditioners::Model> ZoneHybridUnitaryAirConditioner;
+    Array1D_bool MySizeFlag;
+    Array1D_bool MyEnvrnFlag;
+    Array1D_bool MyFanFlag;
+    Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 
     void clear_state() override
     {
@@ -117,6 +122,10 @@ struct HybridUnitaryAirConditionersData : BaseGlobalStruct {
         this->HybridCoolOneTimeFlag = true;
         this->CheckZoneHybridEvapName.deallocate();
         this->ZoneHybridUnitaryAirConditioner.deallocate();
+        this->MySizeFlag.clear();
+        this->MyEnvrnFlag.clear();
+        this->MyFanFlag.clear();
+        this->MyZoneEqFlag.clear();
     }
 };
 

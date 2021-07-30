@@ -134,7 +134,7 @@
 !    semiheated_skylight_frame = Skylight_Frame_Semiheated
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,9.4;
+  Version,9.6;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -6862,14 +6862,12 @@
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-Office OA System,    !- Name
     PSZ-Office OA System Controllers,  !- Controller List Name
-    PSZ-Office OA System Equipment,  !- Outdoor Air Equipment List Name
-    PSZ-Office Availability Managers;  !- Availability Manager List Name
+    PSZ-Office OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-Fine Storage OA System,  !- Name
     PSZ-Fine Storage OA System Controllers,  !- Controller List Name
-    PSZ-Fine Storage OA System Equipment,  !- Outdoor Air Equipment List Name
-    PSZ-Fine Storage Availability Managers;  !- Availability Manager List Name
+    PSZ-Fine Storage OA System Equipment;  !- Outdoor Air Equipment List Name
 
  !-   ===========  ALL OBJECTS IN CLASS: OUTSIDE AIR NODE ===========
 

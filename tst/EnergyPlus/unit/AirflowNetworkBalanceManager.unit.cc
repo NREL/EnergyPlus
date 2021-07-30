@@ -48,7 +48,6 @@
 // EnergyPlus::AirflowNetworkBalanceManager unit tests
 
 // Google test headers
-#include <exception>
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
@@ -63,13 +62,16 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/HVACStandAloneERV.hh>
+#include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -77,6 +79,7 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -88,6 +91,9 @@ using namespace DataHeatBalance;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::ScheduleManager;
 using namespace OutAirNodeManager;
+using namespace EnergyPlus::Fans;
+using namespace EnergyPlus::HVACStandAloneERV;
+using namespace EnergyPlus::DataHVACGlobals;
 
 namespace EnergyPlus {
 
@@ -97,31 +103,31 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestOtherSideCoefficients
     int i = 2;
 
     state->dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtSurfaces = 2;
-    AirflowNetwork::AirflowNetworkNumOfSurfaces = 2;
+    state->dataAirflowNetwork->AirflowNetworkNumOfSurfaces = 2;
 
-    AirflowNetwork::MultizoneSurfaceData.allocate(i);
-    Surface.allocate(i);
-    Surface(1).ExtBoundCond = -2;
-    Surface(2).ExtBoundCond = -2;
-    Surface(1).ExtWind = true;
-    Surface(2).ExtWind = true;
-    Surface(1).Tilt = 90.0;
-    Surface(2).Tilt = 90.0;
-    Surface(1).Azimuth = 0.0;
-    Surface(2).Azimuth = 180.0;
+    state->dataAirflowNetwork->MultizoneSurfaceData.allocate(i);
+    state->dataSurface->Surface.allocate(i);
+    state->dataSurface->Surface(1).ExtBoundCond = -2;
+    state->dataSurface->Surface(2).ExtBoundCond = -2;
+    state->dataSurface->Surface(1).ExtWind = true;
+    state->dataSurface->Surface(2).ExtWind = true;
+    state->dataSurface->Surface(1).Tilt = 90.0;
+    state->dataSurface->Surface(2).Tilt = 90.0;
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(2).Azimuth = 180.0;
 
-    AirflowNetwork::MultizoneSurfaceData(1).SurfNum = 1;
-    AirflowNetwork::MultizoneSurfaceData(2).SurfNum = 2;
+    state->dataAirflowNetwork->MultizoneSurfaceData(1).SurfNum = 1;
+    state->dataAirflowNetwork->MultizoneSurfaceData(2).SurfNum = 2;
 
     state->dataAirflowNetworkBalanceManager->calculateWindPressureCoeffs(*state);
-    EXPECT_EQ(1, AirflowNetwork::MultizoneSurfaceData(1).NodeNums[1]);
-    EXPECT_EQ(2, AirflowNetwork::MultizoneSurfaceData(2).NodeNums[1]);
-    EXPECT_EQ(1, AirflowNetwork::MultizoneExternalNodeData(1).curve);
-    EXPECT_EQ(3, AirflowNetwork::MultizoneExternalNodeData(2).curve);
+    EXPECT_EQ(1, state->dataAirflowNetwork->MultizoneSurfaceData(1).NodeNums[1]);
+    EXPECT_EQ(2, state->dataAirflowNetwork->MultizoneSurfaceData(2).NodeNums[1]);
+    EXPECT_EQ(1, state->dataAirflowNetwork->MultizoneExternalNodeData(1).curve);
+    EXPECT_EQ(3, state->dataAirflowNetwork->MultizoneExternalNodeData(2).curve);
 
-    AirflowNetwork::MultizoneSurfaceData.deallocate();
-    AirflowNetwork::MultizoneExternalNodeData.deallocate();
-    Surface.deallocate();
+    state->dataAirflowNetwork->MultizoneSurfaceData.deallocate();
+    state->dataAirflowNetwork->MultizoneExternalNodeData.deallocate();
+    state->dataSurface->Surface.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSch)
@@ -129,30 +135,30 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSch)
 
     // Unit test for #5021
 
-    Zone.allocate(1);
-    Zone(1).Name = "SALA DE AULA";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "SALA DE AULA";
 
-    Surface.allocate(2);
-    Surface(1).Name = "WINDOW AULA 1";
-    Surface(1).Zone = 1;
-    Surface(1).ZoneName = "SALA DE AULA";
-    Surface(1).Azimuth = 0.0;
-    Surface(1).ExtBoundCond = 0;
-    Surface(1).HeatTransSurf = true;
-    Surface(1).Tilt = 90.0;
-    Surface(1).Sides = 4;
-    Surface(2).Name = "WINDOW AULA 2";
-    Surface(2).Zone = 1;
-    Surface(2).ZoneName = "SALA DE AULA";
-    Surface(2).Azimuth = 180.0;
-    Surface(2).ExtBoundCond = 0;
-    Surface(2).HeatTransSurf = true;
-    Surface(2).Tilt = 90.0;
-    Surface(2).Sides = 4;
+    state->dataSurface->Surface.allocate(2);
+    state->dataSurface->Surface(1).Name = "WINDOW AULA 1";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "SALA DE AULA";
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(1).ExtBoundCond = 0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Tilt = 90.0;
+    state->dataSurface->Surface(1).Sides = 4;
+    state->dataSurface->Surface(2).Name = "WINDOW AULA 2";
+    state->dataSurface->Surface(2).Zone = 1;
+    state->dataSurface->Surface(2).ZoneName = "SALA DE AULA";
+    state->dataSurface->Surface(2).Azimuth = 180.0;
+    state->dataSurface->Surface(2).ExtBoundCond = 0;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(2).Tilt = 90.0;
+    state->dataSurface->Surface(2).Sides = 4;
 
-    SurfaceGeometry::AllocateSurfaceWindows(2);
-    SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
-    SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
+    SurfaceGeometry::AllocateSurfaceWindows(*state, 2);
+    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
     state->dataGlobal->NumOfZones = 1;
 
     std::string const idf_objects = delimited_string({
@@ -221,12 +227,13 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSch)
     GetAirflowNetworkInput(*state);
 
     // MultizoneZoneData has only 1 element so may be hardcoded
-    auto GetIndex = UtilityRoutines::FindItemInList(AirflowNetwork::MultizoneZoneData(1).VentingSchName, Schedule({1, NumSchedules}));
-    EXPECT_EQ(GetIndex, AirflowNetwork::MultizoneZoneData(1).VentingSchNum);
+    auto GetIndex = UtilityRoutines::FindItemInList(state->dataAirflowNetwork->MultizoneZoneData(1).VentingSchName,
+                                                    state->dataScheduleMgr->Schedule({1, state->dataScheduleMgr->NumSchedules}));
+    EXPECT_EQ(GetIndex, state->dataAirflowNetwork->MultizoneZoneData(1).VentingSchNum);
 
-    Zone.deallocate();
-    Surface.deallocate();
-    SurfaceWindow.deallocate();
+    state->dataHeatBal->Zone.deallocate();
+    state->dataSurface->Surface.deallocate();
+    state->dataSurface->SurfaceWindow.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestTriangularWindowWarning)
@@ -234,49 +241,49 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestTriangularWindowWarni
 
     // Unit test for #5384
 
-    Zone.allocate(1);
-    Zone(1).Name = "WEST_ZONE";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "WEST_ZONE";
 
-    Surface.allocate(3);
-    Surface(1).Name = "SURFACE_1";
-    Surface(1).Zone = 1;
-    Surface(1).ZoneName = "WEST_ZONE";
-    Surface(1).Azimuth = 0.0;
-    Surface(1).ExtBoundCond = 0;
-    Surface(1).HeatTransSurf = true;
-    Surface(1).Tilt = 90.0;
-    Surface(1).Sides = 4;
-    Surface(2).Name = "SURFACE_2";
-    Surface(2).Zone = 1;
-    Surface(2).ZoneName = "WEST_ZONE";
-    Surface(2).Azimuth = 180.0;
-    Surface(2).ExtBoundCond = 0;
-    Surface(2).HeatTransSurf = true;
-    Surface(2).Tilt = 90.0;
-    Surface(2).Sides = 4;
-    Surface(3).Name = "WINDOW1";
-    Surface(3).Zone = 1;
-    Surface(3).ZoneName = "WEST_ZONE";
-    Surface(3).Azimuth = 180.0;
-    Surface(3).ExtBoundCond = 0;
-    Surface(3).HeatTransSurf = true;
-    Surface(3).Tilt = 90.0;
-    Surface(3).Sides = 3;
-    Surface(3).Vertex.allocate(3);
-    Surface(3).Vertex(1).x = 3.0;
-    Surface(3).Vertex(2).x = 3.0;
-    Surface(3).Vertex(3).x = 1.0;
-    Surface(3).Vertex(1).y = 10.778;
-    Surface(3).Vertex(2).y = 10.778;
-    Surface(3).Vertex(3).y = 10.778;
-    Surface(3).Vertex(1).z = 2.0;
-    Surface(3).Vertex(2).z = 1.0;
-    Surface(3).Vertex(3).z = 1.0;
+    state->dataSurface->Surface.allocate(3);
+    state->dataSurface->Surface(1).Name = "SURFACE_1";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "WEST_ZONE";
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(1).ExtBoundCond = 0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Tilt = 90.0;
+    state->dataSurface->Surface(1).Sides = 4;
+    state->dataSurface->Surface(2).Name = "SURFACE_2";
+    state->dataSurface->Surface(2).Zone = 1;
+    state->dataSurface->Surface(2).ZoneName = "WEST_ZONE";
+    state->dataSurface->Surface(2).Azimuth = 180.0;
+    state->dataSurface->Surface(2).ExtBoundCond = 0;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(2).Tilt = 90.0;
+    state->dataSurface->Surface(2).Sides = 4;
+    state->dataSurface->Surface(3).Name = "WINDOW1";
+    state->dataSurface->Surface(3).Zone = 1;
+    state->dataSurface->Surface(3).ZoneName = "WEST_ZONE";
+    state->dataSurface->Surface(3).Azimuth = 180.0;
+    state->dataSurface->Surface(3).ExtBoundCond = 0;
+    state->dataSurface->Surface(3).HeatTransSurf = true;
+    state->dataSurface->Surface(3).Tilt = 90.0;
+    state->dataSurface->Surface(3).Sides = 3;
+    state->dataSurface->Surface(3).Vertex.allocate(3);
+    state->dataSurface->Surface(3).Vertex(1).x = 3.0;
+    state->dataSurface->Surface(3).Vertex(2).x = 3.0;
+    state->dataSurface->Surface(3).Vertex(3).x = 1.0;
+    state->dataSurface->Surface(3).Vertex(1).y = 10.778;
+    state->dataSurface->Surface(3).Vertex(2).y = 10.778;
+    state->dataSurface->Surface(3).Vertex(3).y = 10.778;
+    state->dataSurface->Surface(3).Vertex(1).z = 2.0;
+    state->dataSurface->Surface(3).Vertex(2).z = 1.0;
+    state->dataSurface->Surface(3).Vertex(3).z = 1.0;
 
-    SurfaceGeometry::AllocateSurfaceWindows(3);
-    SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
-    SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
-    SurfWinOriginalClass(3) = DataSurfaces::SurfaceClass::Window;
+    SurfaceGeometry::AllocateSurfaceWindows(*state, 3);
+    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(3) = DataSurfaces::SurfaceClass::Window;
     state->dataGlobal->NumOfZones = 1;
 
     std::string const idf_objects = delimited_string({
@@ -349,12 +356,12 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestTriangularWindowWarni
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
-    AirflowNetwork::AirflowNetworkNodeData.deallocate();
-    AirflowNetwork::AirflowNetworkCompData.deallocate();
-    AirflowNetwork::MultizoneExternalNodeData.deallocate();
-    Zone.deallocate();
-    Surface.deallocate();
-    SurfaceWindow.deallocate();
+    state->dataAirflowNetwork->AirflowNetworkNodeData.deallocate();
+    state->dataAirflowNetwork->AirflowNetworkCompData.deallocate();
+    state->dataAirflowNetwork->MultizoneExternalNodeData.deallocate();
+    state->dataHeatBal->Zone.deallocate();
+    state->dataSurface->Surface.deallocate();
+    state->dataSurface->SurfaceWindow.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
@@ -2216,20 +2223,18 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    using namespace EnergyPlus::DataIPShortCuts;
-
-    lNumericFieldBlanks.allocate(1000);
-    lAlphaFieldBlanks.allocate(1000);
-    cAlphaFieldNames.allocate(1000);
-    cNumericFieldNames.allocate(1000);
-    cAlphaArgs.allocate(1000);
-    rNumericArgs.allocate(1000);
-    lNumericFieldBlanks = false;
-    lAlphaFieldBlanks = false;
-    cAlphaFieldNames = " ";
-    cNumericFieldNames = " ";
-    cAlphaArgs = " ";
-    rNumericArgs = 0.0;
+    state->dataIPShortCut->lNumericFieldBlanks.allocate(1000);
+    state->dataIPShortCut->lAlphaFieldBlanks.allocate(1000);
+    state->dataIPShortCut->cAlphaFieldNames.allocate(1000);
+    state->dataIPShortCut->cNumericFieldNames.allocate(1000);
+    state->dataIPShortCut->cAlphaArgs.allocate(1000);
+    state->dataIPShortCut->rNumericArgs.allocate(1000);
+    state->dataIPShortCut->lNumericFieldBlanks = false;
+    state->dataIPShortCut->lAlphaFieldBlanks = false;
+    state->dataIPShortCut->cAlphaFieldNames = " ";
+    state->dataIPShortCut->cNumericFieldNames = " ";
+    state->dataIPShortCut->cAlphaArgs = " ";
+    state->dataIPShortCut->rNumericArgs = 0.0;
 
     bool ErrorsFound = false;
     // Read objects
@@ -2256,183 +2261,194 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
 
     Real64 PressureSet = 0.5;
 
-    Schedule(UtilityRoutines::FindItemInList("PRESSURE SETPOINT SCHEDULE", Schedule({1, NumSchedules}))).CurrentValue =
-        PressureSet; // Pressure setpoint
-    Schedule(UtilityRoutines::FindItemInList("FANANDCOILAVAILSCHED", Schedule({1, NumSchedules}))).CurrentValue =
-        1.0;                                                                                         // set availability and fan schedule to 1
-    Schedule(UtilityRoutines::FindItemInList("ON", Schedule({1, NumSchedules}))).CurrentValue = 1.0; // On
-    Schedule(UtilityRoutines::FindItemInList("VENTINGSCHED", Schedule({1, NumSchedules}))).CurrentValue = 25.55;  // VentingSched
-    Schedule(UtilityRoutines::FindItemInList("WINDOWVENTSCHED", Schedule({1, NumSchedules}))).CurrentValue = 1.0; // WindowVentSched
+    state->dataScheduleMgr
+        ->Schedule(UtilityRoutines::FindItemInList("PRESSURE SETPOINT SCHEDULE",
+                                                   state->dataScheduleMgr->Schedule({1, state->dataScheduleMgr->NumSchedules})))
+        .CurrentValue = PressureSet; // Pressure setpoint
+    state->dataScheduleMgr
+        ->Schedule(
+            UtilityRoutines::FindItemInList("FANANDCOILAVAILSCHED", state->dataScheduleMgr->Schedule({1, state->dataScheduleMgr->NumSchedules})))
+        .CurrentValue = 1.0; // set availability and fan schedule to 1
+    state->dataScheduleMgr
+        ->Schedule(UtilityRoutines::FindItemInList("ON", state->dataScheduleMgr->Schedule({1, state->dataScheduleMgr->NumSchedules})))
+        .CurrentValue = 1.0; // On
+    state->dataScheduleMgr
+        ->Schedule(UtilityRoutines::FindItemInList("VENTINGSCHED", state->dataScheduleMgr->Schedule({1, state->dataScheduleMgr->NumSchedules})))
+        .CurrentValue = 25.55; // VentingSched
+    state->dataScheduleMgr
+        ->Schedule(UtilityRoutines::FindItemInList("WINDOWVENTSCHED", state->dataScheduleMgr->Schedule({1, state->dataScheduleMgr->NumSchedules})))
+        .CurrentValue = 1.0; // WindowVentSched
 
-    AirflowNetwork::AirflowNetworkFanActivated = true;
+    state->dataAirflowNetwork->AirflowNetworkFanActivated = true;
     state->dataEnvrn->OutDryBulbTemp = -17.29025;
     state->dataEnvrn->OutHumRat = 0.0008389;
     state->dataEnvrn->OutBaroPress = 99063.0;
     state->dataEnvrn->WindSpeed = 4.9;
     state->dataEnvrn->WindDir = 270.0;
 
-    int index = UtilityRoutines::FindItemInList("OA INLET NODE", AirflowNetwork::AirflowNetworkNodeData);
+    int index = UtilityRoutines::FindItemInList("OA INLET NODE", state->dataAirflowNetwork->AirflowNetworkNodeData);
     for (i = 1; i <= 36; ++i) {
-        AirflowNetwork::AirflowNetworkNodeSimu(i).TZ = 23.0;
-        AirflowNetwork::AirflowNetworkNodeSimu(i).WZ = 0.0008400;
+        state->dataAirflowNetwork->AirflowNetworkNodeSimu(i).TZ = 23.0;
+        state->dataAirflowNetwork->AirflowNetworkNodeSimu(i).WZ = 0.0008400;
         if ((i > 4 && i < 10) || i == index) { // NFACADE, EFACADE, SFACADE, WFACADE, HORIZONTAL are always at indexes 5 through 9
-            AirflowNetwork::AirflowNetworkNodeSimu(i).TZ =
-                DataEnvironment::OutDryBulbTempAt(*state, AirflowNetwork::AirflowNetworkNodeData(i).NodeHeight); // AirflowNetworkNodeData vals differ
-            AirflowNetwork::AirflowNetworkNodeSimu(i).WZ = state->dataEnvrn->OutHumRat;
+            state->dataAirflowNetwork->AirflowNetworkNodeSimu(i).TZ = DataEnvironment::OutDryBulbTempAt(
+                *state, state->dataAirflowNetwork->AirflowNetworkNodeData(i).NodeHeight); // AirflowNetworkNodeData vals differ
+            state->dataAirflowNetwork->AirflowNetworkNodeSimu(i).WZ = state->dataEnvrn->OutHumRat;
         }
     }
 
     // Set up node values
-    Node.allocate(10);
-    if (AirflowNetwork::MultizoneCompExhaustFanData(1).InletNode == 0) {
-        AirflowNetwork::MultizoneCompExhaustFanData(1).InletNode = 3;
+    state->dataLoopNodes->Node.allocate(10);
+    if (state->dataAirflowNetwork->MultizoneCompExhaustFanData(1).InletNode == 0) {
+        state->dataAirflowNetwork->MultizoneCompExhaustFanData(1).InletNode = 3;
     }
-    Node(AirflowNetwork::MultizoneCompExhaustFanData(1).InletNode).MassFlowRate = 0.1005046;
+    state->dataLoopNodes->Node(state->dataAirflowNetwork->MultizoneCompExhaustFanData(1).InletNode).MassFlowRate = 0.1005046;
 
-    if (AirflowNetwork::DisSysCompCVFData(1).InletNode == 0) {
-        AirflowNetwork::DisSysCompCVFData(1).InletNode = 1;
+    if (state->dataAirflowNetwork->DisSysCompCVFData(1).InletNode == 0) {
+        state->dataAirflowNetwork->DisSysCompCVFData(1).InletNode = 1;
     }
-    Node(AirflowNetwork::DisSysCompCVFData(1).InletNode).MassFlowRate = 2.23418088;
-    AirflowNetwork::DisSysCompCVFData(1).FlowRate = Node(AirflowNetwork::DisSysCompCVFData(1).InletNode).MassFlowRate;
+    state->dataLoopNodes->Node(state->dataAirflowNetwork->DisSysCompCVFData(1).InletNode).MassFlowRate = 2.23418088;
+    state->dataAirflowNetwork->DisSysCompCVFData(1).FlowRate =
+        state->dataLoopNodes->Node(state->dataAirflowNetwork->DisSysCompCVFData(1).InletNode).MassFlowRate;
 
-    if (AirflowNetwork::DisSysCompOutdoorAirData(1).InletNode == 0) {
-        AirflowNetwork::DisSysCompOutdoorAirData(1).InletNode = 5;
-        AirflowNetwork::DisSysCompOutdoorAirData(1).OutletNode = 6;
+    if (state->dataAirflowNetwork->DisSysCompOutdoorAirData(1).InletNode == 0) {
+        state->dataAirflowNetwork->DisSysCompOutdoorAirData(1).InletNode = 5;
+        state->dataAirflowNetwork->DisSysCompOutdoorAirData(1).OutletNode = 6;
     }
-    Node(AirflowNetwork::DisSysCompOutdoorAirData(1).InletNode).MassFlowRate = 0.5095108;
-    Node(AirflowNetwork::DisSysCompOutdoorAirData(1).OutletNode).MassFlowRate = 0.5095108;
+    state->dataLoopNodes->Node(state->dataAirflowNetwork->DisSysCompOutdoorAirData(1).InletNode).MassFlowRate = 0.5095108;
+    state->dataLoopNodes->Node(state->dataAirflowNetwork->DisSysCompOutdoorAirData(1).OutletNode).MassFlowRate = 0.5095108;
 
-    if (AirflowNetwork::DisSysCompReliefAirData(1).InletNode == 0) {
-        AirflowNetwork::DisSysCompReliefAirData(1).InletNode = 6;
-        AirflowNetwork::DisSysCompReliefAirData(1).OutletNode = 5;
+    if (state->dataAirflowNetwork->DisSysCompReliefAirData(1).InletNode == 0) {
+        state->dataAirflowNetwork->DisSysCompReliefAirData(1).InletNode = 6;
+        state->dataAirflowNetwork->DisSysCompReliefAirData(1).OutletNode = 5;
     }
-    AirflowNetwork::AirflowNetworkNodeData(3).AirLoopNum = 1;
-    AirflowNetwork::AirflowNetworkLinkageData(46).AirLoopNum = 1;
+    state->dataAirflowNetwork->AirflowNetworkNodeData(3).AirLoopNum = 1;
+    state->dataAirflowNetwork->AirflowNetworkLinkageData(46).AirLoopNum = 1;
 
     state->dataAirLoop->AirLoopAFNInfo.allocate(1);
     //    state->dataAirLoop->LoopOnOffFanPartLoadRatio.allocate(1);
     state->dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode = 0.0;
     state->dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
     // Calculate mass flow rate based on pressure setpoint
-    AirflowNetwork::PressureControllerData(1).OANodeNum = AirflowNetwork::DisSysCompReliefAirData(1).OutletNode;
+    state->dataAirflowNetwork->PressureControllerData(1).OANodeNum = state->dataAirflowNetwork->DisSysCompReliefAirData(1).OutletNode;
     CalcAirflowNetworkAirBalance(*state);
 
     // Check indoor pressure and mass flow rate
-    EXPECT_NEAR(PressureSet, AirflowNetwork::AirflowNetworkNodeSimu(3).PZ, 0.0001);
-    EXPECT_NEAR(0.00255337, AirflowNetwork::ReliefMassFlowRate, 0.0001);
+    EXPECT_NEAR(PressureSet, state->dataAirflowNetwork->AirflowNetworkNodeSimu(3).PZ, 0.0001);
+    EXPECT_NEAR(0.00255337, state->dataAirflowNetwork->ReliefMassFlowRate, 0.0001);
 
     // Start a test for #5687 to report zero values of AirflowNetwork:Distribution airflow and pressure outputs when a system is off
-    AirflowNetwork::AirflowNetworkFanActivated = false;
+    state->dataAirflowNetwork->AirflowNetworkFanActivated = false;
 
     state->dataAirflowNetworkBalanceManager->exchangeData.allocate(state->dataGlobal->NumOfZones);
 
     UpdateAirflowNetwork(*state);
 
-    EXPECT_NEAR(0.0, AirflowNetwork::AirflowNetworkNodeSimu(10).PZ, 0.0001);
-    EXPECT_NEAR(0.0, AirflowNetwork::AirflowNetworkNodeSimu(20).PZ, 0.0001);
+    EXPECT_NEAR(0.0, state->dataAirflowNetwork->AirflowNetworkNodeSimu(10).PZ, 0.0001);
+    EXPECT_NEAR(0.0, state->dataAirflowNetwork->AirflowNetworkNodeSimu(20).PZ, 0.0001);
     EXPECT_NEAR(0.0, state->dataAirflowNetworkBalanceManager->linkReport(20).FLOW, 0.0001);
     EXPECT_NEAR(0.0, state->dataAirflowNetworkBalanceManager->linkReport(50).FLOW, 0.0001);
 
     // Start a test for #6005
-    AirflowNetwork::ANZT = 26.0;
-    AirflowNetwork::MultizoneSurfaceData(2).HybridVentClose = true;
-    AirflowNetwork::MultizoneSurfaceData(5).HybridVentClose = true;
-    AirflowNetwork::MultizoneSurfaceData(14).HybridVentClose = true;
+    state->dataAirflowNetwork->ANZT = 26.0;
+    state->dataAirflowNetwork->MultizoneSurfaceData(2).HybridVentClose = true;
+    state->dataAirflowNetwork->MultizoneSurfaceData(5).HybridVentClose = true;
+    state->dataAirflowNetwork->MultizoneSurfaceData(14).HybridVentClose = true;
     CalcAirflowNetworkAirBalance(*state);
-    EXPECT_EQ(0.0, AirflowNetwork::MultizoneSurfaceData(2).OpenFactor);
-    EXPECT_EQ(0.0, AirflowNetwork::MultizoneSurfaceData(5).OpenFactor);
-    EXPECT_EQ(0.0, AirflowNetwork::MultizoneSurfaceData(14).OpenFactor);
-    EXPECT_EQ(0.0, SurfWinVentingOpenFactorMultRep(2));
-    EXPECT_EQ(0.0, SurfWinVentingOpenFactorMultRep(5));
-    EXPECT_EQ(0.0, SurfWinVentingOpenFactorMultRep(14));
+    EXPECT_EQ(0.0, state->dataAirflowNetwork->MultizoneSurfaceData(2).OpenFactor);
+    EXPECT_EQ(0.0, state->dataAirflowNetwork->MultizoneSurfaceData(5).OpenFactor);
+    EXPECT_EQ(0.0, state->dataAirflowNetwork->MultizoneSurfaceData(14).OpenFactor);
+    EXPECT_EQ(0.0, state->dataSurface->SurfWinVentingOpenFactorMultRep(2));
+    EXPECT_EQ(0.0, state->dataSurface->SurfWinVentingOpenFactorMultRep(5));
+    EXPECT_EQ(0.0, state->dataSurface->SurfWinVentingOpenFactorMultRep(14));
 
     // Test for #7162
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(4);
-    DataHeatBalFanSys::MAT.allocate(4);
-    DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(4);
+    state->dataHeatBalFanSys->MAT.allocate(4);
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(state->dataGlobal->NumOfZones);
 
-    DataHeatBalFanSys::MAT(1) = 23.0;
-    DataHeatBalFanSys::MAT(2) = 23.0;
-    DataHeatBalFanSys::MAT(3) = 23.0;
-    DataHeatBalFanSys::MAT(4) = 5.0;
-    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.0007;
-    DataHeatBalFanSys::ZoneAirHumRat(2) = 0.0011;
-    DataHeatBalFanSys::ZoneAirHumRat(3) = 0.0012;
-    DataHeatBalFanSys::ZoneAirHumRat(4) = 0.0008;
-    DataHeatBalFanSys::ZoneAirHumRatAvg = DataHeatBalFanSys::ZoneAirHumRat;
+    state->dataHeatBalFanSys->MAT(1) = 23.0;
+    state->dataHeatBalFanSys->MAT(2) = 23.0;
+    state->dataHeatBalFanSys->MAT(3) = 23.0;
+    state->dataHeatBalFanSys->MAT(4) = 5.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.0007;
+    state->dataHeatBalFanSys->ZoneAirHumRat(2) = 0.0011;
+    state->dataHeatBalFanSys->ZoneAirHumRat(3) = 0.0012;
+    state->dataHeatBalFanSys->ZoneAirHumRat(4) = 0.0008;
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg = state->dataHeatBalFanSys->ZoneAirHumRat;
     state->dataZoneEquip->ZoneEquipConfig.allocate(4);
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = false;
     state->dataZoneEquip->ZoneEquipConfig(2).IsControlled = false;
     state->dataZoneEquip->ZoneEquipConfig(3).IsControlled = false;
     state->dataZoneEquip->ZoneEquipConfig(4).IsControlled = false;
-    DataHVACGlobals::TimeStepSys = 0.1;
+    state->dataHVACGlobal->TimeStepSys = 0.1;
 
-    AirflowNetwork::AirflowNetworkLinkSimu(1).FLOW2 = 0.1;
-    AirflowNetwork::AirflowNetworkLinkSimu(10).FLOW2 = 0.15;
-    AirflowNetwork::AirflowNetworkLinkSimu(13).FLOW2 = 0.1;
+    state->dataAirflowNetwork->AirflowNetworkLinkSimu(1).FLOW2 = 0.1;
+    state->dataAirflowNetwork->AirflowNetworkLinkSimu(10).FLOW2 = 0.15;
+    state->dataAirflowNetwork->AirflowNetworkLinkSimu(13).FLOW2 = 0.1;
 
     ReportAirflowNetwork(*state);
 
     // Original results
-    // EXPECT_NEAR(34.3673036, AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiLatGainW, 0.0001);
-    // EXPECT_NEAR(36.7133377, AirflowNetwork::AirflowNetworkReportData(2).MultiZoneMixLatGainW, 0.0001);
-    // EXPECT_NEAR(89.3450925, AirflowNetwork::AirflowNetworkReportData(3).MultiZoneInfiLatLossW, 0.0001);
+    // EXPECT_NEAR(34.3673036, state->dataAirflowNetwork->AirflowNetworkReportData(1).MultiZoneInfiLatGainW, 0.0001);
+    // EXPECT_NEAR(36.7133377, state->dataAirflowNetwork->AirflowNetworkReportData(2).MultiZoneMixLatGainW, 0.0001);
+    // EXPECT_NEAR(89.3450925, state->dataAirflowNetwork->AirflowNetworkReportData(3).MultiZoneInfiLatLossW, 0.0001);
     // revised based #7844
-    EXPECT_NEAR(35.3319353, AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiLatGainW, 0.0001);
-    EXPECT_NEAR(38.1554377, AirflowNetwork::AirflowNetworkReportData(2).MultiZoneMixLatGainW, 0.0001);
-    EXPECT_NEAR(91.8528571, AirflowNetwork::AirflowNetworkReportData(3).MultiZoneInfiLatLossW, 0.0001);
+    EXPECT_NEAR(35.3319353, state->dataAirflowNetwork->AirflowNetworkReportData(1).MultiZoneInfiLatGainW, 0.0001);
+    EXPECT_NEAR(38.1554377, state->dataAirflowNetwork->AirflowNetworkReportData(2).MultiZoneMixLatGainW, 0.0001);
+    EXPECT_NEAR(91.8528571, state->dataAirflowNetwork->AirflowNetworkReportData(3).MultiZoneInfiLatLossW, 0.0001);
 
-    Real64 hg = Psychrometrics::PsyHgAirFnWTdb(DataHeatBalFanSys::ZoneAirHumRat(1), DataHeatBalFanSys::MAT(1));
-    Real64 hzone = Psychrometrics::PsyHFnTdbW(DataHeatBalFanSys::MAT(1), DataHeatBalFanSys::ZoneAirHumRat(1));
+    Real64 hg = Psychrometrics::PsyHgAirFnWTdb(state->dataHeatBalFanSys->ZoneAirHumRat(1), state->dataHeatBalFanSys->MAT(1));
+    Real64 hzone = Psychrometrics::PsyHFnTdbW(state->dataHeatBalFanSys->MAT(1), state->dataHeatBalFanSys->ZoneAirHumRat(1));
     Real64 hamb = Psychrometrics::PsyHFnTdbW(0.0, state->dataEnvrn->OutHumRat);
-    Real64 hdiff = AirflowNetwork::AirflowNetworkLinkSimu(1).FLOW2 * (hzone - hamb);
-    Real64 sum =
-        AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiSenLossW - AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiLatGainW;
+    Real64 hdiff = state->dataAirflowNetwork->AirflowNetworkLinkSimu(1).FLOW2 * (hzone - hamb);
+    Real64 sum = state->dataAirflowNetwork->AirflowNetworkReportData(1).MultiZoneInfiSenLossW -
+                 state->dataAirflowNetwork->AirflowNetworkReportData(1).MultiZoneInfiLatGainW;
     // Existing code uses T_average to calculate hg, get close results
     EXPECT_NEAR(hdiff, sum, 0.4);
-    Real64 dhlatent = AirflowNetwork::AirflowNetworkLinkSimu(1).FLOW2 * hg * (DataHeatBalFanSys::ZoneAirHumRat(1) - state->dataEnvrn->OutHumRat);
+    Real64 dhlatent =
+        state->dataAirflowNetwork->AirflowNetworkLinkSimu(1).FLOW2 * hg * (state->dataHeatBalFanSys->ZoneAirHumRat(1) - state->dataEnvrn->OutHumRat);
     // when hg is calculated with indoor temperature, get exact results
-    sum = AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiSenLossW + dhlatent;
+    sum = state->dataAirflowNetwork->AirflowNetworkReportData(1).MultiZoneInfiSenLossW + dhlatent;
     EXPECT_NEAR(hdiff, sum, 0.001);
-
 }
 TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSchWithAdaptiveCtrl)
 {
 
     // Unit test for #5490
 
-    Zone.allocate(1);
-    Zone(1).Name = "SOFF";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "SOFF";
 
-    Surface.allocate(2);
-    Surface(1).Name = "WINDOW 1";
-    Surface(1).Zone = 1;
-    Surface(1).ZoneName = "SOFF";
-    Surface(1).Azimuth = 0.0;
-    Surface(1).ExtBoundCond = 0;
-    Surface(1).HeatTransSurf = true;
-    Surface(1).Tilt = 90.0;
-    Surface(1).Sides = 4;
-    Surface(2).Name = "WINDOW 2";
-    Surface(2).Zone = 1;
-    Surface(2).ZoneName = "SOFF";
-    Surface(2).Azimuth = 180.0;
-    Surface(2).ExtBoundCond = 0;
-    Surface(2).HeatTransSurf = true;
-    Surface(2).Tilt = 90.0;
-    Surface(2).Sides = 4;
+    state->dataSurface->Surface.allocate(2);
+    state->dataSurface->Surface(1).Name = "WINDOW 1";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "SOFF";
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(1).ExtBoundCond = 0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Tilt = 90.0;
+    state->dataSurface->Surface(1).Sides = 4;
+    state->dataSurface->Surface(2).Name = "WINDOW 2";
+    state->dataSurface->Surface(2).Zone = 1;
+    state->dataSurface->Surface(2).ZoneName = "SOFF";
+    state->dataSurface->Surface(2).Azimuth = 180.0;
+    state->dataSurface->Surface(2).ExtBoundCond = 0;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(2).Tilt = 90.0;
+    state->dataSurface->Surface(2).Sides = 4;
 
-    SurfaceGeometry::AllocateSurfaceWindows(2);
-    SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
-    SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
+    SurfaceGeometry::AllocateSurfaceWindows(*state, 2);
+    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
     state->dataGlobal->NumOfZones = 1;
 
-    TotPeople = 1; // Total number of people statements
-    People.allocate(TotPeople);
-    People(1).ZonePtr = 1;
-    People(1).NumberOfPeople = 100.0;
-    People(1).NumberOfPeoplePtr = 1; // From dataglobals, always returns a 1 for schedule value
-    People(1).AdaptiveCEN15251 = true;
+    state->dataHeatBal->TotPeople = 1; // Total number of people statements
+    state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
+    state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(1).NumberOfPeople = 100.0;
+    state->dataHeatBal->People(1).NumberOfPeoplePtr = 1; // From dataglobals, always returns a 1 for schedule value
+    state->dataHeatBal->People(1).AdaptiveCEN15251 = true;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant,OnSch,,1.0;",
@@ -2489,13 +2505,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSchWithAdaptiveCtrl)
 
     // changed index 2 to 1 because in new sorted scheedule MultizoneZone(1).VentingSchName ("FREERUNNINGSEASON")
     // has index 1 which is the .VentSchNum
-    auto GetIndex = UtilityRoutines::FindItemInList(AirflowNetwork::MultizoneZoneData(1).VentingSchName, Schedule({1, NumSchedules}));
-    EXPECT_EQ(GetIndex, AirflowNetwork::MultizoneZoneData(1).VentingSchNum);
+    auto GetIndex = UtilityRoutines::FindItemInList(state->dataAirflowNetwork->MultizoneZoneData(1).VentingSchName,
+                                                    state->dataScheduleMgr->Schedule({1, state->dataScheduleMgr->NumSchedules}));
+    EXPECT_EQ(GetIndex, state->dataAirflowNetwork->MultizoneZoneData(1).VentingSchNum);
 
-    Zone.deallocate();
-    Surface.deallocate();
-    SurfaceWindow.deallocate();
-    People.deallocate();
+    state->dataHeatBal->Zone.deallocate();
+    state->dataSurface->Surface.deallocate();
+    state->dataSurface->SurfaceWindow.deallocate();
+    state->dataHeatBal->People.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestPolygonalWindows)
@@ -2503,352 +2520,352 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestPolygonalWindows)
 
     // Unit test for a new feature
 
-    Zone.allocate(1);
-    Zone(1).Name = "ZONE 1";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
 
-    Surface.allocate(14);
+    state->dataSurface->Surface.allocate(14);
     // Rectangular base surface
-    Surface(1).Name = "LIVING:NORTH";
-    Surface(1).Zone = 1;
-    Surface(1).ZoneName = "ZONE 1";
-    Surface(1).Azimuth = 180.0;
-    Surface(1).ExtBoundCond = 0;
-    Surface(1).HeatTransSurf = true;
-    Surface(1).Tilt = 90.0;
-    Surface(1).Sides = 4;
-    Surface(1).Area = 25.17;
-    Surface(1).Vertex.allocate(4);
-    Surface(1).Vertex(1).x = 10.323;
-    Surface(1).Vertex(2).x = 10.323;
-    Surface(1).Vertex(3).x = 0.0;
-    Surface(1).Vertex(4).x = 0.0;
-    Surface(1).Vertex(1).y = 10.778;
-    Surface(1).Vertex(2).y = 10.778;
-    Surface(1).Vertex(3).y = 10.778;
-    Surface(1).Vertex(4).y = 10.778;
-    Surface(1).Vertex(1).z = 2.4384;
-    Surface(1).Vertex(2).z = 0.0;
-    Surface(1).Vertex(3).z = 0.0;
-    Surface(1).Vertex(4).z = 2.4384;
+    state->dataSurface->Surface(1).Name = "LIVING:NORTH";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "ZONE 1";
+    state->dataSurface->Surface(1).Azimuth = 180.0;
+    state->dataSurface->Surface(1).ExtBoundCond = 0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Tilt = 90.0;
+    state->dataSurface->Surface(1).Sides = 4;
+    state->dataSurface->Surface(1).Area = 25.17;
+    state->dataSurface->Surface(1).Vertex.allocate(4);
+    state->dataSurface->Surface(1).Vertex(1).x = 10.323;
+    state->dataSurface->Surface(1).Vertex(2).x = 10.323;
+    state->dataSurface->Surface(1).Vertex(3).x = 0.0;
+    state->dataSurface->Surface(1).Vertex(4).x = 0.0;
+    state->dataSurface->Surface(1).Vertex(1).y = 10.778;
+    state->dataSurface->Surface(1).Vertex(2).y = 10.778;
+    state->dataSurface->Surface(1).Vertex(3).y = 10.778;
+    state->dataSurface->Surface(1).Vertex(4).y = 10.778;
+    state->dataSurface->Surface(1).Vertex(1).z = 2.4384;
+    state->dataSurface->Surface(1).Vertex(2).z = 0.0;
+    state->dataSurface->Surface(1).Vertex(3).z = 0.0;
+    state->dataSurface->Surface(1).Vertex(4).z = 2.4384;
 
     // Rectangular base surface
-    Surface(2).Name = "LIVING:SOUTH";
-    Surface(2).Zone = 1;
-    Surface(2).ZoneName = "ZONE 1";
-    Surface(2).Azimuth = 0.0;
-    Surface(2).ExtBoundCond = 0;
-    Surface(2).HeatTransSurf = true;
-    Surface(2).Tilt = 90.0;
-    Surface(2).Sides = 4;
-    Surface(2).Width = 10.323;
-    Surface(2).Height = 2.4384;
-    Surface(2).Area = 25.17;
-    Surface(2).Vertex.allocate(4);
-    Surface(2).Vertex(1).x = 10.323;
-    Surface(2).Vertex(2).x = 10.323;
-    Surface(2).Vertex(3).x = 0.0;
-    Surface(2).Vertex(4).x = 0.0;
-    Surface(2).Vertex(1).y = 0.0;
-    Surface(2).Vertex(2).y = 0.0;
-    Surface(2).Vertex(3).y = 0.0;
-    Surface(2).Vertex(4).y = 0.0;
-    Surface(2).Vertex(1).z = 2.4384;
-    Surface(2).Vertex(2).z = 0.0;
-    Surface(2).Vertex(3).z = 0.0;
-    Surface(2).Vertex(4).z = 2.4384;
+    state->dataSurface->Surface(2).Name = "LIVING:SOUTH";
+    state->dataSurface->Surface(2).Zone = 1;
+    state->dataSurface->Surface(2).ZoneName = "ZONE 1";
+    state->dataSurface->Surface(2).Azimuth = 0.0;
+    state->dataSurface->Surface(2).ExtBoundCond = 0;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(2).Tilt = 90.0;
+    state->dataSurface->Surface(2).Sides = 4;
+    state->dataSurface->Surface(2).Width = 10.323;
+    state->dataSurface->Surface(2).Height = 2.4384;
+    state->dataSurface->Surface(2).Area = 25.17;
+    state->dataSurface->Surface(2).Vertex.allocate(4);
+    state->dataSurface->Surface(2).Vertex(1).x = 10.323;
+    state->dataSurface->Surface(2).Vertex(2).x = 10.323;
+    state->dataSurface->Surface(2).Vertex(3).x = 0.0;
+    state->dataSurface->Surface(2).Vertex(4).x = 0.0;
+    state->dataSurface->Surface(2).Vertex(1).y = 0.0;
+    state->dataSurface->Surface(2).Vertex(2).y = 0.0;
+    state->dataSurface->Surface(2).Vertex(3).y = 0.0;
+    state->dataSurface->Surface(2).Vertex(4).y = 0.0;
+    state->dataSurface->Surface(2).Vertex(1).z = 2.4384;
+    state->dataSurface->Surface(2).Vertex(2).z = 0.0;
+    state->dataSurface->Surface(2).Vertex(3).z = 0.0;
+    state->dataSurface->Surface(2).Vertex(4).z = 2.4384;
 
     // Polygonal base surface
-    Surface(3).Name = "LIVING:EAST";
-    Surface(3).Zone = 1;
-    Surface(3).ZoneName = "ZONE 1";
-    Surface(3).Azimuth = 90.0;
-    Surface(3).ExtBoundCond = 0;
-    Surface(3).HeatTransSurf = true;
-    Surface(3).Tilt = 90.0;
-    Surface(3).Sides = 5;
-    Surface(3).Area = 25.17;
-    Surface(3).Vertex.allocate(5);
-    Surface(3).Vertex(1).x = 10.0;
-    Surface(3).Vertex(2).x = 10.0;
-    Surface(3).Vertex(3).x = 10.0;
-    Surface(3).Vertex(4).x = 10.0;
-    Surface(3).Vertex(5).x = 10.0;
-    Surface(3).Vertex(1).y = 0.0;
-    Surface(3).Vertex(2).y = 0.0;
-    Surface(3).Vertex(3).y = 10.0;
-    Surface(3).Vertex(4).y = 10.0;
-    Surface(3).Vertex(5).y = 5.0;
-    Surface(3).Vertex(1).z = 2.0;
-    Surface(3).Vertex(2).z = 0.0;
-    Surface(3).Vertex(3).z = 0.0;
-    Surface(3).Vertex(4).z = 2.0;
-    Surface(3).Vertex(5).z = 2.5;
+    state->dataSurface->Surface(3).Name = "LIVING:EAST";
+    state->dataSurface->Surface(3).Zone = 1;
+    state->dataSurface->Surface(3).ZoneName = "ZONE 1";
+    state->dataSurface->Surface(3).Azimuth = 90.0;
+    state->dataSurface->Surface(3).ExtBoundCond = 0;
+    state->dataSurface->Surface(3).HeatTransSurf = true;
+    state->dataSurface->Surface(3).Tilt = 90.0;
+    state->dataSurface->Surface(3).Sides = 5;
+    state->dataSurface->Surface(3).Area = 25.17;
+    state->dataSurface->Surface(3).Vertex.allocate(5);
+    state->dataSurface->Surface(3).Vertex(1).x = 10.0;
+    state->dataSurface->Surface(3).Vertex(2).x = 10.0;
+    state->dataSurface->Surface(3).Vertex(3).x = 10.0;
+    state->dataSurface->Surface(3).Vertex(4).x = 10.0;
+    state->dataSurface->Surface(3).Vertex(5).x = 10.0;
+    state->dataSurface->Surface(3).Vertex(1).y = 0.0;
+    state->dataSurface->Surface(3).Vertex(2).y = 0.0;
+    state->dataSurface->Surface(3).Vertex(3).y = 10.0;
+    state->dataSurface->Surface(3).Vertex(4).y = 10.0;
+    state->dataSurface->Surface(3).Vertex(5).y = 5.0;
+    state->dataSurface->Surface(3).Vertex(1).z = 2.0;
+    state->dataSurface->Surface(3).Vertex(2).z = 0.0;
+    state->dataSurface->Surface(3).Vertex(3).z = 0.0;
+    state->dataSurface->Surface(3).Vertex(4).z = 2.0;
+    state->dataSurface->Surface(3).Vertex(5).z = 2.5;
 
     // Triangular window sub surface
-    Surface(4).Name = "NORTH:WINDOW1";
-    Surface(4).Zone = 1;
-    Surface(4).ZoneName = "ZONE 1";
-    Surface(4).Azimuth = 180.0;
-    Surface(4).ExtBoundCond = 0;
-    Surface(4).HeatTransSurf = true;
-    Surface(4).Tilt = 90.0;
-    Surface(4).Sides = 3;
-    Surface(4).Area = 1.0;
-    Surface(4).BaseSurf = 1;
-    Surface(4).Vertex.allocate(3);
-    Surface(4).Vertex(1).x = 3.0;
-    Surface(4).Vertex(2).x = 3.0;
-    Surface(4).Vertex(3).x = 1.0;
-    Surface(4).Vertex(1).y = 10.778;
-    Surface(4).Vertex(2).y = 10.778;
-    Surface(4).Vertex(3).y = 10.778;
-    Surface(4).Vertex(1).z = 2.0;
-    Surface(4).Vertex(2).z = 1.0;
-    Surface(4).Vertex(3).z = 1.0;
+    state->dataSurface->Surface(4).Name = "NORTH:WINDOW1";
+    state->dataSurface->Surface(4).Zone = 1;
+    state->dataSurface->Surface(4).ZoneName = "ZONE 1";
+    state->dataSurface->Surface(4).Azimuth = 180.0;
+    state->dataSurface->Surface(4).ExtBoundCond = 0;
+    state->dataSurface->Surface(4).HeatTransSurf = true;
+    state->dataSurface->Surface(4).Tilt = 90.0;
+    state->dataSurface->Surface(4).Sides = 3;
+    state->dataSurface->Surface(4).Area = 1.0;
+    state->dataSurface->Surface(4).BaseSurf = 1;
+    state->dataSurface->Surface(4).Vertex.allocate(3);
+    state->dataSurface->Surface(4).Vertex(1).x = 3.0;
+    state->dataSurface->Surface(4).Vertex(2).x = 3.0;
+    state->dataSurface->Surface(4).Vertex(3).x = 1.0;
+    state->dataSurface->Surface(4).Vertex(1).y = 10.778;
+    state->dataSurface->Surface(4).Vertex(2).y = 10.778;
+    state->dataSurface->Surface(4).Vertex(3).y = 10.778;
+    state->dataSurface->Surface(4).Vertex(1).z = 2.0;
+    state->dataSurface->Surface(4).Vertex(2).z = 1.0;
+    state->dataSurface->Surface(4).Vertex(3).z = 1.0;
 
     // Polygonal window sub surface
-    Surface(5).Name = "NORTH:WINDOW2";
-    Surface(5).Zone = 1;
-    Surface(5).ZoneName = "ZONE 1";
-    Surface(5).Azimuth = 180.0;
-    Surface(5).ExtBoundCond = 0;
-    Surface(5).HeatTransSurf = true;
-    Surface(5).Tilt = 90.0;
-    Surface(5).Sides = 5;
-    Surface(5).Area = 2.5;
-    Surface(5).BaseSurf = 1;
-    Surface(5).Vertex.allocate(5);
-    Surface(5).Vertex(1).x = 5.0;
-    Surface(5).Vertex(2).x = 5.0;
-    Surface(5).Vertex(3).x = 3.0;
-    Surface(5).Vertex(4).x = 3.0;
-    Surface(5).Vertex(5).x = 4.0;
-    Surface(5).Vertex(1).y = 10.778;
-    Surface(5).Vertex(2).y = 10.778;
-    Surface(5).Vertex(3).y = 10.778;
-    Surface(5).Vertex(4).y = 10.778;
-    Surface(5).Vertex(5).y = 10.778;
-    Surface(5).Vertex(1).z = 2.0;
-    Surface(5).Vertex(2).z = 1.0;
-    Surface(5).Vertex(3).z = 1.0;
-    Surface(5).Vertex(4).z = 2.0;
-    Surface(5).Vertex(5).z = 2.5;
+    state->dataSurface->Surface(5).Name = "NORTH:WINDOW2";
+    state->dataSurface->Surface(5).Zone = 1;
+    state->dataSurface->Surface(5).ZoneName = "ZONE 1";
+    state->dataSurface->Surface(5).Azimuth = 180.0;
+    state->dataSurface->Surface(5).ExtBoundCond = 0;
+    state->dataSurface->Surface(5).HeatTransSurf = true;
+    state->dataSurface->Surface(5).Tilt = 90.0;
+    state->dataSurface->Surface(5).Sides = 5;
+    state->dataSurface->Surface(5).Area = 2.5;
+    state->dataSurface->Surface(5).BaseSurf = 1;
+    state->dataSurface->Surface(5).Vertex.allocate(5);
+    state->dataSurface->Surface(5).Vertex(1).x = 5.0;
+    state->dataSurface->Surface(5).Vertex(2).x = 5.0;
+    state->dataSurface->Surface(5).Vertex(3).x = 3.0;
+    state->dataSurface->Surface(5).Vertex(4).x = 3.0;
+    state->dataSurface->Surface(5).Vertex(5).x = 4.0;
+    state->dataSurface->Surface(5).Vertex(1).y = 10.778;
+    state->dataSurface->Surface(5).Vertex(2).y = 10.778;
+    state->dataSurface->Surface(5).Vertex(3).y = 10.778;
+    state->dataSurface->Surface(5).Vertex(4).y = 10.778;
+    state->dataSurface->Surface(5).Vertex(5).y = 10.778;
+    state->dataSurface->Surface(5).Vertex(1).z = 2.0;
+    state->dataSurface->Surface(5).Vertex(2).z = 1.0;
+    state->dataSurface->Surface(5).Vertex(3).z = 1.0;
+    state->dataSurface->Surface(5).Vertex(4).z = 2.0;
+    state->dataSurface->Surface(5).Vertex(5).z = 2.5;
 
     // Triangular window sub surface
-    Surface(6).Name = "SOUTH:WINDOW1";
-    Surface(6).Zone = 1;
-    Surface(6).ZoneName = "ZONE 1";
-    Surface(6).Azimuth = 0.0;
-    Surface(6).ExtBoundCond = 0;
-    Surface(6).HeatTransSurf = true;
-    Surface(6).Tilt = 90.0;
-    Surface(6).Sides = 3;
-    Surface(6).Area = 0.5;
-    Surface(6).BaseSurf = 2;
-    Surface(6).Vertex.allocate(3);
-    Surface(6).Vertex(1).x = 9.0;
-    Surface(6).Vertex(2).x = 9.0;
-    Surface(6).Vertex(3).x = 8.0;
-    Surface(6).Vertex(1).y = 0.0;
-    Surface(6).Vertex(2).y = 0.0;
-    Surface(6).Vertex(3).y = 0.0;
-    Surface(6).Vertex(1).z = 2.0;
-    Surface(6).Vertex(2).z = 1.0;
-    Surface(6).Vertex(3).z = 1.0;
+    state->dataSurface->Surface(6).Name = "SOUTH:WINDOW1";
+    state->dataSurface->Surface(6).Zone = 1;
+    state->dataSurface->Surface(6).ZoneName = "ZONE 1";
+    state->dataSurface->Surface(6).Azimuth = 0.0;
+    state->dataSurface->Surface(6).ExtBoundCond = 0;
+    state->dataSurface->Surface(6).HeatTransSurf = true;
+    state->dataSurface->Surface(6).Tilt = 90.0;
+    state->dataSurface->Surface(6).Sides = 3;
+    state->dataSurface->Surface(6).Area = 0.5;
+    state->dataSurface->Surface(6).BaseSurf = 2;
+    state->dataSurface->Surface(6).Vertex.allocate(3);
+    state->dataSurface->Surface(6).Vertex(1).x = 9.0;
+    state->dataSurface->Surface(6).Vertex(2).x = 9.0;
+    state->dataSurface->Surface(6).Vertex(3).x = 8.0;
+    state->dataSurface->Surface(6).Vertex(1).y = 0.0;
+    state->dataSurface->Surface(6).Vertex(2).y = 0.0;
+    state->dataSurface->Surface(6).Vertex(3).y = 0.0;
+    state->dataSurface->Surface(6).Vertex(1).z = 2.0;
+    state->dataSurface->Surface(6).Vertex(2).z = 1.0;
+    state->dataSurface->Surface(6).Vertex(3).z = 1.0;
 
     // Triangular window sub surface
-    Surface(9).Name = "SOUTH:WINDOW2";
-    Surface(9).Zone = 1;
-    Surface(9).ZoneName = "ZONE 1";
-    Surface(9).Azimuth = 0.0;
-    Surface(9).ExtBoundCond = 0;
-    Surface(9).HeatTransSurf = true;
-    Surface(9).Tilt = 90.0;
-    Surface(9).Sides = 3;
-    Surface(9).Area = 0.5;
-    Surface(9).BaseSurf = 2;
-    Surface(9).Vertex.allocate(3);
-    Surface(9).Vertex(1).x = 7.0;
-    Surface(9).Vertex(2).x = 7.0;
-    Surface(9).Vertex(3).x = 6.0;
-    Surface(9).Vertex(1).y = 0.0;
-    Surface(9).Vertex(2).y = 0.0;
-    Surface(9).Vertex(3).y = 0.0;
-    Surface(9).Vertex(1).z = 2.0;
-    Surface(9).Vertex(2).z = 1.0;
-    Surface(9).Vertex(3).z = 1.0;
+    state->dataSurface->Surface(9).Name = "SOUTH:WINDOW2";
+    state->dataSurface->Surface(9).Zone = 1;
+    state->dataSurface->Surface(9).ZoneName = "ZONE 1";
+    state->dataSurface->Surface(9).Azimuth = 0.0;
+    state->dataSurface->Surface(9).ExtBoundCond = 0;
+    state->dataSurface->Surface(9).HeatTransSurf = true;
+    state->dataSurface->Surface(9).Tilt = 90.0;
+    state->dataSurface->Surface(9).Sides = 3;
+    state->dataSurface->Surface(9).Area = 0.5;
+    state->dataSurface->Surface(9).BaseSurf = 2;
+    state->dataSurface->Surface(9).Vertex.allocate(3);
+    state->dataSurface->Surface(9).Vertex(1).x = 7.0;
+    state->dataSurface->Surface(9).Vertex(2).x = 7.0;
+    state->dataSurface->Surface(9).Vertex(3).x = 6.0;
+    state->dataSurface->Surface(9).Vertex(1).y = 0.0;
+    state->dataSurface->Surface(9).Vertex(2).y = 0.0;
+    state->dataSurface->Surface(9).Vertex(3).y = 0.0;
+    state->dataSurface->Surface(9).Vertex(1).z = 2.0;
+    state->dataSurface->Surface(9).Vertex(2).z = 1.0;
+    state->dataSurface->Surface(9).Vertex(3).z = 1.0;
 
-    Surface(10).Name = "EAST:WINDOW1";
-    Surface(10).Zone = 1;
-    Surface(10).ZoneName = "ZONE 1";
-    Surface(10).Azimuth = 90.0;
-    Surface(10).ExtBoundCond = 0;
-    Surface(10).HeatTransSurf = true;
-    Surface(10).Tilt = 90.0;
-    Surface(10).Sides = 3;
-    Surface(10).Area = 0.5;
-    Surface(10).BaseSurf = 3;
-    Surface(10).Vertex.allocate(3);
-    Surface(10).Vertex(1).x = 10.0;
-    Surface(10).Vertex(2).x = 10.0;
-    Surface(10).Vertex(3).x = 10.0;
-    Surface(10).Vertex(1).y = 1.0;
-    Surface(10).Vertex(2).y = 1.0;
-    Surface(10).Vertex(3).y = 2.0;
-    Surface(10).Vertex(1).z = 2.0;
-    Surface(10).Vertex(2).z = 1.0;
-    Surface(10).Vertex(3).z = 1.0;
-
-    // Polygonal horizontal base surface
-    Surface(7).Name = "ROOF-POLY";
-    Surface(7).Zone = 1;
-    Surface(7).ZoneName = "ZONE 1";
-    Surface(7).Azimuth = 0.0;
-    Surface(7).ExtBoundCond = 0;
-    Surface(7).HeatTransSurf = true;
-    Surface(7).Tilt = 0.0;
-    Surface(7).Sides = 5;
-    Surface(7).Area = 55.0;
-    Surface(7).Vertex.allocate(5);
-    Surface(7).Vertex(1).x = 0.0;
-    Surface(7).Vertex(2).x = 0.0;
-    Surface(7).Vertex(3).x = 10.0;
-    Surface(7).Vertex(4).x = 10.0;
-    Surface(7).Vertex(5).x = 5.0;
-    Surface(7).Vertex(1).y = 10.0;
-    Surface(7).Vertex(2).y = 5.0;
-    Surface(7).Vertex(3).y = 5.0;
-    Surface(7).Vertex(4).y = 10.0;
-    Surface(7).Vertex(5).y = 11.0;
-    Surface(7).Vertex(1).z = 2.4384;
-    Surface(7).Vertex(2).z = 2.4384;
-    Surface(7).Vertex(3).z = 2.4384;
-    Surface(7).Vertex(4).z = 2.4384;
-    Surface(7).Vertex(5).z = 2.4384;
+    state->dataSurface->Surface(10).Name = "EAST:WINDOW1";
+    state->dataSurface->Surface(10).Zone = 1;
+    state->dataSurface->Surface(10).ZoneName = "ZONE 1";
+    state->dataSurface->Surface(10).Azimuth = 90.0;
+    state->dataSurface->Surface(10).ExtBoundCond = 0;
+    state->dataSurface->Surface(10).HeatTransSurf = true;
+    state->dataSurface->Surface(10).Tilt = 90.0;
+    state->dataSurface->Surface(10).Sides = 3;
+    state->dataSurface->Surface(10).Area = 0.5;
+    state->dataSurface->Surface(10).BaseSurf = 3;
+    state->dataSurface->Surface(10).Vertex.allocate(3);
+    state->dataSurface->Surface(10).Vertex(1).x = 10.0;
+    state->dataSurface->Surface(10).Vertex(2).x = 10.0;
+    state->dataSurface->Surface(10).Vertex(3).x = 10.0;
+    state->dataSurface->Surface(10).Vertex(1).y = 1.0;
+    state->dataSurface->Surface(10).Vertex(2).y = 1.0;
+    state->dataSurface->Surface(10).Vertex(3).y = 2.0;
+    state->dataSurface->Surface(10).Vertex(1).z = 2.0;
+    state->dataSurface->Surface(10).Vertex(2).z = 1.0;
+    state->dataSurface->Surface(10).Vertex(3).z = 1.0;
 
     // Polygonal horizontal base surface
-    Surface(13).Name = "ROOF-POLY-WINDOW1";
-    Surface(13).Zone = 1;
-    Surface(13).ZoneName = "ZONE 1";
-    Surface(13).Azimuth = 0.0;
-    Surface(13).ExtBoundCond = 0;
-    Surface(13).HeatTransSurf = true;
-    Surface(13).Tilt = 0.0;
-    Surface(13).Sides = 3;
-    Surface(13).Area = 1;
-    Surface(13).BaseSurf = 7;
-    Surface(13).Vertex.allocate(3);
-    Surface(13).Vertex(1).x = 8.0;
-    Surface(13).Vertex(2).x = 8.0;
-    Surface(13).Vertex(3).x = 9.0;
-    Surface(13).Vertex(1).y = 9.0;
-    Surface(13).Vertex(2).y = 7.0;
-    Surface(13).Vertex(3).y = 7.0;
-    Surface(13).Vertex(1).z = 2.4384;
-    Surface(13).Vertex(2).z = 2.4384;
-    Surface(13).Vertex(3).z = 2.4384;
+    state->dataSurface->Surface(7).Name = "ROOF-POLY";
+    state->dataSurface->Surface(7).Zone = 1;
+    state->dataSurface->Surface(7).ZoneName = "ZONE 1";
+    state->dataSurface->Surface(7).Azimuth = 0.0;
+    state->dataSurface->Surface(7).ExtBoundCond = 0;
+    state->dataSurface->Surface(7).HeatTransSurf = true;
+    state->dataSurface->Surface(7).Tilt = 0.0;
+    state->dataSurface->Surface(7).Sides = 5;
+    state->dataSurface->Surface(7).Area = 55.0;
+    state->dataSurface->Surface(7).Vertex.allocate(5);
+    state->dataSurface->Surface(7).Vertex(1).x = 0.0;
+    state->dataSurface->Surface(7).Vertex(2).x = 0.0;
+    state->dataSurface->Surface(7).Vertex(3).x = 10.0;
+    state->dataSurface->Surface(7).Vertex(4).x = 10.0;
+    state->dataSurface->Surface(7).Vertex(5).x = 5.0;
+    state->dataSurface->Surface(7).Vertex(1).y = 10.0;
+    state->dataSurface->Surface(7).Vertex(2).y = 5.0;
+    state->dataSurface->Surface(7).Vertex(3).y = 5.0;
+    state->dataSurface->Surface(7).Vertex(4).y = 10.0;
+    state->dataSurface->Surface(7).Vertex(5).y = 11.0;
+    state->dataSurface->Surface(7).Vertex(1).z = 2.4384;
+    state->dataSurface->Surface(7).Vertex(2).z = 2.4384;
+    state->dataSurface->Surface(7).Vertex(3).z = 2.4384;
+    state->dataSurface->Surface(7).Vertex(4).z = 2.4384;
+    state->dataSurface->Surface(7).Vertex(5).z = 2.4384;
 
     // Polygonal horizontal base surface
-    Surface(14).Name = "ROOF-POLY-WINDOW2";
-    Surface(14).Zone = 1;
-    Surface(14).ZoneName = "ZONE 1";
-    Surface(14).Azimuth = 0.0;
-    Surface(14).ExtBoundCond = 0;
-    Surface(14).HeatTransSurf = true;
-    Surface(14).Tilt = 0.0;
-    Surface(14).Sides = 3;
-    Surface(14).Area = 1;
-    Surface(14).BaseSurf = 7;
-    Surface(14).Vertex.allocate(3);
-    Surface(14).Vertex(1).x = 6.0;
-    Surface(14).Vertex(2).x = 6.0;
-    Surface(14).Vertex(3).x = 7.0;
-    Surface(14).Vertex(1).y = 9.0;
-    Surface(14).Vertex(2).y = 7.0;
-    Surface(14).Vertex(3).y = 7.0;
-    Surface(14).Vertex(1).z = 2.4384;
-    Surface(14).Vertex(2).z = 2.4384;
-    Surface(14).Vertex(3).z = 2.4384;
+    state->dataSurface->Surface(13).Name = "ROOF-POLY-WINDOW1";
+    state->dataSurface->Surface(13).Zone = 1;
+    state->dataSurface->Surface(13).ZoneName = "ZONE 1";
+    state->dataSurface->Surface(13).Azimuth = 0.0;
+    state->dataSurface->Surface(13).ExtBoundCond = 0;
+    state->dataSurface->Surface(13).HeatTransSurf = true;
+    state->dataSurface->Surface(13).Tilt = 0.0;
+    state->dataSurface->Surface(13).Sides = 3;
+    state->dataSurface->Surface(13).Area = 1;
+    state->dataSurface->Surface(13).BaseSurf = 7;
+    state->dataSurface->Surface(13).Vertex.allocate(3);
+    state->dataSurface->Surface(13).Vertex(1).x = 8.0;
+    state->dataSurface->Surface(13).Vertex(2).x = 8.0;
+    state->dataSurface->Surface(13).Vertex(3).x = 9.0;
+    state->dataSurface->Surface(13).Vertex(1).y = 9.0;
+    state->dataSurface->Surface(13).Vertex(2).y = 7.0;
+    state->dataSurface->Surface(13).Vertex(3).y = 7.0;
+    state->dataSurface->Surface(13).Vertex(1).z = 2.4384;
+    state->dataSurface->Surface(13).Vertex(2).z = 2.4384;
+    state->dataSurface->Surface(13).Vertex(3).z = 2.4384;
+
+    // Polygonal horizontal base surface
+    state->dataSurface->Surface(14).Name = "ROOF-POLY-WINDOW2";
+    state->dataSurface->Surface(14).Zone = 1;
+    state->dataSurface->Surface(14).ZoneName = "ZONE 1";
+    state->dataSurface->Surface(14).Azimuth = 0.0;
+    state->dataSurface->Surface(14).ExtBoundCond = 0;
+    state->dataSurface->Surface(14).HeatTransSurf = true;
+    state->dataSurface->Surface(14).Tilt = 0.0;
+    state->dataSurface->Surface(14).Sides = 3;
+    state->dataSurface->Surface(14).Area = 1;
+    state->dataSurface->Surface(14).BaseSurf = 7;
+    state->dataSurface->Surface(14).Vertex.allocate(3);
+    state->dataSurface->Surface(14).Vertex(1).x = 6.0;
+    state->dataSurface->Surface(14).Vertex(2).x = 6.0;
+    state->dataSurface->Surface(14).Vertex(3).x = 7.0;
+    state->dataSurface->Surface(14).Vertex(1).y = 9.0;
+    state->dataSurface->Surface(14).Vertex(2).y = 7.0;
+    state->dataSurface->Surface(14).Vertex(3).y = 7.0;
+    state->dataSurface->Surface(14).Vertex(1).z = 2.4384;
+    state->dataSurface->Surface(14).Vertex(2).z = 2.4384;
+    state->dataSurface->Surface(14).Vertex(3).z = 2.4384;
 
     // Rectangular horizontal base surface
-    Surface(8).Name = "ROOF-REC";
-    Surface(8).Zone = 1;
-    Surface(8).ZoneName = "ZONE 1";
-    Surface(8).Azimuth = 0.0;
-    Surface(8).ExtBoundCond = 0;
-    Surface(8).HeatTransSurf = true;
-    Surface(8).Tilt = 0.0;
-    Surface(8).Sides = 4;
-    Surface(8).Area = 50.0;
-    Surface(8).Width = 10.0;
-    Surface(8).Height = 5.0;
-    Surface(8).Vertex.allocate(4);
-    Surface(8).Vertex(1).x = 0.0;
-    Surface(8).Vertex(2).x = 0.0;
-    Surface(8).Vertex(3).x = 10.0;
-    Surface(8).Vertex(4).x = 10.0;
-    Surface(8).Vertex(1).y = 5.0;
-    Surface(8).Vertex(2).y = 0.0;
-    Surface(8).Vertex(3).y = 0.0;
-    Surface(8).Vertex(4).y = 5.0;
-    Surface(8).Vertex(1).z = 2.4384;
-    Surface(8).Vertex(2).z = 2.4384;
-    Surface(8).Vertex(3).z = 2.4384;
-    Surface(8).Vertex(4).z = 2.4384;
+    state->dataSurface->Surface(8).Name = "ROOF-REC";
+    state->dataSurface->Surface(8).Zone = 1;
+    state->dataSurface->Surface(8).ZoneName = "ZONE 1";
+    state->dataSurface->Surface(8).Azimuth = 0.0;
+    state->dataSurface->Surface(8).ExtBoundCond = 0;
+    state->dataSurface->Surface(8).HeatTransSurf = true;
+    state->dataSurface->Surface(8).Tilt = 0.0;
+    state->dataSurface->Surface(8).Sides = 4;
+    state->dataSurface->Surface(8).Area = 50.0;
+    state->dataSurface->Surface(8).Width = 10.0;
+    state->dataSurface->Surface(8).Height = 5.0;
+    state->dataSurface->Surface(8).Vertex.allocate(4);
+    state->dataSurface->Surface(8).Vertex(1).x = 0.0;
+    state->dataSurface->Surface(8).Vertex(2).x = 0.0;
+    state->dataSurface->Surface(8).Vertex(3).x = 10.0;
+    state->dataSurface->Surface(8).Vertex(4).x = 10.0;
+    state->dataSurface->Surface(8).Vertex(1).y = 5.0;
+    state->dataSurface->Surface(8).Vertex(2).y = 0.0;
+    state->dataSurface->Surface(8).Vertex(3).y = 0.0;
+    state->dataSurface->Surface(8).Vertex(4).y = 5.0;
+    state->dataSurface->Surface(8).Vertex(1).z = 2.4384;
+    state->dataSurface->Surface(8).Vertex(2).z = 2.4384;
+    state->dataSurface->Surface(8).Vertex(3).z = 2.4384;
+    state->dataSurface->Surface(8).Vertex(4).z = 2.4384;
 
     // Rectangular horizontal base surface
-    Surface(12).Name = "ROOF-REC-WINDOW1";
-    Surface(12).Zone = 1;
-    Surface(12).ZoneName = "ZONE 1";
-    Surface(12).Azimuth = 0.0;
-    Surface(12).ExtBoundCond = 0;
-    Surface(12).HeatTransSurf = true;
-    Surface(12).Tilt = 0.0;
-    Surface(12).Sides = 3;
-    Surface(12).Area = 0.5;
-    Surface(12).BaseSurf = 8;
-    Surface(12).Vertex.allocate(3);
-    Surface(12).Vertex(1).x = 8.0;
-    Surface(12).Vertex(2).x = 8.0;
-    Surface(12).Vertex(3).x = 9.0;
-    Surface(12).Vertex(1).y = 4.0;
-    Surface(12).Vertex(2).y = 3.0;
-    Surface(12).Vertex(3).y = 3.0;
-    Surface(12).Vertex(1).z = 2.4384;
-    Surface(12).Vertex(2).z = 2.4384;
-    Surface(12).Vertex(3).z = 2.4384;
+    state->dataSurface->Surface(12).Name = "ROOF-REC-WINDOW1";
+    state->dataSurface->Surface(12).Zone = 1;
+    state->dataSurface->Surface(12).ZoneName = "ZONE 1";
+    state->dataSurface->Surface(12).Azimuth = 0.0;
+    state->dataSurface->Surface(12).ExtBoundCond = 0;
+    state->dataSurface->Surface(12).HeatTransSurf = true;
+    state->dataSurface->Surface(12).Tilt = 0.0;
+    state->dataSurface->Surface(12).Sides = 3;
+    state->dataSurface->Surface(12).Area = 0.5;
+    state->dataSurface->Surface(12).BaseSurf = 8;
+    state->dataSurface->Surface(12).Vertex.allocate(3);
+    state->dataSurface->Surface(12).Vertex(1).x = 8.0;
+    state->dataSurface->Surface(12).Vertex(2).x = 8.0;
+    state->dataSurface->Surface(12).Vertex(3).x = 9.0;
+    state->dataSurface->Surface(12).Vertex(1).y = 4.0;
+    state->dataSurface->Surface(12).Vertex(2).y = 3.0;
+    state->dataSurface->Surface(12).Vertex(3).y = 3.0;
+    state->dataSurface->Surface(12).Vertex(1).z = 2.4384;
+    state->dataSurface->Surface(12).Vertex(2).z = 2.4384;
+    state->dataSurface->Surface(12).Vertex(3).z = 2.4384;
 
-    Surface(11).Name = "ROOF-REC-WINDOW2";
-    Surface(11).Zone = 1;
-    Surface(11).ZoneName = "ZONE 1";
-    Surface(11).Azimuth = 0.0;
-    Surface(11).ExtBoundCond = 0;
-    Surface(11).HeatTransSurf = true;
-    Surface(11).Tilt = 0.0;
-    Surface(11).Sides = 3;
-    Surface(11).Area = 0.5;
-    Surface(11).BaseSurf = 8;
-    Surface(11).Vertex.allocate(3);
-    Surface(11).Vertex(1).x = 7.0;
-    Surface(11).Vertex(2).x = 7.0;
-    Surface(11).Vertex(3).x = 8.0;
-    Surface(11).Vertex(1).y = 4.0;
-    Surface(11).Vertex(2).y = 3.0;
-    Surface(11).Vertex(3).y = 3.0;
-    Surface(11).Vertex(1).z = 2.4384;
-    Surface(11).Vertex(2).z = 2.4384;
-    Surface(11).Vertex(3).z = 2.4384;
+    state->dataSurface->Surface(11).Name = "ROOF-REC-WINDOW2";
+    state->dataSurface->Surface(11).Zone = 1;
+    state->dataSurface->Surface(11).ZoneName = "ZONE 1";
+    state->dataSurface->Surface(11).Azimuth = 0.0;
+    state->dataSurface->Surface(11).ExtBoundCond = 0;
+    state->dataSurface->Surface(11).HeatTransSurf = true;
+    state->dataSurface->Surface(11).Tilt = 0.0;
+    state->dataSurface->Surface(11).Sides = 3;
+    state->dataSurface->Surface(11).Area = 0.5;
+    state->dataSurface->Surface(11).BaseSurf = 8;
+    state->dataSurface->Surface(11).Vertex.allocate(3);
+    state->dataSurface->Surface(11).Vertex(1).x = 7.0;
+    state->dataSurface->Surface(11).Vertex(2).x = 7.0;
+    state->dataSurface->Surface(11).Vertex(3).x = 8.0;
+    state->dataSurface->Surface(11).Vertex(1).y = 4.0;
+    state->dataSurface->Surface(11).Vertex(2).y = 3.0;
+    state->dataSurface->Surface(11).Vertex(3).y = 3.0;
+    state->dataSurface->Surface(11).Vertex(1).z = 2.4384;
+    state->dataSurface->Surface(11).Vertex(2).z = 2.4384;
+    state->dataSurface->Surface(11).Vertex(3).z = 2.4384;
 
-    SurfaceGeometry::AllocateSurfaceWindows(14);
-    SurfWinOriginalClass(4) = DataSurfaces::SurfaceClass::Window;
-    SurfWinOriginalClass(5) = DataSurfaces::SurfaceClass::Window;
-    SurfWinOriginalClass(6) = DataSurfaces::SurfaceClass::Window;
-    SurfWinOriginalClass(9) = DataSurfaces::SurfaceClass::Window;
-    SurfWinOriginalClass(10) = DataSurfaces::SurfaceClass::Window;
-    SurfWinOriginalClass(11) = DataSurfaces::SurfaceClass::Window;
-    SurfWinOriginalClass(12) = DataSurfaces::SurfaceClass::Window;
-    SurfWinOriginalClass(13) = DataSurfaces::SurfaceClass::Window;
-    SurfWinOriginalClass(14) = DataSurfaces::SurfaceClass::Window;
+    SurfaceGeometry::AllocateSurfaceWindows(*state, 14);
+    state->dataSurface->SurfWinOriginalClass(4) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(5) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(6) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(9) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(10) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(11) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(12) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(13) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(14) = DataSurfaces::SurfaceClass::Window;
     state->dataGlobal->NumOfZones = 1;
 
     std::string const idf_objects = delimited_string({
@@ -3028,36 +3045,36 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestPolygonalWindows)
     GetAirflowNetworkInput(*state);
 
     // Choice: Height; Base Surface: Vertical Rectangular
-    EXPECT_NEAR(1.0, AirflowNetwork::MultizoneSurfaceData(1).Width, 0.0001);
-    EXPECT_NEAR(1.0, AirflowNetwork::MultizoneSurfaceData(1).Height, 0.0001);
+    EXPECT_NEAR(1.0, state->dataAirflowNetwork->MultizoneSurfaceData(1).Width, 0.0001);
+    EXPECT_NEAR(1.0, state->dataAirflowNetwork->MultizoneSurfaceData(1).Height, 0.0001);
     // Choice: Height; Base Surface: Vertical Polygon
-    EXPECT_NEAR(1.666667, AirflowNetwork::MultizoneSurfaceData(2).Width, 0.0001);
-    EXPECT_NEAR(1.5, AirflowNetwork::MultizoneSurfaceData(2).Height, 0.0001);
+    EXPECT_NEAR(1.666667, state->dataAirflowNetwork->MultizoneSurfaceData(2).Width, 0.0001);
+    EXPECT_NEAR(1.5, state->dataAirflowNetwork->MultizoneSurfaceData(2).Height, 0.0001);
     // Choice: Base aspect ratio; Base Surface: Vertical Rectangular
-    EXPECT_NEAR(1.454907, AirflowNetwork::MultizoneSurfaceData(3).Width, 0.0001);
-    EXPECT_NEAR(0.343664, AirflowNetwork::MultizoneSurfaceData(3).Height, 0.0001);
+    EXPECT_NEAR(1.454907, state->dataAirflowNetwork->MultizoneSurfaceData(3).Width, 0.0001);
+    EXPECT_NEAR(0.343664, state->dataAirflowNetwork->MultizoneSurfaceData(3).Height, 0.0001);
     // Choice: User aspect ratio; Base Surface: Vertical Rectangular
-    EXPECT_NEAR(0.70711, AirflowNetwork::MultizoneSurfaceData(4).Width, 0.0001);
-    EXPECT_NEAR(0.70711, AirflowNetwork::MultizoneSurfaceData(4).Height, 0.0001);
+    EXPECT_NEAR(0.70711, state->dataAirflowNetwork->MultizoneSurfaceData(4).Width, 0.0001);
+    EXPECT_NEAR(0.70711, state->dataAirflowNetwork->MultizoneSurfaceData(4).Height, 0.0001);
     // Choice: Base aspect ratio --> Height; Base Surface: Vertical Polygon
-    EXPECT_NEAR(0.5, AirflowNetwork::MultizoneSurfaceData(5).Width, 0.0001);
-    EXPECT_NEAR(1.0, AirflowNetwork::MultizoneSurfaceData(5).Height, 0.0001);
+    EXPECT_NEAR(0.5, state->dataAirflowNetwork->MultizoneSurfaceData(5).Width, 0.0001);
+    EXPECT_NEAR(1.0, state->dataAirflowNetwork->MultizoneSurfaceData(5).Height, 0.0001);
     // Choice: Height --> Base aspect ratio; Base Surface: Horizontal Rectangular
-    EXPECT_NEAR(1.0, AirflowNetwork::MultizoneSurfaceData(6).Width, 0.0001);
-    EXPECT_NEAR(0.5, AirflowNetwork::MultizoneSurfaceData(6).Height, 0.0001);
+    EXPECT_NEAR(1.0, state->dataAirflowNetwork->MultizoneSurfaceData(6).Width, 0.0001);
+    EXPECT_NEAR(0.5, state->dataAirflowNetwork->MultizoneSurfaceData(6).Height, 0.0001);
     // Choice: Base aspect ratio; Base Surface: Horizontal Rectangular
-    EXPECT_NEAR(1.0, AirflowNetwork::MultizoneSurfaceData(7).Width, 0.0001);
-    EXPECT_NEAR(0.5, AirflowNetwork::MultizoneSurfaceData(7).Height, 0.0001);
+    EXPECT_NEAR(1.0, state->dataAirflowNetwork->MultizoneSurfaceData(7).Width, 0.0001);
+    EXPECT_NEAR(0.5, state->dataAirflowNetwork->MultizoneSurfaceData(7).Height, 0.0001);
     // Choice: Base aspect ratio --> User Aspect Ratio; Base Surface: Horizontal Polygon
-    EXPECT_NEAR(1.0, AirflowNetwork::MultizoneSurfaceData(8).Width, 0.0001);
-    EXPECT_NEAR(1.0, AirflowNetwork::MultizoneSurfaceData(8).Height, 0.0001);
+    EXPECT_NEAR(1.0, state->dataAirflowNetwork->MultizoneSurfaceData(8).Width, 0.0001);
+    EXPECT_NEAR(1.0, state->dataAirflowNetwork->MultizoneSurfaceData(8).Height, 0.0001);
     // Choice: Height --> User Aspect Ratio; Base Surface: Horizontal Polygon
-    EXPECT_NEAR(1.0, AirflowNetwork::MultizoneSurfaceData(9).Width, 0.0001);
-    EXPECT_NEAR(1.0, AirflowNetwork::MultizoneSurfaceData(9).Height, 0.0001);
+    EXPECT_NEAR(1.0, state->dataAirflowNetwork->MultizoneSurfaceData(9).Width, 0.0001);
+    EXPECT_NEAR(1.0, state->dataAirflowNetwork->MultizoneSurfaceData(9).Height, 0.0001);
 
-    Zone.deallocate();
-    Surface.deallocate();
-    SurfaceWindow.deallocate();
+    state->dataHeatBal->Zone.deallocate();
+    state->dataSurface->Surface.deallocate();
+    state->dataSurface->SurfaceWindow.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_UserDefinedDuctViewFactors)
@@ -4428,7 +4445,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_UserDefinedDuctViewFactor
     HeatBalanceManager::GetHeatBalanceInput(*state);
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     state->dataEnvrn->OutBaroPress = 101000;
-    DataHVACGlobals::TimeStepSys = state->dataGlobal->TimeStepZone;
+    state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
     SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
@@ -4442,19 +4459,19 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_UserDefinedDuctViewFactor
     state->dataAirflowNetworkBalanceManager->initialize(*state);
 
     // Check inputs
-    EXPECT_EQ(AirflowNetwork::AirflowNetworkLinkageViewFactorData(1).LinkageName, "ZONESUPPLYLINK1");
-    EXPECT_EQ(AirflowNetwork::AirflowNetworkLinkageViewFactorData(1).DuctExposureFraction, 1.0);
-    EXPECT_EQ(AirflowNetwork::AirflowNetworkLinkageViewFactorData(1).DuctEmittance, 0.9);
-    EXPECT_EQ(AirflowNetwork::AirflowNetworkLinkageViewFactorData(1).LinkageSurfaceData(1).SurfaceName, "ATTIC FLOOR");
-    EXPECT_EQ(AirflowNetwork::AirflowNetworkLinkageViewFactorData(1).LinkageSurfaceData(1).ViewFactor, 0.483577);
-    EXPECT_EQ(AirflowNetwork::AirflowNetworkLinkageViewFactorData(1).LinkageSurfaceData(2).SurfaceName, "ATTIC ROOF NORTH");
-    EXPECT_EQ(AirflowNetwork::AirflowNetworkLinkageViewFactorData(1).LinkageSurfaceData(2).ViewFactor, 0.237692);
-    EXPECT_EQ(AirflowNetwork::AirflowNetworkLinkageViewFactorData(1).LinkageSurfaceData(3).SurfaceName, "ATTIC ROOF SOUTH");
-    EXPECT_EQ(AirflowNetwork::AirflowNetworkLinkageViewFactorData(1).LinkageSurfaceData(3).ViewFactor, 0.237692);
-    EXPECT_EQ(AirflowNetwork::AirflowNetworkLinkageViewFactorData(1).LinkageSurfaceData(4).SurfaceName, "EAST WALL ATTIC");
-    EXPECT_EQ(AirflowNetwork::AirflowNetworkLinkageViewFactorData(1).LinkageSurfaceData(4).ViewFactor, 0.02052);
-    EXPECT_EQ(AirflowNetwork::AirflowNetworkLinkageViewFactorData(1).LinkageSurfaceData(5).SurfaceName, "WEST WALL ATTIC");
-    EXPECT_EQ(AirflowNetwork::AirflowNetworkLinkageViewFactorData(1).LinkageSurfaceData(5).ViewFactor, 0.02052);
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkLinkageViewFactorData(1).LinkageName, "ZONESUPPLYLINK1");
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkLinkageViewFactorData(1).DuctExposureFraction, 1.0);
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkLinkageViewFactorData(1).DuctEmittance, 0.9);
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkLinkageViewFactorData(1).LinkageSurfaceData(1).SurfaceName, "ATTIC FLOOR");
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkLinkageViewFactorData(1).LinkageSurfaceData(1).ViewFactor, 0.483577);
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkLinkageViewFactorData(1).LinkageSurfaceData(2).SurfaceName, "ATTIC ROOF NORTH");
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkLinkageViewFactorData(1).LinkageSurfaceData(2).ViewFactor, 0.237692);
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkLinkageViewFactorData(1).LinkageSurfaceData(3).SurfaceName, "ATTIC ROOF SOUTH");
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkLinkageViewFactorData(1).LinkageSurfaceData(3).ViewFactor, 0.237692);
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkLinkageViewFactorData(1).LinkageSurfaceData(4).SurfaceName, "EAST WALL ATTIC");
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkLinkageViewFactorData(1).LinkageSurfaceData(4).ViewFactor, 0.02052);
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkLinkageViewFactorData(1).LinkageSurfaceData(5).SurfaceName, "WEST WALL ATTIC");
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkLinkageViewFactorData(1).LinkageSurfaceData(5).ViewFactor, 0.02052);
 
     Real64 const tol = 0.01;
 
@@ -4641,7 +4658,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestWindPressureTable)
     state->dataEnvrn->SiteTempGradient = 0.0; // Disconnect z from testing
 
     // Make sure we can compute the right density
-    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
+    Real64 rho =
+        Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
     // CalcWindPressure(MultizoneExternalNodeData(i).curve, 1
     //	Vref, 1
@@ -4729,7 +4747,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestWPCValue)
     Real64 humRat = state->dataEnvrn->OutHumRat;
 
     // Make sure we can compute the right density
-    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
+    Real64 rho =
+        Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
 
     // Compute wind pressure with current defaults
@@ -5204,355 +5223,355 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodes)
          "  0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
          "  12.19200,6.096000,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
          "  12.19200,12.19200,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-         /*"FenestrationSurface:Detailed,",
-         "  WINDOW11,                !- Name",
-         "  WINDOW,                  !- Surface Type",
-         "  WIN-CON-LIGHT,           !- Construction Name",
-         "  Surface_1,               !- Building Surface Name",
-                        "  ,                        !- Outside Boundary Condition Object",
-                        "  0.5000000,               !- View Factor to Ground",
-         "  ,                        !- Frame and Divider Name",
-         "  1.0,                     !- Multiplier",
-         "  3,                       !- Number of Vertices",
-         "  1.00000,0,2.500000,  !- X,Y,Z ==> Vertex 1 {m}",
-         "  1.00000,0,1.0000000,  !- X,Y,Z ==> Vertex 2 {m}",
-         "  5.000000,0,1.0000000;  !- X,Y,Z ==> Vertex 3 {m}",
-         "FenestrationSurface:Detailed,",
-         "  WINDOW12,                !- Name",
-         "  WINDOW,                  !- Surface Type",
-         "  WIN-CON-LIGHT,           !- Construction Name",
-         "  Surface_1,               !- Building Surface Name",
-                        "  ,                        !- Outside Boundary Condition Object",
-                        "  0.5000000,               !- View Factor to Ground",
-
-                        "  4,                       !- Number of Vertices",
-                        "  0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-                        "  0,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
-                        "  0,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
-                        "  0,0,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-                        "BuildingSurface:Detailed,",
-                        "  Surface_3,               !- Name",
-                        "  WALL,                    !- Surface Type",
-                        "  PARTITION06,             !- Construction Name",
-                        "  WEST_ZONE,               !- Zone Name",
-                        "  Surface,                 !- Outside Boundary Condition",
-                        "  Surface_17,              !- Outside Boundary Condition Object",
-                        "  NoSun,                   !- Sun Exposure",
-                        "  NoWind,                  !- Wind Exposure",
-                        "  0.5000000,               !- View Factor to Ground",
-                        "  4,                       !- Number of Vertices",
-                        "  6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-                        "  6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
-                        "  0,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
-                        "  0,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-                        "BuildingSurface:Detailed,",
-                        "  Surface_4,               !- Name",
-                        "  WALL,                    !- Surface Type",
-                        "  PARTITION06,             !- Construction Name",
-                        "  WEST_ZONE,               !- Zone Name",
-                        "  Surface,                 !- Outside Boundary Condition",
-                        "  Surface_10,              !- Outside Boundary Condition Object",
-                        "  NoSun,                   !- Sun Exposure",
-                        "  NoWind,                  !- Wind Exposure",
-                        "  0.5000000,               !- View Factor to Ground",
-                        "  4,                       !- Number of Vertices",
-                        "  6.096000,0,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-                        "  6.096000,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
-                        "  6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
-                        "  6.096000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-                        "BuildingSurface:Detailed,",
-                        "  Surface_5,               !- Name",
-                        "  FLOOR,                   !- Surface Type",
-                        "  FLOOR SLAB 8 IN,         !- Construction Name",
-                        "  WEST_ZONE,               !- Zone Name",
-                        "  Surface,                 !- Outside Boundary Condition",
-                        "  Surface_5,               !- Outside Boundary Condition Object",
-                        "  NoSun,                   !- Sun Exposure",
-                        "  NoWind,                  !- Wind Exposure",
-                        "  1.000000,                !- View Factor to Ground",
-                        "  4,                       !- Number of Vertices",
-                        "  0,0,0,  !- X,Y,Z ==> Vertex 1 {m}",
-                        "  0,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
-                        "  6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
-                        "  6.096000,0,0;  !- X,Y,Z ==> Vertex 4 {m}",
-                        "BuildingSurface:Detailed,",
-                        "  Surface_6,               !- Name",
-                        "  ROOF,                    !- Surface Type",
-                        "  ROOF34,                  !- Construction Name",
-                        "  WEST_ZONE,               !- Zone Name",
-                        "  Outdoors,                !- Outside Boundary Condition",
-                        "  ,                        !- Outside Boundary Condition Object",
-                        "  SunExposed,              !- Sun Exposure",
-                        "  WindExposed,             !- Wind Exposure",
-                        "  0,                       !- View Factor to Ground",
-                        "  4,                       !- Number of Vertices",
-                        "  0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-                        "  0,0,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
-                        "  6.096000,0,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
-                        "  6.096000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-                        "BuildingSurface:Detailed,",
-                        "  Surface_8,               !- Name",
-                        "  WALL,                    !- Surface Type",
-                        "  EXTWALL80,               !- Construction Name",
-                        "  EAST_ZONE,               !- Zone Name",
-                        "  Outdoors,                !- Outside Boundary Condition",
-                        "  ,                        !- Outside Boundary Condition Object",
-                        "  SunExposed,              !- Sun Exposure",
-                        "  WindExposed,             !- Wind Exposure",
-                        "  0.5000000,               !- View Factor to Ground",
-                        "  4,                       !- Number of Vertices",
-                        "  6.096000,0,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-                        "  6.096000,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
-                        "  12.19200,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
-                        "  12.19200,0,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-                        "BuildingSurface:Detailed,",
-                        "  Surface_9,               !- Name",
-                        "  WALL,                    !- Surface Type",
-                        "  EXTWALL80,               !- Construction Name",
-                        "  EAST_ZONE,               !- Zone Name",
-                        "  Outdoors,                !- Outside Boundary Condition",
-                        "  ,                        !- Outside Boundary Condition Object",
-                        "  SunExposed,              !- Sun Exposure",
-                        "  WindExposed,             !- Wind Exposure",
-                        "  0.5000000,               !- View Factor to Ground",
-                        "  4,                       !- Number of Vertices",
-                        "  12.19200,0,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-                        "  12.19200,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
-                        "  12.19200,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
-                        "  12.19200,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-                        "BuildingSurface:Detailed,",
-                        "  Surface_10,              !- Name",
-                        "  WALL,                    !- Surface Type",
-                        "  PARTITION06,             !- Construction Name",
-                        "  EAST_ZONE,               !- Zone Name",
-                        "  Surface,                 !- Outside Boundary Condition",
-                        "  Surface_4,               !- Outside Boundary Condition Object",
-                        "  NoSun,                   !- Sun Exposure",
-                        "  NoWind,                  !- Wind Exposure",
-                        "  0.5000000,               !- View Factor to Ground",
-                        "  4,                       !- Number of Vertices",
-                        "  6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-                        "  6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
-                        "  6.096000,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
-                        "  6.096001,0,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-                        "BuildingSurface:Detailed,",
-                        "  Surface_11,              !- Name",
-                        "  WALL,                    !- Surface Type",
-                        "  PARTITION06,             !- Construction Name",
-                        "  EAST_ZONE,               !- Zone Name",
-                        "  Surface,                 !- Outside Boundary Condition",
-                        "  Surface_18,              !- Outside Boundary Condition Object",
-                        "  NoSun,                   !- Sun Exposure",
-                        "  NoWind,                  !- Wind Exposure",
-                        "  0.5000000,               !- View Factor to Ground",
-                        "  4,                       !- Number of Vertices",
-                        "  12.19200,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-                        "  12.19200,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
-                        "  6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
-                        "  6.096000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-                        "BuildingSurface:Detailed,",
-                        "  Surface_12,              !- Name",
-                        "  FLOOR,                   !- Surface Type",
-                        "  FLOOR SLAB 8 IN,         !- Construction Name",
-                        "  EAST_ZONE,               !- Zone Name",
-                        "  Surface,                 !- Outside Boundary Condition",
-                        "  Surface_12,              !- Outside Boundary Condition Object",
-                        "  NoSun,                   !- Sun Exposure",
-                        "  NoWind,                  !- Wind Exposure",
-                        "  1.000000,                !- View Factor to Ground",
-                        "  4,                       !- Number of Vertices",
-                        "  6.096000,0,0,  !- X,Y,Z ==> Vertex 1 {m}",
-                        "  6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
-                        "  12.19200,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
-                        "  12.19200,0,0;  !- X,Y,Z ==> Vertex 4 {m}",
-                        "BuildingSurface:Detailed,",
-                        "  Surface_13,              !- Name",
-                        "  ROOF,                    !- Surface Type",
-                        "  ROOF34,                  !- Construction Name",
-                        "  EAST_ZONE,               !- Zone Name",
-                        "  Outdoors,                !- Outside Boundary Condition",
-                        "  ,                        !- Outside Boundary Condition Object",
-                        "  SunExposed,              !- Sun Exposure",
-                        "  WindExposed,             !- Wind Exposure",
-                        "  0,                       !- View Factor to Ground",
-                        "  4,                       !- Number of Vertices",
-                        "  6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-                        "  6.096000,0,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
-                        "  12.19200,0,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
-                        "  12.19200,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-                        "BuildingSurface:Detailed,",
-                        "  Surface_14,              !- Name",
-                        "  WALL,                    !- Surface Type",
-                        "  EXTWALL80,               !- Construction Name",
-                        "  NORTH_ZONE,              !- Zone Name",
-                        "  Outdoors,                !- Outside Boundary Condition",
-                        "  ,                        !- Outside Boundary Condition Object",
-                        "  SunExposed,              !- Sun Exposure",
-                        "  WindExposed,             !- Wind Exposure",
-                        "  0.5000000,               !- View Factor to Ground",
-                        "  4,                       !- Number of Vertices",
-                        "  0,12.19200,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-                        "  0,12.19200,0,  !- X,Y,Z ==> Vertex 2 {m}",
-                        "  0,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
-                        "  0,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-                        "BuildingSurface:Detailed,",
-                        "  Surface_15,              !- Name",
-                        "  WALL,                    !- Surface Type",
-                        "  EXTWALL80,               !- Construction Name",
-                        "  NORTH_ZONE,              !- Zone Name",
-                        "  Outdoors,                !- Outside Boundary Condition",
-                        "  ,                        !- Outside Boundary Condition Object",
-                        "  SunExposed,              !- Sun Exposure",
-                        "  WindExposed,             !- Wind Exposure",
-                        "  0.5000000,               !- View Factor to Ground",
-                        "  4,                       !- Number of Vertices",
-                        "  12.19200,12.19200,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-                        "  12.19200,12.19200,0,  !- X,Y,Z ==> Vertex 2 {m}",
-                        "  0,12.19200,0,  !- X,Y,Z ==> Vertex 3 {m}",
-                        "  0,12.19200,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-                        "BuildingSurface:Detailed,",
-                        "  Surface_16,              !- Name",
-                        "  WALL,                    !- Surface Type",
-                        "  EXTWALL80,               !- Construction Name",
-                        "  NORTH_ZONE,              !- Zone Name",
-                        "  Outdoors,                !- Outside Boundary Condition",
-                        "  ,                        !- Outside Boundary Condition Object",
-                        "  SunExposed,              !- Sun Exposure",
-                        "  WindExposed,             !- Wind Exposure",
-                        "  0.5000000,               !- View Factor to Ground",
-                        "  4,                       !- Number of Vertices",
-                        "  12.19200,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-                        "  12.19200,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
-                        "  12.19200,12.19200,0,  !- X,Y,Z ==> Vertex 3 {m}",
-                        "  12.19200,12.19200,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-                        "BuildingSurface:Detailed,",
-                        "  Surface_17,              !- Name",
-                        "  WALL,                    !- Surface Type",
-                        "  PARTITION06,             !- Construction Name",
-                        "  NORTH_ZONE,              !- Zone Name",
-                        "  Surface,                 !- Outside Boundary Condition",
-                        "  Surface_3,               !- Outside Boundary Condition Object",
-                        "  NoSun,                   !- Sun Exposure",
-                        "  NoWind,                  !- Wind Exposure",
-                        "  0.5000000,               !- View Factor to Ground",
-                        "  4,                       !- Number of Vertices",
-                        "  0.000,6.096,3.048,  !- X,Y,Z ==> Vertex 1 {m}",
-                        "  0.000,6.096,0.000,  !- X,Y,Z ==> Vertex 2 {m}",
-                        "  6.096,6.096,0.000,  !- X,Y,Z ==> Vertex 3 {m}",
-                        "  6.096,6.096,3.048;  !- X,Y,Z ==> Vertex 4 {m}",
-                        "BuildingSurface:Detailed,",
-                        "  Surface_18,              !- Name",
-                        "  WALL,                    !- Surface Type",
-                        "  PARTITION06,             !- Construction Name",
-                        "  NORTH_ZONE,              !- Zone Name",
-                        "  Surface,                 !- Outside Boundary Condition",
-                        "  Surface_11,              !- Outside Boundary Condition Object",
-                        "  NoSun,                   !- Sun Exposure",
-                        "  NoWind,                  !- Wind Exposure",
-                        "  0.5000000,               !- View Factor to Ground",
-                        "  4,                       !- Number of Vertices",
-                        "  6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-                        "  6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
-                        "  12.19200,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
-                        "  12.19200,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-                        "BuildingSurface:Detailed,",
-                        "  Surface_19,              !- Name",
-                        "  FLOOR,                   !- Surface Type",
-                        "  FLOOR SLAB 8 IN,         !- Construction Name",
-                        "  NORTH_ZONE,              !- Zone Name",
-                        "  Surface,                 !- Outside Boundary Condition",
-                        "  Surface_19,              !- Outside Boundary Condition Object",
-                        "  NoSun,                   !- Sun Exposure",
-                        "  NoWind,                  !- Wind Exposure",
-                        "  1.000000,                !- View Factor to Ground",
-                        "  4,                       !- Number of Vertices",
-                        "  0,6.096000,0,  !- X,Y,Z ==> Vertex 1 {m}",
-                        "  0,12.19200,0,  !- X,Y,Z ==> Vertex 2 {m}",
-                        "  12.19200,12.19200,0,  !- X,Y,Z ==> Vertex 3 {m}",
-                        "  12.19200,6.096000,0;  !- X,Y,Z ==> Vertex 4 {m}",
-                        "BuildingSurface:Detailed,",
-                        "  Surface_20,              !- Name",
-                        "  ROOF,                    !- Surface Type",
-                        "  ROOF34,                  !- Construction Name",
-                        "  NORTH_ZONE,              !- Zone Name",
-                        "  Outdoors,                !- Outside Boundary Condition",
-                        "  ,                        !- Outside Boundary Condition Object",
-                        "  SunExposed,              !- Sun Exposure",
-                        "  WindExposed,             !- Wind Exposure",
-                        "  0,                       !- View Factor to Ground",
-                        "  4,                       !- Number of Vertices",
-                        "  0,12.19200,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-                        "  0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
-                        "  12.19200,6.096000,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
-                        "  12.19200,12.19200,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-                        "FenestrationSurface:Detailed,",
-                        "  WINDOW11,                !- Name",
-                        "  WINDOW,                  !- Surface Type",
-                        "  WIN-CON-LIGHT,           !- Construction Name",
-                        "  Surface_1,               !- Building Surface Name",
-                        "  ,                        !- Outside Boundary Condition Object",
-                        "  0.5000000,               !- View Factor to Ground",
-                        "  ,                        !- Frame and Divider Name",
-                        "  1.0,                     !- Multiplier",
-                        "  3,                       !- Number of Vertices",
-                        "  1.00000,0,2.500000,  !- X,Y,Z ==> Vertex 1 {m}",
-                        "  1.00000,0,1.0000000,  !- X,Y,Z ==> Vertex 2 {m}",
-                        "  5.000000,0,1.0000000;  !- X,Y,Z ==> Vertex 3 {m}",
-                        "FenestrationSurface:Detailed,",
-                        "  WINDOW12,                !- Name",
-                        "  WINDOW,                  !- Surface Type",
-                        "  WIN-CON-LIGHT,           !- Construction Name",
-                        "  Surface_1,               !- Building Surface Name",
-                        "  ,                        !- Outside Boundary Condition Object",
-                        "  0.5000000,               !- View Factor to Ground",
-                        "  ,                        !- Frame and Divider Name",
-                        "  1.0,                     !- Multiplier",
-                        "  3,                       !- Number of Vertices",
-                        "  5.00000,0,1.0000000,  !- X,Y,Z ==> Vertex 2 {m}",
-                        "  5.000000,0,2.5000000,  !- X,Y,Z ==> Vertex 3 {m}",
-                        "  1.000000,0,2.500000;  !- X,Y,Z ==> Vertex 4 {m}",
-                        "FenestrationSurface:Detailed,",
-                        "  DoorInSurface_3,         !- Name",
-                        "  DOOR,                    !- Surface Type",
-                        "  DOOR-CON,                !- Construction Name",
-                        "  Surface_3,               !- Building Surface Name",
-                        "  DoorInSurface_17,        !- Outside Boundary Condition Object",
-                        "  0.5000000,               !- View Factor to Ground",
-                        "  ,                        !- Frame and Divider Name",
-                        "  1.0,                     !- Multiplier",
-                        "  4,                       !- Number of Vertices",
-                        "  3.500,6.096000,2.0,  !- X,Y,Z ==> Vertex 1 {m}",
-                        "  3.500,6.096000,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
-                        "  2.500,6.096000,0.0,  !- X,Y,Z ==> Vertex 3 {m}",
-                        "  2.500,6.096000,2.0;  !- X,Y,Z ==> Vertex 4 {m}",
-                        "FenestrationSurface:Detailed,",
-                        "  WINDOW2,                 !- Name",
-                        "  WINDOW,                  !- Surface Type",
-                        "  WIN-CON-LIGHT,           !- Construction Name",
-                        "  Surface_15,              !- Building Surface Name",
-                        "  ,                        !- Outside Boundary Condition Object",
-                        "  0.5000000,               !- View Factor to Ground",
-                        "  ,                        !- Frame and Divider Name",
-                        "  1.0,                     !- Multiplier",
-                        "  4,                       !- Number of Vertices",
-                        "  6.000000,12.19200,2.333000,  !- X,Y,Z ==> Vertex 1 {m}",
-                        "  6.000000,12.19200,1.000000,  !- X,Y,Z ==> Vertex 2 {m}",
-                        "  3.000000,12.19200,1.000000,  !- X,Y,Z ==> Vertex 3 {m}",
-                        "  3.000000,12.19200,2.333000;  !- X,Y,Z ==> Vertex 4 {m}",
-                        "FenestrationSurface:Detailed,",
-                        "  DoorInSurface_17,        !- Name",
-                        "  DOOR,                    !- Surface Type",
-                        "  DOOR-CON,                !- Construction Name",
-                        "  Surface_17,              !- Building Surface Name",
-                        "  DoorInSurface_3,         !- Outside Boundary Condition Object",
-                        "  0.5000000,               !- View Factor to Ground",
-                        "  ,                        !- Frame and Divider Name",
-                        "  1.0,                     !- Multiplier",
-                        "  4,                       !- Number of Vertices",
-                        "  2.500,6.096000,2.0,  !- X,Y,Z ==> Vertex 1 {m}",
-                        "  2.500,6.096000,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
-                        "  3.500,6.096000,0.0,  !- X,Y,Z ==> Vertex 3 {m}",
-                        "  3.500,6.096000,2.0;  !- X,Y,Z ==> Vertex 4 {m}",*/
+         //"FenestrationSurface:Detailed,",
+         //"  WINDOW11,                !- Name",
+         //"  WINDOW,                  !- Surface Type",
+         //"  WIN-CON-LIGHT,           !- Construction Name",
+         //"  Surface_1,               !- Building Surface Name",
+         //"  ,                        !- Outside Boundary Condition Object",
+         //"  0.5000000,               !- View Factor to Ground",
+         //"  ,                        !- Frame and Divider Name",
+         //"  1.0,                     !- Multiplier",
+         //"  3,                       !- Number of Vertices",
+         //"  1.00000,0,2.500000,  !- X,Y,Z ==> Vertex 1 {m}",
+         //"  1.00000,0,1.0000000,  !- X,Y,Z ==> Vertex 2 {m}",
+         //"  5.000000,0,1.0000000;  !- X,Y,Z ==> Vertex 3 {m}",
+         //"FenestrationSurface:Detailed,",
+         //"  WINDOW12,                !- Name",
+         //"  WINDOW,                  !- Surface Type",
+         //"  WIN-CON-LIGHT,           !- Construction Name",
+         //"  Surface_1,               !- Building Surface Name",
+         //"  ,                        !- Outside Boundary Condition Object",
+         //"  0.5000000,               !- View Factor to Ground",
+         //
+         //"  4,                       !- Number of Vertices",
+         //"  0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+         //"  0,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+         //"  0,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+         //"  0,0,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+         //"BuildingSurface:Detailed,",
+         //"  Surface_3,               !- Name",
+         //"  WALL,                    !- Surface Type",
+         //"  PARTITION06,             !- Construction Name",
+         //"  WEST_ZONE,               !- Zone Name",
+         //"  Surface,                 !- Outside Boundary Condition",
+         //"  Surface_17,              !- Outside Boundary Condition Object",
+         //"  NoSun,                   !- Sun Exposure",
+         //"  NoWind,                  !- Wind Exposure",
+         //"  0.5000000,               !- View Factor to Ground",
+         //"  4,                       !- Number of Vertices",
+         //"  6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+         //"  6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+         //"  0,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+         //"  0,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+         //"BuildingSurface:Detailed,",
+         //"  Surface_4,               !- Name",
+         //"  WALL,                    !- Surface Type",
+         //"  PARTITION06,             !- Construction Name",
+         //"  WEST_ZONE,               !- Zone Name",
+         //"  Surface,                 !- Outside Boundary Condition",
+         //"  Surface_10,              !- Outside Boundary Condition Object",
+         //"  NoSun,                   !- Sun Exposure",
+         //"  NoWind,                  !- Wind Exposure",
+         //"  0.5000000,               !- View Factor to Ground",
+         //"  4,                       !- Number of Vertices",
+         //"  6.096000,0,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+         //"  6.096000,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+         //"  6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+         //"  6.096000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+         //"BuildingSurface:Detailed,",
+         //"  Surface_5,               !- Name",
+         //"  FLOOR,                   !- Surface Type",
+         //"  FLOOR SLAB 8 IN,         !- Construction Name",
+         //"  WEST_ZONE,               !- Zone Name",
+         //"  Surface,                 !- Outside Boundary Condition",
+         //"  Surface_5,               !- Outside Boundary Condition Object",
+         //"  NoSun,                   !- Sun Exposure",
+         //"  NoWind,                  !- Wind Exposure",
+         //"  1.000000,                !- View Factor to Ground",
+         //"  4,                       !- Number of Vertices",
+         //"  0,0,0,  !- X,Y,Z ==> Vertex 1 {m}",
+         //"  0,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+         //"  6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+         //"  6.096000,0,0;  !- X,Y,Z ==> Vertex 4 {m}",
+         //"BuildingSurface:Detailed,",
+         //"  Surface_6,               !- Name",
+         //"  ROOF,                    !- Surface Type",
+         //"  ROOF34,                  !- Construction Name",
+         //"  WEST_ZONE,               !- Zone Name",
+         //"  Outdoors,                !- Outside Boundary Condition",
+         //"  ,                        !- Outside Boundary Condition Object",
+         //"  SunExposed,              !- Sun Exposure",
+         //"  WindExposed,             !- Wind Exposure",
+         //"  0,                       !- View Factor to Ground",
+         //"  4,                       !- Number of Vertices",
+         //"  0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+         //"  0,0,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
+         //"  6.096000,0,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
+         //"  6.096000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+         //"BuildingSurface:Detailed,",
+         //"  Surface_8,               !- Name",
+         //"  WALL,                    !- Surface Type",
+         //"  EXTWALL80,               !- Construction Name",
+         //"  EAST_ZONE,               !- Zone Name",
+         //"  Outdoors,                !- Outside Boundary Condition",
+         //"  ,                        !- Outside Boundary Condition Object",
+         //"  SunExposed,              !- Sun Exposure",
+         //"  WindExposed,             !- Wind Exposure",
+         //"  0.5000000,               !- View Factor to Ground",
+         //"  4,                       !- Number of Vertices",
+         //"  6.096000,0,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+         //"  6.096000,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+         //"  12.19200,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+         //"  12.19200,0,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+         //"BuildingSurface:Detailed,",
+         //"  Surface_9,               !- Name",
+         //"  WALL,                    !- Surface Type",
+         //"  EXTWALL80,               !- Construction Name",
+         //"  EAST_ZONE,               !- Zone Name",
+         //"  Outdoors,                !- Outside Boundary Condition",
+         //"  ,                        !- Outside Boundary Condition Object",
+         //"  SunExposed,              !- Sun Exposure",
+         //"  WindExposed,             !- Wind Exposure",
+         //"  0.5000000,               !- View Factor to Ground",
+         //"  4,                       !- Number of Vertices",
+         //"  12.19200,0,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+         //"  12.19200,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+         //"  12.19200,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+         //"  12.19200,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+         //"BuildingSurface:Detailed,",
+         //"  Surface_10,              !- Name",
+         //"  WALL,                    !- Surface Type",
+         //"  PARTITION06,             !- Construction Name",
+         //"  EAST_ZONE,               !- Zone Name",
+         //"  Surface,                 !- Outside Boundary Condition",
+         //"  Surface_4,               !- Outside Boundary Condition Object",
+         //"  NoSun,                   !- Sun Exposure",
+         //"  NoWind,                  !- Wind Exposure",
+         //"  0.5000000,               !- View Factor to Ground",
+         //"  4,                       !- Number of Vertices",
+         //"  6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+         //"  6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+         //"  6.096000,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+         //"  6.096001,0,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+         //"BuildingSurface:Detailed,",
+         //"  Surface_11,              !- Name",
+         //"  WALL,                    !- Surface Type",
+         //"  PARTITION06,             !- Construction Name",
+         //"  EAST_ZONE,               !- Zone Name",
+         //"  Surface,                 !- Outside Boundary Condition",
+         //"  Surface_18,              !- Outside Boundary Condition Object",
+         //"  NoSun,                   !- Sun Exposure",
+         //"  NoWind,                  !- Wind Exposure",
+         //"  0.5000000,               !- View Factor to Ground",
+         //"  4,                       !- Number of Vertices",
+         //"  12.19200,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+         //"  12.19200,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+         //"  6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+         //"  6.096000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+         //"BuildingSurface:Detailed,",
+         //"  Surface_12,              !- Name",
+         //"  FLOOR,                   !- Surface Type",
+         //"  FLOOR SLAB 8 IN,         !- Construction Name",
+         //"  EAST_ZONE,               !- Zone Name",
+         //"  Surface,                 !- Outside Boundary Condition",
+         //"  Surface_12,              !- Outside Boundary Condition Object",
+         //"  NoSun,                   !- Sun Exposure",
+         //"  NoWind,                  !- Wind Exposure",
+         //"  1.000000,                !- View Factor to Ground",
+         //"  4,                       !- Number of Vertices",
+         //"  6.096000,0,0,  !- X,Y,Z ==> Vertex 1 {m}",
+         //"  6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+         //"  12.19200,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+         //"  12.19200,0,0;  !- X,Y,Z ==> Vertex 4 {m}",
+         //"BuildingSurface:Detailed,",
+         //"  Surface_13,              !- Name",
+         //"  ROOF,                    !- Surface Type",
+         //"  ROOF34,                  !- Construction Name",
+         //"  EAST_ZONE,               !- Zone Name",
+         //"  Outdoors,                !- Outside Boundary Condition",
+         //"  ,                        !- Outside Boundary Condition Object",
+         //"  SunExposed,              !- Sun Exposure",
+         //"  WindExposed,             !- Wind Exposure",
+         //"  0,                       !- View Factor to Ground",
+         //"  4,                       !- Number of Vertices",
+         //"  6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+         //"  6.096000,0,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
+         //"  12.19200,0,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
+         //"  12.19200,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+         //"BuildingSurface:Detailed,",
+         //"  Surface_14,              !- Name",
+         //"  WALL,                    !- Surface Type",
+         //"  EXTWALL80,               !- Construction Name",
+         //"  NORTH_ZONE,              !- Zone Name",
+         //"  Outdoors,                !- Outside Boundary Condition",
+         //"  ,                        !- Outside Boundary Condition Object",
+         //"  SunExposed,              !- Sun Exposure",
+         //"  WindExposed,             !- Wind Exposure",
+         //"  0.5000000,               !- View Factor to Ground",
+         //"  4,                       !- Number of Vertices",
+         //"  0,12.19200,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+         //"  0,12.19200,0,  !- X,Y,Z ==> Vertex 2 {m}",
+         //"  0,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+         //"  0,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+         //"BuildingSurface:Detailed,",
+         //"  Surface_15,              !- Name",
+         //"  WALL,                    !- Surface Type",
+         //"  EXTWALL80,               !- Construction Name",
+         //"  NORTH_ZONE,              !- Zone Name",
+         //"  Outdoors,                !- Outside Boundary Condition",
+         //"  ,                        !- Outside Boundary Condition Object",
+         //"  SunExposed,              !- Sun Exposure",
+         //"  WindExposed,             !- Wind Exposure",
+         //"  0.5000000,               !- View Factor to Ground",
+         //"  4,                       !- Number of Vertices",
+         //"  12.19200,12.19200,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+         //"  12.19200,12.19200,0,  !- X,Y,Z ==> Vertex 2 {m}",
+         //"  0,12.19200,0,  !- X,Y,Z ==> Vertex 3 {m}",
+         //"  0,12.19200,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+         //"BuildingSurface:Detailed,",
+         //"  Surface_16,              !- Name",
+         //"  WALL,                    !- Surface Type",
+         //"  EXTWALL80,               !- Construction Name",
+         //"  NORTH_ZONE,              !- Zone Name",
+         //"  Outdoors,                !- Outside Boundary Condition",
+         //"  ,                        !- Outside Boundary Condition Object",
+         //"  SunExposed,              !- Sun Exposure",
+         //"  WindExposed,             !- Wind Exposure",
+         //"  0.5000000,               !- View Factor to Ground",
+         //"  4,                       !- Number of Vertices",
+         //"  12.19200,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+         //"  12.19200,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+         //"  12.19200,12.19200,0,  !- X,Y,Z ==> Vertex 3 {m}",
+         //"  12.19200,12.19200,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+         //"BuildingSurface:Detailed,",
+         //"  Surface_17,              !- Name",
+         //"  WALL,                    !- Surface Type",
+         //"  PARTITION06,             !- Construction Name",
+         //"  NORTH_ZONE,              !- Zone Name",
+         //"  Surface,                 !- Outside Boundary Condition",
+         //"  Surface_3,               !- Outside Boundary Condition Object",
+         //"  NoSun,                   !- Sun Exposure",
+         //"  NoWind,                  !- Wind Exposure",
+         //"  0.5000000,               !- View Factor to Ground",
+         //"  4,                       !- Number of Vertices",
+         //"  0.000,6.096,3.048,  !- X,Y,Z ==> Vertex 1 {m}",
+         //"  0.000,6.096,0.000,  !- X,Y,Z ==> Vertex 2 {m}",
+         //"  6.096,6.096,0.000,  !- X,Y,Z ==> Vertex 3 {m}",
+         //"  6.096,6.096,3.048;  !- X,Y,Z ==> Vertex 4 {m}",
+         //"BuildingSurface:Detailed,",
+         //"  Surface_18,              !- Name",
+         //"  WALL,                    !- Surface Type",
+         //"  PARTITION06,             !- Construction Name",
+         //"  NORTH_ZONE,              !- Zone Name",
+         //"  Surface,                 !- Outside Boundary Condition",
+         //"  Surface_11,              !- Outside Boundary Condition Object",
+         //"  NoSun,                   !- Sun Exposure",
+         //"  NoWind,                  !- Wind Exposure",
+         //"  0.5000000,               !- View Factor to Ground",
+         //"  4,                       !- Number of Vertices",
+         //"  6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+         //"  6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+         //"  12.19200,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+         //"  12.19200,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+         //"BuildingSurface:Detailed,",
+         //"  Surface_19,              !- Name",
+         //"  FLOOR,                   !- Surface Type",
+         //"  FLOOR SLAB 8 IN,         !- Construction Name",
+         //"  NORTH_ZONE,              !- Zone Name",
+         //"  Surface,                 !- Outside Boundary Condition",
+         //"  Surface_19,              !- Outside Boundary Condition Object",
+         //"  NoSun,                   !- Sun Exposure",
+         //"  NoWind,                  !- Wind Exposure",
+         //"  1.000000,                !- View Factor to Ground",
+         //"  4,                       !- Number of Vertices",
+         //"  0,6.096000,0,  !- X,Y,Z ==> Vertex 1 {m}",
+         //"  0,12.19200,0,  !- X,Y,Z ==> Vertex 2 {m}",
+         //"  12.19200,12.19200,0,  !- X,Y,Z ==> Vertex 3 {m}",
+         //"  12.19200,6.096000,0;  !- X,Y,Z ==> Vertex 4 {m}",
+         //"BuildingSurface:Detailed,",
+         //"  Surface_20,              !- Name",
+         //"  ROOF,                    !- Surface Type",
+         //"  ROOF34,                  !- Construction Name",
+         //"  NORTH_ZONE,              !- Zone Name",
+         //"  Outdoors,                !- Outside Boundary Condition",
+         //"  ,                        !- Outside Boundary Condition Object",
+         //"  SunExposed,              !- Sun Exposure",
+         //"  WindExposed,             !- Wind Exposure",
+         //"  0,                       !- View Factor to Ground",
+         //"  4,                       !- Number of Vertices",
+         //"  0,12.19200,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+         //"  0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
+         //"  12.19200,6.096000,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
+         //"  12.19200,12.19200,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+         //"FenestrationSurface:Detailed,",
+         //"  WINDOW11,                !- Name",
+         //"  WINDOW,                  !- Surface Type",
+         //"  WIN-CON-LIGHT,           !- Construction Name",
+         //"  Surface_1,               !- Building Surface Name",
+         //"  ,                        !- Outside Boundary Condition Object",
+         //"  0.5000000,               !- View Factor to Ground",
+         //"  ,                        !- Frame and Divider Name",
+         //"  1.0,                     !- Multiplier",
+         //"  3,                       !- Number of Vertices",
+         //"  1.00000,0,2.500000,  !- X,Y,Z ==> Vertex 1 {m}",
+         //"  1.00000,0,1.0000000,  !- X,Y,Z ==> Vertex 2 {m}",
+         //"  5.000000,0,1.0000000;  !- X,Y,Z ==> Vertex 3 {m}",
+         //"FenestrationSurface:Detailed,",
+         //"  WINDOW12,                !- Name",
+         //"  WINDOW,                  !- Surface Type",
+         //"  WIN-CON-LIGHT,           !- Construction Name",
+         //"  Surface_1,               !- Building Surface Name",
+         //"  ,                        !- Outside Boundary Condition Object",
+         //"  0.5000000,               !- View Factor to Ground",
+         //"  ,                        !- Frame and Divider Name",
+         //"  1.0,                     !- Multiplier",
+         //"  3,                       !- Number of Vertices",
+         //"  5.00000,0,1.0000000,  !- X,Y,Z ==> Vertex 2 {m}",
+         //"  5.000000,0,2.5000000,  !- X,Y,Z ==> Vertex 3 {m}",
+         //"  1.000000,0,2.500000;  !- X,Y,Z ==> Vertex 4 {m}",
+         //"FenestrationSurface:Detailed,",
+         //"  DoorInSurface_3,         !- Name",
+         //"  DOOR,                    !- Surface Type",
+         //"  DOOR-CON,                !- Construction Name",
+         //"  Surface_3,               !- Building Surface Name",
+         //"  DoorInSurface_17,        !- Outside Boundary Condition Object",
+         //"  0.5000000,               !- View Factor to Ground",
+         //"  ,                        !- Frame and Divider Name",
+         //"  1.0,                     !- Multiplier",
+         //"  4,                       !- Number of Vertices",
+         //"  3.500,6.096000,2.0,  !- X,Y,Z ==> Vertex 1 {m}",
+         //"  3.500,6.096000,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
+         //"  2.500,6.096000,0.0,  !- X,Y,Z ==> Vertex 3 {m}",
+         //"  2.500,6.096000,2.0;  !- X,Y,Z ==> Vertex 4 {m}",
+         //"FenestrationSurface:Detailed,",
+         //"  WINDOW2,                 !- Name",
+         //"  WINDOW,                  !- Surface Type",
+         //"  WIN-CON-LIGHT,           !- Construction Name",
+         //"  Surface_15,              !- Building Surface Name",
+         //"  ,                        !- Outside Boundary Condition Object",
+         //"  0.5000000,               !- View Factor to Ground",
+         //"  ,                        !- Frame and Divider Name",
+         //"  1.0,                     !- Multiplier",
+         //"  4,                       !- Number of Vertices",
+         //"  6.000000,12.19200,2.333000,  !- X,Y,Z ==> Vertex 1 {m}",
+         //"  6.000000,12.19200,1.000000,  !- X,Y,Z ==> Vertex 2 {m}",
+         //"  3.000000,12.19200,1.000000,  !- X,Y,Z ==> Vertex 3 {m}",
+         //"  3.000000,12.19200,2.333000;  !- X,Y,Z ==> Vertex 4 {m}",
+         //"FenestrationSurface:Detailed,",
+         //"  DoorInSurface_17,        !- Name",
+         //"  DOOR,                    !- Surface Type",
+         //"  DOOR-CON,                !- Construction Name",
+         //"  Surface_17,              !- Building Surface Name",
+         //"  DoorInSurface_3,         !- Outside Boundary Condition Object",
+         //"  0.5000000,               !- View Factor to Ground",
+         //"  ,                        !- Frame and Divider Name",
+         //"  1.0,                     !- Multiplier",
+         //"  4,                       !- Number of Vertices",
+         //"  2.500,6.096000,2.0,  !- X,Y,Z ==> Vertex 1 {m}",
+         //"  2.500,6.096000,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
+         //"  3.500,6.096000,0.0,  !- X,Y,Z ==> Vertex 3 {m}",
+         //"  3.500,6.096000,2.0;  !- X,Y,Z ==> Vertex 4 {m}",
          "AirflowNetwork:SimulationControl,",
          "  NaturalVentilation,      !- Name",
          "  MultizoneWithoutDistribution,  !- AirflowNetwork Control",
@@ -5691,21 +5710,21 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodes)
     bool errors = false;
 
     HeatBalanceManager::GetMaterialData(*state, errors); // read material data
-    EXPECT_FALSE(errors);                        // expect no errors
+    EXPECT_FALSE(errors);                                // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, errors); // read construction data
-    EXPECT_FALSE(errors);                         // expect no errors
+    EXPECT_FALSE(errors);                                 // expect no errors
 
     HeatBalanceManager::GetZoneData(*state, errors); // read zone data
-    EXPECT_FALSE(errors);                    // expect no errors
+    EXPECT_FALSE(errors);                            // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
     SurfaceGeometry::GetSurfaceData(*state, errors); // setup zone geometry and get zone data
-    EXPECT_FALSE(errors);                    // expect no errors
+    EXPECT_FALSE(errors);                            // expect no errors
 
     CurveManager::GetCurveInput(*state);
     EXPECT_EQ(state->dataCurveManager->NumCurves, 2);
@@ -5713,20 +5732,20 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodes)
     AirflowNetworkBalanceManager::GetAirflowNetworkInput(*state);
 
     // Check the airflow elements
-    EXPECT_EQ(2u, AirflowNetwork::MultizoneExternalNodeData.size());
-    EXPECT_EQ(3u, AirflowNetwork::MultizoneZoneData.size());
-    EXPECT_EQ(4u, AirflowNetwork::MultizoneSurfaceData.size());
-    EXPECT_EQ(1u, AirflowNetwork::MultizoneSurfaceCrackData.size());
+    EXPECT_EQ(2u, state->dataAirflowNetwork->MultizoneExternalNodeData.size());
+    EXPECT_EQ(3u, state->dataAirflowNetwork->MultizoneZoneData.size());
+    EXPECT_EQ(4u, state->dataAirflowNetwork->MultizoneSurfaceData.size());
+    EXPECT_EQ(1u, state->dataAirflowNetwork->MultizoneSurfaceCrackData.size());
 
-    EXPECT_EQ(0.0, AirflowNetwork::MultizoneExternalNodeData(1).azimuth);
-    EXPECT_FALSE(AirflowNetwork::MultizoneExternalNodeData(1).symmetricCurve);
-    EXPECT_FALSE(AirflowNetwork::MultizoneExternalNodeData(1).useRelativeAngle);
-    EXPECT_EQ(1, AirflowNetwork::MultizoneExternalNodeData(1).curve);
+    EXPECT_EQ(0.0, state->dataAirflowNetwork->MultizoneExternalNodeData(1).azimuth);
+    EXPECT_FALSE(state->dataAirflowNetwork->MultizoneExternalNodeData(1).symmetricCurve);
+    EXPECT_FALSE(state->dataAirflowNetwork->MultizoneExternalNodeData(1).useRelativeAngle);
+    EXPECT_EQ(1, state->dataAirflowNetwork->MultizoneExternalNodeData(1).curve);
 
-    EXPECT_EQ(180.0, AirflowNetwork::MultizoneExternalNodeData(2).azimuth);
-    EXPECT_FALSE(AirflowNetwork::MultizoneExternalNodeData(2).symmetricCurve);
-    EXPECT_FALSE(AirflowNetwork::MultizoneExternalNodeData(2).useRelativeAngle);
-    EXPECT_EQ(2, AirflowNetwork::MultizoneExternalNodeData(2).curve);
+    EXPECT_EQ(180.0, state->dataAirflowNetwork->MultizoneExternalNodeData(2).azimuth);
+    EXPECT_FALSE(state->dataAirflowNetwork->MultizoneExternalNodeData(2).symmetricCurve);
+    EXPECT_FALSE(state->dataAirflowNetwork->MultizoneExternalNodeData(2).useRelativeAngle);
+    EXPECT_EQ(2, state->dataAirflowNetwork->MultizoneExternalNodeData(2).curve);
 
     // Set up some environmental parameters
     state->dataEnvrn->OutBaroPress = 101325.0;
@@ -5738,9 +5757,11 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodes)
     state->dataEnvrn->WindSpeed = 10.0;
 
     // Make sure we can compute the right wind pressure
-    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
+    Real64 rho =
+        Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
-    Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(*state, AirflowNetwork::MultizoneExternalNodeData(1).curve,
+    Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(*state,
+                                                              state->dataAirflowNetwork->MultizoneExternalNodeData(1).curve,
                                                               false,
                                                               false,
                                                               0.0,
@@ -5751,15 +5772,15 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodes)
     EXPECT_DOUBLE_EQ(-0.56 * 0.5 * 1.1841123742118911, p);
 
     // Make sure the reference velocity comes out right
-    EXPECT_DOUBLE_EQ(10.0, DataEnvironment::WindSpeedAt(*state, AirflowNetwork::MultizoneExternalNodeData(1).height));
+    EXPECT_DOUBLE_EQ(10.0, DataEnvironment::WindSpeedAt(*state, state->dataAirflowNetwork->MultizoneExternalNodeData(1).height));
 
-    EXPECT_EQ(5u, AirflowNetwork::AirflowNetworkNodeSimu.size());
+    EXPECT_EQ(5u, state->dataAirflowNetwork->AirflowNetworkNodeSimu.size());
 
     // Run the balance routine, for now only to get the pressure set at the external nodes
     AirflowNetworkBalanceManager::CalcAirflowNetworkAirBalance(*state);
 
-    EXPECT_DOUBLE_EQ(-0.56 * 0.5 * 118.41123742118911, AirflowNetwork::AirflowNetworkNodeSimu(4).PZ);
-    EXPECT_DOUBLE_EQ(-0.26 * 0.5 * 118.41123742118911, AirflowNetwork::AirflowNetworkNodeSimu(5).PZ);
+    EXPECT_DOUBLE_EQ(-0.56 * 0.5 * 118.41123742118911, state->dataAirflowNetwork->AirflowNetworkNodeSimu(4).PZ);
+    EXPECT_DOUBLE_EQ(-0.26 * 0.5 * 118.41123742118911, state->dataAirflowNetwork->AirflowNetworkNodeSimu(5).PZ);
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithTables)
@@ -6395,21 +6416,21 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithTables)
     bool errors = false;
 
     HeatBalanceManager::GetMaterialData(*state, errors); // read material data
-    EXPECT_FALSE(errors);                        // expect no errors
+    EXPECT_FALSE(errors);                                // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, errors); // read construction data
-    EXPECT_FALSE(errors);                         // expect no errors
+    EXPECT_FALSE(errors);                                 // expect no errors
 
     HeatBalanceManager::GetZoneData(*state, errors); // read zone data
-    EXPECT_FALSE(errors);                    // expect no errors
+    EXPECT_FALSE(errors);                            // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
     SurfaceGeometry::GetSurfaceData(*state, errors); // setup zone geometry and get zone data
-    EXPECT_FALSE(errors);                    // expect no errors
+    EXPECT_FALSE(errors);                            // expect no errors
 
     CurveManager::GetCurveInput(*state);
     EXPECT_EQ(state->dataCurveManager->NumCurves, 2);
@@ -6417,20 +6438,20 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithTables)
     AirflowNetworkBalanceManager::GetAirflowNetworkInput(*state);
 
     // Check the airflow elements
-    EXPECT_EQ(2u, AirflowNetwork::MultizoneExternalNodeData.size());
-    EXPECT_EQ(3u, AirflowNetwork::MultizoneZoneData.size());
-    EXPECT_EQ(4u, AirflowNetwork::MultizoneSurfaceData.size());
-    EXPECT_EQ(1u, AirflowNetwork::MultizoneSurfaceCrackData.size());
+    EXPECT_EQ(2u, state->dataAirflowNetwork->MultizoneExternalNodeData.size());
+    EXPECT_EQ(3u, state->dataAirflowNetwork->MultizoneZoneData.size());
+    EXPECT_EQ(4u, state->dataAirflowNetwork->MultizoneSurfaceData.size());
+    EXPECT_EQ(1u, state->dataAirflowNetwork->MultizoneSurfaceCrackData.size());
 
-    EXPECT_EQ(0.0, AirflowNetwork::MultizoneExternalNodeData(1).azimuth);
-    EXPECT_FALSE(AirflowNetwork::MultizoneExternalNodeData(1).symmetricCurve);
-    EXPECT_FALSE(AirflowNetwork::MultizoneExternalNodeData(1).useRelativeAngle);
-    EXPECT_EQ(1, AirflowNetwork::MultizoneExternalNodeData(1).curve);
+    EXPECT_EQ(0.0, state->dataAirflowNetwork->MultizoneExternalNodeData(1).azimuth);
+    EXPECT_FALSE(state->dataAirflowNetwork->MultizoneExternalNodeData(1).symmetricCurve);
+    EXPECT_FALSE(state->dataAirflowNetwork->MultizoneExternalNodeData(1).useRelativeAngle);
+    EXPECT_EQ(1, state->dataAirflowNetwork->MultizoneExternalNodeData(1).curve);
 
-    EXPECT_EQ(180.0, AirflowNetwork::MultizoneExternalNodeData(2).azimuth);
-    EXPECT_FALSE(AirflowNetwork::MultizoneExternalNodeData(2).symmetricCurve);
-    EXPECT_FALSE(AirflowNetwork::MultizoneExternalNodeData(2).useRelativeAngle);
-    EXPECT_EQ(2, AirflowNetwork::MultizoneExternalNodeData(2).curve);
+    EXPECT_EQ(180.0, state->dataAirflowNetwork->MultizoneExternalNodeData(2).azimuth);
+    EXPECT_FALSE(state->dataAirflowNetwork->MultizoneExternalNodeData(2).symmetricCurve);
+    EXPECT_FALSE(state->dataAirflowNetwork->MultizoneExternalNodeData(2).useRelativeAngle);
+    EXPECT_EQ(2, state->dataAirflowNetwork->MultizoneExternalNodeData(2).curve);
 
     // Set up some environmental parameters
     state->dataEnvrn->OutBaroPress = 101325.0;
@@ -6442,9 +6463,11 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithTables)
     state->dataEnvrn->WindSpeed = 10.0;
 
     // Make sure we can compute the right wind pressure
-    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
+    Real64 rho =
+        Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
-    Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(*state, AirflowNetwork::MultizoneExternalNodeData(1).curve,
+    Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(*state,
+                                                              state->dataAirflowNetwork->MultizoneExternalNodeData(1).curve,
                                                               false,
                                                               false,
                                                               0.0,
@@ -6455,15 +6478,15 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithTables)
     EXPECT_DOUBLE_EQ(-0.56 * 0.5 * 1.1841123742118911, p);
 
     // Make sure the reference velocity comes out right
-    EXPECT_DOUBLE_EQ(10.0, DataEnvironment::WindSpeedAt(*state, AirflowNetwork::MultizoneExternalNodeData(1).height));
+    EXPECT_DOUBLE_EQ(10.0, DataEnvironment::WindSpeedAt(*state, state->dataAirflowNetwork->MultizoneExternalNodeData(1).height));
 
-    EXPECT_EQ(5u, AirflowNetwork::AirflowNetworkNodeSimu.size());
+    EXPECT_EQ(5u, state->dataAirflowNetwork->AirflowNetworkNodeSimu.size());
 
     // Run the balance routine, for now only to get the pressure set at the external nodes
     AirflowNetworkBalanceManager::CalcAirflowNetworkAirBalance(*state);
 
-    EXPECT_DOUBLE_EQ(-0.56 * 0.5 * 118.41123742118911, AirflowNetwork::AirflowNetworkNodeSimu(4).PZ);
-    EXPECT_DOUBLE_EQ(-0.26 * 0.5 * 118.41123742118911, AirflowNetwork::AirflowNetworkNodeSimu(5).PZ);
+    EXPECT_DOUBLE_EQ(-0.56 * 0.5 * 118.41123742118911, state->dataAirflowNetwork->AirflowNetworkNodeSimu(4).PZ);
+    EXPECT_DOUBLE_EQ(-0.26 * 0.5 * 118.41123742118911, state->dataAirflowNetwork->AirflowNetworkNodeSimu(5).PZ);
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
@@ -7018,21 +7041,21 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
     bool errors = false;
 
     HeatBalanceManager::GetMaterialData(*state, errors); // read material data
-    EXPECT_FALSE(errors);                        // expect no errors
+    EXPECT_FALSE(errors);                                // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, errors); // read construction data
-    EXPECT_FALSE(errors);                         // expect no errors
+    EXPECT_FALSE(errors);                                 // expect no errors
 
     HeatBalanceManager::GetZoneData(*state, errors); // read zone data
-    EXPECT_FALSE(errors);                    // expect no errors
+    EXPECT_FALSE(errors);                            // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
     SurfaceGeometry::GetSurfaceData(*state, errors); // setup zone geometry and get zone data
-    EXPECT_FALSE(errors);                    // expect no errors
+    EXPECT_FALSE(errors);                            // expect no errors
 
     CurveManager::GetCurveInput(*state);
     EXPECT_EQ(state->dataCurveManager->NumCurves, 1);
@@ -7052,20 +7075,20 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
     EXPECT_DOUBLE_EQ(0.592, CurveManager::CurveValue(*state, 1, 0)); // In-range value
 
     // Check the airflow elements
-    EXPECT_EQ(2u, AirflowNetwork::MultizoneExternalNodeData.size());
-    EXPECT_EQ(3u, AirflowNetwork::MultizoneZoneData.size());
-    EXPECT_EQ(4u, AirflowNetwork::MultizoneSurfaceData.size());
-    EXPECT_EQ(1u, AirflowNetwork::MultizoneSurfaceCrackData.size());
+    EXPECT_EQ(2u, state->dataAirflowNetwork->MultizoneExternalNodeData.size());
+    EXPECT_EQ(3u, state->dataAirflowNetwork->MultizoneZoneData.size());
+    EXPECT_EQ(4u, state->dataAirflowNetwork->MultizoneSurfaceData.size());
+    EXPECT_EQ(1u, state->dataAirflowNetwork->MultizoneSurfaceCrackData.size());
 
-    EXPECT_EQ(180.0, AirflowNetwork::MultizoneExternalNodeData(1).azimuth);
-    EXPECT_FALSE(AirflowNetwork::MultizoneExternalNodeData(1).symmetricCurve);
-    EXPECT_FALSE(AirflowNetwork::MultizoneExternalNodeData(1).useRelativeAngle);
-    EXPECT_EQ(4, AirflowNetwork::MultizoneExternalNodeData(1).curve);
+    EXPECT_EQ(180.0, state->dataAirflowNetwork->MultizoneExternalNodeData(1).azimuth);
+    EXPECT_FALSE(state->dataAirflowNetwork->MultizoneExternalNodeData(1).symmetricCurve);
+    EXPECT_FALSE(state->dataAirflowNetwork->MultizoneExternalNodeData(1).useRelativeAngle);
+    EXPECT_EQ(4, state->dataAirflowNetwork->MultizoneExternalNodeData(1).curve);
 
-    EXPECT_EQ(0.0, AirflowNetwork::MultizoneExternalNodeData(2).azimuth);
-    EXPECT_FALSE(AirflowNetwork::MultizoneExternalNodeData(2).symmetricCurve);
-    EXPECT_FALSE(AirflowNetwork::MultizoneExternalNodeData(2).useRelativeAngle);
-    EXPECT_EQ(2, AirflowNetwork::MultizoneExternalNodeData(2).curve);
+    EXPECT_EQ(0.0, state->dataAirflowNetwork->MultizoneExternalNodeData(2).azimuth);
+    EXPECT_FALSE(state->dataAirflowNetwork->MultizoneExternalNodeData(2).symmetricCurve);
+    EXPECT_FALSE(state->dataAirflowNetwork->MultizoneExternalNodeData(2).useRelativeAngle);
+    EXPECT_EQ(2, state->dataAirflowNetwork->MultizoneExternalNodeData(2).curve);
 
     // Set up some environmental parameters
     state->dataEnvrn->OutBaroPress = 101325.0;
@@ -7077,9 +7100,11 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
     state->dataEnvrn->WindSpeed = 10.0;
 
     // Make sure we can compute the right wind pressure
-    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
+    Real64 rho =
+        Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
-    Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(*state, AirflowNetwork::MultizoneExternalNodeData(2).curve,
+    Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(*state,
+                                                              state->dataAirflowNetwork->MultizoneExternalNodeData(2).curve,
                                                               false,
                                                               false,
                                                               0.0,
@@ -7088,7 +7113,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
                                                               DataEnvironment::OutDryBulbTempAt(*state, 10.0),
                                                               state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(cp105N * 0.5 * 1.1841123742118911, p);
-    p = AirflowNetworkBalanceManager::CalcWindPressure(*state, AirflowNetwork::MultizoneExternalNodeData(1).curve,
+    p = AirflowNetworkBalanceManager::CalcWindPressure(*state,
+                                                       state->dataAirflowNetwork->MultizoneExternalNodeData(1).curve,
                                                        false,
                                                        false,
                                                        0.0,
@@ -7099,15 +7125,15 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
     EXPECT_DOUBLE_EQ(cp105S * 0.5 * 1.1841123742118911, p);
 
     // Make sure the reference velocity comes out right
-    EXPECT_DOUBLE_EQ(10.0, DataEnvironment::WindSpeedAt(*state, AirflowNetwork::MultizoneExternalNodeData(1).height));
+    EXPECT_DOUBLE_EQ(10.0, DataEnvironment::WindSpeedAt(*state, state->dataAirflowNetwork->MultizoneExternalNodeData(1).height));
 
-    EXPECT_EQ(5u, AirflowNetwork::AirflowNetworkNodeSimu.size());
+    EXPECT_EQ(5u, state->dataAirflowNetwork->AirflowNetworkNodeSimu.size());
 
     // Run the balance routine, for now only to get the pressure set at the external nodes
     AirflowNetworkBalanceManager::CalcAirflowNetworkAirBalance(*state);
 
-    EXPECT_DOUBLE_EQ(cp105N * 0.5 * 118.41123742118911, AirflowNetwork::AirflowNetworkNodeSimu(5).PZ);
-    EXPECT_DOUBLE_EQ(cp105S * 0.5 * 118.41123742118911, AirflowNetwork::AirflowNetworkNodeSimu(4).PZ);
+    EXPECT_DOUBLE_EQ(cp105N * 0.5 * 118.41123742118911, state->dataAirflowNetwork->AirflowNetworkNodeSimu(5).PZ);
+    EXPECT_DOUBLE_EQ(cp105S * 0.5 * 118.41123742118911, state->dataAirflowNetwork->AirflowNetworkNodeSimu(4).PZ);
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricTable)
@@ -7707,21 +7733,21 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricTable)
     bool errors = false;
 
     HeatBalanceManager::GetMaterialData(*state, errors); // read material data
-    EXPECT_FALSE(errors);                        // expect no errors
+    EXPECT_FALSE(errors);                                // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, errors); // read construction data
-    EXPECT_FALSE(errors);                         // expect no errors
+    EXPECT_FALSE(errors);                                 // expect no errors
 
     HeatBalanceManager::GetZoneData(*state, errors); // read zone data
-    EXPECT_FALSE(errors);                    // expect no errors
+    EXPECT_FALSE(errors);                            // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
     SurfaceGeometry::GetSurfaceData(*state, errors); // setup zone geometry and get zone data
-    EXPECT_FALSE(errors);                    // expect no errors
+    EXPECT_FALSE(errors);                            // expect no errors
 
     CurveManager::GetCurveInput(*state);
     EXPECT_EQ(state->dataCurveManager->NumCurves, 1);
@@ -7729,20 +7755,20 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricTable)
     AirflowNetworkBalanceManager::GetAirflowNetworkInput(*state);
 
     // Check the airflow elements
-    EXPECT_EQ(2u, AirflowNetwork::MultizoneExternalNodeData.size());
-    EXPECT_EQ(3u, AirflowNetwork::MultizoneZoneData.size());
-    EXPECT_EQ(4u, AirflowNetwork::MultizoneSurfaceData.size());
-    EXPECT_EQ(1u, AirflowNetwork::MultizoneSurfaceCrackData.size());
+    EXPECT_EQ(2u, state->dataAirflowNetwork->MultizoneExternalNodeData.size());
+    EXPECT_EQ(3u, state->dataAirflowNetwork->MultizoneZoneData.size());
+    EXPECT_EQ(4u, state->dataAirflowNetwork->MultizoneSurfaceData.size());
+    EXPECT_EQ(1u, state->dataAirflowNetwork->MultizoneSurfaceCrackData.size());
 
-    EXPECT_EQ(0.0, AirflowNetwork::MultizoneExternalNodeData(1).azimuth);
-    EXPECT_TRUE(AirflowNetwork::MultizoneExternalNodeData(1).symmetricCurve);
-    EXPECT_FALSE(AirflowNetwork::MultizoneExternalNodeData(1).useRelativeAngle);
-    EXPECT_EQ(1, AirflowNetwork::MultizoneExternalNodeData(1).curve);
+    EXPECT_EQ(0.0, state->dataAirflowNetwork->MultizoneExternalNodeData(1).azimuth);
+    EXPECT_TRUE(state->dataAirflowNetwork->MultizoneExternalNodeData(1).symmetricCurve);
+    EXPECT_FALSE(state->dataAirflowNetwork->MultizoneExternalNodeData(1).useRelativeAngle);
+    EXPECT_EQ(1, state->dataAirflowNetwork->MultizoneExternalNodeData(1).curve);
 
-    EXPECT_EQ(180.0, AirflowNetwork::MultizoneExternalNodeData(2).azimuth);
-    EXPECT_TRUE(AirflowNetwork::MultizoneExternalNodeData(2).symmetricCurve);
-    EXPECT_TRUE(AirflowNetwork::MultizoneExternalNodeData(2).useRelativeAngle);
-    EXPECT_EQ(1, AirflowNetwork::MultizoneExternalNodeData(2).curve);
+    EXPECT_EQ(180.0, state->dataAirflowNetwork->MultizoneExternalNodeData(2).azimuth);
+    EXPECT_TRUE(state->dataAirflowNetwork->MultizoneExternalNodeData(2).symmetricCurve);
+    EXPECT_TRUE(state->dataAirflowNetwork->MultizoneExternalNodeData(2).useRelativeAngle);
+    EXPECT_EQ(1, state->dataAirflowNetwork->MultizoneExternalNodeData(2).curve);
 
     // Set up some environmental parameters
     state->dataEnvrn->OutBaroPress = 101325.0;
@@ -7754,9 +7780,11 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricTable)
     state->dataEnvrn->WindSpeed = 10.0;
 
     // Make sure we can compute the right wind pressure
-    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
+    Real64 rho =
+        Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
-    Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(*state, AirflowNetwork::MultizoneExternalNodeData(1).curve,
+    Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(*state,
+                                                              state->dataAirflowNetwork->MultizoneExternalNodeData(1).curve,
                                                               false,
                                                               false,
                                                               0.0,
@@ -7767,15 +7795,15 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricTable)
     EXPECT_DOUBLE_EQ(-0.56 * 0.5 * 1.1841123742118911, p);
 
     // Make sure the reference velocity comes out right
-    EXPECT_DOUBLE_EQ(10.0, DataEnvironment::WindSpeedAt(*state, AirflowNetwork::MultizoneExternalNodeData(1).height));
+    EXPECT_DOUBLE_EQ(10.0, DataEnvironment::WindSpeedAt(*state, state->dataAirflowNetwork->MultizoneExternalNodeData(1).height));
 
-    EXPECT_EQ(5u, AirflowNetwork::AirflowNetworkNodeSimu.size());
+    EXPECT_EQ(5u, state->dataAirflowNetwork->AirflowNetworkNodeSimu.size());
 
     // Run the balance routine, for now only to get the pressure set at the external nodes
     AirflowNetworkBalanceManager::CalcAirflowNetworkAirBalance(*state);
 
-    EXPECT_DOUBLE_EQ(-0.56 * 0.5 * 118.41123742118911, AirflowNetwork::AirflowNetworkNodeSimu(4).PZ);
-    EXPECT_DOUBLE_EQ(-0.26 * 0.5 * 118.41123742118911, AirflowNetwork::AirflowNetworkNodeSimu(5).PZ);
+    EXPECT_DOUBLE_EQ(-0.56 * 0.5 * 118.41123742118911, state->dataAirflowNetwork->AirflowNetworkNodeSimu(4).PZ);
+    EXPECT_DOUBLE_EQ(-0.26 * 0.5 * 118.41123742118911, state->dataAirflowNetwork->AirflowNetworkNodeSimu(5).PZ);
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricCurve)
@@ -8341,21 +8369,21 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricCurve)
     bool errors = false;
 
     HeatBalanceManager::GetMaterialData(*state, errors); // read material data
-    EXPECT_FALSE(errors);                        // expect no errors
+    EXPECT_FALSE(errors);                                // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, errors); // read construction data
-    EXPECT_FALSE(errors);                         // expect no errors
+    EXPECT_FALSE(errors);                                 // expect no errors
 
     HeatBalanceManager::GetZoneData(*state, errors); // read zone data
-    EXPECT_FALSE(errors);                    // expect no errors
+    EXPECT_FALSE(errors);                            // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
     SurfaceGeometry::GetSurfaceData(*state, errors); // setup zone geometry and get zone data
-    EXPECT_FALSE(errors);                    // expect no errors
+    EXPECT_FALSE(errors);                            // expect no errors
 
     CurveManager::GetCurveInput(*state);
     EXPECT_EQ(state->dataCurveManager->NumCurves, 1);
@@ -8363,20 +8391,20 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricCurve)
     AirflowNetworkBalanceManager::GetAirflowNetworkInput(*state);
 
     // Check the airflow elements
-    EXPECT_EQ(2u, AirflowNetwork::MultizoneExternalNodeData.size());
-    EXPECT_EQ(3u, AirflowNetwork::MultizoneZoneData.size());
-    EXPECT_EQ(4u, AirflowNetwork::MultizoneSurfaceData.size());
-    EXPECT_EQ(1u, AirflowNetwork::MultizoneSurfaceCrackData.size());
+    EXPECT_EQ(2u, state->dataAirflowNetwork->MultizoneExternalNodeData.size());
+    EXPECT_EQ(3u, state->dataAirflowNetwork->MultizoneZoneData.size());
+    EXPECT_EQ(4u, state->dataAirflowNetwork->MultizoneSurfaceData.size());
+    EXPECT_EQ(1u, state->dataAirflowNetwork->MultizoneSurfaceCrackData.size());
 
-    EXPECT_EQ(0.0, AirflowNetwork::MultizoneExternalNodeData(1).azimuth);
-    EXPECT_TRUE(AirflowNetwork::MultizoneExternalNodeData(1).symmetricCurve);
-    EXPECT_FALSE(AirflowNetwork::MultizoneExternalNodeData(1).useRelativeAngle);
-    EXPECT_EQ(1, AirflowNetwork::MultizoneExternalNodeData(1).curve);
+    EXPECT_EQ(0.0, state->dataAirflowNetwork->MultizoneExternalNodeData(1).azimuth);
+    EXPECT_TRUE(state->dataAirflowNetwork->MultizoneExternalNodeData(1).symmetricCurve);
+    EXPECT_FALSE(state->dataAirflowNetwork->MultizoneExternalNodeData(1).useRelativeAngle);
+    EXPECT_EQ(1, state->dataAirflowNetwork->MultizoneExternalNodeData(1).curve);
 
-    EXPECT_EQ(180.0, AirflowNetwork::MultizoneExternalNodeData(2).azimuth);
-    EXPECT_TRUE(AirflowNetwork::MultizoneExternalNodeData(2).symmetricCurve);
-    EXPECT_TRUE(AirflowNetwork::MultizoneExternalNodeData(2).useRelativeAngle);
-    EXPECT_EQ(1, AirflowNetwork::MultizoneExternalNodeData(2).curve);
+    EXPECT_EQ(180.0, state->dataAirflowNetwork->MultizoneExternalNodeData(2).azimuth);
+    EXPECT_TRUE(state->dataAirflowNetwork->MultizoneExternalNodeData(2).symmetricCurve);
+    EXPECT_TRUE(state->dataAirflowNetwork->MultizoneExternalNodeData(2).useRelativeAngle);
+    EXPECT_EQ(1, state->dataAirflowNetwork->MultizoneExternalNodeData(2).curve);
 
     // Check the curves
     Real64 cp105N = -0.590653062499999;
@@ -8397,9 +8425,11 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricCurve)
     state->dataEnvrn->WindSpeed = 10.0;
 
     // Make sure we can compute the right wind pressure
-    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
+    Real64 rho =
+        Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
-    Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(*state, AirflowNetwork::MultizoneExternalNodeData(1).curve,
+    Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(*state,
+                                                              state->dataAirflowNetwork->MultizoneExternalNodeData(1).curve,
                                                               false,
                                                               false,
                                                               0.0,
@@ -8410,15 +8440,15 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricCurve)
     EXPECT_DOUBLE_EQ(cp105N * 0.5 * 1.1841123742118911, p);
 
     // Make sure the reference velocity comes out right
-    EXPECT_DOUBLE_EQ(10.0, DataEnvironment::WindSpeedAt(*state, AirflowNetwork::MultizoneExternalNodeData(1).height));
+    EXPECT_DOUBLE_EQ(10.0, DataEnvironment::WindSpeedAt(*state, state->dataAirflowNetwork->MultizoneExternalNodeData(1).height));
 
-    EXPECT_EQ(5u, AirflowNetwork::AirflowNetworkNodeSimu.size());
+    EXPECT_EQ(5u, state->dataAirflowNetwork->AirflowNetworkNodeSimu.size());
 
     // Run the balance routine, for now only to get the pressure set at the external nodes
     AirflowNetworkBalanceManager::CalcAirflowNetworkAirBalance(*state);
 
-    EXPECT_NEAR(cp105N * 0.5 * 118.41123742118911, AirflowNetwork::AirflowNetworkNodeSimu(4).PZ, 1e-13);
-    EXPECT_NEAR(cp105S * 0.5 * 118.41123742118911, AirflowNetwork::AirflowNetworkNodeSimu(5).PZ, 1e-13);
+    EXPECT_NEAR(cp105N * 0.5 * 118.41123742118911, state->dataAirflowNetwork->AirflowNetworkNodeSimu(4).PZ, 1e-13);
+    EXPECT_NEAR(cp105S * 0.5 * 118.41123742118911, state->dataAirflowNetwork->AirflowNetworkNodeSimu(5).PZ, 1e-13);
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
@@ -9079,16 +9109,16 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetHeatBalanceInput(*state);
     HeatBalanceManager::AllocateHeatBalArrays(*state);
-    DataHVACGlobals::TimeStepSys = state->dataGlobal->TimeStepZone;
+    state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
     SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
     SurfaceGeometry::GetSurfaceData(*state, errors); // setup zone geometry and get zone data
-    EXPECT_FALSE(errors);                    // expect no errors
+    EXPECT_FALSE(errors);                            // expect no errors
 
     CurveManager::GetCurveInput(*state);
     EXPECT_EQ(state->dataCurveManager->NumCurves, 2);
@@ -9106,50 +9136,52 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
     state->dataAirflowNetworkBalanceManager->initialize(*state);
 
     // Check the airflow elements
-    EXPECT_EQ(2u, AirflowNetwork::MultizoneExternalNodeData.size());
-    EXPECT_EQ(3u, AirflowNetwork::MultizoneZoneData.size());
-    EXPECT_EQ(4u, AirflowNetwork::MultizoneSurfaceData.size());
-    EXPECT_EQ(1u, AirflowNetwork::MultizoneSurfaceCrackData.size());
+    EXPECT_EQ(2u, state->dataAirflowNetwork->MultizoneExternalNodeData.size());
+    EXPECT_EQ(3u, state->dataAirflowNetwork->MultizoneZoneData.size());
+    EXPECT_EQ(4u, state->dataAirflowNetwork->MultizoneSurfaceData.size());
+    EXPECT_EQ(1u, state->dataAirflowNetwork->MultizoneSurfaceCrackData.size());
 
-    EXPECT_EQ(0.0, AirflowNetwork::MultizoneExternalNodeData(1).azimuth);
-    EXPECT_FALSE(AirflowNetwork::MultizoneExternalNodeData(1).symmetricCurve);
-    EXPECT_FALSE(AirflowNetwork::MultizoneExternalNodeData(1).useRelativeAngle);
-    EXPECT_EQ(1, AirflowNetwork::MultizoneExternalNodeData(1).curve);
+    EXPECT_EQ(0.0, state->dataAirflowNetwork->MultizoneExternalNodeData(1).azimuth);
+    EXPECT_FALSE(state->dataAirflowNetwork->MultizoneExternalNodeData(1).symmetricCurve);
+    EXPECT_FALSE(state->dataAirflowNetwork->MultizoneExternalNodeData(1).useRelativeAngle);
+    EXPECT_EQ(1, state->dataAirflowNetwork->MultizoneExternalNodeData(1).curve);
 
-    EXPECT_EQ(180.0, AirflowNetwork::MultizoneExternalNodeData(2).azimuth);
-    EXPECT_FALSE(AirflowNetwork::MultizoneExternalNodeData(2).symmetricCurve);
-    EXPECT_FALSE(AirflowNetwork::MultizoneExternalNodeData(2).useRelativeAngle);
-    EXPECT_EQ(2, AirflowNetwork::MultizoneExternalNodeData(2).curve);
+    EXPECT_EQ(180.0, state->dataAirflowNetwork->MultizoneExternalNodeData(2).azimuth);
+    EXPECT_FALSE(state->dataAirflowNetwork->MultizoneExternalNodeData(2).symmetricCurve);
+    EXPECT_FALSE(state->dataAirflowNetwork->MultizoneExternalNodeData(2).useRelativeAngle);
+    EXPECT_EQ(2, state->dataAirflowNetwork->MultizoneExternalNodeData(2).curve);
 
     // Make sure we can compute the right wind pressure
-    Node(1).OutAirWindSpeed = 1.0;
-    Node(1).OutAirDryBulb = 15.0;
-    Real64 rho_1 =
-        Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, DataLoopNode::Node(1).OutAirDryBulb, DataLoopNode::Node(1).HumRat);
-    Real64 rho_2 = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
+    state->dataLoopNodes->Node(1).OutAirWindSpeed = 1.0;
+    state->dataLoopNodes->Node(1).OutAirDryBulb = 15.0;
+    Real64 rho_1 = Psychrometrics::PsyRhoAirFnPbTdbW(
+        *state, state->dataEnvrn->OutBaroPress, state->dataLoopNodes->Node(1).OutAirDryBulb, state->dataLoopNodes->Node(1).HumRat);
+    Real64 rho_2 =
+        Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(1.2252059842834473, rho_1);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho_2);
 
-    Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(*state, AirflowNetwork::MultizoneExternalNodeData(1).curve,
+    Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(*state,
+                                                              state->dataAirflowNetwork->MultizoneExternalNodeData(1).curve,
                                                               false,
                                                               false,
                                                               0.0,
-                                                              DataLoopNode::Node(1).OutAirWindSpeed,
-                                                              DataLoopNode::Node(1).OutAirWindDir,
-                                                              DataLoopNode::Node(1).OutAirDryBulb,
-                                                              DataLoopNode::Node(1).HumRat);
+                                                              state->dataLoopNodes->Node(1).OutAirWindSpeed,
+                                                              state->dataLoopNodes->Node(1).OutAirWindDir,
+                                                              state->dataLoopNodes->Node(1).OutAirDryBulb,
+                                                              state->dataLoopNodes->Node(1).HumRat);
     EXPECT_DOUBLE_EQ(-0.56 * 0.5 * 1.2252059842834473, p);
 
     // Run the balance routine, for now only to get the pressure set at the external nodes
 
     AirflowNetworkBalanceManager::CalcAirflowNetworkAirBalance(*state);
     // Make sure we set the right temperature
-    EXPECT_DOUBLE_EQ(25.0, AirflowNetwork::AirflowNetworkNodeSimu(4).TZ);
-    EXPECT_DOUBLE_EQ(15.0, AirflowNetwork::AirflowNetworkNodeSimu(5).TZ);
+    EXPECT_DOUBLE_EQ(25.0, state->dataAirflowNetwork->AirflowNetworkNodeSimu(4).TZ);
+    EXPECT_DOUBLE_EQ(15.0, state->dataAirflowNetwork->AirflowNetworkNodeSimu(5).TZ);
     EXPECT_DOUBLE_EQ(4.7384645696854548, DataEnvironment::WindSpeedAt(*state, 1.524));
     // Global wind speed 10 m/s, temp 25 C; Local wind speed 1 m/s, temp 15 C;
-    EXPECT_DOUBLE_EQ(-0.56 * 0.5 * rho_2 * 4.7384645696854548 * 4.7384645696854548, AirflowNetwork::AirflowNetworkNodeSimu(4).PZ);
-    EXPECT_DOUBLE_EQ(-0.26 * 0.5 * rho_1, AirflowNetwork::AirflowNetworkNodeSimu(5).PZ);
+    EXPECT_DOUBLE_EQ(-0.56 * 0.5 * rho_2 * 4.7384645696854548 * 4.7384645696854548, state->dataAirflowNetwork->AirflowNetworkNodeSimu(4).PZ);
+    EXPECT_DOUBLE_EQ(-0.26 * 0.5 * rho_1, state->dataAirflowNetwork->AirflowNetworkNodeSimu(5).PZ);
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSided)
@@ -9549,21 +9581,21 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSided)
     bool errors = false;
 
     HeatBalanceManager::GetMaterialData(*state, errors); // read material data
-    EXPECT_FALSE(errors);                        // expect no errors
+    EXPECT_FALSE(errors);                                // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, errors); // read construction data
-    EXPECT_FALSE(errors);                         // expect no errors
+    EXPECT_FALSE(errors);                                 // expect no errors
 
     HeatBalanceManager::GetZoneData(*state, errors); // read zone data
-    EXPECT_FALSE(errors);                    // expect no errors
+    EXPECT_FALSE(errors);                            // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
     SurfaceGeometry::GetSurfaceData(*state, errors); // setup zone geometry and get zone data
-    EXPECT_FALSE(errors);                    // expect no errors
+    EXPECT_FALSE(errors);                            // expect no errors
 
     CurveManager::GetCurveInput(*state);
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
@@ -9574,15 +9606,15 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSided)
     EXPECT_EQ(7, state->dataCurveManager->NumCurves);
 
     // Check the airflow elements
-    ASSERT_EQ(3u, AirflowNetwork::MultizoneExternalNodeData.size());
-    EXPECT_EQ(1u, AirflowNetwork::MultizoneZoneData.size());
-    EXPECT_EQ(3u, AirflowNetwork::MultizoneSurfaceData.size());
-    EXPECT_EQ(1u, AirflowNetwork::MultizoneSurfaceCrackData.size());
-    EXPECT_EQ(1u, AirflowNetwork::MultizoneCompDetOpeningData.size());
+    ASSERT_EQ(3u, state->dataAirflowNetwork->MultizoneExternalNodeData.size());
+    EXPECT_EQ(1u, state->dataAirflowNetwork->MultizoneZoneData.size());
+    EXPECT_EQ(3u, state->dataAirflowNetwork->MultizoneSurfaceData.size());
+    EXPECT_EQ(1u, state->dataAirflowNetwork->MultizoneSurfaceCrackData.size());
+    EXPECT_EQ(1u, state->dataAirflowNetwork->MultizoneCompDetOpeningData.size());
 
-    EXPECT_EQ(270.0, AirflowNetwork::MultizoneExternalNodeData(1).azimuth);
-    EXPECT_EQ(270.0, AirflowNetwork::MultizoneExternalNodeData(2).azimuth);
-    EXPECT_EQ(270.0, AirflowNetwork::MultizoneExternalNodeData(3).azimuth);
+    EXPECT_EQ(270.0, state->dataAirflowNetwork->MultizoneExternalNodeData(1).azimuth);
+    EXPECT_EQ(270.0, state->dataAirflowNetwork->MultizoneExternalNodeData(2).azimuth);
+    EXPECT_EQ(270.0, state->dataAirflowNetwork->MultizoneExternalNodeData(3).azimuth);
 
     // Check the curve values for the left window, taken from v8.6.0 on Windows
     for (unsigned i = 0; i <= 36; i++) {
@@ -11167,8 +11199,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
         "  AirLoopHVAC:OutdoorAirSystem,",
         "    OA Sys 1,                !- Name",
         "    OA Sys 1 Controllers,    !- Controller List Name",
-        "    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name",
-        "    Reheat System 1 Avail List;  !- Availability Manager List Name",
+        "    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name",
 
         "  OutdoorAir:NodeList,",
         "    OutsideAirInletNodes;    !- Node or NodeList Name 1",
@@ -13011,8 +13042,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
         "AirLoopHVAC:OutdoorAirSystem,",
         "  Heat Pump 1 OA System,                                   !- Name",
         "  Heat Pump 1 OA System Controllers,                       !- Controller List Name",
-        "  Heat Pump 1 OA System Equipment,                         !- Outdoor Air Equipment List Name",
-        "  Heat Pump 1 Availability Managers;                       !- Availability Manager List Name",
+        "  Heat Pump 1 OA System Equipment;                         !- Outdoor Air Equipment List Name",
 
         "AirLoopHVAC:ControllerList,",
         "  Heat Pump 1 OA System Controllers,                       !- Name",
@@ -13085,8 +13115,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
         "  20.44,                                                   !- November Ground Temperature",
         "  20.20;                                                   !- December Ground Temperature",
 
-        "Output:Diagnostics,DisplayExtraWarnings,DisplayUnusedSchedules;"
-    });
+        "Output:Diagnostics,DisplayExtraWarnings,DisplayUnusedSchedules;"});
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -13115,14 +13144,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
 
     Real64 PresssureSet = 0.5;
     // Assign values
-    Schedule(1).CurrentValue = 25.55;         // WindowVentSched
-    Schedule(9).CurrentValue = 1.0;           // FanAndCoilAvailSched
-    Schedule(14).CurrentValue = 1.0;          // VentingSched
-    Schedule(16).CurrentValue = PresssureSet; // Pressure setpoint
-    Schedule(17).CurrentValue = 1.0;          // HVACTemplate-Always 1
-    Schedule(18).CurrentValue = 0.0;          // HVACTemplate-Always 0
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 25.55;         // WindowVentSched
+    state->dataScheduleMgr->Schedule(9).CurrentValue = 1.0;           // FanAndCoilAvailSched
+    state->dataScheduleMgr->Schedule(14).CurrentValue = 1.0;          // VentingSched
+    state->dataScheduleMgr->Schedule(16).CurrentValue = PresssureSet; // Pressure setpoint
+    state->dataScheduleMgr->Schedule(17).CurrentValue = 1.0;          // HVACTemplate-Always 1
+    state->dataScheduleMgr->Schedule(18).CurrentValue = 0.0;          // HVACTemplate-Always 0
 
-    AirflowNetwork::AirflowNetworkFanActivated = true;
+    state->dataAirflowNetwork->AirflowNetworkFanActivated = true;
     state->dataEnvrn->OutDryBulbTemp = -17.29025;
     state->dataEnvrn->OutHumRat = 0.0008389;
     state->dataEnvrn->OutBaroPress = 99063.0;
@@ -13130,38 +13159,41 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     state->dataEnvrn->WindDir = 270.0;
 
     for (int i = 1; i <= 50; ++i) {
-        AirflowNetwork::AirflowNetworkNodeSimu(i).TZ = 23.0;
-        AirflowNetwork::AirflowNetworkNodeSimu(i).WZ = 0.0008400;
+        state->dataAirflowNetwork->AirflowNetworkNodeSimu(i).TZ = 23.0;
+        state->dataAirflowNetwork->AirflowNetworkNodeSimu(i).WZ = 0.0008400;
         if ((i > 4 && i < 10) || i == 32) {
-            AirflowNetwork::AirflowNetworkNodeSimu(i).TZ = DataEnvironment::OutDryBulbTempAt(*state, AirflowNetwork::AirflowNetworkNodeData(i).NodeHeight);
-            AirflowNetwork::AirflowNetworkNodeSimu(i).WZ = state->dataEnvrn->OutHumRat;
+            state->dataAirflowNetwork->AirflowNetworkNodeSimu(i).TZ =
+                DataEnvironment::OutDryBulbTempAt(*state, state->dataAirflowNetwork->AirflowNetworkNodeData(i).NodeHeight);
+            state->dataAirflowNetwork->AirflowNetworkNodeSimu(i).WZ = state->dataEnvrn->OutHumRat;
         }
     }
 
     // Set up node values
-    Node.allocate(17);
-    Node(AirflowNetwork::MultizoneCompExhaustFanData(1).InletNode).MassFlowRate = 0.1005046;
+    state->dataLoopNodes->Node.allocate(17);
+    state->dataLoopNodes->Node(state->dataAirflowNetwork->MultizoneCompExhaustFanData(1).InletNode).MassFlowRate = 0.1005046;
 
-    Node(AirflowNetwork::DisSysCompCVFData(1).InletNode).MassFlowRate = 1.40;
-    AirflowNetwork::DisSysCompCVFData(1).FlowRate = Node(AirflowNetwork::DisSysCompCVFData(1).InletNode).MassFlowRate;
-    Node(AirflowNetwork::DisSysCompCVFData(2).InletNode).MassFlowRate = 0.52;
-    AirflowNetwork::DisSysCompCVFData(2).FlowRate = Node(AirflowNetwork::DisSysCompCVFData(2).InletNode).MassFlowRate;
+    state->dataLoopNodes->Node(state->dataAirflowNetwork->DisSysCompCVFData(1).InletNode).MassFlowRate = 1.40;
+    state->dataAirflowNetwork->DisSysCompCVFData(1).FlowRate =
+        state->dataLoopNodes->Node(state->dataAirflowNetwork->DisSysCompCVFData(1).InletNode).MassFlowRate;
+    state->dataLoopNodes->Node(state->dataAirflowNetwork->DisSysCompCVFData(2).InletNode).MassFlowRate = 0.52;
+    state->dataAirflowNetwork->DisSysCompCVFData(2).FlowRate =
+        state->dataLoopNodes->Node(state->dataAirflowNetwork->DisSysCompCVFData(2).InletNode).MassFlowRate;
 
-    AirflowNetwork::DisSysCompOutdoorAirData(2).InletNode = 1;
-    Node(AirflowNetwork::DisSysCompOutdoorAirData(2).InletNode).MassFlowRate = 0.2795108;
-    AirflowNetwork::DisSysCompOutdoorAirData(1).InletNode = 6;
-    Node(AirflowNetwork::DisSysCompOutdoorAirData(1).InletNode).MassFlowRate = 0.1095108;
+    state->dataAirflowNetwork->DisSysCompOutdoorAirData(2).InletNode = 1;
+    state->dataLoopNodes->Node(state->dataAirflowNetwork->DisSysCompOutdoorAirData(2).InletNode).MassFlowRate = 0.2795108;
+    state->dataAirflowNetwork->DisSysCompOutdoorAirData(1).InletNode = 6;
+    state->dataLoopNodes->Node(state->dataAirflowNetwork->DisSysCompOutdoorAirData(1).InletNode).MassFlowRate = 0.1095108;
 
-    if (AirflowNetwork::DisSysCompReliefAirData(1).InletNode == 0) {
-        AirflowNetwork::DisSysCompReliefAirData(1).OutletNode = 1;
+    if (state->dataAirflowNetwork->DisSysCompReliefAirData(1).InletNode == 0) {
+        state->dataAirflowNetwork->DisSysCompReliefAirData(1).OutletNode = 1;
     }
 
-    AirflowNetwork::AirflowNetworkNodeData(3).AirLoopNum = 1;
-    AirflowNetwork::AirflowNetworkLinkageData(51).AirLoopNum = 1;
-    AirflowNetwork::AirflowNetworkLinkageData(52).AirLoopNum = 1;
-    AirflowNetwork::AirflowNetworkLinkageData(66).AirLoopNum = 2;
-    AirflowNetwork::AirflowNetworkLinkageData(42).AirLoopNum = 1;
-    AirflowNetwork::AirflowNetworkLinkageData(67).AirLoopNum = 2;
+    state->dataAirflowNetwork->AirflowNetworkNodeData(3).AirLoopNum = 1;
+    state->dataAirflowNetwork->AirflowNetworkLinkageData(51).AirLoopNum = 1;
+    state->dataAirflowNetwork->AirflowNetworkLinkageData(52).AirLoopNum = 1;
+    state->dataAirflowNetwork->AirflowNetworkLinkageData(66).AirLoopNum = 2;
+    state->dataAirflowNetwork->AirflowNetworkLinkageData(42).AirLoopNum = 1;
+    state->dataAirflowNetwork->AirflowNetworkLinkageData(67).AirLoopNum = 2;
 
     state->dataAirLoop->AirLoopAFNInfo.allocate(2);
     state->dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode = 0.0;
@@ -13173,44 +13205,66 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     CalcAirflowNetworkAirBalance(*state);
 
     // Check mass flow rate
-    EXPECT_NEAR(1.40, AirflowNetwork::AirflowNetworkLinkSimu(42).FLOW, 0.0001);
-    EXPECT_NEAR(0.52, AirflowNetwork::AirflowNetworkLinkSimu(67).FLOW, 0.0001);
-    EXPECT_NEAR(0.2795108, AirflowNetwork::AirflowNetworkLinkSimu(51).FLOW, 0.0001);
-    EXPECT_NEAR(0.1095108, AirflowNetwork::AirflowNetworkLinkSimu(66).FLOW, 0.0001);
-    EXPECT_NEAR(0.1005046, AirflowNetwork::AirflowNetworkLinkSimu(15).FLOW, 0.0001);
+    EXPECT_NEAR(1.40, state->dataAirflowNetwork->AirflowNetworkLinkSimu(42).FLOW, 0.0001);
+    EXPECT_NEAR(0.52, state->dataAirflowNetwork->AirflowNetworkLinkSimu(67).FLOW, 0.0001);
+    EXPECT_NEAR(0.2795108, state->dataAirflowNetwork->AirflowNetworkLinkSimu(51).FLOW, 0.0001);
+    EXPECT_NEAR(0.1095108, state->dataAirflowNetwork->AirflowNetworkLinkSimu(66).FLOW, 0.0001);
+    EXPECT_NEAR(0.1005046, state->dataAirflowNetwork->AirflowNetworkLinkSimu(15).FLOW, 0.0001);
 
-    AirflowNetwork::AirflowNetworkFanActivated = false;
+    state->dataAirflowNetwork->AirflowNetworkFanActivated = false;
     // #7977
     CalcAirflowNetworkAirBalance(*state);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(5);
-    DataHeatBalFanSys::MAT.allocate(5);
-    DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(5);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(5);
+    state->dataHeatBalFanSys->MAT.allocate(5);
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(5);
     state->dataZoneEquip->ZoneEquipConfig.allocate(5);
-    DataHeatBalFanSys::MAT = 23.0;
-    DataHeatBalFanSys::ZoneAirHumRat = 0.001;
-    DataHeatBalFanSys::ZoneAirHumRatAvg = DataHeatBalFanSys::ZoneAirHumRat;
-    Zone(1).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
-    Zone(2).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
-    Zone(3).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
-    Zone(4).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
-    Zone(5).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
+    state->dataHeatBalFanSys->MAT = 23.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat = 0.001;
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg = state->dataHeatBalFanSys->ZoneAirHumRat;
+    state->dataHeatBal->Zone(1).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
+    state->dataHeatBal->Zone(2).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
+    state->dataHeatBal->Zone(3).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
+    state->dataHeatBal->Zone(4).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
+    state->dataHeatBal->Zone(5).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = false;
     state->dataZoneEquip->ZoneEquipConfig(2).IsControlled = false;
     state->dataZoneEquip->ZoneEquipConfig(3).IsControlled = false;
     state->dataZoneEquip->ZoneEquipConfig(4).IsControlled = false;
     state->dataZoneEquip->ZoneEquipConfig(5).IsControlled = false;
     state->dataAirflowNetworkBalanceManager->exchangeData.allocate(5);
-    AirflowNetwork::AirflowNetworkLinkSimu(3).FLOW2 = 0.002364988;
+    state->dataAirflowNetwork->AirflowNetworkLinkSimu(3).FLOW2 = 0.002364988;
     ReportAirflowNetwork(*state);
 
-    EXPECT_NEAR(AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiSenLossW, 95.89575, 0.001);
-    EXPECT_NEAR(AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiLatLossW, 0.969147, 0.001);
+    EXPECT_NEAR(state->dataAirflowNetwork->AirflowNetworkReportData(1).MultiZoneInfiSenLossW, 95.89575, 0.001);
+    EXPECT_NEAR(state->dataAirflowNetwork->AirflowNetworkReportData(1).MultiZoneInfiLatLossW, 0.969147, 0.001);
 
-    AirflowNetwork::AirflowNetworkCompData(AirflowNetwork::AirflowNetworkLinkageData(2).CompNum).CompTypeNum = 1;
+    state->dataAirflowNetwork->AirflowNetworkCompData(state->dataAirflowNetwork->AirflowNetworkLinkageData(2).CompNum).CompTypeNum =
+        AirflowNetwork::iComponentTypeNum::DOP;
     ReportAirflowNetwork(*state);
 
-    EXPECT_NEAR(AirflowNetwork::AirflowNetworkReportData(1).MultiZoneVentSenLossW, 95.89575, 0.001);
-    EXPECT_NEAR(AirflowNetwork::AirflowNetworkReportData(1).MultiZoneVentLatLossW, 0.969147, 0.001);
+    EXPECT_NEAR(state->dataAirflowNetwork->AirflowNetworkReportData(1).MultiZoneVentSenLossW, 95.89575, 0.001);
+    EXPECT_NEAR(state->dataAirflowNetwork->AirflowNetworkReportData(1).MultiZoneVentLatLossW, 0.969147, 0.001);
+    // #8475
+    state->dataHVACGlobal->TimeStepSys = 0.1;
+    state->dataHeatBal->Zone(1).Volume = 30.0;
+    // Ventilation
+    UpdateAirflowNetwork(*state);
+    ReportAirflowNetwork(*state);
+    EXPECT_NEAR(state->dataAirflowNetworkBalanceManager->exchangeData(1).SumMVCp, 2.38012, 0.001);
+    EXPECT_NEAR(state->dataAirflowNetworkBalanceManager->exchangeData(1).SumMVCpT, -41.1529, 0.001);
+    EXPECT_NEAR(state->dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(1).VentilVolume, 0.7314456, 0.001);
+    EXPECT_NEAR(state->dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(1).VentilAirChangeRate, 0.2438, 0.001);
+    EXPECT_NEAR(state->dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(1).VentilMass, 0.85114, 0.001);
+    // Infiltration
+    state->dataAirflowNetwork->AirflowNetworkCompData(state->dataAirflowNetwork->AirflowNetworkLinkageData(2).CompNum).CompTypeNum =
+        AirflowNetwork::iComponentTypeNum::SCR;
+    UpdateAirflowNetwork(*state);
+    ReportAirflowNetwork(*state);
+    EXPECT_NEAR(state->dataAirflowNetworkBalanceManager->exchangeData(1).SumMCp, 2.38012, 0.001);
+    EXPECT_NEAR(state->dataAirflowNetworkBalanceManager->exchangeData(1).SumMCpT, -41.1529, 0.001);
+    EXPECT_NEAR(state->dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(1).InfilVolume, 0.7314456, 0.001);
+    EXPECT_NEAR(state->dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(1).InfilAirChangeRate, 0.2438, 0.001);
+    EXPECT_NEAR(state->dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(1).InfilMass, 0.85114, 0.001);
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_CheckNumOfFansInAirLoopTest)
@@ -13638,30 +13692,30 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSidedAvoidCrashTest)
     bool errors = false;
 
     HeatBalanceManager::GetMaterialData(*state, errors); // read material data
-    EXPECT_FALSE(errors);                        // expect no errors
+    EXPECT_FALSE(errors);                                // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, errors); // read construction data
-    EXPECT_FALSE(errors);                         // expect no errors
+    EXPECT_FALSE(errors);                                 // expect no errors
 
     HeatBalanceManager::GetZoneData(*state, errors); // read zone data
-    EXPECT_FALSE(errors);                    // expect no errors
+    EXPECT_FALSE(errors);                            // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
     SurfaceGeometry::GetSurfaceData(*state, errors); // setup zone geometry and get zone data
-    EXPECT_FALSE(errors);                    // expect no errors
+    EXPECT_FALSE(errors);                            // expect no errors
 
     CurveManager::GetCurveInput(*state);
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
 
     // #6912
-    DataHeatBalFanSys::MAT.allocate(1);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
-    DataHeatBalFanSys::MAT(1) = 23.0;
-    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.001;
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
+    state->dataHeatBalFanSys->MAT(1) = 23.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
     state->dataEnvrn->OutDryBulbTemp = -17.29025;
     state->dataEnvrn->OutHumRat = 0.0008389;
     state->dataEnvrn->OutBaroPress = 99063.0;
@@ -13671,7 +13725,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSidedAvoidCrashTest)
     int iter = 1;
     bool resimu = false;
 
-    Zone(1).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
+    state->dataHeatBal->Zone(1).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
     AirflowNetworkBalanceManager::GetAirflowNetworkInput(*state);
     state->dataAirflowNetworkBalanceManager->AirflowNetworkGetInputFlag = false;
     state->dataAirflowNetworkBalanceManager->exchangeData.allocate(1);
@@ -15548,20 +15602,18 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    using namespace EnergyPlus::DataIPShortCuts;
-
-    lNumericFieldBlanks.allocate(1000);
-    lAlphaFieldBlanks.allocate(1000);
-    cAlphaFieldNames.allocate(1000);
-    cNumericFieldNames.allocate(1000);
-    cAlphaArgs.allocate(1000);
-    rNumericArgs.allocate(1000);
-    lNumericFieldBlanks = false;
-    lAlphaFieldBlanks = false;
-    cAlphaFieldNames = " ";
-    cNumericFieldNames = " ";
-    cAlphaArgs = " ";
-    rNumericArgs = 0.0;
+    state->dataIPShortCut->lNumericFieldBlanks.allocate(1000);
+    state->dataIPShortCut->lAlphaFieldBlanks.allocate(1000);
+    state->dataIPShortCut->cAlphaFieldNames.allocate(1000);
+    state->dataIPShortCut->cNumericFieldNames.allocate(1000);
+    state->dataIPShortCut->cAlphaArgs.allocate(1000);
+    state->dataIPShortCut->rNumericArgs.allocate(1000);
+    state->dataIPShortCut->lNumericFieldBlanks = false;
+    state->dataIPShortCut->lAlphaFieldBlanks = false;
+    state->dataIPShortCut->cAlphaFieldNames = " ";
+    state->dataIPShortCut->cNumericFieldNames = " ";
+    state->dataIPShortCut->cAlphaArgs = " ";
+    state->dataIPShortCut->rNumericArgs = 0.0;
 
     bool ErrorsFound = false;
     // Read objects
@@ -15586,22 +15638,22 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
     // Read AirflowNetwork inputs
     GetAirflowNetworkInput(*state);
 
-    Schedule(1).CurrentValue = 1.0;
-    Schedule(2).CurrentValue = 100.0;
-    Schedule(3).CurrentValue = 1.0;
-    Schedule(4).CurrentValue = 1.0;
-    Schedule(5).CurrentValue = 0.1;
-    Schedule(6).CurrentValue = 1.0;
-    Schedule(7).CurrentValue = 1.0;
-    Schedule(8).CurrentValue = 1.0;
-    Schedule(9).CurrentValue = 1.0;
-    Schedule(10).CurrentValue = 1.0;
-    Schedule(11).CurrentValue = 21.0;
-    Schedule(12).CurrentValue = 25.0;
-    Schedule(13).CurrentValue = 1.0;
-    Schedule(14).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(2).CurrentValue = 100.0;
+    state->dataScheduleMgr->Schedule(3).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(4).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(5).CurrentValue = 0.1;
+    state->dataScheduleMgr->Schedule(6).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(7).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(8).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(9).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(10).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(11).CurrentValue = 21.0;
+    state->dataScheduleMgr->Schedule(12).CurrentValue = 25.0;
+    state->dataScheduleMgr->Schedule(13).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(14).CurrentValue = 1.0;
 
-    AirflowNetwork::AirflowNetworkFanActivated = true;
+    state->dataAirflowNetwork->AirflowNetworkFanActivated = true;
     state->dataEnvrn->OutDryBulbTemp = -17.29025;
     state->dataEnvrn->OutHumRat = 0.0008389;
     state->dataEnvrn->OutBaroPress = 99063.0;
@@ -15609,39 +15661,39 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
     state->dataEnvrn->WindDir = 270.0;
 
     for (i = 1; i <= 21; ++i) {
-        AirflowNetwork::AirflowNetworkNodeSimu(i).TZ = 23.0;
-        AirflowNetwork::AirflowNetworkNodeSimu(i).WZ = 0.0008400;
+        state->dataAirflowNetwork->AirflowNetworkNodeSimu(i).TZ = 23.0;
+        state->dataAirflowNetwork->AirflowNetworkNodeSimu(i).WZ = 0.0008400;
         if ((i >= 4 && i <= 7)) {
-            AirflowNetwork::AirflowNetworkNodeSimu(i).TZ =
-                DataEnvironment::OutDryBulbTempAt(*state, AirflowNetwork::AirflowNetworkNodeData(i).NodeHeight); // AirflowNetworkNodeData vals differ
-            AirflowNetwork::AirflowNetworkNodeSimu(i).WZ = state->dataEnvrn->OutHumRat;
+            state->dataAirflowNetwork->AirflowNetworkNodeSimu(i).TZ = DataEnvironment::OutDryBulbTempAt(
+                *state, state->dataAirflowNetwork->AirflowNetworkNodeData(i).NodeHeight); // AirflowNetworkNodeData vals differ
+            state->dataAirflowNetwork->AirflowNetworkNodeSimu(i).WZ = state->dataEnvrn->OutHumRat;
         }
     }
     state->dataAirLoop->AirLoopAFNInfo.allocate(1);
     state->dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode = 1;
     state->dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
     state->dataAirLoop->AirLoopAFNInfo(1).LoopSystemOnMassFlowrate = 1.23;
-    AirflowNetwork::AirflowNetworkLinkageData(17).AirLoopNum = 1;
-    Node(4).MassFlowRate = 1.23;
+    state->dataAirflowNetwork->AirflowNetworkLinkageData(17).AirLoopNum = 1;
+    state->dataLoopNodes->Node(4).MassFlowRate = 1.23;
 
     CalcAirflowNetworkAirBalance(*state);
     // Fan:SystemModel
-    EXPECT_NEAR(1.23, AirflowNetwork::AirflowNetworkLinkSimu(20).FLOW, 0.0001);
-    EXPECT_TRUE(AirflowNetwork::DisSysCompCVFData(1).FanModelFlag);
+    EXPECT_NEAR(1.23, state->dataAirflowNetwork->AirflowNetworkLinkSimu(20).FLOW, 0.0001);
+    EXPECT_TRUE(state->dataAirflowNetwork->DisSysCompCVFData(1).FanModelFlag);
 
     for (i = 1; i <= 21; ++i) {
-        AirflowNetwork::AirflowNetworkNodeSimu(i).TZ = 23.0;
-        AirflowNetwork::AirflowNetworkNodeSimu(i).WZ = 0.0008400;
+        state->dataAirflowNetwork->AirflowNetworkNodeSimu(i).TZ = 23.0;
+        state->dataAirflowNetwork->AirflowNetworkNodeSimu(i).WZ = 0.0008400;
         if ((i >= 4 && i <= 7)) {
-            AirflowNetwork::AirflowNetworkNodeSimu(i).TZ =
-                DataEnvironment::OutDryBulbTempAt(*state, AirflowNetwork::AirflowNetworkNodeData(i).NodeHeight); // AirflowNetworkNodeData vals differ
-            AirflowNetwork::AirflowNetworkNodeSimu(i).WZ = state->dataEnvrn->OutHumRat;
+            state->dataAirflowNetwork->AirflowNetworkNodeSimu(i).TZ = DataEnvironment::OutDryBulbTempAt(
+                *state, state->dataAirflowNetwork->AirflowNetworkNodeData(i).NodeHeight); // AirflowNetworkNodeData vals differ
+            state->dataAirflowNetwork->AirflowNetworkNodeSimu(i).WZ = state->dataEnvrn->OutHumRat;
         }
     }
     // Fan:OnOff
-    AirflowNetwork::DisSysCompCVFData(1).FanModelFlag = false;
+    state->dataAirflowNetwork->DisSysCompCVFData(1).FanModelFlag = false;
     CalcAirflowNetworkAirBalance(*state);
-    EXPECT_NEAR(1.23, AirflowNetwork::AirflowNetworkLinkSimu(20).FLOW, 0.0001);
+    EXPECT_NEAR(1.23, state->dataAirflowNetwork->AirflowNetworkLinkSimu(20).FLOW, 0.0001);
 
     state->dataAirLoop->AirLoopAFNInfo.deallocate();
 }
@@ -15650,29 +15702,29 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
 TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoZoneNode)
 {
     state->dataGlobal->NumOfZones = 1;
-    DataHeatBalance::Zone.allocate(1);
-    DataHeatBalance::Zone(1).Name = "ATTIC ZONE";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ATTIC ZONE";
 
-    DataSurfaces::Surface.allocate(1);
-    DataSurfaces::Surface(1).Name = "ZN004:ROOF001";
-    DataSurfaces::Surface(1).Zone = 1;
-    DataSurfaces::Surface(1).ZoneName = "ATTIC ZONE";
-    DataSurfaces::Surface(1).Azimuth = 0.0;
-    DataSurfaces::Surface(1).ExtBoundCond = 0;
-    DataSurfaces::Surface(1).HeatTransSurf = true;
-    DataSurfaces::Surface(1).Tilt = 180.0;
-    DataSurfaces::Surface(1).Sides = 4;
-    DataSurfaces::Surface(1).Name = "ZN004:ROOF002";
-    DataSurfaces::Surface(1).Zone = 1;
-    DataSurfaces::Surface(1).ZoneName = "ATTIC ZONE";
-    DataSurfaces::Surface(1).Azimuth = 0.0;
-    DataSurfaces::Surface(1).ExtBoundCond = 0;
-    DataSurfaces::Surface(1).HeatTransSurf = true;
-    DataSurfaces::Surface(1).Tilt = 180.0;
-    DataSurfaces::Surface(1).Sides = 4;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).Name = "ZN004:ROOF001";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "ATTIC ZONE";
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(1).ExtBoundCond = 0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Tilt = 180.0;
+    state->dataSurface->Surface(1).Sides = 4;
+    state->dataSurface->Surface(1).Name = "ZN004:ROOF002";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "ATTIC ZONE";
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(1).ExtBoundCond = 0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Tilt = 180.0;
+    state->dataSurface->Surface(1).Sides = 4;
 
-    DataSurfaces::SurfWinOriginalClass.allocate(1);
-    DataSurfaces::SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass.allocate(1);
+    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
 
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
@@ -15681,13 +15733,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoZoneNode)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
 
-    DataLoopNode::NumOfNodes = 1;
-    DataLoopNode::Node.allocate(1);
-    DataLoopNode::Node(1).FluidType = DataLoopNode::NodeType_Air;
-    DataLoopNode::NodeID.allocate(1);
-    DataLoopNode::NodeID(1) = "ATTIC ZONE AIR NODE";
+    state->dataLoopNodes->NumOfNodes = 1;
+    state->dataLoopNodes->Node.allocate(1);
+    state->dataLoopNodes->Node(1).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->NodeID.allocate(1);
+    state->dataLoopNodes->NodeID(1) = "ATTIC ZONE AIR NODE";
     bool errFlag{false};
-    BranchNodeConnections::RegisterNodeConnection(*state, 1, "ATTIC ZONE AIR NODE", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
+    BranchNodeConnections::RegisterNodeConnection(
+        *state, 1, "ATTIC ZONE AIR NODE", "Type1", "Object1", "ZoneNode", NodeInputManager::compFluidStream::Primary, false, errFlag);
     EXPECT_FALSE(errFlag);
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
@@ -15718,29 +15771,29 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoZoneNode)
 TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoInletNode)
 {
     state->dataGlobal->NumOfZones = 1;
-    DataHeatBalance::Zone.allocate(1);
-    DataHeatBalance::Zone(1).Name = "ATTIC ZONE";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ATTIC ZONE";
 
-    DataSurfaces::Surface.allocate(1);
-    DataSurfaces::Surface(1).Name = "ZN004:ROOF001";
-    DataSurfaces::Surface(1).Zone = 1;
-    DataSurfaces::Surface(1).ZoneName = "ATTIC ZONE";
-    DataSurfaces::Surface(1).Azimuth = 0.0;
-    DataSurfaces::Surface(1).ExtBoundCond = 0;
-    DataSurfaces::Surface(1).HeatTransSurf = true;
-    DataSurfaces::Surface(1).Tilt = 180.0;
-    DataSurfaces::Surface(1).Sides = 4;
-    DataSurfaces::Surface(1).Name = "ZN004:ROOF002";
-    DataSurfaces::Surface(1).Zone = 1;
-    DataSurfaces::Surface(1).ZoneName = "ATTIC ZONE";
-    DataSurfaces::Surface(1).Azimuth = 0.0;
-    DataSurfaces::Surface(1).ExtBoundCond = 0;
-    DataSurfaces::Surface(1).HeatTransSurf = true;
-    DataSurfaces::Surface(1).Tilt = 180.0;
-    DataSurfaces::Surface(1).Sides = 4;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).Name = "ZN004:ROOF001";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "ATTIC ZONE";
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(1).ExtBoundCond = 0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Tilt = 180.0;
+    state->dataSurface->Surface(1).Sides = 4;
+    state->dataSurface->Surface(1).Name = "ZN004:ROOF002";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "ATTIC ZONE";
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(1).ExtBoundCond = 0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Tilt = 180.0;
+    state->dataSurface->Surface(1).Sides = 4;
 
-    DataSurfaces::SurfWinOriginalClass.allocate(1);
-    DataSurfaces::SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass.allocate(1);
+    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
 
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
@@ -15749,13 +15802,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoInletNode)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
 
-    DataLoopNode::NumOfNodes = 1;
-    DataLoopNode::Node.allocate(2);
-    DataLoopNode::Node(1).FluidType = DataLoopNode::NodeType_Air;
-    DataLoopNode::NodeID.allocate(1);
-    DataLoopNode::NodeID(1) = "ATTIC ZONE AIR NODE";
+    state->dataLoopNodes->NumOfNodes = 1;
+    state->dataLoopNodes->Node.allocate(2);
+    state->dataLoopNodes->Node(1).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->NodeID.allocate(1);
+    state->dataLoopNodes->NodeID(1) = "ATTIC ZONE AIR NODE";
     bool errFlag{false};
-    BranchNodeConnections::RegisterNodeConnection(*state, 1, "ATTIC ZONE AIR NODE", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
+    BranchNodeConnections::RegisterNodeConnection(
+        *state, 1, "ATTIC ZONE AIR NODE", "Type1", "Object1", "ZoneNode", NodeInputManager::compFluidStream::Primary, false, errFlag);
     EXPECT_FALSE(errFlag);
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
@@ -15768,16 +15822,16 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoInletNode)
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
 
     // One AirflowNetwork:MultiZone:Zone object
-    AirflowNetwork::AirflowNetworkNumOfZones = 1;
-    AirflowNetwork::MultizoneZoneData.allocate(1);
-    AirflowNetwork::MultizoneZoneData(1).ZoneNum = 1;
-    AirflowNetwork::MultizoneZoneData(1).ZoneName = "ATTIC ZONE";
+    state->dataAirflowNetwork->AirflowNetworkNumOfZones = 1;
+    state->dataAirflowNetwork->MultizoneZoneData.allocate(1);
+    state->dataAirflowNetwork->MultizoneZoneData(1).ZoneNum = 1;
+    state->dataAirflowNetwork->MultizoneZoneData(1).ZoneName = "ATTIC ZONE";
 
     // Assume only one AirflowNetwork:Distribution:Node object is set for the Zone Air Node
-    AirflowNetwork::AirflowNetworkNumOfNodes = 1;
-    AirflowNetwork::AirflowNetworkNodeData.allocate(1);
-    AirflowNetwork::AirflowNetworkNodeData(1).Name = "ATTIC ZONE";
-    AirflowNetwork::AirflowNetworkNodeData(1).EPlusZoneNum = 1;
+    state->dataAirflowNetwork->AirflowNetworkNumOfNodes = 1;
+    state->dataAirflowNetwork->AirflowNetworkNodeData.allocate(1);
+    state->dataAirflowNetwork->AirflowNetworkNodeData(1).Name = "ATTIC ZONE";
+    state->dataAirflowNetwork->AirflowNetworkNodeData(1).EPlusZoneNum = 1;
 
     state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers.allocate(2);
     state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(1) = 0;
@@ -17157,7 +17211,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_DuplicatedNodeNameTest)
     HeatBalanceManager::GetHeatBalanceInput(*state);
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     state->dataEnvrn->OutBaroPress = 101000;
-    DataHVACGlobals::TimeStepSys = state->dataGlobal->TimeStepZone;
+    state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
     SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
@@ -17203,2720 +17257,2717 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SenLatLoadsConservation_Test)
     // Average value
     sum = sen1 + lat1;
     EXPECT_NEAR(hdiff, sum, 0.0001);
-
 }
 
 TEST_F(EnergyPlusFixture, DISABLED_AirLoopNumTest)
 {
 
-std::string const idf_objects = delimited_string({
-
-"  Building,",
-    "    Small Office with AirflowNetwork model,  !- Name",
-    "    0,                       !- North Axis {deg}",
-    "    Suburbs,                 !- Terrain",
-    "    0.001,                   !- Loads Convergence Tolerance Value",
-    "    0.0050000,               !- Temperature Convergence Tolerance Value {deltaC}",
-    "    FullInteriorAndExterior, !- Solar Distribution",
-    "    25,                      !- Maximum Number of Warmup Days",
-    "    6;                       !- Minimum Number of Warmup Days",
-
-    "  Timestep,6;",
-
-    "  SurfaceConvectionAlgorithm:Inside,TARP;",
-
-    "  SurfaceConvectionAlgorithm:Outside,DOE-2;",
-
-    "  HeatBalanceAlgorithm,ConductionTransferFunction;",
-
-    "  Output:DebuggingData,0,0;",
-
-    "  ZoneCapacitanceMultiplier:ResearchSpecial,",
-    "    Multiplier,              !- Name",
-    "    ,                        !- Zone or ZoneList Name",
-    "    1.0,                     !- Temperature Capacity Multiplier",
-    "    1.0,                     !- Humidity Capacity Multiplier",
-    "    1.0,                     !- Carbon Dioxide Capacity Multiplier",
-    "    ;                        !- Generic Contaminant Capacity Multiplier",
-
-    "  SimulationControl,",
-    "    No,                     !- Do Zone Sizing Calculation",
-    "    No,                     !- Do System Sizing Calculation",
-    "    No,                      !- Do Plant Sizing Calculation",
-    "    Yes,                     !- Run Simulation for Sizing Periods",
-    "    No;                      !- Run Simulation for Weather File Run Periods",
-
-    "  Sizing:Parameters,",
-    "    1.53,                    !- Heating Sizing Factor",
-    "    1.70,                    !- Cooling Sizing Factor",
-    "    6;                       !- Timesteps in Averaging Window",
-
-    "  RunPeriod,",
-    "    Spring run,              !- Name",
-    "    4,                       !- Begin Month",
-    "    1,                       !- Begin Day of Month",
-    "    ,                        !- Begin Year",
-    "    4,                       !- End Month",
-    "    1,                       !- End Day of Month",
-    "    ,                        !- End Year",
-    "    Tuesday,                 !- Day of Week for Start Day",
-    "    Yes,                     !- Use Weather File Holidays and Special Days",
-    "    Yes,                     !- Use Weather File Daylight Saving Period",
-    "    No,                      !- Apply Weekend Holiday Rule",
-    "    Yes,                     !- Use Weather File Rain Indicators",
-    "    Yes;                     !- Use Weather File Snow Indicators",
-
-    "  RunPeriod,",
-    "    Winter run,              !- Name",
-    "    1,                       !- Begin Month",
-    "    14,                      !- Begin Day of Month",
-    "    ,                        !- Begin Year",
-    "    1,                       !- End Month",
-    "    14,                      !- End Day of Month",
-    "    ,                        !- End Year",
-    "    Tuesday,                 !- Day of Week for Start Day",
-    "    Yes,                     !- Use Weather File Holidays and Special Days",
-    "    Yes,                     !- Use Weather File Daylight Saving Period",
-    "    No,                      !- Apply Weekend Holiday Rule",
-    "    Yes,                     !- Use Weather File Rain Indicators",
-    "    Yes;                     !- Use Weather File Snow Indicators",
-
-    "  RunPeriod,",
-    "    Summer run,              !- Name",
-    "    7,                       !- Begin Month",
-    "    7,                       !- Begin Day of Month",
-    "    ,                        !- Begin Year",
-    "    7,                       !- End Month",
-    "    7,                       !- End Day of Month",
-    "    ,                        !- End Year",
-    "    Tuesday,                 !- Day of Week for Start Day",
-    "    Yes,                     !- Use Weather File Holidays and Special Days",
-    "    Yes,                     !- Use Weather File Daylight Saving Period",
-    "    No,                      !- Apply Weekend Holiday Rule",
-    "    Yes,                     !- Use Weather File Rain Indicators",
-    "    Yes;                     !- Use Weather File Snow Indicators",
-
-    "  Site:Location,",
-    "    CHICAGO_IL_USA TMY2-94846,  !- Name",
-    "    41.78,                   !- Latitude {deg}",
-    "    -87.75,                  !- Longitude {deg}",
-    "    -6.00,                   !- Time Zone {hr}",
-    "    190.00;                  !- Elevation {m}",
-
-    "  SizingPeriod:DesignDay,",
-    "    CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name",
-    "    1,                       !- Month",
-    "    21,                      !- Day of Month",
-    "    WinterDesignDay,         !- Day Type",
-    "    -17.3,                   !- Maximum Dry-Bulb Temperature {C}",
-    "    0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}",
-    "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
-    "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
-    "    Wetbulb,                 !- Humidity Condition Type",
-    "    -17.3,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
-    "    ,                        !- Humidity Condition Day Schedule Name",
-    "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
-    "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
-    "    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
-    "    99063.,                  !- Barometric Pressure {Pa}",
-    "    4.9,                     !- Wind Speed {m/s}",
-    "    270,                     !- Wind Direction {deg}",
-    "    No,                      !- Rain Indicator",
-    "    No,                      !- Snow Indicator",
-    "    No,                      !- Daylight Saving Time Indicator",
-    "    ASHRAEClearSky,          !- Solar Model Indicator",
-    "    ,                        !- Beam Solar Day Schedule Name",
-    "    ,                        !- Diffuse Solar Day Schedule Name",
-    "    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
-    "    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
-    "    0.0;                     !- Sky Clearness",
-
-    "  SizingPeriod:DesignDay,",
-    "    CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name",
-    "    7,                       !- Month",
-    "    21,                      !- Day of Month",
-    "    SummerDesignDay,         !- Day Type",
-    "    31.5,                    !- Maximum Dry-Bulb Temperature {C}",
-    "    10.7,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
-    "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
-    "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
-    "    Wetbulb,                 !- Humidity Condition Type",
-    "    23.0,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
-    "    ,                        !- Humidity Condition Day Schedule Name",
-    "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
-    "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
-    "    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
-    "    99063.,                  !- Barometric Pressure {Pa}",
-    "    5.3,                     !- Wind Speed {m/s}",
-    "    230,                     !- Wind Direction {deg}",
-    "    No,                      !- Rain Indicator",
-    "    No,                      !- Snow Indicator",
-    "    No,                      !- Daylight Saving Time Indicator",
-    "    ASHRAEClearSky,          !- Solar Model Indicator",
-    "    ,                        !- Beam Solar Day Schedule Name",
-    "    ,                        !- Diffuse Solar Day Schedule Name",
-    "    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
-    "    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
-    "    1.0;                     !- Sky Clearness",
-
-    "  Material,",
-    "    A1 - 1 IN STUCCO,        !- Name",
-    "    Smooth,                  !- Roughness",
-    "    2.5389841E-02,           !- Thickness {m}",
-    "    0.6918309,               !- Conductivity {W/m-K}",
-    "    1858.142,                !- Density {kg/m3}",
-    "    836.8000,                !- Specific Heat {J/kg-K}",
-    "    0.9000000,               !- Thermal Absorptance",
-    "    0.9200000,               !- Solar Absorptance",
-    "    0.9200000;               !- Visible Absorptance",
-
-    "  Material,",
-    "    C4 - 4 IN COMMON BRICK,  !- Name",
-    "    Rough,                   !- Roughness",
-    "    0.1014984,               !- Thickness {m}",
-    "    0.7264224,               !- Conductivity {W/m-K}",
-    "    1922.216,                !- Density {kg/m3}",
-    "    836.8000,                !- Specific Heat {J/kg-K}",
-    "    0.9000000,               !- Thermal Absorptance",
-    "    0.7600000,               !- Solar Absorptance",
-    "    0.7600000;               !- Visible Absorptance",
-
-    "  Material,",
-    "    E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Name",
-    "    Smooth,                  !- Roughness",
-    "    1.9050000E-02,           !- Thickness {m}",
-    "    0.7264224,               !- Conductivity {W/m-K}",
-    "    1601.846,                !- Density {kg/m3}",
-    "    836.8000,                !- Specific Heat {J/kg-K}",
-    "    0.9000000,               !- Thermal Absorptance",
-    "    0.9200000,               !- Solar Absorptance",
-    "    0.9200000;               !- Visible Absorptance",
-
-    "  Material,",
-    "    C6 - 8 IN CLAY TILE,     !- Name",
-    "    Smooth,                  !- Roughness",
-    "    0.2033016,               !- Thickness {m}",
-    "    0.5707605,               !- Conductivity {W/m-K}",
-    "    1121.292,                !- Density {kg/m3}",
-    "    836.8000,                !- Specific Heat {J/kg-K}",
-    "    0.9000000,               !- Thermal Absorptance",
-    "    0.8200000,               !- Solar Absorptance",
-    "    0.8200000;               !- Visible Absorptance",
-
-    "  Material,",
-    "    C10 - 8 IN HW CONCRETE,  !- Name",
-    "    MediumRough,             !- Roughness",
-    "    0.2033016,               !- Thickness {m}",
-    "    1.729577,                !- Conductivity {W/m-K}",
-    "    2242.585,                !- Density {kg/m3}",
-    "    836.8000,                !- Specific Heat {J/kg-K}",
-    "    0.9000000,               !- Thermal Absorptance",
-    "    0.6500000,               !- Solar Absorptance",
-    "    0.6500000;               !- Visible Absorptance",
-
-    "  Material,",
-    "    E2 - 1 / 2 IN SLAG OR STONE,  !- Name",
-    "    Rough,                   !- Roughness",
-    "    1.2710161E-02,           !- Thickness {m}",
-    "    1.435549,                !- Conductivity {W/m-K}",
-    "    881.0155,                !- Density {kg/m3}",
-    "    1673.600,                !- Specific Heat {J/kg-K}",
-    "    0.9000000,               !- Thermal Absorptance",
-    "    0.5500000,               !- Solar Absorptance",
-    "    0.5500000;               !- Visible Absorptance",
-
-    "  Material,",
-    "    E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Name",
-    "    Rough,                   !- Roughness",
-    "    9.5402403E-03,           !- Thickness {m}",
-    "    0.1902535,               !- Conductivity {W/m-K}",
-    "    1121.292,                !- Density {kg/m3}",
-    "    1673.600,                !- Specific Heat {J/kg-K}",
-    "    0.9000000,               !- Thermal Absorptance",
-    "    0.7500000,               !- Solar Absorptance",
-    "    0.7500000;               !- Visible Absorptance",
-
-    "  Material,",
-    "    B5 - 1 IN DENSE INSULATION,  !- Name",
-    "    VeryRough,               !- Roughness",
-    "    2.5389841E-02,           !- Thickness {m}",
-    "    4.3239430E-02,           !- Conductivity {W/m-K}",
-    "    91.30524,                !- Density {kg/m3}",
-    "    836.8000,                !- Specific Heat {J/kg-K}",
-    "    0.9000000,               !- Thermal Absorptance",
-    "    0.5000000,               !- Solar Absorptance",
-    "    0.5000000;               !- Visible Absorptance",
-
-    "  Material,",
-    "    C12 - 2 IN HW CONCRETE,  !- Name",
-    "    MediumRough,             !- Roughness",
-    "    5.0901599E-02,           !- Thickness {m}",
-    "    1.729577,                !- Conductivity {W/m-K}",
-    "    2242.585,                !- Density {kg/m3}",
-    "    836.8000,                !- Specific Heat {J/kg-K}",
-    "    0.9000000,               !- Thermal Absorptance",
-    "    0.6500000,               !- Solar Absorptance",
-    "    0.6500000;               !- Visible Absorptance",
-
-    "  Material,",
-    "    1.375in-Solid-Core,      !- Name",
-    "    Smooth,                  !- Roughness",
-    "    3.4925E-02,              !- Thickness {m}",
-    "    0.1525000,               !- Conductivity {W/m-K}",
-    "    614.5000,                !- Density {kg/m3}",
-    "    1630.0000,               !- Specific Heat {J/kg-K}",
-    "    0.9000000,               !- Thermal Absorptance",
-    "    0.9200000,               !- Solar Absorptance",
-    "    0.9200000;               !- Visible Absorptance",
-
-    "  WindowMaterial:Glazing,",
-    "    ELECTRO GLASS LIGHT STATE,  !- Name",
-    "    SpectralAverage,         !- Optical Data Type",
-    "    ,                        !- Window Glass Spectral Data Set Name",
-    "    0.006,                   !- Thickness {m}",
-    "    0.814,                   !- Solar Transmittance at Normal Incidence",
-    "    0.086,                   !- Front Side Solar Reflectance at Normal Incidence",
-    "    0.086,                   !- Back Side Solar Reflectance at Normal Incidence",
-    "    0.847,                   !- Visible Transmittance at Normal Incidence",
-    "    0.099,                   !- Front Side Visible Reflectance at Normal Incidence",
-    "    0.099,                   !- Back Side Visible Reflectance at Normal Incidence",
-    "    0.0,                     !- Infrared Transmittance at Normal Incidence",
-    "    0.84,                    !- Front Side Infrared Hemispherical Emissivity",
-    "    0.84,                    !- Back Side Infrared Hemispherical Emissivity",
-    "    0.9;                     !- Conductivity {W/m-K}",
-
-    "  WindowMaterial:Glazing,",
-    "    ELECTRO GLASS DARK STATE,!- Name",
-    "    SpectralAverage,         !- Optical Data Type",
-    "    ,                        !- Window Glass Spectral Data Set Name",
-    "    0.006,                   !- Thickness {m}",
-    "    0.111,                   !- Solar Transmittance at Normal Incidence",
-    "    0.179,                   !- Front Side Solar Reflectance at Normal Incidence",
-    "    0.179,                   !- Back Side Solar Reflectance at Normal Incidence",
-    "    0.128,                   !- Visible Transmittance at Normal Incidence",
-    "    0.081,                   !- Front Side Visible Reflectance at Normal Incidence",
-    "    0.081,                   !- Back Side Visible Reflectance at Normal Incidence",
-    "    0.0,                     !- Infrared Transmittance at Normal Incidence",
-    "    0.84,                    !- Front Side Infrared Hemispherical Emissivity",
-    "    0.84,                    !- Back Side Infrared Hemispherical Emissivity",
-    "    0.9;                     !- Conductivity {W/m-K}",
-
-    "  WindowMaterial:Gas,",
-    "    WinAirGap,               !- Name",
-    "    AIR,                     !- Gas Type",
-    "    0.013;                   !- Thickness {m}",
-
-    "  Construction,",
-    "    EXTWALL80,               !- Name",
-    "    A1 - 1 IN STUCCO,        !- Outside Layer",
-    "    C4 - 4 IN COMMON BRICK,  !- Layer 2",
-    "    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3",
-
-    "  Construction,",
-    "    PARTITION06,             !- Name",
-    "    E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Outside Layer",
-    "    C6 - 8 IN CLAY TILE,     !- Layer 2",
-    "    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3",
-
-    "  Construction,",
-    "    FLOOR SLAB 8 IN,         !- Name",
-    "    C10 - 8 IN HW CONCRETE;  !- Outside Layer",
-
-    "  Construction,",
-    "    ROOF34,                  !- Name",
-    "    E2 - 1 / 2 IN SLAG OR STONE,  !- Outside Layer",
-    "    E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Layer 2",
-    "    C12 - 2 IN HW CONCRETE;  !- Layer 3",
-
-    "  Construction,",
-    "    CEILING:ZONE,            !- Name",
-    "    B5 - 1 IN DENSE INSULATION,  !- Outside Layer",
-    "    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 2",
-
-    "  Construction,",
-    "    CEILING:ATTIC,           !- Name",
-    "    E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Outside Layer",
-    "    B5 - 1 IN DENSE INSULATION;  !- Layer 2",
-
-    "  Construction,",
-    "    ELECTRO-CON-LIGHT,       !- Name",
-    "    ELECTRO GLASS LIGHT STATE,  !- Outside Layer",
-    "    WinAirGap,               !- Layer 2",
-    "    ELECTRO GLASS LIGHT STATE;  !- Layer 3",
-
-    "  Construction,",
-    "    ELECTRO-CON-DARK,        !- Name",
-    "    ELECTRO GLASS DARK STATE, !- Outside Layer",
-    "    WinAirGap,               !- Layer 2",
-    "    ELECTRO GLASS DARK STATE; !- Layer 3",
-
-    "  Construction,",
-    "    DOOR-CON,                !- Name",
-    "    1.375in-Solid-Core;      !- Outside Layer",
-
-    "  Zone,",
-    "    West Zone,               !- Name",
-    "    0,                       !- Direction of Relative North {deg}",
-    "    0,                       !- X Origin {m}",
-    "    0,                       !- Y Origin {m}",
-    "    0,                       !- Z Origin {m}",
-    "    1,                       !- Type",
-    "    1,                       !- Multiplier",
-    "    autocalculate,           !- Ceiling Height {m}",
-    "    autocalculate;           !- Volume {m3}",
-
-    "  Zone,",
-    "    EAST ZONE,               !- Name",
-    "    0,                       !- Direction of Relative North {deg}",
-    "    0,                       !- X Origin {m}",
-    "    0,                       !- Y Origin {m}",
-    "    0,                       !- Z Origin {m}",
-    "    1,                       !- Type",
-    "    1,                       !- Multiplier",
-    "    autocalculate,           !- Ceiling Height {m}",
-    "    autocalculate;           !- Volume {m3}",
-
-    "  Zone,",
-    "    NORTH ZONE,              !- Name",
-    "    0,                       !- Direction of Relative North {deg}",
-    "    0,                       !- X Origin {m}",
-    "    0,                       !- Y Origin {m}",
-    "    0,                       !- Z Origin {m}",
-    "    1,                       !- Type",
-    "    1,                       !- Multiplier",
-    "    autocalculate,           !- Ceiling Height {m}",
-    "    autocalculate;           !- Volume {m3}",
-
-    "  Zone,",
-    "    ATTIC ZONE,              !- Name",
-    "    0,                       !- Direction of Relative North {deg}",
-    "    0,                       !- X Origin {m}",
-    "    0,                       !- Y Origin {m}",
-    "    0,                       !- Z Origin {m}",
-    "    1,                       !- Type",
-    "    1,                       !- Multiplier",
-    "    autocalculate,           !- Ceiling Height {m}",
-    "    autocalculate;           !- Volume {m3}",
-
-    "  Zone,",
-    "    ATTIC NORTH ZONE,        !- Name",
-    "    0,                       !- Direction of Relative North {deg}",
-    "    0,                       !- X Origin {m}",
-    "    0,                       !- Y Origin {m}",
-    "    0,                       !- Z Origin {m}",
-    "    1,                       !- Type",
-    "    1,                       !- Multiplier",
-    "    autocalculate,           !- Ceiling Height {m}",
-    "    autocalculate;           !- Volume {m3}",
-
-    "  GlobalGeometryRules,",
-    "    UpperLeftCorner,         !- Starting Vertex Position",
-    "    CounterClockWise,        !- Vertex Entry Direction",
-    "    World;                   !- Coordinate System",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn001:Wall001,           !- Name",
-    "    Wall,                    !- Surface Type",
-    "    EXTWALL80,               !- Construction Name",
-    "    West Zone,               !- Zone Name",
-    "    Outdoors,                !- Outside Boundary Condition",
-    "    ,                        !- Outside Boundary Condition Object",
-    "    SunExposed,              !- Sun Exposure",
-    "    WindExposed,             !- Wind Exposure",
-    "    0.5000000,               !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    0,0,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    6.096000,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    6.096000,0,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn001:Wall002,           !- Name",
-    "    Wall,                    !- Surface Type",
-    "    EXTWALL80,               !- Construction Name",
-    "    West Zone,               !- Zone Name",
-    "    Outdoors,                !- Outside Boundary Condition",
-    "    ,                        !- Outside Boundary Condition Object",
-    "    SunExposed,              !- Sun Exposure",
-    "    WindExposed,             !- Wind Exposure",
-    "    0.5000000,               !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    0,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    0,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    0,0,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn001:Wall003,           !- Name",
-    "    Wall,                    !- Surface Type",
-    "    PARTITION06,             !- Construction Name",
-    "    West Zone,               !- Zone Name",
-    "    Surface,                 !- Outside Boundary Condition",
-    "    Zn003:Wall004,           !- Outside Boundary Condition Object",
-    "    NoSun,                   !- Sun Exposure",
-    "    NoWind,                  !- Wind Exposure",
-    "    0.5000000,               !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    0,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    0,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn001:Wall004,           !- Name",
-    "    Wall,                    !- Surface Type",
-    "    PARTITION06,             !- Construction Name",
-    "    West Zone,               !- Zone Name",
-    "    Surface,                 !- Outside Boundary Condition",
-    "    Zn002:Wall004,           !- Outside Boundary Condition Object",
-    "    NoSun,                   !- Sun Exposure",
-    "    NoWind,                  !- Wind Exposure",
-    "    0.5000000,               !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    6.096000,0,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    6.096000,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    6.096000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn001:Flr001,            !- Name",
-    "    Floor,                   !- Surface Type",
-    "    FLOOR SLAB 8 IN,         !- Construction Name",
-    "    West Zone,               !- Zone Name",
-    "    Surface,                 !- Outside Boundary Condition",
-    "    Zn001:Flr001,            !- Outside Boundary Condition Object",
-    "    NoSun,                   !- Sun Exposure",
-    "    NoWind,                  !- Wind Exposure",
-    "    1.000000,                !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    0,0,0,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    0,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    6.096000,0,0;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn001:Ceil001,           !- Name",
-    "    CEILING,                 !- Surface Type",
-    "    CEILING:ZONE,            !- Construction Name",
-    "    West Zone,               !- Zone Name",
-    "    Surface,                 !- Outside Boundary Condition",
-    "    Zn004:Flr001,            !- Outside Boundary Condition Object",
-    "    NoSun,                   !- Sun Exposure",
-    "    NoWind,                  !- Wind Exposure",
-    "    0,                       !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    0,0,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    6.096000,0,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    6.096000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn002:Wall001,           !- Name",
-    "    Wall,                    !- Surface Type",
-    "    EXTWALL80,               !- Construction Name",
-    "    EAST ZONE,               !- Zone Name",
-    "    Outdoors,                !- Outside Boundary Condition",
-    "    ,                        !- Outside Boundary Condition Object",
-    "    SunExposed,              !- Sun Exposure",
-    "    WindExposed,             !- Wind Exposure",
-    "    0.5000000,               !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    12.19200,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    12.19200,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    9.144000,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    9.144000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn002:Wall002,           !- Name",
-    "    Wall,                    !- Surface Type",
-    "    EXTWALL80,               !- Construction Name",
-    "    EAST ZONE,               !- Zone Name",
-    "    Outdoors,                !- Outside Boundary Condition",
-    "    ,                        !- Outside Boundary Condition Object",
-    "    SunExposed,              !- Sun Exposure",
-    "    WindExposed,             !- Wind Exposure",
-    "    0.5000000,               !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    6.096000,0,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    6.096000,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    12.19200,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    12.19200,0,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn002:Wall003,           !- Name",
-    "    Wall,                    !- Surface Type",
-    "    EXTWALL80,               !- Construction Name",
-    "    EAST ZONE,               !- Zone Name",
-    "    Outdoors,                !- Outside Boundary Condition",
-    "    ,                        !- Outside Boundary Condition Object",
-    "    SunExposed,              !- Sun Exposure",
-    "    WindExposed,             !- Wind Exposure",
-    "    0.5000000,               !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    12.19200,0,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    12.19200,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    12.19200,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    12.19200,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn002:Wall004,           !- Name",
-    "    Wall,                    !- Surface Type",
-    "    PARTITION06,             !- Construction Name",
-    "    EAST ZONE,               !- Zone Name",
-    "    Surface,                 !- Outside Boundary Condition",
-    "    Zn001:Wall004,           !- Outside Boundary Condition Object",
-    "    NoSun,                   !- Sun Exposure",
-    "    NoWind,                  !- Wind Exposure",
-    "    0.5000000,               !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    6.096000,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    6.096000,0,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn002:Wall005,           !- Name",
-    "    Wall,                    !- Surface Type",
-    "    PARTITION06,             !- Construction Name",
-    "    EAST ZONE,               !- Zone Name",
-    "    Surface,                 !- Outside Boundary Condition",
-    "    Zn003:Wall005,           !- Outside Boundary Condition Object",
-    "    NoSun,                   !- Sun Exposure",
-    "    NoWind,                  !- Wind Exposure",
-    "    0.5000000,               !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    9.144000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    9.144000,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    6.096000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn002:Flr001,            !- Name",
-    "    Floor,                   !- Surface Type",
-    "    FLOOR SLAB 8 IN,         !- Construction Name",
-    "    EAST ZONE,               !- Zone Name",
-    "    Surface,                 !- Outside Boundary Condition",
-    "    Zn002:Flr001,            !- Outside Boundary Condition Object",
-    "    NoSun,                   !- Sun Exposure",
-    "    NoWind,                  !- Wind Exposure",
-    "    1.000000,                !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    6.096000,0,0,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    12.19200,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    12.19200,0,0;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn002:Ceil001,           !- Name",
-    "    CEILING,                 !- Surface Type",
-    "    CEILING:ZONE,            !- Construction Name",
-    "    EAST ZONE,               !- Zone Name",
-    "    Surface,                 !- Outside Boundary Condition",
-    "    Zn004:Flr002,            !- Outside Boundary Condition Object",
-    "    NoSun,                   !- Sun Exposure",
-    "    NoWind,                  !- Wind Exposure",
-    "    0,                       !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    6.096000,0,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    12.19200,0,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    12.19200,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn003:Wall001,           !- Name",
-    "    Wall,                    !- Surface Type",
-    "    EXTWALL80,               !- Construction Name",
-    "    NORTH ZONE,              !- Zone Name",
-    "    Outdoors,                !- Outside Boundary Condition",
-    "    ,                        !- Outside Boundary Condition Object",
-    "    SunExposed,              !- Sun Exposure",
-    "    WindExposed,             !- Wind Exposure",
-    "    0.5000000,               !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    0,12.19200,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    0,12.19200,0,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    0,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    0,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn003:Wall002,           !- Name",
-    "    Wall,                    !- Surface Type",
-    "    EXTWALL80,               !- Construction Name",
-    "    NORTH ZONE,              !- Zone Name",
-    "    Outdoors,                !- Outside Boundary Condition",
-    "    ,                        !- Outside Boundary Condition Object",
-    "    SunExposed,              !- Sun Exposure",
-    "    WindExposed,             !- Wind Exposure",
-    "    0.5000000,               !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    9.144000,12.19200,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    9.144000,12.19200,0,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    0,12.19200,0,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    0,12.19200,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn003:Wall003,           !- Name",
-    "    Wall,                    !- Surface Type",
-    "    EXTWALL80,               !- Construction Name",
-    "    NORTH ZONE,              !- Zone Name",
-    "    Outdoors,                !- Outside Boundary Condition",
-    "    ,                        !- Outside Boundary Condition Object",
-    "    SunExposed,              !- Sun Exposure",
-    "    WindExposed,             !- Wind Exposure",
-    "    0.5000000,               !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    9.144000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    9.144000,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    9.144000,12.19200,0,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    9.144000,12.19200,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn003:Wall004,           !- Name",
-    "    Wall,                    !- Surface Type",
-    "    PARTITION06,             !- Construction Name",
-    "    NORTH ZONE,              !- Zone Name",
-    "    Surface,                 !- Outside Boundary Condition",
-    "    Zn001:Wall003,           !- Outside Boundary Condition Object",
-    "    NoSun,                   !- Sun Exposure",
-    "    NoWind,                  !- Wind Exposure",
-    "    0.5000000,               !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    0,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    6.096000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn003:Wall005,           !- Name",
-    "    Wall,                    !- Surface Type",
-    "    PARTITION06,             !- Construction Name",
-    "    NORTH ZONE,              !- Zone Name",
-    "    Surface,                 !- Outside Boundary Condition",
-    "    Zn002:Wall005,           !- Outside Boundary Condition Object",
-    "    NoSun,                   !- Sun Exposure",
-    "    NoWind,                  !- Wind Exposure",
-    "    0.5000000,               !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    9.144000,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    9.144000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn003:Flr001,            !- Name",
-    "    Floor,                   !- Surface Type",
-    "    FLOOR SLAB 8 IN,         !- Construction Name",
-    "    NORTH ZONE,              !- Zone Name",
-    "    Surface,                 !- Outside Boundary Condition",
-    "    Zn003:Flr001,            !- Outside Boundary Condition Object",
-    "    NoSun,                   !- Sun Exposure",
-    "    NoWind,                  !- Wind Exposure",
-    "    1.000000,                !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    0,6.096000,0,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    0,12.19200,0,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    9.144000,12.19200,0,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    9.144000,6.096000,0;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn003:Ceil001,           !- Name",
-    "    CEILING,                 !- Surface Type",
-    "    CEILING:ZONE,            !- Construction Name",
-    "    NORTH ZONE,              !- Zone Name",
-    "    Surface,                 !- Outside Boundary Condition",
-    "    Zn005:Flr001,            !- Outside Boundary Condition Object",
-    "    NoSun,                   !- Sun Exposure",
-    "    NoWind,                  !- Wind Exposure",
-    "    0,                       !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    0,12.19200,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    9.144000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    9.144000,12.19200,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn004:Wall001,           !- Name",
-    "    Wall,                    !- Surface Type",
-    "    EXTWALL80,               !- Construction Name",
-    "    ATTIC ZONE,              !- Zone Name",
-    "    Outdoors,                !- Outside Boundary Condition",
-    "    ,                        !- Outside Boundary Condition Object",
-    "    SunExposed,              !- Sun Exposure",
-    "    WindExposed,             !- Wind Exposure",
-    "    0.5000000,               !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    0,0,3.962400,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    0,0,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    6.096000,0,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    6.096000,0,3.962400;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn004:Wall002,           !- Name",
-    "    Wall,                    !- Surface Type",
-    "    EXTWALL80,               !- Construction Name",
-    "    ATTIC ZONE,              !- Zone Name",
-    "    Outdoors,                !- Outside Boundary Condition",
-    "    ,                        !- Outside Boundary Condition Object",
-    "    SunExposed,              !- Sun Exposure",
-    "    WindExposed,             !- Wind Exposure",
-    "    0.5000000,               !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    6.096000,0,3.962400,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    6.096000,0,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    12.19200,0,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    12.19200,0,3.962400;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn004:Wall003,           !- Name",
-    "    Wall,                    !- Surface Type",
-    "    EXTWALL80,               !- Construction Name",
-    "    ATTIC ZONE,              !- Zone Name",
-    "    Outdoors,                !- Outside Boundary Condition",
-    "    ,                        !- Outside Boundary Condition Object",
-    "    SunExposed,              !- Sun Exposure",
-    "    WindExposed,             !- Wind Exposure",
-    "    0.5000000,               !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    12.19200,0,3.962400,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    12.19200,0,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    12.19200,6.096000,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    12.19200,6.096000,3.962400;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn004:Wall004,           !- Name",
-    "    Wall,                    !- Surface Type",
-    "    EXTWALL80,               !- Construction Name",
-    "    ATTIC ZONE,              !- Zone Name",
-    "    Outdoors,                !- Outside Boundary Condition",
-    "    ,                        !- Outside Boundary Condition Object",
-    "    SunExposed,              !- Sun Exposure",
-    "    WindExposed,             !- Wind Exposure",
-    "    0.5000000,               !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    12.19200,6.096000,3.962400,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    12.19200,6.096000,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    9.144000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    9.144000,6.096000,3.962400;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn004:Wall008,           !- Name",
-    "    Wall,                    !- Surface Type",
-    "    EXTWALL80,               !- Construction Name",
-    "    ATTIC ZONE,              !- Zone Name",
-    "    Outdoors,                !- Outside Boundary Condition",
-    "    ,                        !- Outside Boundary Condition Object",
-    "    SunExposed,              !- Sun Exposure",
-    "    WindExposed,             !- Wind Exposure",
-    "    0.5000000,               !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    0,6.096000,3.962400,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    0,0,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    0,0,3.962400;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn004:Wall009,           !- Name",
-    "    Wall,                    !- Surface Type",
-    "    PARTITION06,             !- Construction Name",
-    "    ATTIC Zone,               !- Zone Name",
-    "    Surface,                 !- Outside Boundary Condition",
-    "    Zn005:Wall004,           !- Outside Boundary Condition Object",
-    "    NoSun,                   !- Sun Exposure",
-    "    NoWind,                  !- Wind Exposure",
-    "    0.5000000,               !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    6.096000,6.096000,3.9624,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    0,6.096000,3.9624;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn004:Wall010,           !- Name",
-    "    Wall,                    !- Surface Type",
-    "    PARTITION06,             !- Construction Name",
-    "    ATTIC ZONE,               !- Zone Name",
-    "    Surface,                 !- Outside Boundary Condition",
-    "    Zn005:Wall005,           !- Outside Boundary Condition Object",
-    "    NoSun,                   !- Sun Exposure",
-    "    NoWind,                  !- Wind Exposure",
-    "    0.5000000,               !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    9.144000,6.096000,3.9624,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    9.144000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    6.096000,6.096000,3.9624;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn004:Roof001,           !- Name",
-    "    Roof,                    !- Surface Type",
-    "    ROOF34,                  !- Construction Name",
-    "    ATTIC ZONE,              !- Zone Name",
-    "    Outdoors,                !- Outside Boundary Condition",
-    "    ,                        !- Outside Boundary Condition Object",
-    "    SunExposed,              !- Sun Exposure",
-    "    WindExposed,             !- Wind Exposure",
-    "    0,                       !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    0,6.096000,3.962400,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    0,0,3.962400,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    6.096000,0,3.962400,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    6.096000,6.096000,3.962400;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn004:Roof002,           !- Name",
-    "    Roof,                    !- Surface Type",
-    "    ROOF34,                  !- Construction Name",
-    "    ATTIC ZONE,              !- Zone Name",
-    "    Outdoors,                !- Outside Boundary Condition",
-    "    ,                        !- Outside Boundary Condition Object",
-    "    SunExposed,              !- Sun Exposure",
-    "    WindExposed,             !- Wind Exposure",
-    "    0,                       !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    6.096000,6.096000,3.962400,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    6.096000,0,3.962400,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    12.19200,0,3.962400,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    12.19200,6.096000,3.962400;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn004:Flr001,            !- Name",
-    "    Floor,                   !- Surface Type",
-    "    CEILING:ATTIC,           !- Construction Name",
-    "    ATTIC ZONE,              !- Zone Name",
-    "    Surface,                 !- Outside Boundary Condition",
-    "    Zn001:Ceil001,           !- Outside Boundary Condition Object",
-    "    NoSun,                   !- Sun Exposure",
-    "    NoWind,                  !- Wind Exposure",
-    "    1.000000,                !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    0,0,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    6.096000,0,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn004:Flr002,            !- Name",
-    "    Floor,                   !- Surface Type",
-    "    CEILING:ATTIC,           !- Construction Name",
-    "    ATTIC ZONE,              !- Zone Name",
-    "    Surface,                 !- Outside Boundary Condition",
-    "    Zn002:Ceil001,           !- Outside Boundary Condition Object",
-    "    NoSun,                   !- Sun Exposure",
-    "    NoWind,                  !- Wind Exposure",
-    "    1.000000,                !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    6.096000,0,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    12.19200,6.096000,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    12.19200,0,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn005:Wall001,           !- Name",
-    "    Wall,                    !- Surface Type",
-    "    EXTWALL80,               !- Construction Name",
-    "    ATTIC NORTH ZONE,              !- Zone Name",
-    "    Outdoors,                !- Outside Boundary Condition",
-    "    ,                        !- Outside Boundary Condition Object",
-    "    SunExposed,              !- Sun Exposure",
-    "    WindExposed,             !- Wind Exposure",
-    "    0.5000000,               !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    9.144000,6.096000,3.962400,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    9.144000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    9.144000,12.19200,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    9.144000,12.19200,3.962400;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn005:Wall002,           !- Name",
-    "    Wall,                    !- Surface Type",
-    "    EXTWALL80,               !- Construction Name",
-    "    ATTIC NORTH ZONE,              !- Zone Name",
-    "    Outdoors,                !- Outside Boundary Condition",
-    "    ,                        !- Outside Boundary Condition Object",
-    "    SunExposed,              !- Sun Exposure",
-    "    WindExposed,             !- Wind Exposure",
-    "    0.5000000,               !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    9.144000,12.19200,3.962400,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    9.144000,12.19200,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    0,12.19200,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    0,12.19200,3.962400;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn005:Wall003,           !- Name",
-    "    Wall,                    !- Surface Type",
-    "    EXTWALL80,               !- Construction Name",
-    "    ATTIC NORTH ZONE,              !- Zone Name",
-    "    Outdoors,                !- Outside Boundary Condition",
-    "    ,                        !- Outside Boundary Condition Object",
-    "    SunExposed,              !- Sun Exposure",
-    "    WindExposed,             !- Wind Exposure",
-    "    0.5000000,               !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    0,12.19200,3.962400,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    0,12.19200,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    0,6.096000,3.962400;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn005:Wall004,           !- Name",
-    "    Wall,                    !- Surface Type",
-    "    PARTITION06,             !- Construction Name",
-    "    ATTIC NORTH ZONE,              !- Zone Name",
-    "    Surface,                 !- Outside Boundary Condition",
-    "    Zn004:Wall009,           !- Outside Boundary Condition Object",
-    "    NoSun,                   !- Sun Exposure",
-    "    NoWind,                  !- Wind Exposure",
-    "    0.5000000,               !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    0,6.096000,3.9624,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    6.096000,6.096000,3.9624;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn005:Wall005,           !- Name",
-    "    Wall,                    !- Surface Type",
-    "    PARTITION06,             !- Construction Name",
-    "    ATTIC NORTH ZONE,              !- Zone Name",
-    "    Surface,                 !- Outside Boundary Condition",
-    "    Zn004:Wall010,           !- Outside Boundary Condition Object",
-    "    NoSun,                   !- Sun Exposure",
-    "    NoWind,                  !- Wind Exposure",
-    "    0.5000000,               !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    6.096000,6.096000,3.9624,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    9.144000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    9.144000,6.096000,3.9624;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn005:Flr001,            !- Name",
-    "    Floor,                   !- Surface Type",
-    "    CEILING:ATTIC,           !- Construction Name",
-    "    ATTIC NORTH ZONE,              !- Zone Name",
-    "    Surface,                 !- Outside Boundary Condition",
-    "    Zn003:Ceil001,           !- Outside Boundary Condition Object",
-    "    NoSun,                   !- Sun Exposure",
-    "    NoWind,                  !- Wind Exposure",
-    "    1.000000,                !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    0,12.19200,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    9.144000,12.19200,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    9.144000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  BuildingSurface:Detailed,",
-    "    Zn005:Roof001,           !- Name",
-    "    Roof,                    !- Surface Type",
-    "    ROOF34,                  !- Construction Name",
-    "    ATTIC NORTH ZONE,              !- Zone Name",
-    "    Outdoors,                !- Outside Boundary Condition",
-    "    ,                        !- Outside Boundary Condition Object",
-    "    SunExposed,              !- Sun Exposure",
-    "    WindExposed,             !- Wind Exposure",
-    "    0,                       !- View Factor to Ground",
-    "    4,                       !- Number of Vertices",
-    "    0,12.19200,3.962400,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    0,6.096000,3.962400,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    9.144000,6.096000,3.962400,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    9.144000,12.19200,3.962400;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  FenestrationSurface:Detailed,",
-    "    Zn001:Wall001:Win001,    !- Name",
-    "    Window,                  !- Surface Type",
-    "    ELECTRO-CON-LIGHT,       !- Construction Name",
-    "    Zn001:Wall001,           !- Building Surface Name",
-    "    ,                        !- Outside Boundary Condition Object",
-    "    0.5000000,               !- View Factor to Ground",
-    "    ,     !- Frame and Divider Name",
-    "    1.0,                     !- Multiplier",
-    "    4,                       !- Number of Vertices",
-    "    0.548000,0,2.5000,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    0.548000,0,0.5000,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    5.548000,0,0.5000,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    5.548000,0,2.5000;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  FenestrationSurface:Detailed,",
-    "    Zn001:Wall003:Door001,   !- Name",
-    "    DOOR,                    !- Surface Type",
-    "    DOOR-CON,                !- Construction Name",
-    "    Zn001:Wall003,           !- Building Surface Name",
-    "    Zn003:Wall004:Door001,   !- Outside Boundary Condition Object",
-    "    0.5000000,               !- View Factor to Ground",
-    "    ,                        !- Frame and Divider Name",
-    "    1.0,                     !- Multiplier",
-    "    4,                       !- Number of Vertices",
-    "    3.500,6.096000,2.0,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    3.500,6.096000,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    2.500,6.096000,0.0,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    2.500,6.096000,2.0;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  FenestrationSurface:Detailed,",
-    "    Zn003:Wall002:Win001,    !- Name",
-    "    Window,                  !- Surface Type",
-    "    ELECTRO-CON-LIGHT,       !- Construction Name",
-    "    Zn003:Wall002,           !- Building Surface Name",
-    "    ,                        !- Outside Boundary Condition Object",
-    "    0.5000000,               !- View Factor to Ground",
-    "    ,     !- Frame and Divider Name",
-    "    1.0,                     !- Multiplier",
-    "    4,                       !- Number of Vertices",
-    "    5.548000,12.19200,2.5000,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    5.548000,12.19200,0.5000,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    0.548000,12.19200,0.5000,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    0.548000,12.19200,2.5000;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  FenestrationSurface:Detailed,",
-    "    Zn003:Wall004:Door001,   !- Name",
-    "    DOOR,                    !- Surface Type",
-    "    DOOR-CON,                !- Construction Name",
-    "    Zn003:Wall004,           !- Building Surface Name",
-    "    Zn001:Wall003:Door001,   !- Outside Boundary Condition Object",
-    "    0.5000000,               !- View Factor to Ground",
-    "    ,                        !- Frame and Divider Name",
-    "    1.0,                     !- Multiplier",
-    "    4,                       !- Number of Vertices",
-    "    2.500,6.096000,2.0,  !- X,Y,Z ==> Vertex 1 {m}",
-    "    2.500,6.096000,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
-    "    3.500,6.096000,0.0,  !- X,Y,Z ==> Vertex 3 {m}",
-    "    3.500,6.096000,2.0;  !- X,Y,Z ==> Vertex 4 {m}",
-
-    "  ScheduleTypeLimits,",
-    "    Any Number;              !- Name",
-
-    "  ScheduleTypeLimits,",
-    "    Fraction,                !- Name",
-    "    0.0,                     !- Lower Limit Value",
-    "    1.0,                     !- Upper Limit Value",
-    "    CONTINUOUS;              !- Numeric Type",
-
-    "  ScheduleTypeLimits,",
-    "    Temperature,             !- Name",
-    "    -60,                     !- Lower Limit Value",
-    "    200,                     !- Upper Limit Value",
-    "    CONTINUOUS,              !- Numeric Type",
-    "    Temperature;             !- Unit Type",
-
-    "  ScheduleTypeLimits,",
-    "    Control Type,            !- Name",
-    "    0,                       !- Lower Limit Value",
-    "    4,                       !- Upper Limit Value",
-    "    DISCRETE;                !- Numeric Type",
-
-    "  ScheduleTypeLimits,",
-    "    On/Off,                  !- Name",
-    "    0,                       !- Lower Limit Value",
-    "    1,                       !- Upper Limit Value",
-    "    DISCRETE;                !- Numeric Type",
-
-    "  Schedule:Compact,",
-    "    WindowVentSched,         !- Name",
-    "    Any Number,              !- Schedule Type Limits Name",
-    "    Through: 3/31,           !- Field 1",
-    "    For: AllDays,            !- Field 2",
-    "    Until: 24:00,25.55,      !- Field 3",
-    "    Through: 9/30,           !- Field 5",
-    "    For: AllDays,            !- Field 6",
-    "    Until: 24:00,21.11,      !- Field 7",
-    "    Through: 12/31,          !- Field 9",
-    "    For: AllDays,            !- Field 10",
-    "    Until: 24:00,25.55;      !- Field 11",
-
-    "  Schedule:Compact,",
-    "    Activity Sch,            !- Name",
-    "    Any Number,              !- Schedule Type Limits Name",
-    "    Through: 12/31,          !- Field 1",
-    "    For: AllDays,            !- Field 2",
-    "    Until: 24:00,131.8;      !- Field 3",
-
-    "  Schedule:Compact,",
-    "    Work Eff Sch,            !- Name",
-    "    Any Number,              !- Schedule Type Limits Name",
-    "    Through: 12/31,          !- Field 1",
-    "    For: AllDays,            !- Field 2",
-    "    Until: 24:00,0.0;        !- Field 3",
-
-    "  Schedule:Compact,",
-    "    Clothing Sch,            !- Name",
-    "    Any Number,              !- Schedule Type Limits Name",
-    "    Through: 12/31,          !- Field 1",
-    "    For: AllDays,            !- Field 2",
-    "    Until: 24:00,1.0;        !- Field 3",
-
-    "  Schedule:Compact,",
-    "    Air Velo Sch,            !- Name",
-    "    Any Number,              !- Schedule Type Limits Name",
-    "    Through: 12/31,          !- Field 1",
-    "    For: AllDays,            !- Field 2",
-    "    Until: 24:00,0.137;      !- Field 3",
-
-    "  Schedule:Compact,",
-    "    OFFICE OCCUPANCY,        !- Name",
-    "    Fraction,                !- Schedule Type Limits Name",
-    "    Through: 12/31,          !- Field 1",
-    "    For: WeekDays,           !- Field 2",
-    "    Until: 6:00,0.0,         !- Field 3",
-    "    Until: 7:00,0.10,        !- Field 5",
-    "    Until: 8:00,0.50,        !- Field 7",
-    "    Until: 12:00,1.00,       !- Field 9",
-    "    Until: 13:00,0.50,       !- Field 11",
-    "    Until: 16:00,1.00,       !- Field 13",
-    "    Until: 17:00,0.50,       !- Field 15",
-    "    Until: 18:00,0.10,       !- Field 17",
-    "    Until: 24:00,0.0,        !- Field 19",
-    "    For: AllOtherDays,       !- Field 21",
-    "    Until: 24:00,0.0;        !- Field 22",
-
-    "  Schedule:Compact,",
-    "    INTERMITTENT,            !- Name",
-    "    Fraction,                !- Schedule Type Limits Name",
-    "    Through: 12/31,          !- Field 1",
-    "    For: WeekDays,           !- Field 2",
-    "    Until: 8:00,0.0,         !- Field 3",
-    "    Until: 18:00,1.00,       !- Field 5",
-    "    Until: 24:00,0.0,        !- Field 7",
-    "    For: AllOtherDays,       !- Field 9",
-    "    Until: 24:00,0.0;        !- Field 10",
-
-    "  Schedule:Compact,",
-    "    OFFICE LIGHTING,         !- Name",
-    "    Fraction,                !- Schedule Type Limits Name",
-    "    Through: 12/31,          !- Field 1",
-    "    For: WeekDays,           !- Field 2",
-    "    Until: 6:00,0.05,        !- Field 3",
-    "    Until: 7:00,0.20,        !- Field 5",
-    "    Until: 17:00,1.00,       !- Field 7",
-    "    Until: 18:00,0.50,       !- Field 9",
-    "    Until: 24:00,0.05,       !- Field 11",
-    "    For: AllOtherDays,       !- Field 13",
-    "    Until: 24:00,0.05;       !- Field 14",
-
-    "  Schedule:Compact,",
-    "    FanAndCoilAvailSched,    !- Name",
-    "    Fraction,                !- Schedule Type Limits Name",
-    "    Through: 3/31,           !- Field 1",
-    "    For: AllDays,            !- Field 2",
-    "    Until: 24:00,1.0,        !- Field 3",
-    "    Through: 9/30,           !- Field 5",
-    "    For: WeekDays SummerDesignDay, !- Field 6",
-    "    Until: 7:00,0.0,         !- Field 7",
-    "    Until: 17:00,1.0,        !- Field 9",
-    "    Until: 24:00,0.0,        !- Field 11",
-    "    For: WinterDesignDay,    !- Field 13",
-    "    Until: 24:00,0.0,        !- Field 14",
-    "    For: AllOtherDays,       !- Field 16",
-    "    Until: 24:00,0.0,        !- Field 17",
-    "    Through: 12/31,          !- Field 19",
-    "    For: AllDays,            !- Field 20",
-    "    Until: 24:00,1.0;        !- Field 21",
-
-    "  Schedule:Compact,",
-    "    CoolingCoilAvailSched,   !- Name",
-    "    Fraction,                !- Schedule Type Limits Name",
-    "    Through: 3/31,           !- Field 1",
-    "    For: AllDays,            !- Field 2",
-    "    Until: 24:00,0.0,        !- Field 3",
-    "    Through: 9/30,           !- Field 5",
-    "    For: WeekDays SummerDesignDay, !- Field 6",
-    "    Until: 7:00,0.0,         !- Field 7",
-    "    Until: 17:00,1.0,        !- Field 9",
-    "    Until: 24:00,0.0,        !- Field 11",
-    "    For: WinterDesignDay,    !- Field 13",
-    "    Until: 24:00,0.0,        !- Field 14",
-    "    For: AllOtherDays,       !- Field 16",
-    "    Until: 24:00,0.0,        !- Field 17",
-    "    Through: 12/31,          !- Field 19",
-    "    For: AllDays,            !- Field 20",
-    "    Until: 24:00,0.0;        !- Field 21",
-
-    "  Schedule:Compact,",
-    "    Dual Heating Setpoints,  !- Name",
-    "    Temperature,             !- Schedule Type Limits Name",
-    "    Through: 12/31,          !- Field 1",
-    "    For: AllDays,            !- Field 2",
-    "    Until:  7:00,15.0,       !- Field 3",
-    "    Until: 17:00,22.0,       !- Field 5",
-    "    Until: 24:00,15.0;       !- Field 7",
-
-    "  Schedule:Compact,",
-    "    Dual Cooling Setpoints,  !- Name",
-    "    Temperature,             !- Schedule Type Limits Name",
-    "    Through: 12/31,          !- Field 1",
-    "    For: AllDays,            !- Field 2",
-    "    Until:  7:00,35.0,       !- Field 3",
-    "    Until: 17:00,24.0,       !- Field 5",
-    "    Until: 24:00,40.0;       !- Field 7",
-
-    "  Schedule:Compact,",
-    "    Dual Zone Control Type Sched,  !- Name",
-    "    Control Type,            !- Schedule Type Limits Name",
-    "    Through: 12/31,          !- Field 1",
-    "    For: AllDays,            !- Field 2",
-    "    Until: 24:00,4;          !- Field 3",
-
-    "  Schedule:Compact,",
-    "    VentingSched,            !- Name",
-    "    Fraction,                !- Schedule Type Limits Name",
-    "    Through: 12/31,          !- Field 1",
-    "    For: AllDays,            !- Field 2",
-    "    Until:  7:00,1.0,        !- Field 3",
-    "    Until: 17:00,0.0,        !- Field 5",
-    "    Until: 24:00,1.0;        !- Field 7",
-
-    "  Schedule:Compact,",
-    "    Minimum OA Sch,          !- Name",
-    "    Temperature,             !- Schedule Type Limits Name",
-    "    Through: 3/31,           !- Field 1",
-    "    For: AllDays,            !- Field 2",
-    "    Until:  7:00,0.10,       !- Field 3",
-    "    Until: 17:00,0.25,       !- Field 5",
-    "    Until: 24:00,0.10,       !- Field 7",
-    "    Through: 9/30,           !- Field 9",
-    "    For: AllDays,            !- Field 10",
-    "    Until: 24:00,0.25,       !- Field 11",
-    "    Through: 12/31,          !- Field 13",
-    "    For: AllDays,            !- Field 14",
-    "    Until:  7:00,0.10,       !- Field 15",
-    "    Until: 17:00,0.25,       !- Field 17",
-    "    Until: 24:00,0.10;       !- Field 19",
-
-    "  People,",
-    "    West Zone People,        !- Name",
-    "    West Zone,               !- Zone or ZoneList Name",
-    "    OFFICE OCCUPANCY,        !- Number of People Schedule Name",
-    "    people,                  !- Number of People Calculation Method",
-    "    3.000000,                !- Number of People",
-    "    ,                        !- People per Zone Floor Area {person/m2}",
-    "    ,                        !- Zone Floor Area per Person {m2/person}",
-    "    0.3000000,               !- Fraction Radiant",
-    "    ,                        !- Sensible Heat Fraction",
-    "    Activity Sch,            !- Activity Level Schedule Name",
-    "    3.82E-8,                 !- Carbon Dioxide Generation Rate {m3/s-W}",
-    "    ,                        !- Enable ASHRAE 55 Comfort Warnings",
-    "    zoneaveraged,            !- Mean Radiant Temperature Calculation Type",
-    "    ,                        !- Surface Name/Angle Factor List Name",
-    "    Work Eff Sch,            !- Work Efficiency Schedule Name",
-    "    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
-    "    ,                        !- Clothing Insulation Calculation Method Schedule Name",
-    "    Clothing Sch,            !- Clothing Insulation Schedule Name",
-    "    Air Velo Sch,            !- Air Velocity Schedule Name",
-    "    FANGER;                  !- Thermal Comfort Model 1 Type",
-
-    "  People,",
-    "    EAST ZONE People,        !- Name",
-    "    EAST ZONE,               !- Zone or ZoneList Name",
-    "    OFFICE OCCUPANCY,        !- Number of People Schedule Name",
-    "    people,                  !- Number of People Calculation Method",
-    "    3.000000,                !- Number of People",
-    "    ,                        !- People per Zone Floor Area {person/m2}",
-    "    ,                        !- Zone Floor Area per Person {m2/person}",
-    "    0.3000000,               !- Fraction Radiant",
-    "    ,                        !- Sensible Heat Fraction",
-    "    Activity Sch,            !- Activity Level Schedule Name",
-    "    3.82E-8,                 !- Carbon Dioxide Generation Rate {m3/s-W}",
-    "    ,                        !- Enable ASHRAE 55 Comfort Warnings",
-    "    zoneaveraged,            !- Mean Radiant Temperature Calculation Type",
-    "    ,                        !- Surface Name/Angle Factor List Name",
-    "    Work Eff Sch,            !- Work Efficiency Schedule Name",
-    "    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
-    "    ,                        !- Clothing Insulation Calculation Method Schedule Name",
-    "    Clothing Sch,            !- Clothing Insulation Schedule Name",
-    "    Air Velo Sch,            !- Air Velocity Schedule Name",
-    "    FANGER;                  !- Thermal Comfort Model 1 Type",
-
-    "  People,",
-    "    NORTH ZONE People,       !- Name",
-    "    NORTH ZONE,              !- Zone or ZoneList Name",
-    "    OFFICE OCCUPANCY,        !- Number of People Schedule Name",
-    "    people,                  !- Number of People Calculation Method",
-    "    4.000000,                !- Number of People",
-    "    ,                        !- People per Zone Floor Area {person/m2}",
-    "    ,                        !- Zone Floor Area per Person {m2/person}",
-    "    0.3000000,               !- Fraction Radiant",
-    "    ,                        !- Sensible Heat Fraction",
-    "    Activity Sch,            !- Activity Level Schedule Name",
-    "    3.82E-8,                 !- Carbon Dioxide Generation Rate {m3/s-W}",
-    "    ,                        !- Enable ASHRAE 55 Comfort Warnings",
-    "    zoneaveraged,            !- Mean Radiant Temperature Calculation Type",
-    "    ,                        !- Surface Name/Angle Factor List Name",
-    "    Work Eff Sch,            !- Work Efficiency Schedule Name",
-    "    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
-    "    ,                        !- Clothing Insulation Calculation Method Schedule Name",
-    "    Clothing Sch,            !- Clothing Insulation Schedule Name",
-    "    Air Velo Sch,            !- Air Velocity Schedule Name",
-    "    FANGER;                  !- Thermal Comfort Model 1 Type",
-
-    "  Lights,",
-    "    West Zone Lights 1,      !- Name",
-    "    West Zone,               !- Zone or ZoneList Name",
-    "    OFFICE LIGHTING,         !- Schedule Name",
-    "    LightingLevel,           !- Design Level Calculation Method",
-    "    1464.375,                !- Lighting Level {W}",
-    "    ,                        !- Watts per Zone Floor Area {W/m2}",
-    "    ,                        !- Watts per Person {W/person}",
-    "    0,                       !- Return Air Fraction",
-    "    0.2000000,               !- Fraction Radiant",
-    "    0.2000000,               !- Fraction Visible",
-    "    1.0,                     !- Fraction Replaceable",
-    "    GeneralLights;           !- End-Use Subcategory",
-
-    "  Lights,",
-    "    EAST ZONE Lights 1,      !- Name",
-    "    EAST ZONE,               !- Zone or ZoneList Name",
-    "    OFFICE LIGHTING,         !- Schedule Name",
-    "    LightingLevel,           !- Design Level Calculation Method",
-    "    1464.375,                !- Lighting Level {W}",
-    "    ,                        !- Watts per Zone Floor Area {W/m2}",
-    "    ,                        !- Watts per Person {W/person}",
-    "    0,                       !- Return Air Fraction",
-    "    0.2000000,               !- Fraction Radiant",
-    "    0.2000000,               !- Fraction Visible",
-    "    1.0,                     !- Fraction Replaceable",
-    "    GeneralLights;           !- End-Use Subcategory",
-
-    "  Lights,",
-    "    NORTH ZONE Lights 1,     !- Name",
-    "    NORTH ZONE,              !- Zone or ZoneList Name",
-    "    OFFICE LIGHTING,         !- Schedule Name",
-    "    LightingLevel,           !- Design Level Calculation Method",
-    "    1464.375,                !- Lighting Level {W}",
-    "    ,                        !- Watts per Zone Floor Area {W/m2}",
-    "    ,                        !- Watts per Person {W/person}",
-    "    0,                       !- Return Air Fraction",
-    "    0.2000000,               !- Fraction Radiant",
-    "    0.2000000,               !- Fraction Visible",
-    "    1.0,                     !- Fraction Replaceable",
-    "    GeneralLights;           !- End-Use Subcategory",
-
-    "  ElectricEquipment,",
-    "    West Zone ElecEq 1,      !- Name",
-    "    West Zone,               !- Zone or ZoneList Name",
-    "    INTERMITTENT,            !- Schedule Name",
-    "    EquipmentLevel,          !- Design Level Calculation Method",
-    "    2928.751,                !- Design Level {W}",
-    "    ,                        !- Watts per Zone Floor Area {W/m2}",
-    "    ,                        !- Watts per Person {W/person}",
-    "    0,                       !- Fraction Latent",
-    "    0.3000000,               !- Fraction Radiant",
-    "    0;                       !- Fraction Lost",
-
-    "  ElectricEquipment,",
-    "    EAST ZONE ElecEq 1,      !- Name",
-    "    EAST ZONE,               !- Zone or ZoneList Name",
-    "    INTERMITTENT,            !- Schedule Name",
-    "    EquipmentLevel,          !- Design Level Calculation Method",
-    "    1464.375,                !- Design Level {W}",
-    "    ,                        !- Watts per Zone Floor Area {W/m2}",
-    "    ,                        !- Watts per Person {W/person}",
-    "    0,                       !- Fraction Latent",
-    "    0.3000000,               !- Fraction Radiant",
-    "    0;                       !- Fraction Lost",
-
-    "  ElectricEquipment,",
-    "    NORTH ZONE ElecEq 1,     !- Name",
-    "    NORTH ZONE,              !- Zone or ZoneList Name",
-    "    INTERMITTENT,            !- Schedule Name",
-    "    EquipmentLevel,          !- Design Level Calculation Method",
-    "    2928.751,                !- Design Level {W}",
-    "    ,                        !- Watts per Zone Floor Area {W/m2}",
-    "    ,                        !- Watts per Person {W/person}",
-    "    0,                       !- Fraction Latent",
-    "    0.3000000,               !- Fraction Radiant",
-    "    0;                       !- Fraction Lost",
-
-    "  Daylighting:Controls,",
-    "    West Zone_DaylCtrl,      !- Name",
-    "    West Zone,               !- Zone Name",
-    "    SplitFlux,               !- Daylighting Method",
-    "    ,                        !- Availability Schedule Name",
-    "    Continuous,              !- Lighting Control Type",
-    "    0.3,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control",
-    "    0.2,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control",
-    "    ,                        !- Number of Stepped Control Steps",
-    "    1.0,                     !- Probability Lighting will be Reset When Needed in Manual Stepped Control",
-    "    West Zone_DaylRefPt1,    !- Glare Calculation Daylighting Reference Point Name",
-    "    180.0,                   !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}",
-    "    20.0,                    !- Maximum Allowable Discomfort Glare Index",
-    "    ,                        !- DElight Gridding Resolution {m2}",
-    "    West Zone_DaylRefPt1,    !- Daylighting Reference Point 1 Name",
-    "    1.0,                     !- Fraction of Zone Controlled by Reference Point 1",
-    "    500.;                    !- Illuminance Setpoint at Reference Point 1 {lux}",
-
-    "  Daylighting:ReferencePoint,",
-    "    West Zone_DaylRefPt1,    !- Name",
-    "    West Zone,               !- Zone Name",
-    "    3.048,                   !- X-Coordinate of Reference Point {m}",
-    "    3.048,                   !- Y-Coordinate of Reference Point {m}",
-    "    0.9;                     !- Z-Coordinate of Reference Point {m}",
-
-    "  Curve:Biquadratic,",
-    "    WindACCoolCapFT,         !- Name",
-    "    0.942587793,             !- Coefficient1 Constant",
-    "    0.009543347,             !- Coefficient2 x",
-    "    0.000683770,             !- Coefficient3 x**2",
-    "    -0.011042676,            !- Coefficient4 y",
-    "    0.000005249,             !- Coefficient5 y**2",
-    "    -0.000009720,            !- Coefficient6 x*y",
-    "    12.77778,                !- Minimum Value of x",
-    "    23.88889,                !- Maximum Value of x",
-    "    18.0,                    !- Minimum Value of y",
-    "    46.11111,                !- Maximum Value of y",
-    "    ,                        !- Minimum Curve Output",
-    "    ,                        !- Maximum Curve Output",
-    "    Temperature,             !- Input Unit Type for X",
-    "    Temperature,             !- Input Unit Type for Y",
-    "    Dimensionless;           !- Output Unit Type",
-
-    "  Curve:Biquadratic,",
-    "    WindACEIRFT,             !- Name",
-    "    0.342414409,             !- Coefficient1 Constant",
-    "    0.034885008,             !- Coefficient2 x",
-    "    -0.000623700,            !- Coefficient3 x**2",
-    "    0.004977216,             !- Coefficient4 y",
-    "    0.000437951,             !- Coefficient5 y**2",
-    "    -0.000728028,            !- Coefficient6 x*y",
-    "    12.77778,                !- Minimum Value of x",
-    "    23.88889,                !- Maximum Value of x",
-    "    18.0,                    !- Minimum Value of y",
-    "    46.11111,                !- Maximum Value of y",
-    "    ,                        !- Minimum Curve Output",
-    "    ,                        !- Maximum Curve Output",
-    "    Temperature,             !- Input Unit Type for X",
-    "    Temperature,             !- Input Unit Type for Y",
-    "    Dimensionless;           !- Output Unit Type",
-
-    "  Curve:Quadratic,",
-    "    WindACCoolCapFFF,        !- Name",
-    "    0.8,                     !- Coefficient1 Constant",
-    "    0.2,                     !- Coefficient2 x",
-    "    0.0,                     !- Coefficient3 x**2",
-    "    0.5,                     !- Minimum Value of x",
-    "    1.5;                     !- Maximum Value of x",
-
-    "  Curve:Quadratic,",
-    "    WindACEIRFFF,            !- Name",
-    "    1.1552,                  !- Coefficient1 Constant",
-    "    -0.1808,                 !- Coefficient2 x",
-    "    0.0256,                  !- Coefficient3 x**2",
-    "    0.5,                     !- Minimum Value of x",
-    "    1.5;                     !- Maximum Value of x",
-
-    "  Curve:Quadratic,",
-    "    WindACPLFFPLR,           !- Name",
-    "    0.85,                    !- Coefficient1 Constant",
-    "    0.15,                    !- Coefficient2 x",
-    "    0.0,                     !- Coefficient3 x**2",
-    "    0.0,                     !- Minimum Value of x",
-    "    1.0;                     !- Maximum Value of x",
-
-    "  NodeList,",
-    "    OutsideAirInletNodes,    !- Name",
-    "    Outside Air Inlet Node;  !- Node 1 Name",
-
-    "  NodeList,",
-    "    Zone1Inlets,             !- Name",
-    "    Zone 1 NoReheat Air Outlet Node;  !- Node 1 Name",
-
-    "  NodeList,",
-    "    Zone2Inlets,             !- Name",
-    "    Zone 2 Reheat Air Outlet Node;  !- Node 1 Name",
-
-    "  NodeList,",
-    "    Supply Air Temp Nodes,   !- Name",
-    "    Heating Coil Air Inlet Node,  !- Node 1 Name",
-    "    Air Loop Outlet Node;    !- Node 2 Name",
-
-    "  BranchList,",
-    "    Air Loop Branches,       !- Name",
-    "    Air Loop Main Branch;    !- Branch 1 Name",
-
-    "  Branch,",
-    "    Air Loop Main Branch,    !- Name",
-    "    ,                        !- Pressure Drop Curve Name",
-    "    AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
-    "    OA Sys 1,                !- Component 1 Name",
-    "    Air Loop Inlet Node,     !- Component 1 Inlet Node Name",
-    "    Mixed Air Node,          !- Component 1 Outlet Node Name",
-    "    Fan:ConstantVolume,      !- Component 2 Object Type",
-    "    Supply Fan 1,            !- Component 2 Name",
-    "    Mixed Air Node,          !- Component 2 Inlet Node Name",
-    "    Cooling Coil Air Inlet Node,  !- Component 2 Outlet Node Name",
-    "    CoilSystem:Cooling:DX,   !- Component 3 Object Type",
-    "    DX Cooling Coil System 1,!- Component 3 Name",
-    "    Cooling Coil Air Inlet Node,  !- Component 3 Inlet Node Name",
-    "    Heating Coil Air Inlet Node,  !- Component 3 Outlet Node Name",
-    "    Coil:Heating:Fuel,       !- Component 4 Object Type",
-    "    Main Heating Coil 1,     !- Component 4 Name",
-    "    Heating Coil Air Inlet Node,  !- Component 4 Inlet Node Name",
-    "    Air Loop Outlet Node;    !- Component 4 Outlet Node Name",
-
-    "  AirLoopHVAC,",
-    "    Typical Terminal Reheat 1,  !- Name",
-    "    ,                        !- Controller List Name",
-    "    Reheat System 1 Avail List,  !- Availability Manager List Name",
-    "    1.16,                     !- Design Supply Air Flow Rate {m3/s}",
-    "    Air Loop Branches,       !- Branch List Name",
-    "    ,                        !- Connector List Name",
-    "    Air Loop Inlet Node,     !- Supply Side Inlet Node Name",
-    "    Return Air Mixer Outlet, !- Demand Side Outlet Node Name",
-    "    Zone Equipment Inlet Node,  !- Demand Side Inlet Node Names",
-    "    Air Loop Outlet Node;    !- Supply Side Outlet Node Names",
-
-    "  AirLoopHVAC:ControllerList,",
-    "    OA Sys 1 Controllers,    !- Name",
-    "    Controller:OutdoorAir,   !- Controller 1 Object Type",
-    "    OA Controller 1;         !- Controller 1 Name",
-
-    "  AirLoopHVAC:OutdoorAirSystem:EquipmentList,",
-    "    OA Sys 1 Equipment,      !- Name",
-    "    OutdoorAir:Mixer,        !- Component 1 Object Type",
-    "    OA Mixing Box 1;         !- Component 1 Name",
-
-    "  AirLoopHVAC:OutdoorAirSystem,",
-    "    OA Sys 1,                !- Name",
-    "    OA Sys 1 Controllers,    !- Controller List Name",
-    "    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name",
-    "    Reheat System 1 Avail List;  !- Availability Manager List Name",
-
-    "  OutdoorAir:NodeList,",
-    "    OutsideAirInletNodes;    !- Node or NodeList Name 1",
-
-    "  OutdoorAir:Mixer,",
-    "    OA Mixing Box 1,         !- Name",
-    "    Mixed Air Node,          !- Mixed Air Node Name",
-    "    Outside Air Inlet Node,  !- Outdoor Air Stream Node Name",
-    "    Relief Air Outlet Node,  !- Relief Air Stream Node Name",
-    "    Air Loop Inlet Node;     !- Return Air Stream Node Name",
-
-    "  AirflowNetwork:SimulationControl,",
-    "    AirflowNetwork_All,      !- Name",
-    "    MultizoneWithDistribution,  !- AirflowNetwork Control",
-    "    INPUT,                   !- Wind Pressure Coefficient Type",
-    "    ExternalNode,            !- Height Selection for Local Wind Pressure Calculation",
-    "    LOWRISE,                 !- Building Type",
-    "    500,                     !- Maximum Number of Iterations {dimensionless}",
-    "    ZeroNodePressures,       !- Initialization Type",
-    "    1.0E-04,                 !- Relative Airflow Convergence Tolerance {dimensionless}",
-    "    1.0E-04,                 !- Absolute Airflow Convergence Tolerance {kg/s}",
-    "    -0.5,                    !- Convergence Acceleration Limit {dimensionless}",
-    "    0.0,                     !- Azimuth Angle of Long Axis of Building {deg}",
-    "    1.0;                     !- Ratio of Building Width Along Short Axis to Width Along Long Axis",
-
-    "  AirflowNetwork:MultiZone:Zone,",
-    "    West Zone,               !- Zone Name",
-    "    Temperature,             !- Ventilation Control Mode",
-    "    WindowVentSched,         !- Ventilation Control Zone Temperature Setpoint Schedule Name",
-    "    0.3,                     !- Minimum Venting Open Factor {dimensionless}",
-    "    5.0,                     !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor {deltaC}",
-    "    10.0,                    !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor {deltaC}",
-    "    0.0,                     !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor {deltaJ/kg}",
-    "    300000.0,                !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor {deltaJ/kg}",
-    "    VentingSched;            !- Venting Availability Schedule Name",
-
-    "  AirflowNetwork:MultiZone:Zone,",
-    "    EAST ZONE,               !- Zone Name",
-    "    NoVent,                  !- Ventilation Control Mode",
-    "    ,                        !- Ventilation Control Zone Temperature Setpoint Schedule Name",
-    "    1.0,                     !- Minimum Venting Open Factor {dimensionless}",
-    "    0.0,                     !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor {deltaC}",
-    "    100.0,                   !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor {deltaC}",
-    "    0.0,                     !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor {deltaJ/kg}",
-    "    300000.0;                !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor {deltaJ/kg}",
-
-    "  AirflowNetwork:MultiZone:Zone,",
-    "    NORTH ZONE,              !- Zone Name",
-    "    Temperature,             !- Ventilation Control Mode",
-    "    WindowVentSched,         !- Ventilation Control Zone Temperature Setpoint Schedule Name",
-    "    1.0,                     !- Minimum Venting Open Factor {dimensionless}",
-    "    0.0,                     !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor {deltaC}",
-    "    100.0,                   !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor {deltaC}",
-    "    0.0,                     !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor {deltaJ/kg}",
-    "    300000.0,                !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor {deltaJ/kg}",
-    "    VentingSched;            !- Venting Availability Schedule Name",
-
-    "  AirflowNetwork:MultiZone:Zone,",
-    "    ATTIC ZONE,              !- Zone Name",
-    "    NoVent,                  !- Ventilation Control Mode",
-    "    ,                        !- Ventilation Control Zone Temperature Setpoint Schedule Name",
-    "    1.0,                     !- Minimum Venting Open Factor {dimensionless}",
-    "    0.0,                     !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor {deltaC}",
-    "    100.0,                   !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor {deltaC}",
-    "    0.0,                     !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor {deltaJ/kg}",
-    "    300000.0;                !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor {deltaJ/kg}",
-
-    "  AirflowNetwork:MultiZone:Zone,",
-    "    ATTIC NORTH ZONE,              !- Zone Name",
-    "    NoVent,                  !- Ventilation Control Mode",
-    "    ,                        !- Ventilation Control Zone Temperature Setpoint Schedule Name",
-    "    1.0,                     !- Minimum Venting Open Factor {dimensionless}",
-    "    0.0,                     !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor {deltaC}",
-    "    100.0,                   !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor {deltaC}",
-    "    0.0,                     !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor {deltaJ/kg}",
-    "    300000.0;                !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor {deltaJ/kg}",
-
-    "  AirflowNetwork:MultiZone:Surface,",
-    "    Zn001:Wall001,           !- Surface Name",
-    "    ELA-1,                   !- Leakage Component Name",
-    "    SFacade,                 !- External Node Name",
-    "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
-
-    "  AirflowNetwork:MultiZone:Surface,",
-    "    Zn001:Wall001:Win001,    !- Surface Name",
-    "    CR-1,                    !- Leakage Component Name",
-    "    SFacade,                 !- External Node Name",
-    "    0.5;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
-
-    "  AirflowNetwork:MultiZone:Surface,",
-    "    Zn001:Wall002,           !- Surface Name",
-    "    CR-1,                    !- Leakage Component Name",
-    "    WFacade,                 !- External Node Name",
-    "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
-
-    "  AirflowNetwork:MultiZone:Surface,",
-    "    Zn001:Wall003,           !- Surface Name",
-    "    CRcri,                   !- Leakage Component Name",
-    "    ,                        !- External Node Name",
-    "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
-
-    "  AirflowNetwork:MultiZone:Surface,",
-    "    Zn001:Wall003:Door001,   !- Surface Name",
-    "    CRcri,                   !- Leakage Component Name",
-    "    ,                        !- External Node Name",
-    "    0.5;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
-
-    "  AirflowNetwork:MultiZone:Surface,",
-    "    Zn001:Wall004,           !- Surface Name",
-    "    CRcri,                   !- Leakage Component Name",
-    "    ,                        !- External Node Name",
-    "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
-
-    "  AirflowNetwork:MultiZone:Surface,",
-    "    Zn001:Ceil001,           !- Surface Name",
-    "    CRcri,                   !- Leakage Component Name",
-    "    ,                        !- External Node Name",
-    "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
-
-    "  AirflowNetwork:MultiZone:Surface,",
-    "    Zn002:Wall002,           !- Surface Name",
-    "    CR-1,                    !- Leakage Component Name",
-    "    SFacade,                 !- External Node Name",
-    "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
-
-    "  AirflowNetwork:MultiZone:Surface,",
-    "    Zn002:Wall003,           !- Surface Name",
-    "    CR-1,                    !- Leakage Component Name",
-    "    EFacade,                 !- External Node Name",
-    "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
-
-    "  AirflowNetwork:MultiZone:Surface,",
-    "    Zn002:Wall005,           !- Surface Name",
-    "    CRcri,                   !- Leakage Component Name",
-    "    ,                        !- External Node Name",
-    "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
-
-    "  AirflowNetwork:MultiZone:Surface,",
-    "    Zn002:Ceil001,           !- Surface Name",
-    "    CRcri,                   !- Leakage Component Name",
-    "    ,                        !- External Node Name",
-    "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
-
-    "  AirflowNetwork:MultiZone:Surface,",
-    "    Zn003:Wall001,           !- Surface Name",
-    "    CR-1,                    !- Leakage Component Name",
-    "    WFacade,                 !- External Node Name",
-    "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
-
-    "  AirflowNetwork:MultiZone:Surface,",
-    "    Zn003:Wall002,           !- Surface Name",
-    "    CR-1,                    !- Leakage Component Name",
-    "    NFacade,                 !- External Node Name",
-    "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
-
-    "  AirflowNetwork:MultiZone:Surface,",
-    "    Zn003:Wall002:Win001,    !- Surface Name",
-    "    CR-1,                    !- Leakage Component Name",
-    "    NFacade,                 !- External Node Name",
-    "    0.5;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
-
-    "  AirflowNetwork:MultiZone:Surface,",
-    "    Zn003:Ceil001,           !- Surface Name",
-    "    CRcri,                   !- Leakage Component Name",
-    "    ,                        !- External Node Name",
-    "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
-
-    "  AirflowNetwork:MultiZone:Surface,",
-    "    Zn004:Roof001,           !- Surface Name",
-    "    CR-1,                    !- Leakage Component Name",
-    "    Horizontal,              !- External Node Name",
-    "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
-
-    "  AirflowNetwork:MultiZone:Surface,",
-    "    Zn004:Roof002,           !- Surface Name",
-    "    CR-1,                    !- Leakage Component Name",
-    "    Horizontal,              !- External Node Name",
-    "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
-
-    "  AirflowNetwork:MultiZone:Surface,",
-    "    Zn005:Roof001,           !- Surface Name",
-    "    CR-1,                    !- Leakage Component Name",
-    "    Horizontal,              !- External Node Name",
-    "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
-
-    "  AirflowNetwork:MultiZone:Surface,",
-    "    Zn005:Wall004,           !- Surface Name",
-    "    CR-1,                    !- Leakage Component Name",
-    "    ,              !- External Node Name",
-    "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
-
-    "  AirflowNetwork:MultiZone:Surface,",
-    "    Zn005:Wall005,           !- Surface Name",
-    "    CR-1,                    !- Leakage Component Name",
-    "    ,              !- External Node Name",
-    "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
-
-    "  AirflowNetwork:MultiZone:Component:DetailedOpening,",
-    "    WiOpen1,                 !- Name",
-    "    0.0001,                  !- Air Mass Flow Coefficient When Opening is Closed {kg/s-m}",
-    "    0.667,                   !- Air Mass Flow Exponent When Opening is Closed {dimensionless}",
-    "    NonPivoted,              !- Type of Rectangular Large Vertical Opening (LVO)",
-    "    0.0,                     !- Extra Crack Length or Height of Pivoting Axis {m}",
-    "    2,                       !- Number of Sets of Opening Factor Data",
-    "    0.0,                     !- Opening Factor 1 {dimensionless}",
-    "    0.5,                     !- Discharge Coefficient for Opening Factor 1 {dimensionless}",
-    "    0.0,                     !- Width Factor for Opening Factor 1 {dimensionless}",
-    "    1.0,                     !- Height Factor for Opening Factor 1 {dimensionless}",
-    "    0.0,                     !- Start Height Factor for Opening Factor 1 {dimensionless}",
-    "    1.0,                     !- Opening Factor 2 {dimensionless}",
-    "    0.6,                     !- Discharge Coefficient for Opening Factor 2 {dimensionless}",
-    "    1.0,                     !- Width Factor for Opening Factor 2 {dimensionless}",
-    "    1.0,                     !- Height Factor for Opening Factor 2 {dimensionless}",
-    "    0.0,                     !- Start Height Factor for Opening Factor 2 {dimensionless}",
-    "    0,                       !- Opening Factor 3 {dimensionless}",
-    "    0,                       !- Discharge Coefficient for Opening Factor 3 {dimensionless}",
-    "    0,                       !- Width Factor for Opening Factor 3 {dimensionless}",
-    "    0,                       !- Height Factor for Opening Factor 3 {dimensionless}",
-    "    0,                       !- Start Height Factor for Opening Factor 3 {dimensionless}",
-    "    0,                       !- Opening Factor 4 {dimensionless}",
-    "    0,                       !- Discharge Coefficient for Opening Factor 4 {dimensionless}",
-    "    0,                       !- Width Factor for Opening Factor 4 {dimensionless}",
-    "    0,                       !- Height Factor for Opening Factor 4 {dimensionless}",
-    "    0;                       !- Start Height Factor for Opening Factor 4 {dimensionless}",
-
-    "  AirflowNetwork:MultiZone:Component:SimpleOpening,",
-    "    DrOpen,                  !- Name",
-    "    0.0001,                  !- Air Mass Flow Coefficient When Opening is Closed {kg/s-m}",
-    "    0.667,                   !- Air Mass Flow Exponent When Opening is Closed {dimensionless}",
-    "    0.0001,                  !- Minimum Density Difference for Two-Way Flow {kg/m3}",
-    "    0.55;                    !- Discharge Coefficient {dimensionless}",
-
-    "  AirflowNetwork:MultiZone:ReferenceCrackConditions,",
-    "    ReferenceCrackConditions,!- Name",
-    "    20.0,                    !- Reference Temperature {C}",
-    "    101325,                  !- Reference Barometric Pressure {Pa}",
-    "    0.0;                     !- Reference Humidity Ratio {kgWater/kgDryAir}",
-
-    "  AirflowNetwork:MultiZone:Surface:Crack,",
-    "    CR-1,                    !- Name",
-    "    0.001,                   !- Air Mass Flow Coefficient at Reference Conditions {kg/s}",
-    "    0.667;                   !- Air Mass Flow Exponent {dimensionless}",
-
-    "  AirflowNetwork:MultiZone:Surface:Crack,",
-    "    CRcri,                   !- Name",
-    "    0.05,                    !- Air Mass Flow Coefficient at Reference Conditions {kg/s}",
-    "    0.667;                   !- Air Mass Flow Exponent {dimensionless}",
-
-    "  AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea,",
-    "    ELA-1,                   !- Name",
-    "    0.007,                   !- Effective Leakage Area {m2}",
-    "    1.0,                     !- Discharge Coefficient {dimensionless}",
-    "    4.0,                     !- Reference Pressure Difference {Pa}",
-    "    0.667;                   !- Air Mass Flow Exponent {dimensionless}",
-
-    "  AirflowNetwork:MultiZone:ExternalNode,",
-    "    NFacade,                 !- Name",
-    "    1.524,                   !- External Node Height {m}",
-    "    NFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name",
-
-    "  AirflowNetwork:MultiZone:ExternalNode,",
-    "    EFacade,                 !- Name",
-    "    1.524,                   !- External Node Height {m}",
-    "    EFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name",
-
-    "  AirflowNetwork:MultiZone:ExternalNode,",
-    "    SFacade,                 !- Name",
-    "    1.524,                   !- External Node Height {m}",
-    "    SFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name",
-
-    "  AirflowNetwork:MultiZone:ExternalNode,",
-    "    WFacade,                 !- Name",
-    "    1.524,                   !- External Node Height {m}",
-    "    WFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name",
-
-    "  AirflowNetwork:MultiZone:ExternalNode,",
-    "    Horizontal,              !- Name",
-    "    3.028,                   !- External Node Height {m}",
-    "    Horizontal_WPCValue;     !- Wind Pressure Coefficient Curve Name",
-
-    "  AirflowNetwork:MultiZone:WindPressureCoefficientArray,",
-    "    Every 30 Degrees,        !- Name",
-    "    0,                       !- Wind Direction 1 {deg}",
-    "    30,                      !- Wind Direction 2 {deg}",
-    "    60,                      !- Wind Direction 3 {deg}",
-    "    90,                      !- Wind Direction 4 {deg}",
-    "    120,                     !- Wind Direction 5 {deg}",
-    "    150,                     !- Wind Direction 6 {deg}",
-    "    180,                     !- Wind Direction 7 {deg}",
-    "    210,                     !- Wind Direction 8 {deg}",
-    "    240,                     !- Wind Direction 9 {deg}",
-    "    270,                     !- Wind Direction 10 {deg}",
-    "    300,                     !- Wind Direction 11 {deg}",
-    "    330;                     !- Wind Direction 12 {deg}",
-
-    "  AirflowNetwork:MultiZone:WindPressureCoefficientValues,",
-    "    NFacade_WPCValue,        !- Name",
-    "    Every 30 Degrees,        !- AirflowNetwork:MultiZone:WindPressureCoefficientArray Name",
-    "    0.60,                    !- Wind Pressure Coefficient Value 1 {dimensionless}",
-    "    0.48,                    !- Wind Pressure Coefficient Value 2 {dimensionless}",
-    "    0.04,                    !- Wind Pressure Coefficient Value 3 {dimensionless}",
-    "    -0.56,                   !- Wind Pressure Coefficient Value 4 {dimensionless}",
-    "    -0.56,                   !- Wind Pressure Coefficient Value 5 {dimensionless}",
-    "    -0.42,                   !- Wind Pressure Coefficient Value 6 {dimensionless}",
-    "    -0.37,                   !- Wind Pressure Coefficient Value 7 {dimensionless}",
-    "    -0.42,                   !- Wind Pressure Coefficient Value 8 {dimensionless}",
-    "    -0.56,                   !- Wind Pressure Coefficient Value 9 {dimensionless}",
-    "    -0.56,                   !- Wind Pressure Coefficient Value 10 {dimensionless}",
-    "    0.04,                    !- Wind Pressure Coefficient Value 11 {dimensionless}",
-    "    0.48;                    !- Wind Pressure Coefficient Value 12 {dimensionless}",
-
-    "  AirflowNetwork:MultiZone:WindPressureCoefficientValues,",
-    "    EFacade_WPCValue,        !- Name",
-    "    Every 30 Degrees,        !- AirflowNetwork:MultiZone:WindPressureCoefficientArray Name",
-    "    -0.56,                   !- Wind Pressure Coefficient Value 1 {dimensionless}",
-    "    0.04,                    !- Wind Pressure Coefficient Value 2 {dimensionless}",
-    "    0.48,                    !- Wind Pressure Coefficient Value 3 {dimensionless}",
-    "    0.60,                    !- Wind Pressure Coefficient Value 4 {dimensionless}",
-    "    0.48,                    !- Wind Pressure Coefficient Value 5 {dimensionless}",
-    "    0.04,                    !- Wind Pressure Coefficient Value 6 {dimensionless}",
-    "    -0.56,                   !- Wind Pressure Coefficient Value 7 {dimensionless}",
-    "    -0.56,                   !- Wind Pressure Coefficient Value 8 {dimensionless}",
-    "    -0.42,                   !- Wind Pressure Coefficient Value 9 {dimensionless}",
-    "    -0.37,                   !- Wind Pressure Coefficient Value 10 {dimensionless}",
-    "    -0.42,                   !- Wind Pressure Coefficient Value 11 {dimensionless}",
-    "    -0.56;                   !- Wind Pressure Coefficient Value 12 {dimensionless}",
-
-    "  AirflowNetwork:MultiZone:WindPressureCoefficientValues,",
-    "    SFacade_WPCValue,        !- Name",
-    "    Every 30 Degrees,        !- AirflowNetwork:MultiZone:WindPressureCoefficientArray Name",
-    "    -0.37,                   !- Wind Pressure Coefficient Value 1 {dimensionless}",
-    "    -0.42,                   !- Wind Pressure Coefficient Value 2 {dimensionless}",
-    "    -0.56,                   !- Wind Pressure Coefficient Value 3 {dimensionless}",
-    "    -0.56,                   !- Wind Pressure Coefficient Value 4 {dimensionless}",
-    "    0.04,                    !- Wind Pressure Coefficient Value 5 {dimensionless}",
-    "    0.48,                    !- Wind Pressure Coefficient Value 6 {dimensionless}",
-    "    0.60,                    !- Wind Pressure Coefficient Value 7 {dimensionless}",
-    "    0.48,                    !- Wind Pressure Coefficient Value 8 {dimensionless}",
-    "    0.04,                    !- Wind Pressure Coefficient Value 9 {dimensionless}",
-    "    -0.56,                   !- Wind Pressure Coefficient Value 10 {dimensionless}",
-    "    -0.56,                   !- Wind Pressure Coefficient Value 11 {dimensionless}",
-    "    -0.42;                   !- Wind Pressure Coefficient Value 12 {dimensionless}",
-
-    "  AirflowNetwork:MultiZone:WindPressureCoefficientValues,",
-    "    WFacade_WPCValue,        !- Name",
-    "    Every 30 Degrees,        !- AirflowNetwork:MultiZone:WindPressureCoefficientArray Name",
-    "    -0.56,                   !- Wind Pressure Coefficient Value 1 {dimensionless}",
-    "    -0.56,                   !- Wind Pressure Coefficient Value 2 {dimensionless}",
-    "    -0.42,                   !- Wind Pressure Coefficient Value 3 {dimensionless}",
-    "    -0.37,                   !- Wind Pressure Coefficient Value 4 {dimensionless}",
-    "    -0.42,                   !- Wind Pressure Coefficient Value 5 {dimensionless}",
-    "    -0.56,                   !- Wind Pressure Coefficient Value 6 {dimensionless}",
-    "    -0.56,                   !- Wind Pressure Coefficient Value 7 {dimensionless}",
-    "    0.04,                    !- Wind Pressure Coefficient Value 8 {dimensionless}",
-    "    0.48,                    !- Wind Pressure Coefficient Value 9 {dimensionless}",
-    "    0.60,                    !- Wind Pressure Coefficient Value 10 {dimensionless}",
-    "    0.48,                    !- Wind Pressure Coefficient Value 11 {dimensionless}",
-    "    0.04;                    !- Wind Pressure Coefficient Value 12 {dimensionless}",
-
-    "  AirflowNetwork:MultiZone:WindPressureCoefficientValues,",
-    "    Horizontal_WPCValue,     !- Name",
-    "    Every 30 Degrees,        !- AirflowNetwork:MultiZone:WindPressureCoefficientArray Name",
-    "    0.00,                    !- Wind Pressure Coefficient Value 1 {dimensionless}",
-    "    0.00,                    !- Wind Pressure Coefficient Value 2 {dimensionless}",
-    "    0.00,                    !- Wind Pressure Coefficient Value 3 {dimensionless}",
-    "    0.00,                    !- Wind Pressure Coefficient Value 4 {dimensionless}",
-    "    0.00,                    !- Wind Pressure Coefficient Value 5 {dimensionless}",
-    "    0.00,                    !- Wind Pressure Coefficient Value 6 {dimensionless}",
-    "    0.00,                    !- Wind Pressure Coefficient Value 7 {dimensionless}",
-    "    0.00,                    !- Wind Pressure Coefficient Value 8 {dimensionless}",
-    "    0.00,                    !- Wind Pressure Coefficient Value 9 {dimensionless}",
-    "    0.00,                    !- Wind Pressure Coefficient Value 10 {dimensionless}",
-    "    0.00,                    !- Wind Pressure Coefficient Value 11 {dimensionless}",
-    "    0.00;                    !- Wind Pressure Coefficient Value 12 {dimensionless}",
-
-    "  AirflowNetwork:Distribution:Node,",
-    "    EquipmentInletNode,      !- Name",
-    "    Zone Equipment Inlet Node,  !- Component Name or Node Name",
-    "    Other,                   !- Component Object Type or Node Type",
-    "    3.0;                     !- Node Height {m}",
-
-    "  AirflowNetwork:Distribution:Node,",
-    "    EquipmentOutletNode,     !- Name",
-    "    ,                        !- Component Name or Node Name",
-    "    Other,                   !- Component Object Type or Node Type",
-    "    3.0;                     !- Node Height {m}",
-
-    "  AirflowNetwork:Distribution:Node,",
-    "    SupplyMainNode,          !- Name",
-    "    ,                        !- Component Name or Node Name",
-    "    Other,                   !- Component Object Type or Node Type",
-    "    3.0;                     !- Node Height {m}",
-
-    "  AirflowNetwork:Distribution:Node,",
-    "    MainSplitterNode,        !- Name",
-    "    ,                        !- Component Name or Node Name",
-    "    AirLoopHVAC:ZoneSplitter,!- Component Object Type or Node Type",
-    "    3.0;                     !- Node Height {m}",
-
-    "  AirflowNetwork:Distribution:Node,",
-    "    Zone1SupplyNode,         !- Name",
-    "    ,                        !- Component Name or Node Name",
-    "    Other,                   !- Component Object Type or Node Type",
-    "    3.0;                     !- Node Height {m}",
-
-    "  AirflowNetwork:Distribution:Node,",
-    "    Zone1SupplyRegisterNode, !- Name",
-    "    Zone 1 NoReheat Air Outlet Node,       !- Component Name or Node Name",
-    "    Other,                   !- Component Object Type or Node Type",
-    "    3.0;                     !- Node Height {m}",
-
-    "  AirflowNetwork:Distribution:Node,",
-    "    Zone1OutletNode,         !- Name",
-    "    Zone 1 Outlet Node,      !- Component Name or Node Name",
-    "    Other,                   !- Component Object Type or Node Type",
-    "    3.0;                     !- Node Height {m}",
-
-    "  AirflowNetwork:Distribution:Node,",
-    "    Zone2SupplyNode,         !- Name",
-    "    ,                        !- Component Name or Node Name",
-    "    Other,                   !- Component Object Type or Node Type",
-    "    3.0;                     !- Node Height {m}",
-
-    "  AirflowNetwork:Distribution:Node,",
-    "    ReheatInlet2Node,        !- Name",
-    "    Zone 2 Reheat Air Inlet Node,  !- Component Name or Node Name",
-    "    Other,                   !- Component Object Type or Node Type",
-    "    3.0;                     !- Node Height {m}",
-
-    "  AirflowNetwork:Distribution:Node,",
-    "    Zone2SupplyRegisterNode, !- Name",
-    "    Zone 2 Reheat Air Outlet Node,  !- Component Name or Node Name",
-    "    Other,                   !- Component Object Type or Node Type",
-    "    3.0;                     !- Node Height {m}",
-
-    "  AirflowNetwork:Distribution:Node,",
-    "    Zone2OutletNode,         !- Name",
-    "    Zone 2 Outlet Node,      !- Component Name or Node Name",
-    "    Other,                   !- Component Object Type or Node Type",
-    "    3.0;                     !- Node Height {m}",
-
-    "  AirflowNetwork:Distribution:Node,",
-    "    Zone1ReturnNode,         !- Name",
-    "    ,                        !- Component Name or Node Name",
-    "    Other,                   !- Component Object Type or Node Type",
-    "    3.0;                     !- Node Height {m}",
-
-    "  AirflowNetwork:Distribution:Node,",
-    "    Zone2ReturnNode,         !- Name",
-    "    ,                        !- Component Name or Node Name",
-    "    Other,                   !- Component Object Type or Node Type",
-    "    3.0;                     !- Node Height {m}",
-
-    "  AirflowNetwork:Distribution:Node,",
-    "    MainMixerNode,           !- Name",
-    "    ,                        !- Component Name or Node Name",
-    "    AirLoopHVAC:ZoneMixer,   !- Component Object Type or Node Type",
-    "    3.0;                     !- Node Height {m}",
-
-    "  AirflowNetwork:Distribution:Node,",
-    "    MainReturnNode,          !- Name",
-    "    Return Air Mixer Outlet, !- Component Name or Node Name",
-    "    Other,                   !- Component Object Type or Node Type",
-    "    3.0;                     !- Node Height {m}",
-
-    "  AirflowNetwork:Distribution:Node,",
-    "    MainInletNode,           !- Name",
-    "    Air Loop Inlet Node,     !- Component Name or Node Name",
-    "    Other,                   !- Component Object Type or Node Type",
-    "    3.0;                     !- Node Height {m}",
-
-    "  AirflowNetwork:Distribution:Node,",
-    "    OA System Node,          !- Name",
-    "    ,                        !- Component Name or Node Name",
-    "    AirLoopHVAC:OutdoorAirSystem,  !- Component Object Type or Node Type",
-    "    3.0;                     !- Node Height {m}",
-
-    "  AirflowNetwork:Distribution:Node,",
-    "    OA Inlet Node,           !- Name",
-    "    Outside Air Inlet Node,  !- Component Name or Node Name",
-    "    OAMixerOutdoorAirStreamNode,  !- Component Object Type or Node Type",
-    "    1.5;                     !- Node Height {m}",
-
-    "  AirflowNetwork:Distribution:Node,",
-    "    FanInletNode,            !- Name",
-    "    Mixed Air Node,          !- Component Name or Node Name",
-    "    Other,                   !- Component Object Type or Node Type",
-    "    3.0;                     !- Node Height {m}",
-
-    "  AirflowNetwork:Distribution:Node,",
-    "    FanOutletNode,           !- Name",
-    "    Cooling Coil Air Inlet Node,  !- Component Name or Node Name",
-    "    Other,                   !- Component Object Type or Node Type",
-    "    3.0;                     !- Node Height {m}",
-
-    "  AirflowNetwork:Distribution:Node,",
-    "    HeatingInletNode,        !- Name",
-    "    Heating Coil Air Inlet Node,  !- Component Name or Node Name",
-    "    Other,                   !- Component Object Type or Node Type",
-    "    3.0;                     !- Node Height {m}",
-
-    "  AirflowNetwork:Distribution:Node,",
-    "    HeatingOutletNode,       !- Name",
-    "    Air Loop Outlet Node,    !- Component Name or Node Name",
-    "    Other,                   !- Component Object Type or Node Type",
-    "    3.0;                     !- Node Height {m}",
-
-    "  AirflowNetwork:Distribution:Component:Leak,",
-    "    MainSupplyLeak,          !- Name",
-    "    0.0025,                  !- Air Mass Flow Coefficient {kg/s}",
-    "    0.65;                    !- Air Mass Flow Exponent {dimensionless}",
-
-    "  AirflowNetwork:Distribution:Component:ConstantPressureDrop,",
-    "    SupplyCPDComp,           !- Name",
-    "    1.0;                     !- Pressure Difference Across the Component {Pa}",
-
-    "  AirflowNetwork:Distribution:Component:LeakageRatio,",
-    "    ZoneSupplyELR1,          !- Name",
-    "    0.01,                    !- Effective Leakage Ratio {dimensionless}",
-    "    1.9,                     !- Maximum Flow Rate {m3/s}",
-    "    59.0,                    !- Reference Pressure Difference {Pa}",
-    "    0.65;                    !- Air Mass Flow Exponent {dimensionless}",
-
-    "  AirflowNetwork:Distribution:Component:LeakageRatio,",
-    "    ZoneSupplyELR2,          !- Name",
-    "    0.01,                    !- Effective Leakage Ratio {dimensionless}",
-    "    1.9,                     !- Maximum Flow Rate {m3/s}",
-    "    59.0,                    !- Reference Pressure Difference {Pa}",
-    "    0.65;                    !- Air Mass Flow Exponent {dimensionless}",
-
-    "  AirflowNetwork:Distribution:Component:LeakageRatio,",
-    "    ReturnLeakELR1,          !- Name",
-    "    0.03,                    !- Effective Leakage Ratio {dimensionless}",
-    "    1.9,                     !- Maximum Flow Rate {m3/s}",
-    "    41.0,                    !- Reference Pressure Difference {Pa}",
-    "    0.65;                    !- Air Mass Flow Exponent {dimensionless}",
-
-    "  AirflowNetwork:Distribution:Component:LeakageRatio,",
-    "    ReturnLeakELR2,          !- Name",
-    "    0.03,                    !- Effective Leakage Ratio {dimensionless}",
-    "    1.9,                     !- Maximum Flow Rate {m3/s}",
-    "    40.0,                    !- Reference Pressure Difference {Pa}",
-    "    0.65;                    !- Air Mass Flow Exponent {dimensionless}",
-
-    "  AirflowNetwork:Distribution:Component:Duct,",
-    "    MainTruck1,              !- Name",
-    "    3.0,                     !- Duct Length {m}",
-    "    0.6,                     !- Hydraulic Diameter {m}",
-    "    0.2827,                  !- Cross Section Area {m2}",
-    "    0.0009,                  !- Surface Roughness {m}",
-    "    0.01,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}",
-    "    0.946792,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}",
-    "    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}",
-    "    5.018000,                !- Outside Convection Coefficient {W/m2-K}",
-    "    25.090000;               !- Inside Convection Coefficient {W/m2-K}",
-
-    "  AirflowNetwork:Distribution:Component:Duct,",
-    "    MainTruck2,              !- Name",
-    "    4.0,                     !- Duct Length {m}",
-    "    0.6,                     !- Hydraulic Diameter {m}",
-    "    0.2827,                  !- Cross Section Area {m2}",
-    "    0.0009,                  !- Surface Roughness {m}",
-    "    0.01,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}",
-    "    0.946792,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}",
-    "    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}",
-    "    5.018000,                !- Outside Convection Coefficient {W/m2-K}",
-    "    25.090000;               !- Inside Convection Coefficient {W/m2-K}",
-
-    "  AirflowNetwork:Distribution:Component:Duct,",
-    "    Zone1Supply,             !- Name",
-    "    5.0,                     !- Duct Length {m}",
-    "    0.4,                     !- Hydraulic Diameter {m}",
-    "    0.1256,                  !- Cross Section Area {m2}",
-    "    0.0009,                  !- Surface Roughness {m}",
-    "    1.00,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}",
-    "    0.946792,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}",
-    "    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}",
-    "    5.018000,                !- Outside Convection Coefficient {W/m2-K}",
-    "    25.090000;               !- Inside Convection Coefficient {W/m2-K}",
-
-    "  AirflowNetwork:Distribution:Component:Duct,",
-    "    Zone2Supply,             !- Name",
-    "    4.0,                     !- Duct Length {m}",
-    "    0.39,                    !- Hydraulic Diameter {m}",
-    "    0.1195,                  !- Cross Section Area {m2}",
-    "    0.0009,                  !- Surface Roughness {m}",
-    "    2.5,                     !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}",
-    "    0.946792,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}",
-    "    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}",
-    "    5.018000,                !- Outside Convection Coefficient {W/m2-K}",
-    "    25.090000;               !- Inside Convection Coefficient {W/m2-K}",
-
-    "  AirflowNetwork:Distribution:Component:Duct,",
-    "    Zone1Return,             !- Name",
-    "    4.0,                     !- Duct Length {m}",
-    "    0.50,                    !- Hydraulic Diameter {m}",
-    "    0.1963,                  !- Cross Section Area {m2}",
-    "    0.0009,                  !- Surface Roughness {m}",
-    "    1.0,                     !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}",
-    "    0.946792,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}",
-    "    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}",
-    "    5.018000,                !- Outside Convection Coefficient {W/m2-K}",
-    "    25.090000;               !- Inside Convection Coefficient {W/m2-K}",
-
-    "  AirflowNetwork:Distribution:Component:Duct,",
-    "    Zone2Return,             !- Name",
-    "    4.0,                     !- Duct Length {m}",
-    "    0.48,                    !- Hydraulic Diameter {m}",
-    "    0.1809,                  !- Cross Section Area {m2}",
-    "    0.0009,                  !- Surface Roughness {m}",
-    "    1.0,                     !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}",
-    "    0.946792,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}",
-    "    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}",
-    "    5.018000,                !- Outside Convection Coefficient {W/m2-K}",
-    "    25.090000;               !- Inside Convection Coefficient {W/m2-K}",
-
-    "  AirflowNetwork:Distribution:Component:Duct,",
-    "    ZoneConnectionDuct,      !- Name",
-    "    0.1,                     !- Duct Length {m}",
-    "    1.0,                     !- Hydraulic Diameter {m}",
-    "    0.7854,                  !- Cross Section Area {m2}",
-    "    0.0001,                  !- Surface Roughness {m}",
-    "    30.00,                   !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}",
-    "    0.001226,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}",
-    "    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}",
-    "    0.006500,                !- Outside Convection Coefficient {W/m2-K}",
-    "    0.032500;                !- Inside Convection Coefficient {W/m2-K}",
-
-    "  AirflowNetwork:Distribution:Component:Duct,",
-    "    MixerConnectionDuct,     !- Name",
-    "    0.1,                     !- Duct Length {m}",
-    "    1.0,                     !- Hydraulic Diameter {m}",
-    "    0.7854,                  !- Cross Section Area {m2}",
-    "    0.0001,                  !- Surface Roughness {m}",
-    "    1.00,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}",
-    "    0.001226,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}",
-    "    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}",
-    "    0.006500,                !- Outside Convection Coefficient {W/m2-K}",
-    "    0.032500;                !- Inside Convection Coefficient {W/m2-K}",
-
-    "  AirflowNetwork:Distribution:Component:Duct,",
-    "    AirLoopReturn,           !- Name",
-    "    0.1,                     !- Duct Length {m}",
-    "    1.0,                     !- Hydraulic Diameter {m}",
-    "    0.7854,                  !- Cross Section Area {m2}",
-    "    0.0001,                  !- Surface Roughness {m}",
-    "    1.00,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}",
-    "    0.001226,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}",
-    "    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}",
-    "    0.006500,                !- Outside Convection Coefficient {W/m2-K}",
-    "    0.032500;                !- Inside Convection Coefficient {W/m2-K}",
-
-    "  AirflowNetwork:Distribution:Component:Duct,",
-    "    AirLoopSupply,           !- Name",
-    "    0.1,                     !- Duct Length {m}",
-    "    1.0,                     !- Hydraulic Diameter {m}",
-    "    0.7854,                  !- Cross Section Area {m2}",
-    "    0.0001,                  !- Surface Roughness {m}",
-    "    1.00,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}",
-    "    0.001226,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}",
-    "    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}",
-    "    0.006500,                !- Outside Convection Coefficient {W/m2-K}",
-    "    0.032500;                !- Inside Convection Coefficient {W/m2-K}",
-
-    "  AirflowNetwork:Distribution:Component:Fan,",
-    "    Supply Fan 1,            !- Fan Name",
-    "    Fan:ConstantVolume;      !- Supply Fan Object Type",
-
-    "  AirflowNetwork:Distribution:Component:Coil,",
-    "    ACDXCoil 1,              !- Coil Name",
-    "    Coil:Cooling:DX:SingleSpeed,  !- Coil Object Type",
-    "    0.1,                     !- Air Path Length {m}",
-    "    1.00;                    !- Air Path Hydraulic Diameter {m}",
-
-    "  AirflowNetwork:Distribution:Component:Coil,",
-    "    Main Heating Coil 1,     !- Coil Name",
-    "    Coil:Heating:Fuel,       !- Coil Object Type",
-    "    0.1,                     !- Air Path Length {m}",
-    "    1.00;                    !- Air Path Hydraulic Diameter {m}",
-
-    "  AirflowNetwork:Distribution:Component:TerminalUnit,",
-    "    Reheat Zone 2,           !- Terminal Unit Name",
-    "    AirTerminal:SingleDuct:ConstantVolume:Reheat,  !- Terminal Unit Object Type",
-    "    0.1,                     !- Air Path Length {m}",
-    "    0.44;                    !- Air Path Hydraulic Diameter {m}",
-
-    "  AirflowNetwork:Distribution:Linkage,",
-    "    Main Link 1,             !- Name",
-    "    EquipmentInletNode,      !- Node 1 Name",
-    "    EquipmentOutletNode,     !- Node 2 Name",
-    "    MainTruck1,              !- Component Name",
-    "    Attic Zone;              !- Thermal Zone Name",
-
-    "  AirflowNetwork:Distribution:Linkage,",
-    "    Main CDP Link,           !- Name",
-    "    EquipmentOutletNode,     !- Node 1 Name",
-    "    SupplyMainNode,          !- Node 2 Name",
-    "    SupplyCPDComp;           !- Component Name",
-
-    "  AirflowNetwork:Distribution:Linkage,",
-    "    Main Link 2,             !- Name",
-    "    SupplyMainNode,          !- Node 1 Name",
-    "    MainSplitterNode,        !- Node 2 Name",
-    "    MainTruck2,              !- Component Name",
-    "    Attic Zone;              !- Thermal Zone Name",
-
-    "  AirflowNetwork:Distribution:Linkage,",
-    "    Zone1Supply1Link,        !- Name",
-    "    MainSplitterNode,        !- Node 1 Name",
-    "    Zone1SupplyNode,         !- Node 2 Name",
-    "    Zone1Supply,             !- Component Name",
-    "    Attic Zone;              !- Thermal Zone Name",
-
-    "  AirflowNetwork:Distribution:Linkage,",
-    "    Zone1Supply2Link,        !- Name",
-    "    Zone1SupplyNode,         !- Node 1 Name",
-    "    Zone1SupplyRegisterNode,        !- Node 2 Name",
-    "    Zone1Supply,             !- Component Name",
-    "    Attic Zone;              !- Thermal Zone Name",
-
-    "  AirflowNetwork:Distribution:Linkage,",
-    "    Zone1SupplyConnectionLink,  !- Name",
-    "    Zone1SupplyRegisterNode, !- Node 1 Name",
-    "    West Zone,               !- Node 2 Name",
-    "    ZoneConnectionDuct;      !- Component Name",
-
-    "  AirflowNetwork:Distribution:Linkage,",
-    "    Zone1ReturnConnectionLink,  !- Name",
-    "    West Zone,               !- Node 1 Name",
-    "    Zone1OutletNode,         !- Node 2 Name",
-    "    ZoneConnectionDuct;      !- Component Name",
-
-    "  AirflowNetwork:Distribution:Linkage,",
-    "    Zone2Supply1Link,        !- Name",
-    "    MainSplitterNode,        !- Node 1 Name",
-    "    Zone2SupplyNode,         !- Node 2 Name",
-    "    Zone2Supply,             !- Component Name",
-    "    Attic Zone;              !- Thermal Zone Name",
-
-    "  AirflowNetwork:Distribution:Linkage,",
-    "    Zone2Supply2Link,        !- Name",
-    "    Zone2SupplyNode,         !- Node 1 Name",
-    "    ReheatInlet2Node,        !- Node 2 Name",
-    "    Zone2Supply,             !- Component Name",
-    "    Attic Zone;              !- Thermal Zone Name",
-
-    "  AirflowNetwork:Distribution:Linkage,",
-    "    Zone2ReheatCoilLink,     !- Name",
-    "    ReheatInlet2Node,        !- Node 1 Name",
-    "    Zone2SupplyRegisterNode, !- Node 2 Name",
-    "    Reheat Zone 2;           !- Component Name",
-
-    "  AirflowNetwork:Distribution:Linkage,",
-    "    Zone2SupplyConnectionLink,  !- Name",
-    "    Zone2SupplyRegisterNode, !- Node 1 Name",
-    "    EAST ZONE,               !- Node 2 Name",
-    "    ZoneConnectionDuct;      !- Component Name",
-
-    "  AirflowNetwork:Distribution:Linkage,",
-    "    Zone2returnConnectionLink,  !- Name",
-    "    EAST ZONE,               !- Node 1 Name",
-    "    Zone2OutletNode,         !- Node 2 Name",
-    "    ZoneConnectionDuct;      !- Component Name",
-
-    "  AirflowNetwork:Distribution:Linkage,",
-    "    Zone1Return1Link,        !- Name",
-    "    Zone1OutletNode,         !- Node 1 Name",
-    "    Zone1ReturnNode,         !- Node 2 Name",
-    "    Zone1Return,             !- Component Name",
-    "    Attic Zone;              !- Thermal Zone Name",
-
-    "  AirflowNetwork:Distribution:Linkage,",
-    "    Zone1Return2Link,        !- Name",
-    "    Zone1ReturnNode,         !- Node 1 Name",
-    "    MainMixerNode,           !- Node 2 Name",
-    "    Zone1Return,             !- Component Name",
-    "    Attic Zone;              !- Thermal Zone Name",
-
-    "  AirflowNetwork:Distribution:Linkage,",
-    "    Zone2Return1Link,        !- Name",
-    "    Zone2OutletNode,         !- Node 1 Name",
-    "    Zone2ReturnNode,         !- Node 2 Name",
-    "    Zone2Return,             !- Component Name",
-    "    Attic Zone;              !- Thermal Zone Name",
-
-    "  AirflowNetwork:Distribution:Linkage,",
-    "    Zone2Return2Link,        !- Name",
-    "    Zone2ReturnNode,         !- Node 1 Name",
-    "    MainMixerNode,           !- Node 2 Name",
-    "    Zone2Return,             !- Component Name",
-    "    Attic Zone;              !- Thermal Zone Name",
-
-    "  AirflowNetwork:Distribution:Linkage,",
-    "    ReturnMixerLink,         !- Name",
-    "    MainMixerNode,           !- Node 1 Name",
-    "    MainReturnNode,          !- Node 2 Name",
-    "    MixerConnectionDuct,     !- Component Name",
-    "    Attic Zone;              !- Thermal Zone Name",
-
-    "  AirflowNetwork:Distribution:Linkage,",
-    "    AirLoopReturnLink,       !- Name",
-    "    MainReturnNode,          !- Node 1 Name",
-    "    MainInletNode,           !- Node 2 Name",
-    "    AirLoopReturn;           !- Component Name",
-
-    "  AirflowNetwork:Distribution:Linkage,",
-    "    OASystemInletLink,       !- Name",
-    "    MainInletNode,           !- Node 1 Name",
-    "    OA System Node,          !- Node 2 Name",
-    "    ZoneConnectionDuct;      !- Component Name",
-
-    "  AirflowNetwork:Distribution:Linkage,",
-    "    OAMixerOutletLink,       !- Name",
-    "    OA System Node,          !- Node 1 Name",
-    "    FanInletNode,            !- Node 2 Name",
-    "    ZoneConnectionDuct;      !- Component Name",
-
-    "  AirflowNetwork:Distribution:Linkage,",
-    "    SupplyFanLink,           !- Name",
-    "    FanInletNode,            !- Node 1 Name",
-    "    FanOutletNode,           !- Node 2 Name",
-    "    Supply Fan 1;            !- Component Name",
-
-    "  AirflowNetwork:Distribution:Linkage,",
-    "    CoolingCoilLink,         !- Name",
-    "    FanOutletNode,           !- Node 1 Name",
-    "    HeatingInletNode,        !- Node 2 Name",
-    "    ACDXCoil 1;              !- Component Name",
-
-    "  AirflowNetwork:Distribution:Linkage,",
-    "    HeatingCoilLink,         !- Name",
-    "    HeatingInletNode,        !- Node 1 Name",
-    "    HeatingOutletNode,       !- Node 2 Name",
-    "    Main Heating Coil 1;     !- Component Name",
-
-    "  AirflowNetwork:Distribution:Linkage,",
-    "    EquipmentAirLoopLink,    !- Name",
-    "    HeatingOutletNode,       !- Node 1 Name",
-    "    EquipmentInletNode,      !- Node 2 Name",
-    "    AirLoopSupply;           !- Component Name",
-
-    "  AirflowNetwork:Distribution:Linkage,",
-    "    Zone1ReturnLeakLink,     !- Name",
-    "    Zone1ReturnNode,         !- Node 1 Name",
-    "    OA Inlet Node,           !- Node 2 Name",
-    "    ReturnLeakELR1;          !- Component Name",
-
-    "  AirflowNetwork:Distribution:Linkage,",
-    "    MainSupplyLeakLink,      !- Name",
-    "    SupplyMainNode,          !- Node 1 Name",
-    "    ATTIC ZONE,              !- Node 2 Name",
-    "    MainSupplyLeak;          !- Component Name",
-
-    "  AirflowNetwork:Distribution:Linkage,",
-    "    Zone1SupplyLeakLink,     !- Name",
-    "    Zone1SupplyNode,         !- Node 1 Name",
-    "    ATTIC ZONE,              !- Node 2 Name",
-    "    ZoneSupplyELR1;          !- Component Name",
-
-    "  AirflowNetwork:Distribution:Linkage,",
-    "    Zone2ReturnLeakLink,     !- Name",
-    "    Zone2ReturnNode,         !- Node 1 Name",
-    "    OA Inlet Node,           !- Node 2 Name",
-    "    ReturnLeakELR2;          !- Component Name",
-
-    "  AirflowNetwork:Distribution:Linkage,",
-    "    Zone2SupplyLeakLink,     !- Name",
-    "    Zone2SupplyNode,         !- Node 1 Name",
-    "    ATTIC ZONE,              !- Node 2 Name",
-    "    ZoneSupplyELR2;          !- Component Name",
-
-    "  AirflowNetwork:Distribution:Linkage,",
-    "    OASystemFanLink,       !- Name",
-    "    OA Inlet Node,           !- Node 1 Name",
-    "    OA System Node,          !- Node 2 Name",
-    "    OA Fan;                  !- Component Name",
-
-    "  AirflowNetwork:Distribution:Linkage,",
-    "    OASystemReliefLink,      !- Name",
-    "    OA System Node,          !- Node 1 Name",
-    "    OA Inlet Node,           !- Node 2 Name",
-    "    Relief Fan;              !- Component Name",
-
-    "  AirflowNetwork:Distribution:Component:OutdoorAirFlow,",
-    "    OA Fan,                  !- Name",
-    "    OA Mixing Box 1,         !- Outdoor Air Mixer Name",
-    "    0.001,                   !- Air Mass Flow Coefficient When No Outdoor Air Flow at Reference Conditions {kg/s}",
-    "    0.667;                   !- Air Mass Flow Exponent When No Outdoor Air Flow {dimensionless}",
-
-    "  AirflowNetwork:Distribution:Component:ReliefAirFlow,",
-    "    Relief Fan,              !- Name",
-    "    OA Mixing Box 1,         !- Outdoor Air Mixer Name",
-    "    0.001,                   !- Air Mass Flow Coefficient When No Outdoor Air Flow at Reference Conditions {kg/s}",
-    "    0.667;                   !- Air Mass Flow Exponent When No Outdoor Air Flow {dimensionless}",
-
-    "  Schedule:Compact,",
-    "    Pressure Setpoint Schedule,  !- Name",
-    "    Any Number,              !- Schedule Type Limits Name",
-    "    Through: 3/31,           !- Field 1",
-    "    For: AllDays,            !- Field 2",
-    "    Until: 24:00,5.0,        !- Field 3",
-    "    Through: 9/30,           !- Field 5",
-    "    For: AllDays,            !- Field 6",
-    "    Until: 24:00,9.5,        !- Field 7",
-    "    Through: 12/31,          !- Field 9",
-    "    For: AllDays,            !- Field 10",
-    "    Until: 24:00,5.0;        !- Field 11",
-
-    "  AvailabilityManagerAssignmentList,",
-    "    Reheat System 1 Avail List,  !- Name",
-    "    AvailabilityManager:Scheduled,  !- Availability Manager 1 Object Type",
-    "    Reheat System 1 Avail;   !- Availability Manager 1 Name",
-
-    "  AvailabilityManager:Scheduled,",
-    "    Reheat System 1 Avail,   !- Name",
-    "    FanAndCoilAvailSched;    !- Schedule Name",
-
-    "  SetpointManager:SingleZone:Reheat,",
-    "    Supply Air Temp Manager, !- Name",
-    "    Temperature,             !- Control Variable",
-    "    13.,                     !- Minimum Supply Air Temperature {C}",
-    "    45.,                     !- Maximum Supply Air Temperature {C}",
-    "    WEST ZONE,              !- Control Zone Name",
-    "    Zone 1 Node,             !- Zone Node Name",
-    "    Zone 1 NoReheat Air Outlet Node,       !- Zone Inlet Node Name",
-    "    Supply Air Temp Nodes;   !- Setpoint Node or NodeList Name",
-
-    "  Controller:OutdoorAir,",
-    "    OA Controller 1,         !- Name",
-    "    Relief Air Outlet Node,  !- Relief Air Outlet Node Name",
-    "    Air Loop Inlet Node,     !- Return Air Node Name",
-    "    Mixed Air Node,          !- Mixed Air Node Name",
-    "    Outside Air Inlet Node,  !- Actuator Node Name",
-    "    0.2333,                  !- Minimum Outdoor Air Flow Rate {m3/s}",
-    "    1.16,                     !- Maximum Outdoor Air Flow Rate {m3/s}",
-    "    NoEconomizer,            !- Economizer Control Type",
-    "    ModulateFlow,            !- Economizer Control Action Type",
-    "    19.,                     !- Economizer Maximum Limit Dry-Bulb Temperature {C}",
-    "    ,                        !- Economizer Maximum Limit Enthalpy {J/kg}",
-    "    ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}",
-    "    ,                        !- Electronic Enthalpy Limit Curve Name",
-    "    4.,                      !- Economizer Minimum Limit Dry-Bulb Temperature {C}",
-    "    NoLockout,               !- Lockout Type",
-    "    FixedMinimum;            !- Minimum Limit Type",
-
-    "  ZoneHVAC:EquipmentConnections,",
-    "    West Zone,               !- Zone Name",
-    "    Zone1Equipment,          !- Zone Conditioning Equipment List Name",
-    "    Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name",
-    "    ,                        !- Zone Air Exhaust Node or NodeList Name",
-    "    Zone 1 Node,             !- Zone Air Node Name",
-    "    Zone 1 Outlet Node;      !- Zone Return Air Node or NodeList Name",
-
-    "  ZoneHVAC:EquipmentConnections,",
-    "    EAST ZONE,               !- Zone Name",
-    "    Zone2Equipment,          !- Zone Conditioning Equipment List Name",
-    "    Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name",
-    "    ,                        !- Zone Air Exhaust Node or NodeList Name",
-    "    Zone 2 Node,             !- Zone Air Node Name",
-    "    Zone 2 Outlet Node;      !- Zone Return Air Node or NodeList Name",
-
-    "  ZoneHVAC:EquipmentList,",
-    "    Zone1Equipment,          !- Name",
-    "    SequentialLoad,          !- Load Distribution Scheme",
-    "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
-    "    Zone1NoReheat,           !- Zone Equipment 1 Name",
-    "    1,                       !- Zone Equipment 1 Cooling Sequence",
-    "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
-    "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
-    "    ;                        !- Zone Equipment 1 Sequential Heating Fraction",
-
-    "  ZoneHVAC:EquipmentList,",
-    "    Zone2Equipment,          !- Name",
-    "    SequentialLoad,          !- Load Distribution Scheme",
-    "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
-    "    Zone2TermReheat,         !- Zone Equipment 1 Name",
-    "    1,                       !- Zone Equipment 1 Cooling Sequence",
-    "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
-    "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
-    "    ;                        !- Zone Equipment 1 Sequential Heating Fraction",
-
-    "  ZoneHVAC:AirDistributionUnit,",
-    "    Zone1NoReheat,         !- Name",
-    "    Zone 1 NoReheat Air Outlet Node,  !- Air Distribution Unit Outlet Node Name",
-    "    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
-    "    No Reheat Zone 1;           !- Air Terminal Name",
-
-    "  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
-    "    No Reheat Zone 1,           !- Name",
-    "    FanAndCoilAvailSched,    !- Availability Schedule Name",
-    "    Zone 1 NoReheat Air Inlet Node,  !- Air Inlet Node Name",
-    "    Zone 1 NoReheat Air Outlet Node,  !- Air Outlet Node Name",
-    "    0.64;                    !- Maximum Air Flow Rate {m3/s}",
-
-    "  ZoneHVAC:AirDistributionUnit,",
-    "    Zone2TermReheat,         !- Name",
-    "    Zone 2 Reheat Air Outlet Node,  !- Air Distribution Unit Outlet Node Name",
-    "    AirTerminal:SingleDuct:ConstantVolume:Reheat,  !- Air Terminal Object Type",
-    "    Reheat Zone 2;           !- Air Terminal Name",
-
-    "  CoilSystem:Cooling:DX,",
-    "    DX Cooling Coil System 1,!- Name",
-    "    CoolingCoilAvailSched,   !- Availability Schedule Name",
-    "    Cooling Coil Air Inlet Node,  !- DX Cooling Coil System Inlet Node Name",
-    "    Heating Coil Air Inlet Node,  !- DX Cooling Coil System Outlet Node Name",
-    "    Heating Coil Air Inlet Node,  !- DX Cooling Coil System Sensor Node Name",
-    "    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type",
-    "    ACDXCoil 1;              !- Cooling Coil Name",
-
-    "  AirTerminal:SingleDuct:ConstantVolume:Reheat,",
-    "    Reheat Zone 2,           !- Name",
-    "    FanAndCoilAvailSched,    !- Availability Schedule Name",
-    "    Zone 2 Reheat Air Outlet Node,  !- Air Outlet Node Name",
-    "    Zone 2 Reheat Air Inlet Node,  !- Air Inlet Node Name",
-    "    0.52,                    !- Maximum Air Flow Rate {m3/s}",
-    "    Coil:Heating:Fuel,       !- Reheat Coil Object Type",
-    "    Reheat Coil Zone 2,      !- Reheat Coil Name",
-    "    0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}",
-    "    0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}",
-    "    0.001;                   !- Convergence Tolerance",
-
-    "  ZoneControl:Thermostat,",
-    "    Zone 1 Thermostat,       !- Name",
-    "    West Zone,               !- Zone or ZoneList Name",
-    "    Dual Zone Control Type Sched,  !- Control Type Schedule Name",
-    "    ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type",
-    "    Setpoints;               !- Control 1 Name",
-
-    "  ZoneControl:Thermostat,",
-    "    Zone 2 Thermostat,       !- Name",
-    "    EAST ZONE,               !- Zone or ZoneList Name",
-    "    Dual Zone Control Type Sched,  !- Control Type Schedule Name",
-    "    ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type",
-    "    Setpoints;               !- Control 1 Name",
-
-    "  AirLoopHVAC:SupplyPath,",
-    "    TermReheatSupplyPath,    !- Name",
-    "    Zone Equipment Inlet Node,  !- Supply Air Path Inlet Node Name",
-    "    AirLoopHVAC:ZoneSplitter,!- Component 1 Object Type",
-    "    Zone Supply Air Splitter;!- Component 1 Name",
-
-    "  AirLoopHVAC:ReturnPath,",
-    "    TermReheatReturnPath,    !- Name",
-    "    Return Air Mixer Outlet, !- Return Air Path Outlet Node Name",
-    "    AirLoopHVAC:ZoneMixer,   !- Component 1 Object Type",
-    "    Zone Return Air Mixer;   !- Component 1 Name",
-
-    "  AirLoopHVAC:ZoneSplitter,",
-    "    Zone Supply Air Splitter,!- Name",
-    "    Zone Equipment Inlet Node,  !- Inlet Node Name",
-    "    Zone 1 NoReheat Air Inlet Node,  !- Outlet 1 Node Name",
-    "    Zone 2 Reheat Air Inlet Node;  !- Outlet 2 Node Name",
-
-    "  AirLoopHVAC:ZoneMixer,",
-    "    Zone Return Air Mixer,   !- Name",
-    "    Return Air Mixer Outlet, !- Outlet Node Name",
-    "    Zone 1 Outlet Node,      !- Inlet 1 Node Name",
-    "    Zone 2 Outlet Node;      !- Inlet 2 Node Name",
-
-    "  Coil:Heating:Fuel,",
-    "    Main Heating Coil 1,     !- Name",
-    "    FanAndCoilAvailSched,    !- Availability Schedule Name",
-    "    NaturalGas,              !- Fuel Type",
-    "    0.8,                     !- Burner Efficiency",
-    "    45000,                   !- Nominal Capacity {W}",
-    "    Heating Coil Air Inlet Node,  !- Air Inlet Node Name",
-    "    Air Loop Outlet Node,    !- Air Outlet Node Name",
-    "    Air Loop Outlet Node;    !- Temperature Setpoint Node Name",
-
-    "  Coil:Heating:Fuel,",
-    "    Reheat Coil Zone 2,      !- Name",
-    "    FanAndCoilAvailSched,    !- Availability Schedule Name",
-    "    NaturalGas,              !- Fuel Type",
-    "    1.0,                     !- Burner Efficiency",
-    "    3000,                    !- Nominal Capacity {W}",
-    "    Zone 2 Reheat Air Inlet Node,  !- Air Inlet Node Name",
-    "    Zone 2 Reheat Air Outlet Node;  !- Air Outlet Node Name",
-
-    "  Coil:Cooling:DX:SingleSpeed,",
-    "    ACDXCoil 1,              !- Name",
-    "    CoolingCoilAvailSched,   !- Availability Schedule Name",
-    "    20000,                   !- Gross Rated Total Cooling Capacity {W}",
-    "    0.75,                     !- Gross Rated Sensible Heat Ratio",
-    "    3.0,                     !- Gross Rated Cooling COP {W/W}",
-    "    1.16,                     !- Rated Air Flow Rate {m3/s}",
-    "    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
-    "    Cooling Coil Air Inlet Node,  !- Air Inlet Node Name",
-    "    Heating Coil Air Inlet Node,  !- Air Outlet Node Name",
-    "    WindACCoolCapFT,         !- Total Cooling Capacity Function of Temperature Curve Name",
-    "    WindACCoolCapFFF,        !- Total Cooling Capacity Function of Flow Fraction Curve Name",
-    "    WindACEIRFT,             !- Energy Input Ratio Function of Temperature Curve Name",
-    "    WindACEIRFFF,            !- Energy Input Ratio Function of Flow Fraction Curve Name",
-    "    WindACPLFFPLR;           !- Part Load Fraction Correlation Curve Name",
-
-    "  Fan:ConstantVolume,",
-    "    Supply Fan 1,            !- Name",
-    "    FanAndCoilAvailSched,    !- Availability Schedule Name",
-    "    0.7,                     !- Fan Total Efficiency",
-    "    600.0,                   !- Pressure Rise {Pa}",
-    "    1.16,                     !- Maximum Flow Rate {m3/s}",
-    "    0.9,                     !- Motor Efficiency",
-    "    1.0,                     !- Motor In Airstream Fraction",
-    "    Mixed Air Node,          !- Air Inlet Node Name",
-    "    Cooling Coil Air Inlet Node;  !- Air Outlet Node Name",
-
-    "  ThermostatSetpoint:DualSetpoint,",
-    "    Setpoints,               !- Name",
-    "    Dual Heating Setpoints,  !- Heating Setpoint Temperature Schedule Name",
-    "    Dual Cooling Setpoints;  !- Cooling Setpoint Temperature Schedule Name",
-
-    "ScheduleTypeLimits,",
-    "  HVACTemplate Any Number;                                 !- Name",
-
-    "Schedule:Compact,",
-    "  HVACTemplate-Always 1,                                   !- Name",
-    "  HVACTemplate Any Number,                                 !- Schedule Type Limits Name",
-    "  Through: 12/31,                                          !- Field 1",
-    "  For: AllDays,                                            !- Field 2",
-    "  Until: 24:00,                                            !- Field 3",
-    "  1;                                                       !- Field 4",
-
-    "Site:GroundTemperature:BuildingSurface,",
-    "  20.03,                                                   !- January Ground Temperature",
-    "  20.03,                                                   !- February Ground Temperature",
-    "  20.13,                                                   !- March Ground Temperature",
-    "  20.30,                                                   !- April Ground Temperature",
-    "  20.43,                                                   !- May Ground Temperature",
-    "  20.52,                                                   !- June Ground Temperature",
-    "  20.62,                                                   !- July Ground Temperature",
-    "  20.77,                                                   !- August Ground Temperature",
-    "  20.78,                                                   !- September Ground Temperature",
-    "  20.55,                                                   !- October Ground Temperature",
-    "  20.44,                                                   !- November Ground Temperature",
-    "  20.20;                                                   !- December Ground Temperature",
-
-    "Output:Diagnostics,DisplayExtraWarnings;",
-
-    "Output:Diagnostics,DisplayUnusedSchedules;"});
-
+    std::string const idf_objects = delimited_string({
+
+        "  Building,",
+        "    Small Office with AirflowNetwork model,  !- Name",
+        "    0,                       !- North Axis {deg}",
+        "    Suburbs,                 !- Terrain",
+        "    0.001,                   !- Loads Convergence Tolerance Value",
+        "    0.0050000,               !- Temperature Convergence Tolerance Value {deltaC}",
+        "    FullInteriorAndExterior, !- Solar Distribution",
+        "    25,                      !- Maximum Number of Warmup Days",
+        "    6;                       !- Minimum Number of Warmup Days",
+
+        "  Timestep,6;",
+
+        "  SurfaceConvectionAlgorithm:Inside,TARP;",
+
+        "  SurfaceConvectionAlgorithm:Outside,DOE-2;",
+
+        "  HeatBalanceAlgorithm,ConductionTransferFunction;",
+
+        "  Output:DebuggingData,0,0;",
+
+        "  ZoneCapacitanceMultiplier:ResearchSpecial,",
+        "    Multiplier,              !- Name",
+        "    ,                        !- Zone or ZoneList Name",
+        "    1.0,                     !- Temperature Capacity Multiplier",
+        "    1.0,                     !- Humidity Capacity Multiplier",
+        "    1.0,                     !- Carbon Dioxide Capacity Multiplier",
+        "    ;                        !- Generic Contaminant Capacity Multiplier",
+
+        "  SimulationControl,",
+        "    No,                     !- Do Zone Sizing Calculation",
+        "    No,                     !- Do System Sizing Calculation",
+        "    No,                      !- Do Plant Sizing Calculation",
+        "    Yes,                     !- Run Simulation for Sizing Periods",
+        "    No;                      !- Run Simulation for Weather File Run Periods",
+
+        "  Sizing:Parameters,",
+        "    1.53,                    !- Heating Sizing Factor",
+        "    1.70,                    !- Cooling Sizing Factor",
+        "    6;                       !- Timesteps in Averaging Window",
+
+        "  RunPeriod,",
+        "    Spring run,              !- Name",
+        "    4,                       !- Begin Month",
+        "    1,                       !- Begin Day of Month",
+        "    ,                        !- Begin Year",
+        "    4,                       !- End Month",
+        "    1,                       !- End Day of Month",
+        "    ,                        !- End Year",
+        "    Tuesday,                 !- Day of Week for Start Day",
+        "    Yes,                     !- Use Weather File Holidays and Special Days",
+        "    Yes,                     !- Use Weather File Daylight Saving Period",
+        "    No,                      !- Apply Weekend Holiday Rule",
+        "    Yes,                     !- Use Weather File Rain Indicators",
+        "    Yes;                     !- Use Weather File Snow Indicators",
+
+        "  RunPeriod,",
+        "    Winter run,              !- Name",
+        "    1,                       !- Begin Month",
+        "    14,                      !- Begin Day of Month",
+        "    ,                        !- Begin Year",
+        "    1,                       !- End Month",
+        "    14,                      !- End Day of Month",
+        "    ,                        !- End Year",
+        "    Tuesday,                 !- Day of Week for Start Day",
+        "    Yes,                     !- Use Weather File Holidays and Special Days",
+        "    Yes,                     !- Use Weather File Daylight Saving Period",
+        "    No,                      !- Apply Weekend Holiday Rule",
+        "    Yes,                     !- Use Weather File Rain Indicators",
+        "    Yes;                     !- Use Weather File Snow Indicators",
+
+        "  RunPeriod,",
+        "    Summer run,              !- Name",
+        "    7,                       !- Begin Month",
+        "    7,                       !- Begin Day of Month",
+        "    ,                        !- Begin Year",
+        "    7,                       !- End Month",
+        "    7,                       !- End Day of Month",
+        "    ,                        !- End Year",
+        "    Tuesday,                 !- Day of Week for Start Day",
+        "    Yes,                     !- Use Weather File Holidays and Special Days",
+        "    Yes,                     !- Use Weather File Daylight Saving Period",
+        "    No,                      !- Apply Weekend Holiday Rule",
+        "    Yes,                     !- Use Weather File Rain Indicators",
+        "    Yes;                     !- Use Weather File Snow Indicators",
+
+        "  Site:Location,",
+        "    CHICAGO_IL_USA TMY2-94846,  !- Name",
+        "    41.78,                   !- Latitude {deg}",
+        "    -87.75,                  !- Longitude {deg}",
+        "    -6.00,                   !- Time Zone {hr}",
+        "    190.00;                  !- Elevation {m}",
+
+        "  SizingPeriod:DesignDay,",
+        "    CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name",
+        "    1,                       !- Month",
+        "    21,                      !- Day of Month",
+        "    WinterDesignDay,         !- Day Type",
+        "    -17.3,                   !- Maximum Dry-Bulb Temperature {C}",
+        "    0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "    Wetbulb,                 !- Humidity Condition Type",
+        "    -17.3,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "    ,                        !- Humidity Condition Day Schedule Name",
+        "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "    99063.,                  !- Barometric Pressure {Pa}",
+        "    4.9,                     !- Wind Speed {m/s}",
+        "    270,                     !- Wind Direction {deg}",
+        "    No,                      !- Rain Indicator",
+        "    No,                      !- Snow Indicator",
+        "    No,                      !- Daylight Saving Time Indicator",
+        "    ASHRAEClearSky,          !- Solar Model Indicator",
+        "    ,                        !- Beam Solar Day Schedule Name",
+        "    ,                        !- Diffuse Solar Day Schedule Name",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+        "    0.0;                     !- Sky Clearness",
+
+        "  SizingPeriod:DesignDay,",
+        "    CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name",
+        "    7,                       !- Month",
+        "    21,                      !- Day of Month",
+        "    SummerDesignDay,         !- Day Type",
+        "    31.5,                    !- Maximum Dry-Bulb Temperature {C}",
+        "    10.7,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "    Wetbulb,                 !- Humidity Condition Type",
+        "    23.0,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "    ,                        !- Humidity Condition Day Schedule Name",
+        "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "    99063.,                  !- Barometric Pressure {Pa}",
+        "    5.3,                     !- Wind Speed {m/s}",
+        "    230,                     !- Wind Direction {deg}",
+        "    No,                      !- Rain Indicator",
+        "    No,                      !- Snow Indicator",
+        "    No,                      !- Daylight Saving Time Indicator",
+        "    ASHRAEClearSky,          !- Solar Model Indicator",
+        "    ,                        !- Beam Solar Day Schedule Name",
+        "    ,                        !- Diffuse Solar Day Schedule Name",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+        "    1.0;                     !- Sky Clearness",
+
+        "  Material,",
+        "    A1 - 1 IN STUCCO,        !- Name",
+        "    Smooth,                  !- Roughness",
+        "    2.5389841E-02,           !- Thickness {m}",
+        "    0.6918309,               !- Conductivity {W/m-K}",
+        "    1858.142,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.9200000,               !- Solar Absorptance",
+        "    0.9200000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    C4 - 4 IN COMMON BRICK,  !- Name",
+        "    Rough,                   !- Roughness",
+        "    0.1014984,               !- Thickness {m}",
+        "    0.7264224,               !- Conductivity {W/m-K}",
+        "    1922.216,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7600000,               !- Solar Absorptance",
+        "    0.7600000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Name",
+        "    Smooth,                  !- Roughness",
+        "    1.9050000E-02,           !- Thickness {m}",
+        "    0.7264224,               !- Conductivity {W/m-K}",
+        "    1601.846,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.9200000,               !- Solar Absorptance",
+        "    0.9200000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    C6 - 8 IN CLAY TILE,     !- Name",
+        "    Smooth,                  !- Roughness",
+        "    0.2033016,               !- Thickness {m}",
+        "    0.5707605,               !- Conductivity {W/m-K}",
+        "    1121.292,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.8200000,               !- Solar Absorptance",
+        "    0.8200000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    C10 - 8 IN HW CONCRETE,  !- Name",
+        "    MediumRough,             !- Roughness",
+        "    0.2033016,               !- Thickness {m}",
+        "    1.729577,                !- Conductivity {W/m-K}",
+        "    2242.585,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.6500000,               !- Solar Absorptance",
+        "    0.6500000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    E2 - 1 / 2 IN SLAG OR STONE,  !- Name",
+        "    Rough,                   !- Roughness",
+        "    1.2710161E-02,           !- Thickness {m}",
+        "    1.435549,                !- Conductivity {W/m-K}",
+        "    881.0155,                !- Density {kg/m3}",
+        "    1673.600,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.5500000,               !- Solar Absorptance",
+        "    0.5500000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Name",
+        "    Rough,                   !- Roughness",
+        "    9.5402403E-03,           !- Thickness {m}",
+        "    0.1902535,               !- Conductivity {W/m-K}",
+        "    1121.292,                !- Density {kg/m3}",
+        "    1673.600,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7500000,               !- Solar Absorptance",
+        "    0.7500000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    B5 - 1 IN DENSE INSULATION,  !- Name",
+        "    VeryRough,               !- Roughness",
+        "    2.5389841E-02,           !- Thickness {m}",
+        "    4.3239430E-02,           !- Conductivity {W/m-K}",
+        "    91.30524,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.5000000,               !- Solar Absorptance",
+        "    0.5000000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    C12 - 2 IN HW CONCRETE,  !- Name",
+        "    MediumRough,             !- Roughness",
+        "    5.0901599E-02,           !- Thickness {m}",
+        "    1.729577,                !- Conductivity {W/m-K}",
+        "    2242.585,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.6500000,               !- Solar Absorptance",
+        "    0.6500000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    1.375in-Solid-Core,      !- Name",
+        "    Smooth,                  !- Roughness",
+        "    3.4925E-02,              !- Thickness {m}",
+        "    0.1525000,               !- Conductivity {W/m-K}",
+        "    614.5000,                !- Density {kg/m3}",
+        "    1630.0000,               !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.9200000,               !- Solar Absorptance",
+        "    0.9200000;               !- Visible Absorptance",
+
+        "  WindowMaterial:Glazing,",
+        "    ELECTRO GLASS LIGHT STATE,  !- Name",
+        "    SpectralAverage,         !- Optical Data Type",
+        "    ,                        !- Window Glass Spectral Data Set Name",
+        "    0.006,                   !- Thickness {m}",
+        "    0.814,                   !- Solar Transmittance at Normal Incidence",
+        "    0.086,                   !- Front Side Solar Reflectance at Normal Incidence",
+        "    0.086,                   !- Back Side Solar Reflectance at Normal Incidence",
+        "    0.847,                   !- Visible Transmittance at Normal Incidence",
+        "    0.099,                   !- Front Side Visible Reflectance at Normal Incidence",
+        "    0.099,                   !- Back Side Visible Reflectance at Normal Incidence",
+        "    0.0,                     !- Infrared Transmittance at Normal Incidence",
+        "    0.84,                    !- Front Side Infrared Hemispherical Emissivity",
+        "    0.84,                    !- Back Side Infrared Hemispherical Emissivity",
+        "    0.9;                     !- Conductivity {W/m-K}",
+
+        "  WindowMaterial:Glazing,",
+        "    ELECTRO GLASS DARK STATE,!- Name",
+        "    SpectralAverage,         !- Optical Data Type",
+        "    ,                        !- Window Glass Spectral Data Set Name",
+        "    0.006,                   !- Thickness {m}",
+        "    0.111,                   !- Solar Transmittance at Normal Incidence",
+        "    0.179,                   !- Front Side Solar Reflectance at Normal Incidence",
+        "    0.179,                   !- Back Side Solar Reflectance at Normal Incidence",
+        "    0.128,                   !- Visible Transmittance at Normal Incidence",
+        "    0.081,                   !- Front Side Visible Reflectance at Normal Incidence",
+        "    0.081,                   !- Back Side Visible Reflectance at Normal Incidence",
+        "    0.0,                     !- Infrared Transmittance at Normal Incidence",
+        "    0.84,                    !- Front Side Infrared Hemispherical Emissivity",
+        "    0.84,                    !- Back Side Infrared Hemispherical Emissivity",
+        "    0.9;                     !- Conductivity {W/m-K}",
+
+        "  WindowMaterial:Gas,",
+        "    WinAirGap,               !- Name",
+        "    AIR,                     !- Gas Type",
+        "    0.013;                   !- Thickness {m}",
+
+        "  Construction,",
+        "    EXTWALL80,               !- Name",
+        "    A1 - 1 IN STUCCO,        !- Outside Layer",
+        "    C4 - 4 IN COMMON BRICK,  !- Layer 2",
+        "    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3",
+
+        "  Construction,",
+        "    PARTITION06,             !- Name",
+        "    E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Outside Layer",
+        "    C6 - 8 IN CLAY TILE,     !- Layer 2",
+        "    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3",
+
+        "  Construction,",
+        "    FLOOR SLAB 8 IN,         !- Name",
+        "    C10 - 8 IN HW CONCRETE;  !- Outside Layer",
+
+        "  Construction,",
+        "    ROOF34,                  !- Name",
+        "    E2 - 1 / 2 IN SLAG OR STONE,  !- Outside Layer",
+        "    E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Layer 2",
+        "    C12 - 2 IN HW CONCRETE;  !- Layer 3",
+
+        "  Construction,",
+        "    CEILING:ZONE,            !- Name",
+        "    B5 - 1 IN DENSE INSULATION,  !- Outside Layer",
+        "    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 2",
+
+        "  Construction,",
+        "    CEILING:ATTIC,           !- Name",
+        "    E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Outside Layer",
+        "    B5 - 1 IN DENSE INSULATION;  !- Layer 2",
+
+        "  Construction,",
+        "    ELECTRO-CON-LIGHT,       !- Name",
+        "    ELECTRO GLASS LIGHT STATE,  !- Outside Layer",
+        "    WinAirGap,               !- Layer 2",
+        "    ELECTRO GLASS LIGHT STATE;  !- Layer 3",
+
+        "  Construction,",
+        "    ELECTRO-CON-DARK,        !- Name",
+        "    ELECTRO GLASS DARK STATE, !- Outside Layer",
+        "    WinAirGap,               !- Layer 2",
+        "    ELECTRO GLASS DARK STATE; !- Layer 3",
+
+        "  Construction,",
+        "    DOOR-CON,                !- Name",
+        "    1.375in-Solid-Core;      !- Outside Layer",
+
+        "  Zone,",
+        "    West Zone,               !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    autocalculate,           !- Ceiling Height {m}",
+        "    autocalculate;           !- Volume {m3}",
+
+        "  Zone,",
+        "    EAST ZONE,               !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    autocalculate,           !- Ceiling Height {m}",
+        "    autocalculate;           !- Volume {m3}",
+
+        "  Zone,",
+        "    NORTH ZONE,              !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    autocalculate,           !- Ceiling Height {m}",
+        "    autocalculate;           !- Volume {m3}",
+
+        "  Zone,",
+        "    ATTIC ZONE,              !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    autocalculate,           !- Ceiling Height {m}",
+        "    autocalculate;           !- Volume {m3}",
+
+        "  Zone,",
+        "    ATTIC NORTH ZONE,        !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    autocalculate,           !- Ceiling Height {m}",
+        "    autocalculate;           !- Volume {m3}",
+
+        "  GlobalGeometryRules,",
+        "    UpperLeftCorner,         !- Starting Vertex Position",
+        "    CounterClockWise,        !- Vertex Entry Direction",
+        "    World;                   !- Coordinate System",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn001:Wall001,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    West Zone,               !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    6.096000,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    6.096000,0,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn001:Wall002,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    West Zone,               !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    0,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    0,0,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn001:Wall003,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    PARTITION06,             !- Construction Name",
+        "    West Zone,               !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zn003:Wall004,           !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    0,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    0,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn001:Wall004,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    PARTITION06,             !- Construction Name",
+        "    West Zone,               !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zn002:Wall004,           !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    6.096000,0,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    6.096000,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    6.096000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn001:Flr001,            !- Name",
+        "    Floor,                   !- Surface Type",
+        "    FLOOR SLAB 8 IN,         !- Construction Name",
+        "    West Zone,               !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zn001:Flr001,            !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    1.000000,                !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    6.096000,0,0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn001:Ceil001,           !- Name",
+        "    CEILING,                 !- Surface Type",
+        "    CEILING:ZONE,            !- Construction Name",
+        "    West Zone,               !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zn004:Flr001,            !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,0,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    6.096000,0,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    6.096000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn002:Wall001,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    EAST ZONE,               !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    12.19200,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    12.19200,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    9.144000,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    9.144000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn002:Wall002,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    EAST ZONE,               !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    6.096000,0,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    6.096000,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    12.19200,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    12.19200,0,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn002:Wall003,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    EAST ZONE,               !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    12.19200,0,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    12.19200,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    12.19200,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    12.19200,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn002:Wall004,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    PARTITION06,             !- Construction Name",
+        "    EAST ZONE,               !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zn001:Wall004,           !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    6.096000,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    6.096000,0,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn002:Wall005,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    PARTITION06,             !- Construction Name",
+        "    EAST ZONE,               !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zn003:Wall005,           !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    9.144000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    9.144000,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    6.096000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn002:Flr001,            !- Name",
+        "    Floor,                   !- Surface Type",
+        "    FLOOR SLAB 8 IN,         !- Construction Name",
+        "    EAST ZONE,               !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zn002:Flr001,            !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    1.000000,                !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    6.096000,0,0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    12.19200,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    12.19200,0,0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn002:Ceil001,           !- Name",
+        "    CEILING,                 !- Surface Type",
+        "    CEILING:ZONE,            !- Construction Name",
+        "    EAST ZONE,               !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zn004:Flr002,            !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    6.096000,0,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    12.19200,0,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    12.19200,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn003:Wall001,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    NORTH ZONE,              !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,12.19200,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,12.19200,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    0,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    0,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn003:Wall002,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    NORTH ZONE,              !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    9.144000,12.19200,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    9.144000,12.19200,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    0,12.19200,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    0,12.19200,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn003:Wall003,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    NORTH ZONE,              !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    9.144000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    9.144000,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    9.144000,12.19200,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    9.144000,12.19200,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn003:Wall004,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    PARTITION06,             !- Construction Name",
+        "    NORTH ZONE,              !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zn001:Wall003,           !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    6.096000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn003:Wall005,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    PARTITION06,             !- Construction Name",
+        "    NORTH ZONE,              !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zn002:Wall005,           !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    9.144000,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    9.144000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn003:Flr001,            !- Name",
+        "    Floor,                   !- Surface Type",
+        "    FLOOR SLAB 8 IN,         !- Construction Name",
+        "    NORTH ZONE,              !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zn003:Flr001,            !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    1.000000,                !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,6.096000,0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,12.19200,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    9.144000,12.19200,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    9.144000,6.096000,0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn003:Ceil001,           !- Name",
+        "    CEILING,                 !- Surface Type",
+        "    CEILING:ZONE,            !- Construction Name",
+        "    NORTH ZONE,              !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zn005:Flr001,            !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,12.19200,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    9.144000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    9.144000,12.19200,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn004:Wall001,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    ATTIC ZONE,              !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,3.962400,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,0,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    6.096000,0,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    6.096000,0,3.962400;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn004:Wall002,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    ATTIC ZONE,              !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    6.096000,0,3.962400,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    6.096000,0,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    12.19200,0,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    12.19200,0,3.962400;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn004:Wall003,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    ATTIC ZONE,              !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    12.19200,0,3.962400,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    12.19200,0,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    12.19200,6.096000,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    12.19200,6.096000,3.962400;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn004:Wall004,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    ATTIC ZONE,              !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    12.19200,6.096000,3.962400,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    12.19200,6.096000,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    9.144000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    9.144000,6.096000,3.962400;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn004:Wall008,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    ATTIC ZONE,              !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,6.096000,3.962400,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    0,0,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    0,0,3.962400;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn004:Wall009,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    PARTITION06,             !- Construction Name",
+        "    ATTIC Zone,               !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zn005:Wall004,           !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    6.096000,6.096000,3.9624,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    0,6.096000,3.9624;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn004:Wall010,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    PARTITION06,             !- Construction Name",
+        "    ATTIC ZONE,               !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zn005:Wall005,           !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    9.144000,6.096000,3.9624,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    9.144000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    6.096000,6.096000,3.9624;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn004:Roof001,           !- Name",
+        "    Roof,                    !- Surface Type",
+        "    ROOF34,                  !- Construction Name",
+        "    ATTIC ZONE,              !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,6.096000,3.962400,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,0,3.962400,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    6.096000,0,3.962400,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    6.096000,6.096000,3.962400;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn004:Roof002,           !- Name",
+        "    Roof,                    !- Surface Type",
+        "    ROOF34,                  !- Construction Name",
+        "    ATTIC ZONE,              !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    6.096000,6.096000,3.962400,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    6.096000,0,3.962400,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    12.19200,0,3.962400,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    12.19200,6.096000,3.962400;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn004:Flr001,            !- Name",
+        "    Floor,                   !- Surface Type",
+        "    CEILING:ATTIC,           !- Construction Name",
+        "    ATTIC ZONE,              !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zn001:Ceil001,           !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    1.000000,                !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    6.096000,0,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn004:Flr002,            !- Name",
+        "    Floor,                   !- Surface Type",
+        "    CEILING:ATTIC,           !- Construction Name",
+        "    ATTIC ZONE,              !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zn002:Ceil001,           !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    1.000000,                !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    6.096000,0,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    12.19200,6.096000,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    12.19200,0,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn005:Wall001,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    ATTIC NORTH ZONE,              !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    9.144000,6.096000,3.962400,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    9.144000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    9.144000,12.19200,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    9.144000,12.19200,3.962400;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn005:Wall002,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    ATTIC NORTH ZONE,              !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    9.144000,12.19200,3.962400,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    9.144000,12.19200,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    0,12.19200,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    0,12.19200,3.962400;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn005:Wall003,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    ATTIC NORTH ZONE,              !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,12.19200,3.962400,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,12.19200,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    0,6.096000,3.962400;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn005:Wall004,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    PARTITION06,             !- Construction Name",
+        "    ATTIC NORTH ZONE,              !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zn004:Wall009,           !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,6.096000,3.9624,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    6.096000,6.096000,3.9624;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn005:Wall005,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    PARTITION06,             !- Construction Name",
+        "    ATTIC NORTH ZONE,              !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zn004:Wall010,           !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    6.096000,6.096000,3.9624,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    9.144000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    9.144000,6.096000,3.9624;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn005:Flr001,            !- Name",
+        "    Floor,                   !- Surface Type",
+        "    CEILING:ATTIC,           !- Construction Name",
+        "    ATTIC NORTH ZONE,              !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zn003:Ceil001,           !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    1.000000,                !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,12.19200,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    9.144000,12.19200,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    9.144000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn005:Roof001,           !- Name",
+        "    Roof,                    !- Surface Type",
+        "    ROOF34,                  !- Construction Name",
+        "    ATTIC NORTH ZONE,              !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,12.19200,3.962400,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,6.096000,3.962400,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    9.144000,6.096000,3.962400,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    9.144000,12.19200,3.962400;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  FenestrationSurface:Detailed,",
+        "    Zn001:Wall001:Win001,    !- Name",
+        "    Window,                  !- Surface Type",
+        "    ELECTRO-CON-LIGHT,       !- Construction Name",
+        "    Zn001:Wall001,           !- Building Surface Name",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    0.5000000,               !- View Factor to Ground",
+        "    ,     !- Frame and Divider Name",
+        "    1.0,                     !- Multiplier",
+        "    4,                       !- Number of Vertices",
+        "    0.548000,0,2.5000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0.548000,0,0.5000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    5.548000,0,0.5000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    5.548000,0,2.5000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  FenestrationSurface:Detailed,",
+        "    Zn001:Wall003:Door001,   !- Name",
+        "    DOOR,                    !- Surface Type",
+        "    DOOR-CON,                !- Construction Name",
+        "    Zn001:Wall003,           !- Building Surface Name",
+        "    Zn003:Wall004:Door001,   !- Outside Boundary Condition Object",
+        "    0.5000000,               !- View Factor to Ground",
+        "    ,                        !- Frame and Divider Name",
+        "    1.0,                     !- Multiplier",
+        "    4,                       !- Number of Vertices",
+        "    3.500,6.096000,2.0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    3.500,6.096000,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    2.500,6.096000,0.0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    2.500,6.096000,2.0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  FenestrationSurface:Detailed,",
+        "    Zn003:Wall002:Win001,    !- Name",
+        "    Window,                  !- Surface Type",
+        "    ELECTRO-CON-LIGHT,       !- Construction Name",
+        "    Zn003:Wall002,           !- Building Surface Name",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    0.5000000,               !- View Factor to Ground",
+        "    ,     !- Frame and Divider Name",
+        "    1.0,                     !- Multiplier",
+        "    4,                       !- Number of Vertices",
+        "    5.548000,12.19200,2.5000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    5.548000,12.19200,0.5000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    0.548000,12.19200,0.5000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    0.548000,12.19200,2.5000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  FenestrationSurface:Detailed,",
+        "    Zn003:Wall004:Door001,   !- Name",
+        "    DOOR,                    !- Surface Type",
+        "    DOOR-CON,                !- Construction Name",
+        "    Zn003:Wall004,           !- Building Surface Name",
+        "    Zn001:Wall003:Door001,   !- Outside Boundary Condition Object",
+        "    0.5000000,               !- View Factor to Ground",
+        "    ,                        !- Frame and Divider Name",
+        "    1.0,                     !- Multiplier",
+        "    4,                       !- Number of Vertices",
+        "    2.500,6.096000,2.0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    2.500,6.096000,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    3.500,6.096000,0.0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    3.500,6.096000,2.0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  ScheduleTypeLimits,",
+        "    Any Number;              !- Name",
+
+        "  ScheduleTypeLimits,",
+        "    Fraction,                !- Name",
+        "    0.0,                     !- Lower Limit Value",
+        "    1.0,                     !- Upper Limit Value",
+        "    CONTINUOUS;              !- Numeric Type",
+
+        "  ScheduleTypeLimits,",
+        "    Temperature,             !- Name",
+        "    -60,                     !- Lower Limit Value",
+        "    200,                     !- Upper Limit Value",
+        "    CONTINUOUS,              !- Numeric Type",
+        "    Temperature;             !- Unit Type",
+
+        "  ScheduleTypeLimits,",
+        "    Control Type,            !- Name",
+        "    0,                       !- Lower Limit Value",
+        "    4,                       !- Upper Limit Value",
+        "    DISCRETE;                !- Numeric Type",
+
+        "  ScheduleTypeLimits,",
+        "    On/Off,                  !- Name",
+        "    0,                       !- Lower Limit Value",
+        "    1,                       !- Upper Limit Value",
+        "    DISCRETE;                !- Numeric Type",
+
+        "  Schedule:Compact,",
+        "    WindowVentSched,         !- Name",
+        "    Any Number,              !- Schedule Type Limits Name",
+        "    Through: 3/31,           !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,25.55,      !- Field 3",
+        "    Through: 9/30,           !- Field 5",
+        "    For: AllDays,            !- Field 6",
+        "    Until: 24:00,21.11,      !- Field 7",
+        "    Through: 12/31,          !- Field 9",
+        "    For: AllDays,            !- Field 10",
+        "    Until: 24:00,25.55;      !- Field 11",
+
+        "  Schedule:Compact,",
+        "    Activity Sch,            !- Name",
+        "    Any Number,              !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,131.8;      !- Field 3",
+
+        "  Schedule:Compact,",
+        "    Work Eff Sch,            !- Name",
+        "    Any Number,              !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,0.0;        !- Field 3",
+
+        "  Schedule:Compact,",
+        "    Clothing Sch,            !- Name",
+        "    Any Number,              !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,1.0;        !- Field 3",
+
+        "  Schedule:Compact,",
+        "    Air Velo Sch,            !- Name",
+        "    Any Number,              !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,0.137;      !- Field 3",
+
+        "  Schedule:Compact,",
+        "    OFFICE OCCUPANCY,        !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: WeekDays,           !- Field 2",
+        "    Until: 6:00,0.0,         !- Field 3",
+        "    Until: 7:00,0.10,        !- Field 5",
+        "    Until: 8:00,0.50,        !- Field 7",
+        "    Until: 12:00,1.00,       !- Field 9",
+        "    Until: 13:00,0.50,       !- Field 11",
+        "    Until: 16:00,1.00,       !- Field 13",
+        "    Until: 17:00,0.50,       !- Field 15",
+        "    Until: 18:00,0.10,       !- Field 17",
+        "    Until: 24:00,0.0,        !- Field 19",
+        "    For: AllOtherDays,       !- Field 21",
+        "    Until: 24:00,0.0;        !- Field 22",
+
+        "  Schedule:Compact,",
+        "    INTERMITTENT,            !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: WeekDays,           !- Field 2",
+        "    Until: 8:00,0.0,         !- Field 3",
+        "    Until: 18:00,1.00,       !- Field 5",
+        "    Until: 24:00,0.0,        !- Field 7",
+        "    For: AllOtherDays,       !- Field 9",
+        "    Until: 24:00,0.0;        !- Field 10",
+
+        "  Schedule:Compact,",
+        "    OFFICE LIGHTING,         !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: WeekDays,           !- Field 2",
+        "    Until: 6:00,0.05,        !- Field 3",
+        "    Until: 7:00,0.20,        !- Field 5",
+        "    Until: 17:00,1.00,       !- Field 7",
+        "    Until: 18:00,0.50,       !- Field 9",
+        "    Until: 24:00,0.05,       !- Field 11",
+        "    For: AllOtherDays,       !- Field 13",
+        "    Until: 24:00,0.05;       !- Field 14",
+
+        "  Schedule:Compact,",
+        "    FanAndCoilAvailSched,    !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 3/31,           !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,1.0,        !- Field 3",
+        "    Through: 9/30,           !- Field 5",
+        "    For: WeekDays SummerDesignDay, !- Field 6",
+        "    Until: 7:00,0.0,         !- Field 7",
+        "    Until: 17:00,1.0,        !- Field 9",
+        "    Until: 24:00,0.0,        !- Field 11",
+        "    For: WinterDesignDay,    !- Field 13",
+        "    Until: 24:00,0.0,        !- Field 14",
+        "    For: AllOtherDays,       !- Field 16",
+        "    Until: 24:00,0.0,        !- Field 17",
+        "    Through: 12/31,          !- Field 19",
+        "    For: AllDays,            !- Field 20",
+        "    Until: 24:00,1.0;        !- Field 21",
+
+        "  Schedule:Compact,",
+        "    CoolingCoilAvailSched,   !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 3/31,           !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,0.0,        !- Field 3",
+        "    Through: 9/30,           !- Field 5",
+        "    For: WeekDays SummerDesignDay, !- Field 6",
+        "    Until: 7:00,0.0,         !- Field 7",
+        "    Until: 17:00,1.0,        !- Field 9",
+        "    Until: 24:00,0.0,        !- Field 11",
+        "    For: WinterDesignDay,    !- Field 13",
+        "    Until: 24:00,0.0,        !- Field 14",
+        "    For: AllOtherDays,       !- Field 16",
+        "    Until: 24:00,0.0,        !- Field 17",
+        "    Through: 12/31,          !- Field 19",
+        "    For: AllDays,            !- Field 20",
+        "    Until: 24:00,0.0;        !- Field 21",
+
+        "  Schedule:Compact,",
+        "    Dual Heating Setpoints,  !- Name",
+        "    Temperature,             !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until:  7:00,15.0,       !- Field 3",
+        "    Until: 17:00,22.0,       !- Field 5",
+        "    Until: 24:00,15.0;       !- Field 7",
+
+        "  Schedule:Compact,",
+        "    Dual Cooling Setpoints,  !- Name",
+        "    Temperature,             !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until:  7:00,35.0,       !- Field 3",
+        "    Until: 17:00,24.0,       !- Field 5",
+        "    Until: 24:00,40.0;       !- Field 7",
+
+        "  Schedule:Compact,",
+        "    Dual Zone Control Type Sched,  !- Name",
+        "    Control Type,            !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,4;          !- Field 3",
+
+        "  Schedule:Compact,",
+        "    VentingSched,            !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until:  7:00,1.0,        !- Field 3",
+        "    Until: 17:00,0.0,        !- Field 5",
+        "    Until: 24:00,1.0;        !- Field 7",
+
+        "  Schedule:Compact,",
+        "    Minimum OA Sch,          !- Name",
+        "    Temperature,             !- Schedule Type Limits Name",
+        "    Through: 3/31,           !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until:  7:00,0.10,       !- Field 3",
+        "    Until: 17:00,0.25,       !- Field 5",
+        "    Until: 24:00,0.10,       !- Field 7",
+        "    Through: 9/30,           !- Field 9",
+        "    For: AllDays,            !- Field 10",
+        "    Until: 24:00,0.25,       !- Field 11",
+        "    Through: 12/31,          !- Field 13",
+        "    For: AllDays,            !- Field 14",
+        "    Until:  7:00,0.10,       !- Field 15",
+        "    Until: 17:00,0.25,       !- Field 17",
+        "    Until: 24:00,0.10;       !- Field 19",
+
+        "  People,",
+        "    West Zone People,        !- Name",
+        "    West Zone,               !- Zone or ZoneList Name",
+        "    OFFICE OCCUPANCY,        !- Number of People Schedule Name",
+        "    people,                  !- Number of People Calculation Method",
+        "    3.000000,                !- Number of People",
+        "    ,                        !- People per Zone Floor Area {person/m2}",
+        "    ,                        !- Zone Floor Area per Person {m2/person}",
+        "    0.3000000,               !- Fraction Radiant",
+        "    ,                        !- Sensible Heat Fraction",
+        "    Activity Sch,            !- Activity Level Schedule Name",
+        "    3.82E-8,                 !- Carbon Dioxide Generation Rate {m3/s-W}",
+        "    ,                        !- Enable ASHRAE 55 Comfort Warnings",
+        "    zoneaveraged,            !- Mean Radiant Temperature Calculation Type",
+        "    ,                        !- Surface Name/Angle Factor List Name",
+        "    Work Eff Sch,            !- Work Efficiency Schedule Name",
+        "    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
+        "    ,                        !- Clothing Insulation Calculation Method Schedule Name",
+        "    Clothing Sch,            !- Clothing Insulation Schedule Name",
+        "    Air Velo Sch,            !- Air Velocity Schedule Name",
+        "    FANGER;                  !- Thermal Comfort Model 1 Type",
+
+        "  People,",
+        "    EAST ZONE People,        !- Name",
+        "    EAST ZONE,               !- Zone or ZoneList Name",
+        "    OFFICE OCCUPANCY,        !- Number of People Schedule Name",
+        "    people,                  !- Number of People Calculation Method",
+        "    3.000000,                !- Number of People",
+        "    ,                        !- People per Zone Floor Area {person/m2}",
+        "    ,                        !- Zone Floor Area per Person {m2/person}",
+        "    0.3000000,               !- Fraction Radiant",
+        "    ,                        !- Sensible Heat Fraction",
+        "    Activity Sch,            !- Activity Level Schedule Name",
+        "    3.82E-8,                 !- Carbon Dioxide Generation Rate {m3/s-W}",
+        "    ,                        !- Enable ASHRAE 55 Comfort Warnings",
+        "    zoneaveraged,            !- Mean Radiant Temperature Calculation Type",
+        "    ,                        !- Surface Name/Angle Factor List Name",
+        "    Work Eff Sch,            !- Work Efficiency Schedule Name",
+        "    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
+        "    ,                        !- Clothing Insulation Calculation Method Schedule Name",
+        "    Clothing Sch,            !- Clothing Insulation Schedule Name",
+        "    Air Velo Sch,            !- Air Velocity Schedule Name",
+        "    FANGER;                  !- Thermal Comfort Model 1 Type",
+
+        "  People,",
+        "    NORTH ZONE People,       !- Name",
+        "    NORTH ZONE,              !- Zone or ZoneList Name",
+        "    OFFICE OCCUPANCY,        !- Number of People Schedule Name",
+        "    people,                  !- Number of People Calculation Method",
+        "    4.000000,                !- Number of People",
+        "    ,                        !- People per Zone Floor Area {person/m2}",
+        "    ,                        !- Zone Floor Area per Person {m2/person}",
+        "    0.3000000,               !- Fraction Radiant",
+        "    ,                        !- Sensible Heat Fraction",
+        "    Activity Sch,            !- Activity Level Schedule Name",
+        "    3.82E-8,                 !- Carbon Dioxide Generation Rate {m3/s-W}",
+        "    ,                        !- Enable ASHRAE 55 Comfort Warnings",
+        "    zoneaveraged,            !- Mean Radiant Temperature Calculation Type",
+        "    ,                        !- Surface Name/Angle Factor List Name",
+        "    Work Eff Sch,            !- Work Efficiency Schedule Name",
+        "    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
+        "    ,                        !- Clothing Insulation Calculation Method Schedule Name",
+        "    Clothing Sch,            !- Clothing Insulation Schedule Name",
+        "    Air Velo Sch,            !- Air Velocity Schedule Name",
+        "    FANGER;                  !- Thermal Comfort Model 1 Type",
+
+        "  Lights,",
+        "    West Zone Lights 1,      !- Name",
+        "    West Zone,               !- Zone or ZoneList Name",
+        "    OFFICE LIGHTING,         !- Schedule Name",
+        "    LightingLevel,           !- Design Level Calculation Method",
+        "    1464.375,                !- Lighting Level {W}",
+        "    ,                        !- Watts per Zone Floor Area {W/m2}",
+        "    ,                        !- Watts per Person {W/person}",
+        "    0,                       !- Return Air Fraction",
+        "    0.2000000,               !- Fraction Radiant",
+        "    0.2000000,               !- Fraction Visible",
+        "    1.0,                     !- Fraction Replaceable",
+        "    GeneralLights;           !- End-Use Subcategory",
+
+        "  Lights,",
+        "    EAST ZONE Lights 1,      !- Name",
+        "    EAST ZONE,               !- Zone or ZoneList Name",
+        "    OFFICE LIGHTING,         !- Schedule Name",
+        "    LightingLevel,           !- Design Level Calculation Method",
+        "    1464.375,                !- Lighting Level {W}",
+        "    ,                        !- Watts per Zone Floor Area {W/m2}",
+        "    ,                        !- Watts per Person {W/person}",
+        "    0,                       !- Return Air Fraction",
+        "    0.2000000,               !- Fraction Radiant",
+        "    0.2000000,               !- Fraction Visible",
+        "    1.0,                     !- Fraction Replaceable",
+        "    GeneralLights;           !- End-Use Subcategory",
+
+        "  Lights,",
+        "    NORTH ZONE Lights 1,     !- Name",
+        "    NORTH ZONE,              !- Zone or ZoneList Name",
+        "    OFFICE LIGHTING,         !- Schedule Name",
+        "    LightingLevel,           !- Design Level Calculation Method",
+        "    1464.375,                !- Lighting Level {W}",
+        "    ,                        !- Watts per Zone Floor Area {W/m2}",
+        "    ,                        !- Watts per Person {W/person}",
+        "    0,                       !- Return Air Fraction",
+        "    0.2000000,               !- Fraction Radiant",
+        "    0.2000000,               !- Fraction Visible",
+        "    1.0,                     !- Fraction Replaceable",
+        "    GeneralLights;           !- End-Use Subcategory",
+
+        "  ElectricEquipment,",
+        "    West Zone ElecEq 1,      !- Name",
+        "    West Zone,               !- Zone or ZoneList Name",
+        "    INTERMITTENT,            !- Schedule Name",
+        "    EquipmentLevel,          !- Design Level Calculation Method",
+        "    2928.751,                !- Design Level {W}",
+        "    ,                        !- Watts per Zone Floor Area {W/m2}",
+        "    ,                        !- Watts per Person {W/person}",
+        "    0,                       !- Fraction Latent",
+        "    0.3000000,               !- Fraction Radiant",
+        "    0;                       !- Fraction Lost",
+
+        "  ElectricEquipment,",
+        "    EAST ZONE ElecEq 1,      !- Name",
+        "    EAST ZONE,               !- Zone or ZoneList Name",
+        "    INTERMITTENT,            !- Schedule Name",
+        "    EquipmentLevel,          !- Design Level Calculation Method",
+        "    1464.375,                !- Design Level {W}",
+        "    ,                        !- Watts per Zone Floor Area {W/m2}",
+        "    ,                        !- Watts per Person {W/person}",
+        "    0,                       !- Fraction Latent",
+        "    0.3000000,               !- Fraction Radiant",
+        "    0;                       !- Fraction Lost",
+
+        "  ElectricEquipment,",
+        "    NORTH ZONE ElecEq 1,     !- Name",
+        "    NORTH ZONE,              !- Zone or ZoneList Name",
+        "    INTERMITTENT,            !- Schedule Name",
+        "    EquipmentLevel,          !- Design Level Calculation Method",
+        "    2928.751,                !- Design Level {W}",
+        "    ,                        !- Watts per Zone Floor Area {W/m2}",
+        "    ,                        !- Watts per Person {W/person}",
+        "    0,                       !- Fraction Latent",
+        "    0.3000000,               !- Fraction Radiant",
+        "    0;                       !- Fraction Lost",
+
+        "  Daylighting:Controls,",
+        "    West Zone_DaylCtrl,      !- Name",
+        "    West Zone,               !- Zone Name",
+        "    SplitFlux,               !- Daylighting Method",
+        "    ,                        !- Availability Schedule Name",
+        "    Continuous,              !- Lighting Control Type",
+        "    0.3,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control",
+        "    0.2,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control",
+        "    ,                        !- Number of Stepped Control Steps",
+        "    1.0,                     !- Probability Lighting will be Reset When Needed in Manual Stepped Control",
+        "    West Zone_DaylRefPt1,    !- Glare Calculation Daylighting Reference Point Name",
+        "    180.0,                   !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}",
+        "    20.0,                    !- Maximum Allowable Discomfort Glare Index",
+        "    ,                        !- DElight Gridding Resolution {m2}",
+        "    West Zone_DaylRefPt1,    !- Daylighting Reference Point 1 Name",
+        "    1.0,                     !- Fraction of Zone Controlled by Reference Point 1",
+        "    500.;                    !- Illuminance Setpoint at Reference Point 1 {lux}",
+
+        "  Daylighting:ReferencePoint,",
+        "    West Zone_DaylRefPt1,    !- Name",
+        "    West Zone,               !- Zone Name",
+        "    3.048,                   !- X-Coordinate of Reference Point {m}",
+        "    3.048,                   !- Y-Coordinate of Reference Point {m}",
+        "    0.9;                     !- Z-Coordinate of Reference Point {m}",
+
+        "  Curve:Biquadratic,",
+        "    WindACCoolCapFT,         !- Name",
+        "    0.942587793,             !- Coefficient1 Constant",
+        "    0.009543347,             !- Coefficient2 x",
+        "    0.000683770,             !- Coefficient3 x**2",
+        "    -0.011042676,            !- Coefficient4 y",
+        "    0.000005249,             !- Coefficient5 y**2",
+        "    -0.000009720,            !- Coefficient6 x*y",
+        "    12.77778,                !- Minimum Value of x",
+        "    23.88889,                !- Maximum Value of x",
+        "    18.0,                    !- Minimum Value of y",
+        "    46.11111,                !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "    WindACEIRFT,             !- Name",
+        "    0.342414409,             !- Coefficient1 Constant",
+        "    0.034885008,             !- Coefficient2 x",
+        "    -0.000623700,            !- Coefficient3 x**2",
+        "    0.004977216,             !- Coefficient4 y",
+        "    0.000437951,             !- Coefficient5 y**2",
+        "    -0.000728028,            !- Coefficient6 x*y",
+        "    12.77778,                !- Minimum Value of x",
+        "    23.88889,                !- Maximum Value of x",
+        "    18.0,                    !- Minimum Value of y",
+        "    46.11111,                !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Quadratic,",
+        "    WindACCoolCapFFF,        !- Name",
+        "    0.8,                     !- Coefficient1 Constant",
+        "    0.2,                     !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.5,                     !- Minimum Value of x",
+        "    1.5;                     !- Maximum Value of x",
+
+        "  Curve:Quadratic,",
+        "    WindACEIRFFF,            !- Name",
+        "    1.1552,                  !- Coefficient1 Constant",
+        "    -0.1808,                 !- Coefficient2 x",
+        "    0.0256,                  !- Coefficient3 x**2",
+        "    0.5,                     !- Minimum Value of x",
+        "    1.5;                     !- Maximum Value of x",
+
+        "  Curve:Quadratic,",
+        "    WindACPLFFPLR,           !- Name",
+        "    0.85,                    !- Coefficient1 Constant",
+        "    0.15,                    !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.0,                     !- Minimum Value of x",
+        "    1.0;                     !- Maximum Value of x",
+
+        "  NodeList,",
+        "    OutsideAirInletNodes,    !- Name",
+        "    Outside Air Inlet Node;  !- Node 1 Name",
+
+        "  NodeList,",
+        "    Zone1Inlets,             !- Name",
+        "    Zone 1 NoReheat Air Outlet Node;  !- Node 1 Name",
+
+        "  NodeList,",
+        "    Zone2Inlets,             !- Name",
+        "    Zone 2 Reheat Air Outlet Node;  !- Node 1 Name",
+
+        "  NodeList,",
+        "    Supply Air Temp Nodes,   !- Name",
+        "    Heating Coil Air Inlet Node,  !- Node 1 Name",
+        "    Air Loop Outlet Node;    !- Node 2 Name",
+
+        "  BranchList,",
+        "    Air Loop Branches,       !- Name",
+        "    Air Loop Main Branch;    !- Branch 1 Name",
+
+        "  Branch,",
+        "    Air Loop Main Branch,    !- Name",
+        "    ,                        !- Pressure Drop Curve Name",
+        "    AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
+        "    OA Sys 1,                !- Component 1 Name",
+        "    Air Loop Inlet Node,     !- Component 1 Inlet Node Name",
+        "    Mixed Air Node,          !- Component 1 Outlet Node Name",
+        "    Fan:ConstantVolume,      !- Component 2 Object Type",
+        "    Supply Fan 1,            !- Component 2 Name",
+        "    Mixed Air Node,          !- Component 2 Inlet Node Name",
+        "    Cooling Coil Air Inlet Node,  !- Component 2 Outlet Node Name",
+        "    CoilSystem:Cooling:DX,   !- Component 3 Object Type",
+        "    DX Cooling Coil System 1,!- Component 3 Name",
+        "    Cooling Coil Air Inlet Node,  !- Component 3 Inlet Node Name",
+        "    Heating Coil Air Inlet Node,  !- Component 3 Outlet Node Name",
+        "    Coil:Heating:Fuel,       !- Component 4 Object Type",
+        "    Main Heating Coil 1,     !- Component 4 Name",
+        "    Heating Coil Air Inlet Node,  !- Component 4 Inlet Node Name",
+        "    Air Loop Outlet Node;    !- Component 4 Outlet Node Name",
+
+        "  AirLoopHVAC,",
+        "    Typical Terminal Reheat 1,  !- Name",
+        "    ,                        !- Controller List Name",
+        "    Reheat System 1 Avail List,  !- Availability Manager List Name",
+        "    1.16,                     !- Design Supply Air Flow Rate {m3/s}",
+        "    Air Loop Branches,       !- Branch List Name",
+        "    ,                        !- Connector List Name",
+        "    Air Loop Inlet Node,     !- Supply Side Inlet Node Name",
+        "    Return Air Mixer Outlet, !- Demand Side Outlet Node Name",
+        "    Zone Equipment Inlet Node,  !- Demand Side Inlet Node Names",
+        "    Air Loop Outlet Node;    !- Supply Side Outlet Node Names",
+
+        "  AirLoopHVAC:ControllerList,",
+        "    OA Sys 1 Controllers,    !- Name",
+        "    Controller:OutdoorAir,   !- Controller 1 Object Type",
+        "    OA Controller 1;         !- Controller 1 Name",
+
+        "  AirLoopHVAC:OutdoorAirSystem:EquipmentList,",
+        "    OA Sys 1 Equipment,      !- Name",
+        "    OutdoorAir:Mixer,        !- Component 1 Object Type",
+        "    OA Mixing Box 1;         !- Component 1 Name",
+
+        "  AirLoopHVAC:OutdoorAirSystem,",
+        "    OA Sys 1,                !- Name",
+        "    OA Sys 1 Controllers,    !- Controller List Name",
+        "    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name",
+
+        "  OutdoorAir:NodeList,",
+        "    OutsideAirInletNodes;    !- Node or NodeList Name 1",
+
+        "  OutdoorAir:Mixer,",
+        "    OA Mixing Box 1,         !- Name",
+        "    Mixed Air Node,          !- Mixed Air Node Name",
+        "    Outside Air Inlet Node,  !- Outdoor Air Stream Node Name",
+        "    Relief Air Outlet Node,  !- Relief Air Stream Node Name",
+        "    Air Loop Inlet Node;     !- Return Air Stream Node Name",
+
+        "  AirflowNetwork:SimulationControl,",
+        "    AirflowNetwork_All,      !- Name",
+        "    MultizoneWithDistribution,  !- AirflowNetwork Control",
+        "    INPUT,                   !- Wind Pressure Coefficient Type",
+        "    ExternalNode,            !- Height Selection for Local Wind Pressure Calculation",
+        "    LOWRISE,                 !- Building Type",
+        "    500,                     !- Maximum Number of Iterations {dimensionless}",
+        "    ZeroNodePressures,       !- Initialization Type",
+        "    1.0E-04,                 !- Relative Airflow Convergence Tolerance {dimensionless}",
+        "    1.0E-04,                 !- Absolute Airflow Convergence Tolerance {kg/s}",
+        "    -0.5,                    !- Convergence Acceleration Limit {dimensionless}",
+        "    0.0,                     !- Azimuth Angle of Long Axis of Building {deg}",
+        "    1.0;                     !- Ratio of Building Width Along Short Axis to Width Along Long Axis",
+
+        "  AirflowNetwork:MultiZone:Zone,",
+        "    West Zone,               !- Zone Name",
+        "    Temperature,             !- Ventilation Control Mode",
+        "    WindowVentSched,         !- Ventilation Control Zone Temperature Setpoint Schedule Name",
+        "    0.3,                     !- Minimum Venting Open Factor {dimensionless}",
+        "    5.0,                     !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor {deltaC}",
+        "    10.0,                    !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor {deltaC}",
+        "    0.0,                     !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor {deltaJ/kg}",
+        "    300000.0,                !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor {deltaJ/kg}",
+        "    VentingSched;            !- Venting Availability Schedule Name",
+
+        "  AirflowNetwork:MultiZone:Zone,",
+        "    EAST ZONE,               !- Zone Name",
+        "    NoVent,                  !- Ventilation Control Mode",
+        "    ,                        !- Ventilation Control Zone Temperature Setpoint Schedule Name",
+        "    1.0,                     !- Minimum Venting Open Factor {dimensionless}",
+        "    0.0,                     !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor {deltaC}",
+        "    100.0,                   !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor {deltaC}",
+        "    0.0,                     !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor {deltaJ/kg}",
+        "    300000.0;                !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor {deltaJ/kg}",
+
+        "  AirflowNetwork:MultiZone:Zone,",
+        "    NORTH ZONE,              !- Zone Name",
+        "    Temperature,             !- Ventilation Control Mode",
+        "    WindowVentSched,         !- Ventilation Control Zone Temperature Setpoint Schedule Name",
+        "    1.0,                     !- Minimum Venting Open Factor {dimensionless}",
+        "    0.0,                     !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor {deltaC}",
+        "    100.0,                   !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor {deltaC}",
+        "    0.0,                     !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor {deltaJ/kg}",
+        "    300000.0,                !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor {deltaJ/kg}",
+        "    VentingSched;            !- Venting Availability Schedule Name",
+
+        "  AirflowNetwork:MultiZone:Zone,",
+        "    ATTIC ZONE,              !- Zone Name",
+        "    NoVent,                  !- Ventilation Control Mode",
+        "    ,                        !- Ventilation Control Zone Temperature Setpoint Schedule Name",
+        "    1.0,                     !- Minimum Venting Open Factor {dimensionless}",
+        "    0.0,                     !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor {deltaC}",
+        "    100.0,                   !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor {deltaC}",
+        "    0.0,                     !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor {deltaJ/kg}",
+        "    300000.0;                !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor {deltaJ/kg}",
+
+        "  AirflowNetwork:MultiZone:Zone,",
+        "    ATTIC NORTH ZONE,              !- Zone Name",
+        "    NoVent,                  !- Ventilation Control Mode",
+        "    ,                        !- Ventilation Control Zone Temperature Setpoint Schedule Name",
+        "    1.0,                     !- Minimum Venting Open Factor {dimensionless}",
+        "    0.0,                     !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor {deltaC}",
+        "    100.0,                   !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor {deltaC}",
+        "    0.0,                     !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor {deltaJ/kg}",
+        "    300000.0;                !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor {deltaJ/kg}",
+
+        "  AirflowNetwork:MultiZone:Surface,",
+        "    Zn001:Wall001,           !- Surface Name",
+        "    ELA-1,                   !- Leakage Component Name",
+        "    SFacade,                 !- External Node Name",
+        "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
+
+        "  AirflowNetwork:MultiZone:Surface,",
+        "    Zn001:Wall001:Win001,    !- Surface Name",
+        "    CR-1,                    !- Leakage Component Name",
+        "    SFacade,                 !- External Node Name",
+        "    0.5;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
+
+        "  AirflowNetwork:MultiZone:Surface,",
+        "    Zn001:Wall002,           !- Surface Name",
+        "    CR-1,                    !- Leakage Component Name",
+        "    WFacade,                 !- External Node Name",
+        "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
+
+        "  AirflowNetwork:MultiZone:Surface,",
+        "    Zn001:Wall003,           !- Surface Name",
+        "    CRcri,                   !- Leakage Component Name",
+        "    ,                        !- External Node Name",
+        "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
+
+        "  AirflowNetwork:MultiZone:Surface,",
+        "    Zn001:Wall003:Door001,   !- Surface Name",
+        "    CRcri,                   !- Leakage Component Name",
+        "    ,                        !- External Node Name",
+        "    0.5;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
+
+        "  AirflowNetwork:MultiZone:Surface,",
+        "    Zn001:Wall004,           !- Surface Name",
+        "    CRcri,                   !- Leakage Component Name",
+        "    ,                        !- External Node Name",
+        "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
+
+        "  AirflowNetwork:MultiZone:Surface,",
+        "    Zn001:Ceil001,           !- Surface Name",
+        "    CRcri,                   !- Leakage Component Name",
+        "    ,                        !- External Node Name",
+        "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
+
+        "  AirflowNetwork:MultiZone:Surface,",
+        "    Zn002:Wall002,           !- Surface Name",
+        "    CR-1,                    !- Leakage Component Name",
+        "    SFacade,                 !- External Node Name",
+        "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
+
+        "  AirflowNetwork:MultiZone:Surface,",
+        "    Zn002:Wall003,           !- Surface Name",
+        "    CR-1,                    !- Leakage Component Name",
+        "    EFacade,                 !- External Node Name",
+        "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
+
+        "  AirflowNetwork:MultiZone:Surface,",
+        "    Zn002:Wall005,           !- Surface Name",
+        "    CRcri,                   !- Leakage Component Name",
+        "    ,                        !- External Node Name",
+        "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
+
+        "  AirflowNetwork:MultiZone:Surface,",
+        "    Zn002:Ceil001,           !- Surface Name",
+        "    CRcri,                   !- Leakage Component Name",
+        "    ,                        !- External Node Name",
+        "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
+
+        "  AirflowNetwork:MultiZone:Surface,",
+        "    Zn003:Wall001,           !- Surface Name",
+        "    CR-1,                    !- Leakage Component Name",
+        "    WFacade,                 !- External Node Name",
+        "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
+
+        "  AirflowNetwork:MultiZone:Surface,",
+        "    Zn003:Wall002,           !- Surface Name",
+        "    CR-1,                    !- Leakage Component Name",
+        "    NFacade,                 !- External Node Name",
+        "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
+
+        "  AirflowNetwork:MultiZone:Surface,",
+        "    Zn003:Wall002:Win001,    !- Surface Name",
+        "    CR-1,                    !- Leakage Component Name",
+        "    NFacade,                 !- External Node Name",
+        "    0.5;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
+
+        "  AirflowNetwork:MultiZone:Surface,",
+        "    Zn003:Ceil001,           !- Surface Name",
+        "    CRcri,                   !- Leakage Component Name",
+        "    ,                        !- External Node Name",
+        "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
+
+        "  AirflowNetwork:MultiZone:Surface,",
+        "    Zn004:Roof001,           !- Surface Name",
+        "    CR-1,                    !- Leakage Component Name",
+        "    Horizontal,              !- External Node Name",
+        "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
+
+        "  AirflowNetwork:MultiZone:Surface,",
+        "    Zn004:Roof002,           !- Surface Name",
+        "    CR-1,                    !- Leakage Component Name",
+        "    Horizontal,              !- External Node Name",
+        "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
+
+        "  AirflowNetwork:MultiZone:Surface,",
+        "    Zn005:Roof001,           !- Surface Name",
+        "    CR-1,                    !- Leakage Component Name",
+        "    Horizontal,              !- External Node Name",
+        "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
+
+        "  AirflowNetwork:MultiZone:Surface,",
+        "    Zn005:Wall004,           !- Surface Name",
+        "    CR-1,                    !- Leakage Component Name",
+        "    ,              !- External Node Name",
+        "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
+
+        "  AirflowNetwork:MultiZone:Surface,",
+        "    Zn005:Wall005,           !- Surface Name",
+        "    CR-1,                    !- Leakage Component Name",
+        "    ,              !- External Node Name",
+        "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
+
+        "  AirflowNetwork:MultiZone:Component:DetailedOpening,",
+        "    WiOpen1,                 !- Name",
+        "    0.0001,                  !- Air Mass Flow Coefficient When Opening is Closed {kg/s-m}",
+        "    0.667,                   !- Air Mass Flow Exponent When Opening is Closed {dimensionless}",
+        "    NonPivoted,              !- Type of Rectangular Large Vertical Opening (LVO)",
+        "    0.0,                     !- Extra Crack Length or Height of Pivoting Axis {m}",
+        "    2,                       !- Number of Sets of Opening Factor Data",
+        "    0.0,                     !- Opening Factor 1 {dimensionless}",
+        "    0.5,                     !- Discharge Coefficient for Opening Factor 1 {dimensionless}",
+        "    0.0,                     !- Width Factor for Opening Factor 1 {dimensionless}",
+        "    1.0,                     !- Height Factor for Opening Factor 1 {dimensionless}",
+        "    0.0,                     !- Start Height Factor for Opening Factor 1 {dimensionless}",
+        "    1.0,                     !- Opening Factor 2 {dimensionless}",
+        "    0.6,                     !- Discharge Coefficient for Opening Factor 2 {dimensionless}",
+        "    1.0,                     !- Width Factor for Opening Factor 2 {dimensionless}",
+        "    1.0,                     !- Height Factor for Opening Factor 2 {dimensionless}",
+        "    0.0,                     !- Start Height Factor for Opening Factor 2 {dimensionless}",
+        "    0,                       !- Opening Factor 3 {dimensionless}",
+        "    0,                       !- Discharge Coefficient for Opening Factor 3 {dimensionless}",
+        "    0,                       !- Width Factor for Opening Factor 3 {dimensionless}",
+        "    0,                       !- Height Factor for Opening Factor 3 {dimensionless}",
+        "    0,                       !- Start Height Factor for Opening Factor 3 {dimensionless}",
+        "    0,                       !- Opening Factor 4 {dimensionless}",
+        "    0,                       !- Discharge Coefficient for Opening Factor 4 {dimensionless}",
+        "    0,                       !- Width Factor for Opening Factor 4 {dimensionless}",
+        "    0,                       !- Height Factor for Opening Factor 4 {dimensionless}",
+        "    0;                       !- Start Height Factor for Opening Factor 4 {dimensionless}",
+
+        "  AirflowNetwork:MultiZone:Component:SimpleOpening,",
+        "    DrOpen,                  !- Name",
+        "    0.0001,                  !- Air Mass Flow Coefficient When Opening is Closed {kg/s-m}",
+        "    0.667,                   !- Air Mass Flow Exponent When Opening is Closed {dimensionless}",
+        "    0.0001,                  !- Minimum Density Difference for Two-Way Flow {kg/m3}",
+        "    0.55;                    !- Discharge Coefficient {dimensionless}",
+
+        "  AirflowNetwork:MultiZone:ReferenceCrackConditions,",
+        "    ReferenceCrackConditions,!- Name",
+        "    20.0,                    !- Reference Temperature {C}",
+        "    101325,                  !- Reference Barometric Pressure {Pa}",
+        "    0.0;                     !- Reference Humidity Ratio {kgWater/kgDryAir}",
+
+        "  AirflowNetwork:MultiZone:Surface:Crack,",
+        "    CR-1,                    !- Name",
+        "    0.001,                   !- Air Mass Flow Coefficient at Reference Conditions {kg/s}",
+        "    0.667;                   !- Air Mass Flow Exponent {dimensionless}",
+
+        "  AirflowNetwork:MultiZone:Surface:Crack,",
+        "    CRcri,                   !- Name",
+        "    0.05,                    !- Air Mass Flow Coefficient at Reference Conditions {kg/s}",
+        "    0.667;                   !- Air Mass Flow Exponent {dimensionless}",
+
+        "  AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea,",
+        "    ELA-1,                   !- Name",
+        "    0.007,                   !- Effective Leakage Area {m2}",
+        "    1.0,                     !- Discharge Coefficient {dimensionless}",
+        "    4.0,                     !- Reference Pressure Difference {Pa}",
+        "    0.667;                   !- Air Mass Flow Exponent {dimensionless}",
+
+        "  AirflowNetwork:MultiZone:ExternalNode,",
+        "    NFacade,                 !- Name",
+        "    1.524,                   !- External Node Height {m}",
+        "    NFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name",
+
+        "  AirflowNetwork:MultiZone:ExternalNode,",
+        "    EFacade,                 !- Name",
+        "    1.524,                   !- External Node Height {m}",
+        "    EFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name",
+
+        "  AirflowNetwork:MultiZone:ExternalNode,",
+        "    SFacade,                 !- Name",
+        "    1.524,                   !- External Node Height {m}",
+        "    SFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name",
+
+        "  AirflowNetwork:MultiZone:ExternalNode,",
+        "    WFacade,                 !- Name",
+        "    1.524,                   !- External Node Height {m}",
+        "    WFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name",
+
+        "  AirflowNetwork:MultiZone:ExternalNode,",
+        "    Horizontal,              !- Name",
+        "    3.028,                   !- External Node Height {m}",
+        "    Horizontal_WPCValue;     !- Wind Pressure Coefficient Curve Name",
+
+        "  AirflowNetwork:MultiZone:WindPressureCoefficientArray,",
+        "    Every 30 Degrees,        !- Name",
+        "    0,                       !- Wind Direction 1 {deg}",
+        "    30,                      !- Wind Direction 2 {deg}",
+        "    60,                      !- Wind Direction 3 {deg}",
+        "    90,                      !- Wind Direction 4 {deg}",
+        "    120,                     !- Wind Direction 5 {deg}",
+        "    150,                     !- Wind Direction 6 {deg}",
+        "    180,                     !- Wind Direction 7 {deg}",
+        "    210,                     !- Wind Direction 8 {deg}",
+        "    240,                     !- Wind Direction 9 {deg}",
+        "    270,                     !- Wind Direction 10 {deg}",
+        "    300,                     !- Wind Direction 11 {deg}",
+        "    330;                     !- Wind Direction 12 {deg}",
+
+        "  AirflowNetwork:MultiZone:WindPressureCoefficientValues,",
+        "    NFacade_WPCValue,        !- Name",
+        "    Every 30 Degrees,        !- AirflowNetwork:MultiZone:WindPressureCoefficientArray Name",
+        "    0.60,                    !- Wind Pressure Coefficient Value 1 {dimensionless}",
+        "    0.48,                    !- Wind Pressure Coefficient Value 2 {dimensionless}",
+        "    0.04,                    !- Wind Pressure Coefficient Value 3 {dimensionless}",
+        "    -0.56,                   !- Wind Pressure Coefficient Value 4 {dimensionless}",
+        "    -0.56,                   !- Wind Pressure Coefficient Value 5 {dimensionless}",
+        "    -0.42,                   !- Wind Pressure Coefficient Value 6 {dimensionless}",
+        "    -0.37,                   !- Wind Pressure Coefficient Value 7 {dimensionless}",
+        "    -0.42,                   !- Wind Pressure Coefficient Value 8 {dimensionless}",
+        "    -0.56,                   !- Wind Pressure Coefficient Value 9 {dimensionless}",
+        "    -0.56,                   !- Wind Pressure Coefficient Value 10 {dimensionless}",
+        "    0.04,                    !- Wind Pressure Coefficient Value 11 {dimensionless}",
+        "    0.48;                    !- Wind Pressure Coefficient Value 12 {dimensionless}",
+
+        "  AirflowNetwork:MultiZone:WindPressureCoefficientValues,",
+        "    EFacade_WPCValue,        !- Name",
+        "    Every 30 Degrees,        !- AirflowNetwork:MultiZone:WindPressureCoefficientArray Name",
+        "    -0.56,                   !- Wind Pressure Coefficient Value 1 {dimensionless}",
+        "    0.04,                    !- Wind Pressure Coefficient Value 2 {dimensionless}",
+        "    0.48,                    !- Wind Pressure Coefficient Value 3 {dimensionless}",
+        "    0.60,                    !- Wind Pressure Coefficient Value 4 {dimensionless}",
+        "    0.48,                    !- Wind Pressure Coefficient Value 5 {dimensionless}",
+        "    0.04,                    !- Wind Pressure Coefficient Value 6 {dimensionless}",
+        "    -0.56,                   !- Wind Pressure Coefficient Value 7 {dimensionless}",
+        "    -0.56,                   !- Wind Pressure Coefficient Value 8 {dimensionless}",
+        "    -0.42,                   !- Wind Pressure Coefficient Value 9 {dimensionless}",
+        "    -0.37,                   !- Wind Pressure Coefficient Value 10 {dimensionless}",
+        "    -0.42,                   !- Wind Pressure Coefficient Value 11 {dimensionless}",
+        "    -0.56;                   !- Wind Pressure Coefficient Value 12 {dimensionless}",
+
+        "  AirflowNetwork:MultiZone:WindPressureCoefficientValues,",
+        "    SFacade_WPCValue,        !- Name",
+        "    Every 30 Degrees,        !- AirflowNetwork:MultiZone:WindPressureCoefficientArray Name",
+        "    -0.37,                   !- Wind Pressure Coefficient Value 1 {dimensionless}",
+        "    -0.42,                   !- Wind Pressure Coefficient Value 2 {dimensionless}",
+        "    -0.56,                   !- Wind Pressure Coefficient Value 3 {dimensionless}",
+        "    -0.56,                   !- Wind Pressure Coefficient Value 4 {dimensionless}",
+        "    0.04,                    !- Wind Pressure Coefficient Value 5 {dimensionless}",
+        "    0.48,                    !- Wind Pressure Coefficient Value 6 {dimensionless}",
+        "    0.60,                    !- Wind Pressure Coefficient Value 7 {dimensionless}",
+        "    0.48,                    !- Wind Pressure Coefficient Value 8 {dimensionless}",
+        "    0.04,                    !- Wind Pressure Coefficient Value 9 {dimensionless}",
+        "    -0.56,                   !- Wind Pressure Coefficient Value 10 {dimensionless}",
+        "    -0.56,                   !- Wind Pressure Coefficient Value 11 {dimensionless}",
+        "    -0.42;                   !- Wind Pressure Coefficient Value 12 {dimensionless}",
+
+        "  AirflowNetwork:MultiZone:WindPressureCoefficientValues,",
+        "    WFacade_WPCValue,        !- Name",
+        "    Every 30 Degrees,        !- AirflowNetwork:MultiZone:WindPressureCoefficientArray Name",
+        "    -0.56,                   !- Wind Pressure Coefficient Value 1 {dimensionless}",
+        "    -0.56,                   !- Wind Pressure Coefficient Value 2 {dimensionless}",
+        "    -0.42,                   !- Wind Pressure Coefficient Value 3 {dimensionless}",
+        "    -0.37,                   !- Wind Pressure Coefficient Value 4 {dimensionless}",
+        "    -0.42,                   !- Wind Pressure Coefficient Value 5 {dimensionless}",
+        "    -0.56,                   !- Wind Pressure Coefficient Value 6 {dimensionless}",
+        "    -0.56,                   !- Wind Pressure Coefficient Value 7 {dimensionless}",
+        "    0.04,                    !- Wind Pressure Coefficient Value 8 {dimensionless}",
+        "    0.48,                    !- Wind Pressure Coefficient Value 9 {dimensionless}",
+        "    0.60,                    !- Wind Pressure Coefficient Value 10 {dimensionless}",
+        "    0.48,                    !- Wind Pressure Coefficient Value 11 {dimensionless}",
+        "    0.04;                    !- Wind Pressure Coefficient Value 12 {dimensionless}",
+
+        "  AirflowNetwork:MultiZone:WindPressureCoefficientValues,",
+        "    Horizontal_WPCValue,     !- Name",
+        "    Every 30 Degrees,        !- AirflowNetwork:MultiZone:WindPressureCoefficientArray Name",
+        "    0.00,                    !- Wind Pressure Coefficient Value 1 {dimensionless}",
+        "    0.00,                    !- Wind Pressure Coefficient Value 2 {dimensionless}",
+        "    0.00,                    !- Wind Pressure Coefficient Value 3 {dimensionless}",
+        "    0.00,                    !- Wind Pressure Coefficient Value 4 {dimensionless}",
+        "    0.00,                    !- Wind Pressure Coefficient Value 5 {dimensionless}",
+        "    0.00,                    !- Wind Pressure Coefficient Value 6 {dimensionless}",
+        "    0.00,                    !- Wind Pressure Coefficient Value 7 {dimensionless}",
+        "    0.00,                    !- Wind Pressure Coefficient Value 8 {dimensionless}",
+        "    0.00,                    !- Wind Pressure Coefficient Value 9 {dimensionless}",
+        "    0.00,                    !- Wind Pressure Coefficient Value 10 {dimensionless}",
+        "    0.00,                    !- Wind Pressure Coefficient Value 11 {dimensionless}",
+        "    0.00;                    !- Wind Pressure Coefficient Value 12 {dimensionless}",
+
+        "  AirflowNetwork:Distribution:Node,",
+        "    EquipmentInletNode,      !- Name",
+        "    Zone Equipment Inlet Node,  !- Component Name or Node Name",
+        "    Other,                   !- Component Object Type or Node Type",
+        "    3.0;                     !- Node Height {m}",
+
+        "  AirflowNetwork:Distribution:Node,",
+        "    EquipmentOutletNode,     !- Name",
+        "    ,                        !- Component Name or Node Name",
+        "    Other,                   !- Component Object Type or Node Type",
+        "    3.0;                     !- Node Height {m}",
+
+        "  AirflowNetwork:Distribution:Node,",
+        "    SupplyMainNode,          !- Name",
+        "    ,                        !- Component Name or Node Name",
+        "    Other,                   !- Component Object Type or Node Type",
+        "    3.0;                     !- Node Height {m}",
+
+        "  AirflowNetwork:Distribution:Node,",
+        "    MainSplitterNode,        !- Name",
+        "    ,                        !- Component Name or Node Name",
+        "    AirLoopHVAC:ZoneSplitter,!- Component Object Type or Node Type",
+        "    3.0;                     !- Node Height {m}",
+
+        "  AirflowNetwork:Distribution:Node,",
+        "    Zone1SupplyNode,         !- Name",
+        "    ,                        !- Component Name or Node Name",
+        "    Other,                   !- Component Object Type or Node Type",
+        "    3.0;                     !- Node Height {m}",
+
+        "  AirflowNetwork:Distribution:Node,",
+        "    Zone1SupplyRegisterNode, !- Name",
+        "    Zone 1 NoReheat Air Outlet Node,       !- Component Name or Node Name",
+        "    Other,                   !- Component Object Type or Node Type",
+        "    3.0;                     !- Node Height {m}",
+
+        "  AirflowNetwork:Distribution:Node,",
+        "    Zone1OutletNode,         !- Name",
+        "    Zone 1 Outlet Node,      !- Component Name or Node Name",
+        "    Other,                   !- Component Object Type or Node Type",
+        "    3.0;                     !- Node Height {m}",
+
+        "  AirflowNetwork:Distribution:Node,",
+        "    Zone2SupplyNode,         !- Name",
+        "    ,                        !- Component Name or Node Name",
+        "    Other,                   !- Component Object Type or Node Type",
+        "    3.0;                     !- Node Height {m}",
+
+        "  AirflowNetwork:Distribution:Node,",
+        "    ReheatInlet2Node,        !- Name",
+        "    Zone 2 Reheat Air Inlet Node,  !- Component Name or Node Name",
+        "    Other,                   !- Component Object Type or Node Type",
+        "    3.0;                     !- Node Height {m}",
+
+        "  AirflowNetwork:Distribution:Node,",
+        "    Zone2SupplyRegisterNode, !- Name",
+        "    Zone 2 Reheat Air Outlet Node,  !- Component Name or Node Name",
+        "    Other,                   !- Component Object Type or Node Type",
+        "    3.0;                     !- Node Height {m}",
+
+        "  AirflowNetwork:Distribution:Node,",
+        "    Zone2OutletNode,         !- Name",
+        "    Zone 2 Outlet Node,      !- Component Name or Node Name",
+        "    Other,                   !- Component Object Type or Node Type",
+        "    3.0;                     !- Node Height {m}",
+
+        "  AirflowNetwork:Distribution:Node,",
+        "    Zone1ReturnNode,         !- Name",
+        "    ,                        !- Component Name or Node Name",
+        "    Other,                   !- Component Object Type or Node Type",
+        "    3.0;                     !- Node Height {m}",
+
+        "  AirflowNetwork:Distribution:Node,",
+        "    Zone2ReturnNode,         !- Name",
+        "    ,                        !- Component Name or Node Name",
+        "    Other,                   !- Component Object Type or Node Type",
+        "    3.0;                     !- Node Height {m}",
+
+        "  AirflowNetwork:Distribution:Node,",
+        "    MainMixerNode,           !- Name",
+        "    ,                        !- Component Name or Node Name",
+        "    AirLoopHVAC:ZoneMixer,   !- Component Object Type or Node Type",
+        "    3.0;                     !- Node Height {m}",
+
+        "  AirflowNetwork:Distribution:Node,",
+        "    MainReturnNode,          !- Name",
+        "    Return Air Mixer Outlet, !- Component Name or Node Name",
+        "    Other,                   !- Component Object Type or Node Type",
+        "    3.0;                     !- Node Height {m}",
+
+        "  AirflowNetwork:Distribution:Node,",
+        "    MainInletNode,           !- Name",
+        "    Air Loop Inlet Node,     !- Component Name or Node Name",
+        "    Other,                   !- Component Object Type or Node Type",
+        "    3.0;                     !- Node Height {m}",
+
+        "  AirflowNetwork:Distribution:Node,",
+        "    OA System Node,          !- Name",
+        "    ,                        !- Component Name or Node Name",
+        "    AirLoopHVAC:OutdoorAirSystem,  !- Component Object Type or Node Type",
+        "    3.0;                     !- Node Height {m}",
+
+        "  AirflowNetwork:Distribution:Node,",
+        "    OA Inlet Node,           !- Name",
+        "    Outside Air Inlet Node,  !- Component Name or Node Name",
+        "    OAMixerOutdoorAirStreamNode,  !- Component Object Type or Node Type",
+        "    1.5;                     !- Node Height {m}",
+
+        "  AirflowNetwork:Distribution:Node,",
+        "    FanInletNode,            !- Name",
+        "    Mixed Air Node,          !- Component Name or Node Name",
+        "    Other,                   !- Component Object Type or Node Type",
+        "    3.0;                     !- Node Height {m}",
+
+        "  AirflowNetwork:Distribution:Node,",
+        "    FanOutletNode,           !- Name",
+        "    Cooling Coil Air Inlet Node,  !- Component Name or Node Name",
+        "    Other,                   !- Component Object Type or Node Type",
+        "    3.0;                     !- Node Height {m}",
+
+        "  AirflowNetwork:Distribution:Node,",
+        "    HeatingInletNode,        !- Name",
+        "    Heating Coil Air Inlet Node,  !- Component Name or Node Name",
+        "    Other,                   !- Component Object Type or Node Type",
+        "    3.0;                     !- Node Height {m}",
+
+        "  AirflowNetwork:Distribution:Node,",
+        "    HeatingOutletNode,       !- Name",
+        "    Air Loop Outlet Node,    !- Component Name or Node Name",
+        "    Other,                   !- Component Object Type or Node Type",
+        "    3.0;                     !- Node Height {m}",
+
+        "  AirflowNetwork:Distribution:Component:Leak,",
+        "    MainSupplyLeak,          !- Name",
+        "    0.0025,                  !- Air Mass Flow Coefficient {kg/s}",
+        "    0.65;                    !- Air Mass Flow Exponent {dimensionless}",
+
+        "  AirflowNetwork:Distribution:Component:ConstantPressureDrop,",
+        "    SupplyCPDComp,           !- Name",
+        "    1.0;                     !- Pressure Difference Across the Component {Pa}",
+
+        "  AirflowNetwork:Distribution:Component:LeakageRatio,",
+        "    ZoneSupplyELR1,          !- Name",
+        "    0.01,                    !- Effective Leakage Ratio {dimensionless}",
+        "    1.9,                     !- Maximum Flow Rate {m3/s}",
+        "    59.0,                    !- Reference Pressure Difference {Pa}",
+        "    0.65;                    !- Air Mass Flow Exponent {dimensionless}",
+
+        "  AirflowNetwork:Distribution:Component:LeakageRatio,",
+        "    ZoneSupplyELR2,          !- Name",
+        "    0.01,                    !- Effective Leakage Ratio {dimensionless}",
+        "    1.9,                     !- Maximum Flow Rate {m3/s}",
+        "    59.0,                    !- Reference Pressure Difference {Pa}",
+        "    0.65;                    !- Air Mass Flow Exponent {dimensionless}",
+
+        "  AirflowNetwork:Distribution:Component:LeakageRatio,",
+        "    ReturnLeakELR1,          !- Name",
+        "    0.03,                    !- Effective Leakage Ratio {dimensionless}",
+        "    1.9,                     !- Maximum Flow Rate {m3/s}",
+        "    41.0,                    !- Reference Pressure Difference {Pa}",
+        "    0.65;                    !- Air Mass Flow Exponent {dimensionless}",
+
+        "  AirflowNetwork:Distribution:Component:LeakageRatio,",
+        "    ReturnLeakELR2,          !- Name",
+        "    0.03,                    !- Effective Leakage Ratio {dimensionless}",
+        "    1.9,                     !- Maximum Flow Rate {m3/s}",
+        "    40.0,                    !- Reference Pressure Difference {Pa}",
+        "    0.65;                    !- Air Mass Flow Exponent {dimensionless}",
+
+        "  AirflowNetwork:Distribution:Component:Duct,",
+        "    MainTruck1,              !- Name",
+        "    3.0,                     !- Duct Length {m}",
+        "    0.6,                     !- Hydraulic Diameter {m}",
+        "    0.2827,                  !- Cross Section Area {m2}",
+        "    0.0009,                  !- Surface Roughness {m}",
+        "    0.01,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}",
+        "    0.946792,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}",
+        "    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}",
+        "    5.018000,                !- Outside Convection Coefficient {W/m2-K}",
+        "    25.090000;               !- Inside Convection Coefficient {W/m2-K}",
+
+        "  AirflowNetwork:Distribution:Component:Duct,",
+        "    MainTruck2,              !- Name",
+        "    4.0,                     !- Duct Length {m}",
+        "    0.6,                     !- Hydraulic Diameter {m}",
+        "    0.2827,                  !- Cross Section Area {m2}",
+        "    0.0009,                  !- Surface Roughness {m}",
+        "    0.01,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}",
+        "    0.946792,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}",
+        "    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}",
+        "    5.018000,                !- Outside Convection Coefficient {W/m2-K}",
+        "    25.090000;               !- Inside Convection Coefficient {W/m2-K}",
+
+        "  AirflowNetwork:Distribution:Component:Duct,",
+        "    Zone1Supply,             !- Name",
+        "    5.0,                     !- Duct Length {m}",
+        "    0.4,                     !- Hydraulic Diameter {m}",
+        "    0.1256,                  !- Cross Section Area {m2}",
+        "    0.0009,                  !- Surface Roughness {m}",
+        "    1.00,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}",
+        "    0.946792,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}",
+        "    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}",
+        "    5.018000,                !- Outside Convection Coefficient {W/m2-K}",
+        "    25.090000;               !- Inside Convection Coefficient {W/m2-K}",
+
+        "  AirflowNetwork:Distribution:Component:Duct,",
+        "    Zone2Supply,             !- Name",
+        "    4.0,                     !- Duct Length {m}",
+        "    0.39,                    !- Hydraulic Diameter {m}",
+        "    0.1195,                  !- Cross Section Area {m2}",
+        "    0.0009,                  !- Surface Roughness {m}",
+        "    2.5,                     !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}",
+        "    0.946792,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}",
+        "    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}",
+        "    5.018000,                !- Outside Convection Coefficient {W/m2-K}",
+        "    25.090000;               !- Inside Convection Coefficient {W/m2-K}",
+
+        "  AirflowNetwork:Distribution:Component:Duct,",
+        "    Zone1Return,             !- Name",
+        "    4.0,                     !- Duct Length {m}",
+        "    0.50,                    !- Hydraulic Diameter {m}",
+        "    0.1963,                  !- Cross Section Area {m2}",
+        "    0.0009,                  !- Surface Roughness {m}",
+        "    1.0,                     !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}",
+        "    0.946792,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}",
+        "    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}",
+        "    5.018000,                !- Outside Convection Coefficient {W/m2-K}",
+        "    25.090000;               !- Inside Convection Coefficient {W/m2-K}",
+
+        "  AirflowNetwork:Distribution:Component:Duct,",
+        "    Zone2Return,             !- Name",
+        "    4.0,                     !- Duct Length {m}",
+        "    0.48,                    !- Hydraulic Diameter {m}",
+        "    0.1809,                  !- Cross Section Area {m2}",
+        "    0.0009,                  !- Surface Roughness {m}",
+        "    1.0,                     !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}",
+        "    0.946792,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}",
+        "    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}",
+        "    5.018000,                !- Outside Convection Coefficient {W/m2-K}",
+        "    25.090000;               !- Inside Convection Coefficient {W/m2-K}",
+
+        "  AirflowNetwork:Distribution:Component:Duct,",
+        "    ZoneConnectionDuct,      !- Name",
+        "    0.1,                     !- Duct Length {m}",
+        "    1.0,                     !- Hydraulic Diameter {m}",
+        "    0.7854,                  !- Cross Section Area {m2}",
+        "    0.0001,                  !- Surface Roughness {m}",
+        "    30.00,                   !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}",
+        "    0.001226,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}",
+        "    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}",
+        "    0.006500,                !- Outside Convection Coefficient {W/m2-K}",
+        "    0.032500;                !- Inside Convection Coefficient {W/m2-K}",
+
+        "  AirflowNetwork:Distribution:Component:Duct,",
+        "    MixerConnectionDuct,     !- Name",
+        "    0.1,                     !- Duct Length {m}",
+        "    1.0,                     !- Hydraulic Diameter {m}",
+        "    0.7854,                  !- Cross Section Area {m2}",
+        "    0.0001,                  !- Surface Roughness {m}",
+        "    1.00,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}",
+        "    0.001226,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}",
+        "    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}",
+        "    0.006500,                !- Outside Convection Coefficient {W/m2-K}",
+        "    0.032500;                !- Inside Convection Coefficient {W/m2-K}",
+
+        "  AirflowNetwork:Distribution:Component:Duct,",
+        "    AirLoopReturn,           !- Name",
+        "    0.1,                     !- Duct Length {m}",
+        "    1.0,                     !- Hydraulic Diameter {m}",
+        "    0.7854,                  !- Cross Section Area {m2}",
+        "    0.0001,                  !- Surface Roughness {m}",
+        "    1.00,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}",
+        "    0.001226,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}",
+        "    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}",
+        "    0.006500,                !- Outside Convection Coefficient {W/m2-K}",
+        "    0.032500;                !- Inside Convection Coefficient {W/m2-K}",
+
+        "  AirflowNetwork:Distribution:Component:Duct,",
+        "    AirLoopSupply,           !- Name",
+        "    0.1,                     !- Duct Length {m}",
+        "    1.0,                     !- Hydraulic Diameter {m}",
+        "    0.7854,                  !- Cross Section Area {m2}",
+        "    0.0001,                  !- Surface Roughness {m}",
+        "    1.00,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}",
+        "    0.001226,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}",
+        "    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}",
+        "    0.006500,                !- Outside Convection Coefficient {W/m2-K}",
+        "    0.032500;                !- Inside Convection Coefficient {W/m2-K}",
+
+        "  AirflowNetwork:Distribution:Component:Fan,",
+        "    Supply Fan 1,            !- Fan Name",
+        "    Fan:ConstantVolume;      !- Supply Fan Object Type",
+
+        "  AirflowNetwork:Distribution:Component:Coil,",
+        "    ACDXCoil 1,              !- Coil Name",
+        "    Coil:Cooling:DX:SingleSpeed,  !- Coil Object Type",
+        "    0.1,                     !- Air Path Length {m}",
+        "    1.00;                    !- Air Path Hydraulic Diameter {m}",
+
+        "  AirflowNetwork:Distribution:Component:Coil,",
+        "    Main Heating Coil 1,     !- Coil Name",
+        "    Coil:Heating:Fuel,       !- Coil Object Type",
+        "    0.1,                     !- Air Path Length {m}",
+        "    1.00;                    !- Air Path Hydraulic Diameter {m}",
+
+        "  AirflowNetwork:Distribution:Component:TerminalUnit,",
+        "    Reheat Zone 2,           !- Terminal Unit Name",
+        "    AirTerminal:SingleDuct:ConstantVolume:Reheat,  !- Terminal Unit Object Type",
+        "    0.1,                     !- Air Path Length {m}",
+        "    0.44;                    !- Air Path Hydraulic Diameter {m}",
+
+        "  AirflowNetwork:Distribution:Linkage,",
+        "    Main Link 1,             !- Name",
+        "    EquipmentInletNode,      !- Node 1 Name",
+        "    EquipmentOutletNode,     !- Node 2 Name",
+        "    MainTruck1,              !- Component Name",
+        "    Attic Zone;              !- Thermal Zone Name",
+
+        "  AirflowNetwork:Distribution:Linkage,",
+        "    Main CDP Link,           !- Name",
+        "    EquipmentOutletNode,     !- Node 1 Name",
+        "    SupplyMainNode,          !- Node 2 Name",
+        "    SupplyCPDComp;           !- Component Name",
+
+        "  AirflowNetwork:Distribution:Linkage,",
+        "    Main Link 2,             !- Name",
+        "    SupplyMainNode,          !- Node 1 Name",
+        "    MainSplitterNode,        !- Node 2 Name",
+        "    MainTruck2,              !- Component Name",
+        "    Attic Zone;              !- Thermal Zone Name",
+
+        "  AirflowNetwork:Distribution:Linkage,",
+        "    Zone1Supply1Link,        !- Name",
+        "    MainSplitterNode,        !- Node 1 Name",
+        "    Zone1SupplyNode,         !- Node 2 Name",
+        "    Zone1Supply,             !- Component Name",
+        "    Attic Zone;              !- Thermal Zone Name",
+
+        "  AirflowNetwork:Distribution:Linkage,",
+        "    Zone1Supply2Link,        !- Name",
+        "    Zone1SupplyNode,         !- Node 1 Name",
+        "    Zone1SupplyRegisterNode,        !- Node 2 Name",
+        "    Zone1Supply,             !- Component Name",
+        "    Attic Zone;              !- Thermal Zone Name",
+
+        "  AirflowNetwork:Distribution:Linkage,",
+        "    Zone1SupplyConnectionLink,  !- Name",
+        "    Zone1SupplyRegisterNode, !- Node 1 Name",
+        "    West Zone,               !- Node 2 Name",
+        "    ZoneConnectionDuct;      !- Component Name",
+
+        "  AirflowNetwork:Distribution:Linkage,",
+        "    Zone1ReturnConnectionLink,  !- Name",
+        "    West Zone,               !- Node 1 Name",
+        "    Zone1OutletNode,         !- Node 2 Name",
+        "    ZoneConnectionDuct;      !- Component Name",
+
+        "  AirflowNetwork:Distribution:Linkage,",
+        "    Zone2Supply1Link,        !- Name",
+        "    MainSplitterNode,        !- Node 1 Name",
+        "    Zone2SupplyNode,         !- Node 2 Name",
+        "    Zone2Supply,             !- Component Name",
+        "    Attic Zone;              !- Thermal Zone Name",
+
+        "  AirflowNetwork:Distribution:Linkage,",
+        "    Zone2Supply2Link,        !- Name",
+        "    Zone2SupplyNode,         !- Node 1 Name",
+        "    ReheatInlet2Node,        !- Node 2 Name",
+        "    Zone2Supply,             !- Component Name",
+        "    Attic Zone;              !- Thermal Zone Name",
+
+        "  AirflowNetwork:Distribution:Linkage,",
+        "    Zone2ReheatCoilLink,     !- Name",
+        "    ReheatInlet2Node,        !- Node 1 Name",
+        "    Zone2SupplyRegisterNode, !- Node 2 Name",
+        "    Reheat Zone 2;           !- Component Name",
+
+        "  AirflowNetwork:Distribution:Linkage,",
+        "    Zone2SupplyConnectionLink,  !- Name",
+        "    Zone2SupplyRegisterNode, !- Node 1 Name",
+        "    EAST ZONE,               !- Node 2 Name",
+        "    ZoneConnectionDuct;      !- Component Name",
+
+        "  AirflowNetwork:Distribution:Linkage,",
+        "    Zone2returnConnectionLink,  !- Name",
+        "    EAST ZONE,               !- Node 1 Name",
+        "    Zone2OutletNode,         !- Node 2 Name",
+        "    ZoneConnectionDuct;      !- Component Name",
+
+        "  AirflowNetwork:Distribution:Linkage,",
+        "    Zone1Return1Link,        !- Name",
+        "    Zone1OutletNode,         !- Node 1 Name",
+        "    Zone1ReturnNode,         !- Node 2 Name",
+        "    Zone1Return,             !- Component Name",
+        "    Attic Zone;              !- Thermal Zone Name",
+
+        "  AirflowNetwork:Distribution:Linkage,",
+        "    Zone1Return2Link,        !- Name",
+        "    Zone1ReturnNode,         !- Node 1 Name",
+        "    MainMixerNode,           !- Node 2 Name",
+        "    Zone1Return,             !- Component Name",
+        "    Attic Zone;              !- Thermal Zone Name",
+
+        "  AirflowNetwork:Distribution:Linkage,",
+        "    Zone2Return1Link,        !- Name",
+        "    Zone2OutletNode,         !- Node 1 Name",
+        "    Zone2ReturnNode,         !- Node 2 Name",
+        "    Zone2Return,             !- Component Name",
+        "    Attic Zone;              !- Thermal Zone Name",
+
+        "  AirflowNetwork:Distribution:Linkage,",
+        "    Zone2Return2Link,        !- Name",
+        "    Zone2ReturnNode,         !- Node 1 Name",
+        "    MainMixerNode,           !- Node 2 Name",
+        "    Zone2Return,             !- Component Name",
+        "    Attic Zone;              !- Thermal Zone Name",
+
+        "  AirflowNetwork:Distribution:Linkage,",
+        "    ReturnMixerLink,         !- Name",
+        "    MainMixerNode,           !- Node 1 Name",
+        "    MainReturnNode,          !- Node 2 Name",
+        "    MixerConnectionDuct,     !- Component Name",
+        "    Attic Zone;              !- Thermal Zone Name",
+
+        "  AirflowNetwork:Distribution:Linkage,",
+        "    AirLoopReturnLink,       !- Name",
+        "    MainReturnNode,          !- Node 1 Name",
+        "    MainInletNode,           !- Node 2 Name",
+        "    AirLoopReturn;           !- Component Name",
+
+        "  AirflowNetwork:Distribution:Linkage,",
+        "    OASystemInletLink,       !- Name",
+        "    MainInletNode,           !- Node 1 Name",
+        "    OA System Node,          !- Node 2 Name",
+        "    ZoneConnectionDuct;      !- Component Name",
+
+        "  AirflowNetwork:Distribution:Linkage,",
+        "    OAMixerOutletLink,       !- Name",
+        "    OA System Node,          !- Node 1 Name",
+        "    FanInletNode,            !- Node 2 Name",
+        "    ZoneConnectionDuct;      !- Component Name",
+
+        "  AirflowNetwork:Distribution:Linkage,",
+        "    SupplyFanLink,           !- Name",
+        "    FanInletNode,            !- Node 1 Name",
+        "    FanOutletNode,           !- Node 2 Name",
+        "    Supply Fan 1;            !- Component Name",
+
+        "  AirflowNetwork:Distribution:Linkage,",
+        "    CoolingCoilLink,         !- Name",
+        "    FanOutletNode,           !- Node 1 Name",
+        "    HeatingInletNode,        !- Node 2 Name",
+        "    ACDXCoil 1;              !- Component Name",
+
+        "  AirflowNetwork:Distribution:Linkage,",
+        "    HeatingCoilLink,         !- Name",
+        "    HeatingInletNode,        !- Node 1 Name",
+        "    HeatingOutletNode,       !- Node 2 Name",
+        "    Main Heating Coil 1;     !- Component Name",
+
+        "  AirflowNetwork:Distribution:Linkage,",
+        "    EquipmentAirLoopLink,    !- Name",
+        "    HeatingOutletNode,       !- Node 1 Name",
+        "    EquipmentInletNode,      !- Node 2 Name",
+        "    AirLoopSupply;           !- Component Name",
+
+        "  AirflowNetwork:Distribution:Linkage,",
+        "    Zone1ReturnLeakLink,     !- Name",
+        "    Zone1ReturnNode,         !- Node 1 Name",
+        "    OA Inlet Node,           !- Node 2 Name",
+        "    ReturnLeakELR1;          !- Component Name",
+
+        "  AirflowNetwork:Distribution:Linkage,",
+        "    MainSupplyLeakLink,      !- Name",
+        "    SupplyMainNode,          !- Node 1 Name",
+        "    ATTIC ZONE,              !- Node 2 Name",
+        "    MainSupplyLeak;          !- Component Name",
+
+        "  AirflowNetwork:Distribution:Linkage,",
+        "    Zone1SupplyLeakLink,     !- Name",
+        "    Zone1SupplyNode,         !- Node 1 Name",
+        "    ATTIC ZONE,              !- Node 2 Name",
+        "    ZoneSupplyELR1;          !- Component Name",
+
+        "  AirflowNetwork:Distribution:Linkage,",
+        "    Zone2ReturnLeakLink,     !- Name",
+        "    Zone2ReturnNode,         !- Node 1 Name",
+        "    OA Inlet Node,           !- Node 2 Name",
+        "    ReturnLeakELR2;          !- Component Name",
+
+        "  AirflowNetwork:Distribution:Linkage,",
+        "    Zone2SupplyLeakLink,     !- Name",
+        "    Zone2SupplyNode,         !- Node 1 Name",
+        "    ATTIC ZONE,              !- Node 2 Name",
+        "    ZoneSupplyELR2;          !- Component Name",
+
+        "  AirflowNetwork:Distribution:Linkage,",
+        "    OASystemFanLink,       !- Name",
+        "    OA Inlet Node,           !- Node 1 Name",
+        "    OA System Node,          !- Node 2 Name",
+        "    OA Fan;                  !- Component Name",
+
+        "  AirflowNetwork:Distribution:Linkage,",
+        "    OASystemReliefLink,      !- Name",
+        "    OA System Node,          !- Node 1 Name",
+        "    OA Inlet Node,           !- Node 2 Name",
+        "    Relief Fan;              !- Component Name",
+
+        "  AirflowNetwork:Distribution:Component:OutdoorAirFlow,",
+        "    OA Fan,                  !- Name",
+        "    OA Mixing Box 1,         !- Outdoor Air Mixer Name",
+        "    0.001,                   !- Air Mass Flow Coefficient When No Outdoor Air Flow at Reference Conditions {kg/s}",
+        "    0.667;                   !- Air Mass Flow Exponent When No Outdoor Air Flow {dimensionless}",
+
+        "  AirflowNetwork:Distribution:Component:ReliefAirFlow,",
+        "    Relief Fan,              !- Name",
+        "    OA Mixing Box 1,         !- Outdoor Air Mixer Name",
+        "    0.001,                   !- Air Mass Flow Coefficient When No Outdoor Air Flow at Reference Conditions {kg/s}",
+        "    0.667;                   !- Air Mass Flow Exponent When No Outdoor Air Flow {dimensionless}",
+
+        "  Schedule:Compact,",
+        "    Pressure Setpoint Schedule,  !- Name",
+        "    Any Number,              !- Schedule Type Limits Name",
+        "    Through: 3/31,           !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,5.0,        !- Field 3",
+        "    Through: 9/30,           !- Field 5",
+        "    For: AllDays,            !- Field 6",
+        "    Until: 24:00,9.5,        !- Field 7",
+        "    Through: 12/31,          !- Field 9",
+        "    For: AllDays,            !- Field 10",
+        "    Until: 24:00,5.0;        !- Field 11",
+
+        "  AvailabilityManagerAssignmentList,",
+        "    Reheat System 1 Avail List,  !- Name",
+        "    AvailabilityManager:Scheduled,  !- Availability Manager 1 Object Type",
+        "    Reheat System 1 Avail;   !- Availability Manager 1 Name",
+
+        "  AvailabilityManager:Scheduled,",
+        "    Reheat System 1 Avail,   !- Name",
+        "    FanAndCoilAvailSched;    !- Schedule Name",
+
+        "  SetpointManager:SingleZone:Reheat,",
+        "    Supply Air Temp Manager, !- Name",
+        "    Temperature,             !- Control Variable",
+        "    13.,                     !- Minimum Supply Air Temperature {C}",
+        "    45.,                     !- Maximum Supply Air Temperature {C}",
+        "    WEST ZONE,              !- Control Zone Name",
+        "    Zone 1 Node,             !- Zone Node Name",
+        "    Zone 1 NoReheat Air Outlet Node,       !- Zone Inlet Node Name",
+        "    Supply Air Temp Nodes;   !- Setpoint Node or NodeList Name",
+
+        "  Controller:OutdoorAir,",
+        "    OA Controller 1,         !- Name",
+        "    Relief Air Outlet Node,  !- Relief Air Outlet Node Name",
+        "    Air Loop Inlet Node,     !- Return Air Node Name",
+        "    Mixed Air Node,          !- Mixed Air Node Name",
+        "    Outside Air Inlet Node,  !- Actuator Node Name",
+        "    0.2333,                  !- Minimum Outdoor Air Flow Rate {m3/s}",
+        "    1.16,                     !- Maximum Outdoor Air Flow Rate {m3/s}",
+        "    NoEconomizer,            !- Economizer Control Type",
+        "    ModulateFlow,            !- Economizer Control Action Type",
+        "    19.,                     !- Economizer Maximum Limit Dry-Bulb Temperature {C}",
+        "    ,                        !- Economizer Maximum Limit Enthalpy {J/kg}",
+        "    ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}",
+        "    ,                        !- Electronic Enthalpy Limit Curve Name",
+        "    4.,                      !- Economizer Minimum Limit Dry-Bulb Temperature {C}",
+        "    NoLockout,               !- Lockout Type",
+        "    FixedMinimum;            !- Minimum Limit Type",
+
+        "  ZoneHVAC:EquipmentConnections,",
+        "    West Zone,               !- Zone Name",
+        "    Zone1Equipment,          !- Zone Conditioning Equipment List Name",
+        "    Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name",
+        "    ,                        !- Zone Air Exhaust Node or NodeList Name",
+        "    Zone 1 Node,             !- Zone Air Node Name",
+        "    Zone 1 Outlet Node;      !- Zone Return Air Node or NodeList Name",
+
+        "  ZoneHVAC:EquipmentConnections,",
+        "    EAST ZONE,               !- Zone Name",
+        "    Zone2Equipment,          !- Zone Conditioning Equipment List Name",
+        "    Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name",
+        "    ,                        !- Zone Air Exhaust Node or NodeList Name",
+        "    Zone 2 Node,             !- Zone Air Node Name",
+        "    Zone 2 Outlet Node;      !- Zone Return Air Node or NodeList Name",
+
+        "  ZoneHVAC:EquipmentList,",
+        "    Zone1Equipment,          !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "    Zone1NoReheat,           !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 1 Sequential Heating Fraction",
+
+        "  ZoneHVAC:EquipmentList,",
+        "    Zone2Equipment,          !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "    Zone2TermReheat,         !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 1 Sequential Heating Fraction",
+
+        "  ZoneHVAC:AirDistributionUnit,",
+        "    Zone1NoReheat,         !- Name",
+        "    Zone 1 NoReheat Air Outlet Node,  !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+        "    No Reheat Zone 1;           !- Air Terminal Name",
+
+        "  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+        "    No Reheat Zone 1,           !- Name",
+        "    FanAndCoilAvailSched,    !- Availability Schedule Name",
+        "    Zone 1 NoReheat Air Inlet Node,  !- Air Inlet Node Name",
+        "    Zone 1 NoReheat Air Outlet Node,  !- Air Outlet Node Name",
+        "    0.64;                    !- Maximum Air Flow Rate {m3/s}",
+
+        "  ZoneHVAC:AirDistributionUnit,",
+        "    Zone2TermReheat,         !- Name",
+        "    Zone 2 Reheat Air Outlet Node,  !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:ConstantVolume:Reheat,  !- Air Terminal Object Type",
+        "    Reheat Zone 2;           !- Air Terminal Name",
+
+        "  CoilSystem:Cooling:DX,",
+        "    DX Cooling Coil System 1,!- Name",
+        "    CoolingCoilAvailSched,   !- Availability Schedule Name",
+        "    Cooling Coil Air Inlet Node,  !- DX Cooling Coil System Inlet Node Name",
+        "    Heating Coil Air Inlet Node,  !- DX Cooling Coil System Outlet Node Name",
+        "    Heating Coil Air Inlet Node,  !- DX Cooling Coil System Sensor Node Name",
+        "    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type",
+        "    ACDXCoil 1;              !- Cooling Coil Name",
+
+        "  AirTerminal:SingleDuct:ConstantVolume:Reheat,",
+        "    Reheat Zone 2,           !- Name",
+        "    FanAndCoilAvailSched,    !- Availability Schedule Name",
+        "    Zone 2 Reheat Air Outlet Node,  !- Air Outlet Node Name",
+        "    Zone 2 Reheat Air Inlet Node,  !- Air Inlet Node Name",
+        "    0.52,                    !- Maximum Air Flow Rate {m3/s}",
+        "    Coil:Heating:Fuel,       !- Reheat Coil Object Type",
+        "    Reheat Coil Zone 2,      !- Reheat Coil Name",
+        "    0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}",
+        "    0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}",
+        "    0.001;                   !- Convergence Tolerance",
+
+        "  ZoneControl:Thermostat,",
+        "    Zone 1 Thermostat,       !- Name",
+        "    West Zone,               !- Zone or ZoneList Name",
+        "    Dual Zone Control Type Sched,  !- Control Type Schedule Name",
+        "    ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type",
+        "    Setpoints;               !- Control 1 Name",
+
+        "  ZoneControl:Thermostat,",
+        "    Zone 2 Thermostat,       !- Name",
+        "    EAST ZONE,               !- Zone or ZoneList Name",
+        "    Dual Zone Control Type Sched,  !- Control Type Schedule Name",
+        "    ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type",
+        "    Setpoints;               !- Control 1 Name",
+
+        "  AirLoopHVAC:SupplyPath,",
+        "    TermReheatSupplyPath,    !- Name",
+        "    Zone Equipment Inlet Node,  !- Supply Air Path Inlet Node Name",
+        "    AirLoopHVAC:ZoneSplitter,!- Component 1 Object Type",
+        "    Zone Supply Air Splitter;!- Component 1 Name",
+
+        "  AirLoopHVAC:ReturnPath,",
+        "    TermReheatReturnPath,    !- Name",
+        "    Return Air Mixer Outlet, !- Return Air Path Outlet Node Name",
+        "    AirLoopHVAC:ZoneMixer,   !- Component 1 Object Type",
+        "    Zone Return Air Mixer;   !- Component 1 Name",
+
+        "  AirLoopHVAC:ZoneSplitter,",
+        "    Zone Supply Air Splitter,!- Name",
+        "    Zone Equipment Inlet Node,  !- Inlet Node Name",
+        "    Zone 1 NoReheat Air Inlet Node,  !- Outlet 1 Node Name",
+        "    Zone 2 Reheat Air Inlet Node;  !- Outlet 2 Node Name",
+
+        "  AirLoopHVAC:ZoneMixer,",
+        "    Zone Return Air Mixer,   !- Name",
+        "    Return Air Mixer Outlet, !- Outlet Node Name",
+        "    Zone 1 Outlet Node,      !- Inlet 1 Node Name",
+        "    Zone 2 Outlet Node;      !- Inlet 2 Node Name",
+
+        "  Coil:Heating:Fuel,",
+        "    Main Heating Coil 1,     !- Name",
+        "    FanAndCoilAvailSched,    !- Availability Schedule Name",
+        "    NaturalGas,              !- Fuel Type",
+        "    0.8,                     !- Burner Efficiency",
+        "    45000,                   !- Nominal Capacity {W}",
+        "    Heating Coil Air Inlet Node,  !- Air Inlet Node Name",
+        "    Air Loop Outlet Node,    !- Air Outlet Node Name",
+        "    Air Loop Outlet Node;    !- Temperature Setpoint Node Name",
+
+        "  Coil:Heating:Fuel,",
+        "    Reheat Coil Zone 2,      !- Name",
+        "    FanAndCoilAvailSched,    !- Availability Schedule Name",
+        "    NaturalGas,              !- Fuel Type",
+        "    1.0,                     !- Burner Efficiency",
+        "    3000,                    !- Nominal Capacity {W}",
+        "    Zone 2 Reheat Air Inlet Node,  !- Air Inlet Node Name",
+        "    Zone 2 Reheat Air Outlet Node;  !- Air Outlet Node Name",
+
+        "  Coil:Cooling:DX:SingleSpeed,",
+        "    ACDXCoil 1,              !- Name",
+        "    CoolingCoilAvailSched,   !- Availability Schedule Name",
+        "    20000,                   !- Gross Rated Total Cooling Capacity {W}",
+        "    0.75,                     !- Gross Rated Sensible Heat Ratio",
+        "    3.0,                     !- Gross Rated Cooling COP {W/W}",
+        "    1.16,                     !- Rated Air Flow Rate {m3/s}",
+        "    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    Cooling Coil Air Inlet Node,  !- Air Inlet Node Name",
+        "    Heating Coil Air Inlet Node,  !- Air Outlet Node Name",
+        "    WindACCoolCapFT,         !- Total Cooling Capacity Function of Temperature Curve Name",
+        "    WindACCoolCapFFF,        !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "    WindACEIRFT,             !- Energy Input Ratio Function of Temperature Curve Name",
+        "    WindACEIRFFF,            !- Energy Input Ratio Function of Flow Fraction Curve Name",
+        "    WindACPLFFPLR;           !- Part Load Fraction Correlation Curve Name",
+
+        "  Fan:ConstantVolume,",
+        "    Supply Fan 1,            !- Name",
+        "    FanAndCoilAvailSched,    !- Availability Schedule Name",
+        "    0.7,                     !- Fan Total Efficiency",
+        "    600.0,                   !- Pressure Rise {Pa}",
+        "    1.16,                     !- Maximum Flow Rate {m3/s}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Airstream Fraction",
+        "    Mixed Air Node,          !- Air Inlet Node Name",
+        "    Cooling Coil Air Inlet Node;  !- Air Outlet Node Name",
+
+        "  ThermostatSetpoint:DualSetpoint,",
+        "    Setpoints,               !- Name",
+        "    Dual Heating Setpoints,  !- Heating Setpoint Temperature Schedule Name",
+        "    Dual Cooling Setpoints;  !- Cooling Setpoint Temperature Schedule Name",
+
+        "ScheduleTypeLimits,",
+        "  HVACTemplate Any Number;                                 !- Name",
+
+        "Schedule:Compact,",
+        "  HVACTemplate-Always 1,                                   !- Name",
+        "  HVACTemplate Any Number,                                 !- Schedule Type Limits Name",
+        "  Through: 12/31,                                          !- Field 1",
+        "  For: AllDays,                                            !- Field 2",
+        "  Until: 24:00,                                            !- Field 3",
+        "  1;                                                       !- Field 4",
+
+        "Site:GroundTemperature:BuildingSurface,",
+        "  20.03,                                                   !- January Ground Temperature",
+        "  20.03,                                                   !- February Ground Temperature",
+        "  20.13,                                                   !- March Ground Temperature",
+        "  20.30,                                                   !- April Ground Temperature",
+        "  20.43,                                                   !- May Ground Temperature",
+        "  20.52,                                                   !- June Ground Temperature",
+        "  20.62,                                                   !- July Ground Temperature",
+        "  20.77,                                                   !- August Ground Temperature",
+        "  20.78,                                                   !- September Ground Temperature",
+        "  20.55,                                                   !- October Ground Temperature",
+        "  20.44,                                                   !- November Ground Temperature",
+        "  20.20;                                                   !- December Ground Temperature",
+
+        "Output:Diagnostics,DisplayExtraWarnings;",
+
+        "Output:Diagnostics,DisplayUnusedSchedules;"});
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -19943,7 +19994,7 @@ std::string const idf_objects = delimited_string({
     // Read AirflowNetwork inputs
     GetAirflowNetworkInput(*state);
 
-    AirflowNetwork::AirflowNetworkFanActivated = true;
+    state->dataAirflowNetwork->AirflowNetworkFanActivated = true;
     state->dataEnvrn->OutDryBulbTemp = -17.29025;
     state->dataEnvrn->OutHumRat = 0.0008389;
     state->dataEnvrn->OutBaroPress = 99063.0;
@@ -19951,45 +20002,47 @@ std::string const idf_objects = delimited_string({
     state->dataEnvrn->WindDir = 270.0;
 
     for (int i = 1; i <= 32; ++i) {
-        AirflowNetwork::AirflowNetworkNodeSimu(i).TZ = 23.0;
-        AirflowNetwork::AirflowNetworkNodeSimu(i).WZ = 0.0008400;
+        state->dataAirflowNetwork->AirflowNetworkNodeSimu(i).TZ = 23.0;
+        state->dataAirflowNetwork->AirflowNetworkNodeSimu(i).WZ = 0.0008400;
         if ((i > 4 && i < 10) || i == 32) {
-            AirflowNetwork::AirflowNetworkNodeSimu(i).TZ = DataEnvironment::OutDryBulbTempAt(*state, AirflowNetwork::AirflowNetworkNodeData(i).NodeHeight);
-            AirflowNetwork::AirflowNetworkNodeSimu(i).WZ = state->dataEnvrn->OutHumRat;
+            state->dataAirflowNetwork->AirflowNetworkNodeSimu(i).TZ =
+                DataEnvironment::OutDryBulbTempAt(*state, state->dataAirflowNetwork->AirflowNetworkNodeData(i).NodeHeight);
+            state->dataAirflowNetwork->AirflowNetworkNodeSimu(i).WZ = state->dataEnvrn->OutHumRat;
         }
     }
 
     // Set up node values
-    Node.allocate(17);
+    state->dataLoopNodes->Node.allocate(17);
 
-    Node(AirflowNetwork::DisSysCompCVFData(1).InletNode).MassFlowRate = 1.40;
-    AirflowNetwork::DisSysCompCVFData(1).FlowRate = Node(AirflowNetwork::DisSysCompCVFData(1).InletNode).MassFlowRate;
+    state->dataLoopNodes->Node(state->dataAirflowNetwork->DisSysCompCVFData(1).InletNode).MassFlowRate = 1.40;
+    state->dataAirflowNetwork->DisSysCompCVFData(1).FlowRate =
+        state->dataLoopNodes->Node(state->dataAirflowNetwork->DisSysCompCVFData(1).InletNode).MassFlowRate;
 
-    AirflowNetwork::DisSysCompOutdoorAirData(1).InletNode = 6;
-    Node(AirflowNetwork::DisSysCompOutdoorAirData(1).InletNode).MassFlowRate = 0.1095108;
+    state->dataAirflowNetwork->DisSysCompOutdoorAirData(1).InletNode = 6;
+    state->dataLoopNodes->Node(state->dataAirflowNetwork->DisSysCompOutdoorAirData(1).InletNode).MassFlowRate = 0.1095108;
 
-    if (AirflowNetwork::DisSysCompReliefAirData(1).InletNode == 0) {
-        AirflowNetwork::DisSysCompReliefAirData(1).OutletNode = 1;
+    if (state->dataAirflowNetwork->DisSysCompReliefAirData(1).InletNode == 0) {
+        state->dataAirflowNetwork->DisSysCompReliefAirData(1).OutletNode = 1;
     }
 
     state->dataAirLoop->AirLoopAFNInfo.allocate(1);
     state->dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode = 0.0;
     state->dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
 
-    AirflowNetwork::AirflowNetworkFanActivated = false;
+    state->dataAirflowNetwork->AirflowNetworkFanActivated = false;
 
-    DataHeatBalFanSys::MAT.allocate(5);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(5);
-    DataHeatBalFanSys::MAT(1) = 23.0;
-    DataHeatBalFanSys::MAT(2) = 23.0;
-    DataHeatBalFanSys::MAT(3) = 23.0;
-    DataHeatBalFanSys::MAT(4) = 23.0;
-    DataHeatBalFanSys::MAT(5) = 23.0;
-    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.001;
-    DataHeatBalFanSys::ZoneAirHumRat(2) = 0.001;
-    DataHeatBalFanSys::ZoneAirHumRat(3) = 0.001;
-    DataHeatBalFanSys::ZoneAirHumRat(4) = 0.001;
-    DataHeatBalFanSys::ZoneAirHumRat(5) = 0.001;
+    state->dataHeatBalFanSys->MAT.allocate(5);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(5);
+    state->dataHeatBalFanSys->MAT(1) = 23.0;
+    state->dataHeatBalFanSys->MAT(2) = 23.0;
+    state->dataHeatBalFanSys->MAT(3) = 23.0;
+    state->dataHeatBalFanSys->MAT(4) = 23.0;
+    state->dataHeatBalFanSys->MAT(5) = 23.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
+    state->dataHeatBalFanSys->ZoneAirHumRat(2) = 0.001;
+    state->dataHeatBalFanSys->ZoneAirHumRat(3) = 0.001;
+    state->dataHeatBalFanSys->ZoneAirHumRat(4) = 0.001;
+    state->dataHeatBalFanSys->ZoneAirHumRat(5) = 0.001;
 
     DataZoneEquipment::GetZoneEquipmentData(*state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
@@ -20003,52 +20056,51 @@ std::string const idf_objects = delimited_string({
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeAirLoopNum(1) = 1;
     state->dataZoneEquip->ZoneEquipConfig(2).InletNodeAirLoopNum(1) = 1;
     state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeAirLoopNum(1) = 1;
-    AirflowNetwork::DisSysNodeData(9).EPlusNodeNum = 50;
+    state->dataAirflowNetwork->DisSysNodeData(9).EPlusNodeNum = 50;
     // AirflowNetwork::AirflowNetworkExchangeData.allocate(5);
     ManageAirflowNetworkBalance(*state, true);
-    EXPECT_EQ(AirflowNetwork::DisSysCompCVFData(1).AirLoopNum,1);
-
+    EXPECT_EQ(state->dataAirflowNetwork->DisSysCompCVFData(1).AirLoopNum, 1);
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingAirBoundary)
 {
-    Zone.allocate(1);
-    Zone(1).Name = "SALA DE AULA";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "SALA DE AULA";
 
-    Surface.allocate(3);
-    Surface(1).Name = "WINDOW AULA 1";
-    Surface(1).Zone = 1;
-    Surface(1).ZoneName = "SALA DE AULA";
-    Surface(1).Azimuth = 0.0;
-    Surface(1).ExtBoundCond = DataSurfaces::ExternalEnvironment;
-    Surface(1).HeatTransSurf = true;
-    Surface(1).IsAirBoundarySurf = false;
-    Surface(1).Tilt = 90.0;
-    Surface(1).Sides = 4;
-    Surface(2).Name = "AIR WALL AULA 2";
-    Surface(2).Zone = 1;
-    Surface(2).ZoneName = "SALA DE AULA";
-    Surface(2).Azimuth = 180.0;
-    Surface(2).BaseSurf = 2; // Make this a base surface
-    Surface(2).ExtBoundCond = 3; // Make this is an interzone surface
-    Surface(2).HeatTransSurf = false;
-    Surface(2).IsAirBoundarySurf = true;
-    Surface(2).Tilt = 90.0;
-    Surface(2).Sides = 4;
-    Surface(3).Name = "AIR WALL AULA 2b";
-    Surface(3).Zone = 1;
-    Surface(3).ZoneName = "SALA DE AULA";
-    Surface(3).Azimuth = 0.0;
-    Surface(3).BaseSurf = 3; // Make this a base surface
-    Surface(3).ExtBoundCond = 2; // Make this is an interzone surface
-    Surface(3).HeatTransSurf = false;
-    Surface(3).IsAirBoundarySurf = true;
-    Surface(3).Tilt = 90.0;
-    Surface(3).Sides = 4;
+    state->dataSurface->Surface.allocate(3);
+    state->dataSurface->Surface(1).Name = "WINDOW AULA 1";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "SALA DE AULA";
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(1).ExtBoundCond = DataSurfaces::ExternalEnvironment;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).IsAirBoundarySurf = false;
+    state->dataSurface->Surface(1).Tilt = 90.0;
+    state->dataSurface->Surface(1).Sides = 4;
+    state->dataSurface->Surface(2).Name = "AIR WALL AULA 2";
+    state->dataSurface->Surface(2).Zone = 1;
+    state->dataSurface->Surface(2).ZoneName = "SALA DE AULA";
+    state->dataSurface->Surface(2).Azimuth = 180.0;
+    state->dataSurface->Surface(2).BaseSurf = 2;     // Make this a base surface
+    state->dataSurface->Surface(2).ExtBoundCond = 3; // Make this is an interzone surface
+    state->dataSurface->Surface(2).HeatTransSurf = false;
+    state->dataSurface->Surface(2).IsAirBoundarySurf = true;
+    state->dataSurface->Surface(2).Tilt = 90.0;
+    state->dataSurface->Surface(2).Sides = 4;
+    state->dataSurface->Surface(3).Name = "AIR WALL AULA 2b";
+    state->dataSurface->Surface(3).Zone = 1;
+    state->dataSurface->Surface(3).ZoneName = "SALA DE AULA";
+    state->dataSurface->Surface(3).Azimuth = 0.0;
+    state->dataSurface->Surface(3).BaseSurf = 3;     // Make this a base surface
+    state->dataSurface->Surface(3).ExtBoundCond = 2; // Make this is an interzone surface
+    state->dataSurface->Surface(3).HeatTransSurf = false;
+    state->dataSurface->Surface(3).IsAirBoundarySurf = true;
+    state->dataSurface->Surface(3).Tilt = 90.0;
+    state->dataSurface->Surface(3).Sides = 4;
 
-    SurfaceGeometry::AllocateSurfaceWindows(2);
-    SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
-    SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
+    SurfaceGeometry::AllocateSurfaceWindows(*state, 2);
+    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
     state->dataGlobal->NumOfZones = 1;
 
     std::string const idf_objects = delimited_string({
@@ -20117,25 +20169,3484 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingAirBoundary)
     GetAirflowNetworkInput(*state);
     // Expect warnings about the air boundary surface
     EXPECT_TRUE(has_err_output(false));
-    std::string const expectedErrString = delimited_string({
-        "   ** Warning ** GetAirflowNetworkInput: AirflowNetwork:MultiZone:Surface=\"AIR WALL AULA 2\" is an air boundary surface.",
-        "   **   ~~~   ** Ventilation Control Mode = TEMPERATURE is not valid. Resetting to Constant.",
-        "   ** Warning ** GetAirflowNetworkInput: AirflowNetwork:MultiZone:Surface=\"AIR WALL AULA 2\" is an air boundary surface.",
-        "   **   ~~~   ** Venting Availability Schedule will be ignored, venting is always available."
-        });
+    std::string const expectedErrString =
+        delimited_string({"   ** Warning ** GetAirflowNetworkInput: AirflowNetwork:MultiZone:Surface=\"AIR WALL AULA 2\" is an air boundary surface.",
+                          "   **   ~~~   ** Ventilation Control Mode = TEMPERATURE is not valid. Resetting to Constant.",
+                          "   ** Warning ** GetAirflowNetworkInput: AirflowNetwork:MultiZone:Surface=\"AIR WALL AULA 2\" is an air boundary surface.",
+                          "   **   ~~~   ** Venting Availability Schedule will be ignored, venting is always available."});
     EXPECT_TRUE(compare_err_stream(expectedErrString, true));
 
     // MultizoneSurfaceData(1) is connected to a normal heat transfer surface -
     // venting schedule should be non-zero and venting method should be ZoneLevel
-    auto GetIndex = UtilityRoutines::FindItemInList(AirflowNetwork::MultizoneSurfaceData(1).VentingSchName, Schedule({1, NumSchedules}));
+    auto GetIndex = UtilityRoutines::FindItemInList(state->dataAirflowNetwork->MultizoneSurfaceData(1).VentingSchName,
+                                                    state->dataScheduleMgr->Schedule({1, state->dataScheduleMgr->NumSchedules}));
     EXPECT_GT(GetIndex, 0);
-    EXPECT_EQ(GetIndex, AirflowNetwork::MultizoneSurfaceData(1).VentingSchNum);
-    EXPECT_EQ(AirflowNetwork::MultizoneSurfaceData(1).VentSurfCtrNum, AirflowNetwork::VentControlType::Temp);
+    EXPECT_EQ(GetIndex, state->dataAirflowNetwork->MultizoneSurfaceData(1).VentingSchNum);
+    EXPECT_EQ(state->dataAirflowNetwork->MultizoneSurfaceData(1).VentSurfCtrNum, AirflowNetwork::VentControlType::Temp);
 
     // MultizoneSurfaceData(2) is connected to an air boundary surface
     // venting schedule should be zero and venting method should be Constant
-    EXPECT_EQ(0, AirflowNetwork::MultizoneSurfaceData(2).VentingSchNum);
-    EXPECT_EQ(AirflowNetwork::MultizoneSurfaceData(2).VentSurfCtrNum, AirflowNetwork::VentControlType::Const);
+    EXPECT_EQ(0, state->dataAirflowNetwork->MultizoneSurfaceData(2).VentingSchNum);
+    EXPECT_EQ(state->dataAirflowNetwork->MultizoneSurfaceData(2).VentSurfCtrNum, AirflowNetwork::VentControlType::Const);
 }
-} // namespace EnergyPlus
 
+TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestNoZoneEqpSupportZoneERV)
+{
+    // Create zone
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
+
+    // Create surfaces
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).Name = "ZN004:ROOF001";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "ZONE 1";
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(1).ExtBoundCond = 0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Tilt = 180.0;
+    state->dataSurface->Surface(1).Sides = 4;
+    state->dataSurface->Surface(1).Name = "ZN004:ROOF002";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "ZONE 1";
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(1).ExtBoundCond = 0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Tilt = 180.0;
+    state->dataSurface->Surface(1).Sides = 4;
+
+    state->dataSurface->SurfWinOriginalClass.allocate(1);
+    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+
+    // Create air system
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
+
+    // Create air nodes
+    state->dataLoopNodes->NumOfNodes = 5;
+    state->dataLoopNodes->Node.allocate(5);
+    state->dataLoopNodes->Node(1).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(2).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(3).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(4).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(5).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->NodeID.allocate(5);
+    state->dataLoopNodes->NodeID(1) = "ZONE 1 AIR NODE";
+    bool errFlag{false};
+    BranchNodeConnections::RegisterNodeConnection(
+        *state, 1, "ZONE 1 AIR NODE", "Type1", "Object1", "ZoneNode", NodeInputManager::compFluidStream::Primary, false, errFlag);
+    EXPECT_FALSE(errFlag);
+
+    // Connect zone to air node
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "ZONE 1";
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+
+    // One AirflowNetwork:MultiZone:Zone object
+    state->dataAirflowNetwork->AirflowNetworkNumOfZones = 1;
+    state->dataAirflowNetwork->MultizoneZoneData.allocate(1);
+    state->dataAirflowNetwork->MultizoneZoneData(1).ZoneNum = 1;
+    state->dataAirflowNetwork->MultizoneZoneData(1).ZoneName = "ZONE 1";
+
+    // Assume only one AirflowNetwork:Distribution:Node object is set for the Zone Air Node
+    state->dataAirflowNetwork->AirflowNetworkNumOfNodes = 1;
+    state->dataAirflowNetwork->AirflowNetworkNodeData.allocate(1);
+    state->dataAirflowNetwork->AirflowNetworkNodeData(1).Name = "ZONE 1";
+    state->dataAirflowNetwork->AirflowNetworkNodeData(1).EPlusZoneNum = 1;
+
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers.allocate(2);
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(1) = 0;
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(2) = 0;
+
+    // Set flag to support zone equipment
+    state->dataAirflowNetwork->AirflowNetworkSimu.AllowSupportZoneEqp = false;
+
+    // Create Fans
+    Real64 supplyFlowRate = 0.005;
+    Real64 exhaustFlowRate = 0.005;
+    state->dataFans->Fan.allocate(2);
+    state->dataFans->Fan(1).InletNodeNum = 2;
+    state->dataFans->Fan(1).OutletNodeNum = 3;
+    state->dataFans->Fan(1).FanType_Num = FanType_SimpleOnOff;
+    state->dataFans->Fan(1).FanName = "SupplyFan";
+    state->dataFans->Fan(1).MaxAirFlowRate = supplyFlowRate;
+    state->dataLoopNodes->NodeID(2) = "SupplyFanInletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  2,
+                                                  state->dataLoopNodes->NodeID(2),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(1).FanName,
+                                                  "Inlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
+    state->dataLoopNodes->NodeID(3) = "SupplyFanOutletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  3,
+                                                  state->dataLoopNodes->NodeID(3),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(1).FanName,
+                                                  "Outlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
+    state->dataFans->Fan(2).InletNodeNum = 4;
+    state->dataFans->Fan(2).OutletNodeNum = 5;
+    state->dataFans->Fan(2).FanType_Num = FanType_SimpleOnOff;
+    state->dataFans->Fan(2).FanName = "ExhaustFan";
+    state->dataFans->Fan(2).MaxAirFlowRate = exhaustFlowRate;
+    state->dataLoopNodes->NodeID(4) = "SupplyExhaustInletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  4,
+                                                  state->dataLoopNodes->NodeID(4),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(2).FanName,
+                                                  "Inlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
+    state->dataLoopNodes->NodeID(5) = "SupplyExhaustOutletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  5,
+                                                  state->dataLoopNodes->NodeID(5),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(2).FanName,
+                                                  "Outlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
+
+    // Create ERV
+    state->dataHVACStandAloneERV->StandAloneERV.allocate(1);
+    state->dataHVACStandAloneERV->GetERVInputFlag = false;
+    state->dataHVACStandAloneERV->NumStandAloneERVs = 1;
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirVolFlow = 0.005;
+    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirVolFlow = 0.005;
+    state->dataHVACStandAloneERV->StandAloneERV(1).DesignSAFanVolFlowRate = 0.005;
+    state->dataHVACStandAloneERV->StandAloneERV(1).DesignEAFanVolFlowRate = 0.005;
+    state->dataHVACStandAloneERV->StandAloneERV(1).DesignHXVolFlowRate = 0.005;
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanName = state->dataFans->Fan(1).FanName;
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanIndex = 1;
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirInletNode = 2;
+    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanName = state->dataFans->Fan(2).FanName;
+    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanIndex = 2;
+    state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerTypeNum = HX_AIRTOAIR_GENERIC;
+    state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerName = "ERV Heat Exchanger";
+
+    // Check validation and expected errors
+    ASSERT_THROW(ValidateDistributionSystem(*state), std::runtime_error);
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** ValidateDistributionSystem: 'SupplyFanInletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   ** Severe  ** ValidateDistributionSystem: 'SupplyFanOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   ** Severe  ** ValidateDistributionSystem: 'SupplyExhaustInletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   ** Severe  ** ValidateDistributionSystem: 'SupplyExhaustOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   **  Fatal  ** ValidateDistributionSystem: Program terminates for preceding reason(s).",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=4",
+        "   ..... Last severe error=ValidateDistributionSystem: 'SupplyExhaustOutletNode' is not defined as an AirflowNetwork:Distribution:Node "
+        "object.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportZoneERV)
+{
+    // Create zone
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
+
+    // Create surfaces
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).Name = "ZN004:ROOF001";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "ZONE 1";
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(1).ExtBoundCond = 0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Tilt = 180.0;
+    state->dataSurface->Surface(1).Sides = 4;
+    state->dataSurface->Surface(1).Name = "ZN004:ROOF002";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "ZONE 1";
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(1).ExtBoundCond = 0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Tilt = 180.0;
+    state->dataSurface->Surface(1).Sides = 4;
+
+    state->dataSurface->SurfWinOriginalClass.allocate(1);
+    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+
+    // Create air system
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
+
+    // Create air nodes
+    state->dataLoopNodes->NumOfNodes = 5;
+    state->dataLoopNodes->Node.allocate(5);
+    state->dataLoopNodes->Node(1).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(2).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(3).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(4).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(5).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->NodeID.allocate(5);
+    state->dataLoopNodes->NodeID(1) = "ZONE 1 AIR NODE";
+    bool errFlag{false};
+    BranchNodeConnections::RegisterNodeConnection(
+        *state, 1, "ZONE 1 AIR NODE", "Type1", "Object1", "ZoneNode", NodeInputManager::compFluidStream::Primary, false, errFlag);
+    EXPECT_FALSE(errFlag);
+
+    // Connect zone to air node
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "ZONE 1";
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+
+    // One AirflowNetwork:MultiZone:Zone object
+    state->dataAirflowNetwork->AirflowNetworkNumOfZones = 1;
+    state->dataAirflowNetwork->MultizoneZoneData.allocate(1);
+    state->dataAirflowNetwork->MultizoneZoneData(1).ZoneNum = 1;
+    state->dataAirflowNetwork->MultizoneZoneData(1).ZoneName = "ZONE 1";
+
+    // Assume only one AirflowNetwork:Distribution:Node object is set for the Zone Air Node
+    state->dataAirflowNetwork->AirflowNetworkNumOfNodes = 1;
+    state->dataAirflowNetwork->AirflowNetworkNodeData.allocate(1);
+    state->dataAirflowNetwork->AirflowNetworkNodeData(1).Name = "ZONE 1";
+    state->dataAirflowNetwork->AirflowNetworkNodeData(1).EPlusZoneNum = 1;
+
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers.allocate(2);
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(1) = 0;
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(2) = 0;
+
+    // Set flag to support zone equipment
+    state->dataAirflowNetwork->AirflowNetworkSimu.AllowSupportZoneEqp = true;
+
+    // Create Fans
+    Real64 supplyFlowRate = 0.005;
+    Real64 exhaustFlowRate = 0.005;
+    state->dataFans->Fan.allocate(2);
+    state->dataFans->Fan(1).InletNodeNum = 2;
+    state->dataFans->Fan(1).OutletNodeNum = 3;
+    state->dataFans->Fan(1).FanType_Num = FanType_SimpleOnOff;
+    state->dataFans->Fan(1).FanName = "SupplyFan";
+    state->dataFans->Fan(1).MaxAirFlowRate = supplyFlowRate;
+    state->dataLoopNodes->NodeID(2) = "SupplyFanInletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  2,
+                                                  state->dataLoopNodes->NodeID(2),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(1).FanName,
+                                                  "Inlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
+    state->dataLoopNodes->NodeID(3) = "SupplyFanOutletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  3,
+                                                  state->dataLoopNodes->NodeID(3),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(1).FanName,
+                                                  "Outlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
+    state->dataFans->Fan(2).InletNodeNum = 4;
+    state->dataFans->Fan(2).OutletNodeNum = 5;
+    state->dataFans->Fan(2).FanType_Num = FanType_SimpleOnOff;
+    state->dataFans->Fan(2).FanName = "ExhaustFan";
+    state->dataFans->Fan(2).MaxAirFlowRate = exhaustFlowRate;
+    state->dataLoopNodes->NodeID(4) = "SupplyExhaustInletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  4,
+                                                  state->dataLoopNodes->NodeID(4),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(2).FanName,
+                                                  "Inlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
+    state->dataLoopNodes->NodeID(5) = "SupplyExhaustOutletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  5,
+                                                  state->dataLoopNodes->NodeID(5),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(2).FanName,
+                                                  "Outlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
+
+    // Create ERV
+    state->dataHVACStandAloneERV->StandAloneERV.allocate(1);
+    state->dataHVACStandAloneERV->GetERVInputFlag = false;
+    state->dataHVACStandAloneERV->NumStandAloneERVs = 1;
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirVolFlow = 0.005;
+    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirVolFlow = 0.005;
+    state->dataHVACStandAloneERV->StandAloneERV(1).DesignSAFanVolFlowRate = 0.005;
+    state->dataHVACStandAloneERV->StandAloneERV(1).DesignEAFanVolFlowRate = 0.005;
+    state->dataHVACStandAloneERV->StandAloneERV(1).DesignHXVolFlowRate = 0.005;
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanName = state->dataFans->Fan(1).FanName;
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanIndex = 1;
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirInletNode = 2;
+    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanName = state->dataFans->Fan(2).FanName;
+    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanIndex = 2;
+    state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerTypeNum = HX_AIRTOAIR_GENERIC;
+    state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerName = "ERV Heat Exchanger";
+
+    // Check validation and expected warning
+    ValidateDistributionSystem(*state);
+
+    EXPECT_TRUE(compare_err_stream("   ** Warning ** ValidateDistributionSystem: A ZoneHVAC:EnergyRecoveryVentilator is simulated along with an "
+                                   "AirflowNetwork but is not included in the AirflowNetwork.\n",
+                                   true));
+}
+
+TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportUnbalancedZoneERV)
+{
+    // Create zone
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
+
+    // Create surfaces
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).Name = "ZN004:ROOF001";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "ZONE 1";
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(1).ExtBoundCond = 0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Tilt = 180.0;
+    state->dataSurface->Surface(1).Sides = 4;
+    state->dataSurface->Surface(1).Name = "ZN004:ROOF002";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "ZONE 1";
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(1).ExtBoundCond = 0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Tilt = 180.0;
+    state->dataSurface->Surface(1).Sides = 4;
+
+    state->dataSurface->SurfWinOriginalClass.allocate(1);
+    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+
+    // Create air system
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
+
+    // Create air nodes
+    state->dataLoopNodes->NumOfNodes = 5;
+    state->dataLoopNodes->Node.allocate(5);
+    state->dataLoopNodes->Node(1).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(2).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(3).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(4).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(5).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->NodeID.allocate(5);
+    state->dataLoopNodes->NodeID(1) = "ZONE 1 AIR NODE";
+    bool errFlag{false};
+    BranchNodeConnections::RegisterNodeConnection(
+        *state, 1, "ZONE 1 AIR NODE", "Type1", "Object1", "ZoneNode", NodeInputManager::compFluidStream::Primary, false, errFlag);
+    EXPECT_FALSE(errFlag);
+
+    // Connect zone to air node
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "ZONE 1";
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+
+    // One AirflowNetwork:MultiZone:Zone object
+    state->dataAirflowNetwork->AirflowNetworkNumOfZones = 1;
+    state->dataAirflowNetwork->MultizoneZoneData.allocate(1);
+    state->dataAirflowNetwork->MultizoneZoneData(1).ZoneNum = 1;
+    state->dataAirflowNetwork->MultizoneZoneData(1).ZoneName = "ZONE 1";
+
+    // Assume only one AirflowNetwork:Distribution:Node object is set for the Zone Air Node
+    state->dataAirflowNetwork->AirflowNetworkNumOfNodes = 1;
+    state->dataAirflowNetwork->AirflowNetworkNodeData.allocate(1);
+    state->dataAirflowNetwork->AirflowNetworkNodeData(1).Name = "ZONE 1";
+    state->dataAirflowNetwork->AirflowNetworkNodeData(1).EPlusZoneNum = 1;
+
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers.allocate(2);
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(1) = 0;
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(2) = 0;
+
+    // Set flag to support zone equipment
+    state->dataAirflowNetwork->AirflowNetworkSimu.AllowSupportZoneEqp = true;
+
+    // Create Fans
+    Real64 supplyFlowRate = 0.005;
+    Real64 exhaustFlowRate = 0.003;
+    state->dataFans->Fan.allocate(2);
+    state->dataFans->Fan(1).InletNodeNum = 2;
+    state->dataFans->Fan(1).OutletNodeNum = 3;
+    state->dataFans->Fan(1).FanType_Num = FanType_SimpleOnOff;
+    state->dataFans->Fan(1).FanName = "SupplyFan";
+    state->dataFans->Fan(1).MaxAirFlowRate = supplyFlowRate;
+    state->dataLoopNodes->NodeID(2) = "SupplyFanInletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  2,
+                                                  state->dataLoopNodes->NodeID(2),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(1).FanName,
+                                                  "Inlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
+    state->dataLoopNodes->NodeID(3) = "SupplyFanOutletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  3,
+                                                  state->dataLoopNodes->NodeID(3),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(1).FanName,
+                                                  "Outlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
+    state->dataFans->Fan(2).InletNodeNum = 4;
+    state->dataFans->Fan(2).OutletNodeNum = 5;
+    state->dataFans->Fan(2).FanType_Num = FanType_SimpleOnOff;
+    state->dataFans->Fan(2).FanName = "ExhaustFan";
+    state->dataFans->Fan(2).MaxAirFlowRate = exhaustFlowRate;
+    state->dataLoopNodes->NodeID(4) = "SupplyExhaustInletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  4,
+                                                  state->dataLoopNodes->NodeID(4),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(2).FanName,
+                                                  "Inlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
+    state->dataLoopNodes->NodeID(5) = "SupplyExhaustOutletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  5,
+                                                  state->dataLoopNodes->NodeID(5),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(2).FanName,
+                                                  "Outlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
+
+    // Create ERV
+    state->dataHVACStandAloneERV->StandAloneERV.allocate(1);
+    state->dataHVACStandAloneERV->GetERVInputFlag = false;
+    state->dataHVACStandAloneERV->NumStandAloneERVs = 1;
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirVolFlow = 0.005;
+    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirVolFlow = 0.005;
+    state->dataHVACStandAloneERV->StandAloneERV(1).DesignSAFanVolFlowRate = 0.005;
+    state->dataHVACStandAloneERV->StandAloneERV(1).DesignEAFanVolFlowRate = 0.005;
+    state->dataHVACStandAloneERV->StandAloneERV(1).DesignHXVolFlowRate = 0.005;
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanName = state->dataFans->Fan(1).FanName;
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanIndex = 1;
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirInletNode = 2;
+    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanName = state->dataFans->Fan(2).FanName;
+    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanIndex = 2;
+    state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerTypeNum = HX_AIRTOAIR_GENERIC;
+    state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerName = "ERV Heat Exchanger";
+
+    // Check validation and expected errors
+    ASSERT_THROW(ValidateDistributionSystem(*state), std::runtime_error);
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** ValidateDistributionSystem: 'SupplyFanInletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   ** Severe  ** ValidateDistributionSystem: 'SupplyFanOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   ** Severe  ** ValidateDistributionSystem: 'SupplyExhaustInletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   ** Severe  ** ValidateDistributionSystem: 'SupplyExhaustOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   **  Fatal  ** ValidateDistributionSystem: Program terminates for preceding reason(s).",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=4",
+        "   ..... Last severe error=ValidateDistributionSystem: 'SupplyExhaustOutletNode' is not defined as an AirflowNetwork:Distribution:Node "
+        "object.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestNoZoneEqpSupportHPWH)
+{
+    // Create zone
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
+
+    // Create surfaces
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).Name = "ZN004:ROOF001";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "ZONE 1";
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(1).ExtBoundCond = 0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Tilt = 180.0;
+    state->dataSurface->Surface(1).Sides = 4;
+    state->dataSurface->Surface(1).Name = "ZN004:ROOF002";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "ZONE 1";
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(1).ExtBoundCond = 0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Tilt = 180.0;
+    state->dataSurface->Surface(1).Sides = 4;
+
+    state->dataSurface->SurfWinOriginalClass.allocate(1);
+    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+
+    // Create air system
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
+
+    // Create air nodes
+    state->dataLoopNodes->NumOfNodes = 3;
+    state->dataLoopNodes->Node.allocate(3);
+    state->dataLoopNodes->Node(1).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(2).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(3).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->NodeID.allocate(3);
+    state->dataLoopNodes->NodeID(1) = "ZONE 1 AIR NODE";
+    bool errFlag{false};
+    BranchNodeConnections::RegisterNodeConnection(
+        *state, 1, "ZONE 1 AIR NODE", "Type1", "Object1", "ZoneNode", NodeInputManager::compFluidStream::Primary, false, errFlag);
+    EXPECT_FALSE(errFlag);
+
+    // Connect zone to air node
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "ZONE 1";
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+
+    // One AirflowNetwork:MultiZone:Zone object
+    state->dataAirflowNetwork->AirflowNetworkNumOfZones = 1;
+    state->dataAirflowNetwork->MultizoneZoneData.allocate(1);
+    state->dataAirflowNetwork->MultizoneZoneData(1).ZoneNum = 1;
+    state->dataAirflowNetwork->MultizoneZoneData(1).ZoneName = "ZONE 1";
+
+    // Assume only one AirflowNetwork:Distribution:Node object is set for the Zone Air Node
+    state->dataAirflowNetwork->AirflowNetworkNumOfNodes = 1;
+    state->dataAirflowNetwork->AirflowNetworkNodeData.allocate(1);
+    state->dataAirflowNetwork->AirflowNetworkNodeData(1).Name = "ZONE 1";
+    state->dataAirflowNetwork->AirflowNetworkNodeData(1).EPlusZoneNum = 1;
+
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers.allocate(2);
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(1) = 0;
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(2) = 0;
+
+    // Set flag to support zone equipment
+    state->dataAirflowNetwork->AirflowNetworkSimu.AllowSupportZoneEqp = false;
+
+    // Create Fan
+    state->dataFans->Fan.allocate(1);
+    state->dataFans->Fan(1).InletNodeNum = 2;
+    state->dataFans->Fan(1).OutletNodeNum = 3;
+    state->dataFans->Fan(1).FanType_Num = FanType_SimpleOnOff;
+    state->dataFans->Fan(1).FanName = "SupplyFan";
+    state->dataLoopNodes->NodeID(2) = "SupplyFanInletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  2,
+                                                  state->dataLoopNodes->NodeID(2),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(1).FanName,
+                                                  "Inlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
+    state->dataLoopNodes->NodeID(3) = "SupplyFanOutletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  3,
+                                                  state->dataLoopNodes->NodeID(3),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(1).FanName,
+                                                  "Outlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
+
+    // Create HPWH
+    state->dataWaterThermalTanks->HPWaterHeater.allocate(1);
+    state->dataWaterThermalTanks->getWaterThermalTankInputFlag = false;
+    state->dataWaterThermalTanks->numHeatPumpWaterHeater = 1;
+    state->dataWaterThermalTanks->HPWaterHeater(1).InletAirConfiguration = WaterThermalTanks::AmbientTempEnum::TempZone;
+    state->dataWaterThermalTanks->HPWaterHeater(1).FanName = state->dataFans->Fan(1).FanName;
+    state->dataWaterThermalTanks->HPWaterHeater(1).FanType = "Fan:OnOff";
+    state->dataWaterThermalTanks->HPWaterHeater(1).FanOutletNode = 3;
+
+    // Check validation and expected errors
+    ASSERT_THROW(ValidateDistributionSystem(*state), std::runtime_error);
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** ValidateDistributionSystem: 'SupplyFanInletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   ** Severe  ** ValidateDistributionSystem: 'SupplyFanOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   **  Fatal  ** ValidateDistributionSystem: Program terminates for preceding reason(s).",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=2",
+        "   ..... Last severe error=ValidateDistributionSystem: 'SupplyFanOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportHPWH)
+{
+    // Create zone
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
+
+    // Create surfaces
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).Name = "ZN004:ROOF001";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "ZONE 1";
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(1).ExtBoundCond = 0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Tilt = 180.0;
+    state->dataSurface->Surface(1).Sides = 4;
+    state->dataSurface->Surface(1).Name = "ZN004:ROOF002";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "ZONE 1";
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(1).ExtBoundCond = 0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Tilt = 180.0;
+    state->dataSurface->Surface(1).Sides = 4;
+
+    state->dataSurface->SurfWinOriginalClass.allocate(1);
+    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+
+    // Create air system
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
+
+    // Create air nodes
+    state->dataLoopNodes->NumOfNodes = 3;
+    state->dataLoopNodes->Node.allocate(3);
+    state->dataLoopNodes->Node(1).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(2).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(3).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->NodeID.allocate(3);
+    state->dataLoopNodes->NodeID(1) = "ZONE 1 AIR NODE";
+    bool errFlag{false};
+    BranchNodeConnections::RegisterNodeConnection(
+        *state, 1, "ZONE 1 AIR NODE", "Type1", "Object1", "ZoneNode", NodeInputManager::compFluidStream::Primary, false, errFlag);
+    EXPECT_FALSE(errFlag);
+
+    // Connect zone to air node
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "ZONE 1";
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+
+    // One AirflowNetwork:MultiZone:Zone object
+    state->dataAirflowNetwork->AirflowNetworkNumOfZones = 1;
+    state->dataAirflowNetwork->MultizoneZoneData.allocate(1);
+    state->dataAirflowNetwork->MultizoneZoneData(1).ZoneNum = 1;
+    state->dataAirflowNetwork->MultizoneZoneData(1).ZoneName = "ZONE 1";
+
+    // Assume only one AirflowNetwork:Distribution:Node object is set for the Zone Air Node
+    state->dataAirflowNetwork->AirflowNetworkNumOfNodes = 1;
+    state->dataAirflowNetwork->AirflowNetworkNodeData.allocate(1);
+    state->dataAirflowNetwork->AirflowNetworkNodeData(1).Name = "ZONE 1";
+    state->dataAirflowNetwork->AirflowNetworkNodeData(1).EPlusZoneNum = 1;
+
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers.allocate(2);
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(1) = 0;
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(2) = 0;
+
+    // Set flag to support zone equipment
+    state->dataAirflowNetwork->AirflowNetworkSimu.AllowSupportZoneEqp = true;
+
+    // Create Fan
+    state->dataFans->Fan.allocate(1);
+    state->dataFans->Fan(1).InletNodeNum = 2;
+    state->dataFans->Fan(1).OutletNodeNum = 3;
+    state->dataFans->Fan(1).FanType_Num = FanType_SimpleOnOff;
+    state->dataFans->Fan(1).FanName = "SupplyFan";
+    state->dataLoopNodes->NodeID(2) = "SupplyFanInletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  2,
+                                                  state->dataLoopNodes->NodeID(2),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(1).FanName,
+                                                  "Inlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
+    state->dataLoopNodes->NodeID(3) = "SupplyFanOutletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  3,
+                                                  state->dataLoopNodes->NodeID(3),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(1).FanName,
+                                                  "Outlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
+
+    // Create HPWH
+    state->dataWaterThermalTanks->HPWaterHeater.allocate(1);
+    state->dataWaterThermalTanks->getWaterThermalTankInputFlag = false;
+    state->dataWaterThermalTanks->numHeatPumpWaterHeater = 1;
+    state->dataWaterThermalTanks->HPWaterHeater(1).InletAirConfiguration = WaterThermalTanks::AmbientTempEnum::TempZone;
+    state->dataWaterThermalTanks->HPWaterHeater(1).FanName = state->dataFans->Fan(1).FanName;
+    state->dataWaterThermalTanks->HPWaterHeater(1).FanType = "Fan:OnOff";
+    state->dataWaterThermalTanks->HPWaterHeater(1).FanOutletNode = 3;
+
+    // Check validation and expected warning
+    ValidateDistributionSystem(*state);
+    EXPECT_TRUE(compare_err_stream("   ** Warning ** ValidateDistributionSystem: Heat pump water heater is simulated along with an AirflowNetwork "
+                                   "but is not included in the AirflowNetwork.\n",
+                                   true));
+}
+
+TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportHPWHZoneAndOA)
+{
+    // Create zone
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
+
+    // Create surfaces
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).Name = "ZN004:ROOF001";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "ZONE 1";
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(1).ExtBoundCond = 0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Tilt = 180.0;
+    state->dataSurface->Surface(1).Sides = 4;
+    state->dataSurface->Surface(1).Name = "ZN004:ROOF002";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "ZONE 1";
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(1).ExtBoundCond = 0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Tilt = 180.0;
+    state->dataSurface->Surface(1).Sides = 4;
+
+    state->dataSurface->SurfWinOriginalClass.allocate(1);
+    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+
+    // Create air system
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
+
+    // Create air nodes
+    state->dataLoopNodes->NumOfNodes = 3;
+    state->dataLoopNodes->Node.allocate(3);
+    state->dataLoopNodes->Node(1).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(2).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(3).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->NodeID.allocate(3);
+    state->dataLoopNodes->NodeID(1) = "ZONE 1 AIR NODE";
+    bool errFlag{false};
+    BranchNodeConnections::RegisterNodeConnection(
+        *state, 1, "ZONE 1 AIR NODE", "Type1", "Object1", "ZoneNode", NodeInputManager::compFluidStream::Primary, false, errFlag);
+    EXPECT_FALSE(errFlag);
+
+    // Connect zone to air node
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "ZONE 1";
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+
+    // One AirflowNetwork:MultiZone:Zone object
+    state->dataAirflowNetwork->AirflowNetworkNumOfZones = 1;
+    state->dataAirflowNetwork->MultizoneZoneData.allocate(1);
+    state->dataAirflowNetwork->MultizoneZoneData(1).ZoneNum = 1;
+    state->dataAirflowNetwork->MultizoneZoneData(1).ZoneName = "ZONE 1";
+
+    // Assume only one AirflowNetwork:Distribution:Node object is set for the Zone Air Node
+    state->dataAirflowNetwork->AirflowNetworkNumOfNodes = 1;
+    state->dataAirflowNetwork->AirflowNetworkNodeData.allocate(1);
+    state->dataAirflowNetwork->AirflowNetworkNodeData(1).Name = "ZONE 1";
+    state->dataAirflowNetwork->AirflowNetworkNodeData(1).EPlusZoneNum = 1;
+
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers.allocate(2);
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(1) = 0;
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(2) = 0;
+
+    // Set flag to support zone equipment
+    state->dataAirflowNetwork->AirflowNetworkSimu.AllowSupportZoneEqp = true;
+
+    // Create Fan
+    state->dataFans->Fan.allocate(1);
+    state->dataFans->Fan(1).InletNodeNum = 2;
+    state->dataFans->Fan(1).OutletNodeNum = 3;
+    state->dataFans->Fan(1).FanType_Num = FanType_SimpleOnOff;
+    state->dataFans->Fan(1).FanName = "SupplyFan";
+    state->dataLoopNodes->NodeID(2) = "SupplyFanInletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  2,
+                                                  state->dataLoopNodes->NodeID(2),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(1).FanName,
+                                                  "Inlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
+    state->dataLoopNodes->NodeID(3) = "SupplyFanOutletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  3,
+                                                  state->dataLoopNodes->NodeID(3),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(1).FanName,
+                                                  "Outlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
+
+    // Create HPWH
+    state->dataWaterThermalTanks->HPWaterHeater.allocate(1);
+    state->dataWaterThermalTanks->getWaterThermalTankInputFlag = false;
+    state->dataWaterThermalTanks->numHeatPumpWaterHeater = 1;
+    state->dataWaterThermalTanks->HPWaterHeater(1).InletAirConfiguration = WaterThermalTanks::AmbientTempEnum::ZoneAndOA;
+    state->dataWaterThermalTanks->HPWaterHeater(1).FanName = state->dataFans->Fan(1).FanName;
+    state->dataWaterThermalTanks->HPWaterHeater(1).FanType = "Fan:OnOff";
+    state->dataWaterThermalTanks->HPWaterHeater(1).FanOutletNode = 3;
+
+    // Check validation and expected errors
+    ASSERT_THROW(ValidateDistributionSystem(*state), std::runtime_error);
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** ValidateDistributionSystem: 'SupplyFanInletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   ** Severe  ** ValidateDistributionSystem: 'SupplyFanOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   **  Fatal  ** ValidateDistributionSystem: Program terminates for preceding reason(s).",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=2",
+        "   ..... Last severe error=ValidateDistributionSystem: 'SupplyFanOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, AirflowNetwork_TestDefaultBehaviourOfSimulationControl)
+{
+
+    // Unit test for #5021
+
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "SALA DE AULA";
+
+    state->dataSurface->Surface.allocate(2);
+    state->dataSurface->Surface(1).Name = "WINDOW AULA 1";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "SALA DE AULA";
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(1).ExtBoundCond = 0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Tilt = 90.0;
+    state->dataSurface->Surface(1).Sides = 4;
+    state->dataSurface->Surface(2).Name = "WINDOW AULA 2";
+    state->dataSurface->Surface(2).Zone = 1;
+    state->dataSurface->Surface(2).ZoneName = "SALA DE AULA";
+    state->dataSurface->Surface(2).Azimuth = 180.0;
+    state->dataSurface->Surface(2).ExtBoundCond = 0;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(2).Tilt = 90.0;
+    state->dataSurface->Surface(2).Sides = 4;
+
+    SurfaceGeometry::AllocateSurfaceWindows(*state, 2);
+    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
+    state->dataGlobal->NumOfZones = 1;
+
+    std::string const idf_objects = delimited_string({
+        "Schedule:Constant,OnSch,,1.0;",
+        "Schedule:Constant,Aula people sched,,0.0;",
+        "Schedule:Constant,Sempre 21,,21.0;",
+        "AirflowNetwork:MultiZone:Zone,",
+        "  sala de aula, !- Zone Name",
+        "  Temperature, !- Ventilation Control Mode",
+        "  Sempre 21, !- Ventilation Control Zone Temperature Setpoint Schedule Name",
+        "  1, !- Minimum Venting Open Factor{ dimensionless }",
+        "  , !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor{ deltaC }",
+        "  100, !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor{ deltaC }",
+        "  , !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor{ deltaJ / kg }",
+        "  300000, !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor{ deltaJ / kg }",
+        "  Aula people sched, !- Venting Availability Schedule Name",
+        "  Standard;                !- Single Sided Wind Pressure Coefficient Algorithm",
+        "AirflowNetwork:MultiZone:Surface,",
+        "  window aula 1, !- Surface Name",
+        "  Simple Window, !- Leakage Component Name",
+        "  , !- External Node Name",
+        "  1, !- Window / Door Opening Factor, or Crack Factor{ dimensionless }",
+        "  ZoneLevel, !- Ventilation Control Mode",
+        "  , !- Ventilation Control Zone Temperature Setpoint Schedule Name",
+        "  , !- Minimum Venting Open Factor{ dimensionless }",
+        "  , !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor{ deltaC }",
+        "  100, !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor{ deltaC }",
+        "  , !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor{ deltaJ / kg }",
+        "  300000, !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor{ deltaJ / kg }",
+        "  Aula people sched;       !- Venting Availability Schedule Name",
+        "AirflowNetwork:MultiZone:Surface,",
+        "  window aula 2, !- Surface Name",
+        "  Simple Window, !- Leakage Component Name",
+        "  , !- External Node Name",
+        "  1, !- Window / Door Opening Factor, or Crack Factor{ dimensionless }",
+        "  Temperature, !- Ventilation Control Mode",
+        "  Sempre 21, !- Ventilation Control Zone Temperature Setpoint Schedule Name",
+        "  1, !- Minimum Venting Open Factor{ dimensionless }",
+        "  , !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor{ deltaC }",
+        "  100, !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor{ deltaC }",
+        "  , !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor{ deltaJ / kg }",
+        "  300000, !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor{ deltaJ / kg }",
+        "  Aula people sched;       !- Venting Availability Schedule Name",
+        "AirflowNetwork:MultiZone:Component:SimpleOpening,",
+        "  Simple Window, !- Name",
+        "  0.0010, !- Air Mass Flow Coefficient When Opening is Closed{ kg / s - m }",
+        "  0.65, !- Air Mass Flow Exponent When Opening is Closed{ dimensionless }",
+        "  0.01, !- Minimum Density Difference for Two - Way Flow{ kg / m3 }",
+        "  0.78;                    !- Discharge Coefficient{ dimensionless }",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    GetAirflowNetworkInput(*state);
+
+    // MultizoneZoneData has only 1 element so may be hardcoded
+    EXPECT_TRUE(state->dataAirflowNetwork->AFNDefaultControlFlag);
+
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkSimu.AirflowNetworkSimuName, "AFNDefaultControl");
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkSimu.Control, "MULTIZONEWITHOUTDISTRIBUTION");
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkSimu.WPCCntr, "SURFACEAVERAGECALCULATION");
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkSimu.HeightOption, "OPENINGHEIGHT");
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkSimu.BldgType, "LOWRISE");
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkSimu.InitType, "ZERONODEPRESSURES");
+    EXPECT_FALSE(state->dataAirflowNetwork->AirflowNetworkSimu.TExtHeightDep);
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkSimu.solver, AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU);
+    //// Use default values for numerical fields
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkSimu.MaxIteration, 500);
+    EXPECT_NEAR(state->dataAirflowNetwork->AirflowNetworkSimu.RelTol, 1.0E-4, 0.00001);
+    EXPECT_NEAR(state->dataAirflowNetwork->AirflowNetworkSimu.AbsTol, 1.E-6, 0.0000001);
+    EXPECT_NEAR(state->dataAirflowNetwork->AirflowNetworkSimu.ConvLimit, -0.5, 0.01);
+    EXPECT_NEAR(state->dataAirflowNetwork->AirflowNetworkSimu.Azimuth, 0.0, 0.0001);
+    EXPECT_NEAR(state->dataAirflowNetwork->AirflowNetworkSimu.AspectRatio, 1.0, 0.0001);
+}
+
+TEST_F(EnergyPlusFixture, AirflowNetwork_TestIntraZoneLinkageZoneIndex)
+{
+
+    // Unit test for #8735
+
+    std::string const idf_objects = delimited_string({
+
+        "Version,",
+        "    9.5;                     !- Version Identifier",
+
+        "SimulationControl,",
+        "    Yes,                     !- Do Zone Sizing Calculation",
+        "    Yes,                     !- Do System Sizing Calculation",
+        "    No,                      !- Do Plant Sizing Calculation",
+        "    Yes,                     !- Run Simulation for Sizing Periods",
+        "    No,                      !- Run Simulation for Weather File Run Periods",
+        "    No,                      !- Do HVAC Sizing Simulation for Sizing Periods",
+        "    1;                       !- Maximum Number of HVAC Sizing Simulation Passes",
+
+        "Building,",
+        "    AirflowNetwork 3 Zone Building,  !- Name",
+        "    0,                       !- North Axis {deg}",
+        "    Suburbs,                 !- Terrain",
+        "    0.0400000,               !- Loads Convergence Tolerance Value {W}",
+        "    0.0400000,               !- Temperature Convergence Tolerance Value {deltaC}",
+        "    MinimalShadowing,        !- Solar Distribution",
+        "    25,                      !- Maximum Number of Warmup Days",
+        "    6;                       !- Minimum Number of Warmup Days",
+
+        "SurfaceConvectionAlgorithm:Inside,",
+        "    Simple;                  !- Algorithm",
+
+        "SurfaceConvectionAlgorithm:Outside,",
+        "    SimpleCombined;          !- Algorithm",
+
+        "HeatBalanceAlgorithm,",
+        "    ConductionTransferFunction;  !- Algorithm",
+
+        "ZoneCapacitanceMultiplier:ResearchSpecial,",
+        "    Multiplier,              !- Name",
+        "    ,                        !- Zone or ZoneList Name",
+        "    1.0,                     !- Temperature Capacity Multiplier",
+        "    1.0,                     !- Humidity Capacity Multiplier",
+        "    1.0,                     !- Carbon Dioxide Capacity Multiplier",
+        "    1.0;                     !- Generic Contaminant Capacity Multiplier",
+
+        "Timestep,",
+        "    6;                       !- Number of Timesteps per Hour",
+
+        "Site:Location,",
+        "    CHICAGO_IL_USA TMY2-94846,  !- Name",
+        "    41.78,                   !- Latitude {deg}",
+        "    -87.75,                  !- Longitude {deg}",
+        "    -6.00,                   !- Time Zone {hr}",
+        "    190.00;                  !- Elevation {m}",
+
+        "SizingPeriod:DesignDay,",
+        "    CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name",
+        "    1,                       !- Month",
+        "    21,                      !- Day of Month",
+        "    WinterDesignDay,         !- Day Type",
+        "    -17.3,                   !- Maximum Dry-Bulb Temperature {C}",
+        "    0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "    Wetbulb,                 !- Humidity Condition Type",
+        "    -17.3,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "    ,                        !- Humidity Condition Day Schedule Name",
+        "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "    99063.,                  !- Barometric Pressure {Pa}",
+        "    4.9,                     !- Wind Speed {m/s}",
+        "    270,                     !- Wind Direction {deg}",
+        "    No,                      !- Rain Indicator",
+        "    No,                      !- Snow Indicator",
+        "    No,                      !- Daylight Saving Time Indicator",
+        "    ASHRAEClearSky,          !- Solar Model Indicator",
+        "    ,                        !- Beam Solar Day Schedule Name",
+        "    ,                        !- Diffuse Solar Day Schedule Name",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+        "    0.0;                     !- Sky Clearness",
+
+        "SizingPeriod:DesignDay,",
+        "    CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name",
+        "    7,                       !- Month",
+        "    21,                      !- Day of Month",
+        "    SummerDesignDay,         !- Day Type",
+        "    31.5,                    !- Maximum Dry-Bulb Temperature {C}",
+        "    10.7,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "    Wetbulb,                 !- Humidity Condition Type",
+        "    23.0,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "    ,                        !- Humidity Condition Day Schedule Name",
+        "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "    99063.,                  !- Barometric Pressure {Pa}",
+        "    5.3,                     !- Wind Speed {m/s}",
+        "    230,                     !- Wind Direction {deg}",
+        "    No,                      !- Rain Indicator",
+        "    No,                      !- Snow Indicator",
+        "    No,                      !- Daylight Saving Time Indicator",
+        "    ASHRAEClearSky,          !- Solar Model Indicator",
+        "    ,                        !- Beam Solar Day Schedule Name",
+        "    ,                        !- Diffuse Solar Day Schedule Name",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+        "    1.0;                     !- Sky Clearness",
+
+        "RunPeriod,",
+        "    Run Period 1,            !- Name",
+        "    7,                       !- Begin Month",
+        "    1,                       !- Begin Day of Month",
+        "    ,                        !- Begin Year",
+        "    7,                       !- End Month",
+        "    2,                       !- End Day of Month",
+        "    ,                        !- End Year",
+        "    ,                        !- Day of Week for Start Day",
+        "    Yes,                     !- Use Weather File Holidays and Special Days",
+        "    Yes,                     !- Use Weather File Daylight Saving Period",
+        "    No,                      !- Apply Weekend Holiday Rule",
+        "    Yes,                     !- Use Weather File Rain Indicators",
+        "    Yes;                     !- Use Weather File Snow Indicators",
+
+        "Site:GroundTemperature:BuildingSurface,",
+        "    20.03,                   !- January Ground Temperature {C}",
+        "    20.03,                   !- February Ground Temperature {C}",
+        "    20.13,                   !- March Ground Temperature {C}",
+        "    20.30,                   !- April Ground Temperature {C}",
+        "    20.43,                   !- May Ground Temperature {C}",
+        "    20.52,                   !- June Ground Temperature {C}",
+        "    20.62,                   !- July Ground Temperature {C}",
+        "    20.77,                   !- August Ground Temperature {C}",
+        "    20.78,                   !- September Ground Temperature {C}",
+        "    20.55,                   !- October Ground Temperature {C}",
+        "    20.44,                   !- November Ground Temperature {C}",
+        "    20.20;                   !- December Ground Temperature {C}",
+
+        "ScheduleTypeLimits,",
+        "    Any Number;              !- Name",
+
+        "ScheduleTypeLimits,",
+        "    Fraction,                !- Name",
+        "    0.0,                     !- Lower Limit Value",
+        "    1.0,                     !- Upper Limit Value",
+        "    CONTINUOUS;              !- Numeric Type",
+
+        "ScheduleTypeLimits,",
+        "    Temperature,             !- Name",
+        "    -60,                     !- Lower Limit Value",
+        "    200,                     !- Upper Limit Value",
+        "    CONTINUOUS;              !- Numeric Type",
+
+        "ScheduleTypeLimits,",
+        "    Control Type,            !- Name",
+        "    0,                       !- Lower Limit Value",
+        "    4,                       !- Upper Limit Value",
+        "    DISCRETE;                !- Numeric Type",
+
+        "ScheduleTypeLimits,",
+        "    HVACTemplate Any Number; !- Name",
+
+        "Schedule:Compact,",
+        "    Activity Sch,            !- Name",
+        "    Any Number,              !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,            !- Field 3",
+        "    131.8;                   !- Field 4",
+
+        "Schedule:Compact,",
+        "    Work Eff Sch,            !- Name",
+        "    Any Number,              !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,            !- Field 3",
+        "    0.0;                     !- Field 4",
+
+        "Schedule:Compact,",
+        "    Clothing Sch,            !- Name",
+        "    Any Number,              !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,            !- Field 3",
+        "    1.0;                     !- Field 4",
+
+        "Schedule:Compact,",
+        "    Air Velo Sch,            !- Name",
+        "    Any Number,              !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,            !- Field 3",
+        "    0.137;                   !- Field 4",
+
+        "Schedule:Compact,",
+        "    WindowVentSched,         !- Name",
+        "    Any Number,              !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: Wednesday Thursday Friday Saturday,  !- Field 2",
+        "    Until: 24:00,            !- Field 3",
+        "    21.11,                   !- Field 4",
+        "    For: Holiday SummerDesignDay,  !- Field 5",
+        "    Until: 24:00,            !- Field 6",
+        "    21.11,                   !- Field 7",
+        "    For: Sunday Monday Tuesday,  !- Field 8",
+        "    Until: 24:00,            !- Field 9",
+        "    25.55,                   !- Field 10",
+        "    For: WinterDesignDay CustomDay1 CustomDay2,  !- Field 11",
+        "    Until: 24:00,            !- Field 12",
+        "    25.55;                   !- Field 13",
+
+        "Schedule:Compact,",
+        "    OFFICE OCCUPANCY,        !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: WeekDays,           !- Field 2",
+        "    Until: 6:00,             !- Field 3",
+        "    0.0,                     !- Field 4",
+        "    Until: 7:00,             !- Field 5",
+        "    0.10,                    !- Field 6",
+        "    Until: 8:00,             !- Field 7",
+        "    0.50,                    !- Field 8",
+        "    Until: 12:00,            !- Field 9",
+        "    1.00,                    !- Field 10",
+        "    Until: 13:00,            !- Field 11",
+        "    0.50,                    !- Field 12",
+        "    Until: 16:00,            !- Field 13",
+        "    1.00,                    !- Field 14",
+        "    Until: 17:00,            !- Field 15",
+        "    0.50,                    !- Field 16",
+        "    Until: 18:00,            !- Field 17",
+        "    0.10,                    !- Field 18",
+        "    Until: 24:00,            !- Field 19",
+        "    0.0,                     !- Field 20",
+        "    For: AllOtherDays,       !- Field 21",
+        "    Until: 24:00,            !- Field 22",
+        "    0.0;                     !- Field 23",
+
+        "Schedule:Compact,",
+        "    INTERMITTENT,            !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: WeekDays,           !- Field 2",
+        "    Until: 8:00,             !- Field 3",
+        "    0.0,                     !- Field 4",
+        "    Until: 18:00,            !- Field 5",
+        "    1.00,                    !- Field 6",
+        "    Until: 24:00,            !- Field 7",
+        "    0.0,                     !- Field 8",
+        "    For: AllOtherDays,       !- Field 9",
+        "    Until: 24:00,            !- Field 10",
+        "    0.0;                     !- Field 11",
+
+        "Schedule:Compact,",
+        "    OFFICE LIGHTING,         !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: WeekDays,           !- Field 2",
+        "    Until: 6:00,             !- Field 3",
+        "    0.05,                    !- Field 4",
+        "    Until: 7:00,             !- Field 5",
+        "    0.20,                    !- Field 6",
+        "    Until: 17:00,            !- Field 7",
+        "    1.00,                    !- Field 8",
+        "    Until: 18:00,            !- Field 9",
+        "    0.50,                    !- Field 10",
+        "    Until: 24:00,            !- Field 11",
+        "    0.05,                    !- Field 12",
+        "    For: AllOtherDays,       !- Field 13",
+        "    Until: 24:00,            !- Field 14",
+        "    0.05;                    !- Field 15",
+
+        "Schedule:Compact,",
+        "    Htg-SetP-Sch,            !- Name",
+        "    Temperature,             !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: WeekDays CustomDay1 CustomDay2,  !- Field 2",
+        "    Until: 6:00,             !- Field 3",
+        "    13.0,                    !- Field 4",
+        "    Until: 7:00,             !- Field 5",
+        "    18.0,                    !- Field 6",
+        "    Until: 21:00,            !- Field 7",
+        "    23.0,                    !- Field 8",
+        "    Until: 24:00,            !- Field 9",
+        "    13.0,                    !- Field 10",
+        "    For: WeekEnds Holiday,   !- Field 11",
+        "    Until: 24:00,            !- Field 12",
+        "    13.0,                    !- Field 13",
+        "    For: SummerDesignDay,    !- Field 14",
+        "    Until: 24:00,            !- Field 15",
+        "    13.0,                    !- Field 16",
+        "    For: WinterDesignDay,    !- Field 17",
+        "    Until: 24:00,            !- Field 18",
+        "    23.0;                    !- Field 19",
+
+        "Schedule:Compact,",
+        "    Clg-SetP-Sch,            !- Name",
+        "    Temperature,             !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: WeekDays CustomDay1 CustomDay2,  !- Field 2",
+        "    Until: 7:00,             !- Field 3",
+        "    32.0,                    !- Field 4",
+        "    Until: 21:00,            !- Field 5",
+        "    24.0,                    !- Field 6",
+        "    Until: 24:00,            !- Field 7",
+        "    32.0,                    !- Field 8",
+        "    For: WeekEnds Holiday,   !- Field 9",
+        "    Until: 24:00,            !- Field 10",
+        "    32.0,                    !- Field 11",
+        "    For: SummerDesignDay,    !- Field 12",
+        "    Until: 24:00,            !- Field 13",
+        "    24.0,                    !- Field 14",
+        "    For: WinterDesignDay,    !- Field 15",
+        "    Until: 24:00,            !- Field 16",
+        "    32.0;                    !- Field 17",
+
+        "Schedule:Compact,",
+        "    HVACTemplate-Always 1,   !- Name",
+        "    HVACTemplate Any Number, !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,            !- Field 3",
+        "    1;                       !- Field 4",
+
+        "Schedule:Compact,",
+        "    HVACTemplate-Always 4,   !- Name",
+        "    HVACTemplate Any Number, !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,            !- Field 3",
+        "    4;                       !- Field 4",
+
+        "Schedule:Compact,",
+        "    HVACTemplate-Always 0,   !- Name",
+        "    HVACTemplate Any Number, !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,            !- Field 3",
+        "    0;                       !- Field 4",
+
+        "Material,",
+        "    A1 - 1 IN STUCCO,        !- Name",
+        "    Smooth,                  !- Roughness",
+        "    2.5389841E-02,           !- Thickness {m}",
+        "    0.6918309,               !- Conductivity {W/m-K}",
+        "    1858.142,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.9200000,               !- Solar Absorptance",
+        "    0.9200000;               !- Visible Absorptance",
+
+        "Material,",
+        "    C4 - 4 IN COMMON BRICK,  !- Name",
+        "    Rough,                   !- Roughness",
+        "    0.1014984,               !- Thickness {m}",
+        "    0.7264224,               !- Conductivity {W/m-K}",
+        "    1922.216,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7600000,               !- Solar Absorptance",
+        "    0.7600000;               !- Visible Absorptance",
+
+        "Material,",
+        "    E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Name",
+        "    Smooth,                  !- Roughness",
+        "    1.905E-02,               !- Thickness {m}",
+        "    0.7264224,               !- Conductivity {W/m-K}",
+        "    1601.846,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.9200000,               !- Solar Absorptance",
+        "    0.9200000;               !- Visible Absorptance",
+
+        "Material,",
+        "    C6 - 8 IN CLAY TILE,     !- Name",
+        "    Smooth,                  !- Roughness",
+        "    0.2033016,               !- Thickness {m}",
+        "    0.5707605,               !- Conductivity {W/m-K}",
+        "    1121.292,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.8200000,               !- Solar Absorptance",
+        "    0.8200000;               !- Visible Absorptance",
+
+        "Material,",
+        "    C10 - 8 IN HW CONCRETE,  !- Name",
+        "    MediumRough,             !- Roughness",
+        "    0.2033016,               !- Thickness {m}",
+        "    1.729577,                !- Conductivity {W/m-K}",
+        "    2242.585,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.6500000,               !- Solar Absorptance",
+        "    0.6500000;               !- Visible Absorptance",
+
+        "Material,",
+        "    C10 - 4 IN HW CONCRETE,  !- Name",
+        "    MediumRough,             !- Roughness",
+        "    0.1017016,               !- Thickness {m}",
+        "    1.729577,                !- Conductivity {W/m-K}",
+        "    2242.585,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.6500000,               !- Solar Absorptance",
+        "    0.6500000;               !- Visible Absorptance",
+
+        "Material,",
+        "    E2 - 1 / 2 IN SLAG OR STONE,  !- Name",
+        "    Rough,                   !- Roughness",
+        "    1.2710161E-02,           !- Thickness {m}",
+        "    1.435549,                !- Conductivity {W/m-K}",
+        "    881.0155,                !- Density {kg/m3}",
+        "    1673.600,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.5500000,               !- Solar Absorptance",
+        "    0.5500000;               !- Visible Absorptance",
+
+        "Material,",
+        "    E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Name",
+        "    Rough,                   !- Roughness",
+        "    9.5402403E-03,           !- Thickness {m}",
+        "    0.1902535,               !- Conductivity {W/m-K}",
+        "    1121.292,                !- Density {kg/m3}",
+        "    1673.600,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7500000,               !- Solar Absorptance",
+        "    0.7500000;               !- Visible Absorptance",
+
+        "Material,",
+        "    B5 - 1 IN DENSE INSULATION,  !- Name",
+        "    VeryRough,               !- Roughness",
+        "    2.5389841E-02,           !- Thickness {m}",
+        "    4.3239430E-02,           !- Conductivity {W/m-K}",
+        "    91.30524,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.5000000,               !- Solar Absorptance",
+        "    0.5000000;               !- Visible Absorptance",
+
+        "Material,",
+        "    C12 - 2 IN HW CONCRETE,  !- Name",
+        "    MediumRough,             !- Roughness",
+        "    5.0901599E-02,           !- Thickness {m}",
+        "    1.729577,                !- Conductivity {W/m-K}",
+        "    2242.585,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.6500000,               !- Solar Absorptance",
+        "    0.6500000;               !- Visible Absorptance",
+
+        "Material,",
+        "    1.375in-Solid-Core,      !- Name",
+        "    Smooth,                  !- Roughness",
+        "    3.4925E-02,              !- Thickness {m}",
+        "    0.1525000,               !- Conductivity {W/m-K}",
+        "    614.5000,                !- Density {kg/m3}",
+        "    1630.0000,               !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.9200000,               !- Solar Absorptance",
+        "    0.9200000;               !- Visible Absorptance",
+
+        "Material:InfraredTransparent,",
+        "    IRTMaterial;             !- Name",
+
+        "WindowMaterial:Glazing,",
+        "    WIN-LAY-GLASS-LIGHT,     !- Name",
+        "    SpectralAverage,         !- Optical Data Type",
+        "    ,                        !- Window Glass Spectral Data Set Name",
+        "    0.0025,                  !- Thickness {m}",
+        "    0.850,                   !- Solar Transmittance at Normal Incidence",
+        "    0.075,                   !- Front Side Solar Reflectance at Normal Incidence",
+        "    0.075,                   !- Back Side Solar Reflectance at Normal Incidence",
+        "    0.901,                   !- Visible Transmittance at Normal Incidence",
+        "    0.081,                   !- Front Side Visible Reflectance at Normal Incidence",
+        "    0.081,                   !- Back Side Visible Reflectance at Normal Incidence",
+        "    0.0,                     !- Infrared Transmittance at Normal Incidence",
+        "    0.84,                    !- Front Side Infrared Hemispherical Emissivity",
+        "    0.84,                    !- Back Side Infrared Hemispherical Emissivity",
+        "    0.9;                     !- Conductivity {W/m-K}",
+
+        "Construction,",
+        "    DOOR-CON,                !- Name",
+        "    1.375in-Solid-Core;      !- Outside Layer",
+
+        "Construction,",
+        "    EXTWALL80,               !- Name",
+        "    A1 - 1 IN STUCCO,        !- Outside Layer",
+        "    C4 - 4 IN COMMON BRICK,  !- Layer 2",
+        "    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3",
+
+        "Construction,",
+        "    PARTITION06,             !- Name",
+        "    E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Outside Layer",
+        "    C6 - 8 IN CLAY TILE,     !- Layer 2",
+        "    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3",
+
+        "Construction,",
+        "    FLOOR SLAB 8 IN,         !- Name",
+        "    C10 - 8 IN HW CONCRETE;  !- Outside Layer",
+
+        "Construction,",
+        "    FLOOR SLAB 4 IN,         !- Name",
+        "    C10 - 4 IN HW CONCRETE;  !- Outside Layer",
+
+        "Construction,",
+        "    ROOF34,                  !- Name",
+        "    E2 - 1 / 2 IN SLAG OR STONE,  !- Outside Layer",
+        "    E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Layer 2",
+        "    B5 - 1 IN DENSE INSULATION,  !- Layer 3",
+        "    C12 - 2 IN HW CONCRETE;  !- Layer 4",
+
+        "Construction,",
+        "    WIN-CON-LIGHT,           !- Name",
+        "    WIN-LAY-GLASS-LIGHT;     !- Outside Layer",
+
+        "GlobalGeometryRules,",
+        "    UpperLeftCorner,         !- Starting Vertex Position",
+        "    CounterClockWise,        !- Vertex Entry Direction",
+        "    World;                   !- Coordinate System",
+
+        "Zone,",
+        "    WEST_ZONE,               !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    autocalculate;           !- Ceiling Height {m}",
+
+        "Zone,",
+        "    EAST_ZONE,               !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    autocalculate;           !- Ceiling Height {m}",
+
+        "Zone,",
+        "    NORTH_ZONE,              !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    autocalculate;           !- Ceiling Height {m}",
+
+        "Zone,",
+        "    WEST_ZONE_T,             !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    autocalculate;           !- Ceiling Height {m}",
+
+        "Zone,",
+        "    EAST_ZONE_T,             !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    autocalculate;           !- Ceiling Height {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_1,               !- Name",
+        "    WALL,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    WEST_ZONE,               !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,                       !- Vertex 1 X-coordinate {m}",
+        "    0,                       !- Vertex 1 Y-coordinate {m}",
+        "    3.048000,                !- Vertex 1 Z-coordinate {m}",
+        "    0,                       !- Vertex 2 X-coordinate {m}",
+        "    0,                       !- Vertex 2 Y-coordinate {m}",
+        "    0,                       !- Vertex 2 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 3 X-coordinate {m}",
+        "    0,                       !- Vertex 3 Y-coordinate {m}",
+        "    0,                       !- Vertex 3 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 4 X-coordinate {m}",
+        "    0,                       !- Vertex 4 Y-coordinate {m}",
+        "    3.048000;                !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_1_T,             !- Name",
+        "    WALL,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    WEST_ZONE_T,             !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,                       !- Vertex 1 X-coordinate {m}",
+        "    0,                       !- Vertex 1 Y-coordinate {m}",
+        "    6.096,                   !- Vertex 1 Z-coordinate {m}",
+        "    0,                       !- Vertex 2 X-coordinate {m}",
+        "    0,                       !- Vertex 2 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 2 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 3 X-coordinate {m}",
+        "    0,                       !- Vertex 3 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 3 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 4 X-coordinate {m}",
+        "    0,                       !- Vertex 4 Y-coordinate {m}",
+        "    6.096;                   !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_2,               !- Name",
+        "    WALL,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    WEST_ZONE,               !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,                       !- Vertex 1 X-coordinate {m}",
+        "    6.096000,                !- Vertex 1 Y-coordinate {m}",
+        "    3.048000,                !- Vertex 1 Z-coordinate {m}",
+        "    0,                       !- Vertex 2 X-coordinate {m}",
+        "    6.096000,                !- Vertex 2 Y-coordinate {m}",
+        "    0,                       !- Vertex 2 Z-coordinate {m}",
+        "    0,                       !- Vertex 3 X-coordinate {m}",
+        "    0,                       !- Vertex 3 Y-coordinate {m}",
+        "    0,                       !- Vertex 3 Z-coordinate {m}",
+        "    0,                       !- Vertex 4 X-coordinate {m}",
+        "    0,                       !- Vertex 4 Y-coordinate {m}",
+        "    3.048000;                !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_2_T,             !- Name",
+        "    WALL,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    WEST_ZONE_T,             !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,                       !- Vertex 1 X-coordinate {m}",
+        "    6.096000,                !- Vertex 1 Y-coordinate {m}",
+        "    6.096,                   !- Vertex 1 Z-coordinate {m}",
+        "    0,                       !- Vertex 2 X-coordinate {m}",
+        "    6.096000,                !- Vertex 2 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 2 Z-coordinate {m}",
+        "    0,                       !- Vertex 3 X-coordinate {m}",
+        "    0,                       !- Vertex 3 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 3 Z-coordinate {m}",
+        "    0,                       !- Vertex 4 X-coordinate {m}",
+        "    0,                       !- Vertex 4 Y-coordinate {m}",
+        "    6.096;                   !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_3,               !- Name",
+        "    WALL,                    !- Surface Type",
+        "    PARTITION06,             !- Construction Name",
+        "    WEST_ZONE,               !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Surface_17,              !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    6.096000,                !- Vertex 1 X-coordinate {m}",
+        "    6.096000,                !- Vertex 1 Y-coordinate {m}",
+        "    3.048000,                !- Vertex 1 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 2 X-coordinate {m}",
+        "    6.096000,                !- Vertex 2 Y-coordinate {m}",
+        "    0,                       !- Vertex 2 Z-coordinate {m}",
+        "    0,                       !- Vertex 3 X-coordinate {m}",
+        "    6.096000,                !- Vertex 3 Y-coordinate {m}",
+        "    0,                       !- Vertex 3 Z-coordinate {m}",
+        "    0,                       !- Vertex 4 X-coordinate {m}",
+        "    6.096000,                !- Vertex 4 Y-coordinate {m}",
+        "    3.048000;                !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_3_T,             !- Name",
+        "    WALL,                    !- Surface Type",
+        "    PARTITION06,             !- Construction Name",
+        "    WEST_ZONE_T,             !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Surface_17_T,            !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    6.096000,                !- Vertex 1 X-coordinate {m}",
+        "    6.096000,                !- Vertex 1 Y-coordinate {m}",
+        "    6.096,                   !- Vertex 1 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 2 X-coordinate {m}",
+        "    6.096000,                !- Vertex 2 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 2 Z-coordinate {m}",
+        "    0,                       !- Vertex 3 X-coordinate {m}",
+        "    6.096000,                !- Vertex 3 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 3 Z-coordinate {m}",
+        "    0,                       !- Vertex 4 X-coordinate {m}",
+        "    6.096000,                !- Vertex 4 Y-coordinate {m}",
+        "    6.096;                   !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_4,               !- Name",
+        "    WALL,                    !- Surface Type",
+        "    PARTITION06,             !- Construction Name",
+        "    WEST_ZONE,               !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Surface_10,              !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    6.096000,                !- Vertex 1 X-coordinate {m}",
+        "    0,                       !- Vertex 1 Y-coordinate {m}",
+        "    3.048000,                !- Vertex 1 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 2 X-coordinate {m}",
+        "    0,                       !- Vertex 2 Y-coordinate {m}",
+        "    0,                       !- Vertex 2 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 3 X-coordinate {m}",
+        "    6.096000,                !- Vertex 3 Y-coordinate {m}",
+        "    0,                       !- Vertex 3 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 4 X-coordinate {m}",
+        "    6.096000,                !- Vertex 4 Y-coordinate {m}",
+        "    3.048000;                !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_4_T,             !- Name",
+        "    WALL,                    !- Surface Type",
+        "    PARTITION06,             !- Construction Name",
+        "    WEST_ZONE_T,             !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Surface_10_T,            !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    6.096000,                !- Vertex 1 X-coordinate {m}",
+        "    0,                       !- Vertex 1 Y-coordinate {m}",
+        "    6.096,                   !- Vertex 1 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 2 X-coordinate {m}",
+        "    0,                       !- Vertex 2 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 2 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 3 X-coordinate {m}",
+        "    6.096000,                !- Vertex 3 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 3 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 4 X-coordinate {m}",
+        "    6.096000,                !- Vertex 4 Y-coordinate {m}",
+        "    6.096;                   !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_5,               !- Name",
+        "    FLOOR,                   !- Surface Type",
+        "    FLOOR SLAB 8 IN,         !- Construction Name",
+        "    WEST_ZONE,               !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Surface_5,               !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    1.000000,                !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,                       !- Vertex 1 X-coordinate {m}",
+        "    0,                       !- Vertex 1 Y-coordinate {m}",
+        "    0,                       !- Vertex 1 Z-coordinate {m}",
+        "    0,                       !- Vertex 2 X-coordinate {m}",
+        "    6.096000,                !- Vertex 2 Y-coordinate {m}",
+        "    0,                       !- Vertex 2 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 3 X-coordinate {m}",
+        "    6.096000,                !- Vertex 3 Y-coordinate {m}",
+        "    0,                       !- Vertex 3 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 4 X-coordinate {m}",
+        "    0,                       !- Vertex 4 Y-coordinate {m}",
+        "    0;                       !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_5_T,             !- Name",
+        "    FLOOR,                   !- Surface Type",
+        "    FLOOR SLAB 4 IN,         !- Construction Name",
+        "    WEST_ZONE_T,             !- Zone Name",
+        "    Zone,                    !- Outside Boundary Condition",
+        "    WEST_ZONE,               !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    1.000000,                !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,                       !- Vertex 1 X-coordinate {m}",
+        "    0,                       !- Vertex 1 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 1 Z-coordinate {m}",
+        "    0,                       !- Vertex 2 X-coordinate {m}",
+        "    6.096000,                !- Vertex 2 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 2 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 3 X-coordinate {m}",
+        "    6.096000,                !- Vertex 3 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 3 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 4 X-coordinate {m}",
+        "    0,                       !- Vertex 4 Y-coordinate {m}",
+        "    3.048;                   !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_6,               !- Name",
+        "    ROOF,                    !- Surface Type",
+        "    ROOF34,                  !- Construction Name",
+        "    WEST_ZONE_T,             !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,                       !- Vertex 1 X-coordinate {m}",
+        "    6.096000,                !- Vertex 1 Y-coordinate {m}",
+        "    6.096,                   !- Vertex 1 Z-coordinate {m}",
+        "    0,                       !- Vertex 2 X-coordinate {m}",
+        "    0,                       !- Vertex 2 Y-coordinate {m}",
+        "    6.096,                   !- Vertex 2 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 3 X-coordinate {m}",
+        "    0,                       !- Vertex 3 Y-coordinate {m}",
+        "    6.096,                   !- Vertex 3 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 4 X-coordinate {m}",
+        "    6.096000,                !- Vertex 4 Y-coordinate {m}",
+        "    6.096;                   !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_8,               !- Name",
+        "    WALL,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    EAST_ZONE,               !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    6.096000,                !- Vertex 1 X-coordinate {m}",
+        "    0,                       !- Vertex 1 Y-coordinate {m}",
+        "    3.048000,                !- Vertex 1 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 2 X-coordinate {m}",
+        "    0,                       !- Vertex 2 Y-coordinate {m}",
+        "    0,                       !- Vertex 2 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 3 X-coordinate {m}",
+        "    0,                       !- Vertex 3 Y-coordinate {m}",
+        "    0,                       !- Vertex 3 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 4 X-coordinate {m}",
+        "    0,                       !- Vertex 4 Y-coordinate {m}",
+        "    3.048000;                !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_8_T,             !- Name",
+        "    WALL,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    EAST_ZONE_T,             !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    6.096000,                !- Vertex 1 X-coordinate {m}",
+        "    0,                       !- Vertex 1 Y-coordinate {m}",
+        "    6.096,                   !- Vertex 1 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 2 X-coordinate {m}",
+        "    0,                       !- Vertex 2 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 2 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 3 X-coordinate {m}",
+        "    0,                       !- Vertex 3 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 3 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 4 X-coordinate {m}",
+        "    0,                       !- Vertex 4 Y-coordinate {m}",
+        "    6.096;                   !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_9,               !- Name",
+        "    WALL,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    EAST_ZONE,               !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    12.19200,                !- Vertex 1 X-coordinate {m}",
+        "    0,                       !- Vertex 1 Y-coordinate {m}",
+        "    3.048000,                !- Vertex 1 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 2 X-coordinate {m}",
+        "    0,                       !- Vertex 2 Y-coordinate {m}",
+        "    0,                       !- Vertex 2 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 3 X-coordinate {m}",
+        "    6.096000,                !- Vertex 3 Y-coordinate {m}",
+        "    0,                       !- Vertex 3 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 4 X-coordinate {m}",
+        "    6.096000,                !- Vertex 4 Y-coordinate {m}",
+        "    3.048000;                !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_9_T,             !- Name",
+        "    WALL,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    EAST_ZONE_T,             !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    12.19200,                !- Vertex 1 X-coordinate {m}",
+        "    0,                       !- Vertex 1 Y-coordinate {m}",
+        "    6.096,                   !- Vertex 1 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 2 X-coordinate {m}",
+        "    0,                       !- Vertex 2 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 2 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 3 X-coordinate {m}",
+        "    6.096000,                !- Vertex 3 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 3 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 4 X-coordinate {m}",
+        "    6.096000,                !- Vertex 4 Y-coordinate {m}",
+        "    6.096;                   !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_10,              !- Name",
+        "    WALL,                    !- Surface Type",
+        "    PARTITION06,             !- Construction Name",
+        "    EAST_ZONE,               !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Surface_4,               !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    6.096000,                !- Vertex 1 X-coordinate {m}",
+        "    6.096000,                !- Vertex 1 Y-coordinate {m}",
+        "    3.048000,                !- Vertex 1 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 2 X-coordinate {m}",
+        "    6.096000,                !- Vertex 2 Y-coordinate {m}",
+        "    0,                       !- Vertex 2 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 3 X-coordinate {m}",
+        "    0,                       !- Vertex 3 Y-coordinate {m}",
+        "    0,                       !- Vertex 3 Z-coordinate {m}",
+        "    6.096001,                !- Vertex 4 X-coordinate {m}",
+        "    0,                       !- Vertex 4 Y-coordinate {m}",
+        "    3.048000;                !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_10_T,            !- Name",
+        "    WALL,                    !- Surface Type",
+        "    PARTITION06,             !- Construction Name",
+        "    EAST_ZONE_T,             !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Surface_4_T,             !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    6.096000,                !- Vertex 1 X-coordinate {m}",
+        "    6.096000,                !- Vertex 1 Y-coordinate {m}",
+        "    6.096,                   !- Vertex 1 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 2 X-coordinate {m}",
+        "    6.096000,                !- Vertex 2 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 2 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 3 X-coordinate {m}",
+        "    0,                       !- Vertex 3 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 3 Z-coordinate {m}",
+        "    6.096001,                !- Vertex 4 X-coordinate {m}",
+        "    0,                       !- Vertex 4 Y-coordinate {m}",
+        "    6.096;                   !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_11,              !- Name",
+        "    WALL,                    !- Surface Type",
+        "    PARTITION06,             !- Construction Name",
+        "    EAST_ZONE,               !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Surface_18,              !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    12.19200,                !- Vertex 1 X-coordinate {m}",
+        "    6.096000,                !- Vertex 1 Y-coordinate {m}",
+        "    3.048000,                !- Vertex 1 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 2 X-coordinate {m}",
+        "    6.096000,                !- Vertex 2 Y-coordinate {m}",
+        "    0,                       !- Vertex 2 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 3 X-coordinate {m}",
+        "    6.096000,                !- Vertex 3 Y-coordinate {m}",
+        "    0,                       !- Vertex 3 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 4 X-coordinate {m}",
+        "    6.096000,                !- Vertex 4 Y-coordinate {m}",
+        "    3.048000;                !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_11_T,            !- Name",
+        "    WALL,                    !- Surface Type",
+        "    PARTITION06,             !- Construction Name",
+        "    EAST_ZONE_T,             !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Surface_18_T,            !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    12.19200,                !- Vertex 1 X-coordinate {m}",
+        "    6.096000,                !- Vertex 1 Y-coordinate {m}",
+        "    6.096,                   !- Vertex 1 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 2 X-coordinate {m}",
+        "    6.096000,                !- Vertex 2 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 2 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 3 X-coordinate {m}",
+        "    6.096000,                !- Vertex 3 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 3 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 4 X-coordinate {m}",
+        "    6.096000,                !- Vertex 4 Y-coordinate {m}",
+        "    6.096;                   !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_12,              !- Name",
+        "    FLOOR,                   !- Surface Type",
+        "    FLOOR SLAB 8 IN,         !- Construction Name",
+        "    EAST_ZONE,               !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Surface_12,              !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    1.000000,                !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    6.096000,                !- Vertex 1 X-coordinate {m}",
+        "    0,                       !- Vertex 1 Y-coordinate {m}",
+        "    0,                       !- Vertex 1 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 2 X-coordinate {m}",
+        "    6.096000,                !- Vertex 2 Y-coordinate {m}",
+        "    0,                       !- Vertex 2 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 3 X-coordinate {m}",
+        "    6.096000,                !- Vertex 3 Y-coordinate {m}",
+        "    0,                       !- Vertex 3 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 4 X-coordinate {m}",
+        "    0,                       !- Vertex 4 Y-coordinate {m}",
+        "    0;                       !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_12_T,            !- Name",
+        "    FLOOR,                   !- Surface Type",
+        "    FLOOR SLAB 4 IN,         !- Construction Name",
+        "    EAST_ZONE_T,             !- Zone Name",
+        "    Zone,                    !- Outside Boundary Condition",
+        "    EAST_ZONE,               !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    1.000000,                !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    6.096000,                !- Vertex 1 X-coordinate {m}",
+        "    0,                       !- Vertex 1 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 1 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 2 X-coordinate {m}",
+        "    6.096000,                !- Vertex 2 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 2 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 3 X-coordinate {m}",
+        "    6.096000,                !- Vertex 3 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 3 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 4 X-coordinate {m}",
+        "    0,                       !- Vertex 4 Y-coordinate {m}",
+        "    3.048;                   !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_13,              !- Name",
+        "    ROOF,                    !- Surface Type",
+        "    ROOF34,                  !- Construction Name",
+        "    EAST_ZONE_T,             !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    6.096000,                !- Vertex 1 X-coordinate {m}",
+        "    6.096000,                !- Vertex 1 Y-coordinate {m}",
+        "    6.096,                   !- Vertex 1 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 2 X-coordinate {m}",
+        "    0,                       !- Vertex 2 Y-coordinate {m}",
+        "    6.096,                   !- Vertex 2 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 3 X-coordinate {m}",
+        "    0,                       !- Vertex 3 Y-coordinate {m}",
+        "    6.096,                   !- Vertex 3 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 4 X-coordinate {m}",
+        "    6.096000,                !- Vertex 4 Y-coordinate {m}",
+        "    6.096;                   !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_14,              !- Name",
+        "    WALL,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    NORTH_ZONE,              !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,                       !- Vertex 1 X-coordinate {m}",
+        "    12.19200,                !- Vertex 1 Y-coordinate {m}",
+        "    3.048000,                !- Vertex 1 Z-coordinate {m}",
+        "    0,                       !- Vertex 2 X-coordinate {m}",
+        "    12.19200,                !- Vertex 2 Y-coordinate {m}",
+        "    0,                       !- Vertex 2 Z-coordinate {m}",
+        "    0,                       !- Vertex 3 X-coordinate {m}",
+        "    6.096000,                !- Vertex 3 Y-coordinate {m}",
+        "    0,                       !- Vertex 3 Z-coordinate {m}",
+        "    0,                       !- Vertex 4 X-coordinate {m}",
+        "    6.096000,                !- Vertex 4 Y-coordinate {m}",
+        "    3.048000;                !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_14_T,            !- Name",
+        "    WALL,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    NORTH_ZONE,              !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,                       !- Vertex 1 X-coordinate {m}",
+        "    12.19200,                !- Vertex 1 Y-coordinate {m}",
+        "    6.096,                   !- Vertex 1 Z-coordinate {m}",
+        "    0,                       !- Vertex 2 X-coordinate {m}",
+        "    12.19200,                !- Vertex 2 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 2 Z-coordinate {m}",
+        "    0,                       !- Vertex 3 X-coordinate {m}",
+        "    6.096000,                !- Vertex 3 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 3 Z-coordinate {m}",
+        "    0,                       !- Vertex 4 X-coordinate {m}",
+        "    6.096000,                !- Vertex 4 Y-coordinate {m}",
+        "    6.096;                   !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_15,              !- Name",
+        "    WALL,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    NORTH_ZONE,              !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    12.19200,                !- Vertex 1 X-coordinate {m}",
+        "    12.19200,                !- Vertex 1 Y-coordinate {m}",
+        "    3.048000,                !- Vertex 1 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 2 X-coordinate {m}",
+        "    12.19200,                !- Vertex 2 Y-coordinate {m}",
+        "    0,                       !- Vertex 2 Z-coordinate {m}",
+        "    0,                       !- Vertex 3 X-coordinate {m}",
+        "    12.19200,                !- Vertex 3 Y-coordinate {m}",
+        "    0,                       !- Vertex 3 Z-coordinate {m}",
+        "    0,                       !- Vertex 4 X-coordinate {m}",
+        "    12.19200,                !- Vertex 4 Y-coordinate {m}",
+        "    3.048000;                !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_15_T,            !- Name",
+        "    WALL,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    NORTH_ZONE,              !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    12.19200,                !- Vertex 1 X-coordinate {m}",
+        "    12.19200,                !- Vertex 1 Y-coordinate {m}",
+        "    6.096,                   !- Vertex 1 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 2 X-coordinate {m}",
+        "    12.19200,                !- Vertex 2 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 2 Z-coordinate {m}",
+        "    0,                       !- Vertex 3 X-coordinate {m}",
+        "    12.19200,                !- Vertex 3 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 3 Z-coordinate {m}",
+        "    0,                       !- Vertex 4 X-coordinate {m}",
+        "    12.19200,                !- Vertex 4 Y-coordinate {m}",
+        "    6.096;                   !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_16,              !- Name",
+        "    WALL,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    NORTH_ZONE,              !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    12.19200,                !- Vertex 1 X-coordinate {m}",
+        "    6.096000,                !- Vertex 1 Y-coordinate {m}",
+        "    3.048000,                !- Vertex 1 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 2 X-coordinate {m}",
+        "    6.096000,                !- Vertex 2 Y-coordinate {m}",
+        "    0,                       !- Vertex 2 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 3 X-coordinate {m}",
+        "    12.19200,                !- Vertex 3 Y-coordinate {m}",
+        "    0,                       !- Vertex 3 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 4 X-coordinate {m}",
+        "    12.19200,                !- Vertex 4 Y-coordinate {m}",
+        "    3.048000;                !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_16_T,            !- Name",
+        "    WALL,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    NORTH_ZONE,              !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    12.19200,                !- Vertex 1 X-coordinate {m}",
+        "    6.096000,                !- Vertex 1 Y-coordinate {m}",
+        "    6.096,                   !- Vertex 1 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 2 X-coordinate {m}",
+        "    6.096000,                !- Vertex 2 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 2 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 3 X-coordinate {m}",
+        "    12.19200,                !- Vertex 3 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 3 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 4 X-coordinate {m}",
+        "    12.19200,                !- Vertex 4 Y-coordinate {m}",
+        "    6.096;                   !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_17,              !- Name",
+        "    WALL,                    !- Surface Type",
+        "    PARTITION06,             !- Construction Name",
+        "    NORTH_ZONE,              !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Surface_3,               !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0.000,                   !- Vertex 1 X-coordinate {m}",
+        "    6.096,                   !- Vertex 1 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 1 Z-coordinate {m}",
+        "    0.000,                   !- Vertex 2 X-coordinate {m}",
+        "    6.096,                   !- Vertex 2 Y-coordinate {m}",
+        "    0.000,                   !- Vertex 2 Z-coordinate {m}",
+        "    6.096,                   !- Vertex 3 X-coordinate {m}",
+        "    6.096,                   !- Vertex 3 Y-coordinate {m}",
+        "    0.000,                   !- Vertex 3 Z-coordinate {m}",
+        "    6.096,                   !- Vertex 4 X-coordinate {m}",
+        "    6.096,                   !- Vertex 4 Y-coordinate {m}",
+        "    3.048;                   !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_17_T,            !- Name",
+        "    WALL,                    !- Surface Type",
+        "    PARTITION06,             !- Construction Name",
+        "    NORTH_ZONE,              !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Surface_3_T,             !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0.000,                   !- Vertex 1 X-coordinate {m}",
+        "    6.096,                   !- Vertex 1 Y-coordinate {m}",
+        "    6.096,                   !- Vertex 1 Z-coordinate {m}",
+        "    0.000,                   !- Vertex 2 X-coordinate {m}",
+        "    6.096,                   !- Vertex 2 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 2 Z-coordinate {m}",
+        "    6.096,                   !- Vertex 3 X-coordinate {m}",
+        "    6.096,                   !- Vertex 3 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 3 Z-coordinate {m}",
+        "    6.096,                   !- Vertex 4 X-coordinate {m}",
+        "    6.096,                   !- Vertex 4 Y-coordinate {m}",
+        "    6.096;                   !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_18_T,            !- Name",
+        "    WALL,                    !- Surface Type",
+        "    PARTITION06,             !- Construction Name",
+        "    NORTH_ZONE,              !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Surface_11_T,            !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    6.096000,                !- Vertex 1 X-coordinate {m}",
+        "    6.096000,                !- Vertex 1 Y-coordinate {m}",
+        "    6.096,                   !- Vertex 1 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 2 X-coordinate {m}",
+        "    6.096000,                !- Vertex 2 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 2 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 3 X-coordinate {m}",
+        "    6.096000,                !- Vertex 3 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 3 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 4 X-coordinate {m}",
+        "    6.096000,                !- Vertex 4 Y-coordinate {m}",
+        "    6.096;                   !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_18,              !- Name",
+        "    WALL,                    !- Surface Type",
+        "    PARTITION06,             !- Construction Name",
+        "    NORTH_ZONE,              !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Surface_11,              !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    6.096000,                !- Vertex 1 X-coordinate {m}",
+        "    6.096000,                !- Vertex 1 Y-coordinate {m}",
+        "    3.048000,                !- Vertex 1 Z-coordinate {m}",
+        "    6.096000,                !- Vertex 2 X-coordinate {m}",
+        "    6.096000,                !- Vertex 2 Y-coordinate {m}",
+        "    0,                       !- Vertex 2 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 3 X-coordinate {m}",
+        "    6.096000,                !- Vertex 3 Y-coordinate {m}",
+        "    0,                       !- Vertex 3 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 4 X-coordinate {m}",
+        "    6.096000,                !- Vertex 4 Y-coordinate {m}",
+        "    3.048000;                !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_19,              !- Name",
+        "    FLOOR,                   !- Surface Type",
+        "    FLOOR SLAB 8 IN,         !- Construction Name",
+        "    NORTH_ZONE,              !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Surface_19,              !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    1.000000,                !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,                       !- Vertex 1 X-coordinate {m}",
+        "    6.096000,                !- Vertex 1 Y-coordinate {m}",
+        "    0,                       !- Vertex 1 Z-coordinate {m}",
+        "    0,                       !- Vertex 2 X-coordinate {m}",
+        "    12.19200,                !- Vertex 2 Y-coordinate {m}",
+        "    0,                       !- Vertex 2 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 3 X-coordinate {m}",
+        "    12.19200,                !- Vertex 3 Y-coordinate {m}",
+        "    0,                       !- Vertex 3 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 4 X-coordinate {m}",
+        "    6.096000,                !- Vertex 4 Y-coordinate {m}",
+        "    0;                       !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Surface_20,              !- Name",
+        "    ROOF,                    !- Surface Type",
+        "    ROOF34,                  !- Construction Name",
+        "    NORTH_ZONE,              !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,                       !- Vertex 1 X-coordinate {m}",
+        "    12.19200,                !- Vertex 1 Y-coordinate {m}",
+        "    6.096,                   !- Vertex 1 Z-coordinate {m}",
+        "    0,                       !- Vertex 2 X-coordinate {m}",
+        "    6.096000,                !- Vertex 2 Y-coordinate {m}",
+        "    6.096,                   !- Vertex 2 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 3 X-coordinate {m}",
+        "    6.096000,                !- Vertex 3 Y-coordinate {m}",
+        "    6.096,                   !- Vertex 3 Z-coordinate {m}",
+        "    12.19200,                !- Vertex 4 X-coordinate {m}",
+        "    12.19200,                !- Vertex 4 Y-coordinate {m}",
+        "    6.096;                   !- Vertex 4 Z-coordinate {m}",
+
+        "FenestrationSurface:Detailed,",
+        "    WINDOW1,                 !- Name",
+        "    WINDOW,                  !- Surface Type",
+        "    WIN-CON-LIGHT,           !- Construction Name",
+        "    Surface_1,               !- Building Surface Name",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    0.5000000,               !- View Factor to Ground",
+        "    ,                        !- Frame and Divider Name",
+        "    1.0,                     !- Multiplier",
+        "    4,                       !- Number of Vertices",
+        "    1.00000,                 !- Vertex 1 X-coordinate {m}",
+        "    0,                       !- Vertex 1 Y-coordinate {m}",
+        "    2.500000,                !- Vertex 1 Z-coordinate {m}",
+        "    1.00000,                 !- Vertex 2 X-coordinate {m}",
+        "    0,                       !- Vertex 2 Y-coordinate {m}",
+        "    1.0000000,               !- Vertex 2 Z-coordinate {m}",
+        "    5.000000,                !- Vertex 3 X-coordinate {m}",
+        "    0,                       !- Vertex 3 Y-coordinate {m}",
+        "    1.0000000,               !- Vertex 3 Z-coordinate {m}",
+        "    5.000000,                !- Vertex 4 X-coordinate {m}",
+        "    0,                       !- Vertex 4 Y-coordinate {m}",
+        "    2.500000;                !- Vertex 4 Z-coordinate {m}",
+
+        "FenestrationSurface:Detailed,",
+        "    DoorInSurface_3,         !- Name",
+        "    DOOR,                    !- Surface Type",
+        "    DOOR-CON,                !- Construction Name",
+        "    Surface_3,               !- Building Surface Name",
+        "    DoorInSurface_17,        !- Outside Boundary Condition Object",
+        "    0.5000000,               !- View Factor to Ground",
+        "    ,                        !- Frame and Divider Name",
+        "    1.0,                     !- Multiplier",
+        "    4,                       !- Number of Vertices",
+        "    3.500,                   !- Vertex 1 X-coordinate {m}",
+        "    6.096000,                !- Vertex 1 Y-coordinate {m}",
+        "    2.0,                     !- Vertex 1 Z-coordinate {m}",
+        "    3.500,                   !- Vertex 2 X-coordinate {m}",
+        "    6.096000,                !- Vertex 2 Y-coordinate {m}",
+        "    0.0,                     !- Vertex 2 Z-coordinate {m}",
+        "    2.500,                   !- Vertex 3 X-coordinate {m}",
+        "    6.096000,                !- Vertex 3 Y-coordinate {m}",
+        "    0.0,                     !- Vertex 3 Z-coordinate {m}",
+        "    2.500,                   !- Vertex 4 X-coordinate {m}",
+        "    6.096000,                !- Vertex 4 Y-coordinate {m}",
+        "    2.0;                     !- Vertex 4 Z-coordinate {m}",
+
+        "FenestrationSurface:Detailed,",
+        "    WINDOW2,                 !- Name",
+        "    WINDOW,                  !- Surface Type",
+        "    WIN-CON-LIGHT,           !- Construction Name",
+        "    Surface_15,              !- Building Surface Name",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    0.5000000,               !- View Factor to Ground",
+        "    ,                        !- Frame and Divider Name",
+        "    1.0,                     !- Multiplier",
+        "    4,                       !- Number of Vertices",
+        "    6.000000,                !- Vertex 1 X-coordinate {m}",
+        "    12.19200,                !- Vertex 1 Y-coordinate {m}",
+        "    2.333000,                !- Vertex 1 Z-coordinate {m}",
+        "    6.000000,                !- Vertex 2 X-coordinate {m}",
+        "    12.19200,                !- Vertex 2 Y-coordinate {m}",
+        "    1.000000,                !- Vertex 2 Z-coordinate {m}",
+        "    3.000000,                !- Vertex 3 X-coordinate {m}",
+        "    12.19200,                !- Vertex 3 Y-coordinate {m}",
+        "    1.000000,                !- Vertex 3 Z-coordinate {m}",
+        "    3.000000,                !- Vertex 4 X-coordinate {m}",
+        "    12.19200,                !- Vertex 4 Y-coordinate {m}",
+        "    2.333000;                !- Vertex 4 Z-coordinate {m}",
+
+        "FenestrationSurface:Detailed,",
+        "    DoorInSurface_17,        !- Name",
+        "    DOOR,                    !- Surface Type",
+        "    DOOR-CON,                !- Construction Name",
+        "    Surface_17,              !- Building Surface Name",
+        "    DoorInSurface_3,         !- Outside Boundary Condition Object",
+        "    0.5000000,               !- View Factor to Ground",
+        "    ,                        !- Frame and Divider Name",
+        "    1.0,                     !- Multiplier",
+        "    4,                       !- Number of Vertices",
+        "    2.500,                   !- Vertex 1 X-coordinate {m}",
+        "    6.096000,                !- Vertex 1 Y-coordinate {m}",
+        "    2.0,                     !- Vertex 1 Z-coordinate {m}",
+        "    2.500,                   !- Vertex 2 X-coordinate {m}",
+        "    6.096000,                !- Vertex 2 Y-coordinate {m}",
+        "    0.0,                     !- Vertex 2 Z-coordinate {m}",
+        "    3.500,                   !- Vertex 3 X-coordinate {m}",
+        "    6.096000,                !- Vertex 3 Y-coordinate {m}",
+        "    0.0,                     !- Vertex 3 Z-coordinate {m}",
+        "    3.500,                   !- Vertex 4 X-coordinate {m}",
+        "    6.096000,                !- Vertex 4 Y-coordinate {m}",
+        "    2.0;                     !- Vertex 4 Z-coordinate {m}",
+
+        "FenestrationSurface:Detailed,",
+        "    WINDOW1_T,               !- Name",
+        "    WINDOW,                  !- Surface Type",
+        "    WIN-CON-LIGHT,           !- Construction Name",
+        "    Surface_1_T,             !- Building Surface Name",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    0.5000000,               !- View Factor to Ground",
+        "    ,                        !- Frame and Divider Name",
+        "    1.0,                     !- Multiplier",
+        "    4,                       !- Number of Vertices",
+        "    1.00000,                 !- Vertex 1 X-coordinate {m}",
+        "    0,                       !- Vertex 1 Y-coordinate {m}",
+        "    5.548,                   !- Vertex 1 Z-coordinate {m}",
+        "    1.00000,                 !- Vertex 2 X-coordinate {m}",
+        "    0,                       !- Vertex 2 Y-coordinate {m}",
+        "    4.048,                   !- Vertex 2 Z-coordinate {m}",
+        "    5.000000,                !- Vertex 3 X-coordinate {m}",
+        "    0,                       !- Vertex 3 Y-coordinate {m}",
+        "    4.048,                   !- Vertex 3 Z-coordinate {m}",
+        "    5.000000,                !- Vertex 4 X-coordinate {m}",
+        "    0,                       !- Vertex 4 Y-coordinate {m}",
+        "    5.548;                   !- Vertex 4 Z-coordinate {m}",
+
+        "FenestrationSurface:Detailed,",
+        "    DoorInSurface_3_T,       !- Name",
+        "    DOOR,                    !- Surface Type",
+        "    DOOR-CON,                !- Construction Name",
+        "    Surface_3_T,             !- Building Surface Name",
+        "    DoorInSurface_17_T,      !- Outside Boundary Condition Object",
+        "    0.5000000,               !- View Factor to Ground",
+        "    ,                        !- Frame and Divider Name",
+        "    1.0,                     !- Multiplier",
+        "    4,                       !- Number of Vertices",
+        "    3.500,                   !- Vertex 1 X-coordinate {m}",
+        "    6.096000,                !- Vertex 1 Y-coordinate {m}",
+        "    5.048,                   !- Vertex 1 Z-coordinate {m}",
+        "    3.500,                   !- Vertex 2 X-coordinate {m}",
+        "    6.096000,                !- Vertex 2 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 2 Z-coordinate {m}",
+        "    2.500,                   !- Vertex 3 X-coordinate {m}",
+        "    6.096000,                !- Vertex 3 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 3 Z-coordinate {m}",
+        "    2.500,                   !- Vertex 4 X-coordinate {m}",
+        "    6.096000,                !- Vertex 4 Y-coordinate {m}",
+        "    5.048;                   !- Vertex 4 Z-coordinate {m}",
+
+        "FenestrationSurface:Detailed,",
+        "    WINDOW2_T,               !- Name",
+        "    WINDOW,                  !- Surface Type",
+        "    WIN-CON-LIGHT,           !- Construction Name",
+        "    Surface_15_T,            !- Building Surface Name",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    0.5000000,               !- View Factor to Ground",
+        "    ,                        !- Frame and Divider Name",
+        "    1.0,                     !- Multiplier",
+        "    4,                       !- Number of Vertices",
+        "    6.000000,                !- Vertex 1 X-coordinate {m}",
+        "    12.19200,                !- Vertex 1 Y-coordinate {m}",
+        "    5.381,                   !- Vertex 1 Z-coordinate {m}",
+        "    6.000000,                !- Vertex 2 X-coordinate {m}",
+        "    12.19200,                !- Vertex 2 Y-coordinate {m}",
+        "    4.048,                   !- Vertex 2 Z-coordinate {m}",
+        "    3.000000,                !- Vertex 3 X-coordinate {m}",
+        "    12.19200,                !- Vertex 3 Y-coordinate {m}",
+        "    4.048,                   !- Vertex 3 Z-coordinate {m}",
+        "    3.000000,                !- Vertex 4 X-coordinate {m}",
+        "    12.19200,                !- Vertex 4 Y-coordinate {m}",
+        "    5.381;                   !- Vertex 4 Z-coordinate {m}",
+
+        "FenestrationSurface:Detailed,",
+        "    DoorInSurface_17_T,      !- Name",
+        "    DOOR,                    !- Surface Type",
+        "    DOOR-CON,                !- Construction Name",
+        "    Surface_17_T,            !- Building Surface Name",
+        "    DoorInSurface_3_T,       !- Outside Boundary Condition Object",
+        "    0.5000000,               !- View Factor to Ground",
+        "    ,                        !- Frame and Divider Name",
+        "    1.0,                     !- Multiplier",
+        "    4,                       !- Number of Vertices",
+        "    2.500,                   !- Vertex 1 X-coordinate {m}",
+        "    6.096000,                !- Vertex 1 Y-coordinate {m}",
+        "    5.048,                   !- Vertex 1 Z-coordinate {m}",
+        "    2.500,                   !- Vertex 2 X-coordinate {m}",
+        "    6.096000,                !- Vertex 2 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 2 Z-coordinate {m}",
+        "    3.500,                   !- Vertex 3 X-coordinate {m}",
+        "    6.096000,                !- Vertex 3 Y-coordinate {m}",
+        "    3.048,                   !- Vertex 3 Z-coordinate {m}",
+        "    3.500,                   !- Vertex 4 X-coordinate {m}",
+        "    6.096000,                !- Vertex 4 Y-coordinate {m}",
+        "    5.048;                   !- Vertex 4 Z-coordinate {m}",
+
+        "RoomAirModelType,",
+        "    RoomAirWithAirflowNetwork,  !- Name",
+        "    NORTH_ZONE,              !- Zone Name",
+        "    AirflowNetwork,          !- Room-Air Modeling Type",
+        "    DIRECT;                  !- Air Temperature Coupling Strategy",
+
+        "RoomAir:Node:AirflowNetwork,",
+        "    LeftUpper,               !- Name",
+        "    NORTH_ZONE,              !- Zone Name",
+        "    0.15,                    !- Fraction of Zone Air Volume",
+        "    Surface_18_T_List,       !- RoomAir:Node:AirflowNetwork:AdjacentSurfaceList Name",
+        "    LeftUpper_Gain,          !- RoomAir:Node:AirflowNetwork:InternalGains Name",
+        "    LeftUpper_HVAC;          !- RoomAir:Node:AirflowNetwork:HVACEquipment Name",
+
+        "RoomAir:Node:AirflowNetwork,",
+        "    CentralUpper,            !- Name",
+        "    NORTH_ZONE,              !- Zone Name",
+        "    0.15,                    !- Fraction of Zone Air Volume",
+        "    Surface_20_List,         !- RoomAir:Node:AirflowNetwork:AdjacentSurfaceList Name",
+        "    CentralUpper_Gain,       !- RoomAir:Node:AirflowNetwork:InternalGains Name",
+        "    CentralUpper_HVAC;       !- RoomAir:Node:AirflowNetwork:HVACEquipment Name",
+
+        "RoomAir:Node:AirflowNetwork,",
+        "    LeftMiddle,              !- Name",
+        "    NORTH_ZONE,              !- Zone Name",
+        "    0.15,                    !- Fraction of Zone Air Volume",
+        "    Surface_14_List,         !- RoomAir:Node:AirflowNetwork:AdjacentSurfaceList Name",
+        "    LeftMiddle_Gain,         !- RoomAir:Node:AirflowNetwork:InternalGains Name",
+        "    LeftMiddle_HVAC;         !- RoomAir:Node:AirflowNetwork:HVACEquipment Name",
+
+        "RoomAir:Node:AirflowNetwork,",
+        "    North_Zone,              !- Name",
+        "    NORTH_ZONE,              !- Zone Name",
+        "    0.25,                    !- Fraction of Zone Air Volume",
+        "    Surface_16_List,         !- RoomAir:Node:AirflowNetwork:AdjacentSurfaceList Name",
+        "    NORTH_ZONE_Gain,         !- RoomAir:Node:AirflowNetwork:InternalGains Name",
+        "    NORTH_ZONE_HVAC;         !- RoomAir:Node:AirflowNetwork:HVACEquipment Name",
+
+        "RoomAir:Node:AirflowNetwork,",
+        "    LeftLower,               !- Name",
+        "    NORTH_ZONE,              !- Zone Name",
+        "    0.15,                    !- Fraction of Zone Air Volume",
+        "    Surface_18_List,         !- RoomAir:Node:AirflowNetwork:AdjacentSurfaceList Name",
+        "    LeftLower_Gain,          !- RoomAir:Node:AirflowNetwork:InternalGains Name",
+        "    LeftLower_HVAC;          !- RoomAir:Node:AirflowNetwork:HVACEquipment Name",
+
+        "RoomAir:Node:AirflowNetwork,",
+        "    CentralLower,            !- Name",
+        "    NORTH_ZONE,              !- Zone Name",
+        "    0.15,                    !- Fraction of Zone Air Volume",
+        "    Surface_19_List,         !- RoomAir:Node:AirflowNetwork:AdjacentSurfaceList Name",
+        "    CentralLower_Gain,       !- RoomAir:Node:AirflowNetwork:InternalGains Name",
+        "    CentralLower_HVAC;       !- RoomAir:Node:AirflowNetwork:HVACEquipment Name",
+
+        "RoomAir:Node:AirflowNetwork:AdjacentSurfaceList,",
+        "    Surface_18_T_List,       !- Name",
+        "    Surface_18_T;            !- Surface 1 Name",
+
+        "RoomAir:Node:AirflowNetwork:AdjacentSurfaceList,",
+        "    Surface_20_List,         !- Name",
+        "    Surface_20;              !- Surface 1 Name",
+
+        "RoomAir:Node:AirflowNetwork:AdjacentSurfaceList,",
+        "    Surface_14_List,         !- Name",
+        "    Surface_14;              !- Surface 1 Name",
+
+        "RoomAir:Node:AirflowNetwork:AdjacentSurfaceList,",
+        "    Surface_16_List,         !- Name",
+        "    Surface_16;              !- Surface 1 Name",
+
+        "RoomAir:Node:AirflowNetwork:AdjacentSurfaceList,",
+        "    Surface_18_List,         !- Name",
+        "    Surface_18;              !- Surface 1 Name",
+
+        "RoomAir:Node:AirflowNetwork:AdjacentSurfaceList,",
+        "    Surface_19_List,         !- Name",
+        "    Surface_19;              !- Surface 1 Name",
+
+        "RoomAir:Node:AirflowNetwork:InternalGains,",
+        "    LeftUpper_Gain,          !- Name",
+        "    People,                  !- Internal Gain Object 1 Type",
+        "    NORTH_ZONE People,       !- Internal Gain Object 1 Name",
+        "    0.15,                    !- Fraction of Gains to Node 1",
+        "    Lights,                  !- Internal Gain Object 2 Type",
+        "    NORTH_ZONE Lights,       !- Internal Gain Object 2 Name",
+        "    0.15,                    !- Fraction of Gains to Node 2",
+        "    ElectricEquipment,       !- Internal Gain Object 3 Type",
+        "    NORTH_ZONE Equip,        !- Internal Gain Object 3 Name",
+        "    0.15;                    !- Fraction of Gains to Node 3",
+
+        "RoomAir:Node:AirflowNetwork:InternalGains,",
+        "    CentralUpper_Gain,       !- Name",
+        "    People,                  !- Internal Gain Object 1 Type",
+        "    NORTH_ZONE People,       !- Internal Gain Object 1 Name",
+        "    0.15,                    !- Fraction of Gains to Node 1",
+        "    Lights,                  !- Internal Gain Object 2 Type",
+        "    NORTH_ZONE Lights,       !- Internal Gain Object 2 Name",
+        "    0.15,                    !- Fraction of Gains to Node 2",
+        "    ElectricEquipment,       !- Internal Gain Object 3 Type",
+        "    NORTH_ZONE Equip,        !- Internal Gain Object 3 Name",
+        "    0.15;                    !- Fraction of Gains to Node 3",
+
+        "RoomAir:Node:AirflowNetwork:InternalGains,",
+        "    LeftMiddle_Gain,         !- Name",
+        "    People,                  !- Internal Gain Object 1 Type",
+        "    NORTH_ZONE People,       !- Internal Gain Object 1 Name",
+        "    0.15,                    !- Fraction of Gains to Node 1",
+        "    Lights,                  !- Internal Gain Object 2 Type",
+        "    NORTH_ZONE Lights,       !- Internal Gain Object 2 Name",
+        "    0.15,                    !- Fraction of Gains to Node 2",
+        "    ElectricEquipment,       !- Internal Gain Object 3 Type",
+        "    NORTH_ZONE Equip,        !- Internal Gain Object 3 Name",
+        "    0.15;                    !- Fraction of Gains to Node 3",
+
+        "RoomAir:Node:AirflowNetwork:InternalGains,",
+        "    NORTH_ZONE_Gain,         !- Name",
+        "    People,                  !- Internal Gain Object 1 Type",
+        "    NORTH_ZONE People,       !- Internal Gain Object 1 Name",
+        "    0.20,                    !- Fraction of Gains to Node 1",
+        "    Lights,                  !- Internal Gain Object 2 Type",
+        "    NORTH_ZONE Lights,       !- Internal Gain Object 2 Name",
+        "    0.20,                    !- Fraction of Gains to Node 2",
+        "    ElectricEquipment,       !- Internal Gain Object 3 Type",
+        "    NORTH_ZONE Equip,        !- Internal Gain Object 3 Name",
+        "    0.20;                    !- Fraction of Gains to Node 3",
+
+        "RoomAir:Node:AirflowNetwork:InternalGains,",
+        "    LeftLower_Gain,          !- Name",
+        "    People,                  !- Internal Gain Object 1 Type",
+        "    NORTH_ZONE People,       !- Internal Gain Object 1 Name",
+        "    0.15,                    !- Fraction of Gains to Node 1",
+        "    Lights,                  !- Internal Gain Object 2 Type",
+        "    NORTH_ZONE Lights,       !- Internal Gain Object 2 Name",
+        "    0.15,                    !- Fraction of Gains to Node 2",
+        "    ElectricEquipment,       !- Internal Gain Object 3 Type",
+        "    NORTH_ZONE Equip,        !- Internal Gain Object 3 Name",
+        "    0.15;                    !- Fraction of Gains to Node 3",
+
+        "RoomAir:Node:AirflowNetwork:InternalGains,",
+        "    CentralLower_Gain,       !- Name",
+        "    People,                  !- Internal Gain Object 1 Type",
+        "    NORTH_ZONE People,       !- Internal Gain Object 1 Name",
+        "    0.20,                    !- Fraction of Gains to Node 1",
+        "    Lights,                  !- Internal Gain Object 2 Type",
+        "    NORTH_ZONE Lights,       !- Internal Gain Object 2 Name",
+        "    0.20,                    !- Fraction of Gains to Node 2",
+        "    ElectricEquipment,       !- Internal Gain Object 3 Type",
+        "    NORTH_ZONE Equip,        !- Internal Gain Object 3 Name",
+        "    0.20;                    !- Fraction of Gains to Node 3",
+
+        "RoomAir:Node:AirflowNetwork:HVACEquipment,",
+        "    LeftUpper_HVAC,          !- Name",
+        "    ZoneHVAC:PackagedTerminalAirConditioner,  !- ZoneHVAC or Air Terminal Equipment Object Type 1",
+        "    NORTH_ZONE PTAC,         !- ZoneHVAC or Air Terminal Equipment Object Name 1",
+        "    0.04,                    !- Fraction of Output or Supply Air from HVAC Equipment 1",
+        "    0.04;                    !- Fraction of Input or Return Air to HVAC Equipment 1",
+
+        "RoomAir:Node:AirflowNetwork:HVACEquipment,",
+        "    CentralUpper_HVAC,       !- Name",
+        "    ZoneHVAC:PackagedTerminalAirConditioner,  !- ZoneHVAC or Air Terminal Equipment Object Type 1",
+        "    NORTH_ZONE PTAC,         !- ZoneHVAC or Air Terminal Equipment Object Name 1",
+        "    0.14,                    !- Fraction of Output or Supply Air from HVAC Equipment 1",
+        "    0.14;                    !- Fraction of Input or Return Air to HVAC Equipment 1",
+
+        "RoomAir:Node:AirflowNetwork:HVACEquipment,",
+        "    LeftMiddle_HVAC,         !- Name",
+        "    ZoneHVAC:PackagedTerminalAirConditioner,  !- ZoneHVAC or Air Terminal Equipment Object Type 1",
+        "    NORTH_ZONE PTAC,         !- ZoneHVAC or Air Terminal Equipment Object Name 1",
+        "    0.04,                    !- Fraction of Output or Supply Air from HVAC Equipment 1",
+        "    0.04;                    !- Fraction of Input or Return Air to HVAC Equipment 1",
+
+        "RoomAir:Node:AirflowNetwork:HVACEquipment,",
+        "    NORTH_ZONE_HVAC,         !- Name",
+        "    ZoneHVAC:PackagedTerminalAirConditioner,  !- ZoneHVAC or Air Terminal Equipment Object Type 1",
+        "    NORTH_ZONE PTAC,         !- ZoneHVAC or Air Terminal Equipment Object Name 1",
+        "    0.68,                    !- Fraction of Output or Supply Air from HVAC Equipment 1",
+        "    0.68;                    !- Fraction of Input or Return Air to HVAC Equipment 1",
+
+        "RoomAir:Node:AirflowNetwork:HVACEquipment,",
+        "    LeftLower_HVAC,          !- Name",
+        "    ZoneHVAC:PackagedTerminalAirConditioner,  !- ZoneHVAC or Air Terminal Equipment Object Type 1",
+        "    NORTH_ZONE PTAC,         !- ZoneHVAC or Air Terminal Equipment Object Name 1",
+        "    0.06,                    !- Fraction of Output or Supply Air from HVAC Equipment 1",
+        "    0.06;                    !- Fraction of Input or Return Air to HVAC Equipment 1",
+
+        "RoomAir:Node:AirflowNetwork:HVACEquipment,",
+        "    CentralLower_HVAC,       !- Name",
+        "    ZoneHVAC:PackagedTerminalAirConditioner,  !- ZoneHVAC or Air Terminal Equipment Object Type 1",
+        "    NORTH_ZONE PTAC,         !- ZoneHVAC or Air Terminal Equipment Object Name 1",
+        "    0.04,                    !- Fraction of Output or Supply Air from HVAC Equipment 1",
+        "    0.04;                    !- Fraction of Input or Return Air to HVAC Equipment 1",
+
+        "RoomAirSettings:AirflowNetwork,",
+        "    NORTH_ZONE,              !- Name",
+        "    NORTH_ZONE,              !- Zone Name",
+        "    North_Zone,              !- Control Point RoomAirflowNetwork:Node Name",
+        "    LeftUpper,               !- RoomAirflowNetwork:Node Name 1",
+        "    CentralUpper,            !- RoomAirflowNetwork:Node Name 2",
+        "    North_Zone,              !- RoomAirflowNetwork:Node Name 3",
+        "    LeftMiddle,              !- RoomAirflowNetwork:Node Name 4",
+        "    LeftLower,               !- RoomAirflowNetwork:Node Name 5",
+        "    CentralLower;            !- RoomAirflowNetwork:Node Name 6",
+
+        "People,",
+        "    NORTH_ZONE People,       !- Name",
+        "    NORTH_ZONE,              !- Zone or ZoneList Name",
+        "    OFFICE OCCUPANCY,        !- Number of People Schedule Name",
+        "    people,                  !- Number of People Calculation Method",
+        "    4.000000,                !- Number of People",
+        "    ,                        !- People per Zone Floor Area {person/m2}",
+        "    ,                        !- Zone Floor Area per Person {m2/person}",
+        "    0.3000000,               !- Fraction Radiant",
+        "    ,                        !- Sensible Heat Fraction",
+        "    Activity Sch,            !- Activity Level Schedule Name",
+        "    3.82E-8,                 !- Carbon Dioxide Generation Rate {m3/s-W}",
+        "    ,                        !- Enable ASHRAE 55 Comfort Warnings",
+        "    zoneaveraged,            !- Mean Radiant Temperature Calculation Type",
+        "    ,                        !- Surface Name/Angle Factor List Name",
+        "    Work Eff Sch,            !- Work Efficiency Schedule Name",
+        "    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
+        "    ,                        !- Clothing Insulation Calculation Method Schedule Name",
+        "    Clothing Sch,            !- Clothing Insulation Schedule Name",
+        "    Air Velo Sch,            !- Air Velocity Schedule Name",
+        "    FANGER;                  !- Thermal Comfort Model 1 Type",
+
+        "Lights,",
+        "    EAST_ZONE Lights,        !- Name",
+        "    EAST_ZONE,               !- Zone or ZoneList Name",
+        "    OFFICE LIGHTING,         !- Schedule Name",
+        "    LightingLevel,           !- Design Level Calculation Method",
+        "    1464.375,                !- Lighting Level {W}",
+        "    ,                        !- Watts per Zone Floor Area {W/m2}",
+        "    ,                        !- Watts per Person {W/person}",
+        "    0,                       !- Return Air Fraction",
+        "    0.2000000,               !- Fraction Radiant",
+        "    0.2000000,               !- Fraction Visible",
+        "    0,                       !- Fraction Replaceable",
+        "    GeneralLights;           !- End-Use Subcategory",
+
+        "Lights,",
+        "    NORTH_ZONE Lights,       !- Name",
+        "    NORTH_ZONE,              !- Zone or ZoneList Name",
+        "    OFFICE LIGHTING,         !- Schedule Name",
+        "    LightingLevel,           !- Design Level Calculation Method",
+        "    878.6252,                !- Lighting Level {W}",
+        "    ,                        !- Watts per Zone Floor Area {W/m2}",
+        "    ,                        !- Watts per Person {W/person}",
+        "    0,                       !- Return Air Fraction",
+        "    0.2000000,               !- Fraction Radiant",
+        "    0.2000000,               !- Fraction Visible",
+        "    0,                       !- Fraction Replaceable",
+        "    GeneralLights;           !- End-Use Subcategory",
+
+        "Lights,",
+        "    EAST_ZONE_T Lights,      !- Name",
+        "    EAST_ZONE_T,             !- Zone or ZoneList Name",
+        "    OFFICE LIGHTING,         !- Schedule Name",
+        "    LightingLevel,           !- Design Level Calculation Method",
+        "    1464.375,                !- Lighting Level {W}",
+        "    ,                        !- Watts per Zone Floor Area {W/m2}",
+        "    ,                        !- Watts per Person {W/person}",
+        "    0,                       !- Return Air Fraction",
+        "    0.2000000,               !- Fraction Radiant",
+        "    0.2000000,               !- Fraction Visible",
+        "    0,                       !- Fraction Replaceable",
+        "    GeneralLights;           !- End-Use Subcategory",
+
+        "ElectricEquipment,",
+        "    WEST_ZONE Equip,         !- Name",
+        "    WEST_ZONE,               !- Zone or ZoneList Name",
+        "    INTERMITTENT,            !- Schedule Name",
+        "    EquipmentLevel,          !- Design Level Calculation Method",
+        "    2928.751,                !- Design Level {W}",
+        "    ,                        !- Watts per Zone Floor Area {W/m2}",
+        "    ,                        !- Watts per Person {W/person}",
+        "    0,                       !- Fraction Latent",
+        "    0.3000000,               !- Fraction Radiant",
+        "    0;                       !- Fraction Lost",
+
+        "ElectricEquipment,",
+        "    EAST_ZONE Equip,         !- Name",
+        "    EAST_ZONE,               !- Zone or ZoneList Name",
+        "    INTERMITTENT,            !- Schedule Name",
+        "    EquipmentLevel,          !- Design Level Calculation Method",
+        "    1464.375,                !- Design Level {W}",
+        "    ,                        !- Watts per Zone Floor Area {W/m2}",
+        "    ,                        !- Watts per Person {W/person}",
+        "    0,                       !- Fraction Latent",
+        "    0.3000000,               !- Fraction Radiant",
+        "    0;                       !- Fraction Lost",
+
+        "ElectricEquipment,",
+        "    NORTH_ZONE Equip,        !- Name",
+        "    NORTH_ZONE,              !- Zone or ZoneList Name",
+        "    INTERMITTENT,            !- Schedule Name",
+        "    EquipmentLevel,          !- Design Level Calculation Method",
+        "    2928.751,                !- Design Level {W}",
+        "    ,                        !- Watts per Zone Floor Area {W/m2}",
+        "    ,                        !- Watts per Person {W/person}",
+        "    0,                       !- Fraction Latent",
+        "    0.3000000,               !- Fraction Radiant",
+        "    0;                       !- Fraction Lost",
+
+        "ElectricEquipment,",
+        "    WEST_ZONE_T Equip,       !- Name",
+        "    WEST_ZONE_T,             !- Zone or ZoneList Name",
+        "    INTERMITTENT,            !- Schedule Name",
+        "    EquipmentLevel,          !- Design Level Calculation Method",
+        "    2928.751,                !- Design Level {W}",
+        "    ,                        !- Watts per Zone Floor Area {W/m2}",
+        "    ,                        !- Watts per Person {W/person}",
+        "    0,                       !- Fraction Latent",
+        "    0.3000000,               !- Fraction Radiant",
+        "    0;                       !- Fraction Lost",
+
+        "ElectricEquipment,",
+        "    EAST_ZONE_T Equip,       !- Name",
+        "    EAST_ZONE_T,             !- Zone or ZoneList Name",
+        "    INTERMITTENT,            !- Schedule Name",
+        "    EquipmentLevel,          !- Design Level Calculation Method",
+        "    1464.375,                !- Design Level {W}",
+        "    ,                        !- Watts per Zone Floor Area {W/m2}",
+        "    ,                        !- Watts per Person {W/person}",
+        "    0,                       !- Fraction Latent",
+        "    0.3000000,               !- Fraction Radiant",
+        "    0;                       !- Fraction Lost",
+
+        "AirflowNetwork:SimulationControl,",
+        "    NaturalVentilation,      !- Name",
+        "    MultizoneWithoutDistribution,  !- AirflowNetwork Control",
+        "    INPUT,                   !- Wind Pressure Coefficient Type",
+        "    ExternalNode,            !- Height Selection for Local Wind Pressure Calculation",
+        "    LOWRISE,                 !- Building Type",
+        "    500,                     !- Maximum Number of Iterations {dimensionless}",
+        "    ZeroNodePressures,       !- Initialization Type",
+        "    1.0E-05,                 !- Relative Airflow Convergence Tolerance {dimensionless}",
+        "    1.0E-06,                 !- Absolute Airflow Convergence Tolerance {kg/s}",
+        "    -0.5,                    !- Convergence Acceleration Limit {dimensionless}",
+        "    0.0,                     !- Azimuth Angle of Long Axis of Building {deg}",
+        "    1.0;                     !- Ratio of Building Width Along Short Axis to Width Along Long Axis",
+
+        "AirflowNetwork:MultiZone:Zone,",
+        "    NORTH_ZONE,              !- Zone Name",
+        "    Temperature,             !- Ventilation Control Mode",
+        "    WindowVentSched,         !- Ventilation Control Zone Temperature Setpoint Schedule Name",
+        "    1.0,                     !- Minimum Venting Open Factor {dimensionless}",
+        "    0.0,                     !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor {deltaC}",
+        "    100.0,                   !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor {deltaC}",
+        "    0.0,                     !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor {deltaJ/kg}",
+        "    300000.0;                !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor {deltaJ/kg}",
+
+        "AirflowNetwork:MultiZone:Surface,",
+        "    Surface_14,              !- Surface Name",
+        "    CR-1,                    !- Leakage Component Name",
+        "    WFacade,                 !- External Node Name",
+        "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
+
+        "AirflowNetwork:MultiZone:Surface,",
+        "    Surface_15,              !- Surface Name",
+        "    CR-1,                    !- Leakage Component Name",
+        "    NFacade,                 !- External Node Name",
+        "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
+
+        "AirflowNetwork:MultiZone:Surface,",
+        "    Window2,                 !- Surface Name",
+        "    WiOpen1,                 !- Leakage Component Name",
+        "    NFacade,                 !- External Node Name",
+        "    0.01;                    !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
+
+        "AirflowNetwork:MultiZone:Surface,",
+        "    Surface_16,              !- Surface Name",
+        "    CR-1,                    !- Leakage Component Name",
+        "    EFacade,                 !- External Node Name",
+        "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
+
+        "AirflowNetwork:MultiZone:Surface,",
+        "    Surface_14_T,            !- Surface Name",
+        "    CR-1,                    !- Leakage Component Name",
+        "    WFacade,                 !- External Node Name",
+        "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
+
+        "AirflowNetwork:MultiZone:Surface,",
+        "    Surface_15_T,            !- Surface Name",
+        "    CR-1,                    !- Leakage Component Name",
+        "    NFacade,                 !- External Node Name",
+        "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
+
+        "AirflowNetwork:MultiZone:Surface,",
+        "    Window2_T,               !- Surface Name",
+        "    WiOpen1,                 !- Leakage Component Name",
+        "    NFacade,                 !- External Node Name",
+        "    0.01;                    !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
+
+        "AirflowNetwork:MultiZone:Surface,",
+        "    Surface_16_T,            !- Surface Name",
+        "    CR-1,                    !- Leakage Component Name",
+        "    EFacade,                 !- External Node Name",
+        "    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}",
+
+        "AirflowNetwork:MultiZone:ReferenceCrackConditions,",
+        "    ReferenceCrackConditions,!- Name",
+        "    20.0,                    !- Reference Temperature {C}",
+        "    101320,                  !- Reference Barometric Pressure {Pa}",
+        "    0.005;                   !- Reference Humidity Ratio {kgWater/kgDryAir}",
+
+        "AirflowNetwork:MultiZone:Surface:Crack,",
+        "    CR-1,                    !- Name",
+        "    0.01,                    !- Air Mass Flow Coefficient at Reference Conditions {kg/s}",
+        "    0.667,                   !- Air Mass Flow Exponent {dimensionless}",
+        "    ReferenceCrackConditions;!- Reference Crack Conditions",
+
+        "AirflowNetwork:MultiZone:Surface:Crack,",
+        "    CRcri,                   !- Name",
+        "    0.05,                    !- Air Mass Flow Coefficient at Reference Conditions {kg/s}",
+        "    0.667,                   !- Air Mass Flow Exponent {dimensionless}",
+        "    ReferenceCrackConditions;!- Reference Crack Conditions",
+
+        "AirflowNetwork:MultiZone:Component:DetailedOpening,",
+        "    WiOpen1,                 !- Name",
+        "    0.001,                   !- Air Mass Flow Coefficient When Opening is Closed {kg/s-m}",
+        "    0.667,                   !- Air Mass Flow Exponent When Opening is Closed {dimensionless}",
+        "    NonPivoted,              !- Type of Rectangular Large Vertical Opening (LVO)",
+        "    0.0,                     !- Extra Crack Length or Height of Pivoting Axis {m}",
+        "    2,                       !- Number of Sets of Opening Factor Data",
+        "    0.0,                     !- Opening Factor 1 {dimensionless}",
+        "    0.5,                     !- Discharge Coefficient for Opening Factor 1 {dimensionless}",
+        "    0.0,                     !- Width Factor for Opening Factor 1 {dimensionless}",
+        "    1.0,                     !- Height Factor for Opening Factor 1 {dimensionless}",
+        "    0.0,                     !- Start Height Factor for Opening Factor 1 {dimensionless}",
+        "    1.0,                     !- Opening Factor 2 {dimensionless}",
+        "    0.6,                     !- Discharge Coefficient for Opening Factor 2 {dimensionless}",
+        "    1.0,                     !- Width Factor for Opening Factor 2 {dimensionless}",
+        "    1.0,                     !- Height Factor for Opening Factor 2 {dimensionless}",
+        "    0.0,                     !- Start Height Factor for Opening Factor 2 {dimensionless}",
+        "    0,                       !- Opening Factor 3 {dimensionless}",
+        "    0,                       !- Discharge Coefficient for Opening Factor 3 {dimensionless}",
+        "    0,                       !- Width Factor for Opening Factor 3 {dimensionless}",
+        "    0,                       !- Height Factor for Opening Factor 3 {dimensionless}",
+        "    0,                       !- Start Height Factor for Opening Factor 3 {dimensionless}",
+        "    0,                       !- Opening Factor 4 {dimensionless}",
+        "    0,                       !- Discharge Coefficient for Opening Factor 4 {dimensionless}",
+        "    0,                       !- Width Factor for Opening Factor 4 {dimensionless}",
+        "    0,                       !- Height Factor for Opening Factor 4 {dimensionless}",
+        "    0;                       !- Start Height Factor for Opening Factor 4 {dimensionless}",
+
+        "AirflowNetwork:MultiZone:Component:DetailedOpening,",
+        "    DrOpen,                  !- Name",
+        "    0.001,                   !- Air Mass Flow Coefficient When Opening is Closed {kg/s-m}",
+        "    0.667,                   !- Air Mass Flow Exponent When Opening is Closed {dimensionless}",
+        "    NonPivoted,              !- Type of Rectangular Large Vertical Opening (LVO)",
+        "    0.0,                     !- Extra Crack Length or Height of Pivoting Axis {m}",
+        "    2,                       !- Number of Sets of Opening Factor Data",
+        "    0.0,                     !- Opening Factor 1 {dimensionless}",
+        "    0.5,                     !- Discharge Coefficient for Opening Factor 1 {dimensionless}",
+        "    0.0,                     !- Width Factor for Opening Factor 1 {dimensionless}",
+        "    1.0,                     !- Height Factor for Opening Factor 1 {dimensionless}",
+        "    0.0,                     !- Start Height Factor for Opening Factor 1 {dimensionless}",
+        "    1.0,                     !- Opening Factor 2 {dimensionless}",
+        "    0.6,                     !- Discharge Coefficient for Opening Factor 2 {dimensionless}",
+        "    1.0,                     !- Width Factor for Opening Factor 2 {dimensionless}",
+        "    1.0,                     !- Height Factor for Opening Factor 2 {dimensionless}",
+        "    0.0,                     !- Start Height Factor for Opening Factor 2 {dimensionless}",
+        "    0,                       !- Opening Factor 3 {dimensionless}",
+        "    0,                       !- Discharge Coefficient for Opening Factor 3 {dimensionless}",
+        "    0,                       !- Width Factor for Opening Factor 3 {dimensionless}",
+        "    0,                       !- Height Factor for Opening Factor 3 {dimensionless}",
+        "    0,                       !- Start Height Factor for Opening Factor 3 {dimensionless}",
+        "    0,                       !- Opening Factor 4 {dimensionless}",
+        "    0,                       !- Discharge Coefficient for Opening Factor 4 {dimensionless}",
+        "    0,                       !- Width Factor for Opening Factor 4 {dimensionless}",
+        "    0,                       !- Height Factor for Opening Factor 4 {dimensionless}",
+        "    0;                       !- Start Height Factor for Opening Factor 4 {dimensionless}",
+
+        "AirflowNetwork:MultiZone:Component:HorizontalOpening,",
+        "    HrOpen,                  !- Name",
+        "    0.001,                   !- Air Mass Flow Coefficient When Opening is Closed {kg/s-m}",
+        "    0.667,                   !- Air Mass Flow Exponent When Opening is Closed {dimensionless}",
+        "    90.0,                    !- Sloping Plane Angle {deg}",
+        "    0.2;                     !- Discharge Coefficient {dimensionless}",
+
+        "AirflowNetwork:MultiZone:ExternalNode,",
+        "    NFacade,                 !- Name",
+        "    1.524,                   !- External Node Height {m}",
+        "    NFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name",
+
+        "AirflowNetwork:MultiZone:ExternalNode,",
+        "    EFacade,                 !- Name",
+        "    1.524,                   !- External Node Height {m}",
+        "    EFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name",
+
+        "AirflowNetwork:MultiZone:ExternalNode,",
+        "    SFacade,                 !- Name",
+        "    1.524,                   !- External Node Height {m}",
+        "    SFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name",
+
+        "AirflowNetwork:MultiZone:ExternalNode,",
+        "    WFacade,                 !- Name",
+        "    1.524,                   !- External Node Height {m}",
+        "    WFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name",
+
+        "AirflowNetwork:MultiZone:WindPressureCoefficientArray,",
+        "    Every 30 Degrees,        !- Name",
+        "    0,                       !- Wind Direction 1 {deg}",
+        "    30,                      !- Wind Direction 2 {deg}",
+        "    60,                      !- Wind Direction 3 {deg}",
+        "    90,                      !- Wind Direction 4 {deg}",
+        "    120,                     !- Wind Direction 5 {deg}",
+        "    150,                     !- Wind Direction 6 {deg}",
+        "    180,                     !- Wind Direction 7 {deg}",
+        "    210,                     !- Wind Direction 8 {deg}",
+        "    240,                     !- Wind Direction 9 {deg}",
+        "    270,                     !- Wind Direction 10 {deg}",
+        "    300,                     !- Wind Direction 11 {deg}",
+        "    330;                     !- Wind Direction 12 {deg}",
+
+        "AirflowNetwork:MultiZone:WindPressureCoefficientValues,",
+        "    NFacade_WPCValue,        !- Name",
+        "    Every 30 Degrees,        !- AirflowNetwork:MultiZone:WindPressureCoefficientArray Name",
+        "    0.60,                    !- Wind Pressure Coefficient Value 1 {dimensionless}",
+        "    0.48,                    !- Wind Pressure Coefficient Value 2 {dimensionless}",
+        "    0.04,                    !- Wind Pressure Coefficient Value 3 {dimensionless}",
+        "    -0.56,                   !- Wind Pressure Coefficient Value 4 {dimensionless}",
+        "    -0.56,                   !- Wind Pressure Coefficient Value 5 {dimensionless}",
+        "    -0.42,                   !- Wind Pressure Coefficient Value 6 {dimensionless}",
+        "    -0.37,                   !- Wind Pressure Coefficient Value 7 {dimensionless}",
+        "    -0.42,                   !- Wind Pressure Coefficient Value 8 {dimensionless}",
+        "    -0.56,                   !- Wind Pressure Coefficient Value 9 {dimensionless}",
+        "    -0.56,                   !- Wind Pressure Coefficient Value 10 {dimensionless}",
+        "    0.04,                    !- Wind Pressure Coefficient Value 11 {dimensionless}",
+        "    0.48;                    !- Wind Pressure Coefficient Value 12 {dimensionless}",
+
+        "AirflowNetwork:MultiZone:WindPressureCoefficientValues,",
+        "    EFacade_WPCValue,        !- Name",
+        "    Every 30 Degrees,        !- AirflowNetwork:MultiZone:WindPressureCoefficientArray Name",
+        "    -0.56,                   !- Wind Pressure Coefficient Value 1 {dimensionless}",
+        "    0.04,                    !- Wind Pressure Coefficient Value 2 {dimensionless}",
+        "    0.48,                    !- Wind Pressure Coefficient Value 3 {dimensionless}",
+        "    0.60,                    !- Wind Pressure Coefficient Value 4 {dimensionless}",
+        "    0.48,                    !- Wind Pressure Coefficient Value 5 {dimensionless}",
+        "    0.04,                    !- Wind Pressure Coefficient Value 6 {dimensionless}",
+        "    -0.56,                   !- Wind Pressure Coefficient Value 7 {dimensionless}",
+        "    -0.56,                   !- Wind Pressure Coefficient Value 8 {dimensionless}",
+        "    -0.42,                   !- Wind Pressure Coefficient Value 9 {dimensionless}",
+        "    -0.37,                   !- Wind Pressure Coefficient Value 10 {dimensionless}",
+        "    -0.42,                   !- Wind Pressure Coefficient Value 11 {dimensionless}",
+        "    -0.56;                   !- Wind Pressure Coefficient Value 12 {dimensionless}",
+
+        "AirflowNetwork:MultiZone:WindPressureCoefficientValues,",
+        "    SFacade_WPCValue,        !- Name",
+        "    Every 30 Degrees,        !- AirflowNetwork:MultiZone:WindPressureCoefficientArray Name",
+        "    -0.37,                   !- Wind Pressure Coefficient Value 1 {dimensionless}",
+        "    -0.42,                   !- Wind Pressure Coefficient Value 2 {dimensionless}",
+        "    -0.56,                   !- Wind Pressure Coefficient Value 3 {dimensionless}",
+        "    -0.56,                   !- Wind Pressure Coefficient Value 4 {dimensionless}",
+        "    0.04,                    !- Wind Pressure Coefficient Value 5 {dimensionless}",
+        "    0.48,                    !- Wind Pressure Coefficient Value 6 {dimensionless}",
+        "    0.60,                    !- Wind Pressure Coefficient Value 7 {dimensionless}",
+        "    0.48,                    !- Wind Pressure Coefficient Value 8 {dimensionless}",
+        "    0.04,                    !- Wind Pressure Coefficient Value 9 {dimensionless}",
+        "    -0.56,                   !- Wind Pressure Coefficient Value 10 {dimensionless}",
+        "    -0.56,                   !- Wind Pressure Coefficient Value 11 {dimensionless}",
+        "    -0.42;                   !- Wind Pressure Coefficient Value 12 {dimensionless}",
+
+        "AirflowNetwork:MultiZone:WindPressureCoefficientValues,",
+        "    WFacade_WPCValue,        !- Name",
+        "    Every 30 Degrees,        !- AirflowNetwork:MultiZone:WindPressureCoefficientArray Name",
+        "    -0.56,                   !- Wind Pressure Coefficient Value 1 {dimensionless}",
+        "    -0.56,                   !- Wind Pressure Coefficient Value 2 {dimensionless}",
+        "    -0.42,                   !- Wind Pressure Coefficient Value 3 {dimensionless}",
+        "    -0.37,                   !- Wind Pressure Coefficient Value 4 {dimensionless}",
+        "    -0.42,                   !- Wind Pressure Coefficient Value 5 {dimensionless}",
+        "    -0.56,                   !- Wind Pressure Coefficient Value 6 {dimensionless}",
+        "    -0.56,                   !- Wind Pressure Coefficient Value 7 {dimensionless}",
+        "    0.04,                    !- Wind Pressure Coefficient Value 8 {dimensionless}",
+        "    0.48,                    !- Wind Pressure Coefficient Value 9 {dimensionless}",
+        "    0.60,                    !- Wind Pressure Coefficient Value 10 {dimensionless}",
+        "    0.48,                    !- Wind Pressure Coefficient Value 11 {dimensionless}",
+        "    0.04;                    !- Wind Pressure Coefficient Value 12 {dimensionless}",
+
+        "AirflowNetwork:IntraZone:Node,",
+        "    LeftUpper,               !- Name",
+        "    LeftUpper,               !- RoomAir:Node:AirflowNetwork Name",
+        "    NORTH_ZONE,              !- Zone Name",
+        "    4.572;                   !- Node Height {m}",
+
+        "AirflowNetwork:IntraZone:Node,",
+        "    CentralUpper,            !- Name",
+        "    CentralUpper,            !- RoomAir:Node:AirflowNetwork Name",
+        "    NORTH_ZONE,              !- Zone Name",
+        "    4.572;                   !- Node Height {m}",
+
+        "AirflowNetwork:IntraZone:Node,",
+        "    LeftMiddle,              !- Name",
+        "    LeftMiddle,              !- RoomAir:Node:AirflowNetwork Name",
+        "    NORTH_ZONE,              !- Zone Name",
+        "    3.048;                   !- Node Height {m}",
+
+        "AirflowNetwork:IntraZone:Node,",
+        "    LeftLower,               !- Name",
+        "    LeftLower,               !- RoomAir:Node:AirflowNetwork Name",
+        "    NORTH_ZONE,              !- Zone Name",
+        "    1.524;                   !- Node Height {m}",
+
+        "AirflowNetwork:IntraZone:Node,",
+        "    CentralLower,            !- Name",
+        "    CentralLower,            !- RoomAir:Node:AirflowNetwork Name",
+        "    NORTH_ZONE,              !- Zone Name",
+        "    1.524;                   !- Node Height {m}",
+
+        "AirflowNetwork:IntraZone:Linkage,",
+        "    Link1,                   !- Name",
+        "    LeftUpper,               !- Node 1 Name",
+        "    CentralUpper,            !- Node 2 Name",
+        "    CR-1;                    !- Component Name",
+
+        "AirflowNetwork:IntraZone:Linkage,",
+        "    Link2,                   !- Name",
+        "    LeftUpper,               !- Node 1 Name",
+        "    LeftMiddle,              !- Node 2 Name",
+        "    CR-1;                    !- Component Name",
+
+        "AirflowNetwork:IntraZone:Linkage,",
+        "    Link3,                   !- Name",
+        "    LeftLower,               !- Node 1 Name",
+        "    LeftMiddle,              !- Node 2 Name",
+        "    CR-1;                    !- Component Name",
+
+        "AirflowNetwork:IntraZone:Linkage,",
+        "    Link4,                   !- Name",
+        "    LeftLower,               !- Node 1 Name",
+        "    CentralLower,            !- Node 2 Name",
+        "    CR-1;                    !- Component Name",
+
+        "AirflowNetwork:IntraZone:Linkage,",
+        "    Link5,                   !- Name",
+        "    CentralUpper,            !- Node 1 Name",
+        "    North_Zone,              !- Node 2 Name",
+        "    CR-1;                    !- Component Name",
+
+        "AirflowNetwork:IntraZone:Linkage,",
+        "    Link6,                   !- Name",
+        "    CentralLower,            !- Node 1 Name",
+        "    North_Zone,              !- Node 2 Name",
+        "    CR-1;                    !- Component Name",
+
+        "DesignSpecification:OutdoorAir,",
+        "    SZ DSOA NORTH_ZONE,      !- Name",
+        "    flow/person,             !- Outdoor Air Method",
+        "    0.00944,                 !- Outdoor Air Flow per Person {m3/s-person}",
+        "    0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}",
+        "    0.0;                     !- Outdoor Air Flow per Zone {m3/s}",
+
+        "DesignSpecification:ZoneAirDistribution,",
+        "    SZ DSZAD NORTH_ZONE,     !- Name",
+        "    1,                       !- Zone Air Distribution Effectiveness in Cooling Mode {dimensionless}",
+        "    1;                       !- Zone Air Distribution Effectiveness in Heating Mode {dimensionless}",
+
+        "Sizing:Parameters,",
+        "    1.2,                     !- Heating Sizing Factor",
+        "    1.2;                     !- Cooling Sizing Factor",
+
+        "Sizing:Zone,",
+        "    NORTH_ZONE,              !- Zone or ZoneList Name",
+        "    SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method",
+        "    14.0,                    !- Zone Cooling Design Supply Air Temperature {C}",
+        "    11.11,                   !- Zone Cooling Design Supply Air Temperature Difference {deltaC}",
+        "    SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method",
+        "    50.0,                    !- Zone Heating Design Supply Air Temperature {C}",
+        "    ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}",
+        "    0.008,                   !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}",
+        "    0.008,                   !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}",
+        "    SZ DSOA NORTH_ZONE,      !- Design Specification Outdoor Air Object Name",
+        "    ,                        !- Zone Heating Sizing Factor",
+        "    ,                        !- Zone Cooling Sizing Factor",
+        "    DesignDay,               !- Cooling Design Air Flow Method",
+        "    0,                       !- Cooling Design Air Flow Rate {m3/s}",
+        "    ,                        !- Cooling Minimum Air Flow per Zone Floor Area {m3/s-m2}",
+        "    ,                        !- Cooling Minimum Air Flow {m3/s}",
+        "    0,                       !- Cooling Minimum Air Flow Fraction",
+        "    DesignDay,               !- Heating Design Air Flow Method",
+        "    0,                       !- Heating Design Air Flow Rate {m3/s}",
+        "    ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}",
+        "    ,                        !- Heating Maximum Air Flow {m3/s}",
+        "    0,                       !- Heating Maximum Air Flow Fraction",
+        "    SZ DSZAD NORTH_ZONE,     !- Design Specification Zone Air Distribution Object Name",
+        "    No,                      !- Account for Dedicated Outdoor Air System",
+        "    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy",
+        "    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}",
+        "    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}",
+
+        "ZoneControl:Thermostat,",
+        "    NORTH_ZONE Thermostat,   !- Name",
+        "    NORTH_ZONE,              !- Zone or ZoneList Name",
+        "    HVACTemplate-Always 4,   !- Control Type Schedule Name",
+        "    ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type",
+        "    All Zones Dual SP Control;  !- Control 1 Name",
+
+        "ThermostatSetpoint:DualSetpoint,",
+        "    All Zones Dual SP Control,  !- Name",
+        "    Htg-SetP-Sch,            !- Heating Setpoint Temperature Schedule Name",
+        "    Clg-SetP-Sch;            !- Cooling Setpoint Temperature Schedule Name",
+
+        "ZoneHVAC:PackagedTerminalAirConditioner,",
+        "    NORTH_ZONE PTAC,         !- Name",
+        "    HVACTemplate-Always 1,   !- Availability Schedule Name",
+        "    NORTH_ZONE PTAC Return,  !- Air Inlet Node Name",
+        "    NORTH_ZONE PTAC Supply Inlet,  !- Air Outlet Node Name",
+        "    OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type",
+        "    NORTH_ZONE PTAC OA Mixing Box,  !- Outdoor Air Mixer Name",
+        "    autosize,                !- Cooling Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- Heating Supply Air Flow Rate {m3/s}",
+        "    ,                        !- No Load Supply Air Flow Rate {m3/s}",
+        "    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}",
+        "    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}",
+        "    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}",
+        "    Fan:OnOff,               !- Supply Air Fan Object Type",
+        "    NORTH_ZONE PTAC Supply Fan,  !- Supply Air Fan Name",
+        "    Coil:Heating:Electric,   !- Heating Coil Object Type",
+        "    NORTH_ZONE PTAC Heating Coil,  !- Heating Coil Name",
+        "    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type",
+        "    NORTH_ZONE PTAC Cooling Coil,  !- Cooling Coil Name",
+        "    DrawThrough,             !- Fan Placement",
+        "    HVACTemplate-Always 0;   !- Supply Air Fan Operating Mode Schedule Name",
+
+        "ZoneHVAC:EquipmentList,",
+        "    NORTH_ZONE Equipment,    !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type",
+        "    NORTH_ZONE PTAC,         !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name",
+        "    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name",
+
+        "ZoneHVAC:EquipmentConnections,",
+        "    NORTH_ZONE,              !- Zone Name",
+        "    NORTH_ZONE Equipment,    !- Zone Conditioning Equipment List Name",
+        "    NORTH_ZONE PTAC Supply Inlet,  !- Zone Air Inlet Node or NodeList Name",
+        "    NORTH_ZONE PTAC Return,  !- Zone Air Exhaust Node or NodeList Name",
+        "    NORTH_ZONE Zone Air Node,!- Zone Air Node Name",
+        "    NORTH_ZONE Return Outlet;!- Zone Return Air Node or NodeList Name",
+
+        "Fan:OnOff,",
+        "    NORTH_ZONE PTAC Supply Fan,  !- Name",
+        "    HVACTemplate-Always 1,   !- Availability Schedule Name",
+        "    0.7,                     !- Fan Total Efficiency",
+        "    75,                      !- Pressure Rise {Pa}",
+        "    autosize,                !- Maximum Flow Rate {m3/s}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1,                       !- Motor In Airstream Fraction",
+        "    NORTH_ZONE PTAC Heating Coil Outlet,  !- Air Inlet Node Name",
+        "    NORTH_ZONE PTAC Supply Inlet;  !- Air Outlet Node Name",
+
+        "Coil:Cooling:DX:SingleSpeed,",
+        "    NORTH_ZONE PTAC Cooling Coil,  !- Name",
+        "    HVACTemplate-Always 1,   !- Availability Schedule Name",
+        "    autosize,                !- Gross Rated Total Cooling Capacity {W}",
+        "    autosize,                !- Gross Rated Sensible Heat Ratio",
+        "    3,                       !- Gross Rated Cooling COP {W/W}",
+        "    autosize,                !- Rated Air Flow Rate {m3/s}",
+        "    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    NORTH_ZONE PTAC Mixed Air Outlet,  !- Air Inlet Node Name",
+        "    NORTH_ZONE PTAC Cooling Coil Outlet,  !- Air Outlet Node Name",
+        "    NORTH_ZONE PTAC Cooling Coil Cap-FT,  !- Total Cooling Capacity Function of Temperature Curve Name",
+        "    NORTH_ZONE PTAC Cooling Coil Cap-FF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "    NORTH_ZONE PTAC Cooling Coil EIR-FT,  !- Energy Input Ratio Function of Temperature Curve Name",
+        "    NORTH_ZONE PTAC Cooling Coil EIR-FF,  !- Energy Input Ratio Function of Flow Fraction Curve Name",
+        "    NORTH_ZONE PTAC Cooling Coil Coil PLF,  !- Part Load Fraction Correlation Curve Name",
+        "    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "    0,                       !- Nominal Time for Condensate Removal to Begin {s}",
+        "    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
+        "    0,                       !- Maximum Cycling Rate {cycles/hr}",
+        "    0,                       !- Latent Capacity Time Constant {s}",
+        "    NORTH_ZONE PTAC Cooling Coil Condenser Inlet,  !- Condenser Air Inlet Node Name",
+        "    AirCooled,               !- Condenser Type",
+        "    0,                       !- Evaporative Condenser Effectiveness {dimensionless}",
+        "    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}",
+        "    0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}",
+        "    0,                       !- Crankcase Heater Capacity {W}",
+        "    10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+
+        "Coil:Heating:Electric,",
+        "    NORTH_ZONE PTAC Heating Coil,  !- Name",
+        "    HVACTemplate-Always 1,   !- Availability Schedule Name",
+        "    1,                       !- Efficiency",
+        "    autosize,                !- Nominal Capacity {W}",
+        "    NORTH_ZONE PTAC Cooling Coil Outlet,  !- Air Inlet Node Name",
+        "    NORTH_ZONE PTAC Heating Coil Outlet;  !- Air Outlet Node Name",
+
+        "OutdoorAir:Mixer,",
+        "    NORTH_ZONE PTAC OA Mixing Box,  !- Name",
+        "    NORTH_ZONE PTAC Mixed Air Outlet,  !- Mixed Air Node Name",
+        "    NORTH_ZONE PTAC Outside Air Inlet,  !- Outdoor Air Stream Node Name",
+        "    NORTH_ZONE PTAC Relief Air Outlet,  !- Relief Air Stream Node Name",
+        "    NORTH_ZONE PTAC Return;  !- Return Air Stream Node Name",
+
+        "OutdoorAir:Node,",
+        "    NORTH_ZONE PTAC Outside Air Inlet,  !- Name",
+        "    -1;                      !- Height Above Ground {m}",
+
+        "OutdoorAir:Node,",
+        "    NORTH_ZONE PTAC Cooling Coil Condenser Inlet,  !- Name",
+        "    -1;                      !- Height Above Ground {m}",
+
+        "Curve:Quadratic,",
+        "    NORTH_ZONE PTAC Cooling Coil Cap-FF,  !- Name",
+        "    0.8,                     !- Coefficient1 Constant",
+        "    0.2,                     !- Coefficient2 x",
+        "    0,                       !- Coefficient3 x**2",
+        "    0.5,                     !- Minimum Value of x",
+        "    1.5;                     !- Maximum Value of x",
+
+        "Curve:Quadratic,",
+        "    NORTH_ZONE PTAC Cooling Coil EIR-FF,  !- Name",
+        "    1.1552,                  !- Coefficient1 Constant",
+        "    -0.1808,                 !- Coefficient2 x",
+        "    0.0256,                  !- Coefficient3 x**2",
+        "    0.5,                     !- Minimum Value of x",
+        "    1.5;                     !- Maximum Value of x",
+
+        "Curve:Quadratic,",
+        "    NORTH_ZONE PTAC Cooling Coil Coil PLF,  !- Name",
+        "    0.85,                    !- Coefficient1 Constant",
+        "    0.15,                    !- Coefficient2 x",
+        "    0,                       !- Coefficient3 x**2",
+        "    0,                       !- Minimum Value of x",
+        "    1;                       !- Maximum Value of x",
+
+        "Curve:Biquadratic,",
+        "    NORTH_ZONE PTAC Cooling Coil Cap-FT,  !- Name",
+        "    0.942587793,             !- Coefficient1 Constant",
+        "    0.009543347,             !- Coefficient2 x",
+        "    0.00068377,              !- Coefficient3 x**2",
+        "    -0.011042676,            !- Coefficient4 y",
+        "    0.000005249,             !- Coefficient5 y**2",
+        "    -0.00000972,             !- Coefficient6 x*y",
+        "    12.77778,                !- Minimum Value of x",
+        "    23.88889,                !- Maximum Value of x",
+        "    18.0,                    !- Minimum Value of y",
+        "    46.11111;                !- Maximum Value of y",
+
+        "Curve:Biquadratic,",
+        "    NORTH_ZONE PTAC Cooling Coil EIR-FT,  !- Name",
+        "    0.342414409,             !- Coefficient1 Constant",
+        "    0.034885008,             !- Coefficient2 x",
+        "    -0.0006237,              !- Coefficient3 x**2",
+        "    0.004977216,             !- Coefficient4 y",
+        "    0.000437951,             !- Coefficient5 y**2",
+        "    -0.000728028,            !- Coefficient6 x*y",
+        "    12.77778,                !- Minimum Value of x",
+        "    23.88889,                !- Maximum Value of x",
+        "    18.0,                    !- Minimum Value of y",
+        "    46.11111;                !- Maximum Value of y",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    // Read objects
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetWindowGlassSpectralData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
+    SurfaceGeometry::GetSurfaceData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    ScheduleManager::ProcessScheduleInput(*state);
+    state->dataScheduleMgr->Schedule(6).MinValue = 0.0;
+    state->dataScheduleMgr->Schedule(6).MaxValue = 2.0;
+    state->dataScheduleMgr->DaySchedule(1).TSValue = 150;
+    state->dataScheduleMgr->DaySchedule(1).TSValMax = 200;
+    state->dataScheduleMgr->DaySchedule(1).TSValMin = 0;
+    state->dataScheduleMgr->DaySchedule(2).TSValue = 1.0;
+    state->dataScheduleMgr->DaySchedule(3).TSValue = 1.0;
+    state->dataScheduleMgr->Schedule(2).MinValue = 0.0;
+    state->dataScheduleMgr->Schedule(2).MaxValue = 1.0;
+    state->dataScheduleMgr->Schedule(3).MinValue = 0.0;
+    state->dataScheduleMgr->Schedule(3).MaxValue = 1.0;
+
+    InternalHeatGains::GetInternalHeatGainsInput(*state);
+    HeatBalanceAirManager::GetRoomAirModelParameters(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    // Read AirflowNetwork inputs
+    GetAirflowNetworkInput(*state);
+
+    EXPECT_EQ(state->dataAirflowNetwork->IntraZoneNodeData(1).AFNZoneNum, 1);
+    EXPECT_EQ(state->dataAirflowNetwork->IntraZoneNodeData(1).ZoneNum, 3);
+}
+
+} // namespace EnergyPlus

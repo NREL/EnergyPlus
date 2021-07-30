@@ -80,7 +80,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.4;
+  Version,9.6;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -710,7 +710,7 @@
     Gap_9_Glz_62_Layer_2,    !- Gap 2 Name
     ,                        !- Gap 2 Directional Front Absoptance Matrix Name
     ,                        !- Gap 2 Directional Back Absoptance Matrix Name
-    Glass_21436_Layer,       !- Layer 3 Material
+    Glass_21436_Layer,       !- Layer 3 Name
     CFS_Glz_62_Layer_3_fAbs, !- Layer 3 Directional Front Absoptance Matrix Name
     CFS_Glz_62_Layer_3_bAbs, !- Layer 3 Directional Back Absoptance Matrix Name
     Gap_9_Glz_62_Layer_3,    !- Gap 3 Name

@@ -57,7 +57,7 @@
 ! Floor Area:              300 m2
 ! Number of Stories:       1
 
-  Version,9.4;
+  Version,9.6;
 
   Timestep,6;
 
@@ -448,8 +448,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     Outside Air System,      !- Name
     Outside Air System Controllers,  !- Controller List Name
-    Outside Air System Equipment,  !- Outdoor Air Equipment List Name
-    Evap Cooler Availability List;  !- Availability Manager List Name
+    Outside Air System Equipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:Node,
     Outside Air Inlet Node;  !- Name

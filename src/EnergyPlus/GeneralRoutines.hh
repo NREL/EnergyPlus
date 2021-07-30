@@ -55,12 +55,71 @@
 // EnergyPlus Headers
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
+
+struct IntervalHalf
+{
+    // Members
+    Real64 MaxFlow;
+    Real64 MinFlow;
+    Real64 MaxResult;
+    Real64 MinResult;
+    Real64 MidFlow;
+    Real64 MidResult;
+    bool MaxFlowCalc;
+    bool MinFlowCalc;
+    bool MinFlowResult;
+    bool NormFlowCalc;
+
+    // Default Constructor
+    IntervalHalf() = default;
+
+    // Member Constructor
+    IntervalHalf(Real64 const MaxFlow,
+                 Real64 const MinFlow,
+                 Real64 const MaxResult,
+                 Real64 const MinResult,
+                 Real64 const MidFlow,
+                 Real64 const MidResult,
+                 bool const MaxFlowCalc,
+                 bool const MinFlowCalc,
+                 bool const MinFlowResult,
+                 bool const NormFlowCalc)
+        : MaxFlow(MaxFlow), MinFlow(MinFlow), MaxResult(MaxResult), MinResult(MinResult), MidFlow(MidFlow), MidResult(MidResult),
+          MaxFlowCalc(MaxFlowCalc), MinFlowCalc(MinFlowCalc), MinFlowResult(MinFlowResult), NormFlowCalc(NormFlowCalc)
+    {
+    }
+};
+
+struct ZoneEquipControllerProps
+{
+    // Members
+    Real64 SetPoint;           // Desired setpoint;
+    Real64 MaxSetPoint;        // The maximum setpoint; either user input or reset per time step by simulation
+    Real64 MinSetPoint;        // The minimum setpoint; either user input or reset per time step by simulation
+    Real64 SensedValue;        // The sensed control variable of any type
+    Real64 CalculatedSetPoint; // The Calculated SetPoint or new control actuated value
+
+    // Default Constructor
+    ZoneEquipControllerProps() = default;
+
+    // Member Constructor
+    ZoneEquipControllerProps(Real64 const SetPoint,          // Desired setpoint;
+                             Real64 const MaxSetPoint,       // The maximum setpoint; either user input or reset per time step by simulation
+                             Real64 const MinSetPoint,       // The minimum setpoint; either user input or reset per time step by simulation
+                             Real64 const SensedValue,       // The sensed control variable of any type
+                             Real64 const CalculatedSetPoint // The Calculated SetPoint or new control actuated value
+                             )
+        : SetPoint(SetPoint), MaxSetPoint(MaxSetPoint), MinSetPoint(MinSetPoint), SensedValue(SensedValue), CalculatedSetPoint(CalculatedSetPoint)
+    {
+    }
+};
 
 void ControlCompOutput(EnergyPlusData &state,
                        std::string const &CompName,               // the component Name
@@ -92,14 +151,15 @@ void CheckSysSizing(EnergyPlusData &state,
                     std::string const &CompName  // Component Name (e.g. Big Chiller)
 );
 
-void CheckThisAirSystemForSizing(int const AirLoopNum, bool &AirLoopWasSized);
+void CheckThisAirSystemForSizing(EnergyPlusData &state, int const AirLoopNum, bool &AirLoopWasSized);
 
 void CheckZoneSizing(EnergyPlusData &state,
                      std::string const &CompType, // Component Type (e.g. Chiller:Electric)
                      std::string const &CompName  // Component Name (e.g. Big Chiller)
 );
 
-void CheckThisZoneForSizing(int const ZoneNum, // zone index to be checked
+void CheckThisZoneForSizing(EnergyPlusData &state,
+                            int const ZoneNum, // zone index to be checked
                             bool &ZoneWasSized);
 
 void ValidateComponent(EnergyPlusData &state,
@@ -119,25 +179,25 @@ void ValidateComponent(EnergyPlusData &state,
 
 void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
                                   const Array1D_int &SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
-                                  Real64 const VentArea,        // Area available for venting the gap [m2]
-                                  Real64 const Cv,              // Oriface coefficient for volume-based discharge, wind-driven [--]
-                                  Real64 const Cd,              // oriface coefficient for discharge,  bouyancy-driven [--]
-                                  Real64 const HdeltaNPL,       // Height difference from neutral pressure level [m]
-                                  Real64 const SolAbs,          // solar absorptivity of baffle [--]
-                                  Real64 const AbsExt,          // thermal absorptance/emittance of baffle material [--]
-                                  Real64 const Tilt,            // Tilt of gap [Degrees]
-                                  Real64 const AspRat,          // aspect ratio of gap  Height/gap [--]
-                                  Real64 const GapThick,        // Thickness of air space between baffle and underlying heat transfer surface
-                                  int const Roughness,          // Roughness index (1-6), see DataHeatBalance parameters
-                                  Real64 const QdotSource,      // Source/sink term, e.g. electricity exported from solar cell [W]
-                                  Real64 &TsBaffle,             // Temperature of baffle (both sides) use lagged value on input [C]
-                                  Real64 &TaGap,                // Temperature of air gap (assumed mixed) use lagged value on input [C]
+                                  Real64 const VentArea,         // Area available for venting the gap [m2]
+                                  Real64 const Cv,               // Oriface coefficient for volume-based discharge, wind-driven [--]
+                                  Real64 const Cd,               // oriface coefficient for discharge,  buoyancy-driven [--]
+                                  Real64 const HdeltaNPL,        // Height difference from neutral pressure level [m]
+                                  Real64 const SolAbs,           // solar absorptivity of baffle [--]
+                                  Real64 const AbsExt,           // thermal absorptance/emittance of baffle material [--]
+                                  Real64 const Tilt,             // Tilt of gap [Degrees]
+                                  Real64 const AspRat,           // aspect ratio of gap  Height/gap [--]
+                                  Real64 const GapThick,         // Thickness of air space between baffle and underlying heat transfer surface
+                                  DataSurfaces::SurfaceRoughness const Roughness, // Roughness index (1-6), see DataHeatBalance parameters
+                                  Real64 const QdotSource,                        // Source/sink term, e.g. electricity exported from solar cell [W]
+                                  Real64 &TsBaffle,                               // Temperature of baffle (both sides) use lagged value on input [C]
+                                  Real64 &TaGap, // Temperature of air gap (assumed mixed) use lagged value on input [C]
                                   Optional<Real64> HcGapRpt = _,
                                   Optional<Real64> HrGapRpt = _,
                                   Optional<Real64> IscRpt = _,
                                   Optional<Real64> MdotVentRpt = _,
                                   Optional<Real64> VdotWindRpt = _,
-                                  Optional<Real64> VdotBouyRpt = _);
+                                  Optional<Real64> VdotBuoyRpt = _);
 
 //****************************************************************************
 
@@ -189,9 +249,12 @@ void CalcZoneSensibleOutput(Real64 const MassFlow, // air mass flow rate, {kg/s}
                             Real64 &SensibleOutput // sensible output rate (state 2 -> State 1), {W}
 );
 
-struct GeneralRoutinesData : BaseGlobalStruct {
+struct GeneralRoutinesData : BaseGlobalStruct
+{
 
     bool MyICSEnvrnFlag = true;
+    IntervalHalf ZoneInterHalf = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false, false, false, false};
+    ZoneEquipControllerProps ZoneController = {0.0, 0.0, 0.0, 0.0, 0.0};
 
     void clear_state() override
     {

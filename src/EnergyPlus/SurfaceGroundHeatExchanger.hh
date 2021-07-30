@@ -73,25 +73,25 @@ namespace SurfaceGroundHeatExchanger {
         std::string InletNode;        // surface GHE inlet fluid node
         std::string OutletNode;       // surface GHE outlet fluid node
         Real64 DesignMassFlowRate;
-        Real64 TubeDiameter;  // hydronic tube inside diameter
-        Real64 TubeSpacing;   // tube spacing
-        Real64 SurfaceLength; // active length of surface GHE
-        Real64 SurfaceWidth;  // active width of surface GHE
-        Real64 TopThermAbs;   // Thermal absortivity of top layer
-        Real64 TopSolarAbs;   // solar absortivity of top layer
-        Real64 BtmThermAbs;   // Thermal absortivity of bottom layer
-        int LowerSurfCond;    // Type of lower surf. boundary condition
-        int TubeCircuits;     // number of circuits in total
-        int ConstructionNum;  // construction index number
-        int InletNodeNum;     // inlet node number
-        int OutletNodeNum;    // oulet node number
-        int TopRoughness;     // roughness of top layer
-        int BtmRoughness;     // roughness of bottom layer
-        int FrozenErrIndex1;  // recurring error index
-        int FrozenErrIndex2;  // recurring error index
-        int ConvErrIndex1;    // recurring error index
-        int ConvErrIndex2;    // recurring error index
-        int ConvErrIndex3;    // recurring error index
+        Real64 TubeDiameter;                         // hydronic tube inside diameter
+        Real64 TubeSpacing;                          // tube spacing
+        Real64 SurfaceLength;                        // active length of surface GHE
+        Real64 SurfaceWidth;                         // active width of surface GHE
+        Real64 TopThermAbs;                          // Thermal absortivity of top layer
+        Real64 TopSolarAbs;                          // solar absortivity of top layer
+        Real64 BtmThermAbs;                          // Thermal absortivity of bottom layer
+        int LowerSurfCond;                           // Type of lower surf. boundary condition
+        int TubeCircuits;                            // number of circuits in total
+        int ConstructionNum;                         // construction index number
+        int InletNodeNum;                            // inlet node number
+        int OutletNodeNum;                           // oulet node number
+        DataSurfaces::SurfaceRoughness TopRoughness; // roughness of top layer
+        DataSurfaces::SurfaceRoughness BtmRoughness; // roughness of bottom layer
+        int FrozenErrIndex1;                         // recurring error index
+        int FrozenErrIndex2;                         // recurring error index
+        int ConvErrIndex1;                           // recurring error index
+        int ConvErrIndex2;                           // recurring error index
+        int ConvErrIndex3;                           // recurring error index
         // loop topology variables
         int LoopNum;
         int LoopSideNum;
@@ -154,17 +154,19 @@ namespace SurfaceGroundHeatExchanger {
         // Default Constructor
         SurfaceGroundHeatExchangerData()
             : DesignMassFlowRate(0.0), TubeDiameter(0.0), TubeSpacing(0.0), SurfaceLength(0.0), SurfaceWidth(0.0), TopThermAbs(0.0), TopSolarAbs(0.0),
-              BtmThermAbs(0.0), LowerSurfCond(0), TubeCircuits(0), ConstructionNum(0), InletNodeNum(0), OutletNodeNum(0), TopRoughness(0),
-              BtmRoughness(0), FrozenErrIndex1(0), FrozenErrIndex2(0), ConvErrIndex1(0), ConvErrIndex2(0), ConvErrIndex3(0), LoopNum(0),
-              LoopSideNum(0), BranchNum(0), CompNum(0),
-
+              BtmThermAbs(0.0), LowerSurfCond(0), TubeCircuits(0), ConstructionNum(0), InletNodeNum(0), OutletNodeNum(0),
+              TopRoughness(DataSurfaces::SurfaceRoughness::Unassigned), BtmRoughness(DataSurfaces::SurfaceRoughness::Unassigned), FrozenErrIndex1(0),
+              FrozenErrIndex2(0), ConvErrIndex1(0), ConvErrIndex2(0), ConvErrIndex3(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0),
               TsrcConstCoef(0.0), TsrcVarCoef(0.0), QbtmConstCoef(0.0), QbtmVarCoef(0.0), QtopConstCoef(0.0), QtopVarCoef(0.0), NumCTFTerms(0),
-              CTFin({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFout({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFcross({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
-              CTFflux({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFSourceIn({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFSourceOut({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
+              CTFin({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFout({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
+              CTFcross({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFflux({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
+              CTFSourceIn({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFSourceOut({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
               CTFTSourceOut({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFTSourceIn({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
-              CTFTSourceQ({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), TbtmHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), TtopHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
-              TsrcHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), QbtmHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), QtopHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
-              QsrcHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), QSrc(0.0), QSrcAvg(0.0), LastQSrc(0.0), LastSysTimeElapsed(0.0), LastTimeStepSys(0.0),
+              CTFTSourceQ({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), TbtmHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
+              TtopHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), TsrcHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
+              QbtmHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), QtopHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
+              QsrcHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), QSrc(0.0), QSrcAvg(0.0), LastQSrc(0.0), LastSysTimeElapsed(0.0),
+              LastTimeStepSys(0.0),
 
               InletTemp(0.0), OutletTemp(0.0), MassFlowRate(0.0), TopSurfaceTemp(0.0), BtmSurfaceTemp(0.0), TopSurfaceFlux(0.0), BtmSurfaceFlux(0.0),
               HeatTransferRate(0.0), SurfHeatTransferRate(0.0), Energy(0.0), SurfEnergy(0.0), SourceTemp(0.0),
@@ -173,7 +175,11 @@ namespace SurfaceGroundHeatExchanger {
         {
         }
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
 
         static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string objectName);
 
@@ -224,7 +230,7 @@ namespace SurfaceGroundHeatExchanger {
         //==============================================================================
 
         void CalcTopSurfTemp(Real64 FluxTop,             // top surface flux
-                             Real64 &TempTop,                  // top surface temperature
+                             Real64 &TempTop,            // top surface temperature
                              Real64 ThisDryBulb,         // dry bulb temperature
                              Real64 ThisWetBulb,         // wet bulb temperature
                              Real64 ThisSkyTemp,         // sky temperature
@@ -239,7 +245,7 @@ namespace SurfaceGroundHeatExchanger {
         //==============================================================================
 
         void CalcBottomSurfTemp(Real64 FluxBtm,       // bottom surface flux
-                                Real64 &TempBtm,            // bottom surface temperature
+                                Real64 &TempBtm,      // bottom surface temperature
                                 Real64 ThisDryBulb,   // dry bulb temperature
                                 Real64 ThisWindSpeed, // wind speed
                                 Real64 ThisGroundTemp // ground temperature
@@ -252,6 +258,10 @@ namespace SurfaceGroundHeatExchanger {
         //==============================================================================
 
         void ReportSurfaceGroundHeatExchngr(EnergyPlusData &state); // Index for the surface under consideration
+
+        //==============================================================================
+
+        void oneTimeInit(EnergyPlusData &state) override; // Empty function for pure virtual oneTimeInitFlag function
     };
 
     void GetSurfaceGroundHeatExchanger(EnergyPlusData &state);
@@ -260,16 +270,17 @@ namespace SurfaceGroundHeatExchanger {
 
 } // namespace SurfaceGroundHeatExchanger
 
-struct SurfaceGroundHeatExchangersData : BaseGlobalStruct {
+struct SurfaceGroundHeatExchangersData : BaseGlobalStruct
+{
 
     // utility variables initialized once
     bool NoSurfaceGroundTempObjWarning = true; // This will cause a warning to be issued if no "surface" ground
-    Real64 FlowRate = 0.0;       // water mass flow rate
-    Real64 TopSurfTemp = 0.0;    // Top  surface temperature
-    Real64 BtmSurfTemp = 0.0;    // Bottom  surface temperature
-    Real64 TopSurfFlux = 0.0;    // Top  surface heat flux
-    Real64 BtmSurfFlux = 0.0;    // Bottom  surface heat flux
-    Real64 SourceFlux = 0.0;     // total heat transfer rate, Watts
+    Real64 FlowRate = 0.0;                     // water mass flow rate
+    Real64 TopSurfTemp = 0.0;                  // Top  surface temperature
+    Real64 BtmSurfTemp = 0.0;                  // Bottom  surface temperature
+    Real64 TopSurfFlux = 0.0;                  // Top  surface heat flux
+    Real64 BtmSurfFlux = 0.0;                  // Bottom  surface heat flux
+    Real64 SourceFlux = 0.0;                   // total heat transfer rate, Watts
     Array1D_bool CheckEquipName;
 
     // weather data records updated every zone time step
@@ -293,6 +304,10 @@ struct SurfaceGroundHeatExchangersData : BaseGlobalStruct {
     bool InitializeTempTop = false;
 
     Array1D<SurfaceGroundHeatExchanger::SurfaceGroundHeatExchangerData> SurfaceGHE;
+    Real64 FluxTop; // top surface flux
+    Real64 FluxBtm; // bottom surface flux
+    Real64 TempBtm; // bottom surface temp
+    Real64 TempTop; // top surface temp
 
     void clear_state() override
     {

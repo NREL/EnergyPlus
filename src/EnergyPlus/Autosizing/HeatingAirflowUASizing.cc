@@ -61,7 +61,10 @@ void HeatingAirflowUASizer::initializeForSingleDuctZoneTerminal(EnergyPlusData &
     this->termUnitSizing(1).AirVolFlow = mainFlowRate;
 }
 
-void HeatingAirflowUASizer::initializeForZoneInductionUnit(EnergyPlusData &state, Real64 const elevation, Real64 mainFlowRate, Real64 reheatMultiplier)
+void HeatingAirflowUASizer::initializeForZoneInductionUnit(EnergyPlusData &state,
+                                                           Real64 const elevation,
+                                                           Real64 mainFlowRate,
+                                                           Real64 reheatMultiplier)
 {
     this->initializeFromAPI(state, elevation);
     this->zoneSizingRunDone = true;
@@ -102,7 +105,10 @@ void HeatingAirflowUASizer::initializeForSystemOutdoorAir(EnergyPlusData &state,
     }
 }
 
-void HeatingAirflowUASizer::initializeForSystemMainDuct(EnergyPlusData &state, Real64 const elevation, Real64 overallSystemVolFlow, Real64 minFlowRateRatio)
+void HeatingAirflowUASizer::initializeForSystemMainDuct(EnergyPlusData &state,
+                                                        Real64 const elevation,
+                                                        Real64 overallSystemVolFlow,
+                                                        Real64 minFlowRateRatio)
 {
     this->initializeFromAPI(state, elevation);
     this->curSysNum = 1;

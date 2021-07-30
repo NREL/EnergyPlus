@@ -129,7 +129,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.4;
+  Version,9.6;
 
   Building,
     Small Office with AirflowNetwork model,  !- Name
@@ -1969,8 +1969,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 1,                !- Name
     OA Sys 1 Controllers,    !- Controller List Name
-    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name
-    Reheat System 1 Avail List;  !- Availability Manager List Name
+    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     OutsideAirInletNodes;    !- Node or NodeList Name 1
@@ -3179,6 +3178,10 @@
   Output:Variable,West Zone,AFN Zone Infiltration Sensible Heat Loss Energy,Timestep;
 
   Output:Variable,West Zone,AFN Zone Infiltration Sensible Heat Gain Energy,Timestep;
+
+  Output:Variable,West Zone,AFN Zone Ventilation Sensible Heat Loss Energy,Timestep;
+
+  Output:Variable,West Zone,AFN Zone Ventilation Sensible Heat Gain Energy,Timestep;
 
   Output:Variable,*,Heating Coil NaturalGas Rate,Timestep;
 

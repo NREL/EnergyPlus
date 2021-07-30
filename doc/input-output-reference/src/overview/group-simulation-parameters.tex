@@ -283,7 +283,7 @@ This input object is used control the choice of models used for surface convecti
 
 \paragraph{Field: Algorithm}\label{field-algorithm-000}
 
-The model specified in this field is the default algorithm for the inside face all the surfaces.. The key choices are \textbf{Simple}, \textbf{TARP}, \textbf{CeilingDiffuser}, and \textbf{AdaptiveConvectionAlgorithm}.
+The model specified in this field is the default algorithm for the inside face all the surfaces.. The key choices are \textbf{Simple}, \textbf{TARP}, \textbf{CeilingDiffuser}, \textbf{AdaptiveConvectionAlgorithm}, and \textbf{ASTMC1340}.
 
 The \textbf{Simple} model applies constant heat transfer coefficients depending on the surface orientation.
 
@@ -292,6 +292,8 @@ The \textbf{TARP} model correlates the heat transfer coefficient to the temperat
 The \textbf{CeilingDiffuser} model is a mixed and forced convection model for ceiling diffuser configurations. The model correlates the heat transfer coefficient to the air change rate for ceilings, walls and floors. These correlations are based on experiments performed in an isothermal room with a cold ceiling jet. To avoid discontinuities in surface heat transfer rate calculations, all of correlations have been extrapolated beyond the lower limit of the data set (3 ACH) to a natural convection limit that is applied during the hours when the system is off.
 
 The \textbf{AdaptiveConvectionAlgorithm} model is an dynamic algorithm that organizes a large number of different convection models and automatically selects the one that best applies. The adaptive convection algorithm can also be customized using the \hyperref[surfaceconvectionalgorithminsideadaptivemodelselections]{SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections} input object. These models are explained in detail in the EnergyPlus Engineering Reference Document.
+
+The \textbf{ASTMC1340} model correlates mixed convection coefficients to the surface-to-air temperature difference, heat flow direction, surface tilt angle, surface characteristic length, and air speed past the surface. These correlations are based on ASTM C1340 standard.
 
 The default is \textbf{TARP}.
 
@@ -622,8 +624,7 @@ This fields specifies during shading calculation, for all surfaces in a targeted
 This fields specifies during shading calculation, for all surfaces in a targeted Zone Group, whether or not (\textbf{Yes} or \textbf{No} ) the self-shading effect from all exterior surfaces in the target Zone Group to other zones is disabled. If Yes, self-shading will be disabled from all exterior surfaces in a given Shading Zone Group to all other zones in the model. If both Disable Self-Shading Within Shading Zone Groups and Disable Self-Shading From Shading Zone Groups to Other Zones = Yes, then all self-shading from exterior surfaces will be disabled. If only one of these fields = Yes, then at least one Shading Zone Group must be specified, or this field will be ignored. Shading from Shading:* surfaces, overhangs, fins, and reveals will not be disabled.
 
 \paragraph{Field: Shading Zone Group ZoneList Name}\label{field-shading-zone-group-zoneList-name}
-The shading zones group specifies group of zones which are controlled by the Disable Self-Shading fields.
-This field is extensible.
+The shading zones group specifies group of zones which are controlled by the Disable Self-Shading fields.  This object is extensible, so additional fields of this type can be added to the end of this object.
 
 Examples of this object in IDF: (note this object must be unique in an IDF)
 

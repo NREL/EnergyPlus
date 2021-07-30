@@ -80,64 +80,57 @@ namespace GlobalNames {
     void IntraObjUniquenessCheck(EnergyPlusData &state,
                                  std::string &NameToVerify,
                                  std::string const &CurrentModuleObject,
-                                 std::string const &FieldName,
+                                 std::string_view FieldName,
                                  std::unordered_set<std::string> &UniqueStrings,
-                                 bool &ErrorsFound
-    );
+                                 bool &ErrorsFound);
+
+    bool VerifyUniqueInterObjectName(EnergyPlusData &state,
+                                     std::unordered_map<std::string, std::string> &names,
+                                     std::string &object_name,
+                                     std::string_view object_type,
+                                     std::string_view field_name,
+                                     bool &ErrorsFound);
 
     bool VerifyUniqueInterObjectName(EnergyPlusData &state,
                                      std::unordered_map<std::string, std::string> &names,
                                      std::string &object_name,
                                      std::string const &object_type,
-                                     std::string const &field_name,
-                                     bool &ErrorsFound
-    );
+                                     bool &ErrorsFound);
 
-    bool VerifyUniqueInterObjectName(EnergyPlusData &state,
-                                     std::unordered_map<std::string, std::string> &names,
-                                     std::string &object_name,
-                                     std::string const &object_type,
-                                     bool &ErrorsFound
-    );
+    void VerifyUniqueChillerName(EnergyPlusData &state,
+                                 std::string const &TypeToVerify,
+                                 std::string const &NameToVerify,
+                                 bool &ErrorsFound, // returns true if duplicate name found, unchanged otherwise
+                                 std::string const &StringToDisplay);
 
-    void
-    VerifyUniqueChillerName(EnergyPlusData &state,
-                            std::string const &TypeToVerify,
-                            std::string const &NameToVerify,
-                            bool &ErrorsFound,                   // returns true if duplicate name found, unchanged otherwise
-                            std::string const &StringToDisplay);
+    void VerifyUniqueBaseboardName(EnergyPlusData &state,
+                                   std::string const &TypeToVerify,
+                                   std::string const &NameToVerify,
+                                   bool &ErrorsFound, // returns true if duplicate name found, unchanged otherwise
+                                   std::string const &StringToDisplay);
 
-    void
-    VerifyUniqueBaseboardName(EnergyPlusData &state,
+    void VerifyUniqueBoilerName(EnergyPlusData &state,
+                                std::string const &TypeToVerify,
+                                std::string const &NameToVerify,
+                                bool &ErrorsFound, // returns true if duplicate name found, unchanged otherwise
+                                std::string const &StringToDisplay);
+
+    void VerifyUniqueCoilName(EnergyPlusData &state,
                               std::string const &TypeToVerify,
-                              std::string const &NameToVerify,
-                              bool &ErrorsFound,                 // returns true if duplicate name found, unchanged otherwise
+                              std::string &NameToVerify,
+                              bool &ErrorsFound, // returns true if duplicate name found, unchanged otherwise
                               std::string const &StringToDisplay);
 
-    void
-    VerifyUniqueBoilerName(EnergyPlusData &state,
-                           std::string const &TypeToVerify,
-                           std::string const &NameToVerify,
-                           bool &ErrorsFound,                    // returns true if duplicate name found, unchanged otherwise
-                           std::string const &StringToDisplay);
-
-    void
-    VerifyUniqueCoilName(EnergyPlusData &state,
-                         std::string const &TypeToVerify,
-                         std::string &NameToVerify,
-                         bool &ErrorsFound,                      // returns true if duplicate name found, unchanged otherwise
-                         std::string const &StringToDisplay);
-
-    void
-    VerifyUniqueADUName(EnergyPlusData &state,
-                        std::string const &TypeToVerify,
-                        std::string const &NameToVerify,
-                        bool &ErrorsFound,                       // returns true if duplicate name found, unchanged otherwise
-                        std::string const &StringToDisplay);
+    void VerifyUniqueADUName(EnergyPlusData &state,
+                             std::string const &TypeToVerify,
+                             std::string const &NameToVerify,
+                             bool &ErrorsFound, // returns true if duplicate name found, unchanged otherwise
+                             std::string const &StringToDisplay);
 
 } // namespace GlobalNames
 
-struct GlobalNamesData : BaseGlobalStruct {
+struct GlobalNamesData : BaseGlobalStruct
+{
 
     int NumChillers = 0;
     int NumBoilers = 0;

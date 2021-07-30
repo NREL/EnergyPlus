@@ -59,7 +59,7 @@ using namespace EnergyPlus::Psychrometrics;
 TEST_F(EnergyPlusFixture, Psychrometrics_PsyTsatFnHPb_Test)
 {
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     // Test 1: TEMP. IS FROM  20 C  TO   40 C
     Real64 H = 7.5223e4 - 1.78637e4;
@@ -150,7 +150,7 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyTsatFnHPb_Test)
 TEST_F(EnergyPlusFixture, Psychrometrics_PsyTsatFnPb_Test)
 {
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     // Test 1: general
     Real64 PB = 101325.0;
@@ -222,7 +222,8 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyWFnTdpPb_Test)
         "   **   ~~~   **  Dew-Point= 100.00 Barometric Pressure= 81000.00",
         "   **   ~~~   ** Instead, calculated Humidity Ratio at 93.0 (7 degree less) = 20.0794 will be used. Simulation continues.",
     });
-    Psychrometrics::iPsyErrIndex(5) = 0;
+    state->dataPsychrometrics->iPsyErrIndex[static_cast<int>(PsychrometricFunction::WFnTdpPb)] = 0;
+
     W = Psychrometrics::PsyWFnTdpPb(*state, TDP, PB);
     EXPECT_NEAR(20.07942181, W, 0.0001);
     EXPECT_TRUE(compare_err_stream(error_string1, true));
@@ -274,7 +275,7 @@ inline Real64 PsyCpAirFnWTdb(Real64 const dw, // humidity ratio {kgWater/kgDryAi
 TEST_F(EnergyPlusFixture, Psychrometrics_PsyCpAirFn_Test)
 {
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     // Test 1: analytical PsyCpAirFnW is independent of temperature
     Real64 W = 0.0080;
@@ -345,7 +346,7 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyCpAirFn_Test)
 TEST_F(EnergyPlusFixture, Psychrometrics_CpAirValue_Test)
 {
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     // Test 1: dry cooling process test, delta enthalpy vs cpair times delta T
     Real64 W1 = 0.0030;
@@ -390,29 +391,28 @@ TEST_F(EnergyPlusFixture, Psychrometrics_CpAirValue_Test)
 TEST_F(EnergyPlusFixture, Psychrometrics_PsyTwbFnTdbWPb_Test)
 {
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     // Test when wet bulb temperature is below zero
-    Real64 TDB = 1; // C
+    Real64 TDB = 1;   // C
     Real64 W = 0.002; // Kg.water/Kg.dryair
     Real64 Pb = 101325.0;
     Real64 result = PsyTwbFnTdbWPb(*state, TDB, W, Pb);
     Real64 expected_result = -2.200; // expected result from psychrometrics chart
     EXPECT_NEAR(result, expected_result, 0.001);
-
 }
 
 TEST_F(EnergyPlusFixture, Psychrometrics_CpAirAverageValue_Test)
 {
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     // Test 1: heating process, constant humidity ratio
     Real64 W1 = 0.0030;
     Real64 W2 = 0.0030;
-    Real64 CpAirIn = PsyCpAirFnW(W1);           // cp of air at state 1
-    Real64 CpAirOut = PsyCpAirFnW(W2);          // cp of air at state 2
-    Real64 CpAir_result = PsyCpAirFnW(0.5 * (W1 + W2));  // cp of air at average humidity ratio
+    Real64 CpAirIn = PsyCpAirFnW(W1);                   // cp of air at state 1
+    Real64 CpAirOut = PsyCpAirFnW(W2);                  // cp of air at state 2
+    Real64 CpAir_result = PsyCpAirFnW(0.5 * (W1 + W2)); // cp of air at average humidity ratio
     Real64 CpAir_average = (CpAirIn + CpAirOut) / 2;
     ;
     // check heating results
@@ -423,9 +423,9 @@ TEST_F(EnergyPlusFixture, Psychrometrics_CpAirAverageValue_Test)
     // Test 2: cooling Processes, dehumidified air
     W1 = 0.010;
     W2 = 0.008;
-    CpAirIn = PsyCpAirFnW(W1);           // cp of air at state 1
-    CpAirOut = PsyCpAirFnW(W2);          // cp of air at state 2
-    CpAir_result = PsyCpAirFnW(0.5 * (W1 + W2));  // cp of air at average humidity ratio
+    CpAirIn = PsyCpAirFnW(W1);                   // cp of air at state 1
+    CpAirOut = PsyCpAirFnW(W2);                  // cp of air at state 2
+    CpAir_result = PsyCpAirFnW(0.5 * (W1 + W2)); // cp of air at average humidity ratio
     CpAir_average = (CpAirIn + CpAirOut) / 2;
     ;
     // check cooling results

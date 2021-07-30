@@ -70,9 +70,6 @@ namespace PlantCondLoopOperation {
                                      bool &LoopShutDownFlag, // EMS flag to tell loop solver to shut down pumps
                                      bool &LoadDistributionWasPerformed);
 
-    // Beginning of GetInput subroutines for the Module
-    //******************************************************************************
-
     void GetPlantOperationInput(EnergyPlusData &state, bool &GetInputOK);
 
     void GetOperationSchemeInput(EnergyPlusData &state);
@@ -116,19 +113,7 @@ namespace PlantCondLoopOperation {
                                      bool &ErrorsFound                 // May be set here and passed on
     );
 
-    // End of GetInput subroutines for the Module
-    //******************************************************************************
-
-    // Beginning Initialization Section of the Plant Loop Module
-    //******************************************************************************
-
     void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration);
-
-    // End Initialization Section of the Plant Loop Module
-    //******************************************************************************
-
-    // Begin Load Calculation/Distribution Section of the Plant Loop Module
-    //******************************************************************************
 
     void DistributePlantLoad(EnergyPlusData &state,
                              int const LoopNum,
@@ -171,21 +156,11 @@ namespace PlantCondLoopOperation {
                                         Real64 const LoopDemand,
                                         Real64 &RemLoopDemand);
 
-    // End Load Calculation/Distribution Section of the Plant Loop Module
-    //******************************************************************************
-
-    //********************************
-
     Real64 FindRangeVariable(EnergyPlusData &state,
                              int const LoopNum,      // PlantLoop data structure loop counter
                              int const CurSchemePtr, // set by PL()%LoopSide()%Branch()%Comp()%OpScheme()%OpSchemePtr
                              int const CurSchemeType // identifier set in PlantData
     );
-
-    //********************************
-
-    // Begin Plant Loop ON/OFF Utility Subroutines
-    //******************************************************************************
 
     void TurnOnPlantLoopPipes(EnergyPlusData &state, int const LoopNum, int const LoopSideNum);
 
@@ -193,15 +168,10 @@ namespace PlantCondLoopOperation {
 
     void TurnOffLoopSideEquipment(EnergyPlusData &state, int const LoopNum, int const LoopSideNum);
 
-    // End Plant Loop ON/OFF Utility Subroutines
-    //******************************************************************************
-
-    // Begin Plant EMS Control Routines
-    //******************************************************************************
-
     void SetupPlantEMSActuators(EnergyPlusData &state);
 
-    void ActivateEMSControls(EnergyPlusData &state, int const LoopNum, int const LoopSideNum, int const BranchNum, int const CompNum, bool &LoopShutDownFlag);
+    void ActivateEMSControls(
+        EnergyPlusData &state, int const LoopNum, int const LoopSideNum, int const BranchNum, int const CompNum, bool &LoopShutDownFlag);
 
     void AdjustChangeInLoadByEMSControls(EnergyPlusData &state,
                                          int const LoopNum,
@@ -213,17 +183,27 @@ namespace PlantCondLoopOperation {
 
 } // namespace PlantCondLoopOperation
 
-struct PlantCondLoopOperationData : BaseGlobalStruct {
+struct PlantCondLoopOperationData : BaseGlobalStruct
+{
 
     bool GetPlantOpInput = true;
     bool InitLoadDistributionOneTimeFlag = true;
     bool LoadEquipListOneTimeFlag = true;
-
+    int TotNumLists = 0;
+    Array1D_string EquipListsNameList;
+    Array1D<DataPlant::LoopType> EquipListsTypeList;
+    Array1D_int EquipListsIndexList;
+    bool lDummy = false; // for User-defined component load dispatch
     void clear_state() override
     {
         this->GetPlantOpInput = true;
         this->InitLoadDistributionOneTimeFlag = true;
         this->LoadEquipListOneTimeFlag = true;
+        this->TotNumLists = 0;
+        this->EquipListsNameList.clear();
+        this->EquipListsTypeList.clear();
+        this->EquipListsIndexList.clear();
+        this->lDummy = false;
     }
 };
 

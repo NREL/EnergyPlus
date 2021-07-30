@@ -408,16 +408,44 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
                           "    0.0003,                  !- Rated Source Side Flow Rate {m3/s}",
                           "    5490,                    !- Rated Heating Capacity {W}",
                           "    1640,                    !- Rated Heating Power Consumption {W}",
-                          "    -3.01043,                !- Heating Capacity Coefficient 1",
-                          "    -.51452,                 !- Heating Capacity Coefficient 2",
-                          "    4.515927,                !- Heating Capacity Coefficient 3",
-                          "    0.017971,                !- Heating Capacity Coefficient 4",
-                          "    0.155798,                !- Heating Capacity Coefficient 5",
-                          "    -2.65423,                !- Heating Compressor Power Coefficient 1",
-                          "    8.570358,                !- Heating Compressor Power Coefficient 2",
-                          "    1.21629,                 !- Heating Compressor Power Coefficient 3",
-                          "    -.21629,                 !- Heating Compressor Power Coefficient 4",
-                          "    0.033862;                !- Heating Compressor Power Coefficient 5",
+                          "    HtgCapCurve,             !- Heating Capacity Curve Name",
+                          "    HtgPowCurve;             !- Heating Compressor Power Curve Name",
+
+                          "Curve:QuadLinear,",
+                          "    HtgCapCurve,             ! Curve Name",
+                          "    -3.01043,                ! CoefficientC1",
+                          "    -.51452,                 ! CoefficientC2",
+                          "    4.515927,                ! CoefficientC3",
+                          "    0.017971,                ! CoefficientC4",
+                          "    0.155798,                ! CoefficientC5",
+                          "    0.,                      ! Minimum Value of w",
+                          "    100.,                    ! Maximum Value of w",
+                          "    0.,                      ! Minimum Value of x",
+                          "    100.,                    ! Maximum Value of x",
+                          "    0.,                      ! Minimum Value of y",
+                          "    100.,                    ! Maximum Value of y",
+                          "    0,                       ! Minimum Value of z",
+                          "    100,                     ! Maximum Value of z",
+                          "    0.,                      ! Minimum Curve Output",
+                          "    38.;                     ! Maximum Curve Output",
+
+                          "Curve:QuadLinear,",
+                          "    HtgPowCurve,             ! Curve Name",
+                          "    -2.65423,                ! CoefficientC1",
+                          "    8.570358,                ! CoefficientC2",
+                          "    1.21629,                 ! CoefficientC3",
+                          "    -.21629,                 ! CoefficientC4",
+                          "    0.033862,                ! CoefficientC5",
+                          "    0.,                      ! Minimum Value of w",
+                          "    100.,                    ! Maximum Value of w",
+                          "    0.,                      ! Minimum Value of x",
+                          "    100.,                    ! Maximum Value of x",
+                          "    0.,                      ! Minimum Value of y",
+                          "    100.,                    ! Maximum Value of y",
+                          "    0,                       ! Minimum Value of z",
+                          "    100,                     ! Maximum Value of z",
+                          "    0.,                      ! Minimum Curve Output",
+                          "    38.;                     ! Maximum Curve Output",
 
                           "PlantLoop,",
                           "    GHEV Loop,               !- Name",
@@ -715,9 +743,10 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
     OutputReportPredefined::SetPredefinedTables(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
-    OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-    OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    OutputProcessor::SetupTimePointers(
+        *state, OutputProcessor::SOVTimeStepType::Zone, state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+    OutputProcessor::SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, state->dataHVACGlobal->TimeStepSys);
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
 
@@ -765,7 +794,8 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
                 state->dataGlobal->BeginHourFlag = true;
                 state->dataGlobal->EndHourFlag = false;
 
-                for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour; ++state->dataGlobal->TimeStep) {
+                for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour;
+                     ++state->dataGlobal->TimeStep) {
 
                     state->dataGlobal->BeginTimeStepFlag = true;
 
@@ -808,7 +838,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
 
     } // ... End environment loop.
 
-    EXPECT_NEAR(DataLoopNode::Node(12).MassFlowRate, 0.3, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(12).MassFlowRate, 0.3, 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
@@ -1150,18 +1180,46 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
                           "    autosize,                  !- Rated Source Side Flow Rate {m3/s}",
                           "    autosize,                    !- Rated Heating Capacity {W}",
                           "    autosize,                    !- Rated Heating Power Consumption {W}",
-                          "    -3.01043,                !- Heating Capacity Coefficient 1",
-                          "    -.51452,                 !- Heating Capacity Coefficient 2",
-                          "    4.515927,                !- Heating Capacity Coefficient 3",
-                          "    0.017971,                !- Heating Capacity Coefficient 4",
-                          "    0.155798,                !- Heating Capacity Coefficient 5",
-                          "    -2.65423,                !- Heating Compressor Power Coefficient 1",
-                          "    8.570358,                !- Heating Compressor Power Coefficient 2",
-                          "    1.21629,                 !- Heating Compressor Power Coefficient 3",
-                          "    -.21629,                 !- Heating Compressor Power Coefficient 4",
-                          "    0.033862,                !- Heating Compressor Power Coefficient 5",
+                          "    HtgCapCurve,                !- Heating Capacity Curve Name",
+                          "    HtgPowCurve,                !- Heating Compressor Power Curve Name",
                           "    3.3475,                  !- Reference Coefficient of Performance",
                           "    1.0;                     !- Sizing Factor",
+
+                          "Curve:QuadLinear,",
+                          "    HtgCapCurve,             ! Curve Name",
+                          "    -3.01043,                ! CoefficientC1",
+                          "    -.51452,                 ! CoefficientC2",
+                          "    4.515927,                ! CoefficientC3",
+                          "    0.017971,                ! CoefficientC4",
+                          "    0.155798,                ! CoefficientC5",
+                          "    0.,                      ! Minimum Value of w",
+                          "    100.,                    ! Maximum Value of w",
+                          "    0.,                      ! Minimum Value of x",
+                          "    100.,                    ! Maximum Value of x",
+                          "    0.,                      ! Minimum Value of y",
+                          "    100.,                    ! Maximum Value of y",
+                          "    0,                       ! Minimum Value of z",
+                          "    100,                     ! Maximum Value of z",
+                          "    0.,                      ! Minimum Curve Output",
+                          "    38.;                     ! Maximum Curve Output",
+
+                          "Curve:QuadLinear,",
+                          "    HtgPowCurve,             ! Curve Name",
+                          "    -2.65423,                ! CoefficientC1",
+                          "    8.570358,                ! CoefficientC2",
+                          "    1.21629,                 ! CoefficientC3",
+                          "    -.21629,                 ! CoefficientC4",
+                          "    0.033862,                ! CoefficientC5",
+                          "    0.,                      ! Minimum Value of w",
+                          "    100.,                    ! Maximum Value of w",
+                          "    0.,                      ! Minimum Value of x",
+                          "    100.,                    ! Maximum Value of x",
+                          "    0.,                      ! Minimum Value of y",
+                          "    100.,                    ! Maximum Value of y",
+                          "    0,                       ! Minimum Value of z",
+                          "    100,                     ! Maximum Value of z",
+                          "    0.,                      ! Minimum Curve Output",
+                          "    38.;                     ! Maximum Curve Output",
 
                           "PlantLoop,",
                           "    GHEV Loop,               !- Name",
@@ -1465,9 +1523,10 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
     OutputReportPredefined::SetPredefinedTables(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
-    OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-    OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
+    OutputProcessor::SetupTimePointers(
+        *state, OutputProcessor::SOVTimeStepType::Zone, state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+    OutputProcessor::SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, state->dataHVACGlobal->TimeStepSys);
+    createFacilityElectricPowerServiceObject(*state);
     OutputProcessor::GetReportVariableInput(*state);
     PlantManager::CheckIfAnyPlant(*state);
 
@@ -1494,15 +1553,15 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
 
     // Check that we are outputing the correct values
     EXPECT_EQ("HeatPump:WaterToWater:EquationFit:Heating",
-              OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchMechType,
-                                                               state->dataHPWaterToWaterSimple->GSHP(1).Name));
+              OutputReportPredefined::RetrievePreDefTableEntry(
+                  *state, state->dataOutRptPredefined->pdchMechType, state->dataHPWaterToWaterSimple->GSHP(1).Name));
 
     EXPECT_EQ("3.35",
-              OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchMechNomEff,
-                                                               state->dataHPWaterToWaterSimple->GSHP(1).Name));
+              OutputReportPredefined::RetrievePreDefTableEntry(
+                  *state, state->dataOutRptPredefined->pdchMechNomEff, state->dataHPWaterToWaterSimple->GSHP(1).Name));
 
     EXPECT_EQ("7200.71",
-              OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchMechNomCap,
-                                                               state->dataHPWaterToWaterSimple->GSHP(1).Name));
+              OutputReportPredefined::RetrievePreDefTableEntry(
+                  *state, state->dataOutRptPredefined->pdchMechNomCap, state->dataHPWaterToWaterSimple->GSHP(1).Name));
 }
 } // namespace EnergyPlus

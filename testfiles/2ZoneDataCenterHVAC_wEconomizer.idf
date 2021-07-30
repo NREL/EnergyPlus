@@ -111,7 +111,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.4;
+  Version,9.6;
 
   Timestep,4;
 
@@ -979,8 +979,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     West Zone OA System,     !- Name
     West Data Center OA Controllers,  !- Controller List Name
-    West Data Center OA Equipment,  !- Outdoor Air Equipment List Name
-    West Data Center Avail List;  !- Availability Manager List Name
+    West Data Center OA Equipment;  !- Outdoor Air Equipment List Name
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTSIDE AIR INLET NODE LIST ===========
 
@@ -1666,8 +1665,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     East Zone OA System,     !- Name
     East Data Center OA Controllers,  !- Controller List Name
-    East Data Center OA Equipment,  !- Outdoor Air Equipment List Name
-    East Data Center Avail List;  !- Availability Manager List Name
+    East Data Center OA Equipment;  !- Outdoor Air Equipment List Name
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTSIDE AIR INLET NODE LIST ===========
 

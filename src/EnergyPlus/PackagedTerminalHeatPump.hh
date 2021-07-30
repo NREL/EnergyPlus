@@ -337,13 +337,13 @@ namespace PackagedTerminalHeatPump {
     };
 
     void SimPackagedTerminalUnit(EnergyPlusData &state,
-                                 std::string const &CompName, // name of the packaged terminal heat pump
-                                 int ZoneNum,                 // number of zone being served
-                                 bool FirstHVACIteration,     // TRUE if 1st HVAC simulation of system timestep
-                                 Real64 &QUnitOut,            // sensible capacity delivered to zone
-                                 Real64 &LatOutputProvided,   // Latent add/removal by packaged terminal unit (kg/s), dehumid = negative
-                                 int PTUnitType,              // indicates whether PTAC, PTHP or PTWSHP
-                                 int &CompIndex               // index to Packaged Terminal Heat Pump
+                                 std::string_view CompName, // name of the packaged terminal heat pump
+                                 int ZoneNum,               // number of zone being served
+                                 bool FirstHVACIteration,   // TRUE if 1st HVAC simulation of system timestep
+                                 Real64 &QUnitOut,          // sensible capacity delivered to zone
+                                 Real64 &LatOutputProvided, // Latent add/removal by packaged terminal unit (kg/s), dehumid = negative
+                                 int PTUnitType,            // indicates whether PTAC, PTHP or PTWSHP
+                                 int &CompIndex             // index to Packaged Terminal Heat Pump
     );
 
     void SimPTUnit(EnergyPlusData &state,
@@ -572,6 +572,17 @@ struct PackagedTerminalHeatPumpData : BaseGlobalStruct
     Array1D<PackagedTerminalHeatPump::PTUnitData> PTUnit;
     std::unordered_map<std::string, std::string> PTUnitUniqueNames;
     Array1D<PackagedTerminalHeatPump::PTUnitNumericFieldData> PTUnitUNumericFields; // holds VRF TU numeric input fields character field name
+    Array1D_bool MyEnvrnFlag;                                                       // used for initializations each begin environment flag
+    Array1D_bool MySizeFlag;                                                        // used for sizing PTHP inputs one time
+    Array1D_bool MyFanFlag;                                                         // used for sizing PTHP fan inputs one time
+    Array1D_bool MyPlantScanFlag;
+    Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
+    Array1D<Real64> ControlPTUnitOutputPar = Array1D<Real64>(8);
+    Array1D<Real64> CalcPTUnitPar = Array1D<Real64>(3);
+    Array1D<Real64> ControlVSHPOutputPar = Array1D<Real64>(11);
+    int ErrCountCyc = 0; // Counter used to minimize the occurrence of output warnings
+    int ErrCountVar = 0; // Counter used to minimize the occurrence of output warnings
+    Array1D<Real64> CalcVarSpeedHeatPumpPar = Array1D<Real64>(3);
 
     void clear_state() override
     {
@@ -600,6 +611,13 @@ struct PackagedTerminalHeatPumpData : BaseGlobalStruct
         this->PTUnit.deallocate();
         this->PTUnitUniqueNames.clear();
         this->PTUnitUNumericFields.deallocate();
+        this->MyEnvrnFlag.clear();
+        this->MySizeFlag.clear();
+        this->MyFanFlag.clear();
+        this->MyPlantScanFlag.clear();
+        this->MyZoneEqFlag.clear();
+        this->ErrCountCyc = 0;
+        this->ErrCountVar = 0;
     }
 };
 

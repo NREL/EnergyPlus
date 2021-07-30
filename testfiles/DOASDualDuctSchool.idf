@@ -75,7 +75,7 @@
 ! End SimMetaData
 ! Number of Zones: 11
 
-  Version,9.4;
+  Version,9.6;
 
   Timestep,6;
 
@@ -7646,8 +7646,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     DOAS_POD_1_OA,           !- Name
     DOAS_POD_1_OA_Controllers,  !- Controller List Name
-    DOAS_POD_1_OA_Equipment, !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    DOAS_POD_1_OA_Equipment; !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     DOAS_POD_1_OANode List;  !- Node or NodeList Name 1
@@ -8005,8 +8004,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     DUALDUCT_OTHER_OA,       !- Name
     DUALDUCT_OTHER_OA_Controllers,  !- Controller List Name
-    DUALDUCT_OTHER_OA_Equipment,  !- Outdoor Air Equipment List Name
-    ;                        !- Availability Manager List Name
+    DUALDUCT_OTHER_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     DUALDUCT_OTHER_OANode List;  !- Node or NodeList Name 1

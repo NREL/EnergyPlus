@@ -160,6 +160,56 @@ Reports the total outdoor air volume that has been supplied to a zone over the r
 
 Reports the air changes per hour in the zone due to the outside fresh air supplied by mechanical ventilation system.
 
+\paragraph{Zone Target Voz Ventilation Flow Rate {[}m3/s{]}}\label{zone-target-voz-ventilation-flow-rate}
+The target ventilation flow rate \(V_{oz-dyn}\) at standard density at the current timestep as defined by the zone Design Specification Outdoor Air Object (\hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir}).
+
+\paragraph{Zone Ventilation Below Target Voz Time {[}hr{]}}\label{zone-ventilation-below-target-voz-time}
+The time that the zone total ventilation rate (mechanical ventilation plus natural ventilation) is more than 1\% below the \emph{Zone Target Voz Ventilation Flow Rate}.
+
+\paragraph{Zone Ventilation At Target Voz Time {[}hr{]}}\label{zone-ventilation-at-target-voz-time}
+The time that the zone total ventilation rate (mechanical ventilation plus natural ventilation) is within 1\% of the \emph{Zone Target Voz Ventilation Flow Rate}.
+
+\paragraph{Zone Ventilation Above Target Voz Time {[}hr{]}}\label{zone-ventilation-above-target-voz-time}
+The time that the zone total ventilation rate (mechanical ventilation plus natural ventilation) is more than 1\% above the \emph{Zone Target Voz Ventilation Flow Rate}.
+
+\paragraph{Zone Ventilation When Unoccupied Time {[}hr{]}}\label{zone-ventilation-when-unoccupied-time}
+The time that the zone total ventilation rate (mechanical ventilation plus natural ventilation) is greater than zero when the zone is unoccupied.
+
+\paragraph{Facility Any Zone Ventilation Below Target Voz Time {[}hr{]}}\label{facility-any-zone-ventilation-below-target-voz-time}
+The time that any zone's total ventilation rate (mechanical ventilation plus natural ventilation) is more than 1\% below the \emph{Zone Target Voz Ventilation Flow Rate}.
+
+\paragraph{Facility All Zones Ventilation At Target Voz Time {[}hr{]}}\label{facility-all-zones-ventilation-at-target-voz-time}
+The time that every zone's total ventilation rate (mechanical ventilation plus natural ventilation) is within 1\% of the \emph{Zone Target Voz Ventilation Flow Rate}.
+
+\paragraph{Facility Any Zone Ventilation Above Target Voz Time {[}hr{]}}\label{facility-any-zone-ventilation-above-target-voz-time}
+The time that any zone's total ventilation rate (mechanical ventilation plus natural ventilation) is more than 1\% above the \emph{Zone Target Voz Ventilation Flow Rate}.
+
+\paragraph{Facility Any Zone Ventilation When Unoccupied Time {[}hr{]}}\label{facility-any-zone-ventilation-when-unoccupied-time}
+The time that any zone's total ventilation rate (mechanical ventilation plus natural ventilation) is greater than zero when the zone is unoccupied.
+
+\paragraph{Air System Mechanical Ventilation Flow Rate {[}m3/s{]}}\label{air-system-mechanical-ventilation-flow-rate}
+The current airloop mechanical ventilation flow rate at standard density.
+
+\paragraph{Air System Natural Ventilation Flow Rate {[}m3/s{]}}\label{air-system-natural-ventilation-flow-rate}
+The sum of the natural ventilation flow rate at standard density at the current timestep for each zone on the airloop. If any zone terminal unit has a Design Specification Air Terminal Sizing Object  (\hyperref[designspecificationairterminalsizing]{DesignSpecification:AirTerminal:Sizing}) then the natural ventilation rate for that zone is scaled by the Fraction of Minimum Outdoor Air Flow value.
+
+\paragraph{Air System Target Voz Ventilation Flow Rate {[}m3/s{]}}\label{air-system-target-voz-ventilation-flow-rate}
+The sum of the target ventilation flow rates \(V_{oz-dyn}\) at standard density at the current timestep for each zone on the airloop. If any zone terminal unit has a Design Specification Air Terminal Sizing Object  (\hyperref[designspecificationairterminalsizing]{DesignSpecification:AirTerminal:Sizing}) then the target ventilation rate for that zone is scaled by the Fraction of Minimum Outdoor Air Flow value.
+
+\paragraph{Air System Ventilation Below Target Voz Time {[}hr{]}}\label{air-system-ventilation-below-target-voz-time}
+The time that the airloop total ventilation rate (mechanical ventilation plus natural ventilation) is more than 1\% below the \emph{Zone Target Voz Ventilation Flow Rate}.
+
+\paragraph{Air System Ventilation At Target Voz Time {[}hr{]}}\label{air-system-ventilation-at-target-voz-time}
+The time that the airloop total ventilation rate (mechanical ventilation plus natural ventilation) is within 1\% of the \emph{Zone Target Voz Ventilation Flow Rate}.
+
+\paragraph{Air System Ventilation Above Target Voz Time {[}hr{]}}\label{air-system-ventilation-above-target-voz-time}
+The time that the airloop total ventilation rate (mechanical ventilation plus natural ventilation) is more than 1\% above the \emph{Zone Target Voz Ventilation Flow Rate}.
+
+\paragraph{Air System Ventilation When Unoccupied Time {[}hr{]}}\label{air-system-ventilation-when-unoccupied-time}
+The time that the airloop total ventilation rate (mechanical ventilation plus natural ventilation) is greater than zero when all of the zones on the airloop are unoccupied.
+
+
+
 The example syntax below shows the basic ventilation flow variables reported on an hourly basis.
 
 \begin{itemize}
@@ -177,6 +227,38 @@ The example syntax below shows the basic ventilation flow variables reported on 
   Output:Variable,*,Zone Mechanical Ventilation Current Density Volume,Hourly;
 \item
   Output:Variable,*, Zone Mechanical Ventilation Air Changes per Hour,Hourly;
+\item
+  Output:Variable,*, Zone Target Voz Ventilation Flow Rate,Hourly;
+\item
+  Output:Variable,*, Zone Ventilation Below Target Voz Time,Hourly;
+\item
+  Output:Variable,*, Zone Ventilation At Target Voz Time,Hourly;
+\item
+  Output:Variable,*, Zone Ventilation Above Target Voz Time,Hourly;
+\item
+  Output:Variable,*, Zone Ventilation When Unoccupied Time,Hourly;
+\item
+  Output:Variable,*, Facility Any Zone Ventilation Below Target Voz Time,Hourly;
+\item
+  Output:Variable,*, Facility All Zones Ventilation At Target Voz Time,Hourly;
+\item
+  Output:Variable,*, Facility Any Zone Ventilation Above Target Voz Time,Hourly;
+\item
+  Output:Variable,*, Facility Any Zone Ventilation When Unoccupied Time,Hourly;
+\item
+  Output:Variable,*, Air System Mechanical Ventilation Flow Rate,Hourly;
+\item
+  Output:Variable,*, Air System Natural Ventilation Flow Rate,Hourly;
+\item
+  Output:Variable,*, Air System Target Voz Ventilation Flow Rate,Hourly;
+\item
+  Output:Variable,*, Air System Ventilation Below Target Voz Time,Hourly;
+\item
+  Output:Variable,*, Air System Ventilation At Target Voz Time,Hourly;
+\item
+  Output:Variable,*, Air System Ventilation Above Target Voz Time,Hourly;
+\item
+  Output:Variable,*, Air System Ventilation When Unoccupied Time,Hourly;
 \end{itemize}
 
 \paragraph{Ventilation Load Reports}\label{ventilation-load-reports}
@@ -610,7 +692,7 @@ The name of the AvailabilityManagerAssignmentList ~object. This is referenced by
 
 \paragraph{Field Set (Availability Manager Object Type, Name)}\label{field-set-availability-manager-object-type-name}
 
-Managers are listed by pairs of data items:~ \emph{Availability Manager Object Type} and \emph{Availability Manager Name}. The managers are simulated down the list and calculate a control status for use by the \hyperref[airloophvac]{AirLoopHVAC} or \hyperref[plantloop]{PlantLoop}. The priority of each manager used for a specific loop is based on the rules described above. Availability managers are not currently used for condenser loops. The availability managers, along with the \hyperref[airloophvac]{AirLoopHVAC} and \hyperref[plantloop]{PlantLoop} object, report the control status calculated each simulation timestep. These output variables can be used to prioritize the managers according to the required control strategy. Six managers are accomodated in the list by default, however, this IDD specification is extensible. Additional pairs may be added by directly editing the IDD.
+Managers are listed by pairs of data items:~ \emph{Availability Manager Object Type} and \emph{Availability Manager Name}. The managers are simulated down the list and calculate a control status for use by the \hyperref[airloophvac]{AirLoopHVAC} or \hyperref[plantloop]{PlantLoop}. The priority of each manager used for a specific loop is based on the rules described above. Availability managers are not currently used for condenser loops. The availability managers, along with the \hyperref[airloophvac]{AirLoopHVAC} and \hyperref[plantloop]{PlantLoop} object, report the control status calculated each simulation timestep. These output variables can be used to prioritize the managers according to the required control strategy. Six managers are accomodated in the list by default.  This object is extensible, so additional pairs of the next two fields may be added.
 
 \paragraph{Field: Availability Manager \textless{}x\textgreater{} Object Type}\label{field-availability-manager-x-object-type}
 
@@ -638,7 +720,7 @@ AvailabilityManagerAssignmentList,
 
 The Outside Air System (object AirLoopHVAC:OutdoorAirSystem) is a subsystem of an \hyperref[airloophvac]{AirLoopHVAC}. It handles the mixed air portion of the primary air system: the system relief air, the outside air inlet, and any components and controllers associated with the system relief air and outside air streams. From the perspective of the primary air loop the Outside Air System is treated as a single component. As a subsystem, it can contain one or more components and controllers.
 
-The input for the Outside Air System consists of a system name, a controller list name, an equipment list name, and an availability manager list name. The controller list simply lists, by type and unique name, all the controllers in the subsystem. The controllers will be simulated in list order. The equipment list lists all the components in the subsystem, by type and name. The equipment is simulated in list order. Finally, the availability manager list gives the type and name of the availability managers used by the subsystem.
+The input for the Outside Air System consists of a system name, a controller list name, and an equipment list name. The controller list simply lists, by type and unique name, all the controllers in the subsystem. The controllers will be simulated in list order. The equipment list lists all the components in the subsystem, by type and name. The equipment is simulated in list order.
 
 The equipment inlet/outlet must be sequential with no loops - the simulation can only handle a straight-through air path, both on the primary air side and on the secondary air side, if any. Heat exchanger secondary air inlets need to be independent of the primary air stream -- usually relief air is used.
 
@@ -661,10 +743,6 @@ When this object is referred in \hyperref[airloophvacdedicatedoutdoorairsystem]{
 This field is the name of an \hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList} object. An \hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList} is simply a list of components giving both component name and type. This Outdoor Air Equipment List specifies all the components that will be simulated in this outside air system. The order of the components in the list is significant: components are simulated sequentially in the order given in the Outdoor Air Equipment List. Typically the equipment list would contain at least an \hyperref[outdoorairmixer]{OutdoorAir:Mixer}. If there is more than one component, the components must be listed in order from the outside air to the \hyperref[outdoorairmixer]{OutdoorAir:Mixer} (the \hyperref[outdoorairmixer]{OutdoorAir:Mixer} is last).
 
 When this object is referred in \hyperref[airloophvacdedicatedoutdoorairsystem]{AirLoopHVAC:DedicatedOutdoorAirSystem}, the \hyperref[outdoorairmixer]{OutdoorAir:Mixer} will not be allowed as a component, because all the incoming airflow is from outdoor, and no mixing is needed.
-
-\paragraph{Field: Availability Manager List Name}\label{field-availability-manager-list-name-1}
-
-This field is the name of a \hyperref[availabilitymanagerassignmentlist]{AvailabilityManagerAssignmentList} object. An Availability Manager List is a list of Availability Managers giving both Availability Manager Object Type and Name. \textbf{Use of this input is optional.} This field may be omitted; it is not currently used by the program.
 
 An IDF example, including the \hyperref[airloophvac]{AirLoopHVAC}, and the controller and equipment lists.
 

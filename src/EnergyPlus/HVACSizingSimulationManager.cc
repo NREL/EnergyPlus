@@ -72,29 +72,28 @@ namespace EnergyPlus {
 void HVACSizingSimulationManager::DetermineSizingAnalysesNeeded(EnergyPlusData &state)
 {
     using DataSizing::Coincident;
-    using DataSizing::NumPltSizInput;
-    using DataSizing::PlantSizData;
 
     // currently the only type of advanced sizing analysis available is for coincident plant sizing
     // expect more specialized sizing analysis objects to be added, so minimizing code here and jump to a worker method once we know an instance is to
     // be created.
 
     // Loop over PlantSizData struct and find those plant loops that are to use coincident sizing
-    for (int i = 1; i <= NumPltSizInput; ++i) {
+    for (int i = 1; i <= state.dataSize->NumPltSizInput; ++i) {
 
-        if (PlantSizData(i).ConcurrenceOption == Coincident) {
+        if (state.dataSize->PlantSizData(i).ConcurrenceOption == Coincident) {
 
             // create an instance of analysis object for each loop
-            CreateNewCoincidentPlantAnalysisObject(state, PlantSizData(i).PlantLoopName, i);
+            CreateNewCoincidentPlantAnalysisObject(state, state.dataSize->PlantSizData(i).PlantLoopName, i);
         }
     }
 }
 
-void HVACSizingSimulationManager::CreateNewCoincidentPlantAnalysisObject(EnergyPlusData &state, std::string const &PlantLoopName, int const PlantSizingIndex)
+void HVACSizingSimulationManager::CreateNewCoincidentPlantAnalysisObject(EnergyPlusData &state,
+                                                                         std::string const &PlantLoopName,
+                                                                         int const PlantSizingIndex)
 {
     using DataPlant::SupplySide;
     using namespace FluidProperties;
-    using DataSizing::PlantSizData;
 
     Real64 density;
     Real64 cp;
@@ -103,17 +102,23 @@ void HVACSizingSimulationManager::CreateNewCoincidentPlantAnalysisObject(EnergyP
     for (int i = 1; i <= state.dataPlnt->TotNumLoops; ++i) {
         if (PlantLoopName == state.dataPlnt->PlantLoop(i).Name) { // found it
 
-            density = GetDensityGlycol(
-                state, state.dataPlnt->PlantLoop(i).FluidName, DataGlobalConstants::CWInitConvTemp, state.dataPlnt->PlantLoop(i).FluidIndex, "createNewCoincidentPlantAnalysisObject");
-            cp = GetSpecificHeatGlycol(
-                state, state.dataPlnt->PlantLoop(i).FluidName, DataGlobalConstants::CWInitConvTemp, state.dataPlnt->PlantLoop(i).FluidIndex, "createNewCoincidentPlantAnalysisObject");
+            density = GetDensityGlycol(state,
+                                       state.dataPlnt->PlantLoop(i).FluidName,
+                                       DataGlobalConstants::CWInitConvTemp,
+                                       state.dataPlnt->PlantLoop(i).FluidIndex,
+                                       "createNewCoincidentPlantAnalysisObject");
+            cp = GetSpecificHeatGlycol(state,
+                                       state.dataPlnt->PlantLoop(i).FluidName,
+                                       DataGlobalConstants::CWInitConvTemp,
+                                       state.dataPlnt->PlantLoop(i).FluidIndex,
+                                       "createNewCoincidentPlantAnalysisObject");
 
             plantCoincAnalyObjs.emplace_back(PlantLoopName,
                                              i,
                                              state.dataPlnt->PlantLoop(i).LoopSide(SupplySide).NodeNumIn,
                                              density,
                                              cp,
-                                             PlantSizData(PlantSizingIndex).NumTimeStepsInAvg,
+                                             state.dataSize->PlantSizData(PlantSizingIndex).NumTimeStepsInAvg,
                                              PlantSizingIndex);
         }
     }
@@ -121,21 +126,25 @@ void HVACSizingSimulationManager::CreateNewCoincidentPlantAnalysisObject(EnergyP
 
 void HVACSizingSimulationManager::SetupSizingAnalyses(EnergyPlusData &state)
 {
-    using DataLoopNode::Node;
     using DataSizing::CondenserLoop;
     using DataSizing::CoolingLoop;
     using DataSizing::HeatingLoop;
-    using DataSizing::PlantSizData;
     using DataSizing::SteamLoop;
 
     for (auto &P : plantCoincAnalyObjs) {
         // call setup log routine for each coincident plant analysis object
-        P.supplyInletNodeFlow_LogIndex = sizingLogger.SetupVariableSizingLog(state, Node(P.supplySideInletNodeNum).MassFlowRate, P.numTimeStepsInAvg);
-        P.supplyInletNodeTemp_LogIndex = sizingLogger.SetupVariableSizingLog(state, Node(P.supplySideInletNodeNum).Temp, P.numTimeStepsInAvg);
-        if (PlantSizData(P.plantSizingIndex).LoopType == HeatingLoop || PlantSizData(P.plantSizingIndex).LoopType == SteamLoop) {
-            P.loopDemand_LogIndex = sizingLogger.SetupVariableSizingLog(state, state.dataPlnt->PlantLoop(P.plantLoopIndex).HeatingDemand, P.numTimeStepsInAvg);
-        } else if (PlantSizData(P.plantSizingIndex).LoopType == CoolingLoop || PlantSizData(P.plantSizingIndex).LoopType == CondenserLoop) {
-            P.loopDemand_LogIndex = sizingLogger.SetupVariableSizingLog(state, state.dataPlnt->PlantLoop(P.plantLoopIndex).CoolingDemand, P.numTimeStepsInAvg);
+        P.supplyInletNodeFlow_LogIndex =
+            sizingLogger.SetupVariableSizingLog(state, state.dataLoopNodes->Node(P.supplySideInletNodeNum).MassFlowRate, P.numTimeStepsInAvg);
+        P.supplyInletNodeTemp_LogIndex =
+            sizingLogger.SetupVariableSizingLog(state, state.dataLoopNodes->Node(P.supplySideInletNodeNum).Temp, P.numTimeStepsInAvg);
+        if (state.dataSize->PlantSizData(P.plantSizingIndex).LoopType == HeatingLoop ||
+            state.dataSize->PlantSizData(P.plantSizingIndex).LoopType == SteamLoop) {
+            P.loopDemand_LogIndex =
+                sizingLogger.SetupVariableSizingLog(state, state.dataPlnt->PlantLoop(P.plantLoopIndex).HeatingDemand, P.numTimeStepsInAvg);
+        } else if (state.dataSize->PlantSizData(P.plantSizingIndex).LoopType == CoolingLoop ||
+                   state.dataSize->PlantSizData(P.plantSizingIndex).LoopType == CondenserLoop) {
+            P.loopDemand_LogIndex =
+                sizingLogger.SetupVariableSizingLog(state, state.dataPlnt->PlantLoop(P.plantLoopIndex).CoolingDemand, P.numTimeStepsInAvg);
         }
     }
 }
@@ -203,19 +212,15 @@ void HVACSizingSimulationManager::UpdateSizingLogsSystemStep(EnergyPlusData &sta
     sizingLogger.UpdateSizingLogValuesSystemStep(state);
 }
 
-std::unique_ptr<HVACSizingSimulationManager> hvacSizingSimulationManager;
-
 void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
 {
-    using DataSystemVariables::ReportDuringHVACSizingSimulation;
     using EMSManager::ManageEMS;
     using ExteriorEnergyUse::ManageExteriorEnergyUse;
-
     using PlantPipingSystemsManager::SimulateGroundDomains;
-
     using namespace WeatherManager;
-    using namespace DataReportingFlags;
     using namespace HeatBalanceManager;
+
+    auto &hvacSizingSimulationManager = state.dataHVACSizingSimMgr->hvacSizingSimulationManager;
 
     hvacSizingSimulationManager = std::unique_ptr<HVACSizingSimulationManager>(new HVACSizingSimulationManager());
 
@@ -249,19 +254,19 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
 
             hvacSizingSimulationManager->sizingLogger.SetupSizingLogsNewEnvironment(state);
 
-            //	if (!state.dataGlobal->DoDesDaySim) continue; // not sure about this, may need to force users to set this on input for this method, but maybe not
+            //    if (!DoDesDaySim) continue; // not sure about this, may need to force users to set this on input for this method, but maybe not
             if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) continue;
             if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) continue;
             if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodDesign) continue;
 
             if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).HVACSizingIterationNum != HVACSizingIterCount) continue;
 
-            if (ReportDuringHVACSizingSimulation) {
-                if (sqlite) {
-                    sqlite->sqliteBegin();
-                    sqlite->createSQLiteEnvironmentPeriodRecord(
+            if (state.dataSysVars->ReportDuringHVACSizingSimulation) {
+                if (state.dataSQLiteProcedures->sqlite) {
+                    state.dataSQLiteProcedures->sqlite->sqliteBegin();
+                    state.dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(
                         state.dataEnvrn->CurEnvirNum, state.dataEnvrn->EnvironmentName, state.dataGlobal->KindOfSim);
-                    sqlite->sqliteCommit();
+                    state.dataSQLiteProcedures->sqlite->sqliteCommit();
                 }
             }
             state.dataErrTracking->ExitDuringSimulations = true;
@@ -269,7 +274,9 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
             DisplayString(state, "Initializing New Environment Parameters, HVAC Sizing Simulation");
 
             state.dataGlobal->BeginEnvrnFlag = true;
-            if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay) && (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).suppressBegEnvReset)) {
+            if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay) &&
+                (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum)
+                     .suppressBegEnvReset)) {
                 // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
                 // easily converge fewer warmup days are allowed
                 DisplayString(state, "Suppressing Initialization of New Environment Parameters");
@@ -282,7 +289,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
             state.dataGlobal->WarmupFlag = true;
             state.dataGlobal->DayOfSim = 0;
             state.dataGlobal->DayOfSimChr = "0";
-            NumOfWarmupDays = 0;
+            state.dataReportFlag->NumOfWarmupDays = 0;
 
             bool anyEMSRan;
             ManageEMS(state, EMSManager::EMSCallFrom::BeginNewEnvironment, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
@@ -291,7 +298,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
 
                 // Let's always do a transaction, except we'll roll it back if need be
                 // if (ReportDuringHVACSizingSimulation) {
-                    if (sqlite) sqlite->sqliteBegin(); // setup for one transaction per day
+                if (state.dataSQLiteProcedures->sqlite) state.dataSQLiteProcedures->sqlite->sqliteBegin(); // setup for one transaction per day
                 // }
                 ++state.dataGlobal->DayOfSim;
                 state.dataGlobal->DayOfSimChr = fmt::to_string(state.dataGlobal->DayOfSim);
@@ -305,16 +312,18 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataGlobal->EndDayFlag = false;
 
                 if (state.dataGlobal->WarmupFlag) {
-                    ++NumOfWarmupDays;
-                    cWarmupDay = fmt::to_string(NumOfWarmupDays);
-                    DisplayString(state, "Warming up {" + cWarmupDay + '}');
+                    ++state.dataReportFlag->NumOfWarmupDays;
+                    state.dataReportFlag->cWarmupDay = fmt::to_string(state.dataReportFlag->NumOfWarmupDays);
+                    DisplayString(state, "Warming up {" + state.dataReportFlag->cWarmupDay + '}');
                 } else if (state.dataGlobal->DayOfSim == 1) {
-                    DisplayString(state, fmt::format("Starting HVAC Sizing Simulation at {} for {}", state.dataEnvrn->CurMnDy, state.dataEnvrn->EnvironmentName));
-                    static constexpr auto Format_700("Environment:WarmupDays,{:3}\n");
-                    print(state.files.eio, Format_700, NumOfWarmupDays);
-                } else if (DisplayPerfSimulationFlag) {
+                    DisplayString(
+                        state,
+                        fmt::format("Starting HVAC Sizing Simulation at {} for {}", state.dataEnvrn->CurMnDy, state.dataEnvrn->EnvironmentName));
+                    static constexpr fmt::string_view Format_700("Environment:WarmupDays,{:3}\n");
+                    print(state.files.eio, Format_700, state.dataReportFlag->NumOfWarmupDays);
+                } else if (state.dataReportFlag->DisplayPerfSimulationFlag) {
                     DisplayString(state, "Continuing Simulation at " + state.dataEnvrn->CurMnDy + " for " + state.dataEnvrn->EnvironmentName);
-                    DisplayPerfSimulationFlag = false;
+                    state.dataReportFlag->DisplayPerfSimulationFlag = false;
                 }
 
                 for (state.dataGlobal->HourOfDay = 1; state.dataGlobal->HourOfDay <= 24; ++state.dataGlobal->HourOfDay) { // Begin hour loop ...
@@ -322,7 +331,8 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
                     state.dataGlobal->BeginHourFlag = true;
                     state.dataGlobal->EndHourFlag = false;
 
-                    for (state.dataGlobal->TimeStep = 1; state.dataGlobal->TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++state.dataGlobal->TimeStep) {
+                    for (state.dataGlobal->TimeStep = 1; state.dataGlobal->TimeStep <= state.dataGlobal->NumOfTimeStepInHour;
+                         ++state.dataGlobal->TimeStep) {
                         if (state.dataGlobal->AnySlabsInModel || state.dataGlobal->AnyBasementsInModel) {
                             SimulateGroundDomains(state, false);
                         }
@@ -363,11 +373,11 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
                     state.dataGlobal->PreviousHour = state.dataGlobal->HourOfDay;
 
                 } // ... End hour loop.
-                if (sqlite) {
-                    if (ReportDuringHVACSizingSimulation) {
-                        sqlite->sqliteCommit(); // one transaction per day
+                if (state.dataSQLiteProcedures->sqlite) {
+                    if (state.dataSysVars->ReportDuringHVACSizingSimulation) {
+                        state.dataSQLiteProcedures->sqlite->sqliteCommit(); // one transaction per day
                     } else {
-                        sqlite->sqliteRollback(); // Cancel transaction
+                        state.dataSQLiteProcedures->sqlite->sqliteRollback(); // Cancel transaction
                     }
                 }
             } // ... End day loop.

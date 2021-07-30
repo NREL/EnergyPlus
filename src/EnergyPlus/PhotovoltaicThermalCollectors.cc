@@ -107,34 +107,21 @@ namespace PhotovoltaicThermalCollectors {
 
     Real64 const SimplePVTWaterSizeFactor(1.905e-5); // [ m3/s/m2 ] average of collectors in SolarCollectors.idf
 
-    bool GetInputFlag(true); // First time, input is "gotten"
-
-    int NumPVT(0); // count of all types of PVT in input file
-
-    Array1D<PVTCollectorStruct> PVT;
-
-    void clear_state()
+    PlantComponent *PVTCollectorStruct::factory(EnergyPlusData &state, std::string_view objectName)
     {
-        GetInputFlag = true;
-        NumPVT = 0;
-        PVT.deallocate();
-    }
-
-    PlantComponent *PVTCollectorStruct::factory(EnergyPlusData &state, std::string const &objectName)
-    {
-        if (GetInputFlag) {
+        if (state.dataPhotovoltaicThermalCollector->GetInputFlag) {
             GetPVTcollectorsInput(state);
-            GetInputFlag = false;
+            state.dataPhotovoltaicThermalCollector->GetInputFlag = false;
         }
 
-        for (auto &thisComp : PVT) {
+        for (auto &thisComp : state.dataPhotovoltaicThermalCollector->PVT) {
             if (thisComp.Name == objectName) {
                 return &thisComp;
             }
         }
 
         // If we didn't find it, fatal
-        ShowFatalError(state, "Solar Thermal Collector Factory: Error getting inputs for object named: " + objectName);
+        ShowFatalError(state, "Solar Thermal Collector Factory: Error getting inputs for object named: " + std::string{objectName});
         // Shut up the compiler
         return nullptr;
     }
@@ -153,7 +140,7 @@ namespace PhotovoltaicThermalCollectors {
     {
 
         this->initialize(state, FirstHVACIteration);
-        this->control();
+        this->control(state);
         this->calculate(state);
         this->update(state);
     }
@@ -180,221 +167,255 @@ namespace PhotovoltaicThermalCollectors {
         Array1D<SimplePVTModelStruct> tmpSimplePVTperf;
 
         // first load the performance object info into temporary structure
-        DataIPShortCuts::cCurrentModuleObject = "SolarCollectorPerformance:PhotovoltaicThermal:Simple";
-        int NumSimplePVTPerform = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
+        state.dataIPShortCut->cCurrentModuleObject = "SolarCollectorPerformance:PhotovoltaicThermal:Simple";
+        int NumSimplePVTPerform = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
         if (NumSimplePVTPerform > 0) {
             tmpSimplePVTperf.allocate(NumSimplePVTPerform);
             for (Item = 1; Item <= NumSimplePVTPerform; ++Item) {
-                inputProcessor->getObjectItem(state,
-                                              DataIPShortCuts::cCurrentModuleObject,
-                                              Item,
-                                              DataIPShortCuts::cAlphaArgs,
-                                              NumAlphas,
-                                              DataIPShortCuts::rNumericArgs,
-                                              NumNumbers,
-                                              IOStatus,
-                                              _,
-                                              DataIPShortCuts::lAlphaFieldBlanks,
-                                              DataIPShortCuts::cAlphaFieldNames,
-                                              DataIPShortCuts::cNumericFieldNames);
-                if (UtilityRoutines::IsNameEmpty(state, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound)) continue;
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                         state.dataIPShortCut->cCurrentModuleObject,
+                                                                         Item,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         NumNumbers,
+                                                                         IOStatus,
+                                                                         _,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
+                if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound))
+                    continue;
 
-                tmpSimplePVTperf(Item).Name = DataIPShortCuts::cAlphaArgs(1);
-                if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(2), "Fixed")) {
+                tmpSimplePVTperf(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
+                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "Fixed")) {
                     tmpSimplePVTperf(Item).ThermEfficMode = ThermEfficEnum::FIXED;
-                } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(2), "Scheduled")) {
+                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "Scheduled")) {
                     tmpSimplePVTperf(Item).ThermEfficMode = ThermEfficEnum::SCHEDULED;
                 } else {
-                    ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + DataIPShortCuts::cAlphaArgs(2));
-                    ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
+                    ShowContinueError(state,
+                                      "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
                     ErrorsFound = true;
                 }
-                tmpSimplePVTperf(Item).ThermalActiveFract = DataIPShortCuts::rNumericArgs(1);
-                tmpSimplePVTperf(Item).ThermEffic = DataIPShortCuts::rNumericArgs(2);
+                tmpSimplePVTperf(Item).ThermalActiveFract = state.dataIPShortCut->rNumericArgs(1);
+                tmpSimplePVTperf(Item).ThermEffic = state.dataIPShortCut->rNumericArgs(2);
 
-                tmpSimplePVTperf(Item).ThermEffSchedNum = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(3));
+                tmpSimplePVTperf(Item).ThermEffSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                 if ((tmpSimplePVTperf(Item).ThermEffSchedNum == 0) && (tmpSimplePVTperf(Item).ThermEfficMode == ThermEfficEnum::SCHEDULED)) {
-                    ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + DataIPShortCuts::cAlphaArgs(3));
-                    ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
+                    ShowContinueError(state,
+                                      "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
                     ErrorsFound = true;
                 }
-                tmpSimplePVTperf(Item).SurfEmissivity = DataIPShortCuts::rNumericArgs(3);
+                tmpSimplePVTperf(Item).SurfEmissivity = state.dataIPShortCut->rNumericArgs(3);
             }
         } // NumSimplePVTPerform > 0
 
         // now get main PVT objects
-        DataIPShortCuts::cCurrentModuleObject = "SolarCollector:FlatPlate:PhotovoltaicThermal";
-        NumPVT = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
-        PVT.allocate(NumPVT);
+        state.dataIPShortCut->cCurrentModuleObject = "SolarCollector:FlatPlate:PhotovoltaicThermal";
+        state.dataPhotovoltaicThermalCollector->NumPVT =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+        state.dataPhotovoltaicThermalCollector->PVT.allocate(state.dataPhotovoltaicThermalCollector->NumPVT);
 
-        for (Item = 1; Item <= NumPVT; ++Item) {
-            inputProcessor->getObjectItem(state,
-                                          DataIPShortCuts::cCurrentModuleObject,
-                                          Item,
-                                          DataIPShortCuts::cAlphaArgs,
-                                          NumAlphas,
-                                          DataIPShortCuts::rNumericArgs,
-                                          NumNumbers,
-                                          IOStatus,
-                                          _,
-                                          DataIPShortCuts::lAlphaFieldBlanks,
-                                          DataIPShortCuts::cAlphaFieldNames,
-                                          DataIPShortCuts::cNumericFieldNames);
-            if (UtilityRoutines::IsNameEmpty(state, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound)) continue;
+        for (Item = 1; Item <= state.dataPhotovoltaicThermalCollector->NumPVT; ++Item) {
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     state.dataIPShortCut->cCurrentModuleObject,
+                                                                     Item,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     _,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound))
+                continue;
 
-            PVT(Item).Name = DataIPShortCuts::cAlphaArgs(1);
-            PVT(Item).TypeNum = DataPlant::TypeOf_PVTSolarCollectorFlatPlate;
+            state.dataPhotovoltaicThermalCollector->PVT(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
+            state.dataPhotovoltaicThermalCollector->PVT(Item).TypeNum = DataPlant::TypeOf_PVTSolarCollectorFlatPlate;
 
-            PVT(Item).SurfNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(2), DataSurfaces::Surface);
+            state.dataPhotovoltaicThermalCollector->PVT(Item).SurfNum =
+                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
             // check surface
-            if (PVT(Item).SurfNum == 0) {
-                if (DataIPShortCuts::lAlphaFieldBlanks(2)) {
-                    ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + DataIPShortCuts::cAlphaArgs(2));
-                    ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
+            if (state.dataPhotovoltaicThermalCollector->PVT(Item).SurfNum == 0) {
+                if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
+                    ShowContinueError(state,
+                                      "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+
                     ShowContinueError(state, "Surface name cannot be blank.");
                 } else {
-                    ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + DataIPShortCuts::cAlphaArgs(2));
-                    ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
+                    ShowContinueError(state,
+                                      "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
                     ShowContinueError(state, "Surface was not found.");
                 }
                 ErrorsFound = true;
             } else {
 
-                if (!DataSurfaces::Surface(PVT(Item).SurfNum).ExtSolar) {
-                    ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + DataIPShortCuts::cAlphaArgs(2));
-                    ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
+                if (!state.dataSurface->Surface(state.dataPhotovoltaicThermalCollector->PVT(Item).SurfNum).ExtSolar) {
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
+                    ShowContinueError(state,
+                                      "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
                     ShowContinueError(state, "Surface must be exposed to solar.");
                     ErrorsFound = true;
                 }
                 // check surface orientation, warn if upside down
-                if ((DataSurfaces::Surface(PVT(Item).SurfNum).Tilt < -95.0) || (DataSurfaces::Surface(PVT(Item).SurfNum).Tilt > 95.0)) {
-                    ShowWarningError(state, "Suspected input problem with " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + DataIPShortCuts::cAlphaArgs(2));
-                    ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
+                if ((state.dataSurface->Surface(state.dataPhotovoltaicThermalCollector->PVT(Item).SurfNum).Tilt < -95.0) ||
+                    (state.dataSurface->Surface(state.dataPhotovoltaicThermalCollector->PVT(Item).SurfNum).Tilt > 95.0)) {
+                    ShowWarningError(state,
+                                     "Suspected input problem with " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " +
+                                         state.dataIPShortCut->cAlphaArgs(2));
+                    ShowContinueError(state,
+                                      "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
                     ShowContinueError(state, "Surface used for solar collector faces down");
-                    ShowContinueError(
-                        state,
-                        format("Surface tilt angle (degrees from ground outward normal) = {:.2R}", DataSurfaces::Surface(PVT(Item).SurfNum).Tilt));
+                    ShowContinueError(state,
+                                      format("Surface tilt angle (degrees from ground outward normal) = {:.2R}",
+                                             state.dataSurface->Surface(state.dataPhotovoltaicThermalCollector->PVT(Item).SurfNum).Tilt));
                 }
 
             } // check surface
 
-            if (DataIPShortCuts::lAlphaFieldBlanks(3)) {
-                ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + DataIPShortCuts::cAlphaArgs(3));
-                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
-                ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(3) + ", name cannot be blank.");
+            if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(3) + ", name cannot be blank.");
                 ErrorsFound = true;
             } else {
-                PVT(Item).PVTModelName = DataIPShortCuts::cAlphaArgs(3);
-                int ThisParamObj = UtilityRoutines::FindItemInList(PVT(Item).PVTModelName, tmpSimplePVTperf);
+                state.dataPhotovoltaicThermalCollector->PVT(Item).PVTModelName = state.dataIPShortCut->cAlphaArgs(3);
+                int ThisParamObj = UtilityRoutines::FindItemInList(state.dataPhotovoltaicThermalCollector->PVT(Item).PVTModelName, tmpSimplePVTperf);
                 if (ThisParamObj > 0) {
-                    PVT(Item).Simple = tmpSimplePVTperf(ThisParamObj); // entire structure assigned
+                    state.dataPhotovoltaicThermalCollector->PVT(Item).Simple = tmpSimplePVTperf(ThisParamObj); // entire structure assigned
                     // do one-time setups on input data
-                    PVT(Item).AreaCol = DataSurfaces::Surface(PVT(Item).SurfNum).Area * PVT(Item).Simple.ThermalActiveFract;
-                    PVT(Item).PVTModelType = SimplePVTmodel;
+                    state.dataPhotovoltaicThermalCollector->PVT(Item).AreaCol =
+                        state.dataSurface->Surface(state.dataPhotovoltaicThermalCollector->PVT(Item).SurfNum).Area *
+                        state.dataPhotovoltaicThermalCollector->PVT(Item).Simple.ThermalActiveFract;
+                    state.dataPhotovoltaicThermalCollector->PVT(Item).PVTModelType = SimplePVTmodel;
                 } else {
-                    ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + DataIPShortCuts::cAlphaArgs(3));
-                    ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
-                    ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(3) + ", was not found.");
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
+                    ShowContinueError(state,
+                                      "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(3) + ", was not found.");
                     ErrorsFound = true;
                 }
             }
-            if (allocated(DataPhotovoltaics::PVarray)) { // then PV input gotten... but don't expect this to be true.
-                PVT(Item).PVnum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(4), DataPhotovoltaics::PVarray);
+            if (allocated(state.dataPhotovoltaic->PVarray)) { // then PV input gotten... but don't expect this to be true.
+                state.dataPhotovoltaicThermalCollector->PVT(Item).PVnum =
+                    UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataPhotovoltaic->PVarray);
                 // check PV
-                if (PVT(Item).PVnum == 0) {
-                    ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(4) + " = " + DataIPShortCuts::cAlphaArgs(4));
-                    ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
+                if (state.dataPhotovoltaicThermalCollector->PVT(Item).PVnum == 0) {
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + state.dataIPShortCut->cAlphaArgs(4));
+                    ShowContinueError(state,
+                                      "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
                     ErrorsFound = true;
                 } else {
-                    PVT(Item).PVname = DataIPShortCuts::cAlphaArgs(4);
-                    PVT(Item).PVfound = true;
+                    state.dataPhotovoltaicThermalCollector->PVT(Item).PVname = state.dataIPShortCut->cAlphaArgs(4);
+                    state.dataPhotovoltaicThermalCollector->PVT(Item).PVfound = true;
                 }
             } else { // no PV or not yet gotten.
-                PVT(Item).PVname = DataIPShortCuts::cAlphaArgs(4);
-                PVT(Item).PVfound = false;
+                state.dataPhotovoltaicThermalCollector->PVT(Item).PVname = state.dataIPShortCut->cAlphaArgs(4);
+                state.dataPhotovoltaicThermalCollector->PVT(Item).PVfound = false;
             }
 
-            if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(5), "Water")) {
-                PVT(Item).WorkingFluidType = WorkingFluidEnum::LIQUID;
-            } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(5), "Air")) {
-                PVT(Item).WorkingFluidType = WorkingFluidEnum::AIR;
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "Water")) {
+                state.dataPhotovoltaicThermalCollector->PVT(Item).WorkingFluidType = WorkingFluidEnum::LIQUID;
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "Air")) {
+                state.dataPhotovoltaicThermalCollector->PVT(Item).WorkingFluidType = WorkingFluidEnum::AIR;
             } else {
-                if (DataIPShortCuts::lAlphaFieldBlanks(5)) {
-                    ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + " = " + DataIPShortCuts::cAlphaArgs(5));
-                    ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
-                    ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(5) + " field cannot be blank.");
+                if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + state.dataIPShortCut->cAlphaArgs(5));
+                    ShowContinueError(state,
+                                      "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(5) + " field cannot be blank.");
                 } else {
-                    ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + " = " + DataIPShortCuts::cAlphaArgs(5));
-                    ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + state.dataIPShortCut->cAlphaArgs(5));
+                    ShowContinueError(state,
+                                      "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
                 }
                 ErrorsFound = true;
             }
 
-            if (PVT(Item).WorkingFluidType == WorkingFluidEnum::LIQUID) {
-                PVT(Item).PlantInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(6),
-                                                                                  ErrorsFound,
-                                                                                  DataIPShortCuts::cCurrentModuleObject,
-                                                                                  DataIPShortCuts::cAlphaArgs(1),
-                                                                                  DataLoopNode::NodeType_Water,
-                                                                                  DataLoopNode::NodeConnectionType_Inlet,
-                                                                                  1,
-                                                                                  DataLoopNode::ObjectIsNotParent);
-                PVT(Item).PlantOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(7),
-                                                                                   ErrorsFound,
-                                                                                   DataIPShortCuts::cCurrentModuleObject,
-                                                                                   DataIPShortCuts::cAlphaArgs(1),
-                                                                                   DataLoopNode::NodeType_Water,
-                                                                                   DataLoopNode::NodeConnectionType_Outlet,
-                                                                                   1,
-                                                                                   DataLoopNode::ObjectIsNotParent);
+            if (state.dataPhotovoltaicThermalCollector->PVT(Item).WorkingFluidType == WorkingFluidEnum::LIQUID) {
+                state.dataPhotovoltaicThermalCollector->PVT(Item).PlantInletNodeNum =
+                    NodeInputManager::GetOnlySingleNode(state,
+                                                        state.dataIPShortCut->cAlphaArgs(6),
+                                                        ErrorsFound,
+                                                        state.dataIPShortCut->cCurrentModuleObject,
+                                                        state.dataIPShortCut->cAlphaArgs(1),
+                                                        DataLoopNode::NodeFluidType::Water,
+                                                        DataLoopNode::NodeConnectionType::Inlet,
+                                                        NodeInputManager::compFluidStream::Primary,
+                                                        DataLoopNode::ObjectIsNotParent);
+                state.dataPhotovoltaicThermalCollector->PVT(Item).PlantOutletNodeNum =
+                    NodeInputManager::GetOnlySingleNode(state,
+                                                        state.dataIPShortCut->cAlphaArgs(7),
+                                                        ErrorsFound,
+                                                        state.dataIPShortCut->cCurrentModuleObject,
+                                                        state.dataIPShortCut->cAlphaArgs(1),
+                                                        DataLoopNode::NodeFluidType::Water,
+                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                        NodeInputManager::compFluidStream::Primary,
+                                                        DataLoopNode::ObjectIsNotParent);
 
-                BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
-                                                   DataIPShortCuts::cAlphaArgs(1),
-                                                   DataIPShortCuts::cAlphaArgs(6),
-                                                   DataIPShortCuts::cAlphaArgs(7),
+                BranchNodeConnections::TestCompSet(state,
+                                                   state.dataIPShortCut->cCurrentModuleObject,
+                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                   state.dataIPShortCut->cAlphaArgs(6),
+                                                   state.dataIPShortCut->cAlphaArgs(7),
                                                    "Water Nodes");
 
-                PVT(Item).WLoopSideNum = DataPlant::DemandSupply_No;
+                state.dataPhotovoltaicThermalCollector->PVT(Item).WLoopSideNum = DataPlant::DemandSupply_No;
             }
 
-            if (PVT(Item).WorkingFluidType == WorkingFluidEnum::AIR) {
-                PVT(Item).HVACInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(8),
-                                                                                 ErrorsFound,
-                                                                                 DataIPShortCuts::cCurrentModuleObject,
-                                                                                 DataIPShortCuts::cAlphaArgs(1),
-                                                                                 DataLoopNode::NodeType_Air,
-                                                                                 DataLoopNode::NodeConnectionType_Inlet,
-                                                                                 1,
-                                                                                 DataLoopNode::ObjectIsNotParent);
-                PVT(Item).HVACOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(9),
-                                                                                  ErrorsFound,
-                                                                                  DataIPShortCuts::cCurrentModuleObject,
-                                                                                  DataIPShortCuts::cAlphaArgs(1),
-                                                                                  DataLoopNode::NodeType_Air,
-                                                                                  DataLoopNode::NodeConnectionType_Outlet,
-                                                                                  1,
-                                                                                  DataLoopNode::ObjectIsNotParent);
+            if (state.dataPhotovoltaicThermalCollector->PVT(Item).WorkingFluidType == WorkingFluidEnum::AIR) {
+                state.dataPhotovoltaicThermalCollector->PVT(Item).HVACInletNodeNum =
+                    NodeInputManager::GetOnlySingleNode(state,
+                                                        state.dataIPShortCut->cAlphaArgs(8),
+                                                        ErrorsFound,
+                                                        state.dataIPShortCut->cCurrentModuleObject,
+                                                        state.dataIPShortCut->cAlphaArgs(1),
+                                                        DataLoopNode::NodeFluidType::Air,
+                                                        DataLoopNode::NodeConnectionType::Inlet,
+                                                        NodeInputManager::compFluidStream::Primary,
+                                                        DataLoopNode::ObjectIsNotParent);
+                state.dataPhotovoltaicThermalCollector->PVT(Item).HVACOutletNodeNum =
+                    NodeInputManager::GetOnlySingleNode(state,
+                                                        state.dataIPShortCut->cAlphaArgs(9),
+                                                        ErrorsFound,
+                                                        state.dataIPShortCut->cCurrentModuleObject,
+                                                        state.dataIPShortCut->cAlphaArgs(1),
+                                                        DataLoopNode::NodeFluidType::Air,
+                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                        NodeInputManager::compFluidStream::Primary,
+                                                        DataLoopNode::ObjectIsNotParent);
 
-                BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
-                                                   DataIPShortCuts::cAlphaArgs(1),
-                                                   DataIPShortCuts::cAlphaArgs(8),
-                                                   DataIPShortCuts::cAlphaArgs(9),
+                BranchNodeConnections::TestCompSet(state,
+                                                   state.dataIPShortCut->cCurrentModuleObject,
+                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                   state.dataIPShortCut->cAlphaArgs(8),
+                                                   state.dataIPShortCut->cAlphaArgs(9),
                                                    "Air Nodes");
             }
 
-            PVT(Item).DesignVolFlowRate = DataIPShortCuts::rNumericArgs(1);
-            PVT(Item).SizingInit = true;
-            if (PVT(Item).DesignVolFlowRate == DataSizing::AutoSize) {
-                PVT(Item).DesignVolFlowRateWasAutoSized = true;
+            state.dataPhotovoltaicThermalCollector->PVT(Item).DesignVolFlowRate = state.dataIPShortCut->rNumericArgs(1);
+            state.dataPhotovoltaicThermalCollector->PVT(Item).SizingInit = true;
+            if (state.dataPhotovoltaicThermalCollector->PVT(Item).DesignVolFlowRate == DataSizing::AutoSize) {
+                state.dataPhotovoltaicThermalCollector->PVT(Item).DesignVolFlowRateWasAutoSized = true;
             }
-            if (PVT(Item).DesignVolFlowRate != DataSizing::AutoSize) {
+            if (state.dataPhotovoltaicThermalCollector->PVT(Item).DesignVolFlowRate != DataSizing::AutoSize) {
 
-                if (PVT(Item).WorkingFluidType == WorkingFluidEnum::LIQUID) {
-                    PlantUtilities::RegisterPlantCompDesignFlow(PVT(Item).PlantInletNodeNum, PVT(Item).DesignVolFlowRate);
-                } else if (PVT(Item).WorkingFluidType == WorkingFluidEnum::AIR) {
-                    PVT(Item).MaxMassFlowRate = PVT(Item).DesignVolFlowRate * state.dataEnvrn->StdRhoAir;
+                if (state.dataPhotovoltaicThermalCollector->PVT(Item).WorkingFluidType == WorkingFluidEnum::LIQUID) {
+                    PlantUtilities::RegisterPlantCompDesignFlow(state,
+                                                                state.dataPhotovoltaicThermalCollector->PVT(Item).PlantInletNodeNum,
+                                                                state.dataPhotovoltaicThermalCollector->PVT(Item).DesignVolFlowRate);
+                } else if (state.dataPhotovoltaicThermalCollector->PVT(Item).WorkingFluidType == WorkingFluidEnum::AIR) {
+                    state.dataPhotovoltaicThermalCollector->PVT(Item).MaxMassFlowRate =
+                        state.dataPhotovoltaicThermalCollector->PVT(Item).DesignVolFlowRate * state.dataEnvrn->StdRhoAir;
                 }
-                PVT(Item).SizingInit = false;
+                state.dataPhotovoltaicThermalCollector->PVT(Item).SizingInit = false;
             }
         }
 
@@ -407,14 +428,21 @@ namespace PhotovoltaicThermalCollectors {
 
     void PVTCollectorStruct::setupReportVars(EnergyPlusData &state)
     {
-        SetupOutputVariable(state, "Generator Produced Thermal Rate", OutputProcessor::Unit::W, this->Report.ThermPower, "System", "Average", this->Name);
+        SetupOutputVariable(state,
+                            "Generator Produced Thermal Rate",
+                            OutputProcessor::Unit::W,
+                            this->Report.ThermPower,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
         if (this->WorkingFluidType == WorkingFluidEnum::LIQUID) {
-            SetupOutputVariable(state, "Generator Produced Thermal Energy",
+            SetupOutputVariable(state,
+                                "Generator Produced Thermal Energy",
                                 OutputProcessor::Unit::J,
                                 this->Report.ThermEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 _,
                                 "SolarWater",
@@ -423,11 +451,12 @@ namespace PhotovoltaicThermalCollectors {
                                 "Plant");
 
         } else if (this->WorkingFluidType == WorkingFluidEnum::AIR) {
-            SetupOutputVariable(state, "Generator Produced Thermal Energy",
+            SetupOutputVariable(state,
+                                "Generator Produced Thermal Energy",
                                 OutputProcessor::Unit::J,
                                 this->Report.ThermEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 _,
                                 "SolarAir",
@@ -436,17 +465,37 @@ namespace PhotovoltaicThermalCollectors {
                                 "System");
 
             SetupOutputVariable(state,
-                "Generator PVT Fluid Bypass Status", OutputProcessor::Unit::None, this->Report.BypassStatus, "System", "Average", this->Name);
+                                "Generator PVT Fluid Bypass Status",
+                                OutputProcessor::Unit::None,
+                                this->Report.BypassStatus,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
         }
 
         SetupOutputVariable(state,
-            "Generator PVT Fluid Inlet Temperature", OutputProcessor::Unit::C, this->Report.TinletWorkFluid, "System", "Average", this->Name);
+                            "Generator PVT Fluid Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->Report.TinletWorkFluid,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
         SetupOutputVariable(state,
-            "Generator PVT Fluid Outlet Temperature", OutputProcessor::Unit::C, this->Report.ToutletWorkFluid, "System", "Average", this->Name);
+                            "Generator PVT Fluid Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->Report.ToutletWorkFluid,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
         SetupOutputVariable(state,
-            "Generator PVT Fluid Mass Flow Rate", OutputProcessor::Unit::kg_s, this->Report.MdotWorkFluid, "System", "Average", this->Name);
+                            "Generator PVT Fluid Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->Report.MdotWorkFluid,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
     }
 
     void PVTCollectorStruct::initialize(EnergyPlusData &state, bool const FirstHVACIteration)
@@ -461,41 +510,15 @@ namespace PhotovoltaicThermalCollectors {
         // PURPOSE OF THIS SUBROUTINE:
         // init for PVT
 
-        static std::string const RoutineName("InitPVTcollectors");
+        static constexpr std::string_view RoutineName("InitPVTcollectors");
 
         // Do the one time initializations
-        if (this->MyOneTimeFlag) {
-            this->setupReportVars(state);
-            this->MyOneTimeFlag = false;
-        }
-
-        if (this->SetLoopIndexFlag) {
-            if (allocated(state.dataPlnt->PlantLoop) && (this->PlantInletNodeNum > 0)) {
-                bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        this->TypeNum,
-                                                        this->WLoopNum,
-                                                        this->WLoopSideNum,
-                                                        this->WLoopBranchNum,
-                                                        this->WLoopCompNum,
-                                                        errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _);
-                if (errFlag) {
-                    ShowFatalError(state, "InitPVTcollectors: Program terminated for previous conditions.");
-                }
-                this->SetLoopIndexFlag = false;
-            }
-        }
+        this->oneTimeInit(state);
 
         // finish set up of PV, because PV get-input follows PVT's get input.
         if (!this->PVfound) {
-            if (allocated(DataPhotovoltaics::PVarray)) {
-                this->PVnum = UtilityRoutines::FindItemInList(this->PVname, DataPhotovoltaics::PVarray);
+            if (allocated(state.dataPhotovoltaic->PVarray)) {
+                this->PVnum = UtilityRoutines::FindItemInList(this->PVname, state.dataPhotovoltaic->PVarray);
                 if (this->PVnum == 0) {
                     ShowSevereError(state, "Invalid name for photovoltaic generator = " + this->PVname);
                     ShowContinueError(state, "Entered in flat plate photovoltaic-thermal collector = " + this->Name);
@@ -510,21 +533,28 @@ namespace PhotovoltaicThermalCollectors {
             }
         }
 
-        if (!state.dataGlobal->SysSizingCalc && this->MySetPointCheckFlag && DataHVACGlobals::DoSetPointTest) {
-            for (int PVTindex = 1; PVTindex <= NumPVT; ++PVTindex) {
-                if (PVT(PVTindex).WorkingFluidType == WorkingFluidEnum::AIR) {
-                    if (DataLoopNode::Node(PVT(PVTindex).HVACOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) {
+        if (!state.dataGlobal->SysSizingCalc && this->MySetPointCheckFlag && state.dataHVACGlobal->DoSetPointTest) {
+            for (int PVTindex = 1; PVTindex <= state.dataPhotovoltaicThermalCollector->NumPVT; ++PVTindex) {
+                if (state.dataPhotovoltaicThermalCollector->PVT(PVTindex).WorkingFluidType == WorkingFluidEnum::AIR) {
+                    if (state.dataLoopNodes->Node(state.dataPhotovoltaicThermalCollector->PVT(PVTindex).HVACOutletNodeNum).TempSetPoint ==
+                        DataLoopNode::SensedNodeFlagValue) {
                         if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                             ShowSevereError(state, "Missing temperature setpoint for PVT outlet node  ");
-                            ShowContinueError(state, "Add a setpoint manager to outlet node of PVT named " + PVT(PVTindex).Name);
-                            DataHVACGlobals::SetPointErrorFlag = true;
+                            ShowContinueError(state,
+                                              "Add a setpoint manager to outlet node of PVT named " +
+                                                  state.dataPhotovoltaicThermalCollector->PVT(PVTindex).Name);
+                            state.dataHVACGlobal->SetPointErrorFlag = true;
                         } else {
                             // need call to EMS to check node
                             EMSManager::CheckIfNodeSetPointManagedByEMS(state,
-                                PVT(PVTindex).HVACOutletNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, DataHVACGlobals::SetPointErrorFlag);
-                            if (DataHVACGlobals::SetPointErrorFlag) {
+                                                                        state.dataPhotovoltaicThermalCollector->PVT(PVTindex).HVACOutletNodeNum,
+                                                                        EMSManager::SPControlType::iTemperatureSetPoint,
+                                                                        state.dataHVACGlobal->SetPointErrorFlag);
+                            if (state.dataHVACGlobal->SetPointErrorFlag) {
                                 ShowSevereError(state, "Missing temperature setpoint for PVT outlet node  ");
-                                ShowContinueError(state, "Add a setpoint manager to outlet node of PVT named " + PVT(PVTindex).Name);
+                                ShowContinueError(state,
+                                                  "Add a setpoint manager to outlet node of PVT named " +
+                                                      state.dataPhotovoltaicThermalCollector->PVT(PVTindex).Name);
                                 ShowContinueError(state, "  or use an EMS actuator to establish a setpoint at the outlet node of PVT");
                             }
                         }
@@ -585,7 +615,8 @@ namespace PhotovoltaicThermalCollectors {
 
                     this->MaxMassFlowRate = this->DesignVolFlowRate * rho;
 
-                    PlantUtilities::InitComponentNodes(0.0,
+                    PlantUtilities::InitComponentNodes(state,
+                                                       0.0,
                                                        this->MaxMassFlowRate,
                                                        InletNode,
                                                        OutletNode,
@@ -610,7 +641,7 @@ namespace PhotovoltaicThermalCollectors {
 
             if (SELECT_CASE_var == WorkingFluidEnum::LIQUID) {
                 // heating only right now, so control flow requests based on incident solar;
-                if (DataHeatBalance::SurfQRadSWOutIncident(this->SurfNum) > DataPhotovoltaics::MinIrradiance) {
+                if (state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) > state.dataPhotovoltaic->MinIrradiance) {
                     this->MassFlowRate = this->MaxMassFlowRate;
                 } else {
                     this->MassFlowRate = 0.0;
@@ -619,7 +650,7 @@ namespace PhotovoltaicThermalCollectors {
                 PlantUtilities::SetComponentFlowRate(
                     state, this->MassFlowRate, InletNode, OutletNode, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum);
             } else if (SELECT_CASE_var == WorkingFluidEnum::AIR) {
-                this->MassFlowRate = DataLoopNode::Node(InletNode).MassFlowRate;
+                this->MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
             }
         }
     }
@@ -643,10 +674,10 @@ namespace PhotovoltaicThermalCollectors {
         bool SizingDesRunThisAirSys; // true if a particular air system had a Sizing:System object and system sizing done
 
         // Indicator to hardsize and no sizing run
-        bool HardSizeNoDesRun = !(DataSizing::SysSizingRunDone || DataSizing::ZoneSizingRunDone);
+        bool HardSizeNoDesRun = !(state.dataSize->SysSizingRunDone || state.dataSize->ZoneSizingRunDone);
 
-        if (DataSizing::CurSysNum > 0) {
-            CheckThisAirSystemForSizing(DataSizing::CurSysNum, SizingDesRunThisAirSys);
+        if (state.dataSize->CurSysNum > 0) {
+            CheckThisAirSystemForSizing(state, state.dataSize->CurSysNum, SizingDesRunThisAirSys);
         } else {
             SizingDesRunThisAirSys = false;
         }
@@ -657,7 +688,7 @@ namespace PhotovoltaicThermalCollectors {
 
         if (this->WorkingFluidType == WorkingFluidEnum::LIQUID) {
 
-            if (!allocated(DataSizing::PlantSizData)) return;
+            if (!allocated(state.dataSize->PlantSizData)) return;
             if (!allocated(state.dataPlnt->PlantLoop)) return;
 
             if (this->WLoopNum > 0) {
@@ -665,8 +696,8 @@ namespace PhotovoltaicThermalCollectors {
             }
             if (this->WLoopSideNum == DataPlant::SupplySide) {
                 if (PltSizNum > 0) {
-                    if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
-                        DesignVolFlowRateDes = DataSizing::PlantSizData(PltSizNum).DesVolFlowRate;
+                    if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                        DesignVolFlowRateDes = state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate;
                     } else {
                         DesignVolFlowRateDes = 0.0;
                     }
@@ -679,7 +710,8 @@ namespace PhotovoltaicThermalCollectors {
                         }
                     } else { // Hardsized
                         if (state.dataPlnt->PlantFinalSizesOkayToReport && this->DesignVolFlowRate > 0.0) {
-                            BaseSizer::reportSizerOutput(state, "SolarCollector:FlatPlate:PhotovoltaicThermal",
+                            BaseSizer::reportSizerOutput(state,
+                                                         "SolarCollector:FlatPlate:PhotovoltaicThermal",
                                                          this->Name,
                                                          "User-Specified Design Flow Rate [m3/s]",
                                                          this->DesignVolFlowRate);
@@ -693,20 +725,25 @@ namespace PhotovoltaicThermalCollectors {
                 this->DesignVolFlowRate = DesignVolFlowRateDes;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(state,
-                        "SolarCollector:FlatPlate:PhotovoltaicThermal", this->Name, "Design Size Design Flow Rate [m3/s]", DesignVolFlowRateDes);
+                                                 "SolarCollector:FlatPlate:PhotovoltaicThermal",
+                                                 this->Name,
+                                                 "Design Size Design Flow Rate [m3/s]",
+                                                 DesignVolFlowRateDes);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, "SolarCollector:FlatPlate:PhotovoltaicThermal",
+                    BaseSizer::reportSizerOutput(state,
+                                                 "SolarCollector:FlatPlate:PhotovoltaicThermal",
                                                  this->Name,
                                                  "Initial Design Size Design Flow Rate [m3/s]",
                                                  DesignVolFlowRateDes);
                 }
-                PlantUtilities::RegisterPlantCompDesignFlow(this->PlantInletNodeNum, this->DesignVolFlowRate);
+                PlantUtilities::RegisterPlantCompDesignFlow(state, this->PlantInletNodeNum, this->DesignVolFlowRate);
 
             } else { // Hardsized with sizing data
                 if (this->DesignVolFlowRate > 0.0 && DesignVolFlowRateDes > 0.0 && state.dataPlnt->PlantFinalSizesOkayToReport) {
                     Real64 DesignVolFlowRateUser = this->DesignVolFlowRate;
-                    BaseSizer::reportSizerOutput(state, "SolarCollector:FlatPlate:PhotovoltaicThermal",
+                    BaseSizer::reportSizerOutput(state,
+                                                 "SolarCollector:FlatPlate:PhotovoltaicThermal",
                                                  this->Name,
                                                  "Design Size Design Flow Rate [m3/s]",
                                                  DesignVolFlowRateDes,
@@ -714,7 +751,7 @@ namespace PhotovoltaicThermalCollectors {
                                                  DesignVolFlowRateUser);
                     if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(DesignVolFlowRateDes - DesignVolFlowRateUser) / DesignVolFlowRateUser) >
-                            DataSizing::AutoVsHardSizingThreshold) {
+                            state.dataSize->AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeSolarCollector: Potential issue with equipment sizing for " + this->Name);
                             ShowContinueError(state, format("User-Specified Design Flow Rate of {:.5R} [W]", DesignVolFlowRateUser));
                             ShowContinueError(state, format("differs from Design Size Design Flow Rate of {:.5R} [W]", DesignVolFlowRateDes));
@@ -728,32 +765,33 @@ namespace PhotovoltaicThermalCollectors {
 
         if (this->WorkingFluidType == WorkingFluidEnum::AIR) {
 
-            if (DataSizing::CurSysNum > 0) {
+            if (state.dataSize->CurSysNum > 0) {
                 if (!this->DesignVolFlowRateWasAutoSized && !SizingDesRunThisAirSys) { // Simulation continue
                     HardSizeNoDesRun = true;
                     if (this->DesignVolFlowRate > 0.0) {
-                        BaseSizer::reportSizerOutput(state, "SolarCollector:FlatPlate:PhotovoltaicThermal",
+                        BaseSizer::reportSizerOutput(state,
+                                                     "SolarCollector:FlatPlate:PhotovoltaicThermal",
                                                      this->Name,
                                                      "User-Specified Design Flow Rate [m3/s]",
                                                      this->DesignVolFlowRate);
                     }
                 } else {
                     CheckSysSizing(state, "SolarCollector:FlatPlate:PhotovoltaicThermal", this->Name);
-                    if (DataSizing::CurOASysNum > 0) {
-                        DesignVolFlowRateDes = DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesOutAirVolFlow;
+                    if (state.dataSize->CurOASysNum > 0) {
+                        DesignVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow;
                     } else {
                         {
-                            auto const SELECT_CASE_var(DataSizing::CurDuctType);
+                            auto const SELECT_CASE_var(state.dataSize->CurDuctType);
                             if (SELECT_CASE_var == DataHVACGlobals::Main) {
-                                DesignVolFlowRateDes = DataSizing::FinalSysSizing(DataSizing::CurSysNum).SysAirMinFlowRat *
-                                                       DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesMainVolFlow;
+                                DesignVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).SysAirMinFlowRat *
+                                                       state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                             } else if (SELECT_CASE_var == DataHVACGlobals::Cooling) {
-                                DesignVolFlowRateDes = DataSizing::FinalSysSizing(DataSizing::CurSysNum).SysAirMinFlowRat *
-                                                       DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesCoolVolFlow;
+                                DesignVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).SysAirMinFlowRat *
+                                                       state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
                             } else if (SELECT_CASE_var == DataHVACGlobals::Heating) {
-                                DesignVolFlowRateDes = DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesHeatVolFlow;
+                                DesignVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
                             } else {
-                                DesignVolFlowRateDes = DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesMainVolFlow;
+                                DesignVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                             }
                         }
                     }
@@ -764,12 +802,16 @@ namespace PhotovoltaicThermalCollectors {
                     if (this->DesignVolFlowRateWasAutoSized) {
                         this->DesignVolFlowRate = DesignVolFlowRateDes;
                         BaseSizer::reportSizerOutput(state,
-                            "SolarCollector:FlatPlate:PhotovoltaicThermal", this->Name, "Design Size Design Flow Rate [m3/s]", DesignVolFlowRateDes);
+                                                     "SolarCollector:FlatPlate:PhotovoltaicThermal",
+                                                     this->Name,
+                                                     "Design Size Design Flow Rate [m3/s]",
+                                                     DesignVolFlowRateDes);
                         this->SizingInit = false;
                     } else {
                         if (this->DesignVolFlowRate > 0.0 && DesignVolFlowRateDes > 0.0) {
                             Real64 DesignVolFlowRateUser = this->DesignVolFlowRate;
-                            BaseSizer::reportSizerOutput(state, "SolarCollector:FlatPlate:PhotovoltaicThermal",
+                            BaseSizer::reportSizerOutput(state,
+                                                         "SolarCollector:FlatPlate:PhotovoltaicThermal",
                                                          this->Name,
                                                          "Design Size Design Flow Rate [m3/s]",
                                                          DesignVolFlowRateDes,
@@ -777,7 +819,7 @@ namespace PhotovoltaicThermalCollectors {
                                                          DesignVolFlowRateUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(DesignVolFlowRateDes - DesignVolFlowRateUser) / DesignVolFlowRateUser) >
-                                    DataSizing::AutoVsHardSizingThreshold) {
+                                    state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeSolarCollector: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, format("User-Specified Design Flow Rate of {:.5R} [W]", DesignVolFlowRateUser));
                                     ShowContinueError(state, format("differs from Design Size Design Flow Rate of {:.5R} [W]", DesignVolFlowRateDes));
@@ -788,7 +830,7 @@ namespace PhotovoltaicThermalCollectors {
                         }
                     }
                 }
-            } else if (DataSizing::CurZoneEqNum > 0) {
+            } else if (state.dataSize->CurZoneEqNum > 0) {
                 // PVT is not currently for zone equipment, should not come here.
             }
         }
@@ -798,7 +840,7 @@ namespace PhotovoltaicThermalCollectors {
         }
     }
 
-    void PVTCollectorStruct::control()
+    void PVTCollectorStruct::control(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -816,10 +858,10 @@ namespace PhotovoltaicThermalCollectors {
         if (this->WorkingFluidType == WorkingFluidEnum::AIR) {
 
             if (this->PVTModelType == SimplePVTmodel) {
-                if (DataHeatBalance::SurfQRadSWOutIncident(this->SurfNum) > DataPhotovoltaics::MinIrradiance) {
+                if (state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) > state.dataPhotovoltaic->MinIrradiance) {
                     // is heating wanted?
                     //  Outlet node is required to have a setpoint.
-                    if (DataLoopNode::Node(this->HVACOutletNodeNum).TempSetPoint > DataLoopNode::Node(this->HVACInletNodeNum).Temp) {
+                    if (state.dataLoopNodes->Node(this->HVACOutletNodeNum).TempSetPoint > state.dataLoopNodes->Node(this->HVACInletNodeNum).Temp) {
                         this->HeatingUseful = true;
                         this->CoolingUseful = false;
                         this->BypassDamperOff = true;
@@ -830,7 +872,7 @@ namespace PhotovoltaicThermalCollectors {
                     }
                 } else {
                     // is cooling wanted?
-                    if (DataLoopNode::Node(this->HVACOutletNodeNum).TempSetPoint < DataLoopNode::Node(this->HVACInletNodeNum).Temp) {
+                    if (state.dataLoopNodes->Node(this->HVACOutletNodeNum).TempSetPoint < state.dataLoopNodes->Node(this->HVACInletNodeNum).Temp) {
                         this->CoolingUseful = true;
                         this->HeatingUseful = false;
                         this->BypassDamperOff = true;
@@ -844,7 +886,7 @@ namespace PhotovoltaicThermalCollectors {
 
         } else if (this->WorkingFluidType == WorkingFluidEnum::LIQUID) {
             if (this->PVTModelType == SimplePVTmodel) {
-                if (DataHeatBalance::SurfQRadSWOutIncident(this->SurfNum) > DataPhotovoltaics::MinIrradiance) {
+                if (state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) > state.dataPhotovoltaic->MinIrradiance) {
                     // is heating wanted?
                     this->HeatingUseful = true;
                     this->BypassDamperOff = true;
@@ -872,7 +914,7 @@ namespace PhotovoltaicThermalCollectors {
         // METHODOLOGY EMPLOYED:
         // Current model is "simple" fixed efficiency and simple night sky balance for cooling
 
-        static std::string const RoutineName("CalcPVTcollectors");
+        static constexpr std::string_view RoutineName("CalcPVTcollectors");
 
         int InletNode(0);
 
@@ -886,7 +928,7 @@ namespace PhotovoltaicThermalCollectors {
         }
 
         Real64 mdot = this->MassFlowRate;
-        Real64 Tinlet = DataLoopNode::Node(InletNode).Temp;
+        Real64 Tinlet = state.dataLoopNodes->Node(InletNode).Temp;
 
         if (this->PVTModelType == SimplePVTmodel) {
 
@@ -908,10 +950,10 @@ namespace PhotovoltaicThermalCollectors {
                     }
                 }
 
-                Real64 PotentialHeatGain = DataHeatBalance::SurfQRadSWOutIncident(this->SurfNum) * Eff * this->AreaCol;
+                Real64 PotentialHeatGain = state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) * Eff * this->AreaCol;
 
                 if (this->WorkingFluidType == WorkingFluidEnum::AIR) {
-                    Real64 Winlet = DataLoopNode::Node(InletNode).HumRat;
+                    Real64 Winlet = state.dataLoopNodes->Node(InletNode).HumRat;
                     Real64 CpInlet = Psychrometrics::PsyCpAirFnW(Winlet);
                     if (mdot * CpInlet > 0.0) {
                         PotentialOutletTemp = Tinlet + PotentialHeatGain / (mdot * CpInlet);
@@ -919,15 +961,15 @@ namespace PhotovoltaicThermalCollectors {
                         PotentialOutletTemp = Tinlet;
                     }
                     // now compare heating potential to setpoint and figure bypass fraction
-                    if (PotentialOutletTemp > DataLoopNode::Node(this->HVACOutletNodeNum).TempSetPoint) { // need to modulate
+                    if (PotentialOutletTemp > state.dataLoopNodes->Node(this->HVACOutletNodeNum).TempSetPoint) { // need to modulate
                         if (Tinlet != PotentialOutletTemp) {
-                            BypassFraction =
-                                (DataLoopNode::Node(this->HVACOutletNodeNum).TempSetPoint - PotentialOutletTemp) / (Tinlet - PotentialOutletTemp);
+                            BypassFraction = (state.dataLoopNodes->Node(this->HVACOutletNodeNum).TempSetPoint - PotentialOutletTemp) /
+                                             (Tinlet - PotentialOutletTemp);
                         } else {
                             BypassFraction = 0.0;
                         }
                         BypassFraction = max(0.0, BypassFraction);
-                        PotentialOutletTemp = DataLoopNode::Node(this->HVACOutletNodeNum).TempSetPoint;
+                        PotentialOutletTemp = state.dataLoopNodes->Node(this->HVACOutletNodeNum).TempSetPoint;
                         PotentialHeatGain = mdot * Psychrometrics::PsyCpAirFnW(Winlet) * (PotentialOutletTemp - Tinlet);
 
                     } else {
@@ -946,7 +988,7 @@ namespace PhotovoltaicThermalCollectors {
                 this->Report.ThermEfficiency = Eff;
                 this->Report.ThermHeatGain = PotentialHeatGain;
                 this->Report.ThermPower = this->Report.ThermHeatGain;
-                this->Report.ThermEnergy = this->Report.ThermPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+                this->Report.ThermEnergy = this->Report.ThermPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
                 this->Report.ThermHeatLoss = 0.0;
                 this->Report.TinletWorkFluid = Tinlet;
                 this->Report.MdotWorkFluid = mdot;
@@ -963,7 +1005,7 @@ namespace PhotovoltaicThermalCollectors {
                 ConvectionCoefficients::InitExteriorConvectionCoeff(state,
                                                                     this->SurfNum,
                                                                     0.0,
-                                                                    DataHeatBalance::VerySmooth,
+                                                                    DataSurfaces::SurfaceRoughness::VerySmooth,
                                                                     this->Simple.SurfEmissivity,
                                                                     this->Simple.LastCollectorTemp,
                                                                     HcExt,
@@ -976,7 +1018,7 @@ namespace PhotovoltaicThermalCollectors {
                 Real64 CpInlet(0.0);
 
                 if (this->WorkingFluidType == WorkingFluidEnum::AIR) {
-                    Real64 Winlet = DataLoopNode::Node(InletNode).HumRat;
+                    Real64 Winlet = state.dataLoopNodes->Node(InletNode).HumRat;
                     CpInlet = Psychrometrics::PsyCpAirFnW(Winlet);
                     WetBulbInlet = Psychrometrics::PsyTwbFnTdbWPb(state, Tinlet, Winlet, state.dataEnvrn->OutBaroPress, RoutineName);
                     DewPointInlet = Psychrometrics::PsyTdpFnTdbTwbPb(state, Tinlet, WetBulbInlet, state.dataEnvrn->OutBaroPress, RoutineName);
@@ -986,8 +1028,8 @@ namespace PhotovoltaicThermalCollectors {
 
                 Real64 Tcollector =
                     (2.0 * mdot * CpInlet * Tinlet + this->AreaCol * (HrGround * state.dataEnvrn->OutDryBulbTemp + HrSky * state.dataEnvrn->SkyTemp +
-                                                                      HrAir * DataSurfaces::Surface(this->SurfNum).OutDryBulbTemp +
-                                                                      HcExt * DataSurfaces::Surface(this->SurfNum).OutDryBulbTemp)) /
+                                                                      HrAir * state.dataSurface->SurfOutDryBulbTemp(this->SurfNum) +
+                                                                      HcExt * state.dataSurface->SurfOutDryBulbTemp(this->SurfNum))) /
                     (2.0 * mdot * CpInlet + this->AreaCol * (HrGround + HrSky + HrAir + HcExt));
 
                 PotentialOutletTemp = 2.0 * Tcollector - Tinlet;
@@ -1012,7 +1054,7 @@ namespace PhotovoltaicThermalCollectors {
                 this->Report.ThermHeatLoss = mdot * CpInlet * (Tinlet - this->Report.ToutletWorkFluid);
                 this->Report.ThermHeatGain = 0.0;
                 this->Report.ThermPower = -1.0 * this->Report.ThermHeatLoss;
-                this->Report.ThermEnergy = this->Report.ThermPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+                this->Report.ThermEnergy = this->Report.ThermPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
                 this->Report.ThermEfficiency = 0.0;
                 this->Simple.LastCollectorTemp = Tcollector;
                 this->Report.BypassStatus = BypassFraction;
@@ -1050,31 +1092,62 @@ namespace PhotovoltaicThermalCollectors {
                 OutletNode = this->PlantOutletNodeNum;
 
                 PlantUtilities::SafeCopyPlantNode(state, InletNode, OutletNode);
-                DataLoopNode::Node(OutletNode).Temp = this->Report.ToutletWorkFluid;
+                state.dataLoopNodes->Node(OutletNode).Temp = this->Report.ToutletWorkFluid;
 
             } else if (SELECT_CASE_var == WorkingFluidEnum::AIR) {
                 InletNode = this->HVACInletNodeNum;
                 OutletNode = this->HVACOutletNodeNum;
 
                 // Set the outlet nodes for properties that just pass through & not used
-                DataLoopNode::Node(OutletNode).Quality = DataLoopNode::Node(InletNode).Quality;
-                DataLoopNode::Node(OutletNode).Press = DataLoopNode::Node(InletNode).Press;
-                DataLoopNode::Node(OutletNode).MassFlowRate = DataLoopNode::Node(InletNode).MassFlowRate;
-                DataLoopNode::Node(OutletNode).MassFlowRateMin = DataLoopNode::Node(InletNode).MassFlowRateMin;
-                DataLoopNode::Node(OutletNode).MassFlowRateMax = DataLoopNode::Node(InletNode).MassFlowRateMax;
-                DataLoopNode::Node(OutletNode).MassFlowRateMinAvail = DataLoopNode::Node(InletNode).MassFlowRateMinAvail;
-                DataLoopNode::Node(OutletNode).MassFlowRateMaxAvail = DataLoopNode::Node(InletNode).MassFlowRateMaxAvail;
+                state.dataLoopNodes->Node(OutletNode).Quality = state.dataLoopNodes->Node(InletNode).Quality;
+                state.dataLoopNodes->Node(OutletNode).Press = state.dataLoopNodes->Node(InletNode).Press;
+                state.dataLoopNodes->Node(OutletNode).MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
+                state.dataLoopNodes->Node(OutletNode).MassFlowRateMin = state.dataLoopNodes->Node(InletNode).MassFlowRateMin;
+                state.dataLoopNodes->Node(OutletNode).MassFlowRateMax = state.dataLoopNodes->Node(InletNode).MassFlowRateMax;
+                state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail;
+                state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail;
 
                 // Set outlet node variables that are possibly changed
-                DataLoopNode::Node(OutletNode).Temp = this->Report.ToutletWorkFluid;
-                DataLoopNode::Node(OutletNode).HumRat = DataLoopNode::Node(InletNode).HumRat; // assumes dewpoint bound on cooling ....
-                DataLoopNode::Node(OutletNode).Enthalpy =
-                    Psychrometrics::PsyHFnTdbW(this->Report.ToutletWorkFluid, DataLoopNode::Node(OutletNode).HumRat);
+                state.dataLoopNodes->Node(OutletNode).Temp = this->Report.ToutletWorkFluid;
+                state.dataLoopNodes->Node(OutletNode).HumRat = state.dataLoopNodes->Node(InletNode).HumRat; // assumes dewpoint bound on cooling ....
+                state.dataLoopNodes->Node(OutletNode).Enthalpy =
+                    Psychrometrics::PsyHFnTdbW(this->Report.ToutletWorkFluid, state.dataLoopNodes->Node(OutletNode).HumRat);
+            }
+        }
+    }
+    void PVTCollectorStruct::oneTimeInit(EnergyPlusData &state)
+    {
+
+        if (this->MyOneTimeFlag) {
+            this->setupReportVars(state);
+            this->MyOneTimeFlag = false;
+        }
+
+        if (this->SetLoopIndexFlag) {
+            if (allocated(state.dataPlnt->PlantLoop) && (this->PlantInletNodeNum > 0)) {
+                bool errFlag = false;
+                PlantUtilities::ScanPlantLoopsForObject(state,
+                                                        this->Name,
+                                                        this->TypeNum,
+                                                        this->WLoopNum,
+                                                        this->WLoopSideNum,
+                                                        this->WLoopBranchNum,
+                                                        this->WLoopCompNum,
+                                                        errFlag,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _);
+                if (errFlag) {
+                    ShowFatalError(state, "InitPVTcollectors: Program terminated for previous conditions.");
+                }
+                this->SetLoopIndexFlag = false;
             }
         }
     }
 
-    void GetPVTThermalPowerProduction(int const PVindex, Real64 &ThermalPower, Real64 &ThermalEnergy)
+    void GetPVTThermalPowerProduction(EnergyPlusData &state, int const PVindex, Real64 &ThermalPower, Real64 &ThermalEnergy)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1086,23 +1159,23 @@ namespace PhotovoltaicThermalCollectors {
         int PVTnum(0);
 
         // first find PVT index that is associated with this PV generator
-        for (int loop = 1; loop <= NumPVT; ++loop) {
-            if (!PVT(loop).PVfound) continue;
-            if (PVT(loop).PVnum == PVindex) { // we found it
+        for (int loop = 1; loop <= state.dataPhotovoltaicThermalCollector->NumPVT; ++loop) {
+            if (!state.dataPhotovoltaicThermalCollector->PVT(loop).PVfound) continue;
+            if (state.dataPhotovoltaicThermalCollector->PVT(loop).PVnum == PVindex) { // we found it
                 PVTnum = loop;
             }
         }
 
         if (PVTnum > 0) {
-            ThermalPower = PVT(PVTnum).Report.ThermPower;
-            ThermalEnergy = PVT(PVTnum).Report.ThermEnergy;
+            ThermalPower = state.dataPhotovoltaicThermalCollector->PVT(PVTnum).Report.ThermPower;
+            ThermalEnergy = state.dataPhotovoltaicThermalCollector->PVT(PVTnum).Report.ThermEnergy;
         } else {
             ThermalPower = 0.0;
             ThermalEnergy = 0.0;
         }
     }
 
-    int GetAirInletNodeNum(EnergyPlusData &state, std::string const &PVTName, bool &ErrorsFound)
+    int GetAirInletNodeNum(EnergyPlusData &state, std::string_view PVTName, bool &ErrorsFound)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -1117,23 +1190,24 @@ namespace PhotovoltaicThermalCollectors {
         int NodeNum; // node number returned
         int WhichPVT;
 
-        if (GetInputFlag) {
+        if (state.dataPhotovoltaicThermalCollector->GetInputFlag) {
             GetPVTcollectorsInput(state);
-            GetInputFlag = false;
+            state.dataPhotovoltaicThermalCollector->GetInputFlag = false;
         }
 
-        WhichPVT = UtilityRoutines::FindItemInList(PVTName, PVT);
+        WhichPVT = UtilityRoutines::FindItemInList(PVTName, state.dataPhotovoltaicThermalCollector->PVT);
         if (WhichPVT != 0) {
-            NodeNum = PVT(WhichPVT).HVACInletNodeNum;
+            NodeNum = state.dataPhotovoltaicThermalCollector->PVT(WhichPVT).HVACInletNodeNum;
         } else {
-            ShowSevereError(state, "GetAirInletNodeNum: Could not find SolarCollector FlatPlate PhotovoltaicThermal = \"" + PVTName + "\"");
+            ShowSevereError(state,
+                            "GetAirInletNodeNum: Could not find SolarCollector FlatPlate PhotovoltaicThermal = \"" + std::string{PVTName} + "\"");
             ErrorsFound = true;
             NodeNum = 0;
         }
 
         return NodeNum;
     }
-    int GetAirOutletNodeNum(EnergyPlusData &state, std::string const &PVTName, bool &ErrorsFound)
+    int GetAirOutletNodeNum(EnergyPlusData &state, std::string_view PVTName, bool &ErrorsFound)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -1148,16 +1222,17 @@ namespace PhotovoltaicThermalCollectors {
         int NodeNum; // node number returned
         int WhichPVT;
 
-        if (GetInputFlag) {
+        if (state.dataPhotovoltaicThermalCollector->GetInputFlag) {
             GetPVTcollectorsInput(state);
-            GetInputFlag = false;
+            state.dataPhotovoltaicThermalCollector->GetInputFlag = false;
         }
 
-        WhichPVT = UtilityRoutines::FindItemInList(PVTName, PVT);
+        WhichPVT = UtilityRoutines::FindItemInList(PVTName, state.dataPhotovoltaicThermalCollector->PVT);
         if (WhichPVT != 0) {
-            NodeNum = PVT(WhichPVT).HVACOutletNodeNum;
+            NodeNum = state.dataPhotovoltaicThermalCollector->PVT(WhichPVT).HVACOutletNodeNum;
         } else {
-            ShowSevereError(state, "GetAirInletNodeNum: Could not find SolarCollector FlatPlate PhotovoltaicThermal = \"" + PVTName + "\"");
+            ShowSevereError(state,
+                            "GetAirInletNodeNum: Could not find SolarCollector FlatPlate PhotovoltaicThermal = \"" + std::string{PVTName} + "\"");
             ErrorsFound = true;
             NodeNum = 0;
         }
@@ -1165,21 +1240,21 @@ namespace PhotovoltaicThermalCollectors {
         return NodeNum;
     }
 
-    int getPVTindexFromName(EnergyPlusData &state, std::string const &objectName)
+    int getPVTindexFromName(EnergyPlusData &state, std::string_view objectName)
     {
-        if (GetInputFlag) {
+        if (state.dataPhotovoltaicThermalCollector->GetInputFlag) {
             GetPVTcollectorsInput(state);
-            GetInputFlag = false;
+            state.dataPhotovoltaicThermalCollector->GetInputFlag = false;
         }
 
-        for (auto it = PVT.begin(); it != PVT.end(); ++it) {
+        for (auto it = state.dataPhotovoltaicThermalCollector->PVT.begin(); it != state.dataPhotovoltaicThermalCollector->PVT.end(); ++it) {
             if (it->Name == objectName) {
-                return static_cast<int>(std::distance(PVT.begin(), it) + 1);
+                return static_cast<int>(std::distance(state.dataPhotovoltaicThermalCollector->PVT.begin(), it) + 1);
             }
         }
 
         // If we didn't find it, fatal
-        ShowFatalError(state, "Solar Thermal Collector GetIndexFromName: Error getting inputs for object named: " + objectName);
+        ShowFatalError(state, "Solar Thermal Collector GetIndexFromName: Error getting inputs for object named: " + std::string{objectName});
         assert(false);
         return 0; // Shutup compiler
     }
@@ -1190,7 +1265,7 @@ namespace PhotovoltaicThermalCollectors {
         Real64 dummyCurLoad(0.0);
         bool dummyRunFlag(true);
 
-        PVT(index).simulate(state, dummyLoc, FirstHVACIteration, dummyCurLoad, dummyRunFlag);
+        state.dataPhotovoltaicThermalCollector->PVT(index).simulate(state, dummyLoc, FirstHVACIteration, dummyCurLoad, dummyRunFlag);
     }
 
 } // namespace PhotovoltaicThermalCollectors

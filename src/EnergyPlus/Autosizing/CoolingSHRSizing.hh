@@ -52,20 +52,21 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 struct CoolingSHRSizer : BaseSizer
 {
     CoolingSHRSizer()
     {
         this->sizingType = AutoSizingType::CoolingSHRSizing;
         this->sizingString = "Gross Rated Sensible Heat Ratio";
-
     }
     ~CoolingSHRSizer() = default;
 
-    Real64 size(EnergyPlusData &State, Real64 originalValue, bool &errorsFound) override;
+    Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) override;
 
-    void updateSizingString();
-
+    void updateSizingString(EnergyPlusData &state);
 };
 
 } // namespace EnergyPlus
