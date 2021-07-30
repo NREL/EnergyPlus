@@ -149,13 +149,16 @@ namespace PhotovoltaicThermalCollectors {
         bool HeatingUseful;
         PVTReportStruct Report;
         bool MySetPointCheckFlag;
+        bool MyOneTimeFlag;
+        bool SetLoopIndexFlag;
 
         // Default Constructor
         PVTCollectorStruct()
             : TypeNum(0), WLoopNum(0), WLoopSideNum(0), WLoopBranchNum(0), WLoopCompNum(0), EnvrnInit(true), SizingInit(true), PVTModelType(0),
               SurfNum(0), PVnum(0), PVfound(false), WorkingFluidType(WorkingFluidEnum::LIQUID), PlantInletNodeNum(0), PlantOutletNodeNum(0),
               HVACInletNodeNum(0), HVACOutletNodeNum(0), DesignVolFlowRate(0.0), DesignVolFlowRateWasAutoSized(false), MaxMassFlowRate(0.0),
-              MassFlowRate(0.0), AreaCol(0.0), BypassDamperOff(true), CoolingUseful(false), HeatingUseful(false), MySetPointCheckFlag(true)
+              MassFlowRate(0.0), AreaCol(0.0), BypassDamperOff(true), CoolingUseful(false), HeatingUseful(false), MySetPointCheckFlag(true),
+              MyOneTimeFlag(true), SetLoopIndexFlag(true)
         {
         }
 

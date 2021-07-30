@@ -1118,25 +1118,31 @@ namespace PhotovoltaicThermalCollectors {
     void PVTCollectorStruct::oneTimeInit(EnergyPlusData &state)
     {
 
-        this->setupReportVars(state);
+        if (this->MyOneTimeFlag) {
+            this->setupReportVars(state);
+            this->MyOneTimeFlag = false;
+        }
 
-        if (allocated(state.dataPlnt->PlantLoop) && (this->PlantInletNodeNum > 0)) {
-            bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    this->TypeNum,
-                                                    this->WLoopNum,
-                                                    this->WLoopSideNum,
-                                                    this->WLoopBranchNum,
-                                                    this->WLoopCompNum,
-                                                    errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _);
-            if (errFlag) {
-                ShowFatalError(state, "InitPVTcollectors: Program terminated for previous conditions.");
+        if (this->SetLoopIndexFlag) {
+            if (allocated(state.dataPlnt->PlantLoop) && (this->PlantInletNodeNum > 0)) {
+                bool errFlag = false;
+                PlantUtilities::ScanPlantLoopsForObject(state,
+                                                        this->Name,
+                                                        this->TypeNum,
+                                                        this->WLoopNum,
+                                                        this->WLoopSideNum,
+                                                        this->WLoopBranchNum,
+                                                        this->WLoopCompNum,
+                                                        errFlag,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _);
+                if (errFlag) {
+                    ShowFatalError(state, "InitPVTcollectors: Program terminated for previous conditions.");
+                }
+                this->SetLoopIndexFlag = false;
             }
         }
     }
