@@ -6245,19 +6245,8 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
             state.dataSurface->SurfIntConvClassification(SurfNum) = A3[iConvOrient][iDeltaTemp];
             break;
         case SurfaceClass::IntMass:
-            // assume horizontal upwards.
-            // this is an exception for when DT=0 which assumes unstable
-            switch (static_cast<ConvectionConstants::ConvSurfDeltaT>(iDeltaTemp)) {
-            case ConvectionConstants::ConvSurfDeltaT::Positive:
-            case ConvectionConstants::ConvSurfDeltaT::Zero:
-                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::A3_UnstableHoriz;
-                break;
-            case ConvectionConstants::ConvSurfDeltaT::Negative:
-                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::A3_StableHoriz;
-                break;
-            default:
-                assert(false);
-            }
+            // assume horizontal upwards
+            state.dataSurface->SurfIntConvClassification(SurfNum) = A3[int(ConvectionConstants::SurfConvOrientation::HorizontalUp)][iDeltaTemp];
             break;
         case SurfaceClass::Window:
         case SurfaceClass::GlassDoor:
@@ -6295,8 +6284,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
             state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::B_Windows;
             break;
         case SurfaceClass::IntMass:
-            // assume horizontal upwards.
-            // TODO: investigate, allows convection algorithm selected to be different from actual surface orientation
+            // assume horizontal upwards
             state.dataSurface->SurfIntConvClassification(SurfNum) = B[int(ConvectionConstants::SurfConvOrientation::HorizontalUp)][iDeltaTemp];
             break;
         default:
@@ -6355,7 +6343,6 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
             break;
         case SurfaceClass::IntMass:
             // assume horizontal upwards.
-            // TODO: investigate, allows convection algorithm selected to be different from actual surface orientation
             state.dataSurface->SurfIntConvClassification(SurfNum) = D[int(ConvectionConstants::SurfConvOrientation::HorizontalUp)][iDeltaTemp];
             break;
         default:
