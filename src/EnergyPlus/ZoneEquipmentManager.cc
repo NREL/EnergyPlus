@@ -4966,7 +4966,11 @@ void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIterat
                         state.dataLoopNodes->Node(ReturnNode).Temp = TempRetAir;
                     }
                     if (ReturnNodeExhaustNum > 0 && state.dataLoopNodes->Node(ReturnNodeExhaustNum).MassFlowRate > 0.0 && QRetAir > 0.0) {
-                        state.dataLoopNodes->Node(ReturnNodeExhaustNum).Temp = TempRetAir;
+                        if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).SharedExhaustNode(nodeCount) != iLightReturnExhaustConfig::Shared) {
+                            state.dataLoopNodes->Node(ReturnNodeExhaustNum).Temp = TempRetAir;
+                        } else {
+                            state.dataLoopNodes->Node(ReturnNodeExhaustNum).Temp += QRetAir / (MassFlowRA * CpAir);
+                        }
                     }
                 } else { // No return air flow
                     // Assign all heat-to-return from window gap airflow to zone air

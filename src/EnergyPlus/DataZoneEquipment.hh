@@ -135,6 +135,15 @@ namespace DataZoneEquipment {
         SequentialUniformPLRLoading
     };
 
+    enum class iLightReturnExhaustConfig : int
+    {
+        NoExhast = 0, // No exhaust node
+        Single = 1,   // One to one configuration
+        Multi = 2,     // Multiple return node referred
+        Shared = 3  // Shared exhaust node
+    };
+
+
     struct EquipMeterData
     {
         // Members
@@ -267,6 +276,8 @@ namespace DataZoneEquipment {
         Array1D_int ReturnNodePlenumNum;      // number of the return plenum attached to this return node (zero if none)
         Array1D_int ReturnFlowBasisNode;      // return air flow basis nodes
         Array1D_int ReturnNodeExhaustNodeNum; // Exhaust node number flow to a corrsponding return node due to light heat gain
+        //Array1D_int SharedExhaustNode;        // Exhaust node number shared by return nodes 0 No exhaust; 1 No share; > 1 shared; -1 use the exhaust node value
+        Array1D<iLightReturnExhaustConfig> SharedExhaustNode; // Exhaust node number shared by return nodes 0 No exhaust; 1 No share; > 1 shared; -1 use the exhaust node value
 
         bool ZonalSystemOnly;     // TRUE if served by a zonal system (only)
         bool IsControlled;        // True when this is a controlled zone.
@@ -469,6 +480,8 @@ namespace DataZoneEquipment {
     int GetZoneEquipControlledZoneNum(EnergyPlusData &state, int const ZoneEquipTypeNum, std::string const &EquipmentName);
 
     bool VerifyLightsExhaustNodeForZone(EnergyPlusData &state, int const ZoneNum, int const ZoneExhaustNodeNum);
+
+    void CheckSharedExhaust(EnergyPlusData &state);
 
 } // namespace DataZoneEquipment
 

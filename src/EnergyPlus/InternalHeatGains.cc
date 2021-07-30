@@ -1450,6 +1450,7 @@ namespace InternalHeatGains {
         state.dataHeatBal->Lights.allocate(state.dataHeatBal->TotLights);
 
         if (state.dataHeatBal->TotLights > 0) {
+            bool CheckSharedExhaustFlag = false;
             Loop = 0;
             for (Item = 1; Item <= state.dataHeatBal->NumLightsStatements; ++Item) {
                 AlphaName = std::string{};
@@ -1730,6 +1731,7 @@ namespace InternalHeatGains {
                                     state.dataZoneEquip->ZoneEquipConfig(state.dataHeatBal->Zone(state.dataHeatBal->Lights(Loop).ZonePtr).ZoneEqNum)
                                         .ReturnNodeExhaustNodeNum(state.dataHeatBal->Lights(Loop).ZoneReturnNum) =
                                         state.dataHeatBal->Lights(Loop).ZoneExhaustNodeNum;
+                                    CheckSharedExhaustFlag = true;
                                 } else {
                                     ShowSevereError(state,
                                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
@@ -1993,7 +1995,10 @@ namespace InternalHeatGains {
                         state, state.dataOutRptPredefined->pdchInLtRetAir, liteName, state.dataHeatBal->Lights(Loop).FractionReturnAir, 4);
                 } // Item1 - zones
             }     // Item = Number of Lights Objects
-        }         // TotLights > 0 check
+            if (CheckSharedExhaustFlag) {
+                DataZoneEquipment::CheckSharedExhaust(state);
+            }
+        } // TotLights > 0 check
         // add total line to lighting summary table
         if (state.dataInternalHeatGains->sumArea > 0.0) {
             PreDefTableEntry(state,
