@@ -69,7 +69,7 @@ F1 = HMovInsul / (HMovInsul + HConvIn_surf + IterDampConst);
 
 SurfTempIn(SurfNum) = (SurfCTFConstInPart(SurfNum) + QRadSWInAbs(SurfNum) + construct.CTFCross(0) * TH11 +
                        F1 * (QRadThermInAbs(SurfNum) + HConvIn_surf * RefAirTemp(SurfNum) +
-                       NetLWRadToSurf(SurfNum) + QdotRadHVACInRepPerArea(SurfNum) +
+                       NetLWRadToSurf(SurfNum) + QdotRadHVACInPerArea(SurfNum) +
                        QAdditionalHeatSourceInside(SurfNum) +
                        IterDampConst * SurfTempInsOld(SurfNum)))
                        / (construct.CTFInside(0) + HMovInsul - F1 * HMovInsul); 

@@ -182,7 +182,7 @@ namespace WindowManager {
             auto glassEmiss = aGlassLayer->getSurface(FenestrationCommon::Side::Back)->getEmissivity();
             auto RhoGlIR2 = 1.0 - glassEmiss;
             auto ShGlReflFacIR = 1.0 - RhoGlIR2 * RhoShIR1;
-            auto rmir = state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalSurf->QdotRadHVACInRepPerArea(SurfNum);
+            auto rmir = state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalSurf->QdotRadHVACInPerArea(SurfNum);
             auto NetIRHeatGainShade =
                 ShadeArea * EpsShIR2 *
                     (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas(state.dataWindowManager->nglfacep), 4) - rmir) +
@@ -225,7 +225,7 @@ namespace WindowManager {
             auto ConvHeatGainFrZoneSideOfGlass =
                 surface.Area * h_cin * (backSurface->getTemperature() - aSystem->getAirTemperature(Tarcog::ISO15099::Environment::Indoor));
 
-            auto rmir = state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalSurf->QdotRadHVACInRepPerArea(SurfNum);
+            auto rmir = state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalSurf->QdotRadHVACInPerArea(SurfNum);
             auto NetIRHeatGainGlass =
                 surface.Area * backSurface->getEmissivity() * (state.dataWindowManager->sigma * pow(backSurface->getTemperature(), 4) - rmir);
 
@@ -623,7 +623,7 @@ namespace WindowManager {
         auto tin = m_Surface.getInsideAirTemperature(state, m_SurfNum) + DataGlobalConstants::KelvinConv;
         auto hcin = state.dataHeatBalSurf->SurfHConvInt(m_SurfNum);
 
-        auto IR = state.dataSurface->SurfWinIRfromParentZone(m_SurfNum) + state.dataHeatBalSurf->QdotRadHVACInRepPerArea(m_SurfNum);
+        auto IR = state.dataSurface->SurfWinIRfromParentZone(m_SurfNum) + state.dataHeatBalSurf->QdotRadHVACInPerArea(m_SurfNum);
 
         std::shared_ptr<Tarcog::ISO15099::CEnvironment> Indoor =
             std::make_shared<Tarcog::ISO15099::CIndoorEnvironment>(tin, state.dataEnvrn->OutBaroPress);

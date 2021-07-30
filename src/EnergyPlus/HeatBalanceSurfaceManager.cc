@@ -767,7 +767,7 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
             state.dataHeatBalFanSys->RadSysToHBTinCoef(SurfNum) = 0.0;
             state.dataHeatBalFanSys->RadSysToHBQsrcCoef(SurfNum) = 0.0;
 
-            state.dataHeatBalSurf->QdotRadHVACInRepPerArea(SurfNum) = 0;
+            state.dataHeatBalSurf->QdotRadHVACInPerArea(SurfNum) = 0;
             state.dataHeatBalFanSys->QRadSysSource(SurfNum) = 0.0;
             state.dataHeatBalFanSys->QPVSysSource(SurfNum) = 0.0;
             state.dataHeatBalFanSys->QPoolSurfNumerator(SurfNum) = 0.0;
@@ -1378,7 +1378,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
 
     state.dataHeatBalSurf->QRadHVACInReport.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->QdotRadHVACInRep.dimension(state.dataSurface->TotSurfaces, 0.0);
-    state.dataHeatBalSurf->QdotRadHVACInRepPerArea.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBalSurf->QdotRadHVACInPerArea.dimension(state.dataSurface->TotSurfaces, 0.0);
 
     state.dataHeatBalSurf->QConvOutReport.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->QdotConvOutRepPerArea.dimension(state.dataSurface->TotSurfaces, 0.0);
@@ -1452,7 +1452,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
     state.dataHeatBalFanSys->QRadSysSource.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalFanSys->TCondFDSourceNode.dimension(state.dataSurface->TotSurfaces, 15.0);
     state.dataHeatBalFanSys->QRadSurfAFNDuct.dimension(state.dataSurface->TotSurfaces, 0.0);
-    state.dataHeatBalSurf->QdotRadHVACInRepPerArea.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBalSurf->QdotRadHVACInPerArea.dimension(state.dataSurface->TotSurfaces, 0.0);
 
     // allocate terms used for pool surface heat balance
     state.dataHeatBalFanSys->QPoolSurfNumerator.dimension(state.dataSurface->TotSurfaces, 0.0);
@@ -1657,7 +1657,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
         SetupOutputVariable(state,
                             "Surface Inside Face System Radiation Heat Gain Rate per Area",
                             OutputProcessor::Unit::W_m2,
-                            state.dataHeatBalSurf->QdotRadHVACInRepPerArea(loop),
+                            state.dataHeatBalSurf->QdotRadHVACInPerArea(loop),
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::State,
                             Surface(loop).Name);
@@ -2180,7 +2180,7 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
             state.dataHeatBalSurf->QdotRadIntGainsInRepPerArea(SurfNum) = 0.0;
             state.dataHeatBalSurf->QRadHVACInReport(SurfNum) = 0.0;
             state.dataHeatBalSurf->QdotRadHVACInRep(SurfNum) = 0.0;
-            state.dataHeatBalSurf->QdotRadHVACInRepPerArea(SurfNum) = 0.0;
+            state.dataHeatBalSurf->QdotRadHVACInPerArea(SurfNum) = 0.0;
             state.dataHeatBalSurf->QConvOutReport(SurfNum) = 0.0;
             state.dataHeatBalSurf->QdotConvOutRep(SurfNum) = 0.0;
             state.dataHeatBalSurf->QdotConvOutRepPerArea(SurfNum) = 0.0;
@@ -3771,7 +3771,7 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                     state.dataSurface->SurfWinFrameQRadInAbs(SurfNum) +=
                         (state.dataHeatBal->EnclSolQSWRad(solEnclosureNum) * state.dataSurface->SurfWinFrameSolAbsorp(SurfNum) +
                          (state.dataHeatBal->EnclRadQThermalRad(radEnclosureNum) * state.dataHeatBal->EnclRadThermAbsMult(radEnclosureNum) +
-                          state.dataHeatBalSurf->QdotRadHVACInRepPerArea(SurfNum)) *
+                          state.dataHeatBalSurf->QdotRadHVACInPerArea(SurfNum)) *
                              state.dataSurface->SurfWinFrameEmis(SurfNum)) *
                         (1.0 + 0.5 * state.dataSurface->SurfWinProjCorrFrIn(SurfNum));          // Window has a frame
                 if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0) {                     // Window has dividers
@@ -3819,7 +3819,7 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                     state.dataSurface->SurfWinDividerQRadInAbs(SurfNum) +=
                         (state.dataHeatBal->EnclSolQSWRad(solEnclosureNum) * DividerSolAbs +
                          (state.dataHeatBal->EnclRadQThermalRad(radEnclosureNum) * state.dataHeatBal->EnclRadThermAbsMult(radEnclosureNum) +
-                          state.dataHeatBalSurf->QdotRadHVACInRepPerArea(SurfNum)) *
+                          state.dataHeatBalSurf->QdotRadHVACInPerArea(SurfNum)) *
                              DividerThermAbs) *
                         (1.0 + state.dataSurface->SurfWinProjCorrDivIn(SurfNum));
                 }
@@ -4800,7 +4800,7 @@ void UpdateFinalSurfaceHeatBalance(EnergyPlusData &state)
 void ZeroQdotRadHVAC(EnergyPlusData &state)
 {
     for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-        state.dataHeatBalSurf->QdotRadHVACInRepPerArea(SurfNum) = 0;
+        state.dataHeatBalSurf->QdotRadHVACInPerArea(SurfNum) = 0;
     }
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         state.dataHeatBalFanSys->QdotRadHVACToPerson(ZoneNum) = 0;
@@ -5606,7 +5606,7 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
         state.dataHeatBalSurf->QRadIntGainsInReport(SurfNum) =
             state.dataHeatBalSurf->QdotRadIntGainsInRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
 
-        state.dataHeatBalSurf->QdotRadHVACInRep(SurfNum) = state.dataHeatBalSurf->QdotRadHVACInRepPerArea(SurfNum) * surfaceArea;
+        state.dataHeatBalSurf->QdotRadHVACInRep(SurfNum) = state.dataHeatBalSurf->QdotRadHVACInPerArea(SurfNum) * surfaceArea;
         state.dataHeatBalSurf->QRadHVACInReport(SurfNum) = state.dataHeatBalSurf->QdotRadHVACInRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
         if (Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
             state.dataHeatBalSurf->SumSurfaceHeatEmission += state.dataHeatBalSurf->QHeatEmiReport(SurfNum) * state.dataGlobal->TimeStepZoneSec;
@@ -6798,7 +6798,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                     Real64 const TempTerm(
                         state.dataHeatBalSurf->SurfCTFConstInPart(SurfNum) + state.dataHeatBal->SurfQRadThermInAbs(SurfNum) +
                         state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) + state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(SurfNum) +
-                        HConvIn_surf * state.dataHeatBalSurfMgr->RefAirTemp(SurfNum) + state.dataHeatBalSurf->QdotRadHVACInRepPerArea(SurfNum) +
+                        HConvIn_surf * state.dataHeatBalSurfMgr->RefAirTemp(SurfNum) + state.dataHeatBalSurf->QdotRadHVACInPerArea(SurfNum) +
                         state.dataHeatBalSurf->SurfNetLWRadToSurf(SurfNum) +
                         (state.dataHeatBalFanSys->QRadSurfAFNDuct(SurfNum) / state.dataGlobal->TimeStepZoneSec));
                     Real64 const TempDiv(1.0 / (construct.CTFInside(0) - construct.CTFCross(0) + HConvIn_surf + IterDampConst));
@@ -6904,7 +6904,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                         Real64 const TempTerm(
                             state.dataHeatBalSurf->SurfCTFConstInPart(SurfNum) + state.dataHeatBal->SurfQRadThermInAbs(SurfNum) +
                             state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) + state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(SurfNum) +
-                            HConvIn_surf * state.dataHeatBalSurfMgr->RefAirTemp(SurfNum) + state.dataHeatBalSurf->QdotRadHVACInRepPerArea(SurfNum) +
+                            HConvIn_surf * state.dataHeatBalSurfMgr->RefAirTemp(SurfNum) + state.dataHeatBalSurf->QdotRadHVACInPerArea(SurfNum) +
                             state.dataHeatBalSurf->SurfNetLWRadToSurf(SurfNum) +
                             (state.dataHeatBalFanSys->QRadSurfAFNDuct(SurfNum) / state.dataGlobal->TimeStepZoneSec));
                         Real64 const TempDiv(1.0 / (construct.CTFInside(0) + HConvIn_surf + IterDampConst));
@@ -7061,7 +7061,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                         (state.dataHeatBalSurf->SurfCTFConstInPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) +
                          construct.CTFCross(0) * TH11 +
                          F1 * (state.dataHeatBal->SurfQRadThermInAbs(SurfNum) + HConvIn_surf * state.dataHeatBalSurfMgr->RefAirTemp(SurfNum) +
-                               state.dataHeatBalSurf->SurfNetLWRadToSurf(SurfNum) + state.dataHeatBalSurf->QdotRadHVACInRepPerArea(SurfNum) +
+                               state.dataHeatBalSurf->SurfNetLWRadToSurf(SurfNum) + state.dataHeatBalSurf->QdotRadHVACInPerArea(SurfNum) +
                                state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(SurfNum) +
                                IterDampConst * state.dataHeatBalSurf->SurfTempInsOld(SurfNum))) /
                         (construct.CTFInside(0) + HMovInsul - F1 * HMovInsul); // Convection from surface to zone air
@@ -7115,7 +7115,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                     HConvIn_surf * surface.Area * (state.dataHeatBalSurf->SurfTempIn(SurfNum) - state.dataHeatBalSurfMgr->RefAirTemp(SurfNum)) +
                     state.dataConstruction->Construct(surface.Construction).InsideAbsorpThermal * surface.Area *
                         (Sigma_Temp_4 -
-                         (state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalSurf->QdotRadHVACInRepPerArea(SurfNum))) -
+                         (state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalSurf->QdotRadHVACInPerArea(SurfNum))) -
                     state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) * surface.Area *
                         state.dataConstruction->Construct(surface.Construction).TransDiff;
                 // Transmitted solar | Convection | IR exchange | IR
@@ -7127,7 +7127,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                     HConvIn_surf * surface.Area * (state.dataHeatBalSurf->SurfTempIn(SurfNum) - state.dataHeatBalSurfMgr->RefAirTemp(SurfNum));
                 state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum) =
                     state.dataConstruction->Construct(surface.Construction).InsideAbsorpThermal * surface.Area *
-                    (Sigma_Temp_4 - (state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalSurf->QdotRadHVACInRepPerArea(SurfNum)));
+                    (Sigma_Temp_4 - (state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalSurf->QdotRadHVACInPerArea(SurfNum)));
                 state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) = state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) * surface.Area *
                                                                            state.dataConstruction->Construct(surface.Construction).TransDiff;
             } else {                                                // Regular window
@@ -7386,7 +7386,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
     }
 
     // Reset radiant HVAC heat gain rate output for next timestep
-    state.dataHeatBalSurf->QdotRadHVACInRepPerArea = 0.0;
+    state.dataHeatBalSurf->QdotRadHVACInPerArea = 0.0;
 
     // Update SumHmXXXX for non-window EMPD or HAMT surfaces
     if (state.dataHeatBal->AnyEMPD || state.dataHeatBal->AnyHAMT) {
@@ -7618,7 +7618,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                 state.dataHeatBalSurf->SurfCTFConstInPart(surfNum) + state.dataHeatBal->SurfQRadThermInAbs(surfNum) +
                 state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(surfNum) + state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(surfNum) +
                 state.dataHeatBalSurf->SurfHConvInt(surfNum) * state.dataHeatBalSurfMgr->RefAirTemp(surfNum) +
-                state.dataHeatBalSurf->QdotRadHVACInRepPerArea(surfNum) + (state.dataHeatBalFanSys->QRadSurfAFNDuct(surfNum) / timeStepZoneSeconds);
+                state.dataHeatBalSurf->QdotRadHVACInPerArea(surfNum) + (state.dataHeatBalFanSys->QRadSurfAFNDuct(surfNum) / timeStepZoneSeconds);
             state.dataHeatBalSurf->SurfTempDiv(surfNum) =
                 1.0 / (state.dataHeatBalSurf->SurfCTFInside0(surfNum) -
                        state.dataHeatBalSurf->SurfIsAdiabatic(surfNum) * state.dataHeatBalSurf->SurfCTFCross0(surfNum) +
@@ -7660,7 +7660,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                         state.dataHeatBalSurf->SurfCTFConstInPart(surfNum) + state.dataHeatBal->SurfQRadThermInAbs(surfNum) +
                         state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(surfNum) + state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(surfNum) +
                         state.dataHeatBalSurf->SurfHConvInt(surfNum) * state.dataHeatBalSurfMgr->RefAirTemp(surfNum) +
-                        state.dataHeatBalSurf->QdotRadHVACInRepPerArea(surfNum) +
+                        state.dataHeatBalSurf->QdotRadHVACInPerArea(surfNum) +
                         (state.dataHeatBalFanSys->QRadSurfAFNDuct(surfNum) / timeStepZoneSeconds);
                     state.dataHeatBalSurf->SurfTempDiv(surfNum) =
                         1.0 /
@@ -7752,7 +7752,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                          state.dataHeatBalSurf->SurfCTFCross0(surfNum) * state.dataHeatBalSurf->SurfTempOutHist(surfNum) +
                          F1 * (state.dataHeatBal->SurfQRadThermInAbs(surfNum) +
                                state.dataHeatBalSurf->SurfHConvInt(surfNum) * state.dataHeatBalSurfMgr->RefAirTemp(surfNum) +
-                               state.dataHeatBalSurf->SurfNetLWRadToSurf(surfNum) + state.dataHeatBalSurf->QdotRadHVACInRepPerArea(surfNum) +
+                               state.dataHeatBalSurf->SurfNetLWRadToSurf(surfNum) + state.dataHeatBalSurf->QdotRadHVACInPerArea(surfNum) +
                                state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(surfNum) +
                                IterDampConst * state.dataHeatBalSurf->SurfTempInsOld(surfNum))) /
                         (state.dataHeatBalSurf->SurfCTFInside0(surfNum) + HMovInsul - F1 * HMovInsul); // Convection from surface to zone air
@@ -7774,7 +7774,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                             state.dataHeatBalSurf->SurfCTFConstInPart(surfNum) + state.dataHeatBal->SurfQRadThermInAbs(surfNum) +
                             state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(surfNum) + state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(surfNum) +
                             state.dataHeatBalSurf->SurfHConvInt(surfNum) * state.dataHeatBalSurfMgr->RefAirTemp(surfNum) +
-                            state.dataHeatBalSurf->QdotRadHVACInRepPerArea(surfNum) + state.dataHeatBalSurf->SurfNetLWRadToSurf(surfNum) +
+                            state.dataHeatBalSurf->QdotRadHVACInPerArea(surfNum) + state.dataHeatBalSurf->SurfNetLWRadToSurf(surfNum) +
                             (state.dataHeatBalFanSys->QRadSurfAFNDuct(surfNum) / state.dataGlobal->TimeStepZoneSec));
                         state.dataHeatBalFanSys->RadSysTiHBConstCoef(surfNum) =
                             TempTerm * RadSysDiv; // Constant portion of cond eq (history terms) | LW radiation from internal sources | SW
@@ -7851,7 +7851,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                         HConvIn_surf * surface.Area * (state.dataHeatBalSurf->SurfTempIn(surfNum) - state.dataHeatBalSurfMgr->RefAirTemp(surfNum)) +
                         state.dataConstruction->Construct(surface.Construction).InsideAbsorpThermal * surface.Area *
                             (Sigma_Temp_4 -
-                             (state.dataSurface->SurfWinIRfromParentZone(surfNum) + state.dataHeatBalSurf->QdotRadHVACInRepPerArea(surfNum))) -
+                             (state.dataSurface->SurfWinIRfromParentZone(surfNum) + state.dataHeatBalSurf->QdotRadHVACInPerArea(surfNum))) -
                         state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) * surface.Area *
                             state.dataConstruction->Construct(surface.Construction)
                                 .TransDiff; // Transmitted solar | Convection | IR exchange | IR
@@ -7864,7 +7864,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                     state.dataSurface->SurfWinGainIRGlazToZoneRep(surfNum) =
                         state.dataConstruction->Construct(surface.Construction).InsideAbsorpThermal * surface.Area *
                         (Sigma_Temp_4 -
-                         (state.dataSurface->SurfWinIRfromParentZone(surfNum) + state.dataHeatBalSurf->QdotRadHVACInRepPerArea(surfNum)));
+                         (state.dataSurface->SurfWinIRfromParentZone(surfNum) + state.dataHeatBalSurf->QdotRadHVACInPerArea(surfNum)));
                     state.dataSurface->SurfWinLossSWZoneToOutWinRep(surfNum) = state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) *
                                                                                surface.Area *
                                                                                state.dataConstruction->Construct(surface.Construction).TransDiff;
@@ -8053,7 +8053,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
     } // ...end of main inside heat balance iteration loop (ends when Converged)
 
     // Reset radiant HVAC heat gain rate output for next timestep
-    state.dataHeatBalSurf->QdotRadHVACInRepPerArea = 0.0;
+    state.dataHeatBalSurf->QdotRadHVACInPerArea = 0.0;
 
     // Set various surface output variables and other record keeping - after iterations are complete - all HT surfaces
     for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {

@@ -388,7 +388,7 @@ Real64 SurfaceData::getOutsideIR(EnergyPlusData &state, const int t_SurfNum) con
     // Calculates outside infrared radiation
     Real64 value = 0;
     if (ExtBoundCond > 0) {
-        value = state.dataSurface->SurfWinIRfromParentZone(ExtBoundCond) + state.dataHeatBalSurf->QdotRadHVACInRepPerArea(ExtBoundCond);
+        value = state.dataSurface->SurfWinIRfromParentZone(ExtBoundCond) + state.dataHeatBalSurf->QdotRadHVACInPerArea(ExtBoundCond);
     } else {
         Real64 tout = getOutsideAirTemperature(state, t_SurfNum) + DataGlobalConstants::KelvinConv;
         value = state.dataWindowManager->sigma * pow_4(tout);

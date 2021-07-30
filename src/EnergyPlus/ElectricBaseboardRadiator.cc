@@ -1083,7 +1083,7 @@ namespace ElectricBaseboardRadiator {
                     if (state.dataSurface->Surface(SurfNum).Area > SmallestArea) {
                         ThisSurfIntensity = (state.dataElectBaseboardRad->QBBElecRadSource(BaseboardNum) *
                                              ElecBaseboard(BaseboardNum).FracDistribToSurf(RadSurfNum) / state.dataSurface->Surface(SurfNum).Area);
-                        state.dataHeatBalSurf->QdotRadHVACInRepPerArea(SurfNum) += ThisSurfIntensity;
+                        state.dataHeatBalSurf->QdotRadHVACInPerArea(SurfNum) += ThisSurfIntensity;
                         if (ThisSurfIntensity > MaxRadHeatFlux) {
                             ShowSevereError(state, "DistributeBBElecRadGains:  excessive thermal radiation heat flux intensity detected");
                             ShowContinueError(state, "Surface = " + state.dataSurface->Surface(SurfNum).Name);

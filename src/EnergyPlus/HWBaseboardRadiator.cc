@@ -1749,7 +1749,7 @@ namespace HWBaseboardRadiator {
                 if (state.dataSurface->Surface(SurfNum).Area > SmallestArea) {
                     ThisSurfIntensity = (QBBRadSource(BaseboardNum) * HWBaseboard(BaseboardNum).FracDistribToSurf(RadSurfNum) /
                                          state.dataSurface->Surface(SurfNum).Area);
-                    state.dataHeatBalSurf->QdotRadHVACInRepPerArea += ThisSurfIntensity;
+                    state.dataHeatBalSurf->QdotRadHVACInPerArea += ThisSurfIntensity;
                     // CR 8074, trap for excessive intensity (throws off surface balance )
                     if (ThisSurfIntensity > MaxRadHeatFlux) {
                         ShowSevereError(state, "DistributeBBRadGains:  excessive thermal radiation heat flux intensity detected");

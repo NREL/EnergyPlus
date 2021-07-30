@@ -2176,8 +2176,8 @@ namespace HeatBalFiniteDiffManager {
         Real64 const NetLWRadToSurfFD(
             state.dataHeatBalSurf->SurfNetLWRadToSurf(Surf)); // Net interior long wavelength radiation to surface from other surfaces
         Real64 const QRadSWInFD(state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(Surf)); // Short wave radiation absorbed on inside of opaque surface
-        Real64 const QdotRadHVACInRepPerAreaFD(state.dataHeatBalSurf->QdotRadHVACInRepPerArea(Surf)); // Total current radiant heat flux at a surface
-        Real64 const QRadThermInFD(state.dataHeatBal->SurfQRadThermInAbs(Surf));                      // Thermal radiation absorbed on inside surfaces
+        Real64 const QdotRadHVACInPerAreaFD(state.dataHeatBalSurf->QdotRadHVACInPerArea(Surf)); // Total current radiant heat flux at a surface
+        Real64 const QRadThermInFD(state.dataHeatBal->SurfQRadThermInAbs(Surf));                // Thermal radiation absorbed on inside surfaces
 
         // Boundary Conditions from Simulation for Interior
         Real64 hconvi(state.dataMstBal->HConvInFD(Surf));
@@ -2187,7 +2187,7 @@ namespace HeatBalFiniteDiffManager {
         //++++++++++++++++++++++++++++++++++++++++++++++++++++++
         //    Do all the nodes in the surface   Else will switch to SigmaR,SigmaC
         auto TDT_i(TDT(i));
-        Real64 const QFac(NetLWRadToSurfFD + QRadSWInFD + QRadThermInFD + QdotRadHVACInRepPerAreaFD);
+        Real64 const QFac(NetLWRadToSurfFD + QRadSWInFD + QRadThermInFD + QdotRadHVACInPerAreaFD);
         if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
             int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
             auto const &mat(state.dataMaterial->Material(MatLay));
