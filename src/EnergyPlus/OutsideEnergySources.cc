@@ -456,7 +456,7 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
     this->EnergyTransfer = this->EnergyRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 }
 
-void OutsideEnergySourceSpecs::oneTimeInit(EnergyPlusData &state)
+void OutsideEnergySourceSpecs::oneTimeInit_new(EnergyPlusData &state)
 {
 
     // Locate the unit on the plant loops for later usage
@@ -535,6 +535,10 @@ void OutsideEnergySourceSpecs::oneTimeInit(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->Name);
+}
+
+void OutsideEnergySourceSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
 }
 
 } // namespace EnergyPlus::OutsideEnergySources

@@ -1605,7 +1605,7 @@ namespace WaterUse {
         this->Energy = this->Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         this->RecoveryEnergy = this->RecoveryRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     }
-    void WaterConnectionsType::oneTimeInit(EnergyPlusData &state)
+    void WaterConnectionsType::oneTimeInit_new(EnergyPlusData &state)
     {
 
         this->setupOutputVars(state);
@@ -1629,6 +1629,9 @@ namespace WaterUse {
                 ShowFatalError(state, "InitConnections: Program terminated due to previous condition(s).");
             }
         }
+    }
+    void WaterConnectionsType::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+    {
     }
 
     void CalcWaterUseZoneGains(EnergyPlusData &state)

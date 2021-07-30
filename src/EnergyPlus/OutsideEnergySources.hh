@@ -113,6 +113,8 @@ namespace OutsideEnergySources {
         void size(EnergyPlusData &state);
 
         void oneTimeInit(EnergyPlusData &state) override;
+
+        void oneTimeInit_new(EnergyPlusData &state) override;
     };
 
     void GetOutsideEnergySourcesInput(EnergyPlusData &state);
