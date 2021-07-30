@@ -125,7 +125,7 @@ namespace UnitarySystems {
         // friend class DesignSpecMSHP;
 
         int m_UnitarySysNum;
-        int m_unitarySystemType_Num;
+        // int m_unitarySystemType_Num;
         bool m_ThisSysInputShouldBeGotten;
         int m_SysAvailSchedPtr; // Pointer to the availability schedule
         ControlType m_ControlType;
@@ -217,9 +217,9 @@ namespace UnitarySystems {
         int m_HeatRecoveryOutletNodeNum;
         int m_DesignSpecMSHPIndex;
         Real64 m_NoLoadAirFlowRateRatio;
-        Real64 m_IdleMassFlowRate;
-        Real64 m_IdleVolumeAirRate; // idle air flow rate [m3/s]
-        Real64 m_IdleSpeedRatio;
+        //Real64 m_IdleMassFlowRate;
+        //Real64 m_IdleVolumeAirRate; // idle air flow rate [m3/s]
+        //Real64 m_IdleSpeedRatio;
         int m_SingleMode;
         bool m_MultiOrVarSpeedHeatCoil;
         bool m_MultiOrVarSpeedCoolCoil;
@@ -268,7 +268,7 @@ namespace UnitarySystems {
 
         Real64 m_DesiredOutletTemp;
         Real64 m_DesiredOutletHumRat;
-        int m_FrostControlStatus;
+        Real64 m_FrostControlStatus;
 
         Real64 m_CoolingCycRatio;
         Real64 m_CoolingSpeedRatio;
@@ -338,6 +338,12 @@ namespace UnitarySystems {
         bool m_SuppCompNotSetYet;
         bool m_OKToPrintSizing;
         Real64 m_SmallLoadTolerance;
+
+        int m_HRcoolCoilFluidInletNode;
+        //int m_HRcoolCoilAirInNode;
+        Real64 m_minWaterLoopTempForHR;        // water coil heat recovery loops
+        // std::string m_HRWaterCoolingCoilNames; // connected HR coils, may become vector in future
+        bool m_WaterHRPlantLoopActive;         // signifies active HR loop for this CoilSystem
 
     public:
         // SZVAV variables

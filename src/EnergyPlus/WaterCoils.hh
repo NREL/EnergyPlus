@@ -206,6 +206,7 @@ namespace WaterCoils {
         int ControllerIndex;            // controller index used by water coil
         bool reportCoilFinalSizes;      // one time report of sizes to coil summary report
         bool AirLoopDOASFlag;           // True when this coil is used AirLoopDOAS
+        bool heatRecoveryCoil;          // is true when coils are connected to each other to create a heat recovery loop
 
         // Default Constructor
         WaterCoilEquipConditions()
@@ -491,7 +492,8 @@ namespace WaterCoils {
     void SetWaterCoilData(EnergyPlusData &state, int const CoilNum,                           // index of hot water heating Coil
                           bool &ErrorsFound,                           // Set to true if certain errors found
                           Optional_bool DesiccantRegenerationCoil = _, // Flag that this coil is used as regeneration air heating coil
-                          Optional_int DesiccantDehumIndex = _         // Index for the desiccant dehum system where this caoil is used
+                          Optional_int DesiccantDehumIndex = _,        // Index for the desiccant dehum system where this caoil is used
+                          Optional_bool HRCoilSystemFlag = _
     );
 
     // estimate heating coil design inlet water temperature for autosizing UA-value

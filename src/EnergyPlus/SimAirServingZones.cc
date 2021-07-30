@@ -1309,17 +1309,21 @@ namespace EnergyPlus::SimAirServingZones {
             }
         }
 
-        OANum = GetNumOASystems(state);
-        for (int OASysNum = 1; OASysNum <= OANum; ++OASysNum) {
-            NumInList = GetOACompListNumber(state, OASysNum);
-            for (int OACompNum = 1; OACompNum <= NumInList; ++OACompNum) {
-                CompType_Num = GetOACompTypeNum(state, OASysNum, OACompNum);
-                if (CompType_Num == WaterCoil_DetailedCool || CompType_Num == WaterCoil_SimpleHeat || CompType_Num == WaterCoil_Cooling) {
-                    WaterCoilNodeNum = GetCoilWaterInletNode(state, GetOACompType(state, OASysNum, OACompNum), GetOACompName(state, OASysNum, OACompNum), ErrorsFound);
-                    CheckCoilWaterInletNode(state, WaterCoilNodeNum, NodeNotFound);
-                    if (NodeNotFound) {
-                        ErrorsFound = true;
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + GetOACompName(state, OASysNum, OACompNum) +
+    OANum = GetNumOASystems(state);
+    for (int OASysNum = 1; OASysNum <= OANum; ++OASysNum) {
+        NumInList = GetOACompListNumber(state, OASysNum);
+        for (int OACompNum = 1; OACompNum <= NumInList; ++OACompNum) {
+            CompType_Num = GetOACompTypeNum(state, OASysNum, OACompNum);
+            if (CompType_Num == CompType::WaterCoil_DetailedCool || CompType_Num == CompType::WaterCoil_SimpleHeat ||
+                CompType_Num == CompType::WaterCoil_Cooling) {
+                WaterCoilNodeNum =
+                    GetCoilWaterInletNode(state, GetOACompType(state, OASysNum, OACompNum), GetOACompName(state, OASysNum, OACompNum), ErrorsFound);
+                CheckCoilWaterInletNode(state, WaterCoilNodeNum, NodeNotFound);
+                UnitarySystems::isWaterCoilHeatRecoveryType(state, WaterCoilNodeNum, NodeNotFound);
+                if (NodeNotFound) {
+                    ErrorsFound = true;
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + GetOACompName(state, OASysNum, OACompNum) +
                                         "\", invalid actuator.");
                         ShowContinueError(state, "...this coil requires a water coil controller and the inlet node of a water coil must also be an actuator "
                                           "node of a water coil controller.");
