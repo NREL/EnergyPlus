@@ -1260,13 +1260,21 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
         }
     }
 
-    // get system sizing id if a sizing run has been done
+    // if a sizing run has been done, check if system sizing has been done for this system
+    bool SizingDesRunThisAirSys = false;
     if (state.dataSize->SysSizingRunDone) {
         AirLoopNum = state.dataZoneEquip->ZoneEquipConfig(state.dataPowerInductionUnits->PIU(PIUNum).CtrlZoneNum)
                          .InletNodeAirLoopNum(state.dataPowerInductionUnits->PIU(PIUNum).ctrlZoneInNodeIndex);
-        SysSizNum = UtilityRoutines::FindItemInList(
-            state.dataSize->FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
-        if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
+        if (AirLoopNum > 0) {
+            CheckThisAirSystemForSizing(state, AirLoopNum, SizingDesRunThisAirSys);
+        }
+
+        // get system sizing id if a sizing run has been done for this system
+        if (SizingDesRunThisAirSys) {
+            SysSizNum = UtilityRoutines::FindItemInList(
+                state.dataSize->FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
+            if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
+        }
     }
 
     IsAutoSize = false;
@@ -1346,7 +1354,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
             } else {
                 MinPriAirFlowFracDes = 0.0;
             }
-            if (state.dataSize->SysSizingRunDone) {
+            if (SizingDesRunThisAirSys) {
                 if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) { // 62.1 simplified procedure
                     if (state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow > 0.0) {
                         MinPriAirFlowFracDes = 1.5 *
@@ -1357,7 +1365,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                 }
             }
             if (IsAutoSize) {
-                if (state.dataSize->SysSizingRunDone) {
+                if (SizingDesRunThisAirSys) {
                     if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) {
                         state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).VpzMinByZoneSPSized = true;
                     }

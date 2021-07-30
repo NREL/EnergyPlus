@@ -328,8 +328,9 @@ namespace MixedAir {
         Real64 Fa = 1.0;                        // temporary variable used in multi-path VRP calc
         Real64 Fb = 1.0;
         Real64 Fc = 1.0;
-        Real64 Xs = 1.0;  // uncorrected system outdoor air fraction
-        Real64 Evz = 1.0; // zone ventilation efficiency
+        Real64 Xs = 1.0;       // uncorrected system outdoor air fraction
+        Real64 Evz = 1.0;      // zone ventilation efficiency
+        Real64 SysDesOA = 0.0; // System design OA
 
         // Default Constructor
         VentilationMechanicalProps()

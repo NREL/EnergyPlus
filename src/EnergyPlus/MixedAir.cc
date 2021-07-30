@@ -3712,6 +3712,16 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
         } else {
             SysSA = curAirLoopFlow.SupFlow;
         }
+
+        // Check if system has a Sizing:System object and a sizing run has been done
+        bool SizingDesRunThisAirSys = false;
+        CheckThisAirSystemForSizing(state, AirLoopNum, SizingDesRunThisAirSys);
+
+        // Get design outdoor air flow rate
+        if (SizingDesRunThisAirSys) {
+            state.dataMixedAir->VentilationMechanical(this->VentMechObjectNum).SysDesOA = state.dataSize->FinalSysSizing(AirLoopNum).DesOutAirVolFlow;
+        }
+
         state.dataMixedAir->VentilationMechanical(this->VentMechObjectNum).CalcMechVentController(state, SysSA, MechVentOAMassFlow);
         MechVentOutsideAirMinFrac = MechVentOAMassFlow / curAirLoopFlow.DesSupply;
         if (curAirLoopFlow.FanPLR > 0.0) {
@@ -4519,10 +4529,10 @@ void VentilationMechanicalProps::CalcMechVentController(
                 if (this->SystemOAMethod == SOAM_ProportionalControlSchOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOcc ||
                     this->SystemOAMethod == SOAM_ProportionalControlDesOARate) {
                     SysOA = SysOA / SysEv;
-                } else if (this->SystemOAMethod == SOAM_VRP && state.dataSze->SysSizingRunDone) {
+                } else if (this->SystemOAMethod == SOAM_VRP && this->SysDesOA > 0.0) {
                     // Limit system OA to design OA minimum flow rate, as per ASHRAE Guideline 36-2018 Section 5.16.3.1
                     // If no system sizing run is done (i.e. no Sizing:System) the design outdoor air flow rate is not known
-                    SysOA = min(SysOAuc / SysEv, state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow);
+                    SysOA = min(SysOAuc / SysEv, this->SysDesOA);
                 } else {
                     SysOA = SysOAuc / SysEv;
                 }

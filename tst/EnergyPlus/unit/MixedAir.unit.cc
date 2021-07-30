@@ -5369,7 +5369,7 @@ TEST_F(EnergyPlusFixture, MechVentController_VRPCap)
     state->dataHeatBal->Zone(1).FloorArea = 1500;                             // Zone 1 total floor area
     state->dataHeatBal->Zone(2).FloorArea = 500;                              // Zone 2 total floor area
     state->dataSize->FinalSysSizing.allocate(1);                              // Create instance of system sizing info
-    state->dataSize->FinalSysSizing(1).DesOutAirVolFlow = ExpectedOAMassFlow; // Set design outdoor air flow rate
+    state->dataMixedAir->VentilationMechanical(1).SysDesOA = ExpectedOAMassFlow; // Set design outdoor air flow rate
     state->dataSize->CurSysNum = 1;                                           // Only one system in this instance
     state->dataEnvrn->StdRhoAir = 1;                                          // Standard air density assumed to be 1 kg/m3 (simplification)
     state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow, OAMassFlow);
