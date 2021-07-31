@@ -100,10 +100,6 @@ void LocalPipeData::simulate(EnergyPlusData &state,
                              [[maybe_unused]] Real64 &CurLoad,
                              [[maybe_unused]] bool const RunFlag)
 {
-    if (this->OneTimeInit) {
-        this->oneTimeInit(state);
-        this->OneTimeInit = false;
-    }
 
     if (state.dataGlobal->BeginEnvrnFlag && this->EnvrnFlag) {
         this->initEachEnvironment(state);

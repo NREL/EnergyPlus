@@ -631,8 +631,6 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
 
     static constexpr std::string_view RoutineNameNoColon("InitFluidHeatExchanger");
 
-    this->oneTimeInit(state); // plant setup
-
     if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
 
         Real64 rho = FluidProperties::GetDensityGlycol(state,
