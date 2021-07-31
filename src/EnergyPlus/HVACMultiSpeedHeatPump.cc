@@ -309,6 +309,13 @@ namespace HVACMultiSpeedHeatPump {
 
         if (MSHeatPump(MSHeatPumpNum).EMSOverrideCoilSpeedNumOn) {
             SpeedNum = MSHeatPump(MSHeatPumpNum).EMSOverrideCoilSpeedNumValue;
+
+//            Real64 test1 = state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum);
+//            Real64 test2 = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum);
+//            Real64 test3 = state.dataHeatBalFanSys->MAT(ZoneNum);
+            
+//            std::cout << state.dataEnvrn->Month << "," << state.dataEnvrn->DayOfMonth << "," << state.dataGlobal->HourOfDay
+//                      << "," << state.dataGlobal->TimeStep << ", speed num " << SpeedNum << ", h setpoint, " << test1 << ", c setpoint, " << test2 << ", MAT, " << test3 << std::endl;
             if (!FirstHVACIteration && MSHeatPump(MSHeatPumpNum).OpMode == CycFanCycCoil && QZnReq < 0.0 &&
                 state.dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoActive) {
                 CompOp = Off;

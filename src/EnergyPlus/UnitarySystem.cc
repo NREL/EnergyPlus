@@ -8044,6 +8044,7 @@ namespace UnitarySystems {
         // This is still no load but at the first speed above idle
         if ((state.dataUnitarySystems->HeatingLoad && this->m_NumOfSpeedHeating > 0) ||
             (state.dataUnitarySystems->CoolingLoad && this->m_NumOfSpeedCooling > 0)) {
+            // todo
             if (this->m_Staged) {
                 if (state.dataUnitarySystems->HeatingLoad) {
                     this->m_HeatingSpeedNum = this->m_StageNum;
@@ -8161,6 +8162,8 @@ namespace UnitarySystems {
                 this->m_CoolingCycRatio = 1.0;
                 this->m_CoolingSpeedNum = this->m_NumOfSpeedCooling;
             }
+
+            // todo
             if (this->m_Staged && this->m_StageNum < 0) {
                 if (this->m_NumOfSpeedCooling > 0) this->m_CoolingSpeedNum = min(std::abs(this->m_StageNum), this->m_NumOfSpeedCooling);
                 this->setOnOffMassFlowRate(state, OnOffAirFlowRatio, PartLoadRatio);
@@ -8274,6 +8277,7 @@ namespace UnitarySystems {
         this->m_CoolingSpeedNum = 0;
         if (!this->m_Staged) {
             if (state.dataUnitarySystems->HeatingLoad) {
+                // todo
                 for (SpeedNum = 1; SpeedNum <= this->m_NumOfSpeedHeating; ++SpeedNum) {
                     CoolPLR = 0.0;
                     HeatPLR = 1.0;
@@ -8329,6 +8333,7 @@ namespace UnitarySystems {
                     }
                 }
             } else { // Cooling or moisture load
+                // todo
                 for (SpeedNum = 1; SpeedNum <= this->m_NumOfSpeedCooling; ++SpeedNum) {
                     CoolPLR = 1.0;
                     HeatPLR = 0.0;
@@ -8396,6 +8401,7 @@ namespace UnitarySystems {
         } else { // IF (.NOT. UnitarySystem(UnitarySysNum)%Staged) THEN
             // Staged control
             if (state.dataUnitarySystems->HeatingLoad) {
+                // todo
                 CoolPLR = 0.0;
                 HeatPLR = 1.0;
                 SpeedNum = this->m_StageNum;
@@ -11761,6 +11767,7 @@ namespace UnitarySystems {
 
                         CycRatio = 1.0;
                         SpeedRatio = 0.0;
+                        // todo
                         for (SpeedNum = 1; SpeedNum <= this->m_NumOfSpeedCooling; ++SpeedNum) {
                             if (SpeedNum > 1) CycRatio = 0.0;
                             if (SpeedNum > 1) SpeedRatio = 1.0;
