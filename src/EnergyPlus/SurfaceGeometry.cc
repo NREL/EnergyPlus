@@ -2432,7 +2432,7 @@ namespace SurfaceGeometry {
                 }
             }
 
-            for (int spaceNum = 1; spaceNum <= state.dataGlobal->NumOfSpaces; ++spaceNum) {
+            for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
                 state.dataHeatBal->Space(spaceNum).CalcFloorArea = state.dataHeatBal->Space(spaceNum).FloorArea;
                 if (state.dataHeatBal->Space(spaceNum).UserEnteredFloorArea != DataGlobalConstants::AutoCalculate) {
                     // Check entered vs calculated
@@ -2832,14 +2832,14 @@ namespace SurfaceGeometry {
                 // If no surfaces have a space assigned, then the default space will be used, otherwise, create a new space
                 if (thisZone.AnySurfacesWithSpace) {
                     // Add new space
-                    ++state.dataGlobal->NumOfSpaces;
-                    state.dataHeatBal->Space(state.dataGlobal->NumOfSpaces).ZoneNum = zoneNum;
+                    ++state.dataGlobal->numSpaces;
+                    state.dataHeatBal->Space(state.dataGlobal->numSpaces).ZoneNum = zoneNum;
                     // Add to zone's list of spaces
-                    thisZone.Spaces.emplace_back(state.dataGlobal->NumOfSpaces);
+                    thisZone.Spaces.emplace_back(state.dataGlobal->numSpaces);
                     // If some surfaces in the zone are assigned to a space, the new space is the remainder of the zone
-                    state.dataHeatBal->Space(state.dataGlobal->NumOfSpaces).Name = thisZone.Name + "-Remainder";
-                    state.dataHeatBal->Space(state.dataGlobal->NumOfSpaces).SpaceType = "GENERAL";
-                    state.dataHeatBal->Space(state.dataGlobal->NumOfSpaces).SpaceTypeNum = HeatBalanceManager::GetGeneralSpaceTypeNum(state);
+                    state.dataHeatBal->Space(state.dataGlobal->numSpaces).Name = thisZone.Name + "-Remainder";
+                    state.dataHeatBal->Space(state.dataGlobal->numSpaces).SpaceType = "GENERAL";
+                    state.dataHeatBal->Space(state.dataGlobal->numSpaces).SpaceTypeNum = HeatBalanceManager::GetGeneralSpaceTypeNum(state);
                 }
             }
         }
@@ -2858,7 +2858,7 @@ namespace SurfaceGeometry {
         }
 
         // TODO MJW: Is this necessary? Check that all Spaces have at least one Surface
-        for (int spaceNum = 1; spaceNum < state.dataGlobal->NumOfSpaces; ++spaceNum) {
+        for (int spaceNum = 1; spaceNum < state.dataGlobal->numSpaces; ++spaceNum) {
             if (int(state.dataHeatBal->Space(spaceNum).Surfaces.size()) == 0) {
                 ShowSevereError(state, std::string(RoutineName) + "Space = " + state.dataHeatBal->Space(spaceNum).Name + " has no surfaces.");
                 ErrorsFound = true;
@@ -14664,11 +14664,11 @@ namespace SurfaceGeometry {
         if (EnclosureType == RadiantEnclosures) {
             radiantSetup = true;
             RadiantOrSolar = "Radiant";
-            state.dataViewFactor->EnclRadInfo.allocate(state.dataGlobal->NumOfSpaces);
+            state.dataViewFactor->EnclRadInfo.allocate(state.dataGlobal->numSpaces);
         } else if (EnclosureType == SolarEnclosures) {
             solarSetup = true;
             RadiantOrSolar = "Solar";
-            state.dataViewFactor->EnclSolInfo.allocate(state.dataGlobal->NumOfSpaces);
+            state.dataViewFactor->EnclSolInfo.allocate(state.dataGlobal->numSpaces);
         } else {
             ShowFatalError(state,
                            std::string{RoutineName} +
@@ -14862,7 +14862,7 @@ namespace SurfaceGeometry {
         }
         if (anyGroupedSpaces) {
             // All grouped spaces have been assigned to an enclosure, now assign remaining spaces
-            for (int spaceNum = 1; spaceNum <= state.dataGlobal->NumOfSpaces; ++spaceNum) {
+            for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
                 int spaceEnclosureNum = 0;
                 if (radiantSetup) {
                     spaceEnclosureNum = state.dataHeatBal->Space(spaceNum).RadiantEnclosureNum;
@@ -14892,7 +14892,7 @@ namespace SurfaceGeometry {
             }
         } else {
             // There are no grouped radiant air boundaries, assign each space to it's own radiant enclosure
-            for (int spaceNum = 1; spaceNum <= state.dataGlobal->NumOfSpaces; ++spaceNum) {
+            for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
                 auto &thisEnclosure(Enclosures(spaceNum));
                 thisEnclosure.Name = state.dataHeatBal->Space(spaceNum).Name;
                 thisEnclosure.SpaceNames.push_back(state.dataHeatBal->Space(spaceNum).Name);
@@ -14907,9 +14907,9 @@ namespace SurfaceGeometry {
                 }
             }
             if (radiantSetup) {
-                state.dataViewFactor->NumOfRadiantEnclosures = state.dataGlobal->NumOfSpaces;
+                state.dataViewFactor->NumOfRadiantEnclosures = state.dataGlobal->numSpaces;
             } else {
-                state.dataViewFactor->NumOfSolarEnclosures = state.dataGlobal->NumOfSpaces;
+                state.dataViewFactor->NumOfSolarEnclosures = state.dataGlobal->numSpaces;
             }
         }
 

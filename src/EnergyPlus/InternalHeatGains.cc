@@ -262,22 +262,22 @@ namespace InternalHeatGains {
         // TODO MJW: Punt for now, sometimes unit test need these to be allocated in AllocateZoneHeatBalArrays, but simulations need them here
         if (!state.dataHeatBal->ZoneIntGain.allocated()) {
             state.dataHeatBal->ZoneIntGain.allocate(state.dataGlobal->NumOfZones);
-            state.dataHeatBal->SpaceIntGain.allocate(state.dataGlobal->NumOfSpaces);
-            state.dataHeatBal->SpaceIntGainDevices.allocate(state.dataGlobal->NumOfSpaces);
+            state.dataHeatBal->SpaceIntGain.allocate(state.dataGlobal->numSpaces);
+            state.dataHeatBal->SpaceIntGainDevices.allocate(state.dataGlobal->numSpaces);
         }
         state.dataHeatBal->ZnRpt.allocate(state.dataGlobal->NumOfZones);
-        state.dataHeatBal->SpaceRpt.allocate(state.dataGlobal->NumOfSpaces);
+        state.dataHeatBal->SpaceRpt.allocate(state.dataGlobal->numSpaces);
         state.dataHeatBal->ZoneIntEEuse.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBal->RefrigCaseCredit.allocate(state.dataGlobal->NumOfZones);
 
         Array1D_bool RepVarSet;
         Array1D_bool SpaceRepVarSet;
         RepVarSet.allocate(state.dataGlobal->NumOfZones);
-        SpaceRepVarSet.allocate(state.dataGlobal->NumOfSpaces);
+        SpaceRepVarSet.allocate(state.dataGlobal->numSpaces);
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             RepVarSet(zoneNum) = true;
         }
-        for (int spaceNum = 1; spaceNum <= state.dataGlobal->NumOfSpaces; ++spaceNum) {
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
             SpaceRepVarSet(spaceNum) = true;
         }
 
@@ -404,7 +404,7 @@ namespace InternalHeatGains {
                                 state.dataHeatBal->Zone(Loop).Name);
         }
 
-        // for (int Loop = 1; Loop <= state.dataGlobal->NumOfSpaces; ++Loop) {
+        // for (int Loop = 1; Loop <= state.dataGlobal->numSpaces; ++Loop) {
         //    // Overall Space Variables
         //    SetupOutputVariable(state,
         //                        "Space Total Internal Radiant Heating Energy",
@@ -1643,7 +1643,7 @@ namespace InternalHeatGains {
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             RepVarSet(zoneNum) = true;
         }
-        for (int spaceNum = 1; spaceNum <= state.dataGlobal->NumOfSpaces; ++spaceNum) {
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
             SpaceRepVarSet(spaceNum) = true;
         }
         CurrentModuleObject = "Lights";
@@ -2249,7 +2249,7 @@ namespace InternalHeatGains {
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             RepVarSet(zoneNum) = true;
         }
-        for (int spaceNum = 1; spaceNum <= state.dataGlobal->NumOfSpaces; ++spaceNum) {
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
             SpaceRepVarSet(spaceNum) = true;
         }
         CurrentModuleObject = "ElectricEquipment";
@@ -2746,7 +2746,7 @@ namespace InternalHeatGains {
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             RepVarSet(zoneNum) = true;
         }
-        for (int spaceNum = 1; spaceNum <= state.dataGlobal->NumOfSpaces; ++spaceNum) {
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
             SpaceRepVarSet(spaceNum) = true;
         }
         CurrentModuleObject = "GasEquipment";
@@ -3281,7 +3281,7 @@ namespace InternalHeatGains {
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             RepVarSet(zoneNum) = true;
         }
-        for (int spaceNum = 1; spaceNum <= state.dataGlobal->NumOfSpaces; ++spaceNum) {
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
             SpaceRepVarSet(spaceNum) = true;
         }
         CurrentModuleObject = "HotWaterEquipment";
@@ -3778,7 +3778,7 @@ namespace InternalHeatGains {
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             RepVarSet(zoneNum) = true;
         }
-        for (int spaceNum = 1; spaceNum <= state.dataGlobal->NumOfSpaces; ++spaceNum) {
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
             SpaceRepVarSet(spaceNum) = true;
         }
         CurrentModuleObject = "SteamEquipment";
@@ -4275,7 +4275,7 @@ namespace InternalHeatGains {
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             RepVarSet(zoneNum) = true;
         }
-        for (int spaceNum = 1; spaceNum <= state.dataGlobal->NumOfSpaces; ++spaceNum) {
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
             SpaceRepVarSet(spaceNum) = true;
         }
         CurrentModuleObject = "OtherEquipment";
@@ -4798,7 +4798,7 @@ namespace InternalHeatGains {
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             RepVarSet(zoneNum) = true;
         }
-        for (int spaceNum = 1; spaceNum <= state.dataGlobal->NumOfSpaces; ++spaceNum) {
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
             SpaceRepVarSet(spaceNum) = true;
         }
         CurrentModuleObject = "ElectricEquipment:ITE:AirCooled";
@@ -5717,7 +5717,7 @@ namespace InternalHeatGains {
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             RepVarSet(zoneNum) = true;
         }
-        for (int spaceNum = 1; spaceNum <= state.dataGlobal->NumOfSpaces; ++spaceNum) {
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
             SpaceRepVarSet(spaceNum) = true;
         }
         CurrentModuleObject = "ZoneBaseboard:OutdoorTemperatureControlled";
@@ -5992,7 +5992,7 @@ namespace InternalHeatGains {
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             RepVarSet(zoneNum) = true;
         }
-        for (int spaceNum = 1; spaceNum <= state.dataGlobal->NumOfSpaces; ++spaceNum) {
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
             SpaceRepVarSet(spaceNum) = true;
         }
         CurrentModuleObject = "ZoneContaminantSourceAndSink:CarbonDioxide";
@@ -7897,7 +7897,7 @@ namespace InternalHeatGains {
                 state.dataHeatBal->ZnRpt(ZoneLoop).TotTotalHeatGainRate * state.dataGlobal->TimeStepZoneSec;
         }
 
-        for (int spaceNum = 1; spaceNum <= state.dataGlobal->NumOfSpaces; ++spaceNum) {
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
             // People
             state.dataHeatBal->SpaceRpt(spaceNum).PeopleNumOcc = state.dataHeatBal->SpaceIntGain(spaceNum).NOFOCC;
             state.dataHeatBal->SpaceRpt(spaceNum).PeopleRadGain =
@@ -8212,7 +8212,7 @@ namespace InternalHeatGains {
         }
 
         // store pointer values to hold generic internal gain values constant for entire timestep
-        for (int spaceNum = 1; spaceNum <= state.dataGlobal->NumOfSpaces; ++spaceNum) {
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
             auto &thisIntGain = state.dataHeatBal->SpaceIntGainDevices(spaceNum);
             for (int Loop = 1; Loop <= thisIntGain.NumberOfDevices; ++Loop) {
                 thisIntGain.Device(Loop).ConvectGainRate = *thisIntGain.Device(Loop).PtrConvectGainRate * thisIntGain.Device(Loop).SpaceGainFrac;

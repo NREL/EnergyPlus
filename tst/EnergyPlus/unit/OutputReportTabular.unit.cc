@@ -6861,8 +6861,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
 
     state->dataGlobal->NumOfZones = 4;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
-    state->dataGlobal->NumOfSpaces = 4;
-    state->dataHeatBal->Space.allocate(state->dataGlobal->NumOfSpaces);
+    state->dataGlobal->numSpaces = 4;
+    state->dataHeatBal->Space.allocate(state->dataGlobal->numSpaces);
 
     state->dataHeatBal->Zone(iZone).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(iZone).HTSurfaceLast = 1;
@@ -8244,8 +8244,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
 
     state->dataGlobal->NumOfZones = 1;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
-    state->dataGlobal->NumOfSpaces = 1;
-    state->dataHeatBal->Space.allocate(state->dataGlobal->NumOfSpaces);
+    state->dataGlobal->numSpaces = 1;
+    state->dataHeatBal->Space.allocate(state->dataGlobal->numSpaces);
 
     state->dataHeatBal->Zone(iZone).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(iZone).HTSurfaceLast = 4;

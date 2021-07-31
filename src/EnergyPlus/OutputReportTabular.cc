@@ -11606,9 +11606,9 @@ void WriteVeriSumTable(EnergyPlusData &state)
 
             rowHead.allocate(state.dataGlobal->NumOfZones + 4);
             Array1D_string rowHeadSpaces;
-            rowHeadSpaces.allocate(state.dataGlobal->NumOfSpaces + 4);
+            rowHeadSpaces.allocate(state.dataGlobal->numSpaces + 4);
             Array1D_string rowHeadSpaceTypes;
-            rowHeadSpaceTypes.allocate(state.dataGlobal->NumSpaceTypes + 4);
+            rowHeadSpaceTypes.allocate(state.dataGlobal->numSpaceTypes + 4);
 
             NumOfCol = 12;
             columnHead.allocate(NumOfCol);

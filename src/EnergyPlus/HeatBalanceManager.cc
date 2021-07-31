@@ -5490,7 +5490,7 @@ namespace HeatBalanceManager {
                 }
                 thisSpace.SpaceType = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "space_type");
                 bool spaceTypeFound = false;
-                for (int spaceTypePtr = 1; spaceTypePtr <= state.dataGlobal->NumSpaceTypes; ++spaceTypePtr) {
+                for (int spaceTypePtr = 1; spaceTypePtr <= state.dataGlobal->numSpaceTypes; ++spaceTypePtr) {
                     if (UtilityRoutines::SameString(thisSpace.SpaceType, state.dataHeatBal->spaceTypes(spaceTypePtr))) {
                         thisSpace.SpaceTypeNum = spaceTypePtr;
                         spaceTypeFound = true;
@@ -5498,9 +5498,9 @@ namespace HeatBalanceManager {
                     }
                 }
                 if (!spaceTypeFound) {
-                    ++state.dataGlobal->NumSpaceTypes;
-                    state.dataHeatBal->spaceTypes(state.dataGlobal->NumSpaceTypes) = thisSpace.SpaceType;
-                    thisSpace.SpaceTypeNum = state.dataGlobal->NumSpaceTypes;
+                    ++state.dataGlobal->numSpaceTypes;
+                    state.dataHeatBal->spaceTypes(state.dataGlobal->numSpaceTypes) = thisSpace.SpaceType;
+                    thisSpace.SpaceTypeNum = state.dataGlobal->numSpaceTypes;
                 }
 
                 auto extensibles = objectFields.find("tags");
@@ -5512,7 +5512,7 @@ namespace HeatBalanceManager {
                     }
                 }
             }
-            state.dataGlobal->NumOfSpaces = spaceNum;
+            state.dataGlobal->numSpaces = spaceNum;
         } else {
             // If no Spaces are defined, then allow for one Space per zone
             state.dataHeatBal->Space.allocate(state.dataGlobal->NumOfZones);
@@ -5576,13 +5576,13 @@ namespace HeatBalanceManager {
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             auto &thisZone = state.dataHeatBal->Zone(zoneNum);
             if (thisZone.Spaces.empty()) {
-                ++state.dataGlobal->NumOfSpaces;
-                state.dataHeatBal->Space(state.dataGlobal->NumOfSpaces).ZoneNum = zoneNum;
-                state.dataHeatBal->Space(state.dataGlobal->NumOfSpaces).Name = thisZone.Name;
-                state.dataHeatBal->Space(state.dataGlobal->NumOfSpaces).SpaceType = "GENERAL";
-                state.dataHeatBal->Space(state.dataGlobal->NumOfSpaces).SpaceTypeNum = GetGeneralSpaceTypeNum(state);
+                ++state.dataGlobal->numSpaces;
+                state.dataHeatBal->Space(state.dataGlobal->numSpaces).ZoneNum = zoneNum;
+                state.dataHeatBal->Space(state.dataGlobal->numSpaces).Name = thisZone.Name;
+                state.dataHeatBal->Space(state.dataGlobal->numSpaces).SpaceType = "GENERAL";
+                state.dataHeatBal->Space(state.dataGlobal->numSpaces).SpaceTypeNum = GetGeneralSpaceTypeNum(state);
                 // Add to zone's list of spaces
-                thisZone.Spaces.emplace_back(state.dataGlobal->NumOfSpaces);
+                thisZone.Spaces.emplace_back(state.dataGlobal->numSpaces);
             }
         }
     }
@@ -5592,7 +5592,7 @@ namespace HeatBalanceManager {
         // If "General" exists as a space type return the index
         bool generalSpaceTypeExists = false;
         int generalSpaceTypeNum = 0;
-        for (int spaceTypePtr = 1; spaceTypePtr <= state.dataGlobal->NumSpaceTypes; ++spaceTypePtr) {
+        for (int spaceTypePtr = 1; spaceTypePtr <= state.dataGlobal->numSpaceTypes; ++spaceTypePtr) {
             if (UtilityRoutines::SameString(state.dataHeatBal->spaceTypes(spaceTypePtr), "GENERAL")) {
                 generalSpaceTypeNum = spaceTypePtr;
                 generalSpaceTypeExists = true;
@@ -5601,9 +5601,9 @@ namespace HeatBalanceManager {
         }
         // Add General space type if it doesn't exist yet
         if (!generalSpaceTypeExists) {
-            ++state.dataGlobal->NumSpaceTypes;
-            state.dataHeatBal->spaceTypes(state.dataGlobal->NumSpaceTypes) = "GENERAL";
-            generalSpaceTypeNum = state.dataGlobal->NumSpaceTypes;
+            ++state.dataGlobal->numSpaceTypes;
+            state.dataHeatBal->spaceTypes(state.dataGlobal->numSpaceTypes) = "GENERAL";
+            generalSpaceTypeNum = state.dataGlobal->numSpaceTypes;
         }
         return generalSpaceTypeNum;
     }
@@ -5852,8 +5852,8 @@ namespace HeatBalanceManager {
         // TODO MJW: Punt for now, sometimes unit test will get here and need these to be allocated, but simulations need them sooner
         if (!state.dataHeatBal->ZoneIntGain.allocated()) {
             state.dataHeatBal->ZoneIntGain.allocate(state.dataGlobal->NumOfZones);
-            state.dataHeatBal->SpaceIntGain.allocate(state.dataGlobal->NumOfSpaces);
-            state.dataHeatBal->SpaceIntGainDevices.allocate(state.dataGlobal->NumOfSpaces);
+            state.dataHeatBal->SpaceIntGain.allocate(state.dataGlobal->numSpaces);
+            state.dataHeatBal->SpaceIntGainDevices.allocate(state.dataGlobal->numSpaces);
         }
         state.dataHeatBal->ZoneMRT.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBal->ZoneSolAbsFirstCalc.allocate(state.dataGlobal->NumOfZones);
