@@ -2,22 +2,18 @@ cmake_minimum_required(VERSION 3.6)
 project(cpgfunctionEP)
 
 set(CMAKE_CXX_STANDARD 17)
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=c++17")
-else()
-    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+if (MSVC)
     add_compile_definitions(_USE_MATH_DEFINES)
 endif()
 
 # Everything will need to access this
 include_directories(include)
 # Third party includes
-include_directories(third_party/eigen-3.3.9)  # Eigen for LU decomposition
 include_directories(third_party/qdt-master)
 
 # Create a DLL with an API
-add_library(cpgfunctionEP SHARED
-        src/boreholes.cpp
+add_library(cpgfunctionEP  src/boreholes.cpp
         src/gfunction.cpp
         src/heat_transfer.cpp
         src/interpolation.cpp
@@ -29,19 +25,22 @@ add_library(cpgfunctionEP SHARED
 
 # It depends on threads
 find_package(Threads REQUIRED)
-target_link_libraries(cpgfunctionEP ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(cpgfunctionEP INTERFACE Threads::Threads)
 
-OPTION (USE_OpenMP "Use OpenMP" ON)
-IF(USE_OpenMP)
-    FIND_PACKAGE(OpenMP)
-    IF(OPENMP_FOUND)
-        SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-    ENDIF()
-ENDIF()
+option (USE_OpenMP "Use OpenMP" ON)
+if(USE_OpenMP)
+    find_package(OpenMP)
+    if(OpenMP_CXX_FOUND)
+        target_link_libraries(cpgfunctionEP PRIVATE OpenMP::OpenMP_CXX)
+    else()
+        message(AUTHOR_WARNING "OpenMP_CXX not found")
+    endif()
+endif()
 
 # if we are only building cpgfnctionEP
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    # local eigen if not in EnergyPlus third_party/
+    include_directories(third_party/eigen-3.3.9)  # Eigen for LU decomposition
     include_directories(third_party/nlohmann-3.9.1)
     # Turn on testing
     enable_testing()
@@ -56,14 +55,14 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     add_executable(packed test/packed.cpp)
     add_executable(gFunction_adaptive test/gFunction_adaptive.cpp)
 
-    target_link_libraries(gFunction_minimal cpgfunctionEP)
-    target_link_libraries(interpolation cpgfunctionEP)
-    # target_link_libraries(test3 cpgfunctionEP)
-    target_link_libraries(borefield_definition cpgfunctionEP)
-    target_link_libraries(time_definition cpgfunctionEP)
-    target_link_libraries(gFunction_tests cpgfunctionEP)
-    target_link_libraries(packed cpgfunctionEP)
-    target_link_libraries(gFunction_adaptive cpgfunctionEP)
+    target_link_libraries(gFunction_minimal PRIVATE cpgfunctionEP)
+    target_link_libraries(interpolation PRIVATE cpgfunctionEP)
+    # target_link_libraries(test3 PRIVATE cpgfunctionEP)
+    target_link_libraries(borefield_definition PRIVATE cpgfunctionEP)
+    target_link_libraries(time_definition PRIVATE cpgfunctionEP)
+    target_link_libraries(gFunction_tests PRIVATE cpgfunctionEP)
+    target_link_libraries(packed PRIVATE cpgfunctionEP)
+    target_link_libraries(gFunction_adaptive PRIVATE cpgfunctionEP)
 
     # Copy validation files to build directory so tests can open
     file(GLOB JsonValidation test/validation/*.json)
@@ -83,4 +82,6 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     add_test(NAME RunTest6 COMMAND ${CMAKE_BINARY_DIR}/gFunction_tests)
     add_test(NAME RunTest7 COMMAND ${CMAKE_BINARY_DIR}/packed)
     add_test(NAME RunTest8 COMMAND ${CMAKE_BINARY_DIR}/gFunction_adaptive)
+else()
+    include_directories(../third_party/eigen)  # Eigen for LU decomposition
 endif()
