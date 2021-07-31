@@ -2461,7 +2461,8 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
             sizerCWDesWaterInTemp.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
             state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp = sizerCWDesWaterInTemp.size(state, TempSize, ErrorsFound);
 
-            if (state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp > state.dataSize->DataDesOutletAirTemp) {
+            if ((state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp > state.dataSize->DataDesOutletAirTemp) &&
+                state.dataSize->DataDesOutletAirTemp > 0.0) {
                 state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp = state.dataSize->DataDesOutletAirTemp - 5.0;
                 ShowWarningError(state, "Invalid design inlet water temperature for " + std::string{CompType} + " = " + std::string{CompName});
                 ShowContinueError(state,
