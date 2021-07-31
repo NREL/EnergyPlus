@@ -5514,8 +5514,9 @@ namespace HeatBalanceManager {
             }
             state.dataGlobal->numSpaces = spaceNum;
         } else {
-            // If no Spaces are defined, then allow for one Space per zone
+            // If no Spaces are defined, then allow for one Space per zone, and one spaceType
             state.dataHeatBal->Space.allocate(state.dataGlobal->NumOfZones);
+            state.dataHeatBal->spaceTypes.allocate(1);
         }
 
         cCurrentModuleObject = "SpaceList";
