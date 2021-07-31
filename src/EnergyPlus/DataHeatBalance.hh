@@ -342,6 +342,7 @@ namespace DataHeatBalance {
         int ZoneNum = 0;                   // Pointer to Zone wich contains this space
         Real64 UserEnteredFloorArea = 0.0; // User input floor area for this space
         std::string SpaceType = "General"; // Space type tag
+        int SpaceTypeNum = 0;              // Points to spaceType for this space
         EPVector<std::string> Tags;        // Optional tags for reporting
         EPVector<int> Surfaces;            // Pointers to surfaces in this space
         Real64 CalcFloorArea = 0.0;        // Calculated floor area used for this space
@@ -1757,7 +1758,7 @@ namespace DataHeatBalance {
         }
     };
 
-    struct ZoneReportVars // Zone level.
+    struct ZoneReportVars // Zone and Space report variables
     {
         // Members
         // People
@@ -2296,6 +2297,7 @@ struct HeatBalanceData : BaseGlobalStruct
     DataHeatBalance::ZoneAirMassFlowConservation ZoneAirMassFlow;
     EPVector<DataHeatBalance::ZoneLocalEnvironmentData> ZoneLocalEnvironment;
     bool MundtFirstTimeFlag = true;
+    EPVector<std::string> spaceTypes;
 
     void clear_state() override
     {
@@ -2569,6 +2571,7 @@ struct HeatBalanceData : BaseGlobalStruct
         this->ZoneAirMassFlow = DataHeatBalance::ZoneAirMassFlowConservation();
         this->ZoneLocalEnvironment.deallocate();
         this->MundtFirstTimeFlag = true;
+        this->spaceTypes.deallocate();
     }
 };
 

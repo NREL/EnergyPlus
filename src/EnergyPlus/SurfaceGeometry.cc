@@ -75,6 +75,7 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -2830,12 +2831,15 @@ namespace SurfaceGeometry {
                 // Every zone has at least one space, created in HeatBalanceManager::GetSpaceData
                 // If no surfaces have a space assigned, then the default space will be used, otherwise, create a new space
                 if (thisZone.AnySurfacesWithSpace) {
+                    // Add new space
                     ++state.dataGlobal->NumOfSpaces;
                     state.dataHeatBal->Space(state.dataGlobal->NumOfSpaces).ZoneNum = zoneNum;
                     // Add to zone's list of spaces
                     thisZone.Spaces.emplace_back(state.dataGlobal->NumOfSpaces);
                     // If some surfaces in the zone are assigned to a space, the new space is the remainder of the zone
                     state.dataHeatBal->Space(state.dataGlobal->NumOfSpaces).Name = thisZone.Name + "-Remainder";
+                    state.dataHeatBal->Space(state.dataGlobal->NumOfSpaces).SpaceType = "GENERAL";
+                    state.dataHeatBal->Space(state.dataGlobal->NumOfSpaces).SpaceTypeNum = HeatBalanceManager::GetGeneralSpaceTypeNum(state);
                 }
             }
         }

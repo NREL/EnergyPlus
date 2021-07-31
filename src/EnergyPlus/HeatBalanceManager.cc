@@ -5467,7 +5467,10 @@ namespace HeatBalanceManager {
             int numSpaces = instancesValue.size();
             int spaceNum = 0;
             // Allow for one additional Space per zone if some surfaces do not have a Space assigned in input
-            state.dataHeatBal->Space.allocate(numSpaces + state.dataGlobal->NumOfZones);
+            state.dataHeatBal->Space.allocate(size_t(numSpaces + state.dataGlobal->NumOfZones));
+            // Allow for one additional "General" space type for auto-generated spaces
+            state.dataHeatBal->spaceTypes.allocate(size_t(numSpaces + 1));
+
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 ++spaceNum;
                 auto const &objectFields = instance.value();
@@ -5486,6 +5489,20 @@ namespace HeatBalanceManager {
                     ErrorsFound = true;
                 }
                 thisSpace.SpaceType = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "space_type");
+                bool spaceTypeFound = false;
+                for (int spaceTypePtr = 1; spaceTypePtr <= state.dataGlobal->NumSpaceTypes; ++spaceTypePtr) {
+                    if (UtilityRoutines::SameString(thisSpace.SpaceType, state.dataHeatBal->spaceTypes(spaceTypePtr))) {
+                        thisSpace.SpaceTypeNum = spaceTypePtr;
+                        spaceTypeFound = true;
+                        break;
+                    }
+                }
+                if (!spaceTypeFound) {
+                    ++state.dataGlobal->NumSpaceTypes;
+                    state.dataHeatBal->spaceTypes(state.dataGlobal->NumSpaceTypes) = thisSpace.SpaceType;
+                    thisSpace.SpaceTypeNum = state.dataGlobal->NumSpaceTypes;
+                }
+
                 auto extensibles = objectFields.find("tags");
                 auto const &extensionSchemaProps = objectSchemaProps["tags"]["items"]["properties"];
                 if (extensibles != objectFields.end()) {
@@ -5497,7 +5514,7 @@ namespace HeatBalanceManager {
             }
             state.dataGlobal->NumOfSpaces = spaceNum;
         } else {
-            // If no Spaces are defined, the allow for one Space per zone
+            // If no Spaces are defined, then allow for one Space per zone
             state.dataHeatBal->Space.allocate(state.dataGlobal->NumOfZones);
         }
 
@@ -5562,10 +5579,33 @@ namespace HeatBalanceManager {
                 ++state.dataGlobal->NumOfSpaces;
                 state.dataHeatBal->Space(state.dataGlobal->NumOfSpaces).ZoneNum = zoneNum;
                 state.dataHeatBal->Space(state.dataGlobal->NumOfSpaces).Name = thisZone.Name;
+                state.dataHeatBal->Space(state.dataGlobal->NumOfSpaces).SpaceType = "GENERAL";
+                state.dataHeatBal->Space(state.dataGlobal->NumOfSpaces).SpaceTypeNum = GetGeneralSpaceTypeNum(state);
                 // Add to zone's list of spaces
                 thisZone.Spaces.emplace_back(state.dataGlobal->NumOfSpaces);
             }
         }
+    }
+
+    int GetGeneralSpaceTypeNum(EnergyPlusData &state)
+    {
+        // If "General" exists as a space type return the index
+        bool generalSpaceTypeExists = false;
+        int generalSpaceTypeNum = 0;
+        for (int spaceTypePtr = 1; spaceTypePtr <= state.dataGlobal->NumSpaceTypes; ++spaceTypePtr) {
+            if (UtilityRoutines::SameString(state.dataHeatBal->spaceTypes(spaceTypePtr), "GENERAL")) {
+                generalSpaceTypeNum = spaceTypePtr;
+                generalSpaceTypeExists = true;
+                break;
+            }
+        }
+        // Add General space type if it doesn't exist yet
+        if (!generalSpaceTypeExists) {
+            ++state.dataGlobal->NumSpaceTypes;
+            state.dataHeatBal->spaceTypes(state.dataGlobal->NumSpaceTypes) = "GENERAL";
+            generalSpaceTypeNum = state.dataGlobal->NumSpaceTypes;
+        }
+        return generalSpaceTypeNum;
     }
     // End of Get Input subroutines for the HB Module
     //******************************************************************************
