@@ -117,7 +117,6 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Real64> SurfHConvInt;        // INSIDE CONVECTION COEFFICIENT
     Array1D<Real64> SurfTempSource;      // Temperature at the source location for each heat transfer surface
     Array1D<Real64> SurfTempUserLoc;     // Temperature at the user specified location for each heat transfer surface
-    Array1D<Real64> SurfTempInRep;       // Temperature of the Inside Surface for each heat transfer surface
     Array1D<Real64> SurfTempInMovInsRep; // Temperature of interior movable insulation on the side facing the zone
 
     Array1D<Real64> QConvInReport;        // Surface convection heat gain at inside face [J]
@@ -208,8 +207,7 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Real64> SurfWinInitialDifSolInTrans; // Initial diffuse solar transmitted out through window surface [W/m2]
 
     // REAL(r64) variables from BLDCTF.inc and only used in the Heat Balance
-    //    Array3D<Real64> TH; // Temperature History (SurfNum,Hist Term,In/Out) where:
-    // Hist Term (1 = Current Time, 2-MaxCTFTerms = previous times),  In/Out (1 = Outside, 2 = Inside)
+    // Hist Term (1 = Current Time, 2-MaxCTFTerms = previous times)
     Array1D<Array1D<Real64>> SurfInsideTempHist;  // Temperature history - inside (Hist Term, SurfNum)
     Array1D<Array1D<Real64>> SurfOutsideTempHist; // Temperature history - outside (Hist Term, SurfNum)
     Array1D<Array1D<Real64>>
@@ -275,7 +273,6 @@ struct HeatBalSurfData : BaseGlobalStruct
 
         this->SurfTempSource.deallocate();
         this->SurfTempUserLoc.deallocate();
-        this->SurfTempInRep.deallocate();
         this->SurfTempInMovInsRep.deallocate();
         this->QConvInReport.deallocate();
         this->QdotConvInRep.deallocate();

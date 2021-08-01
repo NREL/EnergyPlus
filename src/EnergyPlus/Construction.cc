@@ -573,18 +573,17 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
             // completely effective.  If too many history terms are calculated,
             // the time step is adjusted and the CTFs end up being recalculated
             // (see later code in this routine).
-            // TODO - IF CTFTimeStep != TimeStepZone
 
             dtn = 0.0;
             this->CTFTimeStep = 0.0;
             for (int Layer = 1; Layer <= LayersInConstruct; ++Layer) {
-                if (Nodes(Layer) >= Construction::MaxCTFTerms) { // TODO - Nodes(Layer) cannot be greater than MaxCTFTerms
+                if (Nodes(Layer) >= Construction::MaxCTFTerms) {
                     if (this->SolutionDimensions == 1) {
                         dtn = rho(Layer) * cp(Layer) * pow_2(dx(Layer)) / rk(Layer);
                     } else { // 2-D solution requested-->this changes length parameter in Fourier number calculation
                         dtn = rho(Layer) * cp(Layer) * (pow_2(dx(Layer)) + pow_2(dyn)) / rk(Layer);
                     }
-                    if (dtn > this->CTFTimeStep) this->CTFTimeStep = dtn; // TODO - shouldn't it be the maximum of dtn of all layers
+                    if (dtn > this->CTFTimeStep) this->CTFTimeStep = dtn;
                 }
             }
 
