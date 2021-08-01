@@ -2051,6 +2051,7 @@ struct HeatBalanceData : BaseGlobalStruct
     bool StormWinChangeThisDay = false; // True if a storm window has been added or removed from any window during the current day; can only be true
                                         // for first time step of the day.
     bool SimpleCTFOnly = true;          // true if all constructions are simple CTF construction (CTFTimestep = TimeStepZone) with no internal sources
+    int MaxCTFTerms = 0;                // Maximum CTF terms to shift for all surfaces in the simulation
     bool AnyInternalHeatSourceInInput = false;        // true if the user has entered any constructions with internal sources
     bool AdaptiveComfortRequested_CEN15251 = false;   // true if people objects have adaptive comfort requests. CEN15251
     bool AdaptiveComfortRequested_ASH55 = false;      // true if people objects have adaptive comfort requests. ASH55
@@ -2344,6 +2345,7 @@ struct HeatBalanceData : BaseGlobalStruct
         this->CalcWindowRevealReflection = false;
         this->StormWinChangeThisDay = false;
         this->SimpleCTFOnly = true;
+        this->MaxCTFTerms = 0;
         this->AnyInternalHeatSourceInInput = false;
         this->AdaptiveComfortRequested_CEN15251 = false;
         this->AdaptiveComfortRequested_ASH55 = false;

@@ -10004,6 +10004,9 @@ namespace HeatBalanceManager {
             if (construction.NumHistories > 1) {
                 state.dataHeatBal->SimpleCTFOnly = false;
             }
+            if (construction.NumCTFTerms > state.dataHeatBal->MaxCTFTerms) {
+                state.dataHeatBal->MaxCTFTerms = construction.NumCTFTerms;
+            }
         }
         if (state.dataHeatBal->AnyInternalHeatSourceInInput) {
             state.dataHeatBal->SimpleCTFOnly = false;

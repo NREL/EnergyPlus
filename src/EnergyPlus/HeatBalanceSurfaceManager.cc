@@ -696,7 +696,6 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
             }
             if (construct.NumCTFTerms <= 1) continue;
 
-            // todo - tune this to term->surface loop, but need a zone list of CTF surface with construct.NumCTFTerms > 1
             for (int Term = 1; Term <= construct.NumCTFTerms; ++Term) {
                 // [ l11 ] == ( 1, Term + 1, SurfNum ), [ l12 ] == ( 1, Term + 1, SurfNum )
 
@@ -2284,33 +2283,27 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
     state.dataHeatBal->CondFDRelaxFactor = state.dataHeatBal->CondFDRelaxFactorInput;
 
     // Perform other initializations that depend on the surface characteristics
-    for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-
-        if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
-        // TODO: need to tune this around.
-        // Reset outside boundary conditions if necessary
-        if ((Surface(SurfNum).ExtBoundCond == ExternalEnvironment) || (Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt)) {
-            for (int CTFTermNum = 1; CTFTermNum <= Construction::MaxCTFTerms; ++CTFTermNum) {
+    for (int CTFTermNum = 1; CTFTermNum <= state.dataHeatBal->MaxCTFTerms + 1; ++CTFTermNum) {
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
+            // Reset outside boundary conditions if necessary
+            if ((Surface(SurfNum).ExtBoundCond == ExternalEnvironment) || (Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt)) {
                 state.dataHeatBalSurf->SurfOutsideTempHist(CTFTermNum)(SurfNum) = state.dataSurface->SurfOutDryBulbTemp(SurfNum);
-            }
-
-        } else if (Surface(SurfNum).ExtBoundCond == Ground) {
-            for (int CTFTermNum = 1; CTFTermNum <= Construction::MaxCTFTerms; ++CTFTermNum) {
+            } else if (Surface(SurfNum).ExtBoundCond == Ground) {
                 state.dataHeatBalSurf->SurfOutsideTempHist(CTFTermNum)(SurfNum) = state.dataEnvrn->GroundTemp;
-            }
-
-        } else if (Surface(SurfNum).ExtBoundCond == GroundFCfactorMethod) {
-            for (int CTFTermNum = 1; CTFTermNum <= Construction::MaxCTFTerms; ++CTFTermNum) {
+            } else if (Surface(SurfNum).ExtBoundCond == GroundFCfactorMethod) {
                 state.dataHeatBalSurf->SurfOutsideTempHist(CTFTermNum)(SurfNum) = state.dataEnvrn->GroundTempFC;
             }
-        }
-        // Initialize the flux histories
-        for (int CTFTermNum = 2; CTFTermNum <= state.dataConstruction->Construct(Surface(SurfNum).Construction).NumCTFTerms + 1; ++CTFTermNum) {
+            // Initialize the flux histories
             state.dataHeatBalSurf->SurfOutsideFluxHist(CTFTermNum)(SurfNum) =
                 state.dataConstruction->Construct(Surface(SurfNum).Construction).UValue *
                 (state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) - state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum));
             state.dataHeatBalSurf->SurfInsideFluxHist(CTFTermNum)(SurfNum) = state.dataHeatBalSurf->SurfOutsideFluxHist(2)(SurfNum);
         }
+    }
+    for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+
+        if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
         if (state.dataSurface->SurfExtCavityPresent(SurfNum)) {
             state.dataSurface->ExtVentedCavity(state.dataSurface->SurfExtCavNum(SurfNum)).TbaffleLast = 20.0;
@@ -4953,12 +4946,24 @@ void UpdateThermalHistories(EnergyPlusData &state)
     } // ...end of loop over all (heat transfer) surfaces...
 
     if (state.dataHeatBal->SimpleCTFOnly && !state.dataGlobal->AnyConstrOverridesInModel) {
-        for (int HistTermNum = state.dataHeatBal->MaxCTFTermsInModel + 1; HistTermNum >= 2; --HistTermNum) {
-            state.dataHeatBalSurf->SurfInsideTempHist(HistTermNum) = state.dataHeatBalSurf->SurfInsideTempHist(HistTermNum - 1);
-            state.dataHeatBalSurf->SurfOutsideTempHist(HistTermNum) = state.dataHeatBalSurf->SurfOutsideTempHist(HistTermNum - 1);
-            state.dataHeatBalSurf->SurfInsideFluxHist(HistTermNum) = state.dataHeatBalSurf->SurfInsideFluxHist(HistTermNum - 1);
-            state.dataHeatBalSurf->SurfOutsideFluxHist(HistTermNum) = state.dataHeatBalSurf->SurfOutsideFluxHist(HistTermNum - 1);
+        Array1D<Real64> insideTemp(std::move(state.dataHeatBalSurf->SurfInsideTempHist(state.dataHeatBal->MaxCTFTerms + 1)));
+        Array1D<Real64> outsideTemp(std::move(state.dataHeatBalSurf->SurfOutsideTempHist(state.dataHeatBal->MaxCTFTerms + 1)));
+        Array1D<Real64> insideFlux(std::move(state.dataHeatBalSurf->SurfInsideFluxHist(state.dataHeatBal->MaxCTFTerms + 1)));
+        Array1D<Real64> outsideFlux(std::move(state.dataHeatBalSurf->SurfOutsideFluxHist(state.dataHeatBal->MaxCTFTerms + 1)));
+        for (int HistTermNum = state.dataHeatBal->MaxCTFTerms + 1; HistTermNum >= 3; --HistTermNum) {
+            state.dataHeatBalSurf->SurfInsideTempHist(HistTermNum) = std::move(state.dataHeatBalSurf->SurfInsideTempHist(HistTermNum - 1));
+            state.dataHeatBalSurf->SurfOutsideTempHist(HistTermNum) = std::move(state.dataHeatBalSurf->SurfOutsideTempHist(HistTermNum - 1));
+            state.dataHeatBalSurf->SurfInsideFluxHist(HistTermNum) = std::move(state.dataHeatBalSurf->SurfInsideFluxHist(HistTermNum - 1));
+            state.dataHeatBalSurf->SurfOutsideFluxHist(HistTermNum) = std::move(state.dataHeatBalSurf->SurfOutsideFluxHist(HistTermNum - 1));
         }
+        state.dataHeatBalSurf->SurfInsideTempHist(2) = std::move(insideTemp);
+        state.dataHeatBalSurf->SurfOutsideTempHist(2) = std::move(outsideTemp);
+        state.dataHeatBalSurf->SurfInsideFluxHist(2) = std::move(insideFlux);
+        state.dataHeatBalSurf->SurfOutsideFluxHist(2) = std::move(outsideFlux);
+        state.dataHeatBalSurf->SurfInsideTempHist(2) = state.dataHeatBalSurf->SurfInsideTempHist(1);
+        state.dataHeatBalSurf->SurfOutsideTempHist(2) = state.dataHeatBalSurf->SurfOutsideTempHist(1);
+        state.dataHeatBalSurf->SurfInsideFluxHist(2) = state.dataHeatBalSurf->SurfInsideFluxHist(1);
+        state.dataHeatBalSurf->SurfOutsideFluxHist(2) = state.dataHeatBalSurf->SurfOutsideFluxHist(1);
         return;
     }
 
@@ -5056,19 +5061,19 @@ void UpdateThermalHistories(EnergyPlusData &state)
                     for (int HistTermNum = numCTFTerms + 1; HistTermNum >= 3; --HistTermNum) { // Tuned Linear indexing
                         // TH(SideNum, TermNum, SurfNum) = (THM(SideNum, TermNum, SurfNum) -
                         //                                 (THM(SideNum, TermNum, SurfNum) - THM(SideNum, TermNum - 1, SurfNum)) * sum_steps;
-                        Real64 const THM_11(state.dataHeatBalSurf->SurfOutsideTempHistMaster(HistTermNum)(SurfNum));
-                        Real64 const THM_21(state.dataHeatBalSurf->SurfInsideTempHistMaster(HistTermNum)(SurfNum));
-                        Real64 const THM_12(state.dataHeatBalSurf->SurfOutsideTempHistMaster(HistTermNum - 1)(SurfNum));
-                        Real64 const THM_22(state.dataHeatBalSurf->SurfInsideTempHistMaster(HistTermNum - 1)(SurfNum));
-                        state.dataHeatBalSurf->SurfOutsideTempHist(HistTermNum)(SurfNum) = THM_11 - (THM_11 - THM_12) * sum_steps;
-                        state.dataHeatBalSurf->SurfInsideTempHist(HistTermNum)(SurfNum) = THM_21 - (THM_21 - THM_22) * sum_steps;
+                        Real64 const THM_Out_1(state.dataHeatBalSurf->SurfOutsideTempHistMaster(HistTermNum)(SurfNum));
+                        Real64 const THM_In_1(state.dataHeatBalSurf->SurfInsideTempHistMaster(HistTermNum)(SurfNum));
+                        Real64 const THM_Out_2(state.dataHeatBalSurf->SurfOutsideTempHistMaster(HistTermNum - 1)(SurfNum));
+                        Real64 const THM_In_2(state.dataHeatBalSurf->SurfInsideTempHistMaster(HistTermNum - 1)(SurfNum));
+                        state.dataHeatBalSurf->SurfOutsideTempHist(HistTermNum)(SurfNum) = THM_Out_1 - (THM_Out_1 - THM_Out_2) * sum_steps;
+                        state.dataHeatBalSurf->SurfInsideTempHist(HistTermNum)(SurfNum) = THM_In_1 - (THM_In_1 - THM_In_2) * sum_steps;
 
-                        Real64 const QHM_11(state.dataHeatBalSurf->SurfOutsideFluxHistMaster(HistTermNum)(SurfNum));
-                        Real64 const QHM_21(state.dataHeatBalSurf->SurfInsideFluxHistMaster(HistTermNum)(SurfNum));
-                        Real64 const QHM_12(state.dataHeatBalSurf->SurfOutsideFluxHistMaster(HistTermNum - 1)(SurfNum));
-                        Real64 const QHM_22(state.dataHeatBalSurf->SurfInsideFluxHistMaster(HistTermNum - 1)(SurfNum));
-                        state.dataHeatBalSurf->SurfOutsideFluxHist(HistTermNum)(SurfNum) = QHM_11 - (QHM_11 - QHM_12) * sum_steps;
-                        state.dataHeatBalSurf->SurfInsideFluxHist(HistTermNum)(SurfNum) = QHM_21 - (QHM_21 - QHM_22) * sum_steps;
+                        Real64 const QHM_Out_1(state.dataHeatBalSurf->SurfOutsideFluxHistMaster(HistTermNum)(SurfNum));
+                        Real64 const QHM_In_1(state.dataHeatBalSurf->SurfInsideFluxHistMaster(HistTermNum)(SurfNum));
+                        Real64 const QHM_Out_2(state.dataHeatBalSurf->SurfOutsideFluxHistMaster(HistTermNum - 1)(SurfNum));
+                        Real64 const QHM_In_2(state.dataHeatBalSurf->SurfInsideFluxHistMaster(HistTermNum - 1)(SurfNum));
+                        state.dataHeatBalSurf->SurfOutsideFluxHist(HistTermNum)(SurfNum) = QHM_Out_1 - (QHM_Out_1 - QHM_Out_2) * sum_steps;
+                        state.dataHeatBalSurf->SurfInsideFluxHist(HistTermNum)(SurfNum) = QHM_In_1 - (QHM_In_1 - QHM_In_2) * sum_steps;
                     }
                 }
                 // TH( 1, 2, SurfNum ) = THM( 1, 2, SurfNum ) - ( THM( 1, 2, SurfNum ) - TempExt1( SurfNum ) ) * sum_steps;
