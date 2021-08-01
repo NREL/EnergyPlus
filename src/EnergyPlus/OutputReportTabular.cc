@@ -11605,10 +11605,6 @@ void WriteVeriSumTable(EnergyPlusData &state)
             }
 
             rowHead.allocate(state.dataGlobal->NumOfZones + 4);
-            Array1D_string rowHeadSpaces;
-            rowHeadSpaces.allocate(state.dataGlobal->numSpaces + 4);
-            Array1D_string rowHeadSpaceTypes;
-            rowHeadSpaceTypes.allocate(state.dataGlobal->numSpaceTypes + 4);
 
             NumOfCol = 12;
             columnHead.allocate(NumOfCol);
@@ -11827,8 +11823,410 @@ void WriteVeriSumTable(EnergyPlusData &state)
                         tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Zone Summary");
                 }
             }
+
+            // Space and SpaceType sub-tables
+            Array1D_string spaceRowHead;
+            spaceRowHead.allocate(state.dataGlobal->numSpaces + 4);
+            int spaceNumOfCol = 9;
+            Array1D_string spaceColumnHead;
+            spaceColumnHead.allocate(spaceNumOfCol);
+            Array1D_int spaceColumnWidth;
+            spaceColumnWidth.allocate(spaceNumOfCol);
+            spaceColumnWidth = 14; // array assignment - same for all columns
+            Array2D_string spaceTableBody;
+            spaceTableBody.allocate(spaceNumOfCol, state.dataGlobal->numSpaces + 4);
+
+            spaceColumnHead(1) = "Area " + state.dataOutRptTab->m2_unitName;
+            spaceColumnHead(2) = "Conditioned (Y/N)";
+            spaceColumnHead(3) = "Part of Total Floor Area (Y/N)";
+            spaceColumnHead(4) = "Multipliers";
+            spaceColumnHead(5) = "Zone Name";
+            spaceColumnHead(6) = "Space Type";
+            spaceColumnHead(7) = "Lighting " + state.dataOutRptTab->Wm2_unitName;
+            spaceColumnHead(8) = "People " + state.dataOutRptTab->m2_unitName.substr(0, len(state.dataOutRptTab->m2_unitName) - 1) + " per person" +
+                                 state.dataOutRptTab->m2_unitName[len(state.dataOutRptTab->m2_unitName) - 1];
+            spaceColumnHead(9) = "Plug and Process " + state.dataOutRptTab->Wm2_unitName;
+
+            spaceRowHead = "";
+            spaceRowHead(state.dataGlobal->numSpaces + state.dataOutRptTab->grandTotal) = "Total";
+            spaceRowHead(state.dataGlobal->numSpaces + state.dataOutRptTab->condTotal) = "Conditioned Total";
+            spaceRowHead(state.dataGlobal->numSpaces + state.dataOutRptTab->uncondTotal) = "Unconditioned Total";
+            spaceRowHead(state.dataGlobal->numSpaces + state.dataOutRptTab->notpartTotal) = "Not Part of Total";
+
+            Array1D_string spaceTypeRowHead;
+            spaceTypeRowHead.allocate(state.dataGlobal->numSpaceTypes + 1);
+            int spaceTypeNumOfCol = 7;
+            Array1D_string spaceTypeColumnHead;
+            spaceTypeColumnHead.allocate(spaceTypeNumOfCol);
+            Array1D_int spaceTypeColumnWidth;
+            spaceTypeColumnWidth.allocate(spaceTypeNumOfCol);
+            spaceTypeColumnWidth = 14; // array assignment - same for all columns
+            Array2D_string spaceTypeTableBody;
+            spaceTypeTableBody.allocate(spaceTypeNumOfCol, state.dataGlobal->numSpaceTypes + 1);
+
+            spaceTypeColumnHead(1) = "Total Area " + state.dataOutRptTab->m2_unitName;
+            spaceTypeColumnHead(2) = "Conditioned Area " + state.dataOutRptTab->m2_unitName;
+            spaceTypeColumnHead(3) = "Unconditioned Area " + state.dataOutRptTab->m2_unitName;
+            spaceTypeColumnHead(4) = "Not Part of Total Area " + state.dataOutRptTab->m2_unitName;
+            spaceTypeColumnHead(5) = "Lighting " + state.dataOutRptTab->Wm2_unitName;
+            spaceTypeColumnHead(6) = "People " + state.dataOutRptTab->m2_unitName.substr(0, len(state.dataOutRptTab->m2_unitName) - 1) +
+                                     " per person" + state.dataOutRptTab->m2_unitName[len(state.dataOutRptTab->m2_unitName) - 1];
+            spaceTypeColumnHead(7) = "Plug and Process " + state.dataOutRptTab->Wm2_unitName;
+
+            spaceTypeRowHead = "";
+            spaceTypeRowHead(state.dataGlobal->numSpaceTypes + state.dataOutRptTab->grandTotal) = "Total";
+
+            gatherSpaceTables(state, spaceRowHead, spaceTypeRowHead, spaceTableBody, spaceTypeTableBody);
+
+            tableBody = "";
+            if (produceTabular) {
+                WriteSubtitle(state, "Space Summary");
+                WriteTable(state, spaceTableBody, spaceRowHead, spaceColumnHead, spaceColumnWidth);
+            }
+            if (produceSQLite) {
+                if (state.dataSQLiteProcedures->sqlite) {
+                    state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
+                        spaceTableBody, spaceRowHead, spaceColumnHead, "InputVerificationandResultsSummary", "Entire Facility", "Space Summary");
+                }
+            }
+            if (produceTabular) {
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+                        spaceTableBody, spaceRowHead, spaceColumnHead, "Input Verification and Results Summary", "Entire Facility", "Space Summary");
+                }
+            }
+            if (produceTabular) {
+                WriteSubtitle(state, "Space Type Summary");
+                WriteTable(state, spaceTypeTableBody, spaceTypeRowHead, spaceTypeColumnHead, spaceTypeColumnWidth);
+            }
+            if (produceSQLite) {
+                if (state.dataSQLiteProcedures->sqlite) {
+                    state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(spaceTypeTableBody,
+                                                                                       spaceTypeRowHead,
+                                                                                       spaceTypeColumnHead,
+                                                                                       "InputVerificationandResultsSummary",
+                                                                                       "Entire Facility",
+                                                                                       "Space Type Summary");
+                }
+            }
+            if (produceTabular) {
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(spaceTypeTableBody,
+                                                                                                          spaceTypeRowHead,
+                                                                                                          spaceTypeColumnHead,
+                                                                                                          "Input Verification and Results Summary",
+                                                                                                          "Entire Facility",
+                                                                                                          "Space Type Summary");
+                }
+            }
         }
     }
+}
+
+void gatherSpaceTables(EnergyPlusData &state,
+                       Array1D_string &spaceRowHead,
+                       Array1D_string &spaceTypeRowHead,
+                       Array2D_string &spaceTableBody,
+                       Array2D_string &spaceTypeTableBody)
+{
+
+    // spaceColumnHead(1) = "Area "
+    // spaceColumnHead(2) = "Conditioned (Y/N)";
+    // spaceColumnHead(3) = "Part of Total Floor Area (Y/N)";
+    // spaceColumnHead(4) = "Multipliers";
+    // spaceColumnHead(5) = "Zone Name";
+    // spaceColumnHead(6) = "Space Type "
+    // spaceColumnHead(7) = "Lighting "
+    // spaceColumnHead(8) = "People "
+    // spaceColumnHead(9) = "Plug and Process "
+    int constexpr colSpaceArea(1);
+    int constexpr colConditioned(2);
+    int constexpr colPartOfTotal(3);
+    int constexpr colMultipliers(4);
+    int constexpr colZoneName(5);
+    int constexpr colSpaceType(6);
+    int constexpr colSpaceLighting(7);
+    int constexpr colSpacePeople(8);
+    int constexpr colSpacePlugProcess(9);
+    EPVector<Real64> spaceTotLighting;
+    EPVector<Real64> spaceTotPeople;
+    EPVector<Real64> spaceTotPlugProcess;
+    spaceTotLighting.allocate(state.dataGlobal->numSpaces);
+    spaceTotPeople.allocate(state.dataGlobal->numSpaces);
+    spaceTotPlugProcess.allocate(state.dataGlobal->numSpaces);
+    for (int iSpace = 1; iSpace <= state.dataGlobal->numSpaces; ++iSpace) {
+        spaceTotLighting(iSpace) = 0.0;
+        spaceTotPeople(iSpace) = 0.0;
+        spaceTotPlugProcess(iSpace) = 0.0;
+    }
+
+    // spaceTypeColumnHead(1) = "Total Area "
+    // spaceTypeColumnHead(2) = "Conditioned Area "
+    // spaceTypeColumnHead(3) = "Unconditioned Area "
+    // spaceTypeColumnHead(4) = "Not Part of Total Area "
+    // spaceTypeColumnHead(5) = "Lighting "
+    // spaceTypeColumnHead(6) = "People "
+    // spaceTypeColumnHead(7) = "Plug and Process "
+    int constexpr colSpaceTypeTotArea(1);
+    int constexpr colSpaceTypeCondArea(2);
+    int constexpr colSpaceTypeUncondArea(3);
+    int constexpr colSpaceTypeNotTotArea(4);
+    int constexpr colSpaceTypeLighting(5);
+    int constexpr colSpaceTypePeople(6);
+    int constexpr colSpaceTypePlugProcess(7);
+    EPVector<Real64> spaceTypeTotArea;
+    EPVector<Real64> spaceTypeCondArea;
+    EPVector<Real64> spaceTypeUncondArea;
+    EPVector<Real64> spaceTypeNotTotArea;
+    EPVector<Real64> spaceTypeTotLighting;
+    EPVector<Real64> spaceTypeTotPeople;
+    EPVector<Real64> spaceTypeTotPlugProcess;
+    spaceTypeTotArea.allocate(state.dataGlobal->numSpaceTypes);
+    spaceTypeCondArea.allocate(state.dataGlobal->numSpaceTypes);
+    spaceTypeUncondArea.allocate(state.dataGlobal->numSpaceTypes);
+    spaceTypeNotTotArea.allocate(state.dataGlobal->numSpaceTypes);
+    spaceTypeTotLighting.allocate(state.dataGlobal->numSpaceTypes);
+    spaceTypeTotPeople.allocate(state.dataGlobal->numSpaceTypes);
+    spaceTypeTotPlugProcess.allocate(state.dataGlobal->numSpaceTypes);
+    for (int iSpaceType = 1; iSpaceType <= state.dataGlobal->numSpaceTypes; ++iSpaceType) {
+        spaceTypeTotArea(iSpaceType) = 0.0;
+        spaceTypeCondArea(iSpaceType) = 0.0;
+        spaceTypeUncondArea(iSpaceType) = 0.0;
+        spaceTypeNotTotArea(iSpaceType) = 0.0;
+        spaceTypeTotLighting(iSpaceType) = 0.0;
+        spaceTypeTotPeople(iSpaceType) = 0.0;
+        spaceTypeTotPlugProcess(iSpaceType) = 0.0;
+    }
+
+    // Accumulate internal gain totals by space and space type
+    for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
+        auto curPeople = state.dataHeatBal->People(iPeople);
+        for (int iSpace = 1; iSpace <= int(curPeople.SpacePtrs.size()); ++iSpace) {
+            int const spaceNum = curPeople.SpacePtrs(iSpace);
+            Real64 const people = curPeople.NumberOfPeople * curPeople.SpaceFracs(iSpace);
+            spaceTotPeople(spaceNum) += people;
+            spaceTypeTotPeople(state.dataHeatBal->Space(spaceNum).SpaceTypeNum) += people;
+        }
+    }
+    for (int iLights = 1; iLights <= state.dataHeatBal->TotLights; ++iLights) {
+        auto curLighting = state.dataHeatBal->Lights(iLights);
+        for (int iSpace = 1; iSpace <= int(curLighting.SpacePtrs.size()); ++iSpace) {
+            int const spaceNum = curLighting.SpacePtrs(iSpace);
+            Real64 const lighting = curLighting.DesignLevel * curLighting.SpaceFracs(iSpace);
+            spaceTotLighting(spaceNum) += lighting;
+            spaceTypeTotLighting(state.dataHeatBal->Space(spaceNum).SpaceTypeNum) += lighting;
+        }
+    }
+    for (int iElecEquip = 1; iElecEquip <= state.dataHeatBal->TotElecEquip; ++iElecEquip) {
+        auto curElecEquip = state.dataHeatBal->ZoneElectric(iElecEquip);
+        for (int iSpace = 1; iSpace <= int(curElecEquip.SpacePtrs.size()); ++iSpace) {
+            int const spaceNum = curElecEquip.SpacePtrs(iSpace);
+            Real64 const elecEquip = curElecEquip.DesignLevel * curElecEquip.SpaceFracs(iSpace);
+            spaceTotPlugProcess(spaceNum) += elecEquip;
+            spaceTypeTotPlugProcess(state.dataHeatBal->Space(spaceNum).SpaceTypeNum) += elecEquip;
+        }
+    }
+    for (int iGasEquip = 1; iGasEquip <= state.dataHeatBal->TotGasEquip; ++iGasEquip) {
+        auto curGasEquip = state.dataHeatBal->ZoneGas(iGasEquip);
+        for (int iSpace = 1; iSpace <= int(curGasEquip.SpacePtrs.size()); ++iSpace) {
+            int const spaceNum = curGasEquip.SpacePtrs(iSpace);
+            Real64 const gasEquip = curGasEquip.DesignLevel * curGasEquip.SpaceFracs(iSpace);
+            spaceTotPlugProcess(spaceNum) += gasEquip;
+            spaceTypeTotPlugProcess(state.dataHeatBal->Space(spaceNum).SpaceTypeNum) += gasEquip;
+        }
+    }
+    for (int iOthEquip = 1; iOthEquip <= state.dataHeatBal->TotOthEquip; ++iOthEquip) {
+        auto curOthEquip = state.dataHeatBal->ZoneOtherEq(iOthEquip);
+        for (int iSpace = 1; iSpace <= int(curOthEquip.SpacePtrs.size()); ++iSpace) {
+            int const spaceNum = curOthEquip.SpacePtrs(iSpace);
+            Real64 const othEquip = curOthEquip.DesignLevel * curOthEquip.SpaceFracs(iSpace);
+            spaceTotPlugProcess(spaceNum) += othEquip;
+            spaceTypeTotPlugProcess(state.dataHeatBal->Space(spaceNum).SpaceTypeNum) += othEquip;
+        }
+    }
+    for (int iHWEquip = 1; iHWEquip <= state.dataHeatBal->TotHWEquip; ++iHWEquip) {
+        auto curHWEquip = state.dataHeatBal->ZoneHWEq(iHWEquip);
+        for (int iSpace = 1; iSpace <= int(curHWEquip.SpacePtrs.size()); ++iSpace) {
+            int const spaceNum = curHWEquip.SpacePtrs(iSpace);
+            Real64 const hwEquip = curHWEquip.DesignLevel * curHWEquip.SpaceFracs(iSpace);
+            spaceTotPlugProcess(spaceNum) += hwEquip;
+            spaceTypeTotPlugProcess(state.dataHeatBal->Space(spaceNum).SpaceTypeNum) += hwEquip;
+        }
+    }
+    for (int iSteamEquip = 1; iSteamEquip <= state.dataHeatBal->TotStmEquip; ++iSteamEquip) {
+        auto curSteamEquip = state.dataHeatBal->ZoneSteamEq(iSteamEquip);
+        for (int iSpace = 1; iSpace <= int(curSteamEquip.SpacePtrs.size()); ++iSpace) {
+            int const spaceNum = curSteamEquip.SpacePtrs(iSpace);
+            Real64 const steamEquip = curSteamEquip.DesignLevel * curSteamEquip.SpaceFracs(iSpace);
+            spaceTotPlugProcess(spaceNum) += steamEquip;
+            spaceTypeTotPlugProcess(state.dataHeatBal->Space(spaceNum).SpaceTypeNum) += steamEquip;
+        }
+    }
+    for (int iITEquip = 1; iITEquip <= state.dataHeatBal->NumZoneITEqStatements; ++iITEquip) {
+        auto curITEquip = state.dataHeatBal->ZoneITEq(iITEquip);
+        for (int iSpace = 1; iSpace <= int(curITEquip.SpacePtrs.size()); ++iSpace) {
+            int const spaceNum = curITEquip.SpacePtrs(iSpace);
+            Real64 const itEquip = curITEquip.DesignTotalPower * curITEquip.SpaceFracs(iSpace);
+            spaceTotPlugProcess(spaceNum) += itEquip;
+            spaceTypeTotPlugProcess(state.dataHeatBal->Space(spaceNum).SpaceTypeNum) += itEquip;
+        }
+    }
+
+    for (int iTotal = 1; iTotal <= 4; ++iTotal) {
+        state.dataOutRptTab->zstArea(iTotal) = 0.0;
+        state.dataOutRptTab->zstLight(iTotal) = 0.0;
+        state.dataOutRptTab->zstPlug(iTotal) = 0.0;
+        state.dataOutRptTab->zstArea(iTotal) = 0.0;
+    }
+
+    int spaceTableRowNum = 0;
+    for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
+        auto curZone = state.dataHeatBal->Zone(iZone);
+        Real64 const mult = Real64(curZone.Multiplier * curZone.ListMultiplier);
+        for (int const spaceNum : curZone.Spaces) {
+            auto curSpace = state.dataHeatBal->Space(spaceNum);
+            bool spaceIsCond = false;
+            bool useSpaceFloorArea = false;
+            ++spaceTableRowNum;
+            spaceRowHead(spaceTableRowNum) = curSpace.Name;
+            spaceTableBody(colZoneName, spaceTableRowNum) = curZone.Name;
+            spaceTableBody(colSpaceType, spaceTableRowNum) = curSpace.SpaceType;
+            spaceTableBody(colSpaceArea, spaceTableRowNum) = RealToStr(curSpace.FloorArea * state.dataOutRptTab->m2_unitConvWVST, 2);
+            // Conditioned or not
+            if (curZone.SystemZoneNodeNumber > 0) {
+                spaceTableBody(colConditioned, spaceTableRowNum) = "Yes";
+                spaceIsCond = true;
+            } else {
+                spaceTableBody(colConditioned, spaceTableRowNum) = "No";
+                spaceIsCond = false;
+            }
+            // Part of Total Floor Area or not
+            if (curZone.isPartOfTotalArea) {
+                spaceTableBody(colPartOfTotal, spaceTableRowNum) = "Yes";
+                useSpaceFloorArea = true;
+            } else {
+                spaceTableBody(colPartOfTotal, spaceTableRowNum) = "No";
+                useSpaceFloorArea = false;
+            }
+            // lighting density
+            spaceTableBody(colMultipliers, spaceTableRowNum) = RealToStr(mult, 2);
+            if (curSpace.FloorArea > 0) {
+                spaceTableBody(colSpaceLighting, spaceTableRowNum) =
+                    RealToStr(state.dataOutRptTab->Wm2_unitConv * spaceTotLighting(spaceNum) / curSpace.FloorArea, 4);
+            } else {
+                spaceTableBody(colSpaceLighting, spaceTableRowNum) = RealToStr(0.0, 4);
+            }
+            // people density
+            if (spaceTotPeople(spaceNum) > 0) {
+                spaceTableBody(colSpacePeople, spaceTableRowNum) =
+                    RealToStr(curSpace.FloorArea * state.dataOutRptTab->m2_unitConvWVST / spaceTotPeople(spaceNum), 2);
+            } else {
+                spaceTableBody(colSpacePeople, spaceTableRowNum) = RealToStr(0.0, 2);
+            }
+            // plug and process density
+            if (curSpace.FloorArea > 0) {
+                spaceTableBody(colSpacePlugProcess, spaceTableRowNum) =
+                    RealToStr(spaceTotPlugProcess(spaceNum) * state.dataOutRptTab->Wm2_unitConv / curSpace.FloorArea, 4);
+            } else {
+                spaceTableBody(colSpacePlugProcess, spaceTableRowNum) = RealToStr(0.0, 4);
+            }
+
+            // If not part of total, goes directly to this row
+            if (!useSpaceFloorArea) {
+                spaceTypeNotTotArea(curSpace.SpaceTypeNum) += curSpace.FloorArea * mult;
+                state.dataOutRptTab->zstArea(state.dataOutRptTab->notpartTotal) += mult * curSpace.FloorArea;
+                state.dataOutRptTab->zstLight(state.dataOutRptTab->notpartTotal) += mult * spaceTotLighting(spaceNum);
+                state.dataOutRptTab->zstPeople(state.dataOutRptTab->notpartTotal) += mult * spaceTotPeople(spaceNum);
+                state.dataOutRptTab->zstPlug(state.dataOutRptTab->notpartTotal) += mult * spaceTotPlugProcess(spaceNum);
+            } else {
+                // Add it to the 'Total'
+                spaceTypeTotArea(curSpace.SpaceTypeNum) += curSpace.FloorArea * mult;
+                state.dataOutRptTab->zstArea(state.dataOutRptTab->grandTotal) += mult * curSpace.FloorArea;
+                state.dataOutRptTab->zstLight(state.dataOutRptTab->grandTotal) += mult * spaceTotLighting(spaceNum);
+                state.dataOutRptTab->zstPeople(state.dataOutRptTab->grandTotal) += mult * spaceTotPeople(spaceNum);
+                state.dataOutRptTab->zstPlug(state.dataOutRptTab->grandTotal) += mult * spaceTotPlugProcess(spaceNum);
+
+                // Subtotal between cond/unconditioned
+                if (spaceIsCond) {
+                    spaceTypeCondArea(curSpace.SpaceTypeNum) += curSpace.FloorArea * mult;
+                    state.dataOutRptTab->zstArea(state.dataOutRptTab->condTotal) += mult * curSpace.FloorArea;
+                    state.dataOutRptTab->zstLight(state.dataOutRptTab->condTotal) += mult * spaceTotLighting(spaceNum);
+                    state.dataOutRptTab->zstPeople(state.dataOutRptTab->condTotal) += mult * spaceTotPeople(spaceNum);
+                    state.dataOutRptTab->zstPlug(state.dataOutRptTab->condTotal) += mult * spaceTotPlugProcess(spaceNum);
+                } else if (!spaceIsCond) {
+                    spaceTypeUncondArea(curSpace.SpaceTypeNum) += curSpace.FloorArea * mult;
+                    state.dataOutRptTab->zstArea(state.dataOutRptTab->uncondTotal) += mult * curSpace.FloorArea;
+                    state.dataOutRptTab->zstLight(state.dataOutRptTab->uncondTotal) += mult * spaceTotLighting(spaceNum);
+                    state.dataOutRptTab->zstPeople(state.dataOutRptTab->uncondTotal) += mult * spaceTotPeople(spaceNum);
+                    state.dataOutRptTab->zstPlug(state.dataOutRptTab->uncondTotal) += mult * spaceTotPlugProcess(spaceNum);
+                }
+            }
+        }
+    }
+    // total rows for Total / Not Part of Total
+    // In "Total": break between conditioned/unconditioned
+    for (int iTotal = 1; iTotal <= 4; ++iTotal) {
+        spaceTableBody(colSpaceArea, state.dataGlobal->numSpaces + iTotal) =
+            RealToStr(state.dataOutRptTab->zstArea(iTotal) * state.dataOutRptTab->m2_unitConvWVST, 2);
+        if (state.dataOutRptTab->zstArea(iTotal) != 0) {
+            spaceTableBody(colSpaceLighting, state.dataGlobal->numSpaces + iTotal) =
+                RealToStr(state.dataOutRptTab->zstLight(iTotal) * state.dataOutRptTab->Wm2_unitConv / state.dataOutRptTab->zstArea(iTotal), 4);
+            spaceTableBody(colSpacePlugProcess, state.dataGlobal->numSpaces + iTotal) =
+                RealToStr(state.dataOutRptTab->zstPlug(iTotal) * state.dataOutRptTab->Wm2_unitConv / state.dataOutRptTab->zstArea(iTotal), 4);
+        } else {
+            spaceTableBody(colSpaceLighting, state.dataGlobal->numSpaces + iTotal) = RealToStr(0.0, 4);
+            spaceTableBody(colSpacePlugProcess, state.dataGlobal->numSpaces + iTotal) = RealToStr(0.0, 4);
+        }
+        if (state.dataOutRptTab->zstPeople(iTotal) != 0) {
+            spaceTableBody(colSpacePeople, state.dataGlobal->numSpaces + iTotal) =
+                RealToStr(state.dataOutRptTab->zstArea(iTotal) * state.dataOutRptTab->m2_unitConvWVST / state.dataOutRptTab->zstPeople(iTotal), 2);
+        } else {
+            spaceTableBody(colSpacePeople, state.dataGlobal->numSpaces + iTotal) = RealToStr(0.0, 2);
+        }
+    }
+
+    Real64 totalArea = 0.0;
+    Real64 condArea = 0.0;
+    Real64 uncondArea = 0.0;
+    Real64 notTotalArea = 0.0;
+    for (int iSpaceType = 1; iSpaceType <= state.dataGlobal->numSpaceTypes; ++iSpaceType) {
+        spaceTypeRowHead(iSpaceType) = state.dataHeatBal->spaceTypes(iSpaceType);
+        spaceTypeTableBody(colSpaceTypeTotArea, iSpaceType) = RealToStr(spaceTypeTotArea(iSpaceType) * state.dataOutRptTab->m2_unitConvWVST, 2);
+        spaceTypeTableBody(colSpaceTypeCondArea, iSpaceType) = RealToStr(spaceTypeCondArea(iSpaceType) * state.dataOutRptTab->m2_unitConvWVST, 2);
+        spaceTypeTableBody(colSpaceTypeUncondArea, iSpaceType) = RealToStr(spaceTypeUncondArea(iSpaceType) * state.dataOutRptTab->m2_unitConvWVST, 2);
+        spaceTypeTableBody(colSpaceTypeNotTotArea, iSpaceType) = RealToStr(spaceTypeNotTotArea(iSpaceType) * state.dataOutRptTab->m2_unitConvWVST, 2);
+        totalArea += spaceTypeTotArea(iSpaceType);
+        condArea += spaceTypeCondArea(iSpaceType);
+        uncondArea += spaceTypeUncondArea(iSpaceType);
+        notTotalArea += spaceTypeNotTotArea(iSpaceType);
+        // lighting density
+        if (spaceTypeTotArea(iSpaceType) > 0) {
+            spaceTypeTableBody(colSpaceTypeLighting, iSpaceType) =
+                RealToStr(state.dataOutRptTab->Wm2_unitConv * spaceTypeTotLighting(iSpaceType) / spaceTypeTotArea(iSpaceType), 4);
+        } else {
+            spaceTypeTableBody(colSpaceTypeLighting, iSpaceType) = RealToStr(0.0, 4);
+        }
+        // people density
+        if (spaceTypeTotPeople(iSpaceType) > 0) {
+            spaceTypeTableBody(colSpaceTypePeople, iSpaceType) =
+                RealToStr(spaceTypeTotArea(iSpaceType) * state.dataOutRptTab->m2_unitConvWVST / spaceTypeTotPeople(iSpaceType), 2);
+        } else {
+            spaceTypeTableBody(colSpaceTypePeople, iSpaceType) = RealToStr(0.0, 2);
+        }
+        // plug and process density
+        if (spaceTypeTotArea(iSpaceType) > 0) {
+            spaceTypeTableBody(colSpaceTypePlugProcess, iSpaceType) =
+                RealToStr(spaceTypeTotPlugProcess(iSpaceType) * state.dataOutRptTab->Wm2_unitConv / spaceTypeTotArea(iSpaceType), 4);
+        } else {
+            spaceTypeTableBody(colSpaceTypePlugProcess, iSpaceType) = RealToStr(0.0, 4);
+        }
+    }
+    // Total Area
+    spaceTypeTableBody(colSpaceTypeTotArea, state.dataGlobal->numSpaceTypes + 1) = RealToStr(totalArea * state.dataOutRptTab->m2_unitConvWVST, 2);
+    spaceTypeTableBody(colSpaceTypeCondArea, state.dataGlobal->numSpaceTypes + 1) = RealToStr(condArea * state.dataOutRptTab->m2_unitConvWVST, 2);
+    spaceTypeTableBody(colSpaceTypeUncondArea, state.dataGlobal->numSpaceTypes + 1) = RealToStr(uncondArea * state.dataOutRptTab->m2_unitConvWVST, 2);
+    spaceTypeTableBody(colSpaceTypeNotTotArea, state.dataGlobal->numSpaceTypes + 1) =
+        RealToStr(notTotalArea * state.dataOutRptTab->m2_unitConvWVST, 2);
 }
 
 void WriteAdaptiveComfortTable(EnergyPlusData &state)
