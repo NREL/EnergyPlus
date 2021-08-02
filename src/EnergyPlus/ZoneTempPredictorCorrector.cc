@@ -77,6 +77,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -7033,44 +7034,6 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
     for (SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
 
         Area = state.dataSurface->Surface(SurfNum).Area; // For windows, this is the glazing area
-        // determine reference air temperature for this surface's convective heat transfer model
-        {
-            auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(SurfNum));
-            if (SELECT_CASE_var == ZoneMeanAirTemp) {
-                // The zone air is the reference temperature
-                RefAirTemp = MAT(ZoneNum);
-            } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
-            } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
-                // check whether this zone is a controlled zone or not
-                if (!ControlledZoneAirFlag) {
-                    ShowFatalError(state,
-                                   "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone(ZoneNum).Name);
-                    return;
-                }
-                // determine supply air temperature as a weighted average of the inlet temperatures.
-                for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
-                    // Get node conditions
-                    NodeTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
-                    MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
-                    CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
-
-                    SumSysMCp += MassFlowRate * CpAir;
-                    SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
-
-                } // NodeNum
-                if (SumSysMCp > 0.0) {
-                    RefAirTemp = SumSysMCpT / SumSysMCp;
-                } else {
-                    // no system flow (yet) so just use last value for zone air temp
-                    RefAirTemp = MAT(ZoneNum);
-                }
-
-            } else {
-                // currently set to mean air temp but should add error warning here
-                RefAirTemp = MAT(ZoneNum);
-            }
-        }
 
         if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) {
 
@@ -7107,14 +7070,14 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
 
                 SumHADTsurfs += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
                                 (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) *
-                                (state.dataSurface->SurfWinFrameTempIn(SurfNum) - RefAirTemp);
+                                (state.dataSurface->SurfWinFrameTempIn(SurfNum) - state.dataHeatBalSurfMgr->RefAirTemp(SurfNum));
             }
 
             if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                 // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
                 SumHADTsurfs += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
                                 (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) *
-                                (state.dataSurface->SurfWinDividerTempIn(SurfNum) - RefAirTemp);
+                                (state.dataSurface->SurfWinDividerTempIn(SurfNum) - state.dataHeatBalSurfMgr->RefAirTemp(SurfNum));
             }
 
         } // End of check if window
