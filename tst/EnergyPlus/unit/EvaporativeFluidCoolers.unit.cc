@@ -101,6 +101,7 @@ TEST_F(EvapFluidCoolersFixture, EvapFluidCoolerSpecs_getDesignCapacitiesTest)
     // Obviously, not everything can be skipped so some of this information is needed to avoid crashes in other routines.
     auto &thisEFC = state->dataEvapFluidCoolers->SimpleEvapFluidCooler(1);
     thisEFC.TypeOf_Num = DataPlant::TypeOf_EvapFluidCooler_TwoSpd;
+    thisEFC.MyOneTimeFlag = false;
     thisEFC.OneTimeFlagForEachEvapFluidCooler = false;
     thisEFC.MyEnvrnFlag = false;
     state->dataGlobal->BeginEnvrnFlag = true;
