@@ -1678,7 +1678,7 @@ namespace RoomAirModelManager {
                     } else {
                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain.allocate(maxNumGains);
                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGainsDeviceIndices.allocate(maxNumGains);
-                        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGainsDeviceSpaces.allocate(maxNumGains);
+                        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).intGainsDeviceSpaces.allocate(maxNumGains);
                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGainsFractions.allocate(maxNumGains);
                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).HasIntGainsAssigned = true;
                         int numGainsFound = 0;
@@ -1711,7 +1711,7 @@ namespace RoomAirModelManager {
                                 if (intGainIndex >= 0) {
                                     gainFound = true;
                                     ++numGainsFound;
-                                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGainsDeviceSpaces(numGainsFound) =
+                                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).intGainsDeviceSpaces(numGainsFound) =
                                         spaceNum;
                                     state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGainsDeviceIndices(numGainsFound) =
                                         intGainIndex;

@@ -191,8 +191,8 @@ namespace HeatBalanceIntRadExchange {
         int endEnclosure = state.dataViewFactor->NumOfRadiantEnclosures;
         if (PartialResimulate) {
             // ToDo: For now, use min and max enclosure numbers associated with this zone, this could include unrelated enclosures
-            startEnclosure = state.dataHeatBal->Zone(ZoneToResimulate).ZoneRadEnclosureFirst;
-            endEnclosure = state.dataHeatBal->Zone(ZoneToResimulate).ZoneRadEnclosureLast;
+            startEnclosure = state.dataHeatBal->Zone(ZoneToResimulate).zoneRadEnclosureFirst;
+            endEnclosure = state.dataHeatBal->Zone(ZoneToResimulate).zoneRadEnclosureLast;
             for (int enclosureNum = startEnclosure; enclosureNum <= endEnclosure; ++enclosureNum) {
                 auto const &enclosure(state.dataViewFactor->EnclRadInfo(enclosureNum));
                 for (int i : enclosure.SurfacePtr) {

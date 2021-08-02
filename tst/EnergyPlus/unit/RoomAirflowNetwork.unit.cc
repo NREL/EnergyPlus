@@ -174,14 +174,14 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).HVAC(1).Name = "ZoneHVAC";
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(1).IntGainsDeviceIndices.allocate(1);
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).IntGainsDeviceIndices.allocate(1);
-    state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(1).IntGainsDeviceSpaces.allocate(1);
-    state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).IntGainsDeviceSpaces.allocate(1);
+    state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(1).intGainsDeviceSpaces.allocate(1);
+    state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).intGainsDeviceSpaces.allocate(1);
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(1).NumIntGains = 1;
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).NumIntGains = 1;
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(1).IntGainsDeviceIndices(1) = 1;
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).IntGainsDeviceIndices(1) = 1;
-    state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(1).IntGainsDeviceSpaces(1) = 1;
-    state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).IntGainsDeviceSpaces(1) = 1;
+    state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(1).intGainsDeviceSpaces(1) = 1;
+    state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).intGainsDeviceSpaces(1) = 1;
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(1).IntGainsFractions.allocate(1);
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).IntGainsFractions.allocate(1);
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(1).IntGainsFractions(1) = 0.4;

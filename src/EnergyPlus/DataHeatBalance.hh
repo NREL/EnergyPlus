@@ -435,9 +435,9 @@ namespace DataHeatBalance {
         std::vector<int> ZoneHTNonWindowSurfaceList; // List of non-window HT surfaces related to this zone (includes adjacent interzone surfaces)
         std::vector<int> ZoneHTWindowSurfaceList;    // List of window surfaces related to this zone (includes adjacent interzone surfaces)
         std::vector<int> ZoneExtSolarSurfaceList;    // List of exterior solar surfaces in a zone
-        int ZoneRadEnclosureFirst;                   // For Zone resimulation, need a range of enclosures for CalcInteriorRadExchange
-        int ZoneRadEnclosureLast;                    // For Zone resimulation, need a range of enclosures for CalcInteriorRadExchange
-        int ZoneFirstSpaceSolEnclosure; // TODO: For daylighting, this is a punt, it's the solar enclosure number of the first space in the zone
+        int zoneRadEnclosureFirst;                   // For Zone resimulation, need a range of enclosures for CalcInteriorRadExchange
+        int zoneRadEnclosureLast;                    // For Zone resimulation, need a range of enclosures for CalcInteriorRadExchange
+        int zoneFirstSpaceSolEnclosure; // TODO: For daylighting, this is a punt, it's the solar enclosure number of the first space in the zone
 
         Real64 OutDryBulbTemp;                 // Zone outside dry bulb air temperature (C)
         bool OutDryBulbTempEMSOverrideOn;      // if true, EMS is calling to override the surface's outdoor air temp
@@ -522,8 +522,8 @@ namespace DataHeatBalance {
               OpaqOrIntMassSurfaceLast(-1), WindowSurfaceFirst(0), WindowSurfaceLast(-1), OpaqOrWinSurfaceFirst(0), OpaqOrWinSurfaceLast(-1),
               TDDDomeFirst(0), TDDDomeLast(-1), InsideConvectionAlgo(ConvectionConstants::HcInt_ASHRAESimple), NumSurfaces(0), NumSubSurfaces(0),
               NumShadingSurfaces(0), OutsideConvectionAlgo(ConvectionConstants::HcExt_ASHRAESimple), Centroid(0.0, 0.0, 0.0), MinimumX(0.0),
-              MaximumX(0.0), MinimumY(0.0), MaximumY(0.0), MinimumZ(0.0), MaximumZ(0.0), ZoneRadEnclosureFirst(-1), ZoneRadEnclosureLast(-1),
-              ZoneFirstSpaceSolEnclosure(0),
+              MaximumX(0.0), MinimumY(0.0), MaximumY(0.0), MinimumZ(0.0), MaximumZ(0.0), zoneRadEnclosureFirst(-1), zoneRadEnclosureLast(-1),
+              zoneFirstSpaceSolEnclosure(0),
 
               OutDryBulbTemp(0.0), OutDryBulbTempEMSOverrideOn(false), OutDryBulbTempEMSOverrideValue(0.0), OutWetBulbTemp(0.0),
               OutWetBulbTempEMSOverrideOn(false), OutWetBulbTempEMSOverrideValue(0.0), WindSpeed(0.0), WindSpeedEMSOverrideOn(false),
@@ -1189,7 +1189,7 @@ namespace DataHeatBalance {
     struct SpaceZoneSimData // Calculated data by Space or Zone during each time step/hour
     {
         // Members
-        Real64 NOFOCC;  // Number of Occupants, space total
+        Real64 NOFOCC;  // Number of Occupants
         Real64 QOCTOT;  // Total Energy from Occupants
         Real64 QOCSEN;  // Sensible Energy from Occupants
         Real64 QOCCON;  // ENERGY CONVECTED FROM OCCUPANTS (WH)
