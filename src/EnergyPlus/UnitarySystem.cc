@@ -7198,7 +7198,6 @@ namespace UnitarySystems {
 
                 // now translate to UnitarySystem
                 thisSys.UnitType = cCurrentModuleObject;
-                // thisSys.m_unitarySystemType_Num = DataHVACGlobals::UnitarySys_AnyCoilType;
                 input_specs.control_type = "Setpoint";
                 thisSys.m_CoolCoilExists = true; // is always true
                 thisSys.m_LastMode = state.dataUnitarySystems->CoolingMode;
@@ -7235,7 +7234,8 @@ namespace UnitarySystems {
                         WaterCoils::GetCoilWaterInletNode(state, HRcoolingCoilType, HRWaterCoolingCoilName, errFound);
                     int HRCoilIndex =
                         WaterCoils::GetWaterCoilIndex(state, UtilityRoutines::MakeUPPERCase(HRcoolingCoilType), HRWaterCoolingCoilName, errFound);
-                    WaterCoils::SetWaterCoilData(state, HRCoilIndex, errFound, _, _, true);
+                    bool heatRecoveryCoil = true; // use local here to highlight where this parameter is set
+                    WaterCoils::SetWaterCoilData(state, HRCoilIndex, errFound, _, _, heatRecoveryCoil);
                     if (errFound) ShowContinueError(state, "...occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                     errorsFound = errorsFound || errFound;
                 }
@@ -7288,7 +7288,6 @@ namespace UnitarySystems {
 
                 auto const &fields = instance.value();
                 thisSys.UnitType = cCurrentModuleObject;
-                // thisSys.m_unitarySystemType_Num = DataHVACGlobals::UnitarySys_AnyCoilType;
 
                 UnitarySysInputSpec input_spec;
                 input_spec.name = thisObjectName;
@@ -11152,7 +11151,6 @@ namespace UnitarySystems {
                 } else {
                     mdot = this->CoolCoilWaterFlowRatio * this->MaxCoolCoilFluidFlow;
                 }
-                // Logic seems fishy. SetComponentFlowRate has already been called and now we reset node water flow rate.
                 state.dataLoopNodes->Node(this->CoolCoilFluidInletNode).MassFlowRate = mdot;
                 WaterCoils::SimulateWaterCoilComponents(
                     state, CompName, FirstHVACIteration, this->m_CoolingCoilIndex, QActual, this->m_FanOpMode, PartLoadRatio);
@@ -11672,7 +11670,7 @@ namespace UnitarySystems {
             DesOutTemp -= this->m_FaultyCoilSATOffset;
         }
 
-        // IF DXCoolingSystem is scheduled on and there is flow
+        // IF UnitarySystem is scheduled on and there is flow
         if ((ScheduleManager::GetCurrentScheduleValue(state, this->m_SysAvailSchedPtr) > 0.0) &&
             ScheduleManager::GetCurrentScheduleValue(state, this->m_CoolingCoilAvailSchPtr) > 0.0 &&
             (state.dataLoopNodes->Node(InletNode).MassFlowRate > DataHVACGlobals::SmallAirVolFlow)) {
@@ -11689,9 +11687,6 @@ namespace UnitarySystems {
                 }
                 tempAcc = 0.0;
                 tempHumRatAcc = 0.0;
-            } else if (this->m_WaterHRPlantLoopModel) {
-                // there should be logic here that disables under certain conditions
-                SensibleLoad = true;
             } else {
                 unitSys = true;
                 if (state.dataLoopNodes->Node(InletNode).Temp - DesOutTemp > DataHVACGlobals::TempControlTol) SensibleLoad = true;
@@ -12518,7 +12513,9 @@ namespace UnitarySystems {
             if ((OutletHumRatDXCoil > (DesOutHumRat + tempHumRatAcc)) && (!unitSys || PartLoadFrac < 1.0) &&
                 (this->m_DehumidControlType_Num == DehumCtrlType::Multimode)) {
 
-                if (CoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) { // CoilSystem:Cooling:DX:HeatExchangerAssisted
+                if ((CoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) ||
+                    (CoilType_Num == DataHVACGlobals::CoilWater_CoolingHXAssisted)) { // CoilSystem:Cooling:DX:HeatExchangerAssisted,
+                                                                                      // CoilSystem:Cooling:Water:HeatExchangerAssisted
                     // Determine required part load when heat exchanger is ON
                     HXUnitOn = true;
                     PartLoadFrac = 1.0;

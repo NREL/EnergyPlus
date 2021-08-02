@@ -195,7 +195,6 @@ namespace UnitarySystems {
 
         UnitarySysInputSpec original_input_specs;
         int m_UnitarySysNum;
-        // int m_unitarySystemType_Num;
         bool m_ThisSysInputShouldBeGotten;
         int m_SysAvailSchedPtr; // Pointer to the availability schedule
         ControlType m_ControlType;

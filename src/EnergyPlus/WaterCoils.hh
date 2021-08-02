@@ -248,7 +248,7 @@ namespace WaterCoils {
               CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0), CoilPerfInpMeth(0), FaultyCoilFoulingFlag(false),
               FaultyCoilFoulingIndex(0), FaultyCoilFoulingFactor(0.0), DesiccantRegenerationCoil(false), DesiccantDehumNum(0),
               DesignWaterDeltaTemp(0.0), UseDesignWaterDeltaTemp(false), ControllerName(""), ControllerIndex(0), reportCoilFinalSizes(true),
-              AirLoopDOASFlag(false), DesignInletWaterTemp(0.0), UseDesignInletWaterTemp(false)
+              AirLoopDOASFlag(false), DesignInletWaterTemp(0.0), UseDesignInletWaterTemp(false), heatRecoveryCoil(false)
         {
         }
     };
