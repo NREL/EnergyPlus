@@ -283,29 +283,29 @@ namespace RoomAirModelAirflowNetwork {
                                         "RoomAirflowNetwork Node NonAirSystemResponse",
                                         OutputProcessor::Unit::W,
                                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).NonAirSystemResponse,
-                                        "HVAC",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::HVAC,
+                                        OutputProcessor::SOVStoreType::Average,
                                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).Name);
                     SetupOutputVariable(state,
                                         "RoomAirflowNetwork Node SysDepZoneLoadsLagged",
                                         OutputProcessor::Unit::W,
                                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).SysDepZoneLoadsLagged,
-                                        "HVAC",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::HVAC,
+                                        OutputProcessor::SOVStoreType::Average,
                                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).Name);
                     SetupOutputVariable(state,
                                         "RoomAirflowNetwork Node SumIntSensibleGain",
                                         OutputProcessor::Unit::W,
                                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).SumIntSensibleGain,
-                                        "HVAC",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::HVAC,
+                                        OutputProcessor::SOVStoreType::Average,
                                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).Name);
                     SetupOutputVariable(state,
                                         "RoomAirflowNetwork Node SumIntLatentGain",
                                         OutputProcessor::Unit::W,
                                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).SumIntLatentGain,
-                                        "HVAC",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::HVAC,
+                                        OutputProcessor::SOVStoreType::Average,
                                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).Name);
                 }
             }
@@ -432,16 +432,16 @@ namespace RoomAirModelAirflowNetwork {
                                 "RoomAirflowNetwork Node HVAC Supply Fraction",
                                 OutputProcessor::Unit::None,
                                 state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).SupplyFraction,
-                                "HVAC",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::HVAC,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).Name);
                             SetupOutputVariable(
                                 state,
                                 "RoomAirflowNetwork Node HVAC Return Fraction",
                                 OutputProcessor::Unit::None,
                                 state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).ReturnFraction,
-                                "HVAC",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::HVAC,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).Name);
                         }
                     }

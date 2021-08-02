@@ -721,24 +721,29 @@ void SimHVAC(EnergyPlusData &state)
                             "HVAC System Solver Iteration Count",
                             OutputProcessor::Unit::None,
                             state.dataHVACMgr->HVACManageIteration,
-                            "HVAC",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::HVAC,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SimHVAC");
-        SetupOutputVariable(
-            state, "Air System Solver Iteration Count", OutputProcessor::Unit::None, state.dataHVACMgr->RepIterAir, "HVAC", "Sum", "SimHVAC");
+        SetupOutputVariable(state,
+                            "Air System Solver Iteration Count",
+                            OutputProcessor::Unit::None,
+                            state.dataHVACMgr->RepIterAir,
+                            OutputProcessor::SOVTimeStepType::HVAC,
+                            OutputProcessor::SOVStoreType::Summed,
+                            "SimHVAC");
         SetupOutputVariable(state,
                             "Air System Relief Air Total Heat Loss Energy",
                             OutputProcessor::Unit::J,
                             state.dataHeatBal->SysTotalHVACReliefHeatLoss,
-                            "HVAC",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::HVAC,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SimHVAC");
         SetupOutputVariable(state,
                             "HVAC System Total Heat Rejection Energy",
                             OutputProcessor::Unit::J,
                             state.dataHeatBal->SysTotalHVACRejectHeatLoss,
-                            "HVAC",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::HVAC,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SimHVAC");
         ManageSetPoints(state); // need to call this before getting plant loop data so setpoint checks can complete okay
         GetPlantLoopData(state);
@@ -756,15 +761,15 @@ void SimHVAC(EnergyPlusData &state)
                                 "Plant Solver Sub Iteration Count",
                                 OutputProcessor::Unit::None,
                                 state.dataPlnt->PlantManageSubIterations,
-                                "HVAC",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::HVAC,
+                                OutputProcessor::SOVStoreType::Summed,
                                 "SimHVAC");
             SetupOutputVariable(state,
                                 "Plant Solver Half Loop Calls Count",
                                 OutputProcessor::Unit::None,
                                 state.dataPlnt->PlantManageHalfLoopCalls,
-                                "HVAC",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::HVAC,
+                                OutputProcessor::SOVStoreType::Summed,
                                 "SimHVAC");
             for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                 // init plant sizing numbers in main plant data structure

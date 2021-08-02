@@ -3,53 +3,52 @@
 
 #include <memory>
 #include <vector>
+#include <WCECommon.hpp>
 
-namespace FenestrationCommon {
+namespace MultiLayerOptics
+{
+    //! \brief Calculate absorptances of multiplane layers for simple case (single incident angle)
+    class CAbsorptancesMultiPane
+    {
+    public:
+        CAbsorptancesMultiPane(const FenestrationCommon::CSeries & t_T,
+                               const FenestrationCommon::CSeries & t_Rf,
+                               const FenestrationCommon::CSeries & t_Rb);
 
-	class CSeries;
+        void addLayer(const FenestrationCommon::CSeries & t_T,
+                      const FenestrationCommon::CSeries & t_Rf,
+                      const FenestrationCommon::CSeries & t_Rb);
 
-}
+        FenestrationCommon::CSeries Abs(size_t Index);
+        FenestrationCommon::CSeries Abs(size_t Index, FenestrationCommon::Side side);
+        size_t numOfLayers();
 
-namespace MultiLayerOptics {
+    private:
+        void calculateState();
 
-	// Calculate absorptances of multiplane layers for simple case (single incident angle)
-	class CAbsorptancesMultiPane {
-	public:
-		CAbsorptancesMultiPane( const std::shared_ptr< const FenestrationCommon::CSeries >& t_T,
-		                        const std::shared_ptr< const FenestrationCommon::CSeries >& t_Rf,
-		                        const std::shared_ptr< const FenestrationCommon::CSeries >& t_Rb );
+        FenestrationCommon::CSeries rCoeffs(const FenestrationCommon::CSeries & t_T,
+                                            const FenestrationCommon::CSeries & t_Rf,
+                                            const FenestrationCommon::CSeries & t_Rb,
+                                            const FenestrationCommon::CSeries & t_RCoeffs);
 
-		void addLayer( const std::shared_ptr< const FenestrationCommon::CSeries >& t_T,
-		               const std::shared_ptr< const FenestrationCommon::CSeries >& t_Rf,
-		               const std::shared_ptr< const FenestrationCommon::CSeries >& t_Rb );
+        FenestrationCommon::CSeries tCoeffs(const FenestrationCommon::CSeries & t_T,
+                                            const FenestrationCommon::CSeries & t_Rb,
+                                            const FenestrationCommon::CSeries & t_RCoeffs);
 
-		std::shared_ptr< FenestrationCommon::CSeries > Abs( size_t const Index );
-		size_t numOfLayers();
+        std::vector<FenestrationCommon::CSeries> m_T;
+        std::vector<FenestrationCommon::CSeries> m_Rf;
+        std::vector<FenestrationCommon::CSeries> m_Rb;
+        std::vector<FenestrationCommon::CSeries> m_Abs;
 
-	private:
-		void calculateState();
+        //! \brief Keeps data on how much of absorptance is coming from front and back sides.
+        //! These data are only important for photovoltaic calculations.
+        std::map<FenestrationCommon::Side, std::vector<FenestrationCommon::CSeries>> m_AbsBySide;
 
-		std::shared_ptr< FenestrationCommon::CSeries > rCoeffs(
-			const FenestrationCommon::CSeries& t_T,
-			const FenestrationCommon::CSeries& t_Rf,
-			const FenestrationCommon::CSeries& t_Rb,
-			const FenestrationCommon::CSeries& t_RCoeffs );
+        std::vector<FenestrationCommon::CSeries> m_rCoeffs;
+        std::vector<FenestrationCommon::CSeries> m_tCoeffs;
 
-		std::shared_ptr< FenestrationCommon::CSeries > tCoeffs(
-			const FenestrationCommon::CSeries& t_T,
-			const FenestrationCommon::CSeries& t_Rb,
-			const FenestrationCommon::CSeries& t_RCoeffs );
-
-		std::vector< std::shared_ptr< const FenestrationCommon::CSeries > > m_T;
-		std::vector< std::shared_ptr< const FenestrationCommon::CSeries > > m_Rf;
-		std::vector< std::shared_ptr< const FenestrationCommon::CSeries > > m_Rb;
-		std::vector< std::shared_ptr< FenestrationCommon::CSeries > > m_Abs;
-
-		std::vector< std::shared_ptr< FenestrationCommon::CSeries > > m_rCoeffs;
-		std::vector< std::shared_ptr< FenestrationCommon::CSeries > > m_tCoeffs;
-
-		bool m_StateCalculated;
-	};
-}
+        bool m_StateCalculated;
+    };
+}   // namespace MultiLayerOptics
 
 #endif
