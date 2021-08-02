@@ -753,8 +753,6 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT)
     int SurfNum(1);
     Real64 RadTemp;
 
-    state->dataSurface->Surface.deallocate();
-    state->dataHeatBal->Zone.deallocate();
     state->dataThermalComforts->AngleFactorList.allocate(1);
     state->dataSurface->TotSurfaces = 3;
     state->dataGlobal->NumOfZones = 1;
@@ -781,7 +779,6 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT)
     state->dataSurface->Surface(3).Zone = 1;
     state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).HTSurfaceLast = 3;
-    state->dataHeatBalSurf->SurfInsideTempHist.allocate(1);
     state->dataHeatBalSurf->SurfInsideTempHist(1)(1) = 20.0;
     state->dataHeatBalSurf->SurfInsideTempHist(1)(2) = 15.0;
     state->dataHeatBalSurf->SurfInsideTempHist(1)(3) = 10.0;
