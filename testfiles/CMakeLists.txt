@@ -581,6 +581,7 @@ add_simulation_test(IDF_FILE UnitVent5ZoneAuto.idf EPW_FILE USA_IL_Chicago-OHare
 add_simulation_test(IDF_FILE UnitVent5ZoneFixedOANoCoilOpt.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE UnitaryHybridAC_DedicatedOutsideAir.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE UnitarySystem_5ZoneWaterLoopHeatPump.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+add_simulation_test(IDF_FILE UnitarySystem_5Zones_wWaterSideEconomizer.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE UnitarySystem_DXCoilSystemAuto.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE UnitarySystem_FurnaceWithDXSystemRHcontrol.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 add_simulation_test(IDF_FILE UnitarySystem_HeatPumpAuto.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)

@@ -183,6 +183,475 @@ These reports provide the rate and amount of condensate from the coil. Condensat
 
 This is the energy extracted from the chilled water serving the coil, in Joules.
 
+
+\subsection{Coil:Cooling:Water:DetailedGeometry}\label{coilcoolingwaterdetailedgeometry}
+
+This detailed flat fin coil model is for continuous plate fins. First, found in Type 12 from MODSIM, but now programmed directly from Elmahdy, A.H. and Mitalas, G.P. Then there was a discontinuity in their original model that was fixed in the EnergyPlus implementation. Now this model can be used in an interval halving solution technique for controlling this coil without the problems of non-convergence.
+
+``A Model for Cooling and Dehumidifying Coils for Use in Energy Requirements for Buildings'' ASHRAE Transactions, Vol. 83, Part 2, pp.~103-117 (1977). For fin efficiency see K.A. Gardner, ``Efficiency of Extended ,'' Transactions ASME, Vol. 67, pp.~621-631, 1945.
+
+The following figures illustrate the geometry and circuits in a cooling coil.
+
+\begin{figure}[hbtp] % fig 136
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image353.png}
+\caption{Geometry of a Cooling Coil (CC) \protect \label{fig:geometry-of-a-cooling-coil-cc}}
+\end{figure}
+
+\begin{figure}[hbtp] % fig 137
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image354.png}
+\caption{Number of Coolant Circuits (CCNCC) \protect \label{fig:number-of-coolant-circuits-ccncc}}
+\end{figure}
+
+\subsubsection{Inputs}\label{inputs-12-005}
+
+\paragraph{Field: Name}\label{field-name-11-004}
+
+A unique identifying name for each coil.
+
+\paragraph{Field:Availability Schedule Name}\label{fieldavailability-schedule-name-5}
+
+Schedule that defines when the coil is available. If the schedule's value is 0.0, then the coil is not available and flow will not be requested. If the schedule's value is \textgreater{} 0.0 (usually 1 is used), the coil is available. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Maximum Water Flow Rate}\label{field-maximum-water-flow-rate-1}
+
+The maximum possible water flow rate (m\(^{3}\)/sec) through the coil.
+
+\paragraph{Field: Tube Outside Surface Area}\label{field-tube-outside-surface-area}
+
+The outside surface area (m\(^{2}\)) of the tubes that is exposed to air (i.e. the outside area of the unfinned tubes minus the area of tubes covered by the fins).
+
+\paragraph{Field: Total Tube Inside Area}\label{field-total-tube-inside-area}
+
+The total surface area (m\(^{2}\)) inside the tubes (water side).
+
+\paragraph{Field: Fin Surface Area}\label{field-fin-surface-area}
+
+The total surface area (m\(^{2}\)) of the fins attached to the coil.
+
+\paragraph{Field: Minimum Air Flow Area}\label{field-minimum-air-flow-area}
+
+The minimum cross sectional area (m\(^{2}\)) available for air passage. Frequently calculated as
+
+\begin{lstlisting}
+       Amin  = (Amin/Afr)\*Afr
+\end{lstlisting}
+
+where Afr is the frontal area of the heat exchanger, and (Amin/Afr) is the ratio of the minimum airflow area to frontal area.
+
+\paragraph{Field: Coil Depth}\label{field-coil-depth}
+
+The distance (m) from the front of the coil to the back of the coil in the airflow direction. Also called the fin depth. Illustrated in the figure (Figure~\ref{fig:geometry-of-a-cooling-coil-cc}. Geometry of a Cooling Coil (CC)).
+
+\paragraph{Field: Fin Diameter}\label{field-fin-diameter}
+
+The outside diameter (m) of the fins. Used instead of COIL HEIGHT
+
+\paragraph{Field: Fin Thickness}\label{field-fin-thickness}
+
+Thickness (m) of the air side fins.
+
+\paragraph{Field: Tube Inside Diameter}\label{field-tube-inside-diameter}
+
+The inside diameter (m) of the tubes.
+
+\paragraph{Field: Tube Outside Diameter}\label{field-tube-outside-diameter}
+
+The outside diameter (m) of the tubes.
+
+\paragraph{Field: Tube Thermal Conductivity}\label{field-tube-thermal-conductivity}
+
+The thermal conductivity (W/m-K) of the tube material.
+
+\paragraph{Field: Fin Thermal Conductivity}\label{field-fin-thermal-conductivity}
+
+The thermal conductivity (W/m-K) of the fin material.
+
+\paragraph{Field: Fin Spacing}\label{field-fin-spacing}
+
+The spacing (m) of the fins, centerline to centerline.
+
+\paragraph{Field: Tube Depth Spacing}\label{field-tube-depth-spacing}
+
+The spacing (m) of the tube rows, centerline to centerline. Also called tube longitudinal spacing.
+
+\paragraph{Field: Number of Tube Rows}\label{field-number-of-tube-rows}
+
+The number of tube rows in the direction of the airflow.
+
+\paragraph{Field: Number of Tubes per Row}\label{field-number-of-tubes-per-row}
+
+The number of tubes per row. (NTPR in the above diagram)
+
+\paragraph{Field: Water Inlet Node Name}\label{field-water-inlet-node-name-3-000}
+
+The name of the water coil inlet from the chilled water loop, i.e. Cooling Coil Water Inlet Node.
+
+\paragraph{Field: Water Outlet Node Name}\label{field-water-outlet-node-name-3-000}
+
+The name of the water coil outlet from the chilled water loop, i.e. Cooling Coil Water Outlet Node.
+
+\paragraph{Field: Air Inlet Node Name}\label{field-air-inlet-node-name-8}
+
+The name of the air inlet to the water coil, i.e. Cooling Coil Air Inlet Node.
+
+\paragraph{Field: Air Outlet Node Name}\label{field-air-outlet-node-name-8-000}
+
+The name of the air outlet from the water coil, i.e. Cooling Coil Air Outlet Node.
+
+\paragraph{Field: Condensate Collection Water Storage Tank Name}\label{field-condensate-collection-water-storage-tank-name-1}
+
+This field is optional. It is used to describe where condensate from the coil is collected. If blank or omitted, then any coil condensate is discarded. Enter the name of Water Storage Tank object defined elsewhere and the condensate will then be collected in that tank.
+
+\paragraph{Field: Design Water Temperature Difference}\label{field-design-water-temperature-difference}
+
+This input field is optional. If specified, it is used for sizing the \textit{Design Water Flow Rate}. If blank or omitted, the \textit{Loop Design Temperature Difference} value specified in \textit{\hyperref[sizingplant]{Sizing:Plant}} object is used for sizing the \textit{Design Water Flow Rate}.
+
+\paragraph{Field: Design Water Inlet Temperature}\label{field-design-water-inlet-temperature}
+
+This input field is optional. If specified, it is used for sizing the coil \textit{Design Geometry Parameters}. If blank or omitted, the \textit{Design Loop Exit Temperature} value specified in \textit{\hyperref[sizingplant]{Sizing:Plant}} object is used for sizing the coil \textit{Design Geometry Parameters}.
+
+Examples of these statements in an IDF are:
+
+\begin{lstlisting}
+
+Coil:Cooling:Water:DetailedGeometry,
+  Detailed Cooling Coil,   !Name of cooling coil
+  CoolingCoilAvailSched,   !Cooling Coil Schedule
+  0.0011,                   !Max Water Flow Rate of Coil m3/sec
+  6.23816,                 !Tube Outside Surf Area
+  6.20007018,           !Tube Inside Surf Area
+  101.7158224,         !Fin Surf Area
+  0.300606367,         !Min Air Flow Area
+  0.165097968,         !Coil Depth
+  0.43507152,           !Coil Height
+  0.001499982,         !Fin Thickness
+  0.014449958,         !Tube Inside Diameter
+  0.015879775,         !Tube Outside Diameter
+  386.0,                     !Tube Thermal Conductivity
+  204.0,                     !Fin Thermal Conductivity
+  0.001814292,         !Fin Spacing
+  0.02589977,           !Tube Depth
+  6,                             !Number of Tube Rows
+  16,                           !Number of Tubes per Row
+  NODE_32,NODE_33, !Coil Water Side Inlet & Outlet Node
+  NODE_5, NODE_6;   !Coil Air Side Inlet & Outlet Node
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{outputs-11-002}
+
+\begin{itemize}
+\item
+  HVAC,Sum,Cooling Coil Total Cooling Energy {[}J{]}
+\item
+  HVAC,Sum,Cooling Coil Sensible Cooling Energy {[}J{]}
+\item
+  HVAC,Average,Cooling Coil Total Cooling Rate {[}W{]}
+\item
+  HVAC,Average,Cooling Coil Sensible Cooling Rate {[}W{]}
+\item
+  HVAC,Average,Cooling Coil Condensate Volume Flow Rate {[}m3/s{]}
+\item
+  HVAC,Sum,Cooling Coil Source Side Heat Transfer Energy {[}J{]}
+\item
+  HVAC,Sum,Cooling Coil Condensate Volume {[}m3{]}
+\end{itemize}
+
+\paragraph{Cooling Coil Total Cooling Energy (J)}\label{cooling-coil-total-cooling-energy-j-3}
+
+Cooling Coil Total Cooling Energy is the total amount of heat transfer taking place in the coil at the operating conditions.
+
+\paragraph{Cooling Coil Sensible Cooling Energy (J)}\label{cooling-coil-sensible-cooling-energy-j-3}
+
+Cooling Coil Sensible Cooling Energy is the total amount of Sensible heat transfer taking place in the coil at the operating conditions. It only takes into account temperature difference in the inlet and outlet air streams at operating conditions.
+
+\paragraph{Cooling Coil Total Cooling Rate (W)}\label{cooling-coil-total-cooling-rate-w-3}
+
+Cooling Coil Total Cooling Rate is the Rate of heat transfer taking place in the coil at the operating conditions. The units are (J/sec) or Watts.
+
+\paragraph{Cooling Coil Sensible Cooling Rate (W)}\label{cooling-coil-sensible-cooling-rate-w-3}
+
+Cooling Coil Sensible Cooling Rate is the Rate of Sensible heat transfer taking place in the coil at the operating conditions.
+
+In addition, if a Water Storage Tank is used to collect coil condensate, then the following outputs will be available.
+
+\paragraph{Cooling Coil Condensate Volume Flow Rate {[}m3/s{]}}\label{cooling-coil-condensate-volume-flow-rate-m3s-3}
+
+\paragraph{Cooling Coil Condensate Volume {[}m3{]}}\label{cooling-coil-condensate-volume-m3-3}
+
+These reports provide the rate and amount of condensate from the coil. Condensate is water condensed out of the air as a result of cooling. The condensate volume is also reported on the meter for OnSiteWater.
+
+\paragraph{Cooling Coil Source Side Heat Transfer Energy {[}J{]}}\label{cooling-coil-source-side-heat-transfer-energy-j-1}
+
+This is the energy extracted from the chilled water serving the cooling coil, in Joules.
+
+\subsection{CoilSystem:Cooling:Water:HeatExchangerAssisted}\label{coilsystemcoolingwaterheatexchangerassisted}
+
+The heat exchanger-assisted water cooling coil is a virtual component consisting of a chilled-water cooling coil and an air-to-air heat exchanger as shown in Figure~\ref{fig:schematic-of-the-coilsystem-cooling-water} below. The air-to-air heat exchanger precools the air entering the cooling coil, and reuses this energy to reheat the supply air leaving the cooling coil. This heat exchange process improves the latent removal performance of the cooling coil by allowing it to dedicate more of its cooling capacity toward dehumidification (lower sensible heat ratio).
+
+\begin{figure}[hbtp] % fig 140
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image370.png}
+\caption{Schematic of the CoilSystem:Cooling:Water:HeatExchangerAssisted compound object \protect \label{fig:schematic-of-the-coilsystem-cooling-water}}
+\end{figure}
+
+Note: Node naming shown in Figure~\ref{fig:schematic-of-the-coilsystem-cooling-water} is representative for \hyperref[heatexchangerairtoairsensibleandlatent]{HeatExchanger:AirToAir:SensibleAndLatent}. For \hyperref[heatexchangerairtoairflatplate]{HeatExchanger:AirToAir:FlatPlate}, the exhaust air nodes are referred to as secondary air nodes.
+
+This compound object models the basic operation of an air-to-air heat exchanger in conjunction with a chilled-water cooling coil. The heat exchanger-assisted water cooling coil does not have an operating schedule of its own; its operating schedule is governed by the availability schedules for the chilled-water cooling coil and the air-to-air heat exchanger. Heat exchange will occur whenever the heat exchanger is available to operate (via its availability schedule) and a temperature difference exists between the two air streams -- there is currently no method to enable or disable heat exchange based on zone air humidity level. This compound object is used in place of where a chilled-water cooling coil object would normally be used by itself.
+
+To model a heat exchanger-assisted water cooling coil, the input data file should include the following objects:
+
+\begin{itemize}
+\item
+  CoilSystem:Cooling:Water:HeatExchangerAssisted compound object
+\item
+  Air-to-air heat exchanger object (\hyperref[heatexchangerairtoairflatplate]{HeatExchanger:AirToAir:FlatPlate} or \hyperref[heatexchangerairtoairsensibleandlatent]{HeatExchanger:AirToAir:SensibleAndLatent})
+\item
+  Chilled-water cooling coil object (\hyperref[coilcoolingwater]{Coil:Cooling:Water} or \hyperref[coilcoolingwaterdetailedgeometry]{Coil:Cooling:Water:DetailedGeometry})
+\end{itemize}
+
+Links to the cooling coil and air-to-air heat exchanger specifications are provided in the input data syntax for this compound object. A description of each input field for this compound object is provided below.
+
+\subsubsection{Inputs}\label{inputs-26}
+
+\paragraph{Field: Name}\label{field-name-25-000}
+
+A unique user-assigned name for the heat exchanger-assisted water cooling coil. Any reference to this compound component by another object (e.g., \hyperref[zonehvacunitventilator]{ZoneHVAC:UnitVentilator}, \hyperref[zonehvacfourpipefancoil]{ZoneHVAC:FourPipeFanCoil}, component in an air loop Branch object) will use this name.
+
+\paragraph{Field: Heat Exchanger Object Type}\label{field-heat-exchanger-object-type-1}
+
+This alpha field denotes the type of heat exchanger being modeled. Valid choices are:
+
+\hyperref[heatexchangerairtoairflatplate]{HeatExchanger:AirToAir:FlatPlate}
+
+\hyperref[heatexchangerairtoairsensibleandlatent]{HeatExchanger:AirToAir:SensibleAndLatent}
+
+\paragraph{Field: Heat Exchanger Name}\label{field-heat-exchanger-name-1}
+
+This alpha field denotes the name of the air-to-air heat exchanger being modeled.
+
+\paragraph{Field: Cooling Coil Object Type}\label{field-cooling-coil-object-type-2}
+
+This alpha field denotes the type of chilled-water cooling coil being modeled. Valid choices are:
+
+\hyperref[coilcoolingwater]{Coil:Cooling:Water}
+
+\hyperref[coilcoolingwaterdetailedgeometry]{Coil:Cooling:Water:DetailedGeometry}
+
+\paragraph{Field: Cooling Coil Name}\label{field-cooling-coil-name-2}
+
+This alpha field denotes the name of the chilled-water cooling coil being modeled.
+
+Following is an example input for this compound object:
+
+\begin{lstlisting}
+
+CoilSystem:Cooling:Water:HeatExchangerAssisted,
+  Heat Exchanger Assisted Cooling Coil 1, !- Name of the heat exchanger assisted cooling coil
+  HeatExchanger:AirToAir:FlatPlate,     !- Heat exchanger type
+  Heat Exchanger Assisting Cooling Coil,   !- Heat exchanger name
+  Coil:Cooling:Water:DetailedGeometry,                 !- Cooling coil type
+  Main Cooling Coil 1;                                       !- Cooling coil name
+
+
+  HeatExchanger:AirToAir:FlatPlate,
+  Heat Exchanger Assisting Cooling Coil,   !- Name
+  CoolingCoilAvailSched,     !- Availability Schedule Name
+  Counter Flow,                       !- flow arrangement
+  Yes,                                         !- Economizer lockout
+  1.0,                                         !- hA ratio
+  1.32,                                       !- Nominal supply air flow rate {m3/s}
+  24.0,                                       !- Nominal supply air inlet temperature {C}
+  21.0,                                       !- Nominal supply air outlet temperature {C}
+  1.32,                                       !- Nominal secondary air flow rate {m3/s}
+  12.0,                                       !- Nominal secondary air inlet temperature {C}
+  100.0,                                     !- Nominal electric power {W}
+  Mixed Air Node 1,               !- Supply air inlet node
+  Main Cooling Coil 1 Inlet Node,   !- Supply air outlet node
+  Main Cooling Coil 1 Outlet Node, !- Secondary air inlet node
+  Main Heating Coil 1 Inlet Node;   !- Secondary air outlet node
+
+
+
+
+  Coil:Cooling:Water:DetailedGeometry,
+  Main Cooling Coil 1,         !- Coil Name
+  CoolingCoilAvailSched,     !- Availability Schedule Name
+  autosize,                               !- Max Water Flow Rate of Coil {m3/s}
+  autosize,                               !- Tube Outside Surf Area {m2}
+  autosize,                               !- Total Tube Inside Area {m2}
+  autosize,                               !- Fin Surface Area {m2}
+  autosize,                               !- Minimum Air Flow Area {m2}
+  autosize,                               !- Coil Depth {m}
+  autosize,                               !- Fin Diameter {m}
+  ,                                               !- Fin Thickness {m}
+  ,                                               !- Tube Inside Diameter {m}
+  ,                                               !- Tube Outside Diameter {m}
+  ,                                               !- Tube Thermal Conductivity {W/m-K}
+  ,                                               !- Fin Thermal Conductivity {W/m-K}
+  ,                                               !- Fin Spacing {m}
+  ,                                               !- Tube Depth Spacing {m}
+  ,                                               !- Number of Tube Rows
+  autosize,                               !- Number of Tubes per Row
+  Main Cooling Coil 1 Water Inlet Node,   !- Coil_Water_Inlet_Node
+  Main Cooling Coil 1 Water Outlet Node, !- Coil_Water_Outlet_Node
+  Main Cooling Coil 1 Inlet Node,     !- Coil_Air_Inlet_Node
+  Main Cooling Coil 1 Outlet Node;   !- Coil_Air_Outlet_Node
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{outputs-22}
+
+No variables are reported for this compound object. However, outputs are provided by the cooling coil and heat exchanger that are specified.
+
+\subsection{CoilSystem:Cooling:Water}\label{coilsystemcoolingwater}
+
+The \hyperref[coilsystemcoolingwater]{CoilSystem:Cooling:Water} object is a coil system wrapper for water cooling coils. Valid water cooling coils are: \hyperref[coilcoolingwater]{Coil:Cooling:Water}, \hyperref[coilcoolingwaterdetailedgeometry]{Coil:Cooling:Water:DetailedGeometry} and \hyperref[coilsystemcoolingwaterheatexchangerassisted]{CoilSystem:Cooling:Water:HeatExchangerAssisted}. This coil system allows users to model the three water cooling coils in airloop main and outdoor air branches. Also this object is designed to model water-side economizers for free pre-cooling when the water-side of the coil is placed on the demand side a condenser loop. As a water-side economizer the \textit{CoilSystem:Cooling:Water} object is placed upstream of packaged DX systems or chilled water main cooling coils. The coil system as a water-side economizer provides free pre-cooling when the condition is favorable. Any remaining system cooling load not met by the water side economizer is provided either by a DX or chilled water cooling coil placed downstream of the water-side economizer coil. The \textit{CoilSystem:Cooling:Water} object does not require \textit{Controller:WaterCoil} and relies on a built-in controller. This coil system uses setpoint based control that varies coil entering water (fluid) mass flow rate to meet user specified temperature or humidity setpoint. The coil system as a water-side economizer can be placed on airloop main or outdoor air system branch. 
+
+Figure~\ref{fig:water-side-economizer-coil-system-upstream-of-packaged-dx-system} below shows packaged DX system serving multiple zones and a coil system water cooling object placed upstream of the packaged system. The water-side of the coil system is connected to the demand side of a condenser or plant loop. This coil system configuration provides free pre-cooling when the condition is favorable to operate and there is cooling or dehumidification demand. In this configuration the packaged DX system can be \textit{AirloopHVAC:UnitarySystem} object.
+
+\begin{figure}[hbtp] % fig 141
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image141.png}
+\caption{Water Side Economizer Coil System Upstream of Packaged DX System \protect \label{fig:water-side-economizer-coil-system-upstream-of-packaged-dx-system}}
+\end{figure}
+
+Figure~\ref{fig:water-side-economizer-coil-system-in-outdoor-air-system} below shows a packaged DX system serving multiple zones and a coil system water cooling object placed in the outdoor air system. The water-side of the coil system is connected to the demand side of a condenser or plant loop.  This coil provides free cooling to the outdoor air stream when the condition is favorable to operate and there is pre-cooling demand.
+
+\begin{figure}[hbtp] % fig 142
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image142.png}
+\caption{Water Side Economizer Coil System In Outdoor Air System \protect \label{fig:water-side-economizer-coil-system-in-outdoor-air-system}}
+\end{figure}
+
+
+\subsubsection{Water Side Economizer Mode}\label{water-side-economizer-mode}
+
+The coil system cooling object to operate the coil entering water (fluid) temperature must be less than the coil entering air temperature minus the user specified temperature offset value. The second requirement is that the coil system entering air temperature must be greater than the coil system air outlet node (control node) setpoint temperature, i.e., there has to be a cooling or dehumidification demand. Built in coil system controller strives to meet either temperature or humidity ratio setpoint at the coil system air outlet node by varying the cold water (fluid) mass flow rate.
+
+
+
+\subsubsection{Inputs}\label{inputs}
+
+\paragraph{Field: Name}\label{field-name-06}
+
+This alpha field contains the identifying name for the coil system cooling water object. Any reference to this coil system by another object will use this name.
+
+\paragraph{Field: Air Inlet Node Name}\label{field-air-inlet-node-name-01}
+
+This alpha field contains the coil system cooling water object air inlet node name.
+
+\paragraph{Field: Air Outlet Node Name}\label{field-air-outlet-node-name-01}
+
+This alpha field contains the coil system cooling water object air outlet node name.
+
+\paragraph{Field: Availability Schedule Name}
+
+This alpha field contains the schedule name which contains information on the availability of the coil system cooling water object to operate. A schedule value equal to 0 denotes that the coil system must be off for that time period. A value greater than 0 denotes that the coil system is available to operate during that time period. This schedule may be used to completely disable the coil system as required. If this field is left blank, the schedule has a value of 1.
+
+\paragraph{Field: Cooling Coil Object Type}\label{field-cooling-coil-object-type-01}
+
+This alpha field contains the identifying type of cooling coil specified in the coil system cooling water object. Valid choices for this field are:
+\begin{itemize}
+\item Coil:Cooling:Water
+\item Coil:Cooling:Water:DetailedGeometry
+\item CoilSystem:Cooling:Water:HeatExchangerAssisted
+\end{itemize}
+
+
+\paragraph{Field: Cooling Coil Name}\label{field-cooling-coil-name-01}
+
+This alpha field contains the identifying name given to the coil system water cooling coil.
+
+\paragraph{Field: Dehumidification Control Type}
+
+This alpha field contains the type of dehumidification control. The following options are valid for this field:
+
+\textbf{None} - meet sensible load only, no active dehumidification control. The default is None.
+
+\textbf{Multimode} - activate water coil and meet sensible load. If no sensible load exists, and Run on Latent Load = Yes, and a latent load exists, the coil will operate to meet the latent load. If the latent load cannot be met the heat exchanger will be activated. IF Run on Latent Load = No, the heat exchanger will always be active. This control mode either switches the coil mode or allows the heat exchanger to be turned on and off based on the zone dehumidification requirements. Valid only with cooling coil type CoilSystem:Cooling:Water:HeatExchangerAssisted.
+
+\textbf{CoolReheat} - cool beyond the dry-bulb temperature set point as required to meet the high humidity setpoint. If cooling coil type = CoilSystem:Cooling:Water:HeatExchangerAssisted, then the heat exchanger is assumed to always transfer energy between the cooling coil’s inlet and outlet airstreams when the cooling coil is operating.
+
+
+For the dehumidification control modes, the maximum humidity setpoint on the Sensor Node is used. This must be set using a ZoneControl:Humidistat object. When extra dehumidification is required, the system may not be able to meet the humidity setpoint if its full capacity is not adequate. If the dehumidification control type is specified as CoolReheat, then the system may require reheat coil type and name elsewhere. Although the reheat coil is required only when CoolReheat is selected, the optional reheat coil may be present for any of the allowed Dehumidification Control Types.
+
+Valid humidity setpoint managers include:
+\begin{itemize}
+\item SetpointManager:SingleZone:Humidity:Maximum
+\item SetpointManager:MultiZone:Humidity:Maximum
+\item SetpointManager:MultiZone:MaximumHumidity:Average
+\item SetpointManager:OutdoorAirPretreat
+\end{itemize}
+
+\paragraph{Field: Run On Sensible Load}\label{field-run-on-sensible-load-01}
+
+This alpha field specifies if the coil system will operate to meet a sensible load calculated from the air flow rates through the coil system, coil system entering air temperature and coil outlet node (control node) temperature setpoint. There are two valid choices, Yes or No. If Yes, coil will run if there is a sensible load. If No, coil will not run if there is only a sensible load. The default is Yes.
+
+
+\paragraph{Field: Run on Latent Load}\label{field-run-on-latent-load-01}
+
+This alpha field specifies if the coil will operate to meet a latent load calculated from the air flow rate through the coil system, coil system entering air humidity ratio and coil system outlet node (control node) maximum humidity ratio setpoint. There are two valid choices, Yes or No. If Yes, the coil will run if there is a latent load. If both a sensible and latent load exist, the system will operate to maintain the temperature set point and then activate dehumidification control if needed. When only a latent load exists, the system will operate to meet the maximum humidity ratio set point and requires the use of a heating coil and heating coil outlet node air temperature set point manager downstream of this cooling coil to maintain the temperature set point. If No, the coil will not run if there is only a latent load. The default is No.
+
+
+\paragraph{Field: Minimum Air To Water Temperature Offset [deltaC]}\label{field-minimum-air-to-water-temperature-offset}
+
+The coil system will turn ON as required when coil entering air temperature is above coil entering water temperature by more than the amount of this offset [deltaC]. To model a waterside economizer connected to condenser loop an increased offset as desired. Default is 0.
+
+
+Following is an example input for a coil system cooling water.
+
+\begin{lstlisting}
+
+  CoilSystem:Cooling:Water,
+    Unitary-Free-Cooling,    !- Name
+    Mixed Air Node,          !- Air Inlet Node Name
+    FreeClgCoil OutletNode,  !- Air Outlet Node Name
+    ,                        !- Availability Schedule Name
+    Coil:Cooling:Water,      !- Cooling Coil Object Type
+    Free Cooling Coil,       !- Cooling Coil Name
+    CoolReheat,              !- Dehumidification Control Type
+    Yes,                     !- Run on Sensible Load
+    Yes,                     !- Run on Latent Load
+    3.0;                     !- Minimum Air To Water Temperature Offset
+	
+\end{lstlisting}
+
+
+\subsubsection{Outputs}\label{outputs}
+
+Following are the list of possible output variables from this coil model:
+
+\begin{itemize}
+\item HVAC, Average, Coil System Water Part Load Ratio {[]}
+\item HVAC, Average, Coil System Water Total Cooling Rate {[}W{]}
+\item HVAC, Average, Coil System Water Sensible Cooling Rate {[}W{]}
+\item HVAC, Average, Coil System Water Latent Cooling Rate {[}W{]}
+\item HVAC, Average, Coil System Water Control Status {[]}
+\end{itemize}
+
+
+\paragraph{Coil System Water Part Load Ratio {[]}}\label{coil-system-water-part-load-ratio}
+
+This output variable is the ratio of the sensible cooling load to the current full cooling capacity of the coil system. This variable reports the average load met as a fraction of the full coil capacity during the system timestep. If the ratio is 0.0, then there is no cooling load, else if the ratio is 1.0, then the load met is equal to the coil system full capacity.
+
+\paragraph{Cooling Coil Total Cooling Rate {[}W{]}}
+
+This output field is the total (sensible + latent) cooling rate of the coil system from the supply or outdoor air in Watts. This value is calculated using the enthalpy difference of the coil system outlet air and inlet air streams and the air mass flow rate through the coil system. This value is reported for each HVAC system timestep being simulated and is an average for the timestep.
+
+\paragraph{Cooling Coil Sensible Cooling Rate {[}W{]}}
+
+This output field reports the moist air sensible cooling rate of the coil system from the supply or outdoor air system. This value is calculated using the enthalpy difference of the coil system outlet air and inlet air streams at a constant humidity ratio, and the air mass flow rate through the coil system. This value is reported for each HVAC system timestep simulated and is an average for the timestep.
+
+\paragraph{Cooling Coil Latent Cooling Rate {[}W{]}}
+
+This output field is the latent cooling (dehumidification) rate of the coil system in Watts. This value is calculated as the difference between the total cooling rate and the sensible cooling rate provided by the coil system. This value is reported for each HVAC system timestep being simulated and is an averaged for the timestep.
+
+\paragraph{Coil System Water Control Status {[]}}\label{coil-system-water-control-status}
+
+This output field indicates whether the coil system is favorable to operate or not. Control status value of 1 indicates that the condition is favorable for the coil system to operate. Control status value of 0 indicates the condition is not favorable the coil system to operate. The control status is determined from the coil entering air temperature, coil entering water temperatures and user specified temperature offset. If the coil entering air temperature is above the coil entering water temperatures by more than the specified temperature offset, then the control status is set to 1, else it is set to 0. This value is reported for each HVAC system timestep being simulated, and the control status is an average for the timestep.
+
+
 \subsection{Coil:Heating:Water}\label{coilheatingwater}
 
 This simple heating coil model only does sensible heating of the air. The simple heating coil uses the Effectiveness-NTU algorithm and assumes a cross-flow heat exchanger.
@@ -1519,202 +1988,23 @@ This field is the parasitic gas consumption of the heating coil in Joules over t
 
 This field is the average parasitic gas consumption rate of the heating coil (e.g., standing pilot light) in Watts over the timestep being reported. The model assumes that the parasitic load is present only for the portion of the simulation timestep where the gas heating coil is not operating.
 
-\subsection{Coil:Cooling:Water:DetailedGeometry}\label{coilcoolingwaterdetailedgeometry}
 
-This detailed flat fin coil model is for continuous plate fins. First, found in Type 12 from MODSIM, but now programmed directly from Elmahdy, A.H. and Mitalas, G.P. Then there was a discontinuity in their original model that was fixed in the EnergyPlus implementation. Now this model can be used in an interval halving solution technique for controlling this coil without the problems of non-convergence.
 
-``A Model for Cooling and Dehumidifying Coils for Use in Energy Requirements for Buildings'' ASHRAE Transactions, Vol. 83, Part 2, pp.~103-117 (1977). For fin efficiency see K.A. Gardner, ``Efficiency of Extended ,'' Transactions ASME, Vol. 67, pp.~621-631, 1945.
 
-The following figures illustrate the geometry and circuits in a cooling coil.
 
-\begin{figure}[hbtp] % fig 136
-\centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image353.png}
-\caption{Geometry of a Cooling Coil (CC) \protect \label{fig:geometry-of-a-cooling-coil-cc}}
-\end{figure}
 
-\begin{figure}[hbtp] % fig 137
-\centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image354.png}
-\caption{Number of Coolant Circuits (CCNCC) \protect \label{fig:number-of-coolant-circuits-ccncc}}
-\end{figure}
 
-\subsubsection{Inputs}\label{inputs-12-005}
 
-\paragraph{Field: Name}\label{field-name-11-004}
 
-A unique identifying name for each coil.
 
-\paragraph{Field:Availability Schedule Name}\label{fieldavailability-schedule-name-5}
 
-Schedule that defines when the coil is available. If the schedule's value is 0.0, then the coil is not available and flow will not be requested. If the schedule's value is \textgreater{} 0.0 (usually 1 is used), the coil is available. If this field is blank, the schedule has values of 1 for all time periods.
 
-\paragraph{Field: Maximum Water Flow Rate}\label{field-maximum-water-flow-rate-1}
 
-The maximum possible water flow rate (m\(^{3}\)/sec) through the coil.
 
-\paragraph{Field: Tube Outside Surface Area}\label{field-tube-outside-surface-area}
 
-The outside surface area (m\(^{2}\)) of the tubes that is exposed to air (i.e. the outside area of the unfinned tubes minus the area of tubes covered by the fins).
 
-\paragraph{Field: Total Tube Inside Area}\label{field-total-tube-inside-area}
 
-The total surface area (m\(^{2}\)) inside the tubes (water side).
 
-\paragraph{Field: Fin Surface Area}\label{field-fin-surface-area}
-
-The total surface area (m\(^{2}\)) of the fins attached to the coil.
-
-\paragraph{Field: Minimum Air Flow Area}\label{field-minimum-air-flow-area}
-
-The minimum cross sectional area (m\(^{2}\)) available for air passage. Frequently calculated as
-
-\begin{lstlisting}
-       Amin  = (Amin/Afr)\*Afr
-\end{lstlisting}
-
-where Afr is the frontal area of the heat exchanger, and (Amin/Afr) is the ratio of the minimum airflow area to frontal area.
-
-\paragraph{Field: Coil Depth}\label{field-coil-depth}
-
-The distance (m) from the front of the coil to the back of the coil in the airflow direction. Also called the fin depth. Illustrated in the figure (Figure~\ref{fig:geometry-of-a-cooling-coil-cc}. Geometry of a Cooling Coil (CC)).
-
-\paragraph{Field: Fin Diameter}\label{field-fin-diameter}
-
-The outside diameter (m) of the fins. Used instead of COIL HEIGHT
-
-\paragraph{Field: Fin Thickness}\label{field-fin-thickness}
-
-Thickness (m) of the air side fins.
-
-\paragraph{Field: Tube Inside Diameter}\label{field-tube-inside-diameter}
-
-The inside diameter (m) of the tubes.
-
-\paragraph{Field: Tube Outside Diameter}\label{field-tube-outside-diameter}
-
-The outside diameter (m) of the tubes.
-
-\paragraph{Field: Tube Thermal Conductivity}\label{field-tube-thermal-conductivity}
-
-The thermal conductivity (W/m-K) of the tube material.
-
-\paragraph{Field: Fin Thermal Conductivity}\label{field-fin-thermal-conductivity}
-
-The thermal conductivity (W/m-K) of the fin material.
-
-\paragraph{Field: Fin Spacing}\label{field-fin-spacing}
-
-The spacing (m) of the fins, centerline to centerline.
-
-\paragraph{Field: Tube Depth Spacing}\label{field-tube-depth-spacing}
-
-The spacing (m) of the tube rows, centerline to centerline. Also called tube longitudinal spacing.
-
-\paragraph{Field: Number of Tube Rows}\label{field-number-of-tube-rows}
-
-The number of tube rows in the direction of the airflow.
-
-\paragraph{Field: Number of Tubes per Row}\label{field-number-of-tubes-per-row}
-
-The number of tubes per row. (NTPR in the above diagram)
-
-\paragraph{Field: Water Inlet Node Name}\label{field-water-inlet-node-name-3-000}
-
-The name of the water coil inlet from the chilled water loop, i.e. Cooling Coil Water Inlet Node.
-
-\paragraph{Field: Water Outlet Node Name}\label{field-water-outlet-node-name-3-000}
-
-The name of the water coil outlet from the chilled water loop, i.e. Cooling Coil Water Outlet Node.
-
-\paragraph{Field: Air Inlet Node Name}\label{field-air-inlet-node-name-8}
-
-The name of the air inlet to the water coil, i.e. Cooling Coil Air Inlet Node.
-
-\paragraph{Field: Air Outlet Node Name}\label{field-air-outlet-node-name-8-000}
-
-The name of the air outlet from the water coil, i.e. Cooling Coil Air Outlet Node.
-
-\paragraph{Field: Condensate Collection Water Storage Tank Name}\label{field-condensate-collection-water-storage-tank-name-1}
-
-This field is optional. It is used to describe where condensate from the coil is collected. If blank or omitted, then any coil condensate is discarded. Enter the name of Water Storage Tank object defined elsewhere and the condensate will then be collected in that tank.
-
-\paragraph{Field: Design Water Temperature Difference}\label{field-design-water-temperature-difference}
-This input field is optional. If specified, it is used for sizing the \textit{Design Water Flow Rate}. If blank or omitted, the \textit{Loop Design Temperature Difference} value specified in \textit{\hyperref[sizingplant]{Sizing:Plant}} object is used for sizing the \textit{Design Water Flow Rate}.
-
-Examples of these statements in an IDF are:
-
-\begin{lstlisting}
-
-Coil:Cooling:Water:DetailedGeometry,
-  Detailed Cooling Coil,   !Name of cooling coil
-  CoolingCoilAvailSched,   !Cooling Coil Schedule
-  0.0011,                   !Max Water Flow Rate of Coil m3/sec
-  6.23816,                 !Tube Outside Surf Area
-  6.20007018,           !Tube Inside Surf Area
-  101.7158224,         !Fin Surf Area
-  0.300606367,         !Min Air Flow Area
-  0.165097968,         !Coil Depth
-  0.43507152,           !Coil Height
-  0.001499982,         !Fin Thickness
-  0.014449958,         !Tube Inside Diameter
-  0.015879775,         !Tube Outside Diameter
-  386.0,                     !Tube Thermal Conductivity
-  204.0,                     !Fin Thermal Conductivity
-  0.001814292,         !Fin Spacing
-  0.02589977,           !Tube Depth
-  6,                             !Number of Tube Rows
-  16,                           !Number of Tubes per Row
-  NODE_32,NODE_33, !Coil Water Side Inlet & Outlet Node
-  NODE_5, NODE_6;   !Coil Air Side Inlet & Outlet Node
-\end{lstlisting}
-
-\subsubsection{Outputs}\label{outputs-11-002}
-
-\begin{itemize}
-\item
-  HVAC,Sum,Cooling Coil Total Cooling Energy {[}J{]}
-\item
-  HVAC,Sum,Cooling Coil Sensible Cooling Energy {[}J{]}
-\item
-  HVAC,Average,Cooling Coil Total Cooling Rate {[}W{]}
-\item
-  HVAC,Average,Cooling Coil Sensible Cooling Rate {[}W{]}
-\item
-  HVAC,Average,Cooling Coil Condensate Volume Flow Rate {[}m3/s{]}
-\item
-  HVAC,Sum,Cooling Coil Source Side Heat Transfer Energy {[}J{]}
-\item
-  HVAC,Sum,Cooling Coil Condensate Volume {[}m3{]}
-\end{itemize}
-
-\paragraph{Cooling Coil Total Cooling Energy (J)}\label{cooling-coil-total-cooling-energy-j-3}
-
-Cooling Coil Total Cooling Energy is the total amount of heat transfer taking place in the coil at the operating conditions.
-
-\paragraph{Cooling Coil Sensible Cooling Energy (J)}\label{cooling-coil-sensible-cooling-energy-j-3}
-
-Cooling Coil Sensible Cooling Energy is the total amount of Sensible heat transfer taking place in the coil at the operating conditions. It only takes into account temperature difference in the inlet and outlet air streams at operating conditions.
-
-\paragraph{Cooling Coil Total Cooling Rate (W)}\label{cooling-coil-total-cooling-rate-w-3}
-
-Cooling Coil Total Cooling Rate is the Rate of heat transfer taking place in the coil at the operating conditions. The units are (J/sec) or Watts.
-
-\paragraph{Cooling Coil Sensible Cooling Rate (W)}\label{cooling-coil-sensible-cooling-rate-w-3}
-
-Cooling Coil Sensible Cooling Rate is the Rate of Sensible heat transfer taking place in the coil at the operating conditions.
-
-In addition, if a Water Storage Tank is used to collect coil condensate, then the following outputs will be available.
-
-\paragraph{Cooling Coil Condensate Volume Flow Rate {[}m3/s{]}}\label{cooling-coil-condensate-volume-flow-rate-m3s-3}
-
-\paragraph{Cooling Coil Condensate Volume {[}m3{]}}\label{cooling-coil-condensate-volume-m3-3}
-
-These reports provide the rate and amount of condensate from the coil. Condensate is water condensed out of the air as a result of cooling. The condensate volume is also reported on the meter for OnSiteWater.
-
-\paragraph{Cooling Coil Source Side Heat Transfer Energy {[}J{]}}\label{cooling-coil-source-side-heat-transfer-energy-j-1}
-
-This is the energy extracted from the chilled water serving the cooling coil, in Joules.
 
 \subsection{Coil:Cooling:DX:SingleSpeed}\label{coilcoolingdxsinglespeed}
 
@@ -5423,126 +5713,6 @@ The output variable is the total latent cooling output of the integrated heat pu
 
 \paragraph{Integrated Heat Pump Source Heat Transfer Energy {[}J{]}}\label{Out-Total-Source-Energy-ASIHP}
 The output variable is the total source energy output of the integrated heat pump in joules, absorbed or discharged to the outdoor air, over the timestep being reported.
-
-
-
-\subsection{CoilSystem:Cooling:Water:HeatExchangerAssisted}\label{coilsystemcoolingwaterheatexchangerassisted}
-
-The heat exchanger-assisted water cooling coil is a virtual component consisting of a chilled-water cooling coil and an air-to-air heat exchanger as shown in Figure~\ref{fig:schematic-of-the-coilsystem-cooling-water} below. The air-to-air heat exchanger precools the air entering the cooling coil, and reuses this energy to reheat the supply air leaving the cooling coil. This heat exchange process improves the latent removal performance of the cooling coil by allowing it to dedicate more of its cooling capacity toward dehumidification (lower sensible heat ratio).
-
-\begin{figure}[hbtp] % fig 140
-\centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image370.png}
-\caption{Schematic of the CoilSystem:Cooling:Water:HeatExchangerAssisted compound object \protect \label{fig:schematic-of-the-coilsystem-cooling-water}}
-\end{figure}
-
-Note: Node naming shown in Figure~\ref{fig:schematic-of-the-coilsystem-cooling-water} is representative for \hyperref[heatexchangerairtoairsensibleandlatent]{HeatExchanger:AirToAir:SensibleAndLatent}. For \hyperref[heatexchangerairtoairflatplate]{HeatExchanger:AirToAir:FlatPlate}, the exhaust air nodes are referred to as secondary air nodes.
-
-This compound object models the basic operation of an air-to-air heat exchanger in conjunction with a chilled-water cooling coil. The heat exchanger-assisted water cooling coil does not have an operating schedule of its own; its operating schedule is governed by the availability schedules for the chilled-water cooling coil and the air-to-air heat exchanger. Heat exchange will occur whenever the heat exchanger is available to operate (via its availability schedule) and a temperature difference exists between the two air streams -- there is currently no method to enable or disable heat exchange based on zone air humidity level. This compound object is used in place of where a chilled-water cooling coil object would normally be used by itself.
-
-To model a heat exchanger-assisted water cooling coil, the input data file should include the following objects:
-
-\begin{itemize}
-\item
-  CoilSystem:Cooling:Water:HeatExchangerAssisted compound object
-\item
-  Air-to-air heat exchanger object (\hyperref[heatexchangerairtoairflatplate]{HeatExchanger:AirToAir:FlatPlate} or \hyperref[heatexchangerairtoairsensibleandlatent]{HeatExchanger:AirToAir:SensibleAndLatent})
-\item
-  Chilled-water cooling coil object (\hyperref[coilcoolingwater]{Coil:Cooling:Water} or \hyperref[coilcoolingwaterdetailedgeometry]{Coil:Cooling:Water:DetailedGeometry})
-\end{itemize}
-
-Links to the cooling coil and air-to-air heat exchanger specifications are provided in the input data syntax for this compound object. A description of each input field for this compound object is provided below.
-
-\subsubsection{Inputs}\label{inputs-26}
-
-\paragraph{Field: Name}\label{field-name-25-000}
-
-A unique user-assigned name for the heat exchanger-assisted water cooling coil. Any reference to this compound component by another object (e.g., \hyperref[zonehvacunitventilator]{ZoneHVAC:UnitVentilator}, \hyperref[zonehvacfourpipefancoil]{ZoneHVAC:FourPipeFanCoil}, component in an air loop Branch object) will use this name.
-
-\paragraph{Field: Heat Exchanger Object Type}\label{field-heat-exchanger-object-type-1}
-
-This alpha field denotes the type of heat exchanger being modeled. Valid choices are:
-
-\hyperref[heatexchangerairtoairflatplate]{HeatExchanger:AirToAir:FlatPlate}
-
-\hyperref[heatexchangerairtoairsensibleandlatent]{HeatExchanger:AirToAir:SensibleAndLatent}
-
-\paragraph{Field: Heat Exchanger Name}\label{field-heat-exchanger-name-1}
-
-This alpha field denotes the name of the air-to-air heat exchanger being modeled.
-
-\paragraph{Field: Cooling Coil Object Type}\label{field-cooling-coil-object-type-2}
-
-This alpha field denotes the type of chilled-water cooling coil being modeled. Valid choices are:
-
-\hyperref[coilcoolingwater]{Coil:Cooling:Water}
-
-\hyperref[coilcoolingwaterdetailedgeometry]{Coil:Cooling:Water:DetailedGeometry}
-
-\paragraph{Field: Cooling Coil Name}\label{field-cooling-coil-name-2}
-
-This alpha field denotes the name of the chilled-water cooling coil being modeled.
-
-Following is an example input for this compound object:
-
-\begin{lstlisting}
-
-CoilSystem:Cooling:Water:HeatExchangerAssisted,
-  Heat Exchanger Assisted Cooling Coil 1, !- Name of the heat exchanger assisted cooling coil
-  HeatExchanger:AirToAir:FlatPlate,     !- Heat exchanger type
-  Heat Exchanger Assisting Cooling Coil,   !- Heat exchanger name
-  Coil:Cooling:Water:DetailedGeometry,                 !- Cooling coil type
-  Main Cooling Coil 1;                                       !- Cooling coil name
-
-
-  HeatExchanger:AirToAir:FlatPlate,
-  Heat Exchanger Assisting Cooling Coil,   !- Name
-  CoolingCoilAvailSched,     !- Availability Schedule Name
-  Counter Flow,                       !- flow arrangement
-  Yes,                                         !- Economizer lockout
-  1.0,                                         !- hA ratio
-  1.32,                                       !- Nominal supply air flow rate {m3/s}
-  24.0,                                       !- Nominal supply air inlet temperature {C}
-  21.0,                                       !- Nominal supply air outlet temperature {C}
-  1.32,                                       !- Nominal secondary air flow rate {m3/s}
-  12.0,                                       !- Nominal secondary air inlet temperature {C}
-  100.0,                                     !- Nominal electric power {W}
-  Mixed Air Node 1,               !- Supply air inlet node
-  Main Cooling Coil 1 Inlet Node,   !- Supply air outlet node
-  Main Cooling Coil 1 Outlet Node, !- Secondary air inlet node
-  Main Heating Coil 1 Inlet Node;   !- Secondary air outlet node
-
-
-
-
-  Coil:Cooling:Water:DetailedGeometry,
-  Main Cooling Coil 1,         !- Coil Name
-  CoolingCoilAvailSched,     !- Availability Schedule Name
-  autosize,                               !- Max Water Flow Rate of Coil {m3/s}
-  autosize,                               !- Tube Outside Surf Area {m2}
-  autosize,                               !- Total Tube Inside Area {m2}
-  autosize,                               !- Fin Surface Area {m2}
-  autosize,                               !- Minimum Air Flow Area {m2}
-  autosize,                               !- Coil Depth {m}
-  autosize,                               !- Fin Diameter {m}
-  ,                                               !- Fin Thickness {m}
-  ,                                               !- Tube Inside Diameter {m}
-  ,                                               !- Tube Outside Diameter {m}
-  ,                                               !- Tube Thermal Conductivity {W/m-K}
-  ,                                               !- Fin Thermal Conductivity {W/m-K}
-  ,                                               !- Fin Spacing {m}
-  ,                                               !- Tube Depth Spacing {m}
-  ,                                               !- Number of Tube Rows
-  autosize,                               !- Number of Tubes per Row
-  Main Cooling Coil 1 Water Inlet Node,   !- Coil_Water_Inlet_Node
-  Main Cooling Coil 1 Water Outlet Node, !- Coil_Water_Outlet_Node
-  Main Cooling Coil 1 Inlet Node,     !- Coil_Air_Inlet_Node
-  Main Cooling Coil 1 Outlet Node;   !- Coil_Air_Outlet_Node
-\end{lstlisting}
-
-\subsubsection{Outputs}\label{outputs-22}
-
-No variables are reported for this compound object. However, outputs are provided by the cooling coil and heat exchanger that are specified.
 
 \subsection{Coil:WaterHeating:AirToWaterHeatPump:Pumped}\label{coilwaterheatingairtowaterheatpumppumped}
 

@@ -287,9 +287,9 @@ namespace UnitarySystems {
         int m_HeatRecoveryOutletNodeNum;
         int m_DesignSpecMSHPIndex;
         Real64 m_NoLoadAirFlowRateRatio;
-        //Real64 m_IdleMassFlowRate;
-        //Real64 m_IdleVolumeAirRate; // idle air flow rate [m3/s]
-        //Real64 m_IdleSpeedRatio;
+        // Real64 m_IdleMassFlowRate;
+        // Real64 m_IdleVolumeAirRate; // idle air flow rate [m3/s]
+        // Real64 m_IdleSpeedRatio;
         int m_SingleMode;
         bool m_MultiOrVarSpeedHeatCoil;
         bool m_MultiOrVarSpeedCoolCoil;
@@ -338,7 +338,7 @@ namespace UnitarySystems {
 
         Real64 m_DesiredOutletTemp;
         Real64 m_DesiredOutletHumRat;
-        Real64 m_FrostControlStatus;
+        int m_FrostControlStatus;
 
         Real64 m_CoolingCycRatio;
         Real64 m_CoolingSpeedRatio;
@@ -409,12 +409,14 @@ namespace UnitarySystems {
         bool m_OKToPrintSizing;
         bool m_IsDXCoil;
         Real64 m_SmallLoadTolerance;
+        bool m_waterSideEconomizerFlag;   // true if water-side economizer coil is active
+        Real64 m_minAirToWaterTempOffset; // coil entering air to entering water temp offset
 
         int m_HRcoolCoilFluidInletNode;
-        //int m_HRcoolCoilAirInNode;
-        Real64 m_minWaterLoopTempForHR;        // water coil heat recovery loops
-        // std::string m_HRWaterCoolingCoilNames; // connected HR coils, may become vector in future
-        bool m_WaterHRPlantLoopActive;         // signifies active HR loop for this CoilSystem
+        int m_HRcoolCoilAirInNode;
+        Real64 m_minWaterLoopTempForHR; // water coil heat recovery loops
+        bool m_WaterHRPlantLoopModel;   // signifies water heat recovery loop for this CoilSystem
+        bool enableHRLoop;              // flag used to disable HR loop
 
     public:
         // SZVAV variables
@@ -460,8 +462,10 @@ namespace UnitarySystems {
         DesignSpecMSHP *m_CompPointerMSHP;
         std::string Name;
         std::string UnitType;
-        Real64 LoadSHR; // Load sensible heat ratio with humidity control
-        Real64 CoilSHR; // Load sensible heat ratio with humidity control
+        Real64 LoadSHR;                // Load sensible heat ratio with humidity control
+        Real64 CoilSHR;                // Load sensible heat ratio with humidity control
+        bool runWaterSideEconomizer;   // true if water-side economizer conditioon is favorbale
+        int WaterSideEconomizerStatus; // water side economizer status flag, report variable
 
         //    private:
         // private members not initialized in constructor
@@ -824,6 +828,9 @@ namespace UnitarySystems {
         static void
         getDXCoilSystemData(EnergyPlusData &state, std::string_view Name, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
 
+        static void getCoilWaterSystemInputData(
+            EnergyPlusData &state, std::string_view CoilSysName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
+
         static void allocateUnitarySys(EnergyPlusData &state);
 
         static HVACSystemData *
@@ -900,6 +907,7 @@ namespace UnitarySystems {
     // void setSystemParams(EnergyPlusData &state, UnitarySys &thisSys, Real64 &TotalFloorAreaOnAirLoop, const std::string thisObjectName);
     bool searchTotalComponents(EnergyPlusData &state, std::string_view objectNameToFind, int &compIndex, int &branchIndex, int &airLoopIndex);
     void setupAllOutputVars(EnergyPlusData &state, int const numAllSystemTypes);
+    void isWaterCoilHeatRecoveryType(EnergyPlusData &state, int const waterCoilNodeNum, bool &nodeNotFound);
 
 } // namespace UnitarySystems
 struct UnitarySystemsData : BaseGlobalStruct
@@ -965,6 +973,8 @@ struct UnitarySystemsData : BaseGlobalStruct
 
     bool myOneTimeFlag = true;
     bool getInputFlag = true;
+
+    std::string const coilSysCoolingWaterObjectName = "CoilSystem:Cooling:Water";
 
     void clear_state() override
     {

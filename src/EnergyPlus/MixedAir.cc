@@ -480,18 +480,28 @@ void SimOAComponent(EnergyPlusData &state,
             // get water coil and controller data if not called previously
             if (CompIndex == 0) WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
             // iterate on OA sys controller and water coil at the same time
-            SolveWaterCoilController(state,
-                                     FirstHVACIteration,
-                                     AirLoopNum,
-                                     CompName,
-                                     CompIndex,
-                                     state.dataWaterCoils->WaterCoil(CompIndex).ControllerName,
-                                     state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex,
-                                     false);
-            // set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
-            state.dataHVACControllers->ControllerProps(state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
+            if (!state.dataWaterCoils->WaterCoil(CompIndex).heatRecoveryCoil) {
+                SolveWaterCoilController(state,
+                                         FirstHVACIteration,
+                                         AirLoopNum,
+                                         CompName,
+                                         CompIndex,
+                                         state.dataWaterCoils->WaterCoil(CompIndex).ControllerName,
+                                         state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex,
+                                         false);
+                // set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
+                state.dataHVACControllers->ControllerProps(state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
+            } else {
+                WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
+            }
+        } else {
+            if (CompIndex == 0) {
+                bool errFound = false;
+                CompIndex = WaterCoils::GetWaterCoilIndex(state, CompType, CompName, errFound);
+                if (errFound) ShowFatalError(state, "SimOAComponent: Program terminates for preceding reason.");
+            }
+            if (!state.dataWaterCoils->WaterCoil(CompIndex).heatRecoveryCoil) OACoolingCoil = true;
         }
-        OACoolingCoil = true;
     } else if (CompTypeNum == SimAirServingZones::CompType::WaterCoil_SimpleHeat) { // 'Coil:Heating:Water')
         if (Sim) {
             // get water coil and controller data if not called previously
@@ -589,6 +599,34 @@ void SimOAComponent(EnergyPlusData &state,
                                                                                       ZoneEquipFlag,
                                                                                       sensOut,
                                                                                       latOut);
+        }
+        OACoolingCoil = true;
+    } else if (CompTypeNum == SimAirServingZones::CompType::CoilSystemWater) { // "CoilSystem:Cooling:Water"
+        if (state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompIndex] == nullptr) {
+            UnitarySystems::UnitarySys thisSys;
+            state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompIndex] =
+                thisSys.factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, CompName, false, 0);
+            UnitarySystems::UnitarySys::checkUnitarySysCoilInOASysExists(state, CompName, 0);
+        }
+        if (Sim) {
+            bool HeatingActive = false;
+            bool CoolingActive = false;
+            Real64 OAUCoilOutTemp = 0.0;
+            bool ZoneEquipFlag = false;
+            Real64 sensOut = 0.0;
+            Real64 latOut = 0.0;
+            state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompIndex]->simulate(state,
+                                                                                        CompName,
+                                                                                        FirstHVACIteration,
+                                                                                        AirLoopNum,
+                                                                                        CompIndex,
+                                                                                        HeatingActive,
+                                                                                        CoolingActive,
+                                                                                        CompIndex,
+                                                                                        OAUCoilOutTemp,
+                                                                                        ZoneEquipFlag,
+                                                                                        sensOut,
+                                                                                        latOut);
         }
         OACoolingCoil = true;
     } else if (CompTypeNum == SimAirServingZones::CompType::UnitarySystemModel) { // AirLoopHVAC:UnitarySystem
@@ -1110,6 +1148,12 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
                     // CheckDXCoolingCoilInOASysExists(state, state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum));
                 } else if (SELECT_CASE_var == "COILSYSTEM:HEATING:DX") {
                     state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::DXHeatPumpSystem;
+                } else if (SELECT_CASE_var == "COILSYSTEM:COOLING:WATER") {
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::CoilSystemWater;
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex(CompNum) = CompNum;
+                    UnitarySystems::UnitarySys thisSys;
+                    state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompNum] = thisSys.factory(
+                        state, DataHVACGlobals::UnitarySys_AnyCoilType, state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum), false, 0);
                 } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM") {
                     state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::UnitarySystemModel;
                     UnitarySystems::UnitarySys thisSys;

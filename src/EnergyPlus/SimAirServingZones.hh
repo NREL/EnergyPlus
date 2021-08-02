@@ -74,6 +74,38 @@ namespace SimAirServingZones {
 
     // CompType numerics -- for this module
     // component types addressed by this module
+    constexpr int OAMixer_Num(1);
+    constexpr int Fan_Simple_CV(2);
+    constexpr int Fan_Simple_VAV(3);
+    constexpr int WaterCoil_SimpleCool(4);
+    constexpr int WaterCoil_Cooling(5);
+    constexpr int WaterCoil_SimpleHeat(6);
+    constexpr int SteamCoil_AirHeat(7);
+    constexpr int WaterCoil_DetailedCool(8);
+    constexpr int Coil_ElectricHeat(9);
+    constexpr int Coil_GasHeat(10);
+    constexpr int WaterCoil_CoolingHXAsst(11);
+    constexpr int DXCoil_CoolingHXAsst(12);
+    constexpr int Coil_DeSuperHeat(13);
+    constexpr int DXSystem(14);
+    constexpr int HeatXchngr(15);
+    constexpr int Desiccant(16);
+    constexpr int Unglazed_SolarCollector(17);
+    constexpr int EvapCooler(18);
+    constexpr int Furnace_UnitarySys_HeatOnly(19);
+    constexpr int Furnace_UnitarySys_HeatCool(20);
+    constexpr int Humidifier(21);
+    constexpr int Duct(22);
+    constexpr int UnitarySystem_BypassVAVSys(23);
+    constexpr int UnitarySystem_MSHeatPump(24);
+    constexpr int Fan_ComponentModel(25);
+    constexpr int DXHeatPumpSystem(26);
+    constexpr int CoilUserDefined(27);
+    constexpr int Fan_System_Object(28);
+    constexpr int UnitarySystemModel(29);
+    constexpr int ZoneVRFasAirLoopEquip(30);
+    constexpr int CoilSystemWater(31);
+
     enum class CompType
     {
         Unassigned = -1,
@@ -108,7 +140,8 @@ namespace SimAirServingZones {
         UnitarySystemModel,
         ZoneVRFasAirLoopEquip,
         PVT_AirBased,
-        VRFTerminalUnit
+        VRFTerminalUnit,
+        CoilSystemWater
     };
 
     void ManageAirLoops(EnergyPlusData &state,
