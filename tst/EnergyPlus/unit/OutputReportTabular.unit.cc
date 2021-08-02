@@ -6178,7 +6178,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest)
     auto stringTypes = queryResult("SELECT * FROM StringTypes;", "StringTypes");
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
-    EXPECT_EQ(123ul, tabularData.size());
+    EXPECT_EQ(170ul, tabularData.size());
     // tabularDataIndex, reportNameIndex, reportForStringIndex, tableNameIndex, rowLabelIndex, columnLabelIndex, unitsIndex, simulationIndex, rowId,
     // columnId, value
     EXPECT_EQ("       12.30", tabularData[3][10]);
@@ -9178,7 +9178,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest_DualUnits)
     auto stringTypes = queryResult("SELECT * FROM StringTypes;", "StringTypes");
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
-    EXPECT_EQ(123ul, tabularData.size());
+    EXPECT_EQ(170ul, tabularData.size());
     // tabularDataIndex, reportNameIndex, reportForStringIndex, tableNameIndex, rowLabelIndex, columnLabelIndex, unitsIndex, simulationIndex, rowId,
     // columnId, value
     EXPECT_EQ("       12.30", tabularData[3][10]);
