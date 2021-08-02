@@ -119,9 +119,9 @@ namespace DataDaylighting {
 
     struct EnclDaylightCalc
     {
-        Real64 AveVisDiffReflect = 0.0; // Area-weighted average inside surface visible reflectance of zone
-        Real64 TotInsSurfArea = 0.0;    // Total inside surface area of a daylit zone (m2)
-        Real64 FloorVisRefl = 0.0;      // Area-weighted visible reflectance of floor of a daylit zone
+        Real64 aveVisDiffReflect = 0.0; // Area-weighted average inside surface visible reflectance of zone
+        Real64 totInsSurfArea = 0.0;    // Total inside surface area of a daylit zone (m2)
+        Real64 floorVisRefl = 0.0;      // Area-weighted visible reflectance of floor of a daylit zone
     };
 
     struct ZoneDaylightCalc
@@ -333,7 +333,7 @@ struct DaylightingData : BaseGlobalStruct
     bool DFSReportAllShadowCalculationDays = false;
     int TotDElightCFS = 0;
 
-    Array1D<DataDaylighting::EnclDaylightCalc> EnclDaylight;
+    Array1D<DataDaylighting::EnclDaylightCalc> enclDaylight;
     Array1D<DataDaylighting::ZoneDaylightCalc> ZoneDaylight;
     Array1D<DataDaylighting::IllumMapData> IllumMap;
     Array1D<DataDaylighting::MapCalcData> IllumMapCalc;

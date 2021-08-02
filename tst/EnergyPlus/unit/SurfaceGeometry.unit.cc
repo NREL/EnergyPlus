@@ -5169,23 +5169,23 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresNoAirBoundari
     EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).Name, "Space 1"));
     EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(2).Name, "Space 2"));
     EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(3).Name, "Space 3"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).SpaceNames[0], "Space 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(2).SpaceNames[0], "Space 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(3).SpaceNames[0], "Space 3"));
-    EXPECT_EQ(state->dataHeatBal->Space(1).RadiantEnclosureNum, 1);
-    EXPECT_EQ(state->dataHeatBal->Space(2).RadiantEnclosureNum, 2);
-    EXPECT_EQ(state->dataHeatBal->Space(3).RadiantEnclosureNum, 3);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[0], "Space 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(2).spaceNames[0], "Space 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(3).spaceNames[0], "Space 3"));
+    EXPECT_EQ(state->dataHeatBal->space(1).radiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(2).radiantEnclosureNum, 2);
+    EXPECT_EQ(state->dataHeatBal->space(3).radiantEnclosureNum, 3);
 
     EXPECT_EQ(state->dataViewFactor->NumOfSolarEnclosures, 3);
     EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).Name, "Space 1"));
     EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).Name, "Space 2"));
     EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(3).Name, "Space 3"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).SpaceNames[0], "Space 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).SpaceNames[0], "Space 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(3).SpaceNames[0], "Space 3"));
-    EXPECT_EQ(state->dataHeatBal->Space(1).SolarEnclosureNum, 1);
-    EXPECT_EQ(state->dataHeatBal->Space(2).SolarEnclosureNum, 2);
-    EXPECT_EQ(state->dataHeatBal->Space(3).SolarEnclosureNum, 3);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[0], "Space 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[0], "Space 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(3).spaceNames[0], "Space 3"));
+    EXPECT_EQ(state->dataHeatBal->space(1).solarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(2).solarEnclosureNum, 2);
+    EXPECT_EQ(state->dataHeatBal->space(3).solarEnclosureNum, 3);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBoundaries1)
@@ -5370,21 +5370,21 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
 
     EXPECT_EQ(state->dataViewFactor->NumOfRadiantEnclosures, 1);
     EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).Name, "Radiant Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).SpaceNames[0], "Space 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).SpaceNames[1], "Space 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).SpaceNames[2], "Space 3"));
-    EXPECT_EQ(state->dataHeatBal->Space(1).RadiantEnclosureNum, 1);
-    EXPECT_EQ(state->dataHeatBal->Space(2).RadiantEnclosureNum, 1);
-    EXPECT_EQ(state->dataHeatBal->Space(3).RadiantEnclosureNum, 1);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[0], "Space 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[1], "Space 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[2], "Space 3"));
+    EXPECT_EQ(state->dataHeatBal->space(1).radiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(2).radiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(3).radiantEnclosureNum, 1);
 
     EXPECT_EQ(state->dataViewFactor->NumOfSolarEnclosures, 1);
     EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).Name, "Solar Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).SpaceNames[0], "Space 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).SpaceNames[1], "Space 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).SpaceNames[2], "Space 3"));
-    EXPECT_EQ(state->dataHeatBal->Space(1).SolarEnclosureNum, 1);
-    EXPECT_EQ(state->dataHeatBal->Space(2).SolarEnclosureNum, 1);
-    EXPECT_EQ(state->dataHeatBal->Space(3).SolarEnclosureNum, 1);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[0], "Space 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[1], "Space 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[2], "Space 3"));
+    EXPECT_EQ(state->dataHeatBal->space(1).solarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(2).solarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(3).solarEnclosureNum, 1);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBoundaries2)
@@ -5580,23 +5580,23 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
 
     EXPECT_EQ(state->dataViewFactor->NumOfRadiantEnclosures, 2);
     EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).Name, "Radiant Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).SpaceNames[0], "Space 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).SpaceNames[1], "Space 3"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[0], "Space 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[1], "Space 3"));
     EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(2).Name, "Space 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(2).SpaceNames[0], "Space 2"));
-    EXPECT_EQ(state->dataHeatBal->Space(1).RadiantEnclosureNum, 1);
-    EXPECT_EQ(state->dataHeatBal->Space(2).RadiantEnclosureNum, 2);
-    EXPECT_EQ(state->dataHeatBal->Space(3).RadiantEnclosureNum, 1);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(2).spaceNames[0], "Space 2"));
+    EXPECT_EQ(state->dataHeatBal->space(1).radiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(2).radiantEnclosureNum, 2);
+    EXPECT_EQ(state->dataHeatBal->space(3).radiantEnclosureNum, 1);
 
     EXPECT_EQ(state->dataViewFactor->NumOfSolarEnclosures, 2);
     EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).Name, "Solar Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).SpaceNames[0], "Space 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).SpaceNames[1], "Space 3"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[0], "Space 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[1], "Space 3"));
     EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).Name, "Space 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).SpaceNames[0], "Space 2"));
-    EXPECT_EQ(state->dataHeatBal->Space(1).SolarEnclosureNum, 1);
-    EXPECT_EQ(state->dataHeatBal->Space(2).SolarEnclosureNum, 2);
-    EXPECT_EQ(state->dataHeatBal->Space(3).SolarEnclosureNum, 1);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[0], "Space 2"));
+    EXPECT_EQ(state->dataHeatBal->space(1).solarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(2).solarEnclosureNum, 2);
+    EXPECT_EQ(state->dataHeatBal->space(3).solarEnclosureNum, 1);
 
     // Check surface order
     int Zone1Surface1 = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone1-Surface1"), state->dataSurface->Surface);
@@ -5962,29 +5962,29 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
 
     EXPECT_EQ(state->dataViewFactor->NumOfRadiantEnclosures, 1);
     EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).Name, "Radiant Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).SpaceNames[0], "Space 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).SpaceNames[1], "Space 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).SpaceNames[2], "Space 5"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).SpaceNames[3], "Space 3"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).SpaceNames[4], "Space 4"));
-    EXPECT_EQ(state->dataHeatBal->Space(1).RadiantEnclosureNum, 1);
-    EXPECT_EQ(state->dataHeatBal->Space(2).RadiantEnclosureNum, 1);
-    EXPECT_EQ(state->dataHeatBal->Space(3).RadiantEnclosureNum, 1);
-    EXPECT_EQ(state->dataHeatBal->Space(4).RadiantEnclosureNum, 1);
-    EXPECT_EQ(state->dataHeatBal->Space(5).RadiantEnclosureNum, 1);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[0], "Space 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[1], "Space 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[2], "Space 5"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[3], "Space 3"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[4], "Space 4"));
+    EXPECT_EQ(state->dataHeatBal->space(1).radiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(2).radiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(3).radiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(4).radiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(5).radiantEnclosureNum, 1);
 
     EXPECT_EQ(state->dataViewFactor->NumOfSolarEnclosures, 1);
     EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).Name, "Solar Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).SpaceNames[0], "Space 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).SpaceNames[1], "Space 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).SpaceNames[2], "Space 5"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).SpaceNames[3], "Space 3"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).SpaceNames[4], "Space 4"));
-    EXPECT_EQ(state->dataHeatBal->Space(1).SolarEnclosureNum, 1);
-    EXPECT_EQ(state->dataHeatBal->Space(2).SolarEnclosureNum, 1);
-    EXPECT_EQ(state->dataHeatBal->Space(3).SolarEnclosureNum, 1);
-    EXPECT_EQ(state->dataHeatBal->Space(4).SolarEnclosureNum, 1);
-    EXPECT_EQ(state->dataHeatBal->Space(5).SolarEnclosureNum, 1);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[0], "Space 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[1], "Space 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[2], "Space 5"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[3], "Space 3"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[4], "Space 4"));
+    EXPECT_EQ(state->dataHeatBal->space(1).solarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(2).solarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(3).solarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(4).solarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(5).solarEnclosureNum, 1);
 }
 
 TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)

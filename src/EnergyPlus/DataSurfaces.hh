@@ -627,7 +627,7 @@ namespace DataSurfaces {
         int Zone;                     // Interior environment or zone the surface is a part of
                                       // Note that though attached shading surfaces are part of a zone, this
                                       // value is 0 there to facilitate using them as detached surfaces (more accurate shading.
-        int Space;                    // Space the surface is part of
+        int spaceNum;                 // Space the surface is part of
         std::string ExtBoundCondName; // Name for the Outside Environment Object
         int ExtBoundCond;             // For an "interzone" surface, this is the adjacent surface number.
                                       // for an internal/adiabatic surface this is the current surface number.
@@ -681,9 +681,9 @@ namespace DataSurfaces {
               CosAzim(0.0), SinTilt(0.0), CosTilt(0.0), IsConvex(true), IsDegenerate(false), VerticesProcessed(false), XShift(0.0), YShift(0.0),
 
               HeatTransSurf(false), OutsideHeatSourceTermSchedule(0), InsideHeatSourceTermSchedule(0),
-              HeatTransferAlgorithm(iHeatTransferModel::NotSet), BaseSurf(0), NumSubSurfaces(0), Zone(0), Space(0), ExtBoundCond(0), ExtSolar(false),
-              ExtWind(false), ViewFactorGround(0.0), ViewFactorSky(0.0), ViewFactorGroundIR(0.0), ViewFactorSkyIR(0.0), OSCPtr(0), OSCMPtr(0),
-              MirroredSurf(false), IsShadowing(false), IsShadowPossibleObstruction(false), SchedShadowSurfIndex(0), IsTransparent(false),
+              HeatTransferAlgorithm(iHeatTransferModel::NotSet), BaseSurf(0), NumSubSurfaces(0), Zone(0), spaceNum(0), ExtBoundCond(0),
+              ExtSolar(false), ExtWind(false), ViewFactorGround(0.0), ViewFactorSky(0.0), ViewFactorGroundIR(0.0), ViewFactorSkyIR(0.0), OSCPtr(0),
+              OSCMPtr(0), MirroredSurf(false), IsShadowing(false), IsShadowPossibleObstruction(false), SchedShadowSurfIndex(0), IsTransparent(false),
               SchedMinValue(0.0), activeWindowShadingControl(0), HasShadeControl(false), activeShadedConstruction(0), activeShadedConstructionPrev(0),
               FrameDivider(0), Multiplier(1.0), SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false)
         {
@@ -1155,15 +1155,15 @@ namespace DataSurfaces {
         int Construction;                 // pointer to contruction object
         Real64 GrossArea;                 // internal surface area, [m2]
         bool ZoneListActive;              // flag to a list
-        std::string SpaceOrSpaceListName; // Space or Space list name
-        int SpaceOrSpaceListPtr;          // pointer to a Space list
-        int NumOfSpaces;                  // number of Spaces in a Space list
-        bool SpaceListActive;             // flag to a list
+        std::string spaceOrSpaceListName; // Space or Space list name
+        int spaceOrSpaceListPtr;          // pointer to a Space list
+        int numOfSpaces;                  // number of Spaces in a Space list
+        bool spaceListActive;             // flag to a list
 
         // Default Constructor
         IntMassObject()
-            : ZoneOrZoneListPtr(0), NumOfZones(0), Construction(0), GrossArea(0.0), ZoneListActive(false), SpaceOrSpaceListPtr(0), NumOfSpaces(0),
-              SpaceListActive(false)
+            : ZoneOrZoneListPtr(0), NumOfZones(0), Construction(0), GrossArea(0.0), ZoneListActive(false), spaceOrSpaceListPtr(0), numOfSpaces(0),
+              spaceListActive(false)
         {
         }
     };

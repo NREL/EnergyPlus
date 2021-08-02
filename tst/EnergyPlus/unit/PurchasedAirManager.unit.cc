@@ -121,8 +121,8 @@ protected:
         state->dataHeatBalFanSys->SysDepZoneLoads.allocate(1);
         state->dataHeatBal->MassConservation.allocate(1);
         state->dataHeatBal->ZoneIntGain.allocate(1);
-        state->dataHeatBal->SpaceIntGain.allocate(1);
-        state->dataHeatBal->SpaceIntGainDevices.allocate(1);
+        state->dataHeatBal->spaceIntGain.allocate(1);
+        state->dataHeatBal->spaceIntGainDevices.allocate(1);
         state->dataSurface->SurfaceWindow.allocate(1);
         state->dataHeatBal->RefrigCaseCredit.allocate(1);
         state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);

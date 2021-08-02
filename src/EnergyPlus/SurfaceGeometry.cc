@@ -398,9 +398,9 @@ namespace SurfaceGeometry {
             e.TotalSurfArea = 0.0;
         }
 
-        for (auto &s : state.dataHeatBal->Space) {
-            s.ExtWindowArea = 0.0;
-            s.TotalSurfArea = 0.0;
+        for (auto &s : state.dataHeatBal->space) {
+            s.extWindowArea = 0.0;
+            s.totalSurfArea = 0.0;
         }
         DetailedWWR = (state.dataInputProcessing->inputProcessor->getNumSectionsFound("DETAILEDWWR_DEBUG") > 0);
         if (DetailedWWR) {
@@ -413,13 +413,13 @@ namespace SurfaceGeometry {
             if (!state.dataSurface->Surface(SurfNum).HeatTransSurf && !state.dataSurface->Surface(SurfNum).IsAirBoundarySurf)
                 continue; // Skip shadowing (sub)surfaces
             int const ZoneNum = state.dataSurface->Surface(SurfNum).Zone;
-            int const spaceNum = state.dataSurface->Surface(SurfNum).Space;
+            int const spaceNum = state.dataSurface->Surface(SurfNum).spaceNum;
             state.dataHeatBal->Zone(ZoneNum).TotalSurfArea += state.dataSurface->Surface(SurfNum).Area;
-            state.dataHeatBal->Space(spaceNum).TotalSurfArea += state.dataSurface->Surface(SurfNum).Area;
+            state.dataHeatBal->space(spaceNum).totalSurfArea += state.dataSurface->Surface(SurfNum).Area;
             if (state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TypeIsWindow) {
                 state.dataHeatBal->Zone(ZoneNum).TotalSurfArea += state.dataSurface->SurfWinFrameArea(SurfNum);
                 state.dataHeatBal->Zone(ZoneNum).HasWindow = true;
-                state.dataHeatBal->Space(spaceNum).TotalSurfArea += state.dataSurface->SurfWinFrameArea(SurfNum);
+                state.dataHeatBal->space(spaceNum).totalSurfArea += state.dataSurface->SurfWinFrameArea(SurfNum);
             }
             if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Roof)
                 ZoneCeilingArea(ZoneNum) += state.dataSurface->Surface(SurfNum).GrossArea;
@@ -472,7 +472,7 @@ namespace SurfaceGeometry {
                          (state.dataSurface->Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt)) &&
                         (state.dataSurface->Surface(SurfNum).Class != SurfaceClass::TDD_Dome)) {
                         state.dataHeatBal->Zone(ZoneNum).ExtWindowArea += state.dataSurface->Surface(SurfNum).GrossArea;
-                        state.dataHeatBal->Space(spaceNum).ExtWindowArea += state.dataSurface->Surface(SurfNum).GrossArea;
+                        state.dataHeatBal->space(spaceNum).extWindowArea += state.dataSurface->Surface(SurfNum).GrossArea;
                         state.dataHeatBal->Zone(ZoneNum).ExtWindowArea_Multiplied =
                             state.dataHeatBal->Zone(ZoneNum).ExtWindowArea +
                             state.dataSurface->Surface(SurfNum).GrossArea * state.dataSurface->Surface(SurfNum).Multiplier *
@@ -2383,8 +2383,8 @@ namespace SurfaceGeometry {
                     if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Floor) {
                         state.dataHeatBal->Zone(ZoneNum).FloorArea += state.dataSurface->Surface(SurfNum).Area;
                         state.dataHeatBal->Zone(ZoneNum).HasFloor = true;
-                        int spaceNum = state.dataSurface->Surface(SurfNum).Space;
-                        state.dataHeatBal->Space(spaceNum).FloorArea += state.dataSurface->Surface(SurfNum).Area;
+                        int spaceNum = state.dataSurface->Surface(SurfNum).spaceNum;
+                        state.dataHeatBal->space(spaceNum).floorArea += state.dataSurface->Surface(SurfNum).Area;
                     }
                     if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Roof) {
                         state.dataHeatBal->Zone(ZoneNum).CeilingArea += state.dataSurface->Surface(SurfNum).Area;
@@ -2433,15 +2433,15 @@ namespace SurfaceGeometry {
             }
 
             for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
-                state.dataHeatBal->Space(spaceNum).CalcFloorArea = state.dataHeatBal->Space(spaceNum).FloorArea;
-                if (state.dataHeatBal->Space(spaceNum).UserEnteredFloorArea != DataGlobalConstants::AutoCalculate) {
+                state.dataHeatBal->space(spaceNum).calcFloorArea = state.dataHeatBal->space(spaceNum).floorArea;
+                if (state.dataHeatBal->space(spaceNum).userEnteredFloorArea != DataGlobalConstants::AutoCalculate) {
                     // Check entered vs calculated
-                    if (state.dataHeatBal->Space(spaceNum).UserEnteredFloorArea > 0.0) { // User entered Space floor area,
+                    if (state.dataHeatBal->space(spaceNum).userEnteredFloorArea > 0.0) { // User entered Space floor area,
                         // produce message if not near calculated
-                        if (state.dataHeatBal->Space(spaceNum).CalcFloorArea > 0.0) {
+                        if (state.dataHeatBal->space(spaceNum).calcFloorArea > 0.0) {
                             diffp =
-                                std::abs(state.dataHeatBal->Space(spaceNum).CalcFloorArea - state.dataHeatBal->Space(spaceNum).UserEnteredFloorArea) /
-                                state.dataHeatBal->Space(spaceNum).UserEnteredFloorArea;
+                                std::abs(state.dataHeatBal->space(spaceNum).calcFloorArea - state.dataHeatBal->space(spaceNum).userEnteredFloorArea) /
+                                state.dataHeatBal->space(spaceNum).userEnteredFloorArea;
                             if (diffp > 0.05) {
                                 ++ErrCount;
                                 if (ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
@@ -2454,22 +2454,22 @@ namespace SurfaceGeometry {
                                     // Warn user of using specified Space Floor Area
                                     ShowWarningError(state,
                                                      std::string(RoutineName) + "Entered Floor Area entered for Space=\"" +
-                                                         state.dataHeatBal->Space(spaceNum).Name +
+                                                         state.dataHeatBal->space(spaceNum).Name +
                                                          "\" significantly different from calculated Floor Area");
                                     ShowContinueError(
                                         state,
                                         format("Entered Space Floor Area value={:.2R}, Calculated Space Floor Area value={:.2R}, entered "
                                                "Floor Area will be used in calculations.",
-                                               state.dataHeatBal->Space(spaceNum).UserEnteredFloorArea,
-                                               state.dataHeatBal->Space(spaceNum).CalcFloorArea));
+                                               state.dataHeatBal->space(spaceNum).userEnteredFloorArea,
+                                               state.dataHeatBal->space(spaceNum).calcFloorArea));
                                 }
                             }
                         }
-                        state.dataHeatBal->Space(spaceNum).FloorArea = state.dataHeatBal->Space(spaceNum).UserEnteredFloorArea;
-                        state.dataHeatBal->Space(spaceNum).HasFloor = true;
+                        state.dataHeatBal->space(spaceNum).floorArea = state.dataHeatBal->space(spaceNum).userEnteredFloorArea;
+                        state.dataHeatBal->space(spaceNum).hasFloor = true;
                     }
                 } else {
-                    state.dataHeatBal->Space(spaceNum).FloorArea = state.dataHeatBal->Space(spaceNum).CalcFloorArea; // redundant, already done.
+                    state.dataHeatBal->space(spaceNum).floorArea = state.dataHeatBal->space(spaceNum).calcFloorArea; // redundant, already done.
                 }
             }
         }
@@ -2816,30 +2816,30 @@ namespace SurfaceGeometry {
         for (int surfNum = 1; surfNum <= state.dataSurface->TotSurfaces; ++surfNum) {
             auto &thisSurf = state.dataSurface->Surface(surfNum);
             if (!thisSurf.HeatTransSurf) continue; // ignore shading surfaces
-            if (thisSurf.Space > 0) {
-                state.dataHeatBal->Zone(thisSurf.Zone).AnySurfacesWithSpace = true;
+            if (thisSurf.spaceNum > 0) {
+                state.dataHeatBal->Zone(thisSurf.Zone).anySurfacesWithSpace = true;
             } else {
-                state.dataHeatBal->Zone(thisSurf.Zone).AnySurfacesWithoutSpace = true;
+                state.dataHeatBal->Zone(thisSurf.Zone).anySurfacesWithoutSpace = true;
             }
         }
 
         // Create any missing Spaces
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             auto &thisZone = state.dataHeatBal->Zone(zoneNum);
-            if (thisZone.AnySurfacesWithoutSpace) {
+            if (thisZone.anySurfacesWithoutSpace) {
                 // If any surfaces in the zone are not assigned to a space, may need to create a new space
                 // Every zone has at least one space, created in HeatBalanceManager::GetSpaceData
                 // If no surfaces have a space assigned, then the default space will be used, otherwise, create a new space
-                if (thisZone.AnySurfacesWithSpace) {
+                if (thisZone.anySurfacesWithSpace) {
                     // Add new space
                     ++state.dataGlobal->numSpaces;
-                    state.dataHeatBal->Space(state.dataGlobal->numSpaces).ZoneNum = zoneNum;
+                    state.dataHeatBal->space(state.dataGlobal->numSpaces).zoneNum = zoneNum;
                     // Add to zone's list of spaces
-                    thisZone.Spaces.emplace_back(state.dataGlobal->numSpaces);
+                    thisZone.spaces.emplace_back(state.dataGlobal->numSpaces);
                     // If some surfaces in the zone are assigned to a space, the new space is the remainder of the zone
-                    state.dataHeatBal->Space(state.dataGlobal->numSpaces).Name = thisZone.Name + "-Remainder";
-                    state.dataHeatBal->Space(state.dataGlobal->numSpaces).SpaceType = "GENERAL";
-                    state.dataHeatBal->Space(state.dataGlobal->numSpaces).SpaceTypeNum = HeatBalanceManager::GetGeneralSpaceTypeNum(state);
+                    state.dataHeatBal->space(state.dataGlobal->numSpaces).Name = thisZone.Name + "-Remainder";
+                    state.dataHeatBal->space(state.dataGlobal->numSpaces).spaceType = "GENERAL";
+                    state.dataHeatBal->space(state.dataGlobal->numSpaces).spaceTypeNum = HeatBalanceManager::GetGeneralSpaceTypeNum(state);
                 }
             }
         }
@@ -2848,19 +2848,19 @@ namespace SurfaceGeometry {
         for (int surfNum = 1; surfNum <= state.dataSurface->TotSurfaces; ++surfNum) {
             auto &thisSurf = state.dataSurface->Surface(surfNum);
             if (!thisSurf.HeatTransSurf) continue; // ignore shading surfaces
-            if (thisSurf.Space == 0) {
-                int const numSpaces = state.dataHeatBal->Zone(thisSurf.Zone).Spaces.size();
-                int const lastSpaceForZone = state.dataHeatBal->Zone(thisSurf.Zone).Spaces(numSpaces);
-                thisSurf.Space = lastSpaceForZone;
+            if (thisSurf.spaceNum == 0) {
+                int const numSpaces = state.dataHeatBal->Zone(thisSurf.Zone).spaces.size();
+                int const lastSpaceForZone = state.dataHeatBal->Zone(thisSurf.Zone).spaces(numSpaces);
+                thisSurf.spaceNum = lastSpaceForZone;
                 // Add to Space's list of surfaces
-                state.dataHeatBal->Space(lastSpaceForZone).Surfaces.emplace_back(surfNum);
+                state.dataHeatBal->space(lastSpaceForZone).surfaces.emplace_back(surfNum);
             }
         }
 
         // TODO MJW: Is this necessary? Check that all Spaces have at least one Surface
         for (int spaceNum = 1; spaceNum < state.dataGlobal->numSpaces; ++spaceNum) {
-            if (int(state.dataHeatBal->Space(spaceNum).Surfaces.size()) == 0) {
-                ShowSevereError(state, std::string(RoutineName) + "Space = " + state.dataHeatBal->Space(spaceNum).Name + " has no surfaces.");
+            if (int(state.dataHeatBal->space(spaceNum).surfaces.size()) == 0) {
+                ShowSevereError(state, std::string(RoutineName) + "Space = " + state.dataHeatBal->space(spaceNum).Name + " has no surfaces.");
                 ErrorsFound = true;
             }
         }
@@ -3815,12 +3815,12 @@ namespace SurfaceGeometry {
 
                 ++ArgPointer;
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(ArgPointer)) {
-                    int spaceNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(ArgPointer), state.dataHeatBal->Space);
+                    int spaceNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(ArgPointer), state.dataHeatBal->space);
 
                     if (spaceNum != 0) {
-                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Space = spaceNum;
-                        state.dataHeatBal->Space(spaceNum).Surfaces.emplace_back(SurfNum);
-                        if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone != state.dataHeatBal->Space(spaceNum).ZoneNum) {
+                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).spaceNum = spaceNum;
+                        state.dataHeatBal->space(spaceNum).surfaces.emplace_back(SurfNum);
+                        if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone != state.dataHeatBal->space(spaceNum).zoneNum) {
                             ShowSevereError(state,
                                             cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", invalid " +
                                                 state.dataIPShortCut->cAlphaFieldNames(ArgPointer) + "=\"" +
@@ -4417,11 +4417,11 @@ namespace SurfaceGeometry {
                 }
 
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                    int spaceNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataHeatBal->Space);
+                    int spaceNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataHeatBal->space);
 
                     if (spaceNum != 0) {
-                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Space = spaceNum;
-                        state.dataHeatBal->Space(spaceNum).Surfaces.emplace_back(SurfNum);
+                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).spaceNum = spaceNum;
+                        state.dataHeatBal->space(spaceNum).surfaces.emplace_back(SurfNum);
                     } else {
                         ShowSevereError(state,
                                         cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", invalid " +
@@ -7026,22 +7026,22 @@ namespace SurfaceGeometry {
             }
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                state.dataSurface->IntMassObjects(Item).SpaceOrSpaceListName = state.dataIPShortCut->cAlphaArgs(4);
-                int Item1 = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataHeatBal->Space);
+                state.dataSurface->IntMassObjects(Item).spaceOrSpaceListName = state.dataIPShortCut->cAlphaArgs(4);
+                int Item1 = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataHeatBal->space);
                 int SLItem = 0;
-                if (Item1 == 0 && int(state.dataHeatBal->SpaceList.size()) > 0)
-                    SLItem = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataHeatBal->SpaceList);
+                if (Item1 == 0 && int(state.dataHeatBal->spaceList.size()) > 0)
+                    SLItem = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataHeatBal->spaceList);
                 if (Item1 > 0) {
                     ++NumIntMassSurfaces;
-                    state.dataSurface->IntMassObjects(Item).NumOfSpaces = 1;
-                    state.dataSurface->IntMassObjects(Item).SpaceListActive = false;
-                    state.dataSurface->IntMassObjects(Item).SpaceOrSpaceListPtr = Item1;
+                    state.dataSurface->IntMassObjects(Item).numOfSpaces = 1;
+                    state.dataSurface->IntMassObjects(Item).spaceListActive = false;
+                    state.dataSurface->IntMassObjects(Item).spaceOrSpaceListPtr = Item1;
                 } else if (SLItem > 0) {
-                    int numOfSpaces = int(state.dataHeatBal->SpaceList(SLItem).Spaces.size());
+                    int numOfSpaces = int(state.dataHeatBal->spaceList(SLItem).spaces.size());
                     NumIntMassSurfaces += numOfSpaces;
-                    state.dataSurface->IntMassObjects(Item).NumOfSpaces = numOfSpaces;
-                    state.dataSurface->IntMassObjects(Item).SpaceListActive = true;
-                    state.dataSurface->IntMassObjects(Item).SpaceOrSpaceListPtr = SLItem;
+                    state.dataSurface->IntMassObjects(Item).numOfSpaces = numOfSpaces;
+                    state.dataSurface->IntMassObjects(Item).spaceListActive = true;
+                    state.dataSurface->IntMassObjects(Item).spaceOrSpaceListPtr = SLItem;
                 } else {
                     ShowSevereError(state,
                                     cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
@@ -14709,12 +14709,14 @@ namespace SurfaceGeometry {
                             constr.IsUsedCTF = false;
                             surf.HeatTransSurf = false;
                             surf.HeatTransferAlgorithm = DataSurfaces::iHeatTransferModel::AirBoundaryNoHT;
-                            thisSideEnclosureNum = state.dataHeatBal->Space(surf.Space).RadiantEnclosureNum;
-                            otherSideEnclosureNum = state.dataHeatBal->Space(state.dataSurface->Surface(surf.ExtBoundCond).Space).RadiantEnclosureNum;
+                            thisSideEnclosureNum = state.dataHeatBal->space(surf.spaceNum).radiantEnclosureNum;
+                            otherSideEnclosureNum =
+                                state.dataHeatBal->space(state.dataSurface->Surface(surf.ExtBoundCond).spaceNum).radiantEnclosureNum;
                         } else {
                             // Solar enclosure setup
-                            thisSideEnclosureNum = state.dataHeatBal->Space(surf.Space).SolarEnclosureNum;
-                            otherSideEnclosureNum = state.dataHeatBal->Space(state.dataSurface->Surface(surf.ExtBoundCond).Space).SolarEnclosureNum;
+                            thisSideEnclosureNum = state.dataHeatBal->space(surf.spaceNum).solarEnclosureNum;
+                            otherSideEnclosureNum =
+                                state.dataHeatBal->space(state.dataSurface->Surface(surf.ExtBoundCond).spaceNum).solarEnclosureNum;
                         }
                         anyGroupedSpaces = true;
                         if ((thisSideEnclosureNum == 0) && (otherSideEnclosureNum == 0)) {
@@ -14723,73 +14725,73 @@ namespace SurfaceGeometry {
                             auto &thisEnclosure(Enclosures(enclosureNum));
                             thisSideEnclosureNum = enclosureNum;
                             thisEnclosure.Name = format("{} Enclosure {}", RadiantOrSolar, enclosureNum);
-                            thisEnclosure.SpaceNames.push_back(state.dataHeatBal->Space(surf.Space).Name);
-                            thisEnclosure.SpaceNums.push_back(surf.Space);
-                            thisEnclosure.FloorArea += state.dataHeatBal->Space(surf.Space).FloorArea;
+                            thisEnclosure.spaceNames.push_back(state.dataHeatBal->space(surf.spaceNum).Name);
+                            thisEnclosure.spaceNums.push_back(surf.spaceNum);
+                            thisEnclosure.FloorArea += state.dataHeatBal->space(surf.spaceNum).floorArea;
                             otherSideEnclosureNum = enclosureNum;
-                            thisEnclosure.SpaceNames.push_back(state.dataHeatBal->Space(state.dataSurface->Surface(surf.ExtBoundCond).Space).Name);
-                            thisEnclosure.SpaceNums.push_back(state.dataSurface->Surface(surf.ExtBoundCond).Space);
+                            thisEnclosure.spaceNames.push_back(state.dataHeatBal->space(state.dataSurface->Surface(surf.ExtBoundCond).spaceNum).Name);
+                            thisEnclosure.spaceNums.push_back(state.dataSurface->Surface(surf.ExtBoundCond).spaceNum);
                             thisEnclosure.FloorArea += state.dataHeatBal->Zone(state.dataSurface->Surface(surf.ExtBoundCond).Zone).FloorArea;
                             if (radiantSetup) {
-                                state.dataHeatBal->Space(surf.Space).RadiantEnclosureNum = thisSideEnclosureNum;
-                                state.dataHeatBal->Space(state.dataSurface->Surface(surf.ExtBoundCond).Space).RadiantEnclosureNum =
+                                state.dataHeatBal->space(surf.spaceNum).radiantEnclosureNum = thisSideEnclosureNum;
+                                state.dataHeatBal->space(state.dataSurface->Surface(surf.ExtBoundCond).spaceNum).radiantEnclosureNum =
                                     otherSideEnclosureNum;
                             } else {
-                                thisEnclosure.ExtWindowArea += state.dataHeatBal->Space(surf.Space).ExtWindowArea;
-                                thisEnclosure.TotalSurfArea += state.dataHeatBal->Space(surf.Space).TotalSurfArea;
+                                thisEnclosure.ExtWindowArea += state.dataHeatBal->space(surf.spaceNum).extWindowArea;
+                                thisEnclosure.TotalSurfArea += state.dataHeatBal->space(surf.spaceNum).totalSurfArea;
                                 thisEnclosure.ExtWindowArea +=
-                                    state.dataHeatBal->Space(state.dataSurface->Surface(surf.ExtBoundCond).Space).ExtWindowArea;
+                                    state.dataHeatBal->space(state.dataSurface->Surface(surf.ExtBoundCond).spaceNum).extWindowArea;
                                 thisEnclosure.TotalSurfArea +=
-                                    state.dataHeatBal->Space(state.dataSurface->Surface(surf.ExtBoundCond).Space).TotalSurfArea;
-                                state.dataHeatBal->Space(surf.Space).SolarEnclosureNum = thisSideEnclosureNum;
-                                state.dataHeatBal->Space(state.dataSurface->Surface(surf.ExtBoundCond).Space).SolarEnclosureNum =
+                                    state.dataHeatBal->space(state.dataSurface->Surface(surf.ExtBoundCond).spaceNum).totalSurfArea;
+                                state.dataHeatBal->space(surf.spaceNum).solarEnclosureNum = thisSideEnclosureNum;
+                                state.dataHeatBal->space(state.dataSurface->Surface(surf.ExtBoundCond).spaceNum).solarEnclosureNum =
                                     otherSideEnclosureNum;
                             }
                         } else if (thisSideEnclosureNum == 0) {
                             // Other side is assigned, so use that one for both
                             thisSideEnclosureNum = otherSideEnclosureNum;
                             auto &thisEnclosure(Enclosures(thisSideEnclosureNum));
-                            thisEnclosure.SpaceNames.push_back(state.dataHeatBal->Space(surf.Space).Name);
-                            thisEnclosure.SpaceNums.push_back(surf.Space);
-                            thisEnclosure.FloorArea += state.dataHeatBal->Space(surf.Space).FloorArea;
+                            thisEnclosure.spaceNames.push_back(state.dataHeatBal->space(surf.spaceNum).Name);
+                            thisEnclosure.spaceNums.push_back(surf.spaceNum);
+                            thisEnclosure.FloorArea += state.dataHeatBal->space(surf.spaceNum).floorArea;
                             if (radiantSetup) {
-                                state.dataHeatBal->Space(surf.Space).RadiantEnclosureNum = thisSideEnclosureNum;
+                                state.dataHeatBal->space(surf.spaceNum).radiantEnclosureNum = thisSideEnclosureNum;
                             } else {
-                                thisEnclosure.ExtWindowArea += state.dataHeatBal->Space(surf.Space).ExtWindowArea;
-                                thisEnclosure.TotalSurfArea += state.dataHeatBal->Space(surf.Space).TotalSurfArea;
-                                state.dataHeatBal->Space(surf.Space).SolarEnclosureNum = thisSideEnclosureNum;
+                                thisEnclosure.ExtWindowArea += state.dataHeatBal->space(surf.spaceNum).extWindowArea;
+                                thisEnclosure.TotalSurfArea += state.dataHeatBal->space(surf.spaceNum).totalSurfArea;
+                                state.dataHeatBal->space(surf.spaceNum).solarEnclosureNum = thisSideEnclosureNum;
                             }
                         } else if (otherSideEnclosureNum == 0) {
                             // This side is assigned, so use that one for both
                             otherSideEnclosureNum = thisSideEnclosureNum;
                             auto &thisEnclosure(Enclosures(thisSideEnclosureNum));
-                            thisEnclosure.SpaceNames.push_back(state.dataHeatBal->Space(state.dataSurface->Surface(surf.ExtBoundCond).Space).Name);
-                            thisEnclosure.SpaceNums.push_back(state.dataSurface->Surface(surf.ExtBoundCond).Space);
-                            thisEnclosure.FloorArea += state.dataHeatBal->Space(state.dataSurface->Surface(surf.ExtBoundCond).Space).FloorArea;
+                            thisEnclosure.spaceNames.push_back(state.dataHeatBal->space(state.dataSurface->Surface(surf.ExtBoundCond).spaceNum).Name);
+                            thisEnclosure.spaceNums.push_back(state.dataSurface->Surface(surf.ExtBoundCond).spaceNum);
+                            thisEnclosure.FloorArea += state.dataHeatBal->space(state.dataSurface->Surface(surf.ExtBoundCond).spaceNum).floorArea;
                             if (radiantSetup) {
-                                state.dataHeatBal->Space(state.dataSurface->Surface(surf.ExtBoundCond).Space).RadiantEnclosureNum =
+                                state.dataHeatBal->space(state.dataSurface->Surface(surf.ExtBoundCond).spaceNum).radiantEnclosureNum =
                                     otherSideEnclosureNum;
                             } else {
                                 thisEnclosure.ExtWindowArea +=
-                                    state.dataHeatBal->Space(state.dataSurface->Surface(surf.ExtBoundCond).Space).ExtWindowArea;
+                                    state.dataHeatBal->space(state.dataSurface->Surface(surf.ExtBoundCond).spaceNum).extWindowArea;
                                 thisEnclosure.TotalSurfArea +=
-                                    state.dataHeatBal->Space(state.dataSurface->Surface(surf.ExtBoundCond).Space).TotalSurfArea;
-                                state.dataHeatBal->Space(state.dataSurface->Surface(surf.ExtBoundCond).Space).SolarEnclosureNum =
+                                    state.dataHeatBal->space(state.dataSurface->Surface(surf.ExtBoundCond).spaceNum).totalSurfArea;
+                                state.dataHeatBal->space(state.dataSurface->Surface(surf.ExtBoundCond).spaceNum).solarEnclosureNum =
                                     otherSideEnclosureNum;
                             }
                         } else if (thisSideEnclosureNum != otherSideEnclosureNum) {
                             // If both sides are already assigned to an enclosure, then merge the two enclosures
                             auto &thisEnclosure(Enclosures(thisSideEnclosureNum));
                             auto &otherEnclosure(Enclosures(otherSideEnclosureNum));
-                            for (const auto &zName : thisEnclosure.SpaceNames) {
-                                otherEnclosure.SpaceNames.push_back(zName);
+                            for (const auto &zName : thisEnclosure.spaceNames) {
+                                otherEnclosure.spaceNames.push_back(zName);
                             }
-                            for (const auto &zNum : thisEnclosure.SpaceNums) {
-                                otherEnclosure.SpaceNums.push_back(zNum);
+                            for (const auto &zNum : thisEnclosure.spaceNums) {
+                                otherEnclosure.spaceNums.push_back(zNum);
                                 if (radiantSetup) {
-                                    state.dataHeatBal->Space(zNum).RadiantEnclosureNum = otherSideEnclosureNum;
+                                    state.dataHeatBal->space(zNum).radiantEnclosureNum = otherSideEnclosureNum;
                                 } else {
-                                    state.dataHeatBal->Space(zNum).SolarEnclosureNum = otherSideEnclosureNum;
+                                    state.dataHeatBal->space(zNum).solarEnclosureNum = otherSideEnclosureNum;
                                 }
                             }
                             otherEnclosure.FloorArea += thisEnclosure.FloorArea;
@@ -14800,18 +14802,18 @@ namespace SurfaceGeometry {
                                 std::string saveName = Enclosures(enclNum).Name;
                                 Enclosures(enclNum) = Enclosures(enclNum + 1);
                                 Enclosures(enclNum).Name = saveName;
-                                for (auto zNum : thisEnclosure.SpaceNums) {
+                                for (auto zNum : thisEnclosure.spaceNums) {
                                     if (radiantSetup) {
-                                        state.dataHeatBal->Space(zNum).RadiantEnclosureNum = enclNum;
+                                        state.dataHeatBal->space(zNum).radiantEnclosureNum = enclNum;
                                     } else {
-                                        state.dataHeatBal->Space(zNum).SolarEnclosureNum = enclNum;
+                                        state.dataHeatBal->space(zNum).solarEnclosureNum = enclNum;
                                     }
                                 }
                             }
                             // Clear the last rad enclosure and reduce the total number of enclosures by 1
                             Enclosures(enclosureNum).Name.clear();
-                            Enclosures(enclosureNum).SpaceNames.clear();
-                            Enclosures(enclosureNum).SpaceNums.clear();
+                            Enclosures(enclosureNum).spaceNames.clear();
+                            Enclosures(enclosureNum).spaceNums.clear();
                             Enclosures(enclosureNum).FloorArea = 0;
                             Enclosures(enclosureNum).ExtWindowArea = 0;
                             Enclosures(enclosureNum).TotalSurfArea = 0;
@@ -14865,24 +14867,24 @@ namespace SurfaceGeometry {
             for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
                 int spaceEnclosureNum = 0;
                 if (radiantSetup) {
-                    spaceEnclosureNum = state.dataHeatBal->Space(spaceNum).RadiantEnclosureNum;
+                    spaceEnclosureNum = state.dataHeatBal->space(spaceNum).radiantEnclosureNum;
                 } else {
-                    spaceEnclosureNum = state.dataHeatBal->Space(spaceNum).SolarEnclosureNum;
+                    spaceEnclosureNum = state.dataHeatBal->space(spaceNum).solarEnclosureNum;
                 }
                 if (spaceEnclosureNum == 0) {
                     ++enclosureNum;
                     if (radiantSetup) {
-                        state.dataHeatBal->Space(spaceNum).RadiantEnclosureNum = enclosureNum;
+                        state.dataHeatBal->space(spaceNum).radiantEnclosureNum = enclosureNum;
                     } else {
-                        state.dataHeatBal->Space(spaceNum).SolarEnclosureNum = enclosureNum;
+                        state.dataHeatBal->space(spaceNum).solarEnclosureNum = enclosureNum;
                     }
                     auto &thisEnclosure(Enclosures(enclosureNum));
-                    thisEnclosure.Name = state.dataHeatBal->Space(spaceNum).Name;
-                    thisEnclosure.SpaceNames.push_back(state.dataHeatBal->Space(spaceNum).Name);
-                    thisEnclosure.SpaceNums.push_back(spaceNum);
-                    thisEnclosure.FloorArea = state.dataHeatBal->Space(spaceNum).FloorArea;
-                    thisEnclosure.ExtWindowArea = state.dataHeatBal->Space(spaceNum).ExtWindowArea;
-                    thisEnclosure.TotalSurfArea = state.dataHeatBal->Space(spaceNum).TotalSurfArea;
+                    thisEnclosure.Name = state.dataHeatBal->space(spaceNum).Name;
+                    thisEnclosure.spaceNames.push_back(state.dataHeatBal->space(spaceNum).Name);
+                    thisEnclosure.spaceNums.push_back(spaceNum);
+                    thisEnclosure.FloorArea = state.dataHeatBal->space(spaceNum).floorArea;
+                    thisEnclosure.ExtWindowArea = state.dataHeatBal->space(spaceNum).extWindowArea;
+                    thisEnclosure.TotalSurfArea = state.dataHeatBal->space(spaceNum).totalSurfArea;
                 }
             }
             if (radiantSetup) {
@@ -14894,16 +14896,16 @@ namespace SurfaceGeometry {
             // There are no grouped radiant air boundaries, assign each space to it's own radiant enclosure
             for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
                 auto &thisEnclosure(Enclosures(spaceNum));
-                thisEnclosure.Name = state.dataHeatBal->Space(spaceNum).Name;
-                thisEnclosure.SpaceNames.push_back(state.dataHeatBal->Space(spaceNum).Name);
-                thisEnclosure.SpaceNums.push_back(spaceNum);
-                thisEnclosure.FloorArea = state.dataHeatBal->Space(spaceNum).FloorArea;
+                thisEnclosure.Name = state.dataHeatBal->space(spaceNum).Name;
+                thisEnclosure.spaceNames.push_back(state.dataHeatBal->space(spaceNum).Name);
+                thisEnclosure.spaceNums.push_back(spaceNum);
+                thisEnclosure.FloorArea = state.dataHeatBal->space(spaceNum).floorArea;
                 if (radiantSetup) {
-                    state.dataHeatBal->Space(spaceNum).RadiantEnclosureNum = spaceNum;
+                    state.dataHeatBal->space(spaceNum).radiantEnclosureNum = spaceNum;
                 } else {
-                    state.dataHeatBal->Space(spaceNum).SolarEnclosureNum = spaceNum;
-                    thisEnclosure.ExtWindowArea = state.dataHeatBal->Space(spaceNum).ExtWindowArea;
-                    thisEnclosure.TotalSurfArea = state.dataHeatBal->Space(spaceNum).TotalSurfArea;
+                    state.dataHeatBal->space(spaceNum).solarEnclosureNum = spaceNum;
+                    thisEnclosure.ExtWindowArea = state.dataHeatBal->space(spaceNum).extWindowArea;
+                    thisEnclosure.TotalSurfArea = state.dataHeatBal->space(spaceNum).totalSurfArea;
                 }
             }
             if (radiantSetup) {
@@ -14915,18 +14917,18 @@ namespace SurfaceGeometry {
 
         // ToDo: For now, set the max and min enclosure numbers for each zone to be used in CalcInteriorRadExchange with ZoneToResimulate
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            for (int spaceNum : state.dataHeatBal->Zone(zoneNum).Spaces) {
+            for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
                 if (state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureFirst == -1) { // initial value
-                    state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureFirst = state.dataHeatBal->Space(spaceNum).RadiantEnclosureNum;
+                    state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureFirst = state.dataHeatBal->space(spaceNum).radiantEnclosureNum;
                 } else {
                     state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureFirst =
-                        min(state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureFirst, state.dataHeatBal->Space(spaceNum).RadiantEnclosureNum);
+                        min(state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureFirst, state.dataHeatBal->space(spaceNum).radiantEnclosureNum);
                 }
                 state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureLast =
-                    max(state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureLast, state.dataHeatBal->Space(spaceNum).RadiantEnclosureNum);
+                    max(state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureLast, state.dataHeatBal->space(spaceNum).radiantEnclosureNum);
                 // TODO: For daylighting, set the zone solar enclosure number to the first space's number
                 if (state.dataHeatBal->Zone(zoneNum).ZoneFirstSpaceSolEnclosure == 0) {
-                    state.dataHeatBal->Zone(zoneNum).ZoneFirstSpaceSolEnclosure = state.dataHeatBal->Space(spaceNum).SolarEnclosureNum;
+                    state.dataHeatBal->Zone(zoneNum).ZoneFirstSpaceSolEnclosure = state.dataHeatBal->space(spaceNum).solarEnclosureNum;
                 }
             }
             assert(state.dataHeatBal->Zone(zoneNum).ZoneRadEnclosureFirst != -1);

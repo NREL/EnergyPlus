@@ -106,11 +106,11 @@ protected:
         int NumOfSurfaces = 2;
         state->dataRoomAirMod->RoomAirflowNetworkZoneInfo.allocate(state->dataGlobal->NumOfZones);
         state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
-        state->dataHeatBal->Space.allocate(state->dataGlobal->numSpaces);
+        state->dataHeatBal->space.allocate(state->dataGlobal->numSpaces);
         state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
         state->dataZoneEquip->ZoneEquipList.allocate(state->dataGlobal->NumOfZones);
         state->dataHeatBal->ZoneIntGain.allocate(state->dataGlobal->NumOfZones);
-        state->dataHeatBal->SpaceIntGainDevices.allocate(state->dataGlobal->numSpaces);
+        state->dataHeatBal->spaceIntGainDevices.allocate(state->dataGlobal->numSpaces);
         state->dataLoopNodes->NodeID.allocate(state->dataLoopNodes->NumOfNodes);
         state->dataLoopNodes->Node.allocate(state->dataLoopNodes->NumOfNodes);
         state->dataSurface->Surface.allocate(NumOfSurfaces);
@@ -264,14 +264,14 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataHeatBal->Zone(ZoneNum).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(ZoneNum).HTSurfaceLast = 2;
     state->dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpMoist = 0;
-    state->dataHeatBal->Zone(ZoneNum).Spaces.emplace_back(1);
+    state->dataHeatBal->Zone(ZoneNum).spaces.emplace_back(1);
 
-    state->dataHeatBal->SpaceIntGainDevices(ZoneNum).NumberOfDevices = 1;
-    state->dataHeatBal->SpaceIntGainDevices(ZoneNum).Device.allocate(state->dataHeatBal->SpaceIntGainDevices(1).NumberOfDevices);
-    state->dataHeatBal->SpaceIntGainDevices(ZoneNum).Device(1).CompObjectName = "PEOPLE";
-    state->dataHeatBal->SpaceIntGainDevices(ZoneNum).Device(1).CompTypeOfNum = IntGainTypeOf_People;
-    state->dataHeatBal->SpaceIntGainDevices(ZoneNum).Device(1).ConvectGainRate = 300.0;
-    state->dataHeatBal->SpaceIntGainDevices(ZoneNum).Device(1).LatentGainRate = 200.0;
+    state->dataHeatBal->spaceIntGainDevices(ZoneNum).numberOfDevices = 1;
+    state->dataHeatBal->spaceIntGainDevices(ZoneNum).device.allocate(state->dataHeatBal->spaceIntGainDevices(1).numberOfDevices);
+    state->dataHeatBal->spaceIntGainDevices(ZoneNum).device(1).CompObjectName = "PEOPLE";
+    state->dataHeatBal->spaceIntGainDevices(ZoneNum).device(1).CompTypeOfNum = IntGainTypeOf_People;
+    state->dataHeatBal->spaceIntGainDevices(ZoneNum).device(1).ConvectGainRate = 300.0;
+    state->dataHeatBal->spaceIntGainDevices(ZoneNum).device(1).LatentGainRate = 200.0;
 
     state->dataSurface->Surface(1).HeatTransSurf = true;
     state->dataSurface->Surface(2).HeatTransSurf = true;

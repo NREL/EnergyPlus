@@ -339,27 +339,27 @@ namespace DataHeatBalance {
     struct SpaceData
     {
         std::string Name = "";             // Space name
-        int ZoneNum = 0;                   // Pointer to Zone wich contains this space
-        Real64 UserEnteredFloorArea = 0.0; // User input floor area for this space
-        std::string SpaceType = "General"; // Space type tag
-        int SpaceTypeNum = 0;              // Points to spaceType for this space
-        EPVector<std::string> Tags;        // Optional tags for reporting
-        EPVector<int> Surfaces;            // Pointers to surfaces in this space
-        Real64 CalcFloorArea = 0.0;        // Calculated floor area used for this space
-        Real64 FloorArea = 0.0;            // Floor area used for this space
-        bool HasFloor = false;             // Has "Floor" surface
-        Real64 ExtWindowArea = 0.0;        // Exterior Window Area for Zone
-        Real64 TotalSurfArea = 0.0;        // Total surface area for Zone
-        int RadiantEnclosureNum = 0;       // Radiant exchange enclosure this space belongs to
-        int SolarEnclosureNum = 0;         // Solar distribution enclosure this space belongs to
+        int zoneNum = 0;                   // Pointer to Zone wich contains this space
+        Real64 userEnteredFloorArea = 0.0; // User input floor area for this space
+        std::string spaceType = "General"; // Space type tag
+        int spaceTypeNum = 0;              // Points to spaceType for this space
+        EPVector<std::string> tags;        // Optional tags for reporting
+        EPVector<int> surfaces;            // Pointers to surfaces in this space
+        Real64 calcFloorArea = 0.0;        // Calculated floor area used for this space
+        Real64 floorArea = 0.0;            // Floor area used for this space
+        bool hasFloor = false;             // Has "Floor" surface
+        Real64 extWindowArea = 0.0;        // Exterior Window Area for Zone
+        Real64 totalSurfArea = 0.0;        // Total surface area for Zone
+        int radiantEnclosureNum = 0;       // Radiant exchange enclosure this space belongs to
+        int solarEnclosureNum = 0;         // Solar distribution enclosure this space belongs to
     };
 
     struct SpaceListData
     {
         std::string Name = "";                          // Space List name
-        int NumOfSpaces = 0;                            // Number of spaces in the list
-        std::string::size_type MaxSpaceNameLength = 0u; // Max Name length of Spaces in the list
-        EPVector<int> Spaces;                           // Pointers to Spaces in the list
+        int numOfSpaces = 0;                            // Number of spaces in the list
+        std::string::size_type maxSpaceNameLength = 0u; // Max Name length of Spaces in the list
+        EPVector<int> spaces;                           // Pointers to Spaces in the list
     };
 
     struct ZoneData
@@ -505,9 +505,9 @@ namespace DataHeatBalance {
         Real64 delta_HumRat;                          // Indoor and outdoor humidity ratio delta
 
         // Spaces
-        bool AnySurfacesWithoutSpace; // True if any surfaces in a zone do not have a space assigned in input
-        bool AnySurfacesWithSpace;    // True if any surfaces in a zone have a space assigned in input
-        EPVector<int> Spaces;         // Pointers to spaces in this zone
+        bool anySurfacesWithoutSpace; // True if any surfaces in a zone do not have a space assigned in input
+        bool anySurfacesWithSpace;    // True if any surfaces in a zone have a space assigned in input
+        EPVector<int> spaces;         // Pointers to spaces in this zone
 
         // Default Constructor
         ZoneData()
@@ -539,7 +539,7 @@ namespace DataHeatBalance {
               ZonePeopleActivityLevel(0.0), ZonePeopleSensibleHeatFraction(0.0), ZonePeopleRadiantHeatFraction(0.0), ZoneVolCapMultpSens(1.0),
               ZoneVolCapMultpMoist(1.0), ZoneVolCapMultpCO2(1.0), ZoneVolCapMultpGenContam(1.0), ZoneVolCapMultpSensHM(1.0),
               ZoneVolCapMultpSensHMSum(0.0), ZoneVolCapMultpSensHMCountSum(0.0), ZoneVolCapMultpSensHMAverage(1.0), MCPIHM(0.0),
-              InfilOAAirChangeRateHM(0.0), NumOccHM(0.0), delta_T(0.0), delta_HumRat(0.0), AnySurfacesWithoutSpace(false), AnySurfacesWithSpace(false)
+              InfilOAAirChangeRateHM(0.0), NumOccHM(0.0), delta_T(0.0), delta_HumRat(0.0), anySurfacesWithoutSpace(false), anySurfacesWithSpace(false)
         {
         }
 
@@ -585,10 +585,10 @@ namespace DataHeatBalance {
         int NumOfZones = 0;
         int StartPtr = 0;
         bool ZoneListActive = false;
-        int SpaceOrSpaceListPtr = 0;
-        int NumOfSpaces = 0;
-        int SpaceStartPtr = 0;
-        bool SpaceListActive = false;
+        int spaceOrSpaceListPtr = 0;
+        int numOfSpaces = 0;
+        int spaceStartPtr = 0;
+        bool spaceListActive = false;
     };
 
     struct PeopleData
@@ -596,8 +596,8 @@ namespace DataHeatBalance {
         // Members
         std::string Name;            // PEOPLE object name
         int ZonePtr;                 // Pointer to the zone number for this people statement
-        EPVector<int> SpacePtrs;     // Pointers to space numbers for this people statement
-        EPVector<Real64> SpaceFracs; // Fraction of total gains applied to each space
+        EPVector<int> spacePtrs;     // Pointers to space numbers for this people statement
+        EPVector<Real64> spaceFracs; // Fraction of total gains applied to each space
         Real64 NumberOfPeople;       // Maximum number of people for this statement
         int NumberOfPeoplePtr;       // Pointer to schedule for number of people
         bool EMSPeopleOn;            // EMS actuating number of people if .TRUE.
@@ -677,8 +677,8 @@ namespace DataHeatBalance {
         // Members
         std::string Name;            // LIGHTS object name
         int ZonePtr;                 // Which zone lights are in
-        EPVector<int> SpacePtrs;     // Pointers to space numbers for this object
-        EPVector<Real64> SpaceFracs; // Fraction of total gains applied to each space
+        EPVector<int> spacePtrs;     // Pointers to space numbers for this object
+        EPVector<Real64> spaceFracs; // Fraction of total gains applied to each space
         int SchedPtr;                // Schedule for lights
         Real64 DesignLevel;          // design level for lights [W]
         bool EMSLightsOn;            // EMS actuating Lighting power if .TRUE.
@@ -730,8 +730,8 @@ namespace DataHeatBalance {
         // Members
         std::string Name;            // EQUIPMENT object name
         int ZonePtr;                 // Which zone internal gain is in
-        EPVector<int> SpacePtrs;     // Pointers to space numbers for this object
-        EPVector<Real64> SpaceFracs; // Fraction of total gains applied to each space
+        EPVector<int> spacePtrs;     // Pointers to space numbers for this object
+        EPVector<Real64> spaceFracs; // Fraction of total gains applied to each space
         int SchedPtr;                // Schedule for internal gain
         Real64 DesignLevel;          // design level for internal gain [W]
         bool EMSZoneEquipOverrideOn; // EMS actuating equipment power if .TRUE.
@@ -779,8 +779,8 @@ namespace DataHeatBalance {
         // Members
         std::string Name;                  // EQUIPMENT object name
         int ZonePtr;                       // Which zone internal gain is in
-        EPVector<int> SpacePtrs;           // Pointers to space numbers for this object
-        EPVector<Real64> SpaceFracs;       // Fraction of total gains applied to each space
+        EPVector<int> spacePtrs;           // Pointers to space numbers for this object
+        EPVector<Real64> spaceFracs;       // Fraction of total gains applied to each space
         bool FlowControlWithApproachTemps; // True if using supply and return approach temperature for ITE object.
         Real64 DesignTotalPower;           // Design level for internal gain [W]
         Real64 NomMinDesignLevel;          // Nominal Minimum Design Level (min sch X design level)
@@ -883,8 +883,8 @@ namespace DataHeatBalance {
         // Members
         std::string Name; // BASEBOARD HEAT object name
         int ZonePtr;
-        EPVector<int> SpacePtrs;     // Pointers to space numbers for this object
-        EPVector<Real64> SpaceFracs; // Fraction of total gains applied to each space
+        EPVector<int> spacePtrs;     // Pointers to space numbers for this object
+        EPVector<Real64> spaceFracs; // Fraction of total gains applied to each space
         int SchedPtr;
         Real64 CapatLowTemperature;
         Real64 LowTemperature;
@@ -1159,7 +1159,7 @@ namespace DataHeatBalance {
         std::string CompObjectType;         // device object class name
         std::string CompObjectName;         // device user unique name
         int CompTypeOfNum;                  // type of internal gain device identifier
-        Real64 SpaceGainFrac;               // Fraction of gain value assigned to this Space (because gain rate might be for an entire zone)
+        Real64 spaceGainFrac;               // Fraction of gain value assigned to this Space (because gain rate might be for an entire zone)
         Real64 *PtrConvectGainRate;         // POINTER to value of convection heat gain rate for device, watts
         Real64 ConvectGainRate;             // current timestep value of convection heat gain rate for device, watts
         Real64 *PtrReturnAirConvGainRate;   // POINTER to value of return air convection heat gain rate for device, W
@@ -1178,7 +1178,7 @@ namespace DataHeatBalance {
 
         // Default Constructor
         GenericComponentZoneIntGainStruct()
-            : CompTypeOfNum(0), SpaceGainFrac(1.0), PtrConvectGainRate(nullptr), ConvectGainRate(0.0), PtrReturnAirConvGainRate(nullptr),
+            : CompTypeOfNum(0), spaceGainFrac(1.0), PtrConvectGainRate(nullptr), ConvectGainRate(0.0), PtrReturnAirConvGainRate(nullptr),
               ReturnAirConvGainRate(0.0), PtrRadiantGainRate(nullptr), RadiantGainRate(0.0), PtrLatentGainRate(nullptr), LatentGainRate(0.0),
               PtrReturnAirLatentGainRate(nullptr), ReturnAirLatentGainRate(0.0), PtrCarbonDioxideGainRate(nullptr), CarbonDioxideGainRate(0.0),
               PtrGenericContamGainRate(nullptr), GenericContamGainRate(0.0), ReturnAirNodeNum(0)
@@ -1235,9 +1235,9 @@ namespace DataHeatBalance {
 
     struct SpaceIntGainDeviceData
     {
-        int NumberOfDevices = 0;
-        int MaxNumberOfDevices = 0;
-        Array1D<GenericComponentZoneIntGainStruct> Device;
+        int numberOfDevices = 0;
+        int maxNumberOfDevices = 0;
+        Array1D<GenericComponentZoneIntGainStruct> device;
     };
 
     struct WindowBlindProperties
@@ -2242,13 +2242,13 @@ struct HeatBalanceData : BaseGlobalStruct
     EPVector<DataHeatBalance::ZonePreDefRepType> ZonePreDefRep;
     DataHeatBalance::ZonePreDefRepType BuildingPreDefRep;
     EPVector<DataHeatBalance::SpaceZoneSimData> ZoneIntGain;
-    EPVector<DataHeatBalance::SpaceZoneSimData> SpaceIntGain;
-    EPVector<DataHeatBalance::SpaceIntGainDeviceData> SpaceIntGainDevices;
+    EPVector<DataHeatBalance::SpaceZoneSimData> spaceIntGain;
+    EPVector<DataHeatBalance::SpaceIntGainDeviceData> spaceIntGainDevices;
     EPVector<DataHeatBalance::GapSupportPillar> SupportPillar;
     EPVector<DataHeatBalance::GapDeflectionState> DeflectionState;
     EPVector<DataHeatBalance::SpectralDataProperties> SpectralData;
-    EPVector<DataHeatBalance::SpaceData> Space;
-    EPVector<DataHeatBalance::SpaceListData> SpaceList;
+    EPVector<DataHeatBalance::SpaceData> space;
+    EPVector<DataHeatBalance::SpaceListData> spaceList;
     EPVector<DataHeatBalance::ZoneData> Zone;
     EPVector<DataHeatBalance::ZoneListData> ZoneList;
     EPVector<DataHeatBalance::ZoneGroupData> ZoneGroup;
@@ -2292,7 +2292,7 @@ struct HeatBalanceData : BaseGlobalStruct
     EPVector<DataHeatBalance::GlobalInternalGainMiscObject> InfiltrationObjects;
     EPVector<DataHeatBalance::GlobalInternalGainMiscObject> VentilationObjects;
     EPVector<DataHeatBalance::ZoneReportVars> ZnRpt;
-    EPVector<DataHeatBalance::ZoneReportVars> SpaceRpt;
+    EPVector<DataHeatBalance::ZoneReportVars> spaceRpt;
     EPVector<DataHeatBalance::ZoneMassConservationData> MassConservation;
     DataHeatBalance::ZoneAirMassFlowConservation ZoneAirMassFlow;
     EPVector<DataHeatBalance::ZoneLocalEnvironmentData> ZoneLocalEnvironment;
@@ -2516,13 +2516,13 @@ struct HeatBalanceData : BaseGlobalStruct
         this->ZonePreDefRep.deallocate();
         this->BuildingPreDefRep = DataHeatBalance::ZonePreDefRepType();
         this->ZoneIntGain.deallocate();
-        this->SpaceIntGain.deallocate();
-        this->SpaceIntGainDevices.deallocate();
+        this->spaceIntGain.deallocate();
+        this->spaceIntGainDevices.deallocate();
         this->SupportPillar.deallocate();
         this->DeflectionState.deallocate();
         this->SpectralData.deallocate();
-        this->Space.deallocate();
-        this->SpaceList.deallocate();
+        this->space.deallocate();
+        this->spaceList.deallocate();
         this->Zone.deallocate();
         this->ZoneList.deallocate();
         this->ZoneGroup.deallocate();
@@ -2566,7 +2566,7 @@ struct HeatBalanceData : BaseGlobalStruct
         this->InfiltrationObjects.deallocate();
         this->VentilationObjects.deallocate();
         this->ZnRpt.deallocate();
-        this->SpaceRpt.deallocate();
+        this->spaceRpt.deallocate();
         this->MassConservation.deallocate();
         this->ZoneAirMassFlow = DataHeatBalance::ZoneAirMassFlowConservation();
         this->ZoneLocalEnvironment.deallocate();

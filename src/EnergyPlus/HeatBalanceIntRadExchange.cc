@@ -507,10 +507,10 @@ namespace HeatBalanceIntRadExchange {
                 }
             }
             int numEnclosureSurfaces = 0;
-            for (int spaceNum : thisEnclosure.SpaceNums) {
+            for (int spaceNum : thisEnclosure.spaceNums) {
                 // Note that Space.Surfaces only includes HT surfs, see SurfaceGeometry::CreateMissingSpaces
                 // But it also includes air boundary surfaces which need to be excluded here
-                for (int surfNum : state.dataHeatBal->Space(spaceNum).Surfaces) {
+                for (int surfNum : state.dataHeatBal->space(spaceNum).surfaces) {
                     if (state.dataSurface->Surface(surfNum).IsAirBoundarySurf) continue;
                     ++numEnclosureSurfaces;
                 }
@@ -533,15 +533,15 @@ namespace HeatBalanceIntRadExchange {
 
             // Initialize the surface pointer array
             int enclosureSurfNum = 0;
-            for (int const spaceNum : thisEnclosure.SpaceNums) {
+            for (int const spaceNum : thisEnclosure.spaceNums) {
                 int priorZoneTotEnclSurfs = enclosureSurfNum;
-                for (int surfNum : state.dataHeatBal->Space(spaceNum).Surfaces) {
+                for (int surfNum : state.dataHeatBal->space(spaceNum).surfaces) {
                     if (state.dataSurface->Surface(surfNum).IsAirBoundarySurf) continue;
                     ++enclosureSurfNum;
                     thisEnclosure.SurfacePtr(enclosureSurfNum) = surfNum;
                 }
                 // Store SurfaceReportNums to maintain original reporting order
-                for (int surfNum : state.dataHeatBal->Space(spaceNum).Surfaces) {
+                for (int surfNum : state.dataHeatBal->space(spaceNum).surfaces) {
                     for (int enclSNum = priorZoneTotEnclSurfs + 1; enclSNum <= enclosureSurfNum; ++enclSNum) {
                         if (thisEnclosure.SurfacePtr(enclSNum) == state.dataSurface->AllSurfaceListReportOrder[surfNum - 1]) {
                             thisEnclosure.SurfaceReportNums.push_back(enclSNum);
@@ -621,7 +621,7 @@ namespace HeatBalanceIntRadExchange {
                                thisEnclosure.Area,
                                thisEnclosure.F,
                                thisEnclosure.Name,
-                               thisEnclosure.SpaceNums,
+                               thisEnclosure.spaceNums,
                                CheckValue1,
                                CheckValue2,
                                FinalCheckValue,
@@ -819,10 +819,10 @@ namespace HeatBalanceIntRadExchange {
                           "Convergence");
             }
             int numEnclosureSurfaces = 0;
-            for (int spaceNum : thisEnclosure.SpaceNums) {
+            for (int spaceNum : thisEnclosure.spaceNums) {
                 // Note that Space.Surfaces only includes HT surfs, see SurfaceGeometry::CreateMissingSpaces
                 // But it also includes air boundary surfaces which need to be excluded here
-                for (int surfNum : state.dataHeatBal->Space(spaceNum).Surfaces) {
+                for (int surfNum : state.dataHeatBal->space(spaceNum).surfaces) {
                     if (state.dataSurface->Surface(surfNum).IsAirBoundarySurf) continue;
                     ++numEnclosureSurfaces;
                 }
@@ -840,9 +840,9 @@ namespace HeatBalanceIntRadExchange {
 
             // Initialize the surface pointer array
             int enclosureSurfNum = 0;
-            for (int const spaceNum : thisEnclosure.SpaceNums) {
+            for (int const spaceNum : thisEnclosure.spaceNums) {
                 int priorZoneTotEnclSurfs = enclosureSurfNum;
-                for (int surfNum : state.dataHeatBal->Space(spaceNum).Surfaces) {
+                for (int surfNum : state.dataHeatBal->space(spaceNum).surfaces) {
                     if (state.dataSurface->Surface(surfNum).IsAirBoundarySurf) continue;
                     ++enclosureSurfNum;
                     thisEnclosure.SurfacePtr(enclosureSurfNum) = surfNum;
@@ -852,7 +852,7 @@ namespace HeatBalanceIntRadExchange {
                     state.dataSurface->Surface(surfNum).RadEnclIndex = enclosureNum; // Radiant and Solar enclosures are parallel for now
                 }
                 // Store SurfaceReportNums to maintain original reporting order
-                for (int surfNum : state.dataHeatBal->Space(spaceNum).Surfaces) {
+                for (int surfNum : state.dataHeatBal->space(spaceNum).surfaces) {
                     for (int enclSNum = priorZoneTotEnclSurfs + 1; enclSNum <= enclosureSurfNum; ++enclSNum) {
                         if (thisEnclosure.SurfacePtr(enclSNum) == state.dataSurface->AllSurfaceListReportOrder[surfNum - 1]) {
                             thisEnclosure.SurfaceReportNums.push_back(enclSNum);
@@ -922,7 +922,7 @@ namespace HeatBalanceIntRadExchange {
                            thisEnclosure.Area,
                            thisEnclosure.F,
                            thisEnclosure.Name,
-                           thisEnclosure.SpaceNums,
+                           thisEnclosure.spaceNums,
                            CheckValue1,
                            CheckValue2,
                            FinalCheckValue,
@@ -1167,19 +1167,19 @@ namespace HeatBalanceIntRadExchange {
             if (enclMatchFound) continue; // We're done with this instance
             // Find matching SpaceList name
             int spaceListNum =
-                UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase(thisSpaceOrSpaceListName), state.dataHeatBal->SpaceList);
+                UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase(thisSpaceOrSpaceListName), state.dataHeatBal->spaceList);
             if (spaceListNum > 0) {
                 // Look for radiant enclosure with same list of spaces
-                auto &thisSpaceList(state.dataHeatBal->SpaceList(spaceListNum));
+                auto &thisSpaceList(state.dataHeatBal->spaceList(spaceListNum));
                 for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfRadiantEnclosures; ++enclosureNum) {
                     auto &thisEnclosure(state.dataViewFactor->EnclRadInfo(enclosureNum));
                     bool anySpaceNotFound = false;
                     // If the number of enclosure spaces is not the same as the number of spacelist space, go to the next enclosure
-                    if (thisSpaceList.Spaces.size() != thisEnclosure.SpaceNums.size()) continue;
-                    for (int sListSpaceNum : thisSpaceList.Spaces) {
+                    if (thisSpaceList.spaces.size() != thisEnclosure.spaceNums.size()) continue;
+                    for (int sListSpaceNum : thisSpaceList.spaces) {
                         // Search for matching spaces
                         bool thisSpaceFound = false;
-                        for (int enclSpaceNum : thisEnclosure.SpaceNums) {
+                        for (int enclSpaceNum : thisEnclosure.spaceNums) {
                             if (enclSpaceNum == sListSpaceNum) {
                                 thisSpaceFound = true;
                                 break;
@@ -1205,11 +1205,11 @@ namespace HeatBalanceIntRadExchange {
                         auto &thisEnclosure(state.dataViewFactor->EnclSolInfo(enclosureNum));
                         bool anySpaceNotFound = false;
                         // If the number of enclosure spaces is not the same as the number of spacelist space, go to the next enclosure
-                        if (thisSpaceList.Spaces.size() != thisEnclosure.SpaceNums.size()) continue;
-                        for (int sListSpaceNum : thisSpaceList.Spaces) {
+                        if (thisSpaceList.spaces.size() != thisEnclosure.spaceNums.size()) continue;
+                        for (int sListSpaceNum : thisSpaceList.spaces) {
                             // Search for matching spaces
                             bool thisSpaceFound = false;
-                            for (int enclSpaceNum : thisEnclosure.SpaceNums) {
+                            for (int enclSpaceNum : thisEnclosure.spaceNums) {
                                 if (enclSpaceNum == sListSpaceNum) {
                                     thisSpaceFound = true;
                                     break;
@@ -1641,7 +1641,7 @@ namespace HeatBalanceIntRadExchange {
             FinalCheckValue = FixedCheckValue = std::abs(RowSum - N);
             F = FixedF;
             for (int spaceNum : spaceNums) {
-                state.dataHeatBal->Zone(state.dataHeatBal->Space(spaceNum).ZoneNum).EnforcedReciprocity = true;
+                state.dataHeatBal->Zone(state.dataHeatBal->space(spaceNum).zoneNum).EnforcedReciprocity = true;
             }
             return; // Do not iterate, stop with reciprocity satisfied.
 

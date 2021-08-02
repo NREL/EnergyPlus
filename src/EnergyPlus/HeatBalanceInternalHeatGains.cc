@@ -73,9 +73,9 @@ void SetupZoneInternalGain(EnergyPlusData &state,
 {
     // Distribute zone internal gain across all spaces in the zone weighted by floor area
     Real64 gainFrac = 1.0;
-    for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).Spaces) {
-        if (state.dataHeatBal->Zone(ZoneNum).Spaces.size() > 1) {
-            gainFrac = state.dataHeatBal->Space(spaceNum).FloorArea / state.dataHeatBal->Zone(ZoneNum).FloorArea;
+    for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaces) {
+        if (state.dataHeatBal->Zone(ZoneNum).spaces.size() > 1) {
+            gainFrac = state.dataHeatBal->space(spaceNum).floorArea / state.dataHeatBal->Zone(ZoneNum).FloorArea;
         }
         SetupSpaceInternalGain(state,
                                spaceNum,
@@ -94,8 +94,8 @@ void SetupZoneInternalGain(EnergyPlusData &state,
     }
 }
 void SetupSpaceInternalGain(EnergyPlusData &state,
-                            int const SpaceNum,
-                            Real64 SpaceGainFraction,            // Fraction of gain value assigned to this space
+                            int const spaceNum,
+                            Real64 spaceGainFraction,            // Fraction of gain value assigned to this space
                             std::string const &cComponentObject, // object class name for device contributing internal gain
                             std::string const &cComponentName,   // user unique name for device
                             int const IntGainComp_TypeOfNum,
@@ -148,12 +148,12 @@ void SetupSpaceInternalGain(EnergyPlusData &state,
         return;
     }
 
-    auto &thisIntGain = state.dataHeatBal->SpaceIntGainDevices(SpaceNum);
-    for (IntGainsNum = 1; IntGainsNum <= thisIntGain.NumberOfDevices; ++IntGainsNum) {
-        if ((thisIntGain.Device(IntGainsNum).CompObjectType == UpperCaseObjectType) &&
-            (thisIntGain.Device(IntGainsNum).CompTypeOfNum == IntGainComp_TypeOfNum)) {
+    auto &thisIntGain = state.dataHeatBal->spaceIntGainDevices(spaceNum);
+    for (IntGainsNum = 1; IntGainsNum <= thisIntGain.numberOfDevices; ++IntGainsNum) {
+        if ((thisIntGain.device(IntGainsNum).CompObjectType == UpperCaseObjectType) &&
+            (thisIntGain.device(IntGainsNum).CompTypeOfNum == IntGainComp_TypeOfNum)) {
             FoundIntGainsType = true;
-            if (thisIntGain.Device(IntGainsNum).CompObjectName == UpperCaseObjectName) {
+            if (thisIntGain.device(IntGainsNum).CompObjectName == UpperCaseObjectName) {
                 FoundDuplicate = true;
                 break;
             }
@@ -168,58 +168,58 @@ void SetupSpaceInternalGain(EnergyPlusData &state,
         return;
     }
 
-    if (thisIntGain.NumberOfDevices == 0) {
-        thisIntGain.Device.allocate(DeviceAllocInc);
-        thisIntGain.MaxNumberOfDevices = DeviceAllocInc;
+    if (thisIntGain.numberOfDevices == 0) {
+        thisIntGain.device.allocate(DeviceAllocInc);
+        thisIntGain.maxNumberOfDevices = DeviceAllocInc;
     } else {
-        if (thisIntGain.NumberOfDevices + 1 > thisIntGain.MaxNumberOfDevices) {
-            thisIntGain.Device.redimension(thisIntGain.MaxNumberOfDevices += DeviceAllocInc);
+        if (thisIntGain.numberOfDevices + 1 > thisIntGain.maxNumberOfDevices) {
+            thisIntGain.device.redimension(thisIntGain.maxNumberOfDevices += DeviceAllocInc);
         }
     }
-    ++thisIntGain.NumberOfDevices;
+    ++thisIntGain.numberOfDevices;
 
-    thisIntGain.Device(thisIntGain.NumberOfDevices).CompObjectType = UpperCaseObjectType;
-    thisIntGain.Device(thisIntGain.NumberOfDevices).CompObjectName = UpperCaseObjectName;
-    thisIntGain.Device(thisIntGain.NumberOfDevices).CompTypeOfNum = IntGainComp_TypeOfNum;
-    thisIntGain.Device(thisIntGain.NumberOfDevices).SpaceGainFrac = SpaceGainFraction;
+    thisIntGain.device(thisIntGain.numberOfDevices).CompObjectType = UpperCaseObjectType;
+    thisIntGain.device(thisIntGain.numberOfDevices).CompObjectName = UpperCaseObjectName;
+    thisIntGain.device(thisIntGain.numberOfDevices).CompTypeOfNum = IntGainComp_TypeOfNum;
+    thisIntGain.device(thisIntGain.numberOfDevices).spaceGainFrac = spaceGainFraction;
 
     // note pointer assignments in code below!
     if (ConvectionGainRate) {
-        thisIntGain.Device(thisIntGain.NumberOfDevices).PtrConvectGainRate = ConvectionGainRate;
+        thisIntGain.device(thisIntGain.numberOfDevices).PtrConvectGainRate = ConvectionGainRate;
     } else {
-        thisIntGain.Device(thisIntGain.NumberOfDevices).PtrConvectGainRate = &state.dataHeatBal->zeroPointerVal;
+        thisIntGain.device(thisIntGain.numberOfDevices).PtrConvectGainRate = &state.dataHeatBal->zeroPointerVal;
     }
     if (ReturnAirConvectionGainRate) {
-        thisIntGain.Device(thisIntGain.NumberOfDevices).PtrReturnAirConvGainRate = ReturnAirConvectionGainRate;
+        thisIntGain.device(thisIntGain.numberOfDevices).PtrReturnAirConvGainRate = ReturnAirConvectionGainRate;
     } else {
-        thisIntGain.Device(thisIntGain.NumberOfDevices).PtrReturnAirConvGainRate = &state.dataHeatBal->zeroPointerVal;
+        thisIntGain.device(thisIntGain.numberOfDevices).PtrReturnAirConvGainRate = &state.dataHeatBal->zeroPointerVal;
     }
     if (ThermalRadiationGainRate) {
-        thisIntGain.Device(thisIntGain.NumberOfDevices).PtrRadiantGainRate = ThermalRadiationGainRate;
+        thisIntGain.device(thisIntGain.numberOfDevices).PtrRadiantGainRate = ThermalRadiationGainRate;
     } else {
-        thisIntGain.Device(thisIntGain.NumberOfDevices).PtrRadiantGainRate = &state.dataHeatBal->zeroPointerVal;
+        thisIntGain.device(thisIntGain.numberOfDevices).PtrRadiantGainRate = &state.dataHeatBal->zeroPointerVal;
     }
     if (LatentGainRate) {
-        thisIntGain.Device(thisIntGain.NumberOfDevices).PtrLatentGainRate = LatentGainRate;
+        thisIntGain.device(thisIntGain.numberOfDevices).PtrLatentGainRate = LatentGainRate;
     } else {
-        thisIntGain.Device(thisIntGain.NumberOfDevices).PtrLatentGainRate = &state.dataHeatBal->zeroPointerVal;
+        thisIntGain.device(thisIntGain.numberOfDevices).PtrLatentGainRate = &state.dataHeatBal->zeroPointerVal;
     }
     if (ReturnAirLatentGainRate) {
-        thisIntGain.Device(thisIntGain.NumberOfDevices).PtrReturnAirLatentGainRate = ReturnAirLatentGainRate;
+        thisIntGain.device(thisIntGain.numberOfDevices).PtrReturnAirLatentGainRate = ReturnAirLatentGainRate;
     } else {
-        thisIntGain.Device(thisIntGain.NumberOfDevices).PtrReturnAirLatentGainRate = &state.dataHeatBal->zeroPointerVal;
+        thisIntGain.device(thisIntGain.numberOfDevices).PtrReturnAirLatentGainRate = &state.dataHeatBal->zeroPointerVal;
     }
     if (CarbonDioxideGainRate) {
-        thisIntGain.Device(thisIntGain.NumberOfDevices).PtrCarbonDioxideGainRate = CarbonDioxideGainRate;
+        thisIntGain.device(thisIntGain.numberOfDevices).PtrCarbonDioxideGainRate = CarbonDioxideGainRate;
     } else {
-        thisIntGain.Device(thisIntGain.NumberOfDevices).PtrCarbonDioxideGainRate = &state.dataHeatBal->zeroPointerVal;
+        thisIntGain.device(thisIntGain.numberOfDevices).PtrCarbonDioxideGainRate = &state.dataHeatBal->zeroPointerVal;
     }
     if (GenericContamGainRate) {
-        thisIntGain.Device(thisIntGain.NumberOfDevices).PtrGenericContamGainRate = GenericContamGainRate;
+        thisIntGain.device(thisIntGain.numberOfDevices).PtrGenericContamGainRate = GenericContamGainRate;
     } else {
-        thisIntGain.Device(thisIntGain.NumberOfDevices).PtrGenericContamGainRate = &state.dataHeatBal->zeroPointerVal;
+        thisIntGain.device(thisIntGain.numberOfDevices).PtrGenericContamGainRate = &state.dataHeatBal->zeroPointerVal;
     }
-    thisIntGain.Device(thisIntGain.NumberOfDevices).ReturnAirNodeNum = RetNodeNum;
+    thisIntGain.device(thisIntGain.numberOfDevices).ReturnAirNodeNum = RetNodeNum;
 }
 
 } // namespace EnergyPlus

@@ -3534,8 +3534,8 @@ void InitIntSolarDistribution(EnergyPlusData &state)
     // Note: If sun is not up, QS is only internal gains
     for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
         Real64 sumSpaceQLTSW = 0.0;
-        for (int spaceNum : state.dataViewFactor->EnclSolInfo(enclosureNum).SpaceNums) {
-            sumSpaceQLTSW += state.dataHeatBal->SpaceIntGain(spaceNum).QLTSW;
+        for (int spaceNum : state.dataViewFactor->EnclSolInfo(enclosureNum).spaceNums) {
+            sumSpaceQLTSW += state.dataHeatBal->spaceIntGain(spaceNum).QLTSW;
         }
         state.dataHeatBal->EnclSolQSWRad(enclosureNum) = state.dataHeatBal->EnclSolQD(enclosureNum) + sumSpaceQLTSW;
         state.dataHeatBal->EnclSolQSWRadLights(enclosureNum) = sumSpaceQLTSW;
@@ -3551,8 +3551,8 @@ void InitIntSolarDistribution(EnergyPlusData &state)
 
                     if ((OtherenclosureNum != enclosureNum) && (state.dataHeatBalSurf->EnclSolRecDifShortFromZ(OtherenclosureNum))) {
                         Real64 sumSpaceQLTSW = 0.0;
-                        for (int spaceNum : state.dataViewFactor->EnclSolInfo(OtherenclosureNum).SpaceNums) {
-                            sumSpaceQLTSW += state.dataHeatBal->SpaceIntGain(spaceNum).QLTSW;
+                        for (int spaceNum : state.dataViewFactor->EnclSolInfo(OtherenclosureNum).spaceNums) {
+                            sumSpaceQLTSW += state.dataHeatBal->spaceIntGain(spaceNum).QLTSW;
                         }
                         state.dataHeatBal->EnclSolQSWRad(enclosureNum) +=
                             state.dataHeatBalSurf->ZoneFractDifShortZtoZ(enclosureNum, OtherenclosureNum) *

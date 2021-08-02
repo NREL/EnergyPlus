@@ -5467,40 +5467,40 @@ namespace HeatBalanceManager {
             int numSpaces = instancesValue.size();
             int spaceNum = 0;
             // Allow for one additional Space per zone if some surfaces do not have a Space assigned in input
-            state.dataHeatBal->Space.allocate(size_t(numSpaces + state.dataGlobal->NumOfZones));
+            state.dataHeatBal->space.allocate(size_t(numSpaces + state.dataGlobal->NumOfZones));
             // Allow for one additional "General" space type for auto-generated spaces
             state.dataHeatBal->spaceTypes.allocate(size_t(numSpaces + 1));
 
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 ++spaceNum;
                 auto const &objectFields = instance.value();
-                auto &thisSpace = state.dataHeatBal->Space(spaceNum);
+                auto &thisSpace = state.dataHeatBal->space(spaceNum);
                 thisSpace.Name = UtilityRoutines::MakeUPPERCase(instance.key());
                 ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
                 std::string zoneName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_name");
-                thisSpace.UserEnteredFloorArea = ip->getRealFieldValue(objectFields, objectSchemaProps, "floor_area");
+                thisSpace.userEnteredFloorArea = ip->getRealFieldValue(objectFields, objectSchemaProps, "floor_area");
                 int zoneNum = UtilityRoutines::FindItemInList(zoneName, state.dataHeatBal->Zone);
                 if (zoneNum > 0) {
-                    thisSpace.ZoneNum = zoneNum;
-                    state.dataHeatBal->Zone(zoneNum).Spaces.emplace_back(spaceNum);
+                    thisSpace.zoneNum = zoneNum;
+                    state.dataHeatBal->Zone(zoneNum).spaces.emplace_back(spaceNum);
                 } else {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisSpace.Name);
                     ShowContinueError(state, "Zone Name =" + zoneName + "not found.");
                     ErrorsFound = true;
                 }
-                thisSpace.SpaceType = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "space_type");
+                thisSpace.spaceType = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "space_type");
                 bool spaceTypeFound = false;
                 for (int spaceTypePtr = 1; spaceTypePtr <= state.dataGlobal->numSpaceTypes; ++spaceTypePtr) {
-                    if (UtilityRoutines::SameString(thisSpace.SpaceType, state.dataHeatBal->spaceTypes(spaceTypePtr))) {
-                        thisSpace.SpaceTypeNum = spaceTypePtr;
+                    if (UtilityRoutines::SameString(thisSpace.spaceType, state.dataHeatBal->spaceTypes(spaceTypePtr))) {
+                        thisSpace.spaceTypeNum = spaceTypePtr;
                         spaceTypeFound = true;
                         break;
                     }
                 }
                 if (!spaceTypeFound) {
                     ++state.dataGlobal->numSpaceTypes;
-                    state.dataHeatBal->spaceTypes(state.dataGlobal->numSpaceTypes) = thisSpace.SpaceType;
-                    thisSpace.SpaceTypeNum = state.dataGlobal->numSpaceTypes;
+                    state.dataHeatBal->spaceTypes(state.dataGlobal->numSpaceTypes) = thisSpace.spaceType;
+                    thisSpace.spaceTypeNum = state.dataGlobal->numSpaceTypes;
                 }
 
                 auto extensibles = objectFields.find("tags");
@@ -5508,14 +5508,14 @@ namespace HeatBalanceManager {
                 if (extensibles != objectFields.end()) {
                     auto extensiblesArray = extensibles.value();
                     for (auto extensibleInstance : extensiblesArray) {
-                        thisSpace.Tags.emplace_back(ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "tag"));
+                        thisSpace.tags.emplace_back(ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "tag"));
                     }
                 }
             }
             state.dataGlobal->numSpaces = spaceNum;
         } else {
             // If no Spaces are defined, then allow for one Space per zone, and one spaceType
-            state.dataHeatBal->Space.allocate(state.dataGlobal->NumOfZones);
+            state.dataHeatBal->space.allocate(state.dataGlobal->NumOfZones);
             state.dataHeatBal->spaceTypes.allocate(1);
         }
 
@@ -5526,11 +5526,11 @@ namespace HeatBalanceManager {
             auto &instancesValue = instances2.value();
             int numSpaceLists = instancesValue.size();
             int spaceListNum = 0;
-            state.dataHeatBal->SpaceList.allocate(numSpaceLists);
+            state.dataHeatBal->spaceList.allocate(numSpaceLists);
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 ++spaceListNum;
                 auto const &objectFields = instance.value();
-                auto &thisSpaceList = state.dataHeatBal->SpaceList(spaceListNum);
+                auto &thisSpaceList = state.dataHeatBal->spaceList(spaceListNum);
                 thisSpaceList.Name = UtilityRoutines::MakeUPPERCase(instance.key());
                 ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
 
@@ -5538,7 +5538,7 @@ namespace HeatBalanceManager {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + thisSpaceList.Name + "\":  is a duplicate of a zone name.");
                     ErrorsFound = true;
                 }
-                if (UtilityRoutines::FindItemInList(thisSpaceList.Name, state.dataHeatBal->Space) > 0) {
+                if (UtilityRoutines::FindItemInList(thisSpaceList.Name, state.dataHeatBal->space) > 0) {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + thisSpaceList.Name + "\":  is a duplicate of a space name.");
                     ErrorsFound = true;
                 }
@@ -5550,18 +5550,18 @@ namespace HeatBalanceManager {
                     auto extensiblesArray = extensibles.value();
                     for (auto extensibleInstance : extensiblesArray) {
                         std::string thisSpaceName = ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "space_name");
-                        int thisSpaceNum = UtilityRoutines::FindItemInList(thisSpaceName, state.dataHeatBal->Space);
+                        int thisSpaceNum = UtilityRoutines::FindItemInList(thisSpaceName, state.dataHeatBal->space);
                         if (thisSpaceNum > 0) {
-                            thisSpaceList.Spaces.emplace_back(thisSpaceNum);
+                            thisSpaceList.spaces.emplace_back(thisSpaceNum);
                         } else {
                             ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisSpaceList.Name);
                             ShowContinueError(state, "Space Name =" + thisSpaceName + "not found.");
                             ErrorsFound = true;
                         }
-                        thisSpaceList.MaxSpaceNameLength = max(thisSpaceList.MaxSpaceNameLength, len(thisSpaceName));
+                        thisSpaceList.maxSpaceNameLength = max(thisSpaceList.maxSpaceNameLength, len(thisSpaceName));
                         // Check for duplicate spaces
-                        for (int loop = 1; loop <= int(thisSpaceList.Spaces.size()) - 1; ++loop) {
-                            if (thisSpaceNum == thisSpaceList.Spaces(loop)) {
+                        for (int loop = 1; loop <= int(thisSpaceList.spaces.size()) - 1; ++loop) {
+                            if (thisSpaceNum == thisSpaceList.spaces(loop)) {
                                 ShowSevereError(state,
                                                 RoutineName + cCurrentModuleObject + "=\"" + thisSpaceList.Name + "\":  Space Name " + thisSpaceName +
                                                     " appears more than once in list.");
@@ -5576,14 +5576,14 @@ namespace HeatBalanceManager {
         // Make sure every zone has at least one space
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             auto &thisZone = state.dataHeatBal->Zone(zoneNum);
-            if (thisZone.Spaces.empty()) {
+            if (thisZone.spaces.empty()) {
                 ++state.dataGlobal->numSpaces;
-                state.dataHeatBal->Space(state.dataGlobal->numSpaces).ZoneNum = zoneNum;
-                state.dataHeatBal->Space(state.dataGlobal->numSpaces).Name = thisZone.Name;
-                state.dataHeatBal->Space(state.dataGlobal->numSpaces).SpaceType = "GENERAL";
-                state.dataHeatBal->Space(state.dataGlobal->numSpaces).SpaceTypeNum = GetGeneralSpaceTypeNum(state);
+                state.dataHeatBal->space(state.dataGlobal->numSpaces).zoneNum = zoneNum;
+                state.dataHeatBal->space(state.dataGlobal->numSpaces).Name = thisZone.Name;
+                state.dataHeatBal->space(state.dataGlobal->numSpaces).spaceType = "GENERAL";
+                state.dataHeatBal->space(state.dataGlobal->numSpaces).spaceTypeNum = GetGeneralSpaceTypeNum(state);
                 // Add to zone's list of spaces
-                thisZone.Spaces.emplace_back(state.dataGlobal->numSpaces);
+                thisZone.spaces.emplace_back(state.dataGlobal->numSpaces);
             }
         }
     }
@@ -5853,8 +5853,8 @@ namespace HeatBalanceManager {
         // TODO MJW: Punt for now, sometimes unit test will get here and need these to be allocated, but simulations need them sooner
         if (!state.dataHeatBal->ZoneIntGain.allocated()) {
             state.dataHeatBal->ZoneIntGain.allocate(state.dataGlobal->NumOfZones);
-            state.dataHeatBal->SpaceIntGain.allocate(state.dataGlobal->numSpaces);
-            state.dataHeatBal->SpaceIntGainDevices.allocate(state.dataGlobal->numSpaces);
+            state.dataHeatBal->spaceIntGain.allocate(state.dataGlobal->numSpaces);
+            state.dataHeatBal->spaceIntGainDevices.allocate(state.dataGlobal->numSpaces);
         }
         state.dataHeatBal->ZoneMRT.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBal->ZoneSolAbsFirstCalc.allocate(state.dataGlobal->NumOfZones);

@@ -65,8 +65,8 @@ namespace DataViewFactorInformation {
     {
         // Members
         std::string Name;                    // Enclosure name
-        std::vector<std::string> SpaceNames; // Space names which are part of this enclosure
-        std::vector<int> SpaceNums;          // Spaces which are part of this enclosure
+        std::vector<std::string> spaceNames; // Space names which are part of this enclosure
+        std::vector<int> spaceNums;          // Spaces which are part of this enclosure
         int NumOfSurfaces;                   // Number of surfaces in the enclosure
         Array2D<Real64> F;                   // View Factors
         Array2D<Real64> ScriptF;             // Hottel's Script F //Tuned Transposed

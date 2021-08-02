@@ -11944,74 +11944,74 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
     // Accumulate internal gain totals by space and space type
     for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
         auto curPeople = state.dataHeatBal->People(iPeople);
-        for (int iSpace = 1; iSpace <= int(curPeople.SpacePtrs.size()); ++iSpace) {
-            int const spaceNum = curPeople.SpacePtrs(iSpace);
-            Real64 const people = curPeople.NumberOfPeople * curPeople.SpaceFracs(iSpace);
+        for (int iSpace = 1; iSpace <= int(curPeople.spacePtrs.size()); ++iSpace) {
+            int const spaceNum = curPeople.spacePtrs(iSpace);
+            Real64 const people = curPeople.NumberOfPeople * curPeople.spaceFracs(iSpace);
             spaceTotPeople(spaceNum) += people;
-            spaceTypeTotPeople(state.dataHeatBal->Space(spaceNum).SpaceTypeNum) += people;
+            spaceTypeTotPeople(state.dataHeatBal->space(spaceNum).spaceTypeNum) += people;
         }
     }
     for (int iLights = 1; iLights <= state.dataHeatBal->TotLights; ++iLights) {
         auto curLighting = state.dataHeatBal->Lights(iLights);
-        for (int iSpace = 1; iSpace <= int(curLighting.SpacePtrs.size()); ++iSpace) {
-            int const spaceNum = curLighting.SpacePtrs(iSpace);
-            Real64 const lighting = curLighting.DesignLevel * curLighting.SpaceFracs(iSpace);
+        for (int iSpace = 1; iSpace <= int(curLighting.spacePtrs.size()); ++iSpace) {
+            int const spaceNum = curLighting.spacePtrs(iSpace);
+            Real64 const lighting = curLighting.DesignLevel * curLighting.spaceFracs(iSpace);
             spaceTotLighting(spaceNum) += lighting;
-            spaceTypeTotLighting(state.dataHeatBal->Space(spaceNum).SpaceTypeNum) += lighting;
+            spaceTypeTotLighting(state.dataHeatBal->space(spaceNum).spaceTypeNum) += lighting;
         }
     }
     for (int iElecEquip = 1; iElecEquip <= state.dataHeatBal->TotElecEquip; ++iElecEquip) {
         auto curElecEquip = state.dataHeatBal->ZoneElectric(iElecEquip);
-        for (int iSpace = 1; iSpace <= int(curElecEquip.SpacePtrs.size()); ++iSpace) {
-            int const spaceNum = curElecEquip.SpacePtrs(iSpace);
-            Real64 const elecEquip = curElecEquip.DesignLevel * curElecEquip.SpaceFracs(iSpace);
+        for (int iSpace = 1; iSpace <= int(curElecEquip.spacePtrs.size()); ++iSpace) {
+            int const spaceNum = curElecEquip.spacePtrs(iSpace);
+            Real64 const elecEquip = curElecEquip.DesignLevel * curElecEquip.spaceFracs(iSpace);
             spaceTotPlugProcess(spaceNum) += elecEquip;
-            spaceTypeTotPlugProcess(state.dataHeatBal->Space(spaceNum).SpaceTypeNum) += elecEquip;
+            spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += elecEquip;
         }
     }
     for (int iGasEquip = 1; iGasEquip <= state.dataHeatBal->TotGasEquip; ++iGasEquip) {
         auto curGasEquip = state.dataHeatBal->ZoneGas(iGasEquip);
-        for (int iSpace = 1; iSpace <= int(curGasEquip.SpacePtrs.size()); ++iSpace) {
-            int const spaceNum = curGasEquip.SpacePtrs(iSpace);
-            Real64 const gasEquip = curGasEquip.DesignLevel * curGasEquip.SpaceFracs(iSpace);
+        for (int iSpace = 1; iSpace <= int(curGasEquip.spacePtrs.size()); ++iSpace) {
+            int const spaceNum = curGasEquip.spacePtrs(iSpace);
+            Real64 const gasEquip = curGasEquip.DesignLevel * curGasEquip.spaceFracs(iSpace);
             spaceTotPlugProcess(spaceNum) += gasEquip;
-            spaceTypeTotPlugProcess(state.dataHeatBal->Space(spaceNum).SpaceTypeNum) += gasEquip;
+            spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += gasEquip;
         }
     }
     for (int iOthEquip = 1; iOthEquip <= state.dataHeatBal->TotOthEquip; ++iOthEquip) {
         auto curOthEquip = state.dataHeatBal->ZoneOtherEq(iOthEquip);
-        for (int iSpace = 1; iSpace <= int(curOthEquip.SpacePtrs.size()); ++iSpace) {
-            int const spaceNum = curOthEquip.SpacePtrs(iSpace);
-            Real64 const othEquip = curOthEquip.DesignLevel * curOthEquip.SpaceFracs(iSpace);
+        for (int iSpace = 1; iSpace <= int(curOthEquip.spacePtrs.size()); ++iSpace) {
+            int const spaceNum = curOthEquip.spacePtrs(iSpace);
+            Real64 const othEquip = curOthEquip.DesignLevel * curOthEquip.spaceFracs(iSpace);
             spaceTotPlugProcess(spaceNum) += othEquip;
-            spaceTypeTotPlugProcess(state.dataHeatBal->Space(spaceNum).SpaceTypeNum) += othEquip;
+            spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += othEquip;
         }
     }
     for (int iHWEquip = 1; iHWEquip <= state.dataHeatBal->TotHWEquip; ++iHWEquip) {
         auto curHWEquip = state.dataHeatBal->ZoneHWEq(iHWEquip);
-        for (int iSpace = 1; iSpace <= int(curHWEquip.SpacePtrs.size()); ++iSpace) {
-            int const spaceNum = curHWEquip.SpacePtrs(iSpace);
-            Real64 const hwEquip = curHWEquip.DesignLevel * curHWEquip.SpaceFracs(iSpace);
+        for (int iSpace = 1; iSpace <= int(curHWEquip.spacePtrs.size()); ++iSpace) {
+            int const spaceNum = curHWEquip.spacePtrs(iSpace);
+            Real64 const hwEquip = curHWEquip.DesignLevel * curHWEquip.spaceFracs(iSpace);
             spaceTotPlugProcess(spaceNum) += hwEquip;
-            spaceTypeTotPlugProcess(state.dataHeatBal->Space(spaceNum).SpaceTypeNum) += hwEquip;
+            spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += hwEquip;
         }
     }
     for (int iSteamEquip = 1; iSteamEquip <= state.dataHeatBal->TotStmEquip; ++iSteamEquip) {
         auto curSteamEquip = state.dataHeatBal->ZoneSteamEq(iSteamEquip);
-        for (int iSpace = 1; iSpace <= int(curSteamEquip.SpacePtrs.size()); ++iSpace) {
-            int const spaceNum = curSteamEquip.SpacePtrs(iSpace);
-            Real64 const steamEquip = curSteamEquip.DesignLevel * curSteamEquip.SpaceFracs(iSpace);
+        for (int iSpace = 1; iSpace <= int(curSteamEquip.spacePtrs.size()); ++iSpace) {
+            int const spaceNum = curSteamEquip.spacePtrs(iSpace);
+            Real64 const steamEquip = curSteamEquip.DesignLevel * curSteamEquip.spaceFracs(iSpace);
             spaceTotPlugProcess(spaceNum) += steamEquip;
-            spaceTypeTotPlugProcess(state.dataHeatBal->Space(spaceNum).SpaceTypeNum) += steamEquip;
+            spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += steamEquip;
         }
     }
     for (int iITEquip = 1; iITEquip <= state.dataHeatBal->NumZoneITEqStatements; ++iITEquip) {
         auto curITEquip = state.dataHeatBal->ZoneITEq(iITEquip);
-        for (int iSpace = 1; iSpace <= int(curITEquip.SpacePtrs.size()); ++iSpace) {
-            int const spaceNum = curITEquip.SpacePtrs(iSpace);
-            Real64 const itEquip = curITEquip.DesignTotalPower * curITEquip.SpaceFracs(iSpace);
+        for (int iSpace = 1; iSpace <= int(curITEquip.spacePtrs.size()); ++iSpace) {
+            int const spaceNum = curITEquip.spacePtrs(iSpace);
+            Real64 const itEquip = curITEquip.DesignTotalPower * curITEquip.spaceFracs(iSpace);
             spaceTotPlugProcess(spaceNum) += itEquip;
-            spaceTypeTotPlugProcess(state.dataHeatBal->Space(spaceNum).SpaceTypeNum) += itEquip;
+            spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += itEquip;
         }
     }
 
@@ -12027,15 +12027,15 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
     for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
         auto curZone = state.dataHeatBal->Zone(iZone);
         Real64 const mult = Real64(curZone.Multiplier) * Real64(curZone.ListMultiplier);
-        for (int const spaceNum : curZone.Spaces) {
-            auto curSpace = state.dataHeatBal->Space(spaceNum);
+        for (int const spaceNum : curZone.spaces) {
+            auto curSpace = state.dataHeatBal->space(spaceNum);
             bool spaceIsCond = false;
             bool useSpaceFloorArea = false;
             ++spaceTableRowNum;
             spaceRowHead(spaceTableRowNum) = curSpace.Name;
             spaceTableBody(colZoneName, spaceTableRowNum) = curZone.Name;
-            spaceTableBody(colSpaceType, spaceTableRowNum) = curSpace.SpaceType;
-            spaceTableBody(colSpaceArea, spaceTableRowNum) = RealToStr(curSpace.FloorArea * state.dataOutRptTab->m2_unitConvWVST, 2);
+            spaceTableBody(colSpaceType, spaceTableRowNum) = curSpace.spaceType;
+            spaceTableBody(colSpaceArea, spaceTableRowNum) = RealToStr(curSpace.floorArea * state.dataOutRptTab->m2_unitConvWVST, 2);
             // Conditioned or not
             if (curZone.SystemZoneNodeNumber > 0) {
                 spaceTableBody(colConditioned, spaceTableRowNum) = "Yes";
@@ -12054,30 +12054,30 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
             }
             // lighting density
             spaceTableBody(colMultipliers, spaceTableRowNum) = RealToStr(mult, 2);
-            if (curSpace.FloorArea > 0) {
+            if (curSpace.floorArea > 0) {
                 spaceTableBody(colSpaceLighting, spaceTableRowNum) =
-                    RealToStr(state.dataOutRptTab->Wm2_unitConv * spaceTotLighting(spaceNum) / curSpace.FloorArea, 4);
+                    RealToStr(state.dataOutRptTab->Wm2_unitConv * spaceTotLighting(spaceNum) / curSpace.floorArea, 4);
             } else {
                 spaceTableBody(colSpaceLighting, spaceTableRowNum) = RealToStr(0.0, 4);
             }
             // people density
             if (spaceTotPeople(spaceNum) > 0) {
                 spaceTableBody(colSpacePeople, spaceTableRowNum) =
-                    RealToStr(curSpace.FloorArea * state.dataOutRptTab->m2_unitConvWVST / spaceTotPeople(spaceNum), 2);
+                    RealToStr(curSpace.floorArea * state.dataOutRptTab->m2_unitConvWVST / spaceTotPeople(spaceNum), 2);
             } else {
                 spaceTableBody(colSpacePeople, spaceTableRowNum) = RealToStr(0.0, 2);
             }
             // plug and process density
-            if (curSpace.FloorArea > 0) {
+            if (curSpace.floorArea > 0) {
                 spaceTableBody(colSpacePlugProcess, spaceTableRowNum) =
-                    RealToStr(spaceTotPlugProcess(spaceNum) * state.dataOutRptTab->Wm2_unitConv / curSpace.FloorArea, 4);
+                    RealToStr(spaceTotPlugProcess(spaceNum) * state.dataOutRptTab->Wm2_unitConv / curSpace.floorArea, 4);
             } else {
                 spaceTableBody(colSpacePlugProcess, spaceTableRowNum) = RealToStr(0.0, 4);
             }
 
             std::string tags;
             bool firstTag = true;
-            for (std::string const tag : curSpace.Tags) {
+            for (std::string const tag : curSpace.tags) {
                 if (firstTag) {
                     tags += tag;
                     firstTag = false;
@@ -12089,29 +12089,29 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
 
             // If not part of total, goes directly to this row
             if (!useSpaceFloorArea) {
-                spaceTypeNotTotArea(curSpace.SpaceTypeNum) += curSpace.FloorArea * mult;
-                state.dataOutRptTab->zstArea(state.dataOutRptTab->notpartTotal) += mult * curSpace.FloorArea;
+                spaceTypeNotTotArea(curSpace.spaceTypeNum) += curSpace.floorArea * mult;
+                state.dataOutRptTab->zstArea(state.dataOutRptTab->notpartTotal) += mult * curSpace.floorArea;
                 state.dataOutRptTab->zstLight(state.dataOutRptTab->notpartTotal) += mult * spaceTotLighting(spaceNum);
                 state.dataOutRptTab->zstPeople(state.dataOutRptTab->notpartTotal) += mult * spaceTotPeople(spaceNum);
                 state.dataOutRptTab->zstPlug(state.dataOutRptTab->notpartTotal) += mult * spaceTotPlugProcess(spaceNum);
             } else {
                 // Add it to the 'Total'
-                spaceTypeTotArea(curSpace.SpaceTypeNum) += curSpace.FloorArea * mult;
-                state.dataOutRptTab->zstArea(state.dataOutRptTab->grandTotal) += mult * curSpace.FloorArea;
+                spaceTypeTotArea(curSpace.spaceTypeNum) += curSpace.floorArea * mult;
+                state.dataOutRptTab->zstArea(state.dataOutRptTab->grandTotal) += mult * curSpace.floorArea;
                 state.dataOutRptTab->zstLight(state.dataOutRptTab->grandTotal) += mult * spaceTotLighting(spaceNum);
                 state.dataOutRptTab->zstPeople(state.dataOutRptTab->grandTotal) += mult * spaceTotPeople(spaceNum);
                 state.dataOutRptTab->zstPlug(state.dataOutRptTab->grandTotal) += mult * spaceTotPlugProcess(spaceNum);
 
                 // Subtotal between cond/unconditioned
                 if (spaceIsCond) {
-                    spaceTypeCondArea(curSpace.SpaceTypeNum) += curSpace.FloorArea * mult;
-                    state.dataOutRptTab->zstArea(state.dataOutRptTab->condTotal) += mult * curSpace.FloorArea;
+                    spaceTypeCondArea(curSpace.spaceTypeNum) += curSpace.floorArea * mult;
+                    state.dataOutRptTab->zstArea(state.dataOutRptTab->condTotal) += mult * curSpace.floorArea;
                     state.dataOutRptTab->zstLight(state.dataOutRptTab->condTotal) += mult * spaceTotLighting(spaceNum);
                     state.dataOutRptTab->zstPeople(state.dataOutRptTab->condTotal) += mult * spaceTotPeople(spaceNum);
                     state.dataOutRptTab->zstPlug(state.dataOutRptTab->condTotal) += mult * spaceTotPlugProcess(spaceNum);
                 } else if (!spaceIsCond) {
-                    spaceTypeUncondArea(curSpace.SpaceTypeNum) += curSpace.FloorArea * mult;
-                    state.dataOutRptTab->zstArea(state.dataOutRptTab->uncondTotal) += mult * curSpace.FloorArea;
+                    spaceTypeUncondArea(curSpace.spaceTypeNum) += curSpace.floorArea * mult;
+                    state.dataOutRptTab->zstArea(state.dataOutRptTab->uncondTotal) += mult * curSpace.floorArea;
                     state.dataOutRptTab->zstLight(state.dataOutRptTab->uncondTotal) += mult * spaceTotLighting(spaceNum);
                     state.dataOutRptTab->zstPeople(state.dataOutRptTab->uncondTotal) += mult * spaceTotPeople(spaceNum);
                     state.dataOutRptTab->zstPlug(state.dataOutRptTab->uncondTotal) += mult * spaceTotPlugProcess(spaceNum);

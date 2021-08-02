@@ -1666,7 +1666,7 @@ namespace RoomAirModelManager {
                 if (RAFNNodeNum > 0) { // found it
                     foundList = true;
                     int numInputGains = (NumAlphas + NumNumbers - 1) / 3;
-                    int numSpacesInZone = int(state.dataHeatBal->Zone(ZoneNum).Spaces.size());
+                    int numSpacesInZone = int(state.dataHeatBal->Zone(ZoneNum).spaces.size());
                     int maxNumGains = numInputGains * numSpacesInZone;
                     if (allocated(state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain)) {
                         ShowSevereError(state,
@@ -1701,7 +1701,7 @@ namespace RoomAirModelManager {
 
                             bool gainFound = false;
                             // check all spaces in this zone for matching gains
-                            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).Spaces) {
+                            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaces) {
                                 // verify type and name and get pointer to device in internal gains structure array
                                 int intGainIndex = GetInternalGainDeviceIndex(
                                     state,

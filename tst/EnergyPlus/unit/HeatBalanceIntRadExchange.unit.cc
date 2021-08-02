@@ -168,20 +168,20 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
 
     state->dataHeatBal->Zone.allocate(spaceNum);
     state->dataHeatBal->Zone(spaceNum).Name = "Test";
-    state->dataHeatBal->Zone(spaceNum).Spaces.emplace_back(spaceNum);
-    state->dataHeatBal->Space.allocate(spaceNum);
-    state->dataHeatBal->Space(spaceNum).Name = "Test";
-    state->dataHeatBal->Space(spaceNum).ZoneNum = spaceNum;
+    state->dataHeatBal->Zone(spaceNum).spaces.emplace_back(spaceNum);
+    state->dataHeatBal->space.allocate(spaceNum);
+    state->dataHeatBal->space(spaceNum).Name = "Test";
+    state->dataHeatBal->space(spaceNum).zoneNum = spaceNum;
     state->dataViewFactor->EnclRadInfo.allocate(spaceNum);
-    state->dataViewFactor->EnclRadInfo(spaceNum).Name = state->dataHeatBal->Space(spaceNum).Name;
-    state->dataViewFactor->EnclRadInfo(spaceNum).SpaceNums.push_back(spaceNum);
+    state->dataViewFactor->EnclRadInfo(spaceNum).Name = state->dataHeatBal->space(spaceNum).Name;
+    state->dataViewFactor->EnclRadInfo(spaceNum).spaceNums.push_back(spaceNum);
 
     FixViewFactors(*state,
                    N,
                    A,
                    F,
                    state->dataViewFactor->EnclRadInfo(spaceNum).Name,
-                   state->dataViewFactor->EnclRadInfo(spaceNum).SpaceNums,
+                   state->dataViewFactor->EnclRadInfo(spaceNum).spaceNums,
                    OriginalCheckValue,
                    FixedCheckValue,
                    FinalCheckValue,
@@ -221,7 +221,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
                    A,
                    F,
                    state->dataViewFactor->EnclRadInfo(spaceNum).Name,
-                   state->dataViewFactor->EnclRadInfo(spaceNum).SpaceNums,
+                   state->dataViewFactor->EnclRadInfo(spaceNum).spaceNums,
                    OriginalCheckValue,
                    FixedCheckValue,
                    FinalCheckValue,
@@ -251,7 +251,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
                    A,
                    F,
                    state->dataViewFactor->EnclRadInfo(spaceNum).Name,
-                   state->dataViewFactor->EnclRadInfo(spaceNum).SpaceNums,
+                   state->dataViewFactor->EnclRadInfo(spaceNum).spaceNums,
                    OriginalCheckValue,
                    FixedCheckValue,
                    FinalCheckValue,
@@ -281,7 +281,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
                    A,
                    F,
                    state->dataViewFactor->EnclRadInfo(spaceNum).Name,
-                   state->dataViewFactor->EnclRadInfo(spaceNum).SpaceNums,
+                   state->dataViewFactor->EnclRadInfo(spaceNum).spaceNums,
                    OriginalCheckValue,
                    FixedCheckValue,
                    FinalCheckValue,
@@ -334,7 +334,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
                    A,
                    F,
                    state->dataViewFactor->EnclRadInfo(spaceNum).Name,
-                   state->dataViewFactor->EnclRadInfo(spaceNum).SpaceNums,
+                   state->dataViewFactor->EnclRadInfo(spaceNum).spaceNums,
                    OriginalCheckValue,
                    FixedCheckValue,
                    FinalCheckValue,
@@ -502,18 +502,18 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest)
     state->dataViewFactor->NumOfRadiantEnclosures = 3;
     state->dataViewFactor->EnclRadInfo.allocate(3);
     state->dataViewFactor->EnclRadInfo(1).Name = "Enclosure 1";
-    state->dataViewFactor->EnclRadInfo(1).SpaceNums.push_back(
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone 2"), state->dataHeatBal->Space, state->dataGlobal->numSpaces));
-    state->dataViewFactor->EnclRadInfo(1).SpaceNums.push_back(
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone 1"), state->dataHeatBal->Space, state->dataGlobal->numSpaces));
+    state->dataViewFactor->EnclRadInfo(1).spaceNums.push_back(
+        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone 2"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
+    state->dataViewFactor->EnclRadInfo(1).spaceNums.push_back(
+        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone 1"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
     state->dataViewFactor->EnclRadInfo(2).Name = "Enclosure 2";
-    state->dataViewFactor->EnclRadInfo(2).SpaceNums.push_back(
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone 4"), state->dataHeatBal->Space, state->dataGlobal->numSpaces));
-    state->dataViewFactor->EnclRadInfo(2).SpaceNums.push_back(
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone 5"), state->dataHeatBal->Space, state->dataGlobal->numSpaces));
+    state->dataViewFactor->EnclRadInfo(2).spaceNums.push_back(
+        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone 4"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
+    state->dataViewFactor->EnclRadInfo(2).spaceNums.push_back(
+        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone 5"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
     state->dataViewFactor->EnclRadInfo(3).Name = "Space 3";
-    state->dataViewFactor->EnclRadInfo(3).SpaceNums.push_back(
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone 3"), state->dataHeatBal->Space, state->dataGlobal->numSpaces));
+    state->dataViewFactor->EnclRadInfo(3).spaceNums.push_back(
+        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone 3"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
 
     ErrorsFound = false;
     HeatBalanceIntRadExchange::AlignInputViewFactors(*state, "ZoneProperty:UserViewFactors:BySurfaceName", ErrorsFound);
@@ -603,18 +603,18 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest2)
     state->dataViewFactor->NumOfSolarEnclosures = 3;
     state->dataViewFactor->EnclSolInfo.allocate(3);
     state->dataViewFactor->EnclSolInfo(1).Name = "Enclosure 1";
-    state->dataViewFactor->EnclSolInfo(1).SpaceNums.push_back(
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Space 2"), state->dataHeatBal->Space, state->dataGlobal->numSpaces));
-    state->dataViewFactor->EnclSolInfo(1).SpaceNums.push_back(
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Space 5"), state->dataHeatBal->Space, state->dataGlobal->numSpaces));
+    state->dataViewFactor->EnclSolInfo(1).spaceNums.push_back(
+        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Space 2"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
+    state->dataViewFactor->EnclSolInfo(1).spaceNums.push_back(
+        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Space 5"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
     state->dataViewFactor->EnclSolInfo(2).Name = "Enclosure 2";
-    state->dataViewFactor->EnclSolInfo(2).SpaceNums.push_back(
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Space 4"), state->dataHeatBal->Space, state->dataGlobal->numSpaces));
-    state->dataViewFactor->EnclSolInfo(2).SpaceNums.push_back(
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Space 5"), state->dataHeatBal->Space, state->dataGlobal->numSpaces));
+    state->dataViewFactor->EnclSolInfo(2).spaceNums.push_back(
+        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Space 4"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
+    state->dataViewFactor->EnclSolInfo(2).spaceNums.push_back(
+        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Space 5"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
     state->dataViewFactor->EnclSolInfo(3).Name = "Space 3";
-    state->dataViewFactor->EnclSolInfo(3).SpaceNums.push_back(
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Space 3"), state->dataHeatBal->Space, state->dataGlobal->numSpaces));
+    state->dataViewFactor->EnclSolInfo(3).spaceNums.push_back(
+        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Space 3"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
 
     ErrorsFound = false;
     HeatBalanceIntRadExchange::AlignInputViewFactors(*state, "ZoneProperty:UserViewFactors:BySurfaceName", ErrorsFound);
@@ -701,18 +701,18 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest3)
     state->dataViewFactor->NumOfSolarEnclosures = 3;
     state->dataViewFactor->EnclSolInfo.allocate(3);
     state->dataViewFactor->EnclSolInfo(1).Name = "Enclosure 1";
-    state->dataViewFactor->EnclSolInfo(1).SpaceNums.push_back(
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone 2"), state->dataHeatBal->Space, state->dataGlobal->numSpaces));
-    state->dataViewFactor->EnclSolInfo(1).SpaceNums.push_back(
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone 1"), state->dataHeatBal->Space, state->dataGlobal->numSpaces));
+    state->dataViewFactor->EnclSolInfo(1).spaceNums.push_back(
+        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone 2"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
+    state->dataViewFactor->EnclSolInfo(1).spaceNums.push_back(
+        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone 1"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
     state->dataViewFactor->EnclSolInfo(2).Name = "Enclosure 2";
-    state->dataViewFactor->EnclSolInfo(2).SpaceNums.push_back(
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone 4"), state->dataHeatBal->Space, state->dataGlobal->numSpaces));
-    state->dataViewFactor->EnclSolInfo(2).SpaceNums.push_back(
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone 5"), state->dataHeatBal->Space, state->dataGlobal->numSpaces));
+    state->dataViewFactor->EnclSolInfo(2).spaceNums.push_back(
+        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone 4"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
+    state->dataViewFactor->EnclSolInfo(2).spaceNums.push_back(
+        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone 5"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
     state->dataViewFactor->EnclSolInfo(3).Name = "Space 3";
-    state->dataViewFactor->EnclSolInfo(3).SpaceNums.push_back(
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone 3"), state->dataHeatBal->Space, state->dataGlobal->numSpaces));
+    state->dataViewFactor->EnclSolInfo(3).spaceNums.push_back(
+        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone 3"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
 
     ErrorsFound = false;
     HeatBalanceIntRadExchange::AlignInputViewFactors(*state, "ZoneProperty:UserViewFactors:BySurfaceName", ErrorsFound);
@@ -802,18 +802,18 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest4)
     state->dataViewFactor->NumOfRadiantEnclosures = 3;
     state->dataViewFactor->EnclRadInfo.allocate(3);
     state->dataViewFactor->EnclRadInfo(1).Name = "Enclosure 1";
-    state->dataViewFactor->EnclRadInfo(1).SpaceNums.push_back(
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Space 2"), state->dataHeatBal->Space, state->dataGlobal->numSpaces));
-    state->dataViewFactor->EnclRadInfo(1).SpaceNums.push_back(
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Space 5"), state->dataHeatBal->Space, state->dataGlobal->numSpaces));
+    state->dataViewFactor->EnclRadInfo(1).spaceNums.push_back(
+        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Space 2"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
+    state->dataViewFactor->EnclRadInfo(1).spaceNums.push_back(
+        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Space 5"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
     state->dataViewFactor->EnclRadInfo(2).Name = "Enclosure 2";
-    state->dataViewFactor->EnclRadInfo(2).SpaceNums.push_back(
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Space 4"), state->dataHeatBal->Space, state->dataGlobal->numSpaces));
-    state->dataViewFactor->EnclRadInfo(2).SpaceNums.push_back(
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Space 5"), state->dataHeatBal->Space, state->dataGlobal->numSpaces));
+    state->dataViewFactor->EnclRadInfo(2).spaceNums.push_back(
+        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Space 4"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
+    state->dataViewFactor->EnclRadInfo(2).spaceNums.push_back(
+        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Space 5"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
     state->dataViewFactor->EnclRadInfo(3).Name = "Space 3";
-    state->dataViewFactor->EnclRadInfo(3).SpaceNums.push_back(
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Space 3"), state->dataHeatBal->Space, state->dataGlobal->numSpaces));
+    state->dataViewFactor->EnclRadInfo(3).spaceNums.push_back(
+        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Space 3"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
 
     ErrorsFound = false;
     HeatBalanceIntRadExchange::AlignInputViewFactors(*state, "ZoneProperty:UserViewFactors:BySurfaceName", ErrorsFound);

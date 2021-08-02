@@ -262,11 +262,11 @@ namespace InternalHeatGains {
         // TODO MJW: Punt for now, sometimes unit test need these to be allocated in AllocateZoneHeatBalArrays, but simulations need them here
         if (!state.dataHeatBal->ZoneIntGain.allocated()) {
             state.dataHeatBal->ZoneIntGain.allocate(state.dataGlobal->NumOfZones);
-            state.dataHeatBal->SpaceIntGain.allocate(state.dataGlobal->numSpaces);
-            state.dataHeatBal->SpaceIntGainDevices.allocate(state.dataGlobal->numSpaces);
+            state.dataHeatBal->spaceIntGain.allocate(state.dataGlobal->numSpaces);
+            state.dataHeatBal->spaceIntGainDevices.allocate(state.dataGlobal->numSpaces);
         }
         state.dataHeatBal->ZnRpt.allocate(state.dataGlobal->NumOfZones);
-        state.dataHeatBal->SpaceRpt.allocate(state.dataGlobal->numSpaces);
+        state.dataHeatBal->spaceRpt.allocate(state.dataGlobal->numSpaces);
         state.dataHeatBal->ZoneIntEEuse.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBal->RefrigCaseCredit.allocate(state.dataGlobal->NumOfZones);
 
@@ -409,73 +409,73 @@ namespace InternalHeatGains {
         //    SetupOutputVariable(state,
         //                        "Space Total Internal Radiant Heating Energy",
         //                        OutputProcessor::Unit::J,
-        //                        state.dataHeatBal->SpaceRpt(Loop).TotRadiantGain,
+        //                        state.dataHeatBal->spaceRpt(Loop).TotRadiantGain,
         //                        OutputProcessor::SOVTimeStepType::Zone,
         //                        OutputProcessor::SOVStoreType::Summed,
-        //                        state.dataHeatBal->Space(Loop).Name);
+        //                        state.dataHeatBal->space(Loop).Name);
         //    SetupOutputVariable(state,
         //                        "Space Total Internal Radiant Heating Rate",
         //                        OutputProcessor::Unit::W,
-        //                        state.dataHeatBal->SpaceRpt(Loop).TotRadiantGainRate,
+        //                        state.dataHeatBal->spaceRpt(Loop).TotRadiantGainRate,
         //                        OutputProcessor::SOVTimeStepType::Zone,
         //                        OutputProcessor::SOVStoreType::Average,
-        //                        state.dataHeatBal->Space(Loop).Name);
+        //                        state.dataHeatBal->space(Loop).Name);
         //    SetupOutputVariable(state,
         //                        "Space Total Internal Visible Radiation Heating Energy",
         //                        OutputProcessor::Unit::J,
-        //                        state.dataHeatBal->SpaceRpt(Loop).TotVisHeatGain,
+        //                        state.dataHeatBal->spaceRpt(Loop).TotVisHeatGain,
         //                        OutputProcessor::SOVTimeStepType::Zone,
         //                        OutputProcessor::SOVStoreType::Summed,
-        //                        state.dataHeatBal->Space(Loop).Name);
+        //                        state.dataHeatBal->space(Loop).Name);
         //    SetupOutputVariable(state,
         //                        "Space Total Internal Visible Radiation Heating Rate",
         //                        OutputProcessor::Unit::W,
-        //                        state.dataHeatBal->SpaceRpt(Loop).TotVisHeatGainRate,
+        //                        state.dataHeatBal->spaceRpt(Loop).TotVisHeatGainRate,
         //                        OutputProcessor::SOVTimeStepType::Zone,
         //                        OutputProcessor::SOVStoreType::Average,
-        //                        state.dataHeatBal->Space(Loop).Name);
+        //                        state.dataHeatBal->space(Loop).Name);
         //    SetupOutputVariable(state,
         //                        "Space Total Internal Convective Heating Energy",
         //                        OutputProcessor::Unit::J,
-        //                        state.dataHeatBal->SpaceRpt(Loop).TotConvectiveGain,
+        //                        state.dataHeatBal->spaceRpt(Loop).TotConvectiveGain,
         //                        OutputProcessor::SOVTimeStepType::Zone,
         //                        OutputProcessor::SOVStoreType::Summed,
-        //                        state.dataHeatBal->Space(Loop).Name);
+        //                        state.dataHeatBal->space(Loop).Name);
         //    SetupOutputVariable(state,
         //                        "Space Total Internal Convective Heating Rate",
         //                        OutputProcessor::Unit::W,
-        //                        state.dataHeatBal->SpaceRpt(Loop).TotConvectiveGainRate,
+        //                        state.dataHeatBal->spaceRpt(Loop).TotConvectiveGainRate,
         //                        OutputProcessor::SOVTimeStepType::Zone,
         //                        OutputProcessor::SOVStoreType::Average,
-        //                        state.dataHeatBal->Space(Loop).Name);
+        //                        state.dataHeatBal->space(Loop).Name);
         //    SetupOutputVariable(state,
         //                        "Space Total Internal Latent Gain Energy",
         //                        OutputProcessor::Unit::J,
-        //                        state.dataHeatBal->SpaceRpt(Loop).TotLatentGain,
+        //                        state.dataHeatBal->spaceRpt(Loop).TotLatentGain,
         //                        OutputProcessor::SOVTimeStepType::Zone,
         //                        OutputProcessor::SOVStoreType::Summed,
-        //                        state.dataHeatBal->Space(Loop).Name);
+        //                        state.dataHeatBal->space(Loop).Name);
         //    SetupOutputVariable(state,
         //                        "Space Total Internal Latent Gain Rate",
         //                        OutputProcessor::Unit::W,
-        //                        state.dataHeatBal->SpaceRpt(Loop).TotLatentGainRate,
+        //                        state.dataHeatBal->spaceRpt(Loop).TotLatentGainRate,
         //                        OutputProcessor::SOVTimeStepType::Zone,
         //                        OutputProcessor::SOVStoreType::Average,
-        //                        state.dataHeatBal->Space(Loop).Name);
+        //                        state.dataHeatBal->space(Loop).Name);
         //    SetupOutputVariable(state,
         //                        "Space Total Internal Total Heating Energy",
         //                        OutputProcessor::Unit::J,
-        //                        state.dataHeatBal->SpaceRpt(Loop).TotTotalHeatGain,
+        //                        state.dataHeatBal->spaceRpt(Loop).TotTotalHeatGain,
         //                        OutputProcessor::SOVTimeStepType::Zone,
         //                        OutputProcessor::SOVStoreType::Summed,
-        //                        state.dataHeatBal->Space(Loop).Name);
+        //                        state.dataHeatBal->space(Loop).Name);
         //    SetupOutputVariable(state,
         //                        "Space Total Internal Total Heating Rate",
         //                        OutputProcessor::Unit::W,
-        //                        state.dataHeatBal->SpaceRpt(Loop).TotTotalHeatGainRate,
+        //                        state.dataHeatBal->spaceRpt(Loop).TotTotalHeatGainRate,
         //                        OutputProcessor::SOVTimeStepType::Zone,
         //                        OutputProcessor::SOVStoreType::Average,
-        //                        state.dataHeatBal->Space(Loop).Name);
+        //                        state.dataHeatBal->space(Loop).Name);
         //}
 
         // PEOPLE: Includes both information related to the heat balance and thermal comfort
@@ -512,13 +512,13 @@ namespace InternalHeatGains {
                 state.dataHeatBal->PeopleObjects(Item).ZoneOrZoneListPtr = zoneNum;
                 continue;
             }
-            int spaceNum = UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->Space);
+            int spaceNum = UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->space);
             if (spaceNum > 0) {
                 state.dataHeatBal->PeopleObjects(Item).StartPtr = state.dataHeatBal->TotPeople + 1;
                 ++state.dataHeatBal->TotPeople;
-                state.dataHeatBal->PeopleObjects(Item).NumOfSpaces = 1;
-                state.dataHeatBal->PeopleObjects(Item).SpaceListActive = false;
-                state.dataHeatBal->PeopleObjects(Item).SpaceOrSpaceListPtr = spaceNum;
+                state.dataHeatBal->PeopleObjects(Item).numOfSpaces = 1;
+                state.dataHeatBal->PeopleObjects(Item).spaceListActive = false;
+                state.dataHeatBal->PeopleObjects(Item).spaceOrSpaceListPtr = spaceNum;
                 state.dataHeatBal->PeopleObjects(Item).StartPtr = state.dataHeatBal->TotPeople + 1;
                 continue;
             }
@@ -530,12 +530,12 @@ namespace InternalHeatGains {
                 state.dataHeatBal->PeopleObjects(Item).ZoneOrZoneListPtr = zoneListNum;
                 continue;
             }
-            int spaceListNum = UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->SpaceList);
+            int spaceListNum = UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->spaceList);
             if (spaceListNum > 0) {
-                state.dataHeatBal->TotPeople += state.dataHeatBal->SpaceList(spaceListNum).NumOfSpaces;
-                state.dataHeatBal->PeopleObjects(Item).NumOfSpaces = state.dataHeatBal->SpaceList(spaceListNum).NumOfSpaces;
-                state.dataHeatBal->PeopleObjects(Item).SpaceListActive = true;
-                state.dataHeatBal->PeopleObjects(Item).SpaceOrSpaceListPtr = spaceListNum;
+                state.dataHeatBal->TotPeople += state.dataHeatBal->spaceList(spaceListNum).numOfSpaces;
+                state.dataHeatBal->PeopleObjects(Item).numOfSpaces = state.dataHeatBal->spaceList(spaceListNum).numOfSpaces;
+                state.dataHeatBal->PeopleObjects(Item).spaceListActive = true;
+                state.dataHeatBal->PeopleObjects(Item).spaceOrSpaceListPtr = spaceListNum;
                 continue;
             }
             ShowSevereError(state,
@@ -573,7 +573,7 @@ namespace InternalHeatGains {
                                                                          state.dataIPShortCut->cNumericFieldNames);
 
                 int const numZones = state.dataHeatBal->PeopleObjects(Item).NumOfZones;
-                int const numSpaces = state.dataHeatBal->PeopleObjects(Item).NumOfSpaces;
+                int const numSpaces = state.dataHeatBal->PeopleObjects(Item).numOfSpaces;
                 // At this point, one or both of these should be zero
                 assert((numZones == 0) || (numSpaces == 0));
 
@@ -585,8 +585,8 @@ namespace InternalHeatGains {
                         int const zoneNum = state.dataHeatBal->PeopleObjects(Item).ZoneOrZoneListPtr;
                         state.dataHeatBal->People(Loop).ZonePtr = zoneNum;
                         if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).Spaces) {
-                                state.dataHeatBal->People(Loop).SpacePtrs.emplace_back(spaceNum);
+                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                                state.dataHeatBal->People(Loop).spacePtrs.emplace_back(spaceNum);
                             }
                         }
                     } else if (state.dataHeatBal->PeopleObjects(Item).ZoneListActive) {
@@ -605,48 +605,48 @@ namespace InternalHeatGains {
                         int const zoneNum = state.dataHeatBal->ZoneList(state.dataHeatBal->PeopleObjects(Item).ZoneOrZoneListPtr).Zone(Item1);
                         state.dataHeatBal->People(Loop).ZonePtr = zoneNum;
                         if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).Spaces) {
-                                state.dataHeatBal->People(Loop).SpacePtrs.emplace_back(spaceNum);
+                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                                state.dataHeatBal->People(Loop).spacePtrs.emplace_back(spaceNum);
                             }
                         }
                         if (errFlag) ErrorsFound = true;
-                    } else if ((numSpaces > 0) && !state.dataHeatBal->PeopleObjects(Item).SpaceListActive) {
+                    } else if ((numSpaces > 0) && !state.dataHeatBal->PeopleObjects(Item).spaceListActive) {
                         state.dataHeatBal->People(Loop).Name = AlphaName(1);
-                        int const spaceNum = state.dataHeatBal->PeopleObjects(Item).SpaceOrSpaceListPtr;
+                        int const spaceNum = state.dataHeatBal->PeopleObjects(Item).spaceOrSpaceListPtr;
                         if (spaceNum > 0) {
-                            state.dataHeatBal->People(Loop).SpacePtrs.emplace_back(spaceNum);
-                            state.dataHeatBal->People(Loop).ZonePtr = state.dataHeatBal->Space(spaceNum).ZoneNum;
+                            state.dataHeatBal->People(Loop).spacePtrs.emplace_back(spaceNum);
+                            state.dataHeatBal->People(Loop).ZonePtr = state.dataHeatBal->space(spaceNum).zoneNum;
                         }
-                    } else if (state.dataHeatBal->PeopleObjects(Item).SpaceListActive) {
-                        int const spaceNum = state.dataHeatBal->SpaceList(state.dataHeatBal->PeopleObjects(Item).SpaceOrSpaceListPtr).Spaces(Item1);
+                    } else if (state.dataHeatBal->PeopleObjects(Item).spaceListActive) {
+                        int const spaceNum = state.dataHeatBal->spaceList(state.dataHeatBal->PeopleObjects(Item).spaceOrSpaceListPtr).spaces(Item1);
                         CheckCreatedZoneItemName(
                             state,
                             RoutineName,
                             CurrentModuleObject,
-                            state.dataHeatBal->Space(spaceNum).Name,
-                            state.dataHeatBal->SpaceList(state.dataHeatBal->PeopleObjects(Item).SpaceOrSpaceListPtr).MaxSpaceNameLength,
+                            state.dataHeatBal->space(spaceNum).Name,
+                            state.dataHeatBal->spaceList(state.dataHeatBal->PeopleObjects(Item).spaceOrSpaceListPtr).maxSpaceNameLength,
                             state.dataHeatBal->PeopleObjects(Item).Name,
                             state.dataHeatBal->People,
                             Loop - 1,
                             state.dataHeatBal->People(Loop).Name,
                             errFlag);
                         if (spaceNum > 0) {
-                            state.dataHeatBal->People(Loop).SpacePtrs.emplace_back(spaceNum);
-                            state.dataHeatBal->People(Loop).ZonePtr = state.dataHeatBal->Space(spaceNum).ZoneNum;
+                            state.dataHeatBal->People(Loop).spacePtrs.emplace_back(spaceNum);
+                            state.dataHeatBal->People(Loop).ZonePtr = state.dataHeatBal->space(spaceNum).zoneNum;
                         }
                         if (errFlag) ErrorsFound = true;
                     }
 
                     // Set space load fractions
-                    if (int(state.dataHeatBal->People(Loop).SpacePtrs.size()) <= 1) {
-                        state.dataHeatBal->People(Loop).SpaceFracs.emplace_back(1.0);
+                    if (int(state.dataHeatBal->People(Loop).spacePtrs.size()) <= 1) {
+                        state.dataHeatBal->People(Loop).spaceFracs.emplace_back(1.0);
                     } else {
                         if (state.dataHeatBal->People(Loop).ZonePtr > 0) {
                             Real64 const zoneArea = state.dataHeatBal->Zone(state.dataHeatBal->People(Loop).ZonePtr).FloorArea;
                             if (zoneArea > 0.0) {
-                                for (int const spaceNum : state.dataHeatBal->People(Loop).SpacePtrs) {
-                                    Real64 const spaceArea = state.dataHeatBal->Space(spaceNum).FloorArea;
-                                    state.dataHeatBal->People(Loop).SpaceFracs.emplace_back(spaceArea / zoneArea);
+                                for (int const spaceNum : state.dataHeatBal->People(Loop).spacePtrs) {
+                                    Real64 const spaceArea = state.dataHeatBal->space(spaceNum).floorArea;
+                                    state.dataHeatBal->People(Loop).spaceFracs.emplace_back(spaceArea / zoneArea);
                                 }
                             } else {
                                 ShowSevereError(state, std::string(RoutineName) + "Zone floor area is zero when allocating People loads to Spaces.");
@@ -1462,87 +1462,87 @@ namespace InternalHeatGains {
                     }
 
                     //// Space total report variables
-                    // for (int spaceNum : state.dataHeatBal->People(Loop).SpacePtrs) {
+                    // for (int spaceNum : state.dataHeatBal->People(Loop).spacePtrs) {
 
                     //    if (SpaceRepVarSet(spaceNum)) {
                     //        SpaceRepVarSet(spaceNum) = false;
                     //        SetupOutputVariable(state,
                     //                            "Space People Occupant Count",
                     //                            OutputProcessor::Unit::None,
-                    //                            state.dataHeatBal->SpaceRpt(spaceNum).PeopleNumOcc,
+                    //                            state.dataHeatBal->spaceRpt(spaceNum).PeopleNumOcc,
                     //                            OutputProcessor::SOVTimeStepType::Zone,
                     //                            OutputProcessor::SOVStoreType::Average,
-                    //                            state.dataHeatBal->Space(spaceNum).Name);
+                    //                            state.dataHeatBal->space(spaceNum).Name);
                     //        SetupOutputVariable(state,
                     //                            "Space People Radiant Heating Energy",
                     //                            OutputProcessor::Unit::J,
-                    //                            state.dataHeatBal->SpaceRpt(spaceNum).PeopleRadGain,
+                    //                            state.dataHeatBal->spaceRpt(spaceNum).PeopleRadGain,
                     //                            OutputProcessor::SOVTimeStepType::Zone,
                     //                            OutputProcessor::SOVStoreType::Summed,
-                    //                            state.dataHeatBal->Space(spaceNum).Name);
+                    //                            state.dataHeatBal->space(spaceNum).Name);
                     //        SetupOutputVariable(state,
                     //                            "Space People Radiant Heating Rate",
                     //                            OutputProcessor::Unit::W,
-                    //                            state.dataHeatBal->SpaceRpt(spaceNum).PeopleRadGainRate,
+                    //                            state.dataHeatBal->spaceRpt(spaceNum).PeopleRadGainRate,
                     //                            OutputProcessor::SOVTimeStepType::Zone,
                     //                            OutputProcessor::SOVStoreType::Average,
-                    //                            state.dataHeatBal->Space(spaceNum).Name);
+                    //                            state.dataHeatBal->space(spaceNum).Name);
                     //        SetupOutputVariable(state,
                     //                            "Space People Convective Heating Energy",
                     //                            OutputProcessor::Unit::J,
-                    //                            state.dataHeatBal->SpaceRpt(spaceNum).PeopleConGain,
+                    //                            state.dataHeatBal->spaceRpt(spaceNum).PeopleConGain,
                     //                            OutputProcessor::SOVTimeStepType::Zone,
                     //                            OutputProcessor::SOVStoreType::Summed,
-                    //                            state.dataHeatBal->Space(spaceNum).Name);
+                    //                            state.dataHeatBal->space(spaceNum).Name);
                     //        SetupOutputVariable(state,
                     //                            "Space People Convective Heating Rate",
                     //                            OutputProcessor::Unit::W,
-                    //                            state.dataHeatBal->SpaceRpt(spaceNum).PeopleConGainRate,
+                    //                            state.dataHeatBal->spaceRpt(spaceNum).PeopleConGainRate,
                     //                            OutputProcessor::SOVTimeStepType::Zone,
                     //                            OutputProcessor::SOVStoreType::Average,
-                    //                            state.dataHeatBal->Space(spaceNum).Name);
+                    //                            state.dataHeatBal->space(spaceNum).Name);
                     //        SetupOutputVariable(state,
                     //                            "Space People Sensible Heating Energy",
                     //                            OutputProcessor::Unit::J,
-                    //                            state.dataHeatBal->SpaceRpt(spaceNum).PeopleSenGain,
+                    //                            state.dataHeatBal->spaceRpt(spaceNum).PeopleSenGain,
                     //                            OutputProcessor::SOVTimeStepType::Zone,
                     //                            OutputProcessor::SOVStoreType::Summed,
-                    //                            state.dataHeatBal->Space(spaceNum).Name);
+                    //                            state.dataHeatBal->space(spaceNum).Name);
                     //        SetupOutputVariable(state,
                     //                            "Space People Sensible Heating Rate",
                     //                            OutputProcessor::Unit::W,
-                    //                            state.dataHeatBal->SpaceRpt(spaceNum).PeopleSenGainRate,
+                    //                            state.dataHeatBal->spaceRpt(spaceNum).PeopleSenGainRate,
                     //                            OutputProcessor::SOVTimeStepType::Zone,
                     //                            OutputProcessor::SOVStoreType::Average,
-                    //                            state.dataHeatBal->Space(spaceNum).Name);
+                    //                            state.dataHeatBal->space(spaceNum).Name);
                     //        SetupOutputVariable(state,
                     //                            "Space People Latent Gain Energy",
                     //                            OutputProcessor::Unit::J,
-                    //                            state.dataHeatBal->SpaceRpt(spaceNum).PeopleLatGain,
+                    //                            state.dataHeatBal->spaceRpt(spaceNum).PeopleLatGain,
                     //                            OutputProcessor::SOVTimeStepType::Zone,
                     //                            OutputProcessor::SOVStoreType::Summed,
-                    //                            state.dataHeatBal->Space(spaceNum).Name);
+                    //                            state.dataHeatBal->space(spaceNum).Name);
                     //        SetupOutputVariable(state,
                     //                            "Space People Latent Gain Rate",
                     //                            OutputProcessor::Unit::W,
-                    //                            state.dataHeatBal->SpaceRpt(spaceNum).PeopleLatGainRate,
+                    //                            state.dataHeatBal->spaceRpt(spaceNum).PeopleLatGainRate,
                     //                            OutputProcessor::SOVTimeStepType::Zone,
                     //                            OutputProcessor::SOVStoreType::Average,
-                    //                            state.dataHeatBal->Space(spaceNum).Name);
+                    //                            state.dataHeatBal->space(spaceNum).Name);
                     //        SetupOutputVariable(state,
                     //                            "Space People Total Heating Energy",
                     //                            OutputProcessor::Unit::J,
-                    //                            state.dataHeatBal->SpaceRpt(spaceNum).PeopleTotGain,
+                    //                            state.dataHeatBal->spaceRpt(spaceNum).PeopleTotGain,
                     //                            OutputProcessor::SOVTimeStepType::Zone,
                     //                            OutputProcessor::SOVStoreType::Summed,
-                    //                            state.dataHeatBal->Space(spaceNum).Name);
+                    //                            state.dataHeatBal->space(spaceNum).Name);
                     //        SetupOutputVariable(state,
                     //                            "Space People Total Heating Rate",
                     //                            OutputProcessor::Unit::W,
-                    //                            state.dataHeatBal->SpaceRpt(spaceNum).PeopleTotGainRate,
+                    //                            state.dataHeatBal->spaceRpt(spaceNum).PeopleTotGainRate,
                     //                            OutputProcessor::SOVTimeStepType::Zone,
                     //                            OutputProcessor::SOVStoreType::Average,
-                    //                            state.dataHeatBal->Space(spaceNum).Name);
+                    //                            state.dataHeatBal->space(spaceNum).Name);
                     //    }
                     //}
 
@@ -1728,8 +1728,8 @@ namespace InternalHeatGains {
                         int zoneNum = state.dataHeatBal->LightsObjects(Item).ZoneOrZoneListPtr;
                         state.dataHeatBal->Lights(Loop).ZonePtr = zoneNum;
                         if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).Spaces) {
-                                state.dataHeatBal->Lights(Loop).SpacePtrs.emplace_back(spaceNum);
+                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                                state.dataHeatBal->Lights(Loop).spacePtrs.emplace_back(spaceNum);
                             }
                         }
                     } else {
@@ -1748,8 +1748,8 @@ namespace InternalHeatGains {
                         int zoneNum = state.dataHeatBal->ZoneList(state.dataHeatBal->LightsObjects(Item).ZoneOrZoneListPtr).Zone(Item1);
                         state.dataHeatBal->Lights(Loop).ZonePtr = zoneNum;
                         if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).Spaces) {
-                                state.dataHeatBal->Lights(Loop).SpacePtrs.emplace_back(spaceNum);
+                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                                state.dataHeatBal->Lights(Loop).spacePtrs.emplace_back(spaceNum);
                             }
                         }
                         if (errFlag) ErrorsFound = true;
@@ -1799,15 +1799,15 @@ namespace InternalHeatGains {
                     }
 
                     // Set space load fractions
-                    if (int(state.dataHeatBal->Lights(Loop).SpacePtrs.size()) <= 1) {
-                        state.dataHeatBal->Lights(Loop).SpaceFracs.emplace_back(1.0);
+                    if (int(state.dataHeatBal->Lights(Loop).spacePtrs.size()) <= 1) {
+                        state.dataHeatBal->Lights(Loop).spaceFracs.emplace_back(1.0);
                     } else {
                         if (state.dataHeatBal->Lights(Loop).ZonePtr > 0) {
                             Real64 const zoneArea = state.dataHeatBal->Zone(state.dataHeatBal->Lights(Loop).ZonePtr).FloorArea;
                             if (zoneArea > 0.0) {
-                                for (int const spaceNum : state.dataHeatBal->Lights(Loop).SpacePtrs) {
-                                    Real64 const spaceArea = state.dataHeatBal->Space(spaceNum).FloorArea;
-                                    state.dataHeatBal->Lights(Loop).SpaceFracs.emplace_back(spaceArea / zoneArea);
+                                for (int const spaceNum : state.dataHeatBal->Lights(Loop).spacePtrs) {
+                                    Real64 const spaceArea = state.dataHeatBal->space(spaceNum).floorArea;
+                                    state.dataHeatBal->Lights(Loop).spaceFracs.emplace_back(spaceArea / zoneArea);
                                 }
                             } else {
                                 ShowSevereError(state, std::string(RoutineName) + "Zone floor area is zero when allocating Lights loads to Spaces.");
@@ -2334,8 +2334,8 @@ namespace InternalHeatGains {
                         int zoneNum = state.dataHeatBal->ZoneElectricObjects(Item).ZoneOrZoneListPtr;
                         state.dataHeatBal->ZoneElectric(Loop).ZonePtr = zoneNum;
                         if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).Spaces) {
-                                state.dataHeatBal->ZoneElectric(Loop).SpacePtrs.emplace_back(spaceNum);
+                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                                state.dataHeatBal->ZoneElectric(Loop).spacePtrs.emplace_back(spaceNum);
                             }
                         }
                     } else {
@@ -2355,8 +2355,8 @@ namespace InternalHeatGains {
                         int zoneNum = state.dataHeatBal->ZoneList(state.dataHeatBal->ZoneElectricObjects(Item).ZoneOrZoneListPtr).Zone(Item1);
                         state.dataHeatBal->ZoneElectric(Loop).ZonePtr = zoneNum;
                         if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).Spaces) {
-                                state.dataHeatBal->ZoneElectric(Loop).SpacePtrs.emplace_back(spaceNum);
+                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                                state.dataHeatBal->ZoneElectric(Loop).spacePtrs.emplace_back(spaceNum);
                             }
                         }
                         if (errFlag) ErrorsFound = true;
@@ -2400,15 +2400,15 @@ namespace InternalHeatGains {
                     }
 
                     // Set space load fractions
-                    if (int(state.dataHeatBal->ZoneElectric(Loop).SpacePtrs.size()) <= 1) {
-                        state.dataHeatBal->ZoneElectric(Loop).SpaceFracs.emplace_back(1.0);
+                    if (int(state.dataHeatBal->ZoneElectric(Loop).spacePtrs.size()) <= 1) {
+                        state.dataHeatBal->ZoneElectric(Loop).spaceFracs.emplace_back(1.0);
                     } else {
                         if (state.dataHeatBal->ZoneElectric(Loop).ZonePtr > 0) {
                             Real64 const zoneArea = state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).FloorArea;
                             if (zoneArea > 0.0) {
-                                for (int const spaceNum : state.dataHeatBal->ZoneElectric(Loop).SpacePtrs) {
-                                    Real64 const spaceArea = state.dataHeatBal->Space(spaceNum).FloorArea;
-                                    state.dataHeatBal->ZoneElectric(Loop).SpaceFracs.emplace_back(spaceArea / zoneArea);
+                                for (int const spaceNum : state.dataHeatBal->ZoneElectric(Loop).spacePtrs) {
+                                    Real64 const spaceArea = state.dataHeatBal->space(spaceNum).floorArea;
+                                    state.dataHeatBal->ZoneElectric(Loop).spaceFracs.emplace_back(spaceArea / zoneArea);
                                 }
                             } else {
                                 ShowSevereError(
@@ -2831,8 +2831,8 @@ namespace InternalHeatGains {
                         int zoneNum = state.dataHeatBal->ZoneGasObjects(Item).ZoneOrZoneListPtr;
                         state.dataHeatBal->ZoneGas(Loop).ZonePtr = zoneNum;
                         if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).Spaces) {
-                                state.dataHeatBal->ZoneGas(Loop).SpacePtrs.emplace_back(spaceNum);
+                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                                state.dataHeatBal->ZoneGas(Loop).spacePtrs.emplace_back(spaceNum);
                             }
                         }
                     } else {
@@ -2852,8 +2852,8 @@ namespace InternalHeatGains {
                         int zoneNum = state.dataHeatBal->ZoneList(state.dataHeatBal->ZoneGasObjects(Item).ZoneOrZoneListPtr).Zone(Item1);
                         state.dataHeatBal->ZoneGas(Loop).ZonePtr = zoneNum;
                         if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).Spaces) {
-                                state.dataHeatBal->ZoneGas(Loop).SpacePtrs.emplace_back(spaceNum);
+                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                                state.dataHeatBal->ZoneGas(Loop).spacePtrs.emplace_back(spaceNum);
                             }
                         }
                         if (errFlag) ErrorsFound = true;
@@ -2903,15 +2903,15 @@ namespace InternalHeatGains {
                     }
 
                     // Set space load fractions
-                    if (int(state.dataHeatBal->ZoneGas(Loop).SpacePtrs.size()) <= 1) {
-                        state.dataHeatBal->ZoneGas(Loop).SpaceFracs.emplace_back(1.0);
+                    if (int(state.dataHeatBal->ZoneGas(Loop).spacePtrs.size()) <= 1) {
+                        state.dataHeatBal->ZoneGas(Loop).spaceFracs.emplace_back(1.0);
                     } else {
                         if (state.dataHeatBal->ZoneGas(Loop).ZonePtr > 0) {
                             Real64 const zoneArea = state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(Loop).ZonePtr).FloorArea;
                             if (zoneArea > 0.0) {
-                                for (int const spaceNum : state.dataHeatBal->ZoneGas(Loop).SpacePtrs) {
-                                    Real64 const spaceArea = state.dataHeatBal->Space(spaceNum).FloorArea;
-                                    state.dataHeatBal->ZoneGas(Loop).SpaceFracs.emplace_back(spaceArea / zoneArea);
+                                for (int const spaceNum : state.dataHeatBal->ZoneGas(Loop).spacePtrs) {
+                                    Real64 const spaceArea = state.dataHeatBal->space(spaceNum).floorArea;
+                                    state.dataHeatBal->ZoneGas(Loop).spaceFracs.emplace_back(spaceArea / zoneArea);
                                 }
                             } else {
                                 ShowSevereError(state,
@@ -3366,8 +3366,8 @@ namespace InternalHeatGains {
                         int zoneNum = state.dataHeatBal->HotWaterEqObjects(Item).ZoneOrZoneListPtr;
                         state.dataHeatBal->ZoneHWEq(Loop).ZonePtr = zoneNum;
                         if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).Spaces) {
-                                state.dataHeatBal->ZoneHWEq(Loop).SpacePtrs.emplace_back(spaceNum);
+                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                                state.dataHeatBal->ZoneHWEq(Loop).spacePtrs.emplace_back(spaceNum);
                             }
                         }
                     } else {
@@ -3387,8 +3387,8 @@ namespace InternalHeatGains {
                         int zoneNum = state.dataHeatBal->ZoneList(state.dataHeatBal->HotWaterEqObjects(Item).ZoneOrZoneListPtr).Zone(Item1);
                         state.dataHeatBal->ZoneHWEq(Loop).ZonePtr = zoneNum;
                         if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).Spaces) {
-                                state.dataHeatBal->ZoneHWEq(Loop).SpacePtrs.emplace_back(spaceNum);
+                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                                state.dataHeatBal->ZoneHWEq(Loop).spacePtrs.emplace_back(spaceNum);
                             }
                         }
                         if (errFlag) ErrorsFound = true;
@@ -3432,15 +3432,15 @@ namespace InternalHeatGains {
                     }
 
                     // Set space load fractions
-                    if (int(state.dataHeatBal->ZoneHWEq(Loop).SpacePtrs.size()) <= 1) {
-                        state.dataHeatBal->ZoneHWEq(Loop).SpaceFracs.emplace_back(1.0);
+                    if (int(state.dataHeatBal->ZoneHWEq(Loop).spacePtrs.size()) <= 1) {
+                        state.dataHeatBal->ZoneHWEq(Loop).spaceFracs.emplace_back(1.0);
                     } else {
                         if (state.dataHeatBal->ZoneHWEq(Loop).ZonePtr > 0) {
                             Real64 const zoneArea = state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).FloorArea;
                             if (zoneArea > 0.0) {
-                                for (int const spaceNum : state.dataHeatBal->ZoneHWEq(Loop).SpacePtrs) {
-                                    Real64 const spaceArea = state.dataHeatBal->Space(spaceNum).FloorArea;
-                                    state.dataHeatBal->ZoneHWEq(Loop).SpaceFracs.emplace_back(spaceArea / zoneArea);
+                                for (int const spaceNum : state.dataHeatBal->ZoneHWEq(Loop).spacePtrs) {
+                                    Real64 const spaceArea = state.dataHeatBal->space(spaceNum).floorArea;
+                                    state.dataHeatBal->ZoneHWEq(Loop).spaceFracs.emplace_back(spaceArea / zoneArea);
                                 }
                             } else {
                                 ShowSevereError(
@@ -3863,8 +3863,8 @@ namespace InternalHeatGains {
                         int zoneNum = state.dataHeatBal->SteamEqObjects(Item).ZoneOrZoneListPtr;
                         state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr = zoneNum;
                         if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).Spaces) {
-                                state.dataHeatBal->ZoneSteamEq(Loop).SpacePtrs.emplace_back(spaceNum);
+                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                                state.dataHeatBal->ZoneSteamEq(Loop).spacePtrs.emplace_back(spaceNum);
                             }
                         }
                     } else {
@@ -3884,8 +3884,8 @@ namespace InternalHeatGains {
                         int zoneNum = state.dataHeatBal->ZoneList(state.dataHeatBal->SteamEqObjects(Item).ZoneOrZoneListPtr).Zone(Item1);
                         state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr = zoneNum;
                         if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).Spaces) {
-                                state.dataHeatBal->ZoneSteamEq(Loop).SpacePtrs.emplace_back(spaceNum);
+                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                                state.dataHeatBal->ZoneSteamEq(Loop).spacePtrs.emplace_back(spaceNum);
                             }
                         }
                         if (errFlag) ErrorsFound = true;
@@ -3929,15 +3929,15 @@ namespace InternalHeatGains {
                     }
 
                     // Set space load fractions
-                    if (int(state.dataHeatBal->ZoneSteamEq(Loop).SpacePtrs.size()) <= 1) {
-                        state.dataHeatBal->ZoneSteamEq(Loop).SpaceFracs.emplace_back(1.0);
+                    if (int(state.dataHeatBal->ZoneSteamEq(Loop).spacePtrs.size()) <= 1) {
+                        state.dataHeatBal->ZoneSteamEq(Loop).spaceFracs.emplace_back(1.0);
                     } else {
                         if (state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr > 0) {
                             Real64 const zoneArea = state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).FloorArea;
                             if (zoneArea > 0.0) {
-                                for (int const spaceNum : state.dataHeatBal->ZoneSteamEq(Loop).SpacePtrs) {
-                                    Real64 const spaceArea = state.dataHeatBal->Space(spaceNum).FloorArea;
-                                    state.dataHeatBal->ZoneSteamEq(Loop).SpaceFracs.emplace_back(spaceArea / zoneArea);
+                                for (int const spaceNum : state.dataHeatBal->ZoneSteamEq(Loop).spacePtrs) {
+                                    Real64 const spaceArea = state.dataHeatBal->space(spaceNum).floorArea;
+                                    state.dataHeatBal->ZoneSteamEq(Loop).spaceFracs.emplace_back(spaceArea / zoneArea);
                                 }
                             } else {
                                 ShowSevereError(state,
@@ -4360,8 +4360,8 @@ namespace InternalHeatGains {
                         int zoneNum = state.dataHeatBal->OtherEqObjects(Item).ZoneOrZoneListPtr;
                         state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr = zoneNum;
                         if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).Spaces) {
-                                state.dataHeatBal->ZoneOtherEq(Loop).SpacePtrs.emplace_back(spaceNum);
+                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                                state.dataHeatBal->ZoneOtherEq(Loop).spacePtrs.emplace_back(spaceNum);
                             }
                         }
                     } else {
@@ -4381,8 +4381,8 @@ namespace InternalHeatGains {
                         int zoneNum = state.dataHeatBal->ZoneList(state.dataHeatBal->OtherEqObjects(Item).ZoneOrZoneListPtr).Zone(Item1);
                         state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr = zoneNum;
                         if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).Spaces) {
-                                state.dataHeatBal->ZoneOtherEq(Loop).SpacePtrs.emplace_back(spaceNum);
+                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                                state.dataHeatBal->ZoneOtherEq(Loop).spacePtrs.emplace_back(spaceNum);
                             }
                         }
                         if (errFlag) ErrorsFound = true;
@@ -4430,15 +4430,15 @@ namespace InternalHeatGains {
                     }
 
                     // Set space load fractions
-                    if (int(state.dataHeatBal->ZoneOtherEq(Loop).SpacePtrs.size()) <= 1) {
-                        state.dataHeatBal->ZoneOtherEq(Loop).SpaceFracs.emplace_back(1.0);
+                    if (int(state.dataHeatBal->ZoneOtherEq(Loop).spacePtrs.size()) <= 1) {
+                        state.dataHeatBal->ZoneOtherEq(Loop).spaceFracs.emplace_back(1.0);
                     } else {
                         if (state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr > 0) {
                             Real64 const zoneArea = state.dataHeatBal->Zone(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).FloorArea;
                             if (zoneArea > 0.0) {
-                                for (int const spaceNum : state.dataHeatBal->ZoneOtherEq(Loop).SpacePtrs) {
-                                    Real64 const spaceArea = state.dataHeatBal->Space(spaceNum).FloorArea;
-                                    state.dataHeatBal->ZoneOtherEq(Loop).SpaceFracs.emplace_back(spaceArea / zoneArea);
+                                for (int const spaceNum : state.dataHeatBal->ZoneOtherEq(Loop).spacePtrs) {
+                                    Real64 const spaceArea = state.dataHeatBal->space(spaceNum).floorArea;
+                                    state.dataHeatBal->ZoneOtherEq(Loop).spaceFracs.emplace_back(spaceArea / zoneArea);
                                 }
                             } else {
                                 ShowSevereError(state,
@@ -4830,21 +4830,21 @@ namespace InternalHeatGains {
                 int zoneNum = UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
                 state.dataHeatBal->ZoneITEq(Loop).ZonePtr = zoneNum;
                 if (zoneNum > 0) {
-                    for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).Spaces) {
-                        state.dataHeatBal->ZoneITEq(Loop).SpacePtrs.emplace_back(spaceNum);
+                    for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                        state.dataHeatBal->ZoneITEq(Loop).spacePtrs.emplace_back(spaceNum);
                     }
                 }
 
                 // Set space load fractions
-                if (int(state.dataHeatBal->ZoneITEq(Loop).SpacePtrs.size()) <= 1) {
-                    state.dataHeatBal->ZoneITEq(Loop).SpaceFracs.emplace_back(1.0);
+                if (int(state.dataHeatBal->ZoneITEq(Loop).spacePtrs.size()) <= 1) {
+                    state.dataHeatBal->ZoneITEq(Loop).spaceFracs.emplace_back(1.0);
                 } else {
                     if (state.dataHeatBal->ZoneITEq(Loop).ZonePtr > 0) {
                         Real64 const zoneArea = state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).FloorArea;
                         if (zoneArea > 0.0) {
-                            for (int const spaceNum : state.dataHeatBal->ZoneITEq(Loop).SpacePtrs) {
-                                Real64 const spaceArea = state.dataHeatBal->Space(spaceNum).FloorArea;
-                                state.dataHeatBal->ZoneITEq(Loop).SpaceFracs.emplace_back(spaceArea / zoneArea);
+                            for (int const spaceNum : state.dataHeatBal->ZoneITEq(Loop).spacePtrs) {
+                                Real64 const spaceArea = state.dataHeatBal->space(spaceNum).floorArea;
+                                state.dataHeatBal->ZoneITEq(Loop).spaceFracs.emplace_back(spaceArea / zoneArea);
                             }
                         } else {
                             ShowSevereError(state,
@@ -5751,19 +5751,19 @@ namespace InternalHeatGains {
                                     state.dataIPShortCut->cAlphaFieldNames(2) + " entered=" + AlphaName(2));
                 ErrorsFound = true;
             } else {
-                for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).Spaces) {
-                    state.dataHeatBal->ZoneBBHeat(Loop).SpacePtrs.emplace_back(spaceNum);
+                for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                    state.dataHeatBal->ZoneBBHeat(Loop).spacePtrs.emplace_back(spaceNum);
                 }
 
                 // Set space load fractions
-                if (int(state.dataHeatBal->ZoneBBHeat(Loop).SpacePtrs.size()) <= 1) {
-                    state.dataHeatBal->ZoneBBHeat(Loop).SpaceFracs.emplace_back(1.0);
+                if (int(state.dataHeatBal->ZoneBBHeat(Loop).spacePtrs.size()) <= 1) {
+                    state.dataHeatBal->ZoneBBHeat(Loop).spaceFracs.emplace_back(1.0);
                 } else {
                     Real64 const zoneArea = state.dataHeatBal->Zone(state.dataHeatBal->ZoneBBHeat(Loop).ZonePtr).FloorArea;
                     if (zoneArea > 0.0) {
-                        for (int const spaceNum : state.dataHeatBal->ZoneBBHeat(Loop).SpacePtrs) {
-                            Real64 const spaceArea = state.dataHeatBal->Space(spaceNum).FloorArea;
-                            state.dataHeatBal->ZoneBBHeat(Loop).SpaceFracs.emplace_back(spaceArea / zoneArea);
+                        for (int const spaceNum : state.dataHeatBal->ZoneBBHeat(Loop).spacePtrs) {
+                            Real64 const spaceArea = state.dataHeatBal->space(spaceNum).floorArea;
+                            state.dataHeatBal->ZoneBBHeat(Loop).spaceFracs.emplace_back(spaceArea / zoneArea);
                         }
                     } else {
                         ShowSevereError(state,
@@ -6702,7 +6702,7 @@ namespace InternalHeatGains {
             e.QSELost = 0.0;
         }
 
-        for (auto &e : state.dataHeatBal->SpaceIntGain) {
+        for (auto &e : state.dataHeatBal->spaceIntGain) {
             e.NOFOCC = 0.0;
             e.QOCTOT = 0.0;
             e.QOCSEN = 0.0;
@@ -6829,15 +6829,15 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZoneIntGain(NZ).QOCLAT += state.dataHeatBal->People(Loop).LatGainRate;
             state.dataHeatBal->ZoneIntGain(NZ).QOCTOT += state.dataHeatBal->People(Loop).TotGainRate;
 
-            for (int index = 1; index <= int(state.dataHeatBal->People(Loop).SpacePtrs.size()); ++index) {
-                int spaceNum = state.dataHeatBal->People(Loop).SpacePtrs(index);
-                Real64 spaceFrac = state.dataHeatBal->People(Loop).SpaceFracs(index);
-                state.dataHeatBal->SpaceIntGain(spaceNum).NOFOCC += state.dataHeatBal->People(Loop).NumOcc * spaceFrac;
-                state.dataHeatBal->SpaceIntGain(spaceNum).QOCRAD += state.dataHeatBal->People(Loop).RadGainRate * spaceFrac;
-                state.dataHeatBal->SpaceIntGain(spaceNum).QOCCON += state.dataHeatBal->People(Loop).ConGainRate * spaceFrac;
-                state.dataHeatBal->SpaceIntGain(spaceNum).QOCSEN += state.dataHeatBal->People(Loop).SenGainRate * spaceFrac;
-                state.dataHeatBal->SpaceIntGain(spaceNum).QOCLAT += state.dataHeatBal->People(Loop).LatGainRate * spaceFrac;
-                state.dataHeatBal->SpaceIntGain(spaceNum).QOCTOT += state.dataHeatBal->People(Loop).TotGainRate * spaceFrac;
+            for (int index = 1; index <= int(state.dataHeatBal->People(Loop).spacePtrs.size()); ++index) {
+                int spaceNum = state.dataHeatBal->People(Loop).spacePtrs(index);
+                Real64 spaceFrac = state.dataHeatBal->People(Loop).spaceFracs(index);
+                state.dataHeatBal->spaceIntGain(spaceNum).NOFOCC += state.dataHeatBal->People(Loop).NumOcc * spaceFrac;
+                state.dataHeatBal->spaceIntGain(spaceNum).QOCRAD += state.dataHeatBal->People(Loop).RadGainRate * spaceFrac;
+                state.dataHeatBal->spaceIntGain(spaceNum).QOCCON += state.dataHeatBal->People(Loop).ConGainRate * spaceFrac;
+                state.dataHeatBal->spaceIntGain(spaceNum).QOCSEN += state.dataHeatBal->People(Loop).SenGainRate * spaceFrac;
+                state.dataHeatBal->spaceIntGain(spaceNum).QOCLAT += state.dataHeatBal->People(Loop).LatGainRate * spaceFrac;
+                state.dataHeatBal->spaceIntGain(spaceNum).QOCTOT += state.dataHeatBal->People(Loop).TotGainRate * spaceFrac;
             }
         }
 
@@ -6903,14 +6903,14 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZoneIntGain(NZ).QLTCRA += state.dataHeatBal->Lights(Loop).RetAirGainRate;
             state.dataHeatBal->ZoneIntGain(NZ).QLTTOT += state.dataHeatBal->Lights(Loop).TotGainRate;
 
-            for (int index = 1; index <= int(state.dataHeatBal->Lights(Loop).SpacePtrs.size()); ++index) {
-                int spaceNum = state.dataHeatBal->Lights(Loop).SpacePtrs(index);
-                Real64 spaceFrac = state.dataHeatBal->Lights(Loop).SpaceFracs(index);
-                state.dataHeatBal->SpaceIntGain(spaceNum).QLTRAD += state.dataHeatBal->Lights(Loop).RadGainRate * spaceFrac;
-                state.dataHeatBal->SpaceIntGain(spaceNum).QLTSW += state.dataHeatBal->Lights(Loop).VisGainRate * spaceFrac;
-                state.dataHeatBal->SpaceIntGain(spaceNum).QLTCON += state.dataHeatBal->Lights(Loop).ConGainRate * spaceFrac;
-                state.dataHeatBal->SpaceIntGain(spaceNum).QLTCRA += state.dataHeatBal->Lights(Loop).RetAirGainRate * spaceFrac;
-                state.dataHeatBal->SpaceIntGain(spaceNum).QLTTOT += state.dataHeatBal->Lights(Loop).TotGainRate * spaceFrac;
+            for (int index = 1; index <= int(state.dataHeatBal->Lights(Loop).spacePtrs.size()); ++index) {
+                int spaceNum = state.dataHeatBal->Lights(Loop).spacePtrs(index);
+                Real64 spaceFrac = state.dataHeatBal->Lights(Loop).spaceFracs(index);
+                state.dataHeatBal->spaceIntGain(spaceNum).QLTRAD += state.dataHeatBal->Lights(Loop).RadGainRate * spaceFrac;
+                state.dataHeatBal->spaceIntGain(spaceNum).QLTSW += state.dataHeatBal->Lights(Loop).VisGainRate * spaceFrac;
+                state.dataHeatBal->spaceIntGain(spaceNum).QLTCON += state.dataHeatBal->Lights(Loop).ConGainRate * spaceFrac;
+                state.dataHeatBal->spaceIntGain(spaceNum).QLTCRA += state.dataHeatBal->Lights(Loop).RetAirGainRate * spaceFrac;
+                state.dataHeatBal->spaceIntGain(spaceNum).QLTTOT += state.dataHeatBal->Lights(Loop).TotGainRate * spaceFrac;
             }
         }
 
@@ -6938,13 +6938,13 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZoneIntGain(NZ).QEELAT += state.dataHeatBal->ZoneElectric(Loop).LatGainRate;
             state.dataHeatBal->ZoneIntGain(NZ).QEELost += state.dataHeatBal->ZoneElectric(Loop).LostRate;
 
-            for (int index = 1; index <= int(state.dataHeatBal->ZoneElectric(Loop).SpacePtrs.size()); ++index) {
-                int spaceNum = state.dataHeatBal->ZoneElectric(Loop).SpacePtrs(index);
-                Real64 spaceFrac = state.dataHeatBal->ZoneElectric(Loop).SpaceFracs(index);
-                state.dataHeatBal->SpaceIntGain(spaceNum).QEERAD += state.dataHeatBal->ZoneElectric(Loop).RadGainRate * spaceFrac;
-                state.dataHeatBal->SpaceIntGain(spaceNum).QEECON += state.dataHeatBal->ZoneElectric(Loop).ConGainRate * spaceFrac;
-                state.dataHeatBal->SpaceIntGain(spaceNum).QEELAT += state.dataHeatBal->ZoneElectric(Loop).LatGainRate * spaceFrac;
-                state.dataHeatBal->SpaceIntGain(spaceNum).QEELost += state.dataHeatBal->ZoneElectric(Loop).LostRate * spaceFrac;
+            for (int index = 1; index <= int(state.dataHeatBal->ZoneElectric(Loop).spacePtrs.size()); ++index) {
+                int spaceNum = state.dataHeatBal->ZoneElectric(Loop).spacePtrs(index);
+                Real64 spaceFrac = state.dataHeatBal->ZoneElectric(Loop).spaceFracs(index);
+                state.dataHeatBal->spaceIntGain(spaceNum).QEERAD += state.dataHeatBal->ZoneElectric(Loop).RadGainRate * spaceFrac;
+                state.dataHeatBal->spaceIntGain(spaceNum).QEECON += state.dataHeatBal->ZoneElectric(Loop).ConGainRate * spaceFrac;
+                state.dataHeatBal->spaceIntGain(spaceNum).QEELAT += state.dataHeatBal->ZoneElectric(Loop).LatGainRate * spaceFrac;
+                state.dataHeatBal->spaceIntGain(spaceNum).QEELost += state.dataHeatBal->ZoneElectric(Loop).LostRate * spaceFrac;
             }
         }
 
@@ -6969,13 +6969,13 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZoneIntGain(NZ).QGELAT += state.dataHeatBal->ZoneGas(Loop).LatGainRate;
             state.dataHeatBal->ZoneIntGain(NZ).QGELost += state.dataHeatBal->ZoneGas(Loop).LostRate;
 
-            for (int index = 1; index <= int(state.dataHeatBal->ZoneGas(Loop).SpacePtrs.size()); ++index) {
-                int spaceNum = state.dataHeatBal->ZoneGas(Loop).SpacePtrs(index);
-                Real64 spaceFrac = state.dataHeatBal->ZoneGas(Loop).SpaceFracs(index);
-                state.dataHeatBal->SpaceIntGain(spaceNum).QGERAD += state.dataHeatBal->ZoneGas(Loop).RadGainRate * spaceFrac;
-                state.dataHeatBal->SpaceIntGain(spaceNum).QGECON += state.dataHeatBal->ZoneGas(Loop).ConGainRate * spaceFrac;
-                state.dataHeatBal->SpaceIntGain(spaceNum).QGELAT += state.dataHeatBal->ZoneGas(Loop).LatGainRate * spaceFrac;
-                state.dataHeatBal->SpaceIntGain(spaceNum).QGELost += state.dataHeatBal->ZoneGas(Loop).LostRate * spaceFrac;
+            for (int index = 1; index <= int(state.dataHeatBal->ZoneGas(Loop).spacePtrs.size()); ++index) {
+                int spaceNum = state.dataHeatBal->ZoneGas(Loop).spacePtrs(index);
+                Real64 spaceFrac = state.dataHeatBal->ZoneGas(Loop).spaceFracs(index);
+                state.dataHeatBal->spaceIntGain(spaceNum).QGERAD += state.dataHeatBal->ZoneGas(Loop).RadGainRate * spaceFrac;
+                state.dataHeatBal->spaceIntGain(spaceNum).QGECON += state.dataHeatBal->ZoneGas(Loop).ConGainRate * spaceFrac;
+                state.dataHeatBal->spaceIntGain(spaceNum).QGELAT += state.dataHeatBal->ZoneGas(Loop).LatGainRate * spaceFrac;
+                state.dataHeatBal->spaceIntGain(spaceNum).QGELost += state.dataHeatBal->ZoneGas(Loop).LostRate * spaceFrac;
             }
         }
 
@@ -6998,13 +6998,13 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZoneIntGain(NZ).QOELAT += state.dataHeatBal->ZoneOtherEq(Loop).LatGainRate;
             state.dataHeatBal->ZoneIntGain(NZ).QOELost += state.dataHeatBal->ZoneOtherEq(Loop).LostRate;
 
-            for (int index = 1; index <= int(state.dataHeatBal->ZoneOtherEq(Loop).SpacePtrs.size()); ++index) {
-                int spaceNum = state.dataHeatBal->ZoneOtherEq(Loop).SpacePtrs(index);
-                Real64 spaceFrac = state.dataHeatBal->ZoneOtherEq(Loop).SpaceFracs(index);
-                state.dataHeatBal->SpaceIntGain(spaceNum).QOERAD += state.dataHeatBal->ZoneOtherEq(Loop).RadGainRate * spaceFrac;
-                state.dataHeatBal->SpaceIntGain(spaceNum).QOECON += state.dataHeatBal->ZoneOtherEq(Loop).ConGainRate * spaceFrac;
-                state.dataHeatBal->SpaceIntGain(spaceNum).QOELAT += state.dataHeatBal->ZoneOtherEq(Loop).LatGainRate * spaceFrac;
-                state.dataHeatBal->SpaceIntGain(spaceNum).QOELost += state.dataHeatBal->ZoneOtherEq(Loop).LostRate * spaceFrac;
+            for (int index = 1; index <= int(state.dataHeatBal->ZoneOtherEq(Loop).spacePtrs.size()); ++index) {
+                int spaceNum = state.dataHeatBal->ZoneOtherEq(Loop).spacePtrs(index);
+                Real64 spaceFrac = state.dataHeatBal->ZoneOtherEq(Loop).spaceFracs(index);
+                state.dataHeatBal->spaceIntGain(spaceNum).QOERAD += state.dataHeatBal->ZoneOtherEq(Loop).RadGainRate * spaceFrac;
+                state.dataHeatBal->spaceIntGain(spaceNum).QOECON += state.dataHeatBal->ZoneOtherEq(Loop).ConGainRate * spaceFrac;
+                state.dataHeatBal->spaceIntGain(spaceNum).QOELAT += state.dataHeatBal->ZoneOtherEq(Loop).LatGainRate * spaceFrac;
+                state.dataHeatBal->spaceIntGain(spaceNum).QOELost += state.dataHeatBal->ZoneOtherEq(Loop).LostRate * spaceFrac;
             }
         }
 
@@ -7028,13 +7028,13 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZoneIntGain(NZ).QHWLAT += state.dataHeatBal->ZoneHWEq(Loop).LatGainRate;
             state.dataHeatBal->ZoneIntGain(NZ).QHWLost += state.dataHeatBal->ZoneHWEq(Loop).LostRate;
 
-            for (int index = 1; index <= int(state.dataHeatBal->ZoneHWEq(Loop).SpacePtrs.size()); ++index) {
-                int spaceNum = state.dataHeatBal->ZoneHWEq(Loop).SpacePtrs(index);
-                Real64 spaceFrac = state.dataHeatBal->ZoneHWEq(Loop).SpaceFracs(index);
-                state.dataHeatBal->SpaceIntGain(spaceNum).QHWRAD += state.dataHeatBal->ZoneHWEq(Loop).RadGainRate * spaceFrac;
-                state.dataHeatBal->SpaceIntGain(spaceNum).QHWCON += state.dataHeatBal->ZoneHWEq(Loop).ConGainRate * spaceFrac;
-                state.dataHeatBal->SpaceIntGain(spaceNum).QHWLAT += state.dataHeatBal->ZoneHWEq(Loop).LatGainRate * spaceFrac;
-                state.dataHeatBal->SpaceIntGain(spaceNum).QHWLost += state.dataHeatBal->ZoneHWEq(Loop).LostRate * spaceFrac;
+            for (int index = 1; index <= int(state.dataHeatBal->ZoneHWEq(Loop).spacePtrs.size()); ++index) {
+                int spaceNum = state.dataHeatBal->ZoneHWEq(Loop).spacePtrs(index);
+                Real64 spaceFrac = state.dataHeatBal->ZoneHWEq(Loop).spaceFracs(index);
+                state.dataHeatBal->spaceIntGain(spaceNum).QHWRAD += state.dataHeatBal->ZoneHWEq(Loop).RadGainRate * spaceFrac;
+                state.dataHeatBal->spaceIntGain(spaceNum).QHWCON += state.dataHeatBal->ZoneHWEq(Loop).ConGainRate * spaceFrac;
+                state.dataHeatBal->spaceIntGain(spaceNum).QHWLAT += state.dataHeatBal->ZoneHWEq(Loop).LatGainRate * spaceFrac;
+                state.dataHeatBal->spaceIntGain(spaceNum).QHWLost += state.dataHeatBal->ZoneHWEq(Loop).LostRate * spaceFrac;
             }
         }
 
@@ -7058,13 +7058,13 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZoneIntGain(NZ).QSELAT += state.dataHeatBal->ZoneSteamEq(Loop).LatGainRate;
             state.dataHeatBal->ZoneIntGain(NZ).QSELost += state.dataHeatBal->ZoneSteamEq(Loop).LostRate;
 
-            for (int index = 1; index <= int(state.dataHeatBal->ZoneSteamEq(Loop).SpacePtrs.size()); ++index) {
-                int spaceNum = state.dataHeatBal->ZoneSteamEq(Loop).SpacePtrs(index);
-                Real64 spaceFrac = state.dataHeatBal->ZoneSteamEq(Loop).SpaceFracs(index);
-                state.dataHeatBal->SpaceIntGain(spaceNum).QSERAD += state.dataHeatBal->ZoneSteamEq(Loop).RadGainRate * spaceFrac;
-                state.dataHeatBal->SpaceIntGain(spaceNum).QSECON += state.dataHeatBal->ZoneSteamEq(Loop).ConGainRate * spaceFrac;
-                state.dataHeatBal->SpaceIntGain(spaceNum).QSELAT += state.dataHeatBal->ZoneSteamEq(Loop).LatGainRate * spaceFrac;
-                state.dataHeatBal->SpaceIntGain(spaceNum).QSELost += state.dataHeatBal->ZoneSteamEq(Loop).LostRate * spaceFrac;
+            for (int index = 1; index <= int(state.dataHeatBal->ZoneSteamEq(Loop).spacePtrs.size()); ++index) {
+                int spaceNum = state.dataHeatBal->ZoneSteamEq(Loop).spacePtrs(index);
+                Real64 spaceFrac = state.dataHeatBal->ZoneSteamEq(Loop).spaceFracs(index);
+                state.dataHeatBal->spaceIntGain(spaceNum).QSERAD += state.dataHeatBal->ZoneSteamEq(Loop).RadGainRate * spaceFrac;
+                state.dataHeatBal->spaceIntGain(spaceNum).QSECON += state.dataHeatBal->ZoneSteamEq(Loop).ConGainRate * spaceFrac;
+                state.dataHeatBal->spaceIntGain(spaceNum).QSELAT += state.dataHeatBal->ZoneSteamEq(Loop).LatGainRate * spaceFrac;
+                state.dataHeatBal->spaceIntGain(spaceNum).QSELost += state.dataHeatBal->ZoneSteamEq(Loop).LostRate * spaceFrac;
             }
         }
 
@@ -7095,11 +7095,11 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZoneIntGain(NZ).QBBRAD += state.dataHeatBal->ZoneBBHeat(Loop).RadGainRate;
             state.dataHeatBal->ZoneIntGain(NZ).QBBCON += state.dataHeatBal->ZoneBBHeat(Loop).ConGainRate;
 
-            for (int index = 1; index <= int(state.dataHeatBal->ZoneBBHeat(Loop).SpacePtrs.size()); ++index) {
-                int spaceNum = state.dataHeatBal->ZoneBBHeat(Loop).SpacePtrs(index);
-                Real64 spaceFrac = state.dataHeatBal->ZoneBBHeat(Loop).SpaceFracs(index);
-                state.dataHeatBal->SpaceIntGain(spaceNum).QBBRAD += state.dataHeatBal->ZoneBBHeat(Loop).RadGainRate * spaceFrac;
-                state.dataHeatBal->SpaceIntGain(spaceNum).QBBCON += state.dataHeatBal->ZoneBBHeat(Loop).ConGainRate * spaceFrac;
+            for (int index = 1; index <= int(state.dataHeatBal->ZoneBBHeat(Loop).spacePtrs.size()); ++index) {
+                int spaceNum = state.dataHeatBal->ZoneBBHeat(Loop).spacePtrs(index);
+                Real64 spaceFrac = state.dataHeatBal->ZoneBBHeat(Loop).spaceFracs(index);
+                state.dataHeatBal->spaceIntGain(spaceNum).QBBRAD += state.dataHeatBal->ZoneBBHeat(Loop).RadGainRate * spaceFrac;
+                state.dataHeatBal->spaceIntGain(spaceNum).QBBCON += state.dataHeatBal->ZoneBBHeat(Loop).ConGainRate * spaceFrac;
             }
         }
 
@@ -7137,7 +7137,7 @@ namespace InternalHeatGains {
         for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfRadiantEnclosures; ++enclosureNum) {
             auto &thisEnclosure(state.dataViewFactor->EnclRadInfo(enclosureNum));
             state.dataHeatBal->EnclRadQThermalRad(enclosureNum) = 0.0;
-            for (int const spaceNum : thisEnclosure.SpaceNums) {
+            for (int const spaceNum : thisEnclosure.spaceNums) {
                 Real64 spaceQL;
                 InternalHeatGains::SumAllSpaceInternalRadiationGains(state, spaceNum, spaceQL);
                 state.dataHeatBal->EnclRadQThermalRad(enclosureNum) += spaceQL;
@@ -7155,7 +7155,7 @@ namespace InternalHeatGains {
             int const lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
             if (firstSurf <= 0) continue;
             for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
-                int const radEnclosureNum = state.dataHeatBal->Space(state.dataSurface->Surface(SurfNum).Space).RadiantEnclosureNum;
+                int const radEnclosureNum = state.dataHeatBal->space(state.dataSurface->Surface(SurfNum).spaceNum).radiantEnclosureNum;
                 if (!state.dataGlobal->doLoadComponentPulseNow) {
                     state.dataHeatBal->SurfQRadThermInAbs(SurfNum) = state.dataHeatBal->EnclRadQThermalRad(radEnclosureNum) *
                                                                      state.dataHeatBal->EnclRadThermAbsMult(radEnclosureNum) *
@@ -7899,170 +7899,170 @@ namespace InternalHeatGains {
 
         for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
             // People
-            state.dataHeatBal->SpaceRpt(spaceNum).PeopleNumOcc = state.dataHeatBal->SpaceIntGain(spaceNum).NOFOCC;
-            state.dataHeatBal->SpaceRpt(spaceNum).PeopleRadGain =
-                state.dataHeatBal->SpaceIntGain(spaceNum).QOCRAD * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->SpaceRpt(spaceNum).PeopleConGain =
-                state.dataHeatBal->SpaceIntGain(spaceNum).QOCCON * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->SpaceRpt(spaceNum).PeopleSenGain =
-                state.dataHeatBal->SpaceIntGain(spaceNum).QOCSEN * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->SpaceRpt(spaceNum).PeopleLatGain =
-                state.dataHeatBal->SpaceIntGain(spaceNum).QOCLAT * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->SpaceRpt(spaceNum).PeopleTotGain =
-                state.dataHeatBal->SpaceIntGain(spaceNum).QOCTOT * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->SpaceRpt(spaceNum).PeopleRadGainRate = state.dataHeatBal->SpaceIntGain(spaceNum).QOCRAD;
-            state.dataHeatBal->SpaceRpt(spaceNum).PeopleConGainRate = state.dataHeatBal->SpaceIntGain(spaceNum).QOCCON;
-            state.dataHeatBal->SpaceRpt(spaceNum).PeopleSenGainRate = state.dataHeatBal->SpaceIntGain(spaceNum).QOCSEN;
-            state.dataHeatBal->SpaceRpt(spaceNum).PeopleLatGainRate = state.dataHeatBal->SpaceIntGain(spaceNum).QOCLAT;
-            state.dataHeatBal->SpaceRpt(spaceNum).PeopleTotGainRate = state.dataHeatBal->SpaceIntGain(spaceNum).QOCTOT;
+            state.dataHeatBal->spaceRpt(spaceNum).PeopleNumOcc = state.dataHeatBal->spaceIntGain(spaceNum).NOFOCC;
+            state.dataHeatBal->spaceRpt(spaceNum).PeopleRadGain =
+                state.dataHeatBal->spaceIntGain(spaceNum).QOCRAD * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).PeopleConGain =
+                state.dataHeatBal->spaceIntGain(spaceNum).QOCCON * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).PeopleSenGain =
+                state.dataHeatBal->spaceIntGain(spaceNum).QOCSEN * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).PeopleLatGain =
+                state.dataHeatBal->spaceIntGain(spaceNum).QOCLAT * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).PeopleTotGain =
+                state.dataHeatBal->spaceIntGain(spaceNum).QOCTOT * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).PeopleRadGainRate = state.dataHeatBal->spaceIntGain(spaceNum).QOCRAD;
+            state.dataHeatBal->spaceRpt(spaceNum).PeopleConGainRate = state.dataHeatBal->spaceIntGain(spaceNum).QOCCON;
+            state.dataHeatBal->spaceRpt(spaceNum).PeopleSenGainRate = state.dataHeatBal->spaceIntGain(spaceNum).QOCSEN;
+            state.dataHeatBal->spaceRpt(spaceNum).PeopleLatGainRate = state.dataHeatBal->spaceIntGain(spaceNum).QOCLAT;
+            state.dataHeatBal->spaceRpt(spaceNum).PeopleTotGainRate = state.dataHeatBal->spaceIntGain(spaceNum).QOCTOT;
 
             // General Lights
-            state.dataHeatBal->SpaceRpt(spaceNum).LtsRetAirGain =
-                state.dataHeatBal->SpaceIntGain(spaceNum).QLTCRA * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->SpaceRpt(spaceNum).LtsRadGain = state.dataHeatBal->SpaceIntGain(spaceNum).QLTRAD * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->SpaceRpt(spaceNum).LtsTotGain = state.dataHeatBal->SpaceIntGain(spaceNum).QLTTOT * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->SpaceRpt(spaceNum).LtsConGain = state.dataHeatBal->SpaceIntGain(spaceNum).QLTCON * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->SpaceRpt(spaceNum).LtsVisGain = state.dataHeatBal->SpaceIntGain(spaceNum).QLTSW * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->SpaceRpt(spaceNum).LtsRetAirGainRate = state.dataHeatBal->SpaceIntGain(spaceNum).QLTCRA;
-            state.dataHeatBal->SpaceRpt(spaceNum).LtsRadGainRate = state.dataHeatBal->SpaceIntGain(spaceNum).QLTRAD;
-            state.dataHeatBal->SpaceRpt(spaceNum).LtsTotGainRate = state.dataHeatBal->SpaceIntGain(spaceNum).QLTTOT;
-            state.dataHeatBal->SpaceRpt(spaceNum).LtsConGainRate = state.dataHeatBal->SpaceIntGain(spaceNum).QLTCON;
-            state.dataHeatBal->SpaceRpt(spaceNum).LtsVisGainRate = state.dataHeatBal->SpaceIntGain(spaceNum).QLTSW;
-            state.dataHeatBal->SpaceRpt(spaceNum).LtsElecConsump = state.dataHeatBal->SpaceRpt(spaceNum).LtsTotGain;
+            state.dataHeatBal->spaceRpt(spaceNum).LtsRetAirGain =
+                state.dataHeatBal->spaceIntGain(spaceNum).QLTCRA * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).LtsRadGain = state.dataHeatBal->spaceIntGain(spaceNum).QLTRAD * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).LtsTotGain = state.dataHeatBal->spaceIntGain(spaceNum).QLTTOT * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).LtsConGain = state.dataHeatBal->spaceIntGain(spaceNum).QLTCON * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).LtsVisGain = state.dataHeatBal->spaceIntGain(spaceNum).QLTSW * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).LtsRetAirGainRate = state.dataHeatBal->spaceIntGain(spaceNum).QLTCRA;
+            state.dataHeatBal->spaceRpt(spaceNum).LtsRadGainRate = state.dataHeatBal->spaceIntGain(spaceNum).QLTRAD;
+            state.dataHeatBal->spaceRpt(spaceNum).LtsTotGainRate = state.dataHeatBal->spaceIntGain(spaceNum).QLTTOT;
+            state.dataHeatBal->spaceRpt(spaceNum).LtsConGainRate = state.dataHeatBal->spaceIntGain(spaceNum).QLTCON;
+            state.dataHeatBal->spaceRpt(spaceNum).LtsVisGainRate = state.dataHeatBal->spaceIntGain(spaceNum).QLTSW;
+            state.dataHeatBal->spaceRpt(spaceNum).LtsElecConsump = state.dataHeatBal->spaceRpt(spaceNum).LtsTotGain;
 
             // Electric Equipment
-            state.dataHeatBal->SpaceRpt(spaceNum).ElecConGain = state.dataHeatBal->SpaceIntGain(spaceNum).QEECON * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->SpaceRpt(spaceNum).ElecRadGain = state.dataHeatBal->SpaceIntGain(spaceNum).QEERAD * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->SpaceRpt(spaceNum).ElecLatGain = state.dataHeatBal->SpaceIntGain(spaceNum).QEELAT * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->SpaceRpt(spaceNum).ElecLost = state.dataHeatBal->SpaceIntGain(spaceNum).QEELost * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->SpaceRpt(spaceNum).ElecConGainRate = state.dataHeatBal->SpaceIntGain(spaceNum).QEECON;
-            state.dataHeatBal->SpaceRpt(spaceNum).ElecRadGainRate = state.dataHeatBal->SpaceIntGain(spaceNum).QEERAD;
-            state.dataHeatBal->SpaceRpt(spaceNum).ElecLatGainRate = state.dataHeatBal->SpaceIntGain(spaceNum).QEELAT;
-            state.dataHeatBal->SpaceRpt(spaceNum).ElecLostRate = state.dataHeatBal->SpaceIntGain(spaceNum).QEELost;
-            state.dataHeatBal->SpaceRpt(spaceNum).ElecConsump =
-                state.dataHeatBal->SpaceRpt(spaceNum).ElecConGain + state.dataHeatBal->SpaceRpt(spaceNum).ElecRadGain +
-                state.dataHeatBal->SpaceRpt(spaceNum).ElecLatGain + state.dataHeatBal->SpaceRpt(spaceNum).ElecLost;
-            state.dataHeatBal->SpaceRpt(spaceNum).ElecTotGain = state.dataHeatBal->SpaceRpt(spaceNum).ElecConGain +
-                                                                state.dataHeatBal->SpaceRpt(spaceNum).ElecRadGain +
-                                                                state.dataHeatBal->SpaceRpt(spaceNum).ElecLatGain;
-            state.dataHeatBal->SpaceRpt(spaceNum).ElecTotGainRate = state.dataHeatBal->SpaceRpt(spaceNum).ElecConGainRate +
-                                                                    state.dataHeatBal->SpaceRpt(spaceNum).ElecRadGainRate +
-                                                                    state.dataHeatBal->SpaceRpt(spaceNum).ElecLatGainRate;
+            state.dataHeatBal->spaceRpt(spaceNum).ElecConGain = state.dataHeatBal->spaceIntGain(spaceNum).QEECON * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).ElecRadGain = state.dataHeatBal->spaceIntGain(spaceNum).QEERAD * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).ElecLatGain = state.dataHeatBal->spaceIntGain(spaceNum).QEELAT * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).ElecLost = state.dataHeatBal->spaceIntGain(spaceNum).QEELost * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).ElecConGainRate = state.dataHeatBal->spaceIntGain(spaceNum).QEECON;
+            state.dataHeatBal->spaceRpt(spaceNum).ElecRadGainRate = state.dataHeatBal->spaceIntGain(spaceNum).QEERAD;
+            state.dataHeatBal->spaceRpt(spaceNum).ElecLatGainRate = state.dataHeatBal->spaceIntGain(spaceNum).QEELAT;
+            state.dataHeatBal->spaceRpt(spaceNum).ElecLostRate = state.dataHeatBal->spaceIntGain(spaceNum).QEELost;
+            state.dataHeatBal->spaceRpt(spaceNum).ElecConsump =
+                state.dataHeatBal->spaceRpt(spaceNum).ElecConGain + state.dataHeatBal->spaceRpt(spaceNum).ElecRadGain +
+                state.dataHeatBal->spaceRpt(spaceNum).ElecLatGain + state.dataHeatBal->spaceRpt(spaceNum).ElecLost;
+            state.dataHeatBal->spaceRpt(spaceNum).ElecTotGain = state.dataHeatBal->spaceRpt(spaceNum).ElecConGain +
+                                                                state.dataHeatBal->spaceRpt(spaceNum).ElecRadGain +
+                                                                state.dataHeatBal->spaceRpt(spaceNum).ElecLatGain;
+            state.dataHeatBal->spaceRpt(spaceNum).ElecTotGainRate = state.dataHeatBal->spaceRpt(spaceNum).ElecConGainRate +
+                                                                    state.dataHeatBal->spaceRpt(spaceNum).ElecRadGainRate +
+                                                                    state.dataHeatBal->spaceRpt(spaceNum).ElecLatGainRate;
 
             // Gas Equipment
-            state.dataHeatBal->SpaceRpt(spaceNum).GasConGain = state.dataHeatBal->SpaceIntGain(spaceNum).QGECON * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->SpaceRpt(spaceNum).GasRadGain = state.dataHeatBal->SpaceIntGain(spaceNum).QGERAD * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->SpaceRpt(spaceNum).GasLatGain = state.dataHeatBal->SpaceIntGain(spaceNum).QGELAT * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->SpaceRpt(spaceNum).GasLost = state.dataHeatBal->SpaceIntGain(spaceNum).QGELost * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->SpaceRpt(spaceNum).GasConGainRate = state.dataHeatBal->SpaceIntGain(spaceNum).QGECON;
-            state.dataHeatBal->SpaceRpt(spaceNum).GasRadGainRate = state.dataHeatBal->SpaceIntGain(spaceNum).QGERAD;
-            state.dataHeatBal->SpaceRpt(spaceNum).GasLatGainRate = state.dataHeatBal->SpaceIntGain(spaceNum).QGELAT;
-            state.dataHeatBal->SpaceRpt(spaceNum).GasLostRate = state.dataHeatBal->SpaceIntGain(spaceNum).QGELost;
-            state.dataHeatBal->SpaceRpt(spaceNum).GasConsump =
-                state.dataHeatBal->SpaceRpt(spaceNum).GasConGain + state.dataHeatBal->SpaceRpt(spaceNum).GasRadGain +
-                state.dataHeatBal->SpaceRpt(spaceNum).GasLatGain + state.dataHeatBal->SpaceRpt(spaceNum).GasLost;
-            state.dataHeatBal->SpaceRpt(spaceNum).GasTotGain = state.dataHeatBal->SpaceRpt(spaceNum).GasConGain +
-                                                               state.dataHeatBal->SpaceRpt(spaceNum).GasRadGain +
-                                                               state.dataHeatBal->SpaceRpt(spaceNum).GasLatGain;
-            state.dataHeatBal->SpaceRpt(spaceNum).GasTotGainRate = state.dataHeatBal->SpaceRpt(spaceNum).GasConGainRate +
-                                                                   state.dataHeatBal->SpaceRpt(spaceNum).GasRadGainRate +
-                                                                   state.dataHeatBal->SpaceRpt(spaceNum).GasLatGainRate;
+            state.dataHeatBal->spaceRpt(spaceNum).GasConGain = state.dataHeatBal->spaceIntGain(spaceNum).QGECON * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).GasRadGain = state.dataHeatBal->spaceIntGain(spaceNum).QGERAD * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).GasLatGain = state.dataHeatBal->spaceIntGain(spaceNum).QGELAT * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).GasLost = state.dataHeatBal->spaceIntGain(spaceNum).QGELost * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).GasConGainRate = state.dataHeatBal->spaceIntGain(spaceNum).QGECON;
+            state.dataHeatBal->spaceRpt(spaceNum).GasRadGainRate = state.dataHeatBal->spaceIntGain(spaceNum).QGERAD;
+            state.dataHeatBal->spaceRpt(spaceNum).GasLatGainRate = state.dataHeatBal->spaceIntGain(spaceNum).QGELAT;
+            state.dataHeatBal->spaceRpt(spaceNum).GasLostRate = state.dataHeatBal->spaceIntGain(spaceNum).QGELost;
+            state.dataHeatBal->spaceRpt(spaceNum).GasConsump =
+                state.dataHeatBal->spaceRpt(spaceNum).GasConGain + state.dataHeatBal->spaceRpt(spaceNum).GasRadGain +
+                state.dataHeatBal->spaceRpt(spaceNum).GasLatGain + state.dataHeatBal->spaceRpt(spaceNum).GasLost;
+            state.dataHeatBal->spaceRpt(spaceNum).GasTotGain = state.dataHeatBal->spaceRpt(spaceNum).GasConGain +
+                                                               state.dataHeatBal->spaceRpt(spaceNum).GasRadGain +
+                                                               state.dataHeatBal->spaceRpt(spaceNum).GasLatGain;
+            state.dataHeatBal->spaceRpt(spaceNum).GasTotGainRate = state.dataHeatBal->spaceRpt(spaceNum).GasConGainRate +
+                                                                   state.dataHeatBal->spaceRpt(spaceNum).GasRadGainRate +
+                                                                   state.dataHeatBal->spaceRpt(spaceNum).GasLatGainRate;
 
             // Hot Water Equipment
-            state.dataHeatBal->SpaceRpt(spaceNum).HWConGain = state.dataHeatBal->SpaceIntGain(spaceNum).QHWCON * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->SpaceRpt(spaceNum).HWRadGain = state.dataHeatBal->SpaceIntGain(spaceNum).QHWRAD * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->SpaceRpt(spaceNum).HWLatGain = state.dataHeatBal->SpaceIntGain(spaceNum).QHWLAT * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->SpaceRpt(spaceNum).HWLost = state.dataHeatBal->SpaceIntGain(spaceNum).QHWLost * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->SpaceRpt(spaceNum).HWConGainRate = state.dataHeatBal->SpaceIntGain(spaceNum).QHWCON;
-            state.dataHeatBal->SpaceRpt(spaceNum).HWRadGainRate = state.dataHeatBal->SpaceIntGain(spaceNum).QHWRAD;
-            state.dataHeatBal->SpaceRpt(spaceNum).HWLatGainRate = state.dataHeatBal->SpaceIntGain(spaceNum).QHWLAT;
-            state.dataHeatBal->SpaceRpt(spaceNum).HWLostRate = state.dataHeatBal->SpaceIntGain(spaceNum).QHWLost;
-            state.dataHeatBal->SpaceRpt(spaceNum).HWConsump =
-                state.dataHeatBal->SpaceRpt(spaceNum).HWConGain + state.dataHeatBal->SpaceRpt(spaceNum).HWRadGain +
-                state.dataHeatBal->SpaceRpt(spaceNum).HWLatGain + state.dataHeatBal->SpaceRpt(spaceNum).HWLost;
-            state.dataHeatBal->SpaceRpt(spaceNum).HWTotGain = state.dataHeatBal->SpaceRpt(spaceNum).HWConGain +
-                                                              state.dataHeatBal->SpaceRpt(spaceNum).HWRadGain +
-                                                              state.dataHeatBal->SpaceRpt(spaceNum).HWLatGain;
-            state.dataHeatBal->SpaceRpt(spaceNum).HWTotGainRate = state.dataHeatBal->SpaceRpt(spaceNum).HWConGainRate +
-                                                                  state.dataHeatBal->SpaceRpt(spaceNum).HWRadGainRate +
-                                                                  state.dataHeatBal->SpaceRpt(spaceNum).HWLatGainRate;
+            state.dataHeatBal->spaceRpt(spaceNum).HWConGain = state.dataHeatBal->spaceIntGain(spaceNum).QHWCON * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).HWRadGain = state.dataHeatBal->spaceIntGain(spaceNum).QHWRAD * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).HWLatGain = state.dataHeatBal->spaceIntGain(spaceNum).QHWLAT * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).HWLost = state.dataHeatBal->spaceIntGain(spaceNum).QHWLost * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).HWConGainRate = state.dataHeatBal->spaceIntGain(spaceNum).QHWCON;
+            state.dataHeatBal->spaceRpt(spaceNum).HWRadGainRate = state.dataHeatBal->spaceIntGain(spaceNum).QHWRAD;
+            state.dataHeatBal->spaceRpt(spaceNum).HWLatGainRate = state.dataHeatBal->spaceIntGain(spaceNum).QHWLAT;
+            state.dataHeatBal->spaceRpt(spaceNum).HWLostRate = state.dataHeatBal->spaceIntGain(spaceNum).QHWLost;
+            state.dataHeatBal->spaceRpt(spaceNum).HWConsump =
+                state.dataHeatBal->spaceRpt(spaceNum).HWConGain + state.dataHeatBal->spaceRpt(spaceNum).HWRadGain +
+                state.dataHeatBal->spaceRpt(spaceNum).HWLatGain + state.dataHeatBal->spaceRpt(spaceNum).HWLost;
+            state.dataHeatBal->spaceRpt(spaceNum).HWTotGain = state.dataHeatBal->spaceRpt(spaceNum).HWConGain +
+                                                              state.dataHeatBal->spaceRpt(spaceNum).HWRadGain +
+                                                              state.dataHeatBal->spaceRpt(spaceNum).HWLatGain;
+            state.dataHeatBal->spaceRpt(spaceNum).HWTotGainRate = state.dataHeatBal->spaceRpt(spaceNum).HWConGainRate +
+                                                                  state.dataHeatBal->spaceRpt(spaceNum).HWRadGainRate +
+                                                                  state.dataHeatBal->spaceRpt(spaceNum).HWLatGainRate;
 
             // Steam Equipment
-            state.dataHeatBal->SpaceRpt(spaceNum).SteamConGain = state.dataHeatBal->SpaceIntGain(spaceNum).QSECON * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->SpaceRpt(spaceNum).SteamRadGain = state.dataHeatBal->SpaceIntGain(spaceNum).QSERAD * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->SpaceRpt(spaceNum).SteamLatGain = state.dataHeatBal->SpaceIntGain(spaceNum).QSELAT * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->SpaceRpt(spaceNum).SteamLost = state.dataHeatBal->SpaceIntGain(spaceNum).QSELost * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->SpaceRpt(spaceNum).SteamConGainRate = state.dataHeatBal->SpaceIntGain(spaceNum).QSECON;
-            state.dataHeatBal->SpaceRpt(spaceNum).SteamRadGainRate = state.dataHeatBal->SpaceIntGain(spaceNum).QSERAD;
-            state.dataHeatBal->SpaceRpt(spaceNum).SteamLatGainRate = state.dataHeatBal->SpaceIntGain(spaceNum).QSELAT;
-            state.dataHeatBal->SpaceRpt(spaceNum).SteamLostRate = state.dataHeatBal->SpaceIntGain(spaceNum).QSELost;
-            state.dataHeatBal->SpaceRpt(spaceNum).SteamConsump =
-                state.dataHeatBal->SpaceRpt(spaceNum).SteamConGain + state.dataHeatBal->SpaceRpt(spaceNum).SteamRadGain +
-                state.dataHeatBal->SpaceRpt(spaceNum).SteamLatGain + state.dataHeatBal->SpaceRpt(spaceNum).SteamLost;
-            state.dataHeatBal->SpaceRpt(spaceNum).SteamTotGain = state.dataHeatBal->SpaceRpt(spaceNum).SteamConGain +
-                                                                 state.dataHeatBal->SpaceRpt(spaceNum).SteamRadGain +
-                                                                 state.dataHeatBal->SpaceRpt(spaceNum).SteamLatGain;
-            state.dataHeatBal->SpaceRpt(spaceNum).SteamTotGainRate = state.dataHeatBal->SpaceRpt(spaceNum).SteamConGainRate +
-                                                                     state.dataHeatBal->SpaceRpt(spaceNum).SteamRadGainRate +
-                                                                     state.dataHeatBal->SpaceRpt(spaceNum).SteamLatGainRate;
+            state.dataHeatBal->spaceRpt(spaceNum).SteamConGain = state.dataHeatBal->spaceIntGain(spaceNum).QSECON * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).SteamRadGain = state.dataHeatBal->spaceIntGain(spaceNum).QSERAD * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).SteamLatGain = state.dataHeatBal->spaceIntGain(spaceNum).QSELAT * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).SteamLost = state.dataHeatBal->spaceIntGain(spaceNum).QSELost * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).SteamConGainRate = state.dataHeatBal->spaceIntGain(spaceNum).QSECON;
+            state.dataHeatBal->spaceRpt(spaceNum).SteamRadGainRate = state.dataHeatBal->spaceIntGain(spaceNum).QSERAD;
+            state.dataHeatBal->spaceRpt(spaceNum).SteamLatGainRate = state.dataHeatBal->spaceIntGain(spaceNum).QSELAT;
+            state.dataHeatBal->spaceRpt(spaceNum).SteamLostRate = state.dataHeatBal->spaceIntGain(spaceNum).QSELost;
+            state.dataHeatBal->spaceRpt(spaceNum).SteamConsump =
+                state.dataHeatBal->spaceRpt(spaceNum).SteamConGain + state.dataHeatBal->spaceRpt(spaceNum).SteamRadGain +
+                state.dataHeatBal->spaceRpt(spaceNum).SteamLatGain + state.dataHeatBal->spaceRpt(spaceNum).SteamLost;
+            state.dataHeatBal->spaceRpt(spaceNum).SteamTotGain = state.dataHeatBal->spaceRpt(spaceNum).SteamConGain +
+                                                                 state.dataHeatBal->spaceRpt(spaceNum).SteamRadGain +
+                                                                 state.dataHeatBal->spaceRpt(spaceNum).SteamLatGain;
+            state.dataHeatBal->spaceRpt(spaceNum).SteamTotGainRate = state.dataHeatBal->spaceRpt(spaceNum).SteamConGainRate +
+                                                                     state.dataHeatBal->spaceRpt(spaceNum).SteamRadGainRate +
+                                                                     state.dataHeatBal->spaceRpt(spaceNum).SteamLatGainRate;
 
             // Other Equipment
-            state.dataHeatBal->SpaceRpt(spaceNum).OtherConGain = state.dataHeatBal->SpaceIntGain(spaceNum).QOECON * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->SpaceRpt(spaceNum).OtherRadGain = state.dataHeatBal->SpaceIntGain(spaceNum).QOERAD * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->SpaceRpt(spaceNum).OtherLatGain = state.dataHeatBal->SpaceIntGain(spaceNum).QOELAT * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->SpaceRpt(spaceNum).OtherLost = state.dataHeatBal->SpaceIntGain(spaceNum).QOELost * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->SpaceRpt(spaceNum).OtherConGainRate = state.dataHeatBal->SpaceIntGain(spaceNum).QOECON;
-            state.dataHeatBal->SpaceRpt(spaceNum).OtherRadGainRate = state.dataHeatBal->SpaceIntGain(spaceNum).QOERAD;
-            state.dataHeatBal->SpaceRpt(spaceNum).OtherLatGainRate = state.dataHeatBal->SpaceIntGain(spaceNum).QOELAT;
-            state.dataHeatBal->SpaceRpt(spaceNum).OtherLostRate = state.dataHeatBal->SpaceIntGain(spaceNum).QOELost;
-            state.dataHeatBal->SpaceRpt(spaceNum).OtherConsump =
-                state.dataHeatBal->SpaceRpt(spaceNum).OtherConGain + state.dataHeatBal->SpaceRpt(spaceNum).OtherRadGain +
-                state.dataHeatBal->SpaceRpt(spaceNum).OtherLatGain + state.dataHeatBal->SpaceRpt(spaceNum).OtherLost;
-            state.dataHeatBal->SpaceRpt(spaceNum).OtherTotGain = state.dataHeatBal->SpaceRpt(spaceNum).OtherConGain +
-                                                                 state.dataHeatBal->SpaceRpt(spaceNum).OtherRadGain +
-                                                                 state.dataHeatBal->SpaceRpt(spaceNum).OtherLatGain;
-            state.dataHeatBal->SpaceRpt(spaceNum).OtherTotGainRate = state.dataHeatBal->SpaceRpt(spaceNum).OtherConGainRate +
-                                                                     state.dataHeatBal->SpaceRpt(spaceNum).OtherRadGainRate +
-                                                                     state.dataHeatBal->SpaceRpt(spaceNum).OtherLatGainRate;
+            state.dataHeatBal->spaceRpt(spaceNum).OtherConGain = state.dataHeatBal->spaceIntGain(spaceNum).QOECON * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).OtherRadGain = state.dataHeatBal->spaceIntGain(spaceNum).QOERAD * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).OtherLatGain = state.dataHeatBal->spaceIntGain(spaceNum).QOELAT * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).OtherLost = state.dataHeatBal->spaceIntGain(spaceNum).QOELost * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).OtherConGainRate = state.dataHeatBal->spaceIntGain(spaceNum).QOECON;
+            state.dataHeatBal->spaceRpt(spaceNum).OtherRadGainRate = state.dataHeatBal->spaceIntGain(spaceNum).QOERAD;
+            state.dataHeatBal->spaceRpt(spaceNum).OtherLatGainRate = state.dataHeatBal->spaceIntGain(spaceNum).QOELAT;
+            state.dataHeatBal->spaceRpt(spaceNum).OtherLostRate = state.dataHeatBal->spaceIntGain(spaceNum).QOELost;
+            state.dataHeatBal->spaceRpt(spaceNum).OtherConsump =
+                state.dataHeatBal->spaceRpt(spaceNum).OtherConGain + state.dataHeatBal->spaceRpt(spaceNum).OtherRadGain +
+                state.dataHeatBal->spaceRpt(spaceNum).OtherLatGain + state.dataHeatBal->spaceRpt(spaceNum).OtherLost;
+            state.dataHeatBal->spaceRpt(spaceNum).OtherTotGain = state.dataHeatBal->spaceRpt(spaceNum).OtherConGain +
+                                                                 state.dataHeatBal->spaceRpt(spaceNum).OtherRadGain +
+                                                                 state.dataHeatBal->spaceRpt(spaceNum).OtherLatGain;
+            state.dataHeatBal->spaceRpt(spaceNum).OtherTotGainRate = state.dataHeatBal->spaceRpt(spaceNum).OtherConGainRate +
+                                                                     state.dataHeatBal->spaceRpt(spaceNum).OtherRadGainRate +
+                                                                     state.dataHeatBal->spaceRpt(spaceNum).OtherLatGainRate;
 
             // Baseboard Heat
-            state.dataHeatBal->SpaceRpt(spaceNum).BaseHeatConGain =
-                state.dataHeatBal->SpaceIntGain(spaceNum).QBBCON * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->SpaceRpt(spaceNum).BaseHeatRadGain =
-                state.dataHeatBal->SpaceIntGain(spaceNum).QBBRAD * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->SpaceRpt(spaceNum).BaseHeatConGainRate = state.dataHeatBal->SpaceIntGain(spaceNum).QBBCON;
-            state.dataHeatBal->SpaceRpt(spaceNum).BaseHeatRadGainRate = state.dataHeatBal->SpaceIntGain(spaceNum).QBBRAD;
-            state.dataHeatBal->SpaceRpt(spaceNum).BaseHeatTotGain =
-                state.dataHeatBal->SpaceRpt(spaceNum).BaseHeatConGain + state.dataHeatBal->SpaceRpt(spaceNum).BaseHeatRadGain;
-            state.dataHeatBal->SpaceRpt(spaceNum).BaseHeatTotGainRate =
-                state.dataHeatBal->SpaceRpt(spaceNum).BaseHeatConGainRate + state.dataHeatBal->SpaceRpt(spaceNum).BaseHeatRadGainRate;
-            state.dataHeatBal->SpaceRpt(spaceNum).BaseHeatElecCons = state.dataHeatBal->SpaceRpt(spaceNum).BaseHeatTotGain;
+            state.dataHeatBal->spaceRpt(spaceNum).BaseHeatConGain =
+                state.dataHeatBal->spaceIntGain(spaceNum).QBBCON * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).BaseHeatRadGain =
+                state.dataHeatBal->spaceIntGain(spaceNum).QBBRAD * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).BaseHeatConGainRate = state.dataHeatBal->spaceIntGain(spaceNum).QBBCON;
+            state.dataHeatBal->spaceRpt(spaceNum).BaseHeatRadGainRate = state.dataHeatBal->spaceIntGain(spaceNum).QBBRAD;
+            state.dataHeatBal->spaceRpt(spaceNum).BaseHeatTotGain =
+                state.dataHeatBal->spaceRpt(spaceNum).BaseHeatConGain + state.dataHeatBal->spaceRpt(spaceNum).BaseHeatRadGain;
+            state.dataHeatBal->spaceRpt(spaceNum).BaseHeatTotGainRate =
+                state.dataHeatBal->spaceRpt(spaceNum).BaseHeatConGainRate + state.dataHeatBal->spaceRpt(spaceNum).BaseHeatRadGainRate;
+            state.dataHeatBal->spaceRpt(spaceNum).BaseHeatElecCons = state.dataHeatBal->spaceRpt(spaceNum).BaseHeatTotGain;
 
             // Overall Space Variables
 
             // these overalls include component gains from devices like water heater, water use, and generators
             //   working vars QFCConv QGenConv QFCRad QGenRad  WaterUseLatentGain WaterThermalTankGain WaterUseSensibleGain
 
-            state.dataHeatBal->SpaceRpt(spaceNum).TotVisHeatGain = state.dataHeatBal->SpaceRpt(spaceNum).LtsVisGain;
-            state.dataHeatBal->SpaceRpt(spaceNum).TotVisHeatGainRate = state.dataHeatBal->SpaceRpt(spaceNum).LtsVisGainRate;
+            state.dataHeatBal->spaceRpt(spaceNum).TotVisHeatGain = state.dataHeatBal->spaceRpt(spaceNum).LtsVisGain;
+            state.dataHeatBal->spaceRpt(spaceNum).TotVisHeatGainRate = state.dataHeatBal->spaceRpt(spaceNum).LtsVisGainRate;
 
-            SumInternalRadiationGainsByTypes(state, spaceNum, TradIntGainTypes, state.dataHeatBal->SpaceRpt(spaceNum).TotRadiantGainRate);
-            state.dataHeatBal->SpaceRpt(spaceNum).TotRadiantGain =
-                state.dataHeatBal->SpaceRpt(spaceNum).TotRadiantGainRate * state.dataGlobal->TimeStepZoneSec;
+            SumInternalRadiationGainsByTypes(state, spaceNum, TradIntGainTypes, state.dataHeatBal->spaceRpt(spaceNum).TotRadiantGainRate);
+            state.dataHeatBal->spaceRpt(spaceNum).TotRadiantGain =
+                state.dataHeatBal->spaceRpt(spaceNum).TotRadiantGainRate * state.dataGlobal->TimeStepZoneSec;
 
-            SumInternalConvectionGainsByTypes(state, spaceNum, TradIntGainTypes, state.dataHeatBal->SpaceRpt(spaceNum).TotConvectiveGainRate);
-            state.dataHeatBal->SpaceRpt(spaceNum).TotConvectiveGain =
-                state.dataHeatBal->SpaceRpt(spaceNum).TotConvectiveGainRate * state.dataGlobal->TimeStepZoneSec;
+            SumInternalConvectionGainsByTypes(state, spaceNum, TradIntGainTypes, state.dataHeatBal->spaceRpt(spaceNum).TotConvectiveGainRate);
+            state.dataHeatBal->spaceRpt(spaceNum).TotConvectiveGain =
+                state.dataHeatBal->spaceRpt(spaceNum).TotConvectiveGainRate * state.dataGlobal->TimeStepZoneSec;
 
-            SumInternalLatentGainsByTypes(state, spaceNum, TradIntGainTypes, state.dataHeatBal->SpaceRpt(spaceNum).TotLatentGainRate);
-            state.dataHeatBal->SpaceRpt(spaceNum).TotLatentGain =
-                state.dataHeatBal->SpaceRpt(spaceNum).TotLatentGainRate * state.dataGlobal->TimeStepZoneSec;
+            SumInternalLatentGainsByTypes(state, spaceNum, TradIntGainTypes, state.dataHeatBal->spaceRpt(spaceNum).TotLatentGainRate);
+            state.dataHeatBal->spaceRpt(spaceNum).TotLatentGain =
+                state.dataHeatBal->spaceRpt(spaceNum).TotLatentGainRate * state.dataGlobal->TimeStepZoneSec;
 
-            state.dataHeatBal->SpaceRpt(spaceNum).TotTotalHeatGainRate =
-                state.dataHeatBal->SpaceRpt(spaceNum).TotLatentGainRate + state.dataHeatBal->SpaceRpt(spaceNum).TotRadiantGainRate +
-                state.dataHeatBal->SpaceRpt(spaceNum).TotConvectiveGainRate + state.dataHeatBal->SpaceRpt(spaceNum).TotVisHeatGainRate;
-            state.dataHeatBal->SpaceRpt(spaceNum).TotTotalHeatGain =
-                state.dataHeatBal->SpaceRpt(spaceNum).TotTotalHeatGainRate * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->spaceRpt(spaceNum).TotTotalHeatGainRate =
+                state.dataHeatBal->spaceRpt(spaceNum).TotLatentGainRate + state.dataHeatBal->spaceRpt(spaceNum).TotRadiantGainRate +
+                state.dataHeatBal->spaceRpt(spaceNum).TotConvectiveGainRate + state.dataHeatBal->spaceRpt(spaceNum).TotVisHeatGainRate;
+            state.dataHeatBal->spaceRpt(spaceNum).TotTotalHeatGain =
+                state.dataHeatBal->spaceRpt(spaceNum).TotTotalHeatGainRate * state.dataGlobal->TimeStepZoneSec;
         }
     }
 
@@ -8213,20 +8213,20 @@ namespace InternalHeatGains {
 
         // store pointer values to hold generic internal gain values constant for entire timestep
         for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
-            auto &thisIntGain = state.dataHeatBal->SpaceIntGainDevices(spaceNum);
-            for (int Loop = 1; Loop <= thisIntGain.NumberOfDevices; ++Loop) {
-                thisIntGain.Device(Loop).ConvectGainRate = *thisIntGain.Device(Loop).PtrConvectGainRate * thisIntGain.Device(Loop).SpaceGainFrac;
-                thisIntGain.Device(Loop).ReturnAirConvGainRate =
-                    *thisIntGain.Device(Loop).PtrReturnAirConvGainRate * thisIntGain.Device(Loop).SpaceGainFrac;
+            auto &thisIntGain = state.dataHeatBal->spaceIntGainDevices(spaceNum);
+            for (int Loop = 1; Loop <= thisIntGain.numberOfDevices; ++Loop) {
+                thisIntGain.device(Loop).ConvectGainRate = *thisIntGain.device(Loop).PtrConvectGainRate * thisIntGain.device(Loop).spaceGainFrac;
+                thisIntGain.device(Loop).ReturnAirConvGainRate =
+                    *thisIntGain.device(Loop).PtrReturnAirConvGainRate * thisIntGain.device(Loop).spaceGainFrac;
                 if (DoRadiationUpdate)
-                    thisIntGain.Device(Loop).RadiantGainRate = *thisIntGain.Device(Loop).PtrRadiantGainRate * thisIntGain.Device(Loop).SpaceGainFrac;
-                thisIntGain.Device(Loop).LatentGainRate = *thisIntGain.Device(Loop).PtrLatentGainRate * thisIntGain.Device(Loop).SpaceGainFrac;
-                thisIntGain.Device(Loop).ReturnAirLatentGainRate =
-                    *thisIntGain.Device(Loop).PtrReturnAirLatentGainRate * thisIntGain.Device(Loop).SpaceGainFrac;
-                thisIntGain.Device(Loop).CarbonDioxideGainRate =
-                    *thisIntGain.Device(Loop).PtrCarbonDioxideGainRate * thisIntGain.Device(Loop).SpaceGainFrac;
-                thisIntGain.Device(Loop).GenericContamGainRate =
-                    *thisIntGain.Device(Loop).PtrGenericContamGainRate * thisIntGain.Device(Loop).SpaceGainFrac;
+                    thisIntGain.device(Loop).RadiantGainRate = *thisIntGain.device(Loop).PtrRadiantGainRate * thisIntGain.device(Loop).spaceGainFrac;
+                thisIntGain.device(Loop).LatentGainRate = *thisIntGain.device(Loop).PtrLatentGainRate * thisIntGain.device(Loop).spaceGainFrac;
+                thisIntGain.device(Loop).ReturnAirLatentGainRate =
+                    *thisIntGain.device(Loop).PtrReturnAirLatentGainRate * thisIntGain.device(Loop).spaceGainFrac;
+                thisIntGain.device(Loop).CarbonDioxideGainRate =
+                    *thisIntGain.device(Loop).PtrCarbonDioxideGainRate * thisIntGain.device(Loop).spaceGainFrac;
+                thisIntGain.device(Loop).GenericContamGainRate =
+                    *thisIntGain.device(Loop).PtrGenericContamGainRate * thisIntGain.device(Loop).spaceGainFrac;
             }
         }
         if (ReSumLatentGains) {
@@ -8261,13 +8261,13 @@ namespace InternalHeatGains {
 
         Real64 tmpSumConvGainRate = 0.0;
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).Spaces) {
-            if (state.dataHeatBal->SpaceIntGainDevices(spaceNum).NumberOfDevices == 0) {
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaces) {
+            if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
                 continue;
             }
 
-            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->SpaceIntGainDevices(spaceNum).NumberOfDevices; ++DeviceNum) {
-                tmpSumConvGainRate += state.dataHeatBal->SpaceIntGainDevices(spaceNum).Device(DeviceNum).ConvectGainRate;
+            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
+                tmpSumConvGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ConvectGainRate;
             }
         }
 
@@ -8280,14 +8280,14 @@ namespace InternalHeatGains {
         Real64 tmpSumConvGainRateExceptPeople = 0.0;
         std::string str_people = "PEOPLE";
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).Spaces) {
-            if (state.dataHeatBal->SpaceIntGainDevices(spaceNum).NumberOfDevices == 0) {
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaces) {
+            if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
                 continue;
             }
 
-            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->SpaceIntGainDevices(spaceNum).NumberOfDevices; ++DeviceNum) {
-                if (state.dataHeatBal->SpaceIntGainDevices(spaceNum).Device(DeviceNum).CompObjectType != str_people) {
-                    tmpSumConvGainRateExceptPeople += state.dataHeatBal->SpaceIntGainDevices(spaceNum).Device(DeviceNum).ConvectGainRate;
+            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
+                if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompObjectType != str_people) {
+                    tmpSumConvGainRateExceptPeople += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ConvectGainRate;
                 }
             }
         }
@@ -8311,16 +8311,16 @@ namespace InternalHeatGains {
         int NumberOfTypes = size(GainTypeARR);
         Real64 tmpSumConvGainRate = 0.0;
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).Spaces) {
-            if (state.dataHeatBal->SpaceIntGainDevices(spaceNum).NumberOfDevices == 0) {
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaces) {
+            if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
                 continue;
             }
 
-            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->SpaceIntGainDevices(spaceNum).NumberOfDevices; ++DeviceNum) {
+            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
                 for (int TypeNum = 1; TypeNum <= NumberOfTypes; ++TypeNum) {
 
-                    if (state.dataHeatBal->SpaceIntGainDevices(spaceNum).Device(DeviceNum).CompTypeOfNum == GainTypeARR(TypeNum)) {
-                        tmpSumConvGainRate += state.dataHeatBal->SpaceIntGainDevices(spaceNum).Device(DeviceNum).ConvectGainRate;
+                    if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompTypeOfNum == GainTypeARR(TypeNum)) {
+                        tmpSumConvGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ConvectGainRate;
                     }
                 }
             }
@@ -8345,15 +8345,15 @@ namespace InternalHeatGains {
 
         Real64 tmpSumRetAirGainRate = 0.0;
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).Spaces) {
-            if (state.dataHeatBal->SpaceIntGainDevices(spaceNum).NumberOfDevices == 0) {
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaces) {
+            if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
                 continue;
             }
 
-            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->SpaceIntGainDevices(spaceNum).NumberOfDevices; ++DeviceNum) {
+            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
                 // If ReturnNodeNum is zero, sum for entire zone, otherwise sum only for specified ReturnNodeNum
-                if ((ReturnNodeNum == 0) || (ReturnNodeNum == state.dataHeatBal->SpaceIntGainDevices(spaceNum).Device(DeviceNum).ReturnAirNodeNum)) {
-                    tmpSumRetAirGainRate += state.dataHeatBal->SpaceIntGainDevices(spaceNum).Device(DeviceNum).ReturnAirConvGainRate;
+                if ((ReturnNodeNum == 0) || (ReturnNodeNum == state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ReturnAirNodeNum)) {
+                    tmpSumRetAirGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ReturnAirConvGainRate;
                 }
             }
         }
@@ -8377,16 +8377,16 @@ namespace InternalHeatGains {
         int NumberOfTypes = size(GainTypeARR);
         Real64 tmpSumRetAirConvGainRate = 0.0;
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).Spaces) {
-            if (state.dataHeatBal->SpaceIntGainDevices(spaceNum).NumberOfDevices == 0) {
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaces) {
+            if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
                 continue;
             }
 
-            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->SpaceIntGainDevices(spaceNum).NumberOfDevices; ++DeviceNum) {
+            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
                 for (int TypeNum = 1; TypeNum <= NumberOfTypes; ++TypeNum) {
 
-                    if (state.dataHeatBal->SpaceIntGainDevices(spaceNum).Device(DeviceNum).CompTypeOfNum == GainTypeARR(TypeNum)) {
-                        tmpSumRetAirConvGainRate += state.dataHeatBal->SpaceIntGainDevices(spaceNum).Device(DeviceNum).ReturnAirConvGainRate;
+                    if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompTypeOfNum == GainTypeARR(TypeNum)) {
+                        tmpSumRetAirConvGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ReturnAirConvGainRate;
                     }
                 }
             }
@@ -8396,8 +8396,8 @@ namespace InternalHeatGains {
     }
 
     void SumAllSpaceInternalRadiationGains(EnergyPlusData &state,
-                                           int const SpaceNum, // space index pointer for which space to sum gains for
-                                           Real64 &SumRadGainRate)
+                                           int const spaceNum, // space index pointer for which space to sum gains for
+                                           Real64 &sumRadGainRate)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8409,16 +8409,16 @@ namespace InternalHeatGains {
 
         Real64 tmpSumRadGainRate = 0.0;
 
-        if (state.dataHeatBal->SpaceIntGainDevices(SpaceNum).NumberOfDevices == 0) {
-            SumRadGainRate = 0.0;
+        if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
+            sumRadGainRate = 0.0;
             return;
         }
 
-        for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->SpaceIntGainDevices(SpaceNum).NumberOfDevices; ++DeviceNum) {
-            tmpSumRadGainRate += state.dataHeatBal->SpaceIntGainDevices(SpaceNum).Device(DeviceNum).RadiantGainRate;
+        for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
+            tmpSumRadGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).RadiantGainRate;
         }
 
-        SumRadGainRate = tmpSumRadGainRate;
+        sumRadGainRate = tmpSumRadGainRate;
     }
 
     void SumInternalRadiationGainsByTypes(EnergyPlusData &state,
@@ -8437,15 +8437,15 @@ namespace InternalHeatGains {
         int NumberOfTypes = size(GainTypeARR);
         Real64 tmpSumRadiationGainRate = 0.0;
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).Spaces) {
-            if (state.dataHeatBal->SpaceIntGainDevices(spaceNum).NumberOfDevices == 0) {
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaces) {
+            if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
                 continue;
             }
 
-            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->SpaceIntGainDevices(spaceNum).NumberOfDevices; ++DeviceNum) {
+            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
                 for (int TypeNum = 1; TypeNum <= NumberOfTypes; ++TypeNum) {
-                    if (state.dataHeatBal->SpaceIntGainDevices(spaceNum).Device(DeviceNum).CompTypeOfNum == GainTypeARR(TypeNum)) {
-                        tmpSumRadiationGainRate += state.dataHeatBal->SpaceIntGainDevices(spaceNum).Device(DeviceNum).RadiantGainRate;
+                    if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompTypeOfNum == GainTypeARR(TypeNum)) {
+                        tmpSumRadiationGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).RadiantGainRate;
                     }
                 }
             }
@@ -8468,13 +8468,13 @@ namespace InternalHeatGains {
 
         Real64 tmpSumLatentGainRate = 0.0;
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).Spaces) {
-            if (state.dataHeatBal->SpaceIntGainDevices(spaceNum).NumberOfDevices == 0) {
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaces) {
+            if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
                 continue;
             }
 
-            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->SpaceIntGainDevices(spaceNum).NumberOfDevices; ++DeviceNum) {
-                tmpSumLatentGainRate += state.dataHeatBal->SpaceIntGainDevices(spaceNum).Device(DeviceNum).LatentGainRate;
+            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
+                tmpSumLatentGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).LatentGainRate;
             }
 
             SumLatentGainRate = tmpSumLatentGainRate;
@@ -8488,14 +8488,14 @@ namespace InternalHeatGains {
     {
         Real64 tmpSumLatentGainRateExceptPeople = 0.0;
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).Spaces) {
-            if (state.dataHeatBal->SpaceIntGainDevices(spaceNum).NumberOfDevices == 0) {
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaces) {
+            if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
                 continue;
             }
 
-            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->SpaceIntGainDevices(spaceNum).NumberOfDevices; ++DeviceNum) {
-                if (state.dataHeatBal->SpaceIntGainDevices(spaceNum).Device(DeviceNum).CompTypeOfNum != IntGainTypeOf_People) {
-                    tmpSumLatentGainRateExceptPeople += state.dataHeatBal->SpaceIntGainDevices(spaceNum).Device(DeviceNum).LatentGainRate;
+            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
+                if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompTypeOfNum != IntGainTypeOf_People) {
+                    tmpSumLatentGainRateExceptPeople += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).LatentGainRate;
                 }
             }
         }
@@ -8519,16 +8519,16 @@ namespace InternalHeatGains {
         int NumberOfTypes = size(GainTypeARR);
         Real64 tmpSumLatentGainRate = 0.0;
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).Spaces) {
-            if (state.dataHeatBal->SpaceIntGainDevices(spaceNum).NumberOfDevices == 0) {
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaces) {
+            if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
                 continue;
             }
 
-            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->SpaceIntGainDevices(spaceNum).NumberOfDevices; ++DeviceNum) {
+            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
                 for (int TypeNum = 1; TypeNum <= NumberOfTypes; ++TypeNum) {
 
-                    if (state.dataHeatBal->SpaceIntGainDevices(spaceNum).Device(DeviceNum).CompTypeOfNum == GainTypeARR(TypeNum)) {
-                        tmpSumLatentGainRate += state.dataHeatBal->SpaceIntGainDevices(spaceNum).Device(DeviceNum).LatentGainRate;
+                    if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompTypeOfNum == GainTypeARR(TypeNum)) {
+                        tmpSumLatentGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).LatentGainRate;
                     }
                 }
             }
@@ -8553,15 +8553,15 @@ namespace InternalHeatGains {
 
         Real64 tmpSumLatentGainRate = 0.0;
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).Spaces) {
-            if (state.dataHeatBal->SpaceIntGainDevices(spaceNum).NumberOfDevices == 0) {
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaces) {
+            if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
                 continue;
             }
 
-            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->SpaceIntGainDevices(spaceNum).NumberOfDevices; ++DeviceNum) {
+            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
                 // If ReturnNodeNum is zero, sum for entire zone, otherwise sum only for specified ReturnNodeNum
-                if ((ReturnNodeNum == 0) || (ReturnNodeNum == state.dataHeatBal->SpaceIntGainDevices(spaceNum).Device(DeviceNum).ReturnAirNodeNum)) {
-                    tmpSumLatentGainRate += state.dataHeatBal->SpaceIntGainDevices(spaceNum).Device(DeviceNum).ReturnAirLatentGainRate;
+                if ((ReturnNodeNum == 0) || (ReturnNodeNum == state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ReturnAirNodeNum)) {
+                    tmpSumLatentGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ReturnAirLatentGainRate;
                 }
             }
         }
@@ -8583,13 +8583,13 @@ namespace InternalHeatGains {
 
         Real64 tmpSumCO2GainRate = 0.0;
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).Spaces) {
-            if (state.dataHeatBal->SpaceIntGainDevices(spaceNum).NumberOfDevices == 0) {
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaces) {
+            if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
                 continue;
             }
 
-            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->SpaceIntGainDevices(spaceNum).NumberOfDevices; ++DeviceNum) {
-                tmpSumCO2GainRate += state.dataHeatBal->SpaceIntGainDevices(spaceNum).Device(DeviceNum).CarbonDioxideGainRate;
+            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
+                tmpSumCO2GainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CarbonDioxideGainRate;
             }
         }
 
@@ -8603,14 +8603,14 @@ namespace InternalHeatGains {
     {
         Real64 tmpSumCO2GainRateExceptPeople = 0.0;
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).Spaces) {
-            if (state.dataHeatBal->SpaceIntGainDevices(spaceNum).NumberOfDevices == 0) {
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaces) {
+            if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
                 continue;
             }
 
-            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->SpaceIntGainDevices(spaceNum).NumberOfDevices; ++DeviceNum) {
-                if (state.dataHeatBal->SpaceIntGainDevices(spaceNum).Device(DeviceNum).CompTypeOfNum != IntGainTypeOf_People) {
-                    tmpSumCO2GainRateExceptPeople += state.dataHeatBal->SpaceIntGainDevices(spaceNum).Device(DeviceNum).CarbonDioxideGainRate;
+            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
+                if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompTypeOfNum != IntGainTypeOf_People) {
+                    tmpSumCO2GainRateExceptPeople += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CarbonDioxideGainRate;
                 }
             }
         }
@@ -8634,16 +8634,16 @@ namespace InternalHeatGains {
         int NumberOfTypes = size(GainTypeARR);
         Real64 tmpSumCO2GainRate = 0.0;
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).Spaces) {
-            if (state.dataHeatBal->SpaceIntGainDevices(spaceNum).NumberOfDevices == 0) {
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaces) {
+            if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
                 continue;
             }
 
-            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->SpaceIntGainDevices(spaceNum).NumberOfDevices; ++DeviceNum) {
+            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
                 for (int TypeNum = 1; TypeNum <= NumberOfTypes; ++TypeNum) {
 
-                    if (state.dataHeatBal->SpaceIntGainDevices(spaceNum).Device(DeviceNum).CompTypeOfNum == GainTypeARR(TypeNum)) {
-                        tmpSumCO2GainRate += state.dataHeatBal->SpaceIntGainDevices(spaceNum).Device(DeviceNum).CarbonDioxideGainRate;
+                    if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompTypeOfNum == GainTypeARR(TypeNum)) {
+                        tmpSumCO2GainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CarbonDioxideGainRate;
                     }
                 }
             }
@@ -8666,13 +8666,13 @@ namespace InternalHeatGains {
 
         Real64 tmpSumGCGainRate = 0.0;
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).Spaces) {
-            if (state.dataHeatBal->SpaceIntGainDevices(spaceNum).NumberOfDevices == 0) {
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaces) {
+            if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
                 continue;
             }
 
-            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->SpaceIntGainDevices(spaceNum).NumberOfDevices; ++DeviceNum) {
-                tmpSumGCGainRate += state.dataHeatBal->SpaceIntGainDevices(spaceNum).Device(DeviceNum).GenericContamGainRate;
+            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
+                tmpSumGCGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).GenericContamGainRate;
             }
         }
 
@@ -8810,9 +8810,9 @@ namespace InternalHeatGains {
     }
 
     int GetInternalGainDeviceIndex(EnergyPlusData &state,
-                                   int const SpaceNum,                  // space index pointer for which space to sum gains for
-                                   int const IntGainTypeOfNum,          // space internal gain type number
-                                   std::string_view const &IntGainName) // Internal gain name
+                                   int const spaceNum,                  // space index pointer for which space to sum gains for
+                                   int const intGainTypeOfNum,          // space internal gain type number
+                                   std::string_view const &intGainName) // Internal gain name
     {
 
         // SUBROUTINE INFORMATION:
@@ -8825,14 +8825,14 @@ namespace InternalHeatGains {
 
         int DeviceNum;
         int DeviceIndex;
-        if (state.dataHeatBal->SpaceIntGainDevices(SpaceNum).NumberOfDevices == 0) {
+        if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
             DeviceIndex = -1;
             return DeviceIndex;
         }
-        for (DeviceNum = 1; DeviceNum <= state.dataHeatBal->SpaceIntGainDevices(SpaceNum).NumberOfDevices; ++DeviceNum) {
-            if ((UtilityRoutines::SameString(state.dataHeatBal->SpaceIntGainDevices(SpaceNum).Device(DeviceNum).CompObjectName,
-                                             IntGainName.data())) &&
-                (state.dataHeatBal->SpaceIntGainDevices(SpaceNum).Device(DeviceNum).CompTypeOfNum == IntGainTypeOfNum)) {
+        for (DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
+            if ((UtilityRoutines::SameString(state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompObjectName,
+                                             intGainName.data())) &&
+                (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompTypeOfNum == intGainTypeOfNum)) {
                 DeviceIndex = DeviceNum;
                 break;
             } else {
@@ -8844,11 +8844,11 @@ namespace InternalHeatGains {
 
     void SumInternalConvectionGainsByIndices(
         EnergyPlusData &state,
-        int const NumGains,                 // number of device gains to sum
-        const Array1D_int &DeviceSpaceARR,  // variable length 1-d array of integer space index pointers to include in summation
-        const Array1D_int &DeviceIndexARR,  // variable length 1-d array of integer device index pointers to include in summation
-        const Array1D<Real64> &FractionARR, // array of fractional multipliers to apply to devices
-        Real64 &SumConvGainRate)
+        int const numGains,                 // number of device gains to sum
+        const Array1D_int &deviceSpaceARR,  // variable length 1-d array of integer space index pointers to include in summation
+        const Array1D_int &deviceIndexARR,  // variable length 1-d array of integer device index pointers to include in summation
+        const Array1D<Real64> &fractionARR, // array of fractional multipliers to apply to devices
+        Real64 &sumConvGainRate)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8858,28 +8858,28 @@ namespace InternalHeatGains {
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing a subset of the internal gains by index
 
-        assert(NumGains <= isize(DeviceSpaceARR));
-        assert(NumGains <= isize(DeviceIndexARR));
-        assert(NumGains <= isize(FractionARR));
+        assert(numGains <= isize(deviceSpaceARR));
+        assert(numGains <= isize(deviceIndexARR));
+        assert(numGains <= isize(fractionARR));
 
         Real64 tmpSumConvGainRate = 0.0;
 
-        for (int loop = 1; loop <= NumGains; ++loop) {
-            int spaceNum = DeviceSpaceARR(loop);
-            int deviceNum = DeviceIndexARR(loop);
-            Real64 deviceFraction = FractionARR(loop);
-            tmpSumConvGainRate += state.dataHeatBal->SpaceIntGainDevices(spaceNum).Device(deviceNum).ConvectGainRate * deviceFraction;
+        for (int loop = 1; loop <= numGains; ++loop) {
+            int spaceNum = deviceSpaceARR(loop);
+            int deviceNum = deviceIndexARR(loop);
+            Real64 deviceFraction = fractionARR(loop);
+            tmpSumConvGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(deviceNum).ConvectGainRate * deviceFraction;
         }
-        SumConvGainRate = tmpSumConvGainRate;
+        sumConvGainRate = tmpSumConvGainRate;
     }
 
     void SumInternalLatentGainsByIndices(
         EnergyPlusData &state,
-        int const NumGains,                 // number of device gains to sum
-        const Array1D_int &DeviceSpaceARR,  // variable length 1-d array of integer space index pointers to include in summation
-        const Array1D_int &DeviceIndexARR,  // variable length 1-d array of integer device index pointers to include in summation
-        const Array1D<Real64> &FractionARR, // array of fractional multipliers to apply to devices
-        Real64 &SumLatentGainRate)
+        int const numGains,                 // number of device gains to sum
+        const Array1D_int &deviceSpaceARR,  // variable length 1-d array of integer space index pointers to include in summation
+        const Array1D_int &deviceIndexARR,  // variable length 1-d array of integer device index pointers to include in summation
+        const Array1D<Real64> &fractionARR, // array of fractional multipliers to apply to devices
+        Real64 &sumLatentGainRate)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8889,29 +8889,29 @@ namespace InternalHeatGains {
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing a subset of the internal gains by index
 
-        assert(NumGains <= isize(DeviceSpaceARR));
-        assert(NumGains <= isize(DeviceIndexARR));
-        assert(NumGains <= isize(FractionARR));
+        assert(numGains <= isize(deviceSpaceARR));
+        assert(numGains <= isize(deviceIndexARR));
+        assert(numGains <= isize(fractionARR));
 
         Real64 tmpSumLatentGainRate = 0.0;
 
-        for (int loop = 1; loop <= NumGains; ++loop) {
-            int spaceNum = DeviceSpaceARR(loop);
-            int deviceNum = DeviceIndexARR(loop);
-            Real64 deviceFraction = FractionARR(loop);
+        for (int loop = 1; loop <= numGains; ++loop) {
+            int spaceNum = deviceSpaceARR(loop);
+            int deviceNum = deviceIndexARR(loop);
+            Real64 deviceFraction = fractionARR(loop);
             tmpSumLatentGainRate =
-                tmpSumLatentGainRate + state.dataHeatBal->SpaceIntGainDevices(spaceNum).Device(deviceNum).LatentGainRate * deviceFraction;
+                tmpSumLatentGainRate + state.dataHeatBal->spaceIntGainDevices(spaceNum).device(deviceNum).LatentGainRate * deviceFraction;
         }
-        SumLatentGainRate = tmpSumLatentGainRate;
+        sumLatentGainRate = tmpSumLatentGainRate;
     }
 
     void SumReturnAirConvectionGainsByIndices(
         EnergyPlusData &state,
-        int const NumGains,                 // number of device gains to sum
-        const Array1D_int &DeviceSpaceARR,  // variable length 1-d array of integer space index pointers to include in summation
-        const Array1D_int &DeviceIndexARR,  // variable length 1-d array of integer device index pointers to include in summation
-        const Array1D<Real64> &FractionARR, // array of fractional multipliers to apply to devices
-        Real64 &SumReturnAirGainRate)
+        int const numGains,                 // number of device gains to sum
+        const Array1D_int &deviceSpaceARR,  // variable length 1-d array of integer space index pointers to include in summation
+        const Array1D_int &deviceIndexARR,  // variable length 1-d array of integer device index pointers to include in summation
+        const Array1D<Real64> &fractionARR, // array of fractional multipliers to apply to devices
+        Real64 &sumReturnAirGainRate)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8921,20 +8921,20 @@ namespace InternalHeatGains {
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing a subset of the internal gains by index
 
-        assert(NumGains <= isize(DeviceSpaceARR));
-        assert(NumGains <= isize(DeviceIndexARR));
-        assert(NumGains <= isize(FractionARR));
+        assert(numGains <= isize(deviceSpaceARR));
+        assert(numGains <= isize(deviceIndexARR));
+        assert(numGains <= isize(fractionARR));
 
         Real64 tmpSumReturnAirGainRate = 0.0;
 
-        for (int loop = 1; loop <= NumGains; ++loop) {
-            int spaceNum = DeviceSpaceARR(loop);
-            int deviceNum = DeviceIndexARR(loop);
-            Real64 deviceFraction = FractionARR(loop);
+        for (int loop = 1; loop <= numGains; ++loop) {
+            int spaceNum = deviceSpaceARR(loop);
+            int deviceNum = deviceIndexARR(loop);
+            Real64 deviceFraction = fractionARR(loop);
             tmpSumReturnAirGainRate =
-                tmpSumReturnAirGainRate + state.dataHeatBal->SpaceIntGainDevices(spaceNum).Device(deviceNum).ReturnAirConvGainRate * deviceFraction;
+                tmpSumReturnAirGainRate + state.dataHeatBal->spaceIntGainDevices(spaceNum).device(deviceNum).ReturnAirConvGainRate * deviceFraction;
         }
-        SumReturnAirGainRate = tmpSumReturnAirGainRate;
+        sumReturnAirGainRate = tmpSumReturnAirGainRate;
     }
 
 } // namespace InternalHeatGains
