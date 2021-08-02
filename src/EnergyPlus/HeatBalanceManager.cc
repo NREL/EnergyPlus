@@ -5448,29 +5448,29 @@ namespace HeatBalanceManager {
                             "Zone Outdoor Air Drybulb Temperature",
                             OutputProcessor::Unit::C,
                             state.dataHeatBal->Zone(ZoneLoop).OutDryBulbTemp,
-                            "Zone",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataHeatBal->Zone(ZoneLoop).Name);
         SetupOutputVariable(state,
                             "Zone Outdoor Air Wetbulb Temperature",
                             OutputProcessor::Unit::C,
                             state.dataHeatBal->Zone(ZoneLoop).OutWetBulbTemp,
-                            "Zone",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataHeatBal->Zone(ZoneLoop).Name);
         SetupOutputVariable(state,
                             "Zone Outdoor Air Wind Speed",
                             OutputProcessor::Unit::m_s,
                             state.dataHeatBal->Zone(ZoneLoop).WindSpeed,
-                            "Zone",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataHeatBal->Zone(ZoneLoop).Name);
         SetupOutputVariable(state,
                             "Zone Outdoor Air Wind Direction",
                             OutputProcessor::Unit::deg,
                             state.dataHeatBal->Zone(ZoneLoop).WindDir,
-                            "Zone",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataHeatBal->Zone(ZoneLoop).Name);
     }
 
@@ -5909,8 +5909,8 @@ namespace HeatBalanceManager {
                                 "Zone Mean Radiant Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataHeatBal->ZoneMRT(loop),
-                                "Zone",
-                                "State",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
                                 state.dataHeatBal->Zone(loop).Name);
         }
     }
