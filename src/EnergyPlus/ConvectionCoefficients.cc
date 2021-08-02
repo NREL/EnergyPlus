@@ -5809,8 +5809,8 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
     int EquipOnLoop(0);
     int thisZoneInletNode(0);
     ConvectionConstants::InConvFlowRegime FinalFlowRegime(ConvectionConstants::InConvFlowRegime::Invalid);
-    Real64 Tmin(0.0);       // temporary min surf temp
-    Real64 Tmax(0.0);       // temporary max surf temp
+    Real64 Tmin(std::numeric_limits<float>::min());       // temporary min surf temp
+    Real64 Tmax(std::numeric_limits<float>::max());       // temporary max surf temp
     Real64 GrH(0.0);        // Grashof number for zone height H
     Real64 Re(0.0);         // Reynolds number for zone air system flow
     Real64 Ri(0.0);         // Richardson Number, Gr/Re**2 for determining mixed regime
@@ -6043,8 +6043,11 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
 
         // Calculate Grashof, Reynolds, and Richardson numbers for the zone
         // Grashof for zone air based on largest delta T between surfaces and zone height
-        Tmin = minval(state.dataHeatBalSurf->SurfInsideTempHist(1)({Zone(ZoneNum).HTSurfaceFirst, Zone(ZoneNum).HTSurfaceLast}));
-        Tmax = maxval(state.dataHeatBalSurf->SurfInsideTempHist(1)({Zone(ZoneNum).HTSurfaceFirst, Zone(ZoneNum).HTSurfaceLast}));
+        for (int SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum)  {
+            Real64 SurfTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum);
+            if (SurfTemp < Tmin) Tmin = SurfTemp;
+            else if (SurfTemp > Tmax) Tmax = SurfTemp;
+        }
         GrH = (g * (Tmax - Tmin) * pow_3(Zone(ZoneNum).CeilingHeight)) /
               ((state.dataHeatBalFanSys->MAT(ZoneNum) + DataGlobalConstants::KelvinConv) * pow_2(v));
 
