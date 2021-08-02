@@ -7863,8 +7863,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                         HConvIn_surf * surface.Area * (state.dataHeatBalSurf->SurfTempIn(surfNum) - state.dataHeatBalSurfMgr->RefAirTemp(surfNum));
                     state.dataSurface->SurfWinGainIRGlazToZoneRep(surfNum) =
                         state.dataConstruction->Construct(surface.Construction).InsideAbsorpThermal * surface.Area *
-                        (Sigma_Temp_4 -
-                         (state.dataSurface->SurfWinIRfromParentZone(surfNum) + state.dataHeatBalSurf->QdotRadHVACInPerArea(surfNum)));
+                        (Sigma_Temp_4 - (state.dataSurface->SurfWinIRfromParentZone(surfNum) + state.dataHeatBalSurf->QdotRadHVACInPerArea(surfNum)));
                     state.dataSurface->SurfWinLossSWZoneToOutWinRep(surfNum) = state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) *
                                                                                surface.Area *
                                                                                state.dataConstruction->Construct(surface.Construction).TransDiff;
