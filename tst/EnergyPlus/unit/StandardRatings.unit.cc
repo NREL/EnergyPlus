@@ -108,8 +108,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     Coil.MinOATCompressor = -10.0;
     Coil.CrankcaseHeaterCapacity = 0.0;
     Coil.MaxOATDefrost = 0.0;
-    Coil.DefrostStrategy = Resistive;
-    Coil.DefrostControl = 0; // timed defrost control type
+    Coil.DefrostStrategy = StandardRatings::DefrostStrat::Resistive;
+    Coil.DefrostControl = StandardRatings::HPdefrostControl::Unassigned; // timed defrost control type
     Coil.DefrostTime = 0.058333;
     Coil.DefrostCapacity = 1000;
     Coil.PLRImpact = false;

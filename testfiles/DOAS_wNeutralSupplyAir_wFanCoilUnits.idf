@@ -65,7 +65,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.5;
+  Version,9.6;
 
 !-   ===========  ALL OBJECTS IN CLASS: TIMESTEP ===========
 
@@ -3123,8 +3123,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     VAV OA System,           !- Name
     VAV OA System Controller List,  !- Controller List Name
-    VAV OA System Equipment List,  !- Outdoor Air Equipment List Name
-    VAV OA System Availability Manager List;  !- Availability Manager List Name
+    VAV OA System Equipment List;  !- Outdoor Air Equipment List Name
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTDOORAIR:MIXER ===========
 

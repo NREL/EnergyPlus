@@ -100,7 +100,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.5;
+  Version,9.6;
 
   CoilSystem:Heating:DX,
     HeatPump DX Coil 1,      !- Name
@@ -2004,8 +2004,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 1,                !- Name
     OA Sys 1 Controllers,    !- Controller List Name
-    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name
-    Outdoor Air 1 Avail List;!- Availability Manager List Name
+    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     OutsideAirInletNodes;    !- Node or NodeList Name 1

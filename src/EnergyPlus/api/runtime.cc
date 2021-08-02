@@ -66,6 +66,11 @@ int energyplus(EnergyPlusState state, int argc, const char *argv[])
     //    argv[6] = epcomp->iddPath.c_str();
     //    argv[7] = epcomp->idfInputPath.c_str();
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    if (!thisState->ready) {
+        std::cerr << "Attempted to re-run EnergyPlus using a state that was not yet cleared, call stateReset() on this instance and try again\n";
+        return 1;
+    }
+    thisState->ready = false;
     return runEnergyPlusAsLibrary(*thisState, argc, argv);
 }
 
@@ -73,6 +78,16 @@ void stopSimulation(EnergyPlusState state)
 {
     auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     thisState->dataGlobal->stopSimulation = true;
+}
+
+void setConsoleOutputState(EnergyPlusState state, int outputStatus)
+{
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    if (outputStatus == 0) {
+        thisState->dataGlobal->printConsoleOutput = false;
+    } else {
+        thisState->dataGlobal->printConsoleOutput = true;
+    }
 }
 
 void issueWarning(EnergyPlusState state, const char *message)

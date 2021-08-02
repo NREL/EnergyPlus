@@ -182,6 +182,7 @@ int main(int argc, const char *argv[])
         numWarnings = 0;
     }
     oneTimeHalfway = 0;
+    // reset and run again
     stateReset(state); // note previous callbacks are cleared here
     callbackAfterNewEnvironmentWarmupComplete(state, newEnvrnHandler);
     registerStdOutCallback(state, stdOutHandler);
@@ -190,8 +191,15 @@ int main(int argc, const char *argv[])
         printf("There were %d warnings!\n", numWarnings);
         numWarnings = 0;
     }
+    // reset and run a test with an external hvac manager
     stateReset(state);
     registerExternalHVACManager(state, externalHVAC);
     energyplus(state, argc, argv);
+    // create a new state and run it with console output muted
+    printf("Running EnergyPlus with Console Output Muted...\n");
+    EnergyPlusState state2 = stateNew();
+    setConsoleOutputState(state2, 0);
+    energyplus(state2, argc, argv);
+    printf("...and it is done.");
     return 0;
 }

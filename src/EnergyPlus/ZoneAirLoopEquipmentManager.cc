@@ -173,7 +173,7 @@ namespace ZoneAirLoopEquipmentManager {
         using DualDuct::GetDualDuctOutdoorAirRecircUse;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetZoneAirLoopEquipment: ");            // include trailing blank space
+        static constexpr std::string_view RoutineName("GetZoneAirLoopEquipment: ");   // include trailing blank space
         static std::string const CurrentModuleObject("ZoneHVAC:AirDistributionUnit"); // Object type for getting and error messages
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -231,7 +231,7 @@ namespace ZoneAirLoopEquipmentManager {
                                                                                                          AlphArray(1),
                                                                                                          DataLoopNode::NodeFluidType::Air,
                                                                                                          DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                         1,
+                                                                                                         NodeInputManager::compFluidStream::Primary,
                                                                                                          ObjectIsParent);
                 state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).InletNodeNum = 0;
                 state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).NumComponents = 1;
@@ -511,34 +511,34 @@ namespace ZoneAirLoopEquipmentManager {
                                     "Zone Air Terminal Sensible Heating Energy",
                                     OutputProcessor::Unit::J,
                                     state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).HeatGain,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name);
                 SetupOutputVariable(state,
                                     "Zone Air Terminal Sensible Cooling Energy",
                                     OutputProcessor::Unit::J,
                                     state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).CoolGain,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name);
                 SetupOutputVariable(state,
                                     "Zone Air Terminal Sensible Heating Rate",
                                     OutputProcessor::Unit::W,
                                     state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).HeatRate,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name);
                 SetupOutputVariable(state,
                                     "Zone Air Terminal Sensible Cooling Rate",
                                     OutputProcessor::Unit::W,
                                     state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).CoolRate,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name);
             }
         }
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in getting " + CurrentModuleObject + " Input");
+            ShowFatalError(state, std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject + " Input");
         }
     }
 

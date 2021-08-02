@@ -73,25 +73,25 @@ namespace SurfaceGroundHeatExchanger {
         std::string InletNode;        // surface GHE inlet fluid node
         std::string OutletNode;       // surface GHE outlet fluid node
         Real64 DesignMassFlowRate;
-        Real64 TubeDiameter;  // hydronic tube inside diameter
-        Real64 TubeSpacing;   // tube spacing
-        Real64 SurfaceLength; // active length of surface GHE
-        Real64 SurfaceWidth;  // active width of surface GHE
-        Real64 TopThermAbs;   // Thermal absortivity of top layer
-        Real64 TopSolarAbs;   // solar absortivity of top layer
-        Real64 BtmThermAbs;   // Thermal absortivity of bottom layer
-        int LowerSurfCond;    // Type of lower surf. boundary condition
-        int TubeCircuits;     // number of circuits in total
-        int ConstructionNum;  // construction index number
-        int InletNodeNum;     // inlet node number
-        int OutletNodeNum;    // oulet node number
-        int TopRoughness;     // roughness of top layer
-        int BtmRoughness;     // roughness of bottom layer
-        int FrozenErrIndex1;  // recurring error index
-        int FrozenErrIndex2;  // recurring error index
-        int ConvErrIndex1;    // recurring error index
-        int ConvErrIndex2;    // recurring error index
-        int ConvErrIndex3;    // recurring error index
+        Real64 TubeDiameter;                         // hydronic tube inside diameter
+        Real64 TubeSpacing;                          // tube spacing
+        Real64 SurfaceLength;                        // active length of surface GHE
+        Real64 SurfaceWidth;                         // active width of surface GHE
+        Real64 TopThermAbs;                          // Thermal absortivity of top layer
+        Real64 TopSolarAbs;                          // solar absortivity of top layer
+        Real64 BtmThermAbs;                          // Thermal absortivity of bottom layer
+        int LowerSurfCond;                           // Type of lower surf. boundary condition
+        int TubeCircuits;                            // number of circuits in total
+        int ConstructionNum;                         // construction index number
+        int InletNodeNum;                            // inlet node number
+        int OutletNodeNum;                           // oulet node number
+        DataSurfaces::SurfaceRoughness TopRoughness; // roughness of top layer
+        DataSurfaces::SurfaceRoughness BtmRoughness; // roughness of bottom layer
+        int FrozenErrIndex1;                         // recurring error index
+        int FrozenErrIndex2;                         // recurring error index
+        int ConvErrIndex1;                           // recurring error index
+        int ConvErrIndex2;                           // recurring error index
+        int ConvErrIndex3;                           // recurring error index
         // loop topology variables
         int LoopNum;
         int LoopSideNum;
@@ -154,10 +154,9 @@ namespace SurfaceGroundHeatExchanger {
         // Default Constructor
         SurfaceGroundHeatExchangerData()
             : DesignMassFlowRate(0.0), TubeDiameter(0.0), TubeSpacing(0.0), SurfaceLength(0.0), SurfaceWidth(0.0), TopThermAbs(0.0), TopSolarAbs(0.0),
-              BtmThermAbs(0.0), LowerSurfCond(0), TubeCircuits(0), ConstructionNum(0), InletNodeNum(0), OutletNodeNum(0), TopRoughness(0),
-              BtmRoughness(0), FrozenErrIndex1(0), FrozenErrIndex2(0), ConvErrIndex1(0), ConvErrIndex2(0), ConvErrIndex3(0), LoopNum(0),
-              LoopSideNum(0), BranchNum(0), CompNum(0),
-
+              BtmThermAbs(0.0), LowerSurfCond(0), TubeCircuits(0), ConstructionNum(0), InletNodeNum(0), OutletNodeNum(0),
+              TopRoughness(DataSurfaces::SurfaceRoughness::Unassigned), BtmRoughness(DataSurfaces::SurfaceRoughness::Unassigned), FrozenErrIndex1(0),
+              FrozenErrIndex2(0), ConvErrIndex1(0), ConvErrIndex2(0), ConvErrIndex3(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0),
               TsrcConstCoef(0.0), TsrcVarCoef(0.0), QbtmConstCoef(0.0), QbtmVarCoef(0.0), QtopConstCoef(0.0), QtopVarCoef(0.0), NumCTFTerms(0),
               CTFin({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFout({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
               CTFcross({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFflux({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
@@ -259,6 +258,10 @@ namespace SurfaceGroundHeatExchanger {
         //==============================================================================
 
         void ReportSurfaceGroundHeatExchngr(EnergyPlusData &state); // Index for the surface under consideration
+
+        //==============================================================================
+
+        void oneTimeInit(EnergyPlusData &state) override; // Empty function for pure virtual oneTimeInitFlag function
     };
 
     void GetSurfaceGroundHeatExchanger(EnergyPlusData &state);

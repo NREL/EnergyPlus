@@ -60,6 +60,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 
 namespace EnergyPlus {
 
@@ -72,24 +73,27 @@ namespace FluidProperties {
 
     // Data
     // MODULE PARAMETER DEFINITIONS
-    extern std::string const Refrig;
-    extern std::string const Glycol;
-    extern std::string const Pressure;
-    extern std::string const Enthalpy;
-    extern std::string const Density;
-    extern std::string const SpecificHeat;
-    extern std::string const Conductivity;
-    extern std::string const Viscosity;
-    extern std::string const Fluid;
-    extern std::string const GasFluid;
-    extern std::string const Water;
-    extern std::string const Steam;
-    extern std::string const EthyleneGlycol;
-    extern std::string const PropyleneGlycol;
+
     int constexpr EthyleneGlycolIndex = -2;
     int constexpr PropyleneGlycolIndex = -1;
     int constexpr iRefri = 1;
     int constexpr iGlyco = 1;
+
+    constexpr static std::string_view Refrig("REFRIGERANT");
+    constexpr static std::string_view Glycol("GLYCOL");
+    constexpr static std::string_view Pressure("PRESSURE");
+    constexpr static std::string_view Enthalpy("ENTHALPY");
+    constexpr static std::string_view Density("DENSITY");
+    constexpr static std::string_view SpecificHeat("SPECIFICHEAT");
+    constexpr static std::string_view Conductivity("CONDUCTIVITY");
+    constexpr static std::string_view Viscosity("VISCOSITY");
+    constexpr static std::string_view Fluid("FLUID");
+    constexpr static std::string_view GasFluid("FLUIDGAS");
+    constexpr static std::string_view Water("Water");
+    constexpr static std::string_view Steam("Steam");
+    constexpr static std::string_view EthyleneGlycol("EthyleneGlycol");
+    constexpr static std::string_view PropyleneGlycol("PropyleneGlycol");
+
     // DERIVED TYPE DEFINITIONS
 
     // INTERFACE BLOCK SPECIFICATIONS
@@ -98,11 +102,11 @@ namespace FluidProperties {
     // MODULE VARIABLE DECLARATIONS
 
 #ifdef EP_cache_GlycolSpecificHeat
-    int const t_sh_cache_size = 1024 * 1024;
-    int const t_sh_precision_bits = 24;
-    Int64 const t_sh_cache_mask = (t_sh_cache_size - 1);
+    int constexpr t_sh_cache_size = 1024 * 1024;
+    int constexpr t_sh_precision_bits = 24;
+    std::uint64_t constexpr t_sh_cache_mask = (t_sh_cache_size - 1);
 #endif
-    // ACCESSIBLE SPECIFICATIONS OF MODULE SUBROUTINES OR FUNCTONS:
+    // ACCESSIBLE SPECIFICATIONS OF MODULE SUBROUTINES OR FUNCTIONS:
 
     // Types
 
@@ -342,11 +346,11 @@ namespace FluidProperties {
     struct cached_tsh
     {
         // Members
-        Int64 iT;
+        std::uint64_t iT;
         Real64 sh;
 
         // Default Constructor
-        cached_tsh() : iT(-1000), sh(0.0)
+        cached_tsh() : iT(1000), sh(0.0)
         {
         }
     };
@@ -403,119 +407,123 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetSatPressureRefrig(EnergyPlusData &state,
-                                std::string const &Refrigerant, // carries in substance name
-                                Real64 Temperature,             // actual temperature given as input
-                                int &RefrigIndex,               // Index to Refrigerant Properties
-                                std::string const &CalledFrom   // routine this function was called from (error messages)
+                                std::string_view const Refrigerant, // carries in substance name
+                                Real64 Temperature,                 // actual temperature given as input
+                                int &RefrigIndex,                   // Index to Refrigerant Properties
+                                std::string_view const CalledFrom   // routine this function was called from (error messages)
     );
 
     //*****************************************************************************
 
     Real64 GetSatTemperatureRefrig(EnergyPlusData &state,
-                                   std::string const &Refrigerant, // carries in substance name
-                                   Real64 Pressure,                // actual temperature given as input
-                                   int &RefrigIndex,               // Index to Refrigerant Properties
-                                   std::string const &CalledFrom   // routine this function was called from (error messages)
+                                   std::string_view const Refrigerant, // carries in substance name
+                                   Real64 Pressure,                    // actual temperature given as input
+                                   int &RefrigIndex,                   // Index to Refrigerant Properties
+                                   std::string_view const CalledFrom   // routine this function was called from (error messages)
     );
 
     //*****************************************************************************
 
     Real64 GetSatEnthalpyRefrig(EnergyPlusData &state,
-                                std::string const &Refrigerant, // carries in substance name
-                                Real64 Temperature,             // actual temperature given as input
-                                Real64 Quality,                 // actual quality given as input
-                                int &RefrigIndex,               // Index to Refrigerant Properties
-                                std::string const &CalledFrom   // routine this function was called from (error messages)
+                                std::string_view const Refrigerant, // carries in substance name
+                                Real64 Temperature,                 // actual temperature given as input
+                                Real64 Quality,                     // actual quality given as input
+                                int &RefrigIndex,                   // Index to Refrigerant Properties
+                                std::string_view const CalledFrom   // routine this function was called from (error messages)
     );
 
     //*****************************************************************************
 
     Real64 GetSatDensityRefrig(EnergyPlusData &state,
-                               std::string const &Refrigerant, // carries in substance name
-                               Real64 Temperature,             // actual temperature given as input
-                               Real64 Quality,                 // actual quality given as input
-                               int &RefrigIndex,               // Index to Refrigerant Properties
-                               std::string const &CalledFrom   // routine this function was called from (error messages)
+                               std::string_view const Refrigerant, // carries in substance name
+                               Real64 Temperature,                 // actual temperature given as input
+                               Real64 Quality,                     // actual quality given as input
+                               int &RefrigIndex,                   // Index to Refrigerant Properties
+                               std::string_view const CalledFrom   // routine this function was called from (error messages)
     );
 
     //*****************************************************************************
 
     Real64 GetSatSpecificHeatRefrig(EnergyPlusData &state,
-                                    std::string const &Refrigerant, // carries in substance name
-                                    Real64 Temperature,             // actual temperature given as input
-                                    Real64 Quality,                 // actual quality given as input
-                                    int &RefrigIndex,               // Index to Refrigerant Properties
-                                    std::string const &CalledFrom   // routine this function was called from (error messages)
+                                    std::string_view const Refrigerant, // carries in substance name
+                                    Real64 Temperature,                 // actual temperature given as input
+                                    Real64 Quality,                     // actual quality given as input
+                                    int &RefrigIndex,                   // Index to Refrigerant Properties
+                                    std::string_view const CalledFrom   // routine this function was called from (error messages)
     );
 
     //*****************************************************************************
 
     Real64 GetSupHeatEnthalpyRefrig(EnergyPlusData &state,
-                                    std::string const &Refrigerant, // carries in substance name
-                                    Real64 Temperature,             // actual temperature given as input
-                                    Real64 Pressure,                // actual pressure given as input
-                                    int &RefrigIndex,               // Index to Refrigerant Properties
-                                    std::string const &CalledFrom   // routine this function was called from (error messages)
+                                    std::string_view const Refrigerant, // carries in substance name
+                                    Real64 Temperature,                 // actual temperature given as input
+                                    Real64 Pressure,                    // actual pressure given as input
+                                    int &RefrigIndex,                   // Index to Refrigerant Properties
+                                    std::string_view const CalledFrom   // routine this function was called from (error messages)
     );
 
     //*****************************************************************************
 
     Real64 GetSupHeatPressureRefrig(EnergyPlusData &state,
-                                    std::string const &Refrigerant, // carries in substance name
-                                    Real64 Temperature,             // actual temperature given as input
-                                    Real64 Enthalpy,                // actual enthalpy given as input
-                                    int &RefrigIndex,               // Index to Refrigerant Properties
-                                    std::string const &CalledFrom   // routine this function was called from (error messages)
+                                    std::string_view const Refrigerant, // carries in substance name
+                                    Real64 Temperature,                 // actual temperature given as input
+                                    Real64 Enthalpy,                    // actual enthalpy given as input
+                                    int &RefrigIndex,                   // Index to Refrigerant Properties
+                                    std::string_view const CalledFrom   // routine this function was called from (error messages)
     );
 
     //*****************************************************************************
 
     Real64 GetSupHeatTempRefrig(EnergyPlusData &state,
-                                std::string const &Refrigerant, // carries in substance name
-                                Real64 Pressure,                // actual pressure given as input
-                                Real64 Enthalpy,                // actual enthalpy given as input
-                                Real64 TempLow,                 // lower bound of temperature in the iteration
-                                Real64 TempUp,                  // upper bound of temperature in the iteration
-                                int &RefrigIndex,               // Index to Refrigerant Properties
-                                std::string const &CalledFrom   // routine this function was called from (error messages)
+                                std::string_view const Refrigerant, // carries in substance name
+                                Real64 Pressure,                    // actual pressure given as input
+                                Real64 Enthalpy,                    // actual enthalpy given as input
+                                Real64 TempLow,                     // lower bound of temperature in the iteration
+                                Real64 TempUp,                      // upper bound of temperature in the iteration
+                                int &RefrigIndex,                   // Index to Refrigerant Properties
+                                std::string_view const CalledFrom   // routine this function was called from (error messages)
     );
 
     Real64 GetSupHeatTempRefrigResidual(EnergyPlusData &state,
                                         Real64 Temperature, // temperature of the refrigerant
-                                        Array1D<Real64> const &Par);
+                                        std::array<Real64, 3> const &Par);
 
     //*****************************************************************************
 
     Real64 GetSupHeatDensityRefrig(EnergyPlusData &state,
-                                   std::string const &Refrigerant, // carries in substance name
-                                   Real64 Temperature,             // actual temperature given as input
-                                   Real64 Pressure,                // actual pressure given as input
-                                   int &RefrigIndex,               // Index to Refrigerant Properties
-                                   std::string const &CalledFrom   // routine this function was called from (error messages)
+                                   std::string_view const Refrigerant, // carries in substance name
+                                   Real64 Temperature,                 // actual temperature given as input
+                                   Real64 Pressure,                    // actual pressure given as input
+                                   int &RefrigIndex,                   // Index to Refrigerant Properties
+                                   std::string_view const CalledFrom   // routine this function was called from (error messages)
     );
 
     //*****************************************************************************
 #ifdef EP_cache_GlycolSpecificHeat
     Real64 GetSpecificHeatGlycol_raw(EnergyPlusData &state,
-                                     std::string const &Glycol,    // carries in substance name
-                                     Real64 const Temperature,     // actual temperature given as input
-                                     int &GlycolIndex,             // Index to Glycol Properties
-                                     std::string const &CalledFrom // routine this function was called from (error messages)
+                                     std::string_view const Glycol,    // carries in substance name
+                                     Real64 const Temperature,         // actual temperature given as input
+                                     int &GlycolIndex,                 // Index to Glycol Properties
+                                     std::string_view const CalledFrom // routine this function was called from (error messages)
     );
 
     inline Real64 GetSpecificHeatGlycol(EnergyPlusData &state,
-                                        std::string const &Glycol,    // carries in substance name
-                                        Real64 const Temperature,     // actual temperature given as input
-                                        int &GlycolIndex,             // Index to Glycol Properties
-                                        std::string const &CalledFrom // routine this function was called from (error messages)
+                                        std::string_view const Glycol,    // carries in substance name
+                                        Real64 const Temperature,         // actual temperature given as input
+                                        int &GlycolIndex,                 // Index to Glycol Properties
+                                        std::string_view const CalledFrom // routine this function was called from (error messages)
     )
     {
-        Int64 const Grid_Shift(28);
-        assert(Grid_Shift == 64 - 12 - t_sh_precision_bits);
+        std::uint64_t constexpr Grid_Shift = 64 - 12 - t_sh_precision_bits;
 
-        Int64 const T_tag(bit_shift(bit_transfer(Temperature + 1000 * GlycolIndex, Grid_Shift), -Grid_Shift));
+        double const t(Temperature + 1000 * GlycolIndex);
 
-        Int64 const hash(T_tag & t_sh_cache_mask);
+        DISABLE_WARNING_PUSH
+        DISABLE_WARNING_STRICT_ALIASING
+        std::uint64_t const T_tag(*reinterpret_cast<std::uint64_t const *>(&t) >> Grid_Shift);
+        DISABLE_WARNING_POP
+
+        std::uint64_t const hash(T_tag & t_sh_cache_mask);
         auto &cTsh(cached_t_sh(hash));
 
         if (cTsh.iT != T_tag) {
@@ -527,38 +535,38 @@ namespace FluidProperties {
     }
 #else
     Real64 GetSpecificHeatGlycol(EnergyPlusData &state,
-                                 std::string const &Glycol,    // carries in substance name
-                                 Real64 const Temperature,     // actual temperature given as input
-                                 int &GlycolIndex,             // Index to Glycol Properties
-                                 std::string const &CalledFrom // routine this function was called from (error messages)
+                                 std::string_view const Glycol,    // carries in substance name
+                                 Real64 const Temperature,         // actual temperature given as input
+                                 int &GlycolIndex,                 // Index to Glycol Properties
+                                 std::string_view const CalledFrom // routine this function was called from (error messages)
     );
 #endif
 
     //*****************************************************************************
 
     Real64 GetDensityGlycol(EnergyPlusData &state,
-                            std::string const &Glycol,    // carries in substance name
-                            Real64 Temperature,           // actual temperature given as input
-                            int &GlycolIndex,             // Index to Glycol Properties
-                            std::string const &CalledFrom // routine this function was called from (error messages)
+                            std::string_view const Glycol,    // carries in substance name
+                            Real64 Temperature,               // actual temperature given as input
+                            int &GlycolIndex,                 // Index to Glycol Properties
+                            std::string_view const CalledFrom // routine this function was called from (error messages)
     );
 
     //*****************************************************************************
 
     Real64 GetConductivityGlycol(EnergyPlusData &state,
-                                 std::string const &Glycol,    // carries in substance name
-                                 Real64 Temperature,           // actual temperature given as input
-                                 int &GlycolIndex,             // Index to Glycol Properties
-                                 std::string const &CalledFrom // routine this function was called from (error messages)
+                                 std::string_view const Glycol,    // carries in substance name
+                                 Real64 Temperature,               // actual temperature given as input
+                                 int &GlycolIndex,                 // Index to Glycol Properties
+                                 std::string_view const CalledFrom // routine this function was called from (error messages)
     );
 
     //*****************************************************************************
 
     Real64 GetViscosityGlycol(EnergyPlusData &state,
-                              std::string const &Glycol,    // carries in substance name
-                              Real64 Temperature,           // actual temperature given as input
-                              int &GlycolIndex,             // Index to Glycol Properties
-                              std::string const &CalledFrom // routine this function was called from (error messages)
+                              std::string_view const Glycol,    // carries in substance name
+                              Real64 Temperature,               // actual temperature given as input
+                              int &GlycolIndex,                 // Index to Glycol Properties
+                              std::string_view const CalledFrom // routine this function was called from (error messages)
     );
 
     //*****************************************************************************
@@ -598,7 +606,7 @@ namespace FluidProperties {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Real64 const TempToler(0.001); // Some reasonable value for comparisons
+        Real64 constexpr TempToler(0.001); // Some reasonable value for comparisons
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -630,20 +638,20 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetQualityRefrig(EnergyPlusData &state,
-                            std::string const &Refrigerant, // carries in substance name
-                            Real64 Temperature,             // actual temperature given as input
-                            Real64 Enthalpy,                // actual enthalpy given as input
-                            int &RefrigIndex,               // Index to Refrigerant Properties
-                            std::string const &CalledFrom   // routine this function was called from (error messages)
+                            std::string const &Refrigerant,   // carries in substance name
+                            Real64 Temperature,               // actual temperature given as input
+                            Real64 Enthalpy,                  // actual enthalpy given as input
+                            int &RefrigIndex,                 // Index to Refrigerant Properties
+                            std::string_view const CalledFrom // routine this function was called from (error messages)
     );
 
     //*****************************************************************************
 
-    int FindRefrigerant(EnergyPlusData &state, std::string const &Refrigerant); // carries in substance name
+    int FindRefrigerant(EnergyPlusData &state, std::string_view const Rrefrigerant); // carries in substance name
 
     //*****************************************************************************
 
-    int FindGlycol(EnergyPlusData &state, std::string const &Glycol); // carries in substance name
+    int FindGlycol(EnergyPlusData &state, std::string_view const Glycol); // carries in substance name
 
     //*****************************************************************************
 
@@ -664,14 +672,14 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetInterpolatedSatProp(EnergyPlusData &state,
-                                  Real64 Temperature,               // Saturation Temp.
-                                  Array1D<Real64> const &PropTemps, // Array of temperature at which props are available
-                                  Array1D<Real64> const &LiqProp,   // Array of saturated liquid properties
-                                  Array1D<Real64> const &VapProp,   // Array of saturatedvapour properties
-                                  Real64 Quality,                   // Quality
-                                  std::string const &CalledFrom,    // routine this function was called from (error messages)
-                                  int LowBound,                     // Valid values lower bound (set by calling program)
-                                  int UpperBound                    // Valid values upper bound (set by calling program)
+                                  Real64 Temperature,                // Saturation Temp.
+                                  Array1D<Real64> const &PropTemps,  // Array of temperature at which props are available
+                                  Array1D<Real64> const &LiqProp,    // Array of saturated liquid properties
+                                  Array1D<Real64> const &VapProp,    // Array of saturatedvapour properties
+                                  Real64 Quality,                    // Quality
+                                  std::string_view const CalledFrom, // routine this function was called from (error messages)
+                                  int LowBound,                      // Valid values lower bound (set by calling program)
+                                  int UpperBound                     // Valid values upper bound (set by calling program)
     );
 
     //*****************************************************************************
@@ -682,23 +690,23 @@ namespace FluidProperties {
     void ReportOrphanFluids(EnergyPlusData &state);
 
     void ReportFatalGlycolErrors(EnergyPlusData &state,
-                                 int NumGlycols,                 // Number of Glycols in input/data
-                                 int GlycolNum,                  // Glycol Index
-                                 bool DataPresent,               // data is present for this fluid.
-                                 std::string const &GlycolName,  // Name being reported
-                                 std::string const &RoutineName, // Routine name to show
-                                 std::string const &Property,    // Property being requested
-                                 std::string const &CalledFrom   // original called from (external to fluid properties)
+                                 int NumGlycols,                     // Number of Glycols in input/data
+                                 int GlycolNum,                      // Glycol Index
+                                 bool DataPresent,                   // data is present for this fluid.
+                                 std::string_view const GlycolName,  // Name being reported
+                                 std::string_view const RoutineName, // Routine name to show
+                                 std::string_view const Property,    // Property being requested
+                                 std::string_view const CalledFrom   // original called from (external to fluid properties)
     );
 
     void ReportFatalRefrigerantErrors(EnergyPlusData &state,
-                                      int NumRefrigerants,                // Number of Refrigerants in input/data
-                                      int RefrigerantNum,                 // Refrigerant Index
-                                      bool DataPresent,                   // data is present for this fluid.
-                                      std::string const &RefrigerantName, // Name being reported
-                                      std::string const &RoutineName,     // Routine name to show
-                                      std::string const &Property,        // Property being requested
-                                      std::string const &CalledFrom       // original called from (external to fluid properties)
+                                      int NumRefrigerants,                    // Number of Refrigerants in input/data
+                                      int RefrigerantNum,                     // Refrigerant Index
+                                      bool DataPresent,                       // data is present for this fluid.
+                                      std::string_view const RefrigerantName, // Name being reported
+                                      std::string_view const RoutineName,     // Routine name to show
+                                      std::string_view const Property,        // Property being requested
+                                      std::string_view const CalledFrom       // original called from (external to fluid properties)
     );
 
     void GetFluidDensityTemperatureLimits(EnergyPlusData &state, int FluidIndex, Real64 &MinTempLimit, Real64 &MaxTempLimit);
@@ -749,9 +757,6 @@ struct FluidPropertiesData : BaseGlobalStruct
     int RefrigerantErrorLimitTest = 1; // how many times error is printed with details before recurring called
     Array1D_bool RefrigUsed;
     Array1D_bool GlycolUsed;
-    int FluidIndex_Water = 0;
-    int FluidIndex_EthyleneGlycol = 0;
-    int FluidIndex_PropoleneGlycol = 0;
 
     Array1D<FluidProperties::FluidPropsRefrigerantData> RefrigData;
     Array1D<FluidProperties::FluidPropsRefrigErrors> RefrigErrorTracking;
@@ -785,9 +790,6 @@ struct FluidPropertiesData : BaseGlobalStruct
         this->RefrigerantErrorLimitTest = 1;
         this->RefrigUsed.deallocate();
         this->GlycolUsed.deallocate();
-        this->FluidIndex_Water = 0;
-        this->FluidIndex_EthyleneGlycol = 0;
-        this->FluidIndex_PropoleneGlycol = 0;
 
         this->RefrigData.deallocate();
         this->RefrigErrorTracking.deallocate();

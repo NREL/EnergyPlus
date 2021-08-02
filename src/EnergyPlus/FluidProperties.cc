@@ -60,7 +60,6 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -105,20 +104,6 @@ namespace FluidProperties {
 
     // Data
     // MODULE PARAMETER DEFINITIONS
-    std::string const Refrig("REFRIGERANT");
-    std::string const Glycol("GLYCOL");
-    std::string const Pressure("PRESSURE");
-    std::string const Enthalpy("ENTHALPY");
-    std::string const Density("DENSITY");
-    std::string const SpecificHeat("SPECIFICHEAT");
-    std::string const Conductivity("CONDUCTIVITY");
-    std::string const Viscosity("VISCOSITY");
-    std::string const Fluid("FLUID");
-    std::string const GasFluid("FLUIDGAS");
-    std::string const Water("Water");
-    std::string const Steam("Steam");
-    std::string const EthyleneGlycol("EthyleneGlycol");
-    std::string const PropyleneGlycol("PropyleneGlycol");
 
     // DERIVED TYPE DEFINITIONS
 
@@ -205,7 +190,7 @@ namespace FluidProperties {
         int const DefaultNumSteamTemps(111);               // Temperature dimension of default steam data.
         int const DefaultNumSteamSuperheatedTemps(114);    // Temperature dimension of default steam data.
         int const DefaultNumSteamSuperheatedPressure(114); // Temperature dimension of default steam data.
-        static std::string const RoutineName("GetFluidPropertiesData: ");
+        static constexpr std::string_view RoutineName("GetFluidPropertiesData: ");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -570,14 +555,14 @@ namespace FluidProperties {
                 ++state.dataFluidProps->NumOfGlycols;
                 FluidNames(FluidNum).IsGlycol = true;
             } else {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid type");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid type");
                 ShowContinueError(state, "...entered value=\"" + Alphas(2) + ", Only REFRIGERANT or GLYCOL allowed as " + cAlphaFieldNames(2));
                 ErrorsFound = true;
             }
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + " Previous errors in input cause program termination.");
+            ShowFatalError(state, std::string{RoutineName} + " Previous errors in input cause program termination.");
         }
 
         if (state.dataFluidProps->NumOfRefrigerants + 1 > 0) {
@@ -678,8 +663,9 @@ namespace FluidProperties {
 
             for (TempLoop = 2; TempLoop <= FluidTemps(Loop).NumOfTemps; ++TempLoop) {
                 if (FluidTemps(Loop).Temps(TempLoop) <= FluidTemps(Loop).Temps(TempLoop - 1)) {
-                    ShowSevereError(
-                        state, RoutineName + CurrentModuleObject + " name=" + FluidTemps(Loop).Name + ", lists must have data in ascending order");
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + CurrentModuleObject + " name=" + FluidTemps(Loop).Name +
+                                        ", lists must have data in ascending order");
                     ShowContinueError(state,
                                       format("First out of order occurrence at Temperature #({}) {{{:.R3}}} >= Temp({}) {{{:.R3}}}",
                                              TempLoop - 1,
@@ -736,7 +722,8 @@ namespace FluidProperties {
 
                             // Make sure the number of points in the two arrays (temps and values) are the same
                             if (NumNumbers != state.dataFluidProps->RefrigData(Loop).NumPsPoints) {
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                                ShowSevereError(
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                                 ShowContinueError(state,
                                                   "Temperature Name=" + TempsName +
                                                       ", Temperature array and fluid saturation pressure array must have the same number of points");
@@ -758,7 +745,8 @@ namespace FluidProperties {
 
                         // If it made it all the way to the last temperature array and didn't find a match, then no match was found
                         if (TempLoop == NumOfFluidTempArrays) {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                             ShowContinueError(state, "Found saturated fluid gas/fluid pressure input but no matching temperature array");
                             ShowContinueError(state, "Entered Temperature Name=" + TempsName);
                             ErrorsFound = true;
@@ -772,7 +760,7 @@ namespace FluidProperties {
                 // If it made it all the way to the last input occurrence and didn't find a match,
                 // then no sat press data found
                 if (InData == NumOfSatFluidPropArrays) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                     ShowContinueError(state,
                                       "No Gas/Fluid Saturation Pressure found. Need properties with " + cAlphaFieldNames(2) + "=\"Pressure\" and " +
                                           cAlphaFieldNames(3) + "=\"FluidGas\".");
@@ -814,7 +802,8 @@ namespace FluidProperties {
 
                             // Make sure the number of points in the two arrays (temps and values) are the same
                             if (NumNumbers != state.dataFluidProps->RefrigData(Loop).NumHPoints) {
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                                ShowSevereError(
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                                 ShowSevereError(state,
                                                 "Temperature Name=" + TempsName +
                                                     ", Temperature array and saturated fluid enthalpy array must have the same number of points");
@@ -836,7 +825,8 @@ namespace FluidProperties {
 
                         // If it made it all the way to the last temperature array and didn't find a match, then no match was found
                         if (TempLoop == NumOfFluidTempArrays) {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                             ShowContinueError(state, "Found saturated fluid enthalpy input but no matching temperature array");
                             ShowContinueError(state, "Entered Temperature Name=" + TempsName);
                             ErrorsFound = true;
@@ -849,7 +839,7 @@ namespace FluidProperties {
 
                 // If it made it all the way to the last input occurrence and didn't find a match, then no sat fluid enthalpy data found
                 if (InData == NumOfSatFluidPropArrays) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                     ShowContinueError(state,
                                       "No Saturated Fluid Enthalpy found. Need properties to be entered with " + cAlphaFieldNames(2) +
                                           "=\"Enthalpy\" and " + cAlphaFieldNames(3) + "=\"Fluid\".");
@@ -882,7 +872,8 @@ namespace FluidProperties {
 
                         if (UtilityRoutines::SameString(Alphas(4), FluidTemps(TempLoop).Name)) {
                             if (!UtilityRoutines::SameString(FluidTemps(TempLoop).Name, TempsName)) {
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                                ShowSevereError(
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                                 ShowContinueError(state, "Temperatures for enthalpy fluid and gas/fluid points are not the same");
                                 ShowContinueError(state, "Name=" + Alphas(4) + " => " + FluidTemps(TempLoop).Name + " /= " + TempsName);
                                 ErrorsFound = true;
@@ -894,7 +885,8 @@ namespace FluidProperties {
 
                             // Make sure the number of points in the two arrays (temps and values) are the same
                             if (NumNumbers != state.dataFluidProps->RefrigData(Loop).NumHPoints) {
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                                ShowSevereError(
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                                 ShowContinueError(
                                     state,
                                     "Temperature Name=" + TempsName +
@@ -916,7 +908,8 @@ namespace FluidProperties {
 
                         // If it made it all the way to the last temperature array and didn't find a match, then no match was found
                         if (TempLoop == NumOfFluidTempArrays) {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                             ShowContinueError(state, "Found saturated gas/fluid enthalpy input but no matching temperature array");
                             ShowContinueError(state, "Entered Temperature Name=" + TempsName);
                             ErrorsFound = true;
@@ -929,7 +922,7 @@ namespace FluidProperties {
 
                 // If it made it all the way to the last input occurrence and didn't find a match, then no sat f/g enthalpy data found
                 if (InData == NumOfSatFluidPropArrays) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                     ShowContinueError(state,
                                       "No Saturated Gas/Fluid Enthalpy found. Need properties to be entered with " + cAlphaFieldNames(2) +
                                           "=\"Enthalpy\" and " + cAlphaFieldNames(3) + "=\"FluidGas\".");
@@ -971,7 +964,8 @@ namespace FluidProperties {
 
                             // Make sure the number of points in the two arrays (temps and values) are the same
                             if (NumNumbers != state.dataFluidProps->RefrigData(Loop).NumCpPoints) {
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                                ShowSevereError(
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                                 ShowSevereError(state,
                                                 "Temperature Name=" + TempsName +
                                                     ", Temperature array and saturated fluid Cp array must have the same number of points");
@@ -993,7 +987,8 @@ namespace FluidProperties {
 
                         // If it made it all the way to the last temperature array and didn't find a match, then no match was found
                         if (TempLoop == NumOfFluidTempArrays) {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                             ShowContinueError(state, "Found saturated fluid specific heat (Cp) input but no matching temperature array");
                             ShowContinueError(state, "Entered Temperature Name=" + TempsName);
                             ErrorsFound = true;
@@ -1006,7 +1001,7 @@ namespace FluidProperties {
 
                 // If it made it all the way to the last input occurrence and didn't find a match, then no sat fluid Cp data found
                 if (InData == NumOfSatFluidPropArrays) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                     ShowContinueError(state,
                                       "No Saturated Fluid Specific Heat found. Need properties to be entered with " + cAlphaFieldNames(2) +
                                           "=\"SpecificHeat\" and " + cAlphaFieldNames(3) + "=\"Fluid\".");
@@ -1039,7 +1034,8 @@ namespace FluidProperties {
 
                         if (UtilityRoutines::SameString(Alphas(4), FluidTemps(TempLoop).Name)) {
                             if (!UtilityRoutines::SameString(FluidTemps(TempLoop).Name, TempsName)) {
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                                ShowSevereError(
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                                 ShowContinueError(state, "Temperatures for specific heat fluid and gas/fluid points are not the same");
                                 ShowContinueError(state, "Name=" + Alphas(4) + " => " + FluidTemps(TempLoop).Name + " /= " + TempsName);
                                 ErrorsFound = true;
@@ -1051,7 +1047,8 @@ namespace FluidProperties {
 
                             // Make sure the number of points in the two arrays (temps and values) are the same
                             if (NumNumbers != state.dataFluidProps->RefrigData(Loop).NumCpPoints) {
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                                ShowSevereError(
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                                 ShowContinueError(state,
                                                   "Temperature Name=" + TempsName +
                                                       ", Temperature array and saturated gas/fluid Cp array must have the same number of points");
@@ -1072,7 +1069,8 @@ namespace FluidProperties {
 
                         // If it made it all the way to the last temperature array and didn't find a match, then no match was found
                         if (TempLoop == NumOfFluidTempArrays) {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                             ShowContinueError(state, "Found saturated gas/fluid specific heat (Cp) input but no matching temperature array");
                             ShowContinueError(state, "Entered Temperature Name=" + TempsName);
                             ErrorsFound = true;
@@ -1085,7 +1083,7 @@ namespace FluidProperties {
 
                 // If it made it all the way to the last input occurrence and didn't find a match, then no sat f/g Cp data found
                 if (InData == NumOfSatFluidPropArrays) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                     ShowContinueError(state,
                                       "No Saturated Gas/Fluid Specific Heat found. Need properties to be entered with " + cAlphaFieldNames(2) +
                                           "=\"SpecificHeat\" and " + cAlphaFieldNames(3) + "=\"FluidGas\".");
@@ -1127,7 +1125,8 @@ namespace FluidProperties {
 
                             // Make sure the number of points in the two arrays (temps and values) are the same
                             if (NumNumbers != state.dataFluidProps->RefrigData(Loop).NumRhoPoints) {
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                                ShowSevereError(
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                                 ShowContinueError(state,
                                                   "Temperature Name=" + TempsName +
                                                       ", Temperature array and saturated fluid density array must have the same number of points");
@@ -1149,7 +1148,8 @@ namespace FluidProperties {
 
                         // If it made it all the way to the last temperature array and didn't find a match, then no match was found
                         if (TempLoop == NumOfFluidTempArrays) {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                             ShowContinueError(state, "Found saturated fluid density input but no matching temperature array");
                             ShowContinueError(state, "Entered Temperature Name=" + TempsName);
                             ErrorsFound = true;
@@ -1162,7 +1162,7 @@ namespace FluidProperties {
 
                 // If it made it all the way to the last input occurrence and didn't find a match, then no sat fluid density data found
                 if (InData == NumOfSatFluidPropArrays) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                     ShowContinueError(state,
                                       "No Saturated Fluid Density found. Need properties to be entered with " + cAlphaFieldNames(2) +
                                           "=\"Density\" and " + cAlphaFieldNames(3) + "=\"Fluid\".");
@@ -1195,7 +1195,8 @@ namespace FluidProperties {
 
                         if (UtilityRoutines::SameString(Alphas(4), FluidTemps(TempLoop).Name)) {
                             if (!UtilityRoutines::SameString(FluidTemps(TempLoop).Name, TempsName)) {
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                                ShowSevereError(
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                                 ShowContinueError(state, "Temperatures for density fluid and gas/fluid points are not the same");
                                 ShowContinueError(state, "Name=" + Alphas(4) + " => " + FluidTemps(TempLoop).Name + " /= " + TempsName);
                                 ErrorsFound = true;
@@ -1207,7 +1208,8 @@ namespace FluidProperties {
 
                             // Make sure the number of points in the two arrays (temps and values) are the same
                             if (NumNumbers != state.dataFluidProps->RefrigData(Loop).NumRhoPoints) {
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                                ShowSevereError(
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                                 ShowContinueError(
                                     state,
                                     "Temperature Name=" + TempsName +
@@ -1229,7 +1231,8 @@ namespace FluidProperties {
 
                         // If it made it all the way to the last temperature array and didn't find a match, then no match was found
                         if (TempLoop == NumOfFluidTempArrays) {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                             ShowContinueError(state, "Found saturated gas/fluid density input but no matching temperature array");
                             ShowContinueError(state, "Entered Temperature Name=" + TempsName);
                             ErrorsFound = true;
@@ -1242,7 +1245,7 @@ namespace FluidProperties {
 
                 // If it made it all the way to the last input occurrence and didn't find a match, then no sat f/g density data found
                 if (InData == NumOfSatFluidPropArrays) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                     ShowSevereError(state,
                                     "No Saturated Gas/Fluid Density found. Need properties to be entered with " + cAlphaFieldNames(2) +
                                         "=\"Density\" and " + cAlphaFieldNames(3) + "=\"FluidGas\".");
@@ -1295,11 +1298,14 @@ namespace FluidProperties {
                     if (!UtilityRoutines::SameString(Alphas(2), Enthalpy) && !UtilityRoutines::SameString(Alphas(2), SpecificHeat) &&
                         !UtilityRoutines::SameString(Alphas(2), Density)) {
                         if (iTemp == 0) {
-                            ShowWarningError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                            ShowWarningError(state,
+                                             std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                             ShowContinueError(state,
-                                              cAlphaFieldNames(3) + "=\"" + Fluid + "\", but " + cAlphaFieldNames(2) + "=\"" + Alphas(2) +
-                                                  "\" is not valid.");
-                            ShowContinueError(state, "Valid choices are \"" + Enthalpy + "\", \"" + SpecificHeat + "\", \"" + Density + "\".");
+                                              cAlphaFieldNames(3) + "=\"" + std::string{Fluid} + "\", but " + cAlphaFieldNames(2) + "=\"" +
+                                                  Alphas(2) + "\" is not valid.");
+                            ShowContinueError(state,
+                                              "Valid choices are \"" + std::string{Enthalpy} + "\", \"" + std::string{SpecificHeat} + "\", \"" +
+                                                  std::string{Density} + "\".");
                             ShowContinueError(state, "This fluid property will not be processed mor available for the simulation.");
                         }
                         ++iTemp;
@@ -1308,22 +1314,24 @@ namespace FluidProperties {
                     if (!UtilityRoutines::SameString(Alphas(2), Pressure) && !UtilityRoutines::SameString(Alphas(2), Enthalpy) &&
                         !UtilityRoutines::SameString(Alphas(2), SpecificHeat) && !UtilityRoutines::SameString(Alphas(2), Density)) {
                         if (iTemp == 0) {
-                            ShowWarningError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                            ShowWarningError(state,
+                                             std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                             ShowContinueError(state,
-                                              cAlphaFieldNames(3) + "=\"" + Fluid + "\", but " + cAlphaFieldNames(2) + "=\"" + Alphas(2) +
-                                                  "\" is not valid.");
+                                              cAlphaFieldNames(3) + "=\"" + std::string{Fluid} + "\", but " + cAlphaFieldNames(2) + "=\"" +
+                                                  Alphas(2) + "\" is not valid.");
                             ShowContinueError(state,
-                                              "Valid choices are \"" + Pressure + "\", \"" + Enthalpy + "\", \"" + SpecificHeat + "\", \"" + Density +
-                                                  "\".");
+                                              "Valid choices are \"" + std::string{Pressure} + "\", \"" + std::string{Enthalpy} + "\", \"" +
+                                                  std::string{SpecificHeat} + "\", \"" + std::string{Density} + "\".");
                             ShowContinueError(state, "This fluid property will not be processed nor available for the simulation.");
                         }
                         ++iTemp;
                     }
                 } else {
                     if (iTemp == 0) {
-                        ShowWarningError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                        ShowWarningError(state,
+                                         std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                         ShowContinueError(state, cAlphaFieldNames(3) + "=\"" + Alphas(3) + "\" is not valid.");
-                        ShowContinueError(state, "Valid choices are \"" + Fluid + "\", \"" + GasFluid + "\".");
+                        ShowContinueError(state, "Valid choices are \"" + std::string{Fluid} + "\", \"" + std::string{GasFluid} + "\".");
                         ShowContinueError(state, "This fluid property will not be processed nor available for the simulation.");
                     }
                     ++iTemp;
@@ -1364,7 +1372,8 @@ namespace FluidProperties {
                         FirstSHMatch = false;
                     } else {
                         if (!UtilityRoutines::SameString(TempsName, Alphas(3))) {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                             ShowContinueError(state, "All superheated data for the same property must use the same temperature list");
                             ShowContinueError(state, "Expected name=" + TempsName + ", Entered name=" + Alphas(3));
                             ErrorsFound = true;
@@ -1373,7 +1382,7 @@ namespace FluidProperties {
                 }
             }
             if (NumOfPressPts == 0) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                 ShowContinueError(state, "No pressure data found for superheated enthalpy");
                 ErrorsFound = true;
             }
@@ -1388,7 +1397,7 @@ namespace FluidProperties {
                     break; // the TempLoop DO loop
                 }
                 if (TempLoop == NumOfFluidTempArrays) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                     ShowContinueError(state, "No match for temperature array name found with superheated enthalpy data");
                     ShowContinueError(state, "Entered Temperature Name=" + TempsName);
                     ErrorsFound = true;
@@ -1423,7 +1432,8 @@ namespace FluidProperties {
                     (UtilityRoutines::SameString(Alphas(2), Enthalpy))) {
                     ++NumOfPressPts;
                     if (Numbers(1) <= 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                         ShowContinueError(state, format("Negative pressures not allowed in fluid property input data, Value =[{:.3R}].", Numbers(1)));
                         ErrorsFound = true;
                     }
@@ -1465,7 +1475,8 @@ namespace FluidProperties {
                 // a little error trapping
                 if (InData > 1) {
                     if (state.dataFluidProps->RefrigData(Loop).SHPress(InData) <= state.dataFluidProps->RefrigData(Loop).SHPress(InData - 1)) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                         ShowContinueError(state, "Pressures must be entered in ascending order for fluid property data");
                         ShowContinueError(state,
                                           format("First Occurrence at Pressure({}) {{{:.3R}}} >= Pressure({}) {{{:.3R}}}",
@@ -1481,7 +1492,7 @@ namespace FluidProperties {
                     state.dataFluidProps->RefrigData(Loop).HshValues(InData, {1, state.dataFluidProps->RefrigData(Loop).NumSuperTempPts}) =
                         Numbers({2, NumNumbers});
                 } else {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                     ShowContinueError(state, "Number of superheated enthalpy data points not equal to number of temperature points");
                     ErrorsFound = true;
                 }
@@ -1515,7 +1526,8 @@ namespace FluidProperties {
                     (UtilityRoutines::SameString(Alphas(2), Density))) {
                     ++NumOfPressPts;
                     if (Numbers(1) <= 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                         ShowContinueError(state, format("Negative pressures not allowed in fluid property input data, Value =[{:.3R}].", Numbers(1)));
                         ErrorsFound = true;
                     }
@@ -1554,12 +1566,12 @@ namespace FluidProperties {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
                 if (std::abs(Numbers(1) - state.dataFluidProps->RefrigData(Loop).SHPress(InData)) > PressToler) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                     ShowContinueError(state, "All superheated data for the same refrigerant must use the same pressure data");
                     ErrorsFound = true;
                 }
                 if (!UtilityRoutines::SameString(TempsName, Alphas(3))) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                     ShowContinueError(state, "All superheated data for the same property must use the same temperature list");
                     ErrorsFound = true;
                 }
@@ -1567,7 +1579,7 @@ namespace FluidProperties {
                     state.dataFluidProps->RefrigData(Loop).RhoshValues(InData, {1, state.dataFluidProps->RefrigData(Loop).NumSuperTempPts}) =
                         Numbers({2, NumNumbers});
                 } else {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                     ShowContinueError(state, "Number of superheated density data points not equal to number of temperature points");
                     ErrorsFound = true;
                 }
@@ -1594,9 +1606,10 @@ namespace FluidProperties {
                                                                          cNumericFieldNames);
                 if (!UtilityRoutines::SameString(Alphas(2), Enthalpy) && !UtilityRoutines::SameString(Alphas(2), Density)) {
                     if (iTemp == 0) {
-                        ShowWarningError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                        ShowWarningError(state,
+                                         std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                         ShowContinueError(state, cAlphaFieldNames(2) + "=\"" + Alphas(2) + "\" is not valid.");
-                        ShowContinueError(state, "Valid choices are \"" + Enthalpy + "\", \"" + Density + "\".");
+                        ShowContinueError(state, "Valid choices are \"" + std::string{Enthalpy} + "\", \"" + std::string{Density} + "\".");
                         ShowContinueError(state, format("Pressure value of this item=[{:.2R}].", Numbers(1)));
                         ShowContinueError(state, "This fluid property will not be processed nor available for the simulation.");
                     }
@@ -1609,12 +1622,12 @@ namespace FluidProperties {
             }
 
             if (NumOfPressPts == 0) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                 ShowSevereError(state, "No pressure data found for superheated density");
                 ErrorsFound = true;
             }
             if (NumOfPressPts != state.dataFluidProps->RefrigData(Loop).NumSuperPressPts) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                 ShowSevereError(state, "Number of pressure points for superheated data different for enthalpy and density");
                 ErrorsFound = true;
             }
@@ -1656,7 +1669,8 @@ namespace FluidProperties {
                         FirstSHMatch = false;
                     } else {
                         if (!UtilityRoutines::SameString(TempsName, Alphas(3))) {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
                             ShowContinueError(state, "All glycol specific heat data for the same glycol must use the same temperature list");
                             ShowContinueError(state, "Expected name=" + TempsName + ", Entered name=" + Alphas(3));
                             ErrorsFound = true;
@@ -1676,7 +1690,8 @@ namespace FluidProperties {
                         break; // the TempLoop DO loop
                     }
                     if (TempLoop == NumOfFluidTempArrays) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
                         ShowContinueError(state, "No match for temperature array name found with glycol data");
                         ErrorsFound = true;
                     }
@@ -1711,14 +1726,16 @@ namespace FluidProperties {
                         // a little error trapping
                         if (NumOfConcPts == 1) {
                             if (state.dataFluidProps->GlyRawData(Loop).CpConcs(NumOfConcPts) < 0.0) {
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
+                                ShowSevereError(
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
                                 ShowContinueError(state, "Negative concentrations not allowed in fluid property input data");
                                 ErrorsFound = true;
                             }
                         } else {
                             if (state.dataFluidProps->GlyRawData(Loop).CpConcs(NumOfConcPts) <=
                                 state.dataFluidProps->GlyRawData(Loop).CpConcs(NumOfConcPts - 1)) {
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
+                                ShowSevereError(
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
                                 ShowContinueError(state, "Concentrations must be entered in ascending order for fluid property data");
                                 ErrorsFound = true;
                             }
@@ -1727,7 +1744,8 @@ namespace FluidProperties {
                             state.dataFluidProps->GlyRawData(Loop).CpValues(NumOfConcPts, {1, state.dataFluidProps->GlyRawData(Loop).NumCpTempPts}) =
                                 Numbers({2, NumNumbers});
                         } else {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
                             ShowContinueError(state, "Number of specific heat data points not equal to number of temperature points");
                             ErrorsFound = true;
                         }
@@ -1763,7 +1781,8 @@ namespace FluidProperties {
                         FirstSHMatch = false;
                     } else {
                         if (!UtilityRoutines::SameString(TempsName, Alphas(3))) {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
                             ShowContinueError(state, "All glycol density data for the same glycol must use the same temperature list");
                             ShowContinueError(state, "Expected name=" + TempsName + ", Entered name=" + Alphas(3));
                             ErrorsFound = true;
@@ -1783,7 +1802,8 @@ namespace FluidProperties {
                         break; // the TempLoop DO loop
                     }
                     if (TempLoop == NumOfFluidTempArrays) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
                         ShowContinueError(state, "No match for temperature array name found with glycol data");
                         ErrorsFound = true;
                     }
@@ -1818,14 +1838,16 @@ namespace FluidProperties {
                         // a little error trapping
                         if (NumOfConcPts == 1) {
                             if (state.dataFluidProps->GlyRawData(Loop).RhoConcs(NumOfConcPts) < 0.0) {
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
+                                ShowSevereError(
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
                                 ShowContinueError(state, "Negative concentrations not allowed in fluid property input data");
                                 ErrorsFound = true;
                             }
                         } else {
                             if (state.dataFluidProps->GlyRawData(Loop).RhoConcs(NumOfConcPts) <=
                                 state.dataFluidProps->GlyRawData(Loop).RhoConcs(NumOfConcPts - 1)) {
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
+                                ShowSevereError(
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
                                 ShowContinueError(state, "Concentrations must be entered in ascending order for fluid property data");
                                 ErrorsFound = true;
                             }
@@ -1834,7 +1856,8 @@ namespace FluidProperties {
                             state.dataFluidProps->GlyRawData(Loop).RhoValues(
                                 NumOfConcPts, {1, state.dataFluidProps->GlyRawData(Loop).NumRhoTempPts}) = Numbers({2, NumNumbers});
                         } else {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
                             ShowContinueError(state, "Number of density data points not equal to number of temperature points");
                             ErrorsFound = true;
                         }
@@ -1870,7 +1893,8 @@ namespace FluidProperties {
                         FirstSHMatch = false;
                     } else {
                         if (!UtilityRoutines::SameString(TempsName, Alphas(3))) {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
                             ShowContinueError(state, "All glycol conductivity data for the same glycol must use the same temperature list");
                             ShowContinueError(state, "Expected name=" + TempsName + ", Entered name=" + Alphas(3));
                             ErrorsFound = true;
@@ -1890,7 +1914,8 @@ namespace FluidProperties {
                         break; // the TempLoop DO loop
                     }
                     if (TempLoop == NumOfFluidTempArrays) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
                         ShowContinueError(state, "No match for temperature array name found with glycol data");
                         ErrorsFound = true;
                     }
@@ -1925,14 +1950,16 @@ namespace FluidProperties {
                         // a little error trapping
                         if (NumOfConcPts == 1) {
                             if (state.dataFluidProps->GlyRawData(Loop).CondConcs(NumOfConcPts) < 0.0) {
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
+                                ShowSevereError(
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
                                 ShowContinueError(state, "Negative concentrations not allowed in fluid property input data");
                                 ErrorsFound = true;
                             }
                         } else {
                             if (state.dataFluidProps->GlyRawData(Loop).CondConcs(NumOfConcPts) <=
                                 state.dataFluidProps->GlyRawData(Loop).CondConcs(NumOfConcPts - 1)) {
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
+                                ShowSevereError(
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
                                 ShowContinueError(state, "Concentrations must be entered in ascending order for fluid property data");
                                 ErrorsFound = true;
                             }
@@ -1941,7 +1968,8 @@ namespace FluidProperties {
                             state.dataFluidProps->GlyRawData(Loop).CondValues(
                                 NumOfConcPts, {1, state.dataFluidProps->GlyRawData(Loop).NumCondTempPts}) = Numbers({2, NumNumbers});
                         } else {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
                             ShowContinueError(state, "Number of conductivity data points not equal to number of temperature points");
                             ErrorsFound = true;
                         }
@@ -1977,7 +2005,8 @@ namespace FluidProperties {
                         FirstSHMatch = false;
                     } else {
                         if (!UtilityRoutines::SameString(TempsName, Alphas(3))) {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
                             ShowContinueError(state, "All glycol viscosity data for the same glycol must use the same temperature list");
                             ShowContinueError(state, "Expected name=" + TempsName + ", Entered name=" + Alphas(3));
                             ErrorsFound = true;
@@ -1997,7 +2026,8 @@ namespace FluidProperties {
                         break; // the TempLoop DO loop
                     }
                     if (TempLoop == NumOfFluidTempArrays) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
                         ShowContinueError(state, "No match for temperature array name found with glycol data");
                         ErrorsFound = true;
                     }
@@ -2032,14 +2062,16 @@ namespace FluidProperties {
                         // a little error trapping
                         if (NumOfConcPts == 1) {
                             if (state.dataFluidProps->GlyRawData(Loop).ViscConcs(NumOfConcPts) < 0.0) {
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
+                                ShowSevereError(
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
                                 ShowContinueError(state, "Negative concentrations not allowed in fluid property input data");
                                 ErrorsFound = true;
                             }
                         } else {
                             if (state.dataFluidProps->GlyRawData(Loop).ViscConcs(NumOfConcPts) <=
                                 state.dataFluidProps->GlyRawData(Loop).ViscConcs(NumOfConcPts - 1)) {
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
+                                ShowSevereError(
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
                                 ShowContinueError(state, "Concentrations must be entered in ascending order for fluid property data");
                                 ErrorsFound = true;
                             }
@@ -2048,7 +2080,8 @@ namespace FluidProperties {
                             state.dataFluidProps->GlyRawData(Loop).ViscValues(
                                 NumOfConcPts, {1, state.dataFluidProps->GlyRawData(Loop).NumViscTempPts}) = Numbers({2, NumNumbers});
                         } else {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
                             ShowContinueError(state, "Number of viscosity data points not equal to number of temperature points");
                             ErrorsFound = true;
                         }
@@ -2165,12 +2198,12 @@ namespace FluidProperties {
                     state.dataFluidProps->GlycolData(NumOfGlyConcs).Name = Alphas(1);
                     state.dataFluidProps->GlycolData(NumOfGlyConcs).GlycolName = Alphas(3);
                 } else {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid reference");
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid reference");
                     ShowContinueError(state, "... not found in the FluidProperties:Name list: \"" + Alphas(3) + "\".");
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid field");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid field");
                 ShowContinueError(state, "..." + cAlphaFieldNames(2) + "=\"" + Alphas(2) + "\".");
                 ShowContinueError(state, "... Legal values are PropyleneGlycol, EthyleneGlycol or UserDefinedGlycolType.");
                 ErrorsFound = true;
@@ -2300,7 +2333,7 @@ namespace FluidProperties {
                                               state.dataFluidProps->GlycolData(Loop).Concentration,
                                               state.dataFluidProps->GlycolData(Loop).CpValues);
                 } else {
-                    ShowSevereError(state, RoutineName + "Specific heat data not entered for a " + CurrentModuleObject);
+                    ShowSevereError(state, std::string{RoutineName} + "Specific heat data not entered for a " + CurrentModuleObject);
                     ShowContinueError(state, "ALL data must be entered for user-defined glycols");
                     ShowContinueError(state, "Glycol mixture name = " + state.dataFluidProps->GlycolData(Loop).Name);
                     ShowContinueError(state, "Glycol fluid name = " + state.dataFluidProps->GlycolData(Loop).GlycolName);
@@ -2322,7 +2355,7 @@ namespace FluidProperties {
                                               state.dataFluidProps->GlycolData(Loop).Concentration,
                                               state.dataFluidProps->GlycolData(Loop).RhoValues);
                 } else {
-                    ShowSevereError(state, RoutineName + "Density data not entered for a " + CurrentModuleObject);
+                    ShowSevereError(state, std::string{RoutineName} + "Density data not entered for a " + CurrentModuleObject);
                     ShowContinueError(state, "ALL data must be entered for user-defined glycols");
                     ShowContinueError(state, "Glycol mixture name = " + state.dataFluidProps->GlycolData(Loop).Name);
                     ShowContinueError(state, "Glycol fluid name = " + state.dataFluidProps->GlycolData(Loop).GlycolName);
@@ -2344,7 +2377,7 @@ namespace FluidProperties {
                                               state.dataFluidProps->GlycolData(Loop).Concentration,
                                               state.dataFluidProps->GlycolData(Loop).CondValues);
                 } else {
-                    ShowSevereError(state, RoutineName + "Conductivity data not entered for a " + CurrentModuleObject);
+                    ShowSevereError(state, std::string{RoutineName} + "Conductivity data not entered for a " + CurrentModuleObject);
                     ShowContinueError(state, "ALL data must be entered for user-defined glycols");
                     ShowContinueError(state, "Glycol mixture name = " + state.dataFluidProps->GlycolData(Loop).Name);
                     ShowContinueError(state, "Glycol fluid name = " + state.dataFluidProps->GlycolData(Loop).GlycolName);
@@ -2366,7 +2399,7 @@ namespace FluidProperties {
                                               state.dataFluidProps->GlycolData(Loop).Concentration,
                                               state.dataFluidProps->GlycolData(Loop).ViscValues);
                 } else {
-                    ShowSevereError(state, RoutineName + "Viscosity data not entered for a " + CurrentModuleObject);
+                    ShowSevereError(state, std::string{RoutineName} + "Viscosity data not entered for a " + CurrentModuleObject);
                     ShowContinueError(state, "ALL data must be entered for user-defined glycols");
                     ShowContinueError(state, "Glycol mixture name = " + state.dataFluidProps->GlycolData(Loop).Name);
                     ShowContinueError(state, "Glycol fluid name = " + state.dataFluidProps->GlycolData(Loop).GlycolName);
@@ -2394,7 +2427,7 @@ namespace FluidProperties {
         lNumericFieldBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Previous errors in input cause program termination.");
+            ShowFatalError(state, std::string{RoutineName} + "Previous errors in input cause program termination.");
         }
 
         if (state.dataInputProcessing->inputProcessor->getNumSectionsFound("REPORTGLYCOLS") > 0) state.dataFluidProps->DebugReportGlycols = true;
@@ -4908,7 +4941,7 @@ namespace FluidProperties {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr Real64 ConcToler(0.0001); // Some reasonable value for comparisons
-        static std::string const RoutineName("InterpDefValuesForGlycolConc: ");
+        static constexpr std::string_view RoutineName("InterpDefValuesForGlycolConc: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int HiIndex;       // index on the high side of the concentration
@@ -4950,7 +4983,8 @@ namespace FluidProperties {
                     }
                 }
             } else { // user has input data for concentrations that are too close or repeated, this must be fixed
-                ShowFatalError(state, RoutineName + "concentration values too close or data repeated, check your fluid property input data");
+                ShowFatalError(state,
+                               std::string{RoutineName} + "concentration values too close or data repeated, check your fluid property input data");
             }
         }
     }
@@ -5012,7 +5046,7 @@ namespace FluidProperties {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr Real64 ConcToler(0.0001); // Some reasonable value for comparisons
-        static std::string const RoutineName("InterpValuesForGlycolConc: ");
+        static constexpr std::string_view RoutineName("InterpValuesForGlycolConc: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int HiIndex;       // index on the high side of the concentration
@@ -5053,7 +5087,8 @@ namespace FluidProperties {
                     }
                 }
             } else { // user has input data for concentrations that are too close or repeated, this must be fixed
-                ShowFatalError(state, RoutineName + "concentration values too close or data repeated, check your fluid property input data");
+                ShowFatalError(state,
+                               std::string{RoutineName} + "concentration values too close or data repeated, check your fluid property input data");
             }
         }
     }
@@ -5390,7 +5425,7 @@ namespace FluidProperties {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr Real64 incr(10.0);
-        static std::string const RoutineName("ReportAndTestGlycols");
+        static constexpr std::string_view RoutineName("ReportAndTestGlycols");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -5717,7 +5752,7 @@ namespace FluidProperties {
         // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr Real64 incr(10.0);
         constexpr Real64 Quality(1.0);
-        static std::string const RoutineName("ReportAndTestRefrigerants");
+        static constexpr std::string_view RoutineName("ReportAndTestRefrigerants");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -6144,10 +6179,10 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetSatPressureRefrig(EnergyPlusData &state,
-                                std::string const &Refrigerant, // carries in substance name
-                                Real64 const Temperature,       // actual temperature given as input
-                                int &RefrigIndex,               // Index to Refrigerant Properties
-                                std::string const &CalledFrom   // routine this function was called from (error messages)
+                                std::string_view const Refrigerant, // carries in substance name
+                                Real64 const Temperature,           // actual temperature given as input
+                                int &RefrigIndex,                   // Index to Refrigerant Properties
+                                std::string_view const CalledFrom   // routine this function was called from (error messages)
     )
     {
 
@@ -6177,7 +6212,7 @@ namespace FluidProperties {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetSatPressureRefrig: ");
+        static constexpr std::string_view RoutineName("GetSatPressureRefrig: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -6243,7 +6278,7 @@ namespace FluidProperties {
             // send warning
             if (state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatTempErrCount <= state.dataFluidProps->RefrigerantErrorLimitTest) {
                 ShowSevereMessage(state,
-                                  RoutineName + "Saturation temperature is out of range for refrigerant [" +
+                                  std::string{RoutineName} + "Saturation temperature is out of range for refrigerant [" +
                                       state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name + "] supplied data: **");
                 ShowContinueError(state,
                                   format("...Called From:{}, supplied data range=[{:.2R},{:.2R}]",
@@ -6255,7 +6290,7 @@ namespace FluidProperties {
                 ShowContinueErrorTimeStamp(state, "");
             }
             ShowRecurringSevereErrorAtEnd(state,
-                                          RoutineName + "Saturation temperature is out of range for refrigerant [" +
+                                          std::string{RoutineName} + "Saturation temperature is out of range for refrigerant [" +
                                               state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name + "] supplied data: **",
                                           state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatTempErrIndex,
                                           Temperature,
@@ -6271,10 +6306,10 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetSatTemperatureRefrig(EnergyPlusData &state,
-                                   std::string const &Refrigerant, // carries in substance name
-                                   Real64 const Pressure,          // actual temperature given as input
-                                   int &RefrigIndex,               // Index to Refrigerant Properties
-                                   std::string const &CalledFrom   // routine this function was called from (error messages)
+                                   std::string_view const Refrigerant, // carries in substance name
+                                   Real64 const Pressure,              // actual temperature given as input
+                                   int &RefrigIndex,                   // Index to Refrigerant Properties
+                                   std::string_view const CalledFrom   // routine this function was called from (error messages)
     )
     {
 
@@ -6304,7 +6339,7 @@ namespace FluidProperties {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetSatTemperatureRefrig: ");
+        static constexpr std::string_view RoutineName("GetSatTemperatureRefrig: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -6376,7 +6411,7 @@ namespace FluidProperties {
             // send warning
             if (state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatPressErrCount <= state.dataFluidProps->RefrigerantErrorLimitTest) {
                 ShowSevereMessage(state,
-                                  RoutineName + "Saturation pressure is out of range for refrigerant [" +
+                                  std::string{RoutineName} + "Saturation pressure is out of range for refrigerant [" +
                                       state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name + "] supplied data: **");
                 ShowContinueError(state,
                                   format("...Called From:{}, supplied data range=[{:.0R},{:.0R}]",
@@ -6388,7 +6423,7 @@ namespace FluidProperties {
                 ShowContinueErrorTimeStamp(state, "");
             }
             ShowRecurringSevereErrorAtEnd(state,
-                                          RoutineName + "Saturation pressure is out of range for refrigerant [" +
+                                          std::string{RoutineName} + "Saturation pressure is out of range for refrigerant [" +
                                               state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name + "] supplied data: **",
                                           state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatPressErrIndex,
                                           Pressure,
@@ -6403,11 +6438,11 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetSatEnthalpyRefrig(EnergyPlusData &state,
-                                std::string const &Refrigerant, // carries in substance name
-                                Real64 const Temperature,       // actual temperature given as input
-                                Real64 const Quality,           // actual quality given as input
-                                int &RefrigIndex,               // Index to Refrigerant Properties
-                                std::string const &CalledFrom   // routine this function was called from (error messages)
+                                std::string_view const Refrigerant, // carries in substance name
+                                Real64 const Temperature,           // actual temperature given as input
+                                Real64 const Quality,               // actual quality given as input
+                                int &RefrigIndex,                   // Index to Refrigerant Properties
+                                std::string_view const CalledFrom   // routine this function was called from (error messages)
     )
     {
 
@@ -6438,7 +6473,7 @@ namespace FluidProperties {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetSatEnthalpyRefrig");
+        static constexpr std::string_view RoutineName("GetSatEnthalpyRefrig");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -6461,7 +6496,7 @@ namespace FluidProperties {
         }
 
         if ((Quality < 0.0) || (Quality > 1.0)) {
-            ShowSevereError(state, RoutineName + ": Refrigerant \"" + Refrigerant + "\", invalid quality, called from " + CalledFrom);
+            ShowSevereError(state, fmt::format("{}: Refrigerant \"{}\", invalid quality, called from {}", RoutineName, Refrigerant, CalledFrom));
             ShowContinueError(state, format("Saturated refrigerant quality must be between 0 and 1, entered value=[{:.4R}].", Quality));
             ShowFatalError(state, "Program terminates due to preceding condition.");
         }
@@ -6487,11 +6522,11 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetSatDensityRefrig(EnergyPlusData &state,
-                               std::string const &Refrigerant, // carries in substance name
-                               Real64 const Temperature,       // actual temperature given as input
-                               Real64 const Quality,           // actual quality given as input
-                               int &RefrigIndex,               // Index to Refrigerant Properties
-                               std::string const &CalledFrom   // routine this function was called from (error messages)
+                               std::string_view const Refrigerant, // carries in substance name
+                               Real64 const Temperature,           // actual temperature given as input
+                               Real64 const Quality,               // actual quality given as input
+                               int &RefrigIndex,                   // Index to Refrigerant Properties
+                               std::string_view const CalledFrom   // routine this function was called from (error messages)
     )
     {
 
@@ -6523,7 +6558,7 @@ namespace FluidProperties {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetSatDensityRefrig: ");
+        static constexpr std::string_view RoutineName("GetSatDensityRefrig: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -6555,7 +6590,7 @@ namespace FluidProperties {
         }
 
         if ((Quality < 0.0) || (Quality > 1.0)) {
-            ShowSevereError(state, RoutineName + "Refrigerant \"" + Refrigerant + "\", invalid quality, called from " + CalledFrom);
+            ShowSevereError(state, fmt::format("{}Refrigerant \"{}\", invalid quality, called from {}", RoutineName, Refrigerant, CalledFrom));
             ShowContinueError(state, format("Saturated density quality must be between 0 and 1, entered value=[{:.4R}].", Quality));
             ShowFatalError(state, "Program terminates due to preceding condition.");
         }
@@ -6621,7 +6656,7 @@ namespace FluidProperties {
             // send warning
             if (state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatTempDensityErrCount <= state.dataFluidProps->RefrigerantErrorLimitTest) {
                 ShowSevereMessage(state,
-                                  RoutineName + "Saturation temperature is out of range for refrigerant [" +
+                                  std::string{RoutineName} + "Saturation temperature is out of range for refrigerant [" +
                                       state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name + "] supplied data: **");
                 ShowContinueError(state,
                                   format("...Called From:{}, supplied data range=[{:.2R},{:.2R}]",
@@ -6633,7 +6668,7 @@ namespace FluidProperties {
                 ShowContinueErrorTimeStamp(state, "");
             }
             ShowRecurringSevereErrorAtEnd(state,
-                                          RoutineName + "Saturation temperature is out of range for refrigerant [" +
+                                          std::string{RoutineName} + "Saturation temperature is out of range for refrigerant [" +
                                               state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name + "] supplied data: **",
                                           state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatTempDensityErrIndex,
                                           Temperature,
@@ -6648,11 +6683,11 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetSatSpecificHeatRefrig(EnergyPlusData &state,
-                                    std::string const &Refrigerant, // carries in substance name
-                                    Real64 const Temperature,       // actual temperature given as input
-                                    Real64 const Quality,           // actual quality given as input
-                                    int &RefrigIndex,               // Index to Refrigerant Properties
-                                    std::string const &CalledFrom   // routine this function was called from (error messages)
+                                    std::string_view const Refrigerant, // carries in substance name
+                                    Real64 const Temperature,           // actual temperature given as input
+                                    Real64 const Quality,               // actual quality given as input
+                                    int &RefrigIndex,                   // Index to Refrigerant Properties
+                                    std::string_view const CalledFrom   // routine this function was called from (error messages)
     )
     {
 
@@ -6684,7 +6719,7 @@ namespace FluidProperties {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetSatSpecificHeatRefrig: ");
+        static constexpr std::string_view RoutineName("GetSatSpecificHeatRefrig: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -6707,7 +6742,7 @@ namespace FluidProperties {
         }
 
         if ((Quality < 0.0) || (Quality > 1.0)) {
-            ShowSevereError(state, RoutineName + "Refrigerant \"" + Refrigerant + "\", invalid quality, called from " + CalledFrom);
+            ShowSevereError(state, fmt::format("{}Refrigerant \"{}\", invalid quality, called from {}", RoutineName, Refrigerant, CalledFrom));
             ShowContinueError(state, format("Saturated density quality must be between 0 and 1, entered value=[{:.4R}].", Quality));
             ShowFatalError(state, "Program terminates due to preceding condition.");
         }
@@ -6750,11 +6785,11 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetSupHeatEnthalpyRefrig(EnergyPlusData &state,
-                                    std::string const &Refrigerant, // carries in substance name
-                                    Real64 const Temperature,       // actual temperature given as input
-                                    Real64 const Pressure,          // actual pressure given as input
-                                    int &RefrigIndex,               // Index to Refrigerant Properties
-                                    std::string const &CalledFrom   // routine this function was called from (error messages)
+                                    std::string_view const Refrigerant, // carries in substance name
+                                    Real64 const Temperature,           // actual temperature given as input
+                                    Real64 const Pressure,              // actual pressure given as input
+                                    int &RefrigIndex,                   // Index to Refrigerant Properties
+                                    std::string_view const CalledFrom   // routine this function was called from (error messages)
     )
     {
 
@@ -6794,9 +6829,9 @@ namespace FluidProperties {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetSupHeatEnthalpyRefrig: ");
-        static std::string const RoutineNameNoSpace("GetSupHeatEnthalpyRefrig:");
-        static std::string const RoutineNameNoColon("GetSupHeatEnthalpyRefrig");
+        static constexpr std::string_view RoutineName("GetSupHeatEnthalpyRefrig: ");
+        static constexpr std::string_view RoutineNameNoSpace("GetSupHeatEnthalpyRefrig:");
+        static constexpr std::string_view RoutineNameNoColon("GetSupHeatEnthalpyRefrig");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -6931,7 +6966,7 @@ namespace FluidProperties {
             (refrig.HshValues(LoPressIndex, HiTempIndex) <= 0.0) && (refrig.HshValues(HiPressIndex, HiTempIndex) <= 0.0)) {
             ++state.dataFluidProps->SatErrCountGetSupHeatEnthalpyRefrig;
             // set return value
-            ReturnValue = GetSatEnthalpyRefrig(state, Refrigerant, Temperature, 1.0, RefrigNum, RoutineNameNoSpace + CalledFrom);
+            ReturnValue = GetSatEnthalpyRefrig(state, Refrigerant, Temperature, 1.0, RefrigNum, fmt::format("{}{}", RoutineNameNoSpace, CalledFrom));
             // send warning
             if (!state.dataGlobal->WarmupFlag) {
                 state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupEnthalpyErrCount +=
@@ -6939,16 +6974,17 @@ namespace FluidProperties {
                 // send warning
                 if (state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatTempDensityErrCount <= state.dataFluidProps->RefrigerantErrorLimitTest) {
                     ShowWarningMessage(state,
-                                       RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                                       std::string{RoutineName} + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                            "] is saturated at the given conditions, saturated enthalpy at given temperature returned. **");
-                    ShowContinueError(state, "...Called From:" + CalledFrom);
+                    ShowContinueError(state, fmt::format("...Called From:{}", CalledFrom));
                     ShowContinueError(state, format("Refrigerant temperature = {:.2R}", Temperature));
                     ShowContinueError(state, format("Refrigerant pressure = {:.0R}", Pressure));
                     ShowContinueError(state, format("Returned Enthalpy value = {:.3R}", ReturnValue));
                     ShowContinueErrorTimeStamp(state, "");
                 }
                 ShowRecurringWarningErrorAtEnd(state,
-                                               RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                                               std::string{RoutineName} + "Refrigerant [" +
+                                                   state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                                    "] saturated at the given conditions **",
                                                state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupEnthalpyErrIndex,
                                                Temperature,
@@ -6968,14 +7004,15 @@ namespace FluidProperties {
                 if (CurTempRangeErrCount > 0 && state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupEnthalpyTempErrCount <=
                                                     state.dataFluidProps->RefrigerantErrorLimitTest) {
                     ShowWarningMessage(state,
-                                       RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                                       std::string{RoutineName} + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                            "] Temperature is out of range for superheated refrigerant enthalpy: values capped **");
-                    ShowContinueError(state, " Called From:" + CalledFrom);
+                    ShowContinueError(state, fmt::format(" Called From:{}", CalledFrom));
                     ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurTempRangeErrCount > 0) {
                     ShowRecurringWarningErrorAtEnd(state,
-                                                   RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                                                   std::string{RoutineName} + "Refrigerant [" +
+                                                       state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                                        "] Temperature is out of range for superheated refrigerant enthalpy: values capped **",
                                                    state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupEnthalpyTempErrIndex,
                                                    Temperature,
@@ -6990,14 +7027,15 @@ namespace FluidProperties {
                 if (CurPresRangeErrCount > 0 && state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupEnthalpyPresErrCount <=
                                                     state.dataFluidProps->RefrigerantErrorLimitTest) {
                     ShowWarningMessage(state,
-                                       RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                                       std::string{RoutineName} + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                            "] Pressure is out of range for superheated refrigerant enthalpy: values capped **");
-                    ShowContinueError(state, " Called From:" + CalledFrom);
+                    ShowContinueError(state, fmt::format(" Called From:{}", CalledFrom));
                     ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurPresRangeErrCount > 0) {
                     ShowRecurringWarningErrorAtEnd(state,
-                                                   RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                                                   std::string{RoutineName} + "Refrigerant [" +
+                                                       state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                                        "] Pressure is out of range for superheated refrigerant enthalpy: values capped **",
                                                    state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupEnthalpyPresErrIndex,
                                                    Pressure,
@@ -7015,11 +7053,11 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetSupHeatPressureRefrig(EnergyPlusData &state,
-                                    std::string const &Refrigerant, // carries in substance name
-                                    Real64 const Temperature,       // actual temperature given as input
-                                    Real64 const Enthalpy,          // actual enthalpy given as input
-                                    int &RefrigIndex,               // Index to Refrigerant Properties
-                                    std::string const &CalledFrom   // routine this function was called from (error messages)
+                                    std::string const &Refrigerant,   // carries in substance name
+                                    Real64 const Temperature,         // actual temperature given as input
+                                    Real64 const Enthalpy,            // actual enthalpy given as input
+                                    int &RefrigIndex,                 // Index to Refrigerant Properties
+                                    std::string_view const CalledFrom // routine this function was called from (error messages)
     )
     {
 
@@ -7059,8 +7097,8 @@ namespace FluidProperties {
 
         // FUNCTION PARAMETERS:
         // the enthalpy calculated from the pressure found
-        static std::string const RoutineName("GetSupHeatPressureRefrig: ");
-        static std::string const RoutineNameNoSpace("GetSupHeatPressureRefrig:");
+        static constexpr std::string_view RoutineName("GetSupHeatPressureRefrig: ");
+        static constexpr std::string_view RoutineNameNoSpace("GetSupHeatPressureRefrig:");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -7202,7 +7240,7 @@ namespace FluidProperties {
         EnthalpyMax = max(refrig.HshValues(TempStart, LoTempIndex), refrig.HshValues(TempStart, HiTempIndex));
         EnthalpyMin = min(refrig.HshValues(TempFinish, LoTempIndex), refrig.HshValues(TempFinish, HiTempIndex));
         // get saturated enthalpy for checking
-        SatEnthalpy = GetSatEnthalpyRefrig(state, Refrigerant, Temperature, 1.0, RefrigNum, RoutineNameNoSpace + CalledFrom);
+        SatEnthalpy = GetSatEnthalpyRefrig(state, Refrigerant, Temperature, 1.0, RefrigNum, fmt::format("{}{}", RoutineNameNoSpace, CalledFrom));
 
         // make some checks on the data before interpolating
         if (Enthalpy < SatEnthalpy) {
@@ -7210,7 +7248,7 @@ namespace FluidProperties {
             ++CurSatErrCount;
             ++ErrCount;
             // return sat pressure at this temperature
-            ReturnValue = GetSatPressureRefrig(state, Refrigerant, Temperature, RefrigNum, RoutineNameNoSpace + CalledFrom);
+            ReturnValue = GetSatPressureRefrig(state, Refrigerant, Temperature, RefrigNum, fmt::format("{}{}", RoutineNameNoSpace, CalledFrom));
 
         } else if (EnthalpyMax < Enthalpy || EnthalpyMin > Enthalpy) {
             // out of range error
@@ -7262,9 +7300,9 @@ namespace FluidProperties {
                 if (state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupPressureErrCount <= state.dataFluidProps->RefrigerantErrorLimitTest) {
                     ShowSevereMessage(
                         state,
-                        RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                        std::string{RoutineName} + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                             "] is saturated at the given enthalpy and temperature, saturated enthalpy at given temperature returned. **");
-                    ShowContinueError(state, "...Called From:" + CalledFrom);
+                    ShowContinueError(state, fmt::format("...Called From:{}", CalledFrom));
                     ShowContinueError(state, format("Refrigerant temperature = {:.2R}", Temperature));
                     ShowContinueError(state, format("Refrigerant Enthalpy = {:.3R}", Enthalpy));
                     ShowContinueError(state, format("Returned Pressure value = {:.0R}", ReturnValue));
@@ -7272,7 +7310,8 @@ namespace FluidProperties {
                 }
                 if (CurSatErrCount > 0) {
                     ShowRecurringSevereErrorAtEnd(state,
-                                                  RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                                                  std::string{RoutineName} + "Refrigerant [" +
+                                                      state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                                       "] saturated at the given enthalpy and temperature **",
                                                   state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupPressureErrIndex,
                                                   ReturnValue,
@@ -7287,14 +7326,15 @@ namespace FluidProperties {
                 if (CurTempRangeErrCount > 0 && state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupPressureTempErrCount <=
                                                     state.dataFluidProps->RefrigerantErrorLimitTest) {
                     ShowWarningMessage(state,
-                                       RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                                       std::string{RoutineName} + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                            "] Temperature is out of range for superheated refrigerant pressure: values capped **");
-                    ShowContinueError(state, " Called From:" + CalledFrom);
+                    ShowContinueError(state, fmt::format(" Called From:{}", CalledFrom));
                     ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurTempRangeErrCount > 0) {
                     ShowRecurringWarningErrorAtEnd(state,
-                                                   RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                                                   std::string{RoutineName} + "Refrigerant [" +
+                                                       state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                                        "] Temperature is out of range for superheated refrigerant pressure: values capped **",
                                                    state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupPressureTempErrIndex,
                                                    Temperature,
@@ -7309,14 +7349,15 @@ namespace FluidProperties {
                 if (CurEnthalpyRangeErrCount > 0 && state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupPressureEnthErrCount <=
                                                         state.dataFluidProps->RefrigerantErrorLimitTest) {
                     ShowWarningMessage(state,
-                                       RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                                       std::string{RoutineName} + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                            "] Pressure is out of range for superheated refrigerant enthalpy: values capped **");
-                    ShowContinueError(state, " Called From:" + CalledFrom);
+                    ShowContinueError(state, fmt::format(" Called From:{}", CalledFrom));
                     ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurEnthalpyRangeErrCount > 0) {
                     ShowRecurringWarningErrorAtEnd(state,
-                                                   RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                                                   std::string{RoutineName} + "Refrigerant [" +
+                                                       state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                                        "] Pressure is out of range for superheated refrigerant pressure: values capped **",
                                                    state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupPressureEnthErrIndex,
                                                    Enthalpy,
@@ -7334,13 +7375,13 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetSupHeatTempRefrig(EnergyPlusData &state,
-                                std::string const &Refrigerant, // carries in substance name
-                                Real64 const Pressure,          // actual pressure given as input
-                                Real64 const Enthalpy,          // actual enthalpy given as input
-                                Real64 TempLow,                 // lower bound of temperature in the iteration
-                                Real64 TempUp,                  // upper bound of temperature in the iteration
-                                int &RefrigIndex,               // Index to Refrigerant Properties
-                                std::string const &CalledFrom   // routine this function was called from (error messages)
+                                std::string_view const Refrigerant, // carries in substance name
+                                Real64 const Pressure,              // actual pressure given as input
+                                Real64 const Enthalpy,              // actual enthalpy given as input
+                                Real64 TempLow,                     // lower bound of temperature in the iteration
+                                Real64 TempUp,                      // upper bound of temperature in the iteration
+                                int &RefrigIndex,                   // Index to Refrigerant Properties
+                                std::string_view const CalledFrom   // routine this function was called from (error messages)
     )
     {
         // SUBROUTINE INFORMATION:
@@ -7363,8 +7404,8 @@ namespace FluidProperties {
 
         // FUNCTION PARAMETERS:
         // the enthalpy calculated from the pressure found
-        static std::string const RoutineName("GetSupHeatTempRefrig: ");
-        static std::string const RoutineNameNoSpace("GetSupHeatTempRefrig:");
+        static constexpr std::string_view RoutineName("GetSupHeatTempRefrig: ");
+        static constexpr std::string_view RoutineNameNoSpace("GetSupHeatTempRefrig:");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int RefrigNum;       // index for refrigerant under consideration
@@ -7408,37 +7449,37 @@ namespace FluidProperties {
 
         // check temperature data range and attempt to cap if necessary
         RefTHigh = refrig.PsHighTempValue;
-        RefTSat = GetSatTemperatureRefrig(state, Refrigerant, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom);
+        RefTSat = GetSatTemperatureRefrig(state, Refrigerant, Pressure, RefrigNum, fmt::format("{}{}", RoutineNameNoSpace, CalledFrom));
 
         if (TempLow < RefTSat) {
             ShowWarningMessage(state,
-                               RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                               std::string{RoutineName} + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                    "] temperature lower bound is out of range for superheated refrigerant: values capped **");
-            ShowContinueError(state, " Called From:" + CalledFrom);
+            ShowContinueError(state, fmt::format(" Called From:{}", CalledFrom));
             ShowContinueErrorTimeStamp(state, "");
             TempLow = RefTSat;
         }
         if (TempUp > RefTHigh) {
             ShowWarningMessage(state,
-                               RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                               std::string{RoutineName} + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                    "] temperature lower bound is out of range for superheated refrigerant: values capped **");
-            ShowContinueError(state, " Called From:" + CalledFrom);
+            ShowContinueError(state, fmt::format(" Called From:{}", CalledFrom));
             ShowContinueErrorTimeStamp(state, "");
             TempUp = RefTHigh;
         }
         if (TempLow >= TempUp) {
             ShowWarningMessage(state,
-                               RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                               std::string{RoutineName} + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                    "] temperature lower bound is out of range for superheated refrigerant: values capped **");
-            ShowContinueError(state, " Called From:" + CalledFrom);
+            ShowContinueError(state, fmt::format(" Called From:{}", CalledFrom));
             ShowContinueErrorTimeStamp(state, "");
             TempLow = RefTSat;
             TempUp = RefTHigh;
         }
 
         // check enthalpy data range and attempt to cap if necessary
-        EnthalpyLow = GetSupHeatEnthalpyRefrig(state, Refrigerant, TempLow, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom);
-        EnthalpyHigh = GetSupHeatEnthalpyRefrig(state, Refrigerant, TempUp, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom);
+        EnthalpyLow = GetSupHeatEnthalpyRefrig(state, Refrigerant, TempLow, Pressure, RefrigNum, fmt::format("{}{}", RoutineNameNoSpace, CalledFrom));
+        EnthalpyHigh = GetSupHeatEnthalpyRefrig(state, Refrigerant, TempUp, Pressure, RefrigNum, fmt::format("{}{}", RoutineNameNoSpace, CalledFrom));
         if (Enthalpy <= EnthalpyLow) {
             ReturnValue = TempLow;
             return ReturnValue;
@@ -7450,16 +7491,16 @@ namespace FluidProperties {
 
         // Perform iterations to obtain the temperature level
         {
-            Array1D<Real64> Par(6);       // Parameters passed to RegulaFalsi
+            std::array<Real64, 3> Par;    // Parameters passed to RegulaFalsi
             Real64 const ErrorTol(0.001); // tolerance for RegulaFalsi iterations
             int const MaxIte(500);        // maximum number of iterations
             int SolFla;                   // Flag of RegulaFalsi solver
 
-            Par(1) = RefrigNum;
-            Par(2) = Enthalpy;
-            Par(3) = Pressure;
+            Par[0] = RefrigNum;
+            Par[1] = Enthalpy;
+            Par[2] = Pressure;
 
-            TempSolveRoot::SolveRoot(state, ErrorTol, MaxIte, SolFla, Temp, GetSupHeatTempRefrigResidual, TempLow, TempUp, Par);
+            General::SolveRoot(state, ErrorTol, MaxIte, SolFla, Temp, GetSupHeatTempRefrigResidual, TempLow, TempUp, Par);
             ReturnValue = Temp;
         }
 
@@ -7468,7 +7509,7 @@ namespace FluidProperties {
 
     Real64 GetSupHeatTempRefrigResidual(EnergyPlusData &state,
                                         Real64 const Temp, // temperature of the refrigerant
-                                        Array1D<Real64> const &Par)
+                                        std::array<Real64, 3> const &Par)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Rongpeng Zhang, LBNL
@@ -7508,16 +7549,16 @@ namespace FluidProperties {
         //  na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        static std::string const RoutineNameNoSpace("GetSupHeatTempRefrigResidual");
+        static constexpr std::string_view RoutineNameNoSpace("GetSupHeatTempRefrigResidual");
         std::string Refrigerant; // carries in substance name
         int RefrigNum;           // index for refrigerant under consideration
         Real64 Pressure;         // pressure of the refrigerant
         Real64 Enthalpy_Req;     // enthalpy of the refrigerant to meet
         Real64 Enthalpy_Act;     // enthalpy of the refrigerant calculated
 
-        RefrigNum = int(Par(1));
-        Enthalpy_Req = Par(2);
-        Pressure = Par(3);
+        RefrigNum = int(Par[0]);
+        Enthalpy_Req = Par[1];
+        Pressure = Par[2];
         Refrigerant = state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name;
         if (std::abs(Enthalpy_Req) < 100.0) Enthalpy_Req = sign(100.0, Enthalpy_Req);
 
@@ -7531,11 +7572,11 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetSupHeatDensityRefrig(EnergyPlusData &state,
-                                   std::string const &Refrigerant, // carries in substance name
-                                   Real64 const Temperature,       // actual temperature given as input
-                                   Real64 const Pressure,          // actual pressure given as input
-                                   int &RefrigIndex,               // Index to Refrigerant Properties
-                                   std::string const &CalledFrom   // routine this function was called from (error messages)
+                                   std::string_view const Refrigerant, // carries in substance name
+                                   Real64 const Temperature,           // actual temperature given as input
+                                   Real64 const Pressure,              // actual pressure given as input
+                                   int &RefrigIndex,                   // Index to Refrigerant Properties
+                                   std::string_view const CalledFrom   // routine this function was called from (error messages)
     )
     {
 
@@ -7575,7 +7616,7 @@ namespace FluidProperties {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETERS:
-        static std::string const RoutineName("GetSupHeatDensityRefrig");
+        static constexpr std::string_view RoutineName("GetSupHeatDensityRefrig");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -7720,9 +7761,9 @@ namespace FluidProperties {
             // send warning
             if (state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupDensityErrCount <= state.dataFluidProps->RefrigerantErrorLimitTest) {
                 ShowWarningMessage(state,
-                                   RoutineName + ": Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                                   std::string{RoutineName} + ": Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                        "] is saturated at the given conditions, saturated density at given temperature returned. **");
-                ShowContinueError(state, "...Called From:" + CalledFrom);
+                ShowContinueError(state, fmt::format("...Called From:{}", CalledFrom));
                 ShowContinueError(state, format("Refrigerant temperature = {:.2R}", Temperature));
                 ShowContinueError(state, format("Refrigerant pressure = {:.0R}", Pressure));
                 ShowContinueError(state, format("Returned Density value = {:.3R}", saturated_density));
@@ -7730,7 +7771,8 @@ namespace FluidProperties {
             }
             if (state.dataFluidProps->SatErrCountGetSupHeatDensityRefrig > 0) {
                 ShowRecurringWarningErrorAtEnd(state,
-                                               RoutineName + ": Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                                               std::string{RoutineName} + ": Refrigerant [" +
+                                                   state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                                    "] saturated at the given conditions **",
                                                state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupEnthalpyErrIndex,
                                                Temperature,
@@ -7750,14 +7792,15 @@ namespace FluidProperties {
                 if (CurTempRangeErrCount > 0 && state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupDensityTempErrCount <=
                                                     state.dataFluidProps->RefrigerantErrorLimitTest) {
                     ShowWarningMessage(state,
-                                       RoutineName + ": Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                                       std::string{RoutineName} + ": Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                            "] Temperature is out of range for superheated refrigerant density: values capped **");
-                    ShowContinueError(state, " Called From:" + CalledFrom);
+                    ShowContinueError(state, fmt::format(" Called From:{}", CalledFrom));
                     ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurTempRangeErrCount > 0) {
                     ShowRecurringWarningErrorAtEnd(state,
-                                                   RoutineName + ": Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                                                   std::string{RoutineName} + ": Refrigerant [" +
+                                                       state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                                        "] Temperature is out of range for superheated refrigerant density: values capped **",
                                                    state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupDensityTempErrIndex,
                                                    Temperature,
@@ -7772,14 +7815,15 @@ namespace FluidProperties {
                 if (CurPresRangeErrCount > 0 && state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupDensityPresErrCount <=
                                                     state.dataFluidProps->RefrigerantErrorLimitTest) {
                     ShowWarningMessage(state,
-                                       RoutineName + ": Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                                       std::string{RoutineName} + ": Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                            "] Pressure is out of range for superheated refrigerant density: values capped **");
-                    ShowContinueError(state, " Called From:" + CalledFrom);
+                    ShowContinueError(state, fmt::format(" Called From:{}", CalledFrom));
                     ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurPresRangeErrCount > 0) {
                     ShowRecurringWarningErrorAtEnd(state,
-                                                   RoutineName + ": Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
+                                                   std::string{RoutineName} + ": Refrigerant [" +
+                                                       state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                                        "] Pressure is out of range for superheated refrigerant density: values capped **",
                                                    state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupDensityPresErrIndex,
                                                    Pressure,
@@ -7797,17 +7841,17 @@ namespace FluidProperties {
     //*****************************************************************************
 #ifdef EP_cache_GlycolSpecificHeat
     Real64 GetSpecificHeatGlycol_raw(EnergyPlusData &state,
-                                     std::string const &Glycol,    // carries in substance name
-                                     Real64 const Temperature,     // actual temperature given as input
-                                     int &GlycolIndex,             // Index to Glycol Properties
-                                     std::string const &CalledFrom // routine this function was called from (error messages)
+                                     std::string_view const Glycol,    // carries in substance name
+                                     Real64 const Temperature,         // actual temperature given as input
+                                     int &GlycolIndex,                 // Index to Glycol Properties
+                                     std::string_view const CalledFrom // routine this function was called from (error messages)
     )
 #else
     Real64 GetSpecificHeatGlycol(EnergyPlusData &state,
-                                 std::string const &Glycol,    // carries in substance name
-                                 Real64 const Temperature,     // actual temperature given as input
-                                 int &GlycolIndex,             // Index to Glycol Properties
-                                 std::string const &CalledFrom // routine this function was called from (error messages)
+                                 std::string_view const Glycol,    // carries in substance name
+                                 Real64 const Temperature,         // actual temperature given as input
+                                 int &GlycolIndex,                 // Index to Glycol Properties
+                                 std::string_view const CalledFrom // routine this function was called from (error messages)
     )
 #endif
     {
@@ -7841,7 +7885,7 @@ namespace FluidProperties {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETERS:
-        static std::string const RoutineName("GetSpecificHeatGlycol: ");
+        static constexpr std::string_view RoutineName("GetSpecificHeatGlycol: ");
 
         // Get the input if we haven't already
         if (state.dataFluidProps->GetInput) {
@@ -7887,7 +7931,7 @@ namespace FluidProperties {
                     ++state.dataFluidProps->GlycolErrorTracking(GlycolIndex).SpecHeatLowErrCount;
                 if (state.dataFluidProps->LowTempLimitErrGetSpecificHeatGlycol_raw <= state.dataFluidProps->GlycolErrorLimitTest) {
                     ShowWarningMessage(state,
-                                       RoutineName + "Temperature is out of range (too low) for fluid [" + glycol_data.Name +
+                                       std::string{RoutineName} + "Temperature is out of range (too low) for fluid [" + glycol_data.Name +
                                            "] specific heat supplied values **");
                     ShowContinueError(state,
                                       format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
@@ -7898,7 +7942,7 @@ namespace FluidProperties {
                     ShowContinueErrorTimeStamp(state, "");
                 }
                 ShowRecurringWarningErrorAtEnd(state,
-                                               RoutineName + "Temperature out of range (too low) for fluid [" + glycol_data.Name +
+                                               std::string{RoutineName} + "Temperature out of range (too low) for fluid [" + glycol_data.Name +
                                                    "] specific heat **",
                                                state.dataFluidProps->GlycolErrorTracking(GlycolIndex).SpecHeatLowErrIndex,
                                                Temperature,
@@ -7914,7 +7958,8 @@ namespace FluidProperties {
                     ++state.dataFluidProps->GlycolErrorTracking(GlycolIndex).SpecHeatHighErrCount;
                 if (state.dataFluidProps->HighTempLimitErrGetSpecificHeatGlycol_raw <= state.dataFluidProps->GlycolErrorLimitTest) {
                     ShowWarningMessage(state,
-                                       RoutineName + "Temperature is out of range (too high) for fluid [" + glycol_data.Name + "] specific heat **");
+                                       std::string{RoutineName} + "Temperature is out of range (too high) for fluid [" + glycol_data.Name +
+                                           "] specific heat **");
                     ShowContinueError(state,
                                       format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
                                              CalledFrom,
@@ -7924,7 +7969,7 @@ namespace FluidProperties {
                     ShowContinueErrorTimeStamp(state, "");
                 }
                 ShowRecurringWarningErrorAtEnd(state,
-                                               RoutineName + "Temperature out of range (too high) for fluid [" + glycol_data.Name +
+                                               std::string{RoutineName} + "Temperature out of range (too high) for fluid [" + glycol_data.Name +
                                                    "] specific heat **",
                                                state.dataFluidProps->GlycolErrorTracking(GlycolIndex).SpecHeatHighErrIndex,
                                                Temperature,
@@ -7959,10 +8004,10 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetDensityGlycol(EnergyPlusData &state,
-                            std::string const &Glycol,    // carries in substance name
-                            Real64 const Temperature,     // actual temperature given as input
-                            int &GlycolIndex,             // Index to Glycol Properties
-                            std::string const &CalledFrom // routine this function was called from (error messages)
+                            std::string_view const Glycol,    // carries in substance name
+                            Real64 const Temperature,         // actual temperature given as input
+                            int &GlycolIndex,                 // Index to Glycol Properties
+                            std::string_view const CalledFrom // routine this function was called from (error messages)
     )
     {
 
@@ -7996,7 +8041,7 @@ namespace FluidProperties {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETERS:
-        static std::string const RoutineName("GetDensityGlycol: ");
+        static constexpr std::string_view RoutineName("GetDensityGlycol: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -8086,7 +8131,7 @@ namespace FluidProperties {
 
             if ((LowErrorThisTime) && (state.dataFluidProps->LowTempLimitErrGetDensityGlycol <= state.dataFluidProps->GlycolErrorLimitTest)) {
                 ShowWarningMessage(state,
-                                   RoutineName + "Temperature is out of range (too low) for fluid [" +
+                                   std::string{RoutineName} + "Temperature is out of range (too low) for fluid [" +
                                        state.dataFluidProps->GlycolData(GlycolIndex).Name + "] density **");
                 ShowContinueError(state,
                                   format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
@@ -8098,7 +8143,7 @@ namespace FluidProperties {
             }
             if (LowErrorThisTime) {
                 ShowRecurringWarningErrorAtEnd(state,
-                                               RoutineName + "Temperature out of range (too low) for fluid [" +
+                                               std::string{RoutineName} + "Temperature out of range (too low) for fluid [" +
                                                    state.dataFluidProps->GlycolData(GlycolIndex).Name + "] density **",
                                                state.dataFluidProps->GlycolErrorTracking(GlycolIndex).DensityLowErrIndex,
                                                Temperature,
@@ -8110,7 +8155,7 @@ namespace FluidProperties {
 
             if ((HighErrorThisTime) && (state.dataFluidProps->HighTempLimitErrGetDensityGlycol <= state.dataFluidProps->GlycolErrorLimitTest)) {
                 ShowWarningMessage(state,
-                                   RoutineName + "Temperature is out of range (too high) for fluid [" +
+                                   std::string{RoutineName} + "Temperature is out of range (too high) for fluid [" +
                                        state.dataFluidProps->GlycolData(GlycolIndex).Name + "] density **");
                 ShowContinueError(state,
                                   format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
@@ -8122,7 +8167,7 @@ namespace FluidProperties {
             }
             if (HighErrorThisTime) {
                 ShowRecurringWarningErrorAtEnd(state,
-                                               RoutineName + "Temperature out of range (too high) for fluid [" +
+                                               std::string{RoutineName} + "Temperature out of range (too high) for fluid [" +
                                                    state.dataFluidProps->GlycolData(GlycolIndex).Name + "] density **",
                                                state.dataFluidProps->GlycolErrorTracking(GlycolIndex).DensityHighErrIndex,
                                                Temperature,
@@ -8139,10 +8184,10 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetConductivityGlycol(EnergyPlusData &state,
-                                 std::string const &Glycol,    // carries in substance name
-                                 Real64 const Temperature,     // actual temperature given as input
-                                 int &GlycolIndex,             // Index to Glycol Properties
-                                 std::string const &CalledFrom // routine this function was called from (error messages)
+                                 std::string_view const Glycol,    // carries in substance name
+                                 Real64 const Temperature,         // actual temperature given as input
+                                 int &GlycolIndex,                 // Index to Glycol Properties
+                                 std::string_view const CalledFrom // routine this function was called from (error messages)
     )
     {
 
@@ -8176,7 +8221,7 @@ namespace FluidProperties {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETERS:
-        static std::string const RoutineName("GetConductivityGlycol: ");
+        static constexpr std::string_view RoutineName("GetConductivityGlycol: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -8269,7 +8314,7 @@ namespace FluidProperties {
 
             if ((LowErrorThisTime) && (state.dataFluidProps->LowTempLimitErrGetConductivityGlycol <= state.dataFluidProps->GlycolErrorLimitTest)) {
                 ShowWarningMessage(state,
-                                   RoutineName + "Temperature is out of range (too low) for fluid [" +
+                                   std::string{RoutineName} + "Temperature is out of range (too low) for fluid [" +
                                        state.dataFluidProps->GlycolData(GlycolIndex).Name + "] conductivity **");
                 ShowContinueError(state,
                                   format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
@@ -8281,7 +8326,7 @@ namespace FluidProperties {
             }
             if (LowErrorThisTime) {
                 ShowRecurringWarningErrorAtEnd(state,
-                                               RoutineName + "Temperature out of range (too low) for fluid [" +
+                                               std::string{RoutineName} + "Temperature out of range (too low) for fluid [" +
                                                    state.dataFluidProps->GlycolData(GlycolIndex).Name + "] conductivity **",
                                                state.dataFluidProps->GlycolErrorTracking(GlycolIndex).ConductivityLowErrIndex,
                                                Temperature,
@@ -8293,7 +8338,7 @@ namespace FluidProperties {
 
             if ((HighErrorThisTime) && (state.dataFluidProps->HighTempLimitErrGetConductivityGlycol <= state.dataFluidProps->GlycolErrorLimitTest)) {
                 ShowWarningMessage(state,
-                                   RoutineName + "Temperature is out of range (too high) for fluid [" +
+                                   std::string{RoutineName} + "Temperature is out of range (too high) for fluid [" +
                                        state.dataFluidProps->GlycolData(GlycolIndex).Name + "] conductivity **");
                 ShowContinueError(state,
                                   format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
@@ -8305,7 +8350,7 @@ namespace FluidProperties {
             }
             if (HighErrorThisTime) {
                 ShowRecurringWarningErrorAtEnd(state,
-                                               RoutineName + "Temperature out of range (too high) for fluid [" +
+                                               std::string{RoutineName} + "Temperature out of range (too high) for fluid [" +
                                                    state.dataFluidProps->GlycolData(GlycolIndex).Name + "] conductivity **",
                                                state.dataFluidProps->GlycolErrorTracking(GlycolIndex).ConductivityHighErrIndex,
                                                Temperature,
@@ -8322,10 +8367,10 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetViscosityGlycol(EnergyPlusData &state,
-                              std::string const &Glycol,    // carries in substance name
-                              Real64 const Temperature,     // actual temperature given as input
-                              int &GlycolIndex,             // Index to Glycol Properties
-                              std::string const &CalledFrom // routine this function was called from (error messages)
+                              std::string_view const Glycol,    // carries in substance name
+                              Real64 const Temperature,         // actual temperature given as input
+                              int &GlycolIndex,                 // Index to Glycol Properties
+                              std::string_view const CalledFrom // routine this function was called from (error messages)
     )
     {
 
@@ -8359,7 +8404,7 @@ namespace FluidProperties {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETERS:
-        static std::string const RoutineName("GetViscosityGlycol: ");
+        static constexpr std::string_view RoutineName("GetViscosityGlycol: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -8451,7 +8496,7 @@ namespace FluidProperties {
 
             if ((LowErrorThisTime) && (state.dataFluidProps->LowTempLimitErrGetViscosityGlycol <= state.dataFluidProps->GlycolErrorLimitTest)) {
                 ShowWarningMessage(state,
-                                   RoutineName + "Temperature is out of range (too low) for fluid [" +
+                                   std::string{RoutineName} + "Temperature is out of range (too low) for fluid [" +
                                        state.dataFluidProps->GlycolData(GlycolIndex).Name + "] viscosity **");
                 ShowContinueError(state,
                                   format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
@@ -8463,7 +8508,7 @@ namespace FluidProperties {
             }
             if (LowErrorThisTime) {
                 ShowRecurringWarningErrorAtEnd(state,
-                                               RoutineName + "Temperature out of range (too low) for fluid [" +
+                                               std::string{RoutineName} + "Temperature out of range (too low) for fluid [" +
                                                    state.dataFluidProps->GlycolData(GlycolIndex).Name + "] viscosity **",
                                                state.dataFluidProps->GlycolErrorTracking(GlycolIndex).ViscosityLowErrIndex,
                                                Temperature,
@@ -8475,7 +8520,7 @@ namespace FluidProperties {
 
             if ((HighErrorThisTime) && (state.dataFluidProps->HighTempLimitErrGetViscosityGlycol <= state.dataFluidProps->GlycolErrorLimitTest)) {
                 ShowWarningMessage(state,
-                                   RoutineName + "Temperature is out of range (too high) for fluid [" +
+                                   std::string{RoutineName} + "Temperature is out of range (too high) for fluid [" +
                                        state.dataFluidProps->GlycolData(GlycolIndex).Name + "] viscosity **");
                 ShowContinueError(state,
                                   format("..Called From:{},Temperature=[{:.2R}], supplied data range=[{:.2R},{:.2R}]",
@@ -8487,7 +8532,7 @@ namespace FluidProperties {
             }
             if (HighErrorThisTime) {
                 ShowRecurringWarningErrorAtEnd(state,
-                                               RoutineName + "Temperature out of range (too high) for fluid [" +
+                                               std::string{RoutineName} + "Temperature out of range (too high) for fluid [" +
                                                    state.dataFluidProps->GlycolData(GlycolIndex).Name + "] viscosity **",
                                                state.dataFluidProps->GlycolErrorTracking(GlycolIndex).ViscosityHighErrIndex,
                                                Temperature,
@@ -8511,11 +8556,11 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetQualityRefrig(EnergyPlusData &state,
-                            std::string const &Refrigerant, // carries in substance name
-                            Real64 const Temperature,       // actual temperature given as input
-                            Real64 const Enthalpy,          // actual enthalpy given as input
-                            int &RefrigIndex,               // Index to Refrigerant Properties
-                            std::string const &CalledFrom   // routine this function was called from (error messages)
+                            std::string const &Refrigerant,   // carries in substance name
+                            Real64 const Temperature,         // actual temperature given as input
+                            Real64 const Enthalpy,            // actual enthalpy given as input
+                            int &RefrigIndex,                 // Index to Refrigerant Properties
+                            std::string_view const CalledFrom // routine this function was called from (error messages)
     )
     {
 
@@ -8643,7 +8688,7 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    int FindRefrigerant(EnergyPlusData &state, std::string const &Refrigerant) // carries in substance name
+    int FindRefrigerant(EnergyPlusData &state, std::string_view const Refrigerant) // carries in substance name
     {
 
         // FUNCTION INFORMATION:
@@ -8689,7 +8734,7 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    int FindGlycol(EnergyPlusData &state, std::string const &Glycol) // carries in substance name
+    int FindGlycol(EnergyPlusData &state, std::string_view const Glycol) // carries in substance name
     {
 
         // FUNCTION INFORMATION:
@@ -8897,14 +8942,14 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetInterpolatedSatProp(EnergyPlusData &state,
-                                  Real64 const Temperature,         // Saturation Temp.
-                                  Array1D<Real64> const &PropTemps, // Array of temperature at which props are available
-                                  Array1D<Real64> const &LiqProp,   // Array of saturated liquid properties
-                                  Array1D<Real64> const &VapProp,   // Array of saturatedvapour properties
-                                  Real64 const Quality,             // Quality
-                                  std::string const &CalledFrom,    // routine this function was called from (error messages)
-                                  int const LowBound,               // Valid values lower bound (set by calling program)
-                                  int const UpperBound              // Valid values upper bound (set by calling program)
+                                  Real64 const Temperature,          // Saturation Temp.
+                                  Array1D<Real64> const &PropTemps,  // Array of temperature at which props are available
+                                  Array1D<Real64> const &LiqProp,    // Array of saturated liquid properties
+                                  Array1D<Real64> const &VapProp,    // Array of saturatedvapour properties
+                                  Real64 const Quality,              // Quality
+                                  std::string_view const CalledFrom, // routine this function was called from (error messages)
+                                  int const LowBound,                // Valid values lower bound (set by calling program)
+                                  int const UpperBound               // Valid values upper bound (set by calling program)
     )
     {
 
@@ -8985,7 +9030,7 @@ namespace FluidProperties {
             // send warning
             if (state.dataFluidProps->TempRangeErrCountGetInterpolatedSatProp <= state.dataFluidProps->RefrigerantErrorLimitTest) {
                 ShowWarningError(state, "GetInterpolatedSatProp: Saturation temperature for interpolation is out of range of data supplied: **");
-                ShowContinueErrorTimeStamp(state, " Called from:" + CalledFrom);
+                ShowContinueErrorTimeStamp(state, fmt::format(" Called from:{}", CalledFrom));
                 ShowContinueError(state, format("Refrigerant temperature = {:.2R}", Temperature));
                 ShowContinueError(state, format("Returned saturated property value = {:.3R}", ReturnValue));
             } else {
@@ -9109,13 +9154,13 @@ namespace FluidProperties {
     }
 
     void ReportFatalGlycolErrors(EnergyPlusData &state,
-                                 int const NumGlycols,           // Number of Glycols in input/data
-                                 int const GlycolNum,            // Glycol Index
-                                 bool const DataPresent,         // data is present for this fluid.
-                                 std::string const &GlycolName,  // Name being reported
-                                 std::string const &RoutineName, // Routine name to show
-                                 std::string const &Property,    // Property being requested
-                                 std::string const &CalledFrom   // original called from (external to fluid properties)
+                                 int const NumGlycols,               // Number of Glycols in input/data
+                                 int const GlycolNum,                // Glycol Index
+                                 bool const DataPresent,             // data is present for this fluid.
+                                 std::string_view const GlycolName,  // Name being reported
+                                 std::string_view const RoutineName, // Routine name to show
+                                 std::string_view const Property,    // Property being requested
+                                 std::string_view const CalledFrom   // original called from (external to fluid properties)
     )
     {
 
@@ -9156,15 +9201,17 @@ namespace FluidProperties {
         RefrigNo = FindRefrigerant(state, GlycolName);
 
         if (NumGlycols == 0) {
-            ShowSevereError(state,
-                            RoutineName + ": no glycols found -- cannot evaluate fluid " + Property + " for \"" + GlycolName +
-                                "\", called from: " + CalledFrom);
+            ShowSevereError(
+                state,
+                fmt::format(
+                    "{}: no glycols found -- cannot evaluate fluid {} for \"{}\", called from: {}", RoutineName, Property, GlycolName, CalledFrom));
         } else if (GlycolNum == 0) {
-            ShowSevereError(state, RoutineName + ": data not found in input for requested glycol \"" + GlycolName + "\", called from: " + CalledFrom);
+            ShowSevereError(
+                state, fmt::format("{}: data not found in input for requested glycol \"{}\", called from: {}", RoutineName, GlycolName, CalledFrom));
         } else if (!DataPresent) {
             ShowSevereError(state,
-                            RoutineName + ": " + Property + " data not found in input for requested glycol \"" + GlycolName +
-                                "\", called from: " + CalledFrom);
+                            std::string{RoutineName} + ": " + std::string{Property} + " data not found in input for requested glycol \"" +
+                                std::string{GlycolName} + fmt::format("\", called from: {}", CalledFrom));
         }
         if (RefrigNo > 0) ShowContinueError(state, "Note: that fluid is listed as a Refrigerant from input.");
 
@@ -9172,13 +9219,13 @@ namespace FluidProperties {
     }
 
     void ReportFatalRefrigerantErrors(EnergyPlusData &state,
-                                      int const NumRefrigerants,          // Number of Refrigerants in input/data
-                                      int const RefrigerantNum,           // Refrigerant Index
-                                      bool const DataPresent,             // data is present for this fluid.
-                                      std::string const &RefrigerantName, // Name being reported
-                                      std::string const &RoutineName,     // Routine name to show
-                                      std::string const &Property,        // Property being requested
-                                      std::string const &CalledFrom       // original called from (external to fluid properties)
+                                      int const NumRefrigerants,              // Number of Refrigerants in input/data
+                                      int const RefrigerantNum,               // Refrigerant Index
+                                      bool const DataPresent,                 // data is present for this fluid.
+                                      std::string_view const RefrigerantName, // Name being reported
+                                      std::string_view const RoutineName,     // Routine name to show
+                                      std::string_view const Property,        // Property being requested
+                                      std::string_view const CalledFrom       // original called from (external to fluid properties)
     )
     {
 
@@ -9220,15 +9267,23 @@ namespace FluidProperties {
 
         if (NumRefrigerants == 0) {
             ShowSevereError(state,
-                            RoutineName + ": no refrigerants found -- cannot evaluate fluid " + Property + " for \"" + RefrigerantName +
-                                "\", called from: " + CalledFrom);
+                            fmt::format("{}: no refrigerants found -- cannot evaluate fluid {} for \"{}\", called from: {}",
+                                        RoutineName,
+                                        Property,
+                                        RefrigerantName,
+                                        CalledFrom));
         } else if (RefrigerantNum == 0) {
             ShowSevereError(
-                state, RoutineName + ": data not found in input for requested refrigerant \"" + RefrigerantName + "\", called from: " + CalledFrom);
+                state,
+                fmt::format(
+                    "{}: data not found in input for requested refrigerant \"{}\", called from: {}", RoutineName, RefrigerantName, CalledFrom));
         } else if (!DataPresent) {
             ShowSevereError(state,
-                            RoutineName + ": " + Property + " data not found in input for requested refrigerant \"" + RefrigerantName +
-                                "\", called from: " + CalledFrom);
+                            fmt::format("{}: {} data not found in input for requested refrigerant \"{}\", called from: {}",
+                                        RoutineName,
+                                        Property,
+                                        RefrigerantName,
+                                        CalledFrom));
         }
         if (GlycolNo > 0) ShowContinueError(state, "Note: that fluid is listed as a Glycol from input.");
 
@@ -9238,38 +9293,6 @@ namespace FluidProperties {
     void GetFluidDensityTemperatureLimits(EnergyPlusData &state, int const FluidIndex, Real64 &MinTempLimit, Real64 &MaxTempLimit)
     {
 
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         <author>
-        //       DATE WRITTEN   <date_written>
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetFluidDensityTemperatureLimits: ");
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
         // Get the input if we haven't already
         if (state.dataFluidProps->GetInput) {
             GetFluidPropertiesData(state);
@@ -9284,39 +9307,6 @@ namespace FluidProperties {
 
     void GetFluidSpecificHeatTemperatureLimits(EnergyPlusData &state, int const FluidIndex, Real64 &MinTempLimit, Real64 &MaxTempLimit)
     {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         <author>
-        //       DATE WRITTEN   <date_written>
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetFluidSpecificHeatTemperatureLimits: ");
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
         // Get the input if we haven't already
         if (state.dataFluidProps->GetInput) {
             GetFluidPropertiesData(state);

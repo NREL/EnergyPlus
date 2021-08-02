@@ -73,6 +73,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HVACFan.hh>
@@ -92,7 +93,6 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SteamCoils.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WaterToAirHeatPump.hh>
@@ -134,7 +134,7 @@ using namespace ScheduleManager;
 constexpr const char *fluidNameSteam("STEAM");
 
 void SimPackagedTerminalUnit(EnergyPlusData &state,
-                             std::string const &CompName,   // name of the packaged terminal heat pump
+                             std::string_view CompName,     // name of the packaged terminal heat pump
                              int const ZoneNum,             // number of zone being served
                              bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                              Real64 &QUnitOut,              // sensible capacity delivered to zone
@@ -178,7 +178,7 @@ void SimPackagedTerminalUnit(EnergyPlusData &state,
     if (CompIndex == 0) {
         PTUnitNum = UtilityRoutines::FindItemInList(CompName, state.dataPTHP->PTUnit);
         if (PTUnitNum == 0) {
-            ShowFatalError(state, "SimPackagedTerminalUnit: Unit not found=" + CompName);
+            ShowFatalError(state, "SimPackagedTerminalUnit: Unit not found=" + std::string{CompName});
         }
         CompIndex = state.dataPTHP->PTUnit(PTUnitNum).PTObjectIndex;
     } else {
@@ -488,8 +488,8 @@ void GetPTUnit(EnergyPlusData &state)
     using VariableSpeedCoils::SetVarSpeedCoilData;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("GetPTUnit: "); // include trailing blank space
-    static std::string const RoutineNameFull("GetPackagedTerminalHeatPumpInput");
+    static constexpr std::string_view RoutineName("GetPTUnit: "); // include trailing blank space
+    static constexpr std::string_view RoutineNameFull("GetPackagedTerminalHeatPumpInput");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int PTUnitIndex;             // loop index
@@ -639,7 +639,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                         Alphas(1),
                                                                         DataLoopNode::NodeFluidType::Air,
                                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                                        1,
+                                                                        NodeInputManager::compFluidStream::Primary,
                                                                         ObjectIsParent);
 
         state.dataPTHP->PTUnit(PTUnitNum).AirOutNode = GetOnlySingleNode(state,
@@ -649,7 +649,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                          Alphas(1),
                                                                          DataLoopNode::NodeFluidType::Air,
                                                                          DataLoopNode::NodeConnectionType::Outlet,
-                                                                         1,
+                                                                         NodeInputManager::compFluidStream::Primary,
                                                                          ObjectIsParent);
 
         state.dataPTHP->PTUnit(PTUnitNum).OAMixType = Alphas(5);
@@ -1103,7 +1103,7 @@ void GetPTUnit(EnergyPlusData &state)
                 }
             }
             if (ZoneNodeNotFound) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                 ShowContinueError(state, "..Heat Pumps air inlet node name must be the same as a zone exhaust node name.");
                 ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
                 ShowContinueError(state,
@@ -1125,7 +1125,7 @@ void GetPTUnit(EnergyPlusData &state)
                 }
             }
             if (ZoneNodeNotFound) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                 ShowContinueError(state, "..Heat Pumps air outlet node name must be the same as a zone inlet node name.");
                 ShowContinueError(state, "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object.");
                 ShowContinueError(state,
@@ -1564,7 +1564,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                 state.dataPTHP->PTUnit(PTUnitNum).Name,
                                                 DataLoopNode::NodeFluidType::Water,
                                                 DataLoopNode::NodeConnectionType::Actuator,
-                                                1,
+                                                NodeInputManager::compFluidStream::Primary,
                                                 ObjectIsParent);
             } else if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingSteam) {
                 // Add heating coil steam inlet node as actualtor node for coil
@@ -1575,7 +1575,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                 state.dataPTHP->PTUnit(PTUnitNum).Name,
                                                 DataLoopNode::NodeFluidType::Steam,
                                                 DataLoopNode::NodeConnectionType::Actuator,
-                                                1,
+                                                NodeInputManager::compFluidStream::Primary,
                                                 ObjectIsParent);
             }
         }
@@ -1648,7 +1648,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                         Alphas(1),
                                                                         DataLoopNode::NodeFluidType::Air,
                                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                                        1,
+                                                                        NodeInputManager::compFluidStream::Primary,
                                                                         ObjectIsParent);
 
         state.dataPTHP->PTUnit(PTUnitNum).AirOutNode = GetOnlySingleNode(state,
@@ -1658,7 +1658,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                          Alphas(1),
                                                                          DataLoopNode::NodeFluidType::Air,
                                                                          DataLoopNode::NodeConnectionType::Outlet,
-                                                                         1,
+                                                                         NodeInputManager::compFluidStream::Primary,
                                                                          ObjectIsParent);
 
         state.dataPTHP->PTUnit(PTUnitNum).OAMixType = Alphas(5);
@@ -2044,7 +2044,7 @@ void GetPTUnit(EnergyPlusData &state)
                 }
             }
             if (ZoneNodeNotFound) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                 ShowContinueError(state, "..Air-conditioners air inlet node name must be the same as a zone exhaust node name.");
                 ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
                 ShowContinueError(state,
@@ -2066,7 +2066,7 @@ void GetPTUnit(EnergyPlusData &state)
                 }
             }
             if (ZoneNodeNotFound) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                 ShowContinueError(state, "..Air-conditioners air outlet node name must be the same as a zone inlet node name.");
                 ShowContinueError(state, "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object.");
                 ShowContinueError(
@@ -2114,7 +2114,7 @@ void GetPTUnit(EnergyPlusData &state)
 
                 // OA mixer return node must equal air-conditioner air inlet node
                 if (state.dataPTHP->PTUnit(PTUnitNum).AirInNode != OANodeNums(3)) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError(state, "..Heat Pump air inlet node name must be the same as the OutdoorAir:Mixer return air node name.");
                     ShowContinueError(state,
                                       "..Heat Pump air inlet node name         = " +
@@ -2153,7 +2153,7 @@ void GetPTUnit(EnergyPlusData &state)
             if (!state.dataPTHP->PTUnit(PTUnitNum).ATMixerExists && OANodeNums(4) == 0) {
                 // For no OA Mixer fan inlet node name must be the same as the Air-conditioner's inlet air node name
                 if (state.dataPTHP->PTUnit(PTUnitNum).AirInNode != FanInletNodeNum) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError(state, "..Fan inlet node name must be the same as the Air-conditioners inlet air node name");
                     ShowContinueError(state, "..when blow through " + cAlphaFields(16) + " is specified and an outdoor air mixer is not used.");
                     ShowContinueError(state, "..Fan inlet node name           = " + state.dataLoopNodes->NodeID(FanInletNodeNum));
@@ -2462,7 +2462,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                 state.dataPTHP->PTUnit(PTUnitNum).Name,
                                                 DataLoopNode::NodeFluidType::Water,
                                                 DataLoopNode::NodeConnectionType::Actuator,
-                                                1,
+                                                NodeInputManager::compFluidStream::Primary,
                                                 ObjectIsParent);
             } else if (state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingSteam) {
                 // Add heating coil steam inlet node as actualtor node for coil
@@ -2473,7 +2473,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                 state.dataPTHP->PTUnit(PTUnitNum).Name,
                                                 DataLoopNode::NodeFluidType::Steam,
                                                 DataLoopNode::NodeConnectionType::Actuator,
-                                                1,
+                                                NodeInputManager::compFluidStream::Primary,
                                                 ObjectIsParent);
             }
         }
@@ -2538,7 +2538,8 @@ void GetPTUnit(EnergyPlusData &state)
         } else {
             state.dataPTHP->PTUnit(PTUnitNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
             if (state.dataPTHP->PTUnit(PTUnitNum).SchedPtr == 0) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\" invalid data.");
+                ShowSevereError(state,
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\" invalid data.");
                 ShowContinueError(state, "invalid-not found " + cAlphaFields(2) + "=\"" + Alphas(2) + "\".");
                 ErrorsFound = true;
             }
@@ -2551,7 +2552,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                         Alphas(1),
                                                                         DataLoopNode::NodeFluidType::Air,
                                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                                        1,
+                                                                        NodeInputManager::compFluidStream::Primary,
                                                                         ObjectIsParent);
 
         state.dataPTHP->PTUnit(PTUnitNum).AirOutNode = GetOnlySingleNode(state,
@@ -2561,7 +2562,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                          Alphas(1),
                                                                          DataLoopNode::NodeFluidType::Air,
                                                                          DataLoopNode::NodeConnectionType::Outlet,
-                                                                         1,
+                                                                         NodeInputManager::compFluidStream::Primary,
                                                                          ObjectIsParent);
 
         state.dataPTHP->PTUnit(PTUnitNum).OAMixType = Alphas(5);
@@ -2717,7 +2718,7 @@ void GetPTUnit(EnergyPlusData &state)
                     state, state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilType, state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilName, errFlag);
             }
         } else {
-            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\"");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\"");
             ShowContinueError(state, "Illegal " + cAlphaFields(9) + " = " + Alphas(9));
             ErrorsFound = true;
         }
@@ -2774,7 +2775,7 @@ void GetPTUnit(EnergyPlusData &state)
                     state, state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType, state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName, errFlag);
             }
         } else {
-            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\"");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\"");
             ShowContinueError(state, "Illegal " + cAlphaFields(11) + "=\"" + Alphas(11) + "\".");
             ErrorsFound = true;
         }
@@ -2817,7 +2818,7 @@ void GetPTUnit(EnergyPlusData &state)
                 state.dataPTHP->PTUnit(PTUnitNum).useVSCoilModel = true;
             }
         } else {
-            ShowContinueError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\"");
+            ShowContinueError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\"");
             ShowContinueError(state, "Cooling coil and heating coil should use the equation fit model and be of same general type");
             ErrorsFound = true;
         }
@@ -2939,11 +2940,11 @@ void GetPTUnit(EnergyPlusData &state)
                                                                                    Alphas(1),
                                                                                    DataLoopNode::NodeFluidType::Air,
                                                                                    DataLoopNode::NodeConnectionType::OutsideAirReference,
-                                                                                   1,
+                                                                                   NodeInputManager::compFluidStream::Primary,
                                                                                    ObjectIsNotParent);
             // need better verification.
             if (!CheckOutAirNodeNumber(state, state.dataPTHP->PTUnit(PTUnitNum).CondenserNodeNum)) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\"");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\"");
                 ShowContinueError(state, " Node name of outdoor dry-bulb temperature sensor not valid outdoor air node=\"" + Alphas(15) + "\"");
                 ShowContinueError(state, "...does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
                 ErrorsFound = true;
@@ -2953,7 +2954,7 @@ void GetPTUnit(EnergyPlusData &state)
         if (UtilityRoutines::SameString(Alphas(16), "BlowThrough")) state.dataPTHP->PTUnit(PTUnitNum).FanPlace = BlowThru;
         if (UtilityRoutines::SameString(Alphas(16), "DrawThrough")) state.dataPTHP->PTUnit(PTUnitNum).FanPlace = DrawThru;
         if (state.dataPTHP->PTUnit(PTUnitNum).FanPlace == 0) {
-            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\"");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\"");
             ShowContinueError(state, "Illegal " + cAlphaFields(16) + "=\"" + Alphas(16) + "\".");
             ErrorsFound = true;
         }
@@ -3016,7 +3017,7 @@ void GetPTUnit(EnergyPlusData &state)
             ErrorsFound = true;
         }
         if (SuppHeatOutletNodeNum != state.dataPTHP->PTUnit(PTUnitNum).AirOutNode) { // check that supp HC out = heat pump air outlet
-            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
             ShowContinueError(state, "..Supplemental heating coil outlet node name must be the same as the heat pumps outlet node name.");
             ShowContinueError(state, "..Supplemental heating coil outlet node name = " + state.dataLoopNodes->NodeID(SuppHeatOutletNodeNum));
             ShowContinueError(state,
@@ -3037,7 +3038,7 @@ void GetPTUnit(EnergyPlusData &state)
                 }
             }
             if (ZoneNodeNotFound) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                 ShowContinueError(state, "..Heat Pumps air inlet node name must be the same as a zone exhaust node name.");
                 ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
                 ShowContinueError(state,
@@ -3059,7 +3060,7 @@ void GetPTUnit(EnergyPlusData &state)
                 }
             }
             if (ZoneNodeNotFound) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                 ShowContinueError(state, "..Heat Pumps air outlet node name must be the same as a zone inlet node name.");
                 ShowContinueError(state, "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object.");
                 ShowContinueError(state,
@@ -3105,7 +3106,7 @@ void GetPTUnit(EnergyPlusData &state)
         // check connectivity for blow through fan
         if (state.dataPTHP->PTUnit(PTUnitNum).FanPlace == BlowThru) {
             if (CoolCoilInletNodeNum != FanOutletNodeNum) { // check that fan outlet equals cooling coil inlet
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                 ShowContinueError(state, "..Fan outlet node name must be the same as the cooling coil inlet node name");
                 ShowContinueError(state, "..when blow through " + cAlphaFields(16) + " is specified.");
                 ShowContinueError(state, "..Fan outlet node name         = " + state.dataLoopNodes->NodeID(FanOutletNodeNum));
@@ -3113,7 +3114,7 @@ void GetPTUnit(EnergyPlusData &state)
                 ErrorsFound = true;
             }
             if (HeatCoilOutletNodeNum != SuppHeatInletNodeNum) { // check that heating coil outlet equals supp heating coil inlet
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                 ShowContinueError(state, "..Heating coil outlet node name must be the same as the supplemental heating coil inlet node name");
                 ShowContinueError(state, "..when blow through " + cAlphaFields(16) + " is specified.");
                 ShowContinueError(state, "..Heating coil outlet node name              = " + state.dataLoopNodes->NodeID(HeatCoilOutletNodeNum));
@@ -3123,7 +3124,7 @@ void GetPTUnit(EnergyPlusData &state)
             if (!state.dataPTHP->PTUnit(PTUnitNum).ATMixerExists && OANodeNums(4) > 0) {
                 // Fan inlet node name must be the same as the heat pump's OA mixer mixed air node name
                 if (OANodeNums(4) != FanInletNodeNum) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError(state, "..Fan inlet node name must be the same as the heat pumps OutdoorAir:Mixer mixed air node name");
                     ShowContinueError(state, "..when blow through " + cAlphaFields(16) + " is specified.");
                     ShowContinueError(state, "..Fan inlet node name                   = " + state.dataLoopNodes->NodeID(FanInletNodeNum));
@@ -3132,7 +3133,7 @@ void GetPTUnit(EnergyPlusData &state)
                 }
                 // OA mixer return node must equal heat pump air inlet node
                 if (state.dataPTHP->PTUnit(PTUnitNum).AirInNode != OANodeNums(3)) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError(state, "..Heat Pump air inlet node name must be the same as the OutdoorAir:Mixer return air node name.");
                     ShowContinueError(state,
                                       "..Heat Pump air inlet node name         = " +
@@ -3144,7 +3145,7 @@ void GetPTUnit(EnergyPlusData &state)
             if (OANodeNums(4) == 0) {
                 // For no OA Mixer fan inlet node name must be the same as the heat pump's inlet air node name
                 if (state.dataPTHP->PTUnit(PTUnitNum).AirInNode != FanInletNodeNum) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError(state, "..Fan inlet node name must be the same as the heat pumps inlet air node name");
                     ShowContinueError(state, "..when blow through " + cAlphaFields(16) + " is specified and an outdoor air mixer is not used.");
                     ShowContinueError(state, "..Fan inlet node name           = " + state.dataLoopNodes->NodeID(FanInletNodeNum));
@@ -3169,7 +3170,7 @@ void GetPTUnit(EnergyPlusData &state)
         // check connectivity for draw through fan
         if (state.dataPTHP->PTUnit(PTUnitNum).FanPlace == DrawThru) {
             if (HeatCoilOutletNodeNum != FanInletNodeNum) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                 ShowContinueError(state, "..Heating coil outlet node name must be the same as the fan inlet node name");
                 ShowContinueError(state, "..when draw through " + cAlphaFields(16) + " is specified.");
                 ShowContinueError(state, "..Heating coil outlet node name = " + state.dataLoopNodes->NodeID(HeatCoilOutletNodeNum));
@@ -3177,7 +3178,7 @@ void GetPTUnit(EnergyPlusData &state)
                 ErrorsFound = true;
             }
             if (SuppHeatInletNodeNum != FanOutletNodeNum) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                 ShowContinueError(state, "..Fan outlet node name must be the same as the supplemental heating coil inlet node name ");
                 ShowContinueError(state, "..when draw through " + cAlphaFields(16) + " is specified.");
                 ShowContinueError(state, "..Fan outlet node = " + state.dataLoopNodes->NodeID(FanOutletNodeNum));
@@ -3187,7 +3188,7 @@ void GetPTUnit(EnergyPlusData &state)
             if (OANodeNums(4) == 0) {
                 // For no OA mixer, cooling coil inlet node name must be the same as the heat pump's inlet air node name
                 if (CoolCoilInletNodeNum != state.dataPTHP->PTUnit(PTUnitNum).AirInNode) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError(state, "..Heat pump air inlet node name must be the same as the cooling coil inlet node name");
                     ShowContinueError(state, "..when draw through " + cAlphaFields(16) + " is specified and an outdoor air mixer is not used.");
                     ShowContinueError(
@@ -3209,7 +3210,7 @@ void GetPTUnit(EnergyPlusData &state)
                 }
                 // check OA Mixer return node
                 if (state.dataPTHP->PTUnit(PTUnitNum).AirInNode != OANodeNums(3)) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError(state, "..Heat Pump air inlet node name must be the same as the OutdoorAir:Mixer return air node name.");
                     ShowContinueError(state,
                                       "..Heat Pump air inlet node name         = " +
@@ -3286,7 +3287,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                 state.dataPTHP->PTUnit(PTUnitNum).Name,
                                                 DataLoopNode::NodeFluidType::Water,
                                                 DataLoopNode::NodeConnectionType::Actuator,
-                                                1,
+                                                NodeInputManager::compFluidStream::Primary,
                                                 ObjectIsParent);
             } else if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingSteam) {
                 // Add heating coil steam inlet node as actualtor node for coil
@@ -3297,7 +3298,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                 state.dataPTHP->PTUnit(PTUnitNum).Name,
                                                 DataLoopNode::NodeFluidType::Steam,
                                                 DataLoopNode::NodeConnectionType::Actuator,
-                                                1,
+                                                NodeInputManager::compFluidStream::Primary,
                                                 ObjectIsParent);
             }
         }
@@ -3347,21 +3348,21 @@ void GetPTUnit(EnergyPlusData &state)
 
         state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirVolFlow = Numbers(1);
         if (state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirVolFlow <= 0 && state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirVolFlow != AutoSize) {
-            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
             ShowContinueError(state, format(" illegal value {} = {:.7T}", cNumericFields(1), Numbers(1)));
             ErrorsFound = true;
         }
 
         state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirVolFlow = Numbers(2);
         if (state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirVolFlow <= 0 && state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirVolFlow != AutoSize) {
-            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
             ShowContinueError(state, format(" illegal {} = {:.7T}", cNumericFields(2), Numbers(2)));
             ErrorsFound = true;
         }
 
         state.dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow = Numbers(3);
         if (state.dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow < 0 && state.dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow != AutoSize) {
-            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
             ShowContinueError(state, format(" illegal {} = {:.7T}", cNumericFields(3), Numbers(3)));
             ErrorsFound = true;
         }
@@ -3376,7 +3377,7 @@ void GetPTUnit(EnergyPlusData &state)
         if (OANodeNums(1) > 0) {
             state.dataPTHP->PTUnit(PTUnitNum).CoolOutAirVolFlow = Numbers(4);
             if (state.dataPTHP->PTUnit(PTUnitNum).CoolOutAirVolFlow < 0 && state.dataPTHP->PTUnit(PTUnitNum).CoolOutAirVolFlow != AutoSize) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                 ShowContinueError(state, format(" illegal {} = {:.7T}", cNumericFields(4), Numbers(4)));
                 ErrorsFound = true;
             }
@@ -3384,7 +3385,7 @@ void GetPTUnit(EnergyPlusData &state)
             //     only check that SA flow in cooling is >= OA flow in cooling when either or both are not autosized
             if (state.dataPTHP->PTUnit(PTUnitNum).CoolOutAirVolFlow > state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirVolFlow &&
                 state.dataPTHP->PTUnit(PTUnitNum).CoolOutAirVolFlow != AutoSize && state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirVolFlow != AutoSize) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                 ShowContinueError(state, ".." + cNumericFields(4) + " cannot be greater than " + cNumericFields(1));
                 ShowContinueError(state, format("..{} = {:.7T}", cNumericFields(1), Numbers(1)));
                 ShowContinueError(state, format("..{} = {:.7T}", cNumericFields(4), Numbers(4)));
@@ -3393,7 +3394,7 @@ void GetPTUnit(EnergyPlusData &state)
 
             state.dataPTHP->PTUnit(PTUnitNum).HeatOutAirVolFlow = Numbers(5);
             if (state.dataPTHP->PTUnit(PTUnitNum).HeatOutAirVolFlow < 0 && state.dataPTHP->PTUnit(PTUnitNum).HeatOutAirVolFlow != AutoSize) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                 ShowContinueError(state, format(" illegal {} = {:.7T}", cNumericFields(5), Numbers(5)));
                 ErrorsFound = true;
             }
@@ -3401,7 +3402,7 @@ void GetPTUnit(EnergyPlusData &state)
             //     only check that SA flow in heating is >= OA flow in heating when either or both are not autosized
             if (state.dataPTHP->PTUnit(PTUnitNum).HeatOutAirVolFlow > state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirVolFlow &&
                 state.dataPTHP->PTUnit(PTUnitNum).HeatOutAirVolFlow != AutoSize && state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirVolFlow != AutoSize) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                 ShowContinueError(state, ".." + cNumericFields(5) + " cannot be greater than " + cNumericFields(2));
                 ShowContinueError(state, format("..{} = {:.7T}", cNumericFields(2), Numbers(2)));
                 ShowContinueError(state, format("..{} = {:.7T}", cNumericFields(5), Numbers(5)));
@@ -3411,7 +3412,7 @@ void GetPTUnit(EnergyPlusData &state)
             state.dataPTHP->PTUnit(PTUnitNum).NoCoolHeatOutAirVolFlow = Numbers(6);
             if (state.dataPTHP->PTUnit(PTUnitNum).NoCoolHeatOutAirVolFlow < 0 &&
                 state.dataPTHP->PTUnit(PTUnitNum).NoCoolHeatOutAirVolFlow != AutoSize) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                 ShowContinueError(state, format(" illegal {} = {:.7T}", cNumericFields(6), Numbers(6)));
                 ErrorsFound = true;
             }
@@ -3532,7 +3533,7 @@ void GetPTUnit(EnergyPlusData &state)
     lNumericBlanks.deallocate();
 
     if (ErrorsFound) {
-        ShowFatalError(state, RoutineName + "Errors found in getting input.");
+        ShowFatalError(state, std::string{RoutineName} + "Errors found in getting input.");
         ShowContinueError(state, "... Preceding condition causes termination.");
     }
 
@@ -3542,120 +3543,120 @@ void GetPTUnit(EnergyPlusData &state)
                             "Zone Packaged Terminal Heat Pump Total Heating Rate",
                             OutputProcessor::Unit::W,
                             state.dataPTHP->PTUnit(PTUnitNum).TotHeatEnergyRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Packaged Terminal Heat Pump Total Heating Energy",
                             OutputProcessor::Unit::J,
                             state.dataPTHP->PTUnit(PTUnitNum).TotHeatEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Packaged Terminal Heat Pump Total Cooling Rate",
                             OutputProcessor::Unit::W,
                             state.dataPTHP->PTUnit(PTUnitNum).TotCoolEnergyRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Packaged Terminal Heat Pump Total Cooling Energy",
                             OutputProcessor::Unit::J,
                             state.dataPTHP->PTUnit(PTUnitNum).TotCoolEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Packaged Terminal Heat Pump Sensible Heating Rate",
                             OutputProcessor::Unit::W,
                             state.dataPTHP->PTUnit(PTUnitNum).SensHeatEnergyRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Packaged Terminal Heat Pump Sensible Heating Energy",
                             OutputProcessor::Unit::J,
                             state.dataPTHP->PTUnit(PTUnitNum).SensHeatEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Packaged Terminal Heat Pump Sensible Cooling Rate",
                             OutputProcessor::Unit::W,
                             state.dataPTHP->PTUnit(PTUnitNum).SensCoolEnergyRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Packaged Terminal Heat Pump Sensible Cooling Energy",
                             OutputProcessor::Unit::J,
                             state.dataPTHP->PTUnit(PTUnitNum).SensCoolEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Packaged Terminal Heat Pump Latent Heating Rate",
                             OutputProcessor::Unit::W,
                             state.dataPTHP->PTUnit(PTUnitNum).LatHeatEnergyRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Packaged Terminal Heat Pump Latent Heating Energy",
                             OutputProcessor::Unit::J,
                             state.dataPTHP->PTUnit(PTUnitNum).LatHeatEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Packaged Terminal Heat Pump Latent Cooling Rate",
                             OutputProcessor::Unit::W,
                             state.dataPTHP->PTUnit(PTUnitNum).LatCoolEnergyRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Packaged Terminal Heat Pump Latent Cooling Energy",
                             OutputProcessor::Unit::J,
                             state.dataPTHP->PTUnit(PTUnitNum).LatCoolEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Packaged Terminal Heat Pump Electricity Rate",
                             OutputProcessor::Unit::W,
                             state.dataPTHP->PTUnit(PTUnitNum).ElecPower,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Packaged Terminal Heat Pump Electricity Energy",
                             OutputProcessor::Unit::J,
                             state.dataPTHP->PTUnit(PTUnitNum).ElecConsumption,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Packaged Terminal Heat Pump Fan Part Load Ratio",
                             OutputProcessor::Unit::None,
                             state.dataPTHP->PTUnit(PTUnitNum).FanPartLoadRatio,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Packaged Terminal Heat Pump Compressor Part Load Ratio",
                             OutputProcessor::Unit::None,
                             state.dataPTHP->PTUnit(PTUnitNum).CompPartLoadRatio,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Packaged Terminal Heat Pump Fan Availability Status",
                             OutputProcessor::Unit::None,
                             state.dataPTHP->PTUnit(PTUnitNum).AvailStatus,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
     }
 
@@ -3666,120 +3667,120 @@ void GetPTUnit(EnergyPlusData &state)
                             "Zone Packaged Terminal Air Conditioner Total Heating Rate",
                             OutputProcessor::Unit::W,
                             state.dataPTHP->PTUnit(PTUnitNum).TotHeatEnergyRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Packaged Terminal Air Conditioner Total Heating Energy",
                             OutputProcessor::Unit::J,
                             state.dataPTHP->PTUnit(PTUnitNum).TotHeatEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Packaged Terminal Air Conditioner Total Cooling Rate",
                             OutputProcessor::Unit::W,
                             state.dataPTHP->PTUnit(PTUnitNum).TotCoolEnergyRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Packaged Terminal Air Conditioner Total Cooling Energy",
                             OutputProcessor::Unit::J,
                             state.dataPTHP->PTUnit(PTUnitNum).TotCoolEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Packaged Terminal Air Conditioner Sensible Heating Rate",
                             OutputProcessor::Unit::W,
                             state.dataPTHP->PTUnit(PTUnitNum).SensHeatEnergyRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Packaged Terminal Air Conditioner Sensible Heating Energy",
                             OutputProcessor::Unit::J,
                             state.dataPTHP->PTUnit(PTUnitNum).SensHeatEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Packaged Terminal Air Conditioner Sensible Cooling Rate",
                             OutputProcessor::Unit::W,
                             state.dataPTHP->PTUnit(PTUnitNum).SensCoolEnergyRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Packaged Terminal Air Conditioner Sensible Cooling Energy",
                             OutputProcessor::Unit::J,
                             state.dataPTHP->PTUnit(PTUnitNum).SensCoolEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Packaged Terminal Air Conditioner Latent Heating Rate",
                             OutputProcessor::Unit::W,
                             state.dataPTHP->PTUnit(PTUnitNum).LatHeatEnergyRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Packaged Terminal Air Conditioner Latent Heating Energy",
                             OutputProcessor::Unit::J,
                             state.dataPTHP->PTUnit(PTUnitNum).LatHeatEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Packaged Terminal Air Conditioner Latent Cooling Rate",
                             OutputProcessor::Unit::W,
                             state.dataPTHP->PTUnit(PTUnitNum).LatCoolEnergyRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Packaged Terminal Air Conditioner Latent Cooling Energy",
                             OutputProcessor::Unit::J,
                             state.dataPTHP->PTUnit(PTUnitNum).LatCoolEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Packaged Terminal Air Conditioner Electricity Rate",
                             OutputProcessor::Unit::W,
                             state.dataPTHP->PTUnit(PTUnitNum).ElecPower,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Packaged Terminal Air Conditioner Electricity Energy",
                             OutputProcessor::Unit::J,
                             state.dataPTHP->PTUnit(PTUnitNum).ElecConsumption,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Packaged Terminal Air Conditioner Fan Part Load Ratio",
                             OutputProcessor::Unit::None,
                             state.dataPTHP->PTUnit(PTUnitNum).FanPartLoadRatio,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Packaged Terminal Air Conditioner Compressor Part Load Ratio",
                             OutputProcessor::Unit::None,
                             state.dataPTHP->PTUnit(PTUnitNum).CompPartLoadRatio,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Packaged Terminal Air Conditioner Fan Availability Status",
                             OutputProcessor::Unit::None,
                             state.dataPTHP->PTUnit(PTUnitNum).AvailStatus,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
     }
 
@@ -3789,120 +3790,120 @@ void GetPTUnit(EnergyPlusData &state)
                             "Zone Water to Air Heat Pump Total Heating Rate",
                             OutputProcessor::Unit::W,
                             state.dataPTHP->PTUnit(PTUnitNum).TotHeatEnergyRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Water to Air Heat Pump Total Heating Energy",
                             OutputProcessor::Unit::J,
                             state.dataPTHP->PTUnit(PTUnitNum).TotHeatEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Water to Air Heat Pump Total Cooling Rate",
                             OutputProcessor::Unit::W,
                             state.dataPTHP->PTUnit(PTUnitNum).TotCoolEnergyRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Water to Air Heat Pump Total Cooling Energy",
                             OutputProcessor::Unit::J,
                             state.dataPTHP->PTUnit(PTUnitNum).TotCoolEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Water to Air Heat Pump Sensible Heating Rate",
                             OutputProcessor::Unit::W,
                             state.dataPTHP->PTUnit(PTUnitNum).SensHeatEnergyRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Water to Air Heat Pump Sensible Heating Energy",
                             OutputProcessor::Unit::J,
                             state.dataPTHP->PTUnit(PTUnitNum).SensHeatEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Water to Air Heat Pump Sensible Cooling Rate",
                             OutputProcessor::Unit::W,
                             state.dataPTHP->PTUnit(PTUnitNum).SensCoolEnergyRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Water to Air Heat Pump Sensible Cooling Energy",
                             OutputProcessor::Unit::J,
                             state.dataPTHP->PTUnit(PTUnitNum).SensCoolEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Water to Air Heat Pump Latent Heating Rate",
                             OutputProcessor::Unit::W,
                             state.dataPTHP->PTUnit(PTUnitNum).LatHeatEnergyRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Water to Air Heat Pump Latent Heating Energy",
                             OutputProcessor::Unit::J,
                             state.dataPTHP->PTUnit(PTUnitNum).LatHeatEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Water to Air Heat Pump Latent Cooling Rate",
                             OutputProcessor::Unit::W,
                             state.dataPTHP->PTUnit(PTUnitNum).LatCoolEnergyRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Water to Air Heat Pump Latent Cooling Energy",
                             OutputProcessor::Unit::J,
                             state.dataPTHP->PTUnit(PTUnitNum).LatCoolEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Water to Air Heat Pump Electricity Rate",
                             OutputProcessor::Unit::W,
                             state.dataPTHP->PTUnit(PTUnitNum).ElecPower,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Water to Air Heat Pump Electricity Energy",
                             OutputProcessor::Unit::J,
                             state.dataPTHP->PTUnit(PTUnitNum).ElecConsumption,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Water to Air Heat Pump Fan Part Load Ratio",
                             OutputProcessor::Unit::None,
                             state.dataPTHP->PTUnit(PTUnitNum).FanPartLoadRatio,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Water to Air Heat Pump Compressor Part Load Ratio",
                             OutputProcessor::Unit::None,
                             state.dataPTHP->PTUnit(PTUnitNum).CompPartLoadRatio,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
         SetupOutputVariable(state,
                             "Zone Water to Air Heat Pump Fan Availability Status",
                             OutputProcessor::Unit::None,
                             state.dataPTHP->PTUnit(PTUnitNum).AvailStatus,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPTHP->PTUnit(PTUnitNum).Name);
     }
     for (PTUnitNum = 1; PTUnitNum <= state.dataPTHP->NumPTUs; ++PTUnitNum) {
@@ -4024,8 +4025,8 @@ void InitPTUnit(EnergyPlusData &state,
     Real64 SupHeaterLoad;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("InitPTUnit");
-    static std::string const RoutineNameSpace(" InitPTUnit");
+    static constexpr std::string_view RoutineName("InitPTUnit");
+    static constexpr std::string_view RoutineNameSpace(" InitPTUnit");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int InNode;                // inlet node number in PTHP loop
@@ -5137,7 +5138,7 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
     Real64 MaxSATSupHeatUser;           // Hardsized supply air temperature of supplemental heater for reporting
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("SizePTUnit: "); // include trailing blank space
+    static constexpr std::string_view RoutineName("SizePTUnit: "); // include trailing blank space
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool ErrorsFound;
@@ -5426,6 +5427,7 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
 
             // initialize OA flow for sizing other inputs (e.g., capacity)
             if (state.dataPTHP->PTUnit(PTUnitNum).CoolOutAirVolFlow == AutoSize) {
+                CheckZoneSizing(state, state.dataPTHP->PTUnit(PTUnitNum).UnitType, state.dataPTHP->PTUnit(PTUnitNum).Name);
                 ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA;
             } else {
                 ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow = state.dataPTHP->PTUnit(PTUnitNum).CoolOutAirVolFlow;
@@ -5902,7 +5904,6 @@ void ControlPTUnitOutput(EnergyPlusData &state,
     using PlantUtilities::SetComponentFlowRate;
     using Psychrometrics::PsyCpAirFnW;
     using SteamCoils::SimulateSteamCoilComponents;
-    using TempSolveRoot::SolveRoot;
     using WaterCoils::SimulateWaterCoilComponents;
 
     // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6217,7 +6218,6 @@ void CalcPTUnit(EnergyPlusData &state,
     using Psychrometrics::PsyHFnTdbW;
     using SingleDuct::SimATMixer;
     using SteamCoils::SimulateSteamCoilComponents;
-    using TempSolveRoot::SolveRoot;
     using WaterCoils::SimulateWaterCoilComponents;
     using WaterToAirHeatPumpSimple::SimWatertoAirHPSimple;
 
@@ -7790,7 +7790,6 @@ void ControlVSHPOutput(EnergyPlusData &state,
     using PlantUtilities::SetComponentFlowRate;
     using Psychrometrics::PsyCpAirFnW;
     using SteamCoils::SimulateSteamCoilComponents;
-    using TempSolveRoot::SolveRoot;
     using WaterCoils::SimulateWaterCoilComponents;
 
     // Locals
@@ -8492,15 +8491,13 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
     using Psychrometrics::PsyHFnTdbW;
     using SingleDuct::SimATMixer;
     using SteamCoils::SimulateSteamCoilComponents;
-    using TempSolveRoot::SolveRoot;
     using VariableSpeedCoils::SimVariableSpeedCoils;
     using WaterCoils::SimulateWaterCoilComponents;
     using WaterToAirHeatPumpSimple::SimWatertoAirHPSimple;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("CalcVarSpeedHeatPump: "); // for error messages
-    Real64 const ErrTolerance(0.001);                               // convergence limit for hotwater coil
-    int const SolveMaxIter(50);
+    constexpr Real64 ErrTolerance(0.001); // convergence limit for hotwater coil
+    constexpr int SolveMaxIter(50);
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int OutletNode;            // PTHP air outlet node

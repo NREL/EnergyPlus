@@ -134,7 +134,7 @@
 !    CHW_deltaT = 8.33
 !    HOTW_PumpCurve_flag = pump_ride_on_curve
 
-  Version,9.5;
+  Version,9.6;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -12555,52 +12555,44 @@
   AirLoopHVAC:OutdoorAirSystem,
     CAV_bas_OA,              !- Name
     CAV_bas_OA_Controllers,  !- Controller List Name
-    CAV_bas_OA_Equipment,    !- Outdoor Air Equipment List Name
-    CAV_bas Availability Manager List;  !- Availability Manager List Name
+    CAV_bas_OA_Equipment;    !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     VAV_bot WITH REHEAT_OA,  !- Name
     VAV_bot WITH REHEAT_OA_Controllers,  !- Controller List Name
-    VAV_bot WITH REHEAT_OA_Equipment,  !- Outdoor Air Equipment List Name
-    VAV_bot WITH REHEAT Availability Manager List;  !- Availability Manager List Name
+    VAV_bot WITH REHEAT_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     VAV_mid WITH REHEAT_OA,  !- Name
     VAV_mid WITH REHEAT_OA_Controllers,  !- Controller List Name
-    VAV_mid WITH REHEAT_OA_Equipment,  !- Outdoor Air Equipment List Name
-    VAV_mid WITH REHEAT Availability Manager List;  !- Availability Manager List Name
+    VAV_mid WITH REHEAT_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     VAV_top WITH REHEAT_OA,  !- Name
     VAV_top WITH REHEAT_OA_Controllers,  !- Controller List Name
-    VAV_top WITH REHEAT_OA_Equipment,  !- Outdoor Air Equipment List Name
-    VAV_top WITH REHEAT Availability Manager List;  !- Availability Manager List Name
+    VAV_top WITH REHEAT_OA_Equipment;  !- Outdoor Air Equipment List Name
 
-!- Data Cneter OA System
+!- Data Center OA System
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop DataCenter Basement OA System,  !- Name
     AirLoop DataCenter Basement OA System Controllers,  !- Controller List Name
-    AirLoop DataCenter Basement OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop DataCenter Basement Availability Manager;  !- Availability Manager List Name
+    AirLoop DataCenter Basement OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop DataCenter bot OA System,  !- Name
     AirLoop DataCenter bot OA System Controllers,  !- Controller List Name
-    AirLoop DataCenter bot OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop DataCenter bot Availability Manager;  !- Availability Manager List Name
+    AirLoop DataCenter bot OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop DataCenter mid OA System,  !- Name
     AirLoop DataCenter mid OA System Controllers,  !- Controller List Name
-    AirLoop DataCenter mid OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop DataCenter mid Availability Manager;  !- Availability Manager List Name
+    AirLoop DataCenter mid OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AirLoop DataCenter top OA System,  !- Name
     AirLoop DataCenter top OA System Controllers,  !- Controller List Name
-    AirLoop DataCenter top OA System Equipment,  !- Outdoor Air Equipment List Name
-    AirLoop DataCenter top Availability Manager;  !- Availability Manager List Name
+    AirLoop DataCenter top OA System Equipment;  !- Outdoor Air Equipment List Name
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTSIDE AIR INLET NODE LIST ===========
 

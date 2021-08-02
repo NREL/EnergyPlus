@@ -171,7 +171,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
 
     // HXUnitOn is true and ControlToTemperatureSetPoint is false so expect outlet = temperature based on effectiveness
     HXUnitOn = true;
-    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfigNum = Plate;
+    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfig = HXConfigurationType::Plate;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
     UpdateHeatRecovery(*state, ExchNum);
@@ -181,7 +181,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     Tnode = state->dataHeatRecovery->ExchCond(ExchNum).SupOutTemp;
     EXPECT_DOUBLE_EQ(Toutlet, Tnode);
 
-    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfigNum = Rotary;
+    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfig = HXConfigurationType::Rotary;
     HXUnitOn = true;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
@@ -197,7 +197,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
 
     // HXUnitOn is true and ControlToTemperatureSetPoint is true so expect outlet = set point temperature
     HXUnitOn = true;
-    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfigNum = Plate;
+    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfig = HXConfigurationType::Plate;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
     UpdateHeatRecovery(*state, ExchNum);
@@ -205,7 +205,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     Tnode = state->dataHeatRecovery->ExchCond(ExchNum).SupOutTemp;
     EXPECT_DOUBLE_EQ(Toutlet, Tnode);
 
-    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfigNum = Rotary;
+    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfig = HXConfigurationType::Rotary;
     HXUnitOn = true;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
@@ -252,7 +252,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
 
     // HXUnitOn is true and ControlToTemperatureSetPoint is false so expect outlet = temperature based on effectiveness
     HXUnitOn = true;
-    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfigNum = Plate;
+    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfig = HXConfigurationType::Plate;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
     UpdateHeatRecovery(*state, ExchNum);
@@ -261,7 +261,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
                        (state->dataHeatRecovery->ExchCond(ExchNum).SecInTemp - state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp))),
                      state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).Temp);
 
-    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfigNum = Rotary;
+    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfig = HXConfigurationType::Rotary;
     HXUnitOn = true;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
@@ -276,14 +276,14 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
 
     // HXUnitOn is true and ControlToTemperatureSetPoint is true so expect outlet = set point temperature
     HXUnitOn = true;
-    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfigNum = Plate;
+    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfig = HXConfigurationType::Plate;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
     UpdateHeatRecovery(*state, ExchNum);
     EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).TempSetPoint,
                      state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).Temp);
 
-    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfigNum = Rotary;
+    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfig = HXConfigurationType::Rotary;
     HXUnitOn = true;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
@@ -512,7 +512,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnManinBranch_GetInputTest)
 
     GetReturnAirPathInput(*state);
     GetAirPathData(*state);
-    ASSERT_EQ(SimAirServingZones::HeatXchngr, state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(4).CompType_Num);
+    ASSERT_EQ(SimAirServingZones::CompType::HeatXchngr, state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(4).CompType_Num);
 }
 
 TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
@@ -3088,10 +3088,9 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    DOAS OA Mixing Box;      !- Component 2 Name",
 
         "AirLoopHVAC:OutdoorAirSystem,",
-        "    DOAS OA System,          !- Name",
+        "    DOAS OA System,           !- Name",
         "    DOAS OA System Controllers,  !- Controller List Name",
-        "    DOAS OA System Equipment,!- Outdoor Air Equipment List Name",
-        "    DOAS Availability Managers;  !- Availability Manager List Name",
+        "    DOAS OA System Equipment; !- Outdoor Air Equipment List Name",
 
         "OutdoorAir:Mixer,",
         "    SPACE1-1 OA Mixing Box,  !- Name",

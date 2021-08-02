@@ -67,7 +67,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 3
 
-  Version,9.5;
+  Version,9.6;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -2356,14 +2356,12 @@
   AirLoopHVAC:OutdoorAirSystem,
     FURNACE_PACU_CAV_1:1_OA, !- Name
     FURNACE_PACU_CAV_1:1_OA_Controllers,  !- Controller List Name
-    FURNACE_PACU_CAV_1:1_OA_Equipment,  !- Outdoor Air Equipment List Name
-    FURNACE_PACU_CAV_1:1 Availability Manager List;  !- Availability Manager List Name
+    FURNACE_PACU_CAV_1:1_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     FURNACE_PACU_CAV_2:2_OA, !- Name
     FURNACE_PACU_CAV_2:2_OA_Controllers,  !- Controller List Name
-    FURNACE_PACU_CAV_2:2_OA_Equipment,  !- Outdoor Air Equipment List Name
-    FURNACE_PACU_CAV_2:2 Availability Manager List;  !- Availability Manager List Name
+    FURNACE_PACU_CAV_2:2_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     FURNACE_PACU_CAV_1:1_OANode List;  !- Node or NodeList Name 1

@@ -79,7 +79,6 @@
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SteamCoils.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UnitHeater.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
@@ -128,10 +127,10 @@ namespace UnitHeater {
     using Psychrometrics::PsyRhoAirFnPbTdbW;
     using namespace FluidProperties;
 
-    static std::string const fluidNameSteam("STEAM");
+    static constexpr std::string_view fluidNameSteam("STEAM");
 
     void SimUnitHeater(EnergyPlusData &state,
-                       std::string const &CompName,   // name of the fan coil unit
+                       std::string_view CompName,     // name of the fan coil unit
                        int const ZoneNum,             // number of zone being served
                        bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                        Real64 &PowerMet,              // Sensible power supplied (W)
@@ -160,7 +159,7 @@ namespace UnitHeater {
         if (CompIndex == 0) {
             UnitHeatNum = UtilityRoutines::FindItemInList(CompName, state.dataUnitHeaters->UnitHeat);
             if (UnitHeatNum == 0) {
-                ShowFatalError(state, "SimUnitHeater: Unit not found=" + CompName);
+                ShowFatalError(state, "SimUnitHeater: Unit not found=" + std::string{CompName});
             }
             CompIndex = UnitHeatNum;
         } else {
@@ -240,16 +239,16 @@ namespace UnitHeater {
         using WaterCoils::GetCoilWaterInletNode;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        bool ErrorsFound(false);                                      // Set to true if errors in input, fatal at end of routine
-        int IOStatus;                                                 // Used in GetObjectItem
-        bool IsNotOK;                                                 // TRUE if there was a problem with a list name
-        bool errFlag(false);                                          // interim error flag
-        int NumAlphas;                                                // Number of Alphas for each GetObjectItem call
-        int NumNumbers;                                               // Number of Numbers for each GetObjectItem call
-        int NumFields;                                                // Total number of fields in object
-        int UnitHeatNum;                                              // Item to be "gotten"
-        static std::string const RoutineName("GetUnitHeaterInput: "); // include trailing blank space
-        Real64 FanVolFlow;                                            // Fan volumetric flow rate
+        bool ErrorsFound(false);                                               // Set to true if errors in input, fatal at end of routine
+        int IOStatus;                                                          // Used in GetObjectItem
+        bool IsNotOK;                                                          // TRUE if there was a problem with a list name
+        bool errFlag(false);                                                   // interim error flag
+        int NumAlphas;                                                         // Number of Alphas for each GetObjectItem call
+        int NumNumbers;                                                        // Number of Numbers for each GetObjectItem call
+        int NumFields;                                                         // Total number of fields in object
+        int UnitHeatNum;                                                       // Item to be "gotten"
+        static constexpr std::string_view RoutineName("GetUnitHeaterInput: "); // include trailing blank space
+        Real64 FanVolFlow;                                                     // Fan volumetric flow rate
         std::string CurrentModuleObject;
         Array1D_string Alphas;         // Alpha items for object
         Array1D<Real64> Numbers;       // Numeric items for object
@@ -310,8 +309,8 @@ namespace UnitHeater {
                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
-                                        cAlphaFields(1) + '=' + Alphas(1));
+                                    std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) +
+                                        " for " + cAlphaFields(1) + '=' + Alphas(1));
                     ErrorsFound = true;
                 }
             }
@@ -324,7 +323,7 @@ namespace UnitHeater {
                                                                                        Alphas(1),
                                                                                        DataLoopNode::NodeFluidType::Air,
                                                                                        DataLoopNode::NodeConnectionType::Inlet,
-                                                                                       1,
+                                                                                       NodeInputManager::compFluidStream::Primary,
                                                                                        ObjectIsParent);
 
             state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirOutNode = GetOnlySingleNode(state,
@@ -334,7 +333,7 @@ namespace UnitHeater {
                                                                                         Alphas(1),
                                                                                         DataLoopNode::NodeFluidType::Air,
                                                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                                                        1,
+                                                                                        NodeInputManager::compFluidStream::Primary,
                                                                                         ObjectIsParent);
 
             // Fan information:
@@ -377,7 +376,7 @@ namespace UnitHeater {
                                 ErrorsFound = true;
                             }
                         } else {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + " = \"" + Alphas(1) + "\"");
+                            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " = \"" + Alphas(1) + "\"");
                             ShowContinueError(state, "Fan Type must be Fan:ConstantVolume or Fan:VariableVolume");
                             ErrorsFound = true;
                         }
@@ -654,7 +653,7 @@ namespace UnitHeater {
         lAlphaBlanks.deallocate();
         lNumericBlanks.deallocate();
 
-        if (ErrorsFound) ShowFatalError(state, RoutineName + "Errors found in input");
+        if (ErrorsFound) ShowFatalError(state, std::string{RoutineName} + "Errors found in input");
 
         // Setup Report variables for the Unit Heaters, CurrentModuleObject='ZoneHVAC:UnitHeater'
         for (UnitHeatNum = 1; UnitHeatNum <= state.dataUnitHeaters->NumOfUnitHeats; ++UnitHeatNum) {
@@ -662,45 +661,45 @@ namespace UnitHeater {
                                 "Zone Unit Heater Heating Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
             SetupOutputVariable(state,
                                 "Zone Unit Heater Heating Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
             SetupOutputVariable(state,
                                 "Zone Unit Heater Fan Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).ElecPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
             // Note that the unit heater fan electric is NOT metered because this value is already metered through the fan component
             SetupOutputVariable(state,
                                 "Zone Unit Heater Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).ElecEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
             SetupOutputVariable(state,
                                 "Zone Unit Heater Fan Availability Status",
                                 OutputProcessor::Unit::None,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).AvailStatus,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
             if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType_Num == FanType_SimpleOnOff) {
                 SetupOutputVariable(state,
                                     "Zone Unit Heater Fan Part Load Ratio",
                                     OutputProcessor::Unit::None,
                                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanPartLoadRatio,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
             }
         }
@@ -761,7 +760,7 @@ namespace UnitHeater {
         using WaterCoils::SimulateWaterCoilComponents;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitUnitHeater");
+        static constexpr std::string_view RoutineName("InitUnitHeater");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
@@ -1001,7 +1000,7 @@ namespace UnitHeater {
         using SteamCoils::GetCoilSteamOutletNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeUnitHeater");
+        static constexpr std::string_view RoutineName("SizeUnitHeater");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizHeatNum; // index of plant sizing object for 1st heating loop
@@ -1501,18 +1500,9 @@ namespace UnitHeater {
         using DataZoneEquipment::UnitHeater_Num;
         using General::SolveRoot;
         using PlantUtilities::SetComponentFlowRate;
-        using TempSolveRoot::SolveRoot;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIter(100); // maximum number of iterations
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ControlNode;        // the hot water inlet node

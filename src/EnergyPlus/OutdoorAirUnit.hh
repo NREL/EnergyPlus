@@ -68,24 +68,23 @@ namespace OutdoorAirUnit {
     // component types addressed by this module
     extern std::string const cMO_OutdoorAirUnit;
 
-    extern int const WaterCoil_Cooling;
-    extern int const SteamCoil_AirHeat;
-    //        enum class CompType {
-    //            Unassigned,
-    //            WaterCoil_SimpleCool,
-    //            WaterCoil_Cooling,
-    //            WaterCoil_SimpleHeat,
-    //            SteamCoil_AirHeat,
-    //            WaterCoil_DetailedCool,
-    //            WaterCoil_CoolingHXAsst,
-    //            Coil_ElectricHeat,
-    //            Coil_GasHeat,
-    //            DXSystem,
-    //            HeatXchngr,
-    //            Desiccant,
-    //            DXHeatPumpSystem,
-    //            UnitarySystemModel
-    //        };
+    enum class CompType : int
+    {
+        Unassigned = -1,
+        WaterCoil_SimpleCool = 0,
+        WaterCoil_Cooling = 1,
+        WaterCoil_SimpleHeat = 2,
+        SteamCoil_AirHeat = 3,
+        Coil_ElectricHeat = 4,
+        WaterCoil_DetailedCool = 5,
+        WaterCoil_CoolingHXAsst = 6,
+        Coil_GasHeat = 7,
+        DXSystem = 8,
+        HeatXchngr = 9,
+        Desiccant = 10,
+        DXHeatPumpSystem = 11,
+        UnitarySystemModel = 12
+    };
 
     enum class Control
     {
@@ -126,8 +125,8 @@ namespace OutdoorAirUnit {
         // Equipment List Data
         std::string ComponentName;
         std::string ComponentType;
-        int ComponentType_Num; // Parameterized Component Types this module can address
-        int ComponentIndex;    // Which one in list -- updated by routines called from here
+        CompType ComponentType_Num; // Parameterized Component Types this module can address
+        int ComponentIndex;         // Which one in list -- updated by routines called from here
         HVACSystemData *compPointer = nullptr;
         int CoilAirInletNode;
         int CoilAirOutletNode;
@@ -148,9 +147,9 @@ namespace OutdoorAirUnit {
 
         // Default Constructor
         OAEquipList()
-            : ComponentType_Num(0), ComponentIndex(0), CoilAirInletNode(0), CoilAirOutletNode(0), CoilWaterInletNode(0), CoilWaterOutletNode(0),
-              CoilPlantTypeOfNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), FluidIndex(0), MaxVolWaterFlow(0.0), MaxWaterMassFlow(0.0),
-              MinVolWaterFlow(0.0), MinWaterMassFlow(0.0), FirstPass(true)
+            : ComponentType_Num(CompType::Unassigned), ComponentIndex(0), CoilAirInletNode(0), CoilAirOutletNode(0), CoilWaterInletNode(0),
+              CoilWaterOutletNode(0), CoilPlantTypeOfNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), FluidIndex(0),
+              MaxVolWaterFlow(0.0), MaxWaterMassFlow(0.0), MinVolWaterFlow(0.0), MinWaterMassFlow(0.0), FirstPass(true)
         {
         }
     };
@@ -244,11 +243,11 @@ namespace OutdoorAirUnit {
     };
 
     void SimOutdoorAirUnit(EnergyPlusData &state,
-                           std::string const &CompName, // name of the outdoor air unit
-                           int ZoneNum,                 // number of zone being served
-                           bool FirstHVACIteration,     // TRUE if 1st HVAC simulation of system timestep
-                           Real64 &PowerMet,            // Sensible power supplied (W)
-                           Real64 &LatOutputProvided,   // Latent add/removal supplied by window AC (kg/s), dehumid = negative
+                           std::string_view CompName, // name of the outdoor air unit
+                           int ZoneNum,               // number of zone being served
+                           bool FirstHVACIteration,   // TRUE if 1st HVAC simulation of system timestep
+                           Real64 &PowerMet,          // Sensible power supplied (W)
+                           Real64 &LatOutputProvided, // Latent add/removal supplied by window AC (kg/s), dehumid = negative
                            int &CompIndex);
 
     void GetOutdoorAirUnitInputs(EnergyPlusData &state);
@@ -276,7 +275,7 @@ namespace OutdoorAirUnit {
                                  std::string const &EquipType, // the component type
                                  std::string const &EquipName, // the component Name
                                  int EquipNum,
-                                 int CompTypeNum, // Component Type -- Integerized for this module
+                                 CompType CompTypeNum, // Component Type -- Integerized for this module
                                  bool FirstHVACIteration,
                                  int &CompIndex,
                                  bool Sim // if TRUE, simulate component

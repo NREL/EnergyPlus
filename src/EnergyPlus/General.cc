@@ -89,945 +89,7 @@ namespace EnergyPlus::General {
 using DataHVACGlobals::Bisection;
 
 // MODULE PARAMETER DEFINITIONS
-static std::string const BlankString;
-
-void SolveRoot(EnergyPlusData &state,
-               Real64 const Eps, // required absolute accuracy
-               int const MaxIte, // maximum number of allowed iterations
-               int &Flag,        // integer storing exit status
-               Real64 &XRes,     // value of x that solves f(x,Par) = 0
-               std::function<Real64(Real64 const, Array1D<Real64> const &)> f,
-               Real64 const X_0,          // 1st bound of interval that contains the solution
-               Real64 const X_1,          // 2nd bound of interval that contains the solution
-               Array1D<Real64> const &Par // array with additional parameters used for function evaluation
-)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Michael Wetter
-    //       DATE WRITTEN   March 1999
-    //       MODIFIED       Fred Buhl November 2000, R. Raustad October 2006 - made subroutine RECURSIVE
-    //                      L. Gu, May 2017 - allow both Bisection and RegulaFalsi
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Find the value of x between x0 and x1 such that f(x,Par)
-    // is equal to zero.
-
-    // METHODOLOGY EMPLOYED:
-    // Uses the Regula Falsi (false position) method (similar to secant method)
-
-    // REFERENCES:
-    // See Press et al., Numerical Recipes in Fortran, Cambridge University Press,
-    // 2nd edition, 1992. Page 347 ff.
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // = -2: f(x0) and f(x1) have the same sign
-    // = -1: no convergence
-    // >  0: number of iterations performed
-    // optional
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const SMALL(1.e-10);
-
-    // INTERFACE BLOCK SPECIFICATIONS
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 X0;       // present 1st bound
-    Real64 X1;       // present 2nd bound
-    Real64 XTemp;    // new estimate
-    Real64 Y0;       // f at X0
-    Real64 Y1;       // f at X1
-    Real64 YTemp;    // f at XTemp
-    Real64 DY;       // DY = Y0 - Y1
-    bool Conv;       // flag, true if convergence is achieved
-    bool StopMaxIte; // stop due to exceeding of maximum # of iterations
-    bool Cont;       // flag, if true, continue searching
-    int NIte;        // number of interations
-    int AltIte;      // an accounter used for Alternation choice
-
-    X0 = X_0;
-    X1 = X_1;
-    XTemp = X0;
-    Conv = false;
-    StopMaxIte = false;
-    Cont = true;
-    NIte = 0;
-    AltIte = 0;
-
-    Y0 = f(X0, Par);
-    Y1 = f(X1, Par);
-    // check initial values
-    if (Y0 * Y1 > 0) {
-        Flag = -2;
-        XRes = X0;
-        return;
-    }
-
-    while (Cont) {
-
-        DY = Y0 - Y1;
-        if (std::abs(DY) < SMALL) DY = SMALL;
-        if (std::abs(X1 - X0) < SMALL) {
-            break;
-        }
-        // new estimation
-        switch (state.dataHVACGlobal->HVACSystemRootFinding.HVACSystemRootSolver) {
-        case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi: {
-            XTemp = (Y0 * X1 - Y1 * X0) / DY;
-            break;
-        }
-        case DataHVACGlobals::HVACSystemRootSolverAlgorithm::Bisection: {
-            XTemp = (X1 + X0) / 2.0;
-            break;
-        }
-        case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection: {
-            if (NIte > state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
-                XTemp = (X1 + X0) / 2.0;
-            } else {
-                XTemp = (Y0 * X1 - Y1 * X0) / DY;
-            }
-            break;
-        }
-        case DataHVACGlobals::HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi: {
-            if (NIte <= state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
-                XTemp = (X1 + X0) / 2.0;
-            } else {
-                XTemp = (Y0 * X1 - Y1 * X0) / DY;
-            }
-            break;
-        }
-        case DataHVACGlobals::HVACSystemRootSolverAlgorithm::Alternation: {
-            if (AltIte > state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
-                XTemp = (X1 + X0) / 2.0;
-                if (AltIte >= 2 * state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) AltIte = 0;
-            } else {
-                XTemp = (Y0 * X1 - Y1 * X0) / DY;
-            }
-            break;
-        }
-        default: {
-            XTemp = (Y0 * X1 - Y1 * X0) / DY;
-        }
-        }
-
-        YTemp = f(XTemp, Par);
-
-        ++NIte;
-        ++AltIte;
-
-        // check convergence
-        if (std::abs(YTemp) < Eps) Conv = true;
-
-        if (NIte > MaxIte) StopMaxIte = true;
-
-        if ((!Conv) && (!StopMaxIte)) {
-            Cont = true;
-        } else {
-            Cont = false;
-        }
-
-        if (Cont) {
-
-            // reassign values (only if further iteration required)
-            if (Y0 < 0.0) {
-                if (YTemp < 0.0) {
-                    X0 = XTemp;
-                    Y0 = YTemp;
-                } else {
-                    X1 = XTemp;
-                    Y1 = YTemp;
-                }
-            } else {
-                if (YTemp < 0.0) {
-                    X1 = XTemp;
-                    Y1 = YTemp;
-                } else {
-                    X0 = XTemp;
-                    Y0 = YTemp;
-                }
-            } // ( Y0 < 0 )
-
-        } // (Cont)
-
-    } // Cont
-
-    if (Conv) {
-        Flag = NIte;
-    } else {
-        Flag = -1;
-    }
-    XRes = XTemp;
-}
-
-void SolveRoot(EnergyPlusData &state,
-               Real64 const Eps, // required absolute accuracy
-               int const MaxIte, // maximum number of allowed iterations
-               int &Flag,        // integer storing exit status
-               Real64 &XRes,     // value of x that solves f(x,Par) = 0
-               std::function<Real64(Real64 const, std::vector<Real64> const &)> f,
-               Real64 const X_0,              // 1st bound of interval that contains the solution
-               Real64 const X_1,              // 2nd bound of interval that contains the solution
-               std::vector<Real64> const &Par // array with additional parameters used for function evaluation
-)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Michael Wetter
-    //       DATE WRITTEN   March 1999
-    //       MODIFIED       Fred Buhl November 2000, R. Raustad October 2006 - made subroutine RECURSIVE
-    //                      L. Gu, May 2017 - allow both Bisection and RegulaFalsi
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Find the value of x between x0 and x1 such that f(x,Par)
-    // is equal to zero.
-
-    // METHODOLOGY EMPLOYED:
-    // Uses the Regula Falsi (false position) method (similar to secant method)
-
-    // REFERENCES:
-    // See Press et al., Numerical Recipes in Fortran, Cambridge University Press,
-    // 2nd edition, 1992. Page 347 ff.
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // = -2: f(x0) and f(x1) have the same sign
-    // = -1: no convergence
-    // >  0: number of iterations performed
-    // optional
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const SMALL(1.e-10);
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 X0;       // present 1st bound
-    Real64 X1;       // present 2nd bound
-    Real64 XTemp;    // new estimate
-    Real64 Y0;       // f at X0
-    Real64 Y1;       // f at X1
-    Real64 YTemp;    // f at XTemp
-    Real64 DY;       // DY = Y0 - Y1
-    bool Conv;       // flag, true if convergence is achieved
-    bool StopMaxIte; // stop due to exceeding of maximum # of iterations
-    bool Cont;       // flag, if true, continue searching
-    int NIte;        // number of interations
-    int AltIte;      // an accounter used for Alternation choice
-
-    X0 = X_0;
-    X1 = X_1;
-    XTemp = X0;
-    Conv = false;
-    StopMaxIte = false;
-    Cont = true;
-    NIte = 0;
-    AltIte = 0;
-
-    Y0 = f(X0, Par);
-    Y1 = f(X1, Par);
-    // check initial values
-    if (Y0 * Y1 > 0) {
-        Flag = -2;
-        XRes = X0;
-        return;
-    }
-
-    while (Cont) {
-
-        DY = Y0 - Y1;
-        if (std::abs(DY) < SMALL) DY = SMALL;
-        if (std::abs(X1 - X0) < SMALL) {
-            break;
-        }
-        // new estimation
-        switch (state.dataHVACGlobal->HVACSystemRootFinding.HVACSystemRootSolver) {
-        case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi: {
-            XTemp = (Y0 * X1 - Y1 * X0) / DY;
-            break;
-        }
-        case DataHVACGlobals::HVACSystemRootSolverAlgorithm::Bisection: {
-            XTemp = (X1 + X0) / 2.0;
-            break;
-        }
-        case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection: {
-            if (NIte > state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
-                XTemp = (X1 + X0) / 2.0;
-            } else {
-                XTemp = (Y0 * X1 - Y1 * X0) / DY;
-            }
-            break;
-        }
-        case DataHVACGlobals::HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi: {
-            if (NIte <= state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
-                XTemp = (X1 + X0) / 2.0;
-            } else {
-                XTemp = (Y0 * X1 - Y1 * X0) / DY;
-            }
-            break;
-        }
-        case DataHVACGlobals::HVACSystemRootSolverAlgorithm::Alternation: {
-            if (AltIte > state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
-                XTemp = (X1 + X0) / 2.0;
-                if (AltIte >= 2 * state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) AltIte = 0;
-            } else {
-                XTemp = (Y0 * X1 - Y1 * X0) / DY;
-            }
-            break;
-        }
-        default: {
-            XTemp = (Y0 * X1 - Y1 * X0) / DY;
-        }
-        }
-
-        YTemp = f(XTemp, Par);
-
-        ++NIte;
-        ++AltIte;
-
-        // check convergence
-        if (std::abs(YTemp) < Eps) Conv = true;
-
-        if (NIte > MaxIte) StopMaxIte = true;
-
-        if ((!Conv) && (!StopMaxIte)) {
-            Cont = true;
-        } else {
-            Cont = false;
-        }
-
-        if (Cont) {
-
-            // reassign values (only if further iteration required)
-            if (Y0 < 0.0) {
-                if (YTemp < 0.0) {
-                    X0 = XTemp;
-                    Y0 = YTemp;
-                } else {
-                    X1 = XTemp;
-                    Y1 = YTemp;
-                }
-            } else {
-                if (YTemp < 0.0) {
-                    X1 = XTemp;
-                    Y1 = YTemp;
-                } else {
-                    X0 = XTemp;
-                    Y0 = YTemp;
-                }
-            } // ( Y0 < 0 )
-
-        } // (Cont)
-
-    } // Cont
-
-    if (Conv) {
-        Flag = NIte;
-    } else {
-        Flag = -1;
-    }
-    XRes = XTemp;
-}
-
-void SolveRoot(EnergyPlusData &state,
-               Real64 const Eps, // required absolute accuracy
-               int const MaxIte, // maximum number of allowed iterations
-               int &Flag,        // integer storing exit status
-               Real64 &XRes,     // value of x that solves f(x,Par) = 0
-               std::function<Real64(EnergyPlusData &state, Real64 const, std::vector<Real64> const &)> f,
-               Real64 const X_0,              // 1st bound of interval that contains the solution
-               Real64 const X_1,              // 2nd bound of interval that contains the solution
-               std::vector<Real64> const &Par // array with additional parameters used for function evaluation
-)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Michael Wetter
-    //       DATE WRITTEN   March 1999
-    //       MODIFIED       Fred Buhl November 2000, R. Raustad October 2006 - made subroutine RECURSIVE
-    //                      L. Gu, May 2017 - allow both Bisection and RegulaFalsi
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Find the value of x between x0 and x1 such that f(x,Par)
-    // is equal to zero.
-
-    // METHODOLOGY EMPLOYED:
-    // Uses the Regula Falsi (false position) method (similar to secant method)
-
-    // REFERENCES:
-    // See Press et al., Numerical Recipes in Fortran, Cambridge University Press,
-    // 2nd edition, 1992. Page 347 ff.
-
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // = -2: f(x0) and f(x1) have the same sign
-    // = -1: no convergence
-    // >  0: number of iterations performed
-    Real64 const SMALL(1.e-10);
-
-    Real64 X0;       // present 1st bound
-    Real64 X1;       // present 2nd bound
-    Real64 XTemp;    // new estimate
-    Real64 Y0;       // f at X0
-    Real64 Y1;       // f at X1
-    Real64 YTemp;    // f at XTemp
-    Real64 DY;       // DY = Y0 - Y1
-    bool Conv;       // flag, true if convergence is achieved
-    bool StopMaxIte; // stop due to exceeding of maximum # of iterations
-    bool Cont;       // flag, if true, continue searching
-    int NIte;        // number of interations
-    int AltIte;      // an accounter used for Alternation choice
-
-    X0 = X_0;
-    X1 = X_1;
-    XTemp = X0;
-    Conv = false;
-    StopMaxIte = false;
-    Cont = true;
-    NIte = 0;
-    AltIte = 0;
-
-    Y0 = f(state, X0, Par);
-    Y1 = f(state, X1, Par);
-    // check initial values
-    if (Y0 * Y1 > 0) {
-        Flag = -2;
-        XRes = X0;
-        return;
-    }
-
-    while (Cont) {
-
-        DY = Y0 - Y1;
-        if (std::abs(DY) < SMALL) DY = SMALL;
-        if (std::abs(X1 - X0) < SMALL) {
-            break;
-        }
-        // new estimation
-        switch (state.dataHVACGlobal->HVACSystemRootFinding.HVACSystemRootSolver) {
-        case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi: {
-            XTemp = (Y0 * X1 - Y1 * X0) / DY;
-            break;
-        }
-        case DataHVACGlobals::HVACSystemRootSolverAlgorithm::Bisection: {
-            XTemp = (X1 + X0) / 2.0;
-            break;
-        }
-        case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection: {
-            if (NIte > state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
-                XTemp = (X1 + X0) / 2.0;
-            } else {
-                XTemp = (Y0 * X1 - Y1 * X0) / DY;
-            }
-            break;
-        }
-        case DataHVACGlobals::HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi: {
-            if (NIte <= state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
-                XTemp = (X1 + X0) / 2.0;
-            } else {
-                XTemp = (Y0 * X1 - Y1 * X0) / DY;
-            }
-            break;
-        }
-        case DataHVACGlobals::HVACSystemRootSolverAlgorithm::Alternation: {
-            if (AltIte > state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
-                XTemp = (X1 + X0) / 2.0;
-                if (AltIte >= 2 * state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) AltIte = 0;
-            } else {
-                XTemp = (Y0 * X1 - Y1 * X0) / DY;
-            }
-            break;
-        }
-        default: {
-            XTemp = (Y0 * X1 - Y1 * X0) / DY;
-        }
-        }
-
-        YTemp = f(state, XTemp, Par);
-
-        ++NIte;
-        ++AltIte;
-
-        // check convergence
-        if (std::abs(YTemp) < Eps) Conv = true;
-
-        if (NIte > MaxIte) StopMaxIte = true;
-
-        if ((!Conv) && (!StopMaxIte)) {
-            Cont = true;
-        } else {
-            Cont = false;
-        }
-
-        if (Cont) {
-
-            // reassign values (only if further iteration required)
-            if (Y0 < 0.0) {
-                if (YTemp < 0.0) {
-                    X0 = XTemp;
-                    Y0 = YTemp;
-                } else {
-                    X1 = XTemp;
-                    Y1 = YTemp;
-                }
-            } else {
-                if (YTemp < 0.0) {
-                    X1 = XTemp;
-                    Y1 = YTemp;
-                } else {
-                    X0 = XTemp;
-                    Y0 = YTemp;
-                }
-            } // ( Y0 < 0 )
-
-        } // (Cont)
-
-    } // Cont
-
-    if (Conv) {
-        Flag = NIte;
-    } else {
-        Flag = -1;
-    }
-    XRes = XTemp;
-}
-
-void SolveRoot(Real64 const Eps, // required absolute accuracy
-               int const MaxIte, // maximum number of allowed iterations
-               int &Flag,        // integer storing exit status
-               Real64 &XRes,     // value of x that solves f(x,Par) = 0
-               std::function<Real64(Real64 const, Array1D<Real64> const &)> f,
-               Real64 const X_0,           // 1st bound of interval that contains the solution
-               Real64 const X_1,           // 2nd bound of interval that contains the solution
-               Array1D<Real64> const &Par, // array with additional parameters used for function evaluation
-               int const AlgorithmTypeNum, // ALgorithm selection
-               Real64 &XX_0,               // Low bound obtained with maximum number of allowed iterations
-               Real64 &XX_1                // Hign bound obtained with maximum number of allowed iterations
-)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Michael Wetter
-    //       DATE WRITTEN   March 1999
-    //       MODIFIED       Fred Buhl November 2000, R. Raustad October 2006 - made subroutine RECURSIVE
-    //                      L. Gu, May 2017 - selcte an algorithm and output both bounds
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Find the value of x between x0 and x1 such that f(x,Par)
-    // is equal to zero.
-
-    // METHODOLOGY EMPLOYED:
-    // Uses the Regula Falsi (false position) method (similar to secant method)
-
-    // REFERENCES:
-    // See Press et al., Numerical Recipes in Fortran, Cambridge University Press,
-    // 2nd edition, 1992. Page 347 ff.
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // = -2: f(x0) and f(x1) have the same sign
-    // = -1: no convergence
-    // >  0: number of iterations performed
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const SMALL(1.e-10);
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 X0;       // present 1st bound
-    Real64 X1;       // present 2nd bound
-    Real64 XTemp;    // new estimate
-    Real64 Y0;       // f at X0
-    Real64 Y1;       // f at X1
-    Real64 YTemp;    // f at XTemp
-    Real64 DY;       // DY = Y0 - Y1
-    bool Conv;       // flag, true if convergence is achieved
-    bool StopMaxIte; // stop due to exceeding of maximum # of iterations
-    bool Cont;       // flag, if true, continue searching
-    int NIte;        // number of interations
-
-    X0 = X_0;
-    X1 = X_1;
-    XTemp = X0;
-    Conv = false;
-    StopMaxIte = false;
-    Cont = true;
-    NIte = 0;
-
-    Y0 = f(X0, Par);
-    Y1 = f(X1, Par);
-    // check initial values
-    if (Y0 * Y1 > 0) {
-        Flag = -2;
-        XRes = X0;
-        return;
-    }
-
-    while (Cont) {
-
-        DY = Y0 - Y1;
-        if (std::abs(DY) < SMALL) DY = SMALL;
-        if (std::abs(X1 - X0) < SMALL) {
-            break;
-        }
-        // new estimation
-        if (AlgorithmTypeNum == Bisection) {
-            // Bisection
-            XTemp = (X1 + X0) / 2.0;
-        } else {
-            // Regula Falsi
-            XTemp = (Y0 * X1 - Y1 * X0) / DY;
-        }
-        YTemp = f(XTemp, Par);
-
-        ++NIte;
-
-        // check convergence
-        if (std::abs(YTemp) < Eps) Conv = true;
-
-        if (NIte > MaxIte) StopMaxIte = true;
-
-        if ((!Conv) && (!StopMaxIte)) {
-            Cont = true;
-        } else {
-            Cont = false;
-        }
-
-        if (Cont) {
-
-            // reassign values (only if further iteration required)
-            if (Y0 < 0.0) {
-                if (YTemp < 0.0) {
-                    X0 = XTemp;
-                    Y0 = YTemp;
-                } else {
-                    X1 = XTemp;
-                    Y1 = YTemp;
-                }
-            } else {
-                if (YTemp < 0.0) {
-                    X1 = XTemp;
-                    Y1 = YTemp;
-                } else {
-                    X0 = XTemp;
-                    Y0 = YTemp;
-                }
-            } // ( Y0 < 0 )
-
-        } // (Cont)
-
-    } // Cont
-
-    if (Conv) {
-        Flag = NIte;
-    } else {
-        Flag = -1;
-    }
-    XRes = XTemp;
-    XX_0 = X0;
-    XX_1 = X1;
-}
-
-void SolveRoot(EnergyPlusData &state,
-               Real64 const Eps, // required absolute accuracy
-               int const MaxIte, // maximum number of allowed iterations
-               int &Flag,        // integer storing exit status
-               Real64 &XRes,     // value of x that solves f(x) = 0
-               std::function<Real64(Real64 const)> f,
-               Real64 const X_0, // 1st bound of interval that contains the solution
-               Real64 const X_1  // 2nd bound of interval that contains the solution
-)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Michael Wetter
-    //       DATE WRITTEN   March 1999
-    //       MODIFIED       Fred Buhl November 2000, R. Raustad October 2006 - made subroutine RECURSIVE
-    //                      L. Gu, May 2017 - allow both Bisection and RegulaFalsi
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Find the value of x between x0 and x1 such that f(x)
-    // is equal to zero.
-
-    // METHODOLOGY EMPLOYED:
-    // Uses the Regula Falsi (false position) method (similar to secant method)
-
-    // REFERENCES:
-    // See Press et al., Numerical Recipes in Fortran, Cambridge University Press,
-    // 2nd edition, 1992. Page 347 ff.
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // = -2: f(x0) and f(x1) have the same sign
-    // = -1: no convergence
-    // >  0: number of iterations performed
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const SMALL(1.e-10);
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 X0;       // present 1st bound
-    Real64 X1;       // present 2nd bound
-    Real64 XTemp;    // new estimate
-    Real64 Y0;       // f at X0
-    Real64 Y1;       // f at X1
-    Real64 YTemp;    // f at XTemp
-    Real64 DY;       // DY = Y0 - Y1
-    bool Conv;       // flag, true if convergence is achieved
-    bool StopMaxIte; // stop due to exceeding of maximum # of iterations
-    bool Cont;       // flag, if true, continue searching
-    int NIte;        // number of interations
-    int AltIte;      // used for Alternation choice
-
-    X0 = X_0;
-    X1 = X_1;
-    XTemp = X0;
-    Conv = false;
-    StopMaxIte = false;
-    Cont = true;
-    NIte = 0;
-    AltIte = 0;
-
-    Y0 = f(X0);
-    Y1 = f(X1);
-    // check initial values
-    if (Y0 * Y1 > 0) {
-        Flag = -2;
-        XRes = X0;
-        return;
-    }
-
-    while (Cont) {
-
-        DY = Y0 - Y1;
-        if (std::abs(DY) < SMALL) DY = SMALL;
-        if (std::abs(X1 - X0) < SMALL) {
-            break;
-        }
-        // new estimation
-        switch (state.dataHVACGlobal->HVACSystemRootFinding.HVACSystemRootSolver) {
-        case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi: {
-            XTemp = (Y0 * X1 - Y1 * X0) / DY;
-            break;
-        }
-        case DataHVACGlobals::HVACSystemRootSolverAlgorithm::Bisection: {
-            XTemp = (X1 + X0) / 2.0;
-            break;
-        }
-        case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection: {
-            if (NIte > state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
-                XTemp = (X1 + X0) / 2.0;
-            } else {
-                XTemp = (Y0 * X1 - Y1 * X0) / DY;
-            }
-            break;
-        }
-        case DataHVACGlobals::HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi: {
-            if (NIte <= state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
-                XTemp = (X1 + X0) / 2.0;
-            } else {
-                XTemp = (Y0 * X1 - Y1 * X0) / DY;
-            }
-            break;
-        }
-        case DataHVACGlobals::HVACSystemRootSolverAlgorithm::Alternation: {
-            if (AltIte > state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
-                XTemp = (X1 + X0) / 2.0;
-                if (AltIte >= 2 * state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) AltIte = 0;
-            } else {
-                XTemp = (Y0 * X1 - Y1 * X0) / DY;
-            }
-            break;
-        }
-        default: {
-            XTemp = (Y0 * X1 - Y1 * X0) / DY;
-        }
-        }
-
-        YTemp = f(XTemp);
-
-        ++NIte;
-        ++AltIte;
-
-        // check convergence
-        if (std::abs(YTemp) < Eps) Conv = true;
-
-        if (NIte > MaxIte) StopMaxIte = true;
-
-        if ((!Conv) && (!StopMaxIte)) {
-            Cont = true;
-        } else {
-            Cont = false;
-        }
-
-        if (Cont) {
-
-            // reassign values (only if further iteration required)
-            if (Y0 < 0.0) {
-                if (YTemp < 0.0) {
-                    X0 = XTemp;
-                    Y0 = YTemp;
-                } else {
-                    X1 = XTemp;
-                    Y1 = YTemp;
-                }
-            } else {
-                if (YTemp < 0.0) {
-                    X1 = XTemp;
-                    Y1 = YTemp;
-                } else {
-                    X0 = XTemp;
-                    Y0 = YTemp;
-                }
-            } // ( Y0 < 0 )
-
-        } // (Cont)
-
-    } // Cont
-
-    if (Conv) {
-        Flag = NIte;
-    } else {
-        Flag = -1;
-    }
-    XRes = XTemp;
-}
-
-void SolveRoot(Real64 const Eps, // required absolute accuracy
-               int const MaxIte, // maximum number of allowed iterations
-               int &Flag,        // integer storing exit status
-               Real64 &XRes,     // value of x that solves f(x) = 0
-               std::function<Real64(Real64 const)> f,
-               Real64 const X_0,           // 1st bound of interval that contains the solution
-               Real64 const X_1,           // 2nd bound of interval that contains the solution
-               int const AlgorithmTypeNum, // ALgorithm selection
-               Real64 &XX_0,               // Low bound obtained with maximum number of allowed iterations
-               Real64 &XX_1                // Hign bound obtained with maximum number of allowed iterations
-)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Michael Wetter
-    //       DATE WRITTEN   March 1999
-    //       MODIFIED       Fred Buhl November 2000, R. Raustad October 2006 - made subroutine RECURSIVE
-    //                      L. Gu, May 2017 - selcte an algorithm and output both bounds
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Find the value of x between x0 and x1 such that f(x)
-    // is equal to zero.
-
-    // METHODOLOGY EMPLOYED:
-    // Uses the Regula Falsi (false position) method (similar to secant method)
-
-    // REFERENCES:
-    // See Press et al., Numerical Recipes in Fortran, Cambridge University Press,
-    // 2nd edition, 1992. Page 347 ff.
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // = -2: f(x0) and f(x1) have the same sign
-    // = -1: no convergence
-    // >  0: number of iterations performed
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const SMALL(1.e-10);
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 X0;       // present 1st bound
-    Real64 X1;       // present 2nd bound
-    Real64 XTemp;    // new estimate
-    Real64 Y0;       // f at X0
-    Real64 Y1;       // f at X1
-    Real64 YTemp;    // f at XTemp
-    Real64 DY;       // DY = Y0 - Y1
-    bool Conv;       // flag, true if convergence is achieved
-    bool StopMaxIte; // stop due to exceeding of maximum # of iterations
-    bool Cont;       // flag, if true, continue searching
-    int NIte;        // number of interations
-
-    X0 = X_0;
-    X1 = X_1;
-    XTemp = X0;
-    Conv = false;
-    StopMaxIte = false;
-    Cont = true;
-    NIte = 0;
-
-    Y0 = f(X0);
-    Y1 = f(X1);
-    // check initial values
-    if (Y0 * Y1 > 0) {
-        Flag = -2;
-        XRes = X0;
-        return;
-    }
-
-    while (Cont) {
-
-        DY = Y0 - Y1;
-        if (std::abs(DY) < SMALL) DY = SMALL;
-        if (std::abs(X1 - X0) < SMALL) {
-            break;
-        }
-        // new estimation
-        if (AlgorithmTypeNum == Bisection) {
-            // Bisection
-            XTemp = (X1 + X0) / 2.0;
-        } else {
-            // Regula Falsi
-            XTemp = (Y0 * X1 - Y1 * X0) / DY;
-        }
-        YTemp = f(XTemp);
-
-        ++NIte;
-
-        // check convergence
-        if (std::abs(YTemp) < Eps) Conv = true;
-
-        if (NIte > MaxIte) StopMaxIte = true;
-
-        if ((!Conv) && (!StopMaxIte)) {
-            Cont = true;
-        } else {
-            Cont = false;
-        }
-
-        if (Cont) {
-
-            // reassign values (only if further iteration required)
-            if (Y0 < 0.0) {
-                if (YTemp < 0.0) {
-                    X0 = XTemp;
-                    Y0 = YTemp;
-                } else {
-                    X1 = XTemp;
-                    Y1 = YTemp;
-                }
-            } else {
-                if (YTemp < 0.0) {
-                    X1 = XTemp;
-                    Y1 = YTemp;
-                } else {
-                    X0 = XTemp;
-                    Y0 = YTemp;
-                }
-            } // ( Y0 < 0 )
-
-        } // (Cont)
-
-    } // Cont
-
-    if (Conv) {
-        Flag = NIte;
-    } else {
-        Flag = -1;
-    }
-    XRes = XTemp;
-    XX_0 = X0;
-    XX_1 = X1;
-}
+static constexpr std::string_view BlankString;
 
 Real64 InterpProfAng(Real64 const ProfAng,           // Profile angle (rad)
                      Array1S<Real64> const PropArray // Array of blind properties
@@ -1265,8 +327,8 @@ std::string &strip_trailing_zeros(std::string &InputString)
     // PURPOSE OF THIS FUNCTION:
     // Remove trailing fractional zeros from floating point representation strings in place.
 
-    static std::string const ED("ED");
-    static std::string const zero_string("0.");
+    static constexpr std::string_view ED("ED");
+    static constexpr std::string_view zero_string("0.");
 
     assert(!has_any_of(InputString, "ed"));       // Pre Not using lowercase exponent letter
     assert(InputString == stripped(InputString)); // Pre Already stripped surrounding spaces
@@ -1434,7 +496,6 @@ void DetermineDateTokens(EnergyPlusData &state,
                                             {"ST ", "ND ", "RD ", "TH ", "OF ", "IN "}); // Need trailing spaces: Want thse only at end of words
     static Array1D_string const Months(12, {"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"});
     static Array1D_string const Weekdays(7, {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"});
-    static std::string const Numbers("0123456789");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     std::string CurrentString;
@@ -2261,14 +1322,13 @@ void ParseTime(Real64 const Time, // Time value in seconds
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int const MinToSec(60);
     int const HourToSec(MinToSec * 60);
-    Real64 Remainder(0.0);
 
     // Get number of hours
     // This might undershoot the actual number of hours. See DO WHILE loop.
     Hours = int(Time) / HourToSec;
 
     // Compute remainder in seconds
-    Remainder = (Time - Hours * HourToSec);
+    Real64 Remainder = (Time - Hours * HourToSec);
 
     // Compute minutes
     Minutes = int(Remainder) / MinToSec;
@@ -2327,6 +1387,30 @@ void ScanForReports(EnergyPlusData &state,
         cCurrentModuleObject = "Output:Surfaces:List";
 
         NumReports = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+
+        enum
+        {
+            EMPTY,
+            LINES,
+            VERTICES,
+            DETAILS,
+            DETAILSWITHVERTICES,
+            COSTINFO,
+            VIEWFACTORINFO,
+            DECAYCURVESFROMCOMPONENTLOADSSUMMARY
+        };
+        std::map<std::string, int> localMap = {{"", EMPTY},
+                                               {"LINES", LINES},
+                                               {"VERTICES", VERTICES},
+                                               {"DETAILS", DETAILS},
+                                               {"DETAILED", DETAILS},
+                                               {"DETAIL", DETAILS},
+                                               {"DETAILSWITHVERTICES", DETAILSWITHVERTICES},
+                                               {"DETAILVERTICES", DETAILSWITHVERTICES},
+                                               {"COSTINFO", COSTINFO},
+                                               {"VIEWFACTORINFO", VIEWFACTORINFO},
+                                               {"DECAYCURVESFROMCOMPONENTLOADSSUMMARY", DECAYCURVESFROMCOMPONENTLOADSSUMMARY}};
+
         for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
@@ -2341,46 +1425,45 @@ void ScanForReports(EnergyPlusData &state,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
-            {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(1));
-
-                if (SELECT_CASE_var == "LINES") {
+            try {
+                int value = localMap[state.dataIPShortCut->cAlphaArgs(1)];
+                switch (value) {
+                case LINES:
                     state.dataGeneral->LineRpt = true;
                     LineRptOption1 = state.dataIPShortCut->cAlphaArgs(2);
-
-                } else if (SELECT_CASE_var == "VERTICES") {
+                    break;
+                case VERTICES:
                     state.dataGeneral->SurfVert = true;
-
-                } else if ((SELECT_CASE_var == "DETAILS") || (SELECT_CASE_var == "DETAILED") || (SELECT_CASE_var == "DETAIL")) {
+                    break;
+                case DETAILS:
                     state.dataGeneral->SurfDet = true;
-
-                } else if ((SELECT_CASE_var == "DETAILSWITHVERTICES") || (SELECT_CASE_var == "DETAILVERTICES")) {
+                    break;
+                case DETAILSWITHVERTICES:
                     state.dataGeneral->SurfDetWVert = true;
-
-                } else if (SELECT_CASE_var == "COSTINFO") {
+                    break;
+                case COSTINFO:
                     //   Custom case for reporting surface info for cost estimates (for first costs in opitimzing)
                     state.dataGeneral->CostInfo = true;
-
-                } else if (SELECT_CASE_var == "VIEWFACTORINFO") { // actual reporting is in HeatBalanceIntRadExchange
+                    break;
+                case VIEWFACTORINFO: // actual reporting is in HeatBalanceIntRadExchange
                     state.dataGeneral->ViewFactorInfo = true;
                     ViewRptOption1 = state.dataIPShortCut->cAlphaArgs(2);
-
-                } else if (SELECT_CASE_var == "DECAYCURVESFROMCOMPONENTLOADSSUMMARY") { // Should the Radiant to Convective Decay Curves from the
-                                                                                        // load component report appear in the EIO file
+                    break;
+                case DECAYCURVESFROMCOMPONENTLOADSSUMMARY: // Should the Radiant to Convective Decay Curves from the
+                                                           // load component report appear in the EIO file
                     state.dataGlobal->ShowDecayCurvesInEIO = true;
-
-                } else if (SELECT_CASE_var == "") {
+                    break;
+                default: // including empty
                     ShowWarningError(state, cCurrentModuleObject + ": No " + state.dataIPShortCut->cAlphaFieldNames(1) + " supplied.");
                     ShowContinueError(state,
                                       R"( Legal values are: "Lines", "Vertices", "Details", "DetailsWithVertices", "CostInfo", "ViewFactorIinfo".)");
-
-                } else {
-                    ShowWarningError(state,
-                                     cCurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" +
-                                         state.dataIPShortCut->cAlphaArgs(1) + "\" supplied.");
-                    ShowContinueError(state,
-                                      R"( Legal values are: "Lines", "Vertices", "Details", "DetailsWithVertices", "CostInfo", "ViewFactorIinfo".)");
                 }
+            } catch (int e) {
+                ShowWarningError(state,
+                                 cCurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" +
+                                     state.dataIPShortCut->cAlphaArgs(1) + "\" supplied.");
+                ShowContinueError(state,
+                                  R"( Legal values are: "Lines", "Vertices", "Details", "DetailsWithVertices", "CostInfo", "ViewFactorIinfo".)");
             }
         }
 
@@ -2600,8 +1683,8 @@ void ScanForReports(EnergyPlusData &state,
         auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(reportName));
         if (SELECT_CASE_var == "CONSTRUCTIONS") {
             if (present(ReportKey)) {
-                if (UtilityRoutines::SameString(ReportKey, "Constructions")) DoReport = state.dataGeneral->Constructions;
-                if (UtilityRoutines::SameString(ReportKey, "Materials")) DoReport = state.dataGeneral->Materials;
+                if (UtilityRoutines::SameString(ReportKey(), "Constructions")) DoReport = state.dataGeneral->Constructions;
+                if (UtilityRoutines::SameString(ReportKey(), "Materials")) DoReport = state.dataGeneral->Materials;
             }
         } else if (SELECT_CASE_var == "VIEWFACTORINFO") {
             DoReport = state.dataGeneral->ViewFactorInfo;
@@ -2615,7 +1698,7 @@ void ScanForReports(EnergyPlusData &state,
             //      IF (PRESENT(Option1)) Option1=SchRptOption
         } else if (SELECT_CASE_var == "SURFACES") {
             {
-                auto const SELECT_CASE_var1(UtilityRoutines::MakeUPPERCase(ReportKey)); // Autodesk:OPTIONAL ReportKey used without PRESENT check
+                auto const SELECT_CASE_var1(UtilityRoutines::MakeUPPERCase(ReportKey())); // Autodesk:OPTIONAL ReportKey used without PRESENT check
                 if (SELECT_CASE_var1 == "COSTINFO") {
                     DoReport = state.dataGeneral->CostInfo;
                 } else if (SELECT_CASE_var1 == "DXF") {
@@ -2650,7 +1733,7 @@ void ScanForReports(EnergyPlusData &state,
 }
 
 void CheckCreatedZoneItemName(EnergyPlusData &state,
-                              std::string const &calledFrom,                  // routine called from
+                              std::string_view const calledFrom,              // routine called from
                               std::string const &CurrentObject,               // object being parsed
                               std::string const &ZoneName,                    // Zone Name associated
                               std::string::size_type const MaxZoneNameLength, // maximum length of zonelist zone names
@@ -2679,7 +1762,7 @@ void CheckCreatedZoneItemName(EnergyPlusData &state,
     ResultName = ZoneName + ' ' + ItemName;
     bool TooLong = false;
     if (ItemLength > DataGlobalConstants::MaxNameLength) {
-        ShowWarningError(state, calledFrom + CurrentObject + " Combination of ZoneList and Object Name generate a name too long.");
+        ShowWarningError(state, fmt::format("{}{} Combination of ZoneList and Object Name generate a name too long.", calledFrom, CurrentObject));
         ShowContinueError(state, "Object Name=\"" + ItemName + "\".");
         ShowContinueError(state, "ZoneList/Zone Name=\"" + ZoneName + "\".");
         ShowContinueError(
@@ -2695,7 +1778,7 @@ void CheckCreatedZoneItemName(EnergyPlusData &state,
     int FoundItem = UtilityRoutines::FindItemInList(ResultName, ItemNames, NumItems);
 
     if (FoundItem != 0) {
-        ShowSevereError(state, calledFrom + CurrentObject + "=\"" + ItemName + "\", Duplicate Generated name encountered.");
+        ShowSevereError(state, fmt::format("{}{}=\"{}\", Duplicate Generated name encountered.", calledFrom, CurrentObject, ItemName));
         ShowContinueError(state, format("name=\"{}\" has already been generated or entered as {} item=[{}].", ResultName, CurrentObject, FoundItem));
         if (TooLong) ShowContinueError(state, "Duplicate name likely caused by the previous \"too long\" warning.");
         ResultName = "xxxxxxx";

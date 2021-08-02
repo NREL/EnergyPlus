@@ -205,7 +205,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 25
 
-  Version,9.5;
+  Version,9.6;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -10806,44 +10806,37 @@
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC_1:6_OA,           !- Name
     PSZ-AC_1:6_OA_Controllers,  !- Controller List Name
-    PSZ-AC_1:6_OA_Equipment, !- Outdoor Air Equipment List Name
-    PSZ-AC_1:6 Availability Manager List;  !- Availability Manager List Name
+    PSZ-AC_1:6_OA_Equipment; !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC_2:5_OA,           !- Name
     PSZ-AC_2:5_OA_Controllers,  !- Controller List Name
-    PSZ-AC_2:5_OA_Equipment, !- Outdoor Air Equipment List Name
-    PSZ-AC_2:5 Availability Manager List;  !- Availability Manager List Name
+    PSZ-AC_2:5_OA_Equipment; !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC_2:7_OA,           !- Name
     PSZ-AC_2:7_OA_Controllers,  !- Controller List Name
-    PSZ-AC_2:7_OA_Equipment, !- Outdoor Air Equipment List Name
-    PSZ-AC_2:7 Availability Manager List;  !- Availability Manager List Name
+    PSZ-AC_2:7_OA_Equipment; !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     VAV_OTHER_OA,            !- Name
     VAV_OTHER_OA_Controllers,!- Controller List Name
-    VAV_OTHER_OA_Equipment,  !- Outdoor Air Equipment List Name
-    VAV_OTHER Availability Manager List;  !- Availability Manager List Name
+    VAV_OTHER_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     VAV_POD_1_OA,            !- Name
     VAV_POD_1_OA_Controllers,!- Controller List Name
-    VAV_POD_1_OA_Equipment,  !- Outdoor Air Equipment List Name
-    VAV_POD_1 Availability Manager List;  !- Availability Manager List Name
+    VAV_POD_1_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     VAV_POD_2_OA,            !- Name
     VAV_POD_2_OA_Controllers,!- Controller List Name
-    VAV_POD_2_OA_Equipment,  !- Outdoor Air Equipment List Name
-    VAV_POD_2 Availability Manager List;  !- Availability Manager List Name
+    VAV_POD_2_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     VAV_POD_3_OA,            !- Name
     VAV_POD_3_OA_Controllers,!- Controller List Name
-    VAV_POD_3_OA_Equipment,  !- Outdoor Air Equipment List Name
-    VAV_POD_3 Availability Manager List;  !- Availability Manager List Name
+    VAV_POD_3_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     PSZ-AC_1:6_OANode List;  !- Node or NodeList Name 1

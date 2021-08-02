@@ -108,7 +108,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.5;
+  Version,9.6;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -1689,8 +1689,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA System,               !- Name
     OA System Controllers,   !- Controller List Name
-    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name
-    OA Availability List;    !- Availability Manager List Name
+    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTDOORAIR:MIXER ===========
 

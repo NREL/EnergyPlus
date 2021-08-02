@@ -316,7 +316,7 @@ void GetPlantOperationInput(EnergyPlusData &state, bool &GetInputOK)
     using ScheduleManager::GetScheduleIndex;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("GetPlantOperationInput: "); // include trailing blank space
+    static constexpr std::string_view RoutineName("GetPlantOperationInput: "); // include trailing blank space
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int LoopNum;           // Loop counter (Plant or Cond)
@@ -421,7 +421,7 @@ void GetPlantOperationInput(EnergyPlusData &state, bool &GetInputOK)
                             state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = UncontrolledOpSchemeType;
                         } else { // invalid op scheme type for plant loop
                             ShowSevereError(state,
-                                            RoutineName + "Invalid " + state.dataIPShortCut->cAlphaFieldNames(Num * 3 - 1) + '=' +
+                                            std::string{RoutineName} + "Invalid " + state.dataIPShortCut->cAlphaFieldNames(Num * 3 - 1) + '=' +
                                                 state.dataIPShortCut->cAlphaArgs(Num * 3 - 1) + ", entered in " + CurrentModuleObject + '=' +
                                                 state.dataIPShortCut->cAlphaArgs(1));
                             ErrorsFound = true;
@@ -434,7 +434,7 @@ void GetPlantOperationInput(EnergyPlusData &state, bool &GetInputOK)
                         GetScheduleIndex(state, state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).Sched);
                     if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).SchedPtr == 0) {
                         ShowSevereError(state,
-                                        RoutineName + "Invalid " + state.dataIPShortCut->cAlphaFieldNames(Num * 3 + 1) + " = \"" +
+                                        std::string{RoutineName} + "Invalid " + state.dataIPShortCut->cAlphaFieldNames(Num * 3 + 1) + " = \"" +
                                             state.dataIPShortCut->cAlphaArgs(Num * 3 + 1) + "\", entered in " + CurrentModuleObject + "= \"" +
                                             state.dataIPShortCut->cAlphaArgs(1) + "\".");
                         ErrorsFound = true;
@@ -448,14 +448,16 @@ void GetPlantOperationInput(EnergyPlusData &state, bool &GetInputOK)
                 ErrorsFound = true;
             }
         } else {
-            ShowSevereError(state, RoutineName + PlantLoopObject + '=' + state.dataPlnt->PlantLoop(LoopNum).Name + " is expecting");
+            ShowSevereError(state, std::string{RoutineName} + PlantLoopObject + '=' + state.dataPlnt->PlantLoop(LoopNum).Name + " is expecting");
             ShowContinueError(state, CurrentModuleObject + '=' + PlantOpSchemeName + ", but not found.");
             ErrorsFound = true;
         }
     }
 
     if (ErrorsFound) {
-        ShowFatalError(state, RoutineName + "Errors found in getting input for PlantEquipmentOperationSchemes or CondenserEquipmentOperationSchemes");
+        ShowFatalError(state,
+                       std::string{RoutineName} +
+                           "Errors found in getting input for PlantEquipmentOperationSchemes or CondenserEquipmentOperationSchemes");
     }
 }
 
@@ -484,7 +486,7 @@ void GetOperationSchemeInput(EnergyPlusData &state)
     using namespace DataSizing;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("GetOperationSchemeInput: "); // include trailing blank space
+    static constexpr std::string_view RoutineName("GetOperationSchemeInput: "); // include trailing blank space
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int SchemeNum;
@@ -700,7 +702,7 @@ void GetOperationSchemeInput(EnergyPlusData &state)
 
     // Validate that component names/types in each list correspond to a valid component in input file
     if (ErrorsFound) {
-        ShowFatalError(state, RoutineName + "Errors found getting inputs. Previous error(s) cause program termination.");
+        ShowFatalError(state, std::string{RoutineName} + "Errors found getting inputs. Previous error(s) cause program termination.");
     }
 }
 
@@ -1009,7 +1011,7 @@ void FindDeltaTempRangeInput(EnergyPlusData &state,
                                       AlphArray(1),
                                       DataLoopNode::NodeFluidType::Water,
                                       DataLoopNode::NodeConnectionType::Sensor,
-                                      1,
+                                      NodeInputManager::compFluidStream::Primary,
                                       ObjectIsNotParent);
                 // For DO Loop below -- Check for lower limit > upper limit.(invalid)
                 for (ListNum = 1; ListNum <= NumEquipLists; ++ListNum) {
@@ -1385,7 +1387,7 @@ void FindCompSPInput(EnergyPlusData &state,
                                           state.dataIPShortCut->cAlphaArgs(1),
                                           DataLoopNode::NodeFluidType::Water,
                                           DataLoopNode::NodeConnectionType::Sensor,
-                                          1,
+                                          NodeInputManager::compFluidStream::Primary,
                                           ObjectIsNotParent);
                     state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName =
                         state.dataIPShortCut->cAlphaArgs(CompNumA);
@@ -1397,7 +1399,7 @@ void FindCompSPInput(EnergyPlusData &state,
                                           state.dataIPShortCut->cAlphaArgs(1),
                                           DataLoopNode::NodeFluidType::Water,
                                           DataLoopNode::NodeConnectionType::Sensor,
-                                          1,
+                                          NodeInputManager::compFluidStream::Primary,
                                           ObjectIsNotParent);
                     state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointFlowRate =
                         state.dataIPShortCut->rNumericArgs(CompNumN);
@@ -2801,7 +2803,7 @@ void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
     // load dispatch to account for limits and floating capacities.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("PlantCondLoopOperation:DistributePlantLoad");
+    static constexpr std::string_view RoutineName("PlantCondLoopOperation:DistributePlantLoad");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 CurMassFlowRate(0.0);
@@ -2955,7 +2957,7 @@ void FindCompSPLoad(EnergyPlusData &state,
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("FindCompSPLoad");
+    static constexpr std::string_view RoutineName("FindCompSPLoad");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 CompDemand;
@@ -3385,7 +3387,7 @@ void SetupPlantEMSActuators(EnergyPlusData &state)
     std::string ActuatorType;
     std::string ActuatorName;
     std::string UniqueIDName;
-    static std::string const Units("[on/off]");
+    static constexpr std::string_view Units("[on/off]");
     // INTEGER                      :: NumAct
     int LoopNum;
     int LoopSideNum;
@@ -3506,7 +3508,7 @@ void ActivateEMSControls(
 
     // Locals
     // SUBROUTINE PARAMETER DEFINITIONS
-    static std::string const RoutineName("ActivateEMSControls");
+    static constexpr std::string_view RoutineName("ActivateEMSControls");
 
     // SUBROUTINE VARIABLE DEFINITIONS
     Real64 CurMassFlowRate;

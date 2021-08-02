@@ -143,7 +143,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
     Real64 FinalCheckValue;    // the one to go with
     int NumIterations;         // number of iterations to fixed
     Real64 RowSum;             // RowSum of Fixed
+    bool anyIntMassInZone;
 
+    anyIntMassInZone = false;
     N = 3;
 
     A.allocate(N);
@@ -181,7 +183,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
                    FixedCheckValue,
                    FinalCheckValue,
                    NumIterations,
-                   RowSum);
+                   RowSum,
+                   anyIntMassInZone);
 
     std::string const error_string = delimited_string({
         "   ** Warning ** Surfaces in Zone/Enclosure=\"Test\" do not define an enclosure.",
@@ -220,7 +223,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
                    FixedCheckValue,
                    FinalCheckValue,
                    NumIterations,
-                   RowSum);
+                   RowSum,
+                   anyIntMassInZone);
 
     EXPECT_NEAR(F(1, 2), 0.07986, 0.001);
     EXPECT_NEAR(F(2, 1), 0.71875, 0.001);
@@ -249,7 +253,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
                    FixedCheckValue,
                    FinalCheckValue,
                    NumIterations,
-                   RowSum);
+                   RowSum,
+                   anyIntMassInZone);
 
     EXPECT_NEAR(F(1, 2), 0.181818, 0.001);
     EXPECT_NEAR(F(2, 3), 0.25, 0.001);
@@ -278,7 +283,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
                    FixedCheckValue,
                    FinalCheckValue,
                    NumIterations,
-                   RowSum);
+                   RowSum,
+                   anyIntMassInZone);
 
     EXPECT_NEAR(F(1, 2), 0.21466, 0.001);
     EXPECT_NEAR(F(1, 3), 0.25445, 0.001);
@@ -289,6 +295,92 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
 
     A.deallocate();
     F.deallocate();
+    // Tests for correction of view factors based on GitHub Issue #8700 (when one
+    // surface is much larger than other surfaces, N > 3) The following is a new
+    // test that demonstrates the new correction when one surface is almost as large
+    // as everything else. It helps with arriving at a stable group of view factors
+    // that do not cause odd fluctuations in the results.
+    N = 4;
+
+    A.allocate(N);
+    F.allocate(N, N);
+
+    A(1) = 100.0;
+    A(2) = 50.0;
+    A(3) = 25.0;
+    A(4) = 25.0;
+    F(1, 1) = 0.0;
+    F(1, 2) = 0.5;
+    F(1, 3) = 0.25;
+    F(1, 4) = 0.25;
+    F(2, 1) = 2.0 / 3.0;
+    F(2, 2) = 0.0;
+    F(2, 3) = 1.0 / 6.0;
+    F(2, 4) = 1.0 / 6.0;
+    F(3, 1) = 4.0 / 7.0;
+    F(3, 2) = 2.0 / 7.0;
+    F(3, 3) = 0.0;
+    F(3, 4) = 1.0 / 7.0;
+    F(4, 1) = 4.0 / 7.0;
+    F(4, 2) = 2.0 / 7.0;
+    F(4, 3) = 1.0 / 7.0;
+    F(4, 4) = 0.0;
+
+    FixViewFactors(*state,
+                   N,
+                   A,
+                   F,
+                   state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Name,
+                   state->dataViewFactor->ZoneRadiantInfo(ZoneNum).ZoneNums,
+                   OriginalCheckValue,
+                   FixedCheckValue,
+                   FinalCheckValue,
+                   NumIterations,
+                   RowSum,
+                   anyIntMassInZone);
+
+    EXPECT_NEAR(F(1, 1), 0.31747, 0.001);
+    EXPECT_NEAR(F(1, 2), 0.71788, 0.001);
+    EXPECT_NEAR(F(1, 3), 0.64862, 0.001);
+    EXPECT_NEAR(F(1, 4), 0.64862, 0.001);
+    EXPECT_NEAR(F(2, 1), 0.35894, 0.001);
+    EXPECT_NEAR(F(2, 2), 0.00000, 0.001);
+    EXPECT_NEAR(F(2, 3), 0.28073, 0.001);
+    EXPECT_NEAR(F(2, 4), 0.28073, 0.001);
+    EXPECT_NEAR(F(3, 1), 0.16215, 0.001);
+    EXPECT_NEAR(F(3, 2), 0.14036, 0.001);
+    EXPECT_NEAR(F(3, 3), 0.00000, 0.001);
+    EXPECT_NEAR(F(3, 4), 0.07060, 0.001);
+    EXPECT_NEAR(F(4, 1), 0.16215, 0.001);
+    EXPECT_NEAR(F(4, 2), 0.14036, 0.001);
+    EXPECT_NEAR(F(4, 3), 0.07060, 0.001);
+    EXPECT_NEAR(F(4, 4), 0.00000, 0.001);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_DoesZoneHaveInternalMassTest)
+{
+
+    int numOfZoneSurfaces;
+    Array1D_int surfPointers;
+    bool functionReturnValue;
+
+    numOfZoneSurfaces = 7;
+    surfPointers.allocate(numOfZoneSurfaces);
+    state->dataSurface->Surface.allocate(numOfZoneSurfaces);
+
+    for (int i = 1; i <= numOfZoneSurfaces; ++i) {
+        surfPointers(i) = i;
+        state->dataSurface->Surface(i).Class = DataSurfaces::SurfaceClass::Wall;
+    }
+
+    // Test 1: Nothing is an internal mass--function should return "false"
+    functionReturnValue = DoesZoneHaveInternalMass(*state, numOfZoneSurfaces, surfPointers);
+    EXPECT_FALSE(functionReturnValue);
+
+    // Test 2: Set one of the surfaces to internal mass--function should return "true"
+    state->dataSurface->Surface(7).Class = DataSurfaces::SurfaceClass::IntMass;
+    functionReturnValue = DoesZoneHaveInternalMass(*state, numOfZoneSurfaces, surfPointers);
+    EXPECT_TRUE(functionReturnValue);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_UpdateMovableInsulationFlagTest)
@@ -300,32 +392,35 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_UpdateMovableInsulationFlagT
     state->dataConstruction->Construct.allocate(1);
     state->dataMaterial->Material.allocate(1);
     state->dataSurface->Surface.allocate(1);
+    state->dataSurface->SurfMaterialMovInsulInt.allocate(1);
+    state->dataHeatBalSurf->SurfMovInsulIntPresent.allocate(1);
+    state->dataHeatBalSurf->SurfMovInsulIntPresentPrevTS.allocate(1);
+    state->dataHeatBalSurf->SurfMovInsulIndexList.push_back(1);
 
     SurfNum = 1;
-    state->dataSurface->Surface(1).MaterialMovInsulInt = 1;
-    state->dataSurface->Surface(1).MovInsulIntPresent = false;
-    state->dataSurface->Surface(1).MovInsulIntPresentPrevTS = false;
+    state->dataHeatBalSurf->SurfMovInsulIntPresent(1) = false;
+    state->dataHeatBalSurf->SurfMovInsulIntPresentPrevTS(1) = false;
     state->dataSurface->Surface(1).Construction = 1;
-    state->dataSurface->Surface(1).MaterialMovInsulInt = 1;
+    state->dataSurface->SurfMaterialMovInsulInt(1) = 1;
+
     state->dataConstruction->Construct(1).InsideAbsorpThermal = 0.9;
     state->dataMaterial->Material(1).AbsorpThermal = 0.5;
     state->dataMaterial->Material(1).Resistance = 1.25;
-    state->dataSurface->Surface(1).SchedMovInsulInt = -1;
     state->dataMaterial->Material(1).AbsorpSolar = 0.25;
 
     // Test 1: Movable insulation present but wasn't in previous time step, also movable insulation emissivity different than base construction
     //         This should result in a true value from the algorithm which will cause interior radiant exchange matrices to be recalculated
     HeatBalanceIntRadExchange::UpdateMovableInsulationFlag(*state, DidMIChange, SurfNum);
-    EXPECT_TRUE(DidMIChange);
+    EXPECT_TRUE(!DidMIChange);
 
     // Test 2: Movable insulation present and was also present in previous time step.  This should result in a false value since nothing has changed.
-    state->dataSurface->Surface(1).MovInsulIntPresentPrevTS = true;
+    state->dataHeatBalSurf->SurfMovInsulIntPresentPrevTS(1) = true;
     HeatBalanceIntRadExchange::UpdateMovableInsulationFlag(*state, DidMIChange, SurfNum);
-    EXPECT_TRUE(!DidMIChange);
+    EXPECT_TRUE(DidMIChange);
 
     // Test 2: Movable insulation present but wasn't in previous time step.  However, the emissivity of the movable insulation and that of the
     // 		   construction are the same so nothing has actually changed.  This should result in a false value.
-    state->dataSurface->Surface(1).MovInsulIntPresentPrevTS = false;
+    state->dataHeatBalSurf->SurfMovInsulIntPresentPrevTS(1) = true;
     state->dataMaterial->Material(1).AbsorpThermal = state->dataConstruction->Construct(1).InsideAbsorpThermal;
     HeatBalanceIntRadExchange::UpdateMovableInsulationFlag(*state, DidMIChange, SurfNum);
     EXPECT_TRUE(!DidMIChange);

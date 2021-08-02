@@ -161,7 +161,7 @@ void GetBoilerInput(EnergyPlusData &state)
     // standard EnergyPlus input retrieval using input Processor
 
     // Locals
-    constexpr auto RoutineName("GetBoilerInput: ");
+    static constexpr std::string_view RoutineName("GetBoilerInput: ");
 
     // LOCAL VARIABLES
     bool ErrorsFound(false); // Flag to show errors were found during GetInput
@@ -214,7 +214,8 @@ void GetBoilerInput(EnergyPlusData &state)
         UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum(
             state.dataIPShortCut->cAlphaArgs(2), thisBoiler.BoilerFuelTypeForOutputVariable, thisBoiler.FuelType, FuelTypeError);
         if (FuelTypeError) {
-            ShowSevereError(state, RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
+            ShowSevereError(
+                state, fmt::format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
             // Set to Electric to avoid errors when setting up output variables
             thisBoiler.BoilerFuelTypeForOutputVariable = "Electricity";
@@ -225,7 +226,8 @@ void GetBoilerInput(EnergyPlusData &state)
 
         thisBoiler.NomCap = state.dataIPShortCut->rNumericArgs(1);
         if (state.dataIPShortCut->rNumericArgs(1) == 0.0) {
-            ShowSevereError(state, RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
+            ShowSevereError(
+                state, fmt::format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(1), state.dataIPShortCut->rNumericArgs(1)));
             ShowContinueError(state, "..." + state.dataIPShortCut->cNumericFieldNames(1) + " must be greater than 0.0");
             ErrorsFound = true;
@@ -236,7 +238,8 @@ void GetBoilerInput(EnergyPlusData &state)
 
         thisBoiler.NomEffic = state.dataIPShortCut->rNumericArgs(2);
         if (state.dataIPShortCut->rNumericArgs(2) == 0.0) {
-            ShowSevereError(state, RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
+            ShowSevereError(
+                state, fmt::format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, format("Invalid {}={:.3R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
             ShowSevereError(state, "..." + state.dataIPShortCut->cNumericFieldNames(2) + " must be greater than 0.0");
             ErrorsFound = true;
@@ -265,7 +268,8 @@ void GetBoilerInput(EnergyPlusData &state)
                 if (thisBoiler.CurveTempMode == TempMode::NOTSET) {                              // throw error
                     if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                         ShowSevereError(
-                            state, RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
+                            state,
+                            fmt::format("{}{}=\"{}\"", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                         ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '=' + state.dataIPShortCut->cAlphaArgs(3));
                         ShowContinueError(state,
                                           "boilers.Boiler using curve type of " +
@@ -274,7 +278,8 @@ void GetBoilerInput(EnergyPlusData &state)
                         ShowContinueError(state, "Available choices are EnteringBoiler or LeavingBoiler");
                     } else {
                         ShowSevereError(
-                            state, RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
+                            state,
+                            fmt::format("{}{}=\"{}\"", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                         ShowContinueError(state, "Field " + state.dataIPShortCut->cAlphaFieldNames(3) + " is blank");
                         ShowContinueError(state,
                                           "boilers.Boiler using curve type of " +
@@ -286,7 +291,8 @@ void GetBoilerInput(EnergyPlusData &state)
             }
 
         } else if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-            ShowSevereError(state, RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
+            ShowSevereError(state,
+                            fmt::format("{}{}=\"{}\"", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + '=' + state.dataIPShortCut->cAlphaArgs(4));
             ShowSevereError(state, "..." + state.dataIPShortCut->cAlphaFieldNames(4) + " not found.");
             ErrorsFound = true;
@@ -316,7 +322,7 @@ void GetBoilerInput(EnergyPlusData &state)
                                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                                             DataLoopNode::NodeFluidType::Water,
                                                                             DataLoopNode::NodeConnectionType::Inlet,
-                                                                            1,
+                                                                            NodeInputManager::compFluidStream::Primary,
                                                                             DataLoopNode::ObjectIsNotParent);
         thisBoiler.BoilerOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                              state.dataIPShortCut->cAlphaArgs(6),
@@ -325,7 +331,7 @@ void GetBoilerInput(EnergyPlusData &state)
                                                                              state.dataIPShortCut->cAlphaArgs(1),
                                                                              DataLoopNode::NodeFluidType::Water,
                                                                              DataLoopNode::NodeConnectionType::Outlet,
-                                                                             1,
+                                                                             NodeInputManager::compFluidStream::Primary,
                                                                              DataLoopNode::ObjectIsNotParent);
         BranchNodeConnections::TestCompSet(state,
                                            state.dataIPShortCut->cCurrentModuleObject,
@@ -341,7 +347,8 @@ void GetBoilerInput(EnergyPlusData &state)
         } else if (state.dataIPShortCut->cAlphaArgs(7) == "NOTMODULATED") {
             thisBoiler.FlowMode = DataPlant::FlowMode::NotModulated;
         } else {
-            ShowSevereError(state, RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
+            ShowSevereError(state,
+                            fmt::format("{}{}=\"{}\"", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7));
             ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
             ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
@@ -364,13 +371,19 @@ void GetBoilerInput(EnergyPlusData &state)
 
 void BoilerSpecs::SetupOutputVars(EnergyPlusData &state)
 {
-    SetupOutputVariable(state, "Boiler Heating Rate", OutputProcessor::Unit::W, this->BoilerLoad, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Boiler Heating Rate",
+                        OutputProcessor::Unit::W,
+                        this->BoilerLoad,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
     SetupOutputVariable(state,
                         "Boiler Heating Energy",
                         OutputProcessor::Unit::J,
                         this->BoilerEnergy,
-                        "System",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         _,
                         "ENERGYTRANSFER",
@@ -381,40 +394,75 @@ void BoilerSpecs::SetupOutputVars(EnergyPlusData &state)
                         "Boiler " + this->BoilerFuelTypeForOutputVariable + " Rate",
                         OutputProcessor::Unit::W,
                         this->FuelUsed,
-                        "System",
-                        "Average",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Boiler " + this->BoilerFuelTypeForOutputVariable + " Energy",
                         OutputProcessor::Unit::J,
                         this->FuelConsumed,
-                        "System",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         _,
                         this->BoilerFuelTypeForOutputVariable,
                         "Heating",
                         this->EndUseSubcategory,
                         "Plant");
-    SetupOutputVariable(state, "Boiler Inlet Temperature", OutputProcessor::Unit::C, this->BoilerInletTemp, "System", "Average", this->Name);
-    SetupOutputVariable(state, "Boiler Outlet Temperature", OutputProcessor::Unit::C, this->BoilerOutletTemp, "System", "Average", this->Name);
-    SetupOutputVariable(state, "Boiler Mass Flow Rate", OutputProcessor::Unit::kg_s, this->BoilerMassFlowRate, "System", "Average", this->Name);
-    SetupOutputVariable(
-        state, "Boiler Ancillary Electricity Rate", OutputProcessor::Unit::W, this->ParasiticElecPower, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Boiler Inlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->BoilerInletTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Boiler Outlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->BoilerOutletTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Boiler Mass Flow Rate",
+                        OutputProcessor::Unit::kg_s,
+                        this->BoilerMassFlowRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Boiler Ancillary Electricity Rate",
+                        OutputProcessor::Unit::W,
+                        this->ParasiticElecPower,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
     SetupOutputVariable(state,
                         "Boiler Ancillary Electricity Energy",
                         OutputProcessor::Unit::J,
                         this->ParasiticElecConsumption,
-                        "System",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         _,
                         "ELECTRICITY",
                         "Heating",
                         "Boiler Parasitic",
                         "Plant");
-    SetupOutputVariable(state, "Boiler Part Load Ratio", OutputProcessor::Unit::None, this->BoilerPLR, "System", "Average", this->Name);
-    SetupOutputVariable(state, "Boiler Efficiency", OutputProcessor::Unit::None, this->BoilerEff, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Boiler Part Load Ratio",
+                        OutputProcessor::Unit::None,
+                        this->BoilerPLR,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Boiler Efficiency",
+                        OutputProcessor::Unit::None,
+                        this->BoilerEff,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
     if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
         SetupEMSInternalVariable(state, "Boiler Nominal Capacity", this->Name, "[W]", this->NomCap);
     }
@@ -450,7 +498,7 @@ void BoilerSpecs::oneTimeInit(EnergyPlusData &state)
 
 void BoilerSpecs::initEachEnvironment(EnergyPlusData &state)
 {
-    constexpr auto RoutineName("BoilerSpecs::initEachEnvironment");
+    static constexpr std::string_view RoutineName("BoilerSpecs::initEachEnvironment");
     Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                          state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
                                                          DataGlobalConstants::HWInitConvTemp,
@@ -565,7 +613,7 @@ void BoilerSpecs::SizeBoiler(EnergyPlusData &state)
     // the hot water flow rate and the hot water loop design delta T.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    constexpr auto RoutineName("SizeBoiler");
+    static constexpr std::string_view RoutineName("SizeBoiler");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool ErrorsFound(false); // If errors detected in input
@@ -733,7 +781,7 @@ void BoilerSpecs::CalcBoilerModel(EnergyPlusData &state,
     // load performance
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    constexpr auto RoutineName("CalcBoilerModel");
+    static constexpr std::string_view RoutineName("CalcBoilerModel");
 
     // clean up some operating conditions, may not be necessary
     this->BoilerLoad = 0.0;

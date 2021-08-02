@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 
 namespace EnergyPlus {
 
@@ -88,10 +89,22 @@ namespace StandardRatings {
     extern Real64 const OADBTempLowReducedCapacityTest; // Outdoor air dry-bulb temp in degrees C (65F)
     // Std. AHRI AHRI 340/360 Dry-bulb Temp at reduced capacity, <= 0.444
 
+    // Defrost strategy (heat pump only)
+    enum class DefrostStrat
+    {
+        Unassigned = -1,
+        ReverseCycle, // uses reverse cycle defrost strategy
+        Resistive     // uses electric resistance heater for defrost
+    };
+
     // Defrost control  (heat pump only)
-    extern int const Timed;                             // defrost cycle is timed
-    extern int const OnDemand;                          // defrost cycle occurs only when required
-    extern int const TotalNumOfStandardDHRs;            // Total number of standard design heating requirements
+    enum class HPdefrostControl : int
+    {
+        Unassigned = -1,
+        Timed,   // defrost cycle is timed
+        OnDemand // defrost cycle occurs only when required
+    };
+
     extern Array1D_int const TotalNumOfTemperatureBins; // Total number of temperature
     // bins for a region
     extern Array1D<Real64> const StandardDesignHeatingRequirement;
@@ -116,7 +129,6 @@ namespace StandardRatings {
     extern Array1D<Real64> const RegionSixFracBinHoursAtOutdoorBinTemp;
 
     // Representative cooling season Outdoor air temperature bin from ANSI/AHRI 210/240-2008
-    extern int const NumOfOATempBins; // number of outdoor temperature bins for cooling season
     extern Array1D<Real64> const OutdoorBinTemperatureSEER;
     // Fractional bin hours for different bin temperatures for cooling, from ANSI/AHRI 210/240 - 2008
     extern Array1D<Real64> const CoolFracBinHoursAtOutdoorBinTemp;
@@ -201,9 +213,9 @@ namespace StandardRatings {
         Optional<Real64 const> OATempCompressorOn =
             _, // The outdoor temperature when the compressor is automatically turned //Autodesk:OPTIONAL Used without PRESENT check
         Optional_bool_const OATempCompressorOnOffBlank =
-            _,                                 // Flag used to determine low temperature cut out factor //Autodesk:OPTIONAL Used without PRESENT check
-        Optional_int_const DefrostControl = _, // defrost control; 1=timed, 2=on-demand //Autodesk:OPTIONAL Used without PRESENT check
-        Optional_bool_const ASHRAE127StdRprt = _ // true if user wishes to report ASHRAE 127 standard ratings
+            _, // Flag used to determine low temperature cut out factor //Autodesk:OPTIONAL Used without PRESENT check
+        Optional<HPdefrostControl const> DefrostControl = _, // defrost control; 1=timed, 2=on-demand //Autodesk:OPTIONAL Used without PRESENT check
+        Optional_bool_const ASHRAE127StdRprt = _             // true if user wishes to report ASHRAE 127 standard ratings
     );
 
     void SingleSpeedDXHeatingCoilStandardRatings(
@@ -223,7 +235,7 @@ namespace StandardRatings {
         Optional<Real64 const> MinOATCompressor = _,        // Minimum OAT for heat pump compressor operation [C]
         Optional<Real64 const> OATempCompressorOn = _,      // The outdoor temperature when the compressor is automatically turned
         Optional_bool_const OATempCompressorOnOffBlank = _, // Flag used to determine low temperature cut out factor
-        Optional_int_const DefrostControl = _               // defrost control; 1=timed, 2=on-demand
+        Optional<HPdefrostControl const> DefrostControl = _ // defrost control; 1=timed, 2=on-demand
     );
 
     void SingleSpeedDXCoolingCoilStandardRatings(
@@ -303,12 +315,12 @@ namespace StandardRatings {
         Optional<Real64 const> MinOATCompressor = _,               // Minimum OAT for heat pump compressor operation [C]
         Optional<Real64 const> OATempCompressorOn = _,             // The outdoor temperature when the compressor is automatically turned
         Optional_bool_const OATempCompressorOnOffBlank = _,        // Flag used to determine low temperature cut out factor
-        Optional_int_const DefrostControl = _                      // defrost control; 1=timed, 2=on-demand
+        Optional<HPdefrostControl const> DefrostControl = _        // defrost control; 1=timed, 2=on-demand
     );
 
     void ReportDXCoilRating(EnergyPlusData &state,
                             std::string const &CompType,     // Type of component
-                            std::string const &CompName,     // Name of component
+                            std::string_view CompName,       // Name of component
                             int const CompTypeNum,           // TypeNum of component
                             Real64 const CoolCapVal,         // Standard total (net) cooling capacity for AHRI Std. 210/240 {W}
                             Real64 const SEERValueIP,        // SEER value in IP units from user PLR curve {Btu/W-h}
@@ -324,7 +336,7 @@ namespace StandardRatings {
 
     void ReportDXCoolCoilDataCenterApplication(EnergyPlusData &state,
                                                std::string const &CompType,           // Type of component
-                                               std::string const &CompName,           // Name of component
+                                               std::string_view CompName,             // Name of component
                                                int const CompTypeNum,                 // TypeNum of component
                                                Array1D<Real64> &NetCoolingCapRated,   // net cooling capacity of single speed DX cooling coil
                                                Array1D<Real64> &TotElectricPowerRated // total electric power including supply fan

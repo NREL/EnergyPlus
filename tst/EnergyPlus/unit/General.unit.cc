@@ -243,7 +243,7 @@ TEST_F(EnergyPlusFixture, General_CreateTimeIntervalString)
     }
 }
 
-Real64 Residual(Real64 const Frac)
+Real64 Residual([[maybe_unused]] EnergyPlusData &state, Real64 const Frac, [[maybe_unused]] std::array<Real64, 1> const &Par)
 {
     Real64 Residual;
     Real64 Request = 1.10;
@@ -256,7 +256,7 @@ Real64 Residual(Real64 const Frac)
     return Residual;
 }
 
-Real64 ResidualTest(Real64 const Frac, Array1<Real64> const &Par)
+Real64 ResidualTest([[maybe_unused]] EnergyPlusData &state, Real64 const Frac, [[maybe_unused]] std::array<Real64, 2> const &Par)
 {
     Real64 ResidualTest;
     Real64 Request = 1.0 + 1.0e-12;
@@ -265,9 +265,10 @@ Real64 ResidualTest(Real64 const Frac, Array1<Real64> const &Par)
     Actual = 1.0 + 2.0 * Frac + 10.0 * Frac * Frac;
 
     ResidualTest = (Actual - Request) / Request;
-    Request = Par(1) + 1.0e-12;
+    // Request = Par[0] + 1.0e-12;
     return ResidualTest;
 }
+
 TEST_F(EnergyPlusFixture, General_SolveRootTest)
 {
     // New feature: Multiple solvers
@@ -277,43 +278,39 @@ TEST_F(EnergyPlusFixture, General_SolveRootTest)
     int SolFla;
     Real64 Frac;
 
-    General::SolveRoot(*state, ErrorToler, MaxIte, SolFla, Frac, Residual, 0.0, 1.0);
+    std::array<Real64, 1> dummyParameters;
+
+    General::SolveRoot(*state, ErrorToler, MaxIte, SolFla, Frac, Residual, 0.0, 1.0, dummyParameters);
     EXPECT_EQ(-1, SolFla);
 
-    state->dataHVACGlobal->HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection;
-    state->dataHVACGlobal->HVACSystemRootFinding.NumOfIter = 10;
-    General::SolveRoot(*state, ErrorToler, MaxIte, SolFla, Frac, Residual, 0.0, 1.0);
+    state->dataRootFinder->HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection;
+    state->dataRootFinder->HVACSystemRootFinding.NumOfIter = 10;
+    General::SolveRoot(*state, ErrorToler, MaxIte, SolFla, Frac, Residual, 0.0, 1.0, dummyParameters);
     EXPECT_EQ(28, SolFla);
     EXPECT_NEAR(0.041420287, Frac, ErrorToler);
 
-    state->dataHVACGlobal->HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::Bisection;
-    General::SolveRoot(*state, ErrorToler, 40, SolFla, Frac, Residual, 0.0, 1.0);
+    state->dataRootFinder->HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::Bisection;
+    General::SolveRoot(*state, ErrorToler, 40, SolFla, Frac, Residual, 0.0, 1.0, dummyParameters);
     EXPECT_EQ(17, SolFla);
     EXPECT_NEAR(0.041420287, Frac, ErrorToler);
 
-    state->dataHVACGlobal->HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi;
-    General::SolveRoot(*state, ErrorToler, 40, SolFla, Frac, Residual, 0.0, 1.0);
+    state->dataRootFinder->HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi;
+    General::SolveRoot(*state, ErrorToler, 40, SolFla, Frac, Residual, 0.0, 1.0, dummyParameters);
     EXPECT_EQ(12, SolFla);
     EXPECT_NEAR(0.041420287, Frac, ErrorToler);
 
-    state->dataHVACGlobal->HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::Alternation;
-    state->dataHVACGlobal->HVACSystemRootFinding.NumOfIter = 3;
-    General::SolveRoot(*state, ErrorToler, 40, SolFla, Frac, Residual, 0.0, 1.0);
+    state->dataRootFinder->HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::Alternation;
+    state->dataRootFinder->HVACSystemRootFinding.NumOfIter = 3;
+    General::SolveRoot(*state, ErrorToler, 40, SolFla, Frac, Residual, 0.0, 1.0, dummyParameters);
     EXPECT_EQ(15, SolFla);
     EXPECT_NEAR(0.041420287, Frac, ErrorToler);
 
     // Add a unit test to deal with vary small X value for #6515
-    state->dataHVACGlobal->HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi;
+    state->dataRootFinder->HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::RegulaFalsi;
     Real64 small = 1.0e-11;
-    Array1D<Real64> Par; // Function parameters
-    Par.allocate(2);
-    Par(1) = 1.0;
-    Par(2) = 1.0;
-
+    std::array<Real64, 2> Par = {1.0, 1.0}; // Function parameters
     General::SolveRoot(*state, ErrorToler, 40, SolFla, Frac, ResidualTest, 0.0, small, Par);
     EXPECT_EQ(-1, SolFla);
-
-    Par.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, nthDayOfWeekOfMonth_test)
@@ -397,16 +394,16 @@ TEST_F(EnergyPlusFixture, General_EpexpTest)
     y = epexp(x, d);
     EXPECT_EQ(0.0, y);
 
-    /*// Overflow and near-overflow tests (Not currently used in code)
-    x = 10.0;
-    d = 1.0;
-    y = epexpOverflow(x, d);
-    EXPECT_NEAR(22026.46579480, y, 0.00001);
-
-    x = 800.0;
-    d = 1.0;
-    y = epexpOverflow(x, d);
-    EXPECT_NEAR(1.0142320547350045e+304, y, 1.0E2);
-    */
+    //    /*// Overflow and near-overflow tests (Not currently used in code)
+    //    x = 10.0;
+    //    d = 1.0;
+    //    y = epexpOverflow(x, d);
+    //    EXPECT_NEAR(22026.46579480, y, 0.00001);
+    //
+    //    x = 800.0;
+    //    d = 1.0;
+    //    y = epexpOverflow(x, d);
+    //    EXPECT_NEAR(1.0142320547350045e+304, y, 1.0E2);
+    //    */
 }
 } // namespace EnergyPlus

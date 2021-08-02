@@ -344,117 +344,117 @@ using namespace TARCOGDeflection;
 // Functions
 
 void TARCOG90(EnergyPlusData &state,
-              int const nlayer,                     // Number of layers (glass + SD)
-              int const iwd,                        // Wind direction:
-              Real64 &tout,                         // Outdoor temperature [K]
-              Real64 &tind,                         // Indoor temperature [K]
-              Real64 &trmin,                        // Indoor mean radiant temperature [K]
-              Real64 const wso,                     // Outdoor wind speed [m/s]
-              Real64 const wsi,                     // Inside forced air speed [m/s]
-              Real64 const dir,                     // Direct solar radiation [W/m2]
-              Real64 const outir,                   // IR radiance of window's exterior surround [W/m2]
-              int const isky,                       // Flag for sky temperature(Tsky) and sky emittance(esky)
-              Real64 const tsky,                    // Night sky temperature [K]
-              Real64 &esky,                         // Effective night sky emittance
-              Real64 const fclr,                    // Fraction of sky that is clear
-              Real64 const VacuumPressure,          // maximal pressure for gas to be considered as vacuum
-              Real64 &VacuumMaxGapThickness,        // maximum allowed thickness without producing warning message
-              int const CalcDeflection,             // Deflection calculation flag:
-              Real64 const Pa,                      // Atmospheric (outside/inside) pressure (used onlu if CalcDeflection = 1)
-              Real64 const Pini,                    // Initial presssure at time of fabrication (used only if CalcDeflection = 1)
-              Real64 const Tini,                    // Initial temperature at time of fabrication (used only if CalcDeflection = 1)
-              Array1D<Real64> &gap,                 // Vector of gap widths [m]
-              Array1D<Real64> &GapDefMax,           // Vector of gap widths in deflected state. It will be used as input
-              Array1D<Real64> &thick,               // Vector of glazing layer thicknesses [m]
-              Array1D<Real64> &scon,                // Vector of conductivities of each glazing layer  [W/mK]
-              const Array1D<Real64> &YoungsMod,     // Youngs Modulus coefficients used in deflection calculations
-              const Array1D<Real64> &PoissonsRat,   // Poissons Ratio coefficients used in deflection calculations
-              const Array1D<Real64> &tir,           // Vector of IR transmittances of each surface
-              const Array1D<Real64> &emis,          // Vector of IR emittances of each surface
-              Real64 const totsol,                  // Total solar transmittance of the IGU
-              Real64 const tilt,                    // Window tilt [degrees]
-              const Array1D<Real64> &asol,          // Vector of Absorbed solar energy fractions for each layer
-              Real64 const height,                  // IGU cavity height
-              Real64 const heightt,                 // Window height
-              Real64 const width,                   // Window width
-              const Array1D<Real64> &presure,       // Vector of gas pressures in gaps [N/m2]
-              Array2A_int const iprop,              // Matrix of gas codes - see mgas definition
-              Array2A<Real64> const frct,           // Matrix of mass percentages in gap mixtures
-              Array2A<Real64> const xgcon,          // Matrix of constants for gas conductivity calc
-              Array2A<Real64> const xgvis,          // Matrix of constants for gas dynamic viscosity calc
-              Array2A<Real64> const xgcp,           // Matrix of constants for gas specific heat calc at constant pressure
-              const Array1D<Real64> &xwght,         // Vector of Molecular weights for gasses
-              const Array1D<Real64> &gama,          // Vector of spefic heat ration for low pressure calc
-              const Array1D_int &nmix,              // Vector of number of gasses in gas mixture of each gap
-              const Array1D_int &SupportPillar,     // Shows whether or not gap have support pillar
-              const Array1D<Real64> &PillarSpacing, // Pillar spacing for each gap (used in case there is support pillar)
-              const Array1D<Real64> &PillarRadius,  // Pillar radius for each gap (used in case there is support pillar)
-              Array1D<Real64> &theta,               // Vector of average temperatures of glazing surfaces [K]
-              Array1D<Real64> &LayerDef,            // Vector of layers deflection. [m]
-              Array1D<Real64> &q,                   // Vector of various heat fluxes [W/m2]
-              Array1D<Real64> &qv,                  // Vector of heat fluxes to each gap by ventillation [W/m2]
-              Real64 &ufactor,                      // Center of glass U-value [W/m2 K]
-              Real64 &sc,                           // Shading Coefficient
-              Real64 &hflux,                        // Net heat flux between room and window [W/m2]
-              Real64 &hcin,                         // Indoor convective surface heat transfer coefficient  [W/m2 K]
-              Real64 &hcout,                        // Outdoor convective surface heat transfer coefficient [W/m2 K]
-              Real64 &hrin,                         // Indoor radiative surface heat transfer coefficient [W/m2 K]
-              Real64 &hrout,                        // Outdoor radiative surface heat transfer coefficient [W/m2 K]
-              Real64 &hin,                          // Indoor combined film coefficient (if non-zero) [W/m2K]
-              Real64 &hout,                         // Outdoor combined film coefficient (if non-zero) [W/m2K]
-              Array1D<Real64> &hcgas,               // Convective part of gap effective conductivity (including in and out)
-              Array1D<Real64> &hrgas,               // Radiative part of gap effective conductivity (including in and out)
-              Real64 &shgc,                         // Solar heat gain coefficient - per ISO 15099
-              int &nperr,                           // Error code
-              std::string &ErrorMessage,            // To store error message from tarcog execution
-              Real64 &shgct,                        // Solar heat gain coefficient - per old procedure
-              Real64 &tamb,                         // Outdoor environmental temperature [K]
-              Real64 &troom,                        // Indoor environmental temperature [K]
-              const Array1D_int &ibc,               // Vector of boundary condition flags (ibc(1) - outdoor, ibc(2) - indoor
-              const Array1D<Real64> &Atop,          // Vector with areas of top openings - between SD layers and top of
-              const Array1D<Real64> &Abot,          // Vector with areas of bottom openings - between SD layers and
-              const Array1D<Real64> &Al,            // Vector with areas of left-hand side openings - between SD layers and
-              const Array1D<Real64> &Ar,            // Vector of areas of right-hand side openings - between SD layers and
-              const Array1D<Real64> &Ah,            // Vector of total areas of holes for each SD [m2]
-              const Array1D<Real64> &SlatThick,     // Thickness of the slat material [m]
-              const Array1D<Real64> &SlatWidth,     // Slat width [m]
-              const Array1D<Real64> &SlatAngle,     // Slat tilt angle [deg]
-              const Array1D<Real64> &SlatCond,      // Conductivity of the slat material [W/m.K]
-              const Array1D<Real64> &SlatSpacing,   // Distance between slats [m]
-              const Array1D<Real64> &SlatCurve,     // Curvature radius of the slat [m]
-              const Array1D<Real64> &vvent,         // Vector of velocities for forced ventilation, for each gap, and for
-              const Array1D<Real64> &tvent,         // Vector of temperatures of ventilation gas for forced ventilation,
-              const Array1D_int &LayerType,         // Glazing layer type flag
-              const Array1D_int &nslice,            // Vector of numbers of slices in a laminated glazing layers
-              const Array1D<Real64> &LaminateA,     // Left-hand side array for creating slice equations
-              const Array1D<Real64> &LaminateB,     // Right-hand side array for creating slice equations
-              const Array1D<Real64> &sumsol,        // Array of absorbed solar energy fractions for each laminated
-              Array1D<Real64> &hg,                  // Gas conductance of the glazing cavity [W/m2 K]
-              Array1D<Real64> &hr,                  // Radiation conductance of the glazing cavity [W/m2 K]
-              Array1D<Real64> &hs,                  // Thermal conductance of the glazing cavity [W/m2 K]
-              Real64 &he,                           // External heat transfer coefficient [W/m2 K] - EN673 and ISO 10292 procedure
-              Real64 &hi,                           // Internal heat transfer coefficient [W/m2 K] - EN673 and ISO 10292 procedure
-              Array1D<Real64> &Ra,                  // Vector of Rayleigh numbers, for each gap
-              Array1D<Real64> &Nu,                  // Vector of Nusselt numbers, for each gap
-              int const standard,                   // Calculation standard switch:
-              int const ThermalMod,                 // Thermal model:
-              int const Debug_mode,                 // Switch for debug output files:
-              std::string const &Debug_dir,         // Target directory for debug files
-              std::string const &Debug_file,        // File name template for debug files
-              int const win_ID,                     // ID of window (passed by W6)
-              int const igu_ID,                     // ID of the IGU (passed by W6)
-              Real64 &ShadeEmisRatioOut,            // Ratio of modified to glass emissivity at the outermost glazing surface
-              Real64 &ShadeEmisRatioIn,             // Ratio of modified to glass emissivity at the innermost glazing surface
-              Real64 &ShadeHcRatioOut,              // Ratio of modified to unshaded Hc at the outermost glazing surface
-              Real64 &ShadeHcRatioIn,               // Ratio of modified to unshaded Hc at the innermost glazing surface
-              Real64 &HcUnshadedOut,                // Hc value at outermost glazing surface of an unshaded subsystem [W/m2 K]
-              Real64 &HcUnshadedIn,                 // Hc value at innermost glazing surface of an unshaded subsystem [W/m2 K]
-              Array1D<Real64> &Keff,                // Vector of keff values for gaps [W/m.K]
-              Array1D<Real64> &ShadeGapKeffConv,    // Vector of convective keff values for areas above/below
-              Real64 const SDScalar,                // Factor of Venetian SD layer contribution to convection
-              int const SHGCCalc,                   // SHGC calculation switch:
-              int &NumOfIterations,                 // Number of iterations for reacing solution
-              Real64 const edgeGlCorrFac            // Edge of glass correction factor
+              int const nlayer,                           // Number of layers (glass + SD)
+              int const iwd,                              // Wind direction:
+              Real64 &tout,                               // Outdoor temperature [K]
+              Real64 &tind,                               // Indoor temperature [K]
+              Real64 &trmin,                              // Indoor mean radiant temperature [K]
+              Real64 const wso,                           // Outdoor wind speed [m/s]
+              Real64 const wsi,                           // Inside forced air speed [m/s]
+              Real64 const dir,                           // Direct solar radiation [W/m2]
+              Real64 const outir,                         // IR radiance of window's exterior surround [W/m2]
+              int const isky,                             // Flag for sky temperature(Tsky) and sky emittance(esky)
+              Real64 const tsky,                          // Night sky temperature [K]
+              Real64 &esky,                               // Effective night sky emittance
+              Real64 const fclr,                          // Fraction of sky that is clear
+              Real64 const VacuumPressure,                // maximal pressure for gas to be considered as vacuum
+              Real64 &VacuumMaxGapThickness,              // maximum allowed thickness without producing warning message
+              DeflectionCalculation const CalcDeflection, // Deflection calculation flag:
+              Real64 const Pa,                            // Atmospheric (outside/inside) pressure (used onlu if CalcDeflection = 1)
+              Real64 const Pini,                          // Initial presssure at time of fabrication (used only if CalcDeflection = 1)
+              Real64 const Tini,                          // Initial temperature at time of fabrication (used only if CalcDeflection = 1)
+              Array1D<Real64> &gap,                       // Vector of gap widths [m]
+              Array1D<Real64> &GapDefMax,                 // Vector of gap widths in deflected state. It will be used as input
+              Array1D<Real64> &thick,                     // Vector of glazing layer thicknesses [m]
+              Array1D<Real64> &scon,                      // Vector of conductivities of each glazing layer  [W/mK]
+              const Array1D<Real64> &YoungsMod,           // Youngs Modulus coefficients used in deflection calculations
+              const Array1D<Real64> &PoissonsRat,         // Poissons Ratio coefficients used in deflection calculations
+              const Array1D<Real64> &tir,                 // Vector of IR transmittances of each surface
+              const Array1D<Real64> &emis,                // Vector of IR emittances of each surface
+              Real64 const totsol,                        // Total solar transmittance of the IGU
+              Real64 const tilt,                          // Window tilt [degrees]
+              const Array1D<Real64> &asol,                // Vector of Absorbed solar energy fractions for each layer
+              Real64 const height,                        // IGU cavity height
+              Real64 const heightt,                       // Window height
+              Real64 const width,                         // Window width
+              const Array1D<Real64> &presure,             // Vector of gas pressures in gaps [N/m2]
+              Array2A_int const iprop,                    // Matrix of gas codes - see mgas definition
+              Array2A<Real64> const frct,                 // Matrix of mass percentages in gap mixtures
+              Array2A<Real64> const xgcon,                // Matrix of constants for gas conductivity calc
+              Array2A<Real64> const xgvis,                // Matrix of constants for gas dynamic viscosity calc
+              Array2A<Real64> const xgcp,                 // Matrix of constants for gas specific heat calc at constant pressure
+              const Array1D<Real64> &xwght,               // Vector of Molecular weights for gasses
+              const Array1D<Real64> &gama,                // Vector of spefic heat ration for low pressure calc
+              const Array1D_int &nmix,                    // Vector of number of gasses in gas mixture of each gap
+              const Array1D_int &SupportPillar,           // Shows whether or not gap have support pillar
+              const Array1D<Real64> &PillarSpacing,       // Pillar spacing for each gap (used in case there is support pillar)
+              const Array1D<Real64> &PillarRadius,        // Pillar radius for each gap (used in case there is support pillar)
+              Array1D<Real64> &theta,                     // Vector of average temperatures of glazing surfaces [K]
+              Array1D<Real64> &LayerDef,                  // Vector of layers deflection. [m]
+              Array1D<Real64> &q,                         // Vector of various heat fluxes [W/m2]
+              Array1D<Real64> &qv,                        // Vector of heat fluxes to each gap by ventillation [W/m2]
+              Real64 &ufactor,                            // Center of glass U-value [W/m2 K]
+              Real64 &sc,                                 // Shading Coefficient
+              Real64 &hflux,                              // Net heat flux between room and window [W/m2]
+              Real64 &hcin,                               // Indoor convective surface heat transfer coefficient  [W/m2 K]
+              Real64 &hcout,                              // Outdoor convective surface heat transfer coefficient [W/m2 K]
+              Real64 &hrin,                               // Indoor radiative surface heat transfer coefficient [W/m2 K]
+              Real64 &hrout,                              // Outdoor radiative surface heat transfer coefficient [W/m2 K]
+              Real64 &hin,                                // Indoor combined film coefficient (if non-zero) [W/m2K]
+              Real64 &hout,                               // Outdoor combined film coefficient (if non-zero) [W/m2K]
+              Array1D<Real64> &hcgas,                     // Convective part of gap effective conductivity (including in and out)
+              Array1D<Real64> &hrgas,                     // Radiative part of gap effective conductivity (including in and out)
+              Real64 &shgc,                               // Solar heat gain coefficient - per ISO 15099
+              int &nperr,                                 // Error code
+              std::string &ErrorMessage,                  // To store error message from tarcog execution
+              Real64 &shgct,                              // Solar heat gain coefficient - per old procedure
+              Real64 &tamb,                               // Outdoor environmental temperature [K]
+              Real64 &troom,                              // Indoor environmental temperature [K]
+              const Array1D_int &ibc,                     // Vector of boundary condition flags (ibc(1) - outdoor, ibc(2) - indoor
+              const Array1D<Real64> &Atop,                // Vector with areas of top openings - between SD layers and top of
+              const Array1D<Real64> &Abot,                // Vector with areas of bottom openings - between SD layers and
+              const Array1D<Real64> &Al,                  // Vector with areas of left-hand side openings - between SD layers and
+              const Array1D<Real64> &Ar,                  // Vector of areas of right-hand side openings - between SD layers and
+              const Array1D<Real64> &Ah,                  // Vector of total areas of holes for each SD [m2]
+              const Array1D<Real64> &SlatThick,           // Thickness of the slat material [m]
+              const Array1D<Real64> &SlatWidth,           // Slat width [m]
+              const Array1D<Real64> &SlatAngle,           // Slat tilt angle [deg]
+              const Array1D<Real64> &SlatCond,            // Conductivity of the slat material [W/m.K]
+              const Array1D<Real64> &SlatSpacing,         // Distance between slats [m]
+              const Array1D<Real64> &SlatCurve,           // Curvature radius of the slat [m]
+              const Array1D<Real64> &vvent,               // Vector of velocities for forced ventilation, for each gap, and for
+              const Array1D<Real64> &tvent,               // Vector of temperatures of ventilation gas for forced ventilation,
+              const Array1D<TARCOGLayerType> &LayerType,  // Glazing layer type flag
+              const Array1D_int &nslice,                  // Vector of numbers of slices in a laminated glazing layers
+              const Array1D<Real64> &LaminateA,           // Left-hand side array for creating slice equations
+              const Array1D<Real64> &LaminateB,           // Right-hand side array for creating slice equations
+              const Array1D<Real64> &sumsol,              // Array of absorbed solar energy fractions for each laminated
+              Array1D<Real64> &hg,                        // Gas conductance of the glazing cavity [W/m2 K]
+              Array1D<Real64> &hr,                        // Radiation conductance of the glazing cavity [W/m2 K]
+              Array1D<Real64> &hs,                        // Thermal conductance of the glazing cavity [W/m2 K]
+              Real64 &he,                                 // External heat transfer coefficient [W/m2 K] - EN673 and ISO 10292 procedure
+              Real64 &hi,                                 // Internal heat transfer coefficient [W/m2 K] - EN673 and ISO 10292 procedure
+              Array1D<Real64> &Ra,                        // Vector of Rayleigh numbers, for each gap
+              Array1D<Real64> &Nu,                        // Vector of Nusselt numbers, for each gap
+              TARCOGGassesParams::Stdrd const standard,   // Calculation standard switch:
+              TARCOGThermalModel const ThermalMod,        // Thermal model:
+              int const Debug_mode,                       // Switch for debug output files:
+              std::string const &Debug_dir,               // Target directory for debug files
+              std::string const &Debug_file,              // File name template for debug files
+              int const win_ID,                           // ID of window (passed by W6)
+              int const igu_ID,                           // ID of the IGU (passed by W6)
+              Real64 &ShadeEmisRatioOut,                  // Ratio of modified to glass emissivity at the outermost glazing surface
+              Real64 &ShadeEmisRatioIn,                   // Ratio of modified to glass emissivity at the innermost glazing surface
+              Real64 &ShadeHcRatioOut,                    // Ratio of modified to unshaded Hc at the outermost glazing surface
+              Real64 &ShadeHcRatioIn,                     // Ratio of modified to unshaded Hc at the innermost glazing surface
+              Real64 &HcUnshadedOut,                      // Hc value at outermost glazing surface of an unshaded subsystem [W/m2 K]
+              Real64 &HcUnshadedIn,                       // Hc value at innermost glazing surface of an unshaded subsystem [W/m2 K]
+              Array1D<Real64> &Keff,                      // Vector of keff values for gaps [W/m.K]
+              Array1D<Real64> &ShadeGapKeffConv,          // Vector of convective keff values for areas above/below
+              Real64 const SDScalar,                      // Factor of Venetian SD layer contribution to convection
+              int const SHGCCalc,                         // SHGC calculation switch:
+              int &NumOfIterations,                       // Number of iterations for reacing solution
+              Real64 const edgeGlCorrFac                  // Edge of glass correction factor
 )
 {
 
@@ -734,7 +734,7 @@ void TARCOG90(EnergyPlusData &state,
     // in case of provided deflected gap widths just store deflected widhts before temperatures calculation
     // deflections in this case do not depend of temperatures and it should be calculated before to avoid
     // one extra call of temperatures calculations
-    if (CalcDeflection == DEFLECTION_CALC_GAP_WIDTHS) {
+    if (CalcDeflection == DeflectionCalculation::GAP_WIDTHS) {
         PanesDeflection(CalcDeflection,
                         width,
                         height,
@@ -760,7 +760,7 @@ void TARCOG90(EnergyPlusData &state,
     // in case of deflection calculation for temperature & pressure input some variables needs to be stored because
     // Calc_ISO15099 and EN673 routines will change them and for deflection recalculation everything needs to be
     // called in same way except for changed gap widths
-    if (CalcDeflection == DEFLECTION_CALC_TEMPERATURE) {
+    if (CalcDeflection == DeflectionCalculation::TEMPERATURE) {
         eskyTemp = esky;
         trminTemp = trmin;
         hinTemp = hin;
@@ -771,7 +771,7 @@ void TARCOG90(EnergyPlusData &state,
 
     if (GoAhead(nperr)) {
 
-        if (standard == ISO15099) {
+        if (standard == TARCOGGassesParams::Stdrd::ISO15099) {
             Calc_ISO15099(state,
                           files,
                           nlayer,
@@ -867,7 +867,7 @@ void TARCOG90(EnergyPlusData &state,
                           SHGCCalc,
                           NumOfIterations,
                           edgeGlCorrFac);
-        } else if ((standard == EN673) || (standard == EN673Design)) {
+        } else if ((standard == TARCOGGassesParams::Stdrd::EN673) || (standard == TARCOGGassesParams::Stdrd::EN673Design)) {
             Calc_EN673(state,
                        files,
                        standard,
@@ -914,7 +914,7 @@ void TARCOG90(EnergyPlusData &state,
             return;
         }
 
-        if (CalcDeflection == DEFLECTION_CALC_TEMPERATURE) {
+        if (CalcDeflection == DeflectionCalculation::TEMPERATURE) {
             state.dataTARCOGMain->converged = false;
             while (!(state.dataTARCOGMain->converged)) {
                 PanesDeflection(CalcDeflection,
@@ -953,7 +953,7 @@ void TARCOG90(EnergyPlusData &state,
                 thick = state.dataTARCOGMain->thickTemp;
 
                 // after performed deflection recalculate temperatures with new gap widths
-                if (standard == ISO15099) {
+                if (standard == TARCOGGassesParams::Stdrd::ISO15099) {
                     Calc_ISO15099(state,
                                   files,
                                   nlayer,
@@ -1049,7 +1049,7 @@ void TARCOG90(EnergyPlusData &state,
                                   SHGCCalc,
                                   NumOfIterations,
                                   edgeGlCorrFac);
-                } else if ((standard == EN673) || (standard == EN673Design)) {
+                } else if ((standard == TARCOGGassesParams::Stdrd::EN673) || (standard == TARCOGGassesParams::Stdrd::EN673Design)) {
                     Calc_EN673(state,
                                files,
                                standard,
@@ -1110,7 +1110,7 @@ void TARCOG90(EnergyPlusData &state,
                     ErrorMessage = "Deflection calculations failed to converge";
                 }
             } // do while (.not.(converged))
-        }     // if ((CalcDeflection.eq.DEFLECTION_CALC_TEMPERATURE).or.(CalcDeflection.eq.DEFLECTION_CALC_GAP_WIDTHS)) then
+        }     // if ((CalcDeflection.eq.DeflectionCalculation::TEMPERATURE).or.(CalcDeflection.eq.DeflectionCalculation::GAP_WIDTHS)) then
     }         // if (GoAhead(nperr)) then
 
     FinishDebugOutputFiles(files, nperr);

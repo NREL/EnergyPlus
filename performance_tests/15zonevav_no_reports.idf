@@ -119,7 +119,7 @@
 ! ZONE_TERMINAL_FAN_STATIC_PRESSURE=  298.69
 ! End WebInterface Parameters
 
-  Version,9.5;
+  Version,9.6;
 
   Timestep,4;
 
@@ -7796,8 +7796,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     VAV WITH REHEAT_OA,      !- Name
     VAV WITH REHEAT_OA_Controllers,  !- Controller List Name
-    VAV WITH REHEAT_OA_Equipment,  !- Outdoor Air Equipment List Name
-    VAV WITH REHEAT Availability Manager List;  !- Availability Manager List Name
+    VAV WITH REHEAT_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     VAV WITH REHEAT_OANode List;  !- Node or NodeList Name 1
