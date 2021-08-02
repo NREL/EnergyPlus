@@ -11824,121 +11824,40 @@ void WriteVeriSumTable(EnergyPlusData &state)
                 }
             }
 
-            // Space and SpaceType sub-tables
-            Array1D_string spaceRowHead;
-            spaceRowHead.allocate(state.dataGlobal->numSpaces + 4);
-            int spaceNumOfCol = 9;
-            Array1D_string spaceColumnHead;
-            spaceColumnHead.allocate(spaceNumOfCol);
-            Array1D_int spaceColumnWidth;
-            spaceColumnWidth.allocate(spaceNumOfCol);
-            spaceColumnWidth = 14; // array assignment - same for all columns
-            Array2D_string spaceTableBody;
-            spaceTableBody.allocate(spaceNumOfCol, state.dataGlobal->numSpaces + 4);
-
-            spaceColumnHead(1) = "Area " + state.dataOutRptTab->m2_unitName;
-            spaceColumnHead(2) = "Conditioned (Y/N)";
-            spaceColumnHead(3) = "Part of Total Floor Area (Y/N)";
-            spaceColumnHead(4) = "Multipliers";
-            spaceColumnHead(5) = "Zone Name";
-            spaceColumnHead(6) = "Space Type";
-            spaceColumnHead(7) = "Lighting " + state.dataOutRptTab->Wm2_unitName;
-            spaceColumnHead(8) = "People " + state.dataOutRptTab->m2_unitName.substr(0, len(state.dataOutRptTab->m2_unitName) - 1) + " per person" +
-                                 state.dataOutRptTab->m2_unitName[len(state.dataOutRptTab->m2_unitName) - 1];
-            spaceColumnHead(9) = "Plug and Process " + state.dataOutRptTab->Wm2_unitName;
-
-            spaceRowHead = "";
-            spaceRowHead(state.dataGlobal->numSpaces + state.dataOutRptTab->grandTotal) = "Total";
-            spaceRowHead(state.dataGlobal->numSpaces + state.dataOutRptTab->condTotal) = "Conditioned Total";
-            spaceRowHead(state.dataGlobal->numSpaces + state.dataOutRptTab->uncondTotal) = "Unconditioned Total";
-            spaceRowHead(state.dataGlobal->numSpaces + state.dataOutRptTab->notpartTotal) = "Not Part of Total";
-
-            Array1D_string spaceTypeRowHead;
-            spaceTypeRowHead.allocate(state.dataGlobal->numSpaceTypes + 1);
-            int spaceTypeNumOfCol = 7;
-            Array1D_string spaceTypeColumnHead;
-            spaceTypeColumnHead.allocate(spaceTypeNumOfCol);
-            Array1D_int spaceTypeColumnWidth;
-            spaceTypeColumnWidth.allocate(spaceTypeNumOfCol);
-            spaceTypeColumnWidth = 14; // array assignment - same for all columns
-            Array2D_string spaceTypeTableBody;
-            spaceTypeTableBody.allocate(spaceTypeNumOfCol, state.dataGlobal->numSpaceTypes + 1);
-
-            spaceTypeColumnHead(1) = "Total Area " + state.dataOutRptTab->m2_unitName;
-            spaceTypeColumnHead(2) = "Conditioned Area " + state.dataOutRptTab->m2_unitName;
-            spaceTypeColumnHead(3) = "Unconditioned Area " + state.dataOutRptTab->m2_unitName;
-            spaceTypeColumnHead(4) = "Not Part of Total Area " + state.dataOutRptTab->m2_unitName;
-            spaceTypeColumnHead(5) = "Lighting " + state.dataOutRptTab->Wm2_unitName;
-            spaceTypeColumnHead(6) = "People " + state.dataOutRptTab->m2_unitName.substr(0, len(state.dataOutRptTab->m2_unitName) - 1) +
-                                     " per person" + state.dataOutRptTab->m2_unitName[len(state.dataOutRptTab->m2_unitName) - 1];
-            spaceTypeColumnHead(7) = "Plug and Process " + state.dataOutRptTab->Wm2_unitName;
-
-            spaceTypeRowHead = "";
-            spaceTypeRowHead(state.dataGlobal->numSpaceTypes + state.dataOutRptTab->grandTotal) = "Total";
-
-            gatherSpaceTables(state, spaceRowHead, spaceTypeRowHead, spaceTableBody, spaceTypeTableBody);
-
-            tableBody = "";
-            if (produceTabular) {
-                WriteSubtitle(state, "Space Summary");
-                WriteTable(state, spaceTableBody, spaceRowHead, spaceColumnHead, spaceColumnWidth);
-            }
-            if (produceSQLite) {
-                if (state.dataSQLiteProcedures->sqlite) {
-                    state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
-                        spaceTableBody, spaceRowHead, spaceColumnHead, "InputVerificationandResultsSummary", "Entire Facility", "Space Summary");
-                }
-            }
-            if (produceTabular) {
-                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                        spaceTableBody, spaceRowHead, spaceColumnHead, "Input Verification and Results Summary", "Entire Facility", "Space Summary");
-                }
-            }
-            if (produceTabular) {
-                WriteSubtitle(state, "Space Type Summary");
-                WriteTable(state, spaceTypeTableBody, spaceTypeRowHead, spaceTypeColumnHead, spaceTypeColumnWidth);
-            }
-            if (produceSQLite) {
-                if (state.dataSQLiteProcedures->sqlite) {
-                    state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(spaceTypeTableBody,
-                                                                                       spaceTypeRowHead,
-                                                                                       spaceTypeColumnHead,
-                                                                                       "InputVerificationandResultsSummary",
-                                                                                       "Entire Facility",
-                                                                                       "Space Type Summary");
-                }
-            }
-            if (produceTabular) {
-                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(spaceTypeTableBody,
-                                                                                                          spaceTypeRowHead,
-                                                                                                          spaceTypeColumnHead,
-                                                                                                          "Input Verification and Results Summary",
-                                                                                                          "Entire Facility",
-                                                                                                          "Space Type Summary");
-                }
-            }
+            writeVeriSumSpaceTables(state, produceTabular, produceSQLite);
         }
     }
 }
 
-void gatherSpaceTables(EnergyPlusData &state,
-                       Array1D_string &spaceRowHead,
-                       Array1D_string &spaceTypeRowHead,
-                       Array2D_string &spaceTableBody,
-                       Array2D_string &spaceTypeTableBody)
+void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool produceSQLite)
 {
 
-    // spaceColumnHead(1) = "Area "
-    // spaceColumnHead(2) = "Conditioned (Y/N)";
-    // spaceColumnHead(3) = "Part of Total Floor Area (Y/N)";
-    // spaceColumnHead(4) = "Multipliers";
-    // spaceColumnHead(5) = "Zone Name";
-    // spaceColumnHead(6) = "Space Type "
-    // spaceColumnHead(7) = "Lighting "
-    // spaceColumnHead(8) = "People "
-    // spaceColumnHead(9) = "Plug and Process "
+    // Write Space and SpaceType sub-tables for Input Verification and Results Summary
+    Array1D_string spaceRowHead;
+    Array1D_string spaceColumnHead;
+    Array1D_int spaceColumnWidth;
+    Array2D_string spaceTableBody;
+    int spaceNumCol = 10;
+    spaceRowHead.allocate(state.dataGlobal->numSpaces + 4); // Extra rows for totals
+    spaceColumnHead.allocate(spaceNumCol);
+    spaceColumnWidth.allocate(spaceNumCol);
+    spaceTableBody.allocate(spaceNumCol, state.dataGlobal->numSpaces + 4); // Extra rows for totals
+    for (int iCol = 1; iCol <= spaceNumCol; ++iCol) {
+        spaceColumnWidth = 14;
+    }
+
+    spaceColumnHead(1) = "Area " + state.dataOutRptTab->m2_unitName;
+    spaceColumnHead(2) = "Conditioned (Y/N)";
+    spaceColumnHead(3) = "Part of Total Floor Area (Y/N)";
+    spaceColumnHead(4) = "Multipliers";
+    spaceColumnHead(5) = "Zone Name";
+    spaceColumnHead(6) = "Space Type";
+    spaceColumnHead(7) = "Lighting " + state.dataOutRptTab->Wm2_unitName;
+    spaceColumnHead(8) = "People " + state.dataOutRptTab->m2_unitName.substr(0, len(state.dataOutRptTab->m2_unitName) - 1) + " per person" +
+                         state.dataOutRptTab->m2_unitName[len(state.dataOutRptTab->m2_unitName) - 1];
+    spaceColumnHead(9) = "Plug and Process " + state.dataOutRptTab->Wm2_unitName;
+    spaceColumnHead(10) = "Tags";
+
     int constexpr colSpaceArea(1);
     int constexpr colConditioned(2);
     int constexpr colPartOfTotal(3);
@@ -11948,6 +11867,13 @@ void gatherSpaceTables(EnergyPlusData &state,
     int constexpr colSpaceLighting(7);
     int constexpr colSpacePeople(8);
     int constexpr colSpacePlugProcess(9);
+    int constexpr colSpaceTags(10);
+
+    spaceRowHead(state.dataGlobal->numSpaces + state.dataOutRptTab->grandTotal) = "Total";
+    spaceRowHead(state.dataGlobal->numSpaces + state.dataOutRptTab->condTotal) = "Conditioned Total";
+    spaceRowHead(state.dataGlobal->numSpaces + state.dataOutRptTab->uncondTotal) = "Unconditioned Total";
+    spaceRowHead(state.dataGlobal->numSpaces + state.dataOutRptTab->notpartTotal) = "Not Part of Total";
+
     EPVector<Real64> spaceTotLighting;
     EPVector<Real64> spaceTotPeople;
     EPVector<Real64> spaceTotPlugProcess;
@@ -11960,13 +11886,27 @@ void gatherSpaceTables(EnergyPlusData &state,
         spaceTotPlugProcess(iSpace) = 0.0;
     }
 
-    // spaceTypeColumnHead(1) = "Total Area "
-    // spaceTypeColumnHead(2) = "Conditioned Area "
-    // spaceTypeColumnHead(3) = "Unconditioned Area "
-    // spaceTypeColumnHead(4) = "Not Part of Total Area "
-    // spaceTypeColumnHead(5) = "Lighting "
-    // spaceTypeColumnHead(6) = "People "
-    // spaceTypeColumnHead(7) = "Plug and Process "
+    Array1D_string spaceTypeRowHead;
+    Array1D_string spaceTypeColumnHead;
+    Array1D_int spaceTypeColumnWidth;
+    Array2D_string spaceTypeTableBody;
+    int spaceTypeNumCol = 7;
+    spaceTypeRowHead.allocate(state.dataGlobal->numSpaceTypes + 1); // Extra row for total
+    spaceTypeColumnHead.allocate(spaceTypeNumCol);
+    spaceTypeColumnWidth.allocate(spaceTypeNumCol);
+    spaceTypeTableBody.allocate(spaceTypeNumCol, state.dataGlobal->numSpaceTypes + 1); // Extra row for total
+    for (int iCol = 1; iCol <= spaceTypeNumCol; ++iCol) {
+        spaceTypeColumnWidth = 14;
+    }
+    spaceTypeColumnHead(1) = "Total Area " + state.dataOutRptTab->m2_unitName;
+    spaceTypeColumnHead(2) = "Conditioned Area " + state.dataOutRptTab->m2_unitName;
+    spaceTypeColumnHead(3) = "Unconditioned Area " + state.dataOutRptTab->m2_unitName;
+    spaceTypeColumnHead(4) = "Not Part of Total Area " + state.dataOutRptTab->m2_unitName;
+    spaceTypeColumnHead(5) = "Lighting " + state.dataOutRptTab->Wm2_unitName;
+    spaceTypeColumnHead(6) = "People " + state.dataOutRptTab->m2_unitName.substr(0, len(state.dataOutRptTab->m2_unitName) - 1) + " per person" +
+                             state.dataOutRptTab->m2_unitName[len(state.dataOutRptTab->m2_unitName) - 1];
+    spaceTypeColumnHead(7) = "Plug and Process " + state.dataOutRptTab->Wm2_unitName;
+
     int constexpr colSpaceTypeTotArea(1);
     int constexpr colSpaceTypeCondArea(2);
     int constexpr colSpaceTypeUncondArea(3);
@@ -11974,6 +11914,9 @@ void gatherSpaceTables(EnergyPlusData &state,
     int constexpr colSpaceTypeLighting(5);
     int constexpr colSpaceTypePeople(6);
     int constexpr colSpaceTypePlugProcess(7);
+
+    spaceTypeRowHead(state.dataGlobal->numSpaceTypes + state.dataOutRptTab->grandTotal) = "Total";
+
     EPVector<Real64> spaceTypeTotArea;
     EPVector<Real64> spaceTypeCondArea;
     EPVector<Real64> spaceTypeUncondArea;
@@ -12072,6 +12015,7 @@ void gatherSpaceTables(EnergyPlusData &state,
         }
     }
 
+    // re-use existing zone total variables
     for (int iTotal = 1; iTotal <= 4; ++iTotal) {
         state.dataOutRptTab->zstArea(iTotal) = 0.0;
         state.dataOutRptTab->zstLight(iTotal) = 0.0;
@@ -12082,7 +12026,7 @@ void gatherSpaceTables(EnergyPlusData &state,
     int spaceTableRowNum = 0;
     for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
         auto curZone = state.dataHeatBal->Zone(iZone);
-        Real64 const mult = Real64(curZone.Multiplier * curZone.ListMultiplier);
+        Real64 const mult = Real64(curZone.Multiplier) * Real64(curZone.ListMultiplier);
         for (int const spaceNum : curZone.Spaces) {
             auto curSpace = state.dataHeatBal->Space(spaceNum);
             bool spaceIsCond = false;
@@ -12130,6 +12074,18 @@ void gatherSpaceTables(EnergyPlusData &state,
             } else {
                 spaceTableBody(colSpacePlugProcess, spaceTableRowNum) = RealToStr(0.0, 4);
             }
+
+            std::string tags;
+            bool firstTag = true;
+            for (std::string const tag : curSpace.Tags) {
+                if (firstTag) {
+                    tags += tag;
+                    firstTag = false;
+                } else {
+                    tags += ", " + tag;
+                }
+            }
+            spaceTableBody(colSpaceTags, spaceTableRowNum) = tags;
 
             // If not part of total, goes directly to this row
             if (!useSpaceFloorArea) {
@@ -12227,6 +12183,47 @@ void gatherSpaceTables(EnergyPlusData &state,
     spaceTypeTableBody(colSpaceTypeUncondArea, state.dataGlobal->numSpaceTypes + 1) = RealToStr(uncondArea * state.dataOutRptTab->m2_unitConvWVST, 2);
     spaceTypeTableBody(colSpaceTypeNotTotArea, state.dataGlobal->numSpaceTypes + 1) =
         RealToStr(notTotalArea * state.dataOutRptTab->m2_unitConvWVST, 2);
+
+    if (produceTabular) {
+        WriteSubtitle(state, "Space Summary");
+        WriteTable(state, spaceTableBody, spaceRowHead, spaceColumnHead, spaceColumnWidth);
+    }
+    if (produceSQLite) {
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
+                spaceTableBody, spaceRowHead, spaceColumnHead, "InputVerificationandResultsSummary", "Entire Facility", "Space Summary");
+        }
+    }
+    if (produceTabular) {
+        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+                spaceTableBody, spaceRowHead, spaceColumnHead, "Input Verification and Results Summary", "Entire Facility", "Space Summary");
+        }
+    }
+    if (produceTabular) {
+        WriteSubtitle(state, "Space Type Summary");
+        WriteTable(state, spaceTypeTableBody, spaceTypeRowHead, spaceTypeColumnHead, spaceTypeColumnWidth);
+    }
+    if (produceSQLite) {
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(spaceTypeTableBody,
+                                                                               spaceTypeRowHead,
+                                                                               spaceTypeColumnHead,
+                                                                               "InputVerificationandResultsSummary",
+                                                                               "Entire Facility",
+                                                                               "Space Type Summary");
+        }
+    }
+    if (produceTabular) {
+        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(spaceTypeTableBody,
+                                                                                                  spaceTypeRowHead,
+                                                                                                  spaceTypeColumnHead,
+                                                                                                  "Input Verification and Results Summary",
+                                                                                                  "Entire Facility",
+                                                                                                  "Space Type Summary");
+        }
+    }
 }
 
 void WriteAdaptiveComfortTable(EnergyPlusData &state)

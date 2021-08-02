@@ -603,11 +603,7 @@ namespace OutputReportTabular {
 
     void WriteVeriSumTable(EnergyPlusData &state);
 
-    void gatherSpaceTables(EnergyPlusData &state,
-                           Array1D_string &spaceRowHead,
-                           Array1D_string &spaceTypeRowHead,
-                           Array2D_string &spaceTableBody,
-                           Array2D_string &spaceTypeTableBody);
+    void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool produceSQLite);
 
     void WriteAdaptiveComfortTable(EnergyPlusData &state);
 
