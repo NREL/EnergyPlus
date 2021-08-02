@@ -4780,7 +4780,8 @@ void UpdateFinalSurfaceHeatBalance(EnergyPlusData &state)
     bool CoolingPanelSysOn;   // true if a simple cooling panel is running
     bool SwimmingPoolOn;      // true if a pool is present (running)
 
-    ZeroQdotRadHVAC(state);
+    state.dataHeatBalSurf->QdotRadHVACInPerArea = 0.0;
+    state.dataHeatBalFanSys->QdotRadHVACToPerson = 0.0;
     UpdateRadSysSourceValAvg(state, LowTempRadSysOn);
     UpdateHTRadSourceValAvg(state, HighTempRadSysOn);
     UpdateBBRadSourceValAvg(state, HWBaseboardSysOn);
@@ -4794,16 +4795,6 @@ void UpdateFinalSurfaceHeatBalance(EnergyPlusData &state)
         // Call the outside and inside surface heat balances
         CalcHeatBalanceOutsideSurf(state);
         CalcHeatBalanceInsideSurf(state);
-    }
-}
-
-void ZeroQdotRadHVAC(EnergyPlusData &state)
-{
-    for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-        state.dataHeatBalSurf->QdotRadHVACInPerArea(SurfNum) = 0;
-    }
-    for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-        state.dataHeatBalFanSys->QdotRadHVACToPerson(ZoneNum) = 0;
     }
 }
 
@@ -7387,6 +7378,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
 
     // Reset radiant HVAC heat gain rate output for next timestep
     state.dataHeatBalSurf->QdotRadHVACInPerArea = 0.0;
+    state.dataHeatBalFanSys->QdotRadHVACToPerson = 0.0;
 
     // Update SumHmXXXX for non-window EMPD or HAMT surfaces
     if (state.dataHeatBal->AnyEMPD || state.dataHeatBal->AnyHAMT) {
@@ -8053,6 +8045,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
 
     // Reset radiant HVAC heat gain rate output for next timestep
     state.dataHeatBalSurf->QdotRadHVACInPerArea = 0.0;
+    state.dataHeatBalFanSys->QdotRadHVACToPerson = 0.0;
 
     // Set various surface output variables and other record keeping - after iterations are complete - all HT surfaces
     for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
