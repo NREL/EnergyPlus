@@ -3311,16 +3311,16 @@ namespace WindowManager {
                                     Real64 const ShGlReflFacIR,
                                     Real64 const RhoGlIR1,
                                     Real64 const RhoGlIR2,
-                                    Real64 const hcv,           // Convection coefficient from gap glass or shade/blind to gap air (W/m2-K)
-                                    Real64 const TGapNew,       // Current-iteration average air temp in airflow gap (K)
-                                    Real64 TAirflowGapNew,      // Average air temp in airflow gap between glass panes (K)
-                                    Real64 const hcvAirflowGap, // Convection coefficient from airflow gap glass to airflow gap air (W/m2-K)
-                                    Array1A<Real64> hcvBG,      // Convection coefficient from gap glass or shade to gap gas (W/m2-K)
-                                    Array1A<Real64> TGapNewBG,
-                                    Array1A<Real64> AbsRadShadeFace,
+                                    Real64 const hcv,             // Convection coefficient from gap glass or shade/blind to gap air (W/m2-K)
+                                    Real64 const TGapNew,         // Current-iteration average air temp in airflow gap (K)
+                                    Real64 const TAirflowGapNew,  // Average air temp in airflow gap between glass panes (K)
+                                    Real64 const hcvAirflowGap,   // Convection coefficient from airflow gap glass to airflow gap air (W/m2-K)
+                                    Array1A<Real64> const &hcvBG, // Convection coefficient from gap glass or shade to gap gas (W/m2-K)
+                                    Array1A<Real64> const &TGapNewBG,
+                                    Array1A<Real64> const &AbsRadShadeFace,
+                                    Array1D<Real64> const &hr,
                                     Array2D<Real64> &Aface,
-                                    Array1D<Real64> &Bface,
-                                    Array1D<Real64> hr)
+                                    Array1D<Real64> &Bface)
     {
         auto &hgap = state.dataWindowManager->hgap;
         auto &RhoIR = state.dataWindowManager->RhoIR;
@@ -4018,9 +4018,9 @@ namespace WindowManager {
                                        hcvBG,
                                        TGapNewBG,
                                        AbsRadShadeFace,
+                                       hr,
                                        Aface,
-                                       Bface,
-                                       hr);
+                                       Bface);
             LUdecomposition(state, Aface, state.dataWindowManager->nglfacep, indx, d); // Note that these routines change Aface;
             LUsolution(Aface, state.dataWindowManager->nglfacep, indx, Bface);         // face temperatures are returned in Bface
 

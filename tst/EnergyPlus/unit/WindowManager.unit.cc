@@ -3256,9 +3256,9 @@ TEST_F(EnergyPlusFixture, WindowManager_AdjRatioWindowTemperatureTest)
                                               hcvBG,
                                               TGapNewBG,
                                               AbsRadShadeFace,
+                                              hr,
                                               Aface,
-                                              Bface,
-                                              hr);
+                                              Bface);
 
     AfaceNoAdj = Aface;
     BfaceNoAdj = Bface;
@@ -3287,9 +3287,9 @@ TEST_F(EnergyPlusFixture, WindowManager_AdjRatioWindowTemperatureTest)
                                               hcvBG,
                                               TGapNewBG,
                                               AbsRadShadeFace,
+                                              hr,
                                               Aface,
-                                              Bface,
-                                              hr);
+                                              Bface);
 
     // compare the before and after adjusted coefficient matrices
     // Without shading case
@@ -3354,9 +3354,9 @@ TEST_F(EnergyPlusFixture, WindowManager_AdjRatioWindowTemperatureTest)
                                               hcvBG,
                                               TGapNewBG,
                                               AbsRadShadeFace,
+                                              hr,
                                               Aface,
-                                              Bface,
-                                              hr);
+                                              Bface);
 
     AfaceNoAdj = Aface;
     BfaceNoAdj = Bface;
@@ -3386,9 +3386,9 @@ TEST_F(EnergyPlusFixture, WindowManager_AdjRatioWindowTemperatureTest)
                                               hcvBG,
                                               TGapNewBG,
                                               AbsRadShadeFace,
+                                              hr,
                                               Aface,
-                                              Bface,
-                                              hr);
+                                              Bface);
 
     // compare the before and after adjusted coefficient matrices
     // With external-shading case
