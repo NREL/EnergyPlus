@@ -188,31 +188,14 @@ target_architecture(TARGET_ARCH)
 #
 # End debug
 
+include(cmake/SystemDetails.cmake)
+set_system_nickname()
 if(APPLE)
-  # Looking at cmake source code OS_RELEASE is already set to the output of `sw_vers -productVersion` which is what we want
-  cmake_host_system_information(RESULT OSX_VERSION QUERY OS_RELEASE)
-  message("-- OS_RELEASE variable is set to: " ${OSX_VERSION})
-  if(NOT CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "")
-    message("Using CMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}")
-    set(OSX_VERSION "${CMAKE_OSX_DEPLOYMENT_TARGET}")
-  endif()
-
-  # The output is like 10.12.6 or 10.13, let's strip the end component if any
-  string(REGEX REPLACE "^([0-9]+\\.[0-9]+)\\.?.*" "\\1" OSX_VERSION_MAJOR_MINOR ${OSX_VERSION})
-
-  set(SYSTEM_VERSION "-macOS${OSX_VERSION_MAJOR_MINOR}")
-
+  # eg: '-macOS10.13'
+  set(SYSTEM_VERSION "-${SYSTEM_NICKNAME}")
 elseif(UNIX)
-  # OS_RELEASE is the result of `uname -r` which is unhelpful (eg '5.4.0-42-generic')
-  find_program(LSB_RELEASE lsb_release)
-  # -rs outputs only 16.04, or 18.04
-  execute_process(COMMAND ${LSB_RELEASE} -rs OUTPUT_VARIABLE LSB_RELEASE_VERSION_SHORT OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-  # -is outputs "Ubuntu" or "Fedora"
-  execute_process(COMMAND ${LSB_RELEASE} -is OUTPUT_VARIABLE LSB_RELEASE_ID_SHORT OUTPUT_STRIP_TRAILING_WHITESPACE)
-
   # eg: `-Ubuntu18.04`
-  set(SYSTEM_VERSION "-${LSB_RELEASE_ID_SHORT}${LSB_RELEASE_VERSION_SHORT}")
+  set(SYSTEM_VERSION "-${SYSTEM_NICKNAME}")
 elseif(MSVC)
   # no-op
   set(SYSTEM_VERSION "")
@@ -246,18 +229,18 @@ file(MAKE_DIRECTORY ${DOCS_OUT})
 
 # the output variables listing
 install(
-  CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${PROJECT_SOURCE_DIR}/doc/tools/parse_output_variables.py\" \"${PROJECT_SOURCE_DIR}/src/EnergyPlus\" \"${DOCS_OUT}/SetupOutputVariables.csv\" \"${DOCS_OUT}/SetupOutputVariables.md\")"
+  CODE "execute_process(COMMAND \"${Python_EXECUTABLE}\" \"${PROJECT_SOURCE_DIR}/doc/tools/parse_output_variables.py\" \"${PROJECT_SOURCE_DIR}/src/EnergyPlus\" \"${DOCS_OUT}/SetupOutputVariables.csv\" \"${DOCS_OUT}/SetupOutputVariables.md\")"
 )
 install(FILES "${PROJECT_BINARY_DIR}/autodocs/SetupOutputVariables.csv" DESTINATION "./")
 
 # the example file summary
 install(
-  CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${PROJECT_SOURCE_DIR}/doc/tools/example_file_summary.py\" \"${PROJECT_SOURCE_DIR}/testfiles\" \"${DOCS_OUT}/ExampleFiles.html\")"
+  CODE "execute_process(COMMAND \"${Python_EXECUTABLE}\" \"${PROJECT_SOURCE_DIR}/doc/tools/example_file_summary.py\" \"${PROJECT_SOURCE_DIR}/testfiles\" \"${DOCS_OUT}/ExampleFiles.html\")"
   COMPONENT ExampleFiles)
 install(FILES "${DOCS_OUT}/ExampleFiles.html" DESTINATION "./ExampleFiles/" COMPONENT ExampleFiles)
 
 # the example file objects link
-install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${PROJECT_SOURCE_DIR}/doc/tools/example_file_objects.py\"
+install(CODE "execute_process(COMMAND \"${Python_EXECUTABLE}\" \"${PROJECT_SOURCE_DIR}/doc/tools/example_file_objects.py\"
 \"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd\" \"${PROJECT_SOURCE_DIR}/testfiles\" \"${DOCS_OUT}/ExampleFiles-ObjectsLink.html\")"
         COMPONENT ExampleFiles)
 install(FILES "${DOCS_OUT}/ExampleFiles-ObjectsLink.html" DESTINATION "./ExampleFiles/" COMPONENT ExampleFiles)
@@ -269,7 +252,7 @@ if(BUILD_CHANGELOG)
   # Better to move this condition into the install CODE.
   if(NOT "$ENV{GITHUB_TOKEN}" STREQUAL "")
     install(
-      CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${PROJECT_SOURCE_DIR}/doc/tools/create_changelog.py\" \"${PROJECT_SOURCE_DIR}\" \"${DOCS_OUT}/changelog.md\" \"${DOCS_OUT}/changelog.html\" \"${GIT_EXECUTABLE}\" \"$ENV{GITHUB_TOKEN}\" \"${PREV_RELEASE_SHA}\" \"${CPACK_PACKAGE_VERSION}\")"
+      CODE "execute_process(COMMAND \"${Python_EXECUTABLE}\" \"${PROJECT_SOURCE_DIR}/doc/tools/create_changelog.py\" \"${PROJECT_SOURCE_DIR}\" \"${DOCS_OUT}/changelog.md\" \"${DOCS_OUT}/changelog.html\" \"${GIT_EXECUTABLE}\" \"$ENV{GITHUB_TOKEN}\" \"${PREV_RELEASE_SHA}\" \"${CPACK_PACKAGE_VERSION}\")"
     )
     install(FILES "${DOCS_OUT}/changelog.html" DESTINATION "./" OPTIONAL)
   else()
@@ -370,7 +353,7 @@ install(
 
 # TODO Remove version from file name or generate
 # These files names are stored in variables because they also appear as start menu shortcuts later.
-set(RULES_XLS Rules9-2-0-to-9-3-0.md)
+set(RULES_XLS Rules9-5-0-to-9-6-0.md)
 install(FILES "${PROJECT_SOURCE_DIR}/release/Bugreprt.txt" DESTINATION "./")
 install(FILES "${PROJECT_SOURCE_DIR}/release/favicon.png" DESTINATION "./")
 install(FILES "${PROJECT_SOURCE_DIR}/release/readme.html" DESTINATION "./")
@@ -380,8 +363,8 @@ endif()
 set(CPACK_RESOURCE_FILE_README "${PROJECT_SOURCE_DIR}/release/readme.html")
 
 install(FILES "${PROJECT_SOURCE_DIR}/bin/CurveFitTools/IceStorageCurveFitTool.xlsm" DESTINATION "PreProcess/HVACCurveFitTool/")
-install(FILES "${PROJECT_SOURCE_DIR}/idd/V9-4-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
-install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V9-5-0-Energy+.idd")
+install(FILES "${PROJECT_SOURCE_DIR}/idd/V9-5-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
+install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V9-6-0-Energy+.idd")
 
 # Workflow stuff, takes about 40KB, so not worth it proposing to not install it
 install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/app_g_postprocess.py" DESTINATION "workflows/") # COMPONENT Workflows)
@@ -418,7 +401,7 @@ if(WIN32)
   install(FILES "${PROJECT_SOURCE_DIR}/src/Slab/RunSlab.bat" DESTINATION "PreProcess/GrndTempCalc/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/CurveFitTools/CurveFitTool.xlsm" DESTINATION "PreProcess/HVACCurveFitTool/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFEditor/IDFEditor.exe" DESTINATION "PreProcess/IDFEditor/")
-  install(FILES "${PROJECT_SOURCE_DIR}/src/ParametricPreprocessor/RunParam.bat" DESTINATION "PreProcess/ParametricPreProcessor/")
+  install(FILES "${PROJECT_SOURCE_DIR}/src/ParametricPreprocessor/RunParam.bat" DESTINATION "PreProcess/ParametricPreprocessor/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/ViewFactorCalculation/readme.txt" DESTINATION "PreProcess/ViewFactorCalculation/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/ViewFactorCalculation/View3D.exe" DESTINATION "PreProcess/ViewFactorCalculation/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/ViewFactorCalculation/View3D32.pdf" DESTINATION "PreProcess/ViewFactorCalculation/")
@@ -548,6 +531,7 @@ elseif(UNIX)
       "/usr/local/${CMAKE_PROJECT_NAME}-${CPACK_PACKAGE_VERSION_MAJOR}-${CPACK_PACKAGE_VERSION_MINOR}-${CPACK_PACKAGE_VERSION_PATCH}")
 
   install(PROGRAMS "${PROJECT_SOURCE_DIR}/bin/EP-Compare/Run-Linux/EP-Compare" DESTINATION "PostProcess/EP-Compare/")
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/EP-Compare/GraphHints.csv" DESTINATION "PostProcess/EP-Compare/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/EP-Compare/Run-Linux/EP-Compare Libs/EHInterfaces5001.so"
           DESTINATION "PostProcess/EP-Compare/EP-Compare Libs/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/EP-Compare/Run-Linux/EP-Compare Libs/EHObjectArray5001.so"

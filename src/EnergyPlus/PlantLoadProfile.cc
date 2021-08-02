@@ -139,7 +139,7 @@ void PlantProfileData::simulate(EnergyPlusData &state,
     using FluidProperties::GetSpecificHeatGlycol;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    static std::string const RoutineName("SimulatePlantProfile");
+    static constexpr std::string_view RoutineName("SimulatePlantProfile");
     Real64 DeltaTemp;
 
     this->InitPlantProfile(state);
@@ -186,34 +186,11 @@ void PlantProfileData::InitPlantProfile(EnergyPlusData &state)
     using ScheduleManager::GetScheduleMaxValue;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    static std::string const RoutineName("InitPlantProfile");
+    static constexpr std::string_view RoutineName("InitPlantProfile");
     Real64 FluidDensityInit;
-    bool errFlag;
 
     // Do the one time initializations
-    if (this->SetLoopIndexFlag) {
-        if (allocated(state.dataPlnt->PlantLoop)) {
-            errFlag = false;
-            ScanPlantLoopsForObject(state,
-                                    this->Name,
-                                    this->TypeNum,
-                                    this->WLoopNum,
-                                    this->WLoopSideNum,
-                                    this->WLoopBranchNum,
-                                    this->WLoopCompNum,
-                                    errFlag,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _);
-            if (errFlag) {
-                ShowFatalError(state, "InitPlantProfile: Program terminated for previous conditions.");
-            }
-
-            this->SetLoopIndexFlag = false;
-        }
-    }
+    this->oneTimeInit(state);
 
     if (!state.dataGlobal->SysSizingCalc && this->InitSizing) {
         RegisterPlantCompDesignFlow(state, InletNode, this->PeakVolFlowRate);
@@ -318,6 +295,34 @@ void PlantProfileData::ReportPlantProfile(EnergyPlusData &state)
         this->CoolingEnergy = std::abs(this->Energy);
     }
 }
+void PlantProfileData::oneTimeInit(EnergyPlusData &state)
+{
+    bool errFlag;
+
+    if (this->SetLoopIndexFlag) {
+        if (allocated(state.dataPlnt->PlantLoop)) {
+            errFlag = false;
+            ScanPlantLoopsForObject(state,
+                                    this->Name,
+                                    this->TypeNum,
+                                    this->WLoopNum,
+                                    this->WLoopSideNum,
+                                    this->WLoopBranchNum,
+                                    this->WLoopCompNum,
+                                    errFlag,
+                                    _,
+                                    _,
+                                    _,
+                                    _,
+                                    _);
+            if (errFlag) {
+                ShowFatalError(state, "InitPlantProfile: Program terminated for previous conditions.");
+            }
+
+            this->SetLoopIndexFlag = false;
+        }
+    }
+}
 
 // Functions
 void GetPlantProfileInput(EnergyPlusData &state)
@@ -377,7 +382,7 @@ void GetPlantProfileInput(EnergyPlusData &state)
                                                                                                state.dataIPShortCut->cAlphaArgs(1),
                                                                                                DataLoopNode::NodeFluidType::Water,
                                                                                                DataLoopNode::NodeConnectionType::Inlet,
-                                                                                               1,
+                                                                                               NodeInputManager::compFluidStream::Primary,
                                                                                                ObjectIsNotParent);
             state.dataPlantLoadProfile->PlantProfile(ProfileNum).OutletNode = GetOnlySingleNode(state,
                                                                                                 state.dataIPShortCut->cAlphaArgs(3),
@@ -386,7 +391,7 @@ void GetPlantProfileInput(EnergyPlusData &state)
                                                                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                                                                 DataLoopNode::NodeFluidType::Water,
                                                                                                 DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                1,
+                                                                                                NodeInputManager::compFluidStream::Primary,
                                                                                                 ObjectIsNotParent);
 
             state.dataPlantLoadProfile->PlantProfile(ProfileNum).LoadSchedule = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
@@ -423,24 +428,24 @@ void GetPlantProfileInput(EnergyPlusData &state)
                                 "Plant Load Profile Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).MassFlowRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name);
 
             SetupOutputVariable(state,
                                 "Plant Load Profile Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Power,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name);
 
             SetupOutputVariable(state,
                                 "Plant Load Profile Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Energy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -452,8 +457,8 @@ void GetPlantProfileInput(EnergyPlusData &state)
                                 "Plant Load Profile Heating Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).HeatingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name,
                                 _,
                                 "PLANTLOOPHEATINGDEMAND",
@@ -465,8 +470,8 @@ void GetPlantProfileInput(EnergyPlusData &state)
                                 "Plant Load Profile Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).CoolingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name,
                                 _,
                                 "PLANTLOOPCOOLINGDEMAND",

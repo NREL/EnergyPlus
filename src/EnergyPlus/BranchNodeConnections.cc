@@ -56,6 +56,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus::BranchNodeConnections {
@@ -75,15 +76,15 @@ using namespace DataLoopNode;
 using namespace DataBranchNodeConnections;
 
 void RegisterNodeConnection(EnergyPlusData &state,
-                            int const NodeNumber,                // Number for this Node
-                            std::string const &NodeName,         // Name of this Node
-                            std::string const &ObjectType,       // Type of object this Node is connected to (e.g. Chiller:Electric)
-                            std::string const &ObjectName,       // Name of object this Node is connected to (e.g. MyChiller)
-                            std::string const &ConnectionType,   // Connection Type for this Node (must be valid)
-                            int const FluidStream,               // Count on Fluid Streams
-                            bool const IsParent,                 // True when node is a parent node
-                            bool &errFlag,                       // Will be True if errors already detected or if errors found here
-                            Optional_string_const InputFieldName // Input Field Name
+                            int const NodeNumber,                                // Number for this Node
+                            std::string_view const NodeName,                     // Name of this Node
+                            std::string_view const ObjectType,                   // Type of object this Node is connected to (e.g. Chiller:Electric)
+                            std::string_view const ObjectName,                   // Name of object this Node is connected to (e.g. MyChiller)
+                            std::string_view const ConnectionType,               // Connection Type for this Node (must be valid)
+                            NodeInputManager::compFluidStream const FluidStream, // Count on Fluid Streams
+                            bool const IsParent,                                 // True when node is a parent node
+                            bool &errFlag,                                       // Will be True if errors already detected or if errors found here
+                            Optional_string_const InputFieldName                 // Input Field Name
 )
 {
 
@@ -98,7 +99,7 @@ void RegisterNodeConnection(EnergyPlusData &state,
     // structure is intended to help with HVAC diagramming as well as validation of nodes.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    constexpr auto RoutineName = "RegisterNodeConnection: ";
+    static constexpr std::string_view RoutineName = "RegisterNodeConnection: ";
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool ErrorsFoundHere;
@@ -109,7 +110,9 @@ void RegisterNodeConnection(EnergyPlusData &state,
     ErrorsFoundHere = false;
     if (!IsValidConnectionType(ConnectionType)) {
         ShowSevereError(state, format("{}{}{}", RoutineName, "Invalid ConnectionType=", ConnectionType));
-        ShowContinueError(state, "Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName);
+        ShowContinueError(state,
+                          "Occurs for Node=" + std::string{NodeName} + ", ObjectType=" + std::string{ObjectType} +
+                              ", ObjectName=" + std::string{ObjectName});
         ErrorsFoundHere = true;
     }
 
@@ -167,8 +170,8 @@ void RegisterNodeConnection(EnergyPlusData &state,
                                                     &EqNodeConnectionDef::NodeName,
                                                     state.dataBranchNodeConnections->NumOfAirTerminalNodes - 1);
             if (Found != 0) { // Nodename already used
-                ShowSevereError(state, RoutineName + ObjectType + "=\"" + ObjectName + "\" node name duplicated.");
-                ShowContinueError(state, "NodeName=\"" + NodeName + "\", entered as type=" + ConnectionType);
+                ShowSevereError(state, fmt::format("{}{}=\"{}\" node name duplicated", RoutineName, ObjectType, ObjectName));
+                ShowContinueError(state, "NodeName=\"" + std::string{NodeName} + "\", entered as type=" + std::string{ConnectionType});
                 ShowContinueError(state, "In Field=" + InputFieldName());
                 ShowContinueError(state,
                                   "Already used in " + state.dataBranchNodeConnections->AirTerminalNodeConnections(Found).ObjectType + "=\"" +
@@ -190,7 +193,7 @@ void RegisterNodeConnection(EnergyPlusData &state,
                     InputFieldName;
             }
         } else {
-            ShowSevereError(state, RoutineName + ObjectType + ", Developer Error: Input Field Name not included.");
+            ShowSevereError(state, fmt::format("{}{} , Developer Error: Input Field Name not included.", RoutineName, ObjectType));
             ShowContinueError(state, "Node names not checked for duplication.");
         }
     }
@@ -206,9 +209,9 @@ void OverrideNodeConnectionType(EnergyPlusData &state,
                                 std::string const &ObjectType,     // Type of object this Node is connected to (e.g. Chiller:Electric)
                                 std::string const &ObjectName,     // Name of object this Node is connected to (e.g. MyChiller)
                                 std::string const &ConnectionType, // Connection Type for this Node (must be valid)
-                                int const FluidStream,             // Count on Fluid Streams
-                                bool const IsParent,               // True when node is a parent node
-                                bool &errFlag                      // Will be True if errors already detected or if errors found here
+                                NodeInputManager::compFluidStream const FluidStream, // Count on Fluid Streams
+                                bool const IsParent,                                 // True when node is a parent node
+                                bool &errFlag // Will be True if errors already detected or if errors found here
 )
 {
 
@@ -221,7 +224,7 @@ void OverrideNodeConnectionType(EnergyPlusData &state,
     // structure is intended to help with HVAC diagramming as well as validation of nodes. This function
     // is a based on RegisterNodeConnection.
 
-    constexpr auto RoutineName("ModifyNodeConnectionType: ");
+    static constexpr std::string_view RoutineName("ModifyNodeConnectionType: ");
 
     if (!IsValidConnectionType(ConnectionType)) {
         ShowSevereError(state, format("{}{}{}", RoutineName, "Invalid ConnectionType=", ConnectionType));
@@ -249,7 +252,7 @@ void OverrideNodeConnectionType(EnergyPlusData &state,
     }
 }
 
-bool IsValidConnectionType(std::string const &ConnectionType)
+bool IsValidConnectionType(std::string_view ConnectionType)
 {
 
     // FUNCTION INFORMATION:
@@ -693,7 +696,7 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
     // Check 10 -- fluid streams cannot have multiple inlet/outlet nodes on same component
     //  can have multiple inlets with one outlet or vice versa but cannot have multiple both inlet and outlet
     if (state.dataBranchNodeConnections->NumOfNodeConnections > 0) {
-        MaxFluidStream = maxval(state.dataBranchNodeConnections->NodeConnections, &NodeConnectionDef::FluidStream);
+        MaxFluidStream = static_cast<int>(maxval(state.dataBranchNodeConnections->NodeConnections, &NodeConnectionDef::FluidStream));
         FluidStreamInletCount.allocate(MaxFluidStream);
         FluidStreamOutletCount.allocate(MaxFluidStream);
         FluidStreamCounts.allocate(MaxFluidStream);
@@ -730,18 +733,18 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
             if (state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectIsParent) continue;
             if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType ==
                 ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet))
-                ++FluidStreamInletCount(state.dataBranchNodeConnections->NodeConnections(Loop1).FluidStream);
+                ++FluidStreamInletCount(static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop1).FluidStream));
             if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType ==
                 ValidConnectionTypes(DataLoopNode::NodeConnectionType::Outlet))
-                ++FluidStreamOutletCount(state.dataBranchNodeConnections->NodeConnections(Loop1).FluidStream);
+                ++FluidStreamOutletCount(static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop1).FluidStream));
             for (Loop2 = Loop1 + 1; Loop2 <= NodeObjects(Object + 1) - 1; ++Loop2) {
                 if (state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectIsParent) continue;
                 if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType ==
                     ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet))
-                    ++FluidStreamInletCount(state.dataBranchNodeConnections->NodeConnections(Loop2).FluidStream);
+                    ++FluidStreamInletCount(static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop2).FluidStream));
                 if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType ==
                     ValidConnectionTypes(DataLoopNode::NodeConnectionType::Outlet))
-                    ++FluidStreamOutletCount(state.dataBranchNodeConnections->NodeConnections(Loop2).FluidStream);
+                    ++FluidStreamOutletCount(static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop2).FluidStream));
             }
             for (Loop2 = 1; Loop2 <= MaxFluidStream; ++Loop2) {
                 if (FluidStreamInletCount(Loop2) > 1 && FluidStreamOutletCount(Loop2) > 1) {
@@ -1043,11 +1046,11 @@ void GetComponentData(EnergyPlusData &state,
                       int &NumInlets,
                       Array1D_string &InletNodeNames,
                       Array1D_int &InletNodeNums,
-                      Array1D_int &InletFluidStreams,
+                      Array1D<NodeInputManager::compFluidStream> &InletFluidStreams,
                       int &NumOutlets,
                       Array1D_string &OutletNodeNames,
                       Array1D_int &OutletNodeNums,
-                      Array1D_int &OutletFluidStreams,
+                      Array1D<NodeInputManager::compFluidStream> &OutletFluidStreams,
                       bool &ErrorsFound // set to true if errors found, unchanged otherwise
 )
 {
@@ -1099,10 +1102,10 @@ void GetComponentData(EnergyPlusData &state,
 
     InletNodeNames = std::string();
     InletNodeNums = 0;
-    InletFluidStreams = 0;
+    InletFluidStreams = NodeInputManager::compFluidStream::Unassigned;
     OutletNodeNames = std::string();
     OutletNodeNums = 0;
-    OutletFluidStreams = 0;
+    OutletFluidStreams = NodeInputManager::compFluidStream::Unassigned;
     NumInlets = 0;
     NumOutlets = 0;
     ErrInObject = false;
@@ -1280,12 +1283,12 @@ void GetChildrenData(EnergyPlusData &state,
 }
 
 void SetUpCompSets(EnergyPlusData &state,
-                   std::string const &ParentType,    // Parent Object Type
-                   std::string const &ParentName,    // Parent Object Name
-                   std::string const &CompType,      // Component Type
-                   std::string const &CompName,      // Component Name
-                   std::string const &InletNode,     // Inlet Node Name
-                   std::string const &OutletNode,    // Outlet Node Name
+                   std::string_view ParentType,      // Parent Object Type
+                   std::string_view ParentName,      // Parent Object Name
+                   std::string_view CompType,        // Component Type
+                   std::string_view CompName,        // Component Name
+                   std::string_view InletNode,       // Inlet Node Name
+                   std::string_view OutletNode,      // Outlet Node Name
                    Optional_string_const Description // Description
 )
 {
@@ -1384,7 +1387,7 @@ void SetUpCompSets(EnergyPlusData &state,
                             Found2 = 1;
                     }
                     if (Found2 == 0) {
-                        ShowWarningError(state, "Node used as an inlet more than once: " + InletNode);
+                        ShowWarningError(state, "Node used as an inlet more than once: " + std::string{InletNode});
                         ShowContinueError(state,
                                           "  Used by     : " + state.dataBranchNodeConnections->CompSets(Count).ParentCType +
                                               ", name=" + state.dataBranchNodeConnections->CompSets(Count).ParentCName);
@@ -1427,7 +1430,7 @@ void SetUpCompSets(EnergyPlusData &state,
                     // This rule is violated by dual duct units, so let it pass
                     if ((Found2 == 0) && (!has_prefixi(state.dataBranchNodeConnections->CompSets(Count).CType, "AirTerminal:DualDuct:")) &&
                         (!has_prefixi(CompTypeUC, "AirTerminal:DualDuct:"))) {
-                        ShowWarningError(state, "Node used as an outlet more than once: " + OutletNode);
+                        ShowWarningError(state, "Node used as an outlet more than once: " + std::string{OutletNode});
                         ShowContinueError(state,
                                           "  Used by     : " + state.dataBranchNodeConnections->CompSets(Count).ParentCType +
                                               ", name=" + state.dataBranchNodeConnections->CompSets(Count).ParentCName);
@@ -1547,7 +1550,7 @@ void TestInletOutletNodes(EnergyPlusData &state, [[maybe_unused]] bool &ErrorsFo
 
 void TestCompSet(EnergyPlusData &state,
                  std::string const &CompType,   // Component Type
-                 std::string const &CompName,   // Component Name
+                 std::string_view CompName,     // Component Name
                  std::string const &InletNode,  // Inlet Node Name
                  std::string const &OutletNode, // Outlet Node Name
                  std::string const &Description // Description of Node Pair (for warning message)

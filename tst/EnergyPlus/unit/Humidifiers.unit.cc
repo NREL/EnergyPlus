@@ -80,7 +80,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_Sizing)
 
     HumidifierData thisHum;
 
-    thisHum.HumType_Code = 2;
+    thisHum.HumType = HumidType::Gas;
     thisHum.NomCapVol = 4.00E-5;
     thisHum.NomPower = AutoSize;
     thisHum.ThermalEffRated = 1.0;
@@ -115,7 +115,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_AutoSizing)
 
     HumidifierData thisHum;
 
-    thisHum.HumType_Code = 2;
+    thisHum.HumType = HumidType::Gas;
     thisHum.NomCapVol = AutoSize;
     thisHum.NomPower = AutoSize;
     thisHum.ThermalEffRated = 0.80;
@@ -157,7 +157,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_EnergyUse)
     state->dataHumidifiers->NumGasSteamHums = 1;
     state->dataHumidifiers->NumHumidifiers = 1;
     state->dataHumidifiers->Humidifier.allocate(state->dataHumidifiers->NumGasSteamHums);
-    thisHum.HumType_Code = 2;
+    thisHum.HumType = HumidType::Gas;
     thisHum.NomCapVol = 4.00E-5;
     thisHum.NomPower = 103710.0;
     thisHum.ThermalEffRated = 1.0;
@@ -186,7 +186,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_EnergyUse)
     thisHum.AirInMassFlowRate = 1.8919;
     thisHum.AirInTemp = 20.0;
     thisHum.AirInEnthalpy = 25000.0;
-    thisHum.InletWaterTempOption = 1;
+    thisHum.InletWaterTempOption = InletWaterTemp::Fixed;
     thisHum.CurMakeupWaterTemp = 20.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
 
@@ -247,7 +247,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_ThermalEfficiency)
     state->dataHumidifiers->NumGasSteamHums = 1;
     state->dataHumidifiers->NumHumidifiers = 1;
     state->dataHumidifiers->Humidifier.allocate(state->dataHumidifiers->NumGasSteamHums);
-    thisHum.HumType_Code = 2;
+    thisHum.HumType = HumidType::Gas;
     thisHum.NomCapVol = 4.00E-5;
     thisHum.NomCap = 4.00E-2;
     thisHum.NomPower = 103720.0;
@@ -269,7 +269,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_ThermalEfficiency)
     thisHum.AirInMassFlowRate = 1.8919;
     thisHum.AirInTemp = 20.0;
     thisHum.AirInEnthalpy = 25000.0;
-    thisHum.InletWaterTempOption = 1;
+    thisHum.InletWaterTempOption = InletWaterTemp::Fixed;
     thisHum.CurMakeupWaterTemp = 20.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
 

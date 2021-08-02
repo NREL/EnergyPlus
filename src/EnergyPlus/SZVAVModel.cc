@@ -58,10 +58,10 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/SZVAVModel.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -80,7 +80,6 @@ namespace SZVAVModel {
     // parts of the simulation.
 
     // MODULE PARAMETER DEFINITIONS
-    int const HCoil_Water(1);
 
     // Functions
 
@@ -301,7 +300,7 @@ namespace SZVAVModel {
 
                 Par(12) = minAirMassFlow; // operating air flow rate, minAirMassFlow indicates low speed, maxAirMassFlow indicates full speed
                 Par(13) = 0.0;            // SA Temp target, 0 means iterate on load and not SA temperature
-                TempSolveRoot::SolveRoot(
+                General::SolveRoot(
                     state, 0.001, MaxIter, SolFlag, PartLoadRatio, PackagedTerminalHeatPump::CalcPTUnitWaterFlowResidual, 0.0, 1.0, Par);
                 if (SolFlag < 0) {
                     MessagePrefix = "Step 1: ";
@@ -358,7 +357,7 @@ namespace SZVAVModel {
                         Par(12) = AirMassFlow; // sets air flow rate used when iterating on coil capacity
                         Par(13) = 0.0;         // other than 0 means to iterate on SA temperature
 
-                        TempSolveRoot::SolveRoot(
+                        General::SolveRoot(
                             state, 0.001, MaxIter, SolFlag, PartLoadRatio, PackagedTerminalHeatPump::CalcPTUnitWaterFlowResidual, 0.0, 1.0, Par);
                         outletTemp = state.dataLoopNodes->Node(OutletNode).Temp;
                         if ((CoolingLoad && outletTemp < maxOutletTemp) || (HeatingLoad && outletTemp > maxOutletTemp)) {
@@ -370,7 +369,7 @@ namespace SZVAVModel {
                     } else { // not enough capacity at this air flow rate. Unit does have enough capacity a full water/air, otherwise wouldn't be here
                         // this is different from the PTUnit and UnitarySys routines in this module
                         // find the water flow rate that meets the min load at region 1/2 bounday
-                        TempSolveRoot::SolveRoot(
+                        General::SolveRoot(
                             state, 0.001, MaxIter, SolFlag, lowWaterMdot, PackagedTerminalHeatPump::CalcPTUnitWaterFlowResidual, 0.0, 1.0, Par);
                         Par(9) = lowWaterMdot;
                         if (SolFlag < 0) {
@@ -378,21 +377,21 @@ namespace SZVAVModel {
                         } else {
                             Par(9) = 0.0;
                         }
-                        TempSolveRoot::SolveRoot(state,
-                                                 0.001,
-                                                 MaxIter,
-                                                 SolFlag,
-                                                 PartLoadRatio,
-                                                 PackagedTerminalHeatPump::CalcPTUnitAirAndWaterFlowResidual,
-                                                 0.0,
-                                                 1.0,
-                                                 Par);
+                        General::SolveRoot(state,
+                                           0.001,
+                                           MaxIter,
+                                           SolFlag,
+                                           PartLoadRatio,
+                                           PackagedTerminalHeatPump::CalcPTUnitAirAndWaterFlowResidual,
+                                           0.0,
+                                           1.0,
+                                           Par);
                         if (SolFlag < 0) {
                             MessagePrefix = "Step 2b: ";
                         }
                     }
                 } else { // too much capacity when coil off, could lower air flow rate here to meet load if air flow is above minimum
-                    TempSolveRoot::SolveRoot(
+                    General::SolveRoot(
                         state, 0.001, MaxIter, SolFlag, PartLoadRatio, PackagedTerminalHeatPump::CalcPTUnitAirAndWaterFlowResidual, 0.0, 1.0, Par);
                     if (SolFlag < 0) {
                         MessagePrefix = "Step 2c: ";
@@ -457,13 +456,13 @@ namespace SZVAVModel {
                     // otherwise iterate on load
                     Par(12) = maxAirMassFlow; // operating air flow rate, minAirMassFlow indicates low speed, maxAirMassFlow indicates full speed
                     Par(13) = 0.0;            // SA Temp target, 0 means iterate on load and not SA temperature
-                    TempSolveRoot::SolveRoot(
+                    General::SolveRoot(
                         state, 0.001, MaxIter, SolFlag, PartLoadRatio, PackagedTerminalHeatPump::CalcPTUnitWaterFlowResidual, 0.0, 1.0, Par);
                     if (SolFlag < 0) {
                         MessagePrefix = "Step 3: ";
                     }
                 } else {
-                    TempSolveRoot::SolveRoot(
+                    General::SolveRoot(
                         state, 0.001, MaxIter, SolFlag, PartLoadRatio, PackagedTerminalHeatPump::CalcPTUnitAirAndWaterFlowResidual, 0.0, 1.0, Par);
                     if (SolFlag < 0) {
                         MessagePrefix = "Step 3a: ";
@@ -738,7 +737,7 @@ namespace SZVAVModel {
 
                 Par(12) = minAirMassFlow; // operating air flow rate, minAirMassFlow indicates low speed, maxAirMassFlow indicates full speed
                 Par(13) = 0.0;            // SA Temp target, 0 means iterate on load and not SA temperature
-                TempSolveRoot::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilWaterFlowResidual, 0.0, 1.0, Par);
+                General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilWaterFlowResidual, 0.0, 1.0, Par);
                 if (SolFlag < 0) {
                     MessagePrefix = "Step 1: ";
                 }
@@ -792,11 +791,10 @@ namespace SZVAVModel {
                         Par(12) = AirMassFlow; // sets air flow rate used when iterating on coil capacity
                         Par(13) = 0.0;         // other than 0 means to iterate on SA temperature
                         if (SZVAVModel.HCoilType_Num == FanCoilUnits::HCoil::Water || !HeatingLoad) {
-                            TempSolveRoot::SolveRoot(
+                            General::SolveRoot(
                                 state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilWaterFlowResidual, 0.0, 1.0, Par);
                         } else {
-                            TempSolveRoot::SolveRoot(
-                                state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilLoadResidual, 0.0, 1.0, Par);
+                            General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilLoadResidual, 0.0, 1.0, Par);
                         }
                         outletTemp = state.dataLoopNodes->Node(OutletNode).Temp;
                         if ((CoolingLoad && outletTemp < maxOutletTemp) || (HeatingLoad && outletTemp > maxOutletTemp)) {
@@ -809,7 +807,7 @@ namespace SZVAVModel {
                         // this is different from the PTUnit and UnitarySys routines in this module
                         // find the water flow rate that meets the min load at region 1/2 bounday
                         if (SZVAVModel.HCoilType_Num == FanCoilUnits::HCoil::Water || !HeatingLoad) {
-                            TempSolveRoot::SolveRoot(
+                            General::SolveRoot(
                                 state, 0.001, MaxIter, SolFlag, lowWaterMdot, FanCoilUnits::CalcFanCoilWaterFlowResidual, 0.0, 1.0, Par);
                             Par(9) = lowWaterMdot;
                             if (SolFlag < 0) {
@@ -817,14 +815,13 @@ namespace SZVAVModel {
                             } else {
                                 Par(9) = 0.0;
                             }
-                            TempSolveRoot::SolveRoot(
+                            General::SolveRoot(
                                 state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilAirAndWaterFlowResidual, 0.0, 1.0, Par);
                             if (SolFlag < 0) {
                                 MessagePrefix = "Step 2b: ";
                             }
                         } else {
-                            TempSolveRoot::SolveRoot(
-                                state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilLoadResidual, 0.0, 1.0, Par);
+                            General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilLoadResidual, 0.0, 1.0, Par);
                             if (SolFlag < 0) {
                                 MessagePrefix = "Step 2: ";
                             }
@@ -832,10 +829,10 @@ namespace SZVAVModel {
                     }
                 } else { // too much capacity when coil off, could lower air flow rate here to meet load if air flow is above minimum
                     if (SZVAVModel.HCoilType_Num == FanCoilUnits::HCoil::Water || !HeatingLoad) {
-                        TempSolveRoot::SolveRoot(
+                        General::SolveRoot(
                             state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilAirAndWaterFlowResidual, 0.0, 1.0, Par);
                     } else {
-                        TempSolveRoot::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilLoadResidual, 0.0, 1.0, Par);
+                        General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilLoadResidual, 0.0, 1.0, Par);
                     }
                     if (SolFlag < 0) {
                         MessagePrefix = "Step 2c: ";
@@ -897,20 +894,19 @@ namespace SZVAVModel {
                     Par(12) = maxAirMassFlow; // operating air flow rate, minAirMassFlow indicates low speed, maxAirMassFlow indicates full speed
                     Par(13) = 0.0;            // SA Temp target, 0 means iterate on load and not SA temperature
                     if (SZVAVModel.HCoilType_Num == FanCoilUnits::HCoil::Water || !HeatingLoad) {
-                        TempSolveRoot::SolveRoot(
-                            state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilWaterFlowResidual, 0.0, 1.0, Par);
+                        General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilWaterFlowResidual, 0.0, 1.0, Par);
                     } else {
-                        TempSolveRoot::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilLoadResidual, 0.0, 1.0, Par);
+                        General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilLoadResidual, 0.0, 1.0, Par);
                     }
                     if (SolFlag < 0) {
                         MessagePrefix = "Step 3: ";
                     }
                 } else { // too much capacity at full air flow with coil off, operate coil and fan in unison
                     if (SZVAVModel.HCoilType_Num == FanCoilUnits::HCoil::Water || !HeatingLoad) {
-                        TempSolveRoot::SolveRoot(
+                        General::SolveRoot(
                             state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilAirAndWaterFlowResidual, 0.0, 1.0, Par);
                     } else {
-                        TempSolveRoot::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilLoadResidual, 0.0, 1.0, Par);
+                        General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilLoadResidual, 0.0, 1.0, Par);
                     }
                     if (SolFlag < 0) {
                         MessagePrefix = "Step 3a: ";
@@ -1213,7 +1209,7 @@ namespace SZVAVModel {
                                           // air flow
                 Par[13] = 0.0;            // SA Temp target, 0 means iterate on load and not SA temperature
 
-                TempSolveRoot::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, thisSys.calcUnitarySystemWaterFlowResidual, 0.0, 1.0, Par);
+                General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, thisSys.calcUnitarySystemWaterFlowResidual, 0.0, 1.0, Par);
                 if (SolFlag < 0) {
                     MessagePrefix = "Step 1: ";
                 }
@@ -1252,7 +1248,7 @@ namespace SZVAVModel {
                 Par[12] = AirMassFlow;      // sets air flow rate used when iterating on coil capacity
                 Par[13] = 0.0;              // other than 0 means to iterate on SA temperature
 
-                TempSolveRoot::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, thisSys.calcUnitarySystemWaterFlowResidual, 0.0, 1.0, Par);
+                General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, thisSys.calcUnitarySystemWaterFlowResidual, 0.0, 1.0, Par);
                 if (SolFlag < 0) {
                     MessagePrefix = "Step 2: ";
                 }
@@ -1322,7 +1318,7 @@ namespace SZVAVModel {
                 Par[12] = maxAirMassFlow; // operating air flow rate, minAirMassFlow indicates low speed air flow rate, maxAirMassFlow indicates full
                                           // air flow
                 Par[13] = 0.0;            // SA Temp target, 0 means iterate on load and not SA temperature
-                TempSolveRoot::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, thisSys.calcUnitarySystemWaterFlowResidual, 0.0, 1.0, Par);
+                General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, thisSys.calcUnitarySystemWaterFlowResidual, 0.0, 1.0, Par);
                 if (SolFlag < 0) {
                     MessagePrefix = "Step 3: ";
                 }

@@ -68,6 +68,7 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HVACFourPipeBeam.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -77,7 +78,6 @@
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -97,7 +97,7 @@ namespace FourPipeBeam {
         using namespace DataSizing;
         using CurveManager::GetCurveIndex;
         using ScheduleManager::GetScheduleIndex;
-        static std::string const routineName("FourPipeBeamFactory "); // include trailing blank space
+        static constexpr std::string_view routineName("FourPipeBeamFactory "); // include trailing blank space
 
         int beamIndex; // loop index
 
@@ -157,7 +157,7 @@ namespace FourPipeBeam {
             thisBeam->airAvailSchedNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2)); // convert schedule name to pointer
             if (thisBeam->airAvailSchedNum == 0) {
                 ShowSevereError(state,
-                                routineName + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
+                                std::string{routineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
                                     " entered =" + state.dataIPShortCut->cAlphaArgs(2) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
                                     state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
@@ -169,7 +169,7 @@ namespace FourPipeBeam {
             thisBeam->coolingAvailSchedNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3)); // convert schedule name to index
             if (thisBeam->coolingAvailSchedNum == 0) {
                 ShowSevereError(state,
-                                routineName + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(3) +
+                                std::string{routineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(3) +
                                     " entered =" + state.dataIPShortCut->cAlphaArgs(3) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
                                     state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
@@ -181,7 +181,7 @@ namespace FourPipeBeam {
             thisBeam->heatingAvailSchedNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4)); // convert schedule name to index
             if (thisBeam->heatingAvailSchedNum == 0) {
                 ShowSevereError(state,
-                                routineName + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(4) +
+                                std::string{routineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(4) +
                                     " entered =" + state.dataIPShortCut->cAlphaArgs(4) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
                                     state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
@@ -195,7 +195,7 @@ namespace FourPipeBeam {
                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                    DataLoopNode::NodeFluidType::Air,
                                                    DataLoopNode::NodeConnectionType::Inlet,
-                                                   1,
+                                                   NodeInputManager::compFluidStream::Primary,
                                                    ObjectIsNotParent,
                                                    state.dataIPShortCut->cAlphaFieldNames(5));
         thisBeam->airOutNodeNum = GetOnlySingleNode(state,
@@ -205,7 +205,7 @@ namespace FourPipeBeam {
                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                     DataLoopNode::NodeFluidType::Air,
                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                    1,
+                                                    NodeInputManager::compFluidStream::Primary,
                                                     ObjectIsNotParent,
                                                     state.dataIPShortCut->cAlphaFieldNames(6));
         if (state.dataIPShortCut->lAlphaFieldBlanks(7) && state.dataIPShortCut->lAlphaFieldBlanks(8)) { // no chilled water nodes, no beam cooling
@@ -214,14 +214,14 @@ namespace FourPipeBeam {
                    !state.dataIPShortCut->lAlphaFieldBlanks(8)) { // outlet node but no inlet node for chilled water
             thisBeam->beamCoolingPresent = false;
             ShowWarningError(state,
-                             routineName + cCurrentModuleObject + ": missing " + state.dataIPShortCut->cAlphaFieldNames(7) + " for " +
+                             std::string{routineName} + cCurrentModuleObject + ": missing " + state.dataIPShortCut->cAlphaFieldNames(7) + " for " +
                                  state.dataIPShortCut->cAlphaFieldNames(1) + '=' + state.dataIPShortCut->cAlphaArgs(1) +
                                  ", simulation continues with no beam cooling");
         } else if (!state.dataIPShortCut->lAlphaFieldBlanks(7) &&
                    state.dataIPShortCut->lAlphaFieldBlanks(8)) { // inlet node but no outlet node for chilled water
             thisBeam->beamCoolingPresent = false;
             ShowWarningError(state,
-                             routineName + cCurrentModuleObject + ": missing " + state.dataIPShortCut->cAlphaFieldNames(8) + " for " +
+                             std::string{routineName} + cCurrentModuleObject + ": missing " + state.dataIPShortCut->cAlphaFieldNames(8) + " for " +
                                  state.dataIPShortCut->cAlphaFieldNames(1) + '=' + state.dataIPShortCut->cAlphaArgs(1) +
                                  ", simulation continues with no beam cooling");
         } else {
@@ -233,7 +233,7 @@ namespace FourPipeBeam {
                                                       state.dataIPShortCut->cAlphaArgs(1),
                                                       DataLoopNode::NodeFluidType::Water,
                                                       DataLoopNode::NodeConnectionType::Inlet,
-                                                      2,
+                                                      NodeInputManager::compFluidStream::Secondary,
                                                       ObjectIsParent,
                                                       state.dataIPShortCut->cAlphaFieldNames(7));
             thisBeam->cWOutNodeNum = GetOnlySingleNode(state,
@@ -243,7 +243,7 @@ namespace FourPipeBeam {
                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                        DataLoopNode::NodeFluidType::Water,
                                                        DataLoopNode::NodeConnectionType::Outlet,
-                                                       2,
+                                                       NodeInputManager::compFluidStream::Secondary,
                                                        ObjectIsParent,
                                                        state.dataIPShortCut->cAlphaFieldNames(8));
         }
@@ -253,14 +253,14 @@ namespace FourPipeBeam {
                    !state.dataIPShortCut->lAlphaFieldBlanks(10)) { // outlet node but no inlet node for hot water
             thisBeam->beamHeatingPresent = false;
             ShowWarningError(state,
-                             routineName + cCurrentModuleObject + ": missing " + state.dataIPShortCut->cAlphaFieldNames(9) + " for " +
+                             std::string{routineName} + cCurrentModuleObject + ": missing " + state.dataIPShortCut->cAlphaFieldNames(9) + " for " +
                                  state.dataIPShortCut->cAlphaFieldNames(1) + '=' + state.dataIPShortCut->cAlphaArgs(1) +
                                  ", simulation continues with no beam heating");
         } else if (!state.dataIPShortCut->lAlphaFieldBlanks(9) &&
                    state.dataIPShortCut->lAlphaFieldBlanks(10)) { // inlet node but no outlet node for hot water
             thisBeam->beamHeatingPresent = false;
             ShowWarningError(state,
-                             routineName + cCurrentModuleObject + ": missing " + state.dataIPShortCut->cAlphaFieldNames(10) + " for " +
+                             std::string{routineName} + cCurrentModuleObject + ": missing " + state.dataIPShortCut->cAlphaFieldNames(10) + " for " +
                                  state.dataIPShortCut->cAlphaFieldNames(1) + '=' + state.dataIPShortCut->cAlphaArgs(1) +
                                  ", simulation continues with no beam heating");
         } else {
@@ -272,7 +272,7 @@ namespace FourPipeBeam {
                                                       state.dataIPShortCut->cAlphaArgs(1),
                                                       DataLoopNode::NodeFluidType::Water,
                                                       DataLoopNode::NodeConnectionType::Inlet,
-                                                      2,
+                                                      NodeInputManager::compFluidStream::Secondary,
                                                       ObjectIsParent,
                                                       state.dataIPShortCut->cAlphaFieldNames(9));
             thisBeam->hWOutNodeNum = GetOnlySingleNode(state,
@@ -282,7 +282,7 @@ namespace FourPipeBeam {
                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                        DataLoopNode::NodeFluidType::Water,
                                                        DataLoopNode::NodeConnectionType::Outlet,
-                                                       2,
+                                                       NodeInputManager::compFluidStream::Secondary,
                                                        ObjectIsParent,
                                                        state.dataIPShortCut->cAlphaFieldNames(10));
         }
@@ -309,19 +309,19 @@ namespace FourPipeBeam {
 
         thisBeam->modCoolingQdotDeltaTFuncNum = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(11));
         if (thisBeam->modCoolingQdotDeltaTFuncNum == 0 && thisBeam->beamCoolingPresent) {
-            ShowSevereError(state, routineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+            ShowSevereError(state, std::string{routineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
             ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + '=' + state.dataIPShortCut->cAlphaArgs(11));
             ErrorsFound = true;
         }
         thisBeam->modCoolingQdotAirFlowFuncNum = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(12));
         if (thisBeam->modCoolingQdotAirFlowFuncNum == 0 && thisBeam->beamCoolingPresent) {
-            ShowSevereError(state, routineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+            ShowSevereError(state, std::string{routineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
             ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(12) + '=' + state.dataIPShortCut->cAlphaArgs(12));
             ErrorsFound = true;
         }
         thisBeam->modCoolingQdotCWFlowFuncNum = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(13));
         if (thisBeam->modCoolingQdotCWFlowFuncNum == 0 && thisBeam->beamCoolingPresent) {
-            ShowSevereError(state, routineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+            ShowSevereError(state, std::string{routineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
             ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(13) + '=' + state.dataIPShortCut->cAlphaArgs(13));
             ErrorsFound = true;
         }
@@ -330,19 +330,19 @@ namespace FourPipeBeam {
         thisBeam->vDotNormRatedHW = state.dataIPShortCut->rNumericArgs(11);
         thisBeam->modHeatingQdotDeltaTFuncNum = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(14));
         if (thisBeam->modHeatingQdotDeltaTFuncNum == 0 && thisBeam->beamHeatingPresent) {
-            ShowSevereError(state, routineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+            ShowSevereError(state, std::string{routineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
             ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(14) + '=' + state.dataIPShortCut->cAlphaArgs(14));
             ErrorsFound = true;
         }
         thisBeam->modHeatingQdotAirFlowFuncNum = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(15));
         if (thisBeam->modHeatingQdotAirFlowFuncNum == 0 && thisBeam->beamHeatingPresent) {
-            ShowSevereError(state, routineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+            ShowSevereError(state, std::string{routineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
             ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(15) + '=' + state.dataIPShortCut->cAlphaArgs(15));
             ErrorsFound = true;
         }
         thisBeam->modHeatingQdotHWFlowFuncNum = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(16));
         if (thisBeam->modHeatingQdotHWFlowFuncNum == 0 && thisBeam->beamHeatingPresent) {
-            ShowSevereError(state, routineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+            ShowSevereError(state, std::string{routineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
             ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(16) + '=' + state.dataIPShortCut->cAlphaArgs(16));
             ErrorsFound = true;
         }
@@ -376,8 +376,8 @@ namespace FourPipeBeam {
                                 "Zone Air Terminal Beam Sensible Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 thisBeam->beamCoolingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 thisBeam->name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -388,8 +388,8 @@ namespace FourPipeBeam {
                                 "Zone Air Terminal Beam Sensible Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 thisBeam->beamCoolingRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 thisBeam->name);
         }
         if (thisBeam->beamHeatingPresent) {
@@ -397,8 +397,8 @@ namespace FourPipeBeam {
                                 "Zone Air Terminal Beam Sensible Heating Energy",
                                 OutputProcessor::Unit::J,
                                 thisBeam->beamHeatingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 thisBeam->name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -409,52 +409,52 @@ namespace FourPipeBeam {
                                 "Zone Air Terminal Beam Sensible Heating Rate",
                                 OutputProcessor::Unit::W,
                                 thisBeam->beamHeatingRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 thisBeam->name);
         }
         SetupOutputVariable(state,
                             "Zone Air Terminal Primary Air Sensible Cooling Energy",
                             OutputProcessor::Unit::J,
                             thisBeam->supAirCoolingEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             thisBeam->name);
         SetupOutputVariable(state,
                             "Zone Air Terminal Primary Air Sensible Cooling Rate",
                             OutputProcessor::Unit::W,
                             thisBeam->supAirCoolingRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             thisBeam->name);
         SetupOutputVariable(state,
                             "Zone Air Terminal Primary Air Sensible Heating Energy",
                             OutputProcessor::Unit::J,
                             thisBeam->supAirHeatingEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             thisBeam->name);
         SetupOutputVariable(state,
                             "Zone Air Terminal Primary Air Sensible Heating Rate",
                             OutputProcessor::Unit::W,
                             thisBeam->supAirHeatingRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             thisBeam->name);
         SetupOutputVariable(state,
                             "Zone Air Terminal Primary Air Flow Rate",
                             OutputProcessor::Unit::m3_s,
                             thisBeam->primAirFlow,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             thisBeam->name);
 
         SetupOutputVariable(state,
                             "Zone Air Terminal Outdoor Air Volume Flow Rate",
                             OutputProcessor::Unit::m3_s,
                             thisBeam->OutdoorAirFlowRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             thisBeam->name);
 
         airNodeFound = false;
@@ -467,7 +467,8 @@ namespace FourPipeBeam {
         // assumes if there isn't one assigned, it's an error
         if (thisBeam->aDUNum == 0) {
             ShowSevereError(state,
-                            routineName + "No matching Air Distribution Unit, for Unit = [" + cCurrentModuleObject + ',' + thisBeam->name + "].");
+                            std::string{routineName} + "No matching Air Distribution Unit, for Unit = [" + cCurrentModuleObject + ',' +
+                                thisBeam->name + "].");
             ShowContinueError(state, "...should have outlet node=" + state.dataLoopNodes->NodeID(thisBeam->airOutNodeNum));
             ErrorsFound = true;
         } else {
@@ -506,7 +507,7 @@ namespace FourPipeBeam {
             state.dataFourPipeBeam->FourPipeBeams.push_back(thisBeam);
             return thisBeam;
         } else {
-            ShowFatalError(state, routineName + "Errors found in getting input. Preceding conditions cause termination.");
+            ShowFatalError(state, std::string{routineName} + "Errors found in getting input. Preceding conditions cause termination.");
             return nullptr;
         }
     }
@@ -565,7 +566,7 @@ namespace FourPipeBeam {
         using PlantUtilities::SetComponentFlowRate;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        static std::string const routineName("HVACFourPipeBeam::init");
+        static constexpr std::string_view routineName("HVACFourPipeBeam::init");
 
         bool errFlag = false;
 
@@ -586,7 +587,7 @@ namespace FourPipeBeam {
                                         this->cWInNodeNum,
                                         _);
                 if (errFlag) {
-                    ShowFatalError(state, routineName + " Program terminated for previous conditions.");
+                    ShowFatalError(state, std::string{routineName} + " Program terminated for previous conditions.");
                 }
             }
             if (this->beamHeatingPresent) {
@@ -604,7 +605,7 @@ namespace FourPipeBeam {
                                         this->hWInNodeNum,
                                         _);
                 if (errFlag) {
-                    ShowFatalError(state, routineName + " Program terminated for previous conditions.");
+                    ShowFatalError(state, std::string{routineName} + " Program terminated for previous conditions.");
                 }
             }
             this->plantLoopScanFlag = false;
@@ -615,8 +616,8 @@ namespace FourPipeBeam {
             if (this->aDUNum != 0) {
                 if (!CheckZoneEquipmentList(state, "ZONEHVAC:AIRDISTRIBUTIONUNIT", state.dataDefineEquipment->AirDistUnit(this->aDUNum).Name)) {
                     ShowSevereError(state,
-                                    routineName + ": ADU=[Air Distribution Unit," + state.dataDefineEquipment->AirDistUnit(this->aDUNum).Name +
-                                        "] is not on any ZoneHVAC:EquipmentList.");
+                                    std::string{routineName} + ": ADU=[Air Distribution Unit," +
+                                        state.dataDefineEquipment->AirDistUnit(this->aDUNum).Name + "] is not on any ZoneHVAC:EquipmentList.");
                     ShowContinueError(state, "...Unit=[" + this->unitType + ',' + this->name + "] will not be simulated.");
                 }
                 this->zoneEquipmentListChecked = true;
@@ -768,7 +769,7 @@ namespace FourPipeBeam {
         using Psychrometrics::PsyCpAirFnW;
         using namespace std::placeholders;
 
-        static std::string const routineName("HVACFourPipeBeam::set_size ");
+        static constexpr std::string_view routineName("HVACFourPipeBeam::set_size ");
 
         bool ErrorsFound = false;
         Real64 rho;                     // local fluid density
@@ -892,8 +893,9 @@ namespace FourPipeBeam {
                 this->airAvailable = true;
                 this->coolingAvailable = true;
                 this->heatingAvailable = false;
-                auto f = std::bind(&HVACFourPipeBeam::residualSizing, this, std::placeholders::_1, std::placeholders::_2);
-                TempSolveRoot::SolveRoot(state, ErrTolerance, 50, SolFlag, mDotAirSolutionCooling, f, minFlow, maxFlowCool);
+                bool dummyParameter = false;
+                auto f = std::bind(&HVACFourPipeBeam::residualSizing, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+                General::SolveRoot(state, ErrTolerance, 50, SolFlag, mDotAirSolutionCooling, f, minFlow, maxFlowCool, dummyParameter);
                 if (SolFlag == -1) {
                     ShowWarningError(state, "Cooling load sizing search failed in four pipe beam unit called " + this->name);
                     ShowContinueError(state, "  Iteration limit exceeded in calculating size for design cooling load");
@@ -934,14 +936,16 @@ namespace FourPipeBeam {
                 this->airAvailable = true;
                 this->heatingAvailable = true;
                 this->coolingAvailable = false;
-                TempSolveRoot::SolveRoot(state,
-                                         ErrTolerance,
-                                         50,
-                                         SolFlag,
-                                         mDotAirSolutionHeating,
-                                         std::bind(&HVACFourPipeBeam::residualSizing, this, _1, _2),
-                                         0.0,
-                                         maxFlowHeat);
+                bool dummyParameter = false;
+                General::SolveRoot(state,
+                                   ErrTolerance,
+                                   50,
+                                   SolFlag,
+                                   mDotAirSolutionHeating,
+                                   std::bind(&HVACFourPipeBeam::residualSizing, this, _1, _2, _3),
+                                   0.0,
+                                   maxFlowHeat,
+                                   dummyParameter);
                 if (SolFlag == -1) {
                     ShowWarningError(state, "Heating load sizing search failed in four pipe beam unit called " + this->name);
                     ShowContinueError(state, "  Iteration limit exceeded in calculating size for design heating load");
@@ -1055,11 +1059,11 @@ namespace FourPipeBeam {
     } // set_size
 
     Real64 HVACFourPipeBeam::residualSizing(EnergyPlusData &state,
-                                            Real64 const airFlow // air flow in kg/s
-    )
+                                            Real64 const airFlow, // air flow in kg/s
+                                            [[maybe_unused]] bool const dummyParameter)
     {
 
-        static std::string const routineName("Real64 HVACFourPipeBeam::residualSizing ");
+        static constexpr std::string_view routineName("Real64 HVACFourPipeBeam::residualSizing ");
         Real64 rho;      // local fluid density
         Real64 Residuum; // residual to be minimized to zero
 
@@ -1232,8 +1236,9 @@ namespace FourPipeBeam {
                 // can overcool, modulate chilled water flow rate to meet load
                 this->qDotBeamCoolingMax = this->qDotBeamCooling;
                 ErrTolerance = 0.01;
-                auto f = std::bind(&HVACFourPipeBeam::residualCooling, this, std::placeholders::_1, std::placeholders::_2);
-                TempSolveRoot::SolveRoot(state, ErrTolerance, 50, SolFlag, this->mDotCW, f, 0.0, this->mDotDesignCW);
+                bool dummyParameter = false;
+                auto f = std::bind(&HVACFourPipeBeam::residualCooling, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+                General::SolveRoot(state, ErrTolerance, 50, SolFlag, this->mDotCW, f, 0.0, this->mDotDesignCW, dummyParameter);
                 if (SolFlag == -1) {
                     // ShowWarningError( "Cold water control failed in four pipe beam unit called " + this->name );
                     // ShowContinueError(state,  "  Iteration limit exceeded in calculating cold water mass flow rate" );
@@ -1269,8 +1274,9 @@ namespace FourPipeBeam {
                 this->qDotBeamHeatingMax = this->qDotBeamHeating;
                 // can overheat, modulate hot water flow to meet load
                 ErrTolerance = 0.01;
-                auto f = std::bind(&HVACFourPipeBeam::residualHeating, this, std::placeholders::_1, std::placeholders::_2);
-                TempSolveRoot::SolveRoot(state, ErrTolerance, 50, SolFlag, this->mDotHW, f, 0.0, this->mDotDesignHW);
+                bool dummyParameter = false;
+                auto f = std::bind(&HVACFourPipeBeam::residualHeating, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+                General::SolveRoot(state, ErrTolerance, 50, SolFlag, this->mDotHW, f, 0.0, this->mDotDesignHW, dummyParameter);
                 if (SolFlag == -1) {
                     // ShowWarningError( "Hot water control failed in four pipe beam unit called " + this->name );
                     // ShowContinueError(state,  "  Iteration limit exceeded in calculating hot water mass flow rate" );
@@ -1317,8 +1323,6 @@ namespace FourPipeBeam {
             // don't even need to run calc
             return;
         }
-
-        return;
     }
 
     void HVACFourPipeBeam::calc(EnergyPlusData &state)
@@ -1333,7 +1337,7 @@ namespace FourPipeBeam {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const routineName("HVACFourPipeBeam::calc ");
+        static constexpr std::string_view routineName("HVACFourPipeBeam::calc ");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1385,7 +1389,7 @@ namespace FourPipeBeam {
             if (this->cWTempOut > (std::max(this->tDBSystemAir, this->tDBZoneAirTemp) - 1.0)) {
                 // throw recurring warning as this indicates a problem in beam model input
                 ShowRecurringWarningErrorAtEnd(state,
-                                               routineName + " four pipe beam name " + this->name +
+                                               std::string{routineName} + " four pipe beam name " + this->name +
                                                    ", chilled water outlet temperature is too warm. Capacity was limited. check beam capacity input ",
                                                this->cWTempOutErrorCount,
                                                this->cWTempOut,
@@ -1440,7 +1444,7 @@ namespace FourPipeBeam {
             if (this->hWTempOut < (std::min(this->tDBSystemAir, this->tDBZoneAirTemp) + 1.0)) {
                 // throw recurring warning as this indicates a problem in beam model input
                 ShowRecurringWarningErrorAtEnd(state,
-                                               routineName + " four pipe beam name " + this->name +
+                                               std::string{routineName} + " four pipe beam name " + this->name +
                                                    ", hot water outlet temperature is too cool. Capacity was limited. check beam capacity input ",
                                                this->hWTempOutErrorCount,
                                                this->hWTempOut,
@@ -1468,7 +1472,9 @@ namespace FourPipeBeam {
         this->qDotTotalDelivered = this->qDotSystemAir + this->qDotBeamCooling + this->qDotBeamHeating;
     }
 
-    Real64 HVACFourPipeBeam::residualCooling(EnergyPlusData &state, Real64 const cWFlow // cold water flow rate in kg/s
+    Real64 HVACFourPipeBeam::residualCooling(EnergyPlusData &state,
+                                             Real64 const cWFlow,
+                                             [[maybe_unused]] bool const dummyParameter // cold water flow rate in kg/s
     )
     {
 
@@ -1483,7 +1489,9 @@ namespace FourPipeBeam {
         }
         return Residuum;
     }
-    Real64 HVACFourPipeBeam::residualHeating(EnergyPlusData &state, Real64 const hWFlow // hot water flow rate in kg/s
+    Real64 HVACFourPipeBeam::residualHeating(EnergyPlusData &state,
+                                             Real64 const hWFlow,
+                                             [[maybe_unused]] bool const dummyParameter // hot water flow rate in kg/s
     )
     {
 

@@ -65,14 +65,6 @@ namespace DataHVACGlobals {
     // Data
     // -only module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.
-    enum class HVACSystemRootSolverAlgorithm : int
-    {
-        RegulaFalsi = 0,
-        Bisection,
-        RegulaFalsiThenBisection,
-        BisectionThenRegulaFalsi,
-        Alternation
-    };
 
     // MODULE PARAMETER DEFINITIONS:
 
@@ -100,12 +92,6 @@ namespace DataHVACGlobals {
     int constexpr HeatingCapacitySizing(18);              // request sizing for heating capacity
     int constexpr SystemCapacitySizing(21);               // request sizing for system capacity
     int constexpr AutoCalculateSizing(25);                // identifies an autocalulate input
-
-    // Condenser Type (using same numbering scheme as for chillers)
-    int constexpr AirCooled(1);   // Air-cooled condenser
-    int constexpr WaterCooled(2); // Water-cooled condenser
-    int constexpr EvapCooled(3);  // Evaporatively-cooled condenser
-    int constexpr WaterHeater(4); // Condenser heats water (e.g., in water heater tank)
 
     // The following parameters are used for system availability status
     int constexpr NoAction(0);
@@ -380,18 +366,6 @@ namespace DataHVACGlobals {
         OptStartDataType() = default;
     };
 
-    struct HVACSystemRootFindingAlgorithm
-    {
-        // Members
-        std::string Algorithm;                              // Choice of algorithm
-        int NumOfIter;                                      // Number of Iteration Before Algorith Switch
-        HVACSystemRootSolverAlgorithm HVACSystemRootSolver; // 1 RegulaFalsi; 2 Bisection; 3 BisectionThenRegulaFalsi; 4 RegulaFalsiThenBisection; 5
-                                                            // Alternation Default Constructor
-        HVACSystemRootFindingAlgorithm() : NumOfIter(5), HVACSystemRootSolver(HVACSystemRootSolverAlgorithm::RegulaFalsi)
-        {
-        }
-    };
-
 } // namespace DataHVACGlobals
 
 struct HVACGlobalsData : BaseGlobalStruct
@@ -400,7 +374,6 @@ struct HVACGlobalsData : BaseGlobalStruct
     Array1D<DataHVACGlobals::ZoneCompTypeData> ZoneComp;
     DataHVACGlobals::OptStartDataType OptStartData; // For optimum start
     Array1D<DataHVACGlobals::ComponentSetPtData> CompSetPtEquip;
-    DataHVACGlobals::HVACSystemRootFindingAlgorithm HVACSystemRootFinding;
 
     // Hybrid ventilation control part
     int NumHybridVentSysAvailMgrs = 0;              // Number of hybrid ventilation control

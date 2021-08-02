@@ -76,30 +76,34 @@ namespace FaultsManager {
     int constexpr iController_AirEconomizer = 1001;
 
     // Input methods for fouling coils
-    int constexpr iFouledCoil_UARated = 9001;
-    int constexpr iFouledCoil_FoulingFactor = 9002;
-
-    // MODULE VARIABLE DECLARATIONS:
-    int constexpr NumFaultTypes = 16;
-    int constexpr NumFaultTypesEconomizer = 5;
+    enum class FouledCoil
+    {
+        Unassigned = -1,
+        UARated,
+        FoulingFactor
+    };
 
     // FaultTypeEnum
-    int constexpr iFault_TemperatureSensorOffset_OutdoorAir = 101;
-    int constexpr iFault_HumiditySensorOffset_OutdoorAir = 102;
-    int constexpr iFault_EnthalpySensorOffset_OutdoorAir = 103;
-    int constexpr iFault_TemperatureSensorOffset_ReturnAir = 104;
-    int constexpr iFault_EnthalpySensorOffset_ReturnAir = 105;
-    int constexpr iFault_Fouling_Coil = 106;
-    int constexpr iFault_ThermostatOffset = 107;
-    int constexpr iFault_HumidistatOffset = 108;
-    int constexpr iFault_Fouling_AirFilter = 109;
-    int constexpr iFault_TemperatureSensorOffset_ChillerSupplyWater = 110;
-    int constexpr iFault_TemperatureSensorOffset_CondenserSupplyWater = 111;
-    int constexpr iFault_Fouling_Tower = 112;
-    int constexpr iFault_TemperatureSensorOffset_CoilSupplyAir = 113;
-    int constexpr iFault_Fouling_Boiler = 114;
-    int constexpr iFault_Fouling_Chiller = 115;
-    int constexpr iFault_Fouling_EvapCooler = 116;
+    enum class Fault
+    {
+        Unassigned = -1,
+        TemperatureSensorOffset_OutdoorAir,
+        HumiditySensorOffset_OutdoorAir,
+        EnthalpySensorOffset_OutdoorAir,
+        TemperatureSensorOffset_ReturnAir,
+        EnthalpySensorOffset_ReturnAir,
+        Fouling_Coil,
+        ThermostatOffset,
+        HumidistatOffset,
+        Fouling_AirFilter,
+        TemperatureSensorOffset_ChillerSupplyWater,
+        TemperatureSensorOffset_CondenserSupplyWater,
+        Fouling_Tower,
+        TemperatureSensorOffset_CoilSupplyAir,
+        Fouling_Boiler,
+        Fouling_Chiller,
+        Fouling_EvapCooler
+    };
 
     // Types of faults under Group Operational Faults in IDD
     //  1. Temperature sensor offset (FY14)
@@ -144,7 +148,7 @@ namespace FaultsManager {
         std::string FaultType;        // Fault type
         std::string AvaiSchedule;     // Availability schedule
         std::string SeveritySchedule; // Severity schedule, multipliers to the Offset
-        int FaultTypeEnum;
+        Fault FaultTypeEnum;
         int AvaiSchedPtr;
         int SeveritySchedPtr;
         Real64 Offset; // offset, + means sensor reading is higher than actual value
@@ -152,8 +156,8 @@ namespace FaultsManager {
 
         // Default Constructor
         FaultProperties()
-            : Name(""), FaultType(""), AvaiSchedule(""), SeveritySchedule(""), FaultTypeEnum(0), AvaiSchedPtr(0), SeveritySchedPtr(0), Offset(0.0),
-              Status(false)
+            : Name(""), FaultType(""), AvaiSchedule(""), SeveritySchedule(""), FaultTypeEnum(Fault::Unassigned), AvaiSchedPtr(0), SeveritySchedPtr(0),
+              Offset(0.0), Status(false)
         {
         }
 
@@ -214,20 +218,20 @@ namespace FaultsManager {
     struct FaultPropertiesFoulingCoil : public FaultProperties // Class for FaultModel:Fouling:Coil
     {
         // Members
-        std::string FouledCoilName; // The fouled coil name
-        int FouledCoiledType;       // Type of coil that's fouled
-        int FouledCoilNum;          // The "FouledUARated" implies having to use the Coil's UA, which could be autosized, so have to use this index
-        int FoulingInputMethod;     // Coil fouling input method
-        Real64 UAFouled;            // Fouling coil UA under rating conditions
-        Real64 Rfw;                 // Water side fouling factor
-        Real64 Rfa;                 // Air side fouling factor
-        Real64 Aout;                // Coil outside surface area
-        Real64 Aratio;              // Inside to outside surface area ratio
+        std::string FouledCoilName;    // The fouled coil name
+        int FouledCoiledType;          // Type of coil that's fouled
+        int FouledCoilNum;             // The "FouledUARated" implies having to use the Coil's UA, which could be autosized, so have to use this index
+        FouledCoil FoulingInputMethod; // Coil fouling input method
+        Real64 UAFouled;               // Fouling coil UA under rating conditions
+        Real64 Rfw;                    // Water side fouling factor
+        Real64 Rfa;                    // Air side fouling factor
+        Real64 Aout;                   // Coil outside surface area
+        Real64 Aratio;                 // Inside to outside surface area ratio
 
         // Default Constructor
         FaultPropertiesFoulingCoil()
-            : FouledCoilName(""), FouledCoiledType(0), FouledCoilNum(0), FoulingInputMethod(0), UAFouled(0.0), Rfw(0.0), Rfa(0.0), Aout(0.0),
-              Aratio(0.0)
+            : FouledCoilName(""), FouledCoiledType(0), FouledCoilNum(0), FoulingInputMethod(FouledCoil::Unassigned), UAFouled(0.0), Rfw(0.0),
+              Rfa(0.0), Aout(0.0), Aratio(0.0)
         {
         }
 
@@ -389,7 +393,7 @@ namespace FaultsManager {
     void CheckAndReadFaults(EnergyPlusData &state);
 
     void SetFaultyCoilSATSensor(
-        EnergyPlusData &state, std::string const &CompType, std::string const &CompName, bool &FaultyCoilSATFlag, int &FaultyCoilSATIndex);
+        EnergyPlusData &state, std::string const &CompType, std::string_view CompName, bool &FaultyCoilSATFlag, int &FaultyCoilSATIndex);
 
 } // namespace FaultsManager
 

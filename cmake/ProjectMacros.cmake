@@ -29,11 +29,16 @@ macro(CREATE_SRC_GROUPS SRC)
 endmacro()
 
 # Create test targets
-macro(CREATE_TEST_TARGETS BASE_NAME SRC DEPENDENCIES)
+macro(CREATE_TEST_TARGETS BASE_NAME SRC DEPENDENCIES USE_PCH)
   if(BUILD_TESTING)
 
     add_executable(${BASE_NAME}_tests ${SRC})
-    target_link_libraries(${BASE_NAME}_tests PRIVATE cpp_pch_files project_options project_warnings)
+    target_link_libraries(${BASE_NAME}_tests PRIVATE project_options project_warnings)
+
+    if(USE_PCH)
+      target_link_libraries(${BASE_NAME}_tests PRIVATE cpp_pch_files)
+    endif()
+
     if(ENABLE_GTEST_DEBUG_MODE)
       target_compile_definitions(${BASE_NAME}_tests PRIVATE ENABLE_GTEST_DEBUG_MODE)
     endif()
@@ -155,7 +160,7 @@ function(ADD_SIMULATION_TEST)
     add_test(
       NAME "regression.${IDF_NAME}"
       COMMAND
-        ${CMAKE_COMMAND} -DBINARY_DIR=${PROJECT_BINARY_DIR} -DPYTHON_EXECUTABLE=${PYTHON_EXECUTABLE} -DIDF_FILE=${ADD_SIM_TEST_IDF_FILE}
+        ${CMAKE_COMMAND} -DBINARY_DIR=${PROJECT_BINARY_DIR} -DPYTHON_EXECUTABLE=${Python_EXECUTABLE} -DIDF_FILE=${ADD_SIM_TEST_IDF_FILE}
         -DREGRESSION_SCRIPT_PATH=${REGRESSION_SCRIPT_PATH} -DREGRESSION_BASELINE_PATH=${REGRESSION_BASELINE_PATH}
         -DREGRESSION_BASELINE_SHA=${REGRESSION_BASELINE_SHA} -DCOMMIT_SHA=${COMMIT_SHA} -DDEVICE_ID=${DEVICE_ID} -P
         ${PROJECT_SOURCE_DIR}/cmake/RunRegression.cmake)

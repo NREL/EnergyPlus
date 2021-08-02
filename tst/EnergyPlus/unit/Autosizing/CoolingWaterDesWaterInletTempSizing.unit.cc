@@ -58,7 +58,7 @@ namespace EnergyPlus {
 TEST_F(AutoSizingFixture, CoolingWaterDesWaterInletTempSizingGauntlet)
 {
     // this global state is what would be set up by E+ currently
-    static std::string const routineName("CoolingWaterDesWaterInletTempSizingGauntlet");
+    static constexpr std::string_view routineName("CoolingWaterDesWaterInletTempSizingGauntlet");
 
     // create the sizer and set up the flags to specify the sizing configuration
     CoolingWaterDesWaterInletTempSizer sizer;

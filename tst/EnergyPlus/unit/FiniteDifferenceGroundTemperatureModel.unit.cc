@@ -71,7 +71,7 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModelTest)
 
     std::shared_ptr<FiniteDiffGroundTempsModel> thisModel(new FiniteDiffGroundTempsModel());
 
-    thisModel->objectType = GroundTemperatureManager::objectType_FiniteDiffGroundTemp;
+    thisModel->objectType = GroundTempObjType::FiniteDiffGroundTemp;
     thisModel->objectName = "Test";
     thisModel->baseConductivity = 1.08;
     thisModel->baseDensity = 962.0;
@@ -147,7 +147,7 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_NoWeather)
 
     std::shared_ptr<EnergyPlus::FiniteDiffGroundTempsModel> thisModel(new EnergyPlus::FiniteDiffGroundTempsModel());
 
-    thisModel->objectType = EnergyPlus::GroundTemperatureManager::objectType_FiniteDiffGroundTemp;
+    thisModel->objectType = EnergyPlus::GroundTempObjType::FiniteDiffGroundTemp;
     thisModel->objectName = "Test";
     thisModel->baseConductivity = 1.08;
     thisModel->baseDensity = 962.0;
@@ -272,7 +272,7 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather)
 
     // Set an actual weather file to Chicago EPW
     state->dataWeatherManager->WeatherFileExists = true;
-    state->files.inputWeatherFileName.fileName = configured_source_directory() + "/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
+    state->files.inputWeatherFilePath.filePath = fs::path(configured_source_directory()) / "weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
 
     // Read the project data, such as Timestep
     state->dataGlobal->BeginSimFlag = true;
@@ -292,7 +292,7 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather)
 
     std::shared_ptr<EnergyPlus::FiniteDiffGroundTempsModel> thisModel(new EnergyPlus::FiniteDiffGroundTempsModel());
 
-    thisModel->objectType = EnergyPlus::GroundTemperatureManager::objectType_FiniteDiffGroundTemp;
+    thisModel->objectType = EnergyPlus::GroundTempObjType::FiniteDiffGroundTemp;
     thisModel->objectName = "Test";
     thisModel->baseConductivity = 1.08;
     thisModel->baseDensity = 962.0;
@@ -318,5 +318,5 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather)
     EXPECT_NEAR(firstDay.relativeHumidity, 0.7083, 0.005);
     EXPECT_NEAR(firstDay.windSpeed, 2.8083, 0.001);
     // Sum of (BeamSolarRad + DifSolarRad)/24
-    EXPECT_NEAR(firstDay.horizontalRadiation, 140, 2);
+    EXPECT_NEAR(firstDay.horizontalRadiation, 68, 2);
 }

@@ -232,7 +232,7 @@ TEST_F(EnergyPlusFixture, Beam_FactoryAllAutosize)
                                                                                             "BeamTest",
                                                                                             DataLoopNode::NodeFluidType::Air,
                                                                                             DataLoopNode::NodeConnectionType::ZoneNode,
-                                                                                            1,
+                                                                                            NodeInputManager::compFluidStream::Primary,
                                                                                             DataLoopNode::ObjectIsNotParent,
                                                                                             "Test zone node");
 
@@ -1065,8 +1065,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
                           "  AirLoopHVAC:OutdoorAirSystem,",
                           "    CV_1_OA,                !- Name",
                           "    CV_1_OA_Controllers,    !- Controller List Name",
-                          "    CV_1_OA_Equipment,      !- Outdoor Air Equipment List Name",
-                          "    CV_1 Availability Manager List;  !- Availability Manager List Name",
+                          "    CV_1_OA_Equipment;      !- Outdoor Air Equipment List Name",
 
                           "  OutdoorAir:NodeList,",
                           "    CV_1_OANode List;       !- Node or NodeList Name 1",
@@ -1726,8 +1725,9 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     OutputReportPredefined::SetPredefinedTables(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
-    OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-    OutputProcessor::SetupTimePointers(*state, "HVAC", state->dataHVACGlobal->TimeStepSys);
+    OutputProcessor::SetupTimePointers(
+        *state, OutputProcessor::SOVTimeStepType::Zone, state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+    OutputProcessor::SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, state->dataHVACGlobal->TimeStepSys);
     PlantManager::CheckIfAnyPlant(*state);
     createFacilityElectricPowerServiceObject(*state);
     BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
@@ -2638,8 +2638,7 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
                           "  AirLoopHVAC:OutdoorAirSystem,",
                           "    CV_1_OA,                !- Name",
                           "    CV_1_OA_Controllers,    !- Controller List Name",
-                          "    CV_1_OA_Equipment,      !- Outdoor Air Equipment List Name",
-                          "    CV_1 Availability Manager List;  !- Availability Manager List Name",
+                          "    CV_1_OA_Equipment;      !- Outdoor Air Equipment List Name",
 
                           "  OutdoorAir:NodeList,",
                           "    CV_1_OANode List;       !- Node or NodeList Name 1",
@@ -3299,8 +3298,9 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
     OutputReportPredefined::SetPredefinedTables(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
-    OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-    OutputProcessor::SetupTimePointers(*state, "HVAC", state->dataHVACGlobal->TimeStepSys);
+    OutputProcessor::SetupTimePointers(
+        *state, OutputProcessor::SOVTimeStepType::Zone, state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+    OutputProcessor::SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, state->dataHVACGlobal->TimeStepSys);
     PlantManager::CheckIfAnyPlant(*state);
     createFacilityElectricPowerServiceObject(*state);
     BranchInputManager::ManageBranchInput(*state); // just gets input and returns.

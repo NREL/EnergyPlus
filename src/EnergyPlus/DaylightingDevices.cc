@@ -68,6 +68,7 @@
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -111,9 +112,9 @@ namespace DaylightingDevices {
     // Although visible and solar radiation are similar, solar gain is simulated very differently from the
     // daylighting illuminance calculations.  The gain from direct beam solar is found using the
     // solar beam transmittance.  The diffuse solar, however, is more complicated.  A sky/ground integration
-    // is NOT performed.  Instead anisotropic sky view factor multipliers (AnisoSkyMult) are calculated for
+    // is NOT performed.  Instead anisotropic sky view factor multipliers (SurfAnisoSkyMult) are calculated for
     // each surface.  The diffuse sky/ground transmittance of the TDD is solved using a modification of the
-    // AnisoSkyMult.  The ground radiation transmittance and anisotropic sky transmittance are found separately.
+    // SurfAnisoSkyMult.  The ground radiation transmittance and anisotropic sky transmittance are found separately.
     // See CalcTDDTransSolIso, CalcTDDTransSolHorizon, CalcTDDTransSolAniso below.
     // For thermal conductive/convective gain, TDDs are treated as one big object with an effective R value.
     // The outside face temperature of the dome and the inside face temperature of the diffuser are calculated
@@ -154,18 +155,17 @@ namespace DaylightingDevices {
     // shelf construction, and the sun and sky illuminance on the shelf.  All the luminance is added to the
     // diffuse upgoing flux.  The shelf view factor to sky is assumed to be 1.0 for lack of better information.
     // The outside shelf is treated similarly in the heat balance simulation, but here the shelf view factor to
-    // sky is conveniently given by AnisoSkyMult.  NOTE:  The solar shading code was modified to allow sunlit
-    // fraction, sunlit area, AnisoSkyMult, etc. to be calculated for attached shading surfaces.
+    // sky is conveniently given by SurfAnisoSkyMult.  NOTE:  The solar shading code was modified to allow sunlit
+    // fraction, sunlit area, SurfAnisoSkyMult, etc. to be calculated for attached shading surfaces.
     // Future shelf model improvements:
     // 1. Allow beam and downgoing flux to pass the end of the inside shelf depending on actual shelf goemetry.
     // 2. Reduce outside shelf view factor to sky (for daylighting) by taking into account anisotropic sky
-    //    distribution and shading, i.e. the daylighting equivalent of AnisoSkyMult.
+    //    distribution and shading, i.e. the daylighting equivalent of SurfAnisoSkyMult.
     // 3. Expand view factor to shelf calculation to handle more complicated geometry.
     // REFERENCES:
     // Mills, A. F.  Heat and Mass Transfer, 1995, p. 499.  (Shape factor for adjacent rectangles.)
 
     // Using/Aliasing
-    using DataHeatBalance::MinimalShadowing;
     using DataSurfaces::ExternalEnvironment;
     using DataSurfaces::SurfaceClass;
 
@@ -321,58 +321,58 @@ namespace DaylightingDevices {
                                     "Tubular Daylighting Device Transmitted Solar Radiation Rate",
                                     OutputProcessor::Unit::W,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransmittedSolar,
-                                    "Zone",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Pipe Absorbed Solar Radiation Rate",
                                     OutputProcessor::Unit::W,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).PipeAbsorbedSolar,
-                                    "Zone",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Heat Gain Rate",
                                     OutputProcessor::Unit::W,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).HeatGain,
-                                    "Zone",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Heat Loss Rate",
                                     OutputProcessor::Unit::W,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).HeatLoss,
-                                    "Zone",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
 
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Beam Solar Transmittance",
                                     OutputProcessor::Unit::None,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolBeam,
-                                    "Zone",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Beam Visible Transmittance",
                                     OutputProcessor::Unit::None,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransVisBeam,
-                                    "Zone",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Diffuse Solar Transmittance",
                                     OutputProcessor::Unit::None,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolDiff,
-                                    "Zone",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Diffuse Visible Transmittance",
                                     OutputProcessor::Unit::None,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransVisDiff,
-                                    "Zone",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
 
             } // PipeNum
@@ -842,7 +842,7 @@ namespace DaylightingDevices {
                         state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
                     }
 
-                    if (state.dataSurface->Surface(SurfNum).Shelf > 0) {
+                    if (state.dataSurface->SurfDaylightingShelfInd(SurfNum) > 0) {
                         ShowSevereError(state,
                                         cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Window " +
                                             state.dataIPShortCut->cAlphaArgs(2) + " is referenced by more than one shelf.");
@@ -877,7 +877,7 @@ namespace DaylightingDevices {
                     }
 
                     state.dataDaylightingDevicesData->Shelf(ShelfNum).Window = SurfNum;
-                    state.dataSurface->Surface(SurfNum).Shelf = ShelfNum;
+                    state.dataSurface->SurfDaylightingShelfInd(SurfNum) = ShelfNum;
                 }
 
                 // Get inside shelf heat transfer surface (optional)
@@ -1246,11 +1246,11 @@ namespace DaylightingDevices {
         // and have a different transmittance applied to each component.
         //   FluxInc = IsoSkyRad + CircumSolarRad + HorizonRad
         //   FluxTrans = T1*IsoSkyRad + T2*CircumSolarRad + T3*HorizonRad
-        // It turns out that FluxTrans/FluxInc is equivalent to AnisoSkyTDDMult/AnisoSkyMult.
-        // AnisoSkyMult has been conveniently calculated already in AnisoSkyViewFactors in SolarShading.cc.
-        // AnisoSkyMult = MultIsoSky*DifShdgRatioIsoSky + MultCircumSolar*SunlitFrac + MultHorizonZenith*DifShdgRatioHoriz
+        // It turns out that FluxTrans/FluxInc is equivalent to AnisoSkyTDDMult/SurfAnisoSkyMult.
+        // SurfAnisoSkyMult has been conveniently calculated already in AnisoSkyViewFactors in SolarShading.cc.
+        // SurfAnisoSkyMult = MultIsoSky*DifShdgRatioIsoSky + MultCircumSolar*SunlitFrac + MultHorizonZenith*DifShdgRatioHoriz
         // In this routine a similar AnisoSkyTDDMult is calculated that applies the appropriate transmittance to each
-        // of the components above.  The result is Trans = AnisoSkyTDDMult/AnisoSkyMult.
+        // of the components above.  The result is Trans = AnisoSkyTDDMult/SurfAnisoSkyMult.
         // Shading and orientation are already taken care of by DifShdgRatioIsoSky and DifShdgRatioHoriz.
 
         // REFERENCES:
@@ -1272,23 +1272,23 @@ namespace DaylightingDevices {
         DomeSurf = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome;
 
         if (!state.dataSysVars->DetailedSkyDiffuseAlgorithm || !state.dataSurface->ShadingTransmittanceVaries ||
-            state.dataHeatBal->SolarDistribution == MinimalShadowing) {
-            IsoSkyRad = state.dataHeatBal->MultIsoSky(DomeSurf) * state.dataHeatBal->DifShdgRatioIsoSky(DomeSurf);
-            HorizonRad = state.dataHeatBal->MultHorizonZenith(DomeSurf) * state.dataHeatBal->DifShdgRatioHoriz(DomeSurf);
+            state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::MinimalShadowing) {
+            IsoSkyRad = state.dataSolarShading->SurfMultIsoSky(DomeSurf) * state.dataSolarShading->SurfDifShdgRatioIsoSky(DomeSurf);
+            HorizonRad = state.dataSolarShading->SurfMultHorizonZenith(DomeSurf) * state.dataSolarShading->SurfDifShdgRatioHoriz(DomeSurf);
         } else {
-            IsoSkyRad = state.dataHeatBal->MultIsoSky(DomeSurf) * state.dataHeatBal->curDifShdgRatioIsoSky(DomeSurf);
-            HorizonRad = state.dataHeatBal->MultHorizonZenith(DomeSurf) *
-                         state.dataHeatBal->DifShdgRatioHorizHRTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, DomeSurf);
+            IsoSkyRad = state.dataSolarShading->SurfMultIsoSky(DomeSurf) * state.dataSolarShading->SurfCurDifShdgRatioIsoSky(DomeSurf);
+            HorizonRad = state.dataSolarShading->SurfMultHorizonZenith(DomeSurf) *
+                         state.dataSolarShading->SurfDifShdgRatioHorizHRTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, DomeSurf);
         }
-        CircumSolarRad = state.dataHeatBal->MultCircumSolar(DomeSurf) *
-                         state.dataHeatBal->SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, DomeSurf);
+        CircumSolarRad = state.dataSolarShading->SurfMultCircumSolar(DomeSurf) *
+                         state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, DomeSurf);
 
         AnisoSkyTDDMult = state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso * IsoSkyRad +
                           TransTDD(state, PipeNum, COSI, DataDaylightingDevices::iRadType::SolarBeam) * CircumSolarRad +
                           state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolHorizon * HorizonRad;
 
-        if (state.dataHeatBal->AnisoSkyMult(DomeSurf) > 0.0) {
-            CalcTDDTransSolAniso = AnisoSkyTDDMult / state.dataHeatBal->AnisoSkyMult(DomeSurf);
+        if (state.dataSolarShading->SurfAnisoSkyMult(DomeSurf) > 0.0) {
+            CalcTDDTransSolAniso = AnisoSkyTDDMult / state.dataSolarShading->SurfAnisoSkyMult(DomeSurf);
         } else {
             CalcTDDTransSolAniso = 0.0;
         }
@@ -1511,8 +1511,8 @@ namespace DaylightingDevices {
                     state.dataSurface->SurfWinTransSolar(DiffSurf);
 
             // Add diffuse interior shortwave reflected from zone surfaces and from zone sources, lights, etc.
-            QRefl +=
-                state.dataHeatBal->QS(state.dataSurface->Surface(DiffSurf).SolarEnclIndex) * state.dataSurface->Surface(DiffSurf).Area * transDiff;
+            QRefl += state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(DiffSurf).SolarEnclIndex) *
+                     state.dataSurface->Surface(DiffSurf).Area * transDiff;
 
             TotTDDPipeGain = state.dataSurface->SurfWinTransSolar(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome) -
                              state.dataHeatBal->SurfQRadSWOutIncident(DiffSurf) * state.dataSurface->Surface(DiffSurf).Area +

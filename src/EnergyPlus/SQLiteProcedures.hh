@@ -66,6 +66,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/Material.hh>
 
 namespace EnergyPlus {
@@ -79,13 +80,13 @@ protected:
     SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStream, std::shared_ptr<sqlite3> const &db);
     SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStream,
                      bool writeOutputToSQLite,
-                     std::string const &dbName,
-                     std::string const &errorFileName);
+                     fs::path const &dbName,
+                     fs::path const &errorFilePath);
 
     int sqliteExecuteCommand(const std::string &commandBuffer);
     int sqlitePrepareStatement(sqlite3_stmt *&stmt, const std::string &stmtBuffer);
 
-    int sqliteBindText(sqlite3_stmt *stmt, const int stmtInsertLocationIndex, const std::string &textBuffer);
+    int sqliteBindText(sqlite3_stmt *stmt, const int stmtInsertLocationIndex, std::string_view textBuffer);
     int sqliteBindInteger(sqlite3_stmt *stmt, const int stmtInsertLocationIndex, const int intToInsert);
     int sqliteBindDouble(sqlite3_stmt *stmt, const int stmtInsertLocationIndex, const double doubleToInsert);
     int sqliteBindNULL(sqlite3_stmt *stmt, const int stmtInsertLocationIndex);
@@ -136,8 +137,8 @@ public:
     // Open the DB and prepare for writing data
     // Create all of the tables on construction
     SQLite(std::shared_ptr<std::ostream> errorStream,
-           std::string const &dbName,
-           std::string const &errorFileName,
+           fs::path const &dbName,
+           fs::path const &errorFilePath,
            bool writeOutputToSQLite = false,
            bool writeTabularDataToSQLite = false);
 
@@ -162,7 +163,7 @@ public:
     void createSQLiteReportDictionaryRecord(int const reportVariableReportID,
                                             int const storeTypeIndex,
                                             std::string const &indexGroup,
-                                            std::string const &keyedValueString,
+                                            std::string_view keyedValueString,
                                             std::string const &variableName,
                                             int const indexType,
                                             std::string const &units,
@@ -219,10 +220,10 @@ public:
                                      std::string const &PeakHrMin     // time stamp of the peak
     );
 
-    void addSQLiteComponentSizingRecord(std::string const &CompType, // the type of the component
-                                        std::string const &CompName, // the name of the component
-                                        std::string const &VarDesc,  // the description of the input variable
-                                        Real64 const VarValue        // the value from the sizing calculation
+    void addSQLiteComponentSizingRecord(std::string_view CompType, // the type of the component
+                                        std::string_view CompName, // the name of the component
+                                        std::string_view VarDesc,  // the description of the input variable
+                                        Real64 const VarValue      // the value from the sizing calculation
     );
 
     void createSQLiteDaylightMapTitle(int const mapNum,
@@ -283,7 +284,7 @@ private:
     // Given combinedString, parse out units and description.
     // Example: Given combinedString "Total Energy [GJ]", return "Total Energy"
     // in description and "GJ" in units.
-    static void parseUnitsAndDescription(const std::string &combinedString, std::string &units, std::string &description);
+    static void parseUnitsAndDescription(std::string_view combinedString, std::string &units, std::string &description);
 
     static int logicalToInteger(const bool value);
 
@@ -576,8 +577,8 @@ private:
     private:
         int const number;
         std::string const &name;
-        int const &group;
-        int const &roughness;
+        DataHeatBalance::MaterialGroup const &group;
+        DataSurfaces::SurfaceRoughness const &roughness;
         double const &conductivity;
         double const &density;
         double const &isoMoistCap;
@@ -628,7 +629,7 @@ private:
         double const &outsideAbsorpSolar;
         double const &insideAbsorpThermal;
         double const &outsideAbsorpThermal;
-        int const &outsideRoughness;
+        DataSurfaces::SurfaceRoughness const &outsideRoughness;
         bool const &typeIsWindow;
         double const &uValue;
 
@@ -722,7 +723,7 @@ private:
         bool const &fanger;
         bool const &pierce;
         bool const &ksu;
-        int const &mrtCalcType;
+        DataHeatBalance::CalcMRT const &mrtCalcType;
         int const &surfacePtr;
         std::string const &angleFactorListName;
         int const &angleFactorListPtr;

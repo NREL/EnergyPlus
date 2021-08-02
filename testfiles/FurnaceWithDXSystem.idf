@@ -99,7 +99,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,9.5;
+  Version,9.6;
 
   Building,
     NONE,                    !- Name
@@ -1367,6 +1367,8 @@
   Output:Variable,Air Loop Outlet Node,System Node Temperature,timestep;
 
   Output:Variable,*,Unitary System Fan Part Load Ratio,timestep;
+
+  Output:Variable,*,Fan Electricity Rate,timestep; !- HVAC Average [W]
 
   Output:Variable,*,Zone Air System Sensible Heating Energy,timestep;
 

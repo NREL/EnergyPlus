@@ -255,7 +255,7 @@ namespace SurfaceGroundHeatExchanger {
                                                                                                      state.dataIPShortCut->cAlphaArgs(1),
                                                                                                      DataLoopNode::NodeFluidType::Water,
                                                                                                      DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                     1,
+                                                                                                     NodeInputManager::compFluidStream::Primary,
                                                                                                      ObjectIsNotParent);
             if (state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).InletNodeNum == 0) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '=' + state.dataIPShortCut->cAlphaArgs(3));
@@ -272,7 +272,7 @@ namespace SurfaceGroundHeatExchanger {
                                                                                                       state.dataIPShortCut->cAlphaArgs(1),
                                                                                                       DataLoopNode::NodeFluidType::Water,
                                                                                                       DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                      1,
+                                                                                                      NodeInputManager::compFluidStream::Primary,
                                                                                                       ObjectIsNotParent);
             if (state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).OutletNodeNum == 0) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + '=' + state.dataIPShortCut->cAlphaArgs(4));
@@ -350,85 +350,85 @@ namespace SurfaceGroundHeatExchanger {
                                 "Ground Heat Exchanger Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).HeatTransferRate,
-                                "Plant",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Plant,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).Name);
             SetupOutputVariable(state,
                                 "Ground Heat Exchanger Surface Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).SurfHeatTransferRate,
-                                "Plant",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Plant,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).Name);
             SetupOutputVariable(state,
                                 "Ground Heat Exchanger Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).Energy,
-                                "Plant",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::Plant,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).Name);
             SetupOutputVariable(state,
                                 "Ground Heat Exchanger Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).MassFlowRate,
-                                "Plant",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Plant,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).Name);
             SetupOutputVariable(state,
                                 "Ground Heat Exchanger Inlet Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).InletTemp,
-                                "Plant",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Plant,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).Name);
             SetupOutputVariable(state,
                                 "Ground Heat Exchanger Outlet Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).OutletTemp,
-                                "Plant",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Plant,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).Name);
             SetupOutputVariable(state,
                                 "Ground Heat Exchanger Top Surface Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).TopSurfaceTemp,
-                                "Plant",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Plant,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).Name);
             SetupOutputVariable(state,
                                 "Ground Heat Exchanger Bottom Surface Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).BtmSurfaceTemp,
-                                "Plant",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Plant,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).Name);
             SetupOutputVariable(state,
                                 "Ground Heat Exchanger Top Surface Heat Transfer Energy per Area",
                                 OutputProcessor::Unit::J_m2,
                                 state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).TopSurfaceFlux,
-                                "Plant",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Plant,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).Name);
             SetupOutputVariable(state,
                                 "Ground Heat Exchanger Bottom Surface Heat Transfer Energy per Area",
                                 OutputProcessor::Unit::J_m2,
                                 state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).BtmSurfaceFlux,
-                                "Plant",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Plant,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).Name);
             SetupOutputVariable(state,
                                 "Ground Heat Exchanger Surface Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).SurfEnergy,
-                                "Plant",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::Plant,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).Name);
             SetupOutputVariable(state,
                                 "Ground Heat Exchanger Source Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).SourceTemp,
-                                "Plant",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Plant,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).Name);
         }
 
@@ -461,17 +461,8 @@ namespace SurfaceGroundHeatExchanger {
 
         // Using/Aliasing
         using namespace DataEnvironment;
-        using DataPlant::TypeOf_GrndHtExchgSurface;
-        using FluidProperties::GetDensityGlycol;
-        using PlantUtilities::InitComponentNodes;
-        using PlantUtilities::RegisterPlantCompDesignFlow;
         using PlantUtilities::RegulateCondenserCompFlowReqOp;
-        using PlantUtilities::ScanPlantLoopsForObject;
         using PlantUtilities::SetComponentFlowRate;
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const DesignVelocity(0.5); // Hypothetical design max pipe velocity [m/s]
-        static std::string const RoutineName("InitSurfaceGroundHeatExchanger");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -479,49 +470,8 @@ namespace SurfaceGroundHeatExchanger {
         int Cons;          // construction counter
         int LayerNum;      // material layer number for bottom
         Real64 OutDryBulb; // Height Dependent dry bulb.
-        Real64 rho;        // local fluid density
-        bool errFlag;
 
-        // Init more variables
-        if (this->MyFlag) {
-            // Locate the hx on the plant loops for later usage
-            errFlag = false;
-            ScanPlantLoopsForObject(state,
-                                    this->Name,
-                                    TypeOf_GrndHtExchgSurface,
-                                    this->LoopNum,
-                                    this->LoopSideNum,
-                                    this->BranchNum,
-                                    this->CompNum,
-                                    errFlag,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _);
-
-            if (errFlag) {
-                ShowFatalError(state, "InitSurfaceGroundHeatExchanger: Program terminated due to previous condition(s).");
-            }
-            rho = GetDensityGlycol(state,
-                                   state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
-                                   DataPrecisionGlobals::constant_zero,
-                                   state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
-                                   RoutineName);
-            this->DesignMassFlowRate = DataGlobalConstants::Pi / 4.0 * pow_2(this->TubeDiameter) * DesignVelocity * rho * this->TubeCircuits;
-            InitComponentNodes(state,
-                               0.0,
-                               this->DesignMassFlowRate,
-                               this->InletNodeNum,
-                               this->OutletNodeNum,
-                               this->LoopNum,
-                               this->LoopSideNum,
-                               this->BranchNum,
-                               this->CompNum);
-            RegisterPlantCompDesignFlow(state, this->InletNodeNum, this->DesignMassFlowRate / rho);
-
-            this->MyFlag = false;
-        }
+        this->oneTimeInit(state); // Init more variables
 
         // get QTF data - only once
         if (this->InitQTF) {
@@ -1147,7 +1097,7 @@ namespace SurfaceGroundHeatExchanger {
         static Array1D<Real64> const Pr(
             NumOfPropDivisions, {12.22, 10.26, 8.81, 7.56, 6.62, 5.83, 5.20, 4.62, 4.16, 3.77, 3.42, 3.15, 2.88}); // Prandtl number (dimensionless)
         int const WaterIndex(1);
-        static std::string const RoutineName("SurfaceGroundHeatExchanger:CalcHXEffectTerm");
+        static constexpr std::string_view RoutineName("SurfaceGroundHeatExchanger:CalcHXEffectTerm");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Index;
@@ -1393,7 +1343,7 @@ namespace SurfaceGroundHeatExchanger {
         using PlantUtilities::SafeCopyPlantNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SurfaceGroundHeatExchanger:Update");
+        static constexpr std::string_view RoutineName("SurfaceGroundHeatExchanger:Update");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CpFluid; // Specific heat of working fluid
@@ -1476,6 +1426,60 @@ namespace SurfaceGroundHeatExchanger {
         this->BtmSurfaceFlux = state.dataSurfaceGroundHeatExchangers->BtmSurfFlux;
         this->SurfEnergy = SurfaceArea * (state.dataSurfaceGroundHeatExchangers->TopSurfFlux + state.dataSurfaceGroundHeatExchangers->BtmSurfFlux) *
                            TimeStepSys * DataGlobalConstants::SecInHour;
+    }
+    void SurfaceGroundHeatExchangerData::oneTimeInit(EnergyPlusData &state)
+    {
+        using DataPlant::TypeOf_GrndHtExchgSurface;
+        using FluidProperties::GetDensityGlycol;
+        using PlantUtilities::InitComponentNodes;
+        using PlantUtilities::RegisterPlantCompDesignFlow;
+        using PlantUtilities::ScanPlantLoopsForObject;
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        Real64 const DesignVelocity(0.5); // Hypothetical design max pipe velocity [m/s]
+        Real64 rho;                       // local fluid density
+        bool errFlag;
+        static std::string const RoutineName("InitSurfaceGroundHeatExchanger");
+
+        if (this->MyFlag) {
+            // Locate the hx on the plant loops for later usage
+            errFlag = false;
+            ScanPlantLoopsForObject(state,
+                                    this->Name,
+                                    TypeOf_GrndHtExchgSurface,
+                                    this->LoopNum,
+                                    this->LoopSideNum,
+                                    this->BranchNum,
+                                    this->CompNum,
+                                    errFlag,
+                                    _,
+                                    _,
+                                    _,
+                                    _,
+                                    _);
+
+            if (errFlag) {
+                ShowFatalError(state, "InitSurfaceGroundHeatExchanger: Program terminated due to previous condition(s).");
+            }
+            rho = GetDensityGlycol(state,
+                                   state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                   DataPrecisionGlobals::constant_zero,
+                                   state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                   RoutineName);
+            this->DesignMassFlowRate = DataGlobalConstants::Pi / 4.0 * pow_2(this->TubeDiameter) * DesignVelocity * rho * this->TubeCircuits;
+            InitComponentNodes(state,
+                               0.0,
+                               this->DesignMassFlowRate,
+                               this->InletNodeNum,
+                               this->OutletNodeNum,
+                               this->LoopNum,
+                               this->LoopSideNum,
+                               this->BranchNum,
+                               this->CompNum);
+            RegisterPlantCompDesignFlow(state, this->InletNodeNum, this->DesignMassFlowRate / rho);
+
+            this->MyFlag = false;
+        }
     }
 
 } // namespace SurfaceGroundHeatExchanger

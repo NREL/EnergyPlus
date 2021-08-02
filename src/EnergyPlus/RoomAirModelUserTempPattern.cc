@@ -207,7 +207,6 @@ void CalcTempDistModel(EnergyPlusData &state, int const ZoneNum) // index number
     // appropriate subroutine
 
     // Using/Aliasing
-    using DataSurfaces::ZoneMeanAirTemp;
     using General::FindNumberInList;
     using ScheduleManager::GetCurrentScheduleValue;
 
@@ -421,8 +420,8 @@ void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int c
                             "Room Air Zone Vertical Temperature Gradient",
                             OutputProcessor::Unit::K_m,
                             state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Gradient,
-                            "HVAC",
-                            "State",
+                            OutputProcessor::SOVTimeStepType::HVAC,
+                            OutputProcessor::SOVStoreType::State,
                             state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).ZoneName);
 
         state.dataRoomAirModelTempPattern->SetupOutputFlag(ZoneNum) = false;
@@ -778,7 +777,6 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
     using DataHVACGlobals::RetTempMin;
     using DataSurfaces::AdjacentAirTemp;
     using DataSurfaces::AirFlowWindow_Destination_ReturnAir;
-    using DataSurfaces::ZoneMeanAirTemp;
     using InternalHeatGains::SumAllReturnAirConvectionGains;
     using InternalHeatGains::SumAllReturnAirLatentGains;
     using Psychrometrics::PsyCpAirFnW;
@@ -950,12 +948,12 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
 
     // set results for all surface
     for (int i = SurfFirst, j = 1; i <= SurfLast; ++i, ++j) {
-        state.dataHeatBal->TempEffBulkAir(i) = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(j).TadjacentAir;
+        state.dataHeatBal->SurfTempEffBulkAir(i) = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(j).TadjacentAir;
     }
 
     // set flag for reference air temperature mode
     for (int i = SurfFirst; i <= SurfLast; ++i) {
-        state.dataSurface->Surface(i).TAirRef = AdjacentAirTemp;
+        state.dataSurface->SurfTAirRef(i) = AdjacentAirTemp;
     }
 }
 

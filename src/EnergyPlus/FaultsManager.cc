@@ -60,7 +60,6 @@
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
-#include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/PlantChillers.hh>
@@ -135,7 +134,7 @@ namespace FaultsManager {
     //  Pressure sensor offset
     //  more
 
-    Array1D_string const cFaults(NumFaultTypes,
+    Array1D_string const cFaults({0, 15},
                                  {"FaultModel:TemperatureSensorOffset:OutdoorAir",
                                   "FaultModel:HumiditySensorOffset:OutdoorAir",
                                   "FaultModel:EnthalpySensorOffset:OutdoorAir",
@@ -160,28 +159,6 @@ namespace FaultsManager {
     //      'FaultModel:Fouling:Boiler                    ', &
     //      'FaultModel:DamperLeakage:ReturnAir           ', &
     //      'FaultModel:DamperLeakage:OutdoorAir          ' /)
-
-    Array1D_int const iFaultTypeEnums(NumFaultTypes,
-                                      {iFault_TemperatureSensorOffset_OutdoorAir,
-                                       iFault_HumiditySensorOffset_OutdoorAir,
-                                       iFault_EnthalpySensorOffset_OutdoorAir,
-                                       iFault_TemperatureSensorOffset_ReturnAir,
-                                       iFault_EnthalpySensorOffset_ReturnAir,
-                                       iFault_Fouling_Coil,
-                                       iFault_ThermostatOffset,
-                                       iFault_HumidistatOffset,
-                                       iFault_Fouling_AirFilter,
-                                       iFault_TemperatureSensorOffset_ChillerSupplyWater,
-                                       iFault_TemperatureSensorOffset_CondenserSupplyWater,
-                                       iFault_Fouling_Tower,
-                                       iFault_TemperatureSensorOffset_CoilSupplyAir,
-                                       iFault_Fouling_Boiler,
-                                       iFault_Fouling_Chiller,
-                                       iFault_Fouling_EvapCooler});
-
-    // SUBROUTINE SPECIFICATIONS:
-
-    // Functions
 
     void CheckAndReadFaults(EnergyPlusData &state)
     {
@@ -229,44 +206,44 @@ namespace FaultsManager {
         // check number of faults
         state.dataFaultsMgr->NumFaults = 0;
         state.dataFaultsMgr->NumFaultyEconomizer = 0;
-        for (int NumFaultsTemp = 0, i = 1; i <= NumFaultTypes; ++i) {
+        for (int NumFaultsTemp = 0, i = 0; i <= 15; ++i) {
             NumFaultsTemp = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cFaults(i));
             state.dataFaultsMgr->NumFaults += NumFaultsTemp;
 
-            if (i <= 5) {
+            if (i <= 4) {
                 // 1st-5th fault: economizer sensor offset
                 state.dataFaultsMgr->NumFaultyEconomizer += NumFaultsTemp;
-            } else if (i == 6) {
+            } else if (i == 5) {
                 // 6th fault: Coil fouling
                 state.dataFaultsMgr->NumFouledCoil = NumFaultsTemp;
-            } else if (i == 7) {
+            } else if (i == 6) {
                 // 7th fault: Faulty thermostat
                 state.dataFaultsMgr->NumFaultyThermostat = NumFaultsTemp;
-            } else if (i == 8) {
+            } else if (i == 7) {
                 // 8th fault: Faulty humidistat
                 state.dataFaultsMgr->NumFaultyHumidistat = NumFaultsTemp;
-            } else if (i == 9) {
+            } else if (i == 8) {
                 // 9th fault: Fouled air filter
                 state.dataFaultsMgr->NumFaultyAirFilter = NumFaultsTemp;
-            } else if (i == 10) {
+            } else if (i == 9) {
                 // 10th fault: Faulty Chillers Supply Water Temperature Sensor
                 state.dataFaultsMgr->NumFaultyChillerSWTSensor = NumFaultsTemp;
-            } else if (i == 11) {
+            } else if (i == 10) {
                 // 11th fault: Faulty Condenser Supply Water Temperature Sensor
                 state.dataFaultsMgr->NumFaultyCondenserSWTSensor = NumFaultsTemp;
-            } else if (i == 12) {
+            } else if (i == 11) {
                 // 12th fault: Faulty Towers with Scaling
                 state.dataFaultsMgr->NumFaultyTowerFouling = NumFaultsTemp;
-            } else if (i == 13) {
+            } else if (i == 12) {
                 // 13th fault: Faulty Coil Supply Air Temperature Sensor
                 state.dataFaultsMgr->NumFaultyCoilSATSensor = NumFaultsTemp;
-            } else if (i == 14) {
+            } else if (i == 13) {
                 // 14th fault: Faulty Boiler with Fouling
                 state.dataFaultsMgr->NumFaultyBoilerFouling = NumFaultsTemp;
-            } else if (i == 15) {
+            } else if (i == 14) {
                 // 15th fault: Faulty Chiller with Fouling
                 state.dataFaultsMgr->NumFaultyChillerFouling = NumFaultsTemp;
-            } else if (i == 16) {
+            } else if (i == 15) {
                 // 16th fault: Faulty Evaporative Cooler with Fouling
                 state.dataFaultsMgr->NumFaultyEvapCoolerFouling = NumFaultsTemp;
             }
@@ -307,11 +284,11 @@ namespace FaultsManager {
         if (state.dataFaultsMgr->NumFaultyEvapCoolerFouling > 0)
             state.dataFaultsMgr->FaultsEvapCoolerFouling.allocate(state.dataFaultsMgr->NumFaultyEvapCoolerFouling);
 
-        // read faults input of Fault_type 116: Evaporative Cooler Fouling
+        // read faults input of Evaporative Cooler Fouling
         for (int jFault_EvapCoolerFouling = 1; jFault_EvapCoolerFouling <= state.dataFaultsMgr->NumFaultyEvapCoolerFouling;
              ++jFault_EvapCoolerFouling) {
 
-            cFaultCurrentObject = cFaults(16); // fault object string
+            cFaultCurrentObject = cFaults(15); // fault object string
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cFaultCurrentObject,
                                                                      jFault_EvapCoolerFouling,
@@ -326,7 +303,7 @@ namespace FaultsManager {
                                                                      cNumericFieldNames);
 
             state.dataFaultsMgr->FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).FaultType = cFaultCurrentObject;
-            state.dataFaultsMgr->FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).FaultTypeEnum = iFault_Fouling_EvapCooler;
+            state.dataFaultsMgr->FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).FaultTypeEnum = Fault::Fouling_EvapCooler;
             state.dataFaultsMgr->FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).Name = cAlphaArgs(1);
 
             // Fault availability schedule
@@ -410,10 +387,10 @@ namespace FaultsManager {
             }
         }
 
-        // read faults input of Fault_type 115: Chiller Fouling
+        // read faults input of Chiller Fouling
         for (int jFault_ChillerFouling = 1; jFault_ChillerFouling <= state.dataFaultsMgr->NumFaultyChillerFouling; ++jFault_ChillerFouling) {
 
-            cFaultCurrentObject = cFaults(15); // fault object string
+            cFaultCurrentObject = cFaults(14); // fault object string
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cFaultCurrentObject,
                                                                      jFault_ChillerFouling,
@@ -428,7 +405,7 @@ namespace FaultsManager {
                                                                      cNumericFieldNames);
 
             state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).FaultType = cFaultCurrentObject;
-            state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).FaultTypeEnum = iFault_Fouling_Chiller;
+            state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).FaultTypeEnum = Fault::Fouling_Chiller;
             state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).Name = cAlphaArgs(1);
 
             // Fault availability schedule
@@ -677,10 +654,10 @@ namespace FaultsManager {
             }
         }
 
-        // read faults input of Fault_type 114: Boiler Fouling
+        // read faults input of Boiler Fouling
         for (int jFault_BoilerFouling = 1; jFault_BoilerFouling <= state.dataFaultsMgr->NumFaultyBoilerFouling; ++jFault_BoilerFouling) {
 
-            cFaultCurrentObject = cFaults(14); // fault object string
+            cFaultCurrentObject = cFaults(13); // fault object string
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cFaultCurrentObject,
                                                                      jFault_BoilerFouling,
@@ -695,7 +672,7 @@ namespace FaultsManager {
                                                                      cNumericFieldNames);
 
             state.dataFaultsMgr->FaultsBoilerFouling(jFault_BoilerFouling).FaultType = cFaultCurrentObject;
-            state.dataFaultsMgr->FaultsBoilerFouling(jFault_BoilerFouling).FaultTypeEnum = iFault_Fouling_Boiler;
+            state.dataFaultsMgr->FaultsBoilerFouling(jFault_BoilerFouling).FaultTypeEnum = Fault::Fouling_Boiler;
             state.dataFaultsMgr->FaultsBoilerFouling(jFault_BoilerFouling).Name = cAlphaArgs(1);
 
             // Fault availability schedule
@@ -769,10 +746,10 @@ namespace FaultsManager {
             }
         }
 
-        // read faults input of Fault_type 113: Coil SAT Sensor Offset
+        // read faults input of Coil SAT Sensor Offset
         for (int jFault_CoilSAT = 1; jFault_CoilSAT <= state.dataFaultsMgr->NumFaultyCoilSATSensor; ++jFault_CoilSAT) {
 
-            cFaultCurrentObject = cFaults(13); // fault object string
+            cFaultCurrentObject = cFaults(12); // fault object string
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cFaultCurrentObject,
                                                                      jFault_CoilSAT,
@@ -787,7 +764,7 @@ namespace FaultsManager {
                                                                      cNumericFieldNames);
 
             state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).FaultType = cFaultCurrentObject;
-            state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).FaultTypeEnum = iFault_TemperatureSensorOffset_CoilSupplyAir;
+            state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).FaultTypeEnum = Fault::TemperatureSensorOffset_CoilSupplyAir;
             state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).Name = cAlphaArgs(1);
 
             // Fault availability schedule
@@ -951,25 +928,27 @@ namespace FaultsManager {
                         }
                     }
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "CoilSystem:Cooling:DX")) {
+                    // see else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "AirLoopHVAC:UnitarySystem")) below
+                    // UnitarySystem connects a different way. Make sure this works by testing a CoilSystem model.
                     // Read in DXCoolingSystem input if not done yet
-                    if (state.dataHVACDXSys->GetInputFlag) {
-                        HVACDXSystem::GetDXCoolingSystemInput(state);
-                        state.dataHVACDXSys->GetInputFlag = false;
-                    }
+                    // if (state.dataHVACDXSys->GetInputFlag) {
+                    //    HVACDXSystem::GetDXCoolingSystemInput(state);
+                    //    state.dataHVACDXSys->GetInputFlag = false;
+                    //}
 
-                    // Check the coil name and coil type
-                    int CoilSysNum = UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).CoilName,
-                                                                     state.dataHVACDXSys->DXCoolingSystem);
-                    if (CoilSysNum <= 0) {
-                        ShowSevereError(state,
-                                        cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
-                                            cAlphaArgs(5) + "\" not found.");
-                        state.dataFaultsMgr->ErrorsFound = true;
-                    } else {
-                        // Link the coil system with the fault model
-                        state.dataHVACDXSys->DXCoolingSystem(CoilSysNum).FaultyCoilSATFlag = true;
-                        state.dataHVACDXSys->DXCoolingSystem(CoilSysNum).FaultyCoilSATIndex = jFault_CoilSAT;
-                    }
+                    //// Check the coil name and coil type
+                    // int CoilSysNum = UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).CoilName,
+                    //                                                 state.dataHVACDXSys->DXCoolingSystem);
+                    // if (CoilSysNum <= 0) {
+                    //    ShowSevereError(state,
+                    //                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
+                    //                        cAlphaArgs(5) + "\" not found.");
+                    //    state.dataFaultsMgr->ErrorsFound = true;
+                    //} else {
+                    //    // Link the coil system with the fault model
+                    //    state.dataHVACDXSys->DXCoolingSystem(CoilSysNum).FaultyCoilSATFlag = true;
+                    //    state.dataHVACDXSys->DXCoolingSystem(CoilSysNum).FaultyCoilSATIndex = jFault_CoilSAT;
+                    //}
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "CoilSystem:Heating:DX")) {
                     // Read in DXCoolingSystem input if not done yet
                     if (state.dataHVACDXHeatPumpSys->GetInputFlag) {
@@ -996,10 +975,10 @@ namespace FaultsManager {
             }
         } // End read faults input of Fault_type 113
 
-        // read faults input of Fault_type 112: Cooling tower scaling
+        // read faults input of Cooling tower scaling
         for (int jFault_TowerFouling = 1; jFault_TowerFouling <= state.dataFaultsMgr->NumFaultyTowerFouling; ++jFault_TowerFouling) {
 
-            cFaultCurrentObject = cFaults(12); // fault object string
+            cFaultCurrentObject = cFaults(11); // fault object string
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cFaultCurrentObject,
                                                                      jFault_TowerFouling,
@@ -1014,7 +993,7 @@ namespace FaultsManager {
                                                                      cNumericFieldNames);
 
             state.dataFaultsMgr->FaultsTowerFouling(jFault_TowerFouling).FaultType = cFaultCurrentObject;
-            state.dataFaultsMgr->FaultsTowerFouling(jFault_TowerFouling).FaultTypeEnum = iFault_Fouling_Tower;
+            state.dataFaultsMgr->FaultsTowerFouling(jFault_TowerFouling).FaultTypeEnum = Fault::Fouling_Tower;
             state.dataFaultsMgr->FaultsTowerFouling(jFault_TowerFouling).Name = cAlphaArgs(1);
 
             // Fault availability schedule
@@ -1111,10 +1090,10 @@ namespace FaultsManager {
             }
         }
 
-        // read faults input of Fault_type 111: Condenser SWT Sensor Offset
+        // read faults input of Condenser SWT Sensor Offset
         for (int jFault_CondenserSWT = 1; jFault_CondenserSWT <= state.dataFaultsMgr->NumFaultyCondenserSWTSensor; ++jFault_CondenserSWT) {
 
-            cFaultCurrentObject = cFaults(11); // fault object string
+            cFaultCurrentObject = cFaults(10); // fault object string
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cFaultCurrentObject,
                                                                      jFault_CondenserSWT,
@@ -1129,7 +1108,7 @@ namespace FaultsManager {
                                                                      cNumericFieldNames);
 
             state.dataFaultsMgr->FaultsCondenserSWTSensor(jFault_CondenserSWT).FaultType = cFaultCurrentObject;
-            state.dataFaultsMgr->FaultsCondenserSWTSensor(jFault_CondenserSWT).FaultTypeEnum = iFault_TemperatureSensorOffset_CondenserSupplyWater;
+            state.dataFaultsMgr->FaultsCondenserSWTSensor(jFault_CondenserSWT).FaultTypeEnum = Fault::TemperatureSensorOffset_CondenserSupplyWater;
             state.dataFaultsMgr->FaultsCondenserSWTSensor(jFault_CondenserSWT).Name = cAlphaArgs(1);
 
             // Fault availability schedule
@@ -1214,10 +1193,10 @@ namespace FaultsManager {
             }
         }
 
-        // read faults input of Fault_type 110: Chiller SWT Sensor Offset
+        // read faults input of Chiller SWT Sensor Offset
         for (int jFault_ChillerSWT = 1; jFault_ChillerSWT <= state.dataFaultsMgr->NumFaultyChillerSWTSensor; ++jFault_ChillerSWT) {
 
-            cFaultCurrentObject = cFaults(10); // fault object string
+            cFaultCurrentObject = cFaults(9); // fault object string
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cFaultCurrentObject,
                                                                      jFault_ChillerSWT,
@@ -1232,7 +1211,7 @@ namespace FaultsManager {
                                                                      cNumericFieldNames);
 
             state.dataFaultsMgr->FaultsChillerSWTSensor(jFault_ChillerSWT).FaultType = cFaultCurrentObject;
-            state.dataFaultsMgr->FaultsChillerSWTSensor(jFault_ChillerSWT).FaultTypeEnum = iFault_TemperatureSensorOffset_ChillerSupplyWater;
+            state.dataFaultsMgr->FaultsChillerSWTSensor(jFault_ChillerSWT).FaultTypeEnum = Fault::TemperatureSensorOffset_ChillerSupplyWater;
             state.dataFaultsMgr->FaultsChillerSWTSensor(jFault_ChillerSWT).Name = cAlphaArgs(1);
 
             // Fault availability schedule
@@ -1454,7 +1433,7 @@ namespace FaultsManager {
             }
         }
 
-        // read faults input of Fault_type 109: Fouled Air Filters
+        // read faults input of Fouled Air Filters
         for (int jFault_AirFilter = 1; jFault_AirFilter <= state.dataFaultsMgr->NumFaultyAirFilter; ++jFault_AirFilter) {
 
             // Read in fan if not done yet
@@ -1462,7 +1441,7 @@ namespace FaultsManager {
                 Fans::GetFanInput(state);
             }
 
-            cFaultCurrentObject = cFaults(9); // fault object string
+            cFaultCurrentObject = cFaults(8); // fault object string
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cFaultCurrentObject,
                                                                      jFault_AirFilter,
@@ -1477,7 +1456,7 @@ namespace FaultsManager {
                                                                      cNumericFieldNames);
 
             state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).FaultType = cFaultCurrentObject;
-            state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).FaultTypeEnum = iFault_Fouling_AirFilter;
+            state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).FaultTypeEnum = Fault::Fouling_AirFilter;
             state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).Name = cAlphaArgs(1);
 
             // Information of the fan associated with the fouling air filter
@@ -1545,10 +1524,10 @@ namespace FaultsManager {
             // In the fan object, calculate by each time-step: 1) pressure increase value; 2) air flow rate decrease value.
         }
 
-        // read faults input of Fault_type 108: HumidistatOffset
+        // read faults input of HumidistatOffset
         for (int jFault_Humidistat = 1; jFault_Humidistat <= state.dataFaultsMgr->NumFaultyHumidistat; ++jFault_Humidistat) {
 
-            cFaultCurrentObject = cFaults(8); // fault object string
+            cFaultCurrentObject = cFaults(7); // fault object string
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cFaultCurrentObject,
                                                                      jFault_Humidistat,
@@ -1563,7 +1542,7 @@ namespace FaultsManager {
                                                                      cNumericFieldNames);
 
             state.dataFaultsMgr->FaultsHumidistatOffset(jFault_Humidistat).FaultType = cFaultCurrentObject;
-            state.dataFaultsMgr->FaultsHumidistatOffset(jFault_Humidistat).FaultTypeEnum = iFault_HumidistatOffset;
+            state.dataFaultsMgr->FaultsHumidistatOffset(jFault_Humidistat).FaultTypeEnum = Fault::HumidistatOffset;
             state.dataFaultsMgr->FaultsHumidistatOffset(jFault_Humidistat).Name = cAlphaArgs(1);
             state.dataFaultsMgr->FaultsHumidistatOffset(jFault_Humidistat).FaultyHumidistatName = cAlphaArgs(2);
             state.dataFaultsMgr->FaultsHumidistatOffset(jFault_Humidistat).FaultyHumidistatType = cAlphaArgs(3);
@@ -1625,10 +1604,10 @@ namespace FaultsManager {
             }
         }
 
-        // read faults input of Fault_type 107: ThermostatOffset
+        // read faults input of ThermostatOffset
         for (int jFault_Thermostat = 1; jFault_Thermostat <= state.dataFaultsMgr->NumFaultyThermostat; ++jFault_Thermostat) {
 
-            cFaultCurrentObject = cFaults(7); // fault object string
+            cFaultCurrentObject = cFaults(6); // fault object string
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cFaultCurrentObject,
                                                                      jFault_Thermostat,
@@ -1643,7 +1622,7 @@ namespace FaultsManager {
                                                                      cNumericFieldNames);
 
             state.dataFaultsMgr->FaultsThermostatOffset(jFault_Thermostat).FaultType = cFaultCurrentObject;
-            state.dataFaultsMgr->FaultsThermostatOffset(jFault_Thermostat).FaultTypeEnum = iFault_ThermostatOffset;
+            state.dataFaultsMgr->FaultsThermostatOffset(jFault_Thermostat).FaultTypeEnum = Fault::ThermostatOffset;
             state.dataFaultsMgr->FaultsThermostatOffset(jFault_Thermostat).Name = cAlphaArgs(1);
             state.dataFaultsMgr->FaultsThermostatOffset(jFault_Thermostat).FaultyThermostatName = cAlphaArgs(2);
 
@@ -1684,10 +1663,10 @@ namespace FaultsManager {
             }
         }
 
-        // read faults input of Fault_type 106: Fouling_Coil
+        // read faults input of Fouling_Coil
         for (int jFault_FoulingCoil = 1; jFault_FoulingCoil <= state.dataFaultsMgr->NumFouledCoil; ++jFault_FoulingCoil) {
 
-            cFaultCurrentObject = cFaults(6); // fault object string
+            cFaultCurrentObject = cFaults(5); // fault object string
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cFaultCurrentObject,
                                                                      jFault_FoulingCoil,
@@ -1702,7 +1681,7 @@ namespace FaultsManager {
                                                                      cNumericFieldNames);
 
             state.dataFaultsMgr->FouledCoils(jFault_FoulingCoil).FaultType = cFaultCurrentObject;
-            state.dataFaultsMgr->FouledCoils(jFault_FoulingCoil).FaultTypeEnum = iFault_Fouling_Coil;
+            state.dataFaultsMgr->FouledCoils(jFault_FoulingCoil).FaultTypeEnum = Fault::Fouling_Coil;
             state.dataFaultsMgr->FouledCoils(jFault_FoulingCoil).Name = cAlphaArgs(1);
             state.dataFaultsMgr->FouledCoils(jFault_FoulingCoil).FouledCoilName = cAlphaArgs(2);
 
@@ -1737,13 +1716,13 @@ namespace FaultsManager {
             {
                 auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(cAlphaArgs(5)));
                 if (SELECT_CASE_var == "FOULEDUARATED") {
-                    state.dataFaultsMgr->FouledCoils(jFault_FoulingCoil).FoulingInputMethod = iFouledCoil_UARated;
+                    state.dataFaultsMgr->FouledCoils(jFault_FoulingCoil).FoulingInputMethod = FouledCoil::UARated;
 
                 } else if (SELECT_CASE_var == "FOULINGFACTOR") {
-                    state.dataFaultsMgr->FouledCoils(jFault_FoulingCoil).FoulingInputMethod = iFouledCoil_FoulingFactor;
+                    state.dataFaultsMgr->FouledCoils(jFault_FoulingCoil).FoulingInputMethod = FouledCoil::FoulingFactor;
 
                 } else {
-                    state.dataFaultsMgr->FouledCoils(jFault_FoulingCoil).FoulingInputMethod = iFouledCoil_UARated;
+                    state.dataFaultsMgr->FouledCoils(jFault_FoulingCoil).FoulingInputMethod = FouledCoil::UARated;
                 }
             }
 
@@ -1785,8 +1764,8 @@ namespace FaultsManager {
                                             "Coil Fouling Factor",
                                             OutputProcessor::Unit::K_W,
                                             state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFactor,
-                                            "System",
-                                            "Average",
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Average,
                                             state.dataWaterCoils->WaterCoil(CoilNum).Name);
 
                         // Coil:Cooling:Water doesn't report UA because it's not variable,
@@ -1796,48 +1775,48 @@ namespace FaultsManager {
                                                 "Cooling Coil Total U Factor Times Area Value",
                                                 OutputProcessor::Unit::W_K,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).UACoilTotal,
-                                                "System",
-                                                "Average",
+                                                OutputProcessor::SOVTimeStepType::System,
+                                                OutputProcessor::SOVStoreType::Average,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).Name);
 
                             SetupOutputVariable(state,
                                                 "Cooling Coil External U Factor Times Area Value",
                                                 OutputProcessor::Unit::W_K,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal,
-                                                "System",
-                                                "Average",
+                                                OutputProcessor::SOVTimeStepType::System,
+                                                OutputProcessor::SOVStoreType::Average,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).Name);
 
                             SetupOutputVariable(state,
                                                 "Cooling Coil Internal U Factor Times Area Value",
                                                 OutputProcessor::Unit::W_K,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternal,
-                                                "System",
-                                                "Average",
+                                                OutputProcessor::SOVTimeStepType::System,
+                                                OutputProcessor::SOVStoreType::Average,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).Name);
 
                             SetupOutputVariable(state,
                                                 "Cooling Coil Total U Factor Times Area Value Before Fouling",
                                                 OutputProcessor::Unit::W_K,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).OriginalUACoilVariable,
-                                                "System",
-                                                "Average",
+                                                OutputProcessor::SOVTimeStepType::System,
+                                                OutputProcessor::SOVStoreType::Average,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).Name);
 
                             SetupOutputVariable(state,
                                                 "Cooling Coil External U Factor Times Area Value Before Fouling",
                                                 OutputProcessor::Unit::W_K,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).OriginalUACoilExternal,
-                                                "System",
-                                                "Average",
+                                                OutputProcessor::SOVTimeStepType::System,
+                                                OutputProcessor::SOVStoreType::Average,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).Name);
 
                             SetupOutputVariable(state,
                                                 "Cooling Coil Internal U Factor Times Area Value Before Fouling",
                                                 OutputProcessor::Unit::W_K,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).OriginalUACoilInternal,
-                                                "System",
-                                                "Average",
+                                                OutputProcessor::SOVTimeStepType::System,
+                                                OutputProcessor::SOVStoreType::Average,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).Name);
 
                         } else {
@@ -1845,8 +1824,8 @@ namespace FaultsManager {
                                                 "Heating Coil U Factor Times Area Value Before Fouling",
                                                 OutputProcessor::Unit::W_K,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).OriginalUACoilVariable,
-                                                "System",
-                                                "Average",
+                                                OutputProcessor::SOVTimeStepType::System,
+                                                OutputProcessor::SOVStoreType::Average,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).Name);
                         }
                     } else {
@@ -1861,8 +1840,8 @@ namespace FaultsManager {
             }
         }
 
-        // read faults input: Fault_type 101-105, which are related with economizer sensors
-        for (int j = 0, i = 1; i <= NumFaultTypesEconomizer; ++i) {
+        // read faults input: Fault_type 0 to 4, which are related with economizer sensors
+        for (int j = 0, i = 0; i <= 4; ++i) {
             cFaultCurrentObject = cFaults(i); // fault object string
             int NumFaultsTemp = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cFaultCurrentObject);
 
@@ -1882,7 +1861,7 @@ namespace FaultsManager {
 
                 ++j;
                 state.dataFaultsMgr->FaultsEconomizer(j).FaultType = cFaultCurrentObject;
-                state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum = iFaultTypeEnums(i);
+                state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum = static_cast<Fault>(i);
 
                 state.dataFaultsMgr->FaultsEconomizer(j).Name = cAlphaArgs(1);
                 state.dataFaultsMgr->FaultsEconomizer(j).AvaiSchedule = cAlphaArgs(2);
@@ -2188,7 +2167,7 @@ namespace FaultsManager {
     }
 
     void SetFaultyCoilSATSensor(
-        EnergyPlusData &state, std::string const &CompType, std::string const &CompName, bool &FaultyCoilSATFlag, int &FaultyCoilSATIndex)
+        EnergyPlusData &state, std::string const &CompType, std::string_view CompName, bool &FaultyCoilSATFlag, int &FaultyCoilSATIndex)
     {
 
         FaultyCoilSATFlag = false;
