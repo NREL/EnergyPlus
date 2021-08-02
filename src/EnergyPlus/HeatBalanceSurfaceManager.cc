@@ -7378,7 +7378,6 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
 
     // Reset radiant HVAC heat gain rate output for next timestep
     state.dataHeatBalSurf->QdotRadHVACInPerArea = 0.0;
-    state.dataHeatBalFanSys->QdotRadHVACToPerson = 0.0;
 
     // Update SumHmXXXX for non-window EMPD or HAMT surfaces
     if (state.dataHeatBal->AnyEMPD || state.dataHeatBal->AnyHAMT) {
@@ -8045,7 +8044,6 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
 
     // Reset radiant HVAC heat gain rate output for next timestep
     state.dataHeatBalSurf->QdotRadHVACInPerArea = 0.0;
-    state.dataHeatBalFanSys->QdotRadHVACToPerson = 0.0;
 
     // Set various surface output variables and other record keeping - after iterations are complete - all HT surfaces
     for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
