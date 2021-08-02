@@ -3,32 +3,36 @@
 
 #include <map>
 
-namespace FenestrationCommon {
+namespace FenestrationCommon
+{
+    enum class SurfaceType
+    {
+        Coated,
+        Uncoated
+    };
 
-	enum class SurfaceType { Coated, Uncoated };
+    enum class MaterialType
+    {
+        Monolithic,
+        Coated,
+        Film,
+        AppliedFilm,
+        Laminate,
+        Interlayer,
+        Electrochromic,
+        Thermochromic
+    };
 
-	enum class MaterialType {
-		Monolithic,
-		Coated,
-		Film,
-		AppliedFilm,
-		Laminate,
-		Interlayer,
-		Electrochromic,
-		Thermochromic
-	};
+    const std::map<MaterialType, SurfaceType> coatingType = {
+      {MaterialType::Monolithic, SurfaceType::Uncoated},
+      {MaterialType::Coated, SurfaceType::Coated},
+      {MaterialType::Film, SurfaceType::Coated},
+      {MaterialType::AppliedFilm, SurfaceType::Coated},
+      {MaterialType::Laminate, SurfaceType::Coated},
+      {MaterialType::Interlayer, SurfaceType::Uncoated},
+      {MaterialType::Electrochromic, SurfaceType::Coated},
+      {MaterialType::Thermochromic, SurfaceType::Coated}};
 
-	const std::map< MaterialType, SurfaceType > coatingType = {
-		{ MaterialType::Monolithic, SurfaceType::Uncoated },
-		{ MaterialType::Coated, SurfaceType::Coated },
-		{ MaterialType::Film, SurfaceType::Coated },
-		{ MaterialType::AppliedFilm, SurfaceType::Coated },
-		{ MaterialType::Laminate, SurfaceType::Coated },
-		{ MaterialType::Interlayer, SurfaceType::Uncoated },
-		{ MaterialType::Electrochromic, SurfaceType::Coated },
-		{ MaterialType::Thermochromic, SurfaceType::Coated }
-	};
-
-}
+}   // namespace FenestrationCommon
 
 #endif
