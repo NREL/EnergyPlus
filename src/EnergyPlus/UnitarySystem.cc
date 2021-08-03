@@ -11896,7 +11896,7 @@ namespace UnitarySystems {
 
                 Real64 NoOutput = 0.0; // CoilSystem:Cooling:DX
                 Real64 ReqOutput = 0.0;
-                Real64 FullOutput = 0.0;
+                FullOutput = 0.0;
                 if (this->UnitType == "CoilSystem:Cooling:DX") {
                     NoOutput = state.dataLoopNodes->Node(InletNode).MassFlowRate *
                                (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(OutletNode).HumRat) -
