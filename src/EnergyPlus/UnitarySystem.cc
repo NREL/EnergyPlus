@@ -2089,6 +2089,7 @@ namespace UnitarySystems {
                         min(this->m_NoLoadAirFlowRateRatio, state.dataUnitarySystems->designSpecMSHP[MSHPIndex].heatingVolFlowRatio[0]);
                 }
                 this->m_NoLoadAirFlowRateRatio = min(NoLoadCoolingAirFlowRateRatio, NoLoadHeatingAirFlowRateRatio);
+                state.dataUnitarySystems->designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio = this->m_NoLoadAirFlowRateRatio;
             } else {
                 if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ||
                     this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
@@ -2220,18 +2221,6 @@ namespace UnitarySystems {
         this->MaxHeatAirMassFlow = this->m_MaxHeatAirVolFlow * state.dataEnvrn->StdRhoAir;
         this->MaxNoCoolHeatAirMassFlow = this->m_MaxNoCoolHeatAirVolFlow * state.dataEnvrn->StdRhoAir;
 
-        // initialize idle air flow rate variables in case these are needed in multi-speed heating coil sizing when no multi-speed cooling coil exists
-        // the multi-speed coils will overwrite this data and these variables are only used for multi-speed coils in function SetOnOffMassFlowRate
-        if (this->m_MultiOrVarSpeedCoolCoil || this->m_MultiOrVarSpeedHeatCoil) {
-            if (this->m_DesignFanVolFlowRate > 0.0) {
-                this->m_MaxNoCoolHeatAirVolFlow = this->m_DesignFanVolFlowRate;
-            } else {
-                this->m_MaxNoCoolHeatAirVolFlow = max(this->m_MaxCoolAirVolFlow, this->m_MaxHeatAirVolFlow);
-            }
-            this->MaxNoCoolHeatAirMassFlow = this->m_MaxNoCoolHeatAirVolFlow * state.dataEnvrn->StdRhoAir;
-            this->m_NoLoadAirFlowRateRatio = 1.0;
-        }
-
         // initialize multi-speed coils
         if ((this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) ||
             (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed)) {
@@ -2284,7 +2273,7 @@ namespace UnitarySystems {
                 this->m_MSCoolingSpeedRatio[Iter] = this->m_CoolVolumeFlowRate[Iter] / this->m_DesignFanVolFlowRate;
             }
 
-            if (MSHPIndex > 0) {
+            if (MSHPIndex > -1) {
                 this->m_MaxNoCoolHeatAirVolFlow =
                     this->m_MaxCoolAirVolFlow * state.dataUnitarySystems->designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio;
                 this->MaxNoCoolHeatAirMassFlow = this->m_MaxNoCoolHeatAirVolFlow * state.dataEnvrn->StdRhoAir;
@@ -2516,7 +2505,7 @@ namespace UnitarySystems {
                         this->MaxNoCoolHeatAirMassFlow = this->MaxNoCoolHeatAirMassFlow;
                         this->m_NoLoadAirFlowRateRatio = this->m_MaxNoCoolHeatAirVolFlow / this->m_DesignFanVolFlowRate;
                     }
-                } else if (MSHPIndex > 0) {
+                } else if (MSHPIndex > -1) {
                     this->m_MaxNoCoolHeatAirVolFlow =
                         this->m_MaxHeatAirVolFlow * state.dataUnitarySystems->designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio;
                     this->MaxNoCoolHeatAirMassFlow = this->m_MaxNoCoolHeatAirVolFlow * state.dataEnvrn->StdRhoAir;
@@ -2580,7 +2569,7 @@ namespace UnitarySystems {
             }
 
             if (this->m_CoolCoilExists && this->m_NumOfSpeedHeating > 0) {
-                if (this->m_CoolVolumeFlowRate.size() > 0 && MSHPIndex > 0) {
+                if (this->m_CoolVolumeFlowRate.size() > 0 && MSHPIndex > -1) {
                     this->m_MaxNoCoolHeatAirVolFlow =
                         min(this->m_MaxNoCoolHeatAirVolFlow,
                             this->m_MaxHeatAirVolFlow * state.dataUnitarySystems->designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio);
@@ -2589,7 +2578,7 @@ namespace UnitarySystems {
                             this->MaxHeatAirMassFlow * state.dataUnitarySystems->designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio);
                     this->m_NoLoadAirFlowRateRatio =
                         min(this->m_NoLoadAirFlowRateRatio, this->m_MaxNoCoolHeatAirVolFlow / this->m_DesignFanVolFlowRate);
-                } else if (this->m_CoolVolumeFlowRate.empty() && MSHPIndex > 0) {
+                } else if (this->m_CoolVolumeFlowRate.empty() && MSHPIndex > -1) {
                     this->m_MaxNoCoolHeatAirVolFlow =
                         this->m_MaxHeatAirVolFlow * state.dataUnitarySystems->designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio;
                     this->MaxNoCoolHeatAirMassFlow =
@@ -2606,7 +2595,7 @@ namespace UnitarySystems {
                     this->MaxNoCoolHeatAirMassFlow = this->MaxNoCoolHeatAirMassFlow;
                     this->m_NoLoadAirFlowRateRatio = this->m_MaxNoCoolHeatAirVolFlow / this->m_DesignFanVolFlowRate;
                 }
-            } else if (MSHPIndex > 0) {
+            } else if (MSHPIndex > -1) {
                 this->m_MaxNoCoolHeatAirVolFlow =
                     this->m_MaxHeatAirVolFlow * state.dataUnitarySystems->designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio;
                 this->MaxNoCoolHeatAirMassFlow = this->m_MaxNoCoolHeatAirVolFlow * state.dataEnvrn->StdRhoAir;
@@ -2654,7 +2643,7 @@ namespace UnitarySystems {
                         this->m_NoLoadAirFlowRateRatio =
                             min(this->m_NoLoadAirFlowRateRatio, (this->m_MaxNoCoolHeatAirVolFlow / this->m_DesignFanVolFlowRate));
                     }
-                } else if (MSHPIndex > 0) {
+                } else if (MSHPIndex > -1) {
                     this->m_MaxNoCoolHeatAirVolFlow =
                         this->m_MaxHeatAirVolFlow * state.dataUnitarySystems->designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio;
                     this->MaxNoCoolHeatAirMassFlow =
@@ -7236,7 +7225,12 @@ namespace UnitarySystems {
                         WaterCoils::GetWaterCoilIndex(state, UtilityRoutines::MakeUPPERCase(HRcoolingCoilType), HRWaterCoolingCoilName, errFound);
                     bool heatRecoveryCoil = true; // use local here to highlight where this parameter is set
                     WaterCoils::SetWaterCoilData(state, HRCoilIndex, errFound, _, _, heatRecoveryCoil);
-                    if (errFound) ShowContinueError(state, "...occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                    if (errFound) {
+                        if (HRCoilIndex == 0) {
+                            ShowContinueError(state, "...cooling coil " + HRWaterCoolingCoilName + " must be of type Coil:Cooling:Water.");
+                        }
+                        ShowContinueError(state, "...occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                    }
                     errorsFound = errorsFound || errFound;
                 }
                 // end heat recovery loop inputs

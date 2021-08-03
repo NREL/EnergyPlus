@@ -1562,7 +1562,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageGasHeatCoil_Only)
     // heating coil air inlet node temp is less than heating coil air outlet node temp
     EXPECT_GT(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(3).Temp);
     // no load air flow rate in UnitarySystemPerformance:Multispeed equals 0
-    EXPECT_EQ(0.0, thisSys->m_IdleMassFlowRate);
+    EXPECT_EQ(0.0, thisSys->MaxNoCoolHeatAirMassFlow);
     // make sure control works at speed = 1
     EXPECT_EQ(thisSys->m_HeatingSpeedNum, 1);
 
@@ -1804,7 +1804,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Only)
     // heating coil air inlet node temp is less than heating coil air outlet node temp
     EXPECT_GT(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(3).Temp);
     // no load air flow rate in UnitarySystemPerformance:Multispeed equals 0
-    EXPECT_EQ(0.0, thisSys->m_IdleMassFlowRate);
+    EXPECT_EQ(0.0, thisSys->MaxNoCoolHeatAirMassFlow);
     // make sure control works at speed = 1
     EXPECT_EQ(thisSys->m_HeatingSpeedNum, 1);
 
@@ -2034,7 +2034,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_ElecHeatCoil_Only)
     // heating coil air inlet node temp is less than heating coil air outlet node temp
     EXPECT_GT(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(3).Temp);
     // #6282 idle air flow rate for electric heating coils should equal 0
-    EXPECT_EQ(0.0, thisSys->m_IdleMassFlowRate);
+    EXPECT_EQ(0.0, thisSys->MaxNoCoolHeatAirMassFlow);
 }
 
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageGasHeatCoil_Only_ContFan)
@@ -2251,7 +2251,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageGasHeatCoil_Only_ContFan
     EXPECT_GT(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(3).Temp);
     // no load air flow rate in UnitarySystemPerformance:Multispeed is blank (DS no load flow ratio defaults to 1) so idle mass flow rate = speed 1
     // heating flow
-    EXPECT_EQ(thisSys->m_HeatMassFlowRate[0], thisSys->m_IdleMassFlowRate);
+    EXPECT_EQ(thisSys->m_HeatMassFlowRate[1], thisSys->MaxNoCoolHeatAirMassFlow);
     // make sure control works at speed = 1
     EXPECT_EQ(thisSys->m_HeatingSpeedNum, 1);
 
@@ -3709,8 +3709,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SetOnOffMassFlowRateTest)
     thisSys.m_MSCoolingSpeedRatio.resize(4);
 
     thisSys.m_LastMode = state->dataUnitarySystems->HeatingMode;
-    thisSys.m_IdleMassFlowRate = 0.2;
-    thisSys.m_IdleSpeedRatio = 0.2;
+    thisSys.MaxNoCoolHeatAirMassFlow = 0.2;
+    thisSys.m_NoLoadAirFlowRateRatio = 0.2;
     thisSys.m_FanAvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
     thisSys.AirInNode = 1;
 
@@ -4210,8 +4210,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryHeatingSystem)
     thisSys.m_MSHeatingSpeedRatio.resize(4);
     thisSys.m_MSCoolingSpeedRatio.resize(4);
     thisSys.m_LastMode = state->dataUnitarySystems->HeatingMode;
-    thisSys.m_IdleMassFlowRate = 0.2;
-    thisSys.m_IdleSpeedRatio = 0.2;
+    thisSys.MaxNoCoolHeatAirMassFlow = 0.2;
+    thisSys.m_NoLoadAirFlowRateRatio = 0.2;
     thisSys.m_FanAvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
     thisSys.AirInNode = 1;
     thisSys.m_HeatMassFlowRate[1] = 0.25;
@@ -4355,8 +4355,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryCoolingSystem)
     thisSys.m_MSHeatingSpeedRatio.resize(4);
     thisSys.m_MSCoolingSpeedRatio.resize(4);
     thisSys.m_LastMode = state->dataUnitarySystems->HeatingMode;
-    thisSys.m_IdleMassFlowRate = 0.2;
-    thisSys.m_IdleSpeedRatio = 0.2;
+    thisSys.MaxNoCoolHeatAirMassFlow = 0.2;
+    thisSys.m_NoLoadAirFlowRateRatio = 0.2;
     thisSys.m_FanAvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
     thisSys.AirInNode = 1;
     thisSys.m_HeatMassFlowRate[1] = 0.25;
@@ -10435,7 +10435,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
     thisSys->m_MSHeatingSpeedRatio[Iter] =
         thisSys->m_HeatVolumeFlowRate[Iter] / thisSys->m_HeatVolumeFlowRate[state->dataUnitarySystems->designSpecMSHP[0].numOfSpeedHeating];
 
-    thisSys->m_IdleMassFlowRate = thisSys->m_CoolMassFlowRate[1];
+    thisSys->MaxNoCoolHeatAirMassFlow = thisSys->m_CoolMassFlowRate[1];
     // flow rates are set up now, don't call getInput again
     thisSys->m_ThisSysInputShouldBeGotten = false;
 
@@ -17800,8 +17800,8 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
     thisSys.m_HeatMassFlowRate.resize(1);
     thisSys.m_CoolMassFlowRate.resize(1);
     thisSys.m_LastMode = state->dataUnitarySystems->CoolingMode;
-    thisSys.m_IdleMassFlowRate = 0.2;
-    thisSys.m_IdleSpeedRatio = 0.2;
+    thisSys.MaxNoCoolHeatAirMassFlow = 0.2;
+    thisSys.m_NoLoadAirFlowRateRatio = 0.2;
     thisSys.m_FanAvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
     thisSys.m_FanOpMode = DataHVACGlobals::CycFanCycCoil;
 

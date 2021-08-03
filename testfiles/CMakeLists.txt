@@ -46,6 +46,7 @@ add_simulation_test(IDF_FILE 5ZoneAirCooledWithCoupledInGradeSlab.idf EPW_FILE U
 add_simulation_test(IDF_FILE 5ZoneAirCooledWithDOASAirLoop.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE 5ZoneAirCooled_AirBoundaries.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE 5ZoneAirCooled_AirBoundaries_Daylighting.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+add_simulation_test(IDF_FILE 5ZoneAirCooled_RunaroundHeatRecovery.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE 5ZoneAirCooled_UniformLoading.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE 5ZoneAirCooled_VAVBoxMinAirFlowTurnDown.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE 5ZoneAirCooled_VRPSizing.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
