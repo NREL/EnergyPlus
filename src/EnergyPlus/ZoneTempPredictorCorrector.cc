@@ -7082,7 +7082,8 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
 
         } // End of check if window
 
-        SumHADTsurfs += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area * (state.dataHeatBalSurf->SurfTempInTmp(SurfNum) - RefAirTemp);
+        SumHADTsurfs += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area *
+                        (state.dataHeatBalSurf->SurfTempInTmp(SurfNum) - state.dataHeatBalSurfMgr->RefAirTemp(SurfNum));
 
         // Accumulate Zone Phase Change Material Melting/Freezing Enthalpy output variables
         if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
