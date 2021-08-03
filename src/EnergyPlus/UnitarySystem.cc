@@ -1136,7 +1136,7 @@ namespace UnitarySystems {
                         state.dataLoopNodes->Node(this->AirInNode).MassFlowRate = 0.0;
                     }
 
-                if (this->m_WaterHRPlantLoopModel) {
+                    if (this->m_WaterHRPlantLoopModel) {
                         // initialize loop water temp on FirstHVACIteration
                         Real64 airInTemp = state.dataLoopNodes->Node(this->CoolCoilInletNodeNum).Temp;
                         Real64 companionAirInTemp = state.dataLoopNodes->Node(this->m_HRcoolCoilAirInNode).Temp;
