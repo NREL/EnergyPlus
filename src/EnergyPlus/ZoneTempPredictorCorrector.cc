@@ -7029,6 +7029,7 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
     for (SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
 
         Area = state.dataSurface->Surface(SurfNum).Area; // For windows, this is the glazing area
+        HeatBalanceSurfaceManager::CalcRefAirTemp(state, SurfNum, ZoneNum);
 
         if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) {
 
