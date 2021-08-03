@@ -185,3 +185,131 @@ class InitializeShadeControlFlags(EnergyPlusPlugin):
         else:
             # API not ready, return
             return 0
+
+
+class ConstantVolumePurchasedAirExample(EnergyPlusPlugin):
+
+    def __init__(self):
+        super().__init__()
+        self.need_to_get_hndls = True
+
+    def get_handles(self, state):
+        # global zone state variable handles
+        self.zn_1_state_hndl = self.api.exchange.get_global_handle(state, 'zn_1_state')
+        self.zn_2_state_hndl = self.api.exchange.get_global_handle(state, 'zn_2_state')
+        self.zn_3_state_hndl = self.api.exchange.get_global_handle(state, 'zn_3_state')
+        # zone sensible load "sensor" handles
+        self.zn_1_sen_load_hndl = self.api.exchange.get_variable_handle(state, 'Zone Predicted Sensible Load to Setpoint Heat Transfer Rate', 'West Zone')
+        self.zn_2_sen_load_hndl = self.api.exchange.get_variable_handle(state, 'Zone Predicted Sensible Load to Setpoint Heat Transfer Rate', 'EAST ZONE')
+        self.zn_3_sen_load_hndl = self.api.exchange.get_variable_handle(state, 'Zone Predicted Sensible Load to Setpoint Heat Transfer Rate', 'NORTH ZONE')
+        # mass flow rate actuators handles
+        self.zn_1_air_mdot_hndl = self.api.exchange.get_actuator_handle(state, 'Ideal Loads Air System', 'Air Mass Flow Rate', 'ZONE1AIR')
+        self.zn_2_air_mdot_hndl = self.api.exchange.get_actuator_handle(state, 'Ideal Loads Air System', 'Air Mass Flow Rate', 'ZONE2AIR')
+        self.zn_3_air_mdot_hndl = self.api.exchange.get_actuator_handle(state, 'Ideal Loads Air System', 'Air Mass Flow Rate', 'ZONE3AIR')
+        # temperature actuators handles
+        self.zn_1_air_tsup_hndl = self.api.exchange.get_actuator_handle(state, 'Ideal Loads Air System', 'Air Temperature', 'ZONE1AIR')
+        self.zn_2_air_tsup_hndl = self.api.exchange.get_actuator_handle(state, 'Ideal Loads Air System', 'Air Temperature', 'ZONE2AIR')
+        self.zn_3_air_tsup_hndl = self.api.exchange.get_actuator_handle(state, 'Ideal Loads Air System', 'Air Temperature', 'ZONE3AIR')
+        # humidity ratio actuators handles
+        self.zn_1_air_hmrt_hndl = self.api.exchange.get_actuator_handle(state, 'Ideal Loads Air System', 'Air Humidity Ratio', 'ZONE1AIR')
+        self.zn_2_air_hmrt_hndl = self.api.exchange.get_actuator_handle(state, 'Ideal Loads Air System', 'Air Humidity Ratio', 'ZONE2AIR')
+        self.zn_3_air_hmrt_hndl = self.api.exchange.get_actuator_handle(state, 'Ideal Loads Air System', 'Air Humidity Ratio', 'ZONE3AIR')
+
+    # state representation:  0 is off, 1 is heating, 2 is cooling
+    def determine_purch_air_state(self, state):
+        # zone 1
+        if self.zn_1_sen_load < 0:
+            self.zn_1_state = 2
+        elif self.zn_1_sen_load > 0:
+            self.zn_1_state = 1
+        else:
+            self.zn_1_state = 0
+        # zone 2
+        if self.zn_2_sen_load < 0:
+            self.zn_2_state = 2
+        elif self.zn_2_sen_load > 0:
+            self.zn_2_state = 1
+        else:
+            self.zn_2_state = 0
+        # zone 3
+        if self.zn_3_sen_load < 0:
+            self.zn_3_state = 2
+        elif self.zn_3_sen_load > 0:
+            self.zn_3_state = 1
+        else:
+            self.zn_3_state = 0
+
+    def on_after_predictor_after_hvac_managers(self, state) -> int:
+
+        if not self.api.exchange.api_data_fully_ready(state):
+            return 0
+
+        if self.need_to_get_hndls:
+            self.get_handles(state)
+            self.need_to_get_hndls = False
+
+        # get zone sensible load "sensors"
+        self.zn_1_sen_load = self.api.exchange.get_variable_value(state, self.zn_1_sen_load_hndl)
+        self.zn_2_sen_load = self.api.exchange.get_variable_value(state, self.zn_2_sen_load_hndl)
+        self.zn_3_sen_load = self.api.exchange.get_variable_value(state, self.zn_3_sen_load_hndl)
+
+        # determine purchased air state
+        self.determine_purch_air_state(state)
+
+        # set global zone state variables
+        self.api.exchange.set_global_value(state, self.zn_1_state_hndl, self.zn_1_state)
+        self.api.exchange.set_global_value(state, self.zn_2_state_hndl, self.zn_2_state)
+        self.api.exchange.set_global_value(state, self.zn_3_state_hndl, self.zn_3_state)
+
+        # set zone 1 purchased air state
+        if self.zn_1_state == 2:
+            zn_1_air_mdot = 0.3
+            zn_1_air_temp = 13
+            zn_1_air_hmrt = 0.009
+        elif self.zn_1_state == 1:
+            zn_1_air_mdot = 0.1
+            zn_1_air_temp = 50
+            zn_1_air_hmrt = 0.015
+        else:
+            zn_1_air_mdot = 0
+
+        # set zone 2 purchased air state
+        if self.zn_2_state == 2:
+            zn_2_air_mdot = 0.3
+            zn_2_air_temp = 13
+            zn_2_air_hmrt = 0.009
+        elif self.zn_2_state == 1:
+            zn_2_air_mdot = 0.1
+            zn_2_air_temp = 50
+            zn_2_air_hmrt = 0.015
+        else:
+            zn_2_air_mdot = 0
+
+        # set zone 3 purchased air state
+        if self.zn_3_state == 2:
+            zn_3_air_mdot = 0.3
+            zn_3_air_temp = 13
+            zn_3_air_hmrt = 0.009
+        elif self.zn_3_state == 1:
+            zn_3_air_mdot = 0.1
+            zn_3_air_temp = 50
+            zn_3_air_hmrt = 0.015
+        else:
+            zn_3_air_mdot = 0
+
+        # set mass flow rate actuators
+        self.api.exchange.set_actuator_value(state, self.zn_1_air_mdot_hndl, zn_1_air_mdot)
+        self.api.exchange.set_actuator_value(state, self.zn_2_air_mdot_hndl, zn_2_air_mdot)
+        self.api.exchange.set_actuator_value(state, self.zn_3_air_mdot_hndl, zn_3_air_mdot)
+
+        # set temperature actuators
+        self.api.exchange.set_actuator_value(state, self.zn_1_air_tsup_hndl, zn_1_air_temp)
+        self.api.exchange.set_actuator_value(state, self.zn_2_air_tsup_hndl, zn_2_air_temp)
+        self.api.exchange.set_actuator_value(state, self.zn_3_air_tsup_hndl, zn_3_air_temp)
+
+        # set humidity ratio actuators
+        self.api.exchange.set_actuator_value(state, self.zn_1_air_hmrt_hndl, zn_1_air_hmrt)
+        self.api.exchange.set_actuator_value(state, self.zn_2_air_hmrt_hndl, zn_2_air_hmrt)
+        self.api.exchange.set_actuator_value(state, self.zn_3_air_hmrt_hndl, zn_3_air_hmrt)
+
+        return 0
