@@ -945,6 +945,18 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                                          surfName,
                                          state.dataSurface->FrameDivider(frameDivNum).DividerConductance,
                                          3);
+                        // find key of map 
+                        std::string NFRCname = "-";
+                        for (auto &entry : DataSurfaces::NfrcProductMap) {
+                            if (entry.second == state.dataSurface->FrameDivider(frameDivNum).NfrcProductType) {
+                                NFRCname = entry.first;
+                                break;
+                            }
+                        }
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchFenAssemNfrcType,
+                                         surfName,
+                                         NFRCname);
                     }
                     windowAreaWMult = windowArea * mult;
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAreaOf1, surfName, windowArea);
