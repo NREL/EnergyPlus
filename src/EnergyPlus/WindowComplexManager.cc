@@ -2623,14 +2623,6 @@ namespace WindowComplexManager {
         int IGlass;      // glass layer number (1,2,3,...)
         int IGap;        // Gap layer number (1,2,...)
         int TotGlassLay; // Total number of glass layers in a construction
-        int ZoneEquipConfigNum;
-        int NodeNum;
-        Real64 SumSysMCp;  // Zone sum of air system MassFlowRate*Cp
-        Real64 SumSysMCpT; // Zone sum of air system MassFlowRate*Cp*T
-        Real64 MassFlowRate;
-        Real64 NodeTemp;
-        Real64 CpAir;
-        Real64 RefAirTemp;        // reference air temperatures
         int k;                    // Layer counter
         int SurfNumAdj;           // An interzone surface's number in the adjacent zone
         int ZoneNumAdj;           // An interzone surface's adjacent zone number

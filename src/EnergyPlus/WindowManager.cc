@@ -2286,15 +2286,6 @@ namespace WindowManager {
         Real64 InsideGlassTemp; // Temperature of room side of innermost glass layer (C)
         Real64 Tleft;           // For airflow windows, temperature of the glass faces adjacent
         Real64 Tright;
-        //  to the airflow gap (C)
-        int ZoneEquipConfigNum;
-        int NodeNum;
-        Real64 SumSysMCp;  // Zone sum of air system MassFlowRate*Cp
-        Real64 SumSysMCpT; // Zone sum of air system MassFlowRate*Cp*T
-        Real64 MassFlowRate;
-        Real64 NodeTemp;
-        Real64 CpAir;
-        Real64 RefAirTemp; // reference air temperatures
 
         int SrdSurfsNum;       // Surrounding surfaces list number
         int SrdSurfNum;        // Surrounding surface number DO loop counter
