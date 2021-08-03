@@ -6880,13 +6880,10 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
     Real64 CpAir;      // Specific heat of air
     int SurfNum;       // Surface number
     Real64 Area;       // Effective surface area
-    Real64 RefAirTemp; // Reference air temperature for surface convection calculations
     int ADUListIndex;
     int ADUNum;
     int ADUInNode;
     int ADUOutNode;
-    Real64 SumSysMCp;
-    Real64 SumSysMCpT;
     Real64 Threshold;
     Real64 SumRetAirGains;
     Real64 ADUHeatAddRate;
@@ -6902,8 +6899,6 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
     imBalance = 0.0;
     SumEnthalpyM = 0.0;
     SumEnthalpyH = 0.0;
-    SumSysMCp = 0.0;
-    SumSysMCpT = 0.0;
     ADUHeatAddRate = 0.0;
     ADUNum = 0;
     QSensRate = 0;
