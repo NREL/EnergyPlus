@@ -2643,7 +2643,8 @@ namespace WindowManager {
             if (SurfNumAdj > 0) { // Interzone window
 
                 ZoneNumAdj = state.dataSurface->Surface(SurfNumAdj).Zone;
-                state.dataWindowManager->tout = state.dataHeatBalSurfMgr->RefAirTemp(SurfNum) + state.dataWindowManager->TKelvin; // outside air temperature
+                state.dataWindowManager->tout =
+                    state.dataHeatBalSurfMgr->RefAirTemp(SurfNum) + state.dataWindowManager->TKelvin; // outside air temperature
 
                 // Add long-wave radiation from adjacent zone absorbed by glass layer closest to the adjacent zone.
                 state.dataWindowManager->AbsRadGlassFace(1) += state.dataHeatBal->SurfQRadThermInAbs(SurfNumAdj);
