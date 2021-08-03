@@ -4,65 +4,62 @@
 #include "BaseIGULayer.hpp"
 #include "Surface.hpp"
 
-using namespace FenestrationCommon;
+using FenestrationCommon::Side;
 
+namespace Tarcog
+{
+    namespace ISO15099
+    {
+        CBaseIGULayer::CBaseIGULayer(double const t_Thickness) : m_Thickness(t_Thickness)
+        {}
 
-namespace Tarcog {
+        double CBaseIGULayer::layerTemperature()
+        {
+            return (getTemperature(Side::Front) + getTemperature(Side::Back)) / 2;
+        }
 
-	CBaseIGULayer::CBaseIGULayer( double const t_Thickness ) :
-		m_Thickness( t_Thickness ) {
+        double CBaseIGULayer::getThickness() const
+        {
+            return m_Thickness + getSurface(Side::Front)->getMeanDeflection()
+                   - getSurface(Side::Back)->getMeanDeflection();
+        }
 
-	}
+        double CBaseIGULayer::getTemperature(Side const t_Position) const
+        {
+            return getSurface(t_Position)->getTemperature();
+        }
 
-	CBaseIGULayer::CBaseIGULayer( CBaseIGULayer const& t_Layer ) :
-		CState( t_Layer ), CBaseLayer( t_Layer ) {
-		m_Thickness = t_Layer.m_Thickness;
-	}
+        double CBaseIGULayer::J(Side const t_Position) const
+        {
+            return getSurface(t_Position)->J();
+        }
 
-	// CBaseIGULayer::CBaseIGULayer( CBaseIGULayer const& t_Layer ) {
-	// 	operator=( t_Layer );
-	// }
+        double CBaseIGULayer::getMaxDeflection() const
+        {
+            assert(getSurface(Side::Front)->getMaxDeflection()
+                   == getSurface(Side::Back)->getMaxDeflection());
+            return getSurface(Side::Front)->getMaxDeflection();
+        }
 
-	CBaseIGULayer & CBaseIGULayer::operator=( CBaseIGULayer const & t_BaseIGULayer ) {
-		this->CState::operator=( t_BaseIGULayer );
-		this->CBaseLayer::operator=( t_BaseIGULayer );
-		m_Thickness = t_BaseIGULayer.m_Thickness;
+        double CBaseIGULayer::getMeanDeflection() const
+        {
+            assert(getSurface(Side::Front)->getMeanDeflection()
+                   == getSurface(Side::Back)->getMeanDeflection());
+            return getSurface(Side::Front)->getMeanDeflection();
+        }
 
-		return *this;
-	}
+        double CBaseIGULayer::getConductivity()
+        {
+            return getConductionConvectionCoefficient() * m_Thickness;
+        }
 
-	double CBaseIGULayer::layerTemperature() {
-		return ( m_Surface.at( Side::Front )->getTemperature() +
-			m_Surface.at( Side::Back )->getTemperature() ) / 2;
-	}
+        double CBaseIGULayer::getEffectiveThermalConductivity()
+        {
+            return std::abs(getHeatFlow() * m_Thickness
+                            / (m_Surface.at(FenestrationCommon::Side::Front)->getTemperature()
+                               - m_Surface.at(FenestrationCommon::Side::Back)->getTemperature()));
+        }
 
-	double CBaseIGULayer::getThickness() const {
-		return m_Thickness + getSurface( Side::Front )->getMeanDeflection() -
-			getSurface( Side::Back )->getMeanDeflection();
-	}
+    }   // namespace ISO15099
 
-	double CBaseIGULayer::getTemperature( Side const t_Position ) const {
-		return getSurface( t_Position )->getTemperature();
-	}
-
-	double CBaseIGULayer::J( Side const t_Position ) const {
-		return getSurface( t_Position )->J();
-	}
-
-	double CBaseIGULayer::getMaxDeflection() const {
-		assert( getSurface( Side::Front )->getMaxDeflection() ==
-			getSurface( Side::Back )->getMaxDeflection() );
-		return getSurface( Side::Front )->getMaxDeflection();
-	}
-
-	double CBaseIGULayer::getMeanDeflection() const {
-		assert( getSurface( Side::Front )->getMeanDeflection() ==
-			getSurface( Side::Back )->getMeanDeflection() );
-		return getSurface( Side::Front )->getMeanDeflection();
-	}
-
-	double CBaseIGULayer::getConductivity() {
-		return getConductionConvectionCoefficient() * m_Thickness;
-	}
-
-}
+}   // namespace Tarcog
