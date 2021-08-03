@@ -2414,6 +2414,7 @@ namespace WindowManager {
             state.dataWindowManager->tiltr = state.dataWindowManager->tilt * DataGlobalConstants::DegToRadians;
             SurfNumAdj = surface.ExtBoundCond;
             state.dataWindowManager->hcin = state.dataHeatBalSurf->SurfHConvInt(SurfNum); // Room-side surface convective film conductance
+            HeatBalanceSurfaceManager::CalcRefAirTemp(state, SurfNum, ZoneNum);
             state.dataWindowManager->tin = state.dataHeatBalSurfMgr->RefAirTemp(SurfNum) + state.dataWindowManager->TKelvin; // Inside air temperature
 
             // Reset hcin if necessary since too small a value sometimes causes non-convergence
@@ -2634,6 +2635,7 @@ namespace WindowManager {
             if (SurfNumAdj > 0) { // Interzone window
 
                 ZoneNumAdj = state.dataSurface->Surface(SurfNumAdj).Zone;
+                HeatBalanceSurfaceManager::CalcRefAirTemp(state, SurfNumAdj, ZoneNumAdj);
                 state.dataWindowManager->tout =
                     state.dataHeatBalSurfMgr->RefAirTemp(SurfNum) + state.dataWindowManager->TKelvin; // outside air temperature
 

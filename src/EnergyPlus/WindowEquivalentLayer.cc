@@ -724,6 +724,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     if (CalcCondition == DataBSDFWindow::Condition::Unassigned) {
         ZoneNum = state.dataSurface->Surface(SurfNum).Zone;
         SurfNumAdj = state.dataSurface->Surface(SurfNum).ExtBoundCond;
+        HeatBalanceSurfaceManager::CalcRefAirTemp(state, SurfNum, ZoneNum);
         TaIn = state.dataHeatBalSurfMgr->RefAirTemp(SurfNum);
         TIN = TaIn + DataGlobalConstants::KelvinConv; // Inside air temperature, K
 
@@ -732,6 +733,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
             // this is interzone window. the outside condition is determined from the adjacent zone
             // condition
             ZoneNumAdj = state.dataSurface->Surface(SurfNumAdj).Zone;
+            HeatBalanceSurfaceManager::CalcRefAirTemp(state, SurfNumAdj, ZoneNumAdj);
             Tout = state.dataHeatBalSurfMgr->RefAirTemp(SurfNumAdj) + DataGlobalConstants::KelvinConv; // outside air temperature
             tsky = state.dataHeatBal->ZoneMRT(ZoneNumAdj) +
                    DataGlobalConstants::KelvinConv; // TODO this misses IR from sources such as high temp radiant and baseboards

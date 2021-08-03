@@ -2729,12 +2729,14 @@ namespace WindowComplexManager {
 
         if (CalcCondition == DataBSDFWindow::Condition::Unassigned) {
             ZoneNum = state.dataSurface->Surface(SurfNum).Zone;
+            HeatBalanceSurfaceManager::CalcRefAirTemp(state, SurfNum, ZoneNum);
             tind = state.dataHeatBalSurfMgr->RefAirTemp(SurfNum) + DataGlobalConstants::KelvinConv; // Inside air temperature
 
             // now get "outside" air temperature
             if (SurfNumAdj > 0) { // Interzone window
 
                 ZoneNumAdj = state.dataSurface->Surface(SurfNumAdj).Zone;
+                HeatBalanceSurfaceManager::CalcRefAirTemp(state, SurfNumAdj, ZoneNumAdj);
                 tout = state.dataHeatBalSurfMgr->RefAirTemp(SurfNumAdj) + DataGlobalConstants::KelvinConv; // outside air temperature
 
                 tsky = state.dataHeatBal->ZoneMRT(ZoneNumAdj) +
