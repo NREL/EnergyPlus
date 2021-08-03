@@ -690,10 +690,10 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     int ZoneNum;   // Zone number corresponding to SurfNum
     int ConstrNum; // Construction number
 
-    int SurfNumAdj;    // An interzone surface's number in the adjacent zone
-    int ZoneNumAdj;    // An interzone surface's adjacent zone number
-    Real64 LWAbsIn;    // effective long wave absorptance/emissivity back side
-    Real64 LWAbsOut;   // effective long wave absorptance/emissivity front side
+    int SurfNumAdj;  // An interzone surface's number in the adjacent zone
+    int ZoneNumAdj;  // An interzone surface's adjacent zone number
+    Real64 LWAbsIn;  // effective long wave absorptance/emissivity back side
+    Real64 LWAbsOut; // effective long wave absorptance/emissivity front side
     Real64 outir(0);
     Real64 rmir;
     Real64 Ebout;

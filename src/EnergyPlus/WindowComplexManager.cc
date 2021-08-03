@@ -2618,11 +2618,11 @@ namespace WindowComplexManager {
 
         int TotLay; // Total number of layers in a construction
         //   (sum of solid layers and gap layers)
-        int Lay;         // Layer number
-        int LayPtr;      // Material number for a layer
-        int IGlass;      // glass layer number (1,2,3,...)
-        int IGap;        // Gap layer number (1,2,...)
-        int TotGlassLay; // Total number of glass layers in a construction
+        int Lay;                  // Layer number
+        int LayPtr;               // Material number for a layer
+        int IGlass;               // glass layer number (1,2,3,...)
+        int IGap;                 // Gap layer number (1,2,...)
+        int TotGlassLay;          // Total number of glass layers in a construction
         int k;                    // Layer counter
         int SurfNumAdj;           // An interzone surface's number in the adjacent zone
         int ZoneNumAdj;           // An interzone surface's adjacent zone number

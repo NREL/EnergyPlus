@@ -6877,9 +6877,9 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
     bool ZoneRetPlenumAirFlag;
     bool ZoneSupPlenumAirFlag;
     Real64 RhoAir;
-    Real64 CpAir;      // Specific heat of air
-    int SurfNum;       // Surface number
-    Real64 Area;       // Effective surface area
+    Real64 CpAir; // Specific heat of air
+    int SurfNum;  // Surface number
+    Real64 Area;  // Effective surface area
     int ADUListIndex;
     int ADUNum;
     int ADUInNode;
