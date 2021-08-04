@@ -410,8 +410,8 @@ namespace AirflowNetworkBalanceManager {
                 Real64 refW = defaultReferenceConditions.humidity_ratio;
                 if (!conditionsAreDefaulted) {
                     if (fields.find("reference_crack_conditions") != fields.end()) { // not required field, *should* have default value
-                        auto result =
-                            referenceConditions.find(UtilityRoutines::MakeUPPERCase(std::string_view(fields.at("reference_crack_conditions"))));
+                        std::string refCrackCondName = fields.at("reference_crack_conditions");
+                        auto result = referenceConditions.find(UtilityRoutines::MakeUPPERCase(refCrackCondName));
                         if (result == referenceConditions.end()) {
                             ShowSevereError(state,
                                             std::string{RoutineName} + CurrentModuleObject + ": " + thisObjectName +
@@ -498,8 +498,8 @@ namespace AirflowNetworkBalanceManager {
                 Real64 refW = defaultReferenceConditions.humidity_ratio;
                 if (!conditionsAreDefaulted) {
                     if (fields.find("reference_crack_conditions") != fields.end()) { // not required field, *should* have default value
-                        auto result =
-                            referenceConditions.find(UtilityRoutines::MakeUPPERCase(std::string_view(fields.at("reference_crack_conditions"))));
+                        std::string refCrackCondName = fields.at("reference_crack_conditions");
+                        auto result = referenceConditions.find(UtilityRoutines::MakeUPPERCase(refCrackCondName));
                         if (result == referenceConditions.end()) {
                             ShowSevereError(state,
                                             std::string{RoutineName} + CurrentModuleObject + ": " + thisObjectName +
@@ -575,8 +575,8 @@ namespace AirflowNetworkBalanceManager {
                 Real64 refW = defaultReferenceConditions.humidity_ratio;
                 if (!conditionsAreDefaulted) {
                     if (fields.find("reference_crack_conditions") != fields.end()) { // not required field, *should* have default value
-                        auto result =
-                            referenceConditions.find(UtilityRoutines::MakeUPPERCase(std::string_view(fields.at("reference_crack_conditions"))));
+                        std::string refCrackCondName = fields.at("reference_crack_conditions");
+                        auto result = referenceConditions.find(UtilityRoutines::MakeUPPERCase(refCrackCondName));
                         if (result == referenceConditions.end()) {
                             ShowSevereError(state,
                                             std::string{RoutineName} + CurrentModuleObject + ": " + thisObjectName +
@@ -651,8 +651,8 @@ namespace AirflowNetworkBalanceManager {
                 Real64 refW = defaultReferenceConditions.humidity_ratio;
                 if (!conditionsAreDefaulted) {
                     if (fields.find("reference_crack_conditions") != fields.end()) { // not required field, *should* have default value
-                        auto result =
-                            referenceConditions.find(UtilityRoutines::MakeUPPERCase(std::string_view(fields.at("reference_crack_conditions"))));
+                        std::string refCrackCondName = fields.at("reference_crack_conditions");
+                        auto result = referenceConditions.find(UtilityRoutines::MakeUPPERCase(refCrackCondName));
                         if (result == referenceConditions.end()) {
                             ShowSevereError(state,
                                             std::string{RoutineName} + CurrentModuleObject + ": " + thisObjectName +
