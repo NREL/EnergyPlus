@@ -243,10 +243,10 @@ namespace FluidProperties {
 
         // For default "glycol" fluids of Water, Ethylene Glycol, and Propylene Glycol
 
-        static Array1D<Real64> const
-            DefaultGlycolTemps(DefaultNumGlyTemps, {-35.0, -30.0, -25.0, -20.0, -15.0, -10.0, -5.0,  0.0,   5.0,  10.0, 15.0, 20.0,
-                                                    25.0,  30.0,  35.0,  40.0,  45.0,  50.0,  55.0,  60.0,  65.0, 70.0, 75.0, 80.0,
-                                                    85.0,  90.0,  95.0,  100.0, 105.0, 110.0, 115.0, 120.0, 125.0}); // 33 total temperature points
+        constexpr std::array<Real64, DefaultNumGlyTemps> DefaultGlycolTemps = {
+            -35.0, -30.0, -25.0, -20.0, -15.0, -10.0, -5.0, 0.0,  5.0,  10.0, 15.0,  20.0,  25.0,  30.0,  35.0,  40.0, 45.0,
+            50.0,  55.0,  60.0,  65.0,  70.0,  75.0,  80.0, 85.0, 90.0, 95.0, 100.0, 105.0, 110.0, 115.0, 120.0, 125.0}; // 33 total temperature
+                                                                                                                         // points
 
         static Array1D<Real64> const DefaultGlycolConcs(DefaultNumGlyConcs,
                                                         {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9}); // 10 total concentration points
