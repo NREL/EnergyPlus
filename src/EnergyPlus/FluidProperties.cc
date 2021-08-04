@@ -251,10 +251,10 @@ namespace FluidProperties {
         constexpr std::array<Real64, DefaultNumGlyConcs> DefaultGlycolConcs = {
             0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9}; // 10 total concentration points
 
-        static Array1D<Real64> const DefaultWaterCpData(DefaultNumGlyTemps, {0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    4217.0, 4198.0,
-                                                                             4191.0, 4185.0, 4181.0, 4179.0, 4180.0, 4180.0, 4180.0, 4180.0, 4181.0,
-                                                                             4183.0, 4185.0, 4188.0, 4192.0, 4196.0, 4200.0, 4203.0, 4208.0, 4213.0,
-                                                                             4218.0, 4223.0, 4228.0, 4233.0, 4238.0, 4243.0}); // in J/kg-K
+        constexpr std::array<Real64, DefaultNumGlyTemps> DefaultWaterCpData = {0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    4217.0, 4198.0,
+                                                                               4191.0, 4185.0, 4181.0, 4179.0, 4180.0, 4180.0, 4180.0, 4180.0, 4181.0,
+                                                                               4183.0, 4185.0, 4188.0, 4192.0, 4196.0, 4200.0, 4203.0, 4208.0, 4213.0,
+                                                                               4218.0, 4223.0, 4228.0, 4233.0, 4238.0, 4243.0}; // in J/kg-K
 
         static Array1D<Real64> const DefaultWaterViscData(
             DefaultNumGlyTemps,
