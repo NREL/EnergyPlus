@@ -287,11 +287,11 @@ class ConstantVolumePurchasedAirExample(EnergyPlusPlugin):
 
         # set zone 3 purchased air state
         if self.zn_3_state == 2:
-            zn_3_air_mdot = 0.3
+            zn_3_air_mdot = 0.4
             zn_3_air_temp = 13
             zn_3_air_hmrt = 0.009
         elif self.zn_3_state == 1:
-            zn_3_air_mdot = 0.1
+            zn_3_air_mdot = 0.15
             zn_3_air_temp = 50
             zn_3_air_hmrt = 0.015
         else:
