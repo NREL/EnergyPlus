@@ -173,8 +173,6 @@ namespace HeatBalanceSurfaceManager {
                                            const std::vector<int> &IZSurfs, // Last zone to simulate
                                            Optional_int_const ZoneToResimulate = _);
 
-    void CalcRefAirTemp(EnergyPlusData &state, int const SurfNum, int const ZoneNum);
-
     void
     TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state, Real64 TH12, int const SurfNum, DataHeatBalance::ZoneData &zone, int WarmupSurfTemp);
 

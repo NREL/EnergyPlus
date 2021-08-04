@@ -2414,8 +2414,8 @@ namespace WindowManager {
             state.dataWindowManager->tiltr = state.dataWindowManager->tilt * DataGlobalConstants::DegToRadians;
             SurfNumAdj = surface.ExtBoundCond;
             state.dataWindowManager->hcin = state.dataHeatBalSurf->SurfHConvInt(SurfNum); // Room-side surface convective film conductance
-            HeatBalanceSurfaceManager::CalcRefAirTemp(state, SurfNum, ZoneNum);
-            state.dataWindowManager->tin = state.dataHeatBalSurfMgr->RefAirTemp(SurfNum) + state.dataWindowManager->TKelvin; // Inside air temperature
+            Real64 RefAirTemp = state.dataSurface->Surface(SurfNum).getInsideAirTemperature(state, SurfNum);
+            state.dataWindowManager->tin = RefAirTemp + state.dataWindowManager->TKelvin; // Inside air temperature
 
             // Reset hcin if necessary since too small a value sometimes causes non-convergence
             // of window layer heat balance solution.
@@ -2635,9 +2635,8 @@ namespace WindowManager {
             if (SurfNumAdj > 0) { // Interzone window
 
                 ZoneNumAdj = state.dataSurface->Surface(SurfNumAdj).Zone;
-                HeatBalanceSurfaceManager::CalcRefAirTemp(state, SurfNumAdj, ZoneNumAdj);
-                state.dataWindowManager->tout =
-                    state.dataHeatBalSurfMgr->RefAirTemp(SurfNum) + state.dataWindowManager->TKelvin; // outside air temperature
+                Real64 RefAirTemp = state.dataSurface->Surface(SurfNumAdj).getInsideAirTemperature(state, SurfNumAdj);
+                state.dataWindowManager->tout = RefAirTemp + state.dataWindowManager->TKelvin; // outside air temperature
 
                 // Add long-wave radiation from adjacent zone absorbed by glass layer closest to the adjacent zone.
                 state.dataWindowManager->AbsRadGlassFace(1) += state.dataHeatBal->SurfQRadThermInAbs(SurfNumAdj);

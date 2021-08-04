@@ -7029,7 +7029,7 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
     for (SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
 
         Area = state.dataSurface->Surface(SurfNum).Area; // For windows, this is the glazing area
-        HeatBalanceSurfaceManager::CalcRefAirTemp(state, SurfNum, ZoneNum);
+        Real64 RefAirTemp = state.dataSurface->Surface(SurfNum).getInsideAirTemperature(state, SurfNum);
 
         if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) {
 
@@ -7066,20 +7066,19 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
 
                 SumHADTsurfs += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
                                 (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) *
-                                (state.dataSurface->SurfWinFrameTempIn(SurfNum) - state.dataHeatBalSurfMgr->RefAirTemp(SurfNum));
+                                (state.dataSurface->SurfWinFrameTempIn(SurfNum) - RefAirTemp);
             }
 
             if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                 // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
                 SumHADTsurfs += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
                                 (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) *
-                                (state.dataSurface->SurfWinDividerTempIn(SurfNum) - state.dataHeatBalSurfMgr->RefAirTemp(SurfNum));
+                                (state.dataSurface->SurfWinDividerTempIn(SurfNum) - RefAirTemp);
             }
 
         } // End of check if window
 
-        SumHADTsurfs += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area *
-                        (state.dataHeatBalSurf->SurfTempInTmp(SurfNum) - state.dataHeatBalSurfMgr->RefAirTemp(SurfNum));
+        SumHADTsurfs += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area * (state.dataHeatBalSurf->SurfTempInTmp(SurfNum) - RefAirTemp);
 
         // Accumulate Zone Phase Change Material Melting/Freezing Enthalpy output variables
         if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
