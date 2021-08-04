@@ -39,11 +39,11 @@ where:
 
 \(MassFlowRA\) is the mass flow rate at the return node (kg/s)
 
-\(MassFlowEx\) is the mass flow rate at the exhasut node (kg/s)
+\(MassFlowEx\) is the mass flow rate at the exhaust node (kg/s)
 
 \(CpAir\) is the specific heat (J/kg)
 
-Although a single Lights object allows a return node and an exhasut node, it is possible to have multiple Lights objects with different return nodes and referrred to the same exhaust node. Therefore, the exhaust node will share return heat from different return nodes. The temperature rise at i-th return node is given below:
+Although a single Lights object allows a return node and an exhaust node, it is possible to have multiple Lights objects with different return nodes and referrred to the same exhaust node. Therefore, the exhaust node will share return heat from different return nodes. The temperature rise at i-th return node is given below:
 
 \begin{equation}
 TempRetRise_i = \frac{QRetAir_i} {(MassFlowRA_i + MassFlowEx ) * CpAir}
@@ -55,7 +55,7 @@ TempRetRise_i = \frac{QRetAir_i} {(MassFlowRA_i + MassFlowEx ) * CpAir}
 
 \(MassFlowRA_i\) is the mass flow rate at i-th return node (kg/s)
 
-\(MassFlowEx\) is the mass flow rate at the exhasut node (kg/s)
+\(MassFlowEx\) is the mass flow rate at the exhaust node (kg/s)
 
 \(CpAir\) is the specific heat (J/kg)
 
@@ -73,7 +73,7 @@ where:
 
 \(MassFlowRA_i\) is the mass flow rate at the return node (kg/s)
 
-\(MassFlowEx\) is the mass flow rate at the exhasut node (kg/s)
+\(MassFlowEx\) is the mass flow rate at the exhaust node (kg/s)
 
 \(CpAir\) is the specific heat (J/kg)
 
