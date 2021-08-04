@@ -9989,7 +9989,7 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
     state.dataDaylightingData->IllumMap(MapNum).pointsHeader = "";
     for (R = 1; R <= state.dataDaylightingData->ZoneDaylight(state.dataDaylightingData->IllumMap(MapNum).Zone).TotalDaylRefPoints; ++R) {
         state.dataDaylightingData->IllumMap(MapNum).pointsHeader +=
-            format("RefPt{}=({:.2R}:{:.2R}:{:.2R})",
+            format(" RefPt{}=({:.2R}:{:.2R}:{:.2R})",
                    R,
                    state.dataDaylightingData->ZoneDaylight(state.dataDaylightingData->IllumMap(MapNum).Zone).DaylRefPtAbsCoord(1, R),
                    state.dataDaylightingData->ZoneDaylight(state.dataDaylightingData->IllumMap(MapNum).Zone).DaylRefPtAbsCoord(2, R),

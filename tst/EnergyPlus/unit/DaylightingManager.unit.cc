@@ -2921,7 +2921,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ReportIllumMap)
     state->dataDaylightingData->IllumMap(MapNum).Z = 23.23;
 
     std::string expectedResultName = "ThisOne at 23.23m";
-    std::string expectedResultPtsHeader = "RefPt1=(1.23:2.34:3.45),RefPt2=(4.56:5.67:6.78),RefPt3=(7.89:8.90:9.01)";
+    std::string expectedResultPtsHeader = " RefPt1=(1.23:2.34:3.45), RefPt2=(4.56:5.67:6.78), RefPt3=(7.89:8.90:9.01)";
 
     DaylightingManager::ReportIllumMap(*state, MapNum);
 
