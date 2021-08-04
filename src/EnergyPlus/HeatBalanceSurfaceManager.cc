@@ -6628,6 +6628,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
         if (Surface(SurfNum).Class == SurfaceClass::TDD_Dome) continue; // Skip TDD:DOME objects.  Inside temp is handled by TDD:DIFFUSER.
         Real64 RefAirTemp = state.dataSurface->Surface(SurfNum).getInsideAirTemperature(state, SurfNum);
         state.dataHeatBalSurfMgr->RefAirTemp(SurfNum) = RefAirTemp;
+        state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataHeatBalSurfMgr->RefAirTemp(SurfNum);
     }
 
     // Following variables must be reset due to possible recall of this routine by radiant and Resimulate routines.
@@ -7512,6 +7513,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
             }
             Real64 RefAirTemp = state.dataSurface->Surface(surfNum).getInsideAirTemperature(state, surfNum);
             state.dataHeatBalSurfMgr->RefAirTemp(surfNum) = RefAirTemp;
+            state.dataHeatBal->SurfTempEffBulkAir(surfNum) = state.dataHeatBalSurfMgr->RefAirTemp(surfNum);
         }
 
         // Following variables must be reset due to possible recall of this routine by radiant and Resimulate routines.

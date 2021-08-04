@@ -2415,6 +2415,7 @@ namespace WindowManager {
             SurfNumAdj = surface.ExtBoundCond;
             state.dataWindowManager->hcin = state.dataHeatBalSurf->SurfHConvInt(SurfNum); // Room-side surface convective film conductance
             Real64 RefAirTemp = state.dataSurface->Surface(SurfNum).getInsideAirTemperature(state, SurfNum);
+            state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = RefAirTemp;
             state.dataWindowManager->tin = RefAirTemp + state.dataWindowManager->TKelvin; // Inside air temperature
 
             // Reset hcin if necessary since too small a value sometimes causes non-convergence
@@ -2636,6 +2637,7 @@ namespace WindowManager {
 
                 ZoneNumAdj = state.dataSurface->Surface(SurfNumAdj).Zone;
                 Real64 RefAirTemp = state.dataSurface->Surface(SurfNumAdj).getInsideAirTemperature(state, SurfNumAdj);
+                state.dataHeatBal->SurfTempEffBulkAir(SurfNumAdj) = RefAirTemp;
                 state.dataWindowManager->tout = RefAirTemp + state.dataWindowManager->TKelvin; // outside air temperature
 
                 // Add long-wave radiation from adjacent zone absorbed by glass layer closest to the adjacent zone.
