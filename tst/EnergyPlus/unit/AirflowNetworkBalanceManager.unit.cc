@@ -23816,9 +23816,5 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestReferenceConditionsLe
     Real64 expected_viscosity2 = AirflowNetwork::airDynamicVisc(refT2);
     EXPECT_EQ(expected_density2, state->dataAirflowNetwork->MultizoneSurfaceCrackData(2).reference_density);
     EXPECT_EQ(expected_viscosity2, state->dataAirflowNetwork->MultizoneSurfaceCrackData(2).reference_viscosity);
-    // EXPECT_EQ(0, state->dataAirflowNetwork->MultizoneSurfaceCrackData(1).StandardW);
-    //EXPECT_EQ(30, state->dataAirflowNetwork->MultizoneSurfaceCrackData(2).StandardT);
-    //EXPECT_EQ(50000, state->dataAirflowNetwork->MultizoneSurfaceCrackData(2).StandardP);
-    //EXPECT_EQ(0.002, state->dataAirflowNetwork->MultizoneSurfaceCrackData(2).StandardW);
 }
 } // namespace EnergyPlus
