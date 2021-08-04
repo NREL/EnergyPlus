@@ -168,8 +168,8 @@ void ManageHVAC(EnergyPlusData &state)
     using ZoneTempPredictorCorrector::ManageZoneAirUpdates;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static constexpr auto EndOfHeaderString("End of Data Dictionary");                          // End of data dictionary marker
-    static constexpr auto EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
+    static constexpr fmt::string_view EndOfHeaderString("End of Data Dictionary");                          // End of data dictionary marker
+    static constexpr fmt::string_view EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 PriorTimeStep;       // magnitude of time step for previous history terms
@@ -569,7 +569,7 @@ void ManageHVAC(EnergyPlusData &state)
                       "Enthal     HumRat Fluid Type");
             }
             for (NodeNum = 1; NodeNum <= isize(state.dataLoopNodes->Node); ++NodeNum) {
-                static constexpr auto Format_20{
+                static constexpr fmt::string_view Format_20{
                     " {:3} {:8.2F}  {:8.3F}  {:8.3F}  {:8.2F} {:13.2F} {:13.2F} {:13.2F} {:13.2F}  {:#8.0F}  {:11.2F}  {:9.5F}  {}\n"};
 
                 print(state.files.debug,
@@ -721,24 +721,29 @@ void SimHVAC(EnergyPlusData &state)
                             "HVAC System Solver Iteration Count",
                             OutputProcessor::Unit::None,
                             state.dataHVACMgr->HVACManageIteration,
-                            "HVAC",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::HVAC,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SimHVAC");
-        SetupOutputVariable(
-            state, "Air System Solver Iteration Count", OutputProcessor::Unit::None, state.dataHVACMgr->RepIterAir, "HVAC", "Sum", "SimHVAC");
+        SetupOutputVariable(state,
+                            "Air System Solver Iteration Count",
+                            OutputProcessor::Unit::None,
+                            state.dataHVACMgr->RepIterAir,
+                            OutputProcessor::SOVTimeStepType::HVAC,
+                            OutputProcessor::SOVStoreType::Summed,
+                            "SimHVAC");
         SetupOutputVariable(state,
                             "Air System Relief Air Total Heat Loss Energy",
                             OutputProcessor::Unit::J,
                             state.dataHeatBal->SysTotalHVACReliefHeatLoss,
-                            "HVAC",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::HVAC,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SimHVAC");
         SetupOutputVariable(state,
                             "HVAC System Total Heat Rejection Energy",
                             OutputProcessor::Unit::J,
                             state.dataHeatBal->SysTotalHVACRejectHeatLoss,
-                            "HVAC",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::HVAC,
+                            OutputProcessor::SOVStoreType::Summed,
                             "SimHVAC");
         ManageSetPoints(state); // need to call this before getting plant loop data so setpoint checks can complete okay
         GetPlantLoopData(state);
@@ -756,15 +761,15 @@ void SimHVAC(EnergyPlusData &state)
                                 "Plant Solver Sub Iteration Count",
                                 OutputProcessor::Unit::None,
                                 state.dataPlnt->PlantManageSubIterations,
-                                "HVAC",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::HVAC,
+                                OutputProcessor::SOVStoreType::Summed,
                                 "SimHVAC");
             SetupOutputVariable(state,
                                 "Plant Solver Half Loop Calls Count",
                                 OutputProcessor::Unit::None,
                                 state.dataPlnt->PlantManageHalfLoopCalls,
-                                "HVAC",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::HVAC,
+                                OutputProcessor::SOVStoreType::Summed,
                                 "SimHVAC");
             for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                 // init plant sizing numbers in main plant data structure
@@ -2341,7 +2346,7 @@ void ReportAirHeatBalance(EnergyPlusData &state)
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName3("ReportAirHeatBalance:3");
+    static constexpr std::string_view RoutineName3("ReportAirHeatBalance:3");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int ZoneLoop;                                     // Counter for the # of zones (nz)

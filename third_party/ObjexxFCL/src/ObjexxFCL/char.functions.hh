@@ -22,7 +22,7 @@ namespace ObjexxFCL {
 // Predicate /////
 
 // char is Blank?
-inline
+constexpr
 bool
 is_blank( char const c )
 {
@@ -30,7 +30,7 @@ is_blank( char const c )
 }
 
 // char is Not Blank?
-inline
+constexpr
 bool
 not_blank( char const c )
 {
@@ -43,15 +43,6 @@ bool
 is_alpha( char const c )
 {
 	return ( std::isalpha( c ) != 0 );
-}
-
-// char is a Consonant?
-inline
-bool
-is_consonant( char const c )
-{
-	static std::string const vowels( "aeiou" );
-	return ( ( std::isalpha( c ) != 0 ) && ( vowels.find( std::tolower( c ) ) == std::string::npos ) );
 }
 
 // char is Digits?
@@ -79,49 +70,44 @@ is_upper( char const c )
 }
 
 // char is in a string?
-inline
+constexpr
 bool
-is_any_of( char const c, std::string const & s )
+is_any_of( char const c, std::string_view const s )
 {
 	return ( s.find( c ) != std::string::npos );
 }
 
-// char is in a cstring?
-bool
-is_any_of( char const c, char const * const s );
-
 // char is in a string?
-inline
+constexpr
 bool
-has_any_of( char const c, std::string const & s )
+has_any_of( char const c, std::string_view const s )
 {
 	return ( s.find( c ) != std::string::npos );
 }
 
 // char is not in a string?
-inline
+constexpr
 bool
-not_any_of( char const c, std::string const & s )
+not_any_of( char const c, std::string_view const s )
 {
 	return ( s.find( c ) == std::string::npos );
 }
 
-// char is not in a cstring?
-bool
-not_any_of( char const c, char const * const s );
 
 // Comparison /////
 
 // Lowercased 8-bit ASCII char
+constexpr
 char
 to_lower( char const c ); // Defined below
 
 // Uppercased 8-bit ASCII char
+constexpr
 char
 to_upper( char const c ); // Defined below
 
 // char == char Case-Optionally?
-inline
+constexpr
 bool
 equal( char const c, char const d, bool const exact_case = true )
 {
@@ -129,7 +115,7 @@ equal( char const c, char const d, bool const exact_case = true )
 }
 
 // char == char Case-Insensitively
-inline
+constexpr
 bool
 equali( char const c, char const d )
 {
@@ -137,7 +123,7 @@ equali( char const c, char const d )
 }
 
 // char < char Case-Optionally?
-inline
+constexpr
 bool
 lessthan( char const c, char const d, bool const exact_case = true )
 {
@@ -145,7 +131,7 @@ lessthan( char const c, char const d, bool const exact_case = true )
 }
 
 // char < char Case-Insensitively?
-inline
+constexpr
 bool
 lessthani( char const c, char const d )
 {
@@ -153,7 +139,7 @@ lessthani( char const c, char const d )
 }
 
 // ASCII Lexical < Comparison
-inline
+constexpr
 bool
 LLT( char const c, char const d )
 {
@@ -161,7 +147,7 @@ LLT( char const c, char const d )
 }
 
 // ASCII Lexical <= Comparison
-inline
+constexpr
 bool
 LLE( char const c, char const d )
 {
@@ -169,7 +155,7 @@ LLE( char const c, char const d )
 }
 
 // ASCII Lexical >= Comparison
-inline
+constexpr
 bool
 LGE( char const c, char const d )
 {
@@ -177,7 +163,7 @@ LGE( char const c, char const d )
 }
 
 // ASCII Lexical < Comparison
-inline
+constexpr
 bool
 llt( char const c, char const d )
 {
@@ -185,7 +171,7 @@ llt( char const c, char const d )
 }
 
 // ASCII Lexical <= Comparison
-inline
+constexpr
 bool
 lle( char const c, char const d )
 {
@@ -193,7 +179,7 @@ lle( char const c, char const d )
 }
 
 // ASCII Lexical >= Comparison
-inline
+constexpr
 bool
 lge( char const c, char const d )
 {
@@ -201,7 +187,7 @@ lge( char const c, char const d )
 }
 
 // ASCII Lexical < Comparison
-inline
+constexpr
 bool
 lgt( char const c, char const d )
 {
@@ -211,7 +197,7 @@ lgt( char const c, char const d )
 // Conversion /////
 
 // Integer Value of a char
-inline
+constexpr
 int
 ICHAR( char const c )
 {
@@ -221,7 +207,7 @@ ICHAR( char const c )
 // Modifier /////
 
 // Lowercase a char
-inline
+constexpr
 char &
 lowercase( char & c )
 {
@@ -230,7 +216,7 @@ lowercase( char & c )
 }
 
 // Uppercase a char
-inline
+constexpr
 char &
 uppercase( char & c )
 {
@@ -241,7 +227,7 @@ uppercase( char & c )
 // Generator /////
 
 // Lowercased Copy of a char
-inline
+constexpr
 char
 lowercased( char const c )
 {
@@ -249,7 +235,7 @@ lowercased( char const c )
 }
 
 // Uppercased Copy of a char
-inline
+constexpr
 char
 uppercased( char const c )
 {
@@ -257,7 +243,7 @@ uppercased( char const c )
 }
 
 // Lowercased 8-bit ASCII char
-inline
+constexpr
 char
 to_lower( char const c )
 {
@@ -266,7 +252,7 @@ to_lower( char const c )
 }
 
 // Uppercased 8-bit ASCII char
-inline
+constexpr
 char
 to_upper( char const c )
 {

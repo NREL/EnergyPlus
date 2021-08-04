@@ -1297,149 +1297,149 @@ namespace VentilatedSlab {
                                 "Zone Ventilated Slab Radiant Heating Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataVentilatedSlab->VentSlab(Item).RadHeatingPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataVentilatedSlab->VentSlab(Item).Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Radiant Heating Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataVentilatedSlab->VentSlab(Item).RadHeatingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataVentilatedSlab->VentSlab(Item).Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Radiant Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataVentilatedSlab->VentSlab(Item).RadCoolingPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataVentilatedSlab->VentSlab(Item).Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Radiant Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataVentilatedSlab->VentSlab(Item).RadCoolingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataVentilatedSlab->VentSlab(Item).Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Coil Heating Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataVentilatedSlab->VentSlab(Item).HeatCoilPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataVentilatedSlab->VentSlab(Item).Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Coil Heating Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataVentilatedSlab->VentSlab(Item).HeatCoilEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataVentilatedSlab->VentSlab(Item).Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Coil Total Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataVentilatedSlab->VentSlab(Item).TotCoolCoilPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataVentilatedSlab->VentSlab(Item).Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Coil Total Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataVentilatedSlab->VentSlab(Item).TotCoolCoilEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataVentilatedSlab->VentSlab(Item).Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Coil Sensible Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataVentilatedSlab->VentSlab(Item).SensCoolCoilPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataVentilatedSlab->VentSlab(Item).Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Coil Sensible Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataVentilatedSlab->VentSlab(Item).SensCoolCoilEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataVentilatedSlab->VentSlab(Item).Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Coil Latent Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataVentilatedSlab->VentSlab(Item).LateCoolCoilPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataVentilatedSlab->VentSlab(Item).Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Coil Latent Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataVentilatedSlab->VentSlab(Item).LateCoolCoilEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataVentilatedSlab->VentSlab(Item).Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Air Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 state.dataVentilatedSlab->VentSlab(Item).AirMassFlowRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataVentilatedSlab->VentSlab(Item).Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Fan Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataVentilatedSlab->VentSlab(Item).ElecFanPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataVentilatedSlab->VentSlab(Item).Name);
             //! Note that the ventilated slab fan electric is NOT metered because this value is already metered through the fan component
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataVentilatedSlab->VentSlab(Item).ElecFanEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataVentilatedSlab->VentSlab(Item).Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Inlet Air Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataVentilatedSlab->VentSlab(Item).SlabInTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataVentilatedSlab->VentSlab(Item).Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Outlet Air Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataVentilatedSlab->VentSlab(Item).SlabOutTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataVentilatedSlab->VentSlab(Item).Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Zone Inlet Air Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataVentilatedSlab->VentSlab(Item).ZoneInletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataVentilatedSlab->VentSlab(Item).Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Return Air Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataVentilatedSlab->VentSlab(Item).ReturnAirTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataVentilatedSlab->VentSlab(Item).Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Fan Outlet Air Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataVentilatedSlab->VentSlab(Item).FanOutletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataVentilatedSlab->VentSlab(Item).Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Fan Availability Status",
                                 OutputProcessor::Unit::None,
                                 state.dataVentilatedSlab->VentSlab(Item).AvailStatus,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataVentilatedSlab->VentSlab(Item).Name);
         }
     }
@@ -1484,7 +1484,7 @@ namespace VentilatedSlab {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitVentilatedSlab");
+        static constexpr std::string_view RoutineName("InitVentilatedSlab");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1853,7 +1853,7 @@ namespace VentilatedSlab {
         using SteamCoils::GetCoilSteamOutletNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeVentilatedSlab");
+        static constexpr std::string_view RoutineName("SizeVentilatedSlab");
 
         auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
         auto &CurZoneEqNum(state.dataSize->CurZoneEqNum);
@@ -4933,20 +4933,19 @@ namespace VentilatedSlab {
 
                 if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
-                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
-                                  (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) * state.dataSurface->SurfWinFrameTempSurfIn(SurfNum);
+                    SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
+                                  (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) * state.dataSurface->SurfWinFrameTempIn(SurfNum);
                 }
 
                 if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 &&
                     !ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
-                                  (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) *
-                                  state.dataSurface->SurfWinDividerTempSurfIn(SurfNum);
+                    SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
+                                  (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) * state.dataSurface->SurfWinDividerTempIn(SurfNum);
                 }
             }
 
-            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * state.dataHeatBalSurf->TempSurfInTmp(SurfNum);
+            SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area * state.dataHeatBalSurf->SurfTempInTmp(SurfNum);
         }
 
         return SumHATsurf;

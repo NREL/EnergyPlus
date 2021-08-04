@@ -166,7 +166,6 @@ namespace SimulationManager {
     using namespace ExternalInterface;
 
     // MODULE PARAMETER DEFINITIONS:
-    static std::string const BlankString;
 
     void ManageSimulation(EnergyPlusData &state)
     {
@@ -271,8 +270,9 @@ namespace SimulationManager {
         SetPredefinedTables(state);
         SetPreConstructionInputParameters(state); // establish array bounds for constructions early
 
-        SetupTimePointers(state, "Zone", state.dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-        SetupTimePointers(state, "HVAC", TimeStepSys);
+        SetupTimePointers(
+            state, OutputProcessor::SOVTimeStepType::Zone, state.dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+        SetupTimePointers(state, OutputProcessor::SOVTimeStepType::HVAC, TimeStepSys);
 
         CheckIfAnyEMS(state);
         CheckIfAnyPlant(state);
@@ -508,7 +508,7 @@ namespace SimulationManager {
                     } else {
                         DisplayString(state, "Starting Simulation at " + state.dataEnvrn->CurMnDy + " for " + state.dataEnvrn->EnvironmentName);
                     }
-                    static constexpr auto Format_700("Environment:WarmupDays,{:3}\n");
+                    static constexpr fmt::string_view Format_700("Environment:WarmupDays,{:3}\n");
                     print(state.files.eio, Format_700, state.dataReportFlag->NumOfWarmupDays);
                     ResetAccumulationWhenWarmupComplete(state);
                 } else if (state.dataReportFlag->DisplayPerfSimulationFlag) {
@@ -1181,11 +1181,12 @@ namespace SimulationManager {
                 auto const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, thisObjectName);
                 if (fields.find("use_coil_direct_solutions") != fields.end()) {
-                    state.dataGlobal->DoCoilDirectSolutions = UtilityRoutines::MakeUPPERCase(fields.at("use_coil_direct_solutions")) == "YES";
+                    state.dataGlobal->DoCoilDirectSolutions =
+                        UtilityRoutines::MakeUPPERCase(AsString(fields.at("use_coil_direct_solutions"))) == "YES";
                 }
                 if (fields.find("zone_radiant_exchange_algorithm") != fields.end()) {
                     state.dataHeatBalIntRadExchg->CarrollMethod =
-                        UtilityRoutines::MakeUPPERCase(fields.at("zone_radiant_exchange_algorithm")) == "CARROLLMRT";
+                        UtilityRoutines::MakeUPPERCase(AsString(fields.at("zone_radiant_exchange_algorithm"))) == "CARROLLMRT";
                 }
                 bool overrideTimestep(false);
                 bool overrideZoneAirHeatBalAlg(false);
@@ -1196,7 +1197,7 @@ namespace SimulationManager {
                 bool overrideMaxAllowedDelTemp(false);
                 state.dataZoneTempPredictorCorrector->OscillationVariablesNeeded = true;
                 if (fields.find("override_mode") != fields.end()) {
-                    overrideModeValue = UtilityRoutines::MakeUPPERCase(fields.at("override_mode"));
+                    overrideModeValue = UtilityRoutines::MakeUPPERCase(AsString(fields.at("override_mode")));
                     if (overrideModeValue == "NORMAL") {
                         // no overrides
                     } else if (overrideModeValue == "MODE01") {
@@ -1323,11 +1324,11 @@ namespace SimulationManager {
         }
 
         print(state.files.eio, "{}\n", "! <Version>, Version ID");
-        static constexpr auto Format_721(" Version, {}\n");
+        static constexpr fmt::string_view Format_721(" Version, {}\n");
         print(state.files.eio, Format_721, VersionID);
 
         print(state.files.eio, "{}\n", "! <Timesteps per Hour>, #TimeSteps, Minutes per TimeStep {minutes}");
-        static constexpr auto Format_731(" Timesteps per Hour, {:2}, {:2}\n");
+        static constexpr fmt::string_view Format_731(" Timesteps per Hour, {:2}, {:2}\n");
         print(state.files.eio, Format_731, state.dataGlobal->NumOfTimeStepInHour, state.dataGlobal->MinutesPerTimeStep);
 
         print(state.files.eio,
@@ -1335,7 +1336,7 @@ namespace SimulationManager {
               "! <System Convergence Limits>, Minimum System TimeStep {minutes}, Max HVAC Iterations, Minimum Plant "
               "Iterations, Maximum Plant Iterations");
         MinInt = state.dataConvergeParams->MinTimeStepSys * 60.0;
-        static constexpr auto Format_733(" System Convergence Limits, {}, {}, {}, {}\n");
+        static constexpr fmt::string_view Format_733(" System Convergence Limits, {}, {}, {}, {}\n");
         print(state.files.eio,
               Format_733,
               MinInt,
@@ -1431,7 +1432,7 @@ namespace SimulationManager {
               "{}\n",
               "! <Output Reporting Tolerances>, Tolerance for Time Heating Setpoint Not Met, Tolerance for Zone Cooling Setpoint Not Met Time");
         // Formats
-        static constexpr auto Format_751(" Output Reporting Tolerances, {:.3R}, {:.3R}, \n");
+        static constexpr fmt::string_view Format_751(" Output Reporting Tolerances, {:.3R}, {:.3R}, \n");
 
         print(state.files.eio, Format_751, std::abs(deviationFromSetPtThresholdHtg), deviationFromSetPtThresholdClg);
 
@@ -1837,7 +1838,7 @@ namespace SimulationManager {
         using namespace DataSystemVariables;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr auto EndOfDataString("End of Data"); // Signifies the end of the data block in the output file
+        static constexpr fmt::string_view EndOfDataString("End of Data"); // Signifies the end of the data block in the output file
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string cEnvSetThreads;
@@ -1924,12 +1925,13 @@ namespace SimulationManager {
                   state.dataHeatBal->CondFDRelaxFactor);
         }
         // Report number of threads to eio file
-        static constexpr auto ThreadingHeader("! <Program Control Information:Threads/Parallel Sims>, Threading Supported,Maximum Number of "
-                                              "Threads, Env Set Threads (OMP_NUM_THREADS), EP Env Set Threads (EP_OMP_NUM_THREADS), IDF Set "
-                                              "Threads, Number of Threads Used (Interior Radiant Exchange), Number Nominal Surfaces, Number "
-                                              "Parallel Sims");
+        static constexpr fmt::string_view ThreadingHeader(
+            "! <Program Control Information:Threads/Parallel Sims>, Threading Supported,Maximum Number of "
+            "Threads, Env Set Threads (OMP_NUM_THREADS), EP Env Set Threads (EP_OMP_NUM_THREADS), IDF Set "
+            "Threads, Number of Threads Used (Interior Radiant Exchange), Number Nominal Surfaces, Number "
+            "Parallel Sims");
         print(state.files.eio, "{}\n", ThreadingHeader);
-        static constexpr auto ThreadReport("Program Control:Threads/Parallel Sims, {},{}, {}, {}, {}, {}, {}, {}\n");
+        static constexpr fmt::string_view ThreadReport("Program Control:Threads/Parallel Sims, {},{}, {}, {}, {}, {}, {}, {}\n");
         if (state.dataSysVars->Threading) {
             if (state.dataSysVars->iEnvSetThreads == 0) {
                 cEnvSetThreads = "Not Set";
@@ -2122,8 +2124,8 @@ namespace SimulationManager {
         using namespace DataBranchNodeConnections;
 
         // Formats
-        static constexpr auto Format_702("! <#{0} Node Connections>,<Number of {0} Node Connections>\n");
-        static constexpr auto Format_703(
+        static constexpr fmt::string_view Format_702("! <#{0} Node Connections>,<Number of {0} Node Connections>\n");
+        static constexpr fmt::string_view Format_703(
             "! <{} Node Connection>,<Node Name>,<Node ObjectType>,<Node ObjectName>,<Node ConnectionType>,<Node FluidStream>\n");
 
         state.dataBranchNodeConnections->NonConnectedNodes.dimension(state.dataLoopNodes->NumOfNodes, true);
@@ -2221,9 +2223,9 @@ namespace SimulationManager {
 
         if (NumNonConnected > 0) {
             print(state.files.bnd, "{}\n", "! ===============================================================");
-            static constexpr auto Format_705("! <#NonConnected Nodes>,<Number of NonConnected Nodes>\n #NonConnected Nodes,{}\n");
+            static constexpr fmt::string_view Format_705("! <#NonConnected Nodes>,<Number of NonConnected Nodes>\n #NonConnected Nodes,{}\n");
             print(state.files.bnd, Format_705, NumNonConnected);
-            static constexpr auto Format_706("! <NonConnected Node>,<NonConnected Node Number>,<NonConnected Node Name>");
+            static constexpr fmt::string_view Format_706("! <NonConnected Node>,<NonConnected Node Number>,<NonConnected Node Name>");
             print(state.files.bnd, "{}\n", Format_706);
             for (int Loop = 1; Loop <= state.dataLoopNodes->NumOfNodes; ++Loop) {
                 if (!state.dataBranchNodeConnections->NonConnectedNodes(Loop)) continue;
@@ -2261,14 +2263,15 @@ namespace SimulationManager {
         constexpr static auto errstring("**error**");
 
         // Formats
-        static constexpr auto Format_700("! <#Component Sets>,<Number of Component Sets>");
-        static constexpr auto Format_702("! <Component Set>,<Component Set Count>,<Parent Object Type>,<Parent Object Name>,<Component "
-                                         "Type>,<Component Name>,<Inlet Node ID>,<Outlet Node ID>,<Description>");
-        static constexpr auto Format_720("! <#Zone Equipment Lists>,<Number of Zone Equipment Lists>");
-        static constexpr auto Format_722(
+        static constexpr fmt::string_view Format_700("! <#Component Sets>,<Number of Component Sets>");
+        static constexpr fmt::string_view Format_702("! <Component Set>,<Component Set Count>,<Parent Object Type>,<Parent Object Name>,<Component "
+                                                     "Type>,<Component Name>,<Inlet Node ID>,<Outlet Node ID>,<Description>");
+        static constexpr fmt::string_view Format_720("! <#Zone Equipment Lists>,<Number of Zone Equipment Lists>");
+        static constexpr fmt::string_view Format_722(
             "! <Zone Equipment List>,<Zone Equipment List Count>,<Zone Equipment List Name>,<Zone Name>,<Number of Components>");
-        static constexpr auto Format_723("! <Zone Equipment Component>,<Component Count>,<Component Type>,<Component Name>,<Zone Name>,<Heating "
-                                         "Priority>,<Cooling Priority>");
+        static constexpr fmt::string_view Format_723(
+            "! <Zone Equipment Component>,<Component Count>,<Component Type>,<Component Name>,<Zone Name>,<Heating "
+            "Priority>,<Cooling Priority>");
 
         // Report outside air node names on the Branch-Node Details file
         print(state.files.bnd, "{}\n", "! ===============================================================");
@@ -2849,10 +2852,10 @@ namespace SimulationManager {
                 ChildOutNodeName.allocate(NumChildren);
                 ChildInNodeNum.allocate(NumChildren);
                 ChildOutNodeNum.allocate(NumChildren);
-                ChildCType = BlankString;
-                ChildCName = BlankString;
-                ChildInNodeName = BlankString;
-                ChildOutNodeName = BlankString;
+                ChildCType = std::string{};
+                ChildCName = std::string{};
+                ChildInNodeName = std::string{};
+                ChildOutNodeName = std::string{};
                 ChildInNodeNum = 0;
                 ChildOutNodeNum = 0;
                 GetChildrenData(state,
@@ -3033,11 +3036,6 @@ namespace SimulationManager {
         if (state.dataSimulationManager->PreP_Fatal) {
             ShowFatalError(state, "Preprocessor condition(s) cause termination.");
         }
-
-        // Set up more globals - process fluid input.
-        state.dataFluidProps->FluidIndex_Water = FindGlycol(state, "Water");
-        state.dataFluidProps->FluidIndex_EthyleneGlycol = FindGlycol(state, "EthyleneGlycol");
-        state.dataFluidProps->FluidIndex_PropoleneGlycol = FindGlycol(state, "PropoleneGlycol");
 
         state.dataInputProcessing->inputProcessor->preScanReportingVariables(state);
     }

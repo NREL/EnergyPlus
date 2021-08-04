@@ -122,6 +122,8 @@ namespace PlantLoadProfile {
         void UpdatePlantProfile(EnergyPlusData &state) const;
 
         void ReportPlantProfile(EnergyPlusData &state);
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     // This could be static inside the class

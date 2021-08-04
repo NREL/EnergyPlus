@@ -55,6 +55,7 @@
 #include "UtilityRoutines.hh"
 
 #include "nlohmann/json.hpp"
+#include <algorithm>
 #include <fmt/format.h>
 #include <stdexcept>
 
@@ -613,9 +614,15 @@ public:
                 // 0 pad the end
                 specs()->alt = true;
 
-                if (specs()->precision > 0) {
+                bool initialPrecisionWas1 = false;
+                if (specs()->precision > 1) {
                     // reduce the precision to get rounding behavior
                     --specs()->precision;
+                } else {
+                    // We need AT LEAST one in precision so we capture a '.' below
+                    initialPrecisionWas1 = true;
+                    specs()->precision = 1;
+                    ++specs()->width;
                 }
 
                 // multiply by 10 to get the exponent we want
@@ -627,6 +634,12 @@ public:
                 }
 
                 auto begin = std::find(std::begin(str), std::end(str), '.');
+                if (initialPrecisionWas1) {
+                    // 123.45 => 1.2E+03, except we asked for precision = 1. So we delete the thing after the dot
+                    // and this is why we manually increased the specs()->width by one above
+                    str.erase(std::next(begin));
+                }
+                // if (begin != std::end(str)) {
                 // ' -1.2345E15'
                 //     ^
                 std::swap(*begin, *std::prev(begin));

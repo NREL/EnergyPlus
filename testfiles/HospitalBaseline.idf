@@ -58412,8 +58412,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     AHU2_OA,                 !- Name
     AHU2_OA_Controllers,     !- Controller List Name
-    AHU2_OA_Equipment,       !- Outdoor Air Equipment List Name
-    AHU2 Availability Manager List;  !- Availability Manager List Name
+    AHU2_OA_Equipment;       !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     AHU2_OANode List;        !- Node or NodeList Name 1
@@ -58970,8 +58969,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     AHU1_OA,                 !- Name
     AHU1_OA_Controllers,     !- Controller List Name
-    AHU1_OA_Equipment,       !- Outdoor Air Equipment List Name
-    AHU1 Availability Manager List;  !- Availability Manager List Name
+    AHU1_OA_Equipment;       !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     AHU1_OANode List;        !- Node or NodeList Name 1
@@ -59530,8 +59528,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     AHU3_OA,                 !- Name
     AHU3_OA_Controllers,     !- Controller List Name
-    AHU3_OA_Equipment,       !- Outdoor Air Equipment List Name
-    AHU3 Availability Manager List;  !- Availability Manager List Name
+    AHU3_OA_Equipment;       !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     AHU3_OANode List;        !- Node or NodeList Name 1
@@ -60022,8 +60019,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     AHU5_OA,                 !- Name
     AHU5_OA_Controllers,     !- Controller List Name
-    AHU5_OA_Equipment,       !- Outdoor Air Equipment List Name
-    AHU5 Availability Manager List;  !- Availability Manager List Name
+    AHU5_OA_Equipment;       !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     AHU5_OANode List;        !- Node or NodeList Name 1
@@ -60546,8 +60542,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     AHU4_OA,                 !- Name
     AHU4_OA_Controllers,     !- Controller List Name
-    AHU4_OA_Equipment,       !- Outdoor Air Equipment List Name
-    AHU4 Availability Manager List;  !- Availability Manager List Name
+    AHU4_OA_Equipment;       !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     AHU4_OANode List;        !- Node or NodeList Name 1
@@ -61065,8 +61060,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     AHU6_OA,                 !- Name
     AHU6_OA_Controllers,     !- Controller List Name
-    AHU6_OA_Equipment,       !- Outdoor Air Equipment List Name
-    AHU6 Availability Manager List;  !- Availability Manager List Name
+    AHU6_OA_Equipment;       !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     AHU6_OANode List;        !- Node or NodeList Name 1
