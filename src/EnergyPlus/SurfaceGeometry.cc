@@ -2836,6 +2836,8 @@ namespace SurfaceGeometry {
                     state.dataHeatBal->space(state.dataGlobal->numSpaces).zoneNum = zoneNum;
                     // Add to zone's list of spaces
                     thisZone.spaces.emplace_back(state.dataGlobal->numSpaces);
+                    ++state.dataHeatBal->Zone(zoneNum).numSpaces;
+                    assert(state.dataHeatBal->Zone(zoneNum).numSpaces == int(state.dataHeatBal->Zone(zoneNum).spaces.size()));
                     // If some surfaces in the zone are assigned to a space, the new space is the remainder of the zone
                     state.dataHeatBal->space(state.dataGlobal->numSpaces).Name = thisZone.Name + "-Remainder";
                     state.dataHeatBal->space(state.dataGlobal->numSpaces).spaceType = "GENERAL";
@@ -2849,7 +2851,7 @@ namespace SurfaceGeometry {
             auto &thisSurf = state.dataSurface->Surface(surfNum);
             if (!thisSurf.HeatTransSurf) continue; // ignore shading surfaces
             if (thisSurf.spaceNum == 0) {
-                int const numSpaces = state.dataHeatBal->Zone(thisSurf.Zone).spaces.size();
+                int const numSpaces = state.dataHeatBal->Zone(thisSurf.Zone).numSpaces;
                 int const lastSpaceForZone = state.dataHeatBal->Zone(thisSurf.Zone).spaces(numSpaces);
                 thisSurf.spaceNum = lastSpaceForZone;
                 // Add to Space's list of surfaces

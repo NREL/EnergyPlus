@@ -508,6 +508,7 @@ namespace DataHeatBalance {
         bool anySurfacesWithoutSpace; // True if any surfaces in a zone do not have a space assigned in input
         bool anySurfacesWithSpace;    // True if any surfaces in a zone have a space assigned in input
         EPVector<int> spaces;         // Pointers to spaces in this zone
+        int numSpaces;                // Number of spaces in this zone
 
         // Default Constructor
         ZoneData()
@@ -539,7 +540,8 @@ namespace DataHeatBalance {
               ZonePeopleActivityLevel(0.0), ZonePeopleSensibleHeatFraction(0.0), ZonePeopleRadiantHeatFraction(0.0), ZoneVolCapMultpSens(1.0),
               ZoneVolCapMultpMoist(1.0), ZoneVolCapMultpCO2(1.0), ZoneVolCapMultpGenContam(1.0), ZoneVolCapMultpSensHM(1.0),
               ZoneVolCapMultpSensHMSum(0.0), ZoneVolCapMultpSensHMCountSum(0.0), ZoneVolCapMultpSensHMAverage(1.0), MCPIHM(0.0),
-              InfilOAAirChangeRateHM(0.0), NumOccHM(0.0), delta_T(0.0), delta_HumRat(0.0), anySurfacesWithoutSpace(false), anySurfacesWithSpace(false)
+              InfilOAAirChangeRateHM(0.0), NumOccHM(0.0), delta_T(0.0), delta_HumRat(0.0), anySurfacesWithoutSpace(false),
+              anySurfacesWithSpace(false), numSpaces(0)
         {
         }
 
@@ -589,19 +591,20 @@ namespace DataHeatBalance {
         int numOfSpaces = 0;
         int spaceStartPtr = 0;
         bool spaceListActive = false;
+        EPVector<int> spaceNums;     // Indexes to spaces associated with this input object
+        EPVector<std::string> names; // Names for each instance created from this input object
     };
 
     struct PeopleData
     {
         // Members
-        std::string Name;            // PEOPLE object name
-        int ZonePtr;                 // Pointer to the zone number for this people statement
-        EPVector<int> spacePtrs;     // Pointers to space numbers for this people statement
-        EPVector<Real64> spaceFracs; // Fraction of total gains applied to each space
-        Real64 NumberOfPeople;       // Maximum number of people for this statement
-        int NumberOfPeoplePtr;       // Pointer to schedule for number of people
-        bool EMSPeopleOn;            // EMS actuating number of people if .TRUE.
-        Real64 EMSNumberOfPeople;    // Value EMS is directing to use for override
+        std::string Name;         // PEOPLE object name
+        int ZonePtr;              // Zone index for this people statement
+        int spaceNum;                // Space index for this people statement
+        Real64 NumberOfPeople;    // Maximum number of people for this statement
+        int NumberOfPeoplePtr;    // Pointer to schedule for number of people
+        bool EMSPeopleOn;         // EMS actuating number of people if .TRUE.
+        Real64 EMSNumberOfPeople; // Value EMS is directing to use for override
         // Note that the schedule and maximum number was kept for people since it seemed likely that
         // users would want to assign the same schedule to multiple people statements.
         int ActivityLevelPtr;   // Pointer to schedule for activity level
@@ -659,7 +662,7 @@ namespace DataHeatBalance {
 
         // Default Constructor
         PeopleData()
-            : ZonePtr(0), NumberOfPeople(0.0), NumberOfPeoplePtr(-1), EMSPeopleOn(false), EMSNumberOfPeople(0.0), ActivityLevelPtr(-1),
+            : ZonePtr(0), spaceNum(0), NumberOfPeople(0.0), NumberOfPeoplePtr(-1), EMSPeopleOn(false), EMSNumberOfPeople(0.0), ActivityLevelPtr(-1),
               FractionRadiant(0.0), FractionConvected(0.0), NomMinNumberPeople(0.0), NomMaxNumberPeople(0.0), WorkEffPtr(-1), ClothingPtr(-1),
               ClothingMethodPtr(-1), ClothingType(-1), AirVelocityPtr(-1), AnkleAirVelocityPtr(-1), Fanger(false), Pierce(false), KSU(false),
               AdaptiveASH55(false), AdaptiveCEN15251(false), CoolingEffectASH55(false), AnkleDraftASH55(false),

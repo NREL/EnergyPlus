@@ -506,10 +506,22 @@ namespace InternalHeatGains {
             int zoneNum = UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
             if (zoneNum > 0) {
                 state.dataHeatBal->PeopleObjects(Item).StartPtr = state.dataHeatBal->TotPeople + 1;
-                ++state.dataHeatBal->TotPeople;
+                int numSpaces = state.dataHeatBal->Zone(zoneNum).numSpaces;
+                state.dataHeatBal->TotPeople += numSpaces;
+                state.dataHeatBal->PeopleObjects(Item).numOfSpaces = numSpaces;
                 state.dataHeatBal->PeopleObjects(Item).NumOfZones = 1;
                 state.dataHeatBal->PeopleObjects(Item).ZoneListActive = false;
                 state.dataHeatBal->PeopleObjects(Item).ZoneOrZoneListPtr = zoneNum;
+                if (numSpaces == 1) {
+                    state.dataHeatBal->PeopleObjects(Item).spaceNums.emplace_back(state.dataHeatBal->Zone(zoneNum).spaces(1));
+                    state.dataHeatBal->PeopleObjects(Item).names.emplace_back(state.dataHeatBal->PeopleObjects(Item).Name);
+                } else {
+                    for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                        state.dataHeatBal->PeopleObjects(Item).spaceNums.emplace_back(spaceNum);
+                        state.dataHeatBal->PeopleObjects(Item).names.emplace_back(state.dataHeatBal->PeopleObjects(Item).Name + ' ' +
+                                                                                  state.dataHeatBal->space(spaceNum).Name);
+                    }
+                }
                 continue;
             }
             int spaceNum = UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->space);
@@ -519,12 +531,24 @@ namespace InternalHeatGains {
                 state.dataHeatBal->PeopleObjects(Item).numOfSpaces = 1;
                 state.dataHeatBal->PeopleObjects(Item).spaceListActive = false;
                 state.dataHeatBal->PeopleObjects(Item).spaceOrSpaceListPtr = spaceNum;
-                state.dataHeatBal->PeopleObjects(Item).StartPtr = state.dataHeatBal->TotPeople + 1;
+                state.dataHeatBal->PeopleObjects(Item).spaceNums.emplace_back(spaceNum);
+                state.dataHeatBal->PeopleObjects(Item).names.emplace_back(state.dataHeatBal->PeopleObjects(Item).Name);
                 continue;
             }
             int zoneListNum = UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->ZoneList);
             if (zoneListNum > 0) {
-                state.dataHeatBal->TotPeople += state.dataHeatBal->ZoneList(zoneListNum).NumOfZones;
+                state.dataHeatBal->PeopleObjects(Item).StartPtr = state.dataHeatBal->TotPeople + 1;
+                int numSpaces = 0;
+                for (int const listZoneIdx : state.dataHeatBal->ZoneList(zoneListNum).Zone) {
+                    numSpaces += state.dataHeatBal->Zone(listZoneIdx).numSpaces;
+                    for (int const spaceNum : state.dataHeatBal->Zone(listZoneIdx).spaces) {
+                        state.dataHeatBal->PeopleObjects(Item).spaceNums.emplace_back(spaceNum);
+                        state.dataHeatBal->PeopleObjects(Item).names.emplace_back(state.dataHeatBal->PeopleObjects(Item).Name + ' ' +
+                                                                                  state.dataHeatBal->space(spaceNum).Name);
+                    }
+                }
+                state.dataHeatBal->TotPeople += numSpaces;
+                state.dataHeatBal->PeopleObjects(Item).numOfSpaces = numSpaces;
                 state.dataHeatBal->PeopleObjects(Item).NumOfZones = state.dataHeatBal->ZoneList(zoneListNum).NumOfZones;
                 state.dataHeatBal->PeopleObjects(Item).ZoneListActive = true;
                 state.dataHeatBal->PeopleObjects(Item).ZoneOrZoneListPtr = zoneListNum;
@@ -532,10 +556,17 @@ namespace InternalHeatGains {
             }
             int spaceListNum = UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->spaceList);
             if (spaceListNum > 0) {
-                state.dataHeatBal->TotPeople += state.dataHeatBal->spaceList(spaceListNum).numOfSpaces;
-                state.dataHeatBal->PeopleObjects(Item).numOfSpaces = state.dataHeatBal->spaceList(spaceListNum).numOfSpaces;
+                state.dataHeatBal->PeopleObjects(Item).StartPtr = state.dataHeatBal->TotPeople + 1;
+                int numSpaces = state.dataHeatBal->spaceList(spaceListNum).numOfSpaces;
+                state.dataHeatBal->TotPeople += numSpaces;
+                state.dataHeatBal->PeopleObjects(Item).numOfSpaces = numSpaces;
                 state.dataHeatBal->PeopleObjects(Item).spaceListActive = true;
                 state.dataHeatBal->PeopleObjects(Item).spaceOrSpaceListPtr = spaceListNum;
+                for (int const spaceNum : state.dataHeatBal->spaceList(spaceListNum).spaces) {
+                    state.dataHeatBal->PeopleObjects(Item).spaceNums.emplace_back(spaceNum);
+                    state.dataHeatBal->PeopleObjects(Item).names.emplace_back(state.dataHeatBal->PeopleObjects(Item).Name + ' ' +
+                                                                              state.dataHeatBal->space(spaceNum).Name);
+                }
                 continue;
             }
             ShowSevereError(state,
@@ -571,92 +602,72 @@ namespace InternalHeatGains {
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-
-                int const numZones = state.dataHeatBal->PeopleObjects(Item).NumOfZones;
-                int const numSpaces = state.dataHeatBal->PeopleObjects(Item).numOfSpaces;
-                // At this point, one or both of these should be zero
-                assert((numZones == 0) || (numSpaces == 0));
-
-                int const numItems = max(numZones, numSpaces);
-                for (int Item1 = 1; Item1 <= numItems; ++Item1) {
+                int numZones = state.dataHeatBal->PeopleObjects(Item).NumOfZones;
+                // Create one People instance for every space associated with this People input object
+                for (int Item1 = 1; Item1 <= state.dataHeatBal->PeopleObjects(Item).numOfSpaces; ++Item1) {
                     ++Loop;
-                    if ((numZones > 0) && !state.dataHeatBal->PeopleObjects(Item).ZoneListActive) {
-                        state.dataHeatBal->People(Loop).Name = AlphaName(1);
-                        int const zoneNum = state.dataHeatBal->PeopleObjects(Item).ZoneOrZoneListPtr;
-                        state.dataHeatBal->People(Loop).ZonePtr = zoneNum;
-                        if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
-                                state.dataHeatBal->People(Loop).spacePtrs.emplace_back(spaceNum);
-                            }
-                        }
-                    } else if (state.dataHeatBal->PeopleObjects(Item).ZoneListActive) {
-                        CheckCreatedZoneItemName(
-                            state,
-                            RoutineName,
-                            CurrentModuleObject,
-                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneList(state.dataHeatBal->PeopleObjects(Item).ZoneOrZoneListPtr).Zone(Item1))
-                                .Name,
-                            state.dataHeatBal->ZoneList(state.dataHeatBal->PeopleObjects(Item).ZoneOrZoneListPtr).MaxZoneNameLength,
-                            state.dataHeatBal->PeopleObjects(Item).Name,
-                            state.dataHeatBal->People,
-                            Loop - 1,
-                            state.dataHeatBal->People(Loop).Name,
-                            errFlag);
-                        int const zoneNum = state.dataHeatBal->ZoneList(state.dataHeatBal->PeopleObjects(Item).ZoneOrZoneListPtr).Zone(Item1);
-                        state.dataHeatBal->People(Loop).ZonePtr = zoneNum;
-                        if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
-                                state.dataHeatBal->People(Loop).spacePtrs.emplace_back(spaceNum);
-                            }
-                        }
-                        if (errFlag) ErrorsFound = true;
-                    } else if ((numSpaces > 0) && !state.dataHeatBal->PeopleObjects(Item).spaceListActive) {
-                        state.dataHeatBal->People(Loop).Name = AlphaName(1);
-                        int const spaceNum = state.dataHeatBal->PeopleObjects(Item).spaceOrSpaceListPtr;
-                        if (spaceNum > 0) {
-                            state.dataHeatBal->People(Loop).spacePtrs.emplace_back(spaceNum);
-                            state.dataHeatBal->People(Loop).ZonePtr = state.dataHeatBal->space(spaceNum).zoneNum;
-                        }
-                    } else if (state.dataHeatBal->PeopleObjects(Item).spaceListActive) {
-                        int const spaceNum = state.dataHeatBal->spaceList(state.dataHeatBal->PeopleObjects(Item).spaceOrSpaceListPtr).spaces(Item1);
-                        CheckCreatedZoneItemName(
-                            state,
-                            RoutineName,
-                            CurrentModuleObject,
-                            state.dataHeatBal->space(spaceNum).Name,
-                            state.dataHeatBal->spaceList(state.dataHeatBal->PeopleObjects(Item).spaceOrSpaceListPtr).maxSpaceNameLength,
-                            state.dataHeatBal->PeopleObjects(Item).Name,
-                            state.dataHeatBal->People,
-                            Loop - 1,
-                            state.dataHeatBal->People(Loop).Name,
-                            errFlag);
-                        if (spaceNum > 0) {
-                            state.dataHeatBal->People(Loop).spacePtrs.emplace_back(spaceNum);
-                            state.dataHeatBal->People(Loop).ZonePtr = state.dataHeatBal->space(spaceNum).zoneNum;
-                        }
-                        if (errFlag) ErrorsFound = true;
-                    }
+                    int const spaceNum = state.dataHeatBal->PeopleObjects(Item).spaceNums(Item1);
+                    int const zoneNum = state.dataHeatBal->space(spaceNum).zoneNum;
+                    state.dataHeatBal->People(Loop).Name = state.dataHeatBal->PeopleObjects(Item).names(Item1);
+                    state.dataHeatBal->People(Loop).spaceNum = spaceNum;
+                    state.dataHeatBal->People(Loop).ZonePtr = zoneNum;
 
-                    // Set space load fractions
-                    if (int(state.dataHeatBal->People(Loop).spacePtrs.size()) <= 1) {
-                        state.dataHeatBal->People(Loop).spaceFracs.emplace_back(1.0);
-                    } else {
-                        if (state.dataHeatBal->People(Loop).ZonePtr > 0) {
-                            Real64 const zoneArea = state.dataHeatBal->Zone(state.dataHeatBal->People(Loop).ZonePtr).FloorArea;
-                            if (zoneArea > 0.0) {
-                                for (int const spaceNum : state.dataHeatBal->People(Loop).spacePtrs) {
-                                    Real64 const spaceArea = state.dataHeatBal->space(spaceNum).floorArea;
-                                    state.dataHeatBal->People(Loop).spaceFracs.emplace_back(spaceArea / zoneArea);
-                                }
-                            } else {
-                                ShowSevereError(state, std::string(RoutineName) + "Zone floor area is zero when allocating People loads to Spaces.");
-                                ShowContinueError(state,
-                                                  "Occurs for People object =" + state.dataHeatBal->PeopleObjects(Item).Name +
-                                                      " in Zone=" + state.dataHeatBal->Zone(state.dataHeatBal->People(Loop).ZonePtr).Name);
-                                ErrorsFound = true;
-                            }
-                        }
-                    }
+                    // if ((numZones > 0) && !state.dataHeatBal->PeopleObjects(Item).ZoneListActive) {
+                    //    state.dataHeatBal->People(Loop).Name = AlphaName(1);
+                    //    int const zoneNum = state.dataHeatBal->PeopleObjects(Item).ZoneOrZoneListPtr;
+                    //    state.dataHeatBal->People(Loop).ZonePtr = zoneNum;
+                    //    if (zoneNum > 0) {
+                    //        for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                    //            state.dataHeatBal->People(Loop).spacePtrs.emplace_back(spaceNum);
+                    //        }
+                    //    }
+                    //} else if (state.dataHeatBal->PeopleObjects(Item).ZoneListActive) {
+                    //    CheckCreatedZoneItemName(
+                    //        state,
+                    //        RoutineName,
+                    //        CurrentModuleObject,
+                    //        state.dataHeatBal->Zone(state.dataHeatBal->ZoneList(state.dataHeatBal->PeopleObjects(Item).ZoneOrZoneListPtr).Zone(Item1))
+                    //            .Name,
+                    //        state.dataHeatBal->ZoneList(state.dataHeatBal->PeopleObjects(Item).ZoneOrZoneListPtr).MaxZoneNameLength,
+                    //        state.dataHeatBal->PeopleObjects(Item).Name,
+                    //        state.dataHeatBal->People,
+                    //        Loop - 1,
+                    //        state.dataHeatBal->People(Loop).Name,
+                    //        errFlag);
+                    //    int const zoneNum = state.dataHeatBal->ZoneList(state.dataHeatBal->PeopleObjects(Item).ZoneOrZoneListPtr).Zone(Item1);
+                    //    state.dataHeatBal->People(Loop).ZonePtr = zoneNum;
+                    //    if (zoneNum > 0) {
+                    //        for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                    //            state.dataHeatBal->People(Loop).spacePtrs.emplace_back(spaceNum);
+                    //        }
+                    //    }
+                    //    if (errFlag) ErrorsFound = true;
+                    //} else if ((numSpaces > 0) && !state.dataHeatBal->PeopleObjects(Item).spaceListActive) {
+                    //    state.dataHeatBal->People(Loop).Name = AlphaName(1);
+                    //    int const spaceNum = state.dataHeatBal->PeopleObjects(Item).spaceOrSpaceListPtr;
+                    //    if (spaceNum > 0) {
+                    //        state.dataHeatBal->People(Loop).spacePtrs.emplace_back(spaceNum);
+                    //        state.dataHeatBal->People(Loop).ZonePtr = state.dataHeatBal->space(spaceNum).zoneNum;
+                    //    }
+                    //} else if (state.dataHeatBal->PeopleObjects(Item).spaceListActive) {
+                    //    int const spaceNum = state.dataHeatBal->spaceList(state.dataHeatBal->PeopleObjects(Item).spaceOrSpaceListPtr).spaces(Item1);
+                    //    CheckCreatedZoneItemName(
+                    //        state,
+                    //        RoutineName,
+                    //        CurrentModuleObject,
+                    //        state.dataHeatBal->space(spaceNum).Name,
+                    //        state.dataHeatBal->spaceList(state.dataHeatBal->PeopleObjects(Item).spaceOrSpaceListPtr).maxSpaceNameLength,
+                    //        state.dataHeatBal->PeopleObjects(Item).Name,
+                    //        state.dataHeatBal->People,
+                    //        Loop - 1,
+                    //        state.dataHeatBal->People(Loop).Name,
+                    //        errFlag);
+                    //    if (spaceNum > 0) {
+                    //        state.dataHeatBal->People(Loop).spacePtrs.emplace_back(spaceNum);
+                    //        state.dataHeatBal->People(Loop).ZonePtr = state.dataHeatBal->space(spaceNum).zoneNum;
+                    //    }
+                    //    if (errFlag) ErrorsFound = true;
+                    //}
 
                     state.dataHeatBal->People(Loop).NumberOfPeoplePtr = GetScheduleIndex(state, AlphaName(3));
                     SchMin = 0.0;
@@ -705,7 +716,22 @@ namespace InternalHeatGains {
                     {
                         auto const peopleMethod(AlphaName(4));
                         if (peopleMethod == "PEOPLE") {
-                            state.dataHeatBal->People(Loop).NumberOfPeople = IHGNumbers(1);
+                            // Set space load fraction
+                            Real64 spaceFrac = 1.0;
+                            if (numZones > 1) {
+                                Real64 const zoneArea = state.dataHeatBal->Zone(zoneNum).FloorArea;
+                                if (zoneArea > 0.0) {
+                                    spaceFrac = state.dataHeatBal->space(spaceNum).floorArea / zoneArea;
+                                } else {
+                                    ShowSevereError(state,
+                                                    std::string(RoutineName) + "Zone floor area is zero when allocating People loads to Spaces.");
+                                    ShowContinueError(state,
+                                                      "Occurs for People object =" + state.dataHeatBal->PeopleObjects(Item).Name +
+                                                          " in Zone=" + state.dataHeatBal->Zone(zoneNum).Name);
+                                    ErrorsFound = true;
+                                }
+                            }
+                            state.dataHeatBal->People(Loop).NumberOfPeople = IHGNumbers(1) * spaceFrac;
                             if (state.dataIPShortCut->lNumericFieldBlanks(1)) {
                                 ShowWarningError(state,
                                                  std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataHeatBal->People(Loop).Name +
@@ -716,14 +742,13 @@ namespace InternalHeatGains {
                         } else if (peopleMethod == "PEOPLE/AREA") {
                             if (state.dataHeatBal->People(Loop).ZonePtr != 0) {
                                 if (IHGNumbers(2) >= 0.0) {
-                                    state.dataHeatBal->People(Loop).NumberOfPeople =
-                                        IHGNumbers(2) * state.dataHeatBal->Zone(state.dataHeatBal->People(Loop).ZonePtr).FloorArea;
-                                    if (state.dataHeatBal->Zone(state.dataHeatBal->People(Loop).ZonePtr).FloorArea <= 0.0) {
+                                    state.dataHeatBal->People(Loop).NumberOfPeople = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).floorArea;
+                                    if (state.dataHeatBal->space(spaceNum).floorArea <= 0.0) {
                                         ShowWarningError(state,
                                                          std::string{RoutineName} + CurrentModuleObject + "=\"" +
                                                              state.dataHeatBal->People(Loop).Name + "\", specifies " +
                                                              state.dataIPShortCut->cNumericFieldNames(2) +
-                                                             ", but Zone Floor Area = 0.  0 People will result.");
+                                                             ", but Space Floor Area = 0.  0 People will result.");
                                     }
                                 } else {
                                     ShowSevereError(state,
@@ -746,14 +771,13 @@ namespace InternalHeatGains {
                         } else if (peopleMethod == "AREA/PERSON") {
                             if (state.dataHeatBal->People(Loop).ZonePtr != 0) {
                                 if (IHGNumbers(3) > 0.0) {
-                                    state.dataHeatBal->People(Loop).NumberOfPeople =
-                                        state.dataHeatBal->Zone(state.dataHeatBal->People(Loop).ZonePtr).FloorArea / IHGNumbers(3);
-                                    if (state.dataHeatBal->Zone(state.dataHeatBal->People(Loop).ZonePtr).FloorArea <= 0.0) {
+                                    state.dataHeatBal->People(Loop).NumberOfPeople = state.dataHeatBal->space(spaceNum).floorArea / IHGNumbers(3);
+                                    if (state.dataHeatBal->space(spaceNum).floorArea <= 0.0) {
                                         ShowWarningError(state,
                                                          std::string{RoutineName} + CurrentModuleObject + "=\"" +
                                                              state.dataHeatBal->People(Loop).Name + "\", specifies " +
                                                              state.dataIPShortCut->cNumericFieldNames(3) +
-                                                             ", but Zone Floor Area = 0.  0 People will result.");
+                                                             ", but Space Floor Area = 0.  0 People will result.");
                                     }
                                 } else {
                                     ShowSevereError(state,
@@ -6829,16 +6853,13 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZoneIntGain(NZ).QOCLAT += state.dataHeatBal->People(Loop).LatGainRate;
             state.dataHeatBal->ZoneIntGain(NZ).QOCTOT += state.dataHeatBal->People(Loop).TotGainRate;
 
-            for (int index = 1; index <= int(state.dataHeatBal->People(Loop).spacePtrs.size()); ++index) {
-                int spaceNum = state.dataHeatBal->People(Loop).spacePtrs(index);
-                Real64 spaceFrac = state.dataHeatBal->People(Loop).spaceFracs(index);
-                state.dataHeatBal->spaceIntGain(spaceNum).NOFOCC += state.dataHeatBal->People(Loop).NumOcc * spaceFrac;
-                state.dataHeatBal->spaceIntGain(spaceNum).QOCRAD += state.dataHeatBal->People(Loop).RadGainRate * spaceFrac;
-                state.dataHeatBal->spaceIntGain(spaceNum).QOCCON += state.dataHeatBal->People(Loop).ConGainRate * spaceFrac;
-                state.dataHeatBal->spaceIntGain(spaceNum).QOCSEN += state.dataHeatBal->People(Loop).SenGainRate * spaceFrac;
-                state.dataHeatBal->spaceIntGain(spaceNum).QOCLAT += state.dataHeatBal->People(Loop).LatGainRate * spaceFrac;
-                state.dataHeatBal->spaceIntGain(spaceNum).QOCTOT += state.dataHeatBal->People(Loop).TotGainRate * spaceFrac;
-            }
+            int spaceNum = state.dataHeatBal->People(Loop).spaceNum;
+            state.dataHeatBal->spaceIntGain(spaceNum).NOFOCC += state.dataHeatBal->People(Loop).NumOcc;
+            state.dataHeatBal->spaceIntGain(spaceNum).QOCRAD += state.dataHeatBal->People(Loop).RadGainRate;
+            state.dataHeatBal->spaceIntGain(spaceNum).QOCCON += state.dataHeatBal->People(Loop).ConGainRate;
+            state.dataHeatBal->spaceIntGain(spaceNum).QOCSEN += state.dataHeatBal->People(Loop).SenGainRate;
+            state.dataHeatBal->spaceIntGain(spaceNum).QOCLAT += state.dataHeatBal->People(Loop).LatGainRate;
+            state.dataHeatBal->spaceIntGain(spaceNum).QOCTOT += state.dataHeatBal->People(Loop).TotGainRate;
         }
 
         for (Loop = 1; Loop <= state.dataHeatBal->TotLights; ++Loop) {

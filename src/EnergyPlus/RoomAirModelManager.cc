@@ -1666,7 +1666,7 @@ namespace RoomAirModelManager {
                 if (RAFNNodeNum > 0) { // found it
                     foundList = true;
                     int numInputGains = (NumAlphas + NumNumbers - 1) / 3;
-                    int numSpacesInZone = int(state.dataHeatBal->Zone(ZoneNum).spaces.size());
+                    int numSpacesInZone = state.dataHeatBal->Zone(ZoneNum).numSpaces;
                     int maxNumGains = numInputGains * numSpacesInZone;
                     if (allocated(state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain)) {
                         ShowSevereError(state,

@@ -5483,6 +5483,7 @@ namespace HeatBalanceManager {
                 if (zoneNum > 0) {
                     thisSpace.zoneNum = zoneNum;
                     state.dataHeatBal->Zone(zoneNum).spaces.emplace_back(spaceNum);
+                    ++state.dataHeatBal->Zone(zoneNum).numSpaces;
                 } else {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisSpace.Name);
                     ShowContinueError(state, "Zone Name =" + zoneName + "not found.");
@@ -5584,6 +5585,7 @@ namespace HeatBalanceManager {
                 state.dataHeatBal->space(state.dataGlobal->numSpaces).spaceTypeNum = GetGeneralSpaceTypeNum(state);
                 // Add to zone's list of spaces
                 thisZone.spaces.emplace_back(state.dataGlobal->numSpaces);
+                ++state.dataHeatBal->Zone(zoneNum).numSpaces;
             }
         }
     }

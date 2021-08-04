@@ -11944,12 +11944,10 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
     // Accumulate internal gain totals by space and space type
     for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
         auto curPeople = state.dataHeatBal->People(iPeople);
-        for (int iSpace = 1; iSpace <= int(curPeople.spacePtrs.size()); ++iSpace) {
-            int const spaceNum = curPeople.spacePtrs(iSpace);
-            Real64 const people = curPeople.NumberOfPeople * curPeople.spaceFracs(iSpace);
-            spaceTotPeople(spaceNum) += people;
-            spaceTypeTotPeople(state.dataHeatBal->space(spaceNum).spaceTypeNum) += people;
-        }
+        int const spaceNum = curPeople.spaceNum;
+        Real64 const people = curPeople.NumberOfPeople;
+        spaceTotPeople(spaceNum) += people;
+        spaceTypeTotPeople(state.dataHeatBal->space(spaceNum).spaceTypeNum) += people;
     }
     for (int iLights = 1; iLights <= state.dataHeatBal->TotLights; ++iLights) {
         auto curLighting = state.dataHeatBal->Lights(iLights);
