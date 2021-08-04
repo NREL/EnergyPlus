@@ -1064,10 +1064,10 @@ TEST_F(EnergyPlusFixture, SimplifiedProcedureTest1)
 
     ManageSimulation(*state);
 
-    EXPECT_NEAR(3.494583, state->dataSize->FinalSysSizing(1).DesOutAirVolFlow, 0.0001);
+    EXPECT_NEAR(2.154067, state->dataSize->FinalSysSizing(1).DesOutAirVolFlow, 0.0001);
     EXPECT_EQ(0, state->dataSingleDuct->sd_airterminal(1).ZoneFixedMinAir);
-    EXPECT_NEAR(0.421374, state->dataPowerInductionUnits->PIU(1).MinPriAirFlowFrac, 0.0001);
-    EXPECT_NEAR(0.317689, state->dataPowerInductionUnits->PIU(1).MaxTotAirVolFlow, 0.0001);
+    EXPECT_NEAR(1.0, state->dataPowerInductionUnits->PIU(1).MinPriAirFlowFrac, 0.0001);
+    EXPECT_NEAR(0.089244, state->dataPowerInductionUnits->PIU(1).MaxTotAirVolFlow, 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, SimplifiedProcedureTest2)
@@ -2068,10 +2068,10 @@ TEST_F(EnergyPlusFixture, SimplifiedProcedureTest2)
 
     ManageSimulation(*state);
 
-    EXPECT_NEAR(3.494583, state->dataSize->FinalSysSizing(1).DesOutAirVolFlow, 0.0001);
+    EXPECT_NEAR(2.154067, state->dataSize->FinalSysSizing(1).DesOutAirVolFlow, 0.0001);
     EXPECT_NEAR(2.658660, state->dataSingleDuct->sd_airterminal(1).ZoneFixedMinAir, 0.0001);
     EXPECT_NEAR(0.100000, state->dataPowerInductionUnits->PIU(1).MinPriAirFlowFrac, 0.0001);
-    EXPECT_NEAR(0.317689, state->dataPowerInductionUnits->PIU(1).MaxTotAirVolFlow, 0.0001);
+    EXPECT_NEAR(0.089244, state->dataPowerInductionUnits->PIU(1).MaxTotAirVolFlow, 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, SimplifiedProcedureTest3)
@@ -3072,8 +3072,8 @@ TEST_F(EnergyPlusFixture, SimplifiedProcedureTest3)
 
     ManageSimulation(*state);
 
-    EXPECT_NEAR(3.494583, state->dataSize->FinalSysSizing(1).DesOutAirVolFlow, 0.0001);
+    EXPECT_NEAR(2.154067, state->dataSize->FinalSysSizing(1).DesOutAirVolFlow, 0.0001);
     EXPECT_EQ(0.1, state->dataSingleDuct->sd_airterminal(1).ZoneFixedMinAir);
-    EXPECT_NEAR(0.421374, state->dataPowerInductionUnits->PIU(1).MinPriAirFlowFrac, 0.0001);
-    EXPECT_NEAR(0.317689, state->dataPowerInductionUnits->PIU(1).MaxTotAirVolFlow, 0.0001);
+    EXPECT_NEAR(1, state->dataPowerInductionUnits->PIU(1).MinPriAirFlowFrac, 0.0001);
+    EXPECT_NEAR(0.089244, state->dataPowerInductionUnits->PIU(1).MaxTotAirVolFlow, 0.0001);
 }

@@ -2885,6 +2885,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
     Real64 rho; // local fluid density
     Real64 Cp;  // local fluid specific heat
     bool IsAutoSize;
+    bool IsMaxFlowAutoSize; // Indicate if the maximum terminal flow is autosize
     int ZoneNum(0);
     int AirLoopNum;                           // Air loop number
     int SysSizNum;                            // System sizing number
@@ -2910,6 +2911,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
     DesMassFlow = 0.0;
     ErrorsFound = false;
     IsAutoSize = false;
+    IsMaxFlowAutoSize = false;
     MaxAirVolFlowRateDes = 0.0;
     MaxAirVolFlowRateUser = 0.0;
     MaxHeatAirVolFlowRateDes = 0.0;
@@ -2956,6 +2958,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
             }
             if (IsAutoSize) {
                 this->MaxAirVolFlowRate = MaxAirVolFlowRateDes;
+                IsMaxFlowAutoSize = true;
                 BaseSizer::reportSizerOutput(state, this->SysType, this->SysName, "Design Size Maximum Air Flow Rate [m3/s]", MaxAirVolFlowRateDes);
             } else { // Hard-size with sizing data
                 if (this->MaxAirVolFlowRate > 0.0 && MaxAirVolFlowRateDes > 0.0) {
@@ -3093,6 +3096,21 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                                         max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).VozClgByZone,
                                             state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).VozHtgByZone) /
                                         this->MaxAirVolFlowRate;
+
+                    // adjust maximum flow rate
+                    if (MinAirFlowFracDes > 1.0 && IsMaxFlowAutoSize) {
+                        this->MaxAirVolFlowRate *= MinAirFlowFracDes;
+                        MinAirFlowFracDes = 1.0;
+                    } else if (MinAirFlowFracDes > 1.0) {
+                        ShowWarningError(state, "SingleDuctSystem:SizeSys: Maximum air flow rate for " + this->SysName + " is potentially too low.");
+                        ShowContinueError(
+                            state,
+                            "The flow is lower than the minimum flow rate calculated following the ASHRAE Standard 62.1 Simplified Procedure:");
+                        ShowContinueError(state, format(" User-specified maximum air flow rate: {:.3R} m3/s.", this->MaxAirVolFlowRate));
+                        ShowContinueError(state,
+                                          format(" Calculated minimum air flow rate: {:.3R} m3/s.", this->MaxAirVolFlowRate * MinAirFlowFracDes));
+                        MinAirFlowFracDes = 1.0;
+                    }
                 }
             }
         }
@@ -3172,6 +3190,19 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                 if (this->MaxAirVolFlowRate > 0.0) {
                     FixedMinAirDes = 1.5 * max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).VozClgByZone,
                                                state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).VozHtgByZone);
+
+                    // adjust maximum flow rate
+                    if (FixedMinAirDes > this->MaxAirVolFlowRate && IsMaxFlowAutoSize) {
+                        this->MaxAirVolFlowRate = FixedMinAirDes;
+                    } else if (FixedMinAirDes > this->MaxAirVolFlowRate) {
+                        ShowWarningError(state, "SingleDuctSystem:SizeSys: Maximum air flow rate for " + this->SysName + " is potentially too low.");
+                        ShowContinueError(
+                            state,
+                            "The flow is lower than the minimum flow rate calculated following the ASHRAE Standard 62.1 Simplified Procedure:");
+                        ShowContinueError(state, format(" User-specified maximum air flow rate: {:.3R} m3/s.", this->MaxAirVolFlowRate));
+                        ShowContinueError(state, format(" Calculated minimum air flow rate: {:.3R} m3/s.", FixedMinAirDes));
+                        FixedMinAirDes = this->MaxAirVolFlowRate;
+                    }
                 }
             }
         }
