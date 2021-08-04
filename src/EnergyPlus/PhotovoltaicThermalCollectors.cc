@@ -1172,7 +1172,7 @@ namespace PhotovoltaicThermalCollectors {
             ConvectionCoefficients::InitExteriorConvectionCoeff(state,
                                                                 this->SurfNum,
                                                                 0.0,
-                                                                DataHeatBalance::VerySmooth,
+                                                                DataSurfaces::SurfaceRoughness::VerySmooth,
                                                                 this->Simple.SurfEmissivity,
                                                                 this->Simple.LastCollectorTemp,
                                                                 HcExt,
@@ -1194,10 +1194,8 @@ namespace PhotovoltaicThermalCollectors {
             }
             Real64 Tcollector =
                 (2.0 * mdot * CpInlet * Tinlet + this->AreaCol * (HrGround * state.dataEnvrn->OutDryBulbTemp + HrSky * state.dataEnvrn->SkyTemp +
-                                                                  HrAir * state.dataSurface->Surface(this->SurfNum).OutDryBulbTemp +
-                                                                  HcExt * state.dataSurface->Surface(this->SurfNum).OutDryBulbTemp)) /
+                 HrAir * state.dataHeatBalSurf->TH(1, 1, SurfNum) + HcExt * state.dataHeatBalSurf->TH(1, 1, SurfNum))) /
                 (2.0 * mdot * CpInlet + this->AreaCol * (HrGround + HrSky + HrAir + HcExt));
-
             PotentialOutletTemp = 2.0 * Tcollector - Tinlet;
             this->Report.ToutletWorkFluid = PotentialOutletTemp;
             // trap for air not being cooled below its wetbulb.
@@ -1481,7 +1479,7 @@ namespace PhotovoltaicThermalCollectors {
         ConvectionCoefficients::InitExteriorConvectionCoeff(state,
                                                             this->SurfNum,
                                                             0.0,
-                                                            DataHeatBalance::VerySmooth,
+                                                            DataSurfaces::SurfaceRoughness::VerySmooth,
                                                             emiss_pvg,
                                                             this->BIPVT.LastCollectorTemp,
                                                             HcExt,
