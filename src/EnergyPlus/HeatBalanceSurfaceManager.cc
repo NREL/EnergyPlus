@@ -6622,7 +6622,6 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
 
     // determine reference air temperatures
     for (int SurfNum : HTSurfs) {
-        int ZoneNum = Surface(SurfNum).Zone;
 
         // These conditions are not used in every SurfNum loop here so we don't use them to skip surfaces
         if (Surface(SurfNum).Class == SurfaceClass::TDD_Dome) continue; // Skip TDD:DOME objects.  Inside temp is handled by TDD:DIFFUSER.

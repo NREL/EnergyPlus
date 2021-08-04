@@ -502,7 +502,6 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     state->dataLoopNodes->Node.allocate(4);
-    state->dataHeatBalSurfMgr->RefAirTemp.allocate(3);
     state->dataHeatBal->SurfTempEffBulkAir.allocate(3);
     state->dataHeatBalSurf->SurfTempInTmp.allocate(3);
 
@@ -522,9 +521,6 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataHeatBalSurf->SurfTempInTmp(surfNum1) = 15.0;
     state->dataHeatBalSurf->SurfTempInTmp(surfNum2) = 20.0;
     state->dataHeatBalSurf->SurfTempInTmp(surfNum3) = 25.0;
-    state->dataHeatBalSurfMgr->RefAirTemp(surfNum1) = 10.0;
-    state->dataHeatBalSurfMgr->RefAirTemp(surfNum2) = 10.0;
-    state->dataHeatBalSurfMgr->RefAirTemp(surfNum3) = 10.0;
     state->dataHeatBal->SurfTempEffBulkAir(surfNum1) = 10.0;
     state->dataHeatBal->SurfTempEffBulkAir(surfNum2) = 10.0;
     state->dataHeatBal->SurfTempEffBulkAir(surfNum3) = 10.0;
@@ -2735,7 +2731,6 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     state->dataLoopNodes->Node.allocate(4);
-    state->dataHeatBalSurfMgr->RefAirTemp.allocate(3);
     state->dataHeatBal->SurfTempEffBulkAir.allocate(3);
     state->dataHeatBalSurf->SurfTempInTmp.allocate(3);
 
@@ -2755,9 +2750,6 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataHeatBalSurf->SurfTempInTmp(surfNum1) = 15.0;
     state->dataHeatBalSurf->SurfTempInTmp(surfNum2) = 20.0;
     state->dataHeatBalSurf->SurfTempInTmp(surfNum3) = 25.0;
-    state->dataHeatBalSurfMgr->RefAirTemp(surfNum1) = 10.0;
-    state->dataHeatBalSurfMgr->RefAirTemp(surfNum2) = 10.0;
-    state->dataHeatBalSurfMgr->RefAirTemp(surfNum3) = 10.0;
     state->dataHeatBal->SurfTempEffBulkAir(surfNum1) = 10.0;
     state->dataHeatBal->SurfTempEffBulkAir(surfNum2) = 10.0;
     state->dataHeatBal->SurfTempEffBulkAir(surfNum3) = 10.0;
