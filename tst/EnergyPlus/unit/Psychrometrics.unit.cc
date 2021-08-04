@@ -725,14 +725,14 @@ TEST_F(EnergyPlusFixture, Psychrometrics_CSpline_Test)
     Real64 Press_test_smallchange;
     Real64 error = 0.0;
     int i;
-    for (i = 0; i <= 700; i++) { //Press =50,000 ~ 120,000 Pascal
+    for (i = 0; i <= 700; i++) { // Press =50,000 ~ 120,000 Pascal
         state->dataPsychrometrics->useInterpolationPsychTsatFnPb = false;
         Press_test = 50000 + i * 100;
-        tsat_psy = PsyTsatFnPb_raw(*state, Press_test); //Tsat from original psychrometric function for PsychTsatFnPb
+        tsat_psy = PsyTsatFnPb_raw(*state, Press_test); // Tsat from original psychrometric function for PsychTsatFnPb
 
-        state->dataPsychrometrics->useInterpolationPsychTsatFnPb = true; //change to cspline
+        state->dataPsychrometrics->useInterpolationPsychTsatFnPb = true; // change to cspline
         Press_test_smallchange = Press_test + 1e-60;
-        tsat_cspline = PsyTsatFnPb_raw(*state, Press_test_smallchange); //Tsat from cspline interpolation
+        tsat_cspline = PsyTsatFnPb_raw(*state, Press_test_smallchange); // Tsat from cspline interpolation
         error = max(abs(tsat_psy - tsat_cspline), error);
     }
     // check error
