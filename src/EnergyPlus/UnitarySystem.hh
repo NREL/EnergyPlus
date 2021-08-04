@@ -286,9 +286,6 @@ namespace UnitarySystems {
         int m_HeatRecoveryOutletNodeNum;
         int m_DesignSpecMSHPIndex;
         Real64 m_NoLoadAirFlowRateRatio;
-        // Real64 m_IdleMassFlowRate;
-        // Real64 m_IdleVolumeAirRate; // idle air flow rate [m3/s]
-        // Real64 m_IdleSpeedRatio;
         int m_SingleMode;
         bool m_MultiOrVarSpeedHeatCoil;
         bool m_MultiOrVarSpeedCoolCoil;

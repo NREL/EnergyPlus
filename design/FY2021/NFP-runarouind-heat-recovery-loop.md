@@ -3,17 +3,21 @@ Run-around Heat Recovery Loop
 
 **R. Raustad, FSEC**
 
- - Original Date - 2/5/21
- - Revision Date
+ - Original Date - 2/5/21 DRAFT NFP
+ - Revision Date - 8/2/21 FINAL NFP and Design Doc
  
 
 ## Justification for New Feature ##
 
-Heat recovery is common in HVAC systems. A heat exchanger can easily be installed in an air system where two air steams are side-by-side. However, when the air steams are not are not located near each other, application of heat recovery is more difficult. Designers have overcome this issue by using water coils connected with piping and a pump to create a closed loop system where energy is transfered between these two coil. Third parties are not able to model this type of system in EnergyPlus.
+Heat recovery is common in HVAC systems. A heat exchanger can easily be installed in an air system where two air steams are side-by-side. However, when the air steams are not located near each other, application of heat recovery is more difficult. Designers have overcome this issue by using water coils connected with piping and a pump to create a closed loop system where energy is transfered between these two coil. Third parties are not able to model this type of system in EnergyPlus.
 
 ## E-mail and  Conference Call Conclusions ##
 
-
+Several conference calls have guided this new feature over the last few months. The model evolved as:
+1) allow coil-on-branch configuration with existing plant loop (HVACController did not work)
+2) allow coil-on-branch configuration with RootSolver style controller (water temps did not converge and SimHVAC max itertion warnings appeared)
+3) create new class for CoilSystem:WaterCoil:HeatRecovery and initialize plant loop water temp on FirstHVACIteration (good control)
+4) use new object CoilSystem:Cooling:Water and integrate into UnitarySystem with similar plant loop water temperature initialization (same good result, much less code overhead)
 
 ## Overview ##
 
@@ -43,7 +47,7 @@ There are 3 water coil models in EnergyPlus.
 2. Coil:Cooling:Water:DetailedGeometry
 3. Coil:Heating:Water
 
-As shown in figure 2, one coil heats in winter and cools in summer while the other does the reverse as is typical in heat recovery components. For this reason, a water coil model that can exchange heat based on the entering air and water temperature is required. It is believed that the cooling coil model behaves this way (i.e., can heat the air under certain conditions). I have also seen this a few times and MJWitte also believes the water cooling coil model has this capability.
+As shown in figure 2, one coil heats in winter and cools in summer while the other does the reverse as is typical in heat recovery components. For this reason, a water coil model that can exchange heat based on the entering air and water temperature is required. It is believed that the cooling coil model behaves this way (i.e., can heat the air under certain conditions). I have also seen this a few times and MJWitte also believes the water cooling coil model has this capability. Through testing it has been confirmed Coil:Cooling:Water has the ability to cool or heat the air/water.
 
 There are two possible approaches I can think of. 
 
@@ -109,6 +113,39 @@ I'm not yet sure if objects other than the PlantLoop are even needed for a loop 
     A8,  Coil system inlet air node name
     A9;  Coil system outlet air node name
 
+**Update:** the new CoilSystem:Cooling:Water object will be used to replace this suggestion. This new object was recently added to UnitarySystem and is in the process of being merged into E+ develop. Three new inputs were added to allow control of the new run-around coil loop.
+
+     CoilSystem:Cooling:Water,
+     ...
+    A10, \field Economizer Lockout
+         \type choice
+         \key Yes
+         \key No
+         \default Yes
+         \note Yes means that the heat recovery will be locked out (off)
+     N2, \field Minimum Water Loop Temperature For Heat Recovery
+         \note Only used for heat recovery loops.
+         \note Loop will turn off below this temperature.
+         \type real
+         \units C
+         \default 0.0
+    A11; \field Companion Coil Used For Heat Recovery
+         \note Only used for heat recovery loops.
+         \note Entering a coil name indicates a heat recovery loop is specified.
+         \note Coil listed is connected in series with this objects coil on demand side 
+         \note branch of a plant loop. A dedicated plant loop with no supply side
+         \note equipment, other than a pump, is currently required.
+         \note Only Coil:Cooling:Water coil type is currently allowed for heat recovery loops.
+         \type object-list
+         \object-list CoolingCoilsWater
+
+
+## Design Document ##
+- Implement new feature using existing CoilSystem:Cool:Water object
+- Add new IDD inputs for model control
+- Incorporate new inputs in function getCoilWaterSystemInputData
+- Add controls to Init
+- Execute model in function controlCoolingSystemToSP
 
 ## Testing/Validation/Data Sources ##
 
@@ -116,7 +153,7 @@ A run around coil system will be tested in the OA system. Other configurations w
 
 ## Input Output Reference Documentation ##
 
-TBD
+Add to new documentation for CoilSystem:Cooling:Water
 
 ## Input Description ##
 
