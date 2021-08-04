@@ -101,38 +101,6 @@ namespace MixedAir {
     constexpr int On(1);  // normal coil operation
     constexpr int Off(0); // signal coil shouldn't run
 
-    // component types addressed by this module
-    enum class ComponentType
-    {
-        Unassigned = -1,
-        None,
-        OAMixer_Num,
-        Fan_Simple_CV,
-        Fan_Simple_VAV,
-        WaterCoil_SimpleCool,
-        WaterCoil_Cooling,
-        WaterCoil_SimpleHeat,
-        SteamCoil_AirHeat,
-        WaterCoil_DetailedCool,
-        Coil_ElectricHeat,
-        Coil_GasHeat,
-        WaterCoil_CoolingHXAsst,
-        DXSystem,
-        HeatXchngr,
-        Desiccant,
-        Unglazed_SolarCollector,
-        EvapCooler,
-        PVT_AirBased,
-        Fan_ComponentModel,
-        DXHeatPumpSystem,
-        Coil_UserDefined,
-        Humidifier,
-        Fan_System_Object,
-        UnitarySystemModel,
-        VRFTerminalUnit,
-        CoilSystemWater
-    };
-
     enum class iControllerType
     {
         None,

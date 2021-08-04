@@ -172,7 +172,7 @@ namespace UnitarySystems {
           m_SensibleLoadMet(0.0), m_LatentLoadMet(0.0), m_MyStagedFlag(false), m_SensibleLoadPredicted(0.0), m_MoistureLoadPredicted(0.0),
           m_FaultyCoilSATFlag(false), m_FaultyCoilSATIndex(0), m_FaultyCoilSATOffset(0.0), m_TESOpMode(0), m_initLoadBasedControlAirLoopPass(false),
           m_airLoopPassCounter(0), m_airLoopReturnCounter(0), m_FanCompNotSetYet(true), m_CoolCompNotSetYet(true), m_HeatCompNotSetYet(true),
-          m_SuppCompNotSetYet(true), m_OKToPrintSizing(false), m_IsDXCoil(true), m_SmallLoadTolerance(5.0), m_waterSideEconomizerFlag(false),
+          m_SuppCompNotSetYet(true), m_OKToPrintSizing(false), m_IsDXCoil(true), m_SmallLoadTolerance(5.0), m_TemperatureOffsetControlActive(false),
           m_minAirToWaterTempOffset(0.0), UnitarySystemType_Num(0), MaxIterIndex(0), RegulaFalsiFailedIndex(0), NodeNumOfControlledZone(0),
           FanPartLoadRatio(0.0), CoolCoilWaterFlowRatio(0.0), HeatCoilWaterFlowRatio(0.0), ControlZoneNum(0), AirInNode(0), AirOutNode(0),
           MaxCoolAirMassFlow(0.0), MaxHeatAirMassFlow(0.0), MaxNoCoolHeatAirMassFlow(0.0), DesignMinOutletTemp(0.0), DesignMaxOutletTemp(0.0),
@@ -180,8 +180,7 @@ namespace UnitarySystems {
           CoolCoilOutletNodeNum(0), CoolCoilFluidOutletNodeNum(0), CoolCoilLoopNum(0), CoolCoilLoopSide(0), CoolCoilBranchNum(0), CoolCoilCompNum(0),
           CoolCoilFluidInletNode(0), HeatCoilLoopNum(0), HeatCoilLoopSide(0), HeatCoilBranchNum(0), HeatCoilCompNum(0), HeatCoilFluidInletNode(0),
           HeatCoilFluidOutletNodeNum(0), HeatCoilInletNodeNum(0), HeatCoilOutletNodeNum(0), ATMixerExists(false), ATMixerType(0), ATMixerOutNode(0),
-          ControlZoneMassFlowFrac(0.0), m_CompPointerMSHP(nullptr), LoadSHR(0.0), CoilSHR(0.0), runWaterSideEconomizer(false),
-          WaterSideEconomizerStatus(0)
+          ControlZoneMassFlowFrac(0.0), m_CompPointerMSHP(nullptr), LoadSHR(0.0), CoilSHR(0.0), temperatureOffsetControlStatus(0)
     {
     }
 
@@ -1310,19 +1309,15 @@ namespace UnitarySystems {
             }
         }
 
-        // no water side economizer
-        this->runWaterSideEconomizer = false;
-        this->WaterSideEconomizerStatus = 0;
         // re-set water-side economizer flags each time step
-        if (this->m_waterSideEconomizerFlag) {
-            // enable water-side economizer cooling
-            this->WaterSideEconomizerStatus = 1;
-            this->runWaterSideEconomizer = true;
-            // disable water-side economizer if entering fluid temp is > entering air temp minus user specified temp offset
+        if (this->m_TemperatureOffsetControlActive) {
             if (state.dataLoopNodes->Node(this->CoolCoilFluidInletNode).Temp >
                 (state.dataLoopNodes->Node(this->AirInNode).Temp - this->m_minAirToWaterTempOffset)) {
-                this->runWaterSideEconomizer = false;
-                this->WaterSideEconomizerStatus = 0;
+                // disable water-side economizer if entering fluid temp is > entering air temp minus user specified temp offset
+                this->temperatureOffsetControlStatus = 0;
+            } else {
+                // enable water-side economizer cooling mode
+                this->temperatureOffsetControlStatus = 1;
             }
         }
 
@@ -7098,7 +7093,7 @@ namespace UnitarySystems {
         EnergyPlusData &state, std::string_view CoilSysName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound)
     {
 
-        std::string cCurrentModuleObject(state.dataUnitarySystems->coilSysCoolingWaterObjectName);
+        std::string cCurrentModuleObject("CoilSystem:Cooling:Water");
         static const std::string routineName("getCoilWaterSystemInputData: ");
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
         if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
@@ -7135,7 +7130,7 @@ namespace UnitarySystems {
                 input_specs.cooling_coil_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("cooling_coil_name")));
                 // why is this cooling coil does not have a field for Design Air Vol Flow Rate
                 // set it "SupplyAirFlowRate" to avoid blank, which lead to fatal out during get input
-                std::string loc_cooling_coil_object_type("COIL:COOLING:WATER:DETAILEDGEOMETRY");
+                static constexpr std::string_view loc_cooling_coil_object_type("COIL:COOLING:WATER:DETAILEDGEOMETRY");
                 if (UtilityRoutines::SameString(loc_cooling_coil_object_type, input_specs.cooling_coil_object_type)) {
                     input_specs.cooling_supply_air_flow_rate_method = UtilityRoutines::MakeUPPERCase("SupplyAirFlowRate");
                     input_specs.cooling_supply_air_flow_rate = DataSizing::AutoSize;
@@ -7165,7 +7160,6 @@ namespace UnitarySystems {
                 } else if (runOnSensibleLoad == "NO" && runOnLatentLoad == "YES") {
                     input_specs.latent_load_control = "LatentOnlyLoadControl";
                 } else if (runOnSensibleLoad == "YES" && runOnLatentLoad == "YES") {
-                    // not sure if this is control type is allowed
                     input_specs.latent_load_control = "LatentOrSensibleLoadControl";
                 }
 
@@ -7178,7 +7172,7 @@ namespace UnitarySystems {
                 // set water-side economizer temperature offset
                 thisSys.m_minAirToWaterTempOffset = minAir2FluidTempOffset;
                 // set water-side economizer flag
-                if (thisSys.m_minAirToWaterTempOffset > 0) thisSys.m_waterSideEconomizerFlag = true;
+                if (thisSys.m_minAirToWaterTempOffset > 0) thisSys.m_TemperatureOffsetControlActive = true;
 
                 thisSys.processInputSpec(state, input_specs, sysNum, errorsFound, ZoneEquipment, ZoneOAUnitNum);
 
@@ -7191,9 +7185,8 @@ namespace UnitarySystems {
             }
 
             if (errorsFound) {
-                ShowFatalError(state,
-                               routineName + "Errors found in getting " + state.dataUnitarySystems->coilSysCoolingWaterObjectName +
-                                   " input. Preceding condition(s) causes termination.");
+                ShowFatalError(
+                    state, routineName + "Errors found in getting " + cCurrentModuleObject + " input. Preceding condition(s) causes termination.");
             }
         }
     }
@@ -11647,8 +11640,8 @@ namespace UnitarySystems {
             }
 
             // disable waterside economizer if the condition is NOT favorable
-            if (this->m_waterSideEconomizerFlag) {
-                if (!this->runWaterSideEconomizer) {
+            if (this->m_TemperatureOffsetControlActive) {
+                if (this->temperatureOffsetControlStatus == 0) {
                     SensibleLoad = false;
                     LatentLoad = false;
                     HXUnitOn = false;
@@ -17495,11 +17488,11 @@ namespace UnitarySystems {
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataUnitarySystems->unitarySys[sysNum].Name);
 
-                    if (state.dataUnitarySystems->unitarySys[sysNum].m_waterSideEconomizerFlag) {
+                    if (state.dataUnitarySystems->unitarySys[sysNum].m_TemperatureOffsetControlActive) {
                         SetupOutputVariable(state,
                                             "Coil System Water Control Status",
                                             OutputProcessor::Unit::None,
-                                            state.dataUnitarySystems->unitarySys[sysNum].WaterSideEconomizerStatus,
+                                            state.dataUnitarySystems->unitarySys[sysNum].temperatureOffsetControlStatus,
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Average,
                                             state.dataUnitarySystems->unitarySys[sysNum].Name);

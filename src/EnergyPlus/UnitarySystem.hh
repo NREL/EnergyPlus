@@ -409,7 +409,7 @@ namespace UnitarySystems {
         bool m_OKToPrintSizing;
         bool m_IsDXCoil;
         Real64 m_SmallLoadTolerance;
-        bool m_waterSideEconomizerFlag;   // true if water-side economizer coil is active
+        bool m_TemperatureOffsetControlActive; // true if water-side economizer coil is active
         Real64 m_minAirToWaterTempOffset; // coil entering air to entering water temp offset
 
     public:
@@ -458,8 +458,7 @@ namespace UnitarySystems {
         std::string UnitType;
         Real64 LoadSHR;                // Load sensible heat ratio with humidity control
         Real64 CoilSHR;                // Load sensible heat ratio with humidity control
-        bool runWaterSideEconomizer;   // true if water-side economizer conditioon is favorbale
-        int WaterSideEconomizerStatus; // water side economizer status flag, report variable
+        int temperatureOffsetControlStatus; // water side economizer status flag, also report variable
 
         //    private:
         // private members not initialized in constructor
@@ -966,8 +965,6 @@ struct UnitarySystemsData : BaseGlobalStruct
 
     bool myOneTimeFlag = true;
     bool getInputFlag = true;
-
-    std::string const coilSysCoolingWaterObjectName = "CoilSystem:Cooling:Water";
 
     void clear_state() override
     {

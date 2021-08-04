@@ -9,5 +9,5 @@ This was previously an Excel workbook that made for very difficult version contr
 Summary: Appendded new optional numeric input field *Design Water Inlet Temperature*.
 
 Field 1-24 remains the same.
-New Field F25 (N18): Design Water Inlet Temperature.  Leave blank or assign a typical chilled water supply temperature.
+New Field F25 (N18): Design Inlet Water Temperature.  Leave blank or assign a typical chilled water supply temperature.
 
