@@ -7174,6 +7174,23 @@ namespace WindowManager {
             }
         }
         // EPTeam - again -- believe that is enforced in input //Autodesk But this routine is not self-protecting: Add as an assert
+
+        // allocate surface level adj ratio data member
+        state.dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(state.dataSurface->TotSurfaces, 1.0);
+        state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(state.dataSurface->TotSurfaces, 1.0);
+
+        // init the surface convective and radiative adjustment ratio
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
+            int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
+            for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
+                if (state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
+                    int ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
+                    state.dataHeatBal->SurfWinCoeffAdjRatioIn(SurfNum) = state.dataHeatBal->CoeffAdjRatio(ConstrNum);
+                    state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum) = state.dataHeatBal->CoeffAdjRatio(ConstrNum);
+                }
+            }
+        }
     }
 
     //****************************************************************************
@@ -7312,7 +7329,7 @@ namespace WindowManager {
 
             auto const SELECT_CASE_var(state.dataWindowManager->ngllayer);
             Real64 adjRatio = state.dataHeatBal->CoeffAdjRatio(ConstrNum);
-            GetHeatBalanceEqCoefMatrixSimple(state, adjRatio, SELECT_CASE_var, Aface, Bface, hr, hgap);
+            GetHeatBalanceEqCoefMatrixSimple(state, adjRatio, SELECT_CASE_var, hr, hgap, Aface, Bface);
 
             LUdecomposition(state, Aface, state.dataWindowManager->nglface, indx, d); // Note that these routines change Aface;
             LUsolution(Aface, state.dataWindowManager->nglface, indx, Bface);         // face temperatures are returned in Bface
