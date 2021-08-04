@@ -248,8 +248,8 @@ namespace FluidProperties {
             50.0,  55.0,  60.0,  65.0,  70.0,  75.0,  80.0, 85.0, 90.0, 95.0, 100.0, 105.0, 110.0, 115.0, 120.0, 125.0}; // 33 total temperature
                                                                                                                          // points
 
-        static Array1D<Real64> const DefaultGlycolConcs(DefaultNumGlyConcs,
-                                                        {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9}); // 10 total concentration points
+        constexpr std::array<Real64, DefaultNumGlyConcs> DefaultGlycolConcs = {
+            0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9}; // 10 total concentration points
 
         static Array1D<Real64> const DefaultWaterCpData(DefaultNumGlyTemps, {0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    4217.0, 4198.0,
                                                                              4191.0, 4185.0, 4181.0, 4179.0, 4180.0, 4180.0, 4180.0, 4180.0, 4181.0,
