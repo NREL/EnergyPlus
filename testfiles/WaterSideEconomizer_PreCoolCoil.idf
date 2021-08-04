@@ -1,4 +1,4 @@
-! UnitarySystem_5Zones_wWaterSideEconomizer.idf
+! WaterSideEconomizer_PreCoolCoil.idf
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !                          file derived from 5ZoneAutoDXVAV.idf
 !
