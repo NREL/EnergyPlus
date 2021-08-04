@@ -23802,11 +23802,23 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestReferenceConditionsLe
 
     GetAirflowNetworkInput(*state);
     // check correct values for reference conditions of crack surface when reference conditions were left blank.
-    EXPECT_EQ(20, state->dataAirflowNetwork->MultizoneSurfaceCrackData(1).StandardT);
-    EXPECT_EQ(101325, state->dataAirflowNetwork->MultizoneSurfaceCrackData(1).StandardP);
-    EXPECT_EQ(0, state->dataAirflowNetwork->MultizoneSurfaceCrackData(1).StandardW);
-    EXPECT_EQ(30, state->dataAirflowNetwork->MultizoneSurfaceCrackData(2).StandardT);
-    EXPECT_EQ(50000, state->dataAirflowNetwork->MultizoneSurfaceCrackData(2).StandardP);
-    EXPECT_EQ(0.002, state->dataAirflowNetwork->MultizoneSurfaceCrackData(2).StandardW);
+    Real64 refP1 = 101325.0;
+    Real64 refT1 = 20.0;
+    Real64 refW1 = 0.0;
+    Real64 expected_density1 = AIRDENSITY(*state, refP1, refT1, refW1);
+    Real64 expected_viscosity1 = AirflowNetwork::airDynamicVisc(refT1);
+    EXPECT_EQ(expected_density1, state->dataAirflowNetwork->MultizoneSurfaceCrackData(1).reference_density);
+    EXPECT_EQ(expected_viscosity1, state->dataAirflowNetwork->MultizoneSurfaceCrackData(1).reference_viscosity);
+    Real64 refP2 = 50000.0;
+    Real64 refT2 = 30.0;
+    Real64 refW2 = 0.002;
+    Real64 expected_density2 = AIRDENSITY(*state, refP2, refT2, refW2);
+    Real64 expected_viscosity2 = AirflowNetwork::airDynamicVisc(refT2);
+    EXPECT_EQ(expected_density2, state->dataAirflowNetwork->MultizoneSurfaceCrackData(2).reference_density);
+    EXPECT_EQ(expected_viscosity2, state->dataAirflowNetwork->MultizoneSurfaceCrackData(2).reference_viscosity);
+    // EXPECT_EQ(0, state->dataAirflowNetwork->MultizoneSurfaceCrackData(1).StandardW);
+    //EXPECT_EQ(30, state->dataAirflowNetwork->MultizoneSurfaceCrackData(2).StandardT);
+    //EXPECT_EQ(50000, state->dataAirflowNetwork->MultizoneSurfaceCrackData(2).StandardP);
+    //EXPECT_EQ(0.002, state->dataAirflowNetwork->MultizoneSurfaceCrackData(2).StandardW);
 }
 } // namespace EnergyPlus
