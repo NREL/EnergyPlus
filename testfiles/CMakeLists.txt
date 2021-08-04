@@ -512,6 +512,7 @@ add_simulation_test(IDF_FILE SingleFamilyHouse_HP_Slab.idf EPW_FILE USA_IL_Chica
 add_simulation_test(IDF_FILE SingleFamilyHouse_HP_Slab_Dehumidification.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE SingleFamilyHouse_TwoSpeed_ZoneAirBalance.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE SingleFamilyHouse_TwoSpeed_CutoutTemperature.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+add_simulation_test(IDF_FILE SingleFamilyHouse_TwoSpeed_EMSOverride.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE SmallOffice_CentralDOAS.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE SmOffPSZ-MultiModeDX.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE SmOffPSZ.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)

@@ -161,9 +161,10 @@ namespace UnitarySystems {
           m_HeatRecoveryMassFlowRate(0.0), m_HeatRecoveryRate(0.0), m_HeatRecoveryEnergy(0.0), m_HeatRecoveryInletTemp(0.0),
           m_HeatRecoveryOutletTemp(0.0), m_IterationCounter(0), m_DesiredOutletTemp(0.0), m_DesiredOutletHumRat(0.0), m_FrostControlStatus(0),
           m_CoolingCycRatio(0.0), m_CoolingSpeedRatio(0.0), m_CoolingSpeedNum(0), m_HeatingCycRatio(0.0), m_HeatingSpeedRatio(0.0),
-          m_HeatingSpeedNum(0), m_SpeedNum(0), m_DehumidInducedHeatingDemandRate(0.0), m_TotalAuxElecPower(0.0), m_HeatingAuxElecConsumption(0.0),
-          m_CoolingAuxElecConsumption(0.0), m_ElecPower(0.0), m_ElecPowerConsumption(0.0), m_LastMode(0), m_FirstPass(true), m_TotCoolEnergyRate(0.0),
-          m_SensCoolEnergyRate(0.0), m_LatCoolEnergyRate(0.0), m_TotHeatEnergyRate(0.0), m_SensHeatEnergyRate(0.0), m_LatHeatEnergyRate(0.0),
+          m_HeatingSpeedNum(0), m_SpeedNum(0), m_EMSOverrideCoilSpeedNumOn(false), m_EMSOverrideCoilSpeedNumValue(0),
+          m_DehumidInducedHeatingDemandRate(0.0), m_TotalAuxElecPower(0.0), m_HeatingAuxElecConsumption(0.0), m_CoolingAuxElecConsumption(0.0),
+          m_ElecPower(0.0), m_ElecPowerConsumption(0.0), m_LastMode(0), m_FirstPass(true), m_TotCoolEnergyRate(0.0), m_SensCoolEnergyRate(0.0),
+          m_LatCoolEnergyRate(0.0), m_TotHeatEnergyRate(0.0), m_SensHeatEnergyRate(0.0), m_LatHeatEnergyRate(0.0),
           m_DesignFanVolFlowRateEMSOverrideOn(false), m_MaxHeatAirVolFlowEMSOverrideOn(false), m_MaxCoolAirVolFlowEMSOverrideOn(false),
           m_MaxNoCoolHeatAirVolFlowEMSOverrideOn(false), m_DesignFanVolFlowRateEMSOverrideValue(0.0), m_MaxHeatAirVolFlowEMSOverrideValue(0.0),
           m_MaxCoolAirVolFlowEMSOverrideValue(0.0), m_MaxNoCoolHeatAirVolFlowEMSOverrideValue(0.0), m_EMSOverrideSensZoneLoadRequest(false),
@@ -1494,7 +1495,15 @@ namespace UnitarySystems {
         if (int(state.dataUnitarySystems->unitarySys.size()) == state.dataUnitarySystems->numUnitarySystems &&
             state.dataZoneEquip->ZoneEquipInputsFilled)
             setupAllOutputVars(state, state.dataUnitarySystems->numUnitarySystems);
-
+        for (int coilNUM = 1; coilNUM <= int(state.dataUnitarySystems->unitarySys.size()); ++coilNUM) {
+            SetupEMSActuator(state,
+                             "Coil Speed Control",
+                             state.dataUnitarySystems->unitarySys[coilNUM].Name,
+                             "Unitary System DX Coil Speed Level",
+                             "[]",
+                             state.dataUnitarySystems->unitarySys[coilNUM].m_EMSOverrideCoilSpeedNumOn,
+                             state.dataUnitarySystems->unitarySys[coilNUM].m_EMSOverrideCoilSpeedNumValue);
+        }
         if (errorsFound) {
             ShowFatalError(state, "getUnitarySystemInputData: previous errors cause termination. Check inputs");
         }
@@ -8044,7 +8053,6 @@ namespace UnitarySystems {
         // This is still no load but at the first speed above idle
         if ((state.dataUnitarySystems->HeatingLoad && this->m_NumOfSpeedHeating > 0) ||
             (state.dataUnitarySystems->CoolingLoad && this->m_NumOfSpeedCooling > 0)) {
-            // todo
             if (this->m_Staged) {
                 if (state.dataUnitarySystems->HeatingLoad) {
                     this->m_HeatingSpeedNum = this->m_StageNum;
@@ -8126,6 +8134,7 @@ namespace UnitarySystems {
                 this->m_HeatingCycRatio = 1.0;
                 this->m_HeatingSpeedNum = this->m_NumOfSpeedHeating;
             }
+            // todo - override
             if (this->m_Staged && this->m_StageNum > 0) {
                 if (this->m_NumOfSpeedHeating > 0) {
                     this->m_HeatingSpeedNum = min(this->m_StageNum, this->m_NumOfSpeedHeating);
@@ -8163,7 +8172,7 @@ namespace UnitarySystems {
                 this->m_CoolingSpeedNum = this->m_NumOfSpeedCooling;
             }
 
-            // todo
+            // todo - override
             if (this->m_Staged && this->m_StageNum < 0) {
                 if (this->m_NumOfSpeedCooling > 0) this->m_CoolingSpeedNum = min(std::abs(this->m_StageNum), this->m_NumOfSpeedCooling);
                 this->setOnOffMassFlowRate(state, OnOffAirFlowRatio, PartLoadRatio);
@@ -8275,9 +8284,9 @@ namespace UnitarySystems {
         // Check to see which speed to meet the load
         this->m_HeatingSpeedNum = 0;
         this->m_CoolingSpeedNum = 0;
+        // todo
         if (!this->m_Staged) {
             if (state.dataUnitarySystems->HeatingLoad) {
-                // todo
                 for (SpeedNum = 1; SpeedNum <= this->m_NumOfSpeedHeating; ++SpeedNum) {
                     CoolPLR = 0.0;
                     HeatPLR = 1.0;
