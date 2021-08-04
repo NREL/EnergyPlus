@@ -315,6 +315,10 @@ namespace WindowManager {
         Array1D<Real64> W21(3); // W1-W2, W3-W2, resp. (m)
         Array1D<Real64> W23(3);
 
+        // allocate surface level adj ratio data member
+        state.dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(state.dataSurface->TotSurfaces, 1.0);
+        state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(state.dataSurface->TotSurfaces, 1.0);
+
         W5InitGlassParameters(state);
 
         // Calculate optical properties of blind-type layers entered with MATERIAL:WindowBlind
@@ -7174,10 +7178,6 @@ namespace WindowManager {
             }
         }
         // EPTeam - again -- believe that is enforced in input //Autodesk But this routine is not self-protecting: Add as an assert
-
-        // allocate surface level adj ratio data member
-        state.dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(state.dataSurface->TotSurfaces, 1.0);
-        state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(state.dataSurface->TotSurfaces, 1.0);
 
         // init the surface convective and radiative adjustment ratio
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
