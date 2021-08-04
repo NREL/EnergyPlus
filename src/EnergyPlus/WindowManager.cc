@@ -144,6 +144,11 @@ namespace WindowManager {
 
         // check and read custom solar and/or visible spectrum data if any
         CheckAndReadCustomSprectrumData(state);
+
+        // allocate surface level adj ratio data member
+        state.dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(state.dataSurface->TotSurfaces, 1.0);
+        state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(state.dataSurface->TotSurfaces, 1.0);
+
         if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
             InitWCE_SimplifiedOpticalData(state);
         } else {
@@ -314,10 +319,6 @@ namespace WindowManager {
         Array1D<Real64> W3(3);
         Array1D<Real64> W21(3); // W1-W2, W3-W2, resp. (m)
         Array1D<Real64> W23(3);
-
-        // allocate surface level adj ratio data member
-        state.dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(state.dataSurface->TotSurfaces, 1.0);
-        state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(state.dataSurface->TotSurfaces, 1.0);
 
         W5InitGlassParameters(state);
 
