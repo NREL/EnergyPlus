@@ -3150,14 +3150,14 @@ TEST_F(EnergyPlusFixture, WindowManger_AdjRatioWindowTempNominalTest)
 
     // compute heat balance equation coefficient with default adjustment ratio
     Real64 adjRatioDefault = 1.0;
-    WindowManager::GetHeatBalanceEqCoefMatrixSimple(*state, adjRatioDefault, 1, Aface, Bface, hr, hgap);
+    WindowManager::GetHeatBalanceEqCoefMatrixSimple(*state, adjRatioDefault, 1, hr, hgap, Aface, Bface);
 
     AfaceNoAdj = Aface;
     BfaceNoAdj = Bface;
 
     // compute heat balance equation coefficient with non-default adjustment ratio, 1.5
     Real64 adjRatioNonDefault = 1.5;
-    WindowManager::GetHeatBalanceEqCoefMatrixSimple(*state, adjRatioNonDefault, 1, Aface, Bface, hr, hgap);
+    WindowManager::GetHeatBalanceEqCoefMatrixSimple(*state, adjRatioNonDefault, 1, hr, hgap, Aface, Bface);
 
     // compare the adjustment ratio before and after adjustment
     EXPECT_EQ(AfaceNoAdj(2, 1), state->dataWindowManager->Aface(2, 1));

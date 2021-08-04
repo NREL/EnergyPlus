@@ -65,6 +65,7 @@
 
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -7745,6 +7746,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXCoilSizing)
     createFacilityElectricPowerServiceObject(*state);
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->DoingSizing = true;
+    // allocate surface level adj ratio data member
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(6, 1.0);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(6, 1.0);
     SizingManager::ManageSizing(*state);
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->SysSizingCalc = false;
@@ -9522,6 +9526,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXHeatingCoilOnly)
     createFacilityElectricPowerServiceObject(*state);
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->DoingSizing = true;
+    // allocate surface level adj ratio data member
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(6, 1.0);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(6, 1.0);
     SizingManager::ManageSizing(*state);
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->SysSizingCalc = false;
@@ -11504,6 +11511,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXCoilHeatRecoveryHandlin
 
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->DoingSizing = true;
+    // allocate surface level adj ratio data member
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(6, 1.0);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(6, 1.0);
     SizingManager::ManageSizing(*state);
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->SysSizingCalc = false;

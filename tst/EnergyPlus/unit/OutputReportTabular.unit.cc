@@ -66,6 +66,7 @@
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -1429,6 +1430,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
+    // allocate surface level adj ratio data member
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(12, 1.0);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(12, 1.0);
     ManageSimulation(*state); // run the design day over the warmup period (24 hrs, 25 days)
 
     EXPECT_EQ(10.0,
@@ -2466,6 +2470,9 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
+    // allocate surface level adj ratio data member
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(12, 1.0);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(12, 1.0);
     ManageSimulation(*state); // run the design day over the warmup period (24 hrs, 25 days)
 
     EXPECT_EQ(10.0,

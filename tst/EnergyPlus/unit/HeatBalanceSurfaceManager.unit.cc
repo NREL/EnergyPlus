@@ -750,6 +750,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataHeatBalSurf->SurfTempInTmp(5) = 25.0;
     state->dataHeatBalSurf->SurfTempInTmp(6) = 25.0;
 
+    // allocate surface level adj ratio data member
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(6, 1.0);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(6, 1.0);
+
     state->dataLoopNodes->Node(1).Temp = 20.0;
     state->dataLoopNodes->Node(2).Temp = 20.0;
     state->dataLoopNodes->Node(3).Temp = 20.0;
@@ -2429,6 +2433,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     state->dataHeatBalSurf->SurfTempInTmp(4) = 25.0;
     state->dataHeatBalSurf->SurfTempInTmp(5) = 25.0;
     state->dataHeatBalSurf->SurfTempInTmp(6) = 25.0;
+
+    // allocate surface level adj ratio data member
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(6, 1.0);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(6, 1.0);
 
     state->dataLoopNodes->Node(1).Temp = 20.0;
     state->dataLoopNodes->Node(2).Temp = 20.0;

@@ -56,6 +56,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -1732,6 +1733,9 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     createFacilityElectricPowerServiceObject(*state);
     BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
     state->dataGlobal->DoingSizing = true;
+    // allocate surface level adj ratio data member
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(6, 1.0);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(6, 1.0);
     SizingManager::ManageSizing(*state);
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = true;
@@ -3305,6 +3309,9 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
     createFacilityElectricPowerServiceObject(*state);
     BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
     state->dataGlobal->DoingSizing = true;
+    // allocate surface level adj ratio data member
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(6, 1.0);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(6, 1.0);
     SizingManager::ManageSizing(*state);
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = true;

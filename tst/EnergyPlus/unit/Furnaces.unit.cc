@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -1158,6 +1159,9 @@ TEST_F(EnergyPlusFixture, UnitaryHeatPumpAirToAir_MaxSuppAirTempTest)
     int AirLoopNum(1);
     bool FirstHVACIteration(false);
 
+    // allocate surface level adj ratio data member
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(6, 1.0);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(6, 1.0);
     // OutputProcessor::TimeValue.allocate(2);
     ManageSimulation(*state);
     // check the design max air outlet temperature
