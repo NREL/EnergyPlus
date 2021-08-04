@@ -7178,7 +7178,7 @@ namespace UnitarySystems {
                 // set water-side economizer temperature offset
                 thisSys.m_minAirToWaterTempOffset = minAir2FluidTempOffset;
                 // set water-side economizer flag
-                thisSys.m_waterSideEconomizerFlag = true;
+                if (thisSys.m_minAirToWaterTempOffset > 0) thisSys.m_waterSideEconomizerFlag = true;
 
                 thisSys.processInputSpec(state, input_specs, sysNum, errorsFound, ZoneEquipment, ZoneOAUnitNum);
 
