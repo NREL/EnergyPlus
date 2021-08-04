@@ -657,6 +657,7 @@ namespace DataHeatBalance {
         Real64 FractionReturnAirPlenTempCoeff1;
         Real64 FractionReturnAirPlenTempCoeff2;
         int ZoneReturnNum;        // zone return index (not the node number) for return heat gain
+        std::string RetNodeName;  // Zone return node name
         int ZoneExhaustNodeNum;   // Exhaust node number
         Real64 NomMinDesignLevel; // Nominal Minimum Design Level (min sch X design level)
         Real64 NomMaxDesignLevel; // Nominal Maximum Design Level (max sch X design level)
