@@ -1348,7 +1348,7 @@ namespace Psychrometrics {
         if (state.dataPsychrometrics->useInterpolationPsychTsatFnPb) {
             int n_sample = 1651; // sample bin size = 64 Pa; continous sample size = 1651
             // CSpline interpolation
-            tSat = CSplineint(state, n_sample, Press); // Cubic spline interpolation 
+            tSat = CSplineint(state, n_sample, Press); // Cubic spline interpolation
             iter = 0;
         } else {
             // Uses an iterative process to determine the saturation temperature at a given
@@ -1458,7 +1458,9 @@ namespace Psychrometrics {
         if (j > (n - 2)) j = n - 2;
         static constexpr Real64 h(64); // sample bin 64, sample size=1651
         //********continous sample end
-        A = (tsat_fn_pb_x[j + 1] - x) / h;
+        int tsat_fn_pb_x_j1 = 64 * (j + 1); //sample data for pressure
+        A = (tsat_fn_pb_x_j1 - x) / h;
+        //A = (tsat_fn_pb_x[j + 1] - x) / h;
         B = 1 - A;
         y = A * tsat_fn_pb_y[j] + B * tsat_fn_pb_y[j + 1] +
             ((A * A * A - A) * (tsat_fn_pb_d2y[j]) + (B * B * B - B) * (tsat_fn_pb_d2y[j + 1])) * (h * h) * 0.1666666667;

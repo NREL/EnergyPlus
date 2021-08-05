@@ -1317,9 +1317,10 @@ namespace SimulationManager {
                         state.dataHVACGlobal->LimitNumSysSteps = int(state.dataGlobal->TimeStepZone / state.dataConvergeParams->MinTimeStepSys);
                     }
                     if (overridePsychTsatFnPb) {
-                        ShowWarningError(
-                            state, "Due to PerformancePrecisionTradeoffs Override Mode, the saturated temperature will be calculated using cubic spline interpolations in replacement of PsychTsatFnPb .");
-                       // Mode06 CSpline interpolation (64 Pa bin size + 20/16 bit)
+                        ShowWarningError(state,
+                                         "Due to PerformancePrecisionTradeoffs Override Mode, the saturated temperature will be calculated using "
+                                         "cubic spline interpolations in replacement of PsychTsatFnPb .");
+                        // Mode06 CSpline interpolation (64 Pa bin size + 20/16 bit)
                         state.dataPsychrometrics->useInterpolationPsychTsatFnPb = true;
                     }
                     if (overrideMaxZoneTempDiff) {
