@@ -2010,7 +2010,8 @@ namespace InternalHeatGains {
                     for (int Loop1 = Loop + 1; Loop1 <= state.dataHeatBal->TotLights; ++Loop1) {
                         if (ZoneNum != state.dataHeatBal->Lights(Loop1).ZonePtr) continue;
                         if (ReturnNodeShared(Loop1)) continue;
-                        if (ReturnNum == state.dataHeatBal->Lights(Loop1).ZoneReturnNum) {
+                        if (ReturnNum == state.dataHeatBal->Lights(Loop1).ZoneReturnNum &&
+                            ExhaustNodeNum != state.dataHeatBal->Lights(Loop1).ZoneExhaustNodeNum) {
                             ShowSevereError(state,
                                             std::string{RoutineName} + CurrentModuleObject +
                                                 ": Duplicated Return Air Node = " + state.dataHeatBal->Lights(Loop1).RetNodeName + " is found, ");
