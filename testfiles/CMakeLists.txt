@@ -624,6 +624,7 @@ add_simulation_test(IDF_FILE WaterHeaterHeatPumpWrappedCondenser.idf EPW_FILE US
 add_simulation_test(IDF_FILE WaterHeaterStandAlone.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE WaterSideEconomizer_Integrated.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE WaterSideEconomizer_NonIntegrated.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+add_simulation_test(IDF_FILE WaterSideEconomizer_PreCoolCoil.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE WeatherTimeBins.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE WindACAirtoAir.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE WindACAuto.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
