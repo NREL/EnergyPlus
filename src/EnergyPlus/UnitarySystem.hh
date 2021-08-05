@@ -410,7 +410,7 @@ namespace UnitarySystems {
         bool m_IsDXCoil;
         Real64 m_SmallLoadTolerance;
         bool m_TemperatureOffsetControlActive; // true if water-side economizer coil is active
-        Real64 m_minAirToWaterTempOffset; // coil entering air to entering water temp offset
+        Real64 m_minAirToWaterTempOffset;      // coil entering air to entering water temp offset
 
     public:
         // SZVAV variables
