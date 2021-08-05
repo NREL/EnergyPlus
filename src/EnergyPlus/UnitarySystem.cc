@@ -99,6 +99,7 @@
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WaterToAirHeatPump.hh>
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
+#include <EnergyPlus/ZonePlenum.hh>
 
 namespace EnergyPlus {
 namespace UnitarySystems {
@@ -3353,6 +3354,7 @@ namespace UnitarySystems {
         bool ZoneEquipmentFound = false;
         bool ZoneInletNodeFound = false;
         bool ZoneExhaustNodeFound = false;
+        bool InducedNodeFound = false;
 
         // Get AirTerminal mixer data
         SingleDuct::GetATMixer(state,
@@ -3384,6 +3386,20 @@ namespace UnitarySystems {
                     this->ControlZoneNum = ControlledZoneNum;
                     this->setSystemParams(state, TotalFloorAreaOnAirLoop, thisObjectName);
                     ZoneInletNodeFound = searchZoneInletNodesByEquipmentIndex(state, this->AirOutNode, this->ControlZoneNum);
+                } else { // find if the inlet node is an induced node from zone plenum
+                    int ZoneInletNum = 0;
+                    ZoneInletNodeFound = searchZoneInletNodes(state, this->AirOutNode, this->ControlZoneNum, ZoneInletNum);
+                    if (ZoneInletNodeFound) {
+                        InducedNodeFound = ZonePlenum::ValidateInducedNode(state,
+                                                                           this->AirInNode,
+                                                                           state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).NumReturnNodes,
+                                                                           state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ReturnNode);
+                        if (InducedNodeFound) {
+                            this->m_ZoneInletNode = this->AirOutNode;
+                            ZoneEquipmentFound = true;
+                            this->setSystemParams(state, TotalFloorAreaOnAirLoop, thisObjectName);
+                        }
+                    }
                 }
             } else if (this->ATMixerType == DataHVACGlobals::ATMixer_InletSide) {
                 ZoneExhaustNodeFound = searchExhaustNodes(state, this->m_ATMixerSecNode, ControlledZoneNum, ZoneExhNum);
@@ -3394,6 +3410,20 @@ namespace UnitarySystems {
                     this->setSystemParams(state, TotalFloorAreaOnAirLoop, thisObjectName);
                     // The Node was found among the exhaust nodes, now check that a matching inlet node exists
                     ZoneInletNodeFound = searchZoneInletNodesByEquipmentIndex(state, this->AirOutNode, this->ControlZoneNum);
+                } else {
+                    int ZoneInletNum = 0;
+                    ZoneInletNodeFound = searchZoneInletNodes(state, this->AirOutNode, this->ControlZoneNum, ZoneInletNum);
+                    if (ZoneInletNodeFound) {
+                        InducedNodeFound = ZonePlenum::ValidateInducedNode(state,
+                                                                           this->m_ATMixerSecNode,
+                                                                           state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).NumReturnNodes,
+                                                                           state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ReturnNode);
+                        if (InducedNodeFound) {
+                            this->m_ZoneInletNode = this->AirOutNode;
+                            ZoneEquipmentFound = true;
+                            this->setSystemParams(state, TotalFloorAreaOnAirLoop, thisObjectName);
+                        }
+                    }
                 }
             } else if (this->ATMixerType == DataHVACGlobals::ATMixer_SupplySide) {
                 ZoneExhaustNodeFound = searchExhaustNodes(state, this->AirInNode, ControlledZoneNum, ZoneExhNum);
@@ -3404,6 +3434,20 @@ namespace UnitarySystems {
                     this->setSystemParams(state, TotalFloorAreaOnAirLoop, thisObjectName);
                     // The Node was found among the exhaust nodes, now check that a matching inlet node exists
                     ZoneInletNodeFound = searchZoneInletNodesByEquipmentIndex(state, this->ATMixerOutNode, this->ControlZoneNum);
+                } else {
+                    int ZoneInletNum = 0;
+                    ZoneInletNodeFound = searchZoneInletNodes(state, this->ATMixerOutNode, this->ControlZoneNum, ZoneInletNum);
+                    if (ZoneInletNodeFound) {
+                        InducedNodeFound = ZonePlenum::ValidateInducedNode(state,
+                                                                           this->AirInNode,
+                                                                           state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).NumReturnNodes,
+                                                                           state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ReturnNode);
+                        if (InducedNodeFound) {
+                            this->m_ZoneInletNode = this->ATMixerOutNode;
+                            ZoneEquipmentFound = true;
+                            this->setSystemParams(state, TotalFloorAreaOnAirLoop, thisObjectName);
+                        }
+                    }
                 }
             }
         }
@@ -3496,14 +3540,16 @@ namespace UnitarySystems {
                 }
             }
 
-            if (ZoneEquipmentFound && !ZoneExhaustNodeFound) {
+            if (ZoneEquipmentFound && !ZoneExhaustNodeFound && !InducedNodeFound) {
                 // Exhaust Node was not found
                 ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
-                ShowContinueError(state, "Incorrect or misspelled Air Inlet Node Name or Exhaust Node Name. = " + loc_AirInNodeName);
+                ShowContinueError(state,
+                                  "Incorrect or misspelled Air Inlet Node Name or Exhaust Node Name or Induced Node Name. = " + loc_AirInNodeName);
                 ShowContinueError(state,
                                   "Air Inlet Node " + loc_AirInNodeName +
                                       " name does not match any controlled zone exhaust node name. Check ZoneHVAC:EquipmentConnections "
                                       "object inputs.");
+                ShowContinueError(state, "or Induced Air Outlet Node Name specified in AirLoopHVAC:ReturnPlenum object.");
                 errorsFound = true;
             } else if (ZoneEquipmentFound && !ZoneInletNodeFound) {
                 bool ZoneInletNodeExists = false;
