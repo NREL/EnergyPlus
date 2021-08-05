@@ -463,7 +463,8 @@ namespace Psychrometrics {
         -1.9E-09,     -2.8E-09,     -2E-10,       -0.000000004, -2.5E-09,     -1E-10,       -4.6E-09,     -3E-10,       -2.5E-09,     -3.8E-09,
         -3E-10,       -2.6E-09,     -2.3E-09,     -2.1E-09,     -2.2E-09,     -2.1E-09,     -2.4E-09,     -2.1E-09,     -2.2E-09,     -0.000000002,
         -2.4E-09,     -9E-10,       -3.3E-09,     -2.2E-09,     -4E-10,       -4.1E-09,     -1.4E-09,     -2.9E-09,     4E-10,        -5.5E-09,
-        2.7E-09}; // namespace Psychrometrics
+        2.7E-09}; 
+        // namespace Psychrometrics
 #ifdef EP_psych_stats
     constexpr std::array<bool, static_cast<int>(PsychrometricFunction::Num)> PsyReportIt = {
         true,
