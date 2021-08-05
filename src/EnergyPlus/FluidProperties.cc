@@ -124,8 +124,6 @@ namespace FluidProperties {
 
     void DefaultEthGlyCpData_initializer(Array2D<Real64> &, Array1D<Real64> const &);
 
-    void DefaultEthGlyViscData_initializer(Array2D<Real64> &, Array1D<Real64> const &);
-
     void DefaultEthGlyRhoData_initializer(Array2D<Real64> &, Array1D<Real64> const &);
 
     void DefaultEthGlyCondData_initializer(Array2D<Real64> &, Array1D<Real64> const &);
@@ -274,8 +272,308 @@ namespace FluidProperties {
             DefaultNumGlyTemps, DefaultNumGlyConcs, std::bind(DefaultEthGlyCpData_initializer, _1, DefaultWaterCpData));
 
         // Ethylene Glycol Data: Viscosity in mPa-s
-        static Array2D<Real64> const DefaultEthGlyViscData(
-            DefaultNumGlyTemps, DefaultNumGlyConcs, std::bind(DefaultEthGlyViscData_initializer, _1, DefaultWaterViscData));
+        constexpr std::array<std::array<Real64, 33>, 10> DefaultEthGlyViscData = {{
+            {0.0e-3,    0.0e-3,    0.0e-3,    0.0e-3,    0.0e-3,    0.0e-3,    0.0e-3,    1.7912e-3, 1.5183e-3, 1.306e-3,  1.1376e-3,
+             1.0016e-3, 0.8901e-3, 0.7974e-3, 0.7193e-3, 0.653e-3,  0.5961e-3, 0.5468e-3, 0.504e-3,  0.4664e-3, 0.4332e-3, 0.4039e-3,
+             0.3777e-3, 0.3543e-3, 0.3333e-3, 0.3144e-3, 0.2973e-3, 0.2817e-3, 0.0e-3,    0.0e-3,    0.0e-3,    0.0e-3,    0.0e-3},
+            {0.0,
+             0.0,
+             0.0,
+             0.0,
+             0.0,
+             0.0,
+             0.0,
+             0.0020800000000000003,
+             0.0017900000000000001,
+             0.00156,
+             0.0013700000000000001,
+             0.00121,
+             0.00108,
+             0.0009699999999999999,
+             0.00088,
+             0.0008,
+             0.00073,
+             0.00067,
+             0.00062,
+             0.00057,
+             0.00053,
+             0.0005,
+             0.00047,
+             0.00044,
+             0.00041,
+             0.00039,
+             0.00037,
+             0.00035,
+             0.00033,
+             0.00032,
+             0.0003,
+             0.00029,
+             0.00028000000000000003}, // Conc = 0.1
+            {0.0,
+             0.0,
+             0.0,
+             0.0,
+             0.0,
+             0.0,
+             0.00365,
+             0.00302,
+             0.00254,
+             0.00218,
+             0.00189,
+             0.00165,
+             0.00146,
+             0.0013,
+             0.00117,
+             0.00106,
+             0.0009599999999999999,
+             0.00088,
+             0.0008100000000000001,
+             0.00074,
+             0.00069,
+             0.00064,
+             0.0005899999999999999,
+             0.00055,
+             0.0005200000000000001,
+             0.00049,
+             0.00046,
+             0.00043,
+             0.0004,
+             0.00038,
+             0.00035999999999999997,
+             0.00034,
+             0.00033}, // Conc = 0.2
+            {0.0,
+             0.0,
+             0.0,
+             0.0,
+             0.0,
+             0.00619,
+             0.005030000000000001,
+             0.00415,
+             0.00348,
+             0.0029500000000000004,
+             0.0025299999999999997,
+             0.0022,
+             0.0019199999999999998,
+             0.0016899999999999999,
+             0.0015,
+             0.00134,
+             0.00121,
+             0.00109,
+             0.00099,
+             0.0009,
+             0.00083,
+             0.00076,
+             0.0007,
+             0.00065,
+             0.0006,
+             0.0005600000000000001,
+             0.0005200000000000001,
+             0.00049,
+             0.00046,
+             0.00043,
+             0.00041,
+             0.00038,
+             0.00035999999999999997}, // Conc = 0.3
+            {0.0,
+             0.0,
+             0.0,
+             0.01575,
+             0.01174,
+             0.00906,
+             0.00718,
+             0.00583,
+             0.0048200000000000005,
+             0.00404,
+             0.00344,
+             0.00296,
+             0.00257,
+             0.00226,
+             0.00199,
+             0.00177,
+             0.00159,
+             0.0014299999999999998,
+             0.0012900000000000001,
+             0.00117,
+             0.00106,
+             0.0009699999999999999,
+             0.0008900000000000001,
+             0.00082,
+             0.00076,
+             0.0007,
+             0.00065,
+             0.0006,
+             0.0005600000000000001,
+             0.00053,
+             0.00049,
+             0.00046,
+             0.00043}, // Conc = 0.4
+            {0.06693,
+             0.04398,
+             0.0305,
+             0.02207,
+             0.01653,
+             0.01274,
+             0.01005,
+             0.00809,
+             0.00663,
+             0.0055,
+             0.00463,
+             0.00394,
+             0.0033900000000000002,
+             0.00294,
+             0.00256,
+             0.00226,
+             0.002,
+             0.0017800000000000001,
+             0.00159,
+             0.0014299999999999998,
+             0.0012900000000000001,
+             0.00117,
+             0.00107,
+             0.00098,
+             0.0008900000000000001,
+             0.00082,
+             0.00076,
+             0.0007,
+             0.00065,
+             0.0006,
+             0.0005600000000000001,
+             0.00053,
+             0.00049}, // Conc = 0.5
+            {0.09344,
+             0.06525,
+             0.04675,
+             0.03428,
+             0.02569,
+             0.019620000000000002,
+             0.01525,
+             0.01205,
+             0.00966,
+             0.00785,
+             0.00646,
+             0.00538,
+             0.00452,
+             0.0038399999999999997,
+             0.00329,
+             0.0028399999999999996,
+             0.0024700000000000004,
+             0.00216,
+             0.00191,
+             0.0016899999999999999,
+             0.00151,
+             0.00135,
+             0.00122,
+             0.0011,
+             0.001,
+             0.00092,
+             0.0008399999999999999,
+             0.0007700000000000001,
+             0.0007099999999999999,
+             0.00066,
+             0.00061,
+             0.00057,
+             0.00053}, // Conc = 0.6
+            {0.13353,
+             0.09656999999999999,
+             0.07038,
+             0.05194,
+             0.038880000000000005,
+             0.02953,
+             0.022760000000000002,
+             0.01779,
+             0.01409,
+             0.01131,
+             0.009179999999999999,
+             0.00753,
+             0.00624,
+             0.00523,
+             0.00442,
+             0.00376,
+             0.00323,
+             0.0028,
+             0.0024300000000000003,
+             0.00213,
+             0.00188,
+             0.0016699999999999998,
+             0.00149,
+             0.00133,
+             0.0012,
+             0.00109,
+             0.00099,
+             0.0009,
+             0.00082,
+             0.00076,
+             0.0007,
+             0.00064,
+             0.0006}, // Conc = 0.7
+            {0.19109,
+             0.14102,
+             0.10221,
+             0.07453,
+             0.05509,
+             0.04136,
+             0.03156,
+             0.02444,
+             0.0192,
+             0.01529,
+             0.01233,
+             0.01005,
+             0.008289999999999999,
+             0.006900000000000001,
+             0.00579,
+             0.00491,
+             0.00419,
+             0.00361,
+             0.00312,
+             0.00272,
+             0.00239,
+             0.00211,
+             0.0018700000000000001,
+             0.00166,
+             0.00149,
+             0.00134,
+             0.00121,
+             0.0011,
+             0.001,
+             0.00091,
+             0.00083,
+             0.0007700000000000001,
+             0.0007099999999999999}, // Conc = 0.8
+            {0.0,
+             0.0,
+             0.19687000000000002,
+             0.12843000000000002,
+             0.08752,
+             0.06185,
+             0.045079999999999995,
+             0.03374,
+             0.02584,
+             0.02018,
+             0.01604,
+             0.01295,
+             0.01059,
+             0.00877,
+             0.00734,
+             0.00621,
+             0.0053,
+             0.00456,
+             0.00395,
+             0.0034500000000000004,
+             0.0030299999999999997,
+             0.00267,
+             0.00237,
+             0.00212,
+             0.0019,
+             0.00171,
+             0.0015400000000000001,
+             0.0014,
+             0.00127,
+             0.00116,
+             0.00107,
+             0.00098,
+             0.0009} // Conc = 0.9
+        }};
 
         // Ethylene Glycol Data: Density in kg/m3
         static Array2D<Real64> const DefaultEthGlyRhoData(
@@ -2464,42 +2762,6 @@ namespace FluidProperties {
 
         // Set zero concentration data
         DefaultEthGlyCpData(_, 1) = DefaultWaterCpData;
-    }
-
-    void DefaultEthGlyViscData_initializer(Array2D<Real64> &DefaultEthGlyViscData, Array1D<Real64> const &DefaultWaterViscData)
-    {
-        DefaultEthGlyViscData(_, 1) = 0.0; // Initialize before division below
-        DefaultEthGlyViscData(_, 2) = {0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 2.08, 1.79, 1.56, 1.37, 1.21, 1.08, 0.97, 0.88, 0.80, 0.73,
-                                       0.67, 0.62, 0.57, 0.53, 0.50, 0.47, 0.44, 0.41, 0.39, 0.37, 0.35, 0.33, 0.32, 0.30, 0.29, 0.28}; // Conc=0.1
-        DefaultEthGlyViscData(_, 3) = {0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 3.65, 3.02, 2.54, 2.18, 1.89, 1.65, 1.46, 1.30, 1.17, 1.06, 0.96,
-                                       0.88, 0.81, 0.74, 0.69, 0.64, 0.59, 0.55, 0.52, 0.49, 0.46, 0.43, 0.40, 0.38, 0.36, 0.34, 0.33}; // Conc=0.2
-        DefaultEthGlyViscData(_, 4) = {0.00, 0.00, 0.00, 0.00, 0.00, 6.19, 5.03, 4.15, 3.48, 2.95, 2.53, 2.20, 1.92, 1.69, 1.50, 1.34, 1.21,
-                                       1.09, 0.99, 0.90, 0.83, 0.76, 0.70, 0.65, 0.60, 0.56, 0.52, 0.49, 0.46, 0.43, 0.41, 0.38, 0.36}; // Conc=0.3
-        DefaultEthGlyViscData(_, 5) = {0.00, 0.00, 0.00, 15.75, 11.74, 9.06, 7.18, 5.83, 4.82, 4.04, 3.44, 2.96, 2.57, 2.26, 1.99, 1.77, 1.59,
-                                       1.43, 1.29, 1.17, 1.06,  0.97,  0.89, 0.82, 0.76, 0.70, 0.65, 0.60, 0.56, 0.53, 0.49, 0.46, 0.43}; // Conc=0.4
-        DefaultEthGlyViscData(_,
-                              6) = {66.93, 43.98, 30.5, 22.07, 16.53, 12.74, 10.05, 8.09, 6.63, 5.50, 4.63, 3.94, 3.39, 2.94, 2.56, 2.26, 2.00,
-                                    1.78,  1.59,  1.43, 1.29,  1.17,  1.07,  0.98,  0.89, 0.82, 0.76, 0.70, 0.65, 0.60, 0.56, 0.53, 0.49}; // Conc=0.5
-        DefaultEthGlyViscData(_, 7) = {
-            93.44, 65.25, 46.75, 34.28, 25.69, 19.62, 15.25, 12.05, 9.66, 7.85, 6.46, 5.38, 4.52, 3.84, 3.29, 2.84, 2.47,
-            2.16,  1.91,  1.69,  1.51,  1.35,  1.22,  1.10,  1.00,  0.92, 0.84, 0.77, 0.71, 0.66, 0.61, 0.57, 0.53}; // Conc=0.6
-        DefaultEthGlyViscData(_, 8) = {133.53, 96.57, 70.38, 51.94, 38.88, 29.53, 22.76, 17.79, 14.09, 11.31, 9.18,
-                                       7.53,   6.24,  5.23,  4.42,  3.76,  3.23,  2.80,  2.43,  2.13,  1.88,  1.67,
-                                       1.49,   1.33,  1.20,  1.09,  0.99,  0.90,  0.82,  0.76,  0.70,  0.64,  0.60}; // Conc=0.7
-        DefaultEthGlyViscData(_, 9) = {191.09, 141.02, 102.21, 74.53, 55.09, 41.36, 31.56, 24.44, 19.2, 15.29, 12.33,
-                                       10.05,  8.29,   6.90,   5.79,  4.91,  4.19,  3.61,  3.12,  2.72, 2.39,  2.11,
-                                       1.87,   1.66,   1.49,   1.34,  1.21,  1.10,  1.00,  0.91,  0.83, 0.77,  0.71}; // Conc=0.8
-        DefaultEthGlyViscData(_, 10) = {0.00,  0.00,  196.87, 128.43, 87.52, 61.85, 45.08, 33.74, 25.84, 20.18, 16.04,
-                                        12.95, 10.59, 8.77,   7.34,   6.21,  5.30,  4.56,  3.95,  3.45,  3.03,  2.67,
-                                        2.37,  2.12,  1.90,   1.71,   1.54,  1.40,  1.27,  1.16,  1.07,  0.98,  0.90}; // Conc=0.9
-
-        // Okay, the following is no longer strictly a DATA statement, but it is still data transfer for 0% concentration
-        // Convert mPa-s viscosity data to Pa-s
-        // DefaultWaterViscData = DefaultWaterViscData/1000.0d0
-        DefaultEthGlyViscData /= 1000.0;
-
-        // Set zero concentration data
-        DefaultEthGlyViscData(_, 1) = DefaultWaterViscData;
     }
 
     void DefaultEthGlyRhoData_initializer(Array2D<Real64> &DefaultEthGlyRhoData, Array1D<Real64> const &DefaultWaterRhoData)
@@ -4965,6 +5227,106 @@ namespace FluidProperties {
                     } else {
                         InterpData(LoopT) =
                             RawPropData(LoopT, HiIndex) - (InterpFrac * (RawPropData(LoopT, HiIndex) - RawPropData(LoopT, HiIndex - 1)));
+                    }
+                }
+            } else { // user has input data for concentrations that are too close or repeated, this must be fixed
+                ShowFatalError(state,
+                               std::string{RoutineName} + "concentration values too close or data repeated, check your fluid property input data");
+            }
+        }
+    }
+
+    template <size_t Length1, size_t Length2>
+    void InterpDefValuesForGlycolConc(EnergyPlusData &state,
+                                      int const NumOfConcs,               // number of concentrations (dimension of raw data)
+                                      int const NumOfTemps,               // number of temperatures (dimension of raw data)
+                                      const Array1D<Real64> &RawConcData, // concentrations for raw data
+                                      std::array<std::array<Real64, Length1>, Length2> RawPropData, // raw property data (concentration, temperature)
+                                      Real64 const Concentration,                                   // concentration of actual fluid mix
+                                      Array1D<Real64> &InterpData // interpolated output data at proper concentration
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Rick Strand
+        //       DATE WRITTEN   June 2004
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // The purpose of this subroutine is to find the values for the property
+        // data at a particular concentration from default data that is at "generic"
+        // concentrations.  This is then returned to the main get routine and
+        // then used later in the program to find values at various temperatures.
+        // The ultimate purpose of this is to avoid double interpolation during
+        // the simulation.  Since concentration does not change during the simulation,
+        // there is no reason to do a double interpolation every time a property
+        // value is needed.
+
+        // METHODOLOGY EMPLOYED:
+        // Fairly straight forward--find the two concentrations between which
+        // the actual concentration falls and then interpolate the property
+        // data using standard linear interpolation.  Note that data is stored
+        // in the format: 2dArray(Concentration,Temperature)
+
+        // REFERENCES:
+        // na
+
+        // USE STATEMENTS:
+        // na
+
+        // Argument array dimensioning
+
+        // Locals
+        // FUNCTION ARGUMENT DEFINITIONS:
+
+        // INTERFACE BLOCK SPECIFICATIONS:
+        // na
+
+        // DERIVED TYPE DEFINITIONS:
+        // na
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        constexpr Real64 ConcToler(0.0001); // Some reasonable value for comparisons
+        static constexpr std::string_view RoutineName("InterpDefValuesForGlycolConc: ");
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int HiIndex;       // index on the high side of the concentration
+        Real64 InterpFrac; // intermediate value for interpolations
+        int LoopC;         // loop counter for concentration
+        int LoopT;         // loop counter for temperature
+
+        // First, find where the actual concentration falls between the concentration data.
+        // Then, interpolate if necessary.
+        if (Concentration < RawConcData(1)) { // Concentration too low
+            ShowWarningError(state,
+                             format("{}Glycol concentration out of range for data (too low), concentration = {:.3R}", RoutineName, Concentration));
+            ShowContinueError(state, "Check your data or the definition of your glycols in the GlycolConcentrations input");
+            ShowContinueError(state, "Property data set to data for lowest concentration entered");
+            InterpData = RawPropData[0][1];
+        } else if (Concentration > RawConcData(NumOfConcs)) { // Concentration too high
+            ShowWarningError(state,
+                             format("{}Glycol concentration out of range for data (too high), concentration = {:.3R}", RoutineName, Concentration));
+            ShowContinueError(state, "Check your data or the definition of your glycols in the GlycolConcentrations input");
+            ShowContinueError(state, "Property data set to data for highest concentration entered");
+            InterpData = RawPropData[0][NumOfConcs];
+        } else {                  // Concentration somewhere between lowest and highest point--interpolate
+            HiIndex = NumOfConcs; // Default to highest concentration
+            for (LoopC = 2; LoopC <= NumOfConcs - 1; ++LoopC) {
+                if (Concentration <= RawConcData(LoopC)) {
+                    HiIndex = LoopC;
+                    break; // LoopC DO loop
+                }
+            }
+            if (std::abs(RawConcData(HiIndex) - RawConcData(HiIndex - 1)) >= ConcToler) {
+                InterpFrac = (RawConcData(HiIndex) - Concentration) / (RawConcData(HiIndex) - RawConcData(HiIndex - 1));
+                for (LoopT = 1; LoopT <= NumOfTemps; ++LoopT) {
+                    if ((RawPropData[LoopT][HiIndex] < ConcToler) || (RawPropData[LoopT][HiIndex - 1] < ConcToler)) {
+                        // One of the two values is zero--so we cannot interpolate for this point (assign to zero)
+                        InterpData(LoopT) = 0.0;
+                    } else {
+                        InterpData(LoopT) =
+                            RawPropData[LoopT][HiIndex] - (InterpFrac * (RawPropData[LoopT][HiIndex] - RawPropData[LoopT][HiIndex - 1]));
                     }
                 }
             } else { // user has input data for concentrations that are too close or repeated, this must be fixed
