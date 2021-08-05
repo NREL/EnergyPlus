@@ -841,7 +841,7 @@ namespace DataSurfaces {
 
         Real64 get_average_height(EnergyPlusData &state) const;
 
-        void make_hash_key(EnergyPlusData &state, const int &SurfNum);
+        void make_hash_key(EnergyPlusData &state, const int SurfNum);
 
     private: // Methods
              // Computed Shape Category
