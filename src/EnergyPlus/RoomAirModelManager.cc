@@ -1701,7 +1701,7 @@ namespace RoomAirModelManager {
 
                             bool gainFound = false;
                             // check all spaces in this zone for matching gains
-                            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaces) {
+                            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
                                 // verify type and name and get pointer to device in internal gains structure array
                                 int intGainIndex = GetInternalGainDeviceIndex(
                                     state,

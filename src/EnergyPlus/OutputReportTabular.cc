@@ -11944,7 +11944,7 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
     // Accumulate internal gain totals by space and space type
     for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
         auto curPeople = state.dataHeatBal->People(iPeople);
-        int const spaceNum = curPeople.spaceNum;
+        int const spaceNum = curPeople.spaceIndex;
         Real64 const people = curPeople.NumberOfPeople;
         spaceTotPeople(spaceNum) += people;
         spaceTypeTotPeople(state.dataHeatBal->space(spaceNum).spaceTypeNum) += people;
@@ -12025,7 +12025,7 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
     for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
         auto curZone = state.dataHeatBal->Zone(iZone);
         Real64 const mult = Real64(curZone.Multiplier) * Real64(curZone.ListMultiplier);
-        for (int const spaceNum : curZone.spaces) {
+        for (int const spaceNum : curZone.spaceIndexes) {
             auto curSpace = state.dataHeatBal->space(spaceNum);
             bool spaceIsCond = false;
             bool useSpaceFloorArea = false;

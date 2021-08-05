@@ -237,7 +237,6 @@ namespace InternalHeatGains {
         std::string liteName;
         int zonePt;
         Real64 mult;
-        int ZoneNum;
         Real64 maxOccupLoad;
         std::string CurrentModuleObject;
         bool errFlag;
@@ -513,10 +512,10 @@ namespace InternalHeatGains {
                 state.dataHeatBal->PeopleObjects(Item).ZoneListActive = false;
                 state.dataHeatBal->PeopleObjects(Item).ZoneOrZoneListPtr = zoneNum;
                 if (numSpaces == 1) {
-                    state.dataHeatBal->PeopleObjects(Item).spaceNums.emplace_back(state.dataHeatBal->Zone(zoneNum).spaces(1));
+                    state.dataHeatBal->PeopleObjects(Item).spaceNums.emplace_back(state.dataHeatBal->Zone(zoneNum).spaceIndexes(1));
                     state.dataHeatBal->PeopleObjects(Item).names.emplace_back(state.dataHeatBal->PeopleObjects(Item).Name);
                 } else {
-                    for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                    for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
                         state.dataHeatBal->PeopleObjects(Item).spaceNums.emplace_back(spaceNum);
                         state.dataHeatBal->PeopleObjects(Item).names.emplace_back(state.dataHeatBal->space(spaceNum).Name + ' ' +
                                                                                   state.dataHeatBal->PeopleObjects(Item).Name);
@@ -541,7 +540,7 @@ namespace InternalHeatGains {
                 int numSpaces = 0;
                 for (int const listZoneIdx : state.dataHeatBal->ZoneList(zoneListNum).Zone) {
                     numSpaces += state.dataHeatBal->Zone(listZoneIdx).numSpaces;
-                    for (int const spaceNum : state.dataHeatBal->Zone(listZoneIdx).spaces) {
+                    for (int const spaceNum : state.dataHeatBal->Zone(listZoneIdx).spaceIndexes) {
                         state.dataHeatBal->PeopleObjects(Item).spaceNums.emplace_back(spaceNum);
                         state.dataHeatBal->PeopleObjects(Item).names.emplace_back(state.dataHeatBal->space(spaceNum).Name + ' ' +
                                                                                   state.dataHeatBal->PeopleObjects(Item).Name);
@@ -609,7 +608,7 @@ namespace InternalHeatGains {
                     int const spaceNum = state.dataHeatBal->PeopleObjects(Item).spaceNums(Item1);
                     int const zoneNum = state.dataHeatBal->space(spaceNum).zoneNum;
                     state.dataHeatBal->People(Loop).Name = state.dataHeatBal->PeopleObjects(Item).names(Item1);
-                    state.dataHeatBal->People(Loop).spaceNum = spaceNum;
+                    state.dataHeatBal->People(Loop).spaceIndex = spaceNum;
                     state.dataHeatBal->People(Loop).ZonePtr = zoneNum;
 
                     // if ((numZones > 0) && !state.dataHeatBal->PeopleObjects(Item).ZoneListActive) {
@@ -617,7 +616,7 @@ namespace InternalHeatGains {
                     //    int const zoneNum = state.dataHeatBal->PeopleObjects(Item).ZoneOrZoneListPtr;
                     //    state.dataHeatBal->People(Loop).ZonePtr = zoneNum;
                     //    if (zoneNum > 0) {
-                    //        for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                    //        for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
                     //            state.dataHeatBal->People(Loop).spacePtrs.emplace_back(spaceNum);
                     //        }
                     //    }
@@ -637,7 +636,7 @@ namespace InternalHeatGains {
                     //    int const zoneNum = state.dataHeatBal->ZoneList(state.dataHeatBal->PeopleObjects(Item).ZoneOrZoneListPtr).Zone(Item1);
                     //    state.dataHeatBal->People(Loop).ZonePtr = zoneNum;
                     //    if (zoneNum > 0) {
-                    //        for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                    //        for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
                     //            state.dataHeatBal->People(Loop).spacePtrs.emplace_back(spaceNum);
                     //        }
                     //    }
@@ -1752,7 +1751,7 @@ namespace InternalHeatGains {
                         int zoneNum = state.dataHeatBal->LightsObjects(Item).ZoneOrZoneListPtr;
                         state.dataHeatBal->Lights(Loop).ZonePtr = zoneNum;
                         if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
                                 state.dataHeatBal->Lights(Loop).spacePtrs.emplace_back(spaceNum);
                             }
                         }
@@ -1772,7 +1771,7 @@ namespace InternalHeatGains {
                         int zoneNum = state.dataHeatBal->ZoneList(state.dataHeatBal->LightsObjects(Item).ZoneOrZoneListPtr).Zone(Item1);
                         state.dataHeatBal->Lights(Loop).ZonePtr = zoneNum;
                         if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
                                 state.dataHeatBal->Lights(Loop).spacePtrs.emplace_back(spaceNum);
                             }
                         }
@@ -2358,7 +2357,7 @@ namespace InternalHeatGains {
                         int zoneNum = state.dataHeatBal->ZoneElectricObjects(Item).ZoneOrZoneListPtr;
                         state.dataHeatBal->ZoneElectric(Loop).ZonePtr = zoneNum;
                         if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
                                 state.dataHeatBal->ZoneElectric(Loop).spacePtrs.emplace_back(spaceNum);
                             }
                         }
@@ -2379,7 +2378,7 @@ namespace InternalHeatGains {
                         int zoneNum = state.dataHeatBal->ZoneList(state.dataHeatBal->ZoneElectricObjects(Item).ZoneOrZoneListPtr).Zone(Item1);
                         state.dataHeatBal->ZoneElectric(Loop).ZonePtr = zoneNum;
                         if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
                                 state.dataHeatBal->ZoneElectric(Loop).spacePtrs.emplace_back(spaceNum);
                             }
                         }
@@ -2855,7 +2854,7 @@ namespace InternalHeatGains {
                         int zoneNum = state.dataHeatBal->ZoneGasObjects(Item).ZoneOrZoneListPtr;
                         state.dataHeatBal->ZoneGas(Loop).ZonePtr = zoneNum;
                         if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
                                 state.dataHeatBal->ZoneGas(Loop).spacePtrs.emplace_back(spaceNum);
                             }
                         }
@@ -2876,7 +2875,7 @@ namespace InternalHeatGains {
                         int zoneNum = state.dataHeatBal->ZoneList(state.dataHeatBal->ZoneGasObjects(Item).ZoneOrZoneListPtr).Zone(Item1);
                         state.dataHeatBal->ZoneGas(Loop).ZonePtr = zoneNum;
                         if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
                                 state.dataHeatBal->ZoneGas(Loop).spacePtrs.emplace_back(spaceNum);
                             }
                         }
@@ -3390,7 +3389,7 @@ namespace InternalHeatGains {
                         int zoneNum = state.dataHeatBal->HotWaterEqObjects(Item).ZoneOrZoneListPtr;
                         state.dataHeatBal->ZoneHWEq(Loop).ZonePtr = zoneNum;
                         if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
                                 state.dataHeatBal->ZoneHWEq(Loop).spacePtrs.emplace_back(spaceNum);
                             }
                         }
@@ -3411,7 +3410,7 @@ namespace InternalHeatGains {
                         int zoneNum = state.dataHeatBal->ZoneList(state.dataHeatBal->HotWaterEqObjects(Item).ZoneOrZoneListPtr).Zone(Item1);
                         state.dataHeatBal->ZoneHWEq(Loop).ZonePtr = zoneNum;
                         if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
                                 state.dataHeatBal->ZoneHWEq(Loop).spacePtrs.emplace_back(spaceNum);
                             }
                         }
@@ -3887,7 +3886,7 @@ namespace InternalHeatGains {
                         int zoneNum = state.dataHeatBal->SteamEqObjects(Item).ZoneOrZoneListPtr;
                         state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr = zoneNum;
                         if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
                                 state.dataHeatBal->ZoneSteamEq(Loop).spacePtrs.emplace_back(spaceNum);
                             }
                         }
@@ -3908,7 +3907,7 @@ namespace InternalHeatGains {
                         int zoneNum = state.dataHeatBal->ZoneList(state.dataHeatBal->SteamEqObjects(Item).ZoneOrZoneListPtr).Zone(Item1);
                         state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr = zoneNum;
                         if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
                                 state.dataHeatBal->ZoneSteamEq(Loop).spacePtrs.emplace_back(spaceNum);
                             }
                         }
@@ -4384,7 +4383,7 @@ namespace InternalHeatGains {
                         int zoneNum = state.dataHeatBal->OtherEqObjects(Item).ZoneOrZoneListPtr;
                         state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr = zoneNum;
                         if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
                                 state.dataHeatBal->ZoneOtherEq(Loop).spacePtrs.emplace_back(spaceNum);
                             }
                         }
@@ -4405,7 +4404,7 @@ namespace InternalHeatGains {
                         int zoneNum = state.dataHeatBal->ZoneList(state.dataHeatBal->OtherEqObjects(Item).ZoneOrZoneListPtr).Zone(Item1);
                         state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr = zoneNum;
                         if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
                                 state.dataHeatBal->ZoneOtherEq(Loop).spacePtrs.emplace_back(spaceNum);
                             }
                         }
@@ -4854,7 +4853,7 @@ namespace InternalHeatGains {
                 int zoneNum = UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
                 state.dataHeatBal->ZoneITEq(Loop).ZonePtr = zoneNum;
                 if (zoneNum > 0) {
-                    for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                    for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
                         state.dataHeatBal->ZoneITEq(Loop).spacePtrs.emplace_back(spaceNum);
                     }
                 }
@@ -5775,7 +5774,7 @@ namespace InternalHeatGains {
                                     state.dataIPShortCut->cAlphaFieldNames(2) + " entered=" + AlphaName(2));
                 ErrorsFound = true;
             } else {
-                for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+                for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
                     state.dataHeatBal->ZoneBBHeat(Loop).spacePtrs.emplace_back(spaceNum);
                 }
 
@@ -6225,7 +6224,7 @@ namespace InternalHeatGains {
                 }
             }
 
-            ZoneNum = state.dataHeatBal->People(Loop).ZonePtr;
+            int ZoneNum = state.dataHeatBal->People(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
                 print(state.files.eio, Format_724, "People-Illegal Zone specified", state.dataHeatBal->People(Loop).Name);
@@ -6341,7 +6340,7 @@ namespace InternalHeatGains {
                       "Category,Nominal Minimum Lighting Level {W},Nominal Maximum Lighting Level {W}\n");
             }
 
-            ZoneNum = state.dataHeatBal->Lights(Loop).ZonePtr;
+            int ZoneNum = state.dataHeatBal->Lights(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
                 print(state.files.eio, "Lights-Illegal Zone specified", state.dataHeatBal->Lights(Loop).Name);
@@ -6379,7 +6378,7 @@ namespace InternalHeatGains {
                       "Lost,Fraction Convected,End-Use SubCategory,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}\n");
             }
 
-            ZoneNum = state.dataHeatBal->ZoneElectric(Loop).ZonePtr;
+            int ZoneNum = state.dataHeatBal->ZoneElectric(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
                 print(state.files.eio, Format_724, "Electric Equipment-Illegal Zone specified", state.dataHeatBal->ZoneElectric(Loop).Name);
@@ -6416,7 +6415,7 @@ namespace InternalHeatGains {
                       "Lost,Fraction Convected,End-Use SubCategory,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}\n");
             }
 
-            ZoneNum = state.dataHeatBal->ZoneGas(Loop).ZonePtr;
+            int ZoneNum = state.dataHeatBal->ZoneGas(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
                 print(state.files.eio, Format_724, "Gas Equipment-Illegal Zone specified", state.dataHeatBal->ZoneGas(Loop).Name);
@@ -6455,7 +6454,7 @@ namespace InternalHeatGains {
                       "Lost,Fraction Convected,End-Use SubCategory,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}\n");
             }
 
-            ZoneNum = state.dataHeatBal->ZoneHWEq(Loop).ZonePtr;
+            int ZoneNum = state.dataHeatBal->ZoneHWEq(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
                 print(state.files.eio, Format_724, "Hot Water Equipment-Illegal Zone specified", state.dataHeatBal->ZoneHWEq(Loop).Name);
@@ -6494,7 +6493,7 @@ namespace InternalHeatGains {
                       "Lost,Fraction Convected,End-Use SubCategory,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}\n");
             }
 
-            ZoneNum = state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr;
+            int ZoneNum = state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
                 print(state.files.eio, Format_724, "Steam Equipment-Illegal Zone specified", state.dataHeatBal->ZoneSteamEq(Loop).Name);
@@ -6533,7 +6532,7 @@ namespace InternalHeatGains {
                       "Lost,Fraction Convected,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}\n");
             }
 
-            ZoneNum = state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr;
+            int ZoneNum = state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
                 print(state.files.eio, Format_724, "Other Equipment-Illegal Zone specified", state.dataHeatBal->ZoneOtherEq(Loop).Name);
@@ -6573,7 +6572,7 @@ namespace InternalHeatGains {
                       "Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}, Design Air Volume Flow Rate {m3/s}\n");
             }
 
-            ZoneNum = state.dataHeatBal->ZoneITEq(Loop).ZonePtr;
+            int ZoneNum = state.dataHeatBal->ZoneITEq(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
                 print(state.files.eio, Format_724, "ElectricEquipment:ITE:AirCooled-Illegal Zone specified", state.dataHeatBal->ZoneITEq(Loop).Name);
@@ -6612,7 +6611,7 @@ namespace InternalHeatGains {
                       "{W},High Temperature {C},Fraction Radiant,Fraction Convected,End-Use Subcategory\n");
             }
 
-            ZoneNum = state.dataHeatBal->ZoneBBHeat(Loop).ZonePtr;
+            int ZoneNum = state.dataHeatBal->ZoneBBHeat(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
                 print(state.files.eio,
@@ -6853,7 +6852,7 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZoneIntGain(NZ).QOCLAT += state.dataHeatBal->People(Loop).LatGainRate;
             state.dataHeatBal->ZoneIntGain(NZ).QOCTOT += state.dataHeatBal->People(Loop).TotGainRate;
 
-            int spaceNum = state.dataHeatBal->People(Loop).spaceNum;
+            int spaceNum = state.dataHeatBal->People(Loop).spaceIndex;
             state.dataHeatBal->spaceIntGain(spaceNum).NOFOCC += state.dataHeatBal->People(Loop).NumOcc;
             state.dataHeatBal->spaceIntGain(spaceNum).QOCRAD += state.dataHeatBal->People(Loop).RadGainRate;
             state.dataHeatBal->spaceIntGain(spaceNum).QOCCON += state.dataHeatBal->People(Loop).ConGainRate;
@@ -8282,7 +8281,7 @@ namespace InternalHeatGains {
 
         Real64 tmpSumConvGainRate = 0.0;
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaces) {
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
             if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
                 continue;
             }
@@ -8301,7 +8300,7 @@ namespace InternalHeatGains {
         Real64 tmpSumConvGainRateExceptPeople = 0.0;
         std::string str_people = "PEOPLE";
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaces) {
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
             if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
                 continue;
             }
@@ -8332,7 +8331,7 @@ namespace InternalHeatGains {
         int NumberOfTypes = size(GainTypeARR);
         Real64 tmpSumConvGainRate = 0.0;
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaces) {
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
             if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
                 continue;
             }
@@ -8366,7 +8365,7 @@ namespace InternalHeatGains {
 
         Real64 tmpSumRetAirGainRate = 0.0;
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaces) {
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
             if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
                 continue;
             }
@@ -8398,7 +8397,7 @@ namespace InternalHeatGains {
         int NumberOfTypes = size(GainTypeARR);
         Real64 tmpSumRetAirConvGainRate = 0.0;
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaces) {
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
             if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
                 continue;
             }
@@ -8458,7 +8457,7 @@ namespace InternalHeatGains {
         int NumberOfTypes = size(GainTypeARR);
         Real64 tmpSumRadiationGainRate = 0.0;
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaces) {
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
             if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
                 continue;
             }
@@ -8489,7 +8488,7 @@ namespace InternalHeatGains {
 
         Real64 tmpSumLatentGainRate = 0.0;
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaces) {
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
             if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
                 continue;
             }
@@ -8509,7 +8508,7 @@ namespace InternalHeatGains {
     {
         Real64 tmpSumLatentGainRateExceptPeople = 0.0;
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaces) {
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
             if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
                 continue;
             }
@@ -8540,7 +8539,7 @@ namespace InternalHeatGains {
         int NumberOfTypes = size(GainTypeARR);
         Real64 tmpSumLatentGainRate = 0.0;
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaces) {
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
             if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
                 continue;
             }
@@ -8574,7 +8573,7 @@ namespace InternalHeatGains {
 
         Real64 tmpSumLatentGainRate = 0.0;
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaces) {
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
             if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
                 continue;
             }
@@ -8604,7 +8603,7 @@ namespace InternalHeatGains {
 
         Real64 tmpSumCO2GainRate = 0.0;
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaces) {
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
             if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
                 continue;
             }
@@ -8624,7 +8623,7 @@ namespace InternalHeatGains {
     {
         Real64 tmpSumCO2GainRateExceptPeople = 0.0;
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaces) {
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
             if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
                 continue;
             }
@@ -8655,7 +8654,7 @@ namespace InternalHeatGains {
         int NumberOfTypes = size(GainTypeARR);
         Real64 tmpSumCO2GainRate = 0.0;
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaces) {
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
             if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
                 continue;
             }
@@ -8687,7 +8686,7 @@ namespace InternalHeatGains {
 
         Real64 tmpSumGCGainRate = 0.0;
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaces) {
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
             if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
                 continue;
             }

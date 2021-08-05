@@ -5482,7 +5482,7 @@ namespace HeatBalanceManager {
                 int zoneNum = UtilityRoutines::FindItemInList(zoneName, state.dataHeatBal->Zone);
                 if (zoneNum > 0) {
                     thisSpace.zoneNum = zoneNum;
-                    state.dataHeatBal->Zone(zoneNum).spaces.emplace_back(spaceNum);
+                    state.dataHeatBal->Zone(zoneNum).spaceIndexes.emplace_back(spaceNum);
                     ++state.dataHeatBal->Zone(zoneNum).numSpaces;
                 } else {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisSpace.Name);
@@ -5577,14 +5577,14 @@ namespace HeatBalanceManager {
         // Make sure every zone has at least one space
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             auto &thisZone = state.dataHeatBal->Zone(zoneNum);
-            if (thisZone.spaces.empty()) {
+            if (thisZone.spaceIndexes.empty()) {
                 ++state.dataGlobal->numSpaces;
                 state.dataHeatBal->space(state.dataGlobal->numSpaces).zoneNum = zoneNum;
                 state.dataHeatBal->space(state.dataGlobal->numSpaces).Name = thisZone.Name;
                 state.dataHeatBal->space(state.dataGlobal->numSpaces).spaceType = "GENERAL";
                 state.dataHeatBal->space(state.dataGlobal->numSpaces).spaceTypeNum = GetGeneralSpaceTypeNum(state);
                 // Add to zone's list of spaces
-                thisZone.spaces.emplace_back(state.dataGlobal->numSpaces);
+                thisZone.spaceIndexes.emplace_back(state.dataGlobal->numSpaces);
                 ++state.dataHeatBal->Zone(zoneNum).numSpaces;
             }
         }

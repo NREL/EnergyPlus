@@ -507,7 +507,7 @@ namespace DataHeatBalance {
         // Spaces
         bool anySurfacesWithoutSpace; // True if any surfaces in a zone do not have a space assigned in input
         bool anySurfacesWithSpace;    // True if any surfaces in a zone have a space assigned in input
-        EPVector<int> spaces;         // Pointers to spaces in this zone
+        EPVector<int> spaceIndexes;   // Indexes to spaces in this zone
         int numSpaces;                // Number of spaces in this zone
 
         // Default Constructor
@@ -600,7 +600,7 @@ namespace DataHeatBalance {
         // Members
         std::string Name;         // PEOPLE object name
         int ZonePtr;              // Zone index for this people statement
-        int spaceNum;                // Space index for this people statement
+        int spaceIndex;           // Space index for this people statement
         Real64 NumberOfPeople;    // Maximum number of people for this statement
         int NumberOfPeoplePtr;    // Pointer to schedule for number of people
         bool EMSPeopleOn;         // EMS actuating number of people if .TRUE.
@@ -662,7 +662,7 @@ namespace DataHeatBalance {
 
         // Default Constructor
         PeopleData()
-            : ZonePtr(0), spaceNum(0), NumberOfPeople(0.0), NumberOfPeoplePtr(-1), EMSPeopleOn(false), EMSNumberOfPeople(0.0), ActivityLevelPtr(-1),
+            : ZonePtr(0), spaceIndex(0), NumberOfPeople(0.0), NumberOfPeoplePtr(-1), EMSPeopleOn(false), EMSNumberOfPeople(0.0), ActivityLevelPtr(-1),
               FractionRadiant(0.0), FractionConvected(0.0), NomMinNumberPeople(0.0), NomMaxNumberPeople(0.0), WorkEffPtr(-1), ClothingPtr(-1),
               ClothingMethodPtr(-1), ClothingType(-1), AirVelocityPtr(-1), AnkleAirVelocityPtr(-1), Fanger(false), Pierce(false), KSU(false),
               AdaptiveASH55(false), AdaptiveCEN15251(false), CoolingEffectASH55(false), AnkleDraftASH55(false),

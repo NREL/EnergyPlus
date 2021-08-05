@@ -2835,9 +2835,9 @@ namespace SurfaceGeometry {
                     ++state.dataGlobal->numSpaces;
                     state.dataHeatBal->space(state.dataGlobal->numSpaces).zoneNum = zoneNum;
                     // Add to zone's list of spaces
-                    thisZone.spaces.emplace_back(state.dataGlobal->numSpaces);
+                    thisZone.spaceIndexes.emplace_back(state.dataGlobal->numSpaces);
                     ++state.dataHeatBal->Zone(zoneNum).numSpaces;
-                    assert(state.dataHeatBal->Zone(zoneNum).numSpaces == int(state.dataHeatBal->Zone(zoneNum).spaces.size()));
+                    assert(state.dataHeatBal->Zone(zoneNum).numSpaces == int(state.dataHeatBal->Zone(zoneNum).spaceIndexes.size()));
                     // If some surfaces in the zone are assigned to a space, the new space is the remainder of the zone
                     state.dataHeatBal->space(state.dataGlobal->numSpaces).Name = thisZone.Name + "-Remainder";
                     state.dataHeatBal->space(state.dataGlobal->numSpaces).spaceType = "GENERAL";
@@ -2852,7 +2852,7 @@ namespace SurfaceGeometry {
             if (!thisSurf.HeatTransSurf) continue; // ignore shading surfaces
             if (thisSurf.spaceNum == 0) {
                 int const numSpaces = state.dataHeatBal->Zone(thisSurf.Zone).numSpaces;
-                int const lastSpaceForZone = state.dataHeatBal->Zone(thisSurf.Zone).spaces(numSpaces);
+                int const lastSpaceForZone = state.dataHeatBal->Zone(thisSurf.Zone).spaceIndexes(numSpaces);
                 thisSurf.spaceNum = lastSpaceForZone;
                 // Add to Space's list of surfaces
                 state.dataHeatBal->space(lastSpaceForZone).surfaces.emplace_back(surfNum);
@@ -14919,7 +14919,7 @@ namespace SurfaceGeometry {
 
         // ToDo: For now, set the max and min enclosure numbers for each zone to be used in CalcInteriorRadExchange with ZoneToResimulate
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
+            for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
                 if (state.dataHeatBal->Zone(zoneNum).zoneRadEnclosureFirst == -1) { // initial value
                     state.dataHeatBal->Zone(zoneNum).zoneRadEnclosureFirst = state.dataHeatBal->space(spaceNum).radiantEnclosureNum;
                 } else {
