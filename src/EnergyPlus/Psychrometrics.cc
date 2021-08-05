@@ -1460,7 +1460,6 @@ namespace Psychrometrics {
         //********continous sample end
         int tsat_fn_pb_x_j1 = 64 * (j + 1); //sample data for pressure
         A = (tsat_fn_pb_x_j1 - x) / h;
-        //A = (tsat_fn_pb_x[j + 1] - x) / h;
         B = 1 - A;
         y = A * tsat_fn_pb_y[j] + B * tsat_fn_pb_y[j + 1] +
             ((A * A * A - A) * (tsat_fn_pb_d2y[j]) + (B * B * B - B) * (tsat_fn_pb_d2y[j + 1])) * (h * h) * 0.1666666667;
