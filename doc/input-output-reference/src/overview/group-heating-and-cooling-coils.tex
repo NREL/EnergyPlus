@@ -562,7 +562,7 @@ This alpha field contains the type of dehumidification control. The following op
 
 \textbf{None} - meet sensible load only, no active dehumidification control. Valid with all cooling coil types. When a heat exchanger assisted cooling coil is used, the heat exchanger is locked on at all times. The default is None.
 
-\textbf{Multimode} - activate water coil and meet sensible load. If no sensible load exists, and Run on Latent Load = Yes, and a latent load exists, the coil will operate to meet the latent load. If the latent load cannot be met the heat exchanger will be activated. This control mode either switches the coil mode or allows the heat exchanger to be turned on and off based on the dehumidification setpoint. Valid only with cooling coil type CoilSystem:Cooling:Water:HeatExchangerAssisted.
+\textbf{Multimode} - activate water coil and meet sensible load. If no sensible load exists, and Run on Latent Load = Yes, and a latent load exists, the coil will operate to meet the latent load. If the latent load cannot be met the heat exchanger will be activated. This control mode allows the heat exchanger to be turned on and off based on the dehumidification setpoint. Valid only with cooling coil type CoilSystem:Cooling:Water:HeatExchangerAssisted.
 
 \textbf{CoolReheat} - cool beyond the dry-bulb temperature set point as required to meet the high humidity setpoint. If cooling coil type = CoilSystem:Cooling:Water:HeatExchangerAssisted, then the heat exchanger is assumed to always transfer energy between the cooling coil’s inlet and outlet airstreams when the cooling coil is operating.
 
