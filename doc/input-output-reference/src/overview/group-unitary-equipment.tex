@@ -85,6 +85,8 @@ This alpha field contains the schedule name which contains information on the av
 
 This alpha field contains the unitary system air inlet node name.
 
+When the UnitarySystem is used to serve a zone as a zone equipment unit, this node name must be either the name of a zone air exhaust node (Ref. \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections}) to draw air from a zone directly or an induced air outlet node (Ref. \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum}) to draw air from a return plenum, when the zone return node is connected to a return plenum.
+
 \paragraph{Field: Unitary System Air Outlet Node Name}\label{field-unitary-system-air-outlet-node-name}
 
 This alpha field contains the unitary system air outlet node name.
@@ -1024,7 +1026,7 @@ This alpha field contains the unitary system inlet node name.
 
 This alpha field contains the unitary system outlet node name.
 
-\subsubsection{Field: Supply Air Fan Operating Mode Schedule Name}\label{field-supply-air-fan-operating-mode-schedule-name-4}
+\subsubsection{Field: Supply Air Fan Operating Mode Schedule Name}\label{field-unitaryheatcool-supply-air-fan-operating-mode-schedule-name}
 
 This alpha field specifies the name of the supply air fan operating mode schedule. The supply air fan operating mode may vary during the simulation based on time-of-day or with a change of season. Schedule values of 0 denote that the unitary system supply air fan and the heating or cooling coil cycle on and off together to meet the heating or cooling load (a.k.a. AUTO fan). Schedule values other than 0 denote that the supply fan runs continuously while the heating or cooling coil cycles to meet the load.
 
