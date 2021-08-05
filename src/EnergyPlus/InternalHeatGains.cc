@@ -518,8 +518,8 @@ namespace InternalHeatGains {
                 } else {
                     for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaces) {
                         state.dataHeatBal->PeopleObjects(Item).spaceNums.emplace_back(spaceNum);
-                        state.dataHeatBal->PeopleObjects(Item).names.emplace_back(state.dataHeatBal->PeopleObjects(Item).Name + ' ' +
-                                                                                  state.dataHeatBal->space(spaceNum).Name);
+                        state.dataHeatBal->PeopleObjects(Item).names.emplace_back(state.dataHeatBal->space(spaceNum).Name + ' ' +
+                                                                                  state.dataHeatBal->PeopleObjects(Item).Name);
                     }
                 }
                 continue;
@@ -543,8 +543,8 @@ namespace InternalHeatGains {
                     numSpaces += state.dataHeatBal->Zone(listZoneIdx).numSpaces;
                     for (int const spaceNum : state.dataHeatBal->Zone(listZoneIdx).spaces) {
                         state.dataHeatBal->PeopleObjects(Item).spaceNums.emplace_back(spaceNum);
-                        state.dataHeatBal->PeopleObjects(Item).names.emplace_back(state.dataHeatBal->PeopleObjects(Item).Name + ' ' +
-                                                                                  state.dataHeatBal->space(spaceNum).Name);
+                        state.dataHeatBal->PeopleObjects(Item).names.emplace_back(state.dataHeatBal->space(spaceNum).Name + ' ' +
+                                                                                  state.dataHeatBal->PeopleObjects(Item).Name);
                     }
                 }
                 state.dataHeatBal->TotPeople += numSpaces;
@@ -564,8 +564,8 @@ namespace InternalHeatGains {
                 state.dataHeatBal->PeopleObjects(Item).spaceOrSpaceListPtr = spaceListNum;
                 for (int const spaceNum : state.dataHeatBal->spaceList(spaceListNum).spaces) {
                     state.dataHeatBal->PeopleObjects(Item).spaceNums.emplace_back(spaceNum);
-                    state.dataHeatBal->PeopleObjects(Item).names.emplace_back(state.dataHeatBal->PeopleObjects(Item).Name + ' ' +
-                                                                              state.dataHeatBal->space(spaceNum).Name);
+                    state.dataHeatBal->PeopleObjects(Item).names.emplace_back(state.dataHeatBal->space(spaceNum).Name + ' ' +
+                                                                              state.dataHeatBal->PeopleObjects(Item).Name);
                 }
                 continue;
             }
