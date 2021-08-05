@@ -1495,7 +1495,7 @@ namespace UnitarySystems {
         if (int(state.dataUnitarySystems->unitarySys.size()) == state.dataUnitarySystems->numUnitarySystems &&
             state.dataZoneEquip->ZoneEquipInputsFilled)
             setupAllOutputVars(state, state.dataUnitarySystems->numUnitarySystems);
-        for (int coilNUM = 1; coilNUM <= int(state.dataUnitarySystems->unitarySys.size()); ++coilNUM) {
+        for (std::size_t coilNUM = 1; coilNUM < state.dataUnitarySystems->unitarySys.size(); ++coilNUM) {
             SetupEMSActuator(state,
                              "Coil Speed Control",
                              state.dataUnitarySystems->unitarySys[coilNUM].Name,
@@ -11727,6 +11727,7 @@ namespace UnitarySystems {
                 } else {         // need to turn on compressor to see if load is met
                     doIt = true; // CoilSystem:Cooling:DX
                 }                // CoilSystem:Cooling:DX
+                // todo if EMS, always run
                 if (doIt) {      // CoilSystem:Cooling:DX
                     PartLoadFrac = 1.0;
                     CompOn = 1;
@@ -11979,6 +11980,7 @@ namespace UnitarySystems {
                         doIt = true;
                     }
                 }
+                // todo if EMS, always run
                 if (doIt) {
                     if (unitSys && state.dataLoopNodes->Node(OutletNode).Temp > DesOutTemp - tempAcc) {
                         PartLoadFrac = 1.0;
@@ -12678,6 +12680,7 @@ namespace UnitarySystems {
                         }
 
                     } else if (CoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
+                        // todo - why speed num is not presented here
 
                         DXCoils::SimDXCoilMultiSpeed(state, CompName, SpeedRatio, CycRatio, this->m_CoolingCoilIndex);
                         OutletHumRatDXCoil = state.dataDXCoils->DXCoilOutletHumRat(this->m_CoolingCoilIndex);
@@ -13059,6 +13062,7 @@ namespace UnitarySystems {
         bool LatentLoad = false;
         Real64 OutletTemp = 0.0;
 
+        // todo - OutdoorHumRat, OutdoorWetBulb, OutdoorPressure not used in this function
         if (this->m_CondenserNodeNum != 0) {
             OutdoorDryBulb = state.dataLoopNodes->Node(this->m_CondenserNodeNum).Temp;
             if (this->m_CondenserType == DataHeatBalance::RefrigCondenserType::Water) {
@@ -13235,6 +13239,8 @@ namespace UnitarySystems {
                 }
 
                 //     IF outlet temp at no load is within ACC of set point, do not run the coil
+
+                // todo - ems
                 if (std::abs(state.dataLoopNodes->Node(OutletNode).Temp - DesOutTemp) < Acc ||
                     this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_UserDefined) {
                     // do nothing, coil is at the set point.
