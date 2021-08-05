@@ -2541,6 +2541,9 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
     SurfaceGeometry::GetSurfaceData(*state, FoundError); // setup zone geometry and get zone data
     EXPECT_FALSE(FoundError);                            // expect no errors
 
+    // allocate surface level adj ratio data member
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(34, 1.0);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(34, 1.0);
     WindowManager::InitGlassOpticalCalculations(*state);
 
     int NumAngles = 10; // Number of incident angles
