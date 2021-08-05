@@ -1110,7 +1110,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
     Real64 Cp;
     int DummyWaterIndex(1);
     bool IsAutoSize;               // Indicator to autosize
-    bool IsMaxPriFlowAutoSize;        // Indicate if the maximum terminal flow is autosize
+    bool IsMaxPriFlowAutoSize;     // Indicate if the maximum terminal flow is autosize
     int AirLoopNum;                // Air loop number
     int SysSizNum;                 // System sizing number
     Real64 MaxPriAirVolFlowDes;    // Autosized maximum primary air flow for reporting
@@ -1373,9 +1373,9 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                             ShowWarningError(state,
                                              "SingleDuctSystem:SizeSys: Maximum primary air flow rate for " +
                                                  state.dataPowerInductionUnits->PIU(PIUNum).Name + " is potentially too low.");
-                            ShowContinueError(
-                                state,
-                                "The flow is lower than the minimum primary air flow rate calculated following the ASHRAE Standard 62.1 Simplified Procedure:");
+                            ShowContinueError(state,
+                                              "The flow is lower than the minimum primary air flow rate calculated following the ASHRAE Standard "
+                                              "62.1 Simplified Procedure:");
                             ShowContinueError(state,
                                               format(" User-specified maximum primary air flow rate: {:.3R} m3/s.",
                                                      state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow));

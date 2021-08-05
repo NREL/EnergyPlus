@@ -1065,14 +1065,18 @@ TEST_F(EnergyPlusFixture, SimplifiedProcedureTest1)
     ManageSimulation(*state);
 
     EXPECT_NEAR(2.154067, state->dataSize->FinalSysSizing(1).DesOutAirVolFlow, 0.0001);
-    EXPECT_EQ(0, state->dataSingleDuct->sd_airterminal(1).ZoneFixedMinAir);
-    EXPECT_NEAR(1.0, state->dataPowerInductionUnits->PIU(1).MinPriAirFlowFrac, 0.0001);
+    EXPECT_EQ(0.0, state->dataSingleDuct->sd_airterminal(1).ZoneFixedMinAir);
+    EXPECT_NEAR(2.658660, state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRate, 0.0001);
+    EXPECT_EQ(1.0, state->dataPowerInductionUnits->PIU(1).MinPriAirFlowFrac);
     EXPECT_NEAR(0.089244, state->dataPowerInductionUnits->PIU(1).MaxTotAirVolFlow, 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, SimplifiedProcedureTest2)
 {
-    // AirTerminal:SingleDuct:VAV:NoReheat is autosized by the Standard 62.1 Simplified Procedure
+    // Similar to the test above, both air terminals are autosized by the Standard 62.1 Simplified Procedure.
+    // However, the AirTerminal:SingleDuct:VAV:NoReheat has a user-inputted Maximum Air Flow Rate {m3/s},
+    // which is lower than the Design Size Maximum Air Flow Rate in order to see whether a warning appears.
+
     std::string const idf_objects = delimited_string({
 
         " Output:Diagnostics, DisplayExtraWarnings;",
@@ -1960,7 +1964,7 @@ TEST_F(EnergyPlusFixture, SimplifiedProcedureTest2)
         "  AvailSched,                !- Availability Schedule Name",
         "  autosize,                  !- Maximum Air Flow Rate {m3/s}",
         "  autosize,                  !- Maximum Primary Air Flow Rate {m3/s}",
-        "  0.1,                       !- Minimum Primary Air Flow Fraction",
+        "  autosize,                  !- Minimum Primary Air Flow Fraction",
         "  Space ATU In Node,         !- Supply Air Inlet Node Name",
         "  Space Sec In Node,         !- Secondary Air Inlet Node Name",
         "  Space In Node,             !- Outlet Node Name",
@@ -1992,7 +1996,7 @@ TEST_F(EnergyPlusFixture, SimplifiedProcedureTest2)
         "  AvailSched,              !- Availability Schedule Name",
         "  Spacex10 In Node,        !- Air Outlet Node Name",
         "  Spacex10 ATU In Node,    !- Air Inlet Node Name",
-        "  autosize,                !- Maximum Air Flow Rate {m3/s}",
+        "  0.2,                     !- Maximum Air Flow Rate {m3/s}", // a case which a user inputs an unmatched value
         "  FixedFlowRate,           !- Zone Minimum Air Flow Input Method",
         "  ,                        !- Constant Minimum Air Flow Fraction",
         "  autosize,                !- Fixed Minimum Air Flow Rate {m3/s}", // Standard 62.1 Simplified Procedure
@@ -2069,14 +2073,26 @@ TEST_F(EnergyPlusFixture, SimplifiedProcedureTest2)
     ManageSimulation(*state);
 
     EXPECT_NEAR(2.154067, state->dataSize->FinalSysSizing(1).DesOutAirVolFlow, 0.0001);
-    EXPECT_NEAR(2.658660, state->dataSingleDuct->sd_airterminal(1).ZoneFixedMinAir, 0.0001);
-    EXPECT_NEAR(0.100000, state->dataPowerInductionUnits->PIU(1).MinPriAirFlowFrac, 0.0001);
+    // check whether the user-inputted value for the Maximum Air Flow Rate {m3/s} is assigned
+    // instead of what is calculated by the Standard 62.1 Simplified Procedure.
+    EXPECT_EQ(0.20, state->dataSingleDuct->sd_airterminal(1).ZoneFixedMinAir);
+    EXPECT_EQ(0.20, state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRate);
+    // and check whether the warning appears in the err file.
+    std::string const error_string = delimited_string({
+        "** Warning ** SingleDuctSystem:SizeSys: Maximum air flow rate for SPACEX10 AIR TERMINAL is potentially too low.",
+    });
+    EXPECT_TRUE(match_err_stream(error_string));
+
+    EXPECT_EQ(1.0, state->dataPowerInductionUnits->PIU(1).MinPriAirFlowFrac);
     EXPECT_NEAR(0.089244, state->dataPowerInductionUnits->PIU(1).MaxTotAirVolFlow, 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, SimplifiedProcedureTest3)
 {
-    // AirTerminal:SingleDuct:SeriesPIU:Reheat is autosized by the Standard 62.1 Simplified Procedure
+    // Similar to the test above, both air terminals are autosized by the Standard 62.1 Simplified Procedure.
+    // However, the AirTerminal:SingleDuct:SeriesPIU:Reheat has a user-inputted Maximum Air Flow Rate {m3/s},
+    // which is lower than the Design Size Maximum Air Flow Rate in order to see whether a warning appears.
+
     std::string const idf_objects = delimited_string({
 
         " Output:Diagnostics, DisplayExtraWarnings;",
@@ -2963,8 +2979,8 @@ TEST_F(EnergyPlusFixture, SimplifiedProcedureTest3)
         "  Space Air Terminal,        !- Name",
         "  AvailSched,                !- Availability Schedule Name",
         "  autosize,                  !- Maximum Air Flow Rate {m3/s}",
-        "  autosize,                  !- Maximum Primary Air Flow Rate {m3/s}",
-        "  autosize,                  !- Minimum Primary Air Flow Fraction", // Standard 62.1 Simplified Procedure
+        "  0.05,                      !- Maximum Primary Air Flow Rate {m3/s}", // a user-inputted value
+        "  autosize,                  !- Minimum Primary Air Flow Fraction",    // Standard 62.1 Simplified Procedure
         "  Space ATU In Node,         !- Supply Air Inlet Node Name",
         "  Space Sec In Node,         !- Secondary Air Inlet Node Name",
         "  Space In Node,             !- Outlet Node Name",
@@ -2999,7 +3015,7 @@ TEST_F(EnergyPlusFixture, SimplifiedProcedureTest3)
         "  autosize,                !- Maximum Air Flow Rate {m3/s}",
         "  FixedFlowRate,           !- Zone Minimum Air Flow Input Method",
         "  ,                        !- Constant Minimum Air Flow Fraction",
-        "  0.1,                     !- Fixed Minimum Air Flow Rate {m3/s}",
+        "  autosize,                     !- Fixed Minimum Air Flow Rate {m3/s}",
         "  ,                        !- Minimum Air Flow Fraction Schedule Name",
         "  ;                        !- Design Specification Outdoor Air Object Name",
         " ",
@@ -3073,7 +3089,15 @@ TEST_F(EnergyPlusFixture, SimplifiedProcedureTest3)
     ManageSimulation(*state);
 
     EXPECT_NEAR(2.154067, state->dataSize->FinalSysSizing(1).DesOutAirVolFlow, 0.0001);
-    EXPECT_EQ(0.1, state->dataSingleDuct->sd_airterminal(1).ZoneFixedMinAir);
-    EXPECT_NEAR(1, state->dataPowerInductionUnits->PIU(1).MinPriAirFlowFrac, 0.0001);
+    EXPECT_NEAR(2.658660, state->dataSingleDuct->sd_airterminal(1).ZoneFixedMinAir, 0.0001);
+    EXPECT_NEAR(2.658660, state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRate, 0.0001);
+    EXPECT_NEAR(1.0, state->dataPowerInductionUnits->PIU(1).MinPriAirFlowFrac, 0.0001);
     EXPECT_NEAR(0.089244, state->dataPowerInductionUnits->PIU(1).MaxTotAirVolFlow, 0.0001);
+    // check whether the user-inputted value for the Maximum Air Flow Rate {m3/s} is assigned
+    EXPECT_NEAR(0.05, state->dataPowerInductionUnits->PIU(1).MaxPriAirVolFlow, 0.0001);
+    // and check whether the warning appears in the err file.
+    std::string const error_string = delimited_string({
+        "   ** Warning ** SingleDuctSystem:SizeSys: Maximum primary air flow rate for SPACE AIR TERMINAL is potentially too low.",
+    });
+    EXPECT_TRUE(match_err_stream(error_string));
 }
