@@ -1812,13 +1812,8 @@ void SQLite::addSQLiteComponentSizingRecord(std::string_view compType, // the ty
     }
 }
 
-void SQLite::createSQLiteDaylightMapTitle(int const mapNum,
-                                          std::string const &mapName,
-                                          std::string const &environmentName,
-                                          int const zone,
-                                          std::string const &refPt1,
-                                          std::string const &refPt2,
-                                          Real64 const zCoord)
+void SQLite::createSQLiteDaylightMapTitle(
+    int const mapNum, std::string const &mapName, std::string const &environmentName, int const zone, std::string const &refPts, Real64 const zCoord)
 {
     if (m_writeOutputToSQLite) {
         // for some reason it is adding extra mapNumbers that are getting UNIQUE constraint ignored.
@@ -1827,9 +1822,8 @@ void SQLite::createSQLiteDaylightMapTitle(int const mapNum,
         sqliteBindText(m_daylightMapTitleInsertStmt, 2, mapName);
         sqliteBindText(m_daylightMapTitleInsertStmt, 3, environmentName);
         sqliteBindForeignKey(m_daylightMapTitleInsertStmt, 4, zone);
-        sqliteBindText(m_daylightMapTitleInsertStmt, 5, refPt1);
-        sqliteBindText(m_daylightMapTitleInsertStmt, 6, refPt2);
-        sqliteBindDouble(m_daylightMapTitleInsertStmt, 7, zCoord);
+        sqliteBindText(m_daylightMapTitleInsertStmt, 5, refPts);
+        sqliteBindDouble(m_daylightMapTitleInsertStmt, 6, zCoord);
 
         sqliteStepCommand(m_daylightMapTitleInsertStmt);
         sqliteResetCommand(m_daylightMapTitleInsertStmt);
