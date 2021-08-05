@@ -1919,17 +1919,6 @@
     ,                        !- Fraction of Autosized Heating Design Capacity
     VAV;                     !- Central Cooling Capacity Control Method
 
-!  Schedule:Compact,
-!    Htg-SetP-Sch,            !- Name
-!    Temperature,             !- Schedule Type Limits Name
-!    Through: 12/31,          !- Field 1
-!    For: SummerDesignDay,    !- Field 2
-!    Until: 24:00,15.0,       !- Field 3
-!    For: WinterDesignDay,    !- Field 5
-!    Until: 24:00,21.1,       !- Field 6
-!    For: AllOtherDays,       !- Field 22
-!    Until: 24:00,21.1;       !- Field 27
-
   Schedule:Compact,
     Htg-SetP-Sch,            !- Name
     Temperature,             !- Schedule Type Limits Name
@@ -1957,18 +1946,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,12.8;       !- Field 3
-
-!  Schedule:Compact,
-!    Clg-SetP-Sch,            !- Name
-!    Temperature,             !- Schedule Type Limits Name
-!    Through: 12/31,          !- Field 1
-!    For: SummerDesignDay,    !- Field 2
-!    Until: 24:00,23.9,       !- Field 3
-!    For: WinterDesignDay,    !- Field 5
-!    Until: 24:00,30.0,       !- Field 6
-!    For: AllOtherDays,       !- Field 7
-!    Until: 24:00,23.9;       !- Field 8
-
 
   Schedule:Compact,
     Clg-SetP-Sch,            !- Name
@@ -2033,7 +2010,6 @@
     For: AllOtherDays,       !- Field 16
     Until: 24:00,1.0;        !- Field 21
 
-
   Schedule:Compact,
     ReheatCoilAvailSched,    !- Name
     Fraction,                !- Schedule Type Limits Name
@@ -2043,15 +2019,12 @@
     For: AllOtherDays,       !- Field 16
     Until: 24:00,1.0;        !- Field 21
 
-
   NodeList,
     SupplyAir Temp Nodes,    !- Name
-!   FreeClgCoil OutletNode,  !- Node 1 Name
-    DX Clg Coil Inlet Node,  !- Node 2 Name
-    Heating Coil Inlet Node, !- Node 3 Name
-    Rht Coil Air Inlet Node, !- Node 4 Name
-    VAV Sys 1 Outlet Node;   !- Node 5 Name
-
+    DX Clg Coil Inlet Node,  !- Node 1 Name
+    Heating Coil Inlet Node, !- Node 2 Name
+    Rht Coil Air Inlet Node, !- Node 3 Name
+    VAV Sys 1 Outlet Node;   !- Node 4 Name
 
   SetpointManager:MixedAir,
     MixedAir Temp SPM,       !- Name
@@ -2080,10 +2053,6 @@
     Until: 24:00,0.25;       !- Field 6
 
   Schedule:Constant,Always On Discrete,OnOff,1;
-
-  !Schedule:Constant,Always Off Discrete,OnOff,0;
-  !Schedule:Constant,SupplyAir HumRate Schd,AnyNumber,0.006;
-
 
   Curve:Biquadratic,
     VarSpeedCoolCapFT,       !- Name
@@ -2683,7 +2652,7 @@
     ,                        !- Availability Schedule Name
     Autosize,                !- Design Water Flow Rate {m3/s}
     Autosize,                !- Design Air Flow Rate {m3/s}
-    7.20,                    !- Design Inlet Water Temperature {C}
+    11.0,                    !- Design Inlet Water Temperature {C}
     34.0,                    !- Design Inlet Air Temperature {C}
     16.0,                    !- Design Outlet Air Temperature {C}
     0.009,                   !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}
@@ -2699,7 +2668,6 @@
     DXAC Gas Furnace,        !- Name
     Setpoint,                !- Control Type
     ,                        !- Controlling Zone or Thermostat Location
-    !CoolReheat,             !- Dehumidification Control Type
     None,                    !- Dehumidification Control Type
     ReheatCoilAvailSched,    !- Availability Schedule Name
     FreeClgCoil OutletNode,  !- Air Inlet Node Name
@@ -3285,14 +3253,18 @@
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
 
-  !Output:Variable,*,Zone Mean Air Humidity Ratio,hourly;
+  Output:Variable,*,Zone Mean Air Humidity Ratio,hourly;
 
-  !Output:Variable,*,Zone Air Relative Humidity,hourly;
+  Output:Variable,*,Zone Air Relative Humidity,hourly;
 
   Output:Variable,SPACE1-1,Zone Air Temperature,hourly;
+  
   Output:Variable,SPACE2-1,Zone Air Temperature,hourly;
+  
   Output:Variable,SPACE3-1,Zone Air Temperature,hourly;
+  
   Output:Variable,SPACE4-1,Zone Air Temperature,hourly;
+  
   Output:Variable,SPACE5-1,Zone Air Temperature,hourly;
 
   Output:Variable,SPACE1-1 In Node,System Node Temperature,hourly;
@@ -3351,7 +3323,7 @@
 
   Output:Variable,*,Heating Coil NaturalGas Rate,hourly;
 
-!  Output:Variable,*,Zone Air Terminal VAV Damper Position,hourly;
+  Output:Variable,*,Zone Air Terminal VAV Damper Position,hourly;
 
   Output:Variable,*,Zone Air Terminal Minimum Air Flow Fraction,hourly;
 
