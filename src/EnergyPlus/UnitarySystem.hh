@@ -456,8 +456,8 @@ namespace UnitarySystems {
         DesignSpecMSHP *m_CompPointerMSHP;
         std::string Name;
         std::string UnitType;
-        Real64 LoadSHR;                // Load sensible heat ratio with humidity control
-        Real64 CoilSHR;                // Load sensible heat ratio with humidity control
+        Real64 LoadSHR;                     // Load sensible heat ratio with humidity control
+        Real64 CoilSHR;                     // Load sensible heat ratio with humidity control
         int temperatureOffsetControlStatus; // water side economizer status flag, also report variable
 
         //    private:

@@ -17290,7 +17290,7 @@ TEST_F(EnergyPlusFixture, WaterCoil_getCoilWaterSystemInputDataTest)
     EXPECT_EQ(thisSys.m_CoolingCoilType_Num, DataHVACGlobals::Coil_CoolingWater);
     EXPECT_EQ(thisSys.m_CoolingCoilName, "WATER COOLING COIL");
     EXPECT_TRUE(thisSys.m_CoolCoilExists);
-    EXPECT_TRUE(thisSys.m_waterSideEconomizerFlag);
+    EXPECT_TRUE(thisSys.m_TemperatureOffsetControlActive);
     EXPECT_TRUE(thisSys.m_RunOnSensibleLoad);
     EXPECT_FALSE(thisSys.m_RunOnLatentLoad);
 }
@@ -17375,7 +17375,7 @@ TEST_F(EnergyPlusFixture, DetailedWaterCoil_getCoilWaterSystemInputDataTest)
     EXPECT_EQ(thisSys.m_CoolingCoilType_Num, DataHVACGlobals::Coil_CoolingWaterDetailed);
     EXPECT_EQ(thisSys.m_CoolingCoilName, "WATER COOLING COIL");
     EXPECT_TRUE(thisSys.m_CoolCoilExists);
-    EXPECT_TRUE(thisSys.m_waterSideEconomizerFlag);
+    EXPECT_TRUE(thisSys.m_TemperatureOffsetControlActive);
     EXPECT_TRUE(thisSys.m_RunOnSensibleLoad);
     EXPECT_FALSE(thisSys.m_RunOnLatentLoad);
 }
@@ -17476,7 +17476,7 @@ TEST_F(EnergyPlusFixture, HXAssistedWaterCoil_getCoilWaterSystemInputDataTest)
     EXPECT_EQ(thisSys.m_CoolingCoilType_Num, DataHVACGlobals::Coil_CoolingWater);
     EXPECT_EQ(thisSys.m_CoolingCoilName, "WATER COOLING COIL");
     EXPECT_TRUE(thisSys.m_CoolCoilExists);
-    EXPECT_TRUE(thisSys.m_waterSideEconomizerFlag);
+    EXPECT_TRUE(thisSys.m_TemperatureOffsetControlActive);
     EXPECT_TRUE(thisSys.m_RunOnSensibleLoad);
     EXPECT_TRUE(thisSys.m_RunOnLatentLoad);
 }
@@ -17668,12 +17668,11 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_ControlStatusTest)
     EXPECT_EQ(thisSys.m_CoolingCoilType_Num, DataHVACGlobals::Coil_CoolingWater);
     EXPECT_EQ(thisSys.m_CoolingCoilName, "WATER COOLING COIL");
     EXPECT_TRUE(thisSys.m_CoolCoilExists);
-    EXPECT_TRUE(thisSys.m_waterSideEconomizerFlag);
+    EXPECT_TRUE(thisSys.m_TemperatureOffsetControlActive);
     EXPECT_TRUE(thisSys.m_RunOnSensibleLoad);
     EXPECT_FALSE(thisSys.m_RunOnLatentLoad);
     // Default control status of coil system
-    EXPECT_EQ(thisSys.runWaterSideEconomizer, false);
-    EXPECT_EQ(thisSys.WaterSideEconomizerStatus, 0);
+    EXPECT_EQ(thisSys.temperatureOffsetControlStatus, 0);
 
     thisSys.m_MyFanFlag = false;
     state->dataGlobal->SysSizingCalc = true;
@@ -17691,16 +17690,22 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_ControlStatusTest)
     EXPECT_EQ(coilEnteringWaterTemp, 10.0);
     EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
 
-    bool expected_result_runWaterSideEconomizer(false);
+    // set economizer mode based on user input
+    bool expected_result_TemperatureOffsetControlActive(false);
+    if (thisSys.m_minAirToWaterTempOffset > 0.0) {
+        expected_result_TemperatureOffsetControlActive = true;
+    }
+    // set coil control status based on user input
+    int expected_result_temperatureOffsetControlStatus(0);
     if (coilEnteringWaterTemp < (coilEnteringAirTemp - thisSys.m_minAirToWaterTempOffset)) {
-        expected_result_runWaterSideEconomizer = true;
+        expected_result_temperatureOffsetControlStatus = 1;
     }
     // run init to set control status VAR
     thisSys.initUnitarySystems(*state, AirLoopNum, FirstHVACIteration, ZoneOAUnitNum, OAUCoilOutTemp);
-    // check operating and control status of water side economizer
-    EXPECT_TRUE(thisSys.runWaterSideEconomizer);
-    EXPECT_EQ(thisSys.runWaterSideEconomizer, expected_result_runWaterSideEconomizer);
-    EXPECT_EQ(thisSys.WaterSideEconomizerStatus, 1);
+    // check economizer is active and control status
+    EXPECT_TRUE(thisSys.m_TemperatureOffsetControlActive);
+    EXPECT_TRUE(expected_result_TemperatureOffsetControlActive);
+    EXPECT_EQ(thisSys.temperatureOffsetControlStatus, 1);
 
     // Test 2: coil entering air temperature is less than entering water temperature
     // less the temperature offset, i.e., the coil is expected OFF
@@ -17710,16 +17715,16 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_ControlStatusTest)
     EXPECT_EQ(coilEnteringWaterTemp, 10.0);
     EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
 
-    expected_result_runWaterSideEconomizer = false;
+    expected_result_temperatureOffsetControlStatus = 0;
     if (coilEnteringWaterTemp < (coilEnteringAirTemp - thisSys.m_minAirToWaterTempOffset)) {
-        expected_result_runWaterSideEconomizer = true;
+        expected_result_temperatureOffsetControlStatus = 1;
     }
-    // run init to res-set control status VAR
+    // run init to re-set control status VAR
     thisSys.initUnitarySystems(*state, AirLoopNum, false, ZoneOAUnitNum, OAUCoilOutTemp);
-    // check operating and control status of water side economizer
-    EXPECT_FALSE(thisSys.runWaterSideEconomizer);
-    EXPECT_EQ(thisSys.runWaterSideEconomizer, expected_result_runWaterSideEconomizer);
-    EXPECT_EQ(thisSys.WaterSideEconomizerStatus, 0);
+    // check economizer is active and control status
+    EXPECT_TRUE(thisSys.m_TemperatureOffsetControlActive);
+    EXPECT_EQ(expected_result_temperatureOffsetControlStatus, 0);
+    EXPECT_EQ(thisSys.temperatureOffsetControlStatus, 0);
 }
 
 TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
@@ -17853,7 +17858,6 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
     state->dataWaterCoils->WaterCoil(1).InletAirHumRat =
         Psychrometrics::PsyWFnTdbH(*state, state->dataWaterCoils->WaterCoil(1).InletAirTemp, state->dataWaterCoils->WaterCoil(1).InletAirEnthalpy);
     // water coil air inlet node condition
-
     state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRate = AirMassFlowRate;
     state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRateMax = AirMassFlowRate;
     state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).Temp = state->dataWaterCoils->WaterCoil(1).InletAirTemp;
@@ -17913,12 +17917,11 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
     EXPECT_EQ(thisSys.m_CoolingCoilType_Num, DataHVACGlobals::Coil_CoolingWater);
     EXPECT_EQ(thisSys.m_CoolingCoilName, "WATER COOLING COIL");
     EXPECT_TRUE(thisSys.m_CoolCoilExists);
-    EXPECT_TRUE(thisSys.m_waterSideEconomizerFlag);
+    EXPECT_TRUE(thisSys.m_TemperatureOffsetControlActive);
     EXPECT_TRUE(thisSys.m_RunOnSensibleLoad);
     EXPECT_FALSE(thisSys.m_RunOnLatentLoad);
     // Default control status
-    EXPECT_FALSE(thisSys.runWaterSideEconomizer);
-    EXPECT_EQ(thisSys.WaterSideEconomizerStatus, 0);
+    EXPECT_EQ(thisSys.temperatureOffsetControlStatus, 0);
     // set some flags
     thisSys.m_MyFanFlag = false;
     state->dataGlobal->SysSizingCalc = true;
@@ -17939,8 +17942,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
     // Test 1: economizer inlet water temperature is favorable, expect coil ON
     // run init and check the coil system operating condition and control status
     thisSys.initUnitarySystems(*state, AirLoopNum, FirstHVACIteration, ZoneOAUnitNum, OAUCoilOutTemp);
-    EXPECT_TRUE(thisSys.runWaterSideEconomizer);
-    EXPECT_EQ(thisSys.WaterSideEconomizerStatus, 1);
+    EXPECT_EQ(thisSys.temperatureOffsetControlStatus, 1);
     thisSys.controlCoolingSystemToSP(*state, AirLoopNum, false, HXUnitOn, CompOn);
     EXPECT_EQ(thisSys.m_CoolingPartLoadFrac, 1.0);
     thisSys.calcUnitaryCoolingSystem(*state, AirLoopNum, false, thisSys.m_CoolingPartLoadFrac, CompOn, OnOffAirFlowRatio, CoilCoolHeatRat, false);
@@ -17950,8 +17952,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
     state->dataWaterCoils->WaterCoil(1).InletWaterTemp = 29.5;
     state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).Temp = state->dataWaterCoils->WaterCoil(1).InletWaterTemp;
     thisSys.initUnitarySystems(*state, AirLoopNum, FirstHVACIteration, ZoneOAUnitNum, OAUCoilOutTemp);
-    EXPECT_FALSE(thisSys.runWaterSideEconomizer);
-    EXPECT_EQ(thisSys.WaterSideEconomizerStatus, 0);
+    EXPECT_EQ(thisSys.temperatureOffsetControlStatus, 0);
     thisSys.controlCoolingSystemToSP(*state, AirLoopNum, false, HXUnitOn, CompOn);
     EXPECT_EQ(thisSys.m_CoolingPartLoadFrac, 0.0);
     thisSys.calcUnitaryCoolingSystem(*state, AirLoopNum, false, thisSys.m_CoolingPartLoadFrac, CompOn, OnOffAirFlowRatio, CoilCoolHeatRat, false);

@@ -1313,10 +1313,10 @@ namespace UnitarySystems {
         if (this->m_TemperatureOffsetControlActive) {
             if (state.dataLoopNodes->Node(this->CoolCoilFluidInletNode).Temp >
                 (state.dataLoopNodes->Node(this->AirInNode).Temp - this->m_minAirToWaterTempOffset)) {
-                // disable water-side economizer if entering fluid temp is > entering air temp minus user specified temp offset
+                // disable coilsystem if entering fluid temp is > entering air temp minus user specified temp offset
                 this->temperatureOffsetControlStatus = 0;
             } else {
-                // enable water-side economizer cooling mode
+                // enable coilsystem waterside economizer mode
                 this->temperatureOffsetControlStatus = 1;
             }
         }
@@ -7172,7 +7172,7 @@ namespace UnitarySystems {
                 // set water-side economizer temperature offset
                 thisSys.m_minAirToWaterTempOffset = minAir2FluidTempOffset;
                 // set water-side economizer flag
-                if (thisSys.m_minAirToWaterTempOffset > 0) thisSys.m_TemperatureOffsetControlActive = true;
+                if (thisSys.m_minAirToWaterTempOffset > 0.0) thisSys.m_TemperatureOffsetControlActive = true;
 
                 thisSys.processInputSpec(state, input_specs, sysNum, errorsFound, ZoneEquipment, ZoneOAUnitNum);
 
@@ -11639,7 +11639,7 @@ namespace UnitarySystems {
                 LatentLoad = false;
             }
 
-            // disable waterside economizer if the condition is NOT favorable
+            // disable the coil if the condition is NOT favorable
             if (this->m_TemperatureOffsetControlActive) {
                 if (this->temperatureOffsetControlStatus == 0) {
                     SensibleLoad = false;
