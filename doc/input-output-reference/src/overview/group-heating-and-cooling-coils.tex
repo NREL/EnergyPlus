@@ -628,15 +628,15 @@ Following are the list of possible output variables from this coil model:
 
 This output variable is the ratio of the sensible cooling load to the current full cooling capacity of the coil system. This variable reports the average load met as a fraction of the full coil capacity during the system timestep. If the ratio is 0.0, then there is no cooling load, else if the ratio is 1.0, then the load met is equal to the coil system full capacity.
 
-\paragraph{Cooling Coil Total Cooling Rate {[}W{]}}
+\paragraph{Coil System Water Total Cooling Rate {[}W{]}}\label{coil-system-water-total-cooling-rate}
 
 This output field is the total (sensible + latent) cooling rate of the coil system from the supply or outdoor air in Watts. This value is calculated using the enthalpy difference of the coil system outlet air and inlet air streams and the air mass flow rate through the coil system. This value is reported for each HVAC system timestep being simulated and is an average for the timestep.
 
-\paragraph{Cooling Coil Sensible Cooling Rate {[}W{]}}
+\paragraph{Coil System Water Sensible Cooling Rate {[}W{]}}\label{coil-system-water-sensible-cooling-rate}
 
 This output field reports the moist air sensible cooling rate of the coil system from the supply or outdoor air system. This value is calculated using the enthalpy difference of the coil system outlet air and inlet air streams at a constant humidity ratio, and the air mass flow rate through the coil system. This value is reported for each HVAC system timestep simulated and is an average for the timestep.
 
-\paragraph{Cooling Coil Latent Cooling Rate {[}W{]}}
+\paragraph{Coil System Water Latent Cooling Rate {[}W{]}}\label{coil-system-water-latent-cooling-rate}
 
 This output field is the latent cooling (dehumidification) rate of the coil system in Watts. This value is calculated as the difference between the total cooling rate and the sensible cooling rate provided by the coil system. This value is reported for each HVAC system timestep being simulated and is an averaged for the timestep.
 
