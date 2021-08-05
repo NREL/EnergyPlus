@@ -3948,8 +3948,8 @@ void ElectricStorage::simulateSimpleBucketModel(EnergyPlusData &state,
     Real64 const minDischargeEfficiency = 0.001;
 
     // make sure that there will be no divide by zero that lead to NaN values for electric (Defect #8867)
-    if (energeticEfficCharge_ >= minChargeEfficiency) energeticEfficCharge_ = minChargeEfficiency;
-    if (energeticEfficDischarge_ >= minDischargeEfficiency) energeticEfficDischarge_ = minDischargeEfficiency;
+    if (energeticEfficCharge_ < minChargeEfficiency) energeticEfficCharge_ = minChargeEfficiency;
+    if (energeticEfficDischarge_ < minDischargeEfficiency) energeticEfficDischarge_ = minDischargeEfficiency;
 
     // given arguments for how the storage operation would like to run storage charge or discharge
     // apply model constraints and adjust arguments accordingly
