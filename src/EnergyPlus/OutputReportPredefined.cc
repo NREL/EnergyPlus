@@ -150,12 +150,12 @@ namespace OutputReportPredefined {
         s->pdchFenUfact = newPreDefColumn(state, s->pdstFen, "Glass U-Factor [W/m2-K]");
         s->pdchFenSHGC = newPreDefColumn(state, s->pdstFen, "Glass SHGC");
         s->pdchFenVisTr = newPreDefColumn(state, s->pdstFen, "Glass Visible Transmittance");
+        s->pdchFenFrameConductance = newPreDefColumn(state, s->pdstFen, "Frame Conductance [W/m2-K]");
+        s->pdchFenDividerConductance = newPreDefColumn(state, s->pdstFen, "Divider Conductance [W/m2-K]");
         s->pdchFenAssemNfrcType = newPreDefColumn(state, s->pdstFen, "NFRC Product Type");
         s->pdchFenAssemUfact = newPreDefColumn(state, s->pdstFen, "Assembly U-Factor [W/m2-K]");
         s->pdchFenAssemSHGC = newPreDefColumn(state, s->pdstFen, "Assembly SHGC");
         s->pdchFenAssemVisTr = newPreDefColumn(state, s->pdstFen, "Assembly Visible Transmittance");
-        s->pdchFenFrameConductance = newPreDefColumn(state, s->pdstFen, "Frame Conductance [W/m2-K]");
-        s->pdchFenDividerConductance = newPreDefColumn(state, s->pdstFen, "Divider Conductance [W/m2-K]");
         s->pdchFenSwitchable = newPreDefColumn(state, s->pdstFen, "Shade Control");
         s->pdchFenParent = newPreDefColumn(state, s->pdstFen, "Parent Surface");
         s->pdchFenAzimuth = newPreDefColumn(state, s->pdstFen, "Azimuth [deg]");
