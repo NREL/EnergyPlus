@@ -68,7 +68,7 @@ namespace DataViewFactorInformation {
         std::vector<std::string> ZoneNames; // Zone names which are part of this enclosure
         std::vector<int> ZoneNums;          // Zones which are part of this enclosure
         int NumOfSurfaces;                  // Number of surfaces in the enclosure
-        Array2D<Real64> F;                  // View Factors
+        Array2D<Real64> F;                  // View Factors: F(i,j) = from surface j to surface i (counter-intuitive, but optimized for performance)
         Array2D<Real64> ScriptF;            // Hottel's Script F //Tuned Transposed
         Array1D<Real64> Area;               // Surface area
         Array1D<Real64> Emissivity;         // Surface emissivity
