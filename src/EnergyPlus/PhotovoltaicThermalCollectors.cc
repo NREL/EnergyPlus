@@ -1577,6 +1577,7 @@ namespace PhotovoltaicThermalCollectors {
                 e = -hconvf2;
                 tfavg = -d / e;
             }
+            tfavg = std::max(tfavg, -50.0);
 
             for (i = 0; i <= m - 1; i++) {
                 f[i] = 0.0;
