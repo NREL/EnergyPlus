@@ -781,11 +781,16 @@ void GetZoneEquipmentData(EnergyPlusData &state)
             state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodeInletNum.allocate(NumNodes);
             state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).FixedReturnFlow.allocate(NumNodes);
             state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodePlenumNum.allocate(NumNodes);
-            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNode = 0;           // initialize to zero here
-            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodeAirLoopNum = 0; // initialize to zero here
-            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodeInletNum = 0;   // initialize to zero here
-            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).FixedReturnFlow = false;  // initialize to false here
-            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodePlenumNum = 0;  // initialize to zero here
+            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodeExhaustNodeNum.allocate(NumNodes);
+            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).SharedExhaustNode.allocate(NumNodes);
+            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNode = 0;               // initialize to zero here
+            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodeAirLoopNum = 0;     // initialize to zero here
+            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodeInletNum = 0;       // initialize to zero here
+            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).FixedReturnFlow = false;      // initialize to false here
+            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodePlenumNum = 0;      // initialize to zero here
+            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodeExhaustNodeNum = 0; // initialize to zero here
+            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).SharedExhaustNode =
+                iLightReturnExhaustConfig::NoExhast; // initialize to zero here
 
             for (NodeNum = 1; NodeNum <= NumNodes; ++NodeNum) {
                 state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNode(NodeNum) = NodeNums(NodeNum);
@@ -1324,6 +1329,29 @@ int GetReturnNumForZone(EnergyPlusData &state,
     return ReturnIndex;
 }
 
+bool VerifyLightsExhaustNodeForZone(EnergyPlusData &state, int const ZoneNum, int const ZoneExhaustNodeNum)
+{
+    bool exhaustNodeError;
+    int ExhaustNum;
+
+    exhaustNodeError = true;
+
+    if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
+        GetZoneEquipmentData(state);
+        state.dataZoneEquip->ZoneEquipInputsFilled = true;
+    }
+
+    for (ExhaustNum = 1; ExhaustNum <= state.dataZoneEquip->ZoneEquipConfig(state.dataHeatBal->Zone(ZoneNum).ZoneEqNum).NumExhaustNodes;
+         ++ExhaustNum) {
+        if (ZoneExhaustNodeNum == state.dataZoneEquip->ZoneEquipConfig(state.dataHeatBal->Zone(ZoneNum).ZoneEqNum).ExhaustNode(ExhaustNum)) {
+            exhaustNodeError = false;
+            break;
+        }
+    }
+
+    return exhaustNodeError;
+}
+
 Real64 CalcDesignSpecificationOutdoorAir(EnergyPlusData &state,
                                          int const DSOAPtr,          // Pointer to DesignSpecification:OutdoorAir object
                                          int const ActualZoneNum,    // Zone index
@@ -1761,6 +1789,46 @@ Real64 EquipList::SequentialHeatingFraction(EnergyPlusData &state, const int equ
 Real64 EquipList::SequentialCoolingFraction(EnergyPlusData &state, const int equipNum)
 {
     return ScheduleManager::GetCurrentScheduleValue(state, SequentialCoolingFractionSchedPtr(equipNum));
+}
+
+int GetZoneEquipControlledZoneNum(EnergyPlusData &state, int const ZoneEquipTypeNum, std::string const &EquipmentName)
+{
+    int ControlZoneNum = 0;
+
+    for (int CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
+        if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+        for (int Num = 1; Num <= state.dataZoneEquip->ZoneEquipList(CtrlZone).NumOfEquipTypes; ++Num) {
+            if (UtilityRoutines::SameString(EquipmentName, state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipName(Num)) &&
+                ZoneEquipTypeNum == state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipType_Num(Num)) {
+                ControlZoneNum = CtrlZone;
+                break;
+            }
+        }
+        if (ControlZoneNum > 0) break;
+    }
+
+    return ControlZoneNum;
+}
+
+void CheckSharedExhaust(EnergyPlusData &state)
+{
+    int ExhastNodeNum = 0;
+    for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+        if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumReturnNodes < 2) continue;
+        for (int nodeCount = 1; nodeCount <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumReturnNodes; ++nodeCount) {
+            if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).SharedExhaustNode(nodeCount) == iLightReturnExhaustConfig::Shared) continue;
+            ExhastNodeNum = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeExhaustNodeNum(nodeCount);
+            if (ExhastNodeNum > 0) {
+                state.dataZoneEquip->ZoneEquipConfig(ZoneNum).SharedExhaustNode(nodeCount) = iLightReturnExhaustConfig::Single;
+                for (int nodeCount1 = nodeCount + 1; nodeCount1 <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumReturnNodes; ++nodeCount1) {
+                    if (ExhastNodeNum == state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeExhaustNodeNum(nodeCount1)) {
+                        state.dataZoneEquip->ZoneEquipConfig(ZoneNum).SharedExhaustNode(nodeCount) = iLightReturnExhaustConfig::Multi;
+                        state.dataZoneEquip->ZoneEquipConfig(ZoneNum).SharedExhaustNode(nodeCount1) = iLightReturnExhaustConfig::Shared;
+                    }
+                }
+            }
+        }
+    }
 }
 
 } // namespace EnergyPlus::DataZoneEquipment
