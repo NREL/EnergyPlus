@@ -844,15 +844,15 @@ To illustrate how to use the PerformancePrecisionTradeoffs object and the \_perf
 % \begin{longtable}[c]{cccccccrr}
 \caption{PerfLog Mode Columns\label{table:perflog_mode_columns}} \tabularnewline
 \toprule
-Run & 
-Direct Coil & 
-Radiant Algorithm & 
-Override Mode & 
-Num of Timesteps {[}\#/hour{]}& 
-Min Warmup& 
-Suppress Resets & 
+Run &
+Direct Coil &
+Radiant Algorithm &
+Override Mode &
+Num of Timesteps {[}\#/hour{]}&
+Min Warmup&
+Suppress Resets &
 System Timestep {[}minute{]} &
-MaxZone TempDiff & 
+MaxZone TempDiff &
 MaxAllowed DelTemp &
 Runtime {[}second{]} \tabularnewline
 \midrule
@@ -880,7 +880,7 @@ Runtime {[}second{]} \tabularnewline
 \end{longtable}
 }
 
-This example uses 17 different simulations to arrive at the recommended values for the PerformancePrecisionTradeoffs object, but fewer trials could have been made to reach a similar conclusion. The first run (Run 1, Normal mode) shows the results of no performance precision tradeoffs being applied and is the same as not having the PerformancePrecisionTradeoffs object present. It is a good idea to use this as a first step so that a baseline of the time, errors, and oscillations are available for reference.  Runs 2 through 8 are just stepping through the Override Modes (Mode01 to Mode07). Run 9 employs the ``Use Coil Direct Solution'' option, but the time gain for the simulation is not so significant. Therefore it is not used anymore in later runs. Runs 10 through 17 repeat the various override modes, but this time with the CarrollMRT radiant exchange algorithm. The biggest savings of the computation time are from Mode01 (Run 2) application. Compared to the Normal mode (Run 1) baseline, applying Mode01 (Run 2) immediately reduces the simulation time by nearly 60\%, to about only 40.9\% of that for the Normal baseline. Then again, by applying Mode02 (Run 3), the simulation time is reduced by 5.8\% compared to Mode02 (Run 1); Mode03 (Run 4) saves about 7.3\% compared to Mode02 (Run 3); and Mode04 (Run 5) saves about 7.3\% on top of Mode03 (Run 4). Compared to the normal baseline (Run 1), Mode04 (Run 5) only consumes about one third (33.1\%) of the computation time of Run 1 Normal baseline. 
+This example uses 17 different simulations to arrive at the recommended values for the PerformancePrecisionTradeoffs object, but fewer trials could have been made to reach a similar conclusion. The first run (Run 1, Normal mode) shows the results of no performance precision tradeoffs being applied and is the same as not having the PerformancePrecisionTradeoffs object present. It is a good idea to use this as a first step so that a baseline of the time, errors, and oscillations are available for reference.  Runs 2 through 8 are just stepping through the Override Modes (Mode01 to Mode07). Run 9 employs the ``Use Coil Direct Solution'' option, but the time gain for the simulation is not so significant. Therefore it is not used anymore in later runs. Runs 10 through 17 repeat the various override modes, but this time with the CarrollMRT radiant exchange algorithm. The biggest savings of the computation time are from Mode01 (Run 2) application. Compared to the Normal mode (Run 1) baseline, applying Mode01 (Run 2) immediately reduces the simulation time by nearly 60\%, to about only 40.9\% of that for the Normal baseline. Then again, by applying Mode02 (Run 3), the simulation time is reduced by 5.8\% compared to Mode02 (Run 1); Mode03 (Run 4) saves about 7.3\% compared to Mode02 (Run 3); and Mode04 (Run 5) saves about 7.3\% on top of Mode03 (Run 4). Compared to the normal baseline (Run 1), Mode04 (Run 5) only consumes about one third (33.1\%) of the computation time of Run 1 Normal baseline.
 
 Next, when Mode05 (Run 6) is applied, the simulation time is significantly reduced again---Mode05 reduces the simulation time by nearly a half compared to Mode04 (Run 5). The run time for Mode05 (Run 6) is only 54.3\% of that for Mode04 (Run 5); and it is only 18.0\% of the Normal baseline (Run 1). Mode06 (Run 7) cuts the simulation time by about a second, or about 3.3\% compared to Mode 05 (Run 6); the overall simulation time of Mode06 (Run 7) is about 17.4\% of the Normal baseline. The final Mode07 (Run 8) cuts the simulation time by another 18.0\% compared to Mode06 (Run 7); and the overall run time for Mode07 is only 14.25\% (or about one-seventh) of that for the Run 1 Normal baseline.
 
@@ -894,10 +894,10 @@ These example simulations each takes about three minutes or less to try. If your
 % \begin{longtable}[c]{p{0.2in}p{0.4in}p{0.6in}p{0.7in}p{0.5in}p{0.5in}p{0.7in}p{0.7in}p{0.65in}}
 \caption{PerfLog Energy Columns\label{table:perflog_energy_columns}} \tabularnewline
 \toprule
-Run & 
-Direct Coil & 
-Radiant Algorithm & 
-Override Mode & 
+Run &
+Direct Coil &
+Radiant Algorithm &
+Override Mode &
   Electricity {[}MJ{]} &
   Natural Gas {[}MJ{]} &
   Water {[}m$^3${]} &
@@ -927,7 +927,7 @@ Override Mode &
 \end{longtable}
 }
 
-The CarrollMRT options seem to have a much more significant impact on the natural gas usage; and the total water and the times are similar to the runtimes using ScriptF. So for this example, CarrollMRT does not seem to be a right choice. In these cases, the computation times are not very different from the ScriptF instances; however, the energy usage is further away from the Normal baseline. The electricity usage differences for Runs 2 through 8 are small compared to Run 1 (the Normal baseline case), and are less than 0.27\% different. The natural gas usage has more significant differences of 1.4\% to 1.9\%, and the water usage differs from 0.36\% to 0.88\%. From an energy perspective, these impacts for the ScriptF Runs 2 through 8 are probably tolerable. 
+The CarrollMRT options seem to have a much more significant impact on the natural gas usage; and the total water and the times are similar to the runtimes using ScriptF. So for this example, CarrollMRT does not seem to be a right choice. In these cases, the computation times are not very different from the ScriptF instances; however, the energy usage is further away from the Normal baseline. The electricity usage differences for Runs 2 through 8 are small compared to Run 1 (the Normal baseline case), and are less than 0.27\% different. The natural gas usage has more significant differences of 1.4\% to 1.9\%, and the water usage differs from 0.36\% to 0.88\%. From an energy perspective, these impacts for the ScriptF Runs 2 through 8 are probably tolerable.
 
 % table X
 {\scriptsize
@@ -935,10 +935,10 @@ The CarrollMRT options seem to have a much more significant impact on the natura
 % \begin{longtable}[c]{p{0.2in}p{0.4in}p{0.6in}p{0.7in}p{0.5in}p{0.5in}p{0.7in}p{0.6in}p{0.65in}}
 \caption{PerfLog Oscillation Columns\label{table:perflog_oscillation_columns}} \tabularnewline
 \toprule
-Run & 
-Direct Coil & 
-Radiant Algorithm & 
-Override Mode & 
+Run &
+Direct Coil &
+Radiant Algorithm &
+Override Mode &
   Oscillating {[}hour{]} &
   Oscillating Occupancy {[}hour{]} &
   Oscillating Deadband {[}hour{]} &
@@ -981,7 +981,7 @@ If Yes, an analytical or empirical solution will be used instead of iteration ba
 
 Although this input field may eventually affect all coils, the current implementation is available for only the limited number of systems and coil configurations listed in the following table. Since a linear relationship between system output and part load ratio, or speed ratio, is expected, an analytical direct solution is applied to all coils in the listed in the table when Yes is selected. More coils will be allowed when time allows. Note that this simulation parameter is global and when used every such coil model included in the entire building model will be changed to use the direct method.
 
-The Part Load Ratio (PLR) for a single speed coil or a multiple speed coil at speed 1 is calculated using the equation below: 
+The Part Load Ratio (PLR) for a single speed coil or a multiple speed coil at speed 1 is calculated using the equation below:
 
 \begin{equation}
 \textnormal{PLR} = \frac{\textnormal{SystemLoad} - \textnormal{OutputOff}}{\textnormal{OutputFull} - \textnormal{OutputOff}}
@@ -997,7 +997,7 @@ OutputOff = System output at PLR = 0 as coil off;
 
 OutputFull = System output at PLR = 1 as full output.
 
-The Speed Ratio for a multiple speed coil at speed > 1 is calculated using the equation below: 
+The Speed Ratio for a multiple speed coil at speed > 1 is calculated using the equation below:
 
 \begin{equation}
 \textnormal{SpeedRatio} = \frac{\textnormal{SystemLoad} - \textnormal{OutputFull}_{i-1}}{\textnormal{OutputFull}_{i} - \textnormal{OutputFull}_{i-1}}
@@ -1082,7 +1082,7 @@ Although, defined view factors cannot be used with CarrollMRT, the algorithm app
 
 \paragraph{Field: Override Mode}\label{override-mode}
 
-The Override Mode field provides a single field that will override other inputs located in the IDF/epJSON file as well as convergence related values that appear in the remaining fields of the PerformancePrecisionTradeoffs object. The Normal option (default) provides no overrides while the Mode options provide overrides based on the following tables. The Advanced option, allows the remaining fields of the PerformancePrecisionTradeoffs to be used. 
+The Override Mode field provides a single field that will override other inputs located in the IDF/epJSON file as well as convergence related values that appear in the remaining fields of the PerformancePrecisionTradeoffs object. The Normal option (default) provides no overrides while the Mode options provide overrides based on the following tables. The Advanced option, allows the remaining fields of the PerformancePrecisionTradeoffs to be used.
 
 % table 2
 \begin{longtable}[c]{p{1.5in}p{5.0in}}
@@ -1115,6 +1115,35 @@ This field is only active and used when Override Mode is set to Advanced. The va
 
 This field is only active and used when Override Mode is set to Advanced. The value provided here is used for the MaxAllowedDelTemp variable within EnergyPlus. This variable sets the maximum surface temperature change before the HVAC timestep is shortened. Similar to the MaxZoneTempDiff parameter, larger MaxAllowedDelTemp values result in fewer iterations. To understand this input completely, please review the use of the MaxAllowedDetTemp variable in the CalcHeatBalanceInsideSurf2() routine located in the HeatBalanceSurfaceManager.cc source file of EnergyPlus. The value normally used in EnergyPlus is 0.002 ($^\circ$C), which is also the default value. Testing has been done with a value of 0.1 ($^\circ$C), which increased the overall speed of EnergyPlus for most of a set of selected files that were tested. Values larger than 0.1 have not been tested.
 
+\paragraph{Field: Use Representative Surfaces for Calculations}\label{use-representative-surfaces-for-calculations}
+
+If Yes, EnergyPlus will automatically group heat-transfer surfaces with similar characteristics and perform relevant calculations only once for each group.
+
+Surface are grouped based on the following criteria for similarity:
+
+\begin{itemize}
+    \item construction
+    \item orientation
+    \item surface height
+    \item zone
+    \item solar/wind exposure
+    \item other side boundary condition
+    \item conduction and convection heat transfer algorithms
+    \item movable insulation
+    \item frame and divider (windows only)
+    \item storm window constuction (windows only)
+    \item other minor attributes
+\end{itemize}
+
+Surfaces with the following attributes are currently never grouped because there is a high likelyhood that they will experience dissimilar conditions throughout a simulation:
+
+\begin{itemize}
+    \item ConstructionProperty:InternalHeatSource
+    \item WindowShadingControl (windows only)
+    \item WindowProperty:AirflowControl (windows only)
+\end{itemize}
+
+Currently, the only calculations performed across all surfaces with a group is the interior radiation exchange, where surfaces within a group are collected into a single area for participating in interior longwave radiation exchange. This will reduce the scale and complexity of the algorithm with minimal impact on accuracy. Additional calculations may be performed for a group of surfaces in future releases.
 
 An IDF example:
 
@@ -1124,7 +1153,8 @@ Yes,                      !- Use Coil Direct Solutions
 CarrollMRT;               !- Zone Radiant Exchange Algorithm
 Mode06,                   !- Override Mode
 0.3,                      !- MaxZoneTempDiff
-0.002;                    !- MaxAllowedDelTemp
+0.002,                    !- MaxAllowedDelTemp
+Yes;                      !- Use Representative Surfaces for Calculations
 \end{lstlisting}
 
 
