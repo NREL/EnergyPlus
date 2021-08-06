@@ -56,6 +56,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -81,7 +82,6 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/Construction.hh>
 
 namespace EnergyPlus {
 
@@ -1194,8 +1194,9 @@ namespace PhotovoltaicThermalCollectors {
                 CpInlet = Psychrometrics::CPHW(Tinlet);
             }
             Real64 Tcollector =
-                (2.0 * mdot * CpInlet * Tinlet + this->AreaCol * (HrGround * state.dataEnvrn->OutDryBulbTemp + HrSky * state.dataEnvrn->SkyTemp +
-                 HrAir * state.dataHeatBalSurf->TH(1, 1, SurfNum) + HcExt * state.dataHeatBalSurf->TH(1, 1, SurfNum))) /
+                (2.0 * mdot * CpInlet * Tinlet +
+                 this->AreaCol * (HrGround * state.dataEnvrn->OutDryBulbTemp + HrSky * state.dataEnvrn->SkyTemp +
+                                  HrAir * state.dataHeatBalSurf->TH(1, 1, SurfNum) + HcExt * state.dataHeatBalSurf->TH(1, 1, SurfNum))) /
                 (2.0 * mdot * CpInlet + this->AreaCol * (HrGround + HrSky + HrAir + HcExt));
             PotentialOutletTemp = 2.0 * Tcollector - Tinlet;
             this->Report.ToutletWorkFluid = PotentialOutletTemp;
@@ -1384,24 +1385,24 @@ namespace PhotovoltaicThermalCollectors {
         Real64 emiss_pvg = this->BIPVT.PVGEmiss;          // emissivity of glass surface
 
         // BIPVT model parameters
-        Real64 tsurr, tsurrK;                  // surrouding temperature (DegC, DegK)
-        Real64 t1, t1K, t1_new;                // temperature of pv backing surface (DegC, DegK, DegC)
-        Real64 tpv_new;                        // temperature of pv surface (DegC, DegC)
-        Real64 tpvg, tpvgK, tpvg_new;          // temperature of pv glass cover (DegC, DegK,DegC)
-        Real64 tfavg(18.0);                    // average fluid temperature (DegC)
-        Real64 tfout;                          // outlet fluid temperature from BIPVT channel (DegC)
-        Real64 hconvf1(100.0);                 // heat transfer coefficient between fluid and backing surface (W/m2-K)
-        Real64 hconvf2(100.0);                 // heat transfer coefficient between fluid and bldg surface (W/m2-K)
-        Real64 hconvt_nat(0.0);                // htc external natural
-        Real64 hconvt_forced(0.0);             // htc external forced
-        Real64 hconvt(0.0);                    // htc external total
-        Real64 hpvg_pv;                        // conductance of pv glass cover (W/m2-K)
-        Real64 hpv_1;                          // conductance of pv backing (W/m2-K)
-        Real64 hrad12;                         // radiative heat transfer coefficient between bldg surface and pv backing surface (W/m2-K)
-        Real64 hrad_surr;                      // radiative heat transfer coefficient between pv glass cover and surrounding (W/m2-K)
-        const Real64 small_num(1.0e-10);       // small real number
-        const Real64 sigma(5.67e-8);           // stephan bolzmann constant
-        Real64 eff_pv(0.0);                    // efficiency pv panel
+        Real64 tsurr, tsurrK;            // surrouding temperature (DegC, DegK)
+        Real64 t1, t1K, t1_new;          // temperature of pv backing surface (DegC, DegK, DegC)
+        Real64 tpv_new;                  // temperature of pv surface (DegC, DegC)
+        Real64 tpvg, tpvgK, tpvg_new;    // temperature of pv glass cover (DegC, DegK,DegC)
+        Real64 tfavg(18.0);              // average fluid temperature (DegC)
+        Real64 tfout;                    // outlet fluid temperature from BIPVT channel (DegC)
+        Real64 hconvf1(100.0);           // heat transfer coefficient between fluid and backing surface (W/m2-K)
+        Real64 hconvf2(100.0);           // heat transfer coefficient between fluid and bldg surface (W/m2-K)
+        Real64 hconvt_nat(0.0);          // htc external natural
+        Real64 hconvt_forced(0.0);       // htc external forced
+        Real64 hconvt(0.0);              // htc external total
+        Real64 hpvg_pv;                  // conductance of pv glass cover (W/m2-K)
+        Real64 hpv_1;                    // conductance of pv backing (W/m2-K)
+        Real64 hrad12;                   // radiative heat transfer coefficient between bldg surface and pv backing surface (W/m2-K)
+        Real64 hrad_surr;                // radiative heat transfer coefficient between pv glass cover and surrounding (W/m2-K)
+        const Real64 small_num(1.0e-10); // small real number
+        const Real64 sigma(5.67e-8);     // stephan bolzmann constant
+        Real64 eff_pv(0.0);              // efficiency pv panel
 
         // other parameters
         Real64 a(0), b(0), c(0), d(0), e(0);                                  // variables used for solving average fluid temperature
@@ -1531,7 +1532,7 @@ namespace PhotovoltaicThermalCollectors {
             k_air = 0.000000000015207 * std::pow(tfavg + 273.15, 3.0) - 0.000000048574 * std::pow(tfavg + 273.15, 2.0) +
                     0.00010184 * (tfavg + 273.15) - 0.00039333;
             prandtl_air = (-2.1415e-12) * std::pow(tfavg, 4.0) + (1.6785e-9) * std::pow(tfavg, 3.0) + (4.8260e-8) * std::pow(tfavg, 2.0) -
-                      (2.4939e-4) * tfavg + 7.3506e-1;
+                          (2.4939e-4) * tfavg + 7.3506e-1;
             density_air = 101.3 / (0.287 * (tfavg + 273.15));
             diffusivity_air = k_air / (cp_in * density_air);
             kin_viscosity_air = mu_air / density_air;
@@ -1540,41 +1541,41 @@ namespace PhotovoltaicThermalCollectors {
             tpvgK = tpvg + degc_to_kelvin;
             hrad12 = sigma * (pow(t1K, 2) + pow(t2K, 2)) * (t1K + t2K) / (1 / emiss_b + 1 / emiss_2 - 1);
             hrad_surr = sigma * emiss_pvg * (pow(tsurrK, 2) + pow(tpvgK, 2)) * (tsurrK + tpvgK);
-            if (mdot_bipvt > 0.0) // If there is a positive flow rate 
-            { 
-              vel = mdot_bipvt / (density_air * w * depth_channel);
-              reynolds = density_air * (vel) * (4 * w * depth_channel / (2 * (w + depth_channel))) / mu_air;
-              nusselt = 0.052 * (std::pow(reynolds, 0.78)) * (std::pow(prandtl_air, 0.4));
+            if (mdot_bipvt > 0.0) // If there is a positive flow rate
+            {
+                vel = mdot_bipvt / (density_air * w * depth_channel);
+                reynolds = density_air * (vel) * (4 * w * depth_channel / (2 * (w + depth_channel))) / mu_air;
+                nusselt = 0.052 * (std::pow(reynolds, 0.78)) * (std::pow(prandtl_air, 0.4));
 
-              hconvf1 = k_air * nusselt / (4 * w * depth_channel / (2 * (w + depth_channel)));
-              hconvf1 = 12.0 * vel + 3.0;
-              nusselt = 1.017 * (std::pow(reynolds, 0.471)) * (std::pow(prandtl_air, 0.4));
+                hconvf1 = k_air * nusselt / (4 * w * depth_channel / (2 * (w + depth_channel)));
+                hconvf1 = 12.0 * vel + 3.0;
+                nusselt = 1.017 * (std::pow(reynolds, 0.471)) * (std::pow(prandtl_air, 0.4));
 
-              hconvf2 = k_air * nusselt / (4 * w * depth_channel / (2 * (w + depth_channel)));
-              hconvf2 = hconvf1;
+                hconvf2 = k_air * nusselt / (4 * w * depth_channel / (2 * (w + depth_channel)));
+                hconvf2 = hconvf1;
 
-              a = -(w / (mdot_bipvt * cp_in)) * (hconvf1 + hconvf2);
-              b = (w / (mdot_bipvt * cp_in)) * (hconvf1 * t1 + hconvf2 * t2);
-              tfavg = (1.0 / (a * l)) * (tfin + b / a) * (std::exp(a * l) - 1.0) - b / a;
+                a = -(w / (mdot_bipvt * cp_in)) * (hconvf1 + hconvf2);
+                b = (w / (mdot_bipvt * cp_in)) * (hconvf1 * t1 + hconvf2 * t2);
+                tfavg = (1.0 / (a * l)) * (tfin + b / a) * (std::exp(a * l) - 1.0) - b / a;
             } else // if there is no flow rate (stagnation)
             {
-              raleigh = (gravity * (1.0 / (tfavg + 273.15)) * (std::max((Real64)(0.000001), std::abs(t1 - t2))) * std::pow(depth_channel, 3)) /
-                        (diffusivity_air * kin_viscosity_air);
-              if (slope > 75.0 * pi / 180.0) {
-                  beta = 75.0 * pi / 180.0;
-              } else {
-                  beta = slope;
-              }
-              nusselt = 1.0 +
-                        1.44 * (1.0 - 1708.0 * (std::pow((std::sin(1.8 * beta)), 1.6)) / raleigh / std::cos(beta)) *
-                            std::max(0.0, (1.0 - 1708.0 / raleigh / std::cos(beta))) +
-                        std::max(0.0, ((std::pow((raleigh * std::cos(beta) / 5830.0), (1.0 / 3.0))) - 1.0));
-              hconvf1 = k_air * nusselt / depth_channel;
-              hconvf2 = hconvf1;
-              c = s + s1 + hconvt * (tamb - tpvg) + hrad_surr * (tsurr - tpvg) + hrad12 * (t2 - t1);
-              d = c + hconvf2 * t2;
-              e = -hconvf2;
-              tfavg = -d / e;
+                raleigh = (gravity * (1.0 / (tfavg + 273.15)) * (std::max((Real64)(0.000001), std::abs(t1 - t2))) * std::pow(depth_channel, 3)) /
+                          (diffusivity_air * kin_viscosity_air);
+                if (slope > 75.0 * pi / 180.0) {
+                    beta = 75.0 * pi / 180.0;
+                } else {
+                    beta = slope;
+                }
+                nusselt = 1.0 +
+                          1.44 * (1.0 - 1708.0 * (std::pow((std::sin(1.8 * beta)), 1.6)) / raleigh / std::cos(beta)) *
+                              std::max(0.0, (1.0 - 1708.0 / raleigh / std::cos(beta))) +
+                          std::max(0.0, ((std::pow((raleigh * std::cos(beta) / 5830.0), (1.0 / 3.0))) - 1.0));
+                hconvf1 = k_air * nusselt / depth_channel;
+                hconvf2 = hconvf1;
+                c = s + s1 + hconvt * (tamb - tpvg) + hrad_surr * (tsurr - tpvg) + hrad12 * (t2 - t1);
+                d = c + hconvf2 * t2;
+                e = -hconvf2;
+                tfavg = -d / e;
             }
 
             for (i = 0; i <= m - 1; i++) {
@@ -1600,7 +1601,7 @@ namespace PhotovoltaicThermalCollectors {
             tpvg_new = y[0];
             tpv_new = y[1];
             t1_new = y[2];
-            if(mdot > 0.0) {
+            if (mdot > 0.0) {
                 tfout = (tfin + b / a) * std::exp(a * l) - b / a; // air outlet temperature (DegC)
                 if (((Mode == "Heating") && (q > 0.0) && (tmixed > tsp)) || ((Mode == "Cooling") && (q < 0.0) && (tmixed < tsp))) {
                     bfr = (tsp - tfout) / (tfin - tfout); // bypass fraction
