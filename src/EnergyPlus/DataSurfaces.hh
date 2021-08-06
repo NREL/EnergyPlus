@@ -759,8 +759,9 @@ namespace DataSurfaces {
         }
     };
 
-    enum class NfrcProductOptions
+    enum class NfrcProductOptions : int
     {
+        Unassigned = -1,
         CasementDouble,
         CasementSingle,
         DualAction,
@@ -782,31 +783,19 @@ namespace DataSurfaces {
         DoorTransom,
         TropicalAwning,
         TubularDaylightingDevice,
-        VerticalSlider
+        VerticalSlider,
+        Num
     };
 
-    std::map<std::string, NfrcProductOptions> const NfrcProductMap = {{"CASEMENTDOUBLE", NfrcProductOptions::CasementDouble},
-                                                                      {"CASEMENTSINGLE", NfrcProductOptions::CasementSingle},
-                                                                      {"CURTAINWALL", NfrcProductOptions::CurtainWall},
-                                                                      {"DOORSIDELITE", NfrcProductOptions::DoorSidelite},
-                                                                      {"DOORTRANSOM", NfrcProductOptions::DoorTransom},
-                                                                      {"DUALACTION", NfrcProductOptions::DualAction},
-                                                                      {"FIXED", NfrcProductOptions::Fixed},
-                                                                      {"GARAGE", NfrcProductOptions::Garage},
-                                                                      {"GREENHOUSE", NfrcProductOptions::Greenhouse},
-                                                                      {"HINGEDESCAPE", NfrcProductOptions::HingedEscape},
-                                                                      {"HORIZONTALSLIDER", NfrcProductOptions::HorizontalSlider},
-                                                                      {"JAL", NfrcProductOptions::Jal},
-                                                                      {"PIVOTED", NfrcProductOptions::Pivoted},
-                                                                      {"PROJECTINGDUAL", NfrcProductOptions::ProjectingDual},
-                                                                      {"PROJECTINGSINGLE", NfrcProductOptions::ProjectingSingle},
-                                                                      {"SIDEHINGEDDOOR", NfrcProductOptions::SideHingedDoor},
-                                                                      {"SKYLIGHT", NfrcProductOptions::Skylight},
-                                                                      {"SLIDINGPATIODOOR", NfrcProductOptions::SlidingPatioDoor},
-                                                                      {"SPANDRELPANEL", NfrcProductOptions::SpandrelPanel},
-                                                                      {"TROPICALAWNING", NfrcProductOptions::TropicalAwning},
-                                                                      {"TUBULARDAYLIGHTINGDEVICE", NfrcProductOptions::TubularDaylightingDevice},
-                                                                      {"VERTICALSLIDER", NfrcProductOptions::VerticalSlider}};
+    constexpr std::array<std::string_view, static_cast<int>(NfrcProductOptions::Num)> NfrcProductName = {
+        "CasementDouble", "CasementSingle",   "DualAction",
+        "Fixed",          "Garage",           "Greenhouse",
+        "HingedEscape",   "HorizontalSlider", "Jal",
+        "Pivoted",        "ProjectingSingle", "ProjectingDual",
+        "DoorSidelite",   "Skylight",         "SlidingPatioDoor",
+        "CurtainWall",    "SpandrelPanel",    "SideHingedDoor",
+        "DoorTransom",    "TropicalAwning",   "TubularDaylightingDevice",
+        "VerticalSlider"};
 
     struct FrameDividerProperties
     {
