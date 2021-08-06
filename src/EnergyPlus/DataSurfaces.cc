@@ -538,7 +538,7 @@ void SetSurfaceOutBulbTempAt(EnergyPlusData &state)
         Real64 const BaseWetTemp(state.dataEnvrn->OutWetBulbTemp + state.dataEnvrn->WeatherFileTempModCoeff);
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
             // Base temperatures at Z = 0 (C)
-            if (state.dataSurface->Surface(SurfNum).ExtBoundCond != 0) continue;
+            //            if (state.dataSurface->Surface(SurfNum).ExtBoundCond != 0) continue;
             Real64 const Z(state.dataSurface->Surface(SurfNum).Centroid.z); // Centroid value
             if (Z <= 0.0) {
                 state.dataSurface->SurfOutDryBulbTemp(SurfNum) = BaseDryTemp;

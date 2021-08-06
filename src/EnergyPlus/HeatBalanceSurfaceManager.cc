@@ -1425,7 +1425,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
     state.dataHeatBalSurf->SurfOpaqAvgFaceCondFlux.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfOpaqAvgFaceCondEnergy.dimension(state.dataSurface->TotSurfaces, 0.0);
 
-    state.dataHeatBalSurf->SurfOpaqStorageGainRep.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBalSurf->SurfOpaqStorageCondGainRep.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfOpaqStorageCondLossRep.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfOpaqStorageCond.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfOpaqStorageCondFlux.dimension(state.dataSurface->TotSurfaces, 0.0);
@@ -1943,7 +1943,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                 SetupOutputVariable(state,
                                     "Surface Heat Storage Gain Rate",
                                     OutputProcessor::Unit::W,
-                                    state.dataHeatBalSurf->SurfOpaqStorageGainRep(loop),
+                                    state.dataHeatBalSurf->SurfOpaqStorageCondGainRep(loop),
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::State,
                                     Surface(loop).Name);
@@ -5611,15 +5611,13 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
         int const lastSurf = state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast;
         for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
             Real64 const surfaceArea(Surface(SurfNum).Area);
-            state.dataHeatBalSurf->QdotRadNetSurfInRep(SurfNum) =
-                (state.dataHeatBalSurf->QdotRadNetSurfInRepPerArea(SurfNum) = state.dataHeatBalSurf->SurfNetLWRadToSurf(SurfNum)) * surfaceArea;
+            state.dataHeatBalSurf->QdotRadNetSurfInRepPerArea(SurfNum) = state.dataHeatBalSurf->SurfNetLWRadToSurf(SurfNum);
+            state.dataHeatBalSurf->QdotRadNetSurfInRep(SurfNum) = state.dataHeatBalSurf->QdotRadNetSurfInRepPerArea(SurfNum) * surfaceArea;
             state.dataHeatBalSurf->QRadNetSurfInReport(SurfNum) =
                 state.dataHeatBalSurf->QdotRadNetSurfInRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
-            // Tuned Replaced by one line form below for speed
-            //            QdotRadIntGainsInRepPerArea( SurfNum ) = QRadThermInAbs( SurfNum );
-            //            QdotRadIntGainsInRep( SurfNum ) = QdotRadIntGainsInRepPerArea( SurfNum ) * surfaceArea;
-            state.dataHeatBalSurf->QdotRadIntGainsInRep(SurfNum) =
-                (state.dataHeatBalSurf->QdotRadIntGainsInRepPerArea(SurfNum) = state.dataHeatBal->SurfQRadThermInAbs(SurfNum)) * surfaceArea;
+
+            state.dataHeatBalSurf->QdotRadIntGainsInRepPerArea(SurfNum) = state.dataHeatBal->SurfQRadThermInAbs(SurfNum);
+            state.dataHeatBalSurf->QdotRadIntGainsInRep(SurfNum) = state.dataHeatBalSurf->QdotRadIntGainsInRepPerArea(SurfNum) * surfaceArea;
             state.dataHeatBalSurf->QRadIntGainsInReport(SurfNum) =
                 state.dataHeatBalSurf->QdotRadIntGainsInRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
 
@@ -5627,19 +5625,7 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
                 state.dataHeatBalFanSys->QHTRadSysSurf(SurfNum) + state.dataHeatBalFanSys->QCoolingPanelSurf(SurfNum) +
                 state.dataHeatBalFanSys->QHWBaseboardSurf(SurfNum) + state.dataHeatBalFanSys->QSteamBaseboardSurf(SurfNum) +
                 state.dataHeatBalFanSys->QElecBaseboardSurf(SurfNum);
-            state.dataHeatBalSurf->QdotRadHVACInRep(SurfNum) = state.dataHeatBalSurf->QdotRadHVACInRepPerArea(SurfNum) * Surface(SurfNum).Area;
-            // Tuned Replaced by one line form below for speed
-            //            QdotRadHVACInRepPerArea( SurfNum ) = QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf(
-            // SurfNum
-            //)
-            //+  QElecBaseboardSurf( SurfNum );             QdotRadHVACInRep( SurfNum ) = QdotRadHVACInRepPerArea( SurfNum ) *
-            // surfaceArea;
-            state.dataHeatBalSurf->QdotRadHVACInRep(SurfNum) =
-                (state.dataHeatBalSurf->QdotRadHVACInRepPerArea(SurfNum) =
-                     state.dataHeatBalFanSys->QHTRadSysSurf(SurfNum) + state.dataHeatBalFanSys->QCoolingPanelSurf(SurfNum) +
-                     state.dataHeatBalFanSys->QHWBaseboardSurf(SurfNum) + state.dataHeatBalFanSys->QSteamBaseboardSurf(SurfNum) +
-                     state.dataHeatBalFanSys->QElecBaseboardSurf(SurfNum)) *
-                surfaceArea;
+            state.dataHeatBalSurf->QdotRadHVACInRep(SurfNum) = state.dataHeatBalSurf->QdotRadHVACInRepPerArea(SurfNum) * surfaceArea;
             state.dataHeatBalSurf->QRadHVACInReport(SurfNum) = state.dataHeatBalSurf->QdotRadHVACInRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
         }
         int const firstSurfOpaq = state.dataHeatBal->Zone(ZoneNum).OpaqOrIntMassSurfaceFirst;
@@ -5656,18 +5642,11 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
             state.dataHeatBalSurf->QdotRadLightsInRep(SurfNum) = state.dataHeatBalSurf->QdotRadLightsInRepPerArea(SurfNum) * surfaceArea;
             state.dataHeatBalSurf->QRadLightsInReport(SurfNum) =
                 state.dataHeatBalSurf->QdotRadLightsInRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
-
-            if (state.dataGlobal->ZoneSizingCalc && state.dataGlobal->CompLoadReportIsReq) {
-                int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
-                state.dataOutRptTab->lightSWRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, SurfNum) =
-                    state.dataHeatBalSurf->QdotRadLightsInRep(SurfNum);
-                state.dataOutRptTab->feneSolarRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, SurfNum) =
-                    state.dataHeatBalSurf->QdotRadSolarInRep(SurfNum);
-            }
+        }
+        for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
             // inside face conduction updates
             state.dataHeatBalSurf->SurfOpaqInsFaceCondEnergy(SurfNum) =
                 state.dataHeatBalSurf->SurfOpaqInsFaceCond(SurfNum) * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->ZoneOpaqSurfInsFaceCond(ZoneNum) += state.dataHeatBalSurf->SurfOpaqInsFaceCond(SurfNum);
             state.dataHeatBalSurf->SurfOpaqInsFaceCondGainRep(SurfNum) = 0.0;
             state.dataHeatBalSurf->SurfOpaqInsFaceCondLossRep(SurfNum) = 0.0;
             if (state.dataHeatBalSurf->SurfOpaqInsFaceCond(SurfNum) >= 0.0) {
@@ -5679,7 +5658,6 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
             // outside face conduction updates
             state.dataHeatBalSurf->SurfOpaqOutFaceCondEnergy(SurfNum) =
                 state.dataHeatBalSurf->SurfOpaqOutFaceCond(SurfNum) * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBal->ZoneOpaqSurfExtFaceCond(ZoneNum) += state.dataHeatBalSurf->SurfOpaqOutFaceCond(SurfNum);
             state.dataHeatBalSurf->SurfOpaqExtFaceCondGainRep(SurfNum) = 0.0;
             state.dataHeatBalSurf->SurfOpaqExtFaceCondLossRep(SurfNum) = 0.0;
             if (state.dataHeatBalSurf->SurfOpaqOutFaceCond(SurfNum) >= 0.0) {
@@ -5687,9 +5665,9 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
             } else {
                 state.dataHeatBalSurf->SurfOpaqExtFaceCondLossRep(SurfNum) = -state.dataHeatBalSurf->SurfOpaqOutFaceCond(SurfNum);
             }
-
+        }
+        for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
             // do average surface conduction updates
-
             state.dataHeatBalSurf->SurfOpaqAvgFaceCond(SurfNum) =
                 (state.dataHeatBalSurf->SurfOpaqInsFaceCond(SurfNum) - state.dataHeatBalSurf->SurfOpaqOutFaceCond(SurfNum)) / 2.0;
             state.dataHeatBalSurf->SurfOpaqAvgFaceCondFlux(SurfNum) =
@@ -5711,35 +5689,58 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
                 -(state.dataHeatBalSurf->SurfOpaqInsFaceCond(SurfNum) + state.dataHeatBalSurf->SurfOpaqOutFaceCond(SurfNum));
             state.dataHeatBalSurf->SurfOpaqStorageCondEnergy(SurfNum) =
                 state.dataHeatBalSurf->SurfOpaqStorageCond(SurfNum) * state.dataGlobal->TimeStepZoneSec;
-            state.dataHeatBalSurf->SurfOpaqStorageGainRep(SurfNum) = 0.0;
+            state.dataHeatBalSurf->SurfOpaqStorageCondGainRep(SurfNum) = 0.0;
             state.dataHeatBalSurf->SurfOpaqStorageCondLossRep(SurfNum) = 0.0;
             if (state.dataHeatBalSurf->SurfOpaqStorageCond(SurfNum) >= 0.0) {
-                state.dataHeatBalSurf->SurfOpaqStorageGainRep(SurfNum) = state.dataHeatBalSurf->SurfOpaqStorageCond(SurfNum);
+                state.dataHeatBalSurf->SurfOpaqStorageCondGainRep(SurfNum) = state.dataHeatBalSurf->SurfOpaqStorageCond(SurfNum);
             } else {
                 state.dataHeatBalSurf->SurfOpaqStorageCondLossRep(SurfNum) = -state.dataHeatBalSurf->SurfOpaqStorageCond(SurfNum);
             }
         } // opaque heat transfer surfaces.
-
-        if (state.dataHeatBal->ZoneOpaqSurfInsFaceCond(ZoneNum) >= 0.0) {
-            state.dataHeatBal->ZoneOpaqSurfInsFaceCondGainRep(ZoneNum) = state.dataHeatBal->ZoneOpaqSurfInsFaceCond(ZoneNum);
-            state.dataHeatBal->ZnOpqSurfInsFaceCondGnRepEnrg(ZoneNum) =
-                state.dataHeatBal->ZoneOpaqSurfInsFaceCondGainRep(ZoneNum) * state.dataGlobal->TimeStepZoneSec;
-        } else {
-            state.dataHeatBal->ZoneOpaqSurfInsFaceCondLossRep(ZoneNum) = -state.dataHeatBal->ZoneOpaqSurfInsFaceCond(ZoneNum);
-            state.dataHeatBal->ZnOpqSurfInsFaceCondLsRepEnrg(ZoneNum) =
-                state.dataHeatBal->ZoneOpaqSurfInsFaceCondLossRep(ZoneNum) * state.dataGlobal->TimeStepZoneSec;
+    }
+    if (state.dataGlobal->ZoneSizingCalc && state.dataGlobal->CompLoadReportIsReq) {
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+            int const firstSurfOpaq = state.dataHeatBal->Zone(ZoneNum).OpaqOrIntMassSurfaceFirst;
+            int const lastSurfOpaq = state.dataHeatBal->Zone(ZoneNum).OpaqOrIntMassSurfaceLast;
+            for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
+                int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
+                state.dataOutRptTab->lightSWRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, SurfNum) =
+                    state.dataHeatBalSurf->QdotRadLightsInRep(SurfNum);
+                state.dataOutRptTab->feneSolarRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, SurfNum) =
+                    state.dataHeatBalSurf->QdotRadSolarInRep(SurfNum);
+            }
         }
+    }
+    if (state.dataGlobal->DisplayAdvancedReportVariables) {
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+            int const firstSurfOpaq = state.dataHeatBal->Zone(ZoneNum).OpaqOrIntMassSurfaceFirst;
+            int const lastSurfOpaq = state.dataHeatBal->Zone(ZoneNum).OpaqOrIntMassSurfaceLast;
+            for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
+                state.dataHeatBal->ZoneOpaqSurfExtFaceCond(ZoneNum) += state.dataHeatBalSurf->SurfOpaqOutFaceCond(SurfNum);
+                state.dataHeatBal->ZoneOpaqSurfInsFaceCond(ZoneNum) += state.dataHeatBalSurf->SurfOpaqInsFaceCond(SurfNum);
+            }
 
-        if (state.dataHeatBal->ZoneOpaqSurfExtFaceCond(ZoneNum) >= 0.0) {
-            state.dataHeatBal->ZoneOpaqSurfExtFaceCondGainRep(ZoneNum) = state.dataHeatBal->ZoneOpaqSurfExtFaceCond(ZoneNum);
-            state.dataHeatBal->ZnOpqSurfExtFaceCondGnRepEnrg(ZoneNum) =
-                state.dataHeatBal->ZoneOpaqSurfExtFaceCondGainRep(ZoneNum) * state.dataGlobal->TimeStepZoneSec;
-        } else {
-            state.dataHeatBal->ZoneOpaqSurfExtFaceCondLossRep(ZoneNum) = -state.dataHeatBal->ZoneOpaqSurfExtFaceCond(ZoneNum);
-            state.dataHeatBal->ZnOpqSurfExtFaceCondLsRepEnrg(ZoneNum) =
-                state.dataHeatBal->ZoneOpaqSurfExtFaceCondLossRep(ZoneNum) * state.dataGlobal->TimeStepZoneSec;
-        }
-    } // loop over zones
+            if (state.dataHeatBal->ZoneOpaqSurfInsFaceCond(ZoneNum) >= 0.0) {
+                state.dataHeatBal->ZoneOpaqSurfInsFaceCondGainRep(ZoneNum) = state.dataHeatBal->ZoneOpaqSurfInsFaceCond(ZoneNum);
+                state.dataHeatBal->ZnOpqSurfInsFaceCondGnRepEnrg(ZoneNum) =
+                    state.dataHeatBal->ZoneOpaqSurfInsFaceCondGainRep(ZoneNum) * state.dataGlobal->TimeStepZoneSec;
+            } else {
+                state.dataHeatBal->ZoneOpaqSurfInsFaceCondLossRep(ZoneNum) = -state.dataHeatBal->ZoneOpaqSurfInsFaceCond(ZoneNum);
+                state.dataHeatBal->ZnOpqSurfInsFaceCondLsRepEnrg(ZoneNum) =
+                    state.dataHeatBal->ZoneOpaqSurfInsFaceCondLossRep(ZoneNum) * state.dataGlobal->TimeStepZoneSec;
+            }
+
+            if (state.dataHeatBal->ZoneOpaqSurfExtFaceCond(ZoneNum) >= 0.0) {
+                state.dataHeatBal->ZoneOpaqSurfExtFaceCondGainRep(ZoneNum) = state.dataHeatBal->ZoneOpaqSurfExtFaceCond(ZoneNum);
+                state.dataHeatBal->ZnOpqSurfExtFaceCondGnRepEnrg(ZoneNum) =
+                    state.dataHeatBal->ZoneOpaqSurfExtFaceCondGainRep(ZoneNum) * state.dataGlobal->TimeStepZoneSec;
+            } else {
+                state.dataHeatBal->ZoneOpaqSurfExtFaceCondLossRep(ZoneNum) = -state.dataHeatBal->ZoneOpaqSurfExtFaceCond(ZoneNum);
+                state.dataHeatBal->ZnOpqSurfExtFaceCondLsRepEnrg(ZoneNum) =
+                    state.dataHeatBal->ZoneOpaqSurfExtFaceCondLossRep(ZoneNum) * state.dataGlobal->TimeStepZoneSec;
+            }
+        } // loop over zones
+    }
 }
 
 void ReportIntMovInsInsideSurfTemp(EnergyPlusData &state)
