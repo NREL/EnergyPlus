@@ -537,12 +537,7 @@ namespace ConvectionCoefficients {
         // REFERENCES:
         // 2.  ASHRAE Handbook of Fundamentals 2001, p. 3.12, Table 5.
 
-        // Return value
-        Real64 Hn; // function result
-
-        Hn = 1.31 * std::pow(std::abs(DeltaTemp), ConvectionConstants::OneThird);
-
-        return Hn;
+        return 1.31 * std::pow(std::abs(DeltaTemp), ConvectionConstants::OneThird);
     }
 
     inline Real64 CalcWaltonUnstableHorizontalOrTilt(Real64 const DeltaTemp, // [C] temperature difference between surface and air
@@ -566,12 +561,7 @@ namespace ConvectionCoefficients {
         // 1.  Walton, G. N. 1983. Thermal Analysis Research Program (TARP) Reference Manual,
         //     NBSSIR 83-2655, National Bureau of Standards, "Surface Inside Heat Balances", pp 79-80.
 
-        // Return value
-        Real64 Hn; // function result
-
-        Hn = 9.482 * std::pow(std::abs(DeltaTemp), ConvectionConstants::OneThird) / (7.238 - std::abs(CosineTilt));
-
-        return Hn;
+        return 9.482 * std::pow(std::abs(DeltaTemp), ConvectionConstants::OneThird) / (7.238 - std::abs(CosineTilt));
     }
 
     inline Real64 CalcWaltonStableHorizontalOrTilt(Real64 const DeltaTemp, // [C] temperature difference between surface and air
@@ -593,12 +583,7 @@ namespace ConvectionCoefficients {
         // 1.  Walton, G. N. 1983. Thermal Analysis Research Program (TARP) Reference Manual,
         //     NBSSIR 83-2655, National Bureau of Standards, "Surface Inside Heat Balances", pp 79-80.
 
-        // Return value
-        Real64 Hn; // function result
-
-        Hn = 1.810 * std::pow(std::abs(DeltaTemp), ConvectionConstants::OneThird) / (1.382 + std::abs(CosineTilt));
-
-        return Hn;
+        return 1.810 * std::pow(std::abs(DeltaTemp), ConvectionConstants::OneThird) / (1.382 + std::abs(CosineTilt));
     }
 
     Real64 CalcFisherPedersenCeilDiffuserFloor(EnergyPlusData &state,

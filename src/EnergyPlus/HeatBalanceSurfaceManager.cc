@@ -689,10 +689,6 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
             auto const &construct(state.dataConstruction->Construct(ConstrNum));
             state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) = 0.0;
             state.dataHeatBalSurf->SurfCTFConstInPart(SurfNum) = 0.0;
-            if (construct.SourceSinkPresent) {
-                state.dataHeatBalFanSys->CTFTsrcConstPart(SurfNum) = 0.0;
-                state.dataHeatBalFanSys->CTFTuserConstPart(SurfNum) = 0.0;
-            }
             if (construct.NumCTFTerms <= 1) continue;
 
             for (int Term = 1; Term <= construct.NumCTFTerms; ++Term) {
@@ -718,7 +714,23 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
                 state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) +=
                     construct.CTFOutside(Term) * TH11 - ctf_cross * TH12 + construct.CTFFlux(Term) * QH11;
             }
-            if (construct.SourceSinkPresent) {
+        }
+    }
+    if (state.dataHeatBal->AnyInternalHeatSourceInInput) {
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) { // Loop through all surfaces...
+            int const firstSurfOpaque = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+            int const lastSurfOpaque = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
+            for (int SurfNum = firstSurfOpaque; SurfNum <= lastSurfOpaque; ++SurfNum) {
+                auto const &surface(Surface(SurfNum));
+                int const ConstrNum = surface.Construction;
+                auto const &construct(state.dataConstruction->Construct(ConstrNum));
+                if (!construct.SourceSinkPresent) continue;
+                if (surface.HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CTF &&
+                    surface.HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::EMPD)
+                    continue;
+                state.dataHeatBalFanSys->CTFTsrcConstPart(SurfNum) = 0.0;
+                state.dataHeatBalFanSys->CTFTuserConstPart(SurfNum) = 0.0;
+                if (construct.NumCTFTerms <= 1) continue;
                 for (int Term = 1; Term <= construct.NumCTFTerms; ++Term) {
                     Real64 const TH11(state.dataHeatBalSurf->SurfOutsideTempHist(Term + 1)(SurfNum));
                     Real64 const TH12(state.dataHeatBalSurf->SurfInsideTempHist(Term + 1)(SurfNum));
@@ -737,8 +749,8 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
                         construct.CTFFlux(Term) * state.dataHeatBalSurf->TuserHist(SurfNum, Term + 1);
                 }
             }
-        }
-    } // ...end of surfaces DO loop for initializing temperature history terms for the surface heat balances
+        } // ...end of surfaces DO loop for initializing temperature history terms for the surface heat balances
+    }
 
     // Zero out all of the radiant system heat balance coefficient arrays
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) { // Loop through all surfaces...
@@ -5260,33 +5272,31 @@ void CalcThermalResilience(EnergyPlusData &state)
         for (int Loop = 1; Loop <= state.dataOutputProcessor->NumOfReqVariables; ++Loop) {
             if (state.dataOutputProcessor->ReqRepVars(Loop).VarName == "Zone Heat Index") {
                 state.dataHeatBalSurfMgr->reportVarHeatIndex = true;
-            }
-            if (state.dataOutputProcessor->ReqRepVars(Loop).VarName == "Zone Humidity") {
+            } else if (state.dataOutputProcessor->ReqRepVars(Loop).VarName == "Zone Humidity Index") {
                 state.dataHeatBalSurfMgr->reportVarHumidex = true;
             }
         }
     }
 
-    // Constance for heat index regression equation of Rothfusz.
-    Real64 c1 = -42.379;
-    Real64 c2 = 2.04901523;
-    Real64 c3 = 10.14333127;
-    Real64 c4 = -.22475541;
-    Real64 c5 = -.00683783;
-    Real64 c6 = -.05481717;
-    Real64 c7 = .00122874;
-    Real64 c8 = .00085282;
-    Real64 c9 = -.00000199;
-
     // Calculate Heat Index and Humidex.
     // The heat index equation set is fit to Fahrenheit units, so the zone air temperature values are first convert to F,
     // then heat index is calculated and converted back to C.
     if (state.dataHeatBalSurfMgr->reportVarHeatIndex || state.dataOutRptTab->displayThermalResilienceSummary) {
+        // Constance for heat index regression equation of Rothfusz.
+        Real64 const c1 = -42.379;
+        Real64 const c2 = 2.04901523;
+        Real64 const c3 = 10.14333127;
+        Real64 const c4 = -.22475541;
+        Real64 const c5 = -.00683783;
+        Real64 const c6 = -.05481717;
+        Real64 const c7 = .00122874;
+        Real64 const c8 = .00085282;
+        Real64 const c9 = -.00000199;
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            Real64 ZoneT = state.dataHeatBalFanSys->ZTAV(ZoneNum);
-            Real64 ZoneW = state.dataHeatBalFanSys->ZoneAirHumRatAvg(ZoneNum);
-            Real64 ZoneRH = Psychrometrics::PsyRhFnTdbWPb(state, ZoneT, ZoneW, state.dataEnvrn->OutBaroPress) * 100.0;
-            Real64 ZoneTF = ZoneT * (9.0 / 5.0) + 32.0;
+            Real64 const ZoneT = state.dataHeatBalFanSys->ZTAV(ZoneNum);
+            Real64 const ZoneW = state.dataHeatBalFanSys->ZoneAirHumRatAvg(ZoneNum);
+            Real64 const ZoneRH = Psychrometrics::PsyRhFnTdbWPb(state, ZoneT, ZoneW, state.dataEnvrn->OutBaroPress) * 100.0;
+            Real64 const ZoneTF = ZoneT * (9.0 / 5.0) + 32.0;
             Real64 HI;
 
             if (ZoneTF < 80) {
@@ -5306,12 +5316,12 @@ void CalcThermalResilience(EnergyPlusData &state)
     }
     if (state.dataHeatBalSurfMgr->reportVarHumidex || state.dataOutRptTab->displayThermalResilienceSummary) {
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            Real64 ZoneW = state.dataHeatBalFanSys->ZoneAirHumRatAvg(ZoneNum);
-            Real64 ZoneT = state.dataHeatBalFanSys->ZTAV(ZoneNum);
-            Real64 TDewPointK = Psychrometrics::PsyTdpFnWPb(state, ZoneW, state.dataEnvrn->OutBaroPress) + DataGlobalConstants::KelvinConv;
-            Real64 e = 6.11 * std::exp(5417.7530 * ((1 / 273.16) - (1 / TDewPointK)));
-            Real64 h = 5.0 / 9.0 * (e - 10.0);
-            Real64 Humidex = ZoneT + h;
+            Real64 const ZoneW = state.dataHeatBalFanSys->ZoneAirHumRatAvg(ZoneNum);
+            Real64 const ZoneT = state.dataHeatBalFanSys->ZTAV(ZoneNum);
+            Real64 const TDewPointK = Psychrometrics::PsyTdpFnWPb(state, ZoneW, state.dataEnvrn->OutBaroPress) + DataGlobalConstants::KelvinConv;
+            Real64 const e = 6.11 * std::exp(5417.7530 * ((1 / 273.16) - (1 / TDewPointK)));
+            Real64 const h = 5.0 / 9.0 * (e - 10.0);
+            Real64 const Humidex = ZoneT + h;
             state.dataHeatBalFanSys->ZoneHumidex(ZoneNum) = Humidex;
         }
     }
@@ -5593,15 +5603,9 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine puts the reporting part of the HBSurface Module in one area.
 
-    using SolarShading::ReportSurfaceShading;
     auto &Surface(state.dataSurface->Surface);
-    state.dataHeatBalSurf->SumSurfaceHeatEmission = 0.0;
-    for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-        if (Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
-            state.dataHeatBalSurf->SumSurfaceHeatEmission += state.dataHeatBalSurf->QHeatEmiReport(SurfNum) * state.dataGlobal->TimeStepZoneSec;
-        }
-    }
-    ReportSurfaceShading(state);
+
+    SolarShading::ReportSurfaceShading(state);
 
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         // Tuned Replaced by one line form below for speed
@@ -5697,6 +5701,14 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
                 state.dataHeatBalSurf->SurfOpaqStorageCondLossRep(SurfNum) = -state.dataHeatBalSurf->SurfOpaqStorageCond(SurfNum);
             }
         } // opaque heat transfer surfaces.
+    }
+    if (state.dataOutRptTab->displayHeatEmissionsSummary) {
+        state.dataHeatBalSurf->SumSurfaceHeatEmission = 0.0;
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            if (Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
+                state.dataHeatBalSurf->SumSurfaceHeatEmission += state.dataHeatBalSurf->QHeatEmiReport(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+            }
+        }
     }
     if (state.dataGlobal->ZoneSizingCalc && state.dataGlobal->CompLoadReportIsReq) {
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
