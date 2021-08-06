@@ -1458,7 +1458,7 @@ namespace Psychrometrics {
         if (j > (n - 2)) j = n - 2;
         static constexpr Real64 h(64); // sample bin 64, sample size=1651
         //********continous sample end
-        int tsat_fn_pb_x_j1 = 64 * (j + 1); //sample data for pressure
+        int tsat_fn_pb_x_j1 = 64 * (j + 1); // sample data for pressure
         A = (tsat_fn_pb_x_j1 - x) / h;
         B = 1 - A;
         y = A * tsat_fn_pb_y[j] + B * tsat_fn_pb_y[j + 1] +

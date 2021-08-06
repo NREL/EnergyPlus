@@ -463,7 +463,7 @@ namespace Psychrometrics {
         -1.9E-09,     -2.8E-09,     -2E-10,       -0.000000004, -2.5E-09,     -1E-10,       -4.6E-09,     -3E-10,       -2.5E-09,     -3.8E-09,
         -3E-10,       -2.6E-09,     -2.3E-09,     -2.1E-09,     -2.2E-09,     -2.1E-09,     -2.4E-09,     -2.1E-09,     -2.2E-09,     -0.000000002,
         -2.4E-09,     -9E-10,       -3.3E-09,     -2.2E-09,     -4E-10,       -4.1E-09,     -1.4E-09,     -2.9E-09,     4E-10,        -5.5E-09,
-        2.7E-09};    // namespace Psychrometrics
+        2.7E-09}; // namespace Psychrometrics
 #ifdef EP_psych_stats
     constexpr std::array<bool, static_cast<int>(PsychrometricFunction::Num)> PsyReportIt = {
         true,
@@ -508,10 +508,10 @@ namespace Psychrometrics {
 
     inline Real64 PsyRhoAirFnPbTdbW(
         [[maybe_unused]] EnergyPlusData &state,
-        Real64 const pb,                                        // barometric pressure (Pascals)
-        Real64 const tdb,                                       // dry bulb temperature (Celsius)
-        Real64 const dw,                                        // humidity ratio (kgWater/kgDryAir)
-        [[maybe_unused]] std::string_view const CalledFrom = "" // routine this function was called from (error messages) !unused1208
+        Real64 const pb,                                        //barometric pressure (Pascals)
+        Real64 const tdb,                                       //dry bulb temperature (Celsius)
+        Real64 const dw,                                        //humidity ratio (kgWater/kgDryAir)
+        [[maybe_unused]] std::string_view const CalledFrom = "" //routine this function was called from (error messages) !unused1208
     )
     {
         // FUNCTION INFORMATION:
@@ -822,9 +822,9 @@ namespace Psychrometrics {
 
     inline Real64
         PsyRhFnTdbRhovLBnd0C([[maybe_unused]] EnergyPlusData &state,
-                             Real64 const Tdb,                                       // dry-bulb temperature {C}
-                             Real64 const Rhovapor,                                  // vapor density in air {kg/m3}
-                             [[maybe_unused]] std::string_view const CalledFrom = "" // routine this function was called from (error messages)
+                             Real64 const Tdb,                                       //dry-bulb temperature {C}
+                             Real64 const Rhovapor,                                  //vapor density in air {kg/m3}
+                             [[maybe_unused]] std::string_view const CalledFrom = "" //routine this function was called from (error messages)
         )
     {
         // FUNCTION INFORMATION:
