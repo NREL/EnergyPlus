@@ -358,7 +358,7 @@ namespace FluidProperties {
 #ifdef EP_cache_GlycolSpecificHeat
     extern Array1D<FluidProperties::cached_tsh> cached_t_sh; // DIMENSION(t_sh_cache_size)
 #endif
-        // Object Data
+    // Object Data
 
     // Functions
 
@@ -378,13 +378,12 @@ namespace FluidProperties {
     );
 
     template <size_t Length1, size_t Length2>
-    void InterpDefValuesForGlycolConc(EnergyPlusData &state,
-                                      int NumOfConcs,                     // number of concentrations (dimension of raw data)
-                                      int NumOfTemps,                     // number of temperatures (dimension of raw data)
-                                      const Array1D<Real64> &RawConcData, // concentrations for raw data
-                                      std::array<std::array<Real64, Length1>, Length2> RawPropData, // raw property data (concentration, temperature)
-                                      Real64 Concentration,                                         // concentration of actual fluid mix
-                                      Array1D<Real64> &InterpData // interpolated output data at proper concentration
+    void InterpDefValuesForGlycolConc(
+        EnergyPlusData &state,
+        const Array1D<Real64> &RawConcData,                                  // concentrations for raw data
+        const std::array<std::array<Real64, Length1>, Length2> &RawPropData, // raw property data (concentration, temperature)
+        Real64 Concentration,                                                // concentration of actual fluid mix
+        Array1D<Real64> &InterpData                                          // interpolated output data at proper concentration
     );
 
     //*****************************************************************************
@@ -508,7 +507,7 @@ namespace FluidProperties {
                                    std::string_view const CalledFrom   // routine this function was called from (error messages)
     );
 
-    //*****************************************************************************
+//*****************************************************************************
 #ifdef EP_cache_GlycolSpecificHeat
     Real64 GetSpecificHeatGlycol_raw(EnergyPlusData &state,
                                      std::string_view const Glycol,    // carries in substance name

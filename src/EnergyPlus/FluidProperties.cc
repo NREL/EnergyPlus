@@ -119,7 +119,7 @@ namespace FluidProperties {
 #ifdef EP_cache_GlycolSpecificHeat
     Array1D<cached_tsh> cached_t_sh; // DIMENSION(t_sh_cache_size)
 #endif
-        // Data Initializer Forward Declarations
+    // Data Initializer Forward Declarations
     // See GetFluidPropertiesData "SUBROUTINE LOCAL DATA" for actual data.
 
     void DefaultEthGlyCpData_initializer(Array2D<Real64> &, Array1D<Real64> const &);
@@ -244,7 +244,7 @@ namespace FluidProperties {
         constexpr std::array<Real64, DefaultNumGlyTemps> DefaultGlycolTemps = {
             -35.0, -30.0, -25.0, -20.0, -15.0, -10.0, -5.0, 0.0,  5.0,  10.0, 15.0,  20.0,  25.0,  30.0,  35.0,  40.0, 45.0,
             50.0,  55.0,  60.0,  65.0,  70.0,  75.0,  80.0, 85.0, 90.0, 95.0, 100.0, 105.0, 110.0, 115.0, 120.0, 125.0}; // 33 total temperature
-                                                                                                                         // points
+        // points
 
         constexpr std::array<Real64, DefaultNumGlyConcs> DefaultGlycolConcs = {
             0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9}; // 10 total concentration points
@@ -2560,8 +2560,6 @@ namespace FluidProperties {
                                                  state.dataFluidProps->GlycolData(Loop).Concentration,
                                                  state.dataFluidProps->GlycolData(Loop).CondValues);
                     InterpDefValuesForGlycolConc(state,
-                                                 DefaultNumGlyConcs,
-                                                 DefaultNumGlyTemps,
                                                  DefaultGlycolConcs,
                                                  DefaultEthGlyViscData,
                                                  state.dataFluidProps->GlycolData(Loop).Concentration,
@@ -5236,14 +5234,13 @@ namespace FluidProperties {
         }
     }
 
-    template <size_t Length1, size_t Length2>
-    void InterpDefValuesForGlycolConc(EnergyPlusData &state,
-                                      int const NumOfConcs,               // number of concentrations (dimension of raw data)
-                                      int const NumOfTemps,               // number of temperatures (dimension of raw data)
-                                      const Array1D<Real64> &RawConcData, // concentrations for raw data
-                                      std::array<std::array<Real64, Length1>, Length2> RawPropData, // raw property data (concentration, temperature)
-                                      Real64 const Concentration,                                   // concentration of actual fluid mix
-                                      Array1D<Real64> &InterpData // interpolated output data at proper concentration
+    template <size_t NumOfTemps, size_t NumOfConcs>
+    void InterpDefValuesForGlycolConc(
+        EnergyPlusData &state,
+        const Array1D<Real64> &RawConcData,                                        // concentrations for raw data
+        const std::array<std::array<Real64, NumOfTemps>, NumOfConcs> &RawPropData, // raw property data (concentration, temperature)
+        Real64 const Concentration,                                                // concentration of actual fluid mix
+        Array1D<Real64> &InterpData                                                // interpolated output data at proper concentration
     )
     {
 
@@ -5291,10 +5288,10 @@ namespace FluidProperties {
         static constexpr std::string_view RoutineName("InterpDefValuesForGlycolConc: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int HiIndex;       // index on the high side of the concentration
+        size_t HiIndex;    // index on the high side of the concentration
         Real64 InterpFrac; // intermediate value for interpolations
-        int LoopC;         // loop counter for concentration
-        int LoopT;         // loop counter for temperature
+        size_t LoopC;      // loop counter for concentration
+        size_t LoopT;      // loop counter for temperature
 
         // First, find where the actual concentration falls between the concentration data.
         // Then, interpolate if necessary.
@@ -5321,12 +5318,12 @@ namespace FluidProperties {
             if (std::abs(RawConcData(HiIndex) - RawConcData(HiIndex - 1)) >= ConcToler) {
                 InterpFrac = (RawConcData(HiIndex) - Concentration) / (RawConcData(HiIndex) - RawConcData(HiIndex - 1));
                 for (LoopT = 1; LoopT <= NumOfTemps; ++LoopT) {
-                    if ((RawPropData[HiIndex][LoopT-1] < ConcToler) || (RawPropData[HiIndex - 1][LoopT-1] < ConcToler)) {
+                    if ((RawPropData[HiIndex][LoopT - 1] < ConcToler) || (RawPropData[HiIndex - 1][LoopT - 1] < ConcToler)) {
                         // One of the two values is zero--so we cannot interpolate for this point (assign to zero)
                         InterpData(LoopT) = 0.0;
                     } else {
                         InterpData(LoopT) =
-                            RawPropData[HiIndex][LoopT-1] - (InterpFrac * (RawPropData[HiIndex][LoopT-1] - RawPropData[HiIndex - 1][LoopT-1]));
+                            RawPropData[HiIndex][LoopT - 1] - (InterpFrac * (RawPropData[HiIndex][LoopT - 1] - RawPropData[HiIndex - 1][LoopT - 1]));
                     }
                 }
             } else { // user has input data for concentrations that are too close or repeated, this must be fixed
