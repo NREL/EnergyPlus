@@ -788,6 +788,7 @@ namespace DataSurfaces {
     };
 
     constexpr std::array<std::string_view, static_cast<int>(NfrcProductOptions::Num)> NfrcProductName = {
+//    constexpr gsl::span<std::string_view> NfrcProductName = {
         "CasementDouble", "CasementSingle",   "DualAction",
         "Fixed",          "Garage",           "Greenhouse",
         "HingedEscape",   "HorizontalSlider", "Jal",

@@ -6535,8 +6535,15 @@ namespace HeatBalanceManager {
             state.dataSurface->FrameDivider(FrameDividerNum).NfrcProductType = DataSurfaces::NfrcProductOptions::CurtainWall;
 
             // look up the NFRC Product Type for Assembly Calculations using the DataSurfaces::NfrcProductName
-            state.dataSurface->FrameDivider(FrameDividerNum).NfrcProductType =
-                static_cast<DataSurfaces::NfrcProductOptions>(getEnumerationValue(static_cast<gsl::span<std::string_view>>(DataSurfaces::NfrcProductName), static_cast<std::string_view>(FrameDividerNames(3))));
+            // state.dataSurface->FrameDivider(FrameDividerNum).NfrcProductType =
+            //     static_cast<DataSurfaces::NfrcProductOptions>(getEnumerationValue(static_cast<gsl::span<std::string_view>>(DataSurfaces::NfrcProductName), static_cast<std::string_view>(FrameDividerNames(3))));
+            for (unsigned int i = 0; i < DataSurfaces::NfrcProductName.size(); ++i) {
+                if (UtilityRoutines::SameString(DataSurfaces::NfrcProductName[i], FrameDividerNames(3))) {
+                    state.dataSurface->FrameDivider(FrameDividerNum).NfrcProductType = DataSurfaces::NfrcProductOptions(i);
+                }
+            }
+
+
             state.dataSurface->FrameDivider(FrameDividerNum).OutsideRevealSolAbs = FrameDividerProps(19);
             state.dataSurface->FrameDivider(FrameDividerNum).InsideSillDepth = FrameDividerProps(20);
             state.dataSurface->FrameDivider(FrameDividerNum).InsideSillSolAbs = FrameDividerProps(21);
