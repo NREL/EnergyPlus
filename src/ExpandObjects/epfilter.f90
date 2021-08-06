@@ -18777,7 +18777,6 @@ DO iZone = 1, numCompactZoneConstVol
       CALL AddToObjFld('Component Inlet Node Name', base + cvzNameOff,' Reheat Coil HW Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + cvzNameOff,' Reheat Coil HW Outlet',.TRUE.)
     ELSEIF (reheatCoilType .EQ. ctElectric) THEN
-      CALL AddToObjStr('Hot Water or Steam Inlet Node Name', '')
       CALL AddToObjStr('Reheat Coil Object Type','Coil:Heating:Electric')
       CALL AddToObjFld('Reheat Coil Name', base + cvzNameOff,' Reheat Coil')
       CALL AddToObjStr('Maximum Hot Water or Steam Flow Rate {m3/s}','')
@@ -18798,7 +18797,6 @@ DO iZone = 1, numCompactZoneConstVol
       CALL AddToObjFld('Air Outlet Node Name', base + cvzNameOff,' Supply Inlet')
       CALL AddToObjStr('Temperature Setpoint Node Name','',.TRUE.)
     ELSEIF (reheatCoilType .EQ. ctGas) THEN
-      CALL AddToObjStr('Hot Water or Steam Inlet Node Name', '')
       CALL AddToObjStr('Reheat Coil Object Type','Coil:Heating:Fuel')
       CALL AddToObjFld('Reheat Coil Name', base + cvzNameOff,' Reheat Coil')
       CALL AddToObjStr('Maximum Hot Water or Steam Flow Rate {m3/s}','')
@@ -19147,7 +19145,7 @@ DO iSys = 1, numCompactSysConstVol
   CALL AddToObjStr('100% Outdoor Air in Heating','No')
   CALL AddToObjStr('Central Cooling Design Supply Air Humidity Ratio {kg-H2O/kg-air}','0.008')
   CALL AddToObjStr('Central Heating Design Supply Air Humidity Ratio {kg-H2O/kg-air}','0.008')
-  IF (isSupplyMaxRateAutosize) THEN
+  IF (isSupplyFlowRateAutosize) THEN
     CALL AddToObjStr('Cooling Supply Air Flow Rate Method','DesignDay')
     CALL AddToObjStr('Cooling Supply Air Flow Rate {m3/s}','0')
   ELSE
@@ -19508,11 +19506,7 @@ DO iSys = 1, numCompactSysConstVol
     IF (supFanPlacement .EQ. sfpDrawThru) THEN
       CALL AddToObjStr('Setpoint Node or NodeList Name', TRIM(airloopOutlet),.TRUE.)
     ELSE
-      CALL AddToObjFld('Setpoint Node or NodeList Name', base + cvsAirHandlerNameOff,' Cooling Setpoint Nodes',.TRUE.)
-      CALL CreateNewObj('NodeList')
-      CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Cooling Setpoint Nodes')
-      CALL AddToObjStr('Node Name 1', TRIM(airloopOutlet))
-      CALL AddToObjStr('Node Name 2', TRIM(coolCoilUnitOutlet),.TRUE.)
+      CALL AddToObjStr('Setpoint Node or NodeList Name', TRIM(coolCoilUnitOutlet),.TRUE.)
     END IF
 
     IF ((coolCoilKind .NE. ccNone) .AND. (supFanPlacement .EQ. sfpDrawThru)) THEN
@@ -19530,7 +19524,11 @@ DO iSys = 1, numCompactSysConstVol
       CALL CreateNewObj('SetpointManager:MixedAir')
       CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Economizer Air Temp Manager')
       CALL AddToObjStr('Control Variable','Temperature')
-      CALL AddToObjStr('Reference Setpoint Node Name', TRIM(airloopOutlet))
+      IF  (supFanPlacement .EQ. sfpDrawThru) THEN
+        CALL AddToObjStr('Reference Setpoint Node Name', TRIM(airloopOutlet))
+      ELSE
+        CALL AddToObjStr('Reference Setpoint Node Name', TRIM(coolCoilUnitOutlet))
+      END IF
       CALL AddToObjStr('Fan Inlet Node Name', TRIM(fanInlet))
       CALL AddToObjStr('Fan Outlet Node Name', TRIM(fanOutlet))
       CALL AddToObjFld('Setpoint Node or NodeList Name', base + cvsAirHandlerNameOff,' Mixed Air Outlet',.TRUE.)
