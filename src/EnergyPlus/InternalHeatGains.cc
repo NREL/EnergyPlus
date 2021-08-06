@@ -1726,7 +1726,7 @@ namespace InternalHeatGains {
         state.dataHeatBal->Lights.allocate(state.dataHeatBal->TotLights);
 
         if (state.dataHeatBal->TotLights > 0) {
-            bool CheckSharedExhaustFlag = false;            Loop = 0;
+            bool CheckSharedExhaustFlag = false;
             int Loop = 0;
             for (int Item = 1; Item <= state.dataHeatBal->NumLightsStatements; ++Item) {
                 AlphaName = std::string{};

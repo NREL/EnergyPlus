@@ -168,7 +168,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
 
     state->dataHeatBal->Zone.allocate(spaceNum);
     state->dataHeatBal->Zone(spaceNum).Name = "Test";
-    state->dataHeatBal->Zone(spaceNum).spaces.emplace_back(spaceNum);
+    state->dataHeatBal->Zone(spaceNum).spaceIndexes.emplace_back(spaceNum);
     state->dataHeatBal->space.allocate(spaceNum);
     state->dataHeatBal->space(spaceNum).Name = "Test";
     state->dataHeatBal->space(spaceNum).zoneNum = spaceNum;
