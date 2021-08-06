@@ -695,6 +695,8 @@ namespace DataHeatBalance {
         Real64 FractionReturnAirPlenTempCoeff1;
         Real64 FractionReturnAirPlenTempCoeff2;
         int ZoneReturnNum;        // zone return index (not the node number) for return heat gain
+        std::string RetNodeName;  // Zone return node name
+        int ZoneExhaustNodeNum;   // Exhaust node number
         Real64 NomMinDesignLevel; // Nominal Minimum Design Level (min sch X design level)
         Real64 NomMaxDesignLevel; // Nominal Maximum Design Level (max sch X design level)
         bool ManageDemand;        // Flag to indicate whether to use demand limiting
@@ -720,9 +722,9 @@ namespace DataHeatBalance {
         LightsData()
             : ZonePtr(0), SchedPtr(-1), DesignLevel(0.0), EMSLightsOn(false), EMSLightingPower(0.0), FractionReturnAir(0.0), FractionRadiant(0.0),
               FractionShortWave(0.0), FractionReplaceable(0.0), FractionConvected(0.0), FractionReturnAirIsCalculated(false),
-              FractionReturnAirPlenTempCoeff1(0.0), FractionReturnAirPlenTempCoeff2(0.0), ZoneReturnNum(1), NomMinDesignLevel(0.0),
-              NomMaxDesignLevel(0.0), ManageDemand(false), DemandLimit(0.0), Power(0.0), RadGainRate(0.0), VisGainRate(0.0), ConGainRate(0.0),
-              RetAirGainRate(0.0), TotGainRate(0.0), Consumption(0.0), RadGainEnergy(0.0), VisGainEnergy(0.0), ConGainEnergy(0.0),
+              FractionReturnAirPlenTempCoeff1(0.0), FractionReturnAirPlenTempCoeff2(0.0), ZoneReturnNum(1), ZoneExhaustNodeNum(0),
+              NomMinDesignLevel(0.0), NomMaxDesignLevel(0.0), ManageDemand(false), DemandLimit(0.0), Power(0.0), RadGainRate(0.0), VisGainRate(0.0),
+              ConGainRate(0.0), RetAirGainRate(0.0), TotGainRate(0.0), Consumption(0.0), RadGainEnergy(0.0), VisGainEnergy(0.0), ConGainEnergy(0.0),
               RetAirGainEnergy(0.0), TotGainEnergy(0.0), SumConsumption(0.0), SumTimeNotZeroCons(0.0)
         {
         }

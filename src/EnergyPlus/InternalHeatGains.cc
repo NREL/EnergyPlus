@@ -1726,6 +1726,7 @@ namespace InternalHeatGains {
         state.dataHeatBal->Lights.allocate(state.dataHeatBal->TotLights);
 
         if (state.dataHeatBal->TotLights > 0) {
+            bool CheckSharedExhaustFlag = false;            Loop = 0;
             int Loop = 0;
             for (int Item = 1; Item <= state.dataHeatBal->NumLightsStatements; ++Item) {
                 AlphaName = std::string{};
@@ -1980,7 +1981,7 @@ namespace InternalHeatGains {
 
                     // Set return air node number
                     state.dataHeatBal->Lights(Loop).ZoneReturnNum = 0;
-                    std::string retNodeName = "";
+                    state.dataHeatBal->Lights(Loop).RetNodeName = "";
                     if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
                         if (state.dataHeatBal->LightsObjects(Item).ZoneListActive) {
                             ShowSevereError(state,
@@ -1988,12 +1989,14 @@ namespace InternalHeatGains {
                                                 "\": " + state.dataIPShortCut->cAlphaFieldNames(7) + " must be blank when using a ZoneList.");
                             ErrorsFound = true;
                         } else {
-                            retNodeName = AlphaName(7);
+                            state.dataHeatBal->Lights(Loop).RetNodeName = AlphaName(7);
                         }
                     }
                     if (state.dataHeatBal->Lights(Loop).ZonePtr > 0) {
-                        state.dataHeatBal->Lights(Loop).ZoneReturnNum = DataZoneEquipment::GetReturnNumForZone(
-                            state, state.dataHeatBal->Zone(state.dataHeatBal->Lights(Loop).ZonePtr).Name, retNodeName);
+                        state.dataHeatBal->Lights(Loop).ZoneReturnNum =
+                            DataZoneEquipment::GetReturnNumForZone(state,
+                                                                   state.dataHeatBal->Zone(state.dataHeatBal->Lights(Loop).ZonePtr).Name,
+                                                                   state.dataHeatBal->Lights(Loop).RetNodeName);
                     }
 
                     if ((state.dataHeatBal->Lights(Loop).ZoneReturnNum == 0) && (state.dataHeatBal->Lights(Loop).FractionReturnAir > 0.0) &&
@@ -2004,6 +2007,53 @@ namespace InternalHeatGains {
                         ShowContinueError(state, "No matching Zone Return Air Node found.");
                         ErrorsFound = true;
                     }
+                    // Set exhaust air node number
+                    state.dataHeatBal->Lights(Loop).ZoneExhaustNodeNum = 0;
+                    if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
+                        if (state.dataHeatBal->LightsObjects(Item).ZoneListActive) {
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataHeatBal->Lights(Loop).Name +
+                                                "\": " + state.dataIPShortCut->cAlphaFieldNames(8) + " must be blank when using a ZoneList.");
+                            ErrorsFound = true;
+                        } else {
+                            bool exhaustNodeError = false;
+                            state.dataHeatBal->Lights(Loop).ZoneExhaustNodeNum = GetOnlySingleNode(state,
+                                                                                                   AlphaName(8),
+                                                                                                   exhaustNodeError,
+                                                                                                   CurrentModuleObject,
+                                                                                                   state.dataHeatBal->Lights(Loop).Name,
+                                                                                                   DataLoopNode::NodeFluidType::Air,
+                                                                                                   DataLoopNode::NodeConnectionType::ZoneExhaust,
+                                                                                                   NodeInputManager::compFluidStream::Primary,
+                                                                                                   ObjectIsNotParent);
+                            if (!exhaustNodeError) { // GetOnlySingleNode will throw error messages if the is a NodeList Name and for other issues
+                                exhaustNodeError = DataZoneEquipment::VerifyLightsExhaustNodeForZone(
+                                    state, state.dataHeatBal->Lights(Loop).ZonePtr, state.dataHeatBal->Lights(Loop).ZoneExhaustNodeNum);
+                            }
+                            if (exhaustNodeError) {
+                                ShowSevereError(state,
+                                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                    state.dataIPShortCut->cAlphaFieldNames(8) + " = " + AlphaName(8));
+                                ShowContinueError(state, "No matching Zone Exhaust Air Node found.");
+                                ErrorsFound = true;
+                            } else {
+                                if (state.dataHeatBal->Lights(Loop).ZoneReturnNum > 0) {
+                                    state.dataZoneEquip->ZoneEquipConfig(state.dataHeatBal->Zone(state.dataHeatBal->Lights(Loop).ZonePtr).ZoneEqNum)
+                                        .ReturnNodeExhaustNodeNum(state.dataHeatBal->Lights(Loop).ZoneReturnNum) =
+                                        state.dataHeatBal->Lights(Loop).ZoneExhaustNodeNum;
+                                    CheckSharedExhaustFlag = true;
+                                } else {
+                                    ShowSevereError(state,
+                                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                        state.dataIPShortCut->cAlphaFieldNames(8) + " =" + AlphaName(8) + " is not used");
+                                    ShowContinueError(
+                                        state, "No matching Zone Return Air Node found. The Exhaust Node requires Return Node to work together");
+                                    ErrorsFound = true;
+                                }
+                            }
+                        }
+                    }
+
                     if (state.dataHeatBal->Lights(Loop).ZonePtr <= 0) continue; // Error, will be caught and terminated later
 
                     // Object report variables
@@ -2255,7 +2305,35 @@ namespace InternalHeatGains {
                         state, state.dataOutRptPredefined->pdchInLtRetAir, liteName, state.dataHeatBal->Lights(Loop).FractionReturnAir, 4);
                 } // Item1 - zones
             }     // Item = Number of Lights Objects
-        }         // TotLights > 0 check
+            if (CheckSharedExhaustFlag) {
+                DataZoneEquipment::CheckSharedExhaust(state);
+                Array1D_bool ReturnNodeShared; // zone supply air inlet nodes
+                ReturnNodeShared.allocate(state.dataHeatBal->TotLights);
+                ReturnNodeShared = false;
+                for (Loop = 1; Loop <= state.dataHeatBal->TotLights; ++Loop) {
+                    int ZoneNum = state.dataHeatBal->Lights(Loop).ZonePtr;
+                    int ReturnNum = state.dataHeatBal->Lights(Loop).ZoneReturnNum;
+                    int ExhaustNodeNum = state.dataHeatBal->Lights(Loop).ZoneExhaustNodeNum;
+                    if (ReturnNum == 0 || ExhaustNodeNum == 0) continue;
+                    for (int Loop1 = Loop + 1; Loop1 <= state.dataHeatBal->TotLights; ++Loop1) {
+                        if (ZoneNum != state.dataHeatBal->Lights(Loop1).ZonePtr) continue;
+                        if (ReturnNodeShared(Loop1)) continue;
+                        if (ReturnNum == state.dataHeatBal->Lights(Loop1).ZoneReturnNum &&
+                            ExhaustNodeNum != state.dataHeatBal->Lights(Loop1).ZoneExhaustNodeNum) {
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + CurrentModuleObject +
+                                                ": Duplicated Return Air Node = " + state.dataHeatBal->Lights(Loop1).RetNodeName + " is found, ");
+                            ShowContinueError(state,
+                                              " in both Lights objects = " + state.dataHeatBal->Lights(Loop).Name + " and " +
+                                                  state.dataHeatBal->Lights(Loop1).Name + ".");
+                            ErrorsFound = true;
+                            ReturnNodeShared(Loop1) = true;
+                        }
+                    }
+                }
+                ReturnNodeShared.deallocate();
+            }
+        } // TotLights > 0 check
         // add total line to lighting summary table
         if (state.dataInternalHeatGains->sumArea > 0.0) {
             PreDefTableEntry(state,
