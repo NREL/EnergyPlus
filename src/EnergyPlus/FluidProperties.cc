@@ -5165,7 +5165,7 @@ namespace FluidProperties {
         // Fairly straight forward--find the two concentrations between which
         // the actual concentration falls and then interpolate the property
         // data using standard linear interpolation.  Note that data is stored
-        // in the format: 2dArray(Concentration,Temperature)
+        // in the format: 2dArray(Temperature, Concentration)
 
         // REFERENCES:
         // na
@@ -5244,12 +5244,6 @@ namespace FluidProperties {
     )
     {
 
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Rick Strand
-        //       DATE WRITTEN   June 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
         // PURPOSE OF THIS SUBROUTINE:
         // The purpose of this subroutine is to find the values for the property
         // data at a particular concentration from default data that is at "generic"
@@ -5264,7 +5258,7 @@ namespace FluidProperties {
         // Fairly straight forward--find the two concentrations between which
         // the actual concentration falls and then interpolate the property
         // data using standard linear interpolation.  Note that data is stored
-        // in the format: 2dArray(Concentration,Temperature)
+        // in the format: std::array[Concentration][Temperature]
 
         // REFERENCES:
         // na
