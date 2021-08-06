@@ -182,12 +182,7 @@ namespace FluidProperties {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const PressToler(1.0);                      // Some reasonable value for comparisons
-        int const DefaultNumGlyTemps(33);                  // Temperature dimension of default glycol data
-        int const DefaultNumGlyConcs(10);                  // Concentration dimension of default glycol data
-        int const DefaultNumSteamTemps(111);               // Temperature dimension of default steam data.
-        int const DefaultNumSteamSuperheatedTemps(114);    // Temperature dimension of default steam data.
-        int const DefaultNumSteamSuperheatedPressure(114); // Temperature dimension of default steam data.
+        Real64 const PressToler(1.0); // Some reasonable value for comparisons
         static constexpr std::string_view RoutineName("GetFluidPropertiesData: ");
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -272,7 +267,7 @@ namespace FluidProperties {
             DefaultNumGlyTemps, DefaultNumGlyConcs, std::bind(DefaultEthGlyCpData_initializer, _1, DefaultWaterCpData));
 
         // Ethylene Glycol Data: Viscosity in mPa-s
-        constexpr std::array<std::array<Real64, 33>, 10> DefaultEthGlyViscData = {{
+        constexpr std::array<std::array<Real64, DefaultNumGlyTemps>, DefaultNumGlyConcs> DefaultEthGlyViscData = {{
             {0.0e-3,    0.0e-3,    0.0e-3,    0.0e-3,    0.0e-3,    0.0e-3,    0.0e-3,    1.7912e-3, 1.5183e-3, 1.306e-3,  1.1376e-3,
              1.0016e-3, 0.8901e-3, 0.7974e-3, 0.7193e-3, 0.653e-3,  0.5961e-3, 0.5468e-3, 0.504e-3,  0.4664e-3, 0.4332e-3, 0.4039e-3,
              0.3777e-3, 0.3543e-3, 0.3333e-3, 0.3144e-3, 0.2973e-3, 0.2817e-3, 0.0e-3,    0.0e-3,    0.0e-3,    0.0e-3,    0.0e-3},

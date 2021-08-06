@@ -79,6 +79,12 @@ namespace FluidProperties {
     int constexpr iRefri = 1;
     int constexpr iGlyco = 1;
 
+    constexpr int DefaultNumGlyTemps(33);                  // Temperature dimension of default glycol data
+    constexpr int DefaultNumGlyConcs(10);                  // Concentration dimension of default glycol data
+    constexpr int DefaultNumSteamTemps(111);               // Temperature dimension of default steam data.
+    constexpr int DefaultNumSteamSuperheatedTemps(114);    // Temperature dimension of default steam data.
+    constexpr int DefaultNumSteamSuperheatedPressure(114); // Temperature dimension of default steam data.
+
     constexpr static std::string_view Refrig("REFRIGERANT");
     constexpr static std::string_view Glycol("GLYCOL");
     constexpr static std::string_view Pressure("PRESSURE");
