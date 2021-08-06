@@ -1,5 +1,22 @@
 # History of changes - cpgfunctionEP
 
+## Version 0.4 (2021-07-30)
+
+### Build Changes
+
+* [Issue 42](https://github.com/j-c-cook/cpgfunctionEP/issues/42) - The linked library targets are now imported with a
+  double colon. This follows cmake-policy 28 [CMP0028](https://cmake.org/cmake/help/latest/policy/CMP0028.html).
+
+* [Issue 41](https://github.com/j-c-cook/cpgfunctionEP/issues/41) - The type (PRIVATE, INTERFACE, PUBLIC) of linkage in 
+  targeted libraries is now defined (see cmake 
+  [docs](https://cmake.org/cmake/help/latest/command/target_link_libraries.html#libraries-for-a-target-and-or-its-dependents)
+  or Mr. Scott's [explanation](https://cmake.org/pipermail/cmake/2016-May/063400.html) of libraries for a target and/or
+  its dependents for more details on why this was done). 
+
+* [Issue 40](https://github.com/j-c-cook/cpgfunctionEP/issues/40) - When the `CMAKE_PROJECT_NAME` is not equal to the
+  `PROJECT_NAME` the tests have not been built, and now the copy of Eigen located in EnergyPlus's third party folder
+  will be linked rather than including the copy of Eigen with this library.
+
 ## Version 0.3.2 (2021-07-27)
 
 ### Fixes
