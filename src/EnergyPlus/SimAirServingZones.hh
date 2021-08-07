@@ -108,7 +108,8 @@ namespace SimAirServingZones {
         UnitarySystemModel,
         ZoneVRFasAirLoopEquip,
         PVT_AirBased,
-        VRFTerminalUnit
+        VRFTerminalUnit,
+        CoilSystemWater
     };
 
     void ManageAirLoops(EnergyPlusData &state,
