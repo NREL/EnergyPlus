@@ -352,6 +352,9 @@ namespace DataHeatBalance {
         Real64 totalSurfArea = 0.0;        // Total surface area for Zone
         int radiantEnclosureNum = 0;       // Radiant exchange enclosure this space belongs to
         int solarEnclosureNum = 0;         // Solar distribution enclosure this space belongs to
+        Real64 totOccupants = 0.0;         // total design occupancy (sum of NumberOfPeople for the space People objects, not multiplied)
+        Real64 minOccupants = 0.0;         // minimum occupancy (sum of NomMinNumberPeople for the space People objects, not multiplied)
+        Real64 maxOccupants = 0.0;         // maximum occupancy (sum of NomMaxNumberPeople for the space People objects, not multiplied)
     };
 
     struct SpaceListData
@@ -455,11 +458,12 @@ namespace DataHeatBalance {
         bool HasLinkedOutAirNode; // true if an OutdoorAir::Node is linked to the surface
         int LinkedOutAirNode;     // Index of the an OutdoorAir:Node
 
-        bool isPartOfTotalArea;   // Count the zone area when determining the building total floor area
-        bool isNominalOccupied;   // has occupancy nominally specified
-        bool isNominalControlled; // has Controlled Zone Equip Configuration reference
-        Real64 TotOccupants;      // total design occupancy
-        // (sum of NumberOfPeople for the zone from People object)
+        bool isPartOfTotalArea;          // Count the zone area when determining the building total floor area
+        bool isNominalOccupied;          // has occupancy nominally specified
+        bool isNominalControlled;        // has Controlled Zone Equip Configuration reference
+        Real64 TotOccupants;             // total design occupancy (sum of NumberOfPeople for the zone People objects, not multiplied)
+        Real64 minOccupants;             // minimum occupancy (sum of NomMinNumberPeople for the zone People objects, not multiplied)
+        Real64 maxOccupants;             // maximum occupancy (sum of NomMaxNumberPeople for the zone People objects, not multiplied)
         int AirHBimBalanceErrIndex;      // error management counter
         bool NoHeatToReturnAir;          // TRUE means that heat to return air should be added to the zone load
         bool RefrigCaseRA;               // TRUE means there is potentially heat removal from return air
@@ -530,10 +534,10 @@ namespace DataHeatBalance {
               OutWetBulbTempEMSOverrideOn(false), OutWetBulbTempEMSOverrideValue(0.0), WindSpeed(0.0), WindSpeedEMSOverrideOn(false),
               WindSpeedEMSOverrideValue(0.0), WindDir(0.0), WindDirEMSOverrideOn(false), WindDirEMSOverrideValue(0.0), HasLinkedOutAirNode(false),
               LinkedOutAirNode(0.0), isPartOfTotalArea(true), isNominalOccupied(false), isNominalControlled(false), TotOccupants(0.0),
-              AirHBimBalanceErrIndex(0), NoHeatToReturnAir(false), RefrigCaseRA(false), HasAdjustedReturnTempByITE(false),
-              AdjustedReturnTempByITE(0.0), HasLtsRetAirGain(false), HasAirFlowWindowReturn(false), InternalHeatGains(0.0), NominalInfilVent(0.0),
-              NominalMixing(0.0), TempOutOfBoundsReported(false), EnforcedReciprocity(false), ZoneMinCO2SchedIndex(0), ZoneMaxCO2SchedIndex(0),
-              ZoneContamControllerSchedIndex(0), FlagCustomizedZoneCap(false),
+              minOccupants(0.0), maxOccupants(0.0), AirHBimBalanceErrIndex(0), NoHeatToReturnAir(false), RefrigCaseRA(false),
+              HasAdjustedReturnTempByITE(false), AdjustedReturnTempByITE(0.0), HasLtsRetAirGain(false), HasAirFlowWindowReturn(false),
+              InternalHeatGains(0.0), NominalInfilVent(0.0), NominalMixing(0.0), TempOutOfBoundsReported(false), EnforcedReciprocity(false),
+              ZoneMinCO2SchedIndex(0), ZoneMaxCO2SchedIndex(0), ZoneContamControllerSchedIndex(0), FlagCustomizedZoneCap(false),
               // Hybrid Modeling
               ZoneMeasuredTemperature(0.0), ZoneMeasuredHumidityRatio(0.0), ZoneMeasuredCO2Concentration(0.0), ZoneMeasuredSupplyAirTemperature(0.0),
               ZoneMeasuredSupplyAirFlowRate(0.0), ZoneMeasuredSupplyAirHumidityRatio(0.0), ZoneMeasuredSupplyAirCO2Concentration(0.0),

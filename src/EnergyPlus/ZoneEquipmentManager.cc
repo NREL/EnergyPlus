@@ -791,7 +791,6 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
     Real64 OAVolumeFlowRate;  // outside air flow rate (m3/s)
     bool UseOccSchFlag;       // flag to use occupancy schedule when calculating OA
     bool UseMinOASchFlag;     // flag to use min OA schedule when calculating OA
-    int DSOAPtr;              // index to DesignSpecification:OutdoorAir object
 
     for (ZoneSizIndex = 1; ZoneSizIndex <= state.dataSize->NumZoneSizingInput; ++ZoneSizIndex) {
         ZoneIndex = UtilityRoutines::FindItemInList(state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName, state.dataHeatBal->Zone);
@@ -885,10 +884,6 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
                 state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).HeatDesTempDiff = state.dataSize->ZoneSizingInput(ZoneSizNum).HeatDesTempDiff;
                 state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).CoolDesHumRat = state.dataSize->ZoneSizingInput(ZoneSizNum).CoolDesHumRat;
                 state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).HeatDesHumRat = state.dataSize->ZoneSizingInput(ZoneSizNum).HeatDesHumRat;
-                state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).OADesMethod = state.dataSize->ZoneSizingInput(ZoneSizNum).OADesMethod;
-                state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).DesOAFlowPPer = state.dataSize->ZoneSizingInput(ZoneSizNum).DesOAFlowPPer;
-                state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).DesOAFlowPerArea = state.dataSize->ZoneSizingInput(ZoneSizNum).DesOAFlowPerArea;
-                state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).DesOAFlow = state.dataSize->ZoneSizingInput(ZoneSizNum).DesOAFlow;
                 state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).CoolAirDesMethod = state.dataSize->ZoneSizingInput(ZoneSizNum).CoolAirDesMethod;
                 state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).HeatAirDesMethod = state.dataSize->ZoneSizingInput(ZoneSizNum).HeatAirDesMethod;
                 state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).InpDesCoolAirFlow = state.dataSize->ZoneSizingInput(ZoneSizNum).DesCoolAirFlow;
@@ -920,11 +915,6 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
                 state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatDesTempDiff = state.dataSize->ZoneSizingInput(ZoneSizNum).HeatDesTempDiff;
                 state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).CoolDesHumRat = state.dataSize->ZoneSizingInput(ZoneSizNum).CoolDesHumRat;
                 state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatDesHumRat = state.dataSize->ZoneSizingInput(ZoneSizNum).HeatDesHumRat;
-                state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).OADesMethod = state.dataSize->ZoneSizingInput(ZoneSizNum).OADesMethod;
-                state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).DesOAFlowPPer = state.dataSize->ZoneSizingInput(ZoneSizNum).DesOAFlowPPer;
-                state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).DesOAFlowPerArea =
-                    state.dataSize->ZoneSizingInput(ZoneSizNum).DesOAFlowPerArea;
-                state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).DesOAFlow = state.dataSize->ZoneSizingInput(ZoneSizNum).DesOAFlow;
                 state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).CoolAirDesMethod =
                     state.dataSize->ZoneSizingInput(ZoneSizNum).CoolAirDesMethod;
                 state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatAirDesMethod =
@@ -973,10 +963,6 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
                 state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).HeatDesTempDiff = state.dataSize->ZoneSizingInput(1).HeatDesTempDiff;
                 state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).CoolDesHumRat = state.dataSize->ZoneSizingInput(1).CoolDesHumRat;
                 state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).HeatDesHumRat = state.dataSize->ZoneSizingInput(1).HeatDesHumRat;
-                state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).OADesMethod = state.dataSize->ZoneSizingInput(1).OADesMethod;
-                state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).DesOAFlowPPer = state.dataSize->ZoneSizingInput(1).DesOAFlowPPer;
-                state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).DesOAFlowPerArea = state.dataSize->ZoneSizingInput(1).DesOAFlowPerArea;
-                state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).DesOAFlow = state.dataSize->ZoneSizingInput(1).DesOAFlow;
                 state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).CoolAirDesMethod = state.dataSize->ZoneSizingInput(1).CoolAirDesMethod;
                 state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).HeatAirDesMethod = state.dataSize->ZoneSizingInput(1).HeatAirDesMethod;
                 state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).InpDesCoolAirFlow = state.dataSize->ZoneSizingInput(1).DesCoolAirFlow;
@@ -1003,10 +989,6 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
                 state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatDesTempDiff = state.dataSize->ZoneSizingInput(1).HeatDesTempDiff;
                 state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).CoolDesHumRat = state.dataSize->ZoneSizingInput(1).CoolDesHumRat;
                 state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatDesHumRat = state.dataSize->ZoneSizingInput(1).HeatDesHumRat;
-                state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).OADesMethod = state.dataSize->ZoneSizingInput(1).OADesMethod;
-                state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).DesOAFlowPPer = state.dataSize->ZoneSizingInput(1).DesOAFlowPPer;
-                state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).DesOAFlowPerArea = state.dataSize->ZoneSizingInput(1).DesOAFlowPerArea;
-                state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).DesOAFlow = state.dataSize->ZoneSizingInput(1).DesOAFlow;
                 state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).CoolAirDesMethod = state.dataSize->ZoneSizingInput(1).CoolAirDesMethod;
                 state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatAirDesMethod = state.dataSize->ZoneSizingInput(1).HeatAirDesMethod;
                 state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).InpDesCoolAirFlow = state.dataSize->ZoneSizingInput(1).DesCoolAirFlow;
@@ -1053,10 +1035,6 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
             state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneAirDistributionIndex =
                 state.dataSize->ZoneSizingInput(ZoneSizNum).ZoneAirDistributionIndex;
             state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneDesignSpecOAIndex = state.dataSize->ZoneSizingInput(ZoneSizNum).ZoneDesignSpecOAIndex;
-            state.dataSize->FinalZoneSizing(CtrlZoneNum).OADesMethod = state.dataSize->ZoneSizingInput(ZoneSizNum).OADesMethod;
-            state.dataSize->FinalZoneSizing(CtrlZoneNum).DesOAFlowPPer = state.dataSize->ZoneSizingInput(ZoneSizNum).DesOAFlowPPer;
-            state.dataSize->FinalZoneSizing(CtrlZoneNum).DesOAFlowPerArea = state.dataSize->ZoneSizingInput(ZoneSizNum).DesOAFlowPerArea;
-            state.dataSize->FinalZoneSizing(CtrlZoneNum).DesOAFlow = state.dataSize->ZoneSizingInput(ZoneSizNum).DesOAFlow;
             state.dataSize->FinalZoneSizing(CtrlZoneNum).CoolAirDesMethod = state.dataSize->ZoneSizingInput(ZoneSizNum).CoolAirDesMethod;
             state.dataSize->FinalZoneSizing(CtrlZoneNum).HeatAirDesMethod = state.dataSize->ZoneSizingInput(ZoneSizNum).HeatAirDesMethod;
             state.dataSize->FinalZoneSizing(CtrlZoneNum).InpDesCoolAirFlow = state.dataSize->ZoneSizingInput(ZoneSizNum).DesCoolAirFlow;
@@ -1092,10 +1070,6 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
                 state.dataSize->ZoneSizingInput(ZoneSizNum).ZoneAirDistributionIndex;
             state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneDesignSpecOAIndex =
                 state.dataSize->ZoneSizingInput(ZoneSizNum).ZoneDesignSpecOAIndex;
-            state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).OADesMethod = state.dataSize->ZoneSizingInput(ZoneSizNum).OADesMethod;
-            state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesOAFlowPPer = state.dataSize->ZoneSizingInput(ZoneSizNum).DesOAFlowPPer;
-            state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesOAFlowPerArea = state.dataSize->ZoneSizingInput(ZoneSizNum).DesOAFlowPerArea;
-            state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesOAFlow = state.dataSize->ZoneSizingInput(ZoneSizNum).DesOAFlow;
             state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolAirDesMethod = state.dataSize->ZoneSizingInput(ZoneSizNum).CoolAirDesMethod;
             state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatAirDesMethod = state.dataSize->ZoneSizingInput(ZoneSizNum).HeatAirDesMethod;
             state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).InpDesCoolAirFlow = state.dataSize->ZoneSizingInput(ZoneSizNum).DesCoolAirFlow;
@@ -1129,10 +1103,6 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
             state.dataSize->FinalZoneSizing(CtrlZoneNum).HeatDesHumRat = state.dataSize->ZoneSizingInput(1).HeatDesHumRat;
             state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneAirDistributionIndex = state.dataSize->ZoneSizingInput(1).ZoneAirDistributionIndex;
             state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneDesignSpecOAIndex = state.dataSize->ZoneSizingInput(1).ZoneDesignSpecOAIndex;
-            state.dataSize->FinalZoneSizing(CtrlZoneNum).OADesMethod = state.dataSize->ZoneSizingInput(1).OADesMethod;
-            state.dataSize->FinalZoneSizing(CtrlZoneNum).DesOAFlowPPer = state.dataSize->ZoneSizingInput(1).DesOAFlowPPer;
-            state.dataSize->FinalZoneSizing(CtrlZoneNum).DesOAFlowPerArea = state.dataSize->ZoneSizingInput(1).DesOAFlowPerArea;
-            state.dataSize->FinalZoneSizing(CtrlZoneNum).DesOAFlow = state.dataSize->ZoneSizingInput(1).DesOAFlow;
             state.dataSize->FinalZoneSizing(CtrlZoneNum).CoolAirDesMethod = state.dataSize->ZoneSizingInput(1).CoolAirDesMethod;
             state.dataSize->FinalZoneSizing(CtrlZoneNum).HeatAirDesMethod = state.dataSize->ZoneSizingInput(1).HeatAirDesMethod;
             state.dataSize->FinalZoneSizing(CtrlZoneNum).InpDesCoolAirFlow = state.dataSize->ZoneSizingInput(1).DesCoolAirFlow;
@@ -1163,10 +1133,6 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
             state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatDesHumRat = state.dataSize->ZoneSizingInput(1).HeatDesHumRat;
             state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneAirDistributionIndex = state.dataSize->ZoneSizingInput(1).ZoneAirDistributionIndex;
             state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneDesignSpecOAIndex = state.dataSize->ZoneSizingInput(1).ZoneDesignSpecOAIndex;
-            state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).OADesMethod = state.dataSize->ZoneSizingInput(1).OADesMethod;
-            state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesOAFlowPPer = state.dataSize->ZoneSizingInput(1).DesOAFlowPPer;
-            state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesOAFlowPerArea = state.dataSize->ZoneSizingInput(1).DesOAFlowPerArea;
-            state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesOAFlow = state.dataSize->ZoneSizingInput(1).DesOAFlow;
             state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolAirDesMethod = state.dataSize->ZoneSizingInput(1).CoolAirDesMethod;
             state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatAirDesMethod = state.dataSize->ZoneSizingInput(1).HeatAirDesMethod;
             state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).InpDesCoolAirFlow = state.dataSize->ZoneSizingInput(1).DesCoolAirFlow;
@@ -1349,6 +1315,13 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
         TotPeopleInZone = 0.0;
         Real64 ZoneMinOccupancy = 0.;
         ZoneIndex = state.dataSize->FinalZoneSizing(CtrlZoneNum).ActualZoneNum;
+        int DSOAPtr = state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneDesignSpecOAIndex; // index to DesignSpecification:OutdoorAir object
+        if (DSOAPtr > 0) {
+            state.dataSize->FinalZoneSizing(CtrlZoneNum).DesOAFlowPPer =
+                state.dataSize->OARequirements(DSOAPtr).desFlowPerZonePerson(state, ZoneIndex);
+            state.dataSize->FinalZoneSizing(CtrlZoneNum).DesOAFlowPerArea =
+                state.dataSize->OARequirements(DSOAPtr).desFlowPerZoneArea(state, ZoneIndex);
+        }
         for (PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
             if (state.dataHeatBal->People(PeopleNum).ZonePtr == state.dataSize->FinalZoneSizing(CtrlZoneNum).ActualZoneNum) {
                 TotPeopleInZone += (state.dataHeatBal->People(PeopleNum).NumberOfPeople *
@@ -1368,13 +1341,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
             (state.dataHeatBal->Zone(ZoneIndex).FloorArea *
              state.dataHeatBal->Zone(state.dataSize->FinalZoneSizing(CtrlZoneNum).ActualZoneNum).Multiplier *
              state.dataHeatBal->Zone(state.dataSize->FinalZoneSizing(CtrlZoneNum).ActualZoneNum).ListMultiplier);
-        if (state.dataSize->FinalZoneSizing(CtrlZoneNum).OADesMethod == OAFlowPPer ||
-            state.dataSize->FinalZoneSizing(CtrlZoneNum).OADesMethod == OAFlowSum ||
-            state.dataSize->FinalZoneSizing(CtrlZoneNum).OADesMethod == OAFlowMax) {
-            OAFromPeople = state.dataSize->FinalZoneSizing(CtrlZoneNum).DesOAFlowPPer * TotPeopleInZone;
-        } else {
-            OAFromPeople = 0.0;
-        }
+        OAFromPeople = state.dataSize->FinalZoneSizing(CtrlZoneNum).DesOAFlowPPer * TotPeopleInZone;
         OAFromArea = state.dataSize->FinalZoneSizing(CtrlZoneNum).DesOAFlowPerArea * state.dataSize->FinalZoneSizing(CtrlZoneNum).TotalZoneFloorArea;
         state.dataSize->FinalZoneSizing(CtrlZoneNum).TotPeopleInZone = TotPeopleInZone;
         state.dataSize->FinalZoneSizing(CtrlZoneNum).TotalOAFromPeople = OAFromPeople;
@@ -1392,7 +1359,6 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
         // Calculate the design min OA flow rate for this zone
         UseOccSchFlag = false;
         UseMinOASchFlag = false;
-        DSOAPtr = state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneDesignSpecOAIndex;
         state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneDesignSpecOAIndex = DSOAPtr; // store for later use
         state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex =
             state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneAirDistributionIndex; // store for later use

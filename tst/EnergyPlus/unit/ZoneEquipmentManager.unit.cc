@@ -2200,7 +2200,6 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays)
             thisSizingType.ZnCoolDgnSAMethod = 1;
             thisSizingType.ZnHeatDgnSAMethod = 1;
             thisSizingType.ZoneDesignSpecOAIndex = 1;
-            thisSizingType.OADesMethod = 1;
             thisSizingType.CoolAirDesMethod = 1;
             thisSizingType.HeatAirDesMethod = 1;
             thisSizingType.DOASControlStrategy = 1;
@@ -2217,7 +2216,6 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays)
             thisSizingType.HeatDesHumRat = 1.0;
             thisSizingType.DesOAFlowPPer = 1.0;
             thisSizingType.DesOAFlowPerArea = 1.0;
-            thisSizingType.DesOAFlow = 1.0;
             thisSizingType.InpDesCoolAirFlow = 1.0;
             thisSizingType.DesCoolMinAirFlowPerArea = 1.0;
             thisSizingType.DesCoolMinAirFlow = 1.0;
@@ -2397,7 +2395,6 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays)
             thisSizingType2.ZnCoolDgnSAMethod = 1;
             thisSizingType2.ZnHeatDgnSAMethod = 1;
             thisSizingType2.ZoneDesignSpecOAIndex = 1;
-            thisSizingType2.OADesMethod = 1;
             thisSizingType2.CoolAirDesMethod = 1;
             thisSizingType2.HeatAirDesMethod = 1;
             thisSizingType2.DOASControlStrategy = 1;
@@ -2414,7 +2411,6 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays)
             thisSizingType2.HeatDesHumRat = 1.0;
             thisSizingType2.DesOAFlowPPer = 1.0;
             thisSizingType2.DesOAFlowPerArea = 1.0;
-            thisSizingType2.DesOAFlow = 1.0;
             thisSizingType2.InpDesCoolAirFlow = 1.0;
             thisSizingType2.DesCoolMinAirFlowPerArea = 1.0;
             thisSizingType2.DesCoolMinAirFlow = 1.0;

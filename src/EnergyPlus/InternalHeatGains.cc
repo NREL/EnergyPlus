@@ -811,11 +811,19 @@ namespace InternalHeatGains {
                     state.dataHeatBal->People(Loop).NomMinNumberPeople = state.dataHeatBal->People(Loop).NumberOfPeople * SchMin;
                     state.dataHeatBal->People(Loop).NomMaxNumberPeople = state.dataHeatBal->People(Loop).NumberOfPeople * SchMax;
 
-                    if (state.dataHeatBal->People(Loop).ZonePtr > 0) {
-                        state.dataHeatBal->Zone(state.dataHeatBal->People(Loop).ZonePtr).TotOccupants +=
-                            state.dataHeatBal->People(Loop).NumberOfPeople;
+                    if (zoneNum > 0) {
+                        state.dataHeatBal->Zone(zoneNum).TotOccupants += state.dataHeatBal->People(Loop).NumberOfPeople;
+                        // Note that min/max occupants are non-coincident
+                        state.dataHeatBal->Zone(zoneNum).minOccupants += state.dataHeatBal->People(Loop).NomMinNumberPeople;
+                        state.dataHeatBal->Zone(zoneNum).maxOccupants += state.dataHeatBal->People(Loop).NomMaxNumberPeople;
                     }
 
+                    if (spaceNum > 0) {
+                        state.dataHeatBal->space(spaceNum).totOccupants += state.dataHeatBal->People(Loop).NumberOfPeople;
+                        // Note that min/max occupants are non-coincident
+                        state.dataHeatBal->space(spaceNum).minOccupants += state.dataHeatBal->People(Loop).NomMinNumberPeople;
+                        state.dataHeatBal->space(spaceNum).maxOccupants += state.dataHeatBal->People(Loop).NomMaxNumberPeople;
+                    }
                     state.dataHeatBal->People(Loop).FractionRadiant = IHGNumbers(4);
                     state.dataHeatBal->People(Loop).FractionConvected = 1.0 - state.dataHeatBal->People(Loop).FractionRadiant;
                     if (Item1 == 1) {

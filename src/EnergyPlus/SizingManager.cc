@@ -3033,10 +3033,6 @@ void GetZoneSizingInput(EnergyPlusData &state)
                     OAIndex = UtilityRoutines::FindItemInList(state.dataSize->ZoneSizingInput(ZoneSizIndex).DesignSpecOAObjName,
                                                               state.dataSize->OARequirements);
                     if (OAIndex > 0) {
-                        state.dataSize->ZoneSizingInput(ZoneSizIndex).OADesMethod = state.dataSize->OARequirements(OAIndex).OAFlowMethod;
-                        state.dataSize->ZoneSizingInput(ZoneSizIndex).DesOAFlowPPer = state.dataSize->OARequirements(OAIndex).OAFlowPerPerson;
-                        state.dataSize->ZoneSizingInput(ZoneSizIndex).DesOAFlowPerArea = state.dataSize->OARequirements(OAIndex).OAFlowPerArea;
-                        state.dataSize->ZoneSizingInput(ZoneSizIndex).DesOAFlow = state.dataSize->OARequirements(OAIndex).OAFlowPerZone;
                         state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneDesignSpecOAIndex = OAIndex;
                     } else {
                         ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
@@ -3045,11 +3041,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
                                               "\".");
                         ErrorsFound = true;
                     }
-                } else { // If no design spec object specified, i.e. no OA, then set OA method to None as default but flows to 0
-                    state.dataSize->ZoneSizingInput(ZoneSizIndex).OADesMethod = 0;
-                    state.dataSize->ZoneSizingInput(ZoneSizIndex).DesOAFlowPPer = 0.0;
-                    state.dataSize->ZoneSizingInput(ZoneSizIndex).DesOAFlowPerArea = 0.0;
-                    state.dataSize->ZoneSizingInput(ZoneSizIndex).DesOAFlow = 0.0;
+                } else { // If no design spec object specified, i.e. no OA, then leave ZoneDesignSpecOAIndex = 0
                 }
 
                 //  N7, \field Zone Heating Sizing Factor
