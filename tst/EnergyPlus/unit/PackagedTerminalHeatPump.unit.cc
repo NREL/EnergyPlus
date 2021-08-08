@@ -3850,16 +3850,16 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
     state->dataGlobal->CurrentTime = 12.0;
 
     ProcessScheduleInput(*state); // read schedules
-    //HeatBalanceManager::GetZoneData(*state, ErrorsFound);
-    //EXPECT_FALSE(ErrorsFound);
-    //HeatBalanceManager::GetWindowGlassSpectralData(*state, ErrorsFound);
-    //EXPECT_FALSE(ErrorsFound);
-    //HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
-    //EXPECT_FALSE(ErrorsFound);
-    //HeatBalanceManager::GetConstructData(*state, ErrorsFound);
-    //EXPECT_FALSE(ErrorsFound);
-    //SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
-    //EXPECT_FALSE(ErrorsFound);
+    // HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    // EXPECT_FALSE(ErrorsFound);
+    // HeatBalanceManager::GetWindowGlassSpectralData(*state, ErrorsFound);
+    // EXPECT_FALSE(ErrorsFound);
+    // HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    // EXPECT_FALSE(ErrorsFound);
+    // HeatBalanceManager::GetConstructData(*state, ErrorsFound);
+    // EXPECT_FALSE(ErrorsFound);
+    // SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
+    // EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetHeatBalanceInput(*state);
 
     HeatBalanceManager::AllocateHeatBalArrays(*state);
