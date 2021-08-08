@@ -5,47 +5,50 @@
 #include "BaseIGULayer.hpp"
 #include "WCEGases.hpp"
 
-namespace Gases {
-	class CGas;
+namespace Gases
+{
+    class CGas;
 }
 
-namespace Tarcog {
+namespace Tarcog
+{
+    double const ReferenceTemperature = 273.15;
 
-	double const ReferenceTemperature = 273.15;
+    namespace ISO15099
+    {
+        class CIGUGapLayer : public CBaseIGULayer, public CGasLayer
+        {
+        public:
+            CIGUGapLayer(double t_Thickness, double t_Pressure);
+            CIGUGapLayer(double t_Thickness, double t_Pressure, const Gases::CGas & t_Gas);
 
-	class CIGUGapLayer :
-		public CBaseIGULayer, public CGasLayer {
-	public:
-		CIGUGapLayer( double const t_Thickness, double const t_Pressure );
-		CIGUGapLayer( double const t_Thickness, double const t_Pressure,
-		              std::shared_ptr< Gases::CGas > const& t_Gas );
-		CIGUGapLayer( CIGUGapLayer const& t_Layer );
+            void connectToBackSide(const std::shared_ptr<CBaseLayer> & t_Layer) override;
 
-		void connectToBackSide( std::shared_ptr< CBaseLayer > const& t_Layer ) override;
+            double layerTemperature() override;
 
-		double layerTemperature() override;
+            double averageTemperature() const;
 
-		double averageTemperature() const;
+            double getPressure() override;
 
-		double getPressure() override;
-
-		std::shared_ptr< CBaseLayer > clone() const override;
+            std::shared_ptr<CBaseLayer> clone() const override;
 
 
-	protected:
-		void initializeStateVariables() override;
-		void calculateConvectionOrConductionFlow() override;
+        protected:
+            void initializeStateVariables() override;
+            void calculateConvectionOrConductionFlow() override;
 
-	private:
-		double calculateRayleighNumber();
-		double aspectRatio() const;
-		double convectiveH();
+        private:
+            double calculateRayleighNumber();
+            double aspectRatio() const;
+            double convectiveH();
 
-		double getGasTemperature() override;
+            double getGasTemperature() override;
 
-		void checkNextLayer() const;
-	};
+            void checkNextLayer() const;
+        };
 
-}
+    }   // namespace ISO15099
+
+}   // namespace Tarcog
 
 #endif
