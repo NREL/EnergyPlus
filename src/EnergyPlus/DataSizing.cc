@@ -503,13 +503,12 @@ Real64 ZoneAirDistributionData::calculateEz(EnergyPlusData &state, int const Zon
 }
 
 Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
-                                          int const DSOAPtr,           // Pointer to DesignSpecification:OutdoorAir object
-                                          int const ActualZoneNum,     // Zone index
-                                          bool const UseOccSchFlag,    // Zone occupancy schedule will be used instead of using total zone occupancy
-                                          bool const UseMinOASchFlag,  // Use min OA schedule in DesignSpecification:OutdoorAir object
-                                          bool const PerPersonNotSet,  // when calculation should not include occupants (e.g., dual duct)
-                                          bool const MaxOAVolFlowFlag, // TRUE when calculation uses occupancy schedule  (e.g., dual duct)
-                                          int const spaceNum           // Space index when calculating space-by-space
+                                          int const DSOAPtr,          // Pointer to DesignSpecification:OutdoorAir object
+                                          int const ActualZoneNum,    // Zone index
+                                          bool const UseOccSchFlag,   // Zone occupancy schedule will be used instead of using total zone occupancy
+                                          bool const UseMinOASchFlag, // Use min OA schedule in DesignSpecification:OutdoorAir object
+                                          bool const PerPersonNotSet, // when calculation should not include occupants (e.g., dual duct)
+                                          bool const MaxOAVolFlowFlag // TRUE when calculation uses occupancy schedule  (e.g., dual duct)
 )
 {
     if (this->numDSOA == 1) {

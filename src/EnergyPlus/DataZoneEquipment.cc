@@ -1401,8 +1401,6 @@ Real64 CalcDesignSpecificationOutdoorAir(EnergyPlusData &state,
     Real64 DSOAFlowPerZone; // Outdoor air volume flow rate (m3/s)
     Real64 DSOAFlowPerArea; // Outdoor air volume flow rate based on zone floor area (m3/s)
     Real64 DSOAFlowACH;     // Outdoor air volume flow rate based on air changes per hour (m3/s)
-    Real64 PeopleCount;     // total count of people in people objects
-    int Loop;               // index counter in LOOP
     bool PerPersonModeNotSet;
     bool MaxOAFlag;
     Real64 ZoneOAPeople;              // Zone OA flow rate based on number of occupants [m3/s]

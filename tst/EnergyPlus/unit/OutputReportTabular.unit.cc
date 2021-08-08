@@ -6269,34 +6269,70 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     state->dataHeatBal->ZoneElectric.allocate(state->dataHeatBal->TotElecEquip);
 
     state->dataHeatBal->Lights(1).ZonePtr = 1;
+    state->dataHeatBal->Lights(1).spacePtrs.allocate(1);
+    state->dataHeatBal->Lights(1).spacePtrs(1) = 1;
+    state->dataHeatBal->Lights(1).spaceFracs.allocate(1);
+    state->dataHeatBal->Lights(1).spaceFracs(1) = 1.0;
     state->dataHeatBal->Lights(1).DesignLevel = 1000.0;
     state->dataHeatBal->Lights(2).ZonePtr = 2;
+    state->dataHeatBal->Lights(2).spacePtrs.allocate(1);
+    state->dataHeatBal->Lights(2).spacePtrs(1) = 2;
+    state->dataHeatBal->Lights(2).spaceFracs.allocate(1);
+    state->dataHeatBal->Lights(2).spaceFracs(1) = 1.0;
     state->dataHeatBal->Lights(2).DesignLevel = 100.0;
     state->dataHeatBal->Lights(3).ZonePtr = 3;
+    state->dataHeatBal->Lights(3).spacePtrs.allocate(1);
+    state->dataHeatBal->Lights(3).spacePtrs(1) = 3;
+    state->dataHeatBal->Lights(3).spaceFracs.allocate(1);
+    state->dataHeatBal->Lights(3).spaceFracs(1) = 1.0;
     state->dataHeatBal->Lights(3).DesignLevel = 10.0;
 
     state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(1).spaceIndex = 1;
     state->dataHeatBal->People(1).NumberOfPeople = 10.0;
     state->dataHeatBal->People(2).ZonePtr = 2;
+    state->dataHeatBal->People(2).spaceIndex = 2;
     state->dataHeatBal->People(2).NumberOfPeople = 5.0;
     state->dataHeatBal->People(3).ZonePtr = 3;
+    state->dataHeatBal->People(3).spaceIndex = 3;
     state->dataHeatBal->People(3).NumberOfPeople = 1.0;
 
     state->dataHeatBal->ZoneElectric(1).ZonePtr = 1;
+    state->dataHeatBal->ZoneElectric(1).spacePtrs.allocate(1);
+    state->dataHeatBal->ZoneElectric(1).spacePtrs(1) = 1;
+    state->dataHeatBal->ZoneElectric(1).spaceFracs.allocate(1);
+    state->dataHeatBal->ZoneElectric(1).spaceFracs(1) = 1.0;
     state->dataHeatBal->ZoneElectric(1).DesignLevel = 500.0;
     state->dataHeatBal->ZoneElectric(2).ZonePtr = 2;
+    state->dataHeatBal->ZoneElectric(2).spacePtrs.allocate(1);
+    state->dataHeatBal->ZoneElectric(2).spacePtrs(1) = 2;
+    state->dataHeatBal->ZoneElectric(2).spaceFracs.allocate(1);
+    state->dataHeatBal->ZoneElectric(2).spaceFracs(1) = 1.0;
     state->dataHeatBal->ZoneElectric(2).DesignLevel = 50.0;
     state->dataHeatBal->ZoneElectric(3).ZonePtr = 3;
+    state->dataHeatBal->ZoneElectric(3).spacePtrs.allocate(1);
+    state->dataHeatBal->ZoneElectric(3).spacePtrs(1) = 3;
+    state->dataHeatBal->ZoneElectric(3).spaceFracs.allocate(1);
+    state->dataHeatBal->ZoneElectric(3).spaceFracs(1) = 1.0;
     state->dataHeatBal->ZoneElectric(3).DesignLevel = 5.0;
 
     // zone
     state->dataGlobal->NumOfZones = 3;
+    state->dataGlobal->numSpaces = 3;
+    state->dataGlobal->numSpaceTypes = 1;
+    state->dataHeatBal->spaceTypes.allocate(state->dataGlobal->numSpaceTypes);
+    state->dataHeatBal->spaceTypes(1) = "General";
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->space.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Zone(1).Name = "PartofTot Conditioned Zone";
+    state->dataHeatBal->space(1).Name = "PartofTot Conditioned Zone";
+    state->dataHeatBal->space(1).spaceTypeNum = 1;
     state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1; // Conditioned
     state->dataHeatBal->Zone(1).isPartOfTotalArea = true;
     state->dataHeatBal->Zone(1).Multiplier = 1.;
     state->dataHeatBal->Zone(1).ListMultiplier = 1.;
+    state->dataHeatBal->Zone(1).spaceIndexes.allocate(1);
+    state->dataHeatBal->Zone(1).spaceIndexes(1) = 1;
     // 10x10x2
     state->dataHeatBal->Zone(1).FloorArea = 1000.;
     state->dataHeatBal->Zone(1).Volume = 2000.;
@@ -6305,10 +6341,14 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     state->dataHeatBal->Zone(1).ExtWindowArea = state->dataSurface->Surface(3).GrossArea + state->dataSurface->Surface(4).GrossArea;
 
     state->dataHeatBal->Zone(2).Name = "PartofTot Unconditioned Zone";
+    state->dataHeatBal->space(2).Name = "PartofTot Unconditioned Zone";
+    state->dataHeatBal->space(2).spaceTypeNum = 1;
     state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 0; // Unconditioned
     state->dataHeatBal->Zone(2).isPartOfTotalArea = true;
     state->dataHeatBal->Zone(2).Multiplier = 1.;
     state->dataHeatBal->Zone(2).ListMultiplier = 1.;
+    state->dataHeatBal->Zone(2).spaceIndexes.allocate(1);
+    state->dataHeatBal->Zone(2).spaceIndexes(1) = 2;
     // 10x10x2
     state->dataHeatBal->Zone(2).FloorArea = 100.;
     state->dataHeatBal->Zone(2).Volume = 200.;
@@ -6317,10 +6357,14 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     state->dataHeatBal->Zone(2).ExtWindowArea = 0.0;
 
     state->dataHeatBal->Zone(3).Name = "NOT PartofTot Conditioned Zone";
+    state->dataHeatBal->space(3).Name = "NOT PartofTot Conditioned Zone";
+    state->dataHeatBal->space(3).spaceTypeNum = 1;
     state->dataHeatBal->Zone(3).SystemZoneNodeNumber = 1; // Conditioned
     state->dataHeatBal->Zone(3).isPartOfTotalArea = false;
     state->dataHeatBal->Zone(3).Multiplier = 1.;
     state->dataHeatBal->Zone(3).ListMultiplier = 1.;
+    state->dataHeatBal->Zone(3).spaceIndexes.allocate(1);
+    state->dataHeatBal->Zone(3).spaceIndexes(1) = 3;
     // 10x10x2
     state->dataHeatBal->Zone(3).FloorArea = 10.;
     state->dataHeatBal->Zone(3).Volume = 20.;
@@ -9269,34 +9313,71 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
     state->dataHeatBal->ZoneElectric.allocate(state->dataHeatBal->TotElecEquip);
 
     state->dataHeatBal->Lights(1).ZonePtr = 1;
+    state->dataHeatBal->Lights(1).spacePtrs.allocate(1);
+    state->dataHeatBal->Lights(1).spacePtrs(1) = 1;
+    state->dataHeatBal->Lights(1).spaceFracs.allocate(1);
+    state->dataHeatBal->Lights(1).spaceFracs(1) = 1.0;
     state->dataHeatBal->Lights(1).DesignLevel = 1000.0;
     state->dataHeatBal->Lights(2).ZonePtr = 2;
+    state->dataHeatBal->Lights(2).spacePtrs.allocate(1);
+    state->dataHeatBal->Lights(2).spacePtrs(1) = 2;
+    state->dataHeatBal->Lights(2).spaceFracs.allocate(1);
+    state->dataHeatBal->Lights(2).spaceFracs(1) = 1.0;
     state->dataHeatBal->Lights(2).DesignLevel = 100.0;
     state->dataHeatBal->Lights(3).ZonePtr = 3;
+    state->dataHeatBal->Lights(3).spacePtrs.allocate(1);
+    state->dataHeatBal->Lights(3).spacePtrs(1) = 3;
+    state->dataHeatBal->Lights(3).spaceFracs.allocate(1);
+    state->dataHeatBal->Lights(3).spaceFracs(1) = 1.0;
     state->dataHeatBal->Lights(3).DesignLevel = 10.0;
 
     state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(1).spaceIndex = 1;
     state->dataHeatBal->People(1).NumberOfPeople = 10.0;
     state->dataHeatBal->People(2).ZonePtr = 2;
+    state->dataHeatBal->People(2).spaceIndex = 2;
     state->dataHeatBal->People(2).NumberOfPeople = 5.0;
     state->dataHeatBal->People(3).ZonePtr = 3;
+    state->dataHeatBal->People(3).spaceIndex = 3;
     state->dataHeatBal->People(3).NumberOfPeople = 1.0;
 
     state->dataHeatBal->ZoneElectric(1).ZonePtr = 1;
+    state->dataHeatBal->ZoneElectric(1).spacePtrs.allocate(1);
+    state->dataHeatBal->ZoneElectric(1).spacePtrs(1) = 1;
+    state->dataHeatBal->ZoneElectric(1).spaceFracs.allocate(1);
+    state->dataHeatBal->ZoneElectric(1).spaceFracs(1) = 1.0;
     state->dataHeatBal->ZoneElectric(1).DesignLevel = 500.0;
     state->dataHeatBal->ZoneElectric(2).ZonePtr = 2;
+    state->dataHeatBal->ZoneElectric(2).spacePtrs.allocate(1);
+    state->dataHeatBal->ZoneElectric(2).spacePtrs(1) = 2;
+    state->dataHeatBal->ZoneElectric(2).spaceFracs.allocate(1);
+    state->dataHeatBal->ZoneElectric(2).spaceFracs(1) = 1.0;
     state->dataHeatBal->ZoneElectric(2).DesignLevel = 50.0;
     state->dataHeatBal->ZoneElectric(3).ZonePtr = 3;
+    state->dataHeatBal->ZoneElectric(3).spacePtrs.allocate(1);
+    state->dataHeatBal->ZoneElectric(3).spacePtrs(1) = 3;
+    state->dataHeatBal->ZoneElectric(3).spaceFracs.allocate(1);
+    state->dataHeatBal->ZoneElectric(3).spaceFracs(1) = 1.0;
     state->dataHeatBal->ZoneElectric(3).DesignLevel = 5.0;
 
     // zone
     state->dataGlobal->NumOfZones = 3;
+    state->dataGlobal->numSpaces = 3;
+    state->dataGlobal->numSpaceTypes = 1;
+    state->dataHeatBal->spaceTypes.allocate(state->dataGlobal->numSpaceTypes);
+    state->dataHeatBal->spaceTypes(1) = "General";
+
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->space.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Zone(1).Name = "PartofTot Conditioned Zone";
     state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1; // Conditioned
     state->dataHeatBal->Zone(1).isPartOfTotalArea = true;
     state->dataHeatBal->Zone(1).Multiplier = 1.;
     state->dataHeatBal->Zone(1).ListMultiplier = 1.;
+    state->dataHeatBal->space(1).Name = "PartofTot Conditioned Zone";
+    state->dataHeatBal->space(1).spaceTypeNum = 1;
+    state->dataHeatBal->Zone(1).spaceIndexes.allocate(1);
+    state->dataHeatBal->Zone(1).spaceIndexes(1) = 1;
     // 10x10x2
     state->dataHeatBal->Zone(1).FloorArea = 1000.;
     state->dataHeatBal->Zone(1).Volume = 2000.;
@@ -9309,6 +9390,10 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
     state->dataHeatBal->Zone(2).isPartOfTotalArea = true;
     state->dataHeatBal->Zone(2).Multiplier = 1.;
     state->dataHeatBal->Zone(2).ListMultiplier = 1.;
+    state->dataHeatBal->space(2).Name = "PartofTot Unconditioned Zone";
+    state->dataHeatBal->space(2).spaceTypeNum = 1;
+    state->dataHeatBal->Zone(2).spaceIndexes.allocate(1);
+    state->dataHeatBal->Zone(2).spaceIndexes(1) = 2;
     // 10x10x2
     state->dataHeatBal->Zone(2).FloorArea = 100.;
     state->dataHeatBal->Zone(2).Volume = 200.;
@@ -9321,6 +9406,10 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
     state->dataHeatBal->Zone(3).isPartOfTotalArea = false;
     state->dataHeatBal->Zone(3).Multiplier = 1.;
     state->dataHeatBal->Zone(3).ListMultiplier = 1.;
+    state->dataHeatBal->space(3).Name = "NOT PartofTot Conditioned Zone";
+    state->dataHeatBal->space(3).spaceTypeNum = 1;
+    state->dataHeatBal->Zone(3).spaceIndexes.allocate(1);
+    state->dataHeatBal->Zone(3).spaceIndexes(1) = 3;
     // 10x10x2
     state->dataHeatBal->Zone(3).FloorArea = 10.;
     state->dataHeatBal->Zone(3).Volume = 20.;

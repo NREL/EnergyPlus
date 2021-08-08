@@ -952,7 +952,7 @@ namespace DataSizing {
 
     struct OARequirementsData
     {
-        // Holds complet data for a single DesignSpecification:OutdoorAir object or
+        // Holds complete data for a single DesignSpecification:OutdoorAir object or
         // a list of indexes from a DesignSpecification:OutdoorAir:SpaceList object
         std::string Name;                     // Name of DesignSpecification:OutdoorAir or DesignSpecification:OutdoorAir:SpaceList object
         int numDSOA = 1;                      // Number of DesignSpecification:OutdoorAir objects for this instance
@@ -964,22 +964,22 @@ namespace DataSizing {
         Real64 OAFlowPerArea = 0.0;           // - OA requirement per zone area
         Real64 OAFlowPerZone = 0.0;           // - OA requirement per zone
         Real64 OAFlowACH = 0.0;               // - OA requirement per zone per hour
-        int OAFlowFracSchPtr = 0;             // - Fraction schedule applied to total OA requirement
-        int OAPropCtlMinRateSchPtr = 0;       // - Fraction schedule applied to Proportional Control Minimum Outdoor Air Flow Rate
-        int CO2MaxMinLimitErrorCount = 0;     // Counter when max CO2 concentration < min CO2 concentration for SOAM_ProportionalControlSchOcc
-        int CO2MaxMinLimitErrorIndex = 0;     // Index for max CO2 concentration < min CO2 concentration recurring error message for
-                                              // SOAM_ProportionalControlSchOcc
-        int CO2GainErrorCount = 0;            // Counter when CO2 generation from people is zero for SOAM_ProportionalControlSchOcc
+        int OAFlowFracSchPtr = DataGlobalConstants::ScheduleAlwaysOn; // - Fraction schedule applied to total OA requirement
+        int OAPropCtlMinRateSchPtr =
+            DataGlobalConstants::ScheduleAlwaysOn; // - Fraction schedule applied to Proportional Control Minimum Outdoor Air Flow Rate
+        int CO2MaxMinLimitErrorCount = 0;          // Counter when max CO2 concentration < min CO2 concentration for SOAM_ProportionalControlSchOcc
+        int CO2MaxMinLimitErrorIndex = 0;          // Index for max CO2 concentration < min CO2 concentration recurring error message for
+                                                   // SOAM_ProportionalControlSchOcc
+        int CO2GainErrorCount = 0;                 // Counter when CO2 generation from people is zero for SOAM_ProportionalControlSchOcc
         int CO2GainErrorIndex = 0; // Index for recurring error message when CO2 generation from people is zero for SOAM_ProportionalControlSchOcc
 
         Real64 calcOAFlowRate(EnergyPlusData &state,
-                              int const DSOAPtr,                   // Pointer to DesignSpecification:OutdoorAir object
-                              int const ActualZoneNum,             // Zone index
-                              bool const UseOccSchFlag,            // Zone occupancy schedule will be used instead of using total zone occupancy
-                              bool const UseMinOASchFlag,          // Use min OA schedule in DesignSpecification:OutdoorAir object
-                              bool const PerPersonNotSet = false,  // when calculation should not include occupants (e.g., dual duct)
-                              bool const MaxOAVolFlowFlag = false, // TRUE when calculation uses occupancy schedule  (e.g., dual duct)
-                              int const spaceNum = 0               // Space index when calculating space-by-space
+                              int const DSOAPtr,                  // Pointer to DesignSpecification:OutdoorAir object
+                              int const ActualZoneNum,            // Zone index
+                              bool const UseOccSchFlag,           // Zone occupancy schedule will be used instead of using total zone occupancy
+                              bool const UseMinOASchFlag,         // Use min OA schedule in DesignSpecification:OutdoorAir object
+                              bool const PerPersonNotSet = false, // when calculation should not include occupants (e.g., dual duct)
+                              bool const MaxOAVolFlowFlag = false // TRUE when calculation uses occupancy schedule  (e.g., dual duct)
         );
 
         Real64 desFlowPerZoneArea(EnergyPlusData &state,
