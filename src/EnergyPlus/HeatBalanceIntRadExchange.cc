@@ -1362,8 +1362,8 @@ namespace HeatBalanceIntRadExchange {
 
                 // Aggregate view factors for representative surfaces
                 for (index = 2; index <= NumAlphas; index += 2) {
-                    int fromSurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(index), state.dataSurface->Surface, N);
-                    int toSurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(index + 1), state.dataSurface->Surface, N);
+                    int fromSurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(index), state.dataSurface->Surface);
+                    int toSurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(index + 1), state.dataSurface->Surface);
                     if (fromSurfNum == 0) {
                         ShowSevereError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", invalid surface name.");
                         ShowContinueError(state, "...Surface name=\"" + state.dataIPShortCut->cAlphaArgs(index) + "\", not in this zone or enclosure.");
