@@ -5,81 +5,80 @@
 #include <vector>
 #include <map>
 
-namespace FenestrationCommon {
+#include <WCECommon.hpp>
 
-	class CSeries;
-	enum class Property;
-	enum class Side;
+namespace MultiLayerOptics
+{
+    class CEquivalentLayerSingleComponent;
 
-}
+    ///////////////////////////////////////////////////////////////////////////
+    ///   CSurfaceSeries
+    ///////////////////////////////////////////////////////////////////////////
 
-namespace MultiLayerOptics {
+    // Keeps series of data related to one surface
+    class CSurfaceSeries
+    {
+    public:
+        CSurfaceSeries(const FenestrationCommon::CSeries & t_T,
+                       const FenestrationCommon::CSeries & t_R);
 
-	class CEquivalentLayerSingleComponent;
+        FenestrationCommon::CSeries
+          getProperties(const FenestrationCommon::Property t_Property) const;
 
-	///////////////////////////////////////////////////////////////////////////
-	///   CSurfaceSeries
-	///////////////////////////////////////////////////////////////////////////
+    private:
+        std::map<FenestrationCommon::Property, FenestrationCommon::CSeries> m_Properties;
+    };
 
-	// Keeps series of data related to one surface
-	class CSurfaceSeries {
-	public:
-		CSurfaceSeries( const std::shared_ptr< FenestrationCommon::CSeries >& t_T,
-		                const std::shared_ptr< FenestrationCommon::CSeries >& t_R );
+    ///////////////////////////////////////////////////////////////////////////
+    ///   CLayerSeries
+    ///////////////////////////////////////////////////////////////////////////
 
-		std::shared_ptr< FenestrationCommon::CSeries > getProperties( const FenestrationCommon::Property t_Property ) const;
+    class CLayerSeries
+    {
+    public:
+        CLayerSeries(const FenestrationCommon::CSeries & t_Tf,
+                     const FenestrationCommon::CSeries & t_Rf,
+                     const FenestrationCommon::CSeries & t_Tb,
+                     const FenestrationCommon::CSeries & t_Rb);
 
-	private:
-		std::map< FenestrationCommon::Property, std::shared_ptr< FenestrationCommon::CSeries > > m_Properties;
-	};
+        FenestrationCommon::CSeries
+          getProperties(const FenestrationCommon::Side t_Side,
+                        const FenestrationCommon::Property t_Property) const;
 
-	///////////////////////////////////////////////////////////////////////////
-	///   CLayerSeries
-	///////////////////////////////////////////////////////////////////////////
+    private:
+        std::map<FenestrationCommon::Side, std::shared_ptr<CSurfaceSeries>> m_Surfaces;
+    };
 
-	class CLayerSeries {
-	public:
-		CLayerSeries( const std::shared_ptr< FenestrationCommon::CSeries >& t_Tf,
-		              const std::shared_ptr< FenestrationCommon::CSeries >& t_Rf,
-		              const std::shared_ptr< FenestrationCommon::CSeries >& t_Tb,
-		              const std::shared_ptr< FenestrationCommon::CSeries >& t_Rb );
+    ///////////////////////////////////////////////////////////////////////////
+    ///   CEquivalentLayerSingleComponentMW
+    ///////////////////////////////////////////////////////////////////////////
 
-		std::shared_ptr< FenestrationCommon::CSeries > getProperties( const FenestrationCommon::Side t_Side,
-		                                                              const FenestrationCommon::Property t_Property ) const;
+    // Spectral properties of glazing system made up of layers with defined or measured spectral
+    // properties. Single component means that ray will propagate through IGU in single state (as
+    // perfect beam or prefectly diffuse)
+    class CEquivalentLayerSingleComponentMW
+    {
+    public:
+        CEquivalentLayerSingleComponentMW(const FenestrationCommon::CSeries & t_Tf,
+                                          const FenestrationCommon::CSeries & t_Tb,
+                                          const FenestrationCommon::CSeries & t_Rf,
+                                          const FenestrationCommon::CSeries & t_Rb);
 
-	private:
-		std::map< FenestrationCommon::Side, std::shared_ptr< CSurfaceSeries > > m_Surfaces;
-	};
+        void addLayer(const FenestrationCommon::CSeries & t_Tf,
+                      const FenestrationCommon::CSeries & t_Tb,
+                      const FenestrationCommon::CSeries & t_Rf,
+                      const FenestrationCommon::CSeries & t_Rb);
 
-	///////////////////////////////////////////////////////////////////////////
-	///   CEquivalentLayerSingleComponentMW
-	///////////////////////////////////////////////////////////////////////////
+        FenestrationCommon::CSeries getProperties(const FenestrationCommon::Property t_Property,
+                                                  const FenestrationCommon::Side t_Side) const;
 
-	// Spectral properties of glazing system made up of layers with defined or measured spectral properties.
-	// Single component means that ray will propagate through IGU in single state (as perfect beam or prefectly diffuse)
-	class CEquivalentLayerSingleComponentMW {
-	public:
-		CEquivalentLayerSingleComponentMW( const std::shared_ptr< FenestrationCommon::CSeries >& t_Tf,
-		                                   const std::shared_ptr< FenestrationCommon::CSeries >& t_Tb,
-		                                   const std::shared_ptr< FenestrationCommon::CSeries >& t_Rf,
-		                                   const std::shared_ptr< FenestrationCommon::CSeries >& t_Rb );
+    private:
+        std::shared_ptr<CLayerSeries> m_Layer;
 
-		void addLayer( const std::shared_ptr< FenestrationCommon::CSeries >& t_Tf,
-		               const std::shared_ptr< FenestrationCommon::CSeries >& t_Tb,
-		               const std::shared_ptr< FenestrationCommon::CSeries >& t_Rf,
-		               const std::shared_ptr< FenestrationCommon::CSeries >& t_Rb );
+        // Equivalent layers wavelength by wavelength
+        std::vector<std::shared_ptr<CEquivalentLayerSingleComponent>> m_EqLayerBySeries;
+    };
 
-		std::shared_ptr< FenestrationCommon::CSeries > getProperties( const FenestrationCommon::Property,
-		                                                              const FenestrationCommon::Side ) const;
-
-	private:
-		std::shared_ptr< CLayerSeries > m_Layer;
-
-		// Equivalent layers wavelength by wavelength
-		std::vector< std::shared_ptr< CEquivalentLayerSingleComponent > > m_EqLayerBySeries;
-
-	};
-
-}
+}   // namespace MultiLayerOptics
 
 #endif

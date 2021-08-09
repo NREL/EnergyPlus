@@ -4485,3 +4485,73 @@ TEST_F(EnergyPlusFixture, CalcAirFlowSimple_CO2andGCforRefrigerationDoorsTest)
     EXPECT_NEAR(state->dataContaminantBalance->MixingMassFlowGC(1), 26.347, 0.001);
     EXPECT_NEAR(state->dataContaminantBalance->MixingMassFlowGC(2), 13.172, 0.001);
 }
+
+TEST_F(EnergyPlusFixture, CZoeEquipmentManager_CalcZoneLeavingConditions_Test)
+{
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "LIVING ZONE";
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes);
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeExhaustNodeNum.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes);
+    state->dataZoneEquip->ZoneEquipConfig(1).SharedExhaustNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes);
+
+    int NumOfNodes = 10;
+    state->dataLoopNodes->Node.allocate(NumOfNodes);
+    state->dataLoopNodes->NodeID.allocate(NumOfNodes);
+    state->dataLoopNodes->NodeID(1) = "ZoeNode";
+    state->dataLoopNodes->NodeID(2) = "ZoeInletNode";
+    state->dataLoopNodes->NodeID(3) = "";
+    state->dataLoopNodes->NodeID(4) = "ZoeReturNode1";
+    state->dataLoopNodes->NodeID(5) = "ZoeReturNode2";
+    state->dataLoopNodes->NodeID(6) = "ZoeExhaustNode";
+    state->dataLoopNodes->NodeID(7) = "ZoeSupplyNode";
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(2) = 5;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 6;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeExhaustNodeNum(1) = 6;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeExhaustNodeNum(2) = 6;
+    state->dataZoneEquip->ZoneEquipConfig(1).SharedExhaustNode(1) = iLightReturnExhaustConfig::Multi;
+    state->dataZoneEquip->ZoneEquipConfig(1).SharedExhaustNode(2) = iLightReturnExhaustConfig::Shared;
+
+    state->dataHeatBal->ZoneIntGain.allocate(1);
+    state->dataHeatBal->ZoneIntGain(1).NumberOfDevices = 2;
+    state->dataHeatBal->ZoneIntGain(1).Device.allocate(2);
+    state->dataHeatBal->ZoneIntGain(1).Device(1).ReturnAirNodeNum = 4;
+    state->dataHeatBal->ZoneIntGain(1).Device(2).ReturnAirNodeNum = 5;
+    state->dataHeatBal->ZoneIntGain(1).Device(1).ReturnAirConvGainRate = 50.0;
+    state->dataHeatBal->ZoneIntGain(1).Device(2).ReturnAirConvGainRate = 100.0;
+
+    for (int Nodecount = 1; Nodecount <= NumOfNodes; ++Nodecount) {
+        state->dataLoopNodes->Node(Nodecount).Temp = 20.0;
+        state->dataLoopNodes->Node(Nodecount).HumRat = 0.001;
+    }
+    state->dataLoopNodes->Node(4).MassFlowRate = 0.01;
+    state->dataLoopNodes->Node(5).MassFlowRate = 0.02;
+    state->dataLoopNodes->Node(6).MassFlowRate = 0.015;
+
+    state->dataHeatBal->Zone(1).NoHeatToReturnAir = false;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
+    state->dataZoneEquip->ZoneEquipList.allocate(1);
+
+    CalcZoneLeavingConditions(*state, true);
+    // Zone node temperature is the same as input
+    EXPECT_NEAR(state->dataLoopNodes->Node(1).Temp, 20.0, 0.001);
+    // Return nodes and exhaust node have the same temperature
+    EXPECT_NEAR(state->dataLoopNodes->Node(4).Temp, 21.9866, 0.001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(5).Temp, 22.8381, 0.001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(6).Temp, 24.8248, 0.001);
+    // sum of return node temp diff = exhaust temp diff
+    EXPECT_NEAR(
+        state->dataLoopNodes->Node(4).Temp - 20.0 + state->dataLoopNodes->Node(5).Temp - 20.0, state->dataLoopNodes->Node(6).Temp - 20.0, 0.001);
+}
