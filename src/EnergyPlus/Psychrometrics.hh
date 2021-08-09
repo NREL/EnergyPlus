@@ -823,9 +823,9 @@ namespace Psychrometrics {
 
     inline Real64
         PsyRhFnTdbRhovLBnd0C([[maybe_unused]] EnergyPlusData &state,
-            Real64 const Tdb,                                       // dry-bulb temperature {C}
-            Real64 const Rhovapor,                                  // vapor density in air {kg/m3}
-            [[maybe_unused]] std::string_view const CalledFrom = "" // routine this function was called from (error message)
+                             Real64 const Tdb,                                       // dry-bulb temperature {C}
+                             Real64 const Rhovapor,                                  // vapor density in air {kg/m3}
+                             [[maybe_unused]] std::string_view const CalledFrom = "" // routine this function was called from (error message)
         )
     {
         // FUNCTION INFORMATION:
