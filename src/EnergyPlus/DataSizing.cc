@@ -534,8 +534,11 @@ Real64 OARequirementsData::desFlowPerZoneArea(EnergyPlusData &state,
                                               int const actualZoneNum // Zone index
 )
 {
+    Real64 desFlowPA = 0.0;
     if (this->numDSOA == 1) {
-        return this->OAFlowPerArea;
+        if (this->OAFlowMethod != DataSizing::OAFlowPPer && this->OAFlowMethod != DataSizing::OAFlow && this->OAFlowMethod != DataSizing::OAFlowACH) {
+            desFlowPA = this->OAFlowPerArea;
+        }
     } else {
         Real64 sumAreaOA = 0.0;
         for (int dsoaCount = 1; dsoaCount <= this->numDSOA; ++dsoaCount) {
@@ -545,27 +548,45 @@ Real64 OARequirementsData::desFlowPerZoneArea(EnergyPlusData &state,
                 sumAreaOA += this->OAFlowPerArea * spaceArea;
             }
         }
-        return sumAreaOA / state.dataHeatBal->Zone(actualZoneNum).FloorArea;
+        if (state.dataHeatBal->Zone(actualZoneNum).FloorArea) {
+            desFlowPA = sumAreaOA / state.dataHeatBal->Zone(actualZoneNum).FloorArea;
+        }
     }
+    return desFlowPA;
 }
 
 Real64 OARequirementsData::desFlowPerZonePerson(EnergyPlusData &state,
                                                 int const actualZoneNum // Zone index
 )
 {
+    Real64 desFlowPP = 0.0;
     if (this->numDSOA == 1) {
-        return this->OAFlowPerPerson;
+        if (this->OAFlowMethod != DataSizing::OAFlowPerArea && this->OAFlowMethod != DataSizing::OAFlow &&
+            this->OAFlowMethod != DataSizing::OAFlowACH) {
+            // TODO MJW: Temporarily exclude these methods to avoid diffs vs develop - new issue?
+            if (this->OAFlowMethod != DataSizing::ZOAM_IAQP && this->OAFlowMethod != DataSizing::ZOAM_ProportionalControlSchOcc &&
+                this->OAFlowMethod != DataSizing::ZOAM_ProportionalControlDesOcc) {
+                desFlowPP = this->OAFlowPerPerson;
+            }
+        }
     } else {
         Real64 sumPeopleOA = 0.0;
         for (int dsoaCount = 1; dsoaCount <= this->numDSOA; ++dsoaCount) {
             if (this->OAFlowMethod != DataSizing::OAFlowPerArea && this->OAFlowMethod != DataSizing::OAFlow &&
                 this->OAFlowMethod != DataSizing::OAFlowACH) {
-                Real64 spacePeople = state.dataHeatBal->space(this->dsoaSpaces(dsoaCount)).totOccupants;
-                sumPeopleOA += this->OAFlowPerPerson * spacePeople;
+                // TODO MJW: Temporarily exclude these methods to avoid diffs vs develop - new issue?
+                if (this->OAFlowMethod != DataSizing::ZOAM_IAQP && this->OAFlowMethod != DataSizing::ZOAM_ProportionalControlSchOcc &&
+                    this->OAFlowMethod != DataSizing::ZOAM_ProportionalControlDesOcc) {
+                    Real64 spacePeople = state.dataHeatBal->space(this->dsoaSpaces(dsoaCount)).totOccupants;
+                    sumPeopleOA += this->OAFlowPerPerson * spacePeople;
+                }
             }
         }
-        return sumPeopleOA / state.dataHeatBal->Zone(actualZoneNum).TotOccupants;
+        if (state.dataHeatBal->Zone(actualZoneNum).TotOccupants > 0.0) {
+            desFlowPP = sumPeopleOA / state.dataHeatBal->Zone(actualZoneNum).TotOccupants;
+        }
     }
+    return desFlowPP;
 }
 
 } // namespace EnergyPlus::DataSizing
