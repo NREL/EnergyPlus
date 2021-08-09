@@ -1131,14 +1131,15 @@ Surface are grouped based on the following criteria for similarity:
     \item conduction and convection heat transfer algorithms
     \item movable insulation
     \item frame and divider (windows only)
-    \item storm window constuction (windows only)
+    \item storm window construction (windows only)
     \item other minor attributes
 \end{itemize}
 
-Surfaces with the following attributes are currently never grouped because there is a high likelyhood that they will experience dissimilar conditions throughout a simulation:
+Surfaces with the following objects defined are currently never grouped because there is a high likelihood that they will experience dissimilar conditions throughout a simulation:
 
 \begin{itemize}
     \item ConstructionProperty:InternalHeatSource
+    \item ZoneProperty:UserViewFactors:BySurfaceName
     \item WindowShadingControl (windows only)
     \item WindowProperty:AirflowControl (windows only)
 \end{itemize}

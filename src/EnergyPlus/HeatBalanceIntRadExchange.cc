@@ -1331,71 +1331,33 @@ namespace HeatBalanceIntRadExchange {
 
             F = 0.0;
             numinx1 = 0;
-            if (!state.dataSurface->UseRepresentativeSurfaceCalculations) {
-                if (NumNums < pow_2(N)) {
-                    ShowWarningError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", not enough values.");
-                    ShowContinueError(state,
-                                      format("...Number of input values [{}] is less than the required number=[{}] Missing surface pairs will have a "
-                                             "zero view factor.",
-                                             NumNums,
-                                             pow_2(N)));
-                }
-
-                for (index = 2; index <= NumAlphas; index += 2) {
-                    inx1 = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(index), enclosureSurfaceNames, N);
-                    inx2 = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(index + 1), enclosureSurfaceNames, N);
-                    if (inx1 == 0) {
-                        ShowSevereError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", invalid surface name.");
-                        ShowContinueError(state,
-                                          "...Surface name=\"" + state.dataIPShortCut->cAlphaArgs(index) + "\", not in this zone or enclosure.");
-                        ErrorsFound = true;
-                    }
-                    if (inx2 == 0) {
-                        ShowSevereError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", invalid surface name.");
-                        ShowContinueError(state,
-                                          "...Surface name=\"" + state.dataIPShortCut->cAlphaArgs(index + 2) + "\", not in this zone or enclosure.");
-                        ErrorsFound = true;
-                    }
-                    ++numinx1;
-                    if (inx1 > 0 && inx2 > 0) F(inx2, inx1) = state.dataIPShortCut->rNumericArgs(numinx1);
-                }
-            } else {
-
-                // Aggregate view factors for representative surfaces
-                for (index = 2; index <= NumAlphas; index += 2) {
-                    int fromSurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(index), state.dataSurface->Surface);
-                    int toSurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(index + 1), state.dataSurface->Surface);
-                    if (fromSurfNum == 0) {
-                        ShowSevereError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", invalid surface name.");
-                        ShowContinueError(state,
-                                          "...Surface name=\"" + state.dataIPShortCut->cAlphaArgs(index) + "\", not in this zone or enclosure.");
-                        ErrorsFound = true;
-                    }
-                    if (toSurfNum == 0) {
-                        ShowSevereError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", invalid surface name.");
-                        ShowContinueError(state,
-                                          "...Surface name=\"" + state.dataIPShortCut->cAlphaArgs(index + 2) + "\", not in this zone or enclosure.");
-                        ErrorsFound = true;
-                    }
-                    ++numinx1;
-                    if (fromSurfNum > 0 && toSurfNum > 0) {
-                        auto &fromSurf = state.dataSurface->Surface(fromSurfNum);
-                        auto &toSurf = state.dataSurface->Surface(toSurfNum);
-                        int repFromSurfNum = fromSurf.RepresentativeCalcSurfNum;
-                        int repToSurfNum = toSurf.RepresentativeCalcSurfNum;
-                        // "From" surfaces within a representative group should all have the same view factors to the other surfaces
-                        // "To" surfaces within a representative group should aggregate the view factors from other surfaces
-                        if (fromSurfNum == repFromSurfNum) {
-                            auto &repFromSurf = state.dataSurface->Surface(repFromSurfNum);
-                            auto &repToSurf = state.dataSurface->Surface(repToSurfNum);
-                            int fromInx = UtilityRoutines::FindItemInList(repFromSurf.Name, enclosureSurfaceNames, N);
-                            int toInx = UtilityRoutines::FindItemInList(repToSurf.Name, enclosureSurfaceNames, N);
-                            F(toInx, fromInx) += state.dataIPShortCut->rNumericArgs(numinx1);
-                        }
-                        // TODO: Track view factors to ensure that "From" surfaces have similar view factors?
-                    }
-                }
+            if (NumNums < pow_2(N)) {
+                ShowWarningError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", not enough values.");
+                ShowContinueError(state,
+                                  format("...Number of input values [{}] is less than the required number=[{}] Missing surface pairs will have a "
+                                         "zero view factor.",
+                                         NumNums,
+                                         pow_2(N)));
             }
+
+            for (index = 2; index <= NumAlphas; index += 2) {
+                inx1 = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(index), enclosureSurfaceNames, N);
+                inx2 = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(index + 1), enclosureSurfaceNames, N);
+                if (inx1 == 0) {
+                    ShowSevereError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", invalid surface name.");
+                    ShowContinueError(state, "...Surface name=\"" + state.dataIPShortCut->cAlphaArgs(index) + "\", not in this zone or enclosure.");
+                    ErrorsFound = true;
+                }
+                if (inx2 == 0) {
+                    ShowSevereError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", invalid surface name.");
+                    ShowContinueError(state,
+                                      "...Surface name=\"" + state.dataIPShortCut->cAlphaArgs(index + 2) + "\", not in this zone or enclosure.");
+                    ErrorsFound = true;
+                }
+                ++numinx1;
+                if (inx1 > 0 && inx2 > 0) F(inx2, inx1) = state.dataIPShortCut->rNumericArgs(numinx1);
+            }
+
             enclosureSurfaceNames.deallocate();
         }
     }

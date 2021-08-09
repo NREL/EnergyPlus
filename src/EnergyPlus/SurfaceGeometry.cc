@@ -2750,7 +2750,8 @@ namespace SurfaceGeometry {
             state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->Surface(SurfNum).Construction;
             state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum = SurfNum;
             // Automatic Surface Multipliers: Assign representative heat transfer surfaces
-            if (state.dataSurface->UseRepresentativeSurfaceCalculations && state.dataSurface->Surface(SurfNum).HeatTransSurf) {
+            if (state.dataSurface->UseRepresentativeSurfaceCalculations && state.dataSurface->Surface(SurfNum).HeatTransSurf &&
+                state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ZoneProperty:UserViewFactors:BySurfaceName") == 0) {
                 // Conditions where surface always needs to be unique
                 bool forceUniqueSurface = state.dataSurface->Surface(SurfNum).HasShadeControl || state.dataSurface->SurfWinAirflowSource(SurfNum) ||
                                           state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).SourceSinkPresent;
