@@ -93,7 +93,8 @@ ENERGYPLUSLIB_API void initializeFunctionalAPI(EnergyPlusState state);
 ///          problems if the API ever changes.
 /// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 ENERGYPLUSLIB_API const char *apiVersionFromEPlus(EnergyPlusState state);
-
+/// \brief Returns the version of EnergyPlus currently running in string form
+ENERGYPLUSLIB_API const char *energyPlusVersion();
 /// \brief Allows a user to register an error callback function.
 /// \details If a user script registers a callback function here, then when EnergyPlus is sending an error message to
 ///          the error file, it will also send it here.  The user function will then have the ability to act on the

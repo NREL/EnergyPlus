@@ -201,5 +201,13 @@ int main(int argc, const char *argv[])
     setConsoleOutputState(state2, 0);
     energyplus(state2, argc, argv);
     printf("...and it is done.");
+    // We would like to know call EnergyPlus through the C API and have it run the auxiliary tools, like readvars
+    // With the Python API, we can leverage Python's introspection to find the pyenergyplus folder, and thus the E+ repo
+    // For C programs that link to the API, we don't have this.
+    // Of course, we do have the path to the E+ library in CMake land, but that would then require configuring this file, adding complexity
+    // For now we will call the setEnergyPlusRootDirectory function to exercise the funcional interface, but not attempt anything further
+    // The Python API tests will exercise the functionality of the setEnergyPlusRootDirectory implicitly
+    printf("Setting EnergyPlus root directory for potential runs with auxiliary tools...\n");
+    setEnergyPlusRootDirectory(state2, "/path/to/EnergyPlus/Root");
     return 0;
 }

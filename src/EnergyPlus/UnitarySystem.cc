@@ -99,6 +99,7 @@
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WaterToAirHeatPump.hh>
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
+#include <EnergyPlus/ZonePlenum.hh>
 
 namespace EnergyPlus {
 namespace UnitarySystems {
@@ -173,15 +174,15 @@ namespace UnitarySystems {
           m_SensibleLoadMet(0.0), m_LatentLoadMet(0.0), m_MyStagedFlag(false), m_SensibleLoadPredicted(0.0), m_MoistureLoadPredicted(0.0),
           m_FaultyCoilSATFlag(false), m_FaultyCoilSATIndex(0), m_FaultyCoilSATOffset(0.0), m_TESOpMode(0), m_initLoadBasedControlAirLoopPass(false),
           m_airLoopPassCounter(0), m_airLoopReturnCounter(0), m_FanCompNotSetYet(true), m_CoolCompNotSetYet(true), m_HeatCompNotSetYet(true),
-          m_SuppCompNotSetYet(true), m_OKToPrintSizing(false), m_IsDXCoil(true), m_SmallLoadTolerance(5.0), UnitarySystemType_Num(0), MaxIterIndex(0),
-          RegulaFalsiFailedIndex(0), NodeNumOfControlledZone(0), FanPartLoadRatio(0.0), CoolCoilWaterFlowRatio(0.0), HeatCoilWaterFlowRatio(0.0),
-          ControlZoneNum(0), AirInNode(0), AirOutNode(0), MaxCoolAirMassFlow(0.0), MaxHeatAirMassFlow(0.0), MaxNoCoolHeatAirMassFlow(0.0),
-          DesignMinOutletTemp(0.0), DesignMaxOutletTemp(0.0), LowSpeedCoolFanRatio(0.0), LowSpeedHeatFanRatio(0.0), MaxCoolCoilFluidFlow(0.0),
-          MaxHeatCoilFluidFlow(0.0), CoolCoilInletNodeNum(0), CoolCoilOutletNodeNum(0), CoolCoilFluidOutletNodeNum(0), CoolCoilLoopNum(0),
-          CoolCoilLoopSide(0), CoolCoilBranchNum(0), CoolCoilCompNum(0), CoolCoilFluidInletNode(0), HeatCoilLoopNum(0), HeatCoilLoopSide(0),
-          HeatCoilBranchNum(0), HeatCoilCompNum(0), HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0), HeatCoilInletNodeNum(0),
-          HeatCoilOutletNodeNum(0), ATMixerExists(false), ATMixerType(0), ATMixerOutNode(0), ControlZoneMassFlowFrac(0.0), m_CompPointerMSHP(nullptr),
-          LoadSHR(0.0), CoilSHR(0.0)
+          m_SuppCompNotSetYet(true), m_OKToPrintSizing(false), m_IsDXCoil(true), m_SmallLoadTolerance(5.0), m_TemperatureOffsetControlActive(false),
+          m_minAirToWaterTempOffset(0.0), UnitarySystemType_Num(0), MaxIterIndex(0), RegulaFalsiFailedIndex(0), NodeNumOfControlledZone(0),
+          FanPartLoadRatio(0.0), CoolCoilWaterFlowRatio(0.0), HeatCoilWaterFlowRatio(0.0), ControlZoneNum(0), AirInNode(0), AirOutNode(0),
+          MaxCoolAirMassFlow(0.0), MaxHeatAirMassFlow(0.0), MaxNoCoolHeatAirMassFlow(0.0), DesignMinOutletTemp(0.0), DesignMaxOutletTemp(0.0),
+          LowSpeedCoolFanRatio(0.0), LowSpeedHeatFanRatio(0.0), MaxCoolCoilFluidFlow(0.0), MaxHeatCoilFluidFlow(0.0), CoolCoilInletNodeNum(0),
+          CoolCoilOutletNodeNum(0), CoolCoilFluidOutletNodeNum(0), CoolCoilLoopNum(0), CoolCoilLoopSide(0), CoolCoilBranchNum(0), CoolCoilCompNum(0),
+          CoolCoilFluidInletNode(0), HeatCoilLoopNum(0), HeatCoilLoopSide(0), HeatCoilBranchNum(0), HeatCoilCompNum(0), HeatCoilFluidInletNode(0),
+          HeatCoilFluidOutletNodeNum(0), HeatCoilInletNodeNum(0), HeatCoilOutletNodeNum(0), ATMixerExists(false), ATMixerType(0), ATMixerOutNode(0),
+          ControlZoneMassFlowFrac(0.0), m_CompPointerMSHP(nullptr), LoadSHR(0.0), CoilSHR(0.0), temperatureOffsetControlStatus(0)
     {
     }
 
@@ -1310,6 +1311,18 @@ namespace UnitarySystems {
             }
         }
 
+        // re-set water-side economizer flags each time step
+        if (this->m_TemperatureOffsetControlActive) {
+            if (state.dataLoopNodes->Node(this->CoolCoilFluidInletNode).Temp >
+                (state.dataLoopNodes->Node(this->AirInNode).Temp - this->m_minAirToWaterTempOffset)) {
+                // disable coilsystem if entering fluid temp is > entering air temp minus user specified temp offset
+                this->temperatureOffsetControlStatus = 0;
+            } else {
+                // enable coilsystem waterside economizer mode
+                this->temperatureOffsetControlStatus = 1;
+            }
+        }
+
         this->m_CoolingPartLoadFrac = 0.0;
         this->m_HeatingPartLoadFrac = 0.0;
         this->m_SuppHeatPartLoadFrac = 0.0;
@@ -1489,6 +1502,7 @@ namespace UnitarySystems {
         UnitarySys::allocateUnitarySys(state);
 
         UnitarySys::getDXCoilSystemData(state, objectName, ZoneEquipment, ZoneOAUnitNum, errorsFound);
+        UnitarySys::getCoilWaterSystemInputData(state, objectName, ZoneEquipment, ZoneOAUnitNum, errorsFound);
         UnitarySys::getUnitarySystemInputData(state, objectName, ZoneEquipment, ZoneOAUnitNum, errorsFound);
 
         // all systems should have been processed at this point? I think so, so don't need to if test this call?
@@ -3362,6 +3376,7 @@ namespace UnitarySystems {
         bool ZoneEquipmentFound = false;
         bool ZoneInletNodeFound = false;
         bool ZoneExhaustNodeFound = false;
+        bool InducedNodeFound = false;
 
         // Get AirTerminal mixer data
         SingleDuct::GetATMixer(state,
@@ -3393,6 +3408,20 @@ namespace UnitarySystems {
                     this->ControlZoneNum = ControlledZoneNum;
                     this->setSystemParams(state, TotalFloorAreaOnAirLoop, thisObjectName);
                     ZoneInletNodeFound = searchZoneInletNodesByEquipmentIndex(state, this->AirOutNode, this->ControlZoneNum);
+                } else { // find if the inlet node is an induced node from zone plenum
+                    int ZoneInletNum = 0;
+                    ZoneInletNodeFound = searchZoneInletNodes(state, this->AirOutNode, this->ControlZoneNum, ZoneInletNum);
+                    if (ZoneInletNodeFound) {
+                        InducedNodeFound = ZonePlenum::ValidateInducedNode(state,
+                                                                           this->AirInNode,
+                                                                           state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).NumReturnNodes,
+                                                                           state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ReturnNode);
+                        if (InducedNodeFound) {
+                            this->m_ZoneInletNode = this->AirOutNode;
+                            ZoneEquipmentFound = true;
+                            this->setSystemParams(state, TotalFloorAreaOnAirLoop, thisObjectName);
+                        }
+                    }
                 }
             } else if (this->ATMixerType == DataHVACGlobals::ATMixer_InletSide) {
                 ZoneExhaustNodeFound = searchExhaustNodes(state, this->m_ATMixerSecNode, ControlledZoneNum, ZoneExhNum);
@@ -3403,6 +3432,20 @@ namespace UnitarySystems {
                     this->setSystemParams(state, TotalFloorAreaOnAirLoop, thisObjectName);
                     // The Node was found among the exhaust nodes, now check that a matching inlet node exists
                     ZoneInletNodeFound = searchZoneInletNodesByEquipmentIndex(state, this->AirOutNode, this->ControlZoneNum);
+                } else {
+                    int ZoneInletNum = 0;
+                    ZoneInletNodeFound = searchZoneInletNodes(state, this->AirOutNode, this->ControlZoneNum, ZoneInletNum);
+                    if (ZoneInletNodeFound) {
+                        InducedNodeFound = ZonePlenum::ValidateInducedNode(state,
+                                                                           this->m_ATMixerSecNode,
+                                                                           state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).NumReturnNodes,
+                                                                           state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ReturnNode);
+                        if (InducedNodeFound) {
+                            this->m_ZoneInletNode = this->AirOutNode;
+                            ZoneEquipmentFound = true;
+                            this->setSystemParams(state, TotalFloorAreaOnAirLoop, thisObjectName);
+                        }
+                    }
                 }
             } else if (this->ATMixerType == DataHVACGlobals::ATMixer_SupplySide) {
                 ZoneExhaustNodeFound = searchExhaustNodes(state, this->AirInNode, ControlledZoneNum, ZoneExhNum);
@@ -3413,6 +3456,20 @@ namespace UnitarySystems {
                     this->setSystemParams(state, TotalFloorAreaOnAirLoop, thisObjectName);
                     // The Node was found among the exhaust nodes, now check that a matching inlet node exists
                     ZoneInletNodeFound = searchZoneInletNodesByEquipmentIndex(state, this->ATMixerOutNode, this->ControlZoneNum);
+                } else {
+                    int ZoneInletNum = 0;
+                    ZoneInletNodeFound = searchZoneInletNodes(state, this->ATMixerOutNode, this->ControlZoneNum, ZoneInletNum);
+                    if (ZoneInletNodeFound) {
+                        InducedNodeFound = ZonePlenum::ValidateInducedNode(state,
+                                                                           this->AirInNode,
+                                                                           state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).NumReturnNodes,
+                                                                           state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ReturnNode);
+                        if (InducedNodeFound) {
+                            this->m_ZoneInletNode = this->ATMixerOutNode;
+                            ZoneEquipmentFound = true;
+                            this->setSystemParams(state, TotalFloorAreaOnAirLoop, thisObjectName);
+                        }
+                    }
                 }
             }
         }
@@ -3505,14 +3562,16 @@ namespace UnitarySystems {
                 }
             }
 
-            if (ZoneEquipmentFound && !ZoneExhaustNodeFound) {
+            if (ZoneEquipmentFound && !ZoneExhaustNodeFound && !InducedNodeFound) {
                 // Exhaust Node was not found
                 ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
-                ShowContinueError(state, "Incorrect or misspelled Air Inlet Node Name or Exhaust Node Name. = " + loc_AirInNodeName);
+                ShowContinueError(state,
+                                  "Incorrect or misspelled Air Inlet Node Name or Exhaust Node Name or Induced Node Name. = " + loc_AirInNodeName);
                 ShowContinueError(state,
                                   "Air Inlet Node " + loc_AirInNodeName +
                                       " name does not match any controlled zone exhaust node name. Check ZoneHVAC:EquipmentConnections "
                                       "object inputs.");
+                ShowContinueError(state, "or Induced Air Outlet Node Name specified in AirLoopHVAC:ReturnPlenum object.");
                 errorsFound = true;
             } else if (ZoneEquipmentFound && !ZoneInletNodeFound) {
                 bool ZoneInletNodeExists = false;
@@ -6290,6 +6349,7 @@ namespace UnitarySystems {
             }
         } else if (this->m_CoolingCoilType_Num != DataHVACGlobals::CoilDX_CoolingHXAssisted &&
                    this->m_CoolingCoilType_Num != DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl &&
+                   this->m_CoolingCoilType_Num != DataHVACGlobals::CoilWater_CoolingHXAssisted &&
                    this->m_DehumidControlType_Num == DehumCtrlType::Multimode) {
             ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
             ShowContinueError(state, "Illegal Dehumidification Control Type = " + loc_dehumm_ControlType);
@@ -7076,10 +7136,113 @@ namespace UnitarySystems {
         if (state.dataUnitarySystems->unitarySys.size() > 0) return;
         int numUnitarySystems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:UnitarySystem");
         int numCoilSystems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "CoilSystem:Cooling:DX");
-        int numAllSystemTypes = numUnitarySystems + numCoilSystems;
+        int numCoilSystemsWater = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "CoilSystem:Cooling:Water");
+        int numAllSystemTypes = numUnitarySystems + numCoilSystems + numCoilSystemsWater;
         for (int sysCount = 0; sysCount < numAllSystemTypes; ++sysCount) {
             UnitarySys thisSys;
             state.dataUnitarySystems->unitarySys.push_back(thisSys);
+        }
+    }
+
+    void UnitarySys::getCoilWaterSystemInputData(
+        EnergyPlusData &state, std::string_view CoilSysName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound)
+    {
+
+        std::string cCurrentModuleObject("CoilSystem:Cooling:Water");
+        static const std::string routineName("getCoilWaterSystemInputData: ");
+        auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
+        if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+
+                auto const &fields = instance.value();
+                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+
+                if (!UtilityRoutines::SameString(CoilSysName, thisObjectName) && !state.dataUnitarySystems->getInputOnceFlag) continue;
+
+                int sysNum = getUnitarySystemIndex(state, thisObjectName);
+                UnitarySys thisSys;
+                if (sysNum == -1) {
+                    ++state.dataUnitarySystems->numUnitarySystems;
+                    auto const &thisObjName = instance.key();
+                    state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjName);
+                } else {
+                    thisSys = state.dataUnitarySystems->unitarySys[sysNum];
+                }
+
+                UnitarySysInputSpec input_specs;
+                input_specs.name = thisObjectName;
+                input_specs.system_type = cCurrentModuleObject;
+                input_specs.control_type = "Setpoint";
+                input_specs.air_inlet_node_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("air_inlet_node_name")));
+                input_specs.air_outlet_node_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("air_outlet_node_name")));
+                std::string availScheduleName("");
+                if (fields.find("availability_schedule_name") != fields.end()) { // not required field, has default value of Always On
+                    availScheduleName = UtilityRoutines::MakeUPPERCase(AsString(fields.at("availability_schedule_name")));
+                }
+                input_specs.availability_schedule_name = availScheduleName;
+                input_specs.cooling_coil_object_type = UtilityRoutines::MakeUPPERCase(AsString(fields.at("cooling_coil_object_type")));
+                input_specs.cooling_coil_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("cooling_coil_name")));
+                // why is this cooling coil does not have a field for Design Air Vol Flow Rate
+                // set it "SupplyAirFlowRate" to avoid blank, which lead to fatal out during get input
+                static constexpr std::string_view loc_cooling_coil_object_type("COIL:COOLING:WATER:DETAILEDGEOMETRY");
+                if (UtilityRoutines::SameString(loc_cooling_coil_object_type, input_specs.cooling_coil_object_type)) {
+                    input_specs.cooling_supply_air_flow_rate_method = UtilityRoutines::MakeUPPERCase("SupplyAirFlowRate");
+                    input_specs.cooling_supply_air_flow_rate = DataSizing::AutoSize;
+                }
+                // optional input fields
+                Real64 minAir2FluidTempOffset(0.0);
+                if (fields.find("minimum_air_to_water_temperature_offset") != fields.end()) { // not required field, has default value of 0.0
+                    minAir2FluidTempOffset = fields.at("minimum_air_to_water_temperature_offset");
+                }
+                std::string dehumidControlType("None");
+                if (fields.find("dehumidification_control_type") != fields.end()) {
+                    dehumidControlType = UtilityRoutines::MakeUPPERCase(AsString(fields.at("dehumidification_control_type")));
+                }
+                input_specs.dehumidification_control_type = dehumidControlType;
+
+                std::string runOnSensibleLoad("Yes");
+                if (fields.find("run_on_sensible_load") != fields.end()) {
+                    runOnSensibleLoad = UtilityRoutines::MakeUPPERCase(AsString(fields.at("run_on_sensible_load")));
+                }
+                std::string runOnLatentLoad("No");
+                if (fields.find("run_on_latent_load") != fields.end()) {
+                    runOnLatentLoad = UtilityRoutines::MakeUPPERCase(AsString(fields.at("run_on_latent_load")));
+                }
+
+                if (runOnSensibleLoad == "YES" && runOnLatentLoad == "NO") {
+                    input_specs.latent_load_control = "SensibleOnlyLoadControl";
+                } else if (runOnSensibleLoad == "NO" && runOnLatentLoad == "YES") {
+                    input_specs.latent_load_control = "LatentOnlyLoadControl";
+                } else if (runOnSensibleLoad == "YES" && runOnLatentLoad == "YES") {
+                    input_specs.latent_load_control = "LatentOrSensibleLoadControl";
+                }
+
+                // now translate to UnitarySystem
+                thisSys.UnitType = cCurrentModuleObject;
+                thisSys.m_unitarySystemType_Num = DataHVACGlobals::UnitarySys_AnyCoilType;
+                input_specs.control_type = "Setpoint";
+                thisSys.m_CoolCoilExists = true; // is always true
+                thisSys.m_LastMode = state.dataUnitarySystems->CoolingMode;
+                // set water-side economizer temperature offset
+                thisSys.m_minAirToWaterTempOffset = minAir2FluidTempOffset;
+                // set water-side economizer flag
+                if (thisSys.m_minAirToWaterTempOffset > 0.0) thisSys.m_TemperatureOffsetControlActive = true;
+
+                thisSys.processInputSpec(state, input_specs, sysNum, errorsFound, ZoneEquipment, ZoneOAUnitNum);
+
+                if (sysNum == -1) {
+                    int thisSysNum = state.dataUnitarySystems->numUnitarySystems - 1;
+                    state.dataUnitarySystems->unitarySys[thisSysNum] = thisSys;
+                } else {
+                    state.dataUnitarySystems->unitarySys[sysNum] = thisSys;
+                }
+            }
+
+            if (errorsFound) {
+                ShowFatalError(
+                    state, routineName + "Errors found in getting " + cCurrentModuleObject + " input. Preceding condition(s) causes termination.");
+            }
         }
     }
 
@@ -11537,6 +11700,15 @@ namespace UnitarySystems {
                 LatentLoad = false;
             }
 
+            // disable the coil if the condition is NOT favorable
+            if (this->m_TemperatureOffsetControlActive) {
+                if (this->temperatureOffsetControlStatus == 0) {
+                    SensibleLoad = false;
+                    LatentLoad = false;
+                    HXUnitOn = false;
+                }
+            }
+
             // IF DXCoolingSystem runs with a cooling load then set PartLoadFrac on Cooling System and the Mass Flow
             // Multimode coil will switch to enhanced dehumidification IF available and needed, but it
             // still runs to meet the sensible load. Multimode applies to Multimode or HXAssistedCooling coils.
@@ -11698,7 +11870,7 @@ namespace UnitarySystems {
 
                 Real64 NoOutput = 0.0; // CoilSystem:Cooling:DX
                 Real64 ReqOutput = 0.0;
-                Real64 FullOutput = 0.0;
+                FullOutput = 0.0;
                 if (this->UnitType == "CoilSystem:Cooling:DX") {
                     NoOutput = state.dataLoopNodes->Node(InletNode).MassFlowRate *
                                (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(OutletNode).HumRat) -
@@ -12312,7 +12484,9 @@ namespace UnitarySystems {
             if ((OutletHumRatDXCoil > (DesOutHumRat + tempHumRatAcc)) && (!unitSys || PartLoadFrac < 1.0) &&
                 (this->m_DehumidControlType_Num == DehumCtrlType::Multimode)) {
 
-                if (CoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) { // CoilSystem:Cooling:DX:HeatExchangerAssisted
+                if ((CoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) ||
+                    (CoilType_Num == DataHVACGlobals::CoilWater_CoolingHXAssisted)) { // CoilSystem:Cooling:DX:HeatExchangerAssisted,
+                                                                                      // CoilSystem:Cooling:Water:HeatExchangerAssisted
                     // Determine required part load when heat exchanger is ON
                     HXUnitOn = true;
                     PartLoadFrac = 1.0;
@@ -17351,6 +17525,46 @@ namespace UnitarySystems {
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataUnitarySystems->unitarySys[sysNum].Name);
+                } else if (state.dataUnitarySystems->unitarySys[sysNum].UnitType == "CoilSystem:Cooling:Water") {
+                    // Setup Report variables for the CoilSystemWater
+                    SetupOutputVariable(state,
+                                        "Coil System Water Part Load Ratio",
+                                        OutputProcessor::Unit::None,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_PartLoadFrac,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Average,
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    SetupOutputVariable(state,
+                                        "Coil System Water Total Cooling Rate",
+                                        OutputProcessor::Unit::W,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_TotCoolEnergyRate,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Average,
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    SetupOutputVariable(state,
+                                        "Coil System Water Sensible Cooling Rate",
+                                        OutputProcessor::Unit::W,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_SensCoolEnergyRate,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Average,
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    SetupOutputVariable(state,
+                                        "Coil System Water Latent Cooling Rate",
+                                        OutputProcessor::Unit::W,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_LatCoolEnergyRate,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Average,
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+
+                    if (state.dataUnitarySystems->unitarySys[sysNum].m_TemperatureOffsetControlActive) {
+                        SetupOutputVariable(state,
+                                            "Coil System Water Control Status",
+                                            OutputProcessor::Unit::None,
+                                            state.dataUnitarySystems->unitarySys[sysNum].temperatureOffsetControlStatus,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Average,
+                                            state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    }
                 } else {
                     ShowFatalError(state,
                                    "setupAllOutputVar: Developer error. All report variables must be set up here after all systems are read in.");
