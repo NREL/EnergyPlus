@@ -1510,13 +1510,16 @@ namespace UnitarySystems {
             state.dataZoneEquip->ZoneEquipInputsFilled)
             setupAllOutputVars(state, state.dataUnitarySystems->numUnitarySystems);
         for (std::size_t coilNUM = 1; coilNUM < state.dataUnitarySystems->unitarySys.size(); ++coilNUM) {
-            SetupEMSActuator(state,
-                             "Coil Speed Control",
-                             state.dataUnitarySystems->unitarySys[coilNUM].Name,
-                             "Unitary System DX Coil Speed Level",
-                             "[]",
-                             state.dataUnitarySystems->unitarySys[coilNUM].m_EMSOverrideCoilSpeedNumOn,
-                             state.dataUnitarySystems->unitarySys[coilNUM].m_EMSOverrideCoilSpeedNumValue);
+            if (state.dataUnitarySystems->unitarySys[coilNUM].m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
+                state.dataUnitarySystems->unitarySys[coilNUM].m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
+                SetupEMSActuator(state,
+                                 "Coil Speed Control",
+                                 state.dataUnitarySystems->unitarySys[coilNUM].Name,
+                                 "Unitary System DX Coil Speed Level",
+                                 "[]",
+                                 state.dataUnitarySystems->unitarySys[coilNUM].m_EMSOverrideCoilSpeedNumOn,
+                                 state.dataUnitarySystems->unitarySys[coilNUM].m_EMSOverrideCoilSpeedNumValue);
+            }
         }
         if (errorsFound) {
             ShowFatalError(state, "getUnitarySystemInputData: previous errors cause termination. Check inputs");
@@ -8216,7 +8219,13 @@ namespace UnitarySystems {
         // This is still no load but at the first speed above idle
         if ((state.dataUnitarySystems->HeatingLoad && this->m_NumOfSpeedHeating > 0) ||
             (state.dataUnitarySystems->CoolingLoad && this->m_NumOfSpeedCooling > 0)) {
-            if (this->m_Staged) {
+            if (this->m_EMSOverrideCoilSpeedNumOn) {
+                if (state.dataUnitarySystems->HeatingLoad) {
+                    this->m_HeatingSpeedNum = this->m_EMSOverrideCoilSpeedNumValue;
+                } else {
+                    this->m_CoolingSpeedNum = this->m_EMSOverrideCoilSpeedNumValue;
+                }
+            } else if (this->m_Staged) {
                 if (state.dataUnitarySystems->HeatingLoad) {
                     this->m_HeatingSpeedNum = this->m_StageNum;
                 } else {
@@ -8287,6 +8296,7 @@ namespace UnitarySystems {
         this->FanPartLoadRatio = 1.0;
         CompressorONFlag = CompOn;
 
+        // TODO - EMS do not override full load results?
         if (state.dataUnitarySystems->HeatingLoad) {
             CoolPLR = 0.0;
             HeatPLR = 1.0;
@@ -8297,7 +8307,6 @@ namespace UnitarySystems {
                 this->m_HeatingCycRatio = 1.0;
                 this->m_HeatingSpeedNum = this->m_NumOfSpeedHeating;
             }
-            // todo - override
             if (this->m_Staged && this->m_StageNum > 0) {
                 if (this->m_NumOfSpeedHeating > 0) {
                     this->m_HeatingSpeedNum = min(this->m_StageNum, this->m_NumOfSpeedHeating);
@@ -8335,7 +8344,6 @@ namespace UnitarySystems {
                 this->m_CoolingSpeedNum = this->m_NumOfSpeedCooling;
             }
 
-            // todo - override
             if (this->m_Staged && this->m_StageNum < 0) {
                 if (this->m_NumOfSpeedCooling > 0) this->m_CoolingSpeedNum = min(std::abs(this->m_StageNum), this->m_NumOfSpeedCooling);
                 this->setOnOffMassFlowRate(state, OnOffAirFlowRatio, PartLoadRatio);
@@ -8447,8 +8455,41 @@ namespace UnitarySystems {
         // Check to see which speed to meet the load
         this->m_HeatingSpeedNum = 0;
         this->m_CoolingSpeedNum = 0;
-        // todo
-        if (!this->m_Staged) {
+        if (this->m_EMSOverrideCoilSpeedNumOn) {
+            if (state.dataUnitarySystems->HeatingLoad) {
+                this->m_HeatingSpeedNum = this->m_EMSOverrideCoilSpeedNumValue;
+                CoolPLR = 0.0;
+                HeatPLR = 1.0;
+                if (SpeedNum == 1) {
+                    this->m_HeatingSpeedRatio = 0.0;
+                } else {
+                    this->m_HeatingSpeedRatio = 1.0;
+                }
+                this->m_HeatingCycRatio = 1.0;
+            } else { // Cooling or moisture load
+                this->m_CoolingSpeedNum = this->m_EMSOverrideCoilSpeedNumValue;
+                CoolPLR = 1.0;
+                HeatPLR = 0.0;
+                if (SpeedNum == 1) {
+                    this->m_CoolingSpeedRatio = 0.0;
+                } else {
+                    this->m_CoolingSpeedRatio = 1.0;
+                }
+                this->m_CoolingCycRatio = 1.0;
+            }
+            this->calcUnitarySystemToLoad(state,
+                                          AirLoopNum,
+                                          FirstHVACIteration,
+                                          CoolPLR,
+                                          HeatPLR,
+                                          OnOffAirFlowRatio,
+                                          SensOutputOn,
+                                          LatOutputOn,
+                                          HXUnitOn,
+                                          HeatCoilLoad,
+                                          SupHeaterLoad,
+                                          CompressorONFlag);
+        } else if (!this->m_Staged) {
             if (state.dataUnitarySystems->HeatingLoad) {
                 for (SpeedNum = 1; SpeedNum <= this->m_NumOfSpeedHeating; ++SpeedNum) {
                     CoolPLR = 0.0;
@@ -8505,7 +8546,6 @@ namespace UnitarySystems {
                     }
                 }
             } else { // Cooling or moisture load
-                // todo
                 for (SpeedNum = 1; SpeedNum <= this->m_NumOfSpeedCooling; ++SpeedNum) {
                     CoolPLR = 1.0;
                     HeatPLR = 0.0;
@@ -8573,7 +8613,6 @@ namespace UnitarySystems {
         } else { // IF (.NOT. UnitarySystem(UnitarySysNum)%Staged) THEN
             // Staged control
             if (state.dataUnitarySystems->HeatingLoad) {
-                // todo
                 CoolPLR = 0.0;
                 HeatPLR = 1.0;
                 SpeedNum = this->m_StageNum;
@@ -9274,6 +9313,7 @@ namespace UnitarySystems {
         if ((this->m_DehumidControlType_Num == DehumCtrlType::CoolReheat || this->m_DehumidControlType_Num == DehumCtrlType::Multimode)) {
 
             // find maximum latent output IF not already calculated
+            // TODO - what if EMS override?
             if (state.dataUnitarySystems->HeatingLoad) {
                 CoolPLR = 1.0;
                 this->m_CoolingPartLoadFrac = 1.0;
@@ -9366,12 +9406,12 @@ namespace UnitarySystems {
             if (state.dataUnitarySystems->MoistureLoad < LatOutputOn && this->m_DehumidControlType_Num == DehumCtrlType::CoolReheat) {
                 HXUnitOn = true; // HX is needed to meet moisture load
                 if (this->m_NumOfSpeedCooling > 0) {
-                    for (SpeedNum = this->m_CoolingSpeedNum; SpeedNum <= this->m_NumOfSpeedCooling; ++SpeedNum) {
+                    if (this->m_EMSOverrideCoilSpeedNumOn) {
                         CoolPLR = 1.0;
+                        this->m_CoolingSpeedNum = this->m_EMSOverrideCoilSpeedNumValue;
                         this->m_CoolingPartLoadFrac = CoolPLR;
                         this->m_CoolingSpeedRatio = 1.0;
                         this->m_CoolingCycRatio = 1.0;
-                        this->m_CoolingSpeedNum = SpeedNum;
                         this->calcUnitarySystemToLoad(state,
                                                       AirLoopNum,
                                                       FirstHVACIteration,
@@ -9384,27 +9424,13 @@ namespace UnitarySystems {
                                                       HeatCoilLoad,
                                                       SupHeaterLoad,
                                                       CompressorONFlag);
-                        if (state.dataGlobal->DoCoilDirectSolutions && this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
-                            this->FullOutput[SpeedNum] = SensOutputOn;
-                        }
-                        // over specified logic? it has to be a water coil? what about other VS coil models?
-                        if ((this->m_CoolingCoilType_Num != DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) &&
-                            ((this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWater ||
-                              this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed) &&
-                             !this->m_DiscreteSpeedCoolingCoil)) {
-                            this->m_CoolingSpeedRatio = 0.0;
-                            this->m_CoolingSpeedNum = SpeedNum - 1;
-                            if (this->m_CoolingSpeedNum == 0) {
-                                this->m_CoolingCycRatio = 0.0;
-                                CoolPLR = 0.0;
-                            } else {
-                                this->m_CoolingCycRatio = 1.0;
-                                this->m_CoolingSpeedRatio = 0.0;
-                                if (this->m_SingleMode == 1) {
-                                    CoolPLR = 1.0;
-                                }
-                            }
-
+                    } else {
+                        for (SpeedNum = this->m_CoolingSpeedNum; SpeedNum <= this->m_NumOfSpeedCooling; ++SpeedNum) {
+                            CoolPLR = 1.0;
+                            this->m_CoolingPartLoadFrac = CoolPLR;
+                            this->m_CoolingSpeedRatio = 1.0;
+                            this->m_CoolingCycRatio = 1.0;
+                            this->m_CoolingSpeedNum = SpeedNum;
                             this->calcUnitarySystemToLoad(state,
                                                           AirLoopNum,
                                                           FirstHVACIteration,
@@ -9417,10 +9443,44 @@ namespace UnitarySystems {
                                                           HeatCoilLoad,
                                                           SupHeaterLoad,
                                                           CompressorONFlag);
-                            this->m_CoolingSpeedNum = SpeedNum;
-                        }
-                        if (state.dataUnitarySystems->MoistureLoad >= LatOutputOn) {
-                            break;
+                            if (state.dataGlobal->DoCoilDirectSolutions && this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
+                                this->FullOutput[SpeedNum] = SensOutputOn;
+                            }
+                            // over specified logic? it has to be a water coil? what about other VS coil models?
+                            if ((this->m_CoolingCoilType_Num != DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) &&
+                                ((this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWater ||
+                                  this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed) &&
+                                 !this->m_DiscreteSpeedCoolingCoil)) {
+                                this->m_CoolingSpeedRatio = 0.0;
+                                this->m_CoolingSpeedNum = SpeedNum - 1;
+                                if (this->m_CoolingSpeedNum == 0) {
+                                    this->m_CoolingCycRatio = 0.0;
+                                    CoolPLR = 0.0;
+                                } else {
+                                    this->m_CoolingCycRatio = 1.0;
+                                    this->m_CoolingSpeedRatio = 0.0;
+                                    if (this->m_SingleMode == 1) {
+                                        CoolPLR = 1.0;
+                                    }
+                                }
+
+                                this->calcUnitarySystemToLoad(state,
+                                                              AirLoopNum,
+                                                              FirstHVACIteration,
+                                                              CoolPLR,
+                                                              HeatPLR,
+                                                              OnOffAirFlowRatio,
+                                                              SensOutputOn,
+                                                              LatOutputOn,
+                                                              HXUnitOn,
+                                                              HeatCoilLoad,
+                                                              SupHeaterLoad,
+                                                              CompressorONFlag);
+                                this->m_CoolingSpeedNum = SpeedNum;
+                            }
+                            if (state.dataUnitarySystems->MoistureLoad >= LatOutputOn) {
+                                break;
+                            }
                         }
                     }
                 } else {
@@ -11949,11 +12009,13 @@ namespace UnitarySystems {
 
                         CycRatio = 1.0;
                         SpeedRatio = 0.0;
-                        // todo
-                        for (SpeedNum = 1; SpeedNum <= this->m_NumOfSpeedCooling; ++SpeedNum) {
-                            if (SpeedNum > 1) CycRatio = 0.0;
-                            if (SpeedNum > 1) SpeedRatio = 1.0;
+                        if (this->m_EMSOverrideCoilSpeedNumOn) {
+                            SpeedNum = this->m_EMSOverrideCoilSpeedNumValue;
                             this->m_CoolingSpeedNum = SpeedNum;
+                            if (SpeedNum > 1) {
+                                CycRatio = 0.0;
+                                SpeedRatio = 1.0;
+                            }
                             this->simMultiSpeedCoils(state,
                                                      AirLoopNum,
                                                      FirstHVACIteration,
@@ -11967,7 +12029,26 @@ namespace UnitarySystems {
                             if (SpeedNum == this->m_NumOfSpeedCooling) {
                                 FullLoadHumRatOut = state.dataLoopNodes->Node(OutletNode).HumRat;
                             }
-                            if (OutletTemp < DesOutTemp && SensibleLoad) break;
+                        } else {
+                            for (SpeedNum = 1; SpeedNum <= this->m_NumOfSpeedCooling; ++SpeedNum) {
+                                if (SpeedNum > 1) CycRatio = 0.0;
+                                if (SpeedNum > 1) SpeedRatio = 1.0;
+                                this->m_CoolingSpeedNum = SpeedNum;
+                                this->simMultiSpeedCoils(state,
+                                                         AirLoopNum,
+                                                         FirstHVACIteration,
+                                                         CompOn,
+                                                         SensibleLoad,
+                                                         LatentLoad,
+                                                         PartLoadFrac,
+                                                         state.dataUnitarySystems->CoolingCoil,
+                                                         SpeedNum);
+                                OutletTemp = state.dataLoopNodes->Node(OutletNode).Temp;
+                                if (SpeedNum == this->m_NumOfSpeedCooling) {
+                                    FullLoadHumRatOut = state.dataLoopNodes->Node(OutletNode).HumRat;
+                                }
+                                if (OutletTemp < DesOutTemp && SensibleLoad) break;
+                            }
                         }
 
                     } else if ((CoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) ||
@@ -13414,7 +13495,6 @@ namespace UnitarySystems {
 
                 //     IF outlet temp at no load is within ACC of set point, do not run the coil
 
-                // todo - ems
                 if (std::abs(state.dataLoopNodes->Node(OutletNode).Temp - DesOutTemp) < Acc ||
                     this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_UserDefined) {
                     // do nothing, coil is at the set point.
@@ -13444,10 +13524,13 @@ namespace UnitarySystems {
 
                             CycRatio = 1.0;
                             SpeedRatio = 0.0;
-                            for (SpeedNum = 1; SpeedNum <= this->m_NumOfSpeedHeating; ++SpeedNum) {
-                                if (SpeedNum > 1) CycRatio = 0.0;
-                                if (SpeedNum > 1) SpeedRatio = 1.0;
+                            if (this->m_EMSOverrideCoilSpeedNumOn) {
+                                SpeedNum = this->m_EMSOverrideCoilSpeedNumValue;
                                 this->m_HeatingSpeedNum = SpeedNum;
+                                if (SpeedNum > 1) {
+                                    CycRatio = 0.0;
+                                    SpeedRatio = 1.0;
+                                }
                                 this->simMultiSpeedCoils(state,
                                                          AirLoopNum,
                                                          FirstHVACIteration,
@@ -13458,7 +13541,23 @@ namespace UnitarySystems {
                                                          state.dataUnitarySystems->HeatingCoil,
                                                          SpeedNum);
                                 OutletTemp = state.dataLoopNodes->Node(OutletNode).Temp;
-                                if (OutletTemp > DesOutTemp && SensibleLoad) break;
+                            } else {
+                                for (SpeedNum = 1; SpeedNum <= this->m_NumOfSpeedHeating; ++SpeedNum) {
+                                    if (SpeedNum > 1) CycRatio = 0.0;
+                                    if (SpeedNum > 1) SpeedRatio = 1.0;
+                                    this->m_HeatingSpeedNum = SpeedNum;
+                                    this->simMultiSpeedCoils(state,
+                                                             AirLoopNum,
+                                                             FirstHVACIteration,
+                                                             CompOn,
+                                                             SensibleLoad,
+                                                             LatentLoad,
+                                                             PartLoadFrac,
+                                                             state.dataUnitarySystems->HeatingCoil,
+                                                             SpeedNum);
+                                    OutletTemp = state.dataLoopNodes->Node(OutletNode).Temp;
+                                    if (OutletTemp > DesOutTemp && SensibleLoad) break;
+                                }
                             }
 
                         } else if ((SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric_MultiStage) ||

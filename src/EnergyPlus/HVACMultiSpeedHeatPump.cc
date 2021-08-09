@@ -3033,38 +3033,15 @@ namespace HVACMultiSpeedHeatPump {
         int const MaxIte(500);           // maximum number of iterations
         Real64 const ErrorToler = 0.001; // error tolerance
 
-        // todo - EMS speed num should overwrite the stage num, show warning?
-
+        // todo - EMS speed num should overwrite the stage num, show warning
         auto &MSHeatPump(state.dataHVACMultiSpdHP->MSHeatPump);
         OnOffAirFlowRatio = 0.0;
         SupHeaterLoad = 0.0;
-
-        // Calculate FullOutput
-        Real64 FullOutput = 0.0;
-        PartLoadFrac = 1.0;
-        SpeedRatio = 1.0;
-        int MaxSpeedNum = 0;
-        if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == ModeOfOperation::HeatingMode) {
-            MaxSpeedNum = MSHeatPump(MSHeatPumpNum).NumOfSpeedHeating;
-        } else if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == ModeOfOperation::CoolingMode) {
-            MaxSpeedNum = MSHeatPump(MSHeatPumpNum).NumOfSpeedCooling;
-        }
-        CalcMSHeatPump(state,
-                       MSHeatPumpNum,
-                       FirstHVACIteration,
-                       CompOp,
-                       MaxSpeedNum,
-                       SpeedRatio,
-                       PartLoadFrac,
-                       FullOutput,
-                       QZnReq,
-                       OnOffAirFlowRatio,
-                       SupHeaterLoad);
+        PartLoadFrac = 0.0;
+        SpeedRatio = 0.0;
 
         // Calculate TempOutput
         Real64 TempOutput = 0.0; // unit output when iteration limit exceeded [W]
-        PartLoadFrac = 0.0;
-        SpeedRatio = 0.0;
 
         // Calculate the part load fraction
         int SolFla = 0;         // Flag of RegulaFalsi solver
@@ -3161,7 +3138,7 @@ namespace HVACMultiSpeedHeatPump {
                              CompOp,
                              OpMode,
                              QZnReq,
-                             FullOutput,
+                             TempOutput,
                              SpeedNum,
                              SpeedRatio,
                              PartLoadFrac,
