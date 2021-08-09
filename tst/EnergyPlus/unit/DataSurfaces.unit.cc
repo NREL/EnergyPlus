@@ -359,3 +359,49 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightL)
         EXPECT_DOUBLE_EQ(s.get_average_height(*state), 0.75);
     }
 }
+
+TEST_F(EnergyPlusFixture, SurfaceTest_HashMap)
+{
+    int numSurfs = state->dataSurface->TotSurfaces = 3;
+    state->dataSurface->Surface.allocate(numSurfs);
+    state->dataSurface->SurfTAirRef.allocate(numSurfs);
+    state->dataSurface->SurfIntConvCoeffIndex.allocate(numSurfs);
+    state->dataSurface->SurfExtConvCoeffIndex.allocate(numSurfs);
+    state->dataSurface->SurfWinStormWinConstr.allocate(numSurfs);
+    state->dataSurface->SurfWinStormWinConstr.allocate(numSurfs);
+    state->dataSurface->SurfMaterialMovInsulExt.allocate(numSurfs);
+    state->dataSurface->SurfMaterialMovInsulInt.allocate(numSurfs);
+    state->dataSurface->SurfSchedMovInsulExt.allocate(numSurfs);
+    state->dataSurface->SurfSchedMovInsulInt.allocate(numSurfs);
+    state->dataSurface->SurfExternalShadingSchInd.allocate(numSurfs);
+    state->dataSurface->SurfSurroundingSurfacesNum.allocate(numSurfs);
+    state->dataSurface->SurfLinkedOutAirNode.allocate(numSurfs);
+
+    for (int SurfNum = 1; SurfNum <= numSurfs; SurfNum++) {
+        state->dataSurface->Surface(SurfNum).set_representative_surface(*state, SurfNum);
+    }
+
+    EXPECT_EQ(state->dataSurface->RepresentativeSurfaceMap.size(), 1);
+
+    state->dataSurface->RepresentativeSurfaceMap.clear();
+
+    state->dataSurface->Surface(1).Area = 20.0;
+    state->dataSurface->Surface(2).Azimuth = 180.0;
+    state->dataSurface->Surface(3).Azimuth = 180.04;
+
+    for (int SurfNum = 1; SurfNum <= numSurfs; SurfNum++) {
+        state->dataSurface->Surface(SurfNum).set_representative_surface(*state, SurfNum);
+    }
+
+    EXPECT_EQ(state->dataSurface->RepresentativeSurfaceMap.size(), 2);
+
+    state->dataSurface->RepresentativeSurfaceMap.clear();
+
+    state->dataSurface->Surface(3).Azimuth = 180.05;
+
+    for (int SurfNum = 1; SurfNum <= numSurfs; SurfNum++) {
+        state->dataSurface->Surface(SurfNum).set_representative_surface(*state, SurfNum);
+    }
+
+    EXPECT_EQ(state->dataSurface->RepresentativeSurfaceMap.size(), 3);
+}

@@ -843,6 +843,8 @@ namespace DataSurfaces {
 
         void make_hash_key(EnergyPlusData &state, const int SurfNum);
 
+        void set_representative_surface(EnergyPlusData &state, const int SurfNum);
+
     private: // Methods
              // Computed Shape Category
         ShapeCat computed_shapeCat() const;
@@ -1753,6 +1755,7 @@ struct SurfacesData : BaseGlobalStruct
         this->X0.deallocate();
         this->Y0.deallocate();
         this->Z0.deallocate();
+        this->RepresentativeSurfaceMap.clear();
         this->AllHTSurfaceList.clear();
         this->AllIZSurfaceList.clear();
         this->AllHTNonWindowSurfaceList.clear();
