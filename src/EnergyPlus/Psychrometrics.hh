@@ -508,11 +508,12 @@ namespace Psychrometrics {
 
     inline Real64 PsyRhoAirFnPbTdbW(
         [[maybe_unused]] EnergyPlusData &state,
-        Real64 const pb,                                            // pressure (Pascals)
-        Real64 const tdb,                                           // dry bulb temperature (Celsius)
-        Real64 const dw                                             // humidity ratio (kgWater/kgDryAir)
-            [[maybe_unused]] std::string_view const CalledFrom = "" // routine this function was called from (error messages) !unused1208
-    )
+        Real64 const pb,                                        // pressure (Pascals)
+        Real64 const tdb,                                       // dry bulb temperature (Celsius)
+        Real64 const dw,                                        // humidity ratio (kgWater/kgDryAir)
+        [[maybe_unused]] std::string_view const CalledFrom = "" // routine this function was called from (error messages) !unused1208
+    ) 
+
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         G. S. Wright
@@ -822,9 +823,9 @@ namespace Psychrometrics {
 
     inline Real64
         PsyRhFnTdbRhovLBnd0C([[maybe_unused]] EnergyPlusData &state,
-                             Real64 const Tdb,                                       // dry-bulb temperature {C}
-                             Real64 const Rhovapor,                                  // vapor density in air {kg/m3}
-                             [[maybe_unused]] std::string_view const CalledFrom = "" // routine this function was called from (error message)
+            Real64 const Tdb,                                       // dry-bulb temperature {C}
+            Real64 const Rhovapor,                                  // vapor density in air {kg/m3}
+            [[maybe_unused]] std::string_view const CalledFrom = "" // routine this function was called from (error message)
         )
     {
         // FUNCTION INFORMATION:
