@@ -1334,11 +1334,11 @@ namespace HeatBalanceIntRadExchange {
             if (!state.dataSurface->UseRepresentativeSurfaceCalculations) {
                 if (NumNums < pow_2(N)) {
                     ShowWarningError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", not enough values.");
-                    ShowContinueError(
-                        state,
-                        format("...Number of input values [{}] is less than the required number=[{}] Missing surface pairs will have a zero view factor.",
-                               NumNums,
-                               pow_2(N)));
+                    ShowContinueError(state,
+                                      format("...Number of input values [{}] is less than the required number=[{}] Missing surface pairs will have a "
+                                             "zero view factor.",
+                                             NumNums,
+                                             pow_2(N)));
                 }
 
                 for (index = 2; index <= NumAlphas; index += 2) {
@@ -1346,7 +1346,8 @@ namespace HeatBalanceIntRadExchange {
                     inx2 = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(index + 1), enclosureSurfaceNames, N);
                     if (inx1 == 0) {
                         ShowSevereError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", invalid surface name.");
-                        ShowContinueError(state, "...Surface name=\"" + state.dataIPShortCut->cAlphaArgs(index) + "\", not in this zone or enclosure.");
+                        ShowContinueError(state,
+                                          "...Surface name=\"" + state.dataIPShortCut->cAlphaArgs(index) + "\", not in this zone or enclosure.");
                         ErrorsFound = true;
                     }
                     if (inx2 == 0) {
@@ -1366,7 +1367,8 @@ namespace HeatBalanceIntRadExchange {
                     int toSurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(index + 1), state.dataSurface->Surface);
                     if (fromSurfNum == 0) {
                         ShowSevereError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", invalid surface name.");
-                        ShowContinueError(state, "...Surface name=\"" + state.dataIPShortCut->cAlphaArgs(index) + "\", not in this zone or enclosure.");
+                        ShowContinueError(state,
+                                          "...Surface name=\"" + state.dataIPShortCut->cAlphaArgs(index) + "\", not in this zone or enclosure.");
                         ErrorsFound = true;
                     }
                     if (toSurfNum == 0) {
