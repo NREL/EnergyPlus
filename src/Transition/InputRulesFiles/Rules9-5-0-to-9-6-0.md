@@ -12,6 +12,15 @@ If Field 27 in `Sizing:System` is `VentilationRateProcedure`, it is replaced by 
 
 See [8891](https://github.com/NREL/EnergyPlus/pull/8891)
 
+# Object Change: AirflowNetwork:MultiZone:ReferenceCrackConditions 
+
+Summary: The field for *Reference Temperature* was changed to a required-field without a default value. In previous versions, the field for *Reference Temperature* was not a required-field and has a default value of 20.0C. The transition rule sets a value of 20.0C for this field if it was left blank in previous versions.
+
+Field 1 remains the same.
+Fields 2 remains the same if not blank or is filled in the value of 20.0C if blank.
+Fields 3-4 remain the same.
+
+See [8807](https://github.com/NREL/EnergyPlus/pull/8807)
 # Object Change: Coil:Cooling:Water:DetailedGeometry
 
 Summary: Appended new optional numeric input field *Design Water Inlet Temperature*.
