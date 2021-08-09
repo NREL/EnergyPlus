@@ -428,7 +428,7 @@ PluginManager::PluginManager(EnergyPlusData &state)
     Py_InitializeEx(0);
 
     // Take control of the global interpreter lock while we are here, make sure to release it...
-    PyGILState_STATE s = PyGILState_Ensure();
+    PyGILState_STATE gil = PyGILState_Ensure();
 
     // call this once to allow us to add to, and report, sys.path later as needed
     PyRun_SimpleString("import sys"); // allows us to report sys.path later
@@ -588,7 +588,7 @@ PluginManager::PluginManager(EnergyPlusData &state)
     }
 
     // Release the global interpreter lock
-    PyGILState_Release(s);
+    PyGILState_Release(gil);
     // setting up output variables deferred until later in the simulation setup process
 #else
     // need to alert only if a plugin instance is found
@@ -1028,7 +1028,7 @@ bool PluginInstance::run(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledF
     }
 
     // Get control of the global interpreter lock
-    PyGILState_STATE s = PyGILState_Ensure();
+    PyGILState_STATE gil = PyGILState_Ensure();
 
     // then call the main function
     // static const PyObject oneArgObjFormat = Py_BuildValue)("O");
@@ -1043,7 +1043,7 @@ bool PluginInstance::run(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledF
         } else {
             EnergyPlus::ShowContinueError(state, "This could happen for any number of reasons, check the plugin code.");
         }
-        PyGILState_Release(s);
+        PyGILState_Release(gil);
         EnergyPlus::ShowFatalError(state,
                                    "Program terminates after call to " + functionNameAsString + "() on " + this->stringIdentifier + " failed!");
     }
@@ -1052,22 +1052,22 @@ bool PluginInstance::run(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledF
         if (exitCode == 0) {
             // success
         } else if (exitCode == 1) {
-            PyGILState_Release(s);
+            PyGILState_Release(gil);
             EnergyPlus::ShowFatalError(state, "Python Plugin \"" + this->stringIdentifier + "\" returned 1 to indicate EnergyPlus should abort");
         }
     } else {
         std::string const functionNameAsString(functionName); // only convert to string if an error occurs
-        PyGILState_Release(s);
+        PyGILState_Release(gil);
         EnergyPlus::ShowFatalError(state,
                                    "Invalid return from " + functionNameAsString + "() on class \"" + this->stringIdentifier +
                                        ", make sure it returns an integer exit code, either zero (success) or one (failure)");
     }
     Py_DECREF(pFunctionResponse); // PyObject_CallFunction returns new reference, decrement
     if (state.dataPluginManager->apiErrorFlag) {
-        PyGILState_Release(s);
+        PyGILState_Release(gil);
         EnergyPlus::ShowFatalError(state, "API problems encountered while running plugin cause program termination.");
     }
-    PyGILState_Release(s);
+    PyGILState_Release(gil);
     return true;
 }
 #else
@@ -1340,18 +1340,18 @@ void PluginManager::setGlobalVariableValue([[maybe_unused]] EnergyPlusData &stat
 #endif
 
 #if LINK_WITH_PYTHON == 1
-int PluginManager::getLocationOfUserDefinedPlugin(EnergyPlusData &state, std::string const &programName)
+int PluginManager::getLocationOfUserDefinedPlugin(EnergyPlusData &state, std::string const &_programName)
 {
     for (size_t handle = 0; handle < state.dataPluginManager->plugins.size(); handle++) {
         auto const thisPlugin = state.dataPluginManager->plugins[handle];
-        if (EnergyPlus::UtilityRoutines::MakeUPPERCase(thisPlugin.emsAlias) == EnergyPlus::UtilityRoutines::MakeUPPERCase(programName)) {
+        if (EnergyPlus::UtilityRoutines::MakeUPPERCase(thisPlugin.emsAlias) == EnergyPlus::UtilityRoutines::MakeUPPERCase(_programName)) {
             return handle;
         }
     }
     return -1;
 }
 #else
-int PluginManager::getLocationOfUserDefinedPlugin([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] std::string const &programName)
+int PluginManager::getLocationOfUserDefinedPlugin([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] std::string const &_programName)
 {
     return -1;
 }
