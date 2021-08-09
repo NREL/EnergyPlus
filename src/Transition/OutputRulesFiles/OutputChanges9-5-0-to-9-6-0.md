@@ -14,3 +14,11 @@ For some configurations, this can report a "0", which represents and uninitializ
 ### Surface Outside Face Convection Classification Index
 
 For some configurations, this can report a "0", which represents and uninitialized condition. Internal refactoring has changed this invalid, uninitialized condition to "-1". This condition will be investigated and eliminated in the future.
+
+### Daylight Map Report now supports more than two reference points
+The header of the map file was changed from only allowing two reference points to allow more than two.  The additional points are listed in comma separated order where there used to be only two points.  The format will show up in the header as something like the following:
+
+“ RefPt1=(2.50:2.00:0.80), RefPt2=(2.50:18.00:0.80), RefPt3=(2.50:18.00:0.50)”
+
+[PR#8889](https://github.com/NREL/EnergyPlus/pull/8889) changed the output format in both the MAP file and the SQL output.
+

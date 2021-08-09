@@ -409,6 +409,8 @@ namespace UnitarySystems {
         bool m_OKToPrintSizing;
         bool m_IsDXCoil;
         Real64 m_SmallLoadTolerance;
+        bool m_TemperatureOffsetControlActive; // true if water-side economizer coil is active
+        Real64 m_minAirToWaterTempOffset;      // coil entering air to entering water temp offset
 
     public:
         // SZVAV variables
@@ -454,8 +456,9 @@ namespace UnitarySystems {
         DesignSpecMSHP *m_CompPointerMSHP;
         std::string Name;
         std::string UnitType;
-        Real64 LoadSHR; // Load sensible heat ratio with humidity control
-        Real64 CoilSHR; // Load sensible heat ratio with humidity control
+        Real64 LoadSHR;                     // Load sensible heat ratio with humidity control
+        Real64 CoilSHR;                     // Load sensible heat ratio with humidity control
+        int temperatureOffsetControlStatus; // water side economizer status flag, also report variable
 
         //    private:
         // private members not initialized in constructor
@@ -817,6 +820,9 @@ namespace UnitarySystems {
 
         static void
         getDXCoilSystemData(EnergyPlusData &state, std::string_view Name, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
+
+        static void getCoilWaterSystemInputData(
+            EnergyPlusData &state, std::string_view CoilSysName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
 
         static void allocateUnitarySys(EnergyPlusData &state);
 
