@@ -524,7 +524,7 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
                                                                                   UseMinOASchFlag,
                                                                                   PerPersonNotSet,
                                                                                   MaxOAVolFlowFlag,
-                                                                                  this->dsoaSpaces(dsoaCount));
+                                                                                  this->dsoaSpaceIndexes(dsoaCount));
         }
         return totOAFlowRate;
     }
@@ -544,7 +544,7 @@ Real64 OARequirementsData::desFlowPerZoneArea(EnergyPlusData &state,
         for (int dsoaCount = 1; dsoaCount <= this->numDSOA; ++dsoaCount) {
             if (this->OAFlowMethod != DataSizing::OAFlowPPer && this->OAFlowMethod != DataSizing::OAFlow &&
                 this->OAFlowMethod != DataSizing::OAFlowACH) {
-                Real64 spaceArea = state.dataHeatBal->space(this->dsoaSpaces(dsoaCount)).floorArea;
+                Real64 spaceArea = state.dataHeatBal->space(this->dsoaSpaceIndexes(dsoaCount)).floorArea;
                 sumAreaOA += this->OAFlowPerArea * spaceArea;
             }
         }
@@ -577,7 +577,7 @@ Real64 OARequirementsData::desFlowPerZonePerson(EnergyPlusData &state,
                 // TODO MJW: Temporarily exclude these methods to avoid diffs vs develop - new issue?
                 if (this->OAFlowMethod != DataSizing::ZOAM_IAQP && this->OAFlowMethod != DataSizing::ZOAM_ProportionalControlSchOcc &&
                     this->OAFlowMethod != DataSizing::ZOAM_ProportionalControlDesOcc) {
-                    Real64 spacePeople = state.dataHeatBal->space(this->dsoaSpaces(dsoaCount)).totOccupants;
+                    Real64 spacePeople = state.dataHeatBal->space(this->dsoaSpaceIndexes(dsoaCount)).totOccupants;
                     sumPeopleOA += this->OAFlowPerPerson * spacePeople;
                 }
             }

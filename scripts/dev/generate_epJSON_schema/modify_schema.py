@@ -126,6 +126,7 @@ extension_renaming = {
     'Wall:Detailed': 'vertices',
     'Space': 'tags',
     'SpaceList': 'spaces',
+    'DesignSpecification:OutdoorAir:SpaceList' : 'space_specs'
     'ZoneList': 'zones',
     'Floor:Detailed': 'vertices',
     'Shading:Building:Detailed': 'vertices',

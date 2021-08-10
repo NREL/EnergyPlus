@@ -1324,6 +1324,18 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
         ZoneIndex = state.dataSize->FinalZoneSizing(CtrlZoneNum).ActualZoneNum;
         int DSOAPtr = state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneDesignSpecOAIndex; // index to DesignSpecification:OutdoorAir object
         if (DSOAPtr > 0) {
+            // If this is a DesignSpecification:OutdoorAir:SpaceList check to make sure spaces belong to this zone
+            if (state.dataSize->OARequirements(DSOAPtr).numDSOA > 1) {
+                for (int spaceNum : state.dataSize->OARequirements(DSOAPtr).dsoaSpaceIndexes) {
+                    if (state.dataHeatBal->space(spaceNum).zoneNum != state.dataSize->FinalZoneSizing(CtrlZoneNum).ActualZoneNum) {
+                        ShowSevereError(
+                            state, "SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList=" + state.dataSize->OARequirements(DSOAPtr).Name);
+                        ShowContinueError(state, "is invalid for Sizing:Zone for Zone=" + state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName);
+                        ShowFatalError(state, "All spaces in the list must be part of this zone.");
+                    }
+                }
+            }
+
             state.dataSize->FinalZoneSizing(CtrlZoneNum).DesOAFlowPPer =
                 state.dataSize->OARequirements(DSOAPtr).desFlowPerZonePerson(state, ZoneIndex);
             state.dataSize->FinalZoneSizing(CtrlZoneNum).DesOAFlowPerArea =

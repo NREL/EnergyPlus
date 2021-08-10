@@ -958,7 +958,7 @@ namespace DataSizing {
         int numDSOA = 1;                      // Number of DesignSpecification:OutdoorAir objects for this instance
         EPVector<int> dsoaIndexes;            // Indexes to DesignSpecification:OutdoorAir objects (if this is a DSOA:SpaceList object)
         EPVector<std::string> dsoaSpaceNames; // Names of spaces if this is a (if this is a DSOA:SpaceList object)
-        EPVector<int> dsoaSpaces;             // Indexes to Spaces (if this is a DSOA:SpaceList object)
+        EPVector<int> dsoaSpaceIndexes;       // Indexes to Spaces (if this is a DSOA:SpaceList object)
         int OAFlowMethod = 0;                 // - Method for OA flow calculation (Flow/Person, Flow/Zone, Flow/Area, FlowACH, Sum, Maximum)
         Real64 OAFlowPerPerson = 0.0;         // - OA requirement per person
         Real64 OAFlowPerArea = 0.0;           // - OA requirement per zone area
