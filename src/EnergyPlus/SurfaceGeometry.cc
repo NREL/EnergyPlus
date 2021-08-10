@@ -2846,7 +2846,7 @@ namespace SurfaceGeometry {
             }
         }
 
-        // Assign Spaces to surfaces without one
+        // Assign Spaces to surfaces without one and build Space surface lists now that all of the sorting and space numbering is complete
         for (int surfNum = 1; surfNum <= state.dataSurface->TotSurfaces; ++surfNum) {
             auto &thisSurf = state.dataSurface->Surface(surfNum);
             if (!thisSurf.HeatTransSurf) continue; // ignore shading surfaces
@@ -2854,9 +2854,9 @@ namespace SurfaceGeometry {
                 int const numSpaces = state.dataHeatBal->Zone(thisSurf.Zone).numSpaces;
                 int const lastSpaceForZone = state.dataHeatBal->Zone(thisSurf.Zone).spaceIndexes(numSpaces);
                 thisSurf.spaceNum = lastSpaceForZone;
-                // Add to Space's list of surfaces
-                state.dataHeatBal->space(lastSpaceForZone).surfaces.emplace_back(surfNum);
             }
+            // Add to Space's list of surfaces
+            state.dataHeatBal->space(thisSurf.spaceNum).surfaces.emplace_back(surfNum);
         }
 
         // TODO MJW: Is this necessary? Check that all Spaces have at least one Surface
@@ -3821,7 +3821,6 @@ namespace SurfaceGeometry {
 
                     if (spaceNum != 0) {
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).spaceNum = spaceNum;
-                        state.dataHeatBal->space(spaceNum).surfaces.emplace_back(SurfNum);
                         if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone != state.dataHeatBal->space(spaceNum).zoneNum) {
                             ShowSevereError(state,
                                             cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", invalid " +
@@ -4423,7 +4422,6 @@ namespace SurfaceGeometry {
 
                     if (spaceNum != 0) {
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).spaceNum = spaceNum;
-                        state.dataHeatBal->space(spaceNum).surfaces.emplace_back(SurfNum);
                     } else {
                         ShowSevereError(state,
                                         cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", invalid " +
@@ -14864,6 +14862,49 @@ namespace SurfaceGeometry {
                 ShowContinueError(state, "For explicit details on each use, use Output:Diagnostics,DisplayExtraWarnings;");
             }
         }
+        // Check for any spaces defined only by floor surface(s) and group them
+        for (auto const zone : state.dataHeatBal->Zone) {
+            int newEnclosureNum = 0;
+            for (int const spaceNum : zone.spaceIndexes) {
+                int spaceEnclosureNum = 0;
+                bool spaceHasOnlyFloors = false;
+                if (radiantSetup) {
+                    spaceEnclosureNum = state.dataHeatBal->space(spaceNum).radiantEnclosureNum;
+                } else {
+                    spaceEnclosureNum = state.dataHeatBal->space(spaceNum).solarEnclosureNum;
+                }
+                if (spaceEnclosureNum == 0) {
+                    spaceHasOnlyFloors = true;
+                    for (int const surfNum : state.dataHeatBal->space(spaceNum).surfaces) {
+                        if (state.dataSurface->Surface(surfNum).Class != SurfaceClass::Floor) {
+                            spaceHasOnlyFloors = false;
+                            break;
+                        }
+                    }
+                }
+                if (spaceEnclosureNum == 0 && spaceHasOnlyFloors) {
+                    anyGroupedSpaces = true;
+                    if (newEnclosureNum == 0) {
+                        // Assign one new enclosure for all loose floors in this zone
+                        ++enclosureNum;
+                        newEnclosureNum = enclosureNum;
+                    }
+                    if (radiantSetup) {
+                        state.dataHeatBal->space(spaceNum).radiantEnclosureNum = enclosureNum;
+                    } else {
+                        state.dataHeatBal->space(spaceNum).solarEnclosureNum = enclosureNum;
+                    }
+                    auto &thisEnclosure(Enclosures(enclosureNum));
+                    thisEnclosure.Name = state.dataHeatBal->space(spaceNum).Name;
+                    thisEnclosure.spaceNames.push_back(state.dataHeatBal->space(spaceNum).Name);
+                    thisEnclosure.spaceNums.push_back(spaceNum);
+                    thisEnclosure.FloorArea = state.dataHeatBal->space(spaceNum).floorArea;
+                    thisEnclosure.ExtWindowArea = state.dataHeatBal->space(spaceNum).extWindowArea;
+                    thisEnclosure.TotalSurfArea = state.dataHeatBal->space(spaceNum).totalSurfArea;
+                }
+            }
+        }
+
         if (anyGroupedSpaces) {
             // All grouped spaces have been assigned to an enclosure, now assign remaining spaces
             for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
@@ -14915,6 +14956,11 @@ namespace SurfaceGeometry {
             } else {
                 state.dataViewFactor->NumOfSolarEnclosures = state.dataGlobal->numSpaces;
             }
+        }
+        if (radiantSetup) {
+            assert(state.dataViewFactor->NumOfRadiantEnclosures <= int(Enclosures.size()));
+        } else {
+            assert(state.dataViewFactor->NumOfSolarEnclosures <= int(Enclosures.size()));
         }
 
         // ToDo: For now, set the max and min enclosure numbers for each zone to be used in CalcInteriorRadExchange with ZoneToResimulate
