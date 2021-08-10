@@ -195,6 +195,9 @@ namespace UnitarySystems {
 
         UnitarySysInputSpec original_input_specs;
         int m_UnitarySysNum;
+        bool m_IsUnitarySystem;
+        bool m_IsCoilSystemCoolingDX;
+        bool m_IsCoilSystemCoolingWater;
         bool m_ThisSysInputShouldBeGotten;
         int m_SysAvailSchedPtr; // Pointer to the availability schedule
         ControlType m_ControlType;
@@ -405,14 +408,14 @@ namespace UnitarySystems {
         bool m_OKToPrintSizing;
         bool m_IsDXCoil;
         Real64 m_SmallLoadTolerance;
-        bool m_waterSideEconomizerFlag;   // true if water-side economizer coil is active
-        Real64 m_minAirToWaterTempOffset; // coil entering air to entering water temp offset
+        bool m_TemperatureOffsetControlActive; // true if water-side economizer coil is active
+        Real64 m_minAirToWaterTempOffset;      // coil entering air to entering water temp offset
 
         int m_HRcoolCoilFluidInletNode;
         int m_HRcoolCoilAirInNode;
         Real64 m_minWaterLoopTempForHR; // water coil heat recovery loops
+        bool m_waterSideEconomizerFlag; // user input to enable lockout with economizer
         bool m_WaterHRPlantLoopModel;   // signifies water heat recovery loop for this CoilSystem
-        bool enableHRLoop;              // flag used to disable HR loop
 
     public:
         // SZVAV variables
@@ -458,10 +461,9 @@ namespace UnitarySystems {
         DesignSpecMSHP *m_CompPointerMSHP;
         std::string Name;
         std::string UnitType;
-        Real64 LoadSHR;                // Load sensible heat ratio with humidity control
-        Real64 CoilSHR;                // Load sensible heat ratio with humidity control
-        bool runWaterSideEconomizer;   // true if water-side economizer conditioon is favorbale
-        int WaterSideEconomizerStatus; // water side economizer status flag, report variable
+        Real64 LoadSHR;                     // Load sensible heat ratio with humidity control
+        Real64 CoilSHR;                     // Load sensible heat ratio with humidity control
+        int temperatureOffsetControlStatus; // water side economizer status flag, also report variable
 
         //    private:
         // private members not initialized in constructor
@@ -969,8 +971,6 @@ struct UnitarySystemsData : BaseGlobalStruct
 
     bool myOneTimeFlag = true;
     bool getInputFlag = true;
-
-    std::string const coilSysCoolingWaterObjectName = "CoilSystem:Cooling:Water";
 
     void clear_state() override
     {

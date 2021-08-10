@@ -23649,4 +23649,172 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestIntraZoneLinkageZoneIndex)
     EXPECT_EQ(state->dataAirflowNetwork->IntraZoneNodeData(1).ZoneNum, 3);
 }
 
+TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestReferenceConditionsLeftBlank)
+{
+    // unit test for the object of ReferenceCrackConditions when reference conditions was left blank
+    bool ErrorsFound(false);
+
+    std::string const idf_objects = delimited_string({
+        "SurfaceConvectionAlgorithm:Inside,TARP;",
+        "SurfaceConvectionAlgorithm:Outside,DOE-2;",
+        "HeatBalanceAlgorithm,ConductionTransferFunction;",
+        "ZoneAirHeatBalanceAlgorithm,",
+        "AnalyticalSolution;      !- Algorithm",
+        "Schedule:Constant,OnSch,,1.0;",
+        "Schedule:Constant,Temp21,,21.0;",
+        "Zone,",
+        "    WEST_ZONE,               !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    autocalculate,           !- Ceiling Height {m}",
+        "    autocalculate;           !- Volume {m3}",
+        "BuildingSurface:Detailed,",
+        "    Surface_1,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    PARTITION,               !- Construction Name",
+        "    WEST_ZONE,               !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    6.096000,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    6.096000,0,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "    Surface_2,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    PARTITION,             !- Construction Name",
+        "    WEST_ZONE,               !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    0,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    0,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "Construction,",
+        "    PARTITION,             !- Name",
+        "    GYP BOARD;  !- Outside Layer",
+        "Material,",
+        "    GYP BOARD,  !- Name",
+        "    Smooth,                  !- Roughness",
+        "    1.9050000E-02,           !- Thickness {m}",
+        "    0.7264224,               !- Conductivity {W/m-K}",
+        "    1601.846,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.9200000,               !- Solar Absorptance",
+        "    0.9200000;               !- Visible Absorptance",
+        "AirflowNetwork:SimulationControl,",
+        "   NaturalVentilation, !- Name",
+        "   MultizoneWithoutDistribution, !- AirflowNetwork Control",
+        "   SurfaceAverageCalculation, !- Wind Pressure Coefficient Type",
+        "   , !- Height Selection for Local Wind Pressure Calculation",
+        "   LOWRISE, !- Building Type",
+        "   1000, !- Maximum Number of Iterations{ dimensionless }",
+        "   LinearInitializationMethod, !- Initialization Type",
+        "   0.0001, !- Relative Airflow Convergence Tolerance{ dimensionless }",
+        "   0.0001, !- Absolute Airflow Convergence Tolerance{ kg / s }",
+        "   -0.5, !- Convergence Acceleration Limit{ dimensionless }",
+        "   90, !- Azimuth Angle of Long Axis of Building{ deg }",
+        "   0.36; !- Ratio of Building Width Along Short Axis to Width Along Long Axis",
+        "AirflowNetwork:MultiZone:Zone,",
+        "   WEST_ZONE, !- Zone Name",
+        "   Temperature, !- Ventilation Control Mode",
+        "   Temp21, !- Ventilation Control Zone Temperature Setpoint Schedule Name",
+        "   1, !- Minimum Venting Open Factor{ dimensionless }",
+        "   , !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor{ deltaC }",
+        "   100, !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor{ deltaC }",
+        "   , !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor{ deltaJ / kg }",
+        "   300000, !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor{ deltaJ / kg }",
+        "   OnSch, !- Venting Availability Schedule Name",
+        "   Standard;  !- Single Sided Wind Pressure Coefficient Algorithm",
+        "AirflowNetwork:MultiZone:ReferenceCrackConditions,",
+        "   ReferenceCrackConditions1, !- Name",
+        "   20, !- Reference Temperature{ C }",
+        "   , !- Reference Barometric Pressure{ Pa }",
+        "   ; !- Reference Humidity Ratio{ kgWater / kgDryAir }",
+        "AirflowNetwork:MultiZone:ReferenceCrackConditions,",
+        "   ReferenceCrackConditions2, !- Name",
+        "   30, !- Reference Temperature{ C }",
+        "   50000, !- Reference Barometric Pressure{ Pa }",
+        "   0.002; !- Reference Humidity Ratio{ kgWater / kgDryAir }",
+        "AirflowNetwork:MultiZone:Surface,",
+        "   Surface_1, !- Surface Name",
+        "   CR-1, !- Leakage Component Name",
+        "   , !- External Node Name",
+        "   1; !- Window / Door Opening Factor, or Crack Factor{ dimensionless }",
+        "AirflowNetwork:MultiZone:Surface,",
+        "   Surface_2, !- Surface Name",
+        "   CR-2, !- Leakage Component Name",
+        "   , !- External Node Name",
+        "   1; !- Window / Door Opening Factor, or Crack Factor{ dimensionless }",
+        "AirflowNetwork:MultiZone:Surface:Crack,",
+        "   CR-1, !- Name",
+        "   0.01, !- Air Mass Flow Coefficient at Reference Conditions{ kg / s }",
+        "   0.667, !- Air Mass Flow Exponent{ dimensionless }",
+        "   ReferenceCrackConditions1; !- Reference Crack Conditions",
+        "AirflowNetwork:MultiZone:Surface:Crack,",
+        "   CR-2, !- Name",
+        "   0.01, !- Air Mass Flow Coefficient at Reference Conditions{ kg / s }",
+        "   0.667, !- Air Mass Flow Exponent{ dimensionless }",
+        "   ReferenceCrackConditions2; !- Reference Crack Conditions",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    ErrorsFound = false;
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    ErrorsFound = false;
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    ErrorsFound = false;
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    ErrorsFound = false;
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    ErrorsFound = false;
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
+    SurfaceGeometry::GetSurfaceData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    GetAirflowNetworkInput(*state);
+    // check correct values for reference conditions of crack surface when reference conditions were left blank.
+    Real64 refP1 = 101325.0;
+    Real64 refT1 = 20.0;
+    Real64 refW1 = 0.0;
+    Real64 expected_density1 = AIRDENSITY(*state, refP1, refT1, refW1);
+    Real64 expected_viscosity1 = AirflowNetwork::airDynamicVisc(refT1);
+    EXPECT_EQ(expected_density1, state->dataAirflowNetwork->MultizoneSurfaceCrackData(1).reference_density);
+    EXPECT_EQ(expected_viscosity1, state->dataAirflowNetwork->MultizoneSurfaceCrackData(1).reference_viscosity);
+    Real64 refP2 = 50000.0;
+    Real64 refT2 = 30.0;
+    Real64 refW2 = 0.002;
+    Real64 expected_density2 = AIRDENSITY(*state, refP2, refT2, refW2);
+    Real64 expected_viscosity2 = AirflowNetwork::airDynamicVisc(refT2);
+    EXPECT_EQ(expected_density2, state->dataAirflowNetwork->MultizoneSurfaceCrackData(2).reference_density);
+    EXPECT_EQ(expected_viscosity2, state->dataAirflowNetwork->MultizoneSurfaceCrackData(2).reference_viscosity);
+}
 } // namespace EnergyPlus
