@@ -14895,7 +14895,8 @@ namespace SurfaceGeometry {
                         state.dataHeatBal->space(spaceNum).solarEnclosureNum = enclosureNum;
                     }
                     auto &thisEnclosure(Enclosures(enclosureNum));
-                    thisEnclosure.Name = state.dataHeatBal->space(spaceNum).Name;
+                    // Give this enclosure the zone name and assign this to the zone-remainder space if it exists
+                    thisEnclosure.Name = zone.Name;
                     thisEnclosure.spaceNames.push_back(state.dataHeatBal->space(spaceNum).Name);
                     thisEnclosure.spaceNums.push_back(spaceNum);
                     thisEnclosure.FloorArea = state.dataHeatBal->space(spaceNum).floorArea;
@@ -14908,32 +14909,41 @@ namespace SurfaceGeometry {
         if (anyGroupedSpaces) {
             // All grouped spaces have been assigned to an enclosure, now assign remaining spaces
             for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
+                auto &curSpace = state.dataHeatBal->space(spaceNum);
                 int spaceEnclosureNum = 0;
                 if (radiantSetup) {
-                    spaceEnclosureNum = state.dataHeatBal->space(spaceNum).radiantEnclosureNum;
+                    spaceEnclosureNum = curSpace.radiantEnclosureNum;
                 } else {
-                    spaceEnclosureNum = state.dataHeatBal->space(spaceNum).solarEnclosureNum;
+                    spaceEnclosureNum = curSpace.solarEnclosureNum;
                 }
                 if (spaceEnclosureNum == 0) {
-                    ++enclosureNum;
-                    if (radiantSetup) {
-                        state.dataHeatBal->space(spaceNum).radiantEnclosureNum = enclosureNum;
-                    } else {
-                        state.dataHeatBal->space(spaceNum).solarEnclosureNum = enclosureNum;
+                    if (UtilityRoutines::SameString(curSpace.Name, state.dataHeatBal->Zone(curSpace.zoneNum).Name + "-Remainder")) {
+                        // Search for existing enclosure with same name as the zone
+                        spaceEnclosureNum = UtilityRoutines::FindItemInList(state.dataHeatBal->Zone(curSpace.zoneNum).Name, Enclosures);
                     }
-                    auto &thisEnclosure(Enclosures(enclosureNum));
-                    thisEnclosure.Name = state.dataHeatBal->space(spaceNum).Name;
-                    thisEnclosure.spaceNames.push_back(state.dataHeatBal->space(spaceNum).Name);
+                    if (spaceEnclosureNum == 0) {
+                        // Otherwise add a new one named for the space
+                        ++enclosureNum;
+                        spaceEnclosureNum = enclosureNum;
+                        Enclosures(spaceEnclosureNum).Name = curSpace.Name;
+                        if (radiantSetup) {
+                            state.dataViewFactor->NumOfRadiantEnclosures = enclosureNum;
+                        } else {
+                            state.dataViewFactor->NumOfSolarEnclosures = enclosureNum;
+                        }
+                    }
+                    if (radiantSetup) {
+                        curSpace.radiantEnclosureNum = spaceEnclosureNum;
+                    } else {
+                        curSpace.solarEnclosureNum = spaceEnclosureNum;
+                    }
+                    auto &thisEnclosure(Enclosures(spaceEnclosureNum));
+                    thisEnclosure.spaceNames.push_back(curSpace.Name);
                     thisEnclosure.spaceNums.push_back(spaceNum);
-                    thisEnclosure.FloorArea = state.dataHeatBal->space(spaceNum).floorArea;
-                    thisEnclosure.ExtWindowArea = state.dataHeatBal->space(spaceNum).extWindowArea;
-                    thisEnclosure.TotalSurfArea = state.dataHeatBal->space(spaceNum).totalSurfArea;
+                    thisEnclosure.FloorArea += curSpace.floorArea;
+                    thisEnclosure.ExtWindowArea += curSpace.extWindowArea;
+                    thisEnclosure.TotalSurfArea += curSpace.totalSurfArea;
                 }
-            }
-            if (radiantSetup) {
-                state.dataViewFactor->NumOfRadiantEnclosures = enclosureNum;
-            } else {
-                state.dataViewFactor->NumOfSolarEnclosures = enclosureNum;
             }
         } else {
             // There are no grouped radiant air boundaries, assign each space to it's own radiant enclosure
@@ -15440,8 +15450,8 @@ namespace SurfaceGeometry {
                         break; // exit when diff
                     }          // If none of the above conditions is met, then these should be the same layers in reverse (RevLayersDiffs = false)
                 } else {
-                    // Other material types do not have reversed constructions so if they are not the same layer there is a problem (RevLayersDiffs =
-                    // true)
+                    // Other material types do not have reversed constructions so if they are not the same layer there is a problem
+                    // (RevLayersDiffs = true)
                     RevLayerDiffs = true;
                     break; // exit when diff
                 }          // End check of whether or not these are WindowGlass

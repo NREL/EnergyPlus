@@ -2429,7 +2429,6 @@ void InitSolarHeatGains(EnergyPlusData &state)
     Array1D<Real64> currGndSolarInc(state.dataSurface->TotSurfaces); // Ground diffuse solar incident on a surface
 
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-        state.dataHeatBal->ZoneInitialDifSolReflW(zoneNum) = 0.0;
         state.dataHeatBal->ZoneWinHeatGainRepEnergy(zoneNum) = 0.0;
         state.dataHeatBal->ZoneWinHeatLossRepEnergy(zoneNum) = 0.0;
         state.dataHeatBal->ZnOpqSurfInsFaceCondGnRepEnrg(zoneNum) = 0.0;
@@ -2446,6 +2445,9 @@ void InitSolarHeatGains(EnergyPlusData &state)
         state.dataHeatBal->ZoneOpaqSurfExtFaceCond(zoneNum) = 0.0;
         state.dataHeatBal->ZoneOpaqSurfExtFaceCondGainRep(zoneNum) = 0.0;
         state.dataHeatBal->ZoneOpaqSurfExtFaceCondLossRep(zoneNum) = 0.0;
+    }
+    for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
+        state.dataHeatBal->EnclSolInitialDifSolReflW(enclNum) = 0.0;
     }
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
         int const firstSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
@@ -2544,17 +2546,17 @@ void InitSolarHeatGains(EnergyPlusData &state)
             state.dataSurface->SurfSkySolarInc(SurfNum) = 0.0;
             state.dataSurface->SurfGndSolarInc(SurfNum) = 0.0;
         }
-        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            state.dataHeatBal->ZoneTransSolar(zoneNum) = 0.0;
-            state.dataHeatBal->ZoneBmSolFrExtWinsRep(zoneNum) = 0.0;
-            state.dataHeatBal->ZoneBmSolFrIntWinsRep(zoneNum) = 0.0;
-            state.dataHeatBal->ZoneDifSolFrExtWinsRep(zoneNum) = 0.0;
-            state.dataHeatBal->ZoneDifSolFrIntWinsRep(zoneNum) = 0.0;
-            state.dataHeatBal->ZoneTransSolarEnergy(zoneNum) = 0.0;
-            state.dataHeatBal->ZoneBmSolFrExtWinsRepEnergy(zoneNum) = 0.0;
-            state.dataHeatBal->ZoneBmSolFrIntWinsRepEnergy(zoneNum) = 0.0;
-            state.dataHeatBal->ZoneDifSolFrExtWinsRepEnergy(zoneNum) = 0.0;
-            state.dataHeatBal->ZoneDifSolFrIntWinsRepEnergy(zoneNum) = 0.0;
+        for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
+            state.dataHeatBal->ZoneTransSolar(enclNum) = 0.0;
+            state.dataHeatBal->ZoneBmSolFrExtWinsRep(enclNum) = 0.0;
+            state.dataHeatBal->ZoneBmSolFrIntWinsRep(enclNum) = 0.0;
+            state.dataHeatBal->ZoneDifSolFrExtWinsRep(enclNum) = 0.0;
+            state.dataHeatBal->ZoneDifSolFrIntWinsRep(enclNum) = 0.0;
+            state.dataHeatBal->ZoneTransSolarEnergy(enclNum) = 0.0;
+            state.dataHeatBal->ZoneBmSolFrExtWinsRepEnergy(enclNum) = 0.0;
+            state.dataHeatBal->ZoneBmSolFrIntWinsRepEnergy(enclNum) = 0.0;
+            state.dataHeatBal->ZoneDifSolFrExtWinsRepEnergy(enclNum) = 0.0;
+            state.dataHeatBal->ZoneDifSolFrIntWinsRepEnergy(enclNum) = 0.0;
         }
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
@@ -2747,11 +2749,11 @@ void InitSolarHeatGains(EnergyPlusData &state)
 
             //  Beam from interior windows (EnclSolDBIntWin) reflected from floor is counted in DayltgInterReflIllFrIntWins,
             //  EnclSolDB needs to subtract this part since it is already counted in EnclSolDB.
-            //  Use ZoneInitialDifSolReflW (Rob's previous work) as it better counts initial distribution of
+            //  Use EnclSolInitialDifSolReflW (Rob's previous work) as it better counts initial distribution of
             //   diffuse solar rather than using weighted area*absorptance
             state.dataHeatBal->EnclSolQDforDaylight(enclosureNum) =
                 (state.dataHeatBal->EnclSolDB(enclosureNum) - state.dataHeatBal->EnclSolDBIntWin(enclosureNum)) * state.dataEnvrn->BeamSolarRad +
-                state.dataHeatBal->EnclSolDBSSG(enclosureNum) + state.dataHeatBal->ZoneInitialDifSolReflW(enclosureNum);
+                state.dataHeatBal->EnclSolDBSSG(enclosureNum) + state.dataHeatBal->EnclSolInitialDifSolReflW(enclosureNum);
 
             // to exclude diffuse solar now absorbed/transmitted in CalcWinTransDifSolInitialDistribution
             // EnclSolDB(ZoneNum) is Diffuse Solar from beam reflected from interior surfaces
@@ -2762,7 +2764,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
             //                +EnclSolDG(ZoneNum)*GndSolarRad
             state.dataHeatBal->EnclSolQD(enclosureNum) = state.dataHeatBal->EnclSolDB(enclosureNum) * state.dataEnvrn->BeamSolarRad +
                                                          state.dataHeatBal->EnclSolDBSSG(enclosureNum) +
-                                                         state.dataHeatBal->ZoneInitialDifSolReflW(enclosureNum);
+                                                         state.dataHeatBal->EnclSolInitialDifSolReflW(enclosureNum);
         }
 
         // Flux of diffuse solar in each zone
@@ -4014,7 +4016,8 @@ void ComputeIntThermalAbsorpFactors(EnergyPlusData &state)
 
     auto &Surface(state.dataSurface->Surface);
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-        if (!state.dataHeatBal->EnclRadReCalc(zoneNum)) continue;
+        // TODO MJW: Another zone/enclosure discontinuity
+        if (!state.dataHeatBal->EnclRadReCalc(state.dataHeatBal->Zone(zoneNum).zoneRadEnclosureFirst)) continue;
         int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
         int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
         for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
@@ -4296,11 +4299,11 @@ void ComputeIntSWAbsorpFactors(EnergyPlusData &state)
             // back out whatever window is there.  Note that this also assumes that the shade has no effect.
             // That's probably not correct, but how correct is it to assume that no solar is absorbed anywhere
             // in the zone?
-            if (state.dataHeatBal->ZoneSolAbsFirstCalc(enclosureNum)) {
+            if (state.dataHeatBal->EnclSolAbsFirstCalc(enclosureNum)) {
                 ShowWarningError(state,
                                  "ComputeIntSWAbsorbFactors: Sum of area times inside solar absorption for all surfaces is zero in Zone: " +
                                      state.dataViewFactor->EnclSolInfo(enclosureNum).Name);
-                state.dataHeatBal->ZoneSolAbsFirstCalc(enclosureNum) = false;
+                state.dataHeatBal->EnclSolAbsFirstCalc(enclosureNum) = false;
             }
             state.dataHeatBal->EnclSolVMULT(enclosureNum) = 0.0;
         }

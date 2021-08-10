@@ -90,6 +90,7 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EconomicLifeCycleCost.hh>
@@ -11837,7 +11838,7 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
     Array1D_string spaceColumnHead;
     Array1D_int spaceColumnWidth;
     Array2D_string spaceTableBody;
-    int spaceNumCol = 10;
+    int spaceNumCol = 11;
     spaceRowHead.allocate(state.dataGlobal->numSpaces + 4); // Extra rows for totals
     spaceColumnHead.allocate(spaceNumCol);
     spaceColumnWidth.allocate(spaceNumCol);
@@ -11852,11 +11853,12 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
     spaceColumnHead(4) = "Multipliers";
     spaceColumnHead(5) = "Zone Name";
     spaceColumnHead(6) = "Space Type";
-    spaceColumnHead(7) = "Lighting " + state.dataOutRptTab->Wm2_unitName;
-    spaceColumnHead(8) = "People " + state.dataOutRptTab->m2_unitName.substr(0, len(state.dataOutRptTab->m2_unitName) - 1) + " per person" +
+    spaceColumnHead(7) = "Radiant/Solar Enclosure Name";
+    spaceColumnHead(8) = "Lighting " + state.dataOutRptTab->Wm2_unitName;
+    spaceColumnHead(9) = "People " + state.dataOutRptTab->m2_unitName.substr(0, len(state.dataOutRptTab->m2_unitName) - 1) + " per person" +
                          state.dataOutRptTab->m2_unitName[len(state.dataOutRptTab->m2_unitName) - 1];
-    spaceColumnHead(9) = "Plug and Process " + state.dataOutRptTab->Wm2_unitName;
-    spaceColumnHead(10) = "Tags";
+    spaceColumnHead(10) = "Plug and Process " + state.dataOutRptTab->Wm2_unitName;
+    spaceColumnHead(11) = "Tags";
 
     int constexpr colSpaceArea(1);
     int constexpr colConditioned(2);
@@ -11864,10 +11866,11 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
     int constexpr colMultipliers(4);
     int constexpr colZoneName(5);
     int constexpr colSpaceType(6);
-    int constexpr colSpaceLighting(7);
-    int constexpr colSpacePeople(8);
-    int constexpr colSpacePlugProcess(9);
-    int constexpr colSpaceTags(10);
+    int constexpr colEnclName(7);
+    int constexpr colSpaceLighting(8);
+    int constexpr colSpacePeople(9);
+    int constexpr colSpacePlugProcess(10);
+    int constexpr colSpaceTags(11);
 
     spaceRowHead(state.dataGlobal->numSpaces + state.dataOutRptTab->grandTotal) = "Total";
     spaceRowHead(state.dataGlobal->numSpaces + state.dataOutRptTab->condTotal) = "Conditioned Total";
@@ -12033,6 +12036,7 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
             spaceRowHead(spaceTableRowNum) = curSpace.Name;
             spaceTableBody(colZoneName, spaceTableRowNum) = curZone.Name;
             spaceTableBody(colSpaceType, spaceTableRowNum) = curSpace.spaceType;
+            spaceTableBody(colEnclName, spaceTableRowNum) = state.dataViewFactor->EnclSolInfo(curSpace.solarEnclosureNum).Name;
             spaceTableBody(colSpaceArea, spaceTableRowNum) = RealToStr(curSpace.floorArea * state.dataOutRptTab->m2_unitConvWVST, 2);
             // Conditioned or not
             if (curZone.SystemZoneNodeNumber > 0) {
@@ -13482,7 +13486,7 @@ void AllocateLoadComponentArrays(EnergyPlusData &state)
         ort->ITABSFseq = 0.0;
         ort->TMULTseq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays,
                                state.dataGlobal->NumOfTimeStepInHour * 24,
-                               state.dataGlobal->NumOfZones);
+                               state.dataViewFactor->NumOfRadiantEnclosures);
         ort->TMULTseq = 0.0;
         ort->peopleInstantSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays,
                                        state.dataGlobal->NumOfTimeStepInHour * 24,

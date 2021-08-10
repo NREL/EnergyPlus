@@ -2144,7 +2144,7 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> ZoneWinHeatLossRep;             // = -ZoneWinHeatGain when ZoneWinHeatGain < 0
     Array1D<Real64> ZoneBmSolFrExtWinsRep;          // Beam solar into zone from exterior windows [W]
     Array1D<Real64> ZoneBmSolFrIntWinsRep;          // Beam solar into zone from interior windows [W]
-    Array1D<Real64> ZoneInitialDifSolReflW;         // Initial diffuse solar in zone from ext and int windows reflected from interior surfaces [W]
+    Array1D<Real64> EnclSolInitialDifSolReflW;      // Initial diffuse solar in zone from ext and int windows reflected from interior surfaces [W]
     Array1D<Real64> ZoneDifSolFrExtWinsRep;         // Diffuse solar into zone from exterior windows [W]
     Array1D<Real64> ZoneDifSolFrIntWinsRep;         // Diffuse solar into zone from interior windows [W]
     Array1D<Real64> ZoneOpaqSurfInsFaceCond;        // Zone inside face opaque surface conduction (W)
@@ -2227,7 +2227,7 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> EnclSolVMULT;        // 1/(Sum Of A Zone's Inside Surfaces Area*Absorptance)
     Array1D<Real64> EnclRadQThermalRad;  // TOTAL THERMAL RADIATION ADDED TO ZONE or Radiant Enclosure (group of zones)
     Array1D<Real64> EnclRadThermAbsMult; // EnclRadThermAbsMult  - MULTIPLIER TO COMPUTE 'ITABSF'
-    Array1D<bool> ZoneSolAbsFirstCalc;   // for error message
+    Array1D<bool> EnclSolAbsFirstCalc;   // for error message
     Array1D<bool> EnclRadReCalc;         // Enclosure solar or thermal radiation properties needs to be recalc due to window/shading status change
 
     bool EnclRadAlwaysReCalc = false; // Enclosure solar or thermal radiation properties always needs to be recalc at any time step
@@ -2439,7 +2439,7 @@ struct HeatBalanceData : BaseGlobalStruct
         this->ZoneWinHeatLossRep.deallocate();
         this->ZoneBmSolFrExtWinsRep.deallocate();
         this->ZoneBmSolFrIntWinsRep.deallocate();
-        this->ZoneInitialDifSolReflW.deallocate();
+        this->EnclSolInitialDifSolReflW.deallocate();
         this->ZoneDifSolFrExtWinsRep.deallocate();
         this->ZoneDifSolFrIntWinsRep.deallocate();
         this->ZoneOpaqSurfInsFaceCond.deallocate();
@@ -2506,7 +2506,7 @@ struct HeatBalanceData : BaseGlobalStruct
         this->EnclSolVMULT.deallocate();
         this->EnclRadQThermalRad.deallocate();
         this->EnclRadThermAbsMult.deallocate();
-        this->ZoneSolAbsFirstCalc.deallocate();
+        this->EnclSolAbsFirstCalc.deallocate();
         this->EnclRadReCalc.deallocate();
         this->SurfCosIncidenceAngle.deallocate();
         this->SurfSunlitFracHR.deallocate();
