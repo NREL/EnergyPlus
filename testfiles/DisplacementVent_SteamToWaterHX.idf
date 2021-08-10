@@ -910,22 +910,6 @@
     Until: 24:00,20.00;      !- Field 11
 
   Schedule:Compact,
-    ReportSch1,              !- Name
-    On/Off,                  !- Schedule Type Limits Name
-    Through: 1/31,           !- Field 1
-    For: Alldays,            !- Field 2
-    Until: 24:00,1.00,       !- Field 3
-    Through: 6/30,           !- Field 5
-    For: Alldays,            !- Field 6
-    Until: 24:00,0.00,       !- Field 7
-    Through: 7/31,           !- Field 9
-    For: Alldays,            !- Field 10
-    Until: 24:00,1.00,       !- Field 11
-    Through: 12/31,          !- Field 13
-    For: Alldays,            !- Field 14
-    Until: 24:00,0.00;       !- Field 15
-
-  Schedule:Compact,
     STEAM-LOOP-TEMP-SCHEDULE,!- Name
     TEMPERATURE,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -2490,23 +2474,33 @@
     1;                                    !- Sizing Factor
 
 
-  Output:Variable,*,Zone Mean Air Temperature,timestep,ReportSch1;
+  Output:Variable,*,Zone Mean Air Temperature,timestep;
 
-  Output:Variable,*,Surface Inside Face Temperature,timestep,ReportSch1;
+  Output:Variable,*,Surface Inside Face Temperature,timestep;
 
-  Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep,ReportSch1;
+  Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;
 
-  Output:Variable,*,Steam to Water Heat Exchanger Heat Transfer Rate,timestep,ReportSch1;
+  Output:Variable,*,Steam to Water Heat Exchanger Heat Transfer Rate,timestep;
 
-  Output:Variable,*,Steam to Water Heat Exchanger Steam Mass Flow Rate,timestep,ReportSch1;
+  Output:Variable,*,Steam to Water Heat Exchanger Steam Mass Flow Rate,timestep;
 
-  Output:Variable,*,Steam to Water Heat Exchanger Water Mass Flow Rate,timestep,ReportSch1;
+  Output:Variable,*,Steam to Water Heat Exchanger Water Mass Flow Rate,timestep;
 
-  Output:Variable,*,Steam to Water Heat Exchanger Operation Status,timestep,ReportSch1;
-  
-  Output:Variable,ZONE1 Inlet Node,System Node Mass Flow Rate,timestep,ReportSch1;
+  Output:Variable,*,Steam to Water Heat Exchanger Operation Status,timestep;
 
-  Output:Variable,ZONE1 Inlet Node,System Node Temperature,timestep,ReportSch1;
+  Output:Variable,Steam to Water HX Steam Inlet Node,System Node Temperature,timestep;
+
+  Output:Variable,Steam to Water HX Steam Outlet Node,System Node Temperature,timestep;
+
+  Output:Variable,Steam to Water HX Water Inlet Node,System Node Temperature,timestep;
+
+  Output:Variable,Steam to Water HX Water Outlet Node,System Node Temperature,timestep;
+
+  Output:Variable,*,Boiler Heating Rate,timestep;
+
+  Output:Variable,ZONE1 Inlet Node,System Node Mass Flow Rate,timestep;
+
+  Output:Variable,ZONE1 Inlet Node,System Node Temperature,timestep;
 
   Output:VariableDictionary,Regular;
 

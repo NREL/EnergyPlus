@@ -165,7 +165,7 @@ void HeatExchangerStruct::simulate(EnergyPlusData &state,
                         state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).MassFlowRate);
 
     } else if (this->TypeNum == DataPlant::TypeOf_SteamToWaterPlantHtExchg) {
-        this->controlSteamToWaterHX(state, calledFromLocation.loopNum, CurLoad, FirstHVACIteration);
+        this->controlSteamToWaterHX(state, calledFromLocation.loopNum, CurLoad);
         this->calculateSteamToWaterHX(state, CurLoad, state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).MassFlowRate);
     }
 }
@@ -2142,7 +2142,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
     }
 }
 
-void HeatExchangerStruct::controlSteamToWaterHX(EnergyPlusData &state, int LoopNum, Real64 MyLoad, bool FirstHVACIteration)
+void HeatExchangerStruct::controlSteamToWaterHX(EnergyPlusData &state, [[maybe_unused]] int const LoopNum, Real64 MyLoad)
 {
 
     // SUBROUTINE INFORMATION:
@@ -2769,8 +2769,8 @@ void HeatExchangerStruct::calculateSteamToWaterHX(EnergyPlusData &state, Real64 
                 // this->DemandSideLoop.OutletEnthalpy = this->DemandSideLoop.InletEnthalpy - HeatingLoad / SteamMassFlowRate;
                 state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).MassFlowRate = SteamMassFlowRate;
                 state.dataLoopNodes->Node(this->DemandSideLoop.outletNodeNum).MassFlowRate = SteamMassFlowRate;
-            } else { // Temp water out is temperature setpoint
-                WaterOutletTemp = TempSetPoint;
+            } else { 
+                WaterOutletTemp = WaterInletTemp + QHXCap / (WaterMassFlowRate * CpWaterInlet);
 
                 // In practice Sensible & Superheated heat transfer is negligible compared to latent part.
                 // This is required for outlet water temperature, otherwise it will be saturation temperature.
