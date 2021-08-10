@@ -215,7 +215,7 @@ namespace PVWatts {
 struct PVWattsData : BaseGlobalStruct
 {
 
-    std::map<int, PVWatts::PVWattsGenerator> PVWattsGenerators;
+    std::map<std::string, PVWatts::PVWattsGenerator> PVWattsGenerators;
 
     void clear_state() override
     {
