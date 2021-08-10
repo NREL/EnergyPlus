@@ -6175,14 +6175,48 @@ void GetATMixers(EnergyPlusData &state)
                 }
             ControlledZoneLoop_exit:;
                 if (ZoneNodeNotFound) {
-                    ShowSevereError(state,
-                                    cCurrentModuleObject + " = \"" + state.dataSingleDuct->SysATMixer(ATMixerNum).Name +
-                                        "\". Inlet Side Air Terminal Mixer air inlet node name must be the same as a zone exhaust node name.");
-                    ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
-                    ShowContinueError(state,
-                                      "..Inlet Side CONNECTED Air Terminal Mixer inlet node name = " +
-                                          state.dataLoopNodes->NodeID(state.dataSingleDuct->SysATMixer(ATMixerNum).SecInNode));
-                    ErrorsFound = true;
+                    bool ZoneNodeFoundAgain = false;
+                    for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
+                        for (int Num = 1; Num <= state.dataZoneEquip->ZoneEquipList(CtrlZone).NumOfEquipTypes; ++Num) {
+                            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3),
+                                                            state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipName(Num)) &&
+                                UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2),
+                                                            state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipType(Num))) {
+                                state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->SysATMixer(ATMixerNum).ADUNum).ZoneEqNum = CtrlZone;
+                                state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneEqNum = CtrlZone;
+                                state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
+                                // Must wait until InitATMixer to fill other zone equip config data because ultimate zone inlet node is not known yet
+                                // for inlet side mixers
+                                if (!state.dataSingleDuct->SysATMixer(ATMixerNum).NoOAFlowInputFromUser) {
+                                    bool UseOccSchFlag = false;
+                                    bool UseMinOASchFlag = false;
+                                    state.dataSingleDuct->SysATMixer(ATMixerNum).DesignPrimaryAirVolRate =
+                                        DataZoneEquipment::CalcDesignSpecificationOutdoorAir(
+                                            state,
+                                            state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr,
+                                            state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum,
+                                            UseOccSchFlag,
+                                            UseMinOASchFlag);
+                                }
+                                ZoneNodeFoundAgain = true;
+                                break;
+                            }
+                        }
+                        if (ZoneNodeFoundAgain) break;
+                    }
+                    if (!ZoneNodeFoundAgain) {
+                        ShowSevereError(state,
+                                        cCurrentModuleObject + " = \"" + state.dataSingleDuct->SysATMixer(ATMixerNum).Name +
+                                            "\". Inlet Side Air Terminal Mixer air inlet node name must be the same as either a zone exhaust node "
+                                            "name or an induced "
+                                            "air node in ZonePlenum.");
+                        ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
+                        ShowContinueError(state, "..Induced Air Outlet Node name is specified in AirLoopHVAC:ReturnPlenum object.");
+                        ShowContinueError(state,
+                                          "..Inlet Side CONNECTED Air Terminal Mixer inlet node name = " +
+                                              state.dataLoopNodes->NodeID(state.dataSingleDuct->SysATMixer(ATMixerNum).SecInNode));
+                        ErrorsFound = true;
+                    }
                 }
             }
 
