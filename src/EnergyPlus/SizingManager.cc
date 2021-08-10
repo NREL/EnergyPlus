@@ -2248,7 +2248,7 @@ void GetOARequirements(EnergyPlusData &state)
         state.dataSize->OARequirements.allocate(state.dataSize->NumOARequirements);
 
         // Start Loading the System Input
-        for (int OAIndex = 1; OAIndex <= state.dataSize->NumOARequirements; ++OAIndex) {
+        for (int OAIndex = 1; OAIndex <= numOARequirements; ++OAIndex) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -2299,15 +2299,16 @@ void GetOARequirements(EnergyPlusData &state)
                 ++oaIndex;
                 auto const &objectFields = instance.value();
                 auto &thisOAReq = state.dataSize->OARequirements(oaIndex);
-                thisOAReq.Name = UtilityRoutines::MakeUPPERCase(instance.key());
                 ip->markObjectAsUsed(cCurrentModuleObject2, instance.key());
+                std::string thisOAReqName = UtilityRoutines::MakeUPPERCase(instance.key());
 
-                if (UtilityRoutines::FindItemInList(thisOAReq.Name, state.dataSize->OARequirements) > 0) {
+                if (UtilityRoutines::FindItemInList(thisOAReqName, state.dataSize->OARequirements) > 0) {
                     ShowSevereError(state,
-                                    std::string(RoutineName) + cCurrentModuleObject2 + "=\"" + thisOAReq.Name +
-                                        "\":  is a duplicate DesignSpecification:OutdoorAir name.");
+                                    std::string(RoutineName) + cCurrentModuleObject2 + "=\"" + thisOAReqName +
+                                        "\" is a duplicate DesignSpecification:OutdoorAir name.");
                     ErrorsFound = true;
                 }
+                thisOAReq.Name = thisOAReqName;
 
                 // List of spaces and DSOA names
                 thisOAReq.numDSOA = 0;
@@ -2316,33 +2317,18 @@ void GetOARequirements(EnergyPlusData &state)
                 if (extensibles != objectFields.end()) {
                     auto extensiblesArray = extensibles.value();
                     for (auto extensibleInstance : extensiblesArray) {
+                        // Zones and spaces are not created yet, validate space names in ZoneEquipmentManager::SetupZoneSizingArrays
                         std::string thisSpaceName = ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "space_name");
-                        int thisSpaceNum = UtilityRoutines::FindItemInList(thisSpaceName, state.dataHeatBal->space);
-                        if (thisSpaceNum > 0) {
-                            thisOAReq.dsoaSpaceIndexes.emplace_back(thisSpaceNum);
-                        } else {
-                            ShowSevereError(state, std::string(RoutineName) + cCurrentModuleObject2 + "=" + thisOAReq.Name);
-                            ShowContinueError(state, "Space Name =" + thisSpaceName + "not found.");
-                            ErrorsFound = true;
-                        }
-                        // Check for duplicate spaces
-                        for (int loop = 1; loop <= int(thisOAReq.dsoaSpaceIndexes.size()) - 1; ++loop) {
-                            if (thisSpaceNum == thisOAReq.dsoaSpaceIndexes(loop)) {
-                                ShowSevereError(state,
-                                                std::string(RoutineName) + cCurrentModuleObject2 + "=\"" + thisOAReq.Name + "\":  Space Name " +
-                                                    thisSpaceName + " appears more than once in list.");
-                                ErrorsFound = true;
-                            }
-                        }
+                        thisOAReq.dsoaSpaceNames.emplace_back(thisSpaceName);
                         std::string thisDsoaName =
                             ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "space_design_specification_outdoor_air_object_name");
-                        int thisDsoaNum = UtilityRoutines::FindItemInList(thisSpaceName, state.dataHeatBal->space);
+                        int thisDsoaNum = UtilityRoutines::FindItemInList(thisDsoaName, state.dataSize->OARequirements, oaIndex);
                         if (thisDsoaNum > 0) {
-                            thisOAReq.dsoaSpaceIndexes.emplace_back(thisDsoaNum);
+                            thisOAReq.dsoaIndexes.emplace_back(thisDsoaNum);
                             ++thisOAReq.numDSOA;
                         } else {
                             ShowSevereError(state, std::string(RoutineName) + cCurrentModuleObject2 + "=" + thisOAReq.Name);
-                            ShowContinueError(state, "DesignSpecification:OutdoorAir =" + thisDsoaName + "not found.");
+                            ShowContinueError(state, "DesignSpecification:OutdoorAir=" + thisDsoaName + " not found.");
                             ErrorsFound = true;
                         }
                     }

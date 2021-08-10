@@ -837,9 +837,6 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
             ErrorsFound = true;
         }
     }
-    if (ErrorsFound) {
-        ShowFatalError(state, "SetUpZoneSizingArrays: Errors found in Sizing:Zone input");
-    }
 
     // Put Auto Sizing of Sizing:Zone inputs here!
     AutoCalcDOASControlStrategy(state);
@@ -1324,14 +1321,32 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
         ZoneIndex = state.dataSize->FinalZoneSizing(CtrlZoneNum).ActualZoneNum;
         int DSOAPtr = state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneDesignSpecOAIndex; // index to DesignSpecification:OutdoorAir object
         if (DSOAPtr > 0) {
-            // If this is a DesignSpecification:OutdoorAir:SpaceList check to make sure spaces belong to this zone
-            if (state.dataSize->OARequirements(DSOAPtr).numDSOA > 1) {
-                for (int spaceNum : state.dataSize->OARequirements(DSOAPtr).dsoaSpaceIndexes) {
-                    if (state.dataHeatBal->space(spaceNum).zoneNum != state.dataSize->FinalZoneSizing(CtrlZoneNum).ActualZoneNum) {
-                        ShowSevereError(
-                            state, "SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList=" + state.dataSize->OARequirements(DSOAPtr).Name);
-                        ShowContinueError(state, "is invalid for Sizing:Zone for Zone=" + state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName);
-                        ShowFatalError(state, "All spaces in the list must be part of this zone.");
+            auto &thisOAReq = state.dataSize->OARequirements(DSOAPtr);
+            // If this is a DesignSpecification:OutdoorAir:SpaceList check to make sure spaces are valid and belong to this zone
+            if (thisOAReq.numDSOA > 1) {
+                for (int spaceCounter = 1; spaceCounter <= thisOAReq.numDSOA; ++spaceCounter) {
+                    std::string thisSpaceName = thisOAReq.dsoaSpaceNames(spaceCounter);
+                    int thisSpaceNum = UtilityRoutines::FindItemInList(thisSpaceName, state.dataHeatBal->space);
+                    if (thisSpaceNum > 0) {
+                        thisOAReq.dsoaSpaceIndexes.emplace_back(thisSpaceNum);
+                        if (state.dataHeatBal->space(thisSpaceNum).zoneNum != state.dataSize->FinalZoneSizing(CtrlZoneNum).ActualZoneNum) {
+                            ShowSevereError(state, "SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList=" + thisOAReq.Name);
+                            ShowContinueError(state, "is invalid for Sizing:Zone=" + state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName);
+                            ShowContinueError(state, "All spaces in the list must be part of this zone.");
+                            ErrorsFound = true;
+                        }
+                    } else {
+                        ShowSevereError(state, "SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList=" + thisOAReq.Name);
+                        ShowContinueError(state, "Space Name=" + thisSpaceName + " not found.");
+                        ErrorsFound = true;
+                    }
+                    // Check for duplicate spaces
+                    for (int loop = 1; loop <= int(thisOAReq.dsoaSpaceIndexes.size()) - 1; ++loop) {
+                        if (thisSpaceNum == thisOAReq.dsoaSpaceIndexes(loop)) {
+                            ShowSevereError(state, "SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList=" + thisOAReq.Name);
+                            ShowContinueError(state, "Space Name=" + thisSpaceName + " appears more than once in list.");
+                            ErrorsFound = true;
+                        }
                     }
                 }
             }
@@ -1341,6 +1356,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
             state.dataSize->FinalZoneSizing(CtrlZoneNum).DesOAFlowPerArea =
                 state.dataSize->OARequirements(DSOAPtr).desFlowPerZoneArea(state, ZoneIndex);
         }
+
         for (PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
             if (state.dataHeatBal->People(PeopleNum).ZonePtr == state.dataSize->FinalZoneSizing(CtrlZoneNum).ActualZoneNum) {
                 TotPeopleInZone += (state.dataHeatBal->People(PeopleNum).NumberOfPeople *
@@ -1470,6 +1486,9 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
                   state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName,
                   state.dataSize->FinalZoneSizing(CtrlZoneNum).CoolSizingFactor);
         }
+    }
+    if (ErrorsFound) {
+        ShowFatalError(state, "SetUpZoneSizingArrays: Errors found in Sizing:Zone input");
     }
 }
 
