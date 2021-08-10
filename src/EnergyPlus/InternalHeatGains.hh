@@ -97,7 +97,8 @@ namespace InternalHeatGains {
     void SumInternalConvectionGainsByTypes(EnergyPlusData &state,
                                            int const ZoneNum,              // zone index pointer for which zone to sum gains for
                                            const Array1D_int &GainTypeARR, // variable length 1-d array of integer valued gain types
-                                           Real64 &SumConvGainRate);
+                                           Real64 &SumConvGainRate,
+                                           int const spaceIndex = 0); // space index pointer, sum gains only for this space
 
     int GetInternalGainDeviceIndex(EnergyPlusData &state,
                                    int const SpaceNum,                   // space index pointer for which space to sum gains for
@@ -146,7 +147,8 @@ namespace InternalHeatGains {
     void SumInternalRadiationGainsByTypes(EnergyPlusData &state,
                                           int const ZoneNum,              // zone index pointer for which zone to sum gains for
                                           const Array1D_int &GainTypeARR, // variable length 1-d array of integer valued gain types
-                                          Real64 &SumRadiationGainRate);
+                                          Real64 &SumRadiationGainRate,
+                                          int const spaceIndex = 0); // space index pointer, sum gains only for this space
 
     void SumAllInternalLatentGains(EnergyPlusData &state,
                                    int const ZoneNum, // zone index pointer for which zone to sum gains for
@@ -160,7 +162,8 @@ namespace InternalHeatGains {
     void SumInternalLatentGainsByTypes(EnergyPlusData &state,
                                        int const ZoneNum,              // zone index pointer for which zone to sum gains for
                                        const Array1D_int &GainTypeARR, // variable length 1-d array of integer valued gain types
-                                       Real64 &SumLatentGainRate);
+                                       Real64 &SumLatentGainRate,
+                                       int const spaceIndex = 0); // space index pointer, sum gains only for this space
 
     void SumAllReturnAirLatentGains(EnergyPlusData &state,
                                     int const ZoneNum, // zone index pointer for which zone to sum gains for

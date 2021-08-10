@@ -8152,15 +8152,17 @@ namespace InternalHeatGains {
             state.dataHeatBal->spaceRpt(spaceNum).TotVisHeatGain = state.dataHeatBal->spaceRpt(spaceNum).LtsVisGain;
             state.dataHeatBal->spaceRpt(spaceNum).TotVisHeatGainRate = state.dataHeatBal->spaceRpt(spaceNum).LtsVisGainRate;
 
-            SumInternalRadiationGainsByTypes(state, spaceNum, TradIntGainTypes, state.dataHeatBal->spaceRpt(spaceNum).TotRadiantGainRate);
+            int zoneNum = state.dataHeatBal->space(spaceNum).zoneNum;
+            SumInternalRadiationGainsByTypes(state, zoneNum, TradIntGainTypes, state.dataHeatBal->spaceRpt(spaceNum).TotRadiantGainRate, spaceNum);
             state.dataHeatBal->spaceRpt(spaceNum).TotRadiantGain =
                 state.dataHeatBal->spaceRpt(spaceNum).TotRadiantGainRate * state.dataGlobal->TimeStepZoneSec;
 
-            SumInternalConvectionGainsByTypes(state, spaceNum, TradIntGainTypes, state.dataHeatBal->spaceRpt(spaceNum).TotConvectiveGainRate);
+            SumInternalConvectionGainsByTypes(
+                state, zoneNum, TradIntGainTypes, state.dataHeatBal->spaceRpt(spaceNum).TotConvectiveGainRate, spaceNum);
             state.dataHeatBal->spaceRpt(spaceNum).TotConvectiveGain =
                 state.dataHeatBal->spaceRpt(spaceNum).TotConvectiveGainRate * state.dataGlobal->TimeStepZoneSec;
 
-            SumInternalLatentGainsByTypes(state, spaceNum, TradIntGainTypes, state.dataHeatBal->spaceRpt(spaceNum).TotLatentGainRate);
+            SumInternalLatentGainsByTypes(state, zoneNum, TradIntGainTypes, state.dataHeatBal->spaceRpt(spaceNum).TotLatentGainRate, spaceNum);
             state.dataHeatBal->spaceRpt(spaceNum).TotLatentGain =
                 state.dataHeatBal->spaceRpt(spaceNum).TotLatentGainRate * state.dataGlobal->TimeStepZoneSec;
 
@@ -8404,7 +8406,8 @@ namespace InternalHeatGains {
     void SumInternalConvectionGainsByTypes(EnergyPlusData &state,
                                            int const ZoneNum,              // zone index pointer for which zone to sum gains for
                                            const Array1D_int &GainTypeARR, // variable length 1-d array of integer valued gain types
-                                           Real64 &SumConvGainRate)
+                                           Real64 &SumConvGainRate,
+                                           int const spaceIndex) // space index pointer, sum gains only for this space
     {
 
         // SUBROUTINE INFORMATION:
@@ -8417,16 +8420,27 @@ namespace InternalHeatGains {
         int NumberOfTypes = size(GainTypeARR);
         Real64 tmpSumConvGainRate = 0.0;
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-            if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
-                continue;
+        // TODO MJW: This could be refactored to avoid duplicate code, but for now . . . .
+        if (spaceIndex > 0) {
+            if (state.dataHeatBal->spaceIntGainDevices(spaceIndex).numberOfDevices == 0) {
+                for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceIndex).numberOfDevices; ++DeviceNum) {
+                    for (int TypeNum = 1; TypeNum <= NumberOfTypes; ++TypeNum) {
+                        if (state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).CompTypeOfNum == GainTypeARR(TypeNum)) {
+                            tmpSumConvGainRate += state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).ConvectGainRate;
+                        }
+                    }
+                }
             }
-
-            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
-                for (int TypeNum = 1; TypeNum <= NumberOfTypes; ++TypeNum) {
-
-                    if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompTypeOfNum == GainTypeARR(TypeNum)) {
-                        tmpSumConvGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ConvectGainRate;
+        } else {
+            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
+                    continue;
+                }
+                for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
+                    for (int TypeNum = 1; TypeNum <= NumberOfTypes; ++TypeNum) {
+                        if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompTypeOfNum == GainTypeARR(TypeNum)) {
+                            tmpSumConvGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ConvectGainRate;
+                        }
                     }
                 }
             }
@@ -8530,7 +8544,8 @@ namespace InternalHeatGains {
     void SumInternalRadiationGainsByTypes(EnergyPlusData &state,
                                           int const ZoneNum,              // zone index pointer for which zone to sum gains for
                                           const Array1D_int &GainTypeARR, // variable length 1-d array of integer valued gain types
-                                          Real64 &SumRadiationGainRate)
+                                          Real64 &SumRadiationGainRate,
+                                          int const spaceIndex) // space index pointer, sum gains only for this space
     {
 
         // SUBROUTINE INFORMATION:
@@ -8543,15 +8558,27 @@ namespace InternalHeatGains {
         int NumberOfTypes = size(GainTypeARR);
         Real64 tmpSumRadiationGainRate = 0.0;
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-            if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
-                continue;
+        // TODO MJW: This could be refactored to avoid duplicate code, but for now . . . .
+        if (spaceIndex > 0) {
+            if (state.dataHeatBal->spaceIntGainDevices(spaceIndex).numberOfDevices == 0) {
+                for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceIndex).numberOfDevices; ++DeviceNum) {
+                    for (int TypeNum = 1; TypeNum <= NumberOfTypes; ++TypeNum) {
+                        if (state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).CompTypeOfNum == GainTypeARR(TypeNum)) {
+                            tmpSumRadiationGainRate += state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).RadiantGainRate;
+                        }
+                    }
+                }
             }
-
-            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
-                for (int TypeNum = 1; TypeNum <= NumberOfTypes; ++TypeNum) {
-                    if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompTypeOfNum == GainTypeARR(TypeNum)) {
-                        tmpSumRadiationGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).RadiantGainRate;
+        } else {
+            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
+                    continue;
+                }
+                for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
+                    for (int TypeNum = 1; TypeNum <= NumberOfTypes; ++TypeNum) {
+                        if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompTypeOfNum == GainTypeARR(TypeNum)) {
+                            tmpSumRadiationGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).RadiantGainRate;
+                        }
                     }
                 }
             }
@@ -8612,9 +8639,9 @@ namespace InternalHeatGains {
     void SumInternalLatentGainsByTypes(EnergyPlusData &state,
                                        int const ZoneNum,              // zone index pointer for which zone to sum gains for
                                        const Array1D_int &GainTypeARR, // variable length 1-d array of integer valued gain types
-                                       Real64 &SumLatentGainRate)
+                                       Real64 &SumLatentGainRate,
+                                       int const spaceIndex) // space index pointer, sum gains only for this space
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Dec. 2011
@@ -8625,16 +8652,27 @@ namespace InternalHeatGains {
         int NumberOfTypes = size(GainTypeARR);
         Real64 tmpSumLatentGainRate = 0.0;
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-            if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
-                continue;
+        // TODO MJW: This could be refactored to avoid duplicate code, but for now . . . .
+        if (spaceIndex > 0) {
+            if (state.dataHeatBal->spaceIntGainDevices(spaceIndex).numberOfDevices == 0) {
+                for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceIndex).numberOfDevices; ++DeviceNum) {
+                    for (int TypeNum = 1; TypeNum <= NumberOfTypes; ++TypeNum) {
+                        if (state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).CompTypeOfNum == GainTypeARR(TypeNum)) {
+                            tmpSumLatentGainRate += state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).LatentGainRate;
+                        }
+                    }
+                }
             }
-
-            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
-                for (int TypeNum = 1; TypeNum <= NumberOfTypes; ++TypeNum) {
-
-                    if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompTypeOfNum == GainTypeARR(TypeNum)) {
-                        tmpSumLatentGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).LatentGainRate;
+        } else {
+            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
+                    continue;
+                }
+                for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
+                    for (int TypeNum = 1; TypeNum <= NumberOfTypes; ++TypeNum) {
+                        if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompTypeOfNum == GainTypeARR(TypeNum)) {
+                            tmpSumLatentGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).LatentGainRate;
+                        }
                     }
                 }
             }
