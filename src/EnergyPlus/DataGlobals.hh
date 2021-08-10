@@ -169,6 +169,7 @@ struct DataGlobal : BaseGlobalStruct
     int FDsimDay = 0;
     int FDnumIterYears = 0;
     bool printConsoleOutput = true;
+    bool installRootOverride = false;
 
     void clear_state() override
     {
@@ -275,6 +276,7 @@ struct DataGlobal : BaseGlobalStruct
         this->FDsimDay = 0;
         this->FDnumIterYears = 0;
         this->printConsoleOutput = true;
+        this->installRootOverride = false;
     }
 };
 
