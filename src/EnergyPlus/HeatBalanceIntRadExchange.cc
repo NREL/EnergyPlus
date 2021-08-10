@@ -415,12 +415,16 @@ namespace HeatBalanceIntRadExchange {
                     }
                 }
             }
+        }
 
-            // Automatic Surface Multipliers: Update values of surfaces not simulated
-            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
+        // Automatic Surface Multipliers: Update values of surfaces not simulated
+        if (state.dataSurface->UseRepresentativeSurfaceCalculations) {
+            for (auto SurfNum : state.dataSurface->AllHTSurfaceList) {
                 auto &RepSurfNum = state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum;
-                state.dataSurface->SurfWinIRfromParentZone(SurfNum) = state.dataSurface->SurfWinIRfromParentZone(RepSurfNum);
-                NetLWRadToSurf(SurfNum) = NetLWRadToSurf(RepSurfNum);
+                if (SurfNum != RepSurfNum) {
+                    state.dataSurface->SurfWinIRfromParentZone(SurfNum) = state.dataSurface->SurfWinIRfromParentZone(RepSurfNum);
+                    NetLWRadToSurf(SurfNum) = NetLWRadToSurf(RepSurfNum);
+                }
             }
         }
 
