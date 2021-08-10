@@ -79,7 +79,10 @@ state = api.state_manager.new_state()
 api.runtime.callback_begin_new_environment(state, environment_handler)
 api.runtime.callback_progress(state, progress_handler)
 api.functional.callback_error(state, error_handler)
-api.runtime.run_energyplus(state, sys.argv[1:])
+v = api.runtime.run_energyplus(state, sys.argv[1:])
+if v != 0:
+    print("EnergyPlus Failed!")
+    sys.exit(1)
 
 print("MUTING CONSOLE OUTPUT")
 state2 = api.state_manager.new_state()
@@ -87,5 +90,9 @@ api.runtime.clear_callbacks()
 api.functional.clear_callbacks()
 api.runtime.set_console_output_status(state2, False)
 print("RUNNING MUTED ENERGYPLUS...")
-api.runtime.run_energyplus(state2, sys.argv[1:])
+v = api.runtime.run_energyplus(state2, sys.argv[1:])
+if v != 0:
+    print("EnergyPlus Failed!")
+    sys.exit(1)
+
 print("MUTED E+ RUN DONE")
