@@ -5992,8 +5992,12 @@ void GetATMixers(EnergyPlusData &state)
     state.dataSingleDuct->NumATMixers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     state.dataSingleDuct->SysATMixer.allocate(state.dataSingleDuct->NumATMixers);
 
-    // Need air distribution units first
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state);
+    // make sure the input data is read in only once
+    if (state.dataZoneAirLoopEquipmentManager->GetAirDistUnitsFlag) {
+        // Need air distribution units first
+        ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state);
+        state.dataZoneAirLoopEquipmentManager->GetAirDistUnitsFlag = false;
+    }
 
     for (ATMixerNum = 1; ATMixerNum <= state.dataSingleDuct->NumATMixers; ++ATMixerNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
