@@ -251,7 +251,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     EXPECT_DOUBLE_EQ(HSPF, 0.0);
 }
 
-TEST_F(EnergyPlusFixture, ChillerIPLVTest)
+TEST_F(EnergyPlusFixture, ChillerIPLVTestAirCooled)
 {
 
     using DataPlant::TypeOf_Chiller_ElectricEIR;
@@ -339,14 +339,26 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
                     Optional<const Real64>());
 
     EXPECT_DOUBLE_EQ(round(IPLV * 100) / 100, 3.87); // 13.20 IPLV
+}
+
+TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooled)
+{
+
+    using DataPlant::TypeOf_Chiller_ElectricEIR;
+    using StandardRatings::CalcChillerIPLV;
 
     // Setup a water-cooled Chiller:Electric:EIR chiller with reference conditions being at non-rated conditions
     state->dataChillerElectricEIR->ElectricEIRChiller.allocate(1);
     state->dataChillerElectricEIR->ElectricEIRChiller(1).Name = "ElectricEIRChiller McQuay WSC 471kW/5.89COP/Vanes";
     state->dataChillerElectricEIR->ElectricEIRChiller(1).RefCap = 471200; // W
     state->dataChillerElectricEIR->ElectricEIRChiller(1).RefCOP = 5.89;   // W/W
-    state->dataChillerElectricEIR->ElectricEIRChiller(1).CondenserType = DataPlant::CondenserType::AirCooled;
+    state->dataChillerElectricEIR->ElectricEIRChiller(1).CondenserType = DataPlant::CondenserType::WaterCooled;
     state->dataChillerElectricEIR->ElectricEIRChiller(1).MinUnloadRat = 0.10;
+    state->dataChillerElectricEIR->ElectricEIRChiller(1).MaxPartLoadRat = 1.15;
+
+    int CurveNum;
+    state->dataCurveManager->NumCurves = 3;
+    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
 
     state->dataCurveManager->NumCurves = 3;
     state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
@@ -403,6 +415,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
     state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 1.15;
     state->dataChillerElectricEIR->ElectricEIRChiller(1).ChillerEIRFPLRIndex = 3;
 
+    Real64 IPLV;
     CalcChillerIPLV(*state,
                     state->dataChillerElectricEIR->ElectricEIRChiller(1).Name,
                     TypeOf_Chiller_ElectricEIR,
@@ -418,7 +431,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
                     ObjexxFCL::Optional_int_const(),
                     Optional<const Real64>());
 
-    EXPECT_DOUBLE_EQ(round(IPLV * 100) / 100, 5.54); // 18.56 IPLV
+    EXPECT_DOUBLE_EQ(round(IPLV * 100) / 100, 5.44); // 18.56 IPLV
 }
 
 TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
