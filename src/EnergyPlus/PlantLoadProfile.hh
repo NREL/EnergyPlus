@@ -88,6 +88,8 @@ namespace PlantLoadProfile {
         int FlowRateFracSchedule; // Pointer to schedule object
         Real64 VolFlowRate;       // Volumetric flow rate (m3/s)
         Real64 MassFlowRate;      // Mass flow rate (kg/s)
+        Real64 DegOfSubcooling;   // Degree of subcooling in steam outlet
+        Real64 LoopSubcoolReturn; // Loop subcooling for steam return
         bool EMSOverrideMassFlow;
         Real64 EMSMassFlowValue;
         // Report variables
@@ -135,13 +137,15 @@ struct PlantLoadProfileData : BaseGlobalStruct
 {
 
     bool GetPlantLoadProfileInputFlag = true;
-    int NumOfPlantProfile = 0;
+    int NumOfPlantProfileWater = 0;
+    int NumOfPlantProfileSteam = 0;
     Array1D<PlantLoadProfile::PlantProfileData> PlantProfile;
 
     void clear_state() override
     {
         this->GetPlantLoadProfileInputFlag = true;
-        this->NumOfPlantProfile = 0;
+        this->NumOfPlantProfileWater = 0;
+        this->NumOfPlantProfileSteam = 0;
         this->PlantProfile.deallocate();
     }
 };

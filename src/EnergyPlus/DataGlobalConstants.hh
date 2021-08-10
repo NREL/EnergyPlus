@@ -125,7 +125,8 @@ namespace DataGlobalConstants {
         WellWater,
         Condensate,
         OtherFuel1,
-        OtherFuel2
+        OtherFuel2,
+        DistrictHeatingSteam
     };
 
     enum class CallIndicator
@@ -247,7 +248,8 @@ struct DataGlobalConstantsData : BaseGlobalStruct
                                                                        DataGlobalConstants::ResourceType::WellWater,
                                                                        DataGlobalConstants::ResourceType::Condensate,
                                                                        DataGlobalConstants::ResourceType::OtherFuel1,
-                                                                       DataGlobalConstants::ResourceType::OtherFuel2};
+                                                                       DataGlobalConstants::ResourceType::OtherFuel2,
+                                                                       DataGlobalConstants::ResourceType::DistrictHeatingSteam};
 
     void clear_state() override
     {

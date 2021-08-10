@@ -263,6 +263,8 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
                     sResourceType = "DistrictCooling";
                 } else if (resourceType == "DISTRICTHEATING") {
                     sResourceType = "DistrictHeating";
+                } else if (resourceType == "DISTRICTHEATINGSTEAM") {
+                    sResourceType = "DistrictHeatingSteam";
                 } else if (resourceType == "ELECTRICITYPRODUCEDONSITE") {
                     sResourceType = "ElectricityProduced";
                 } else if (resourceType == "SOLARWATERHEATING") {

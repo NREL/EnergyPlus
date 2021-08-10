@@ -1689,6 +1689,9 @@ namespace OutputProcessor {
             } else if (meterType == "DISTRICTHEATING") {
                 OutResourceType = "DistrictHeating";
 
+            } else if (meterType == "DISTRICTHEATINGSTEAM") {
+                OutResourceType = "DistrictHeatingSteam";
+
             } else if (meterType == "ELECTRICITYPRODUCED") {
                 OutResourceType = "ElectricityProduced";
 
@@ -8248,11 +8251,12 @@ void InitPollutionMeterReporting(EnergyPlusData &state, std::string const &Repor
     using namespace OutputProcessor;
     // SUBROUTINE PARAMETER DEFINITIONS:
     //             Now for the Pollution Meters
-    static Array1D_string const PollutionMeters({1, 29},
+    static Array1D_string const PollutionMeters({1, 30},
                                                 {"Electricity:Facility",
                                                  "Diesel:Facility",
                                                  "DistrictCooling:Facility",
                                                  "DistrictHeating:Facility",
+                                                 "DistrictHeatingSteam:Facility",
                                                  "NaturalGas:Facility",
                                                  "GASOLINE:Facility",
                                                  "COAL:Facility",

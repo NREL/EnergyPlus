@@ -515,6 +515,8 @@ namespace UtilityRoutines {
                     FuelTypeOutput = "DistrictHeating";
                 } else if (SELECT_CASE_var == "DISTRICTCOOLING") {
                     FuelTypeOutput = "DistrictCooling";
+                } else if (SELECT_CASE_var == "DISTRICTHEATINGSTEAM") {
+                    FuelTypeOutput = "DistrictHeatingSteam";
                 } else {
                     FuelTypeErrorsFound = true;
                 }

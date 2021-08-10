@@ -228,6 +228,7 @@ void GetPollutionFactorInput(EnergyPlusData &state)
     }
 
     Pollution.PurchHeatEffic = 0.3;
+    Pollution.PurchHeatSteamEffic = 0.74;
     Pollution.PurchCoolCOP = 3.0;
     Pollution.SteamConvEffic = 0.25;
     Pollution.CarbonEquivN2O = 0.0;
@@ -2081,6 +2082,7 @@ void GetPollutionFactorInput(EnergyPlusData &state)
     FuelType.DieselFacilityIndex = GetMeterIndex(state, "Diesel:Facility");
     FuelType.PurchCoolFacilityIndex = GetMeterIndex(state, "DistrictCooling:Facility");
     FuelType.PurchHeatFacilityIndex = GetMeterIndex(state, "DistrictHeating:Facility");
+    FuelType.PurchHeatSteamFacilityIndex = GetMeterIndex(state, "DistrictHeatingSteam:Facility");
     FuelType.NatGasFacilityIndex = GetMeterIndex(state, "NaturalGas:Facility");
     FuelType.GasolineFacilityIndex = GetMeterIndex(state, "Gasoline:Facility");
     FuelType.CoalFacilityIndex = GetMeterIndex(state, "Coal:Facility");
@@ -6202,6 +6204,9 @@ void ReadEnergyMeters(EnergyPlusData &state)
     FuelType.PurchHeatFacility =
         GetInstantMeterValue(state, FuelType.PurchHeatFacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
         GetInstantMeterValue(state, FuelType.PurchHeatFacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
+    FuelType.PurchHeatSteamFacility =
+        GetInstantMeterValue(state, FuelType.PurchHeatSteamFacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
+        GetInstantMeterValue(state, FuelType.PurchHeatSteamFacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
     FuelType.NatGasFacility =
         GetInstantMeterValue(state, FuelType.NatGasFacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
         GetInstantMeterValue(state, FuelType.NatGasFacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
@@ -6495,6 +6500,20 @@ void GetFuelFactorInfo(EnergyPlusData &state,
                 fuelSourceFactor = 1.084 / Pollution.PurchHeatEffic;
             }
 
+        } else if (SELECT_CASE_var == "DistrictHeatingSteam") {
+            if (Pollution.NatGasCoef.FuelFactorUsed) {
+                fuelFactorUsed = true;
+                fuelSourceFactor = Pollution.NatGasCoef.Source / Pollution.PurchHeatEffic;
+                if (Pollution.NatGasCoef.SourceSched == 0) {
+                    fuelFactorScheduleUsed = false;
+                } else {
+                    fuelFactorScheduleUsed = true;
+                    ffScheduleIndex = Pollution.NatGasCoef.SourceSched;
+                }
+            } else {
+                fuelSourceFactor = 1.35 / Pollution.PurchHeatEffic;
+            }
+
         } else if (SELECT_CASE_var == "DistrictCooling") {
             if (Pollution.ElecCoef.FuelFactorUsed) {
                 fuelFactorUsed = true;
@@ -6518,9 +6537,10 @@ void GetFuelFactorInfo(EnergyPlusData &state,
 }
 
 void GetEnvironmentalImpactFactorInfo(EnergyPlusData &state,
-                                      Real64 &efficiencyDistrictHeating, // if entered, the efficiency of District Heating
-                                      Real64 &efficiencyDistrictCooling, // if entered, the efficiency of District Cooling
-                                      Real64 &sourceFactorSteam          // if entered, the source factor for Steam
+                                      Real64 &efficiencyDistrictHeating,      // if entered, the efficiency of District Heating
+                                      Real64 &efficiencyDistrictCooling,      // if entered, the efficiency of District Cooling
+                                      Real64 &efficiencyDistrictHeatingSteam, // if entered, the efficiency of District Heating Steam
+                                      Real64 &sourceFactorSteam               // if entered, the source factor for Steam
 )
 {
 
@@ -6555,6 +6575,7 @@ void GetEnvironmentalImpactFactorInfo(EnergyPlusData &state,
     if (state.dataPollutionModule->NumEnvImpactFactors > 0) {
         efficiencyDistrictHeating = state.dataPollutionModule->Pollution.PurchHeatEffic;
         efficiencyDistrictCooling = state.dataPollutionModule->Pollution.PurchCoolCOP;
+        efficiencyDistrictHeatingSteam = state.dataPollutionModule->Pollution.PurchHeatSteamEffic;
         sourceFactorSteam = state.dataPollutionModule->Pollution.SteamConvEffic;
     }
 }
