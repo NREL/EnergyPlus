@@ -62,7 +62,6 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
-#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
@@ -523,9 +522,6 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    // allocate surface level adj ratio data member
-    state->dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(7, 1.0);
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(7, 1.0);
     // OutputProcessor::TimeValue.allocate(2); //
     SimulationManager::ManageSimulation(*state);
     // re-set the hour of the day to mid-day
@@ -881,9 +877,6 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    // allocate surface level adj ratio data member
-    state->dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(7, 1.0);
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(7, 1.0);
     // OutputProcessor::TimeValue.allocate(2);
     SimulationManager::ManageSimulation(*state);
     // re-set the hour of the day to noon
@@ -1235,9 +1228,6 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapOutdoorVentedTest)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    // allocate surface level adj ratio data member
-    state->dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(7, 1.0);
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(7, 1.0);
     SimulationManager::ManageSimulation(*state);
 
     int EQLNum(1);
@@ -1562,9 +1552,6 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapIndoorVentedTest)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    // allocate surface level adj ratio data member
-    state->dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(7, 1.0);
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(7, 1.0);
     SimulationManager::ManageSimulation(*state);
 
     int EQLNum(1);
@@ -1953,9 +1940,6 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    // allocate surface level adj ratio data member
-    state->dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(7, 1.0);
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(7, 1.0);
     SimulationManager::ManageSimulation(*state);
 
     int EQLNum(0);

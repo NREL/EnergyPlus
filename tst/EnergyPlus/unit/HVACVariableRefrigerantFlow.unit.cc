@@ -68,7 +68,6 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
-#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -10805,9 +10804,6 @@ TEST_F(EnergyPlusFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    // allocate surface level adj ratio data member
-    state->dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(6, 1.0);
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(6, 1.0);
     SimulationManager::ManageSimulation(*state);
 
     int VRFCond(1);

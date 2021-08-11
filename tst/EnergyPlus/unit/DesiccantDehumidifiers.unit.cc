@@ -55,7 +55,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
@@ -4003,9 +4002,6 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest)
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataGlobal->ZoneSizingCalc = true;
     state->dataGlobal->SysSizingCalc = true;
-    // allocate surface level adj ratio data member
-    state->dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(6, 1.0);
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(6, 1.0);
     SizingManager::ManageSizing(*state);
 
     state->dataSize->CurSysNum = 1;
@@ -5423,9 +5419,6 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataGlobal->ZoneSizingCalc = true;
     state->dataGlobal->SysSizingCalc = true;
-    // allocate surface level adj ratio data member
-    state->dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(6, 1.0);
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(6, 1.0);
     SizingManager::ManageSizing(*state);
 
     state->dataSize->CurSysNum = 1;
@@ -6668,9 +6661,6 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataGlobal->ZoneSizingCalc = true;
     state->dataGlobal->SysSizingCalc = true;
-    // allocate surface level adj ratio data member
-    state->dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(6, 1.0);
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(6, 1.0);
     SizingManager::ManageSizing(*state);
 
     state->dataSize->CurSysNum = 1;

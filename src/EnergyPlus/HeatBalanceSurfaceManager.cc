@@ -7359,13 +7359,12 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
 
     } // ...end of main inside heat balance DO loop (ends when Converged)
 
-    Real64 HConvIn;
     // Set various surface output variables and other record keeping - after iterations are complete
     for (int surfNum : HTSurfs) {
         if (Surface(surfNum).Class == SurfaceClass::TDD_Dome) continue; // Skip TDD:DOME objects.  Inside temp is handled by TDD:DIFFUSER.
 
         // Inside Face Convection - sign convention is positive means energy going into inside face from the air.
-        HConvIn = state.dataHeatBalSurf->SurfHConvInt(surfNum) * state.dataHeatBal->SurfWinCoeffAdjRatioIn(surfNum);
+        Real64 HConvIn = state.dataHeatBalSurf->SurfHConvInt(surfNum) * state.dataHeatBalSurf->SurfWinCoeffAdjRatioIn(surfNum);
         auto const HConvInTemp_fac(-HConvIn * (state.dataHeatBalSurf->SurfTempIn(surfNum) - state.dataHeatBalSurfMgr->RefAirTemp(surfNum)));
         state.dataHeatBalSurf->QdotConvInRep(surfNum) = Surface(surfNum).Area * HConvInTemp_fac;
         state.dataHeatBalSurf->QdotConvInRepPerArea(surfNum) = HConvInTemp_fac;
@@ -8090,14 +8089,13 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
 
     } // ...end of main inside heat balance iteration loop (ends when Converged)
 
-    Real64 HConvIn;
     // Set various surface output variables and other record keeping - after iterations are complete - all HT surfaces
     for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
         int const firstSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceFirst;
         int const lastSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceLast;
         for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
             // Inside Face Convection - sign convention is positive means energy going into inside face from the air.
-            HConvIn = state.dataHeatBalSurf->SurfHConvInt(surfNum) * state.dataHeatBal->SurfWinCoeffAdjRatioIn(surfNum);
+            Real64 HConvIn = state.dataHeatBalSurf->SurfHConvInt(surfNum) * state.dataHeatBalSurf->SurfWinCoeffAdjRatioIn(surfNum);
             auto const HConvInTemp_fac(-HConvIn * (state.dataHeatBalSurf->SurfTempIn(surfNum) - state.dataHeatBalSurfMgr->RefAirTemp(surfNum)));
             state.dataHeatBalSurf->QdotConvInRep(surfNum) = Surface(surfNum).Area * HConvInTemp_fac;
             state.dataHeatBalSurf->QdotConvInRepPerArea(surfNum) = HConvInTemp_fac;

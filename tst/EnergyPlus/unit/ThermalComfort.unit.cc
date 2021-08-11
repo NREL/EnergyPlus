@@ -705,9 +705,6 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
     // OutputProcessor::TimeValue.allocate(2);
     state->dataGlobal->DDOnlySimulation = true;
 
-    // allocate surface level adj ratio data member
-    state->dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(12, 1.0);
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(12, 1.0);
     ManageSimulation(*state);
 
     //	compare_err_stream( "" );
@@ -1567,9 +1564,6 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger_Correct_TimeSt
 
     state->dataGlobal->DDOnlySimulation = true;
 
-    // allocate surface level adj ratio data member
-    state->dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(12, 1.0);
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(12, 1.0);
     ManageSimulation(*state);
 
     CalcThermalComfortFanger(*state);

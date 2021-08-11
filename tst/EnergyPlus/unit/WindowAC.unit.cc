@@ -51,7 +51,6 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
@@ -449,9 +448,6 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
     state->dataGlobal->ZoneSizingCalc = true;
     EnergyPlus::createFacilityElectricPowerServiceObject(*state);
 
-    // allocate surface level adj ratio data member
-    state->dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(1, 1.0);
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(1, 1.0);
     SizingManager::ManageSizing(*state);
 
     SimulationManager::SetupSimulation(*state, errorsFound);

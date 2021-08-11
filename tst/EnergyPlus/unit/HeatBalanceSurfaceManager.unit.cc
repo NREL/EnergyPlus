@@ -78,7 +78,6 @@
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/ThermalComfort.hh>
-#include <EnergyPlus/WindowManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -751,7 +750,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataHeatBalSurf->SurfTempInTmp(6) = 25.0;
 
     // allocate surface level adj ratio data member
-    state->dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(6, 1.0);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioIn.dimension(6, 1.0);
     state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(6, 1.0);
 
     state->dataLoopNodes->Node(1).Temp = 20.0;
@@ -2435,7 +2434,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     state->dataHeatBalSurf->SurfTempInTmp(6) = 25.0;
 
     // allocate surface level adj ratio data member
-    state->dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(6, 1.0);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioIn.dimension(6, 1.0);
     state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(6, 1.0);
 
     state->dataLoopNodes->Node(1).Temp = 20.0;

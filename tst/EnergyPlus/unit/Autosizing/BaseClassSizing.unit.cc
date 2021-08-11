@@ -1435,7 +1435,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_SupplyAirTempLessThanZoneTStatTest)
     EXPECT_NEAR(inputU, 0.6, 0.001);
     int ConstrNum = state->dataSurface->Surface(7).Construction;
     EXPECT_NEAR(state->dataHeatBal->NominalU(ConstrNum), 0.6, 0.001);
-    EXPECT_NEAR(state->dataHeatBal->SurfWinCoeffAdjRatioIn(7), 1.0006045, 1E-7);
+    EXPECT_NEAR(state->dataHeatBalSurf->SurfWinCoeffAdjRatioIn(7), 1.0006045, 1E-7);
     EXPECT_NEAR(state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(7), 1.0006045, 1E-7);
 
     int CtrlZoneNum(1);
@@ -1453,7 +1453,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_SupplyAirTempLessThanZoneTStatTest)
     EXPECT_EQ(state->dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatMassFlow, 0.0);     // expects zero
     // expects non-zero peak heating load
     // reference value changed from 6911.42 to 6911.12
-    // due to state->dataHeatBal->SurfWinCoeffAdjRatioIn(7) and state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(7)
+    // due to state->dataHeatBalSurf->SurfWinCoeffAdjRatioIn(7) and state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(7)
     EXPECT_NEAR(state->dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad, 6911.12, 0.01);
     EXPECT_NEAR(state->dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatLoad, 6911.12, 0.01);
 }

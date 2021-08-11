@@ -62,7 +62,6 @@
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/FuelCellElectricGenerator.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
@@ -791,9 +790,6 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
 
-    // allocate surface level adj ratio data member
-    state->dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(6, 1.0);
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(6, 1.0);
     SimulationManager::ManageSimulation(*state);
     EXPECT_TRUE(has_err_output(true));
 

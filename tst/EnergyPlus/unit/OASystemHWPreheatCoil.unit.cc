@@ -1041,9 +1041,6 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOffSim)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    // allocate surface level adj ratio data member
-    state->dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(6, 1.0);
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(6, 1.0);
     // OutputProcessor::TimeValue.allocate(2);
     SimulationManager::ManageSimulation(*state);
 
@@ -2023,9 +2020,6 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOnSim)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2);
-    // allocate surface level adj ratio data member
-    state->dataHeatBal->SurfWinCoeffAdjRatioIn.dimension(6, 1.0);
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(6, 1.0);
     SimulationManager::ManageSimulation(*state);
 
     EXPECT_EQ(1, state->dataAirLoop->NumOASystems);
