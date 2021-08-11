@@ -155,6 +155,8 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->TotVentilation = 1;
     state->dataHeatBal->Ventilation.allocate(state->dataHeatBal->TotVentilation);
+    state->dataHeatBal->TotInfiltration = 2;
+    state->dataHeatBal->Infiltration.allocate(state->dataHeatBal->TotInfiltration);
     state->dataZoneEquip->VentMCP.allocate(1);
 
     state->dataGlobal->NumOfZones = state->dataGlobal->NumOfZones;
@@ -182,6 +184,10 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     state->dataZoneEquip->ZoneEquipConfig(2).NumReturnNodes = 0;
     state->dataHeatBal->Ventilation(1).ZonePtr = 1;
     state->dataHeatBal->Ventilation(1).AirTemp = state->dataHeatBal->Zone(1).OutDryBulbTemp;
+    state->dataHeatBal->Infiltration(1).ZonePtr = 1;
+    state->dataHeatBal->Infiltration(2).ZonePtr = 2;
+    state->dataHeatBal->Infiltration(1).MCpI_temp = 1.0;
+    state->dataHeatBal->Infiltration(2).MCpI_temp = 1.5;
     state->dataZoneEquip->VentMCP(1) = state->dataHeatBalFanSys->MCPV(1);
     // Call HVACManager
     ReportAirHeatBalance(*state);
@@ -223,6 +229,12 @@ TEST_F(EnergyPlusFixture, ExfilAndExhaustReportTest)
     state->dataHVACGlobal->TimeStepSys = 1.0;
     state->dataHeatBalFanSys->MCPI(1) = 1.0;
     state->dataHeatBalFanSys->MCPI(2) = 1.5;
+    state->dataHeatBal->TotInfiltration = 2;
+    state->dataHeatBal->Infiltration.allocate(state->dataHeatBal->TotInfiltration);
+    state->dataHeatBal->Infiltration(1).ZonePtr = 1;
+    state->dataHeatBal->Infiltration(2).ZonePtr = 2;
+    state->dataHeatBal->Infiltration(1).MCpI_temp = 1.0;
+    state->dataHeatBal->Infiltration(2).MCpI_temp = 1.5;
     state->dataHeatBalFanSys->MCPV(1) = 2.0;
     state->dataHeatBalFanSys->MCPV(2) = 2.5;
     state->dataEnvrn->OutBaroPress = 101325.0;
