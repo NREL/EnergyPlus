@@ -364,17 +364,17 @@ TEST_F(EnergyPlusFixture, SurfaceTest_HashMap)
 {
     int numSurfs = state->dataSurface->TotSurfaces = 4;
     state->dataSurface->Surface.allocate(numSurfs);
-    state->dataSurface->SurfTAirRef.dimension(numSurfs,0);
-    state->dataSurface->SurfIntConvCoeffIndex.dimension(numSurfs,0);
-    state->dataSurface->SurfExtConvCoeffIndex.dimension(numSurfs,0);
-    state->dataSurface->SurfWinStormWinConstr.dimension(numSurfs,0);
-    state->dataSurface->SurfMaterialMovInsulExt.dimension(numSurfs,0);
-    state->dataSurface->SurfMaterialMovInsulInt.dimension(numSurfs,0);
-    state->dataSurface->SurfSchedMovInsulExt.dimension(numSurfs,0);
-    state->dataSurface->SurfSchedMovInsulInt.dimension(numSurfs,0);
-    state->dataSurface->SurfExternalShadingSchInd.dimension(numSurfs,0);
-    state->dataSurface->SurfSurroundingSurfacesNum.dimension(numSurfs,0);
-    state->dataSurface->SurfLinkedOutAirNode.dimension(numSurfs,0);
+    state->dataSurface->SurfTAirRef.dimension(numSurfs, 0);
+    state->dataSurface->SurfIntConvCoeffIndex.dimension(numSurfs, 0);
+    state->dataSurface->SurfExtConvCoeffIndex.dimension(numSurfs, 0);
+    state->dataSurface->SurfWinStormWinConstr.dimension(numSurfs, 0);
+    state->dataSurface->SurfMaterialMovInsulExt.dimension(numSurfs, 0);
+    state->dataSurface->SurfMaterialMovInsulInt.dimension(numSurfs, 0);
+    state->dataSurface->SurfSchedMovInsulExt.dimension(numSurfs, 0);
+    state->dataSurface->SurfSchedMovInsulInt.dimension(numSurfs, 0);
+    state->dataSurface->SurfExternalShadingSchInd.dimension(numSurfs, 0);
+    state->dataSurface->SurfSurroundingSurfacesNum.dimension(numSurfs, 0);
+    state->dataSurface->SurfLinkedOutAirNode.dimension(numSurfs, 0);
 
     for (int SurfNum = 1; SurfNum <= numSurfs; SurfNum++) {
         state->dataSurface->Surface(SurfNum).set_representative_surface(*state, SurfNum);
