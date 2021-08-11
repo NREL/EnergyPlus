@@ -7207,14 +7207,14 @@ namespace UnitarySystems {
 
                 bool runOnSensibleLoad = true;
                 if (fields.find("run_on_sensible_load") != fields.end()) {
-                    runOnSensibleLoad = UtilityRoutines::SameString(fields.at("run_on_sensible_load"), "YES");
+                    runOnSensibleLoad = UtilityRoutines::SameString(AsString(fields.at("run_on_sensible_load")), "YES");
                 }
                 bool runOnLatentLoad = false;
                 if (fields.find("run_on_latent_load") != fields.end()) {
-                    runOnLatentLoad = UtilityRoutines::SameString(fields.at("run_on_latent_load"), "YES");
+                    runOnLatentLoad = UtilityRoutines::SameString(AsString(fields.at("run_on_latent_load")), "YES");
                 }
 
-                if (runOnSensibleLoad  && !runOnLatentLoad) {
+                if (runOnSensibleLoad && !runOnLatentLoad) {
                     input_specs.latent_load_control = "SensibleOnlyLoadControl";
                 } else if (!runOnSensibleLoad && runOnLatentLoad) {
                     input_specs.latent_load_control = "LatentOnlyLoadControl";
@@ -7240,8 +7240,8 @@ namespace UnitarySystems {
                     thisSys.m_minWaterLoopTempForHR = fields.at("minimum_water_loop_temperature_for_heat_recovery");
                 }
                 if (fields.find("economizer_lockout") != fields.end()) { // duplicate above as default
-                    std::string econoFlag = UtilityRoutines::MakeUPPERCase(AsString(fields.at("economizer_lockout")));
-                    if (UtilityRoutines::SameString(UtilityRoutines::MakeUPPERCase(econoFlag), "YES")) {
+                    bool econoFlag = UtilityRoutines::SameString(AsString(fields.at("economizer_lockout")), "YES");
+                    if (econoFlag) {
                         thisSys.m_waterSideEconomizerFlag = true;
                     } else {
                         thisSys.m_waterSideEconomizerFlag = false;
