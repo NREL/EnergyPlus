@@ -26,7 +26,7 @@
     0.0400,                  !- Loads Convergence Tolerance Value {W}
     0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
-    25,                      !- Maximum Number of Warmup Days
+    15,                      !- Maximum Number of Warmup Days
     6;                       !- Minimum Number of Warmup Days
 
 !-   ===========  ALL OBJECTS IN CLASS: SHADOWCALCULATION ===========
@@ -35,7 +35,7 @@
     PolygonClipping,         !- Shading Calculation Method
     Periodic,                !- Shading Calculation Update Frequency Method
     7,                       !- Shading Calculation Update Frequency
-    15000;                   !- Maximum Figures in Shadow Overlap Calculations
+    200;                     !- Maximum Figures in Shadow Overlap Calculations
 
 !-   ===========  ALL OBJECTS IN CLASS: SURFACECONVECTIONALGORITHM:INSIDE ===========
 
@@ -56,8 +56,8 @@
 !-   ===========  ALL OBJECTS IN CLASS: CONVERGENCELIMITS ===========
 
   ConvergenceLimits,
-    1,                       !- Minimum System Timestep {minutes}
-    20;                      !- Maximum HVAC Iterations
+    15,                       !- Minimum System Timestep {minutes}
+    5;                      !- Maximum HVAC Iterations
 
 !-   ===========  ALL OBJECTS IN CLASS: SITE:LOCATION ===========
 
@@ -132,7 +132,7 @@
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
-    12,                      !- End Month
+    1,                      !- End Month
     31,                      !- End Day of Month
     ,                        !- End Year
     Sunday,                  !- Day of Week for Start Day
@@ -141,6 +141,36 @@
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
+
+  RunPeriod,
+    RUNPERIOD 2,              !- Name
+    4,                        !- Begin Month
+    1,                        !- Begin Day of Month
+    ,                         !- Begin Year
+    4,                        !- End Month
+    30,                       !- End Day of Month
+    ,                         !- End Year
+    Sunday,                   !- Day of Week for Start Day
+    No,                       !- Use Weather File Holidays and Special Days
+    No,                       !- Use Weather File Daylight Saving Period
+    No,                       !- Apply Weekend Holiday Rule
+    Yes,                      !- Use Weather File Rain Indicators
+    Yes;                      !- Use Weather File Snow Indicators
+
+  RunPeriod,
+    RUNPERIOD 3,              !- Name
+    7,                        !- Begin Month
+    1,                        !- Begin Day of Month
+    ,                         !- Begin Year
+    7,                        !- End Month
+    31,                       !- End Day of Month
+    ,                         !- End Year
+    Sunday,                   !- Day of Week for Start Day
+    No,                       !- Use Weather File Holidays and Special Days
+    No,                       !- Use Weather File Daylight Saving Period
+    No,                       !- Apply Weekend Holiday Rule
+    Yes,                      !- Use Weather File Rain Indicators
+    Yes;                      !- Use Weather File Snow Indicators
 
 !-   ===========  ALL OBJECTS IN CLASS: RUNPERIODCONTROL:SPECIALDAYS ===========
 
@@ -1557,15 +1587,15 @@
     Through: 12/31,          !- Field 1
     For: Weekday SummerDesignDay, !- Field 2
     Until: 01:00,0.522434224875208, !- Field 3
-    Until: 05:00,0.0,        !- Field 5
+    Until: 05:00,1.0,        !- Field 5
     Until: 24:00,0.522434224875208, !- Field 7
     For: Saturday WinterDesignDay, !- Field 9
     Until: 01:00,0.522434224875208, !- Field 10
-    Until: 05:00,0.0,        !- Field 12
+    Until: 05:00,1.0,        !- Field 12
     Until: 24:00,0.522434224875208, !- Field 14
     For: Sunday Holidays AllOtherDays, !- Field 16
     Until: 01:00,0.522434224875208, !- Field 17
-    Until: 05:00,0.0,        !- Field 19
+    Until: 05:00,1.0,        !- Field 19
     Until: 24:00,0.522434224875208; !- Field 21
 
                              !- Field 22
@@ -2730,7 +2760,7 @@
     SZ DSOA Dining,          !- Name
     FLOW/AREA,               !- Outdoor Air Method
     ,                        !- Outdoor Air Flow per Person {m3/s-person}
-    0.003581176,             !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
+    0.003581378,             !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
   DesignSpecification:OutdoorAir,
@@ -3066,7 +3096,7 @@
     Hours_of_operation,      !- Availability Schedule Name
     1,                       !- Fan Total Efficiency
     0,                       !- Pressure Rise {Pa}
-    1.33143208408505,        !- Maximum Flow Rate {m3/s}
+    1.33137,        !- Maximum Flow Rate {m3/s}
     Dining Exhaust Fan Node, !- Air Inlet Node Name
     Dining Exhaust Fan Outlet Node Name,  !- Air Outlet Node Name
     General;                 !- End-Use Subcategory
@@ -3076,7 +3106,7 @@
     Hours_of_operation,      !- Availability Schedule Name
     0.385,                   !- Fan Total Efficiency
     124.5,                   !- Pressure Rise {Pa}
-    2.54851619723628,        !- Maximum Flow Rate {m3/s}
+    2.54851,        !- Maximum Flow Rate {m3/s}
     Kitchen Exhaust Fan Node,!- Air Inlet Node Name
     Kitchen Exhaust Fan Outlet Node Name,  !- Air Outlet Node Name
     General,                 !- End-Use Subcategory
@@ -4486,4 +4516,3 @@
   Output:Meter:MeterFileOnly,ElectricityNet:Facility,Hourly;
 
   Output:Meter:MeterFileOnly,NaturalGas:Facility,Hourly;
-

@@ -25,8 +25,8 @@
     City,                    !- Terrain
     0.0400,                  !- Loads Convergence Tolerance Value {W}
     0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}
-    FullInteriorAndExterior, !- Solar Distribution
-    25,                      !- Maximum Number of Warmup Days
+    MinimalShadowing,        !- Solar Distribution
+    15,                      !- Maximum Number of Warmup Days
     6;                       !- Minimum Number of Warmup Days
 
 !-   ===========  ALL OBJECTS IN CLASS: SHADOWCALCULATION ===========
@@ -35,7 +35,7 @@
     PolygonClipping,         !- Shading Calculation Method
     Periodic,                !- Shading Calculation Update Frequency Method
     7,                       !- Shading Calculation Update Frequency
-    15000;                   !- Maximum Figures in Shadow Overlap Calculations
+    200;                     !- Maximum Figures in Shadow Overlap Calculations
 
 !-   ===========  ALL OBJECTS IN CLASS: SURFACECONVECTIONALGORITHM:INSIDE ===========
 
@@ -51,13 +51,13 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: TIMESTEP ===========
 
-  Timestep,6;
+  Timestep,4;
 
 !-   ===========  ALL OBJECTS IN CLASS: CONVERGENCELIMITS ===========
 
   ConvergenceLimits,
-    1,                       !- Minimum System Timestep {minutes}
-    20;                      !- Maximum HVAC Iterations
+    15,                       !- Minimum System Timestep {minutes}
+    5;                      !- Maximum HVAC Iterations
 
 !-   ===========  ALL OBJECTS IN CLASS: SITE:LOCATION ===========
 
@@ -132,7 +132,7 @@
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
-    12,                      !- End Month
+    1,                      !- End Month
     31,                      !- End Day of Month
     ,                        !- End Year
     Sunday,                  !- Day of Week for Start Day
@@ -141,6 +141,36 @@
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
+
+  RunPeriod,
+    RUNPERIOD 2,              !- Name
+    4,                        !- Begin Month
+    1,                        !- Begin Day of Month
+    ,                         !- Begin Year
+    4,                        !- End Month
+    30,                       !- End Day of Month
+    ,                         !- End Year
+    Sunday,                   !- Day of Week for Start Day
+    No,                       !- Use Weather File Holidays and Special Days
+    No,                       !- Use Weather File Daylight Saving Period
+    No,                       !- Apply Weekend Holiday Rule
+    Yes,                      !- Use Weather File Rain Indicators
+    Yes;                      !- Use Weather File Snow Indicators
+
+  RunPeriod,
+    RUNPERIOD 3,              !- Name
+    7,                        !- Begin Month
+    1,                        !- Begin Day of Month
+    ,                         !- Begin Year
+    7,                        !- End Month
+    31,                       !- End Day of Month
+    ,                         !- End Year
+    Sunday,                   !- Day of Week for Start Day
+    No,                       !- Use Weather File Holidays and Special Days
+    No,                       !- Use Weather File Daylight Saving Period
+    No,                       !- Apply Weekend Holiday Rule
+    Yes,                      !- Use Weather File Rain Indicators
+    Yes;                      !- Use Weather File Snow Indicators
 
 !-   ===========  ALL OBJECTS IN CLASS: RUNPERIODCONTROL:SPECIALDAYS ===========
 
@@ -2282,14 +2312,14 @@
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00,1;          !- Field 3
+    Until: 24:00,1.0;          !- Field 3
 
   Schedule:Compact,
     Kitchen Exhaust Fan Balanced Exhaust Fraction Schedule,  !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 07:00,0,          !- Field 3
+    Until: 07:00,1.0,          !- Field 3
     Until: 24:00,0.925;      !- Field 5
 
   Schedule:Compact,
@@ -2297,13 +2327,13 @@
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: WinterDesignDay SummerDesignDay, !- Field 2
-    Until: 24:00,0,          !- Field 3
+    Until: 24:00,1.0,          !- Field 3
     For: Allotherdays,       !- Field 5
-    Until: 6:00,0,           !- Field 6
+    Until: 6:00,1.0,           !- Field 6
     Until: 9:00,1,           !- Field 8
-    Until: 16:00,0,          !- Field 10
+    Until: 16:00,1.0,          !- Field 10
     Until: 22:00,1,          !- Field 12
-    Until: 24:00,0;          !- Field 14
+    Until: 24:00,1.0;          !- Field 14
 
 !-   ===========  ALL OBJECTS IN CLASS: SCHEDULE:CONSTANT ===========
 
@@ -15277,4 +15307,3 @@
     Electricity,             !- Resource Type
     ,                        !- Key Name 1
     Wired_LTG;               !- Output Variable or Meter Name 1
-

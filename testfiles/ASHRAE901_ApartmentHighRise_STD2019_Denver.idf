@@ -56,7 +56,7 @@
 !-   ===========  ALL OBJECTS IN CLASS: CONVERGENCELIMITS ===========
 
   ConvergenceLimits,
-    10,                       !- Minimum System Timestep {minutes}
+    15,                       !- Minimum System Timestep {minutes}
     5;                      !- Maximum HVAC Iterations
 
 !-   ===========  ALL OBJECTS IN CLASS: SITE:LOCATION ===========
@@ -147,7 +147,7 @@
     4,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
-    4,                      !- End Month
+    4,                       !- End Month
     30,                      !- End Day of Month
     ,                        !- End Year
     Sunday,                  !- Day of Week for Start Day
@@ -163,21 +163,6 @@
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
     7,                      !- End Month
-    31,                      !- End Day of Month
-    ,                        !- End Year
-    Sunday,                  !- Day of Week for Start Day
-    No,                      !- Use Weather File Holidays and Special Days
-    No,                      !- Use Weather File Daylight Saving Period
-    No,                      !- Apply Weekend Holiday Rule
-    Yes,                     !- Use Weather File Rain Indicators
-    Yes;                     !- Use Weather File Snow Indicators
-
-  RunPeriod,
-    RUNPERIOD 4,             !- Name
-    10,                       !- Begin Month
-    1,                       !- Begin Day of Month
-    ,                        !- Begin Year
-    10,                      !- End Month
     31,                      !- End Day of Month
     ,                        !- End Year
     Sunday,                  !- Day of Week for Start Day

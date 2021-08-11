@@ -25,8 +25,8 @@
     Suburbs,                 !- Terrain
     0.0400,                  !- Loads Convergence Tolerance Value {W}
     0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
-    FullExterior,            !- Solar Distribution
-    25,                      !- Maximum Number of Warmup Days
+    MinimalShadowing,        !- Solar Distribution
+    15,                      !- Maximum Number of Warmup Days
     6;                       !- Minimum Number of Warmup Days
 
 !-   ===========  ALL OBJECTS IN CLASS: SURFACECONVECTIONALGORITHM:INSIDE ===========
@@ -43,13 +43,13 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: TIMESTEP ===========
 
-  Timestep,6;
+  Timestep,4;
 
 !-   ===========  ALL OBJECTS IN CLASS: CONVERGENCELIMITS ===========
 
   ConvergenceLimits,
-    1,                       !- Minimum System Timestep {minutes}
-    20;                      !- Maximum HVAC Iterations
+    15,                       !- Minimum System Timestep {minutes}
+    5;                      !- Maximum HVAC Iterations
 
 !-   ===========  ALL OBJECTS IN CLASS: SITE:LOCATION ===========
 
@@ -124,7 +124,7 @@
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
-    12,                      !- End Month
+    1,                      !- End Month
     31,                      !- End Day of Month
     ,                        !- End Year
     Sunday,                  !- Day of Week for Start Day
@@ -133,6 +133,36 @@
     Yes,                     !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
+
+  RunPeriod,
+    RUNPERIOD 2,              !- Name
+    4,                        !- Begin Month
+    1,                        !- Begin Day of Month
+    ,                         !- Begin Year
+    4,                        !- End Month
+    30,                       !- End Day of Month
+    ,                         !- End Year
+    Sunday,                   !- Day of Week for Start Day
+    No,                       !- Use Weather File Holidays and Special Days
+    No,                       !- Use Weather File Daylight Saving Period
+    No,                       !- Apply Weekend Holiday Rule
+    Yes,                      !- Use Weather File Rain Indicators
+    Yes;                      !- Use Weather File Snow Indicators
+
+  RunPeriod,
+    RUNPERIOD 3,              !- Name
+    7,                        !- Begin Month
+    1,                        !- Begin Day of Month
+    ,                         !- Begin Year
+    7,                        !- End Month
+    31,                       !- End Day of Month
+    ,                         !- End Year
+    Sunday,                   !- Day of Week for Start Day
+    No,                       !- Use Weather File Holidays and Special Days
+    No,                       !- Use Weather File Daylight Saving Period
+    No,                       !- Apply Weekend Holiday Rule
+    Yes,                      !- Use Weather File Rain Indicators
+    Yes;                      !- Use Weather File Snow Indicators
 
 !-   ===========  ALL OBJECTS IN CLASS: RUNPERIODCONTROL:SPECIALDAYS ===========
 
