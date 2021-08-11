@@ -15488,10 +15488,10 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsNoLoadFlowRateSiz
     Real64 results_noLoadCoolingFlowRatio = 1.0 / double(state->dataUnitarySystems->designSpecMSHP[MSHPIndex].numOfSpeedHeating);
     Real64 results_noLoadFlowRatioMin = min(results_noLoadHeatingFlowRatio, results_noLoadCoolingFlowRatio);
 
-    EXPECT_NEAR(results_noLoadFlowRatioMin, thisSys->m_NoLoadAirFlowRateRatio, 0.00001);
-    EXPECT_NEAR(0.50, thisSys->m_NoLoadAirFlowRateRatio, 0.00001);
-    EXPECT_NEAR(0.75, thisSys->m_MaxNoCoolHeatAirVolFlow, 0.00001);
-    EXPECT_NEAR(0.75, thisSys->m_MaxCoolAirVolFlow * thisSys->m_NoLoadAirFlowRateRatio, 0.00001);
+    EXPECT_NEAR(results_noLoadFlowRatioMin, thisSys->m_NoLoadAirFlowRateRatio / 2.0, 0.00001);
+    EXPECT_NEAR(1.0, thisSys->m_NoLoadAirFlowRateRatio, 0.00001);
+    EXPECT_NEAR(1.5, thisSys->m_MaxNoCoolHeatAirVolFlow, 0.00001);
+    EXPECT_NEAR(1.5, thisSys->m_MaxCoolAirVolFlow * thisSys->m_NoLoadAirFlowRateRatio, 0.00001);
 }
 
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTest)

@@ -1993,7 +1993,8 @@ namespace UnitarySystems {
             state.dataSize->DXCoolCap = EqSizing.DesHeatingLoad;
         }
 
-        if (this->m_OKToPrintSizing && !this->m_IsCoilSystemCoolingDX) PrintFlag = true;
+        // So far, only AirloopHVAC:UnitarySystem reports sizing information to eio file
+        if (this->m_OKToPrintSizing && this->m_IsUnitarySystem) PrintFlag = true;
         // STEP 5: report system parameters (e.g., air flow rates, capacities, etc.)
         if (this->m_FanExists) {
 
@@ -2100,7 +2101,6 @@ namespace UnitarySystems {
                         min(this->m_NoLoadAirFlowRateRatio, state.dataUnitarySystems->designSpecMSHP[MSHPIndex].heatingVolFlowRatio[0]);
                 }
                 this->m_NoLoadAirFlowRateRatio = min(NoLoadCoolingAirFlowRateRatio, NoLoadHeatingAirFlowRateRatio);
-                state.dataUnitarySystems->designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio = this->m_NoLoadAirFlowRateRatio;
             } else {
                 if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ||
                     this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
@@ -2290,8 +2290,6 @@ namespace UnitarySystems {
                 this->MaxNoCoolHeatAirMassFlow = this->m_MaxNoCoolHeatAirVolFlow * state.dataEnvrn->StdRhoAir;
                 this->m_NoLoadAirFlowRateRatio = this->m_MaxNoCoolHeatAirVolFlow / this->m_DesignFanVolFlowRate;
             } else if (this->m_CoolVolumeFlowRate.empty()) {
-                this->m_MaxNoCoolHeatAirVolFlow = this->m_MaxNoCoolHeatAirVolFlow;
-                this->MaxNoCoolHeatAirMassFlow = this->MaxNoCoolHeatAirMassFlow;
                 this->m_NoLoadAirFlowRateRatio = this->m_MaxNoCoolHeatAirVolFlow / this->m_DesignFanVolFlowRate;
             }
 
@@ -2364,8 +2362,6 @@ namespace UnitarySystems {
                 this->MaxNoCoolHeatAirMassFlow = this->m_MaxNoCoolHeatAirVolFlow * state.dataEnvrn->StdRhoAir;
                 this->m_NoLoadAirFlowRateRatio = this->m_MaxNoCoolHeatAirVolFlow / this->m_DesignFanVolFlowRate;
             } else if (this->m_CoolVolumeFlowRate.empty()) {
-                this->m_MaxNoCoolHeatAirVolFlow = this->m_MaxNoCoolHeatAirVolFlow;
-                this->MaxNoCoolHeatAirMassFlow = this->MaxNoCoolHeatAirMassFlow;
                 this->m_NoLoadAirFlowRateRatio = this->m_MaxNoCoolHeatAirVolFlow / this->m_DesignFanVolFlowRate;
             }
 
@@ -2410,8 +2406,6 @@ namespace UnitarySystems {
                 this->MaxNoCoolHeatAirMassFlow = this->m_MaxNoCoolHeatAirVolFlow * state.dataEnvrn->StdRhoAir;
                 this->m_NoLoadAirFlowRateRatio = this->m_MaxNoCoolHeatAirVolFlow / this->m_DesignFanVolFlowRate;
             } else if (this->m_CoolVolumeFlowRate.empty()) {
-                this->m_MaxNoCoolHeatAirVolFlow = this->m_MaxNoCoolHeatAirVolFlow;
-                this->MaxNoCoolHeatAirMassFlow = this->MaxNoCoolHeatAirMassFlow;
                 this->m_NoLoadAirFlowRateRatio = this->m_MaxNoCoolHeatAirVolFlow / this->m_DesignFanVolFlowRate;
             } else {
                 for (Iter = this->m_NumOfSpeedCooling; Iter > 0; --Iter) {
@@ -2419,7 +2413,6 @@ namespace UnitarySystems {
                     this->m_CoolMassFlowRate[Iter] = this->m_CoolVolumeFlowRate[Iter] * state.dataEnvrn->StdRhoAir;
                     this->m_MSCoolingSpeedRatio[Iter] = this->m_CoolVolumeFlowRate[Iter] / this->m_DesignFanVolFlowRate;
                 }
-                this->m_MaxNoCoolHeatAirVolFlow = this->m_MaxNoCoolHeatAirVolFlow;
                 this->MaxNoCoolHeatAirMassFlow = this->m_MaxNoCoolHeatAirVolFlow * state.dataEnvrn->StdRhoAir;
                 this->m_NoLoadAirFlowRateRatio = this->m_MaxNoCoolHeatAirVolFlow / this->m_DesignFanVolFlowRate;
             }
@@ -2448,8 +2441,6 @@ namespace UnitarySystems {
                 this->MaxNoCoolHeatAirMassFlow = this->m_MaxNoCoolHeatAirVolFlow * state.dataEnvrn->StdRhoAir;
                 this->m_NoLoadAirFlowRateRatio = this->m_MaxNoCoolHeatAirVolFlow / this->m_DesignFanVolFlowRate;
             } else if (this->m_CoolVolumeFlowRate.empty()) {
-                this->m_MaxNoCoolHeatAirVolFlow = this->m_MaxNoCoolHeatAirVolFlow;
-                this->MaxNoCoolHeatAirMassFlow = this->MaxNoCoolHeatAirMassFlow;
                 this->m_NoLoadAirFlowRateRatio = this->m_MaxNoCoolHeatAirVolFlow / this->m_DesignFanVolFlowRate;
             }
         }
@@ -2512,8 +2503,6 @@ namespace UnitarySystems {
                         this->m_NoLoadAirFlowRateRatio =
                             min(this->m_NoLoadAirFlowRateRatio, this->m_MaxNoCoolHeatAirVolFlow / this->m_DesignFanVolFlowRate);
                     } else {
-                        this->m_MaxNoCoolHeatAirVolFlow = this->m_MaxNoCoolHeatAirVolFlow;
-                        this->MaxNoCoolHeatAirMassFlow = this->MaxNoCoolHeatAirMassFlow;
                         this->m_NoLoadAirFlowRateRatio = this->m_MaxNoCoolHeatAirVolFlow / this->m_DesignFanVolFlowRate;
                     }
                 } else if (MSHPIndex > -1) {
@@ -2522,8 +2511,6 @@ namespace UnitarySystems {
                     this->MaxNoCoolHeatAirMassFlow = this->m_MaxNoCoolHeatAirVolFlow * state.dataEnvrn->StdRhoAir;
                     this->m_NoLoadAirFlowRateRatio = this->m_MaxNoCoolHeatAirVolFlow / this->m_DesignFanVolFlowRate;
                 } else {
-                    this->m_MaxNoCoolHeatAirVolFlow = this->m_MaxNoCoolHeatAirVolFlow;
-                    this->MaxNoCoolHeatAirMassFlow = this->MaxNoCoolHeatAirMassFlow;
                     this->m_NoLoadAirFlowRateRatio = this->m_MaxNoCoolHeatAirVolFlow / this->m_DesignFanVolFlowRate;
                 }
             }
@@ -2602,8 +2589,6 @@ namespace UnitarySystems {
                     this->m_NoLoadAirFlowRateRatio =
                         min(this->m_NoLoadAirFlowRateRatio, this->m_MaxNoCoolHeatAirVolFlow / this->m_DesignFanVolFlowRate);
                 } else {
-                    this->m_MaxNoCoolHeatAirVolFlow = this->m_MaxNoCoolHeatAirVolFlow;
-                    this->MaxNoCoolHeatAirMassFlow = this->MaxNoCoolHeatAirMassFlow;
                     this->m_NoLoadAirFlowRateRatio = this->m_MaxNoCoolHeatAirVolFlow / this->m_DesignFanVolFlowRate;
                 }
             } else if (MSHPIndex > -1) {
@@ -2613,8 +2598,6 @@ namespace UnitarySystems {
                 this->m_NoLoadAirFlowRateRatio = this->m_MSHeatingSpeedRatio[this->m_NumOfSpeedHeating] *
                                                  state.dataUnitarySystems->designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio;
             } else {
-                this->m_MaxNoCoolHeatAirVolFlow = this->m_MaxNoCoolHeatAirVolFlow;
-                this->MaxNoCoolHeatAirMassFlow = this->MaxNoCoolHeatAirMassFlow;
                 this->m_NoLoadAirFlowRateRatio = this->m_MaxNoCoolHeatAirVolFlow / this->m_DesignFanVolFlowRate;
             }
         }
@@ -2662,8 +2645,6 @@ namespace UnitarySystems {
                     this->m_NoLoadAirFlowRateRatio = this->m_MSHeatingSpeedRatio[this->m_NumOfSpeedHeating] *
                                                      state.dataUnitarySystems->designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio;
                 } else {
-                    this->m_MaxNoCoolHeatAirVolFlow = this->m_MaxNoCoolHeatAirVolFlow;
-                    this->MaxNoCoolHeatAirMassFlow = this->MaxNoCoolHeatAirMassFlow;
                     this->m_NoLoadAirFlowRateRatio = this->m_MaxNoCoolHeatAirVolFlow / this->m_DesignFanVolFlowRate;
                 }
             }
@@ -7224,20 +7205,20 @@ namespace UnitarySystems {
                 }
                 input_specs.dehumidification_control_type = dehumidControlType;
 
-                std::string runOnSensibleLoad("YES");
+                bool runOnSensibleLoad = true;
                 if (fields.find("run_on_sensible_load") != fields.end()) {
-                    runOnSensibleLoad = UtilityRoutines::MakeUPPERCase(AsString(fields.at("run_on_sensible_load")));
+                    runOnSensibleLoad = UtilityRoutines::SameString(fields.at("run_on_sensible_load"), "YES");
                 }
-                std::string runOnLatentLoad("NO");
+                bool runOnLatentLoad = false;
                 if (fields.find("run_on_latent_load") != fields.end()) {
-                    runOnLatentLoad = UtilityRoutines::MakeUPPERCase(AsString(fields.at("run_on_latent_load")));
+                    runOnLatentLoad = UtilityRoutines::SameString(fields.at("run_on_latent_load"), "YES");
                 }
 
-                if (runOnSensibleLoad == "YES" && runOnLatentLoad == "NO") {
+                if (runOnSensibleLoad  && !runOnLatentLoad) {
                     input_specs.latent_load_control = "SensibleOnlyLoadControl";
-                } else if (runOnSensibleLoad == "NO" && runOnLatentLoad == "YES") {
+                } else if (!runOnSensibleLoad && runOnLatentLoad) {
                     input_specs.latent_load_control = "LatentOnlyLoadControl";
-                } else if (runOnSensibleLoad == "YES" && runOnLatentLoad == "YES") {
+                } else if (runOnSensibleLoad && runOnLatentLoad) {
                     input_specs.latent_load_control = "LatentOrSensibleLoadControl";
                 }
 
@@ -7258,9 +7239,8 @@ namespace UnitarySystems {
                 if (fields.find("minimum_water_loop_temperature_for_heat_recovery") != fields.end()) {
                     thisSys.m_minWaterLoopTempForHR = fields.at("minimum_water_loop_temperature_for_heat_recovery");
                 }
-                std::string econoFlag;
                 if (fields.find("economizer_lockout") != fields.end()) { // duplicate above as default
-                    econoFlag = UtilityRoutines::MakeUPPERCase(AsString(fields.at("economizer_lockout")));
+                    std::string econoFlag = UtilityRoutines::MakeUPPERCase(AsString(fields.at("economizer_lockout")));
                     if (UtilityRoutines::SameString(UtilityRoutines::MakeUPPERCase(econoFlag), "YES")) {
                         thisSys.m_waterSideEconomizerFlag = true;
                     } else {
@@ -7275,7 +7255,7 @@ namespace UnitarySystems {
                     thisSys.m_WaterHRPlantLoopModel = true;
                 }
                 if (thisSys.m_WaterHRPlantLoopModel) {
-                    std::string HRcoolingCoilType = "Coil:Cooling:Water";
+                    std::string const HRcoolingCoilType("COIL:COOLING:WATER");
                     bool errFound = false;
                     thisSys.m_HRcoolCoilAirInNode = WaterCoils::GetCoilInletNode(state, HRcoolingCoilType, HRWaterCoolingCoilName, errFound);
                     thisSys.m_HRcoolCoilFluidInletNode =
@@ -9953,13 +9933,6 @@ namespace UnitarySystems {
                 this->m_FanOpMode = DataHVACGlobals::ContFanCycCoil;
                 state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
             }
-        }
-
-        //  OpMode = UnitarySystem(UnitarySysNum)%FanOpMode
-        if (allocated(state.dataAirLoop->AirLoopControlInfo) && this->m_AirLoopEquipment) {
-            state.dataUnitarySystems->economizerFlag = state.dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoActive;
-        } else {
-            state.dataUnitarySystems->economizerFlag = false;
         }
 
         // System load calculation for cycling fan systems
