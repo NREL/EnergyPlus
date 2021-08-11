@@ -11948,14 +11948,12 @@
   AirLoopHVAC:OutdoorAirSystem,
     VAV WITH REHEAT_OA,      !- Name
     VAV WITH REHEAT_OA_Controllers,  !- Controller List Name
-    VAV WITH REHEAT_OA_Equipment,  !- Outdoor Air Equipment List Name
-    VAV WITH REHEAT Availability Manager List;  !- Availability Manager List Name
+    VAV WITH REHEAT_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     FLR_3_DOAS_OA,           !- Name
     FLR_3_DOAS_OA_Controllers,  !- Controller List Name
-    FLR_3_DOAS_OA_Equipment, !- Outdoor Air Equipment List Name
-    FLR_3_DOAS Availability Manager List;  !- Availability Manager List Name
+    FLR_3_DOAS_OA_Equipment; !- Outdoor Air Equipment List Name
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTDOORAIR:MIXER ===========
 

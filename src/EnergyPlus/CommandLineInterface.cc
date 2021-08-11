@@ -147,11 +147,11 @@ namespace CommandLineInterface {
                 "-s",
                 "--output-suffix");
 
-        opt.add("", 0, 0, 0, "Display version information", "-v", "--version");
+        opt.add("", false, 0, 0, "Display version information", "-v", "--version");
 
-        opt.add("in.epw", 0, 1, 0, "Weather file path (default: in.epw in current directory)", "-w", "--weather");
+        opt.add("in.epw", false, 1, 0, "Weather file path (default: in.epw in current directory)", "-w", "--weather");
 
-        opt.add("", 0, 0, 0, "Run ExpandObjects prior to simulation", "-x", "--expandobjects");
+        opt.add("", false, 0, 0, "Run ExpandObjects prior to simulation", "-x", "--expandobjects");
 
         opt.example = "energyplus -w weather.epw -r input.idf";
 
@@ -161,15 +161,17 @@ namespace CommandLineInterface {
         opt.parse(argCount, &cStrArgs[0]);
 
         // print arguments parsed (useful for debugging)
-        /*std::string pretty;
-        opt.prettyPrint(pretty);
-        std::cout << pretty << std::endl;*/
+        //        std::string pretty;
+        //        opt.prettyPrint(pretty);
+        //        std::cout << pretty << std::endl;
 
         std::string usage;
         opt.getUsage(usage);
 
-        // Set path of EnergyPlus program path
-        state.dataStrGlobals->exeDirectoryPath = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
+        // Set path of EnergyPlus program path (if we aren't overriding it)
+        if (!state.dataGlobal->installRootOverride) {
+            state.dataStrGlobals->exeDirectoryPath = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
+        }
 
         // ezOptionParser doesn't have a getPath, so we get a string, then convert it to path
         // I'm limiting the scope of the std::string temporaries I used to avoid mistakes
@@ -180,7 +182,7 @@ namespace CommandLineInterface {
         }
 
         {
-            // TODO: should this vbe in IOFiles as an InputFile?
+            // TODO: should this be in IOFiles as an InputFile?
             std::string inputIddFileName;
             opt.get("-i")->getString(inputIddFileName);
             state.dataStrGlobals->inputIddFilePath = fs::path{inputIddFileName};
@@ -230,12 +232,8 @@ namespace CommandLineInterface {
         }
 
         if (opt.lastArgs.size() == 1) {
-            for (size_type i = 0; i < opt.lastArgs.size(); ++i) {
-                std::string const &arg(*opt.lastArgs[i]);
-                std::string inputFileName = arg;
-                state.dataStrGlobals->inputFilePath = fs::path{inputFileName};
-            }
-        } else if (opt.lastArgs.size() == 0) {
+            state.dataStrGlobals->inputFilePath = fs::path{*opt.lastArgs[0]};
+        } else if (opt.lastArgs.empty()) {
             state.dataStrGlobals->inputFilePath = "in.idf";
         }
 
@@ -316,12 +314,8 @@ namespace CommandLineInterface {
             }
         }
 
-        bool runExpandObjects(false);
-        bool runEPMacro(false);
-
-        runExpandObjects = opt.isSet("-x");
-
-        runEPMacro = opt.isSet("-m");
+        bool runExpandObjects = opt.isSet("-x");
+        bool runEPMacro = opt.isSet("-m");
 
         if (opt.isSet("-d")) {
             // Create directory if it doesn't already exist
@@ -484,10 +478,9 @@ namespace CommandLineInterface {
         state.files.outputSszTxtFilePath = composePath(sszSuffix + ".txt");
         state.dataStrGlobals->outputAdsFilePath = composePath(adsSuffix + ".out");
         state.files.shade.filePath = composePath(shdSuffix + ".csv");
-
         if (suffixType == "L") {
-            // out/sqlite.er:w
-            state.dataStrGlobals->outputSqliteErrFilePath = fs::path(state.dataStrGlobals->outDirPath.string() + sqliteSuffix + ".err");
+            // out/sqlite.err
+            state.dataStrGlobals->outputSqliteErrFilePath = state.dataStrGlobals->outDirPath / fs::path{sqliteSuffix + ".err"};
         } else {
             // if 'D':  out/eplus-sqlite.err
             state.dataStrGlobals->outputSqliteErrFilePath = composePath(sqliteSuffix + ".err");
@@ -869,7 +862,14 @@ namespace CommandLineInterface {
         if (!FileSystem::fileExists(readVarsPath)) {
             readVarsPath = (state.dataStrGlobals->exeDirectoryPath / "PostProcess" / "ReadVarsESO").replace_extension(FileSystem::exeExtension);
             if (!FileSystem::fileExists(readVarsPath)) {
-                DisplayString(state, "ERROR: Could not find ReadVarsESO executable: " + FileSystem::getAbsolutePath(readVarsPath).string() + ".");
+                // should report the error differently if the user is calling into E+ through EXE or DLL
+                if (state.dataGlobal->eplusRunningViaAPI) {
+                    DisplayString(
+                        state,
+                        "ERROR: Could not find ReadVarsESO executable.  When calling through C API, make sure to call setEnergyPlusRootDirectory");
+                } else {
+                    DisplayString(state, "ERROR: Could not find ReadVarsESO executable: " + FileSystem::getAbsolutePath(readVarsPath).string() + ".");
+                }
                 return static_cast<int>(ReturnCodes::Failure);
             }
         }

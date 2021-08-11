@@ -147,7 +147,7 @@ namespace SteamCoils {
     };
 
     void SimulateSteamCoilComponents(EnergyPlusData &state,
-                                     std::string const &CompName,
+                                     std::string_view CompName,
                                      bool const FirstHVACIteration,
                                      int &CompIndex,
                                      Optional<Real64 const> QCoilReq = _, // coil load to be met
@@ -179,7 +179,7 @@ namespace SteamCoils {
                           bool &ErrorsFound            // set to true if problem
     );
 
-    void CheckSteamCoilSchedule(EnergyPlusData &state, std::string const &CompType, std::string const &CompName, Real64 &Value, int &CompIndex);
+    void CheckSteamCoilSchedule(EnergyPlusData &state, std::string const &CompType, std::string_view CompName, Real64 &Value, int &CompIndex);
 
     Real64 GetCoilMaxWaterFlowRate(EnergyPlusData &state,
                                    std::string const &CoilType, // must match coil types in this module

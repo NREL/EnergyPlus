@@ -181,7 +181,7 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
     using ScheduleManager::GetScheduleMinValue;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("GetSourcesAndSinks: ");
+    static constexpr std::string_view RoutineName("GetSourcesAndSinks: ");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Array1D_string AlphaName;
@@ -264,8 +264,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
         if (state.dataContaminantBalance->ZoneContamGenericConstant(Loop).ActualZoneNum == 0) {
             ShowSevereError(state,
-                            RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
-                                " entered=" + AlphaName(2));
+                            std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                state.dataIPShortCut->cAlphaFieldNames(2) + " entered=" + AlphaName(2));
             ErrorsFound = true;
         }
 
@@ -273,11 +273,11 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         if (state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCGenerateRateSchedPtr == 0) {
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 ShowSevereError(state,
-                                RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                    " is required.");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                    state.dataIPShortCut->cAlphaFieldNames(3) + " is required.");
             } else {
                 ShowSevereError(state,
-                                RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                     state.dataIPShortCut->cAlphaFieldNames(3) + " entered=" + AlphaName(3));
             }
             ErrorsFound = true;
@@ -287,15 +287,15 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             if (SchMin < 0.0 || SchMax < 0.0) {
                 if (SchMin < 0.0) {
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                        ", minimum is < 0.0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0");
                     ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                     ErrorsFound = true;
                 }
                 if (SchMax < 0.0) {
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                        ", maximum is < 0.0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0");
                     ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                     ErrorsFound = true;
                 }
@@ -309,11 +309,11 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         if (state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCRemovalCoefSchedPtr == 0) {
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 ShowSevereError(state,
-                                RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(4) +
-                                    " is required.");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                    state.dataIPShortCut->cAlphaFieldNames(4) + " is required.");
             } else {
                 ShowSevereError(state,
-                                RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                     state.dataIPShortCut->cAlphaFieldNames(4) + " entered=" + AlphaName(4));
             }
             ErrorsFound = true;
@@ -323,15 +323,15 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             if (SchMin < 0.0 || SchMax < 0.0) {
                 if (SchMin < 0.0) {
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(4) +
-                                        ", minimum is < 0.0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(4) + ", minimum is < 0.0");
                     ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(4), SchMin));
                     ErrorsFound = true;
                 }
                 if (SchMax < 0.0) {
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(4) +
-                                        ", maximum is < 0.0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(4) + ", maximum is < 0.0");
                     ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(4), SchMax));
                     ErrorsFound = true;
                 }
@@ -345,8 +345,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                             "Generic Air Contaminant Constant Source Generation Volume Flow Rate",
                             OutputProcessor::Unit::m3_s,
                             state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCGenRate,
-                            "Zone",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataContaminantBalance->ZoneContamGenericConstant(Loop).Name);
 
         // Zone total report variables
@@ -357,8 +357,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                                 "Zone Generic Air Contaminant Generation Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataHeatBal->ZnRpt(ZonePtr).GCRate,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatBal->Zone(ZonePtr).Name);
         }
         SetupZoneInternalGain(state,
@@ -403,8 +403,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             AlphaName(2), state.dataAirflowNetwork->MultizoneSurfaceData, &AirflowNetwork::MultizoneSurfaceProp::SurfName);
         if (state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfNum == 0) {
             ShowSevereError(state,
-                            RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
-                                " entered=" + AlphaName(2));
+                            std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                state.dataIPShortCut->cAlphaFieldNames(2) + " entered=" + AlphaName(2));
             ShowContinueError(state, "which is not listed in AirflowNetwork:MultiZone:Surface.");
             ErrorsFound = true;
         }
@@ -415,7 +415,7 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                         state.dataAirflowNetwork->MultizoneSurfaceData(state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfNum).SurfNum)
                     .ExtBoundCond != ExternalEnvironment) {
             ShowSevereError(state,
-                            RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + ". The entered surface (" + AlphaName(2) +
+                            std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + ". The entered surface (" + AlphaName(2) +
                                 ") is not an exterior surface");
             ErrorsFound = true;
         }
@@ -424,11 +424,11 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         if (state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).GCGenRateCoefSchedPtr == 0) {
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 ShowSevereError(state,
-                                RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                    " is required.");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                    state.dataIPShortCut->cAlphaFieldNames(3) + " is required.");
             } else {
                 ShowSevereError(state,
-                                RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                     state.dataIPShortCut->cAlphaFieldNames(3) + " entered=" + AlphaName(3));
             }
             ErrorsFound = true;
@@ -438,15 +438,15 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             if (SchMin < 0.0 || SchMax < 0.0) {
                 if (SchMin < 0.0) {
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                        ", minimum is < 0.0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0");
                     ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                     ErrorsFound = true;
                 }
                 if (SchMax < 0.0) {
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                        ", maximum is < 0.0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0");
                     ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                     ErrorsFound = true;
                 }
@@ -456,7 +456,7 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).GCGenRateCoef = IHGNumbers(1);
         if (IHGNumbers(1) < 0.0) {
             ShowSevereError(state,
-                            RoutineName + "Negative values are not allowed for " + state.dataIPShortCut->cNumericFieldNames(1) + " in " +
+                            std::string{RoutineName} + "Negative values are not allowed for " + state.dataIPShortCut->cNumericFieldNames(1) + " in " +
                                 CurrentModuleObject + " = " + AlphaName(1));
             ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(1)));
             ErrorsFound = true;
@@ -465,15 +465,15 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).GCExpo = IHGNumbers(2);
         if (IHGNumbers(2) <= 0.0) {
             ShowSevereError(state,
-                            RoutineName + "Negative or zero value is not allowed for " + state.dataIPShortCut->cNumericFieldNames(2) + " in " +
-                                CurrentModuleObject + " = " + AlphaName(1));
+                            std::string{RoutineName} + "Negative or zero value is not allowed for " + state.dataIPShortCut->cNumericFieldNames(2) +
+                                " in " + CurrentModuleObject + " = " + AlphaName(1));
             ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(2)));
             ErrorsFound = true;
         }
         if (IHGNumbers(2) > 1.0) {
             ShowSevereError(state,
-                            RoutineName + "The value greater than 1.0 is not allowed for " + state.dataIPShortCut->cNumericFieldNames(2) + " in " +
-                                CurrentModuleObject + " = " + AlphaName(1));
+                            std::string{RoutineName} + "The value greater than 1.0 is not allowed for " +
+                                state.dataIPShortCut->cNumericFieldNames(2) + " in " + CurrentModuleObject + " = " + AlphaName(1));
             ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(2)));
             ErrorsFound = true;
         }
@@ -483,8 +483,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                             "Generic Air Contaminant Pressure Driven Generation Volume Flow Rate",
                             OutputProcessor::Unit::m3_s,
                             state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).GCGenRate,
-                            "Zone",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).Name);
 
         if (state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfNum > 0) {
@@ -503,8 +503,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                                 "Zone Generic Air Contaminant Generation Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataHeatBal->ZnRpt(ZonePtr).GCRate,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatBal->Zone(ZonePtr).Name);
         }
         if (ZonePtr > 0)
@@ -550,8 +550,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
         if (state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).ActualZoneNum == 0) {
             ShowSevereError(state,
-                            RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
-                                " entered=" + AlphaName(2));
+                            std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                state.dataIPShortCut->cAlphaFieldNames(2) + " entered=" + AlphaName(2));
             ErrorsFound = true;
         }
 
@@ -559,11 +559,11 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         if (state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).GCGenerateRateSchedPtr == 0) {
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 ShowSevereError(state,
-                                RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                    " is required.");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                    state.dataIPShortCut->cAlphaFieldNames(3) + " is required.");
             } else {
                 ShowSevereError(state,
-                                RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                     state.dataIPShortCut->cAlphaFieldNames(3) + " entered=" + AlphaName(3));
             }
             ErrorsFound = true;
@@ -573,15 +573,15 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             if (SchMin < 0.0 || SchMax < 0.0) {
                 if (SchMin < 0.0) {
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                        ", minimum is < 0.0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0");
                     ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                     ErrorsFound = true;
                 }
                 if (SchMax < 0.0) {
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                        ", maximum is < 0.0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0");
                     ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                     ErrorsFound = true;
                 }
@@ -593,15 +593,15 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
 
         if (IHGNumbers(1) < 0.0) {
             ShowSevereError(state,
-                            RoutineName + "Negative values are not allowed for " + state.dataIPShortCut->cNumericFieldNames(1) + " in " +
+                            std::string{RoutineName} + "Negative values are not allowed for " + state.dataIPShortCut->cNumericFieldNames(1) + " in " +
                                 CurrentModuleObject + " = " + AlphaName(1));
             ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(1)));
             ErrorsFound = true;
         }
         if (IHGNumbers(2) <= 0.0) {
             ShowSevereError(state,
-                            RoutineName + "Negative values or zero are not allowed for " + state.dataIPShortCut->cNumericFieldNames(2) + " in " +
-                                CurrentModuleObject + " = " + AlphaName(1));
+                            std::string{RoutineName} + "Negative values or zero are not allowed for " + state.dataIPShortCut->cNumericFieldNames(2) +
+                                " in " + CurrentModuleObject + " = " + AlphaName(1));
             ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(2)));
             ErrorsFound = true;
         }
@@ -611,8 +611,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                             "Generic Air Contaminant Cutoff Model Generation Volume Flow Rate",
                             OutputProcessor::Unit::m3_s,
                             state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).GCGenRate,
-                            "Zone",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).Name);
 
         // Zone total report variables
@@ -623,8 +623,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                                 "Zone Generic Air Contaminant Generation Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataHeatBal->ZnRpt(ZonePtr).GCRate,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatBal->Zone(ZonePtr).Name);
         }
         SetupZoneInternalGain(state,
@@ -669,8 +669,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
         if (state.dataContaminantBalance->ZoneContamGenericDecay(Loop).ActualZoneNum == 0) {
             ShowSevereError(state,
-                            RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
-                                " entered=" + AlphaName(2));
+                            std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                state.dataIPShortCut->cAlphaFieldNames(2) + " entered=" + AlphaName(2));
             ErrorsFound = true;
         }
 
@@ -678,11 +678,11 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         if (state.dataContaminantBalance->ZoneContamGenericDecay(Loop).GCEmiRateSchedPtr == 0) {
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 ShowSevereError(state,
-                                RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                    " is required.");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                    state.dataIPShortCut->cAlphaFieldNames(3) + " is required.");
             } else {
                 ShowSevereError(state,
-                                RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                     state.dataIPShortCut->cAlphaFieldNames(3) + " entered=" + AlphaName(3));
             }
             ErrorsFound = true;
@@ -692,15 +692,15 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             if (SchMin < 0.0 || SchMax < 0.0) {
                 if (SchMin < 0.0) {
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                        ", minimum is < 0.0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0");
                     ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                     ErrorsFound = true;
                 }
                 if (SchMax < 0.0) {
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                        ", maximum is < 0.0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0");
                     ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                     ErrorsFound = true;
                 }
@@ -712,15 +712,15 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
 
         if (IHGNumbers(1) < 0.0) {
             ShowSevereError(state,
-                            RoutineName + "Negative values are not allowed for " + state.dataIPShortCut->cNumericFieldNames(1) + " in " +
+                            std::string{RoutineName} + "Negative values are not allowed for " + state.dataIPShortCut->cNumericFieldNames(1) + " in " +
                                 CurrentModuleObject + " = " + AlphaName(1));
             ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(1)));
             ErrorsFound = true;
         }
         if (IHGNumbers(2) <= 0.0) {
             ShowSevereError(state,
-                            RoutineName + "Negative values or zero are not allowed for " + state.dataIPShortCut->cNumericFieldNames(2) + " in " +
-                                CurrentModuleObject + " = " + AlphaName(1));
+                            std::string{RoutineName} + "Negative values or zero are not allowed for " + state.dataIPShortCut->cNumericFieldNames(2) +
+                                " in " + CurrentModuleObject + " = " + AlphaName(1));
             ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(2)));
             ErrorsFound = true;
         }
@@ -730,15 +730,15 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                             "Generic Air Contaminant Decay Model Generation Volume Flow Rate",
                             OutputProcessor::Unit::m3_s,
                             state.dataContaminantBalance->ZoneContamGenericDecay(Loop).GCGenRate,
-                            "Zone",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataContaminantBalance->ZoneContamGenericDecay(Loop).Name);
         SetupOutputVariable(state,
                             "Generic Air Contaminant Decay Model Generation Emission Start Elapsed Time",
                             OutputProcessor::Unit::s,
                             state.dataContaminantBalance->ZoneContamGenericDecay(Loop).GCTime,
-                            "Zone",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataContaminantBalance->ZoneContamGenericDecay(Loop).Name);
 
         // Zone total report variables
@@ -749,8 +749,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                                 "Zone Generic Air Contaminant Generation Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataHeatBal->ZnRpt(ZonePtr).GCRate,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatBal->Zone(ZonePtr).Name);
         }
         SetupZoneInternalGain(state,
@@ -795,8 +795,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             UtilityRoutines::FindItemInList(AlphaName(2), state.dataSurface->Surface);
         if (state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).SurfNum == 0) {
             ShowSevereError(state,
-                            RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
-                                " entered=" + AlphaName(2));
+                            std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                state.dataIPShortCut->cAlphaFieldNames(2) + " entered=" + AlphaName(2));
             ErrorsFound = true;
         }
 
@@ -804,11 +804,11 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         if (state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).GCTranCoefSchedPtr == 0) {
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 ShowSevereError(state,
-                                RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                    " is required.");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                    state.dataIPShortCut->cAlphaFieldNames(3) + " is required.");
             } else {
                 ShowSevereError(state,
-                                RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                     state.dataIPShortCut->cAlphaFieldNames(3) + " entered=" + AlphaName(3));
             }
             ErrorsFound = true;
@@ -818,15 +818,15 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             if (SchMin < 0.0 || SchMax < 0.0) {
                 if (SchMin < 0.0) {
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                        ", minimum is < 0.0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0");
                     ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                     ErrorsFound = true;
                 }
                 if (SchMax < 0.0) {
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                        ", maximum is < 0.0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0");
                     ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                     ErrorsFound = true;
                 }
@@ -837,15 +837,15 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).GCHenryCoef = IHGNumbers(2);
         if (IHGNumbers(1) < 0.0) {
             ShowSevereError(state,
-                            RoutineName + "Negative values are not allowed for " + state.dataIPShortCut->cNumericFieldNames(1) + " in " +
+                            std::string{RoutineName} + "Negative values are not allowed for " + state.dataIPShortCut->cNumericFieldNames(1) + " in " +
                                 CurrentModuleObject + " = " + AlphaName(1));
             ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(1)));
             ErrorsFound = true;
         }
         if (IHGNumbers(2) <= 0.0) {
             ShowSevereError(state,
-                            RoutineName + "Negative values or zero are not allowed for " + state.dataIPShortCut->cNumericFieldNames(2) + " in " +
-                                CurrentModuleObject + " = " + AlphaName(1));
+                            std::string{RoutineName} + "Negative values or zero are not allowed for " + state.dataIPShortCut->cNumericFieldNames(2) +
+                                " in " + CurrentModuleObject + " = " + AlphaName(1));
             ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(2)));
             ErrorsFound = true;
         }
@@ -855,16 +855,16 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                             "Generic Air Contaminant Boundary Layer Diffusion Generation Volume Flow Rate",
                             OutputProcessor::Unit::m3_s,
                             state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).GCGenRate,
-                            "Zone",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).Name);
         if (state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).SurfNum > 0) {
             SetupOutputVariable(state,
                                 "Generic Air Contaminant Boundary Layer Diffusion Inside Face Concentration",
                                 OutputProcessor::Unit::ppm,
                                 state.dataSurface->SurfGenericContam(state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).SurfNum),
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).SurfName);
         }
 
@@ -876,8 +876,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                                 "Zone Generic Air Contaminant Generation Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataHeatBal->ZnRpt(ZonePtr).GCRate,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatBal->Zone(ZonePtr).Name);
         }
         SetupZoneInternalGain(state,
@@ -920,8 +920,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         state.dataContaminantBalance->ZoneContamGenericDVS(Loop).SurfNum = UtilityRoutines::FindItemInList(AlphaName(2), state.dataSurface->Surface);
         if (state.dataContaminantBalance->ZoneContamGenericDVS(Loop).SurfNum == 0) {
             ShowSevereError(state,
-                            RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
-                                " entered=" + AlphaName(2));
+                            std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                state.dataIPShortCut->cAlphaFieldNames(2) + " entered=" + AlphaName(2));
             ErrorsFound = true;
         }
 
@@ -929,11 +929,11 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         if (state.dataContaminantBalance->ZoneContamGenericDVS(Loop).GCDepoVeloPtr == 0) {
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 ShowSevereError(state,
-                                RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                    " is required.");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                    state.dataIPShortCut->cAlphaFieldNames(3) + " is required.");
             } else {
                 ShowSevereError(state,
-                                RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                     state.dataIPShortCut->cAlphaFieldNames(3) + " entered=" + AlphaName(3));
             }
             ErrorsFound = true;
@@ -943,15 +943,15 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             if (SchMin < 0.0 || SchMax < 0.0) {
                 if (SchMin < 0.0) {
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                        ", minimum is < 0.0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0");
                     ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                     ErrorsFound = true;
                 }
                 if (SchMax < 0.0) {
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                        ", maximum is < 0.0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0");
                     ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                     ErrorsFound = true;
                 }
@@ -961,7 +961,7 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         state.dataContaminantBalance->ZoneContamGenericDVS(Loop).GCDepoVelo = IHGNumbers(1);
         if (IHGNumbers(1) < 0.0) {
             ShowSevereError(state,
-                            RoutineName + "Negative values are not allowed for " + state.dataIPShortCut->cNumericFieldNames(1) + " in " +
+                            std::string{RoutineName} + "Negative values are not allowed for " + state.dataIPShortCut->cNumericFieldNames(1) + " in " +
                                 CurrentModuleObject + " = " + AlphaName(1));
             ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(1)));
             ErrorsFound = true;
@@ -972,8 +972,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                             "Generic Air Contaminant Deposition Velocity Removal Volume Flow Rate",
                             OutputProcessor::Unit::m3_s,
                             state.dataContaminantBalance->ZoneContamGenericDVS(Loop).GCGenRate,
-                            "Zone",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataContaminantBalance->ZoneContamGenericDVS(Loop).Name);
 
         ZonePtr = state.dataSurface->Surface(state.dataContaminantBalance->ZoneContamGenericDVS(Loop).SurfNum).Zone;
@@ -984,8 +984,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                                 "Zone Generic Air Contaminant Generation Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataHeatBal->ZnRpt(ZonePtr).GCRate,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatBal->Zone(ZonePtr).Name);
         }
         SetupZoneInternalGain(state,
@@ -1029,8 +1029,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
         if (state.dataContaminantBalance->ZoneContamGenericDRS(Loop).ActualZoneNum == 0) {
             ShowSevereError(state,
-                            RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
-                                " entered=" + AlphaName(2));
+                            std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                state.dataIPShortCut->cAlphaFieldNames(2) + " entered=" + AlphaName(2));
             ErrorsFound = true;
         }
 
@@ -1038,11 +1038,11 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         if (state.dataContaminantBalance->ZoneContamGenericDRS(Loop).GCDepoRatePtr == 0) {
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 ShowSevereError(state,
-                                RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                    " is required.");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                    state.dataIPShortCut->cAlphaFieldNames(3) + " is required.");
             } else {
                 ShowSevereError(state,
-                                RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                     state.dataIPShortCut->cAlphaFieldNames(3) + " entered=" + AlphaName(3));
             }
             ErrorsFound = true;
@@ -1052,15 +1052,15 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             if (SchMin < 0.0 || SchMax < 0.0) {
                 if (SchMin < 0.0) {
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                        ", minimum is < 0.0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0");
                     ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                     ErrorsFound = true;
                 }
                 if (SchMax < 0.0) {
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                        ", maximum is < 0.0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0");
                     ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                     ErrorsFound = true;
                 }
@@ -1071,7 +1071,7 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
 
         if (IHGNumbers(1) < 0.0) {
             ShowSevereError(state,
-                            RoutineName + "Negative values are not allowed for " + state.dataIPShortCut->cNumericFieldNames(1) + " in " +
+                            std::string{RoutineName} + "Negative values are not allowed for " + state.dataIPShortCut->cNumericFieldNames(1) + " in " +
                                 CurrentModuleObject + " = " + AlphaName(1));
             ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(1)));
             ErrorsFound = true;
@@ -1082,8 +1082,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                             "Generic Air Contaminant Deposition Rate Removal Volume Flow Rate",
                             OutputProcessor::Unit::m3_s,
                             state.dataContaminantBalance->ZoneContamGenericDRS(Loop).GCGenRate,
-                            "Zone",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataContaminantBalance->ZoneContamGenericDRS(Loop).Name);
 
         ZonePtr = state.dataContaminantBalance->ZoneContamGenericDRS(Loop).ActualZoneNum;
@@ -1094,8 +1094,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                                 "Zone Generic Air Contaminant Generation Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataHeatBal->ZnRpt(ZonePtr).GCRate,
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatBal->Zone(ZonePtr).Name);
         }
         SetupZoneInternalGain(state,
@@ -1434,29 +1434,29 @@ void InitZoneContSetPoints(EnergyPlusData &state)
                                     "Zone Air CO2 Concentration",
                                     OutputProcessor::Unit::ppm,
                                     state.dataContaminantBalance->ZoneAirCO2(Loop),
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->Zone(Loop).Name);
                 SetupOutputVariable(state,
                                     "Zone Air CO2 Predicted Load to Setpoint Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
                                     state.dataContaminantBalance->CO2PredictedRate(Loop),
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->Zone(Loop).Name);
                 SetupOutputVariable(state,
                                     "Zone Air CO2 Setpoint Concentration",
                                     OutputProcessor::Unit::ppm,
                                     state.dataContaminantBalance->ZoneCO2SetPoint(Loop),
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->Zone(Loop).Name);
                 SetupOutputVariable(state,
                                     "Zone Air CO2 Internal Gain Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     state.dataContaminantBalance->ZoneCO2Gain(Loop),
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->Zone(Loop).Name);
             }
 
@@ -1502,22 +1502,22 @@ void InitZoneContSetPoints(EnergyPlusData &state)
                                     "Zone Air Generic Air Contaminant Concentration",
                                     OutputProcessor::Unit::ppm,
                                     state.dataContaminantBalance->ZoneAirGC(Loop),
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->Zone(Loop).Name);
                 SetupOutputVariable(state,
                                     "Zone Generic Air Contaminant Predicted Load to Setpoint Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
                                     state.dataContaminantBalance->GCPredictedRate(Loop),
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->Zone(Loop).Name);
                 SetupOutputVariable(state,
                                     "Zone Generic Air Contaminant Setpoint Concentration",
                                     OutputProcessor::Unit::ppm,
                                     state.dataContaminantBalance->ZoneGCSetPoint(Loop),
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->Zone(Loop).Name);
             }
         } // Loop
@@ -1779,7 +1779,7 @@ void PredictZoneContaminants(EnergyPlusData &state,
 
     using ScheduleManager::GetCurrentScheduleValue;
 
-    static std::string const RoutineName("PredictZoneContaminants");
+    static constexpr std::string_view RoutineName("PredictZoneContaminants");
 
     Real64 CO2Gain;              // Zone CO2 internal load
     Real64 RhoAir;               // Zone air density
@@ -1874,7 +1874,7 @@ void PredictZoneContaminants(EnergyPlusData &state,
             }
         }
 
-        if (state.dataHeatBal->ZoneAirSolutionAlgo != Use3rdOrder) {
+        if (state.dataHeatBal->ZoneAirSolutionAlgo != DataHeatBalance::SolutionAlgo::ThirdOrder) {
             if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                 if (ShortenTimeStepSys && state.dataHVACGlobal->TimeStepSys < state.dataGlobal->TimeStepZone) {
                     if (state.dataHVACGlobal->PreviousTimeStep < state.dataGlobal->TimeStepZone) {
@@ -1999,13 +1999,13 @@ void PredictZoneContaminants(EnergyPlusData &state,
                 // the amount of CO2 that must be removed by the system.
                 {
                     auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
-                    if (SELECT_CASE_var == Use3rdOrder) {
+                    if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::ThirdOrder) {
                         LoadToCO2SetPoint = ((11.0 / 6.0) * C + A) * ZoneAirCO2SetPoint -
                                             (B + C * (3.0 * state.dataContaminantBalance->CO2ZoneTimeMinus1Temp(ZoneNum) -
                                                       (3.0 / 2.0) * state.dataContaminantBalance->CO2ZoneTimeMinus2Temp(ZoneNum) +
                                                       (1.0 / 3.0) * state.dataContaminantBalance->CO2ZoneTimeMinus3Temp(ZoneNum)));
                         // Exact solution
-                    } else if (SELECT_CASE_var == UseAnalyticalSolution) {
+                    } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
                         if (A == 0.0) { // B=0
                             LoadToCO2SetPoint = C * (ZoneAirCO2SetPoint - state.dataContaminantBalance->ZoneCO21(ZoneNum)) - B;
                         } else {
@@ -2014,7 +2014,7 @@ void PredictZoneContaminants(EnergyPlusData &state,
                                     (1.0 - std::exp(min(700.0, -A / C))) -
                                 B;
                         }
-                    } else if (SELECT_CASE_var == UseEulerMethod) {
+                    } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::EulerMethod) {
                         LoadToCO2SetPoint = C * (ZoneAirCO2SetPoint - state.dataContaminantBalance->ZoneCO21(ZoneNum)) + A * ZoneAirCO2SetPoint - B;
                     }
                 }
@@ -2129,13 +2129,13 @@ void PredictZoneContaminants(EnergyPlusData &state,
                 // the amount of GC that must be removed by the system.
                 {
                     auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
-                    if (SELECT_CASE_var == Use3rdOrder) {
+                    if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::ThirdOrder) {
                         LoadToGCSetPoint = ((11.0 / 6.0) * C + A) * ZoneAirGCSetPoint -
                                            (B + C * (3.0 * state.dataContaminantBalance->GCZoneTimeMinus1Temp(ZoneNum) -
                                                      (3.0 / 2.0) * state.dataContaminantBalance->GCZoneTimeMinus2Temp(ZoneNum) +
                                                      (1.0 / 3.0) * state.dataContaminantBalance->GCZoneTimeMinus3Temp(ZoneNum)));
                         // Exact solution
-                    } else if (SELECT_CASE_var == UseAnalyticalSolution) {
+                    } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
                         if (A == 0.0) { // B=0
                             LoadToGCSetPoint = C * (ZoneAirGCSetPoint - state.dataContaminantBalance->ZoneGC1(ZoneNum)) - B;
                         } else {
@@ -2144,7 +2144,7 @@ void PredictZoneContaminants(EnergyPlusData &state,
                                     (1.0 - std::exp(min(700.0, -A / C))) -
                                 B;
                         }
-                    } else if (SELECT_CASE_var == UseEulerMethod) {
+                    } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::EulerMethod) {
                         LoadToGCSetPoint = C * (ZoneAirGCSetPoint - state.dataContaminantBalance->ZoneGC1(ZoneNum)) + A * ZoneAirGCSetPoint - B;
                     }
                 }
@@ -2188,7 +2188,7 @@ void PushZoneTimestepHistories(EnergyPlusData &state)
                 state.dataContaminantBalance->ZoneAirCO2Avg(ZoneNum); // using average for whole zone time step.
             state.dataContaminantBalance->ZoneAirCO2(ZoneNum) = state.dataContaminantBalance->ZoneAirCO2Temp(ZoneNum);
 
-            if (state.dataHeatBal->ZoneAirSolutionAlgo != Use3rdOrder) {
+            if (state.dataHeatBal->ZoneAirSolutionAlgo != DataHeatBalance::SolutionAlgo::ThirdOrder) {
                 state.dataContaminantBalance->ZoneCO2M2(ZoneNum) = state.dataContaminantBalance->ZoneCO2MX(ZoneNum);
                 state.dataContaminantBalance->ZoneCO2MX(ZoneNum) =
                     state.dataContaminantBalance->ZoneAirCO2Avg(ZoneNum); // using average for whole zone time step.
@@ -2203,7 +2203,7 @@ void PushZoneTimestepHistories(EnergyPlusData &state)
                 state.dataContaminantBalance->ZoneAirGCAvg(ZoneNum); // using average for whole zone time step.
             state.dataContaminantBalance->ZoneAirGC(ZoneNum) = state.dataContaminantBalance->ZoneAirGCTemp(ZoneNum);
 
-            if (state.dataHeatBal->ZoneAirSolutionAlgo != Use3rdOrder) {
+            if (state.dataHeatBal->ZoneAirSolutionAlgo != DataHeatBalance::SolutionAlgo::ThirdOrder) {
                 state.dataContaminantBalance->ZoneGCM2(ZoneNum) = state.dataContaminantBalance->ZoneGCMX(ZoneNum);
                 state.dataContaminantBalance->ZoneGCMX(ZoneNum) =
                     state.dataContaminantBalance->ZoneAirGCAvg(ZoneNum); // using average for whole zone time step.
@@ -2244,7 +2244,7 @@ void PushSystemTimestepHistories(EnergyPlusData &state)
         }
     } // zone loop
 
-    if (state.dataHeatBal->ZoneAirSolutionAlgo != Use3rdOrder) {
+    if (state.dataHeatBal->ZoneAirSolutionAlgo != DataHeatBalance::SolutionAlgo::ThirdOrder) {
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                 state.dataContaminantBalance->ZoneCO2M2(ZoneNum) = state.dataContaminantBalance->ZoneCO2MX(ZoneNum);
@@ -2309,8 +2309,6 @@ void InverseModelCO2(EnergyPlusData &state,
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine inversely solve infiltration airflow rate or people count with zone air CO2 concentration measurements.
 
-    static std::string const RoutineName("InverseModelCO2");
-
     Real64 AA(0.0);
     Real64 BB(0.0);
     Real64 CC(0.0);
@@ -2340,7 +2338,7 @@ void InverseModelCO2(EnergyPlusData &state,
         state.dataContaminantBalance->ZoneAirCO2(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredCO2Concentration;
 
         if (state.dataHybridModel->HybridModelZone(ZoneNum).InfiltrationCalc_C && state.dataHVACGlobal->UseZoneTimeStepHistory) {
-            static std::string const RoutineNameInfiltration("CalcAirFlowSimple:Infiltration");
+            static constexpr std::string_view RoutineNameInfiltration("CalcAirFlowSimple:Infiltration");
             // Conditionally calculate the CO2-dependent and CO2-independent terms.
             if (state.dataHybridModel->HybridModelZone(ZoneNum).IncludeSystemSupplyParameters) {
                 state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate =
@@ -2492,7 +2490,7 @@ void CorrectZoneContaminants(EnergyPlusData &state,
     // Routine FinalZnCalcs - FINAL ZONE CALCULATIONS, authored by Dale Herron
     // for BLAST.
 
-    static std::string const RoutineName("CorrectZoneContaminants");
+    static constexpr std::string_view RoutineName("CorrectZoneContaminants");
 
     int NodeNum;
     int ZoneNodeNum;
@@ -2760,21 +2758,21 @@ void CorrectZoneContaminants(EnergyPlusData &state,
             // smooth the changes using the zone air capacitance.
             {
                 auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
-                if (SELECT_CASE_var == Use3rdOrder) {
+                if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::ThirdOrder) {
                     state.dataContaminantBalance->ZoneAirCO2Temp(ZoneNum) =
                         (B + C * (3.0 * state.dataContaminantBalance->CO2ZoneTimeMinus1Temp(ZoneNum) -
                                   (3.0 / 2.0) * state.dataContaminantBalance->CO2ZoneTimeMinus2Temp(ZoneNum) +
                                   (1.0 / 3.0) * state.dataContaminantBalance->CO2ZoneTimeMinus3Temp(ZoneNum))) /
                         ((11.0 / 6.0) * C + A);
                     // Exact solution
-                } else if (SELECT_CASE_var == UseAnalyticalSolution) {
+                } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
                     if (A == 0.0) { // B=0
                         state.dataContaminantBalance->ZoneAirCO2Temp(ZoneNum) = state.dataContaminantBalance->ZoneCO21(ZoneNum) + B / C;
                     } else {
                         state.dataContaminantBalance->ZoneAirCO2Temp(ZoneNum) =
                             (state.dataContaminantBalance->ZoneCO21(ZoneNum) - B / A) * std::exp(min(700.0, -A / C)) + B / A;
                     }
-                } else if (SELECT_CASE_var == UseEulerMethod) {
+                } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::EulerMethod) {
                     state.dataContaminantBalance->ZoneAirCO2Temp(ZoneNum) = (C * state.dataContaminantBalance->ZoneCO21(ZoneNum) + B) / (C + A);
                 }
             }
@@ -2834,21 +2832,21 @@ void CorrectZoneContaminants(EnergyPlusData &state,
             // smooth the changes using the zone air capacitance.
             {
                 auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
-                if (SELECT_CASE_var == Use3rdOrder) {
+                if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::ThirdOrder) {
                     state.dataContaminantBalance->ZoneAirGCTemp(ZoneNum) =
                         (B + C * (3.0 * state.dataContaminantBalance->GCZoneTimeMinus1Temp(ZoneNum) -
                                   (3.0 / 2.0) * state.dataContaminantBalance->GCZoneTimeMinus2Temp(ZoneNum) +
                                   (1.0 / 3.0) * state.dataContaminantBalance->GCZoneTimeMinus3Temp(ZoneNum))) /
                         ((11.0 / 6.0) * C + A);
                     // Exact solution
-                } else if (SELECT_CASE_var == UseAnalyticalSolution) {
+                } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
                     if (A == 0.0) { // B=0
                         state.dataContaminantBalance->ZoneAirGCTemp(ZoneNum) = state.dataContaminantBalance->ZoneGC1(ZoneNum) + B / C;
                     } else {
                         state.dataContaminantBalance->ZoneAirGCTemp(ZoneNum) =
                             (state.dataContaminantBalance->ZoneGC1(ZoneNum) - B / A) * std::exp(min(700.0, -A / C)) + B / A;
                     }
-                } else if (SELECT_CASE_var == UseEulerMethod) {
+                } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::EulerMethod) {
                     state.dataContaminantBalance->ZoneAirGCTemp(ZoneNum) = (C * state.dataContaminantBalance->ZoneGC1(ZoneNum) + B) / (C + A);
                 }
             }

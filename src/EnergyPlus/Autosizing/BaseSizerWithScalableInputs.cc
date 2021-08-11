@@ -56,10 +56,10 @@
 namespace EnergyPlus {
 
 void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
-                                                     const std::string &_compType,
-                                                     const std::string &_compName,
-                                                     const bool &_printWarningFlag,
-                                                     const std::string &_callingRoutine)
+                                                     std::string_view const _compType,
+                                                     std::string_view const _compName,
+                                                     bool const &_printWarningFlag,
+                                                     std::string_view const _callingRoutine)
 {
     BaseSizerWithFanHeatInputs::initializeWithinEP(state, _compType, _compName, _printWarningFlag, _callingRoutine);
 

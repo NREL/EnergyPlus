@@ -160,7 +160,7 @@ namespace ZonePlenum {
     // Functions
 
     void SimAirZonePlenum(EnergyPlusData &state,
-                          std::string const &CompName,
+                          std::string_view CompName,
                           int const iCompType,
                           int &CompIndex,
                           Optional_bool_const FirstHVACIteration = _, // Autodesk:OPTIONAL Used without PRESENT check
@@ -187,6 +187,8 @@ namespace ZonePlenum {
     void GetReturnPlenumName(EnergyPlusData &state, int const &ReturnPlenumIndex, std::string &ReturnPlenumName);
 
     int getReturnPlenumIndexFromInletNode(EnergyPlusData &state, int const &InNodeNum);
+
+    bool ValidateInducedNode(EnergyPlusData &state, int const InduceNodeNum, int const NumReturnNodes, Array1D<int> const &ReturnNode);
 
 } // namespace ZonePlenum
 

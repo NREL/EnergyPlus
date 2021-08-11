@@ -322,9 +322,10 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     Array1D<NeededComfortControlTypes> TComfortControlTypes;
 
     // Formats
-    static constexpr auto Header("! <Zone Volume Capacitance Multiplier>, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, Carbon "
-                                 "Dioxide Capacity Multiplier, Generic Contaminant Capacity Multiplier\n");
-    static constexpr auto Format_701("Zone Volume Capacitance Multiplier,{:8.3F} ,{:8.3F},{:8.3F},{:8.3F}\n");
+    static constexpr fmt::string_view Header(
+        "! <Zone Volume Capacitance Multiplier>, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, Carbon "
+        "Dioxide Capacity Multiplier, Generic Contaminant Capacity Multiplier\n");
+    static constexpr fmt::string_view Format_701("Zone Volume Capacitance Multiplier,{:8.3F} ,{:8.3F},{:8.3F},{:8.3F}\n");
 
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     auto &TStatObjects = state.dataZoneCtrls->TStatObjects;
@@ -2036,8 +2037,8 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                         "Zone Thermostat Operative Temperature",
                                         OutputProcessor::Unit::C,
                                         state.dataHeatBal->ZnAirRpt(TempControlledZone(TempControlledZoneNum).ActualZoneNum).ThermOperativeTemp,
-                                        "Zone",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::Zone,
+                                        OutputProcessor::SOVStoreType::Average,
                                         Zone(TempControlledZone(TempControlledZoneNum).ActualZoneNum).Name);
                 }
             } else {
@@ -2141,8 +2142,8 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                         "Zone Thermostat Operative Temperature",
                                         OutputProcessor::Unit::C,
                                         state.dataHeatBal->ZnAirRpt(TempControlledZone(TempControlledZoneNum).ActualZoneNum).ThermOperativeTemp,
-                                        "Zone",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::Zone,
+                                        OutputProcessor::SOVStoreType::Average,
                                         Zone(TempControlledZone(TempControlledZoneNum).ActualZoneNum).Name);
                 } // TStat Objects Loop
             }     // found thermostat referene
@@ -2944,8 +2945,8 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
                                 "Zone Air System Sensible Heating Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataHeatBal->SNLoadHeatEnergy(Loop),
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 Zone(Loop).Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -2959,8 +2960,8 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
                                 "Zone Air System Sensible Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataHeatBal->SNLoadCoolEnergy(Loop),
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 Zone(Loop).Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -2974,38 +2975,43 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
                                 "Zone Air System Sensible Heating Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataHeatBal->SNLoadHeatRate(Loop),
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Air System Sensible Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataHeatBal->SNLoadCoolRate(Loop),
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
-            SetupOutputVariable(
-                state, "Zone Air Temperature", OutputProcessor::Unit::C, state.dataHeatBalFanSys->ZT(Loop), "System", "Average", Zone(Loop).Name);
+            SetupOutputVariable(state,
+                                "Zone Air Temperature",
+                                OutputProcessor::Unit::C,
+                                state.dataHeatBalFanSys->ZT(Loop),
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                Zone(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Thermostat Air Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataHeatBalFanSys->TempTstatAir(Loop),
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Air Humidity Ratio",
                                 OutputProcessor::Unit::None,
                                 state.dataHeatBalFanSys->ZoneAirHumRat(Loop),
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Air Relative Humidity",
                                 OutputProcessor::Unit::Perc,
                                 state.dataZoneTempPredictorCorrector->ZoneAirRelHum(Loop),
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
 
             // The following output variables are for the predicted Heating/Cooling load for the zone which can be compared to actual load.
@@ -3015,44 +3021,44 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
                                 "Zone Predicted Sensible Load to Setpoint Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataHeatBal->SNLoadPredictedRate(Loop),
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataHeatBal->SNLoadPredictedHSPRate(Loop),
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataHeatBal->SNLoadPredictedCSPRate(Loop),
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
             // Second, these report variable ARE multiplied by zone and group multipliers
             SetupOutputVariable(state,
                                 "Zone System Predicted Sensible Load to Setpoint Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
                                 ZoneSysEnergyDemand(Loop).TotalOutputRequired,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone System Predicted Sensible Load to Heating Setpoint Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
                                 ZoneSysEnergyDemand(Loop).OutputRequiredToHeatingSP,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
                                 ZoneSysEnergyDemand(Loop).OutputRequiredToCoolingSP,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
 
             // The following output variables are for the predicted moisture load for the zone with humidity controlled specified.
@@ -3062,75 +3068,80 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
                                 "Zone Predicted Moisture Load Moisture Transfer Rate",
                                 OutputProcessor::Unit::kgWater_s,
                                 state.dataHeatBal->MoisturePredictedRate(Loop),
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate",
                                 OutputProcessor::Unit::kgWater_s,
                                 state.dataHeatBal->MoisturePredictedHumSPRate(Loop),
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate",
                                 OutputProcessor::Unit::kgWater_s,
                                 state.dataHeatBal->MoisturePredictedDehumSPRate(Loop),
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
             // Second, these report variable ARE multiplied by zone and group multipliers
             SetupOutputVariable(state,
                                 "Zone System Predicted Moisture Load Moisture Transfer Rate",
                                 OutputProcessor::Unit::kgWater_s,
                                 ZoneSysMoistureDemand(Loop).TotalOutputRequired,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone System Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate",
                                 OutputProcessor::Unit::kgWater_s,
                                 ZoneSysMoistureDemand(Loop).OutputRequiredToHumidifyingSP,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone System Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate",
                                 OutputProcessor::Unit::kgWater_s,
                                 ZoneSysMoistureDemand(Loop).OutputRequiredToDehumidifyingSP,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
 
-            SetupOutputVariable(
-                state, "Zone Thermostat Control Type", OutputProcessor::Unit::None, TempControlType(Loop), "Zone", "Average", Zone(Loop).Name);
+            SetupOutputVariable(state,
+                                "Zone Thermostat Control Type",
+                                OutputProcessor::Unit::None,
+                                TempControlType(Loop),
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                Zone(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Thermostat Heating Setpoint Temperature",
                                 OutputProcessor::Unit::C,
                                 ZoneThermostatSetPointLo(Loop),
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Thermostat Cooling Setpoint Temperature",
                                 OutputProcessor::Unit::C,
                                 ZoneThermostatSetPointHi(Loop),
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Adaptive Comfort Operative Temperature Set Point",
                                 OutputProcessor::Unit::C,
                                 state.dataHeatBalFanSys->AdapComfortCoolingSetPoint(Loop),
-                                "Zone",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Predicted Sensible Load Room Air Correction Factor",
                                 OutputProcessor::Unit::None,
                                 state.dataHeatBalFanSys->LoadCorrectionFactor(Loop),
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
 
             if (allocated(state.dataZoneCtrls->StageZoneLogic)) {
@@ -3139,8 +3150,8 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
                                         "Zone Thermostat Staged Number",
                                         OutputProcessor::Unit::None,
                                         ZoneSysEnergyDemand(Loop).StageNum,
-                                        "System",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Average,
                                         Zone(Loop).Name);
                 }
             }
@@ -3156,22 +3167,22 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
                                     "Zone Thermal Comfort Control Type",
                                     OutputProcessor::Unit::None,
                                     state.dataHeatBalFanSys->ComfortControlType(ZoneNum),
-                                    "Zone",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
                                     Zone(ZoneNum).Name);
                 SetupOutputVariable(state,
                                     "Zone Thermal Comfort Control Fanger Low Setpoint PMV",
                                     OutputProcessor::Unit::None,
                                     state.dataHeatBalFanSys->ZoneComfortControlsFanger(ZoneNum).LowPMV,
-                                    "Zone",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
                                     Zone(ZoneNum).Name);
                 SetupOutputVariable(state,
                                     "Zone Thermal Comfort Control Fanger High Setpoint PMV",
                                     OutputProcessor::Unit::None,
                                     state.dataHeatBalFanSys->ZoneComfortControlsFanger(ZoneNum).HighPMV,
-                                    "Zone",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
                                     Zone(ZoneNum).Name);
             }
         }
@@ -3182,29 +3193,29 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
                                 "Zone List Sensible Heating Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataHeatBal->ListSNLoadHeatEnergy(Loop),
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 ZoneList(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone List Sensible Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataHeatBal->ListSNLoadCoolEnergy(Loop),
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 ZoneList(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone List Sensible Heating Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataHeatBal->ListSNLoadHeatRate(Loop),
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 ZoneList(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone List Sensible Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataHeatBal->ListSNLoadCoolRate(Loop),
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 ZoneList(Loop).Name);
         } // Loop
 
@@ -3214,29 +3225,29 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
                                 "Zone Group Sensible Heating Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataHeatBal->GroupSNLoadHeatEnergy(Loop),
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatBal->ZoneGroup(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Group Sensible Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataHeatBal->GroupSNLoadCoolEnergy(Loop),
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatBal->ZoneGroup(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Group Sensible Heating Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataHeatBal->GroupSNLoadHeatRate(Loop),
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatBal->ZoneGroup(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Group Sensible Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataHeatBal->GroupSNLoadCoolRate(Loop),
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatBal->ZoneGroup(Loop).Name);
         } // Loop
 
@@ -3642,7 +3653,7 @@ void PredictSystemLoads(EnergyPlusData &state,
                     auto const SELECT_CASE_var(TempControlType(ZoneNum));
                     TempControlledZone(RelativeZoneNum).CoolOffFlag = false;
                     TempControlledZone(RelativeZoneNum).HeatOffFlag = false;
-                    if (ZoneAirSolutionAlgo == Use3rdOrder) {
+                    if (ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::ThirdOrder) {
                         Tprev = MAT(ZoneNum);
                         if (ShortenTimeStepSys) Tprev = state.dataHeatBalFanSys->XMPT(ZoneNum);
                     } else {
@@ -3960,7 +3971,7 @@ void PredictSystemLoads(EnergyPlusData &state,
 
         // Exact solution or Euler method
         state.dataHVACGlobal->ShortenTimeStepSysRoomAir = false;
-        if (ZoneAirSolutionAlgo != Use3rdOrder) {
+        if (ZoneAirSolutionAlgo != DataHeatBalance::SolutionAlgo::ThirdOrder) {
             if (ShortenTimeStepSys && TimeStepSys < state.dataGlobal->TimeStepZone) {
                 if (state.dataHVACGlobal->PreviousTimeStep < state.dataGlobal->TimeStepZone) {
                     ZoneT1(ZoneNum) = state.dataHeatBalFanSys->ZoneTM2(ZoneNum);
@@ -4311,10 +4322,10 @@ void CalcPredictedSystemLoad(EnergyPlusData &state, int const ZoneNum, Real64 RA
 
             // PH 3/2/04      LoadToHeatingSetPoint = TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) -
             // TempIndZnLd(ZoneNum)
-            if (ZoneAirSolutionAlgo == Use3rdOrder) {
+            if (ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::ThirdOrder) {
                 LoadToHeatingSetPoint = (TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum));
                 // Exact solution
-            } else if (ZoneAirSolutionAlgo == UseAnalyticalSolution) {
+            } else if (ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
                 if (TempDepZnLd(ZoneNum) == 0.0) { // B=0
                     LoadToHeatingSetPoint = AIRRAT(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum)) - TempIndZnLd(ZoneNum);
                 } else {
@@ -4323,7 +4334,7 @@ void CalcPredictedSystemLoad(EnergyPlusData &state, int const ZoneNum, Real64 RA
                         TempDepZnLd(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
                         TempIndZnLd(ZoneNum);
                 }
-            } else if (ZoneAirSolutionAlgo == UseEulerMethod) {
+            } else if (ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::EulerMethod) {
                 LoadToHeatingSetPoint = AIRRAT(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum)) +
                                         TempDepZnLd(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum)) - TempIndZnLd(ZoneNum);
             }
@@ -4339,9 +4350,9 @@ void CalcPredictedSystemLoad(EnergyPlusData &state, int const ZoneNum, Real64 RA
 
             // PH 3/2/04      LoadToCoolingSetPoint = (TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) -
             // TempIndZnLd(ZoneNum))
-            if (ZoneAirSolutionAlgo == Use3rdOrder) {
+            if (ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::ThirdOrder) {
                 LoadToCoolingSetPoint = TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum);
-            } else if (ZoneAirSolutionAlgo == UseAnalyticalSolution) {
+            } else if (ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
                 if (TempDepZnLd(ZoneNum) == 0.0) { // B=0
                     LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum)) - TempIndZnLd(ZoneNum);
                 } else {
@@ -4350,7 +4361,7 @@ void CalcPredictedSystemLoad(EnergyPlusData &state, int const ZoneNum, Real64 RA
                         TempDepZnLd(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
                         TempIndZnLd(ZoneNum);
                 }
-            } else if (ZoneAirSolutionAlgo == UseEulerMethod) {
+            } else if (ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::EulerMethod) {
                 LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum)) +
                                         TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum);
             }
@@ -4370,11 +4381,11 @@ void CalcPredictedSystemLoad(EnergyPlusData &state, int const ZoneNum, Real64 RA
             // PH 3/2/04      LoadToHeatingSetPoint = (TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) -
             // TempIndZnLd(ZoneNum)) PH 3/2/04      !LoadToCoolingSetPoint = (TempDepZnLd(ZoneNum) *
             // TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum))
-            if (ZoneAirSolutionAlgo == Use3rdOrder) {
+            if (ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::ThirdOrder) {
                 LoadToHeatingSetPoint = (TempDepZnLd(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum)) - TempIndZnLd(ZoneNum));
                 LoadToCoolingSetPoint = (TempDepZnLd(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum)) - TempIndZnLd(ZoneNum));
                 // Exact solution
-            } else if (ZoneAirSolutionAlgo == UseAnalyticalSolution) {
+            } else if (ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
                 if (TempDepZnLd(ZoneNum) == 0.0) { // B=0
                     LoadToHeatingSetPoint = AIRRAT(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum)) - TempIndZnLd(ZoneNum);
                     LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum)) - TempIndZnLd(ZoneNum);
@@ -4387,7 +4398,7 @@ void CalcPredictedSystemLoad(EnergyPlusData &state, int const ZoneNum, Real64 RA
                         TempDepZnLd(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
                         TempIndZnLd(ZoneNum);
                 }
-            } else if (ZoneAirSolutionAlgo == UseEulerMethod) {
+            } else if (ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::EulerMethod) {
                 LoadToHeatingSetPoint = AIRRAT(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum)) +
                                         TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum);
                 LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum)) +
@@ -4452,11 +4463,11 @@ void CalcPredictedSystemLoad(EnergyPlusData &state, int const ZoneNum, Real64 RA
 
         } else if (SELECT_CASE_var == DualSetPointWithDeadBand) {
 
-            if (ZoneAirSolutionAlgo == Use3rdOrder) {
+            if (ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::ThirdOrder) {
                 LoadToHeatingSetPoint = (TempDepZnLd(ZoneNum) * (ZoneThermostatSetPointLo(ZoneNum)) - TempIndZnLd(ZoneNum));
                 LoadToCoolingSetPoint = (TempDepZnLd(ZoneNum) * (ZoneThermostatSetPointHi(ZoneNum)) - TempIndZnLd(ZoneNum));
                 // Exact solution
-            } else if (ZoneAirSolutionAlgo == UseAnalyticalSolution) {
+            } else if (ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
                 if (TempDepZnLd(ZoneNum) == 0.0) { // B=0
                     LoadToHeatingSetPoint = AIRRAT(ZoneNum) * (ZoneThermostatSetPointLo(ZoneNum) - ZoneT1(ZoneNum)) - TempIndZnLd(ZoneNum);
                     LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (ZoneThermostatSetPointHi(ZoneNum) - ZoneT1(ZoneNum)) - TempIndZnLd(ZoneNum);
@@ -4469,7 +4480,7 @@ void CalcPredictedSystemLoad(EnergyPlusData &state, int const ZoneNum, Real64 RA
                         TempDepZnLd(ZoneNum) * (ZoneThermostatSetPointHi(ZoneNum) - ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
                         TempIndZnLd(ZoneNum);
                 }
-            } else if (ZoneAirSolutionAlgo == UseEulerMethod) {
+            } else if (ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::EulerMethod) {
                 LoadToHeatingSetPoint = AIRRAT(ZoneNum) * (ZoneThermostatSetPointLo(ZoneNum) - ZoneT1(ZoneNum)) +
                                         TempDepZnLd(ZoneNum) * ZoneThermostatSetPointLo(ZoneNum) - TempIndZnLd(ZoneNum);
                 LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (ZoneThermostatSetPointHi(ZoneNum) - ZoneT1(ZoneNum)) +
@@ -4550,9 +4561,9 @@ void CalcPredictedSystemLoad(EnergyPlusData &state, int const ZoneNum, Real64 RA
                 }
                 state.dataZoneEnergyDemand->DeadBandOrSetback(ZoneNum) = true;
             } else if (ZoneSysEnergyDemand(ZoneNum).StageNum < 0) { // Cooling load
-                if (ZoneAirSolutionAlgo == Use3rdOrder) {
+                if (ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::ThirdOrder) {
                     LoadToCoolingSetPoint = (TempDepZnLd(ZoneNum) * (ZoneThermostatSetPointHi(ZoneNum)) - TempIndZnLd(ZoneNum));
-                } else if (ZoneAirSolutionAlgo == UseAnalyticalSolution) {
+                } else if (ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
                     if (TempDepZnLd(ZoneNum) == 0.0) { // B=0
                         LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (ZoneThermostatSetPointHi(ZoneNum) - ZoneT1(ZoneNum)) - TempIndZnLd(ZoneNum);
                     } else {
@@ -4561,7 +4572,7 @@ void CalcPredictedSystemLoad(EnergyPlusData &state, int const ZoneNum, Real64 RA
                             TempDepZnLd(ZoneNum) * (ZoneThermostatSetPointHi(ZoneNum) - ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
                             TempIndZnLd(ZoneNum);
                     }
-                } else if (ZoneAirSolutionAlgo == UseEulerMethod) {
+                } else if (ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::EulerMethod) {
                     LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (ZoneThermostatSetPointHi(ZoneNum) - ZoneT1(ZoneNum)) +
                                             TempDepZnLd(ZoneNum) * ZoneThermostatSetPointHi(ZoneNum) - TempIndZnLd(ZoneNum);
                 }
@@ -4570,10 +4581,10 @@ void CalcPredictedSystemLoad(EnergyPlusData &state, int const ZoneNum, Real64 RA
                 LoadToHeatingSetPoint = LoadToCoolingSetPoint;
                 if ((ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired) >= 0.0) state.dataZoneEnergyDemand->DeadBandOrSetback(ZoneNum) = true;
             } else { // Heating load
-                if (ZoneAirSolutionAlgo == Use3rdOrder) {
+                if (ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::ThirdOrder) {
                     LoadToHeatingSetPoint = (TempDepZnLd(ZoneNum) * ZoneThermostatSetPointLo(ZoneNum) - TempIndZnLd(ZoneNum));
                     // Exact solution
-                } else if (ZoneAirSolutionAlgo == UseAnalyticalSolution) {
+                } else if (ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
                     if (TempDepZnLd(ZoneNum) == 0.0) { // B=0
                         LoadToHeatingSetPoint = AIRRAT(ZoneNum) * (ZoneThermostatSetPointLo(ZoneNum) - ZoneT1(ZoneNum)) - TempIndZnLd(ZoneNum);
                     } else {
@@ -4582,7 +4593,7 @@ void CalcPredictedSystemLoad(EnergyPlusData &state, int const ZoneNum, Real64 RA
                             TempDepZnLd(ZoneNum) * (ZoneThermostatSetPointLo(ZoneNum) - ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
                             TempIndZnLd(ZoneNum);
                     }
-                } else if (ZoneAirSolutionAlgo == UseEulerMethod) {
+                } else if (ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::EulerMethod) {
                     LoadToHeatingSetPoint = AIRRAT(ZoneNum) * (ZoneThermostatSetPointLo(ZoneNum) - ZoneT1(ZoneNum)) +
                                             TempDepZnLd(ZoneNum) * (ZoneThermostatSetPointLo(ZoneNum)) - TempIndZnLd(ZoneNum);
                 }
@@ -4940,39 +4951,39 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
         // MoistLoadHumidSetPoint = massflow * HumRat = kgDryAir/s * kgWater/kgDryAir = kgWater/s
         WZoneSetPoint = PsyWFnTdbRhPb(state, ZT(ZoneNum), (ZoneRHHumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress, RoutineName);
         Real64 exp_700_A_C(0.0);
-        if (ZoneAirSolutionAlgo == Use3rdOrder) {
+        if (ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::ThirdOrder) {
             LoadToHumidifySetPoint =
                 ((11.0 / 6.0) * C + A) * WZoneSetPoint - (B + C * (3.0 * state.dataHeatBalFanSys->WZoneTimeMinus1Temp(ZoneNum) -
                                                                    (3.0 / 2.0) * state.dataHeatBalFanSys->WZoneTimeMinus2Temp(ZoneNum) +
                                                                    (1.0 / 3.0) * state.dataHeatBalFanSys->WZoneTimeMinus3Temp(ZoneNum)));
             // Exact solution
-        } else if (ZoneAirSolutionAlgo == UseAnalyticalSolution) {
+        } else if (ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
             if (A == 0.0) { // B=0
                 LoadToHumidifySetPoint = C * (WZoneSetPoint - state.dataHeatBalFanSys->ZoneW1(ZoneNum)) - B;
             } else {
                 exp_700_A_C = std::exp(min(700.0, -A / C)); // Tuned Save expensive value
                 LoadToHumidifySetPoint = A * (WZoneSetPoint - state.dataHeatBalFanSys->ZoneW1(ZoneNum) * exp_700_A_C) / (1.0 - exp_700_A_C) - B;
             }
-        } else if (ZoneAirSolutionAlgo == UseEulerMethod) {
+        } else if (ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::EulerMethod) {
             LoadToHumidifySetPoint = C * (WZoneSetPoint - state.dataHeatBalFanSys->ZoneW1(ZoneNum)) + A * WZoneSetPoint - B;
         }
         if (RAFNFrac > 0.0) LoadToHumidifySetPoint = LoadToHumidifySetPoint / RAFNFrac;
         ZoneSysMoistureDemand(ZoneNum).OutputRequiredToHumidifyingSP = LoadToHumidifySetPoint;
         WZoneSetPoint = PsyWFnTdbRhPb(state, ZT(ZoneNum), (ZoneRHDehumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress, RoutineName);
-        if (ZoneAirSolutionAlgo == Use3rdOrder) {
+        if (ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::ThirdOrder) {
             LoadToDehumidifySetPoint =
                 ((11.0 / 6.0) * C + A) * WZoneSetPoint - (B + C * (3.0 * state.dataHeatBalFanSys->WZoneTimeMinus1Temp(ZoneNum) -
                                                                    (3.0 / 2.0) * state.dataHeatBalFanSys->WZoneTimeMinus2Temp(ZoneNum) +
                                                                    (1.0 / 3.0) * state.dataHeatBalFanSys->WZoneTimeMinus3Temp(ZoneNum)));
             // Exact solution
-        } else if (ZoneAirSolutionAlgo == UseAnalyticalSolution) {
+        } else if (ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
             if (A == 0.0) { // B=0
                 LoadToDehumidifySetPoint = C * (WZoneSetPoint - state.dataHeatBalFanSys->ZoneW1(ZoneNum)) - B;
             } else {
                 LoadToDehumidifySetPoint =
                     A * (WZoneSetPoint - state.dataHeatBalFanSys->ZoneW1(ZoneNum) * exp_700_A_C) / (1.0 - exp_700_A_C) - B; // exp_700_A_C set above
             }
-        } else if (ZoneAirSolutionAlgo == UseEulerMethod) {
+        } else if (ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::EulerMethod) {
             LoadToDehumidifySetPoint = C * (WZoneSetPoint - state.dataHeatBalFanSys->ZoneW1(ZoneNum)) + A * WZoneSetPoint - B;
         }
         if (RAFNFrac > 0.0) LoadToDehumidifySetPoint = LoadToDehumidifySetPoint / RAFNFrac;
@@ -5275,20 +5286,20 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
             // Solve for zone air temperature
             {
                 auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
-                if (SELECT_CASE_var == Use3rdOrder) {
+                if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::ThirdOrder) {
                     ZT(ZoneNum) =
                         (TempIndCoef + AirCap * (3.0 * state.dataHeatBalFanSys->ZTM1(ZoneNum) - (3.0 / 2.0) * state.dataHeatBalFanSys->ZTM2(ZoneNum) +
                                                  (1.0 / 3.0) * state.dataHeatBalFanSys->ZTM3(ZoneNum))) /
                         ((11.0 / 6.0) * AirCap + TempDepCoef);
                     // Exact solution
-                } else if (SELECT_CASE_var == UseAnalyticalSolution) {
+                } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
                     if (TempDepCoef == 0.0) { // B=0
                         ZT(ZoneNum) = ZoneT1(ZoneNum) + TempIndCoef / AirCap;
                     } else {
                         ZT(ZoneNum) =
                             (ZoneT1(ZoneNum) - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) + TempIndCoef / TempDepCoef;
                     }
-                } else if (SELECT_CASE_var == UseEulerMethod) {
+                } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::EulerMethod) {
                     ZT(ZoneNum) = (AirCap * ZoneT1(ZoneNum) + TempIndCoef) / (AirCap + TempDepCoef);
                 }
             }
@@ -5372,20 +5383,20 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
             // Solve for zone air temperature
             {
                 auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
-                if (SELECT_CASE_var == Use3rdOrder) {
+                if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::ThirdOrder) {
                     ZT(ZoneNum) =
                         (TempIndCoef + AirCap * (3.0 * state.dataHeatBalFanSys->ZTM1(ZoneNum) - (3.0 / 2.0) * state.dataHeatBalFanSys->ZTM2(ZoneNum) +
                                                  (1.0 / 3.0) * state.dataHeatBalFanSys->ZTM3(ZoneNum))) /
                         ((11.0 / 6.0) * AirCap + TempDepCoef);
                     // Exact solution
-                } else if (SELECT_CASE_var == UseAnalyticalSolution) {
+                } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
                     if (TempDepCoef == 0.0) { // B=0
                         ZT(ZoneNum) = ZoneT1(ZoneNum) + TempIndCoef / AirCap;
                     } else {
                         ZT(ZoneNum) =
                             (ZoneT1(ZoneNum) - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) + TempIndCoef / TempDepCoef;
                     }
-                } else if (SELECT_CASE_var == UseEulerMethod) {
+                } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::EulerMethod) {
                     ZT(ZoneNum) = (AirCap * ZoneT1(ZoneNum) + TempIndCoef) / (AirCap + TempDepCoef);
                 }
             }
@@ -5425,7 +5436,7 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
         // ZoneTempChange is used by HVACManager to determine if the timestep needs to be shortened.
         {
             auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
-            if (SELECT_CASE_var == Use3rdOrder) {
+            if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::ThirdOrder) {
                 if (state.dataRoomAirMod->IsZoneDV(ZoneNum)) {
                     if (state.dataRoomAirMod->ZoneDVMixedFlag(ZoneNum) == 0) {
                         ZoneTempChange = max(ZoneTempChange,
@@ -5445,7 +5456,8 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
                 } else {
                     ZoneTempChange = max(ZoneTempChange, std::abs(ZT(ZoneNum) - state.dataHeatBalFanSys->ZTM1(ZoneNum)));
                 }
-            } else if ((SELECT_CASE_var == UseAnalyticalSolution) || (SELECT_CASE_var == UseEulerMethod)) {
+            } else if ((SELECT_CASE_var == DataHeatBalance::SolutionAlgo::AnalyticalSolution) ||
+                       (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::EulerMethod)) {
                 if (state.dataRoomAirMod->IsZoneDV(ZoneNum)) {
                     if (state.dataRoomAirMod->ZoneDVMixedFlag(ZoneNum) == 0) {
                         ZoneTempChange = max(ZoneTempChange,
@@ -5567,7 +5579,7 @@ void PushZoneTimestepHistories(EnergyPlusData &state)
             }
         }
 
-        if (state.dataHeatBal->ZoneAirSolutionAlgo != Use3rdOrder) {
+        if (state.dataHeatBal->ZoneAirSolutionAlgo != DataHeatBalance::SolutionAlgo::ThirdOrder) {
             state.dataHeatBalFanSys->ZoneTM2(ZoneNum) = state.dataHeatBalFanSys->ZoneTMX(ZoneNum);
             state.dataHeatBalFanSys->ZoneTMX(ZoneNum) = state.dataHeatBalFanSys->ZTAV(ZoneNum); // using average for whole zone time step.
             state.dataHeatBalFanSys->ZoneWM2(ZoneNum) = state.dataHeatBalFanSys->ZoneWMX(ZoneNum);
@@ -5663,7 +5675,7 @@ void PushSystemTimestepHistories(EnergyPlusData &state)
         }
     } // zone loop
 
-    if (state.dataHeatBal->ZoneAirSolutionAlgo != Use3rdOrder) {
+    if (state.dataHeatBal->ZoneAirSolutionAlgo != DataHeatBalance::SolutionAlgo::ThirdOrder) {
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             state.dataHeatBalFanSys->ZoneTM2(ZoneNum) = state.dataHeatBalFanSys->ZoneTMX(ZoneNum);
             state.dataHeatBalFanSys->ZoneTMX(ZoneNum) = MAT(ZoneNum); // using average for whole zone time step.
@@ -5935,20 +5947,20 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
     // smooth the changes using the zone air capacitance.
     {
         auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
-        if (SELECT_CASE_var == Use3rdOrder) {
+        if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::ThirdOrder) {
             state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum) = (B + C * (3.0 * state.dataHeatBalFanSys->WZoneTimeMinus1Temp(ZoneNum) -
                                                                             (3.0 / 2.0) * state.dataHeatBalFanSys->WZoneTimeMinus2Temp(ZoneNum) +
                                                                             (1.0 / 3.0) * state.dataHeatBalFanSys->WZoneTimeMinus3Temp(ZoneNum))) /
                                                                   ((11.0 / 6.0) * C + A);
             // Exact solution
-        } else if (SELECT_CASE_var == UseAnalyticalSolution) {
+        } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
             if (A == 0.0) { // B=0
                 state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum) = state.dataHeatBalFanSys->ZoneW1(ZoneNum) + B / C;
             } else {
                 state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum) =
                     (state.dataHeatBalFanSys->ZoneW1(ZoneNum) - B / A) * std::exp(min(700.0, -A / C)) + B / A;
             }
-        } else if (SELECT_CASE_var == UseEulerMethod) {
+        } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::EulerMethod) {
             state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum) = (C * state.dataHeatBalFanSys->ZoneW1(ZoneNum) + B) / (C + A);
         }
     }
@@ -6202,7 +6214,7 @@ void InverseModelTemperature(EnergyPlusData &state,
             if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
                 TempIndCoef += state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).TotalSen;
             }
-            // Calculate air capacity using UseAnalyticalSolution
+            // Calculate air capacity using DataHeatBalance::SolutionAlgo::AnalyticalSolution
             if (TempDepCoef == 0.0) {
                 // Is this correct? Shouldn't we use log?? What if ZT(ZoneNum) ==
                 // PreviousMeasuredZT1(ZoneNum)??
@@ -7123,13 +7135,13 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
 
     {
         auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
-        if (SELECT_CASE_var == Use3rdOrder) {
+        if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::ThirdOrder) {
             CzdTdt = RhoAir * CpAir * Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpSens *
                      (MAT(ZoneNum) - state.dataHeatBalFanSys->ZTM1(ZoneNum)) / (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
             // Exact solution
-        } else if (SELECT_CASE_var == UseAnalyticalSolution) {
+        } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
             CzdTdt = TempIndCoef - TempDepCoef * MAT(ZoneNum);
-        } else if (SELECT_CASE_var == UseEulerMethod) {
+        } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::EulerMethod) {
             CzdTdt = AIRRAT(ZoneNum) * (MAT(ZoneNum) - state.dataHeatBalFanSys->ZoneT1(ZoneNum));
         }
     }
@@ -7261,22 +7273,22 @@ void DetectOscillatingZoneTemp(EnergyPlusData &state)
                                 "Zone Oscillating Temperatures Time",
                                 OutputProcessor::Unit::hr,
                                 state.dataZoneTempPredictorCorrector->ZoneTempOscillate(iZone),
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 Zone(iZone).Name);
             SetupOutputVariable(state,
                                 "Zone Oscillating Temperatures During Occupancy Time",
                                 OutputProcessor::Unit::hr,
                                 state.dataZoneTempPredictorCorrector->ZoneTempOscillateDuringOccupancy(iZone),
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 Zone(iZone).Name);
             SetupOutputVariable(state,
                                 "Zone Oscillating Temperatures in Deadband Time",
                                 OutputProcessor::Unit::hr,
                                 state.dataZoneTempPredictorCorrector->ZoneTempOscillateInDeadband(iZone),
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 Zone(iZone).Name);
         }
         // set up a variable covering all zones
@@ -7284,22 +7296,22 @@ void DetectOscillatingZoneTemp(EnergyPlusData &state)
                             "Facility Any Zone Oscillating Temperatures Time",
                             OutputProcessor::Unit::hr,
                             state.dataZoneTempPredictorCorrector->AnyZoneTempOscillate,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             "Facility");
         SetupOutputVariable(state,
                             "Facility Any Zone Oscillating Temperatures During Occupancy Time",
                             OutputProcessor::Unit::hr,
                             state.dataZoneTempPredictorCorrector->AnyZoneTempOscillateDuringOccupancy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             "Facility");
         SetupOutputVariable(state,
                             "Facility Any Zone Oscillating Temperatures in Deadband Time",
                             OutputProcessor::Unit::hr,
                             state.dataZoneTempPredictorCorrector->AnyZoneTempOscillateInDeadband,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             "Facility");
         // test if the oscillation variables are even used
         if (ReportingThisVariable(state, "Zone Oscillating Temperatures Time") ||

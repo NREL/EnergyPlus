@@ -393,15 +393,15 @@ void GetGshpInput(EnergyPlusData &state)
                             "Heat Pump Electricity Rate",
                             OutputProcessor::Unit::W,
                             state.dataHPWaterToWaterHtg->GSHP(GSHPNum).Power,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataHPWaterToWaterHtg->GSHP(GSHPNum).Name);
         SetupOutputVariable(state,
                             "Heat Pump Electricity Energy",
                             OutputProcessor::Unit::J,
                             state.dataHPWaterToWaterHtg->GSHP(GSHPNum).Energy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataHPWaterToWaterHtg->GSHP(GSHPNum).Name,
                             _,
                             "Electricity",
@@ -413,73 +413,73 @@ void GetGshpInput(EnergyPlusData &state)
                             "Heat Pump Load Side Heat Transfer Rate",
                             OutputProcessor::Unit::W,
                             state.dataHPWaterToWaterHtg->GSHP(GSHPNum).QLoad,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataHPWaterToWaterHtg->GSHP(GSHPNum).Name);
         SetupOutputVariable(state,
                             "Heat Pump Load Side Heat Transfer Energy",
                             OutputProcessor::Unit::J,
                             state.dataHPWaterToWaterHtg->GSHP(GSHPNum).QLoadEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataHPWaterToWaterHtg->GSHP(GSHPNum).Name);
 
         SetupOutputVariable(state,
                             "Heat Pump Source Side Heat Transfer Rate",
                             OutputProcessor::Unit::W,
                             state.dataHPWaterToWaterHtg->GSHP(GSHPNum).QSource,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataHPWaterToWaterHtg->GSHP(GSHPNum).Name);
         SetupOutputVariable(state,
                             "Heat Pump Source Side Heat Transfer Energy",
                             OutputProcessor::Unit::J,
                             state.dataHPWaterToWaterHtg->GSHP(GSHPNum).QSourceEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataHPWaterToWaterHtg->GSHP(GSHPNum).Name);
 
         SetupOutputVariable(state,
                             "Heat Pump Load Side Outlet Temperature",
                             OutputProcessor::Unit::C,
                             state.dataHPWaterToWaterHtg->GSHP(GSHPNum).LoadSideWaterOutletTemp,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataHPWaterToWaterHtg->GSHP(GSHPNum).Name);
         SetupOutputVariable(state,
                             "Heat Pump Load Side Inlet Temperature",
                             OutputProcessor::Unit::C,
                             state.dataHPWaterToWaterHtg->GSHP(GSHPNum).LoadSideWaterInletTemp,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataHPWaterToWaterHtg->GSHP(GSHPNum).Name);
         SetupOutputVariable(state,
                             "Heat Pump Source Side Outlet Temperature",
                             OutputProcessor::Unit::C,
                             state.dataHPWaterToWaterHtg->GSHP(GSHPNum).SourceSideWaterOutletTemp,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataHPWaterToWaterHtg->GSHP(GSHPNum).Name);
         SetupOutputVariable(state,
                             "Heat Pump Source Side Inlet Temperature",
                             OutputProcessor::Unit::C,
                             state.dataHPWaterToWaterHtg->GSHP(GSHPNum).SourceSideWaterInletTemp,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataHPWaterToWaterHtg->GSHP(GSHPNum).Name);
         SetupOutputVariable(state,
                             "Heat Pump Load Side Mass Flow Rate",
                             OutputProcessor::Unit::kg_s,
                             state.dataHPWaterToWaterHtg->GSHP(GSHPNum).LoadSideWaterMassFlowRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataHPWaterToWaterHtg->GSHP(GSHPNum).Name);
         SetupOutputVariable(state,
                             "Heat Pump Source Side Mass Flow Rate",
                             OutputProcessor::Unit::kg_s,
                             state.dataHPWaterToWaterHtg->GSHP(GSHPNum).SourceSideWaterMassFlowRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataHPWaterToWaterHtg->GSHP(GSHPNum).Name);
     }
 }
@@ -496,7 +496,7 @@ void GshpPeHeatingSpecs::initialize(EnergyPlusData &state)
     // initialization
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("InitGshp");
+    static constexpr std::string_view RoutineName("InitGshp");
 
     // For each new environment
     if (state.dataGlobal->BeginEnvrnFlag && this->beginEnvironFlag) {
