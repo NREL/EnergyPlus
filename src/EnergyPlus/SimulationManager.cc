@@ -1322,7 +1322,6 @@ namespace SimulationManager {
                 }
             }
         }
-        state.dataSurface->UseRepresentativeSurfaceCalculations = true;
         if (ErrorsFound) {
             ShowFatalError(state, "Errors found getting Project Input");
         }
