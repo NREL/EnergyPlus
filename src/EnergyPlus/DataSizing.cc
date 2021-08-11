@@ -564,11 +564,7 @@ Real64 OARequirementsData::desFlowPerZonePerson(EnergyPlusData &state,
     if (this->numDSOA == 1) {
         if (this->OAFlowMethod != DataSizing::OAFlowPerArea && this->OAFlowMethod != DataSizing::OAFlow &&
             this->OAFlowMethod != DataSizing::OAFlowACH) {
-            // TODO MJW: Temporarily exclude these methods to avoid diffs vs develop - new issue?
-            if (this->OAFlowMethod != DataSizing::ZOAM_IAQP && this->OAFlowMethod != DataSizing::ZOAM_ProportionalControlSchOcc &&
-                this->OAFlowMethod != DataSizing::ZOAM_ProportionalControlDesOcc) {
-                desFlowPP = this->OAFlowPerPerson;
-            }
+            desFlowPP = this->OAFlowPerPerson;
         }
     } else {
         Real64 sumPeopleOA = 0.0;
@@ -576,12 +572,8 @@ Real64 OARequirementsData::desFlowPerZonePerson(EnergyPlusData &state,
             auto const thisDSOA = state.dataSize->OARequirements(this->dsoaIndexes(dsoaCount));
             if (thisDSOA.OAFlowMethod != DataSizing::OAFlowPerArea && thisDSOA.OAFlowMethod != DataSizing::OAFlow &&
                 thisDSOA.OAFlowMethod != DataSizing::OAFlowACH) {
-                // TODO MJW: Temporarily exclude these methods to avoid diffs vs develop - new issue?
-                if (thisDSOA.OAFlowMethod != DataSizing::ZOAM_IAQP && thisDSOA.OAFlowMethod != DataSizing::ZOAM_ProportionalControlSchOcc &&
-                    thisDSOA.OAFlowMethod != DataSizing::ZOAM_ProportionalControlDesOcc) {
-                    Real64 spacePeople = state.dataHeatBal->space(this->dsoaSpaceIndexes(dsoaCount)).totOccupants;
-                    sumPeopleOA += thisDSOA.OAFlowPerPerson * spacePeople;
-                }
+                Real64 spacePeople = state.dataHeatBal->space(this->dsoaSpaceIndexes(dsoaCount)).totOccupants;
+                sumPeopleOA += thisDSOA.OAFlowPerPerson * spacePeople;
             }
         }
         if (state.dataHeatBal->Zone(actualZoneNum).TotOccupants > 0.0) {

@@ -494,6 +494,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTes
     state->dataEnvrn->TotDesDays = 2;
     state->dataEnvrn->TotRunDesPersDays = 3;
     state->dataGlobal->NumOfZones = 4;
+    state->dataViewFactor->NumOfRadiantEnclosures = 4;
     state->dataSurface->TotSurfaces = 7;
     state->dataGlobal->NumOfTimeStepInHour = 4;
 
@@ -6178,7 +6179,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest)
     auto stringTypes = queryResult("SELECT * FROM StringTypes;", "StringTypes");
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
-    EXPECT_EQ(170ul, tabularData.size());
+    EXPECT_EQ(174ul, tabularData.size());
     // tabularDataIndex, reportNameIndex, reportForStringIndex, tableNameIndex, rowLabelIndex, columnLabelIndex, unitsIndex, simulationIndex, rowId,
     // columnId, value
     EXPECT_EQ("       12.30", tabularData[3][10]);
@@ -6319,6 +6320,8 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     // zone
     state->dataGlobal->NumOfZones = 3;
     state->dataGlobal->numSpaces = 3;
+    state->dataViewFactor->NumOfSolarEnclosures = 3;
+    state->dataViewFactor->EnclSolInfo.allocate(state->dataViewFactor->NumOfSolarEnclosures);
     state->dataGlobal->numSpaceTypes = 1;
     state->dataHeatBal->spaceTypes.allocate(state->dataGlobal->numSpaceTypes);
     state->dataHeatBal->spaceTypes(1) = "General";
@@ -6327,6 +6330,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     state->dataHeatBal->Zone(1).Name = "PartofTot Conditioned Zone";
     state->dataHeatBal->space(1).Name = "PartofTot Conditioned Zone";
     state->dataHeatBal->space(1).spaceTypeNum = 1;
+    state->dataHeatBal->space(1).solarEnclosureNum = 1;
     state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1; // Conditioned
     state->dataHeatBal->Zone(1).isPartOfTotalArea = true;
     state->dataHeatBal->Zone(1).Multiplier = 1.;
@@ -6343,6 +6347,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     state->dataHeatBal->Zone(2).Name = "PartofTot Unconditioned Zone";
     state->dataHeatBal->space(2).Name = "PartofTot Unconditioned Zone";
     state->dataHeatBal->space(2).spaceTypeNum = 1;
+    state->dataHeatBal->space(2).solarEnclosureNum = 2;
     state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 0; // Unconditioned
     state->dataHeatBal->Zone(2).isPartOfTotalArea = true;
     state->dataHeatBal->Zone(2).Multiplier = 1.;
@@ -6359,6 +6364,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     state->dataHeatBal->Zone(3).Name = "NOT PartofTot Conditioned Zone";
     state->dataHeatBal->space(3).Name = "NOT PartofTot Conditioned Zone";
     state->dataHeatBal->space(3).spaceTypeNum = 1;
+    state->dataHeatBal->space(3).solarEnclosureNum = 3;
     state->dataHeatBal->Zone(3).SystemZoneNodeNumber = 1; // Conditioned
     state->dataHeatBal->Zone(3).isPartOfTotalArea = false;
     state->dataHeatBal->Zone(3).Multiplier = 1.;
@@ -9222,7 +9228,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest_DualUnits)
     auto stringTypes = queryResult("SELECT * FROM StringTypes;", "StringTypes");
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
-    EXPECT_EQ(170ul, tabularData.size());
+    EXPECT_EQ(174ul, tabularData.size());
     // tabularDataIndex, reportNameIndex, reportForStringIndex, tableNameIndex, rowLabelIndex, columnLabelIndex, unitsIndex, simulationIndex, rowId,
     // columnId, value
     EXPECT_EQ("       12.30", tabularData[3][10]);
@@ -9363,6 +9369,8 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
     // zone
     state->dataGlobal->NumOfZones = 3;
     state->dataGlobal->numSpaces = 3;
+    state->dataViewFactor->NumOfSolarEnclosures = 3;
+    state->dataViewFactor->EnclSolInfo.allocate(state->dataViewFactor->NumOfSolarEnclosures);
     state->dataGlobal->numSpaceTypes = 1;
     state->dataHeatBal->spaceTypes.allocate(state->dataGlobal->numSpaceTypes);
     state->dataHeatBal->spaceTypes(1) = "General";
@@ -9376,6 +9384,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
     state->dataHeatBal->Zone(1).ListMultiplier = 1.;
     state->dataHeatBal->space(1).Name = "PartofTot Conditioned Zone";
     state->dataHeatBal->space(1).spaceTypeNum = 1;
+    state->dataHeatBal->space(1).solarEnclosureNum = 1;
     state->dataHeatBal->Zone(1).spaceIndexes.allocate(1);
     state->dataHeatBal->Zone(1).spaceIndexes(1) = 1;
     // 10x10x2
@@ -9392,6 +9401,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
     state->dataHeatBal->Zone(2).ListMultiplier = 1.;
     state->dataHeatBal->space(2).Name = "PartofTot Unconditioned Zone";
     state->dataHeatBal->space(2).spaceTypeNum = 1;
+    state->dataHeatBal->space(2).solarEnclosureNum = 2;
     state->dataHeatBal->Zone(2).spaceIndexes.allocate(1);
     state->dataHeatBal->Zone(2).spaceIndexes(1) = 2;
     // 10x10x2
@@ -9408,6 +9418,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
     state->dataHeatBal->Zone(3).ListMultiplier = 1.;
     state->dataHeatBal->space(3).Name = "NOT PartofTot Conditioned Zone";
     state->dataHeatBal->space(3).spaceTypeNum = 1;
+    state->dataHeatBal->space(3).solarEnclosureNum = 3;
     state->dataHeatBal->Zone(3).spaceIndexes.allocate(1);
     state->dataHeatBal->Zone(3).spaceIndexes(1) = 3;
     // 10x10x2

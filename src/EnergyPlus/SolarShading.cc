@@ -1035,36 +1035,36 @@ void AllocateModuleArrays(EnergyPlusData &state)
                             thisEnclosureName);
     }
     for (int ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
+        SetupOutputVariable(state,
+                            "Zone Windows Total Heat Gain Rate",
+                            OutputProcessor::Unit::W,
+                            state.dataHeatBal->ZoneWinHeatGainRep(ZoneLoop),
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
+                            state.dataHeatBal->Zone(ZoneLoop).Name);
+        SetupOutputVariable(state,
+                            "Zone Windows Total Heat Loss Rate",
+                            OutputProcessor::Unit::W,
+                            state.dataHeatBal->ZoneWinHeatLossRep(ZoneLoop),
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
+                            state.dataHeatBal->Zone(ZoneLoop).Name);
+        SetupOutputVariable(state,
+                            "Zone Windows Total Heat Gain Energy",
+                            OutputProcessor::Unit::J,
+                            state.dataHeatBal->ZoneWinHeatGainRepEnergy(ZoneLoop),
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
+                            state.dataHeatBal->Zone(ZoneLoop).Name);
+        SetupOutputVariable(state,
+                            "Zone Windows Total Heat Loss Energy",
+                            OutputProcessor::Unit::J,
+                            state.dataHeatBal->ZoneWinHeatLossRepEnergy(ZoneLoop),
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
+                            state.dataHeatBal->Zone(ZoneLoop).Name);
         if (state.dataGlobal->DisplayAdvancedReportVariables) {
             // CurrentModuleObject='Zone(Advanced)'
-            SetupOutputVariable(state,
-                                "Zone Windows Total Heat Gain Rate",
-                                OutputProcessor::Unit::W,
-                                state.dataHeatBal->ZoneWinHeatGainRep(ZoneLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
-                                state.dataHeatBal->Zone(ZoneLoop).Name);
-            SetupOutputVariable(state,
-                                "Zone Windows Total Heat Loss Rate",
-                                OutputProcessor::Unit::W,
-                                state.dataHeatBal->ZoneWinHeatLossRep(ZoneLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
-                                state.dataHeatBal->Zone(ZoneLoop).Name);
-            SetupOutputVariable(state,
-                                "Zone Windows Total Heat Gain Energy",
-                                OutputProcessor::Unit::J,
-                                state.dataHeatBal->ZoneWinHeatGainRepEnergy(ZoneLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
-                                state.dataHeatBal->Zone(ZoneLoop).Name);
-            SetupOutputVariable(state,
-                                "Zone Windows Total Heat Loss Energy",
-                                OutputProcessor::Unit::J,
-                                state.dataHeatBal->ZoneWinHeatLossRepEnergy(ZoneLoop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
-                                state.dataHeatBal->Zone(ZoneLoop).Name);
             SetupOutputVariable(state,
                                 "Zone Opaque Surface Inside Faces Total Conduction Heat Gain Rate",
                                 OutputProcessor::Unit::W,

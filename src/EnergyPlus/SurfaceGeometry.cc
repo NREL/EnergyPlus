@@ -14926,11 +14926,6 @@ namespace SurfaceGeometry {
                         ++enclosureNum;
                         spaceEnclosureNum = enclosureNum;
                         Enclosures(spaceEnclosureNum).Name = curSpace.Name;
-                        if (radiantSetup) {
-                            state.dataViewFactor->NumOfRadiantEnclosures = enclosureNum;
-                        } else {
-                            state.dataViewFactor->NumOfSolarEnclosures = enclosureNum;
-                        }
                     }
                     if (radiantSetup) {
                         curSpace.radiantEnclosureNum = spaceEnclosureNum;
@@ -14944,6 +14939,11 @@ namespace SurfaceGeometry {
                     thisEnclosure.ExtWindowArea += curSpace.extWindowArea;
                     thisEnclosure.TotalSurfArea += curSpace.totalSurfArea;
                 }
+            }
+            if (radiantSetup) {
+                state.dataViewFactor->NumOfRadiantEnclosures = enclosureNum;
+            } else {
+                state.dataViewFactor->NumOfSolarEnclosures = enclosureNum;
             }
         } else {
             // There are no grouped radiant air boundaries, assign each space to it's own radiant enclosure
