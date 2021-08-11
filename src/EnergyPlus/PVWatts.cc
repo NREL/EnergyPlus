@@ -471,8 +471,8 @@ namespace PVWatts {
         auto it = PVWattsGenerators.find(GeneratorName);
         if (it == PVWattsGenerators.end()) {
             // It's not in the map, add it.
-            int ObjNum =
-                state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Generator:PVWatts", UtilityRoutines::MakeUPPERCase(GeneratorName));
+            int ObjNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(
+                state, "Generator:PVWatts", UtilityRoutines::MakeUPPERCase(GeneratorName));
             assert(ObjNum >= 0);
             if (ObjNum == 0) {
                 ShowFatalError(state, "Cannot find Generator:PVWatts " + GeneratorName);
