@@ -374,13 +374,13 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    template <size_t Length1, size_t Length2>
+    template <size_t NumOfTemps, size_t NumOfConcs>
     void InterpDefValuesForGlycolConc(
         EnergyPlusData &state,
-        const Array1D<Real64> &RawConcData,                                  // concentrations for raw data
-        const std::array<std::array<Real64, Length1>, Length2> &RawPropData, // raw property data (concentration, temperature)
-        Real64 Concentration,                                                // concentration of actual fluid mix
-        Array1D<Real64> &InterpData                                          // interpolated output data at proper concentration
+        const std::array<Real64, NumOfConcs> &RawConcData,                         // concentrations for raw data
+        const std::array<std::array<Real64, NumOfTemps>, NumOfConcs> &RawPropData, // raw property data (concentration, temperature)
+        Real64 Concentration,                                                      // concentration of actual fluid mix
+        Array1D<Real64> &InterpData                                                // interpolated output data at proper concentration
     );
 
     //*****************************************************************************

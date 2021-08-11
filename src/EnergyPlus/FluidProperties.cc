@@ -2622,9 +2622,9 @@ namespace FluidProperties {
     template <size_t NumOfTemps, size_t NumOfConcs>
     void InterpDefValuesForGlycolConc(
         EnergyPlusData &state,
-        const Array1D<Real64> &RawConcData,                                        // concentrations for raw data
+        const std::array<Real64, NumOfConcs> &RawConcData,                         // concentrations for raw data
         const std::array<std::array<Real64, NumOfTemps>, NumOfConcs> &RawPropData, // raw property data (concentration, temperature)
-        Real64 const Concentration,                                                // concentration of actual fluid mix
+        Real64 Concentration,                                                      // concentration of actual fluid mix
         Array1D<Real64> &InterpData                                                // interpolated output data at proper concentration
     )
     {
@@ -2674,35 +2674,35 @@ namespace FluidProperties {
 
         // First, find where the actual concentration falls between the concentration data.
         // Then, interpolate if necessary.
-        if (Concentration < RawConcData(1)) { // Concentration too low
+        if (Concentration < RawConcData[0]) { // Concentration too low
             ShowWarningError(state,
                              format("{}Glycol concentration out of range for data (too low), concentration = {:.3R}", RoutineName, Concentration));
             ShowContinueError(state, "Check your data or the definition of your glycols in the GlycolConcentrations input");
             ShowContinueError(state, "Property data set to data for lowest concentration entered");
             InterpData = RawPropData[0][0];
-        } else if (Concentration > RawConcData(NumOfConcs)) { // Concentration too high
+        } else if (Concentration > RawConcData[NumOfConcs - 1]) { // Concentration too high
             ShowWarningError(state,
                              format("{}Glycol concentration out of range for data (too high), concentration = {:.3R}", RoutineName, Concentration));
             ShowContinueError(state, "Check your data or the definition of your glycols in the GlycolConcentrations input");
             ShowContinueError(state, "Property data set to data for highest concentration entered");
             InterpData = RawPropData[NumOfConcs - 1][0];
-        } else {                  // Concentration somewhere between lowest and highest point--interpolate
-            HiIndex = NumOfConcs; // Default to highest concentration
-            for (LoopC = 2; LoopC < NumOfConcs - 1; ++LoopC) {
-                if (Concentration <= RawConcData(LoopC)) {
+        } else {                      // Concentration somewhere between lowest and highest point--interpolate
+            HiIndex = NumOfConcs - 1; // Default to highest concentration - 1, since std::arrays start at 0
+            for (LoopC = 1; LoopC < NumOfConcs - 1; ++LoopC) {
+                if (Concentration <= RawConcData[LoopC]) {
                     HiIndex = LoopC;
                     break; // LoopC DO loop
                 }
             }
-            if (std::abs(RawConcData(HiIndex) - RawConcData(HiIndex - 1)) >= ConcToler) {
-                InterpFrac = (RawConcData(HiIndex) - Concentration) / (RawConcData(HiIndex) - RawConcData(HiIndex - 1));
-                for (LoopT = 1; LoopT <= NumOfTemps; ++LoopT) {
-                    if ((RawPropData[HiIndex - 1][LoopT - 1] < ConcToler) || (RawPropData[HiIndex - 2][LoopT - 1] < ConcToler)) {
+            if (std::abs(RawConcData[HiIndex] - RawConcData[HiIndex - 1]) >= ConcToler) {
+                InterpFrac = (RawConcData[HiIndex] - Concentration) / (RawConcData[HiIndex] - RawConcData[HiIndex - 1]);
+                for (LoopT = 0; LoopT < NumOfTemps; ++LoopT) {
+                    if ((RawPropData[HiIndex][LoopT] < ConcToler) || (RawPropData[HiIndex - 1][LoopT] < ConcToler)) {
                         // One of the two values is zero--so we cannot interpolate for this point (assign to zero)
-                        InterpData(LoopT) = 0.0;
+                        InterpData(LoopT + 1) = 0.0;
                     } else {
-                        InterpData(LoopT) = RawPropData[HiIndex - 1][LoopT - 1] -
-                                            (InterpFrac * (RawPropData[HiIndex - 1][LoopT - 1] - RawPropData[HiIndex - 2][LoopT - 1]));
+                        InterpData(LoopT + 1) =
+                            RawPropData[HiIndex][LoopT] - (InterpFrac * (RawPropData[HiIndex][LoopT] - RawPropData[HiIndex - 1][LoopT]));
                     }
                 }
             } else { // user has input data for concentrations that are too close or repeated, this must be fixed
