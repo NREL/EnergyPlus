@@ -8099,7 +8099,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                           "  AND RowName = 'Exterior Lighting:AnotherEndUseSubCat'");
         auto result = queryResult(query, "TabularDataWithStrings");
 
-        ASSERT_EQ(13u, result.size()) << "Failed for query: " << query;
+        ASSERT_EQ(14u, result.size()) << "Failed for query: " << query;
     }
 
     // Specifically get the each fuel (Coal, Gasoline, and Propane) usage for End Use = Heating,
@@ -8153,7 +8153,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                           "  AND RowName = 'Heating'");
         auto result = queryResult(query, "TabularDataWithStrings");
 
-        ASSERT_EQ(13u, result.size()) << "Failed for query: " << query;
+        ASSERT_EQ(14u, result.size()) << "Failed for query: " << query;
     }
 
     {
@@ -8163,7 +8163,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                           "  AND RowName = 'Heating'");
         auto result = queryResult(query, "TabularDataWithStrings");
 
-        ASSERT_EQ(13u, result.size()) << "Failed for query: " << query;
+        ASSERT_EQ(14u, result.size()) << "Failed for query: " << query;
     }
 }
 
@@ -9677,7 +9677,7 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                           "  AND RowName = 'Exterior Lighting:AnotherEndUseSubCat'");
         auto result = queryResult(query, "TabularDataWithStrings");
 
-        ASSERT_EQ(13u, result.size()) << "Failed for query: " << query;
+        ASSERT_EQ(14u, result.size()) << "Failed for query: " << query;
     }
 
     // Specifically get the each fuel (Coal, Gasoline, and Propane) usage for End Use = Heating,
@@ -9735,7 +9735,7 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                           "  AND RowName = 'Heating'");
         auto result = queryResult(query, "TabularDataWithStrings");
 
-        ASSERT_EQ(13u, result.size()) << "Failed for query: " << query;
+        ASSERT_EQ(14u, result.size()) << "Failed for query: " << query;
     }
 
     {
@@ -9745,7 +9745,7 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                           "  AND RowName = 'Heating'");
         auto result = queryResult(query, "TabularDataWithStrings");
 
-        ASSERT_EQ(13u, result.size()) << "Failed for query: " << query;
+        ASSERT_EQ(14u, result.size()) << "Failed for query: " << query;
     }
 }
 

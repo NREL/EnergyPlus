@@ -2115,7 +2115,7 @@
     Steam Boiler Plant Steam Temp Manager,  !- Name
     Temperature,             !- Control Variable
     Steam-Loop-Temp-Schedule,!- Schedule Name
-    Steam Supply Outlet Node;  !- Setpoint Node or NodeList Name
+    Steam Supply Outlet Node List;  !- Setpoint Node or NodeList Name
 
   SetpointManager:MixedAir,
     Mixed Air Temp Manager,  !- Name
@@ -2470,7 +2470,7 @@
     5,                                    !- Degree of SubCooling
     15,                                   !- Degree of Loop SubCooling
     TemperatureSetpointControl,           !- Coil Control Type
-    Steam to Water HX Water Outlet Node,  !- Heat Exchanger Setpoint Node Name
+    HW Supply Outlet Node,  !- Heat Exchanger Setpoint Node Name
     1;                                    !- Sizing Factor
 
 
@@ -2486,6 +2486,10 @@
 
   Output:Variable,*,Steam to Water Heat Exchanger Water Mass Flow Rate,timestep;
 
+  Output:Variable,*,Steam to Water Heat Exchanger Water Inlet Temperature,timestep;
+
+  Output:Variable,*,Steam to Water Heat Exchanger Water Outlet Temperature,timestep;
+
   Output:Variable,*,Steam to Water Heat Exchanger Operation Status,timestep;
 
   Output:Variable,Steam to Water HX Steam Inlet Node,System Node Temperature,timestep;
@@ -2495,6 +2499,10 @@
   Output:Variable,Steam to Water HX Water Inlet Node,System Node Temperature,timestep;
 
   Output:Variable,Steam to Water HX Water Outlet Node,System Node Temperature,timestep;
+
+  Output:Variable,Zone 1 Reheat Water Inlet Node,System Node Temperature,timestep;
+
+  Output:Variable,Zone 1 Reheat Water Outlet Node,System Node Temperature,timestep;
 
   Output:Variable,*,Boiler Heating Rate,timestep;
 

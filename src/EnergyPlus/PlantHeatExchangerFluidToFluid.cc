@@ -2872,6 +2872,9 @@ void HeatExchangerStruct::calculateSteamToWaterHX(EnergyPlusData &state, Real64 
         }
     }
 
+    this->SupplySideLoop.InletTemp = WaterInletTemp;
+    this->DemandSideLoop.InletTemp = SteamInletTemp;
+    
     // Set the outlet conditions
     this->HeatTransferRate = HeatingLoad;
     this->HeatTransferEnergy = this->HeatTransferRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
@@ -2880,6 +2883,7 @@ void HeatExchangerStruct::calculateSteamToWaterHX(EnergyPlusData &state, Real64 
     this->DemandSideLoop.OutletTemp = TempLoopOutToPump;
     this->DemandSideLoop.OutletQuality = 0.0;
 
+    state.dataLoopNodes->Node(this->SupplySideLoop.outletNodeNum).Temp = this->SupplySideLoop.OutletTemp;
     state.dataLoopNodes->Node(this->DemandSideLoop.outletNodeNum).Temp = this->DemandSideLoop.OutletTemp;
     state.dataLoopNodes->Node(this->DemandSideLoop.outletNodeNum).Enthalpy = this->DemandSideLoop.OutletEnthalpy;
     state.dataLoopNodes->Node(this->DemandSideLoop.outletNodeNum).Quality = this->DemandSideLoop.OutletQuality;
