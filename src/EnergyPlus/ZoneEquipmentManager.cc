@@ -6365,8 +6365,7 @@ void ReportInfiltrations(EnergyPlusData &state)
     Real64 H2OHtOfVap; // Heat of vaporization of air
     auto &Zone(state.dataHeatBal->Zone);
     auto &Infiltration(state.dataHeatBal->Infiltration);
-    auto &TimeStepZoneSec(state.dataGlobal->TimeStepZoneSec);
-    auto &TimeStepZone(state.dataGlobal->TimeStepZone);
+    auto &TimeStepSys(state.dataHVACGlobal->TimeStepSys);
     for (j = 1; j <= state.dataHeatBal->TotInfiltration; ++j) {
 
         NZ = state.dataHeatBal->Infiltration(j).ZonePtr;
@@ -6379,14 +6378,14 @@ void ReportInfiltrations(EnergyPlusData &state)
 
         if (state.dataHeatBalFanSys->MAT(NZ) > Zone(NZ).OutDryBulbTemp) {
 
-            Infiltration(j).InfilHeatLoss =
-                0.001 * Infiltration(j).MCpI_temp * (state.dataHeatBalFanSys->MAT(NZ) - Zone(NZ).OutDryBulbTemp) * TimeStepZoneSec * 1000.0;
+            Infiltration(j).InfilHeatLoss = Infiltration(j).MCpI_temp * (state.dataHeatBalFanSys->MAT(NZ) - Zone(NZ).OutDryBulbTemp) * TimeStepSys *
+                                            DataGlobalConstants::SecInHour;
             Infiltration(j).InfilHeatGain = 0.0;
 
         } else if (state.dataHeatBalFanSys->MAT(NZ) <= Zone(NZ).OutDryBulbTemp) {
 
-            Infiltration(j).InfilHeatGain =
-                0.001 * Infiltration(j).MCpI_temp * (Zone(NZ).OutDryBulbTemp - state.dataHeatBalFanSys->MAT(NZ)) * TimeStepZoneSec * 1000.0;
+            Infiltration(j).InfilHeatGain = Infiltration(j).MCpI_temp * (Zone(NZ).OutDryBulbTemp - state.dataHeatBalFanSys->MAT(NZ)) * TimeStepSys *
+                                            DataGlobalConstants::SecInHour;
             Infiltration(j).InfilHeatLoss = 0.0;
         }
 
@@ -6395,16 +6394,16 @@ void ReportInfiltrations(EnergyPlusData &state)
         H2OHtOfVap = PsyHgAirFnWTdb(state.dataHeatBalFanSys->ZoneAirHumRat(NZ), state.dataHeatBalFanSys->MAT(NZ));
         if (state.dataHeatBalFanSys->ZoneAirHumRat(NZ) > state.dataEnvrn->OutHumRat) {
 
-            Infiltration(j).InfilLatentLoss = 0.001 * Infiltration(j).MCpI_temp / CpAir *
-                                              (state.dataHeatBalFanSys->ZoneAirHumRat(NZ) - state.dataEnvrn->OutHumRat) * H2OHtOfVap *
-                                              TimeStepZoneSec * 1000.0;
+            Infiltration(j).InfilLatentLoss = Infiltration(j).MCpI_temp / CpAir *
+                                              (state.dataHeatBalFanSys->ZoneAirHumRat(NZ) - state.dataEnvrn->OutHumRat) * H2OHtOfVap * TimeStepSys *
+                                              DataGlobalConstants::SecInHour;
             Infiltration(j).InfilLatentGain = 0.0;
 
         } else if (state.dataHeatBalFanSys->ZoneAirHumRat(NZ) <= state.dataEnvrn->OutHumRat) {
 
-            Infiltration(j).InfilLatentGain = 0.001 * Infiltration(j).MCpI_temp / CpAir *
-                                              (state.dataEnvrn->OutHumRat - state.dataHeatBalFanSys->ZoneAirHumRat(NZ)) * H2OHtOfVap *
-                                              TimeStepZoneSec * 1000.0;
+            Infiltration(j).InfilLatentGain = Infiltration(j).MCpI_temp / CpAir *
+                                              (state.dataEnvrn->OutHumRat - state.dataHeatBalFanSys->ZoneAirHumRat(NZ)) * H2OHtOfVap * TimeStepSys *
+                                              DataGlobalConstants::SecInHour;
             Infiltration(j).InfilLatentLoss = 0.0;
         }
         // Total infiltration losses and gains
@@ -6417,18 +6416,18 @@ void ReportInfiltrations(EnergyPlusData &state)
             Infiltration(j).InfilTotalLoss = -TotalLoad;
         }
         Infiltration(j).InfilMdot = Infiltration(j).MCpI_temp / CpAir;
-        Infiltration(j).InfilMass = Infiltration(j).InfilMdot * TimeStepZoneSec;
+        Infiltration(j).InfilMass = Infiltration(j).InfilMdot * TimeStepSys * DataGlobalConstants::SecInHour;
         // CR7751  second, calculate using indoor conditions for density property
         AirDensity = PsyRhoAirFnPbTdbW(
             state, state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->MAT(NZ), state.dataHeatBalFanSys->ZoneAirHumRatAvg(NZ), RoutineName);
         Infiltration(j).InfilVdotCurDensity = Infiltration(j).InfilMdot / AirDensity;
-        Infiltration(j).InfilVolumeCurDensity = Infiltration(j).InfilVdotCurDensity * TimeStepZoneSec;
-        Infiltration(j).InfilAirChangeRate = Infiltration(j).InfilVolumeCurDensity / (TimeStepZone * Zone(NZ).Volume);
+        Infiltration(j).InfilVolumeCurDensity = Infiltration(j).InfilVdotCurDensity * TimeStepSys * DataGlobalConstants::SecInHour;
+        Infiltration(j).InfilAirChangeRate = Infiltration(j).InfilVolumeCurDensity / (TimeStepSys * Zone(NZ).Volume);
 
         // CR7751 third, calculate using standard dry air at nominal elevation
         AirDensity = state.dataEnvrn->StdRhoAir;
         Infiltration(j).InfilVdotStdDensity = Infiltration(j).InfilMdot / AirDensity;
-        Infiltration(j).InfilVolumeStdDensity = Infiltration(j).InfilVdotStdDensity * TimeStepZoneSec;
+        Infiltration(j).InfilVolumeStdDensity = Infiltration(j).InfilVdotStdDensity * TimeStepSys * DataGlobalConstants::SecInHour;
     }
 }
 
