@@ -435,6 +435,7 @@ namespace FanCoilUnits {
                                            Real64 const PLR,          // electric heating coil part load ratio
                                            Array1D<Real64> const &Par // Function parameters
     );
+
 } // namespace FanCoilUnits
 
 struct FanCoilUnitsData : BaseGlobalStruct

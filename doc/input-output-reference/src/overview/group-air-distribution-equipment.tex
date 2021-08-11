@@ -1827,7 +1827,7 @@ The primary air (treated outdoor air) inlet node name of the mixer. This will be
 
 \paragraph{Field: Mixer Secondary Air Inlet Node Name}\label{field-mixer-secondary-air-inlet-node-name}
 
-The secondary air (recirculating air) inlet node name of the mixer. This will be the outlet air node name of the ZoneHVAC equipment if the connection type in the input field \textit{Mixer Connection Type} below is \textbf{SupplySide}, or else this will be an exhaust air node name of the conditioned zone if the connection type in the input field \textit{Mixer Connection Type} below is \textbf{InletSide}.
+The secondary air (recirculating air) inlet node name of the mixer. This will be the outlet air node name of the ZoneHVAC equipment if the connection type in the input field \textit{Mixer Connection Type} below is \textbf{SupplySide}, or else this will be either an exhaust air node name of the conditioned zone (Ref. \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} to draw air from a zone directly or an induced air outlet node (Ref. \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum}) to draw air from a return plenum when the zone return node is connected to a return plenum.  The induced air outlet node will be the outlet air node name when the mixer connection type is SupplySide. If the mixer connection type is InletSide, then the induced air outlet node will be the mixer secondary air inlet node.
 
 \paragraph{Field: Mixer Connection Type}\label{field-mixer-connection-type}
 
