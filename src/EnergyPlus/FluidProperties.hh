@@ -362,7 +362,7 @@ namespace FluidProperties {
     };
 
 #ifdef EP_cache_GlycolSpecificHeat
-    extern Array1D<FluidProperties::cached_tsh> cached_t_sh; // DIMENSION(t_sh_cache_size)
+    extern std::array<FluidProperties::cached_tsh, t_sh_cache_size> cached_t_sh;
 #endif
     // Object Data
 
@@ -530,7 +530,7 @@ namespace FluidProperties {
         DISABLE_WARNING_POP
 
         std::uint64_t const hash(T_tag & t_sh_cache_mask);
-        auto &cTsh(cached_t_sh(hash));
+        auto &cTsh(cached_t_sh[hash]);
 
         if (cTsh.iT != T_tag) {
             cTsh.iT = T_tag;

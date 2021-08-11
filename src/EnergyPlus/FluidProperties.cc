@@ -117,7 +117,7 @@ namespace FluidProperties {
     // Object Data
 
 #ifdef EP_cache_GlycolSpecificHeat
-    Array1D<cached_tsh> cached_t_sh; // DIMENSION(t_sh_cache_size)
+    std::array<cached_tsh, t_sh_cache_size> cached_t_sh;
 #endif
     // Data Initializer Forward Declarations
     // See GetFluidPropertiesData "SUBROUTINE LOCAL DATA" for actual data.
@@ -129,7 +129,7 @@ namespace FluidProperties {
     void InitializeGlycRoutines()
     {
 #ifdef EP_cache_GlycolSpecificHeat
-        cached_t_sh.allocate({0, t_sh_cache_size});
+        cached_t_sh.fill({});
 #endif
     }
 
