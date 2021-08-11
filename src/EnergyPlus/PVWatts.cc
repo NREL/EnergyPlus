@@ -214,7 +214,7 @@ namespace PVWatts {
                             m_name);
     }
 
-    PVWattsGenerator PVWattsGenerator::createFromIdfObj(EnergyPlusData &state, int objNum)
+    std::unique_ptr<PVWattsGenerator> PVWattsGenerator::createFromIdfObj(EnergyPlusData &state, int objNum)
     {
         Array1D_string cAlphaFieldNames;
         Array1D_string cNumericFieldNames;
@@ -300,13 +300,13 @@ namespace PVWatts {
         }
 
         if (NumNums < NumFields::GROUND_COVERAGE_RATIO) {
-            return PVWattsGenerator(state, name, dcSystemCapacity, moduleType, arrayType, systemLosses, geometryType, tilt, azimuth, surfaceNum, 0.4);
+            return std::make_unique<PVWattsGenerator>(
+                state, name, dcSystemCapacity, moduleType, arrayType, systemLosses, geometryType, tilt, azimuth, surfaceNum, 0.4);
         }
         const Real64 groundCoverageRatio(rNumericArgs(NumFields::GROUND_COVERAGE_RATIO));
 
-        PVWattsGenerator pvwattsGenerator(
+        return std::make_unique<PVWattsGenerator>(
             state, name, dcSystemCapacity, moduleType, arrayType, systemLosses, geometryType, tilt, azimuth, surfaceNum, groundCoverageRatio);
-        return pvwattsGenerator;
     }
 
     Real64 PVWattsGenerator::getDCSystemCapacity()
@@ -462,29 +462,6 @@ namespace PVWatts {
         GeneratorEnergy = m_outputDCEnergy;
         ThermalPower = 0.0;
         ThermalEnergy = 0.0;
-    }
-
-    PVWattsGenerator &GetOrCreatePVWattsGenerator(EnergyPlusData &state, std::string const &GeneratorName)
-    {
-        auto &PVWattsGenerators(state.dataPVWatts->PVWattsGenerators);
-
-        auto it = PVWattsGenerators.find(GeneratorName);
-        if (it == PVWattsGenerators.end()) {
-            // It's not in the map, add it.
-            int ObjNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(
-                state, "Generator:PVWatts", UtilityRoutines::MakeUPPERCase(GeneratorName));
-            assert(ObjNum >= 0);
-            if (ObjNum == 0) {
-                ShowFatalError(state, "Cannot find Generator:PVWatts " + GeneratorName);
-            }
-
-            PVWattsGenerators.insert(std::make_pair(GeneratorName, PVWattsGenerator::createFromIdfObj(state, ObjNum)));
-            PVWattsGenerator &pvw(PVWattsGenerators.find(GeneratorName)->second);
-            pvw.setupOutputVariables(state);
-            return pvw;
-        } else {
-            return it->second;
-        }
     }
 
 } // namespace PVWatts

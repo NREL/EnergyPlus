@@ -169,7 +169,7 @@ namespace PVWatts {
         ssc_data_t m_pvwattsData;
 
     public:
-        static PVWattsGenerator createFromIdfObj(EnergyPlusData &state, int objNum);
+        static std::unique_ptr<PVWattsGenerator> createFromIdfObj(EnergyPlusData &state, int objNum);
 
         PVWattsGenerator(EnergyPlusData &state,
                          const std::string &name,
@@ -208,20 +208,7 @@ namespace PVWatts {
         void getResults(Real64 &GeneratorPower, Real64 &GeneratorEnergy, Real64 &ThermalPower, Real64 &ThermalEnergy);
     };
 
-    PVWattsGenerator &GetOrCreatePVWattsGenerator(EnergyPlusData &state, std::string const &GeneratorName);
-
 } // namespace PVWatts
-
-struct PVWattsData : BaseGlobalStruct
-{
-
-    std::map<std::string, PVWatts::PVWattsGenerator> PVWattsGenerators;
-
-    void clear_state() override
-    {
-        this->PVWattsGenerators.clear();
-    }
-};
 
 } // namespace EnergyPlus
 
