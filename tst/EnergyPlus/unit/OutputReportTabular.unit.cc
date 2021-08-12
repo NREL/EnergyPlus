@@ -6913,6 +6913,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataGlobal->numSpaces = 4;
     state->dataHeatBal->space.allocate(state->dataGlobal->numSpaces);
+    state->dataViewFactor->NumOfRadiantEnclosures = 4;
 
     state->dataHeatBal->Zone(iZone).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(iZone).HTSurfaceLast = 1;
@@ -6955,7 +6956,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
     Array3D<Real64> feneCondInstantSeq;
     feneCondInstantSeq.allocate(state->dataEnvrn->TotDesDays + state->dataEnvrn->TotRunDesPersDays,
                                 state->dataGlobal->NumOfTimeStepInHour * 24,
-                                state->dataGlobal->NumOfZones);
+                                state->dataViewFactor->NumOfRadiantEnclosures);
     feneCondInstantSeq = 0.0;
 
     Array2D<Real64> surfDelaySeqCool;
@@ -8296,6 +8297,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataGlobal->numSpaces = 1;
     state->dataHeatBal->space.allocate(state->dataGlobal->numSpaces);
+    state->dataViewFactor->NumOfRadiantEnclosures = 1;
 
     state->dataHeatBal->Zone(iZone).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(iZone).HTSurfaceLast = 4;
@@ -8336,7 +8338,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     Array3D<Real64> feneCondInstantSeq;
     feneCondInstantSeq.allocate(state->dataEnvrn->TotDesDays + state->dataEnvrn->TotRunDesPersDays,
                                 state->dataGlobal->NumOfTimeStepInHour * 24,
-                                state->dataGlobal->NumOfZones);
+                                state->dataViewFactor->NumOfRadiantEnclosures);
     feneCondInstantSeq = 0.0;
 
     Array2D<Real64> surfDelaySeqCool;
