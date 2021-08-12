@@ -165,5 +165,7 @@ int main()
         return 1;
     }
 
+    printf("EnergyPlus Version: %s", energyPlusVersion());
+
     return 0;
 }
