@@ -4911,8 +4911,11 @@ void UpdateThermalHistories(EnergyPlusData &state)
             state.dataHeatBalSurf->SurfOpaqInsFaceCond(SurfNum) = surface.Area * SurfInsideFluxHistCurr;
             state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(SurfNum) = SurfInsideFluxHistCurr; // for reporting
             state.dataHeatBalSurf->SurfInsideFluxHist(1)(SurfNum) = SurfInsideFluxHistCurr;
-            state.dataHeatBalSurf->SurfOpaqInsFaceCondGainRep(SurfNum) = std::abs(state.dataHeatBalSurf->SurfOpaqInsFaceCond(SurfNum));
-
+            if (state.dataHeatBalSurf->SurfOpaqInsFaceCond(SurfNum) >= 0.0) {
+                state.dataHeatBalSurf->SurfOpaqInsFaceCondGainRep(SurfNum) = state.dataHeatBalSurf->SurfOpaqInsFaceCond(SurfNum);
+            } else {
+                state.dataHeatBalSurf->SurfOpaqInsFaceCondLossRep(SurfNum) = -state.dataHeatBalSurf->SurfOpaqInsFaceCond(SurfNum);
+            }
             // Update the temperature at the source/sink location (if one is present)
             if (construct.SourceSinkPresent) {
                 state.dataHeatBalSurf->SurfTempSource(SurfNum) = state.dataHeatBalSurf->TsrcHist(SurfNum, 1) =

@@ -574,10 +574,12 @@ namespace HeatBalFiniteDiffManager {
         QHeatOutFlux.allocate(state.dataSurface->TotSurfaces);
 
         // And then initialize
-        QHeatInFlux = 0.0;
-        QHeatOutFlux = 0.0;
-        state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux = 0.0;
-        state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux = 0.0;
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            QHeatInFlux(SurfNum) = 0.0;
+            QHeatOutFlux(SurfNum) = 0.0;
+            state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(SurfNum) = 0.0;
+            state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(SurfNum) = 0.0;
+        }
 
         // Setup Output Variables
 
