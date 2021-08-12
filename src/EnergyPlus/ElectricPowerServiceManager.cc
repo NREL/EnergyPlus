@@ -2184,6 +2184,7 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
             ShowFatalError(state, "Cannot find Generator:PVWatts " + objectName);
         }
         pvwattsGenerator = PVWatts::PVWattsGenerator::createFromIdfObj(state, ObjNum);
+        pvwattsGenerator->setupOutputVariables(state);
 
     } else if (UtilityRoutines::SameString(objectType, "Generator:FuelCell")) {
         generatorType = GeneratorType::FuelCell;
