@@ -68,6 +68,15 @@ namespace InternalHeatGains {
 
     void GetInternalHeatGainsInput(EnergyPlusData &state);
 
+    void setupIHGZonesAndSpaces(EnergyPlusData &state,
+                                const std::string objectType,
+                                EPVector<DataHeatBalance::GlobalInternalGainMiscObject> &inputObjects,
+                                int &numInputObjects,
+                                int &numGainInstances,
+                                bool &errors);
+
+    void setupIHGOutputs(EnergyPlusData &state);
+
     void InitInternalHeatGains(EnergyPlusData &state);
 
     void CheckReturnAirHeatGain(EnergyPlusData &state);

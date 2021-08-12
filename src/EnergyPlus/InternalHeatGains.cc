@@ -214,15 +214,9 @@ namespace InternalHeatGains {
         static constexpr std::string_view RoutineName("GetInternalHeatGains: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D_string AlphaName;
-        Array1D<Real64> IHGNumbers;
         int IOStat;
         int NumAlpha;
         int NumNumber;
-        int MaxAlpha;
-        int MaxNumber;
-        int OptionNum(0); // Autodesk:Init Initialization added to elim poss use uninitialized
-        int lastOption;
         //   Variables for reporting nominal internal gains
         Real64 LightTot;       // Total Lights for calculating lights per square meter
         Real64 ElecTot;        // Total Electric Load for calculating electric per square meter
@@ -237,7 +231,6 @@ namespace InternalHeatGains {
         std::string liteName;
         int zonePt;
         Real64 mult;
-        Real64 maxOccupLoad;
         std::string CurrentModuleObject;
         bool errFlag;
 
@@ -270,328 +263,40 @@ namespace InternalHeatGains {
         state.dataHeatBal->RefrigCaseCredit.allocate(state.dataGlobal->NumOfZones);
 
         Array1D_bool RepVarSet;
-        Array1D_bool SpaceRepVarSet;
         RepVarSet.allocate(state.dataGlobal->NumOfZones);
-        SpaceRepVarSet.allocate(state.dataGlobal->numSpaces);
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             RepVarSet(zoneNum) = true;
         }
-        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
-            SpaceRepVarSet(spaceNum) = true;
-        }
 
-        // Determine argument length of objects gotten by this routine
-        MaxAlpha = -100;
-        MaxNumber = -100;
-        CurrentModuleObject = "People";
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumNumber, NumAlpha, NumNumber);
-        MaxAlpha = max(MaxAlpha, NumAlpha);
-        MaxNumber = max(MaxNumber, NumNumber);
-        CurrentModuleObject = "Lights";
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumNumber, NumAlpha, NumNumber);
-        MaxAlpha = max(MaxAlpha, NumAlpha);
-        MaxNumber = max(MaxNumber, NumNumber);
-        CurrentModuleObject = "ElectricEquipment";
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumNumber, NumAlpha, NumNumber);
-        MaxAlpha = max(MaxAlpha, NumAlpha);
-        MaxNumber = max(MaxNumber, NumNumber);
-        CurrentModuleObject = "GasEquipment";
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumNumber, NumAlpha, NumNumber);
-        MaxAlpha = max(MaxAlpha, NumAlpha);
-        MaxNumber = max(MaxNumber, NumNumber);
-        CurrentModuleObject = "HotWaterEquipment";
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumNumber, NumAlpha, NumNumber);
-        MaxAlpha = max(MaxAlpha, NumAlpha);
-        MaxNumber = max(MaxNumber, NumNumber);
-        CurrentModuleObject = "SteamEquipment";
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumNumber, NumAlpha, NumNumber);
-        MaxAlpha = max(MaxAlpha, NumAlpha);
-        MaxNumber = max(MaxNumber, NumNumber);
-        CurrentModuleObject = "OtherEquipment";
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumNumber, NumAlpha, NumNumber);
-        MaxAlpha = max(MaxAlpha, NumAlpha);
-        MaxNumber = max(MaxNumber, NumNumber);
-        CurrentModuleObject = "ElectricEquipment:ITE:AirCooled";
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumNumber, NumAlpha, NumNumber);
-        MaxAlpha = max(MaxAlpha, NumAlpha);
-        MaxNumber = max(MaxNumber, NumNumber);
-        CurrentModuleObject = "ZoneBaseboard:OutdoorTemperatureControlled";
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumNumber, NumAlpha, NumNumber);
-        MaxAlpha = max(MaxAlpha, NumAlpha);
-        MaxNumber = max(MaxNumber, NumNumber);
-        CurrentModuleObject = "ZoneContaminantSourceAndSink:CarbonDioxide";
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumNumber, NumAlpha, NumNumber);
-        MaxAlpha = max(MaxAlpha, NumAlpha);
-        MaxNumber = max(MaxNumber, NumNumber);
+        const std::string peopleModuleObject = "People";
+        const std::string lightsModuleObject = "Lights";
+        const std::string elecEqModuleObject = "ElectricEquipment";
+        const std::string gasEqModuleObject = "GasEquipment";
+        const std::string hwEqModuleObject = "HotWaterEquipment";
+        const std::string stmEqModuleObject = "SteamEquipment";
+        const std::string othEqModuleObject = "OtherEquipment";
+        const std::string itEqModuleObject = "ElectricEquipment:ITE:AirCooled";
+        const std::string bbModuleObject = "ZoneBaseboard:OutdoorTemperatureControlled";
+        const std::string contamSSModuleObject = "ZoneContaminantSourceAndSink:CarbonDioxide";
 
-        IHGNumbers.allocate(MaxNumber);
-        AlphaName.allocate(MaxAlpha);
-        IHGNumbers = 0.0;
-        AlphaName = "";
-
-        for (int Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
-            // Overall Zone Variables
-            SetupOutputVariable(state,
-                                "Zone Total Internal Radiant Heating Energy",
-                                OutputProcessor::Unit::J,
-                                state.dataHeatBal->ZnRpt(Loop).TotRadiantGain,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
-                                state.dataHeatBal->Zone(Loop).Name);
-            SetupOutputVariable(state,
-                                "Zone Total Internal Radiant Heating Rate",
-                                OutputProcessor::Unit::W,
-                                state.dataHeatBal->ZnRpt(Loop).TotRadiantGainRate,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
-                                state.dataHeatBal->Zone(Loop).Name);
-            SetupOutputVariable(state,
-                                "Zone Total Internal Visible Radiation Heating Energy",
-                                OutputProcessor::Unit::J,
-                                state.dataHeatBal->ZnRpt(Loop).TotVisHeatGain,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
-                                state.dataHeatBal->Zone(Loop).Name);
-            SetupOutputVariable(state,
-                                "Zone Total Internal Visible Radiation Heating Rate",
-                                OutputProcessor::Unit::W,
-                                state.dataHeatBal->ZnRpt(Loop).TotVisHeatGainRate,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
-                                state.dataHeatBal->Zone(Loop).Name);
-            SetupOutputVariable(state,
-                                "Zone Total Internal Convective Heating Energy",
-                                OutputProcessor::Unit::J,
-                                state.dataHeatBal->ZnRpt(Loop).TotConvectiveGain,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
-                                state.dataHeatBal->Zone(Loop).Name);
-            SetupOutputVariable(state,
-                                "Zone Total Internal Convective Heating Rate",
-                                OutputProcessor::Unit::W,
-                                state.dataHeatBal->ZnRpt(Loop).TotConvectiveGainRate,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
-                                state.dataHeatBal->Zone(Loop).Name);
-            SetupOutputVariable(state,
-                                "Zone Total Internal Latent Gain Energy",
-                                OutputProcessor::Unit::J,
-                                state.dataHeatBal->ZnRpt(Loop).TotLatentGain,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
-                                state.dataHeatBal->Zone(Loop).Name);
-            SetupOutputVariable(state,
-                                "Zone Total Internal Latent Gain Rate",
-                                OutputProcessor::Unit::W,
-                                state.dataHeatBal->ZnRpt(Loop).TotLatentGainRate,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
-                                state.dataHeatBal->Zone(Loop).Name);
-            SetupOutputVariable(state,
-                                "Zone Total Internal Total Heating Energy",
-                                OutputProcessor::Unit::J,
-                                state.dataHeatBal->ZnRpt(Loop).TotTotalHeatGain,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
-                                state.dataHeatBal->Zone(Loop).Name);
-            SetupOutputVariable(state,
-                                "Zone Total Internal Total Heating Rate",
-                                OutputProcessor::Unit::W,
-                                state.dataHeatBal->ZnRpt(Loop).TotTotalHeatGainRate,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
-                                state.dataHeatBal->Zone(Loop).Name);
-        }
-
-        // for (int Loop = 1; Loop <= state.dataGlobal->numSpaces; ++Loop) {
-        //    // Overall Space Variables
-        //    SetupOutputVariable(state,
-        //                        "Space Total Internal Radiant Heating Energy",
-        //                        OutputProcessor::Unit::J,
-        //                        state.dataHeatBal->spaceRpt(Loop).TotRadiantGain,
-        //                        OutputProcessor::SOVTimeStepType::Zone,
-        //                        OutputProcessor::SOVStoreType::Summed,
-        //                        state.dataHeatBal->space(Loop).Name);
-        //    SetupOutputVariable(state,
-        //                        "Space Total Internal Radiant Heating Rate",
-        //                        OutputProcessor::Unit::W,
-        //                        state.dataHeatBal->spaceRpt(Loop).TotRadiantGainRate,
-        //                        OutputProcessor::SOVTimeStepType::Zone,
-        //                        OutputProcessor::SOVStoreType::Average,
-        //                        state.dataHeatBal->space(Loop).Name);
-        //    SetupOutputVariable(state,
-        //                        "Space Total Internal Visible Radiation Heating Energy",
-        //                        OutputProcessor::Unit::J,
-        //                        state.dataHeatBal->spaceRpt(Loop).TotVisHeatGain,
-        //                        OutputProcessor::SOVTimeStepType::Zone,
-        //                        OutputProcessor::SOVStoreType::Summed,
-        //                        state.dataHeatBal->space(Loop).Name);
-        //    SetupOutputVariable(state,
-        //                        "Space Total Internal Visible Radiation Heating Rate",
-        //                        OutputProcessor::Unit::W,
-        //                        state.dataHeatBal->spaceRpt(Loop).TotVisHeatGainRate,
-        //                        OutputProcessor::SOVTimeStepType::Zone,
-        //                        OutputProcessor::SOVStoreType::Average,
-        //                        state.dataHeatBal->space(Loop).Name);
-        //    SetupOutputVariable(state,
-        //                        "Space Total Internal Convective Heating Energy",
-        //                        OutputProcessor::Unit::J,
-        //                        state.dataHeatBal->spaceRpt(Loop).TotConvectiveGain,
-        //                        OutputProcessor::SOVTimeStepType::Zone,
-        //                        OutputProcessor::SOVStoreType::Summed,
-        //                        state.dataHeatBal->space(Loop).Name);
-        //    SetupOutputVariable(state,
-        //                        "Space Total Internal Convective Heating Rate",
-        //                        OutputProcessor::Unit::W,
-        //                        state.dataHeatBal->spaceRpt(Loop).TotConvectiveGainRate,
-        //                        OutputProcessor::SOVTimeStepType::Zone,
-        //                        OutputProcessor::SOVStoreType::Average,
-        //                        state.dataHeatBal->space(Loop).Name);
-        //    SetupOutputVariable(state,
-        //                        "Space Total Internal Latent Gain Energy",
-        //                        OutputProcessor::Unit::J,
-        //                        state.dataHeatBal->spaceRpt(Loop).TotLatentGain,
-        //                        OutputProcessor::SOVTimeStepType::Zone,
-        //                        OutputProcessor::SOVStoreType::Summed,
-        //                        state.dataHeatBal->space(Loop).Name);
-        //    SetupOutputVariable(state,
-        //                        "Space Total Internal Latent Gain Rate",
-        //                        OutputProcessor::Unit::W,
-        //                        state.dataHeatBal->spaceRpt(Loop).TotLatentGainRate,
-        //                        OutputProcessor::SOVTimeStepType::Zone,
-        //                        OutputProcessor::SOVStoreType::Average,
-        //                        state.dataHeatBal->space(Loop).Name);
-        //    SetupOutputVariable(state,
-        //                        "Space Total Internal Total Heating Energy",
-        //                        OutputProcessor::Unit::J,
-        //                        state.dataHeatBal->spaceRpt(Loop).TotTotalHeatGain,
-        //                        OutputProcessor::SOVTimeStepType::Zone,
-        //                        OutputProcessor::SOVStoreType::Summed,
-        //                        state.dataHeatBal->space(Loop).Name);
-        //    SetupOutputVariable(state,
-        //                        "Space Total Internal Total Heating Rate",
-        //                        OutputProcessor::Unit::W,
-        //                        state.dataHeatBal->spaceRpt(Loop).TotTotalHeatGainRate,
-        //                        OutputProcessor::SOVTimeStepType::Zone,
-        //                        OutputProcessor::SOVStoreType::Average,
-        //                        state.dataHeatBal->space(Loop).Name);
-        //}
+        auto &IHGNumbers = state.dataIPShortCut->rNumericArgs;
+        auto &AlphaName = state.dataIPShortCut->cAlphaArgs;
 
         // PEOPLE: Includes both information related to the heat balance and thermal comfort
-        // First, allocate and initialize the People derived type
-        CurrentModuleObject = "People";
-        state.dataHeatBal->NumPeopleStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        state.dataHeatBal->PeopleObjects.allocate(state.dataHeatBal->NumPeopleStatements);
-
-        state.dataHeatBal->TotPeople = 0;
-        errFlag = false;
-        for (int Item = 1; Item <= state.dataHeatBal->NumPeopleStatements; ++Item) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     Item,
-                                                                     AlphaName,
-                                                                     NumAlpha,
-                                                                     IHGNumbers,
-                                                                     NumNumber,
-                                                                     IOStat,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
-            errFlag = UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
-
-            state.dataHeatBal->PeopleObjects(Item).Name = AlphaName(1);
-
-            int zoneNum = UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
-            if (zoneNum > 0) {
-                state.dataHeatBal->PeopleObjects(Item).StartPtr = state.dataHeatBal->TotPeople + 1;
-                int numSpaces = state.dataHeatBal->Zone(zoneNum).numSpaces;
-                state.dataHeatBal->TotPeople += numSpaces;
-                state.dataHeatBal->PeopleObjects(Item).numOfSpaces = numSpaces;
-                state.dataHeatBal->PeopleObjects(Item).NumOfZones = 1;
-                state.dataHeatBal->PeopleObjects(Item).ZoneListActive = false;
-                state.dataHeatBal->PeopleObjects(Item).ZoneOrZoneListPtr = zoneNum;
-                if (numSpaces == 1) {
-                    state.dataHeatBal->PeopleObjects(Item).spaceNums.emplace_back(state.dataHeatBal->Zone(zoneNum).spaceIndexes(1));
-                    state.dataHeatBal->PeopleObjects(Item).names.emplace_back(state.dataHeatBal->PeopleObjects(Item).Name);
-                } else {
-                    for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
-                        state.dataHeatBal->PeopleObjects(Item).spaceNums.emplace_back(spaceNum);
-                        state.dataHeatBal->PeopleObjects(Item).names.emplace_back(state.dataHeatBal->space(spaceNum).Name + ' ' +
-                                                                                  state.dataHeatBal->PeopleObjects(Item).Name);
-                    }
-                }
-                continue;
-            }
-            int spaceNum = UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->space);
-            if (spaceNum > 0) {
-                state.dataHeatBal->PeopleObjects(Item).StartPtr = state.dataHeatBal->TotPeople + 1;
-                ++state.dataHeatBal->TotPeople;
-                state.dataHeatBal->PeopleObjects(Item).numOfSpaces = 1;
-                state.dataHeatBal->PeopleObjects(Item).spaceListActive = false;
-                state.dataHeatBal->PeopleObjects(Item).spaceOrSpaceListPtr = spaceNum;
-                state.dataHeatBal->PeopleObjects(Item).spaceNums.emplace_back(spaceNum);
-                state.dataHeatBal->PeopleObjects(Item).names.emplace_back(state.dataHeatBal->PeopleObjects(Item).Name);
-                continue;
-            }
-            int zoneListNum = UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->ZoneList);
-            if (zoneListNum > 0) {
-                state.dataHeatBal->PeopleObjects(Item).StartPtr = state.dataHeatBal->TotPeople + 1;
-                int numSpaces = 0;
-                for (int const listZoneIdx : state.dataHeatBal->ZoneList(zoneListNum).Zone) {
-                    numSpaces += state.dataHeatBal->Zone(listZoneIdx).numSpaces;
-                    for (int const spaceNum : state.dataHeatBal->Zone(listZoneIdx).spaceIndexes) {
-                        state.dataHeatBal->PeopleObjects(Item).spaceNums.emplace_back(spaceNum);
-                        state.dataHeatBal->PeopleObjects(Item).names.emplace_back(state.dataHeatBal->space(spaceNum).Name + ' ' +
-                                                                                  state.dataHeatBal->PeopleObjects(Item).Name);
-                    }
-                }
-                state.dataHeatBal->TotPeople += numSpaces;
-                state.dataHeatBal->PeopleObjects(Item).numOfSpaces = numSpaces;
-                state.dataHeatBal->PeopleObjects(Item).NumOfZones = state.dataHeatBal->ZoneList(zoneListNum).NumOfZones;
-                state.dataHeatBal->PeopleObjects(Item).ZoneListActive = true;
-                state.dataHeatBal->PeopleObjects(Item).ZoneOrZoneListPtr = zoneListNum;
-                continue;
-            }
-            int spaceListNum = UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->spaceList);
-            if (spaceListNum > 0) {
-                state.dataHeatBal->PeopleObjects(Item).StartPtr = state.dataHeatBal->TotPeople + 1;
-                int numSpaces = state.dataHeatBal->spaceList(spaceListNum).numOfSpaces;
-                state.dataHeatBal->TotPeople += numSpaces;
-                state.dataHeatBal->PeopleObjects(Item).numOfSpaces = numSpaces;
-                state.dataHeatBal->PeopleObjects(Item).spaceListActive = true;
-                state.dataHeatBal->PeopleObjects(Item).spaceOrSpaceListPtr = spaceListNum;
-                for (int const spaceNum : state.dataHeatBal->spaceList(spaceListNum).spaces) {
-                    state.dataHeatBal->PeopleObjects(Item).spaceNums.emplace_back(spaceNum);
-                    state.dataHeatBal->PeopleObjects(Item).names.emplace_back(state.dataHeatBal->space(spaceNum).Name + ' ' +
-                                                                              state.dataHeatBal->PeopleObjects(Item).Name);
-                }
-                continue;
-            }
-            ShowSevereError(state,
-                            CurrentModuleObject + "=\"" + AlphaName(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
-                                AlphaName(2) + "\" not found.");
-            ErrorsFound = true;
-            errFlag = true;
-        }
-
-        if (errFlag) {
-            ShowSevereError(state, std::string{RoutineName} + "Errors with invalid names in " + CurrentModuleObject + " objects.");
-            ShowContinueError(state, "...These will not be read in.  Other errors may occur.");
-            state.dataHeatBal->TotPeople = 0;
-        }
-
-        state.dataHeatBal->People.allocate(state.dataHeatBal->TotPeople);
+        setupIHGZonesAndSpaces(state,
+                               peopleModuleObject,
+                               state.dataHeatBal->PeopleObjects,
+                               state.dataHeatBal->NumPeopleStatements,
+                               state.dataHeatBal->TotPeople,
+                               ErrorsFound);
 
         if (state.dataHeatBal->TotPeople > 0) {
-            int Loop = 0;
-            for (int Item = 1; Item <= state.dataHeatBal->NumPeopleStatements; ++Item) {
-                AlphaName = std::string{};
-                IHGNumbers = 0.0;
-
+            state.dataHeatBal->People.allocate(state.dataHeatBal->TotPeople);
+            int peopleNum = 0;
+            for (int peopleInputNum = 1; peopleInputNum <= state.dataHeatBal->NumPeopleStatements; ++peopleInputNum) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                         CurrentModuleObject,
-                                                                         Item,
+                                                                         peopleModuleObject,
+                                                                         peopleInputNum,
                                                                          AlphaName,
                                                                          NumAlpha,
                                                                          IHGNumbers,
@@ -601,97 +306,42 @@ namespace InternalHeatGains {
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-                int numZones = state.dataHeatBal->PeopleObjects(Item).NumOfZones;
+
                 // Create one People instance for every space associated with this People input object
-                for (int Item1 = 1; Item1 <= state.dataHeatBal->PeopleObjects(Item).numOfSpaces; ++Item1) {
-                    ++Loop;
-                    int const spaceNum = state.dataHeatBal->PeopleObjects(Item).spaceNums(Item1);
+                auto &thisPeopleInput = state.dataHeatBal->PeopleObjects(peopleInputNum);
+                for (int Item1 = 1; Item1 <= thisPeopleInput.numOfSpaces; ++Item1) {
+                    ++peopleNum;
+                    auto &thisPeople = state.dataHeatBal->People(peopleNum);
+                    int const spaceNum = thisPeopleInput.spaceNums(Item1);
                     int const zoneNum = state.dataHeatBal->space(spaceNum).zoneNum;
-                    state.dataHeatBal->People(Loop).Name = state.dataHeatBal->PeopleObjects(Item).names(Item1);
-                    state.dataHeatBal->People(Loop).spaceIndex = spaceNum;
-                    state.dataHeatBal->People(Loop).ZonePtr = zoneNum;
+                    thisPeople.Name = thisPeopleInput.names(Item1);
+                    thisPeople.spaceIndex = spaceNum;
+                    thisPeople.ZonePtr = zoneNum;
 
-                    // if ((numZones > 0) && !state.dataHeatBal->PeopleObjects(Item).ZoneListActive) {
-                    //    state.dataHeatBal->People(Loop).Name = AlphaName(1);
-                    //    int const zoneNum = state.dataHeatBal->PeopleObjects(Item).ZoneOrZoneListPtr;
-                    //    state.dataHeatBal->People(Loop).ZonePtr = zoneNum;
-                    //    if (zoneNum > 0) {
-                    //        for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
-                    //            state.dataHeatBal->People(Loop).spacePtrs.emplace_back(spaceNum);
-                    //        }
-                    //    }
-                    //} else if (state.dataHeatBal->PeopleObjects(Item).ZoneListActive) {
-                    //    CheckCreatedZoneItemName(
-                    //        state,
-                    //        RoutineName,
-                    //        CurrentModuleObject,
-                    //        state.dataHeatBal->Zone(state.dataHeatBal->ZoneList(state.dataHeatBal->PeopleObjects(Item).ZoneOrZoneListPtr).Zone(Item1))
-                    //            .Name,
-                    //        state.dataHeatBal->ZoneList(state.dataHeatBal->PeopleObjects(Item).ZoneOrZoneListPtr).MaxZoneNameLength,
-                    //        state.dataHeatBal->PeopleObjects(Item).Name,
-                    //        state.dataHeatBal->People,
-                    //        Loop - 1,
-                    //        state.dataHeatBal->People(Loop).Name,
-                    //        errFlag);
-                    //    int const zoneNum = state.dataHeatBal->ZoneList(state.dataHeatBal->PeopleObjects(Item).ZoneOrZoneListPtr).Zone(Item1);
-                    //    state.dataHeatBal->People(Loop).ZonePtr = zoneNum;
-                    //    if (zoneNum > 0) {
-                    //        for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
-                    //            state.dataHeatBal->People(Loop).spacePtrs.emplace_back(spaceNum);
-                    //        }
-                    //    }
-                    //    if (errFlag) ErrorsFound = true;
-                    //} else if ((numSpaces > 0) && !state.dataHeatBal->PeopleObjects(Item).spaceListActive) {
-                    //    state.dataHeatBal->People(Loop).Name = AlphaName(1);
-                    //    int const spaceNum = state.dataHeatBal->PeopleObjects(Item).spaceOrSpaceListPtr;
-                    //    if (spaceNum > 0) {
-                    //        state.dataHeatBal->People(Loop).spacePtrs.emplace_back(spaceNum);
-                    //        state.dataHeatBal->People(Loop).ZonePtr = state.dataHeatBal->space(spaceNum).zoneNum;
-                    //    }
-                    //} else if (state.dataHeatBal->PeopleObjects(Item).spaceListActive) {
-                    //    int const spaceNum = state.dataHeatBal->spaceList(state.dataHeatBal->PeopleObjects(Item).spaceOrSpaceListPtr).spaces(Item1);
-                    //    CheckCreatedZoneItemName(
-                    //        state,
-                    //        RoutineName,
-                    //        CurrentModuleObject,
-                    //        state.dataHeatBal->space(spaceNum).Name,
-                    //        state.dataHeatBal->spaceList(state.dataHeatBal->PeopleObjects(Item).spaceOrSpaceListPtr).maxSpaceNameLength,
-                    //        state.dataHeatBal->PeopleObjects(Item).Name,
-                    //        state.dataHeatBal->People,
-                    //        Loop - 1,
-                    //        state.dataHeatBal->People(Loop).Name,
-                    //        errFlag);
-                    //    if (spaceNum > 0) {
-                    //        state.dataHeatBal->People(Loop).spacePtrs.emplace_back(spaceNum);
-                    //        state.dataHeatBal->People(Loop).ZonePtr = state.dataHeatBal->space(spaceNum).zoneNum;
-                    //    }
-                    //    if (errFlag) ErrorsFound = true;
-                    //}
-
-                    state.dataHeatBal->People(Loop).NumberOfPeoplePtr = GetScheduleIndex(state, AlphaName(3));
+                    thisPeople.NumberOfPeoplePtr = GetScheduleIndex(state, AlphaName(3));
                     SchMin = 0.0;
                     SchMax = 0.0;
-                    if (state.dataHeatBal->People(Loop).NumberOfPeoplePtr == 0) {
+                    if (thisPeople.NumberOfPeoplePtr == 0) {
                         if (Item1 == 1) { // only show error on first one
                             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                                 ShowSevereError(state,
-                                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", " +
                                                     state.dataIPShortCut->cAlphaFieldNames(3) + " is required.");
                             } else {
                                 ShowSevereError(state,
-                                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                     state.dataIPShortCut->cAlphaFieldNames(3) + " entered=" + AlphaName(3));
                             }
                             ErrorsFound = true;
                         }
                     } else { // check min/max on schedule
-                        SchMin = GetScheduleMinValue(state, state.dataHeatBal->People(Loop).NumberOfPeoplePtr);
-                        SchMax = GetScheduleMaxValue(state, state.dataHeatBal->People(Loop).NumberOfPeoplePtr);
+                        SchMin = GetScheduleMinValue(state, thisPeople.NumberOfPeoplePtr);
+                        SchMax = GetScheduleMaxValue(state, thisPeople.NumberOfPeoplePtr);
                         if (SchMin < 0.0 || SchMax < 0.0) {
                             if (Item1 == 1) {
                                 if (SchMin < 0.0) {
                                     ShowSevereError(state,
-                                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                    std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", " +
                                                         state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0");
                                     ShowContinueError(state,
                                                       format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
@@ -701,7 +351,7 @@ namespace InternalHeatGains {
                             if (Item1 == 1) {
                                 if (SchMax < 0.0) {
                                     ShowSevereError(state,
-                                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                    std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", " +
                                                         state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0");
                                     ShowContinueError(state,
                                                       format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
@@ -717,7 +367,7 @@ namespace InternalHeatGains {
                         if (peopleMethod == "PEOPLE") {
                             // Set space load fraction
                             Real64 spaceFrac = 1.0;
-                            if (numZones > 1) {
+                            if (thisPeopleInput.numOfSpaces > 1) {
                                 Real64 const zoneArea = state.dataHeatBal->Zone(zoneNum).FloorArea;
                                 if (zoneArea > 0.0) {
                                     spaceFrac = state.dataHeatBal->space(spaceNum).floorArea / zoneArea;
@@ -725,27 +375,26 @@ namespace InternalHeatGains {
                                     ShowSevereError(state,
                                                     std::string(RoutineName) + "Zone floor area is zero when allocating People loads to Spaces.");
                                     ShowContinueError(state,
-                                                      "Occurs for People object =" + state.dataHeatBal->PeopleObjects(Item).Name +
+                                                      "Occurs for People object =" + thisPeopleInput.Name +
                                                           " in Zone=" + state.dataHeatBal->Zone(zoneNum).Name);
                                     ErrorsFound = true;
                                 }
                             }
-                            state.dataHeatBal->People(Loop).NumberOfPeople = IHGNumbers(1) * spaceFrac;
+                            thisPeople.NumberOfPeople = IHGNumbers(1) * spaceFrac;
                             if (state.dataIPShortCut->lNumericFieldBlanks(1)) {
                                 ShowWarningError(state,
-                                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataHeatBal->People(Loop).Name +
-                                                     "\", specifies " + state.dataIPShortCut->cNumericFieldNames(1) +
+                                                 std::string{RoutineName} + peopleModuleObject + "=\"" + thisPeople.Name + "\", specifies " +
+                                                     state.dataIPShortCut->cNumericFieldNames(1) +
                                                      ", but that field is blank.  0 People will result.");
                             }
 
                         } else if (peopleMethod == "PEOPLE/AREA") {
-                            if (state.dataHeatBal->People(Loop).ZonePtr != 0) {
+                            if (thisPeople.ZonePtr != 0) {
                                 if (IHGNumbers(2) >= 0.0) {
-                                    state.dataHeatBal->People(Loop).NumberOfPeople = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).floorArea;
+                                    thisPeople.NumberOfPeople = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).floorArea;
                                     if (state.dataHeatBal->space(spaceNum).floorArea <= 0.0) {
                                         ShowWarningError(state,
-                                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                                             state.dataHeatBal->People(Loop).Name + "\", specifies " +
+                                                         std::string{RoutineName} + peopleModuleObject + "=\"" + thisPeople.Name + "\", specifies " +
                                                              state.dataIPShortCut->cNumericFieldNames(2) +
                                                              ", but Space Floor Area = 0.  0 People will result.");
                                     }
@@ -753,8 +402,8 @@ namespace InternalHeatGains {
                                     ShowSevereError(state,
                                                     format("{}{}=\"{}\", invalid {}, value  [<0.0]={:.3R}",
                                                            RoutineName,
-                                                           CurrentModuleObject,
-                                                           state.dataHeatBal->People(Loop).Name,
+                                                           peopleModuleObject,
+                                                           thisPeople.Name,
                                                            state.dataIPShortCut->cNumericFieldNames(2),
                                                            IHGNumbers(2)));
                                     ErrorsFound = true;
@@ -762,19 +411,18 @@ namespace InternalHeatGains {
                             }
                             if (state.dataIPShortCut->lNumericFieldBlanks(2)) {
                                 ShowWarningError(state,
-                                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataHeatBal->People(Loop).Name +
-                                                     "\", specifies " + state.dataIPShortCut->cNumericFieldNames(2) +
+                                                 std::string{RoutineName} + peopleModuleObject + "=\"" + thisPeople.Name + "\", specifies " +
+                                                     state.dataIPShortCut->cNumericFieldNames(2) +
                                                      ", but that field is blank.  0 People will result.");
                             }
 
                         } else if (peopleMethod == "AREA/PERSON") {
-                            if (state.dataHeatBal->People(Loop).ZonePtr != 0) {
+                            if (thisPeople.ZonePtr != 0) {
                                 if (IHGNumbers(3) > 0.0) {
-                                    state.dataHeatBal->People(Loop).NumberOfPeople = state.dataHeatBal->space(spaceNum).floorArea / IHGNumbers(3);
+                                    thisPeople.NumberOfPeople = state.dataHeatBal->space(spaceNum).floorArea / IHGNumbers(3);
                                     if (state.dataHeatBal->space(spaceNum).floorArea <= 0.0) {
                                         ShowWarningError(state,
-                                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                                             state.dataHeatBal->People(Loop).Name + "\", specifies " +
+                                                         std::string{RoutineName} + peopleModuleObject + "=\"" + thisPeople.Name + "\", specifies " +
                                                              state.dataIPShortCut->cNumericFieldNames(3) +
                                                              ", but Space Floor Area = 0.  0 People will result.");
                                     }
@@ -782,8 +430,8 @@ namespace InternalHeatGains {
                                     ShowSevereError(state,
                                                     format("{}{}=\"{}\", invalid {}, value  [<0.0]={:.3R}",
                                                            RoutineName,
-                                                           CurrentModuleObject,
-                                                           state.dataHeatBal->People(Loop).Name,
+                                                           peopleModuleObject,
+                                                           thisPeople.Name,
                                                            state.dataIPShortCut->cNumericFieldNames(3),
                                                            IHGNumbers(3)));
                                     ErrorsFound = true;
@@ -791,15 +439,15 @@ namespace InternalHeatGains {
                             }
                             if (state.dataIPShortCut->lNumericFieldBlanks(3)) {
                                 ShowWarningError(state,
-                                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataHeatBal->People(Loop).Name +
-                                                     "\", specifies " + state.dataIPShortCut->cNumericFieldNames(3) +
+                                                 std::string{RoutineName} + peopleModuleObject + "=\"" + thisPeople.Name + "\", specifies " +
+                                                     state.dataIPShortCut->cNumericFieldNames(3) +
                                                      ", but that field is blank.  0 People will result.");
                             }
 
                         } else {
                             if (Item1 == 1) {
                                 ShowSevereError(state,
-                                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                     state.dataIPShortCut->cAlphaFieldNames(4) + ", value  =" + AlphaName(4));
                                 ShowContinueError(state, "...Valid values are \"People\", \"People/Area\", \"Area/Person\".");
                                 ErrorsFound = true;
@@ -808,30 +456,30 @@ namespace InternalHeatGains {
                     }
 
                     // Calculate nominal min/max people
-                    state.dataHeatBal->People(Loop).NomMinNumberPeople = state.dataHeatBal->People(Loop).NumberOfPeople * SchMin;
-                    state.dataHeatBal->People(Loop).NomMaxNumberPeople = state.dataHeatBal->People(Loop).NumberOfPeople * SchMax;
+                    thisPeople.NomMinNumberPeople = thisPeople.NumberOfPeople * SchMin;
+                    thisPeople.NomMaxNumberPeople = thisPeople.NumberOfPeople * SchMax;
 
                     if (zoneNum > 0) {
-                        state.dataHeatBal->Zone(zoneNum).TotOccupants += state.dataHeatBal->People(Loop).NumberOfPeople;
+                        state.dataHeatBal->Zone(zoneNum).TotOccupants += thisPeople.NumberOfPeople;
                         // Note that min/max occupants are non-coincident
-                        state.dataHeatBal->Zone(zoneNum).minOccupants += state.dataHeatBal->People(Loop).NomMinNumberPeople;
-                        state.dataHeatBal->Zone(zoneNum).maxOccupants += state.dataHeatBal->People(Loop).NomMaxNumberPeople;
+                        state.dataHeatBal->Zone(zoneNum).minOccupants += thisPeople.NomMinNumberPeople;
+                        state.dataHeatBal->Zone(zoneNum).maxOccupants += thisPeople.NomMaxNumberPeople;
                     }
 
                     if (spaceNum > 0) {
-                        state.dataHeatBal->space(spaceNum).totOccupants += state.dataHeatBal->People(Loop).NumberOfPeople;
+                        state.dataHeatBal->space(spaceNum).totOccupants += thisPeople.NumberOfPeople;
                         // Note that min/max occupants are non-coincident
-                        state.dataHeatBal->space(spaceNum).minOccupants += state.dataHeatBal->People(Loop).NomMinNumberPeople;
-                        state.dataHeatBal->space(spaceNum).maxOccupants += state.dataHeatBal->People(Loop).NomMaxNumberPeople;
+                        state.dataHeatBal->space(spaceNum).minOccupants += thisPeople.NomMinNumberPeople;
+                        state.dataHeatBal->space(spaceNum).maxOccupants += thisPeople.NomMaxNumberPeople;
                     }
-                    state.dataHeatBal->People(Loop).FractionRadiant = IHGNumbers(4);
-                    state.dataHeatBal->People(Loop).FractionConvected = 1.0 - state.dataHeatBal->People(Loop).FractionRadiant;
+                    thisPeople.FractionRadiant = IHGNumbers(4);
+                    thisPeople.FractionConvected = 1.0 - thisPeople.FractionRadiant;
                     if (Item1 == 1) {
-                        if (state.dataHeatBal->People(Loop).FractionConvected < 0.0) {
+                        if (thisPeople.FractionConvected < 0.0) {
                             ShowSevereError(state,
                                             format("{}{}=\"{}\", {} < 0.0, value ={:.2R}",
                                                    RoutineName,
-                                                   CurrentModuleObject,
+                                                   peopleModuleObject,
                                                    AlphaName(1),
                                                    state.dataIPShortCut->cNumericFieldNames(4),
                                                    IHGNumbers(4)));
@@ -840,49 +488,49 @@ namespace InternalHeatGains {
                     }
 
                     if (NumNumber >= 5 && !state.dataIPShortCut->lNumericFieldBlanks(5)) {
-                        state.dataHeatBal->People(Loop).UserSpecSensFrac = IHGNumbers(5);
+                        thisPeople.UserSpecSensFrac = IHGNumbers(5);
                     } else {
-                        state.dataHeatBal->People(Loop).UserSpecSensFrac = DataGlobalConstants::AutoCalculate;
+                        thisPeople.UserSpecSensFrac = DataGlobalConstants::AutoCalculate;
                     }
 
                     if (NumNumber == 6 && !state.dataIPShortCut->lNumericFieldBlanks(6)) {
-                        state.dataHeatBal->People(Loop).CO2RateFactor = IHGNumbers(6);
+                        thisPeople.CO2RateFactor = IHGNumbers(6);
                     } else {
-                        state.dataHeatBal->People(Loop).CO2RateFactor = 3.82e-8; // m3/s-W
+                        thisPeople.CO2RateFactor = 3.82e-8; // m3/s-W
                     }
-                    if (state.dataHeatBal->People(Loop).CO2RateFactor < 0.0) {
+                    if (thisPeople.CO2RateFactor < 0.0) {
                         ShowSevereError(state,
                                         format("{}{}=\"{}\", {} < 0.0, value ={:.2R}",
                                                RoutineName,
-                                               CurrentModuleObject,
+                                               peopleModuleObject,
                                                AlphaName(1),
                                                state.dataIPShortCut->cNumericFieldNames(6),
                                                IHGNumbers(6)));
                         ErrorsFound = true;
                     }
 
-                    state.dataHeatBal->People(Loop).ActivityLevelPtr = GetScheduleIndex(state, AlphaName(5));
-                    if (state.dataHeatBal->People(Loop).ActivityLevelPtr == 0) {
+                    thisPeople.ActivityLevelPtr = GetScheduleIndex(state, AlphaName(5));
+                    if (thisPeople.ActivityLevelPtr == 0) {
                         if (Item1 == 1) {
                             if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
                                 ShowSevereError(state,
-                                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", " +
                                                     state.dataIPShortCut->cAlphaFieldNames(5) + " is required.");
                             } else {
                                 ShowSevereError(state,
-                                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                     state.dataIPShortCut->cAlphaFieldNames(5) + " entered=" + AlphaName(5));
                             }
                             ErrorsFound = true;
                         }
                     } else { // Check values in Schedule
-                        SchMin = GetScheduleMinValue(state, state.dataHeatBal->People(Loop).ActivityLevelPtr);
-                        SchMax = GetScheduleMaxValue(state, state.dataHeatBal->People(Loop).ActivityLevelPtr);
+                        SchMin = GetScheduleMinValue(state, thisPeople.ActivityLevelPtr);
+                        SchMax = GetScheduleMaxValue(state, thisPeople.ActivityLevelPtr);
                         if (SchMin < 0.0 || SchMax < 0.0) {
                             if (Item1 == 1) {
                                 if (SchMin < 0.0) {
                                     ShowSevereError(state,
-                                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                    std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", " +
                                                         state.dataIPShortCut->cAlphaFieldNames(5) + " minimum is < 0.0");
                                     ShowContinueError(state,
                                                       format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(5), SchMin));
@@ -892,7 +540,7 @@ namespace InternalHeatGains {
                             if (Item1 == 1) {
                                 if (SchMax < 0.0) {
                                     ShowSevereError(state,
-                                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                    std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", " +
                                                         state.dataIPShortCut->cAlphaFieldNames(5) + " maximum is < 0.0");
                                     ShowContinueError(state,
                                                       format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(5), SchMax));
@@ -902,7 +550,7 @@ namespace InternalHeatGains {
                         } else if (SchMin < 70.0 || SchMax > 1000.0) {
                             if (Item1 == 1) {
                                 ShowWarningError(state,
-                                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                 std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", " +
                                                      state.dataIPShortCut->cAlphaFieldNames(5) + " values");
                                 ShowContinueError(state, "fall outside typical range [70,1000] W/person for Thermal Comfort Reporting.");
                                 ShowContinueError(state, "Odd comfort values may result; Schedule=\"" + AlphaName(5) + "\".");
@@ -914,11 +562,11 @@ namespace InternalHeatGains {
                     // Following is an optional parameter (ASHRAE 55 warnings
                     if (NumAlpha >= 6) {
                         if (UtilityRoutines::SameString(AlphaName(6), "Yes")) {
-                            state.dataHeatBal->People(Loop).Show55Warning = true;
+                            thisPeople.Show55Warning = true;
                         } else if (!UtilityRoutines::SameString(AlphaName(6), "No") && !state.dataIPShortCut->lAlphaFieldBlanks(6)) {
                             if (Item1 == 1) {
                                 ShowSevereError(state,
-                                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", " +
                                                     state.dataIPShortCut->cAlphaFieldNames(6) + " field should be Yes or No");
                                 ShowContinueError(state, "...Field value=\"" + AlphaName(6) + "\" is invalid.");
                                 ErrorsFound = true;
@@ -927,6 +575,7 @@ namespace InternalHeatGains {
                     }
 
                     if (NumAlpha > 6) { // Optional parameters present--thermal comfort data follows...
+                        int lastOption = 0;
                         state.dataInternalHeatGains->UsingThermalComfort = false;
                         if (NumAlpha > 20) {
                             lastOption = 20;
@@ -946,7 +595,7 @@ namespace InternalHeatGains {
                                                                                           state.dataIPShortCut->lAlphaFieldBlanks(13));
                             if (NoTCModelSelectedWithSchedules) {
                                 ShowWarningError(state,
-                                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) +
+                                                 std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) +
                                                      "\" has comfort related schedules but no thermal comfort model selected.");
                                 ShowContinueError(state,
                                                   "If schedules are specified for air velocity, clothing insulation, and/or work efficiency but no "
@@ -959,42 +608,42 @@ namespace InternalHeatGains {
                             }
                         }
 
-                        for (OptionNum = NumFirstTCModel; OptionNum <= lastOption; ++OptionNum) {
+                        for (int OptionNum = NumFirstTCModel; OptionNum <= lastOption; ++OptionNum) {
 
                             {
                                 auto const thermalComfortType(AlphaName(OptionNum));
 
                                 if (thermalComfortType == "FANGER") {
-                                    state.dataHeatBal->People(Loop).Fanger = true;
+                                    thisPeople.Fanger = true;
                                     state.dataInternalHeatGains->UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "PIERCE") {
-                                    state.dataHeatBal->People(Loop).Pierce = true;
+                                    thisPeople.Pierce = true;
                                     state.dataHeatBal->AnyThermalComfortPierceModel = true;
                                     state.dataInternalHeatGains->UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "KSU") {
-                                    state.dataHeatBal->People(Loop).KSU = true;
+                                    thisPeople.KSU = true;
                                     state.dataHeatBal->AnyThermalComfortKSUModel = true;
                                     state.dataInternalHeatGains->UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "ADAPTIVEASH55") {
-                                    state.dataHeatBal->People(Loop).AdaptiveASH55 = true;
+                                    thisPeople.AdaptiveASH55 = true;
                                     state.dataHeatBal->AdaptiveComfortRequested_ASH55 = true;
                                     state.dataInternalHeatGains->UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "ADAPTIVECEN15251") {
-                                    state.dataHeatBal->People(Loop).AdaptiveCEN15251 = true;
+                                    thisPeople.AdaptiveCEN15251 = true;
                                     state.dataHeatBal->AdaptiveComfortRequested_CEN15251 = true;
                                     state.dataInternalHeatGains->UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "COOLINGEFFECTASH55") {
-                                    state.dataHeatBal->People(Loop).CoolingEffectASH55 = true;
+                                    thisPeople.CoolingEffectASH55 = true;
                                     state.dataHeatBal->AnyThermalComfortCoolingEffectModel = true;
                                     state.dataInternalHeatGains->UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "ANKLEDRAFTASH55") {
-                                    state.dataHeatBal->People(Loop).AnkleDraftASH55 = true;
+                                    thisPeople.AnkleDraftASH55 = true;
                                     state.dataHeatBal->AnyThermalComfortAnkleDraftModel = true;
                                     state.dataInternalHeatGains->UsingThermalComfort = true;
 
@@ -1003,7 +652,7 @@ namespace InternalHeatGains {
                                 } else { // An invalid keyword was entered--warn but ignore
                                     if (Item1 == 1) {
                                         ShowWarningError(state,
-                                                         std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                         std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                              state.dataIPShortCut->cAlphaFieldNames(OptionNum) + " Option=" + AlphaName(OptionNum));
                                         ShowContinueError(state,
                                                           "Valid Values are \"Fanger\", \"Pierce\", \"KSU\", \"AdaptiveASH55\", "
@@ -1016,62 +665,56 @@ namespace InternalHeatGains {
                         if (state.dataInternalHeatGains->UsingThermalComfort) {
 
                             // Set the default value of MRTCalcType as 'ZoneAveraged'
-                            state.dataHeatBal->People(Loop).MRTCalcType = DataHeatBalance::CalcMRT::ZoneAveraged;
+                            thisPeople.MRTCalcType = DataHeatBalance::CalcMRT::ZoneAveraged;
 
-                            bool ModelWithAdditionalInputs = state.dataHeatBal->People(Loop).Fanger || state.dataHeatBal->People(Loop).Pierce ||
-                                                             state.dataHeatBal->People(Loop).KSU ||
-                                                             state.dataHeatBal->People(Loop).CoolingEffectASH55 ||
-                                                             state.dataHeatBal->People(Loop).AnkleDraftASH55;
+                            bool ModelWithAdditionalInputs = thisPeople.Fanger || thisPeople.Pierce || thisPeople.KSU ||
+                                                             thisPeople.CoolingEffectASH55 || thisPeople.AnkleDraftASH55;
 
                             // MRT Calculation Type and Surface Name
                             {
                                 auto const mrtType(AlphaName(7));
 
                                 if (mrtType == "ZONEAVERAGED") {
-                                    state.dataHeatBal->People(Loop).MRTCalcType = DataHeatBalance::CalcMRT::ZoneAveraged;
+                                    thisPeople.MRTCalcType = DataHeatBalance::CalcMRT::ZoneAveraged;
 
                                 } else if (mrtType == "SURFACEWEIGHTED") {
-                                    state.dataHeatBal->People(Loop).MRTCalcType = DataHeatBalance::CalcMRT::SurfaceWeighted;
-                                    state.dataHeatBal->People(Loop).SurfacePtr =
-                                        UtilityRoutines::FindItemInList(AlphaName(8), state.dataSurface->Surface);
-                                    if (state.dataHeatBal->People(Loop).SurfacePtr == 0 && ModelWithAdditionalInputs) {
+                                    thisPeople.MRTCalcType = DataHeatBalance::CalcMRT::SurfaceWeighted;
+                                    thisPeople.SurfacePtr = UtilityRoutines::FindItemInList(AlphaName(8), state.dataSurface->Surface);
+                                    if (thisPeople.SurfacePtr == 0 && ModelWithAdditionalInputs) {
                                         if (Item1 == 1) {
                                             ShowSevereError(state,
-                                                            std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                            std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", " +
                                                                 state.dataIPShortCut->cAlphaFieldNames(7) + '=' + AlphaName(7) +
                                                                 " invalid Surface Name=" + AlphaName(8));
                                             ErrorsFound = true;
                                         }
-                                    } else if (state.dataSurface->Surface(state.dataHeatBal->People(Loop).SurfacePtr).Zone !=
-                                                   state.dataHeatBal->People(Loop).ZonePtr &&
+                                    } else if (state.dataSurface->Surface(thisPeople.SurfacePtr).Zone != thisPeople.ZonePtr &&
                                                ModelWithAdditionalInputs) {
                                         ShowSevereError(state,
-                                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) +
+                                                        std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) +
                                                             "\", Surface referenced in " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' +
                                                             AlphaName(7) + " in different zone.");
-                                        ShowContinueError(
-                                            state,
-                                            "Surface is in Zone=" +
-                                                state.dataHeatBal->Zone(state.dataSurface->Surface(state.dataHeatBal->People(Loop).SurfacePtr).Zone)
-                                                    .Name +
-                                                " and " + CurrentModuleObject + " is in Zone=" + AlphaName(2));
+                                        ShowContinueError(state,
+                                                          "Surface is in Zone=" +
+                                                              state.dataHeatBal->Zone(state.dataSurface->Surface(thisPeople.SurfacePtr).Zone).Name +
+                                                              " and " + peopleModuleObject + " is in Zone=" + AlphaName(2));
                                         ErrorsFound = true;
                                     }
 
                                 } else if (mrtType == "ANGLEFACTOR") {
-                                    state.dataHeatBal->People(Loop).MRTCalcType = DataHeatBalance::CalcMRT::AngleFactor;
-                                    state.dataHeatBal->People(Loop).AngleFactorListName = AlphaName(8);
+                                    thisPeople.MRTCalcType = DataHeatBalance::CalcMRT::AngleFactor;
+                                    thisPeople.AngleFactorListName = AlphaName(8);
 
                                 } else if (mrtType == "") { // Blank input field--just ignore this
                                     if (Item1 == 1 && ModelWithAdditionalInputs)
                                         ShowWarningError(state,
-                                                         std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", blank " +
+                                                         std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", blank " +
                                                              state.dataIPShortCut->cAlphaFieldNames(7));
 
                                 } else { // An invalid keyword was entered--warn but ignore
                                     if (Item1 == 1 && ModelWithAdditionalInputs) {
                                         ShowWarningError(state,
-                                                         std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                         std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                              state.dataIPShortCut->cAlphaFieldNames(7) + '=' + AlphaName(7));
                                         ShowContinueError(state, "...Valid values are \"ZoneAveraged\", \"SurfaceWeighted\", \"AngleFactor\".");
                                     }
@@ -1079,22 +722,22 @@ namespace InternalHeatGains {
                             }
 
                             if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
-                                state.dataHeatBal->People(Loop).WorkEffPtr = GetScheduleIndex(state, AlphaName(9));
-                                if (state.dataHeatBal->People(Loop).WorkEffPtr == 0) {
+                                thisPeople.WorkEffPtr = GetScheduleIndex(state, AlphaName(9));
+                                if (thisPeople.WorkEffPtr == 0) {
                                     if (Item1 == 1) {
                                         ShowSevereError(state,
-                                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                        std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                             state.dataIPShortCut->cAlphaFieldNames(9) + " entered=" + AlphaName(9));
                                         ErrorsFound = true;
                                     }
                                 } else { // check min/max on schedule
-                                    SchMin = GetScheduleMinValue(state, state.dataHeatBal->People(Loop).WorkEffPtr);
-                                    SchMax = GetScheduleMaxValue(state, state.dataHeatBal->People(Loop).WorkEffPtr);
+                                    SchMin = GetScheduleMinValue(state, thisPeople.WorkEffPtr);
+                                    SchMax = GetScheduleMaxValue(state, thisPeople.WorkEffPtr);
                                     if (SchMin < 0.0 || SchMax < 0.0) {
                                         if (SchMin < 0.0) {
                                             if (Item1 == 1) {
                                                 ShowSevereError(state,
-                                                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                                std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", " +
                                                                     state.dataIPShortCut->cAlphaFieldNames(9) + ", minimum is < 0.0");
                                                 ShowContinueError(
                                                     state,
@@ -1105,7 +748,7 @@ namespace InternalHeatGains {
                                         if (SchMax < 0.0) {
                                             if (Item1 == 1) {
                                                 ShowSevereError(state,
-                                                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                                std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", " +
                                                                     state.dataIPShortCut->cAlphaFieldNames(9) + ", maximum is < 0.0");
                                                 ShowContinueError(
                                                     state,
@@ -1117,7 +760,7 @@ namespace InternalHeatGains {
                                     if (SchMax > 1.0) {
                                         if (Item1 == 1) {
                                             ShowWarningError(state,
-                                                             std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                             std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", " +
                                                                  state.dataIPShortCut->cAlphaFieldNames(9) + ", maximum is > 1.0");
                                             ShowContinueError(state,
                                                               format("Schedule=\"{}\"; Entered min/max range=[{:.1R},{:.1R}] Work Efficiency.",
@@ -1130,7 +773,7 @@ namespace InternalHeatGains {
                             } else if (ModelWithAdditionalInputs) {
                                 if (Item1 == 1) {
                                     ShowSevereError(state,
-                                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", blank " +
+                                                    std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", blank " +
                                                         state.dataIPShortCut->cAlphaFieldNames(9) + ". " + state.dataIPShortCut->cAlphaFieldNames(9) +
                                                         " is required when Thermal Comfort Model Type is one of "
                                                         "\"Fanger\", \"Pierce\", \"KSU\", \"CoolingEffectASH55\" or \"AnkleDraftASH55\"");
@@ -1142,24 +785,24 @@ namespace InternalHeatGains {
                                 {
                                     auto const clothingType(AlphaName(10));
                                     if (clothingType == "CLOTHINGINSULATIONSCHEDULE") {
-                                        state.dataHeatBal->People(Loop).ClothingType = 1;
-                                        state.dataHeatBal->People(Loop).ClothingPtr = GetScheduleIndex(state, AlphaName(12));
-                                        if (state.dataHeatBal->People(Loop).ClothingPtr == 0 && ModelWithAdditionalInputs) {
+                                        thisPeople.ClothingType = 1;
+                                        thisPeople.ClothingPtr = GetScheduleIndex(state, AlphaName(12));
+                                        if (thisPeople.ClothingPtr == 0 && ModelWithAdditionalInputs) {
                                             if (Item1 == 1) {
                                                 ShowSevereError(state,
-                                                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) +
+                                                                std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) +
                                                                     "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(12) + " entered=\"" +
                                                                     AlphaName(12) + "\".");
                                                 ErrorsFound = true;
                                             }
                                         } else { // check min/max on schedule
-                                            SchMin = GetScheduleMinValue(state, state.dataHeatBal->People(Loop).ClothingPtr);
-                                            SchMax = GetScheduleMaxValue(state, state.dataHeatBal->People(Loop).ClothingPtr);
+                                            SchMin = GetScheduleMinValue(state, thisPeople.ClothingPtr);
+                                            SchMax = GetScheduleMaxValue(state, thisPeople.ClothingPtr);
                                             if (SchMin < 0.0 || SchMax < 0.0) {
                                                 if (SchMin < 0.0) {
                                                     if (Item1 == 1) {
                                                         ShowSevereError(state,
-                                                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) +
+                                                                        std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) +
                                                                             "\", " + state.dataIPShortCut->cAlphaFieldNames(12) +
                                                                             ", minimum is < 0.0");
                                                         ShowContinueError(state,
@@ -1172,7 +815,7 @@ namespace InternalHeatGains {
                                                 if (SchMax < 0.0) {
                                                     if (Item1 == 1) {
                                                         ShowSevereError(state,
-                                                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) +
+                                                                        std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) +
                                                                             "\", " + state.dataIPShortCut->cAlphaFieldNames(12) +
                                                                             ", maximum is < 0.0");
                                                         ShowContinueError(state,
@@ -1186,7 +829,7 @@ namespace InternalHeatGains {
                                             if (SchMax > 2.0) {
                                                 if (Item1 == 1) {
                                                     ShowWarningError(state,
-                                                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                                     std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", " +
                                                                          state.dataIPShortCut->cAlphaFieldNames(12) + ", maximum is > 2.0");
                                                     ShowContinueError(state,
                                                                       format("Schedule=\"{}\"; Entered min/max range=[{:.1R},{:.1R}] Clothing.",
@@ -1198,26 +841,26 @@ namespace InternalHeatGains {
                                         }
 
                                     } else if (clothingType == "DYNAMICCLOTHINGMODELASHRAE55") {
-                                        state.dataHeatBal->People(Loop).ClothingType = 2;
+                                        thisPeople.ClothingType = 2;
 
                                     } else if (clothingType == "CALCULATIONMETHODSCHEDULE") {
-                                        state.dataHeatBal->People(Loop).ClothingType = 3;
-                                        state.dataHeatBal->People(Loop).ClothingMethodPtr = GetScheduleIndex(state, AlphaName(11));
-                                        if (state.dataHeatBal->People(Loop).ClothingMethodPtr == 0) {
+                                        thisPeople.ClothingType = 3;
+                                        thisPeople.ClothingMethodPtr = GetScheduleIndex(state, AlphaName(11));
+                                        if (thisPeople.ClothingMethodPtr == 0) {
                                             if (Item1 == 1) {
                                                 ShowSevereError(state,
-                                                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) +
+                                                                std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) +
                                                                     "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + " entered=\"" +
                                                                     AlphaName(11) + "\".");
                                                 ErrorsFound = true;
                                             }
                                         }
-                                        if (CheckScheduleValue(state, state.dataHeatBal->People(Loop).ClothingMethodPtr, 1)) {
-                                            state.dataHeatBal->People(Loop).ClothingPtr = GetScheduleIndex(state, AlphaName(12));
-                                            if (state.dataHeatBal->People(Loop).ClothingPtr == 0) {
+                                        if (CheckScheduleValue(state, thisPeople.ClothingMethodPtr, 1)) {
+                                            thisPeople.ClothingPtr = GetScheduleIndex(state, AlphaName(12));
+                                            if (thisPeople.ClothingPtr == 0) {
                                                 if (Item1 == 1) {
                                                     ShowSevereError(state,
-                                                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) +
+                                                                    std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) +
                                                                         "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(12) + " entered=\"" +
                                                                         AlphaName(12) + "\".");
                                                     ErrorsFound = true;
@@ -1227,8 +870,7 @@ namespace InternalHeatGains {
 
                                     } else {
                                         ShowSevereError(state,
-                                                        std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                                            state.dataHeatBal->People(Loop).Name + "\", invalid " +
+                                                        std::string{RoutineName} + peopleModuleObject + "=\"" + thisPeople.Name + "\", invalid " +
                                                             state.dataIPShortCut->cAlphaFieldNames(10) + ", value  =" + AlphaName(10));
                                         ShowContinueError(state,
                                                           "...Valid values are \"ClothingInsulationSchedule\",\"DynamicClothingModelASHRAE55a\", "
@@ -1239,22 +881,22 @@ namespace InternalHeatGains {
                             }
 
                             if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
-                                state.dataHeatBal->People(Loop).AirVelocityPtr = GetScheduleIndex(state, AlphaName(13));
-                                if (state.dataHeatBal->People(Loop).AirVelocityPtr == 0) {
+                                thisPeople.AirVelocityPtr = GetScheduleIndex(state, AlphaName(13));
+                                if (thisPeople.AirVelocityPtr == 0) {
                                     if (Item1 == 1) {
                                         ShowSevereError(state,
-                                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                        std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                             state.dataIPShortCut->cAlphaFieldNames(13) + " entered=\"" + AlphaName(13) + "\".");
                                         ErrorsFound = true;
                                     }
                                 } else { // check min/max on schedule
-                                    SchMin = GetScheduleMinValue(state, state.dataHeatBal->People(Loop).AirVelocityPtr);
-                                    SchMax = GetScheduleMaxValue(state, state.dataHeatBal->People(Loop).AirVelocityPtr);
+                                    SchMin = GetScheduleMinValue(state, thisPeople.AirVelocityPtr);
+                                    SchMax = GetScheduleMaxValue(state, thisPeople.AirVelocityPtr);
                                     if (SchMin < 0.0 || SchMax < 0.0) {
                                         if (SchMin < 0.0) {
                                             if (Item1 == 1) {
                                                 ShowSevereError(state,
-                                                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                                std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", " +
                                                                     state.dataIPShortCut->cAlphaFieldNames(13) + ", minimum is < 0.0");
                                                 ShowContinueError(
                                                     state,
@@ -1265,7 +907,7 @@ namespace InternalHeatGains {
                                         if (SchMax < 0.0) {
                                             if (Item1 == 1) {
                                                 ShowSevereError(state,
-                                                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                                std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", " +
                                                                     state.dataIPShortCut->cAlphaFieldNames(13) + ", maximum is < 0.0");
                                                 ShowContinueError(
                                                     state,
@@ -1278,7 +920,7 @@ namespace InternalHeatGains {
                             } else if (ModelWithAdditionalInputs) {
                                 if (Item1 == 1) {
                                     ShowSevereError(state,
-                                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", blank " +
+                                                    std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", blank " +
                                                         state.dataIPShortCut->cAlphaFieldNames(13) + ". " +
                                                         state.dataIPShortCut->cAlphaFieldNames(13) +
                                                         " is required when Thermal Comfort Model Type is one of "
@@ -1289,20 +931,20 @@ namespace InternalHeatGains {
 
                             int indexAnkleAirVelPtr = 21;
                             if (!state.dataIPShortCut->lAlphaFieldBlanks(indexAnkleAirVelPtr) || AlphaName(indexAnkleAirVelPtr) != "") {
-                                state.dataHeatBal->People(Loop).AnkleAirVelocityPtr = GetScheduleIndex(state, AlphaName(indexAnkleAirVelPtr));
-                                if (state.dataHeatBal->People(Loop).AnkleAirVelocityPtr == 0) {
+                                thisPeople.AnkleAirVelocityPtr = GetScheduleIndex(state, AlphaName(indexAnkleAirVelPtr));
+                                if (thisPeople.AnkleAirVelocityPtr == 0) {
                                     if (Item1 == 1) {
                                         ShowSevereError(state,
-                                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                        std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                             state.dataIPShortCut->cAlphaFieldNames(indexAnkleAirVelPtr) + " entered=\"" +
                                                             AlphaName(indexAnkleAirVelPtr) + "\".");
                                         ErrorsFound = true;
                                     }
                                 }
-                            } else if (state.dataHeatBal->People(Loop).AnkleDraftASH55) {
+                            } else if (thisPeople.AnkleDraftASH55) {
                                 if (Item1 == 1) {
                                     ShowSevereError(state,
-                                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", blank " +
+                                                    std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", blank " +
                                                         state.dataIPShortCut->cAlphaFieldNames(indexAnkleAirVelPtr) + ". " +
                                                         state.dataIPShortCut->cAlphaFieldNames(indexAnkleAirVelPtr) +
                                                         " is required when Thermal Comfort Model Type is one of "
@@ -1315,367 +957,106 @@ namespace InternalHeatGains {
 
                     } // ...end of thermal comfort data IF-THEN block  (NumAlphas > 6)
 
-                    if (state.dataHeatBal->People(Loop).ZonePtr <= 0) continue; // Error, will be caught and terminated later
-
-                    // Object report variables
-                    SetupOutputVariable(state,
-                                        "People Occupant Count",
-                                        OutputProcessor::Unit::None,
-                                        state.dataHeatBal->People(Loop).NumOcc,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->People(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "People Radiant Heating Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->People(Loop).RadGainEnergy,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->People(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "People Radiant Heating Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->People(Loop).RadGainRate,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->People(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "People Convective Heating Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->People(Loop).ConGainEnergy,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->People(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "People Convective Heating Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->People(Loop).ConGainRate,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->People(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "People Sensible Heating Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->People(Loop).SenGainEnergy,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->People(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "People Sensible Heating Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->People(Loop).SenGainRate,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->People(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "People Latent Gain Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->People(Loop).LatGainEnergy,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->People(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "People Latent Gain Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->People(Loop).LatGainRate,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->People(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "People Total Heating Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->People(Loop).TotGainEnergy,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->People(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "People Total Heating Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->People(Loop).TotGainRate,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->People(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "People Air Temperature",
-                                        OutputProcessor::Unit::C,
-                                        state.dataHeatBal->People(Loop).TemperatureInZone,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->People(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "People Air Relative Humidity",
-                                        OutputProcessor::Unit::Perc,
-                                        state.dataHeatBal->People(Loop).RelativeHumidityInZone,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->People(Loop).Name);
-
-                    // Zone total report variables
-                    if (RepVarSet(state.dataHeatBal->People(Loop).ZonePtr)) {
-                        RepVarSet(state.dataHeatBal->People(Loop).ZonePtr) = false;
-                        SetupOutputVariable(state,
-                                            "Zone People Occupant Count",
-                                            OutputProcessor::Unit::None,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->People(Loop).ZonePtr).PeopleNumOcc,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->People(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone People Radiant Heating Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->People(Loop).ZonePtr).PeopleRadGain,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->People(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone People Radiant Heating Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->People(Loop).ZonePtr).PeopleRadGainRate,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->People(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone People Convective Heating Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->People(Loop).ZonePtr).PeopleConGain,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->People(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone People Convective Heating Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->People(Loop).ZonePtr).PeopleConGainRate,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->People(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone People Sensible Heating Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->People(Loop).ZonePtr).PeopleSenGain,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->People(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone People Sensible Heating Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->People(Loop).ZonePtr).PeopleSenGainRate,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->People(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone People Latent Gain Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->People(Loop).ZonePtr).PeopleLatGain,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->People(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone People Latent Gain Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->People(Loop).ZonePtr).PeopleLatGainRate,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->People(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone People Total Heating Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->People(Loop).ZonePtr).PeopleTotGain,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->People(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone People Total Heating Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->People(Loop).ZonePtr).PeopleTotGainRate,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->People(Loop).ZonePtr).Name);
-                    }
-
-                    //// Space total report variables
-                    // for (int spaceNum : state.dataHeatBal->People(Loop).spacePtrs) {
-
-                    //    if (SpaceRepVarSet(spaceNum)) {
-                    //        SpaceRepVarSet(spaceNum) = false;
-                    //        SetupOutputVariable(state,
-                    //                            "Space People Occupant Count",
-                    //                            OutputProcessor::Unit::None,
-                    //                            state.dataHeatBal->spaceRpt(spaceNum).PeopleNumOcc,
-                    //                            OutputProcessor::SOVTimeStepType::Zone,
-                    //                            OutputProcessor::SOVStoreType::Average,
-                    //                            state.dataHeatBal->space(spaceNum).Name);
-                    //        SetupOutputVariable(state,
-                    //                            "Space People Radiant Heating Energy",
-                    //                            OutputProcessor::Unit::J,
-                    //                            state.dataHeatBal->spaceRpt(spaceNum).PeopleRadGain,
-                    //                            OutputProcessor::SOVTimeStepType::Zone,
-                    //                            OutputProcessor::SOVStoreType::Summed,
-                    //                            state.dataHeatBal->space(spaceNum).Name);
-                    //        SetupOutputVariable(state,
-                    //                            "Space People Radiant Heating Rate",
-                    //                            OutputProcessor::Unit::W,
-                    //                            state.dataHeatBal->spaceRpt(spaceNum).PeopleRadGainRate,
-                    //                            OutputProcessor::SOVTimeStepType::Zone,
-                    //                            OutputProcessor::SOVStoreType::Average,
-                    //                            state.dataHeatBal->space(spaceNum).Name);
-                    //        SetupOutputVariable(state,
-                    //                            "Space People Convective Heating Energy",
-                    //                            OutputProcessor::Unit::J,
-                    //                            state.dataHeatBal->spaceRpt(spaceNum).PeopleConGain,
-                    //                            OutputProcessor::SOVTimeStepType::Zone,
-                    //                            OutputProcessor::SOVStoreType::Summed,
-                    //                            state.dataHeatBal->space(spaceNum).Name);
-                    //        SetupOutputVariable(state,
-                    //                            "Space People Convective Heating Rate",
-                    //                            OutputProcessor::Unit::W,
-                    //                            state.dataHeatBal->spaceRpt(spaceNum).PeopleConGainRate,
-                    //                            OutputProcessor::SOVTimeStepType::Zone,
-                    //                            OutputProcessor::SOVStoreType::Average,
-                    //                            state.dataHeatBal->space(spaceNum).Name);
-                    //        SetupOutputVariable(state,
-                    //                            "Space People Sensible Heating Energy",
-                    //                            OutputProcessor::Unit::J,
-                    //                            state.dataHeatBal->spaceRpt(spaceNum).PeopleSenGain,
-                    //                            OutputProcessor::SOVTimeStepType::Zone,
-                    //                            OutputProcessor::SOVStoreType::Summed,
-                    //                            state.dataHeatBal->space(spaceNum).Name);
-                    //        SetupOutputVariable(state,
-                    //                            "Space People Sensible Heating Rate",
-                    //                            OutputProcessor::Unit::W,
-                    //                            state.dataHeatBal->spaceRpt(spaceNum).PeopleSenGainRate,
-                    //                            OutputProcessor::SOVTimeStepType::Zone,
-                    //                            OutputProcessor::SOVStoreType::Average,
-                    //                            state.dataHeatBal->space(spaceNum).Name);
-                    //        SetupOutputVariable(state,
-                    //                            "Space People Latent Gain Energy",
-                    //                            OutputProcessor::Unit::J,
-                    //                            state.dataHeatBal->spaceRpt(spaceNum).PeopleLatGain,
-                    //                            OutputProcessor::SOVTimeStepType::Zone,
-                    //                            OutputProcessor::SOVStoreType::Summed,
-                    //                            state.dataHeatBal->space(spaceNum).Name);
-                    //        SetupOutputVariable(state,
-                    //                            "Space People Latent Gain Rate",
-                    //                            OutputProcessor::Unit::W,
-                    //                            state.dataHeatBal->spaceRpt(spaceNum).PeopleLatGainRate,
-                    //                            OutputProcessor::SOVTimeStepType::Zone,
-                    //                            OutputProcessor::SOVStoreType::Average,
-                    //                            state.dataHeatBal->space(spaceNum).Name);
-                    //        SetupOutputVariable(state,
-                    //                            "Space People Total Heating Energy",
-                    //                            OutputProcessor::Unit::J,
-                    //                            state.dataHeatBal->spaceRpt(spaceNum).PeopleTotGain,
-                    //                            OutputProcessor::SOVTimeStepType::Zone,
-                    //                            OutputProcessor::SOVStoreType::Summed,
-                    //                            state.dataHeatBal->space(spaceNum).Name);
-                    //        SetupOutputVariable(state,
-                    //                            "Space People Total Heating Rate",
-                    //                            OutputProcessor::Unit::W,
-                    //                            state.dataHeatBal->spaceRpt(spaceNum).PeopleTotGainRate,
-                    //                            OutputProcessor::SOVTimeStepType::Zone,
-                    //                            OutputProcessor::SOVStoreType::Average,
-                    //                            state.dataHeatBal->space(spaceNum).Name);
-                    //    }
-                    //}
-
-                    if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                        SetupEMSActuator(state,
-                                         "People",
-                                         state.dataHeatBal->People(Loop).Name,
-                                         "Number of People",
-                                         "[each]",
-                                         state.dataHeatBal->People(Loop).EMSPeopleOn,
-                                         state.dataHeatBal->People(Loop).EMSNumberOfPeople);
-                        SetupEMSInternalVariable(state,
-                                                 "People Count Design Level",
-                                                 state.dataHeatBal->People(Loop).Name,
-                                                 "[each]",
-                                                 state.dataHeatBal->People(Loop).NumberOfPeople);
-                    }
-
-                    // setup internal gains
-                    if (!ErrorsFound)
-                        SetupZoneInternalGain(state,
-                                              state.dataHeatBal->People(Loop).ZonePtr,
-                                              "People",
-                                              state.dataHeatBal->People(Loop).Name,
-                                              IntGainTypeOf_People,
-                                              &state.dataHeatBal->People(Loop).ConGainRate,
-                                              nullptr,
-                                              &state.dataHeatBal->People(Loop).RadGainRate,
-                                              &state.dataHeatBal->People(Loop).LatGainRate,
-                                              nullptr,
-                                              &state.dataHeatBal->People(Loop).CO2GainRate);
-
-                } // Item1 - number of zones
-            }     // Item - number of people statements
-        }         // TotPeople > 0
-
-        // transfer the nominal number of people in a zone to the tabular reporting
-        for (int Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
-            if (state.dataHeatBal->Zone(Loop).TotOccupants > 0.0) {
-                if (state.dataHeatBal->Zone(Loop).FloorArea > 0.0 &&
-                    state.dataHeatBal->Zone(Loop).FloorArea / state.dataHeatBal->Zone(Loop).TotOccupants < 0.1) {
-                    ShowWarningError(
-                        state, std::string{RoutineName} + "Zone=\"" + state.dataHeatBal->Zone(Loop).Name + "\" occupant density is extremely high.");
-                    if (state.dataHeatBal->Zone(Loop).FloorArea > 0.0) {
-                        ShowContinueError(state,
-                                          format("Occupant Density=[{:.0R}] person/m2.",
-                                                 state.dataHeatBal->Zone(Loop).TotOccupants / state.dataHeatBal->Zone(Loop).FloorArea));
-                    }
-                    ShowContinueError(state,
-                                      format("Occupant Density=[{:.3R}] m2/person. Problems in Temperature Out of Bounds may result.",
-                                             state.dataHeatBal->Zone(Loop).FloorArea / state.dataHeatBal->Zone(Loop).TotOccupants));
+                    if (thisPeople.ZonePtr <= 0) continue; // Error, will be caught and terminated later
                 }
-                maxOccupLoad = 0.0;
-                for (Loop1 = 1; Loop1 <= state.dataHeatBal->TotPeople; ++Loop1) {
-                    if (state.dataHeatBal->People(Loop1).ZonePtr != Loop) continue;
-                    if (maxOccupLoad < GetScheduleMaxValue(state, state.dataHeatBal->People(Loop1).NumberOfPeoplePtr) *
-                                           state.dataHeatBal->People(Loop1).NumberOfPeople) {
-                        maxOccupLoad = GetScheduleMaxValue(state, state.dataHeatBal->People(Loop1).NumberOfPeoplePtr) *
-                                       state.dataHeatBal->People(Loop1).NumberOfPeople;
-                        MaxNumber = state.dataHeatBal->People(Loop1).NumberOfPeoplePtr;
-                        OptionNum = Loop1;
-                    }
+            }
+
+            for (int peopleNum = 1; peopleNum <= state.dataHeatBal->TotPeople; ++peopleNum) {
+                if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                    SetupEMSActuator(state,
+                                     "People",
+                                     state.dataHeatBal->People(peopleNum).Name,
+                                     "Number of People",
+                                     "[each]",
+                                     state.dataHeatBal->People(peopleNum).EMSPeopleOn,
+                                     state.dataHeatBal->People(peopleNum).EMSNumberOfPeople);
+                    SetupEMSInternalVariable(state,
+                                             "People Count Design Level",
+                                             state.dataHeatBal->People(peopleNum).Name,
+                                             "[each]",
+                                             state.dataHeatBal->People(peopleNum).NumberOfPeople);
                 }
-                if (maxOccupLoad > state.dataHeatBal->Zone(Loop).TotOccupants) {
-                    if (state.dataHeatBal->Zone(Loop).FloorArea > 0.0 && state.dataHeatBal->Zone(Loop).FloorArea / maxOccupLoad < 0.1) {
+
+                // setup internal gains
+                if (!ErrorsFound)
+                    SetupZoneInternalGain(state,
+                                          state.dataHeatBal->People(peopleNum).ZonePtr,
+                                          "People",
+                                          state.dataHeatBal->People(peopleNum).Name,
+                                          IntGainTypeOf_People,
+                                          &state.dataHeatBal->People(peopleNum).ConGainRate,
+                                          nullptr,
+                                          &state.dataHeatBal->People(peopleNum).RadGainRate,
+                                          &state.dataHeatBal->People(peopleNum).LatGainRate,
+                                          nullptr,
+                                          &state.dataHeatBal->People(peopleNum).CO2GainRate);
+            }
+
+            // transfer the nominal number of people in a zone to the tabular reporting
+            for (int Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
+                if (state.dataHeatBal->Zone(Loop).TotOccupants > 0.0) {
+                    if (state.dataHeatBal->Zone(Loop).FloorArea > 0.0 &&
+                        state.dataHeatBal->Zone(Loop).FloorArea / state.dataHeatBal->Zone(Loop).TotOccupants < 0.1) {
                         ShowWarningError(state,
                                          std::string{RoutineName} + "Zone=\"" + state.dataHeatBal->Zone(Loop).Name +
-                                             "\" occupant density at a maximum schedule value is extremely high.");
+                                             "\" occupant density is extremely high.");
                         if (state.dataHeatBal->Zone(Loop).FloorArea > 0.0) {
                             ShowContinueError(state,
-                                              format("Occupant Density=[{:.0R}] person/m2.", maxOccupLoad / state.dataHeatBal->Zone(Loop).FloorArea));
+                                              format("Occupant Density=[{:.0R}] person/m2.",
+                                                     state.dataHeatBal->Zone(Loop).TotOccupants / state.dataHeatBal->Zone(Loop).FloorArea));
                         }
                         ShowContinueError(state,
                                           format("Occupant Density=[{:.3R}] m2/person. Problems in Temperature Out of Bounds may result.",
-                                                 state.dataHeatBal->Zone(Loop).FloorArea / maxOccupLoad));
-                        ShowContinueError(state,
-                                          "Check values in People=" + state.dataHeatBal->People(OptionNum).Name +
-                                              ", Number of People Schedule=" + GetScheduleName(state, MaxNumber));
+                                                 state.dataHeatBal->Zone(Loop).FloorArea / state.dataHeatBal->Zone(Loop).TotOccupants));
+                    }
+                    Real64 maxOccupLoad = 0.0;
+                    int OptionNum = 0;
+                    for (Loop1 = 1; Loop1 <= state.dataHeatBal->TotPeople; ++Loop1) {
+                        if (state.dataHeatBal->People(Loop1).ZonePtr != Loop) continue;
+                        if (maxOccupLoad < GetScheduleMaxValue(state, state.dataHeatBal->People(Loop1).NumberOfPeoplePtr) *
+                                               state.dataHeatBal->People(Loop1).NumberOfPeople) {
+                            maxOccupLoad = GetScheduleMaxValue(state, state.dataHeatBal->People(Loop1).NumberOfPeoplePtr) *
+                                           state.dataHeatBal->People(Loop1).NumberOfPeople;
+                            OptionNum = Loop1;
+                        }
+                    }
+                    if (maxOccupLoad > state.dataHeatBal->Zone(Loop).TotOccupants) {
+                        if (state.dataHeatBal->Zone(Loop).FloorArea > 0.0 && state.dataHeatBal->Zone(Loop).FloorArea / maxOccupLoad < 0.1) {
+                            ShowWarningError(state,
+                                             std::string{RoutineName} + "Zone=\"" + state.dataHeatBal->Zone(Loop).Name +
+                                                 "\" occupant density at a maximum schedule value is extremely high.");
+                            if (state.dataHeatBal->Zone(Loop).FloorArea > 0.0) {
+                                ShowContinueError(
+                                    state, format("Occupant Density=[{:.0R}] person/m2.", maxOccupLoad / state.dataHeatBal->Zone(Loop).FloorArea));
+                            }
+                            ShowContinueError(state,
+                                              format("Occupant Density=[{:.3R}] m2/person. Problems in Temperature Out of Bounds may result.",
+                                                     state.dataHeatBal->Zone(Loop).FloorArea / maxOccupLoad));
+                            ShowContinueError(state,
+                                              "Check values in People=" + state.dataHeatBal->People(OptionNum).Name + ", Number of People Schedule=" +
+                                                  GetScheduleName(state, state.dataHeatBal->People(OptionNum).NumberOfPeoplePtr));
+                        }
+                    }
+                }
+
+                if (state.dataHeatBal->Zone(Loop).isNominalControlled) { // conditioned zones only
+                    if (state.dataHeatBal->Zone(Loop).TotOccupants > 0.0) {
+                        state.dataHeatBal->Zone(Loop).isNominalOccupied = true;
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchOaoNomNumOcc1,
+                                         state.dataHeatBal->Zone(Loop).Name,
+                                         state.dataHeatBal->Zone(Loop).TotOccupants);
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchOaoNomNumOcc2,
+                                         state.dataHeatBal->Zone(Loop).Name,
+                                         state.dataHeatBal->Zone(Loop).TotOccupants);
                     }
                 }
             }
-
-            if (state.dataHeatBal->Zone(Loop).isNominalControlled) { // conditioned zones only
-                if (state.dataHeatBal->Zone(Loop).TotOccupants > 0.0) {
-                    state.dataHeatBal->Zone(Loop).isNominalOccupied = true;
-                    PreDefTableEntry(state,
-                                     state.dataOutRptPredefined->pdchOaoNomNumOcc1,
-                                     state.dataHeatBal->Zone(Loop).Name,
-                                     state.dataHeatBal->Zone(Loop).TotOccupants);
-                    PreDefTableEntry(state,
-                                     state.dataOutRptPredefined->pdchOaoNomNumOcc2,
-                                     state.dataHeatBal->Zone(Loop).Name,
-                                     state.dataHeatBal->Zone(Loop).TotOccupants);
-                }
-            }
-        }
+        } // TotPeople > 0
 
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             RepVarSet(zoneNum) = true;
-        }
-        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
-            SpaceRepVarSet(spaceNum) = true;
         }
         CurrentModuleObject = "Lights";
         state.dataHeatBal->NumLightsStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
@@ -2358,9 +1739,6 @@ namespace InternalHeatGains {
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             RepVarSet(zoneNum) = true;
         }
-        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
-            SpaceRepVarSet(spaceNum) = true;
-        }
         CurrentModuleObject = "ElectricEquipment";
         state.dataHeatBal->NumZoneElectricStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataHeatBal->ZoneElectricObjects.allocate(state.dataHeatBal->NumZoneElectricStatements);
@@ -2854,9 +2232,6 @@ namespace InternalHeatGains {
 
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             RepVarSet(zoneNum) = true;
-        }
-        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
-            SpaceRepVarSet(spaceNum) = true;
         }
         CurrentModuleObject = "GasEquipment";
         state.dataHeatBal->NumZoneGasStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
@@ -3390,9 +2765,6 @@ namespace InternalHeatGains {
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             RepVarSet(zoneNum) = true;
         }
-        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
-            SpaceRepVarSet(spaceNum) = true;
-        }
         CurrentModuleObject = "HotWaterEquipment";
         state.dataHeatBal->NumHotWaterEqStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataHeatBal->HotWaterEqObjects.allocate(state.dataHeatBal->NumHotWaterEqStatements);
@@ -3887,9 +3259,6 @@ namespace InternalHeatGains {
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             RepVarSet(zoneNum) = true;
         }
-        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
-            SpaceRepVarSet(spaceNum) = true;
-        }
         CurrentModuleObject = "SteamEquipment";
         state.dataHeatBal->NumSteamEqStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataHeatBal->SteamEqObjects.allocate(state.dataHeatBal->NumSteamEqStatements);
@@ -4383,9 +3752,6 @@ namespace InternalHeatGains {
 
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             RepVarSet(zoneNum) = true;
-        }
-        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
-            SpaceRepVarSet(spaceNum) = true;
         }
         CurrentModuleObject = "OtherEquipment";
         state.dataHeatBal->NumOtherEqStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
@@ -4906,9 +4272,6 @@ namespace InternalHeatGains {
 
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             RepVarSet(zoneNum) = true;
-        }
-        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
-            SpaceRepVarSet(spaceNum) = true;
         }
         CurrentModuleObject = "ElectricEquipment:ITE:AirCooled";
         state.dataHeatBal->NumZoneITEqStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
@@ -5826,9 +5189,6 @@ namespace InternalHeatGains {
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             RepVarSet(zoneNum) = true;
         }
-        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
-            SpaceRepVarSet(spaceNum) = true;
-        }
         CurrentModuleObject = "ZoneBaseboard:OutdoorTemperatureControlled";
         state.dataHeatBal->TotBBHeat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataHeatBal->ZoneBBHeat.allocate(state.dataHeatBal->TotBBHeat);
@@ -6101,9 +5461,6 @@ namespace InternalHeatGains {
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             RepVarSet(zoneNum) = true;
         }
-        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
-            SpaceRepVarSet(spaceNum) = true;
-        }
         CurrentModuleObject = "ZoneContaminantSourceAndSink:CarbonDioxide";
         state.dataHeatBal->TotCO2Gen = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataHeatBal->ZoneCO2Gen.allocate(state.dataHeatBal->TotCO2Gen);
@@ -6208,13 +5565,12 @@ namespace InternalHeatGains {
         }
 
         RepVarSet.deallocate();
-        SpaceRepVarSet.deallocate();
-        IHGNumbers.deallocate();
-        AlphaName.deallocate();
 
         if (ErrorsFound) {
             ShowFatalError(state, std::string{RoutineName} + "Errors found in Getting Internal Gains Input, Program Stopped");
         }
+
+        setupIHGOutputs(state);
 
         static constexpr fmt::string_view Format_721(
             "! <Zone Internal Gains Nominal>,Zone Name, Floor Area {{m2}},# Occupants,Area per Occupant "
@@ -6722,6 +6078,537 @@ namespace InternalHeatGains {
             print(state.files.eio, "{:.3R},", state.dataHeatBal->ZoneBBHeat(Loop).FractionRadiant);
             print(state.files.eio, "{:.3R},", state.dataHeatBal->ZoneBBHeat(Loop).FractionConvected);
             print(state.files.eio, "{}\n", state.dataHeatBal->ZoneBBHeat(Loop).EndUseSubcategory);
+        }
+    }
+
+    void setupIHGZonesAndSpaces(EnergyPlusData &state,
+                                const std::string objectType,
+                                EPVector<DataHeatBalance::GlobalInternalGainMiscObject> &inputObjects,
+                                int &numInputObjects,
+                                int &numGainInstances,
+                                bool &errors)
+    {
+        constexpr std::string_view routineName = "setupIHGZonesAndSpaces: ";
+        bool localErrFlag = false;
+
+        auto &ip = state.dataInputProcessing->inputProcessor;
+        auto const instances = ip->epJSON.find(objectType);
+        if (instances != ip->epJSON.end()) {
+            auto const &objectSchemaProps = ip->getObjectSchemaProps(state, objectType);
+            auto &instancesValue = instances.value();
+            numInputObjects = int(instancesValue.size());
+            inputObjects.allocate(numInputObjects);
+
+            int counter = 0;
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &objectFields = instance.value();
+                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                ip->markObjectAsUsed(objectType, instance.key());
+
+                // For incoming idf, maintain object order
+                ++counter;
+                int objNum = ip->getIDFObjNum(state, objectType, counter);
+                inputObjects(objNum).Name = thisObjectName;
+                std::string areaName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_or_zonelist_or_space_or_spacelist_name");
+
+                int zoneNum = UtilityRoutines::FindItemInList(areaName, state.dataHeatBal->Zone);
+                if (zoneNum > 0) {
+                    inputObjects(objNum).StartPtr = numGainInstances + 1;
+                    int numSpaces = state.dataHeatBal->Zone(zoneNum).numSpaces;
+                    numGainInstances += numSpaces;
+                    inputObjects(objNum).numOfSpaces = numSpaces;
+                    inputObjects(objNum).NumOfZones = 1;
+                    inputObjects(objNum).ZoneListActive = false;
+                    inputObjects(objNum).ZoneOrZoneListPtr = zoneNum;
+                    if (numSpaces == 1) {
+                        inputObjects(objNum).spaceNums.emplace_back(state.dataHeatBal->Zone(zoneNum).spaceIndexes(1));
+                        inputObjects(objNum).names.emplace_back(inputObjects(objNum).Name);
+                    } else {
+                        for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
+                            inputObjects(objNum).spaceNums.emplace_back(spaceNum);
+                            inputObjects(objNum).names.emplace_back(state.dataHeatBal->space(spaceNum).Name + ' ' + inputObjects(objNum).Name);
+                        }
+                    }
+                    continue;
+                }
+                int spaceNum = UtilityRoutines::FindItemInList(areaName, state.dataHeatBal->space);
+                if (spaceNum > 0) {
+                    inputObjects(objNum).StartPtr = numGainInstances + 1;
+                    ++numGainInstances;
+                    inputObjects(objNum).numOfSpaces = 1;
+                    inputObjects(objNum).spaceListActive = false;
+                    inputObjects(objNum).spaceOrSpaceListPtr = spaceNum;
+                    inputObjects(objNum).spaceNums.emplace_back(spaceNum);
+                    inputObjects(objNum).names.emplace_back(inputObjects(objNum).Name);
+                    continue;
+                }
+                int zoneListNum = UtilityRoutines::FindItemInList(areaName, state.dataHeatBal->ZoneList);
+                if (zoneListNum > 0) {
+                    inputObjects(objNum).StartPtr = numGainInstances + 1;
+                    int numSpaces = 0;
+                    for (int const listZoneIdx : state.dataHeatBal->ZoneList(zoneListNum).Zone) {
+                        numSpaces += state.dataHeatBal->Zone(listZoneIdx).numSpaces;
+                        for (int const spaceNum : state.dataHeatBal->Zone(listZoneIdx).spaceIndexes) {
+                            inputObjects(objNum).spaceNums.emplace_back(spaceNum);
+                            inputObjects(objNum).names.emplace_back(state.dataHeatBal->space(spaceNum).Name + ' ' + inputObjects(objNum).Name);
+                        }
+                    }
+                    numGainInstances += numSpaces;
+                    inputObjects(objNum).numOfSpaces = numSpaces;
+                    inputObjects(objNum).NumOfZones = state.dataHeatBal->ZoneList(zoneListNum).NumOfZones;
+                    inputObjects(objNum).ZoneListActive = true;
+                    inputObjects(objNum).ZoneOrZoneListPtr = zoneListNum;
+                    continue;
+                }
+                int spaceListNum = UtilityRoutines::FindItemInList(areaName, state.dataHeatBal->spaceList);
+                if (spaceListNum > 0) {
+                    inputObjects(objNum).StartPtr = numGainInstances + 1;
+                    int numSpaces = state.dataHeatBal->spaceList(spaceListNum).numOfSpaces;
+                    numGainInstances += numSpaces;
+                    inputObjects(objNum).numOfSpaces = numSpaces;
+                    inputObjects(objNum).spaceListActive = true;
+                    inputObjects(objNum).spaceOrSpaceListPtr = spaceListNum;
+                    for (int const spaceNum : state.dataHeatBal->spaceList(spaceListNum).spaces) {
+                        inputObjects(objNum).spaceNums.emplace_back(spaceNum);
+                        inputObjects(objNum).names.emplace_back(state.dataHeatBal->space(spaceNum).Name + ' ' + inputObjects(objNum).Name);
+                    }
+                    continue;
+                }
+                ShowSevereError(state,
+                                objectType + "=\"" + thisObjectName + "\" invalid Zone or ZoneList or Space or SpaceList Name=\"" + areaName +
+                                    "\" not found.");
+                errors = true;
+                localErrFlag = true;
+            }
+            if (localErrFlag) {
+                ShowSevereError(state, std::string{routineName} + "Errors with invalid names in " + objectType + " objects.");
+                ShowContinueError(state, "...These will not be read in.  Other errors may occur.");
+                numGainInstances = 0;
+            }
+        }
+    }
+
+    void setupIHGOutputs(EnergyPlusData &state)
+    {
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            // Overall Zone Variables
+            SetupOutputVariable(state,
+                                "Zone Total Internal Radiant Heating Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZnRpt(zoneNum).TotRadiantGain,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->Zone(zoneNum).Name);
+            SetupOutputVariable(state,
+                                "Zone Total Internal Radiant Heating Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZnRpt(zoneNum).TotRadiantGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->Zone(zoneNum).Name);
+            SetupOutputVariable(state,
+                                "Zone Total Internal Visible Radiation Heating Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZnRpt(zoneNum).TotVisHeatGain,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->Zone(zoneNum).Name);
+            SetupOutputVariable(state,
+                                "Zone Total Internal Visible Radiation Heating Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZnRpt(zoneNum).TotVisHeatGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->Zone(zoneNum).Name);
+            SetupOutputVariable(state,
+                                "Zone Total Internal Convective Heating Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZnRpt(zoneNum).TotConvectiveGain,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->Zone(zoneNum).Name);
+            SetupOutputVariable(state,
+                                "Zone Total Internal Convective Heating Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZnRpt(zoneNum).TotConvectiveGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->Zone(zoneNum).Name);
+            SetupOutputVariable(state,
+                                "Zone Total Internal Latent Gain Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZnRpt(zoneNum).TotLatentGain,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->Zone(zoneNum).Name);
+            SetupOutputVariable(state,
+                                "Zone Total Internal Latent Gain Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZnRpt(zoneNum).TotLatentGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->Zone(zoneNum).Name);
+            SetupOutputVariable(state,
+                                "Zone Total Internal Total Heating Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZnRpt(zoneNum).TotTotalHeatGain,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->Zone(zoneNum).Name);
+            SetupOutputVariable(state,
+                                "Zone Total Internal Total Heating Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZnRpt(zoneNum).TotTotalHeatGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->Zone(zoneNum).Name);
+        }
+
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
+            // Overall Space Variables
+            SetupOutputVariable(state,
+                                "Space Total Internal Radiant Heating Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->spaceRpt(spaceNum).TotRadiantGain,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->space(spaceNum).Name);
+            SetupOutputVariable(state,
+                                "Space Total Internal Radiant Heating Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->spaceRpt(spaceNum).TotRadiantGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->space(spaceNum).Name);
+            SetupOutputVariable(state,
+                                "Space Total Internal Visible Radiation Heating Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->spaceRpt(spaceNum).TotVisHeatGain,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->space(spaceNum).Name);
+            SetupOutputVariable(state,
+                                "Space Total Internal Visible Radiation Heating Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->spaceRpt(spaceNum).TotVisHeatGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->space(spaceNum).Name);
+            SetupOutputVariable(state,
+                                "Space Total Internal Convective Heating Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->spaceRpt(spaceNum).TotConvectiveGain,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->space(spaceNum).Name);
+            SetupOutputVariable(state,
+                                "Space Total Internal Convective Heating Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->spaceRpt(spaceNum).TotConvectiveGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->space(spaceNum).Name);
+            SetupOutputVariable(state,
+                                "Space Total Internal Latent Gain Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->spaceRpt(spaceNum).TotLatentGain,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->space(spaceNum).Name);
+            SetupOutputVariable(state,
+                                "Space Total Internal Latent Gain Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->spaceRpt(spaceNum).TotLatentGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->space(spaceNum).Name);
+            SetupOutputVariable(state,
+                                "Space Total Internal Total Heating Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->spaceRpt(spaceNum).TotTotalHeatGain,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->space(spaceNum).Name);
+            SetupOutputVariable(state,
+                                "Space Total Internal Total Heating Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->spaceRpt(spaceNum).TotTotalHeatGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->space(spaceNum).Name);
+        }
+
+        Array1D_bool addZoneOutputs;
+        addZoneOutputs.dimension(state.dataGlobal->NumOfZones, false);
+        Array1D_bool addSpaceOutputs;
+        addSpaceOutputs.dimension(state.dataGlobal->numSpaces, false);
+
+        for (int peopleNum = 1; peopleNum <= state.dataHeatBal->TotPeople; ++peopleNum) {
+            // Set flags for zone and space total report variables
+            addZoneOutputs(state.dataHeatBal->People(peopleNum).ZonePtr) = true;
+            addSpaceOutputs(state.dataHeatBal->People(peopleNum).spaceIndex) = true;
+            // Object report variables
+            SetupOutputVariable(state,
+                                "People Occupant Count",
+                                OutputProcessor::Unit::None,
+                                state.dataHeatBal->People(peopleNum).NumOcc,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->People(peopleNum).Name);
+            SetupOutputVariable(state,
+                                "People Radiant Heating Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->People(peopleNum).RadGainEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->People(peopleNum).Name);
+            SetupOutputVariable(state,
+                                "People Radiant Heating Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->People(peopleNum).RadGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->People(peopleNum).Name);
+            SetupOutputVariable(state,
+                                "People Convective Heating Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->People(peopleNum).ConGainEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->People(peopleNum).Name);
+            SetupOutputVariable(state,
+                                "People Convective Heating Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->People(peopleNum).ConGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->People(peopleNum).Name);
+            SetupOutputVariable(state,
+                                "People Sensible Heating Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->People(peopleNum).SenGainEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->People(peopleNum).Name);
+            SetupOutputVariable(state,
+                                "People Sensible Heating Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->People(peopleNum).SenGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->People(peopleNum).Name);
+            SetupOutputVariable(state,
+                                "People Latent Gain Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->People(peopleNum).LatGainEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->People(peopleNum).Name);
+            SetupOutputVariable(state,
+                                "People Latent Gain Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->People(peopleNum).LatGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->People(peopleNum).Name);
+            SetupOutputVariable(state,
+                                "People Total Heating Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->People(peopleNum).TotGainEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->People(peopleNum).Name);
+            SetupOutputVariable(state,
+                                "People Total Heating Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->People(peopleNum).TotGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->People(peopleNum).Name);
+            SetupOutputVariable(state,
+                                "People Air Temperature",
+                                OutputProcessor::Unit::C,
+                                state.dataHeatBal->People(peopleNum).TemperatureInZone,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->People(peopleNum).Name);
+            SetupOutputVariable(state,
+                                "People Air Relative Humidity",
+                                OutputProcessor::Unit::Perc,
+                                state.dataHeatBal->People(peopleNum).RelativeHumidityInZone,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->People(peopleNum).Name);
+        }
+
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            if (addZoneOutputs(zoneNum)) {
+                // Zone total report variables
+                SetupOutputVariable(state,
+                                    "Zone People Occupant Count",
+                                    OutputProcessor::Unit::None,
+                                    state.dataHeatBal->ZnRpt(zoneNum).PeopleNumOcc,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone People Radiant Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).PeopleRadGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone People Radiant Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).PeopleRadGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone People Convective Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).PeopleConGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone People Convective Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).PeopleConGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone People Sensible Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).PeopleSenGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone People Sensible Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).PeopleSenGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone People Latent Gain Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).PeopleLatGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone People Latent Gain Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).PeopleLatGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone People Total Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).PeopleTotGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone People Total Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).PeopleTotGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                // Reset zone output flag
+                addZoneOutputs(zoneNum) = false;
+            }
+        }
+
+        // Space total report variables
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
+            if (addSpaceOutputs(spaceNum)) {
+                SetupOutputVariable(state,
+                                    "Space People Occupant Count",
+                                    OutputProcessor::Unit::None,
+                                    state.dataHeatBal->spaceRpt(spaceNum).PeopleNumOcc,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space People Radiant Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).PeopleRadGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space People Radiant Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).PeopleRadGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space People Convective Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).PeopleConGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space People Convective Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).PeopleConGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space People Sensible Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).PeopleSenGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space People Sensible Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).PeopleSenGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space People Latent Gain Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).PeopleLatGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space People Latent Gain Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).PeopleLatGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space People Total Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).PeopleTotGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space People Total Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).PeopleTotGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                // Reset space output flag
+                addSpaceOutputs(spaceNum) = false;
+            }
         }
     }
 
