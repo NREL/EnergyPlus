@@ -8243,20 +8243,17 @@
   AirLoopHVAC:OutdoorAirSystem,
     PACU_VAV_bot_OA,         !- Name
     PACU_VAV_bot_OA_Controllers,  !- Controller List Name
-    PACU_VAV_bot_OA_Equipment,  !- Outdoor Air Equipment List Name
-    PACU_VAV_bot Availability Manager List;  !- Availability Manager List Name
+    PACU_VAV_bot_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     PACU_VAV_mid_OA,         !- Name
     PACU_VAV_mid_OA_Controllers,  !- Controller List Name
-    PACU_VAV_mid_OA_Equipment,  !- Outdoor Air Equipment List Name
-    PACU_VAV_mid Availability Manager List;  !- Availability Manager List Name
+    PACU_VAV_mid_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     PACU_VAV_top_OA,         !- Name
     PACU_VAV_top_OA_Controllers,  !- Controller List Name
-    PACU_VAV_top_OA_Equipment,  !- Outdoor Air Equipment List Name
-    PACU_VAV_top Availability Manager List;  !- Availability Manager List Name
+    PACU_VAV_top_OA_Equipment;  !- Outdoor Air Equipment List Name
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTDOORAIR:MIXER ===========
 

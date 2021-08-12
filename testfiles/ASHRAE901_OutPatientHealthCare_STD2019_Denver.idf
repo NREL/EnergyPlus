@@ -46852,14 +46852,12 @@
   AirLoopHVAC:OutdoorAirSystem,
     AHU-1_OA,                !- Name
     AHU-1_OA_Controllers,    !- Controller List Name
-    AHU-1_OA_Equipment,      !- Outdoor Air Equipment List Name
-    AHU-1 Availability Manager List;  !- Availability Manager List Name
+    AHU-1_OA_Equipment;      !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     AHU-2_OA,                !- Name
     AHU-2_OA_Controllers,    !- Controller List Name
-    AHU-2_OA_Equipment,      !- Outdoor Air Equipment List Name
-    AHU-2 Availability Manager List;  !- Availability Manager List Name
+    AHU-2_OA_Equipment;      !- Outdoor Air Equipment List Name
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTDOORAIR:MIXER ===========
 
