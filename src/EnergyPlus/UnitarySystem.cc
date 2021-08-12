@@ -8217,15 +8217,15 @@ namespace UnitarySystems {
 
         // if a variable speed unit, the SensOutputOff at SpeedNum=1 must be checked to see if it exceeds the ZoneLoad
         // This is still no load but at the first speed above idle
-        if (this->m_EMSOverrideCoilSpeedNumOn) {
-            if (state.dataUnitarySystems->HeatingLoad) {
-                this->m_HeatingSpeedNum = this->m_EMSOverrideCoilSpeedNumValue;
-            } else {
-                this->m_CoolingSpeedNum = this->m_EMSOverrideCoilSpeedNumValue;
-            }
-        } else if ((state.dataUnitarySystems->HeatingLoad && this->m_NumOfSpeedHeating > 0) ||
-                   (state.dataUnitarySystems->CoolingLoad && this->m_NumOfSpeedCooling > 0)) {
-            if (this->m_Staged) {
+        if ((state.dataUnitarySystems->HeatingLoad && this->m_NumOfSpeedHeating > 0) ||
+            (state.dataUnitarySystems->CoolingLoad && this->m_NumOfSpeedCooling > 0)) {
+            if (this->m_EMSOverrideCoilSpeedNumOn) {
+                if (state.dataUnitarySystems->HeatingLoad) {
+                    this->m_HeatingSpeedNum = this->m_EMSOverrideCoilSpeedNumValue;
+                } else {
+                    this->m_CoolingSpeedNum = this->m_EMSOverrideCoilSpeedNumValue;
+                }
+            } else if (this->m_Staged) {
                 if (state.dataUnitarySystems->HeatingLoad) {
                     this->m_HeatingSpeedNum = this->m_StageNum;
                 } else {
@@ -8296,16 +8296,8 @@ namespace UnitarySystems {
         this->FanPartLoadRatio = 1.0;
         CompressorONFlag = CompOn;
 
-        if (this->m_EMSOverrideCoilSpeedNumOn) {
-            // Pass - using EMS coil speed, no need to calculate full speed load
-            if (state.dataUnitarySystems->HeatingLoad) {
-                this->m_HeatingSpeedNum = this->m_EMSOverrideCoilSpeedNumValue;
-            } else if (state.dataUnitarySystems->CoolingLoad || state.dataUnitarySystems->MoistureLoad < LatOutputOff) {
-                this->m_CoolingSpeedNum = this->m_EMSOverrideCoilSpeedNumValue;
-            } else {
-                return;
-            }
-        } else if (state.dataUnitarySystems->HeatingLoad) {
+        // TODO - EMS do not override full load results?
+        if (state.dataUnitarySystems->HeatingLoad) {
             CoolPLR = 0.0;
             HeatPLR = 1.0;
             this->m_HeatingCoilSensDemand = ZoneLoad;
@@ -8393,27 +8385,25 @@ namespace UnitarySystems {
         FullSensibleOutput = SensOutputOn;
         FullLoadAirOutletTemp = state.dataLoopNodes->Node(OutletNode).Temp;
         FullLoadAirOutletHumRat = state.dataLoopNodes->Node(OutletNode).HumRat;
-        if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
-            this->m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating)
 
-            // turn on HX if dehumidm_ControlType::Multimode
-            if (this->m_DehumidControlType_Num == DehumCtrlType::Multimode && state.dataUnitarySystems->MoistureLoad < 0.0 &&
-                state.dataUnitarySystems->MoistureLoad < LatOutputOn && state.dataUnitarySystems->CoolingLoad) {
-                HXUnitOn = true;
-                this->calcUnitarySystemToLoad(state,
-                                              AirLoopNum,
-                                              FirstHVACIteration,
-                                              CoolPLR,
-                                              HeatPLR,
-                                              OnOffAirFlowRatio,
-                                              SensOutputOn,
-                                              LatOutputOn,
-                                              HXUnitOn,
-                                              HeatCoilLoad,
-                                              SupHeaterLoad,
-                                              CompressorONFlag);
-                FullSensibleOutput = SensOutputOn;
-            }
+        // turn on HX if dehumidm_ControlType::Multimode
+        if (this->m_DehumidControlType_Num == DehumCtrlType::Multimode && state.dataUnitarySystems->MoistureLoad < 0.0 &&
+            state.dataUnitarySystems->MoistureLoad < LatOutputOn && state.dataUnitarySystems->CoolingLoad) {
+            HXUnitOn = true;
+            this->calcUnitarySystemToLoad(state,
+                                          AirLoopNum,
+                                          FirstHVACIteration,
+                                          CoolPLR,
+                                          HeatPLR,
+                                          OnOffAirFlowRatio,
+                                          SensOutputOn,
+                                          LatOutputOn,
+                                          HXUnitOn,
+                                          HeatCoilLoad,
+                                          SupHeaterLoad,
+                                          CompressorONFlag);
+            FullSensibleOutput = SensOutputOn;
+        }
 
         // test to see if full capacity is less than load, if so set to PLR=1 and RETURN if no moisture load
         if ((state.dataUnitarySystems->HeatingLoad && this->m_NumOfSpeedHeating <= 1) ||
@@ -9310,12 +9300,6 @@ namespace UnitarySystems {
         // OnOffAirFlowRatio is used to average air flow between ON and OFF state
         FullSensibleOutput = TempSensOutput;
         LatOutputOn = TempLatOutput;
-
-        if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
-            this->m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating)
-            std::cout << state.dataEnvrn->DayOfMonth << "," << state.dataGlobal->HourOfDay << "," << state.dataGlobal->HourOfDay << ","
-                      << state.dataGlobal->TimeStep << ", cooling " << this->m_CoolingSpeedNum << ", heating " << this->m_HeatingSpeedNum << ","
-                      << OnOffAirFlowRatio << "," << ZoneLoad << "," << FullSensibleOutput << "," << std::endl;
 
         // RETURN if the moisture load is met
         if (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad >= TempLatOutput) return;
@@ -13509,8 +13493,6 @@ namespace UnitarySystems {
                 }
 
                 //     IF outlet temp at no load is within ACC of set point, do not run the coil
-
-                // Todo - doe EMS override this logic?
 
                 if (std::abs(state.dataLoopNodes->Node(OutletNode).Temp - DesOutTemp) < Acc ||
                     this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_UserDefined) {

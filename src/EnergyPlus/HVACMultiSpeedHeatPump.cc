@@ -3033,7 +3033,6 @@ namespace HVACMultiSpeedHeatPump {
         int const MaxIte(500);           // maximum number of iterations
         Real64 const ErrorToler = 0.001; // error tolerance
 
-        // todo - EMS speed num should overwrite the stage num, show warning
         auto &MSHeatPump(state.dataHVACMultiSpdHP->MSHeatPump);
         OnOffAirFlowRatio = 0.0;
         SupHeaterLoad = 0.0;

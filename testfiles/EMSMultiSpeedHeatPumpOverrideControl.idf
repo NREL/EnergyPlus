@@ -2,7 +2,7 @@
 !-Option OriginalOrderTop UseSpecialFormat
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
-! SingleFamilyHouse_TwoSpeed_EMSOverride.idf
+! EMSMultiSpeedHeatPumpOverrideControl.idf
 ! Basic file description: A 186 m^2 (2000 ft^2) residential house with slab-on-grade (no ground contact).
 !
 ! Highlights:             This file tests the EMS actuator to control the coil speed of an unitary multispeed heat pump in a residetial home.
