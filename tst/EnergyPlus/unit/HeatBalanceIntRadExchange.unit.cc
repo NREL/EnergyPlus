@@ -747,10 +747,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest4)
 TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_ViewFactorAngleLimitTest)
 {
 
-    int N;                     // NUMBER OF SURFACES
-    Array1D<Real64> A;         // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
-    Array2D<Real64> F;         // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
-    int ZoneNum;               // Zone number being fixed
+    int N;             // NUMBER OF SURFACES
+    Array1D<Real64> A; // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
+    Array2D<Real64> F; // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
+    int ZoneNum;       // Zone number being fixed
 
     // number of surfaces
     N = 7;
@@ -761,7 +761,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_ViewFactorAngleLimitTest)
     F = 0.0;
 
     // set surface areas to 1.0 for view factor calculations
-    A= 1.0;
+    A = 1.0;
 
     ZoneNum = 1;
     state->dataHeatBal->Zone.allocate(ZoneNum);
