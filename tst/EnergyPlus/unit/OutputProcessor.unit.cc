@@ -2963,7 +2963,9 @@ namespace OutputProcessor {
                                                 meter[2],
                                                 meter[3],
                                                 meter[4],
-                                                errorFound); // the first argument was  meter[ 0 ]
+                                                errorFound,
+                                                "",
+                                                ""); // the first argument was  meter[ 0 ]
             } else if (meter.size() == 6) {
                 ValidateNStandardizeMeterTitles(*state,
                                                 OutputProcessor::Unit::J,
@@ -2972,7 +2974,8 @@ namespace OutputProcessor {
                                                 meter[3],
                                                 meter[4],
                                                 errorFound,
-                                                meter[5]); // the first argument was  meter[ 0 ]
+                                                meter[5],
+                                                ""); // the first argument was  meter[ 0 ]
             }
             EXPECT_FALSE(errorFound);
         }
@@ -2993,7 +2996,7 @@ namespace OutputProcessor {
         std::string group = "BAD INPUT";
         errorFound = false;
 
-        ValidateNStandardizeMeterTitles(*state, units, resourceType, endUse, endUseSub, group, errorFound);
+        ValidateNStandardizeMeterTitles(*state, units, resourceType, endUse, endUseSub, group, errorFound, "", "");
         EXPECT_TRUE(errorFound);
 
         units = OutputProcessor::Unit::J;
@@ -3003,7 +3006,7 @@ namespace OutputProcessor {
         group = "HVAC";
         errorFound = false;
 
-        ValidateNStandardizeMeterTitles(*state, units, resourceType, endUse, endUseSub, group, errorFound);
+        ValidateNStandardizeMeterTitles(*state, units, resourceType, endUse, endUseSub, group, errorFound, "", "");
         EXPECT_TRUE(errorFound);
 
         auto errorData = queryResult("SELECT * FROM Errors;", "Errors");
@@ -4138,7 +4141,9 @@ namespace OutputProcessor {
 
         ASSERT_EQ(17, state->dataOutputProcessor->NumEnergyMeters);
 
-        auto const meters_result = std::map<int, std::tuple<int, std::string, std::string, std::string, std::string, std::string, std::string>>({
+        auto const meters_result =
+            std::map<int,
+                     std::tuple<int, std::string_view, std::string_view, std::string_view, std::string_view, std::string_view, std::string_view>>({
             {1, std::make_tuple(0, "Electricity:Facility", "Electricity", "", "", "", "J")},
             {2, std::make_tuple(0, "Electricity:Building", "Electricity", "", "", "Building", "J")},
             {3, std::make_tuple(0, "Electricity:Zone:SPACE1-1", "Electricity", "", "", "Zone", "J")},
@@ -4200,16 +4205,18 @@ namespace OutputProcessor {
 
         ASSERT_EQ(8, state->dataOutputProcessor->NumEnergyMeters);
 
-        auto const meters_result = std::map<int, std::tuple<int, std::string, std::string, std::string, std::string, std::string, std::string>>({
-            {1, std::make_tuple(0, "Electricity:Facility", "Electricity", "", "", "", "J")},
-            {2, std::make_tuple(0, "Electricity:Building", "Electricity", "", "", "Building", "J")},
-            {3, std::make_tuple(0, "Electricity:Zone:SPACE1-1", "Electricity", "", "", "Zone", "J")},
-            {4, std::make_tuple(0, "Electricity:SpaceType:OFFICE", "Electricity", "", "", "SpaceType", "J")},
-            {5, std::make_tuple(0, "InteriorLights:Electricity", "Electricity", "InteriorLights", "", "", "J")},
-            {6, std::make_tuple(0, "InteriorLights:Electricity:Zone:SPACE1-1", "Electricity", "InteriorLights", "", "Zone", "J")},
-            {7, std::make_tuple(0, "InteriorLights:Electricity:SpaceType:OFFICE", "Electricity", "InteriorLights", "", "SpaceType", "J")},
-            {8, std::make_tuple(0, "GeneralLights:InteriorLights:Electricity", "Electricity", "InteriorLights", "GeneralLights", "", "J")},
-        });
+        auto const meters_result =
+            std::map<int,
+                     std::tuple<int, std::string_view, std::string_view, std::string_view, std::string_view, std::string_view, std::string_view>>({
+                {1, std::make_tuple(0, "Electricity:Facility", "Electricity", "", "", "", "J")},
+                {2, std::make_tuple(0, "Electricity:Building", "Electricity", "", "", "Building", "J")},
+                {3, std::make_tuple(0, "Electricity:Zone:SPACE1-1", "Electricity", "", "", "Zone", "J")},
+                {4, std::make_tuple(0, "Electricity:SpaceType:OFFICE", "Electricity", "", "", "SpaceType", "J")},
+                {5, std::make_tuple(0, "InteriorLights:Electricity", "Electricity", "InteriorLights", "", "", "J")},
+                {6, std::make_tuple(0, "InteriorLights:Electricity:Zone:SPACE1-1", "Electricity", "InteriorLights", "", "Zone", "J")},
+                {7, std::make_tuple(0, "InteriorLights:Electricity:SpaceType:OFFICE", "Electricity", "InteriorLights", "", "SpaceType", "J")},
+                {8, std::make_tuple(0, "GeneralLights:InteriorLights:Electricity", "Electricity", "InteriorLights", "GeneralLights", "", "J")},
+            });
 
         for (auto const &result : meters_result) {
             EXPECT_EQ(std::get<0>(result.second), static_cast<int>(state->dataOutputProcessor->EnergyMeters(result.first).TypeOfMeter));
