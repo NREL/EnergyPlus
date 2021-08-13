@@ -2334,6 +2334,34 @@ namespace OutputProcessor {
             MeterName = EndUseSub + ':' + EndUse + ':' + ResourceType;
             Found = UtilityRoutines::FindItem(MeterName, op->EnergyMeters);
             if (Found == 0) AddMeter(state, MeterName, MtrUnits, ResourceType, EndUse, EndUseSub, "");
+
+            if (Group == "Building") { // Match to Zone and Space
+                if (!ZoneName.empty()) {
+                    Found = UtilityRoutines::FindItem(EndUseSub + ':' + EndUse + ':' + ResourceType + ":Zone:" + ZoneName, op->EnergyMeters);
+                    if (Found == 0) {
+                        AddMeter(state,
+                                 EndUseSub + ':' + EndUse + ':' + ResourceType + ":Zone:" + ZoneName,
+                                 MtrUnits,
+                                 ResourceType,
+                                 EndUse,
+                                 EndUseSub,
+                                 "Zone");
+                    }
+                }
+                if (!SpaceTypeName.empty()) {
+                    Found =
+                        UtilityRoutines::FindItem(EndUseSub + ':' + EndUse + ':' + ResourceType + ":SpaceType:" + SpaceTypeName, op->EnergyMeters);
+                    if (Found == 0) {
+                        AddMeter(state,
+                                 EndUseSub + ':' + EndUse + ':' + ResourceType + ":SpaceType:" + SpaceTypeName,
+                                 MtrUnits,
+                                 ResourceType,
+                                 EndUse,
+                                 EndUseSub,
+                                 "SpaceType");
+                    }
+                }
+            }
         } else if (LocalErrorsFound) {
             ErrorsFound = true;
         }
@@ -4553,8 +4581,8 @@ namespace OutputProcessor {
                 print(state.files.eso, "{},{}\n", creportID, NumberOut);
                 ++state.dataGlobal->StdOutputRecordCount;
             }
-        } else { // if ( ( reportingInterval == ReportDaily ) || ( reportingInterval == ReportMonthly ) || ( reportingInterval == ReportSim ) ) { //
-                 // 2, 3, 4
+        } else { // if ( ( reportingInterval == ReportDaily ) || ( reportingInterval == ReportMonthly ) || ( reportingInterval == ReportSim ) ) {
+                 // // 2, 3, 4
             std::string MaxOut; // Character for Max out string
             std::string MinOut; // Character for Min out string
 
@@ -4825,8 +4853,8 @@ namespace OutputProcessor {
             if (state.files.eso.good()) {
                 print(state.files.eso, "{},{}\n", reportIDString, NumberOut);
             }
-        } else { // if ( ( reportingInterval == ReportDaily ) || ( reportingInterval == ReportMonthly ) || ( reportingInterval == ReportSim ) ) { //
-                 // 2, 3, 4
+        } else { // if ( ( reportingInterval == ReportDaily ) || ( reportingInterval == ReportMonthly ) || ( reportingInterval == ReportSim ) ) {
+                 // // 2, 3, 4
             if (state.files.eso.good()) {
                 print(state.files.eso, "{},{},{},{}\n", reportIDString, NumberOut, MinOut, MaxOut);
             }

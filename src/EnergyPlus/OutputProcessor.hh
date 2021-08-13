@@ -435,7 +435,7 @@ namespace OutputProcessor {
         Array1D_int OnCustomMeters; // Forward pointer to Custom Meter Numbers
 
         // Default Constructor
-        MeterArrayType() : NumOnMeters(0), RepVariable(0), OnMeters(9, 0), NumOnCustomMeters(0)
+        MeterArrayType() : NumOnMeters(0), RepVariable(0), OnMeters(10, 0), NumOnCustomMeters(0)
         {
         }
     };
