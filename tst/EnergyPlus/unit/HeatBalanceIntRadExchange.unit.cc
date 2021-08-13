@@ -744,4 +744,124 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest4)
     EXPECT_EQ(state->dataViewFactor->ZoneRadiantInfo(3).Name, "Zone 3");
 }
 
+TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_ViewFactorAngleLimitTest)
+{
+
+    int N;                     // NUMBER OF SURFACES
+    Array1D<Real64> A;         // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
+    Array2D<Real64> F;         // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
+    int ZoneNum;               // Zone number being fixed
+
+    // number of surfaces
+    N = 7;
+    A.allocate(N);
+    F.allocate(N, N);
+
+    // initialize view factors
+    F = 0.0;
+
+    // set surface areas to 1.0 for view factor calculations
+    A= 1.0;
+
+    ZoneNum = 1;
+    state->dataHeatBal->Zone.allocate(ZoneNum);
+    state->dataHeatBal->Zone(ZoneNum).Name = "Test";
+    state->dataViewFactor->ZoneRadiantInfo.allocate(ZoneNum);
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Name = state->dataHeatBal->Zone(ZoneNum).Name;
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).ZoneNums.push_back(ZoneNum);
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth.allocate(N);
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Tilt.allocate(N);
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).SurfacePtr.allocate(N);
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).SurfacePtr(1) = 1;
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).SurfacePtr(2) = 2;
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).SurfacePtr(3) = 3;
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).SurfacePtr(4) = 4;
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).SurfacePtr(5) = 5;
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).SurfacePtr(6) = 6;
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).SurfacePtr(7) = 7;
+    state->dataSurface->Surface.allocate(N);
+
+    // wall
+    state->dataSurface->Surface(1).Class = DataSurfaces::SurfaceClass::Wall;
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth(1) = 0;
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Tilt(1) = 90;
+    // opposite wall
+    state->dataSurface->Surface(2).Class = DataSurfaces::SurfaceClass::Wall;
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Tilt(2) = 90;
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth(2) = 180;
+    // floor
+    state->dataSurface->Surface(3).Class = DataSurfaces::SurfaceClass::Floor;
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth(3) = 0;
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Tilt(3) = 180;
+    // ceiling/roof
+    state->dataSurface->Surface(4).Class = DataSurfaces::SurfaceClass::Roof;
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth(4) = 0;
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Tilt(4) = 0;
+    // additional floor
+    state->dataSurface->Surface(5).Class = DataSurfaces::SurfaceClass::Floor;
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth(5) = 0;
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Tilt(5) = 180;
+    // additional wall with slight difference in azimuth
+    state->dataSurface->Surface(6).Class = DataSurfaces::SurfaceClass::Wall;
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth(6) = 358;
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Tilt(6) = 90;
+    // internal mass
+    state->dataSurface->Surface(7).Class = DataSurfaces::SurfaceClass::IntMass;
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth(7) = 0;
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Tilt(7) = 0;
+
+    CalcApproximateViewFactors(*state,
+                               N,
+                               A,
+                               state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth,
+                               state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Tilt,
+                               F,
+                               state->dataViewFactor->ZoneRadiantInfo(ZoneNum).SurfacePtr);
+
+    // surfaces can't see themselves, no view factor
+    EXPECT_EQ(F(1, 1), 0.0);
+    EXPECT_EQ(F(2, 2), 0.0);
+    EXPECT_EQ(F(3, 3), 0.0);
+    EXPECT_EQ(F(4, 4), 0.0);
+    EXPECT_EQ(F(5, 5), 0.0);
+    EXPECT_EQ(F(6, 6), 0.0);
+    EXPECT_EQ(F(7, 7), 0.0);
+
+    // two floors should NOT see each other, no view factor
+    EXPECT_EQ(F(3, 5), 0.0);
+    EXPECT_EQ(F(5, 3), 0.0);
+
+    // all surfaces see internal mass
+    EXPECT_GT(F(7, 1), 0.0);
+    EXPECT_GT(F(7, 2), 0.0);
+    EXPECT_GT(F(7, 3), 0.0);
+    EXPECT_GT(F(7, 4), 0.0);
+    EXPECT_GT(F(7, 5), 0.0);
+    EXPECT_GT(F(7, 6), 0.0);
+
+    // all non-floor surfaces see floors
+    EXPECT_GT(F(3, 1), 0.0);
+    EXPECT_GT(F(3, 2), 0.0);
+    EXPECT_GT(F(3, 4), 0.0);
+    EXPECT_GT(F(3, 6), 0.0);
+    EXPECT_GT(F(3, 7), 0.0);
+
+    // all floors see ceilings/roofs and result in a view factor
+    EXPECT_GT(F(4, 3), 0.0);
+    EXPECT_GT(F(4, 5), 0.0);
+
+    // two walls should see each other and result in a view factor
+    EXPECT_GT(F(1, 2), 0.0);
+    EXPECT_GT(F(2, 1), 0.0);
+
+    // ceiling/roof and wall should see each other and result in a view factor
+    EXPECT_GT(F(1, 4), 0.0);
+    EXPECT_GT(F(2, 4), 0.0);
+    EXPECT_GT(F(4, 1), 0.0);
+    EXPECT_GT(F(4, 2), 0.0);
+
+    // two walls with azimuths of 0 and 358 (similar outward normal), should NOT see each other, no view factor
+    EXPECT_EQ(F(1, 6), 0.0);
+    EXPECT_EQ(F(6, 1), 0.0);
+}
 } // namespace EnergyPlus
