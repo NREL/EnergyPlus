@@ -2530,7 +2530,6 @@ void ReportAirHeatBalance(EnergyPlusData &state)
 
     ReportInfiltrations(state);
 
-    CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
     for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
 
         // Break the infiltration load into heat gain and loss components
