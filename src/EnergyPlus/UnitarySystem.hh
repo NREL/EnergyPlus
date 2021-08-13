@@ -197,8 +197,8 @@ namespace UnitarySystems {
         enum class SysType : int
         {
             Unassigned = -1,
-            Unitary,                // AirloopHVAC:UnitarySystem
-            CoilCoolingDX,          // CoilSystem:Cooling:DX
+            Unitary,          // AirloopHVAC:UnitarySystem
+            CoilCoolingDX,    // CoilSystem:Cooling:DX
             CoilCoolingWater, // CoilSystem:Cooling:Water
             Num
         };
