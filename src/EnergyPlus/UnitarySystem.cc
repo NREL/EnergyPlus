@@ -1325,7 +1325,7 @@ namespace UnitarySystems {
         }
 
         // re-set water-side economizer flags each time step
-        if (this->m_TemperatureOffsetControlActive) {
+        if (this->m_TemperatureOffsetControlActive && !this->m_WaterHRPlantLoopModel) {
             if (state.dataLoopNodes->Node(this->CoolCoilFluidInletNode).Temp >
                 (state.dataLoopNodes->Node(this->AirInNode).Temp - this->m_minAirToWaterTempOffset)) {
                 // disable coilsystem if entering fluid temp is > entering air temp minus user specified temp offset
@@ -3243,7 +3243,7 @@ namespace UnitarySystems {
         }
 
         // Early calls to ATMixer don't have enough info to pass GetInput. Need to get the data next time through.
-        if (sysNum == -1 && !state.dataZoneEquip->ZoneEquipInputsFilled) {
+        if (sysNum == -1 || !state.dataZoneEquip->ZoneEquipInputsFilled) {
             return;
         }
 
@@ -7232,8 +7232,6 @@ namespace UnitarySystems {
                 // set water-side economizer flag
                 if (thisSys.m_minAirToWaterTempOffset > 0.0) thisSys.m_TemperatureOffsetControlActive = true;
 
-                thisSys.processInputSpec(state, input_specs, sysNum, errorsFound, ZoneEquipment, ZoneOAUnitNum);
-
                 // heat recovery loop inputs
                 if (fields.find("minimum_water_loop_temperature_for_heat_recovery") != fields.end()) {
                     thisSys.m_minWaterLoopTempForHR = fields.at("minimum_water_loop_temperature_for_heat_recovery");
@@ -7272,6 +7270,9 @@ namespace UnitarySystems {
                     errorsFound = errorsFound || errFound;
                 }
                 // end heat recovery loop inputs
+
+                thisSys.processInputSpec(state, input_specs, sysNum, errorsFound, ZoneEquipment, ZoneOAUnitNum);
+
                 if (sysNum == -1) {
                     int thisSysNum = state.dataUnitarySystems->numUnitarySystems - 1;
                     state.dataUnitarySystems->unitarySys[thisSysNum] = thisSys;
