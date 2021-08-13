@@ -653,16 +653,16 @@ namespace OutputProcessor {
     );
 
     void AttachMeters(EnergyPlusData &state,
-                      Unit const &MtrUnits,            // Units for this meter
-                      std::string &ResourceType,       // Electricity, Gas, etc.
-                      std::string &EndUse,             // End-use category (Lights, Heating, etc.)
-                      std::string &EndUseSub,          // End-use subcategory (user-defined, e.g., General Lights, Task Lights, etc.)
-                      std::string &Group,              // Group key (Facility, Zone, Building, etc.)
-                      std::string const ZoneName,      // Zone key only applicable for Building group
-                      std::string const SpaceTypeName, // Space Type key only applicable for Building group
-                      int RepVarNum,                   // Number of this report variable
-                      int &MeterArrayPtr,              // Output set of Pointers to Meters
-                      bool &ErrorsFound                // True if errors in this call
+                      Unit const &MtrUnits,             // Units for this meter
+                      std::string &ResourceType,        // Electricity, Gas, etc.
+                      std::string &EndUse,              // End-use category (Lights, Heating, etc.)
+                      std::string &EndUseSub,           // End-use subcategory (user-defined, e.g., General Lights, Task Lights, etc.)
+                      std::string &Group,               // Group key (Facility, Zone, Building, etc.)
+                      std::string const &ZoneName,      // Zone key only applicable for Building group
+                      std::string const &SpaceTypeName, // Space Type key only applicable for Building group
+                      int RepVarNum,                    // Number of this report variable
+                      int &MeterArrayPtr,               // Output set of Pointers to Meters
+                      bool &ErrorsFound                 // True if errors in this call
     );
 
     void AttachCustomMeters(EnergyPlusData &state,
@@ -672,14 +672,14 @@ namespace OutputProcessor {
     );
 
     void ValidateNStandardizeMeterTitles(EnergyPlusData &state,
-                                         OutputProcessor::Unit const &MtrUnits,  // Units for the meter
-                                         std::string &ResourceType,              // Electricity, Gas, etc.
-                                         std::string &EndUse,                    // End Use Type (Lights, Heating, etc.)
-                                         std::string &EndUseSub,                 // End Use Sub Type (General Lights, Task Lights, etc.)
-                                         std::string &Group,                     // Group key (Facility, Zone, Building, etc.)
-                                         bool &ErrorsFound,                      // True if errors in this call
-                                         Optional_string_const ZoneName = _,     // ZoneName when Group=Building
-                                         Optional_string_const SpaceTypeName = _ // Space Type Name when Group=Building
+                                         OutputProcessor::Unit const &MtrUnits, // Units for the meter
+                                         std::string &ResourceType,             // Electricity, Gas, etc.
+                                         std::string &EndUse,                   // End Use Type (Lights, Heating, etc.)
+                                         std::string &EndUseSub,                // End Use Sub Type (General Lights, Task Lights, etc.)
+                                         std::string &Group,                    // Group key (Facility, Zone, Building, etc.)
+                                         bool &ErrorsFound,                     // True if errors in this call
+                                         const std::string &ZoneName,           // ZoneName when Group=Building
+                                         const std::string &SpaceTypeName       // Space Type Name when Group=Building
     );
 
     void DetermineMeterIPUnits(EnergyPlusData &state,
@@ -918,7 +918,8 @@ void SetupOutputVariable(EnergyPlusData &state,
                          Optional_int_const ZoneMult = _,                  // Zone Multiplier, defaults to 1
                          Optional_int_const ZoneListMult = _,              // Zone List Multiplier, defaults to 1
                          Optional_int_const indexGroupKey = _,             // Group identifier for SQL output
-                         Optional_string_const customUnitName = _          // the custom name for the units from EMS definition of units
+                         Optional_string_const customUnitName = _,         // the custom name for the units from EMS definition of units
+                         Optional_string_const SpaceType = _               // Space type (applicable for Building group only)
 );
 
 void SetupOutputVariable(EnergyPlusData &state,

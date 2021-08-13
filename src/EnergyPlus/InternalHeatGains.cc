@@ -6418,9 +6418,12 @@ namespace InternalHeatGains {
                                 "InteriorLights",
                                 state.dataHeatBal->Lights(lightsNum).EndUseSubcategory,
                                 "Building",
-                                state.dataHeatBal->space(state.dataHeatBal->Lights(lightsNum).spaceIndex).Name,
+                                state.dataHeatBal->Zone(state.dataHeatBal->Lights(lightsNum).ZonePtr).Name,
                                 state.dataHeatBal->Zone(state.dataHeatBal->Lights(lightsNum).ZonePtr).Multiplier,
-                                state.dataHeatBal->Zone(state.dataHeatBal->Lights(lightsNum).ZonePtr).ListMultiplier);
+                                state.dataHeatBal->Zone(state.dataHeatBal->Lights(lightsNum).ZonePtr).ListMultiplier,
+                                _,
+                                _,
+                                state.dataHeatBal->space(state.dataHeatBal->Lights(lightsNum).spaceIndex).spaceType);
         }
 
         // Zone total report variables
