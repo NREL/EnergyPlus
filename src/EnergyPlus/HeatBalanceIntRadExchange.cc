@@ -1403,10 +1403,12 @@ namespace HeatBalanceIntRadExchange {
 
         int i; // DO loop counters for surfaces in the zone
         int j;
-        Array1D<Real64> ZoneArea; // Sum of the area of all zone surfaces seen
+        Array1D<Real64> ZoneArea;    // Sum of the area of all zone surfaces seen
+        Array1D<Real64> BackAzimuth; // Back azimuth of surface
 
         // Calculate the sum of the areas seen by all zone surfaces
         ZoneArea.dimension(N, 0.0);
+        BackAzimuth.dimension(N, 0.0);
         for (i = 1; i <= N; ++i) {
             for (j = 1; j <= N; ++j) {
                 // Assumption is that a surface cannot see itself or any other surface
@@ -1417,11 +1419,10 @@ namespace HeatBalanceIntRadExchange {
                 if (i == j) continue;
                 //  Include INTMASS, FLOOR(for others), CEILING, ROOF  and different facing surfaces.
                 //  Roofs/ceilings always see floors
+                BackAzimuth(i) = (Azimuth(i) < 180) ? (Azimuth(i) + 180) : (Azimuth(i) - 180);
+                BackAzimuth(j) = (Azimuth(j) < 180) ? (Azimuth(j) + 180) : (Azimuth(j) - 180);
                 if ((state.dataSurface->Surface(SPtr(j)).Class == SurfaceClass::IntMass) ||
-                    (state.dataSurface->Surface(SPtr(j)).Class == SurfaceClass::Floor) ||
-                    (state.dataSurface->Surface(SPtr(j)).Class == SurfaceClass::Roof &&
-                     state.dataSurface->Surface(SPtr(i)).Class == SurfaceClass::Floor) ||
-                    ((std::abs(Azimuth(i) - Azimuth(j)) > SameAngleLimit) ||
+                    (((std::abs(Azimuth(i) - Azimuth(j)) > SameAngleLimit) && (std::abs(BackAzimuth(i) - BackAzimuth(j)) > SameAngleLimit)) ||
                      (std::abs(Tilt(i) - Tilt(j)) >
                       SameAngleLimit))) { // Everything sees internal mass surfaces | Everything except other floors sees floors
 
@@ -1457,9 +1458,8 @@ namespace HeatBalanceIntRadExchange {
                 if (i == j) continue;
                 //  Include INTMASS, FLOOR(for others), CEILING/ROOF  and different facing surfaces.
                 if ((state.dataSurface->Surface(SPtr(j)).Class == SurfaceClass::IntMass) ||
-                    (state.dataSurface->Surface(SPtr(j)).Class == SurfaceClass::Floor) ||
-                    (state.dataSurface->Surface(SPtr(j)).Class == SurfaceClass::Roof) ||
-                    ((std::abs(Azimuth(i) - Azimuth(j)) > SameAngleLimit) || (std::abs(Tilt(i) - Tilt(j)) > SameAngleLimit))) {
+                    (((std::abs(Azimuth(i) - Azimuth(j)) > SameAngleLimit) && (std::abs(BackAzimuth(i) - BackAzimuth(j)) > SameAngleLimit)) ||
+                     (std::abs(Tilt(i) - Tilt(j)) > SameAngleLimit))) {
                     if (ZoneArea(i) > 0.0) F(j, i) = A(j) / (ZoneArea(i));
                 }
             }
