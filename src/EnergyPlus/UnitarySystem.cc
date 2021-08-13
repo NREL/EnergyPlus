@@ -129,14 +129,14 @@ namespace UnitarySystems {
     }
 
     UnitarySys::UnitarySys() // constructor
-        : m_UnitarySysNum(-1), sysType(SysType::UnitarySystem), m_ThisSysInputShouldBeGotten(true), m_SysAvailSchedPtr(0),
-          m_ControlType(ControlType::None), m_DehumidControlType_Num(DehumCtrlType::None), m_Humidistat(false), m_ValidASHRAECoolCoil(false),
-          m_ValidASHRAEHeatCoil(false), m_SimASHRAEModel(false), m_setFaultModelInput(true), m_FanIndex(0), m_FanPlace(FanPlace::NotYetSet),
-          m_FanOpModeSchedPtr(0), m_FanExists(false), m_FanType_Num(0), m_RequestAutoSize(false), m_ActualFanVolFlowRate(0.0),
-          m_DesignFanVolFlowRate(0.0), m_DesignMassFlowRate(0.0), m_FanAvailSchedPtr(0), m_FanOpMode(0), m_ATMixerIndex(0), m_ATMixerPriNode(0),
-          m_ATMixerSecNode(0), m_AirLoopEquipment(true), m_ZoneInletNode(0), m_ZoneSequenceCoolingNum(0), m_ZoneSequenceHeatingNum(0),
-          m_HeatCoilExists(false), m_HeatingSizingRatio(1.0), m_HeatingCoilType_Num(0), m_DXHeatingCoil(false), m_HeatingCoilIndex(0),
-          m_HeatingCoilAvailSchPtr(0), m_DesignHeatingCapacity(0.0), m_MaxHeatAirVolFlow(0.0), m_NumOfSpeedHeating(0), m_MultiSpeedHeatingCoil(false),
+        : m_UnitarySysNum(-1), sysType(SysType::Unitary), m_ThisSysInputShouldBeGotten(true), m_SysAvailSchedPtr(0), m_ControlType(ControlType::None),
+          m_DehumidControlType_Num(DehumCtrlType::None), m_Humidistat(false), m_ValidASHRAECoolCoil(false), m_ValidASHRAEHeatCoil(false),
+          m_SimASHRAEModel(false), m_setFaultModelInput(true), m_FanIndex(0), m_FanPlace(FanPlace::NotYetSet), m_FanOpModeSchedPtr(0),
+          m_FanExists(false), m_FanType_Num(0), m_RequestAutoSize(false), m_ActualFanVolFlowRate(0.0), m_DesignFanVolFlowRate(0.0),
+          m_DesignMassFlowRate(0.0), m_FanAvailSchedPtr(0), m_FanOpMode(0), m_ATMixerIndex(0), m_ATMixerPriNode(0), m_ATMixerSecNode(0),
+          m_AirLoopEquipment(true), m_ZoneInletNode(0), m_ZoneSequenceCoolingNum(0), m_ZoneSequenceHeatingNum(0), m_HeatCoilExists(false),
+          m_HeatingSizingRatio(1.0), m_HeatingCoilType_Num(0), m_DXHeatingCoil(false), m_HeatingCoilIndex(0), m_HeatingCoilAvailSchPtr(0),
+          m_DesignHeatingCapacity(0.0), m_MaxHeatAirVolFlow(0.0), m_NumOfSpeedHeating(0), m_MultiSpeedHeatingCoil(false),
 
           m_VarSpeedHeatingCoil(false), m_SystemHeatControlNodeNum(0), m_CoolCoilExists(false), m_CoolingCoilType_Num(0), m_NumOfSpeedCooling(0),
           m_CoolingCoilAvailSchPtr(0), m_DesignCoolingCapacity(0.0), m_MaxCoolAirVolFlow(0.0), m_CondenserNodeNum(0),
@@ -1111,7 +1111,7 @@ namespace UnitarySystems {
                 }
 
                 // for DX systems, just read the inlet node flow rate and let air loop decide flow
-                if (this->m_ControlType == ControlType::Setpoint && this->sysType == SysType::UnitarySystem) {
+                if (this->m_ControlType == ControlType::Setpoint && this->sysType == SysType::Unitary) {
                     if (ScheduleManager::GetCurrentScheduleValue(state, this->m_SysAvailSchedPtr) > 0.0) {
                         if (this->m_LastMode == state.dataUnitarySystems->CoolingMode) {
                             if (this->m_MultiOrVarSpeedCoolCoil) {
@@ -7320,7 +7320,7 @@ namespace UnitarySystems {
 
                 auto const &fields = instance.value();
                 thisSys.UnitType = cCurrentModuleObject;
-                thisSys.sysType = SysType::UnitarySystem;
+                thisSys.sysType = SysType::Unitary;
 
                 UnitarySysInputSpec input_spec;
                 input_spec.name = thisObjectName;
@@ -17132,7 +17132,7 @@ namespace UnitarySystems {
         // if (UnitarySystem), else (CoilSystem), else (otherSystems), etc., else FATAL.
         if (numAllSystemTypes == state.dataUnitarySystems->numUnitarySystems) {
             for (int sysNum = 0; sysNum < state.dataUnitarySystems->numUnitarySystems; ++sysNum) {
-                if (state.dataUnitarySystems->unitarySys[sysNum].sysType == UnitarySys::SysType::UnitarySystem) {
+                if (state.dataUnitarySystems->unitarySys[sysNum].sysType == UnitarySys::SysType::Unitary) {
                     // Setup Report variables for the Unitary System that are not reported in the components themselves
                     SetupOutputVariable(state,
                                         "Unitary System Part Load Ratio",
