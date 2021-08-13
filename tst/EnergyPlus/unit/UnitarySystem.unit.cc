@@ -17801,7 +17801,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
 
     thisSys.m_MultiOrVarSpeedHeatCoil = false;
     thisSys.m_MultiOrVarSpeedCoolCoil = false;
-    thisSys.m_IsCoilSystemCoolingWater = true;
+    thisSys.sysType = UnitarySys::SysType::CoilCoolingWater;
     state->dataLoopNodes->Node.allocate(10);
     thisSys.m_HeatMassFlowRate.resize(1);
     thisSys.m_CoolMassFlowRate.resize(1);
@@ -18064,7 +18064,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_HeatRecoveryLoop)
 
     thisSys.m_MultiOrVarSpeedHeatCoil = false;
     thisSys.m_MultiOrVarSpeedCoolCoil = false;
-    thisSys.m_IsCoilSystemCoolingWater = true;
+    thisSys.sysType = UnitarySys::SysType::CoilCoolingWater;
     state->dataLoopNodes->Node.allocate(10);
     thisSys.m_HeatMassFlowRate.resize(1);
     thisSys.m_CoolMassFlowRate.resize(1);

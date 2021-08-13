@@ -526,7 +526,7 @@ namespace UnitarySystems {
                     DXCoils::SetCoilSystemCoolingData(state, this->m_CoolingCoilName, this->Name);
                 }
                 // open this up to include UnitarySystem on a future commit
-                if (!this->m_FanExists && this->sysType == SysType::CoilSystemCoolingDX) {
+                if (!this->m_FanExists && this->sysType == SysType::CoilCoolingDX) {
                     if (this->m_CoolCoilExists) { // copy this block for heating coil also on future commit
                         bool coilDataSet = false;
                         bool errorsFound = false;
@@ -1336,7 +1336,7 @@ namespace UnitarySystems {
             }
         }
         if (AirLoopNum > 0) {
-            if (this->sysType == SysType::CoilSystemCoolingWater) {
+            if (this->sysType == SysType::CoilCoolingWater) {
                 if (this->m_waterSideEconomizerFlag) { // CoilSystem:Cooling:Water has an input for economizer lockout
                     state.dataUnitarySystems->economizerFlag = state.dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoActive;
                     if (state.dataUnitarySystems->economizerFlag) {
@@ -1993,7 +1993,7 @@ namespace UnitarySystems {
         }
 
         // TODO: decide which parent objects will report
-        if (this->m_OKToPrintSizing && this->sysType != SysType::CoilSystemCoolingDX) PrintFlag = true;
+        if (this->m_OKToPrintSizing && this->sysType != SysType::CoilCoolingDX) PrintFlag = true;
         // STEP 5: report system parameters (e.g., air flow rates, capacities, etc.)
         if (this->m_FanExists) {
 
@@ -7118,7 +7118,7 @@ namespace UnitarySystems {
                 // now translate to UnitarySystem
                 UnitarySys thisSys;
                 thisSys.UnitType = cCurrentModuleObject;
-                thisSys.sysType = SysType::CoilSystemCoolingDX;
+                thisSys.sysType = SysType::CoilCoolingDX;
                 // TODO: figure out another way to set this next variable
                 // Unitary System will not turn on unless this mode is set OR a different method is used to set air flow rate
                 thisSys.m_LastMode = state.dataUnitarySystems->CoolingMode;
@@ -7223,7 +7223,7 @@ namespace UnitarySystems {
 
                 // now translate to UnitarySystem
                 thisSys.UnitType = cCurrentModuleObject;
-                thisSys.sysType = SysType::CoilSystemCoolingWater;
+                thisSys.sysType = SysType::CoilCoolingWater;
                 input_specs.control_type = "Setpoint";
                 thisSys.m_CoolCoilExists = true; // is always true
                 thisSys.m_LastMode = state.dataUnitarySystems->CoolingMode;
@@ -11693,7 +11693,7 @@ namespace UnitarySystems {
             Real64 tempHumRatAcc = HumRatAcc;
             Real64 tempAcc = Acc;
             // Determine if there is a sensible load on this system
-            if (this->sysType == SysType::CoilSystemCoolingDX) {
+            if (this->sysType == SysType::CoilCoolingDX) {
                 if ((state.dataLoopNodes->Node(InletNode).Temp > state.dataLoopNodes->Node(this->m_SystemCoolControlNodeNum).TempSetPoint) &&
                     (state.dataLoopNodes->Node(InletNode).Temp > DesOutTemp) &&
                     (std::abs(state.dataLoopNodes->Node(InletNode).Temp - DesOutTemp) > DataHVACGlobals::TempControlTol)) {
@@ -11710,7 +11710,7 @@ namespace UnitarySystems {
             if (this->m_HeatPump && this->m_HeatingPartLoadFrac > 0.0) SensibleLoad = false;
 
             // Determine if there is a latent load on this system - for future use to serve latent-only loads
-            if (this->sysType == SysType::CoilSystemCoolingDX) {
+            if (this->sysType == SysType::CoilCoolingDX) {
                 if ((state.dataLoopNodes->Node(InletNode).HumRat > state.dataLoopNodes->Node(InletNode).HumRatMax) &&
                     (state.dataLoopNodes->Node(InletNode).HumRat > DesOutHumRat))
                     LatentLoad = true;
@@ -11917,7 +11917,7 @@ namespace UnitarySystems {
                 Real64 NoOutput = 0.0; // CoilSystem:Cooling:DX
                 Real64 ReqOutput = 0.0;
                 FullOutput = 0.0;
-                if (this->sysType == SysType::CoilSystemCoolingDX) {
+                if (this->sysType == SysType::CoilCoolingDX) {
                     NoOutput = state.dataLoopNodes->Node(InletNode).MassFlowRate *
                                (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(OutletNode).HumRat) -
                                 Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(OutletNode).HumRat));
@@ -11934,7 +11934,7 @@ namespace UnitarySystems {
                 //     IF outlet temp at no load is lower than DesOutTemp (set point), do not operate the coil
                 //      and if coolReheat, check hum rat as well
                 bool doIt = false; // CoilSystem:Cooling:DX
-                if (this->sysType == SysType::CoilSystemCoolingDX) {
+                if (this->sysType == SysType::CoilCoolingDX) {
                     if ((NoOutput - ReqOutput) < Acc) {
                         PartLoadFrac = 0.0;
                     } else {
@@ -12188,7 +12188,7 @@ namespace UnitarySystems {
 
                 //        IF ((FullOutput - ReqOutput) .GT. Acc) THEN ! old method
                 //        IF ((Node(OutletNode)%Temp-DesOutTemp) .GT. Acc) THEN ! new method gets caught when temps are very close
-                if (this->sysType == SysType::CoilSystemCoolingDX) {
+                if (this->sysType == SysType::CoilCoolingDX) {
                     if ((FullOutput - ReqOutput) > tempAcc) {
                         PartLoadFrac = 1.0;
                         doIt = false;
@@ -17509,7 +17509,7 @@ namespace UnitarySystems {
                     }
                     bool anyEMSRan;
                     EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::ComponentGetInput, anyEMSRan, ObjexxFCL::Optional_int_const());
-                } else if (state.dataUnitarySystems->unitarySys[sysNum].sysType == UnitarySys::SysType::CoilSystemCoolingDX) {
+                } else if (state.dataUnitarySystems->unitarySys[sysNum].sysType == UnitarySys::SysType::CoilCoolingDX) {
                     // Setup Report variables for the DXCoolingSystem that is not reported in the components themselves
                     if (state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
                         SetupOutputVariable(state,
@@ -17565,7 +17565,7 @@ namespace UnitarySystems {
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataUnitarySystems->unitarySys[sysNum].Name);
-                } else if (state.dataUnitarySystems->unitarySys[sysNum].sysType == UnitarySys::SysType::CoilSystemCoolingWater) {
+                } else if (state.dataUnitarySystems->unitarySys[sysNum].sysType == UnitarySys::SysType::CoilCoolingWater) {
                     // Setup Report variables for the CoilSystemWater
                     SetupOutputVariable(state,
                                         "Coil System Water Part Load Ratio",

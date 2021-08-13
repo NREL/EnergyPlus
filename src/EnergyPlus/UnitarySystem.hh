@@ -198,8 +198,8 @@ namespace UnitarySystems {
         {
             Unassigned = -1,
             Unitary,                // AirloopHVAC:UnitarySystem
-            CoilSystemCoolingDX,    // CoilSystem:Cooling:DX
-            CoilSystemCoolingWater, // CoilSystem:Cooling:Water
+            CoilCoolingDX,          // CoilSystem:Cooling:DX
+            CoilCoolingWater, // CoilSystem:Cooling:Water
             Num
         };
 
