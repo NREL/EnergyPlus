@@ -6270,22 +6270,13 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     state->dataHeatBal->ZoneElectric.allocate(state->dataHeatBal->TotElecEquip);
 
     state->dataHeatBal->Lights(1).ZonePtr = 1;
-    state->dataHeatBal->Lights(1).spacePtrs.allocate(1);
-    state->dataHeatBal->Lights(1).spacePtrs(1) = 1;
-    state->dataHeatBal->Lights(1).spaceFracs.allocate(1);
-    state->dataHeatBal->Lights(1).spaceFracs(1) = 1.0;
+    state->dataHeatBal->Lights(1).spaceIndex = 1;
     state->dataHeatBal->Lights(1).DesignLevel = 1000.0;
     state->dataHeatBal->Lights(2).ZonePtr = 2;
-    state->dataHeatBal->Lights(2).spacePtrs.allocate(1);
-    state->dataHeatBal->Lights(2).spacePtrs(1) = 2;
-    state->dataHeatBal->Lights(2).spaceFracs.allocate(1);
-    state->dataHeatBal->Lights(2).spaceFracs(1) = 1.0;
+    state->dataHeatBal->Lights(2).spaceIndex = 2;
     state->dataHeatBal->Lights(2).DesignLevel = 100.0;
     state->dataHeatBal->Lights(3).ZonePtr = 3;
-    state->dataHeatBal->Lights(3).spacePtrs.allocate(1);
-    state->dataHeatBal->Lights(3).spacePtrs(1) = 3;
-    state->dataHeatBal->Lights(3).spaceFracs.allocate(1);
-    state->dataHeatBal->Lights(3).spaceFracs(1) = 1.0;
+    state->dataHeatBal->Lights(3).spaceIndex = 3;
     state->dataHeatBal->Lights(3).DesignLevel = 10.0;
 
     state->dataHeatBal->People(1).ZonePtr = 1;
@@ -9321,22 +9312,13 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
     state->dataHeatBal->ZoneElectric.allocate(state->dataHeatBal->TotElecEquip);
 
     state->dataHeatBal->Lights(1).ZonePtr = 1;
-    state->dataHeatBal->Lights(1).spacePtrs.allocate(1);
-    state->dataHeatBal->Lights(1).spacePtrs(1) = 1;
-    state->dataHeatBal->Lights(1).spaceFracs.allocate(1);
-    state->dataHeatBal->Lights(1).spaceFracs(1) = 1.0;
+    state->dataHeatBal->Lights(1).spaceIndex = 1;
     state->dataHeatBal->Lights(1).DesignLevel = 1000.0;
     state->dataHeatBal->Lights(2).ZonePtr = 2;
-    state->dataHeatBal->Lights(2).spacePtrs.allocate(1);
-    state->dataHeatBal->Lights(2).spacePtrs(1) = 2;
-    state->dataHeatBal->Lights(2).spaceFracs.allocate(1);
-    state->dataHeatBal->Lights(2).spaceFracs(1) = 1.0;
+    state->dataHeatBal->Lights(2).spaceIndex = 2;
     state->dataHeatBal->Lights(2).DesignLevel = 100.0;
     state->dataHeatBal->Lights(3).ZonePtr = 3;
-    state->dataHeatBal->Lights(3).spacePtrs.allocate(1);
-    state->dataHeatBal->Lights(3).spacePtrs(1) = 3;
-    state->dataHeatBal->Lights(3).spaceFracs.allocate(1);
-    state->dataHeatBal->Lights(3).spaceFracs(1) = 1.0;
+    state->dataHeatBal->Lights(3).spaceIndex = 3;
     state->dataHeatBal->Lights(3).DesignLevel = 10.0;
 
     state->dataHeatBal->People(1).ZonePtr = 1;

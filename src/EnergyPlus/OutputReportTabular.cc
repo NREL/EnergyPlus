@@ -11954,12 +11954,10 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
     }
     for (int iLights = 1; iLights <= state.dataHeatBal->TotLights; ++iLights) {
         auto curLighting = state.dataHeatBal->Lights(iLights);
-        for (int iSpace = 1; iSpace <= int(curLighting.spacePtrs.size()); ++iSpace) {
-            int const spaceNum = curLighting.spacePtrs(iSpace);
-            Real64 const lighting = curLighting.DesignLevel * curLighting.spaceFracs(iSpace);
-            spaceTotLighting(spaceNum) += lighting;
-            spaceTypeTotLighting(state.dataHeatBal->space(spaceNum).spaceTypeNum) += lighting;
-        }
+        int const spaceNum = curLighting.spaceIndex;
+        Real64 const lighting = curLighting.DesignLevel;
+        spaceTotLighting(spaceNum) += lighting;
+        spaceTypeTotLighting(state.dataHeatBal->space(spaceNum).spaceTypeNum) += lighting;
     }
     for (int iElecEquip = 1; iElecEquip <= state.dataHeatBal->TotElecEquip; ++iElecEquip) {
         auto curElecEquip = state.dataHeatBal->ZoneElectric(iElecEquip);

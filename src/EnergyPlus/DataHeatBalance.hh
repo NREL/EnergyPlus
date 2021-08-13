@@ -682,19 +682,18 @@ namespace DataHeatBalance {
     struct LightsData
     {
         // Members
-        std::string Name;            // LIGHTS object name
-        int ZonePtr;                 // Which zone lights are in
-        EPVector<int> spacePtrs;     // Pointers to space numbers for this object
-        EPVector<Real64> spaceFracs; // Fraction of total gains applied to each space
-        int SchedPtr;                // Schedule for lights
-        Real64 DesignLevel;          // design level for lights [W]
-        bool EMSLightsOn;            // EMS actuating Lighting power if .TRUE.
-        Real64 EMSLightingPower;     // Value EMS is directing to use for override
-        Real64 FractionReturnAir;    // Percentage (fraction 0.0-1.0) of sensible heat gain that is return air
-        Real64 FractionRadiant;      // Percentage (fraction 0.0-1.0) of sensible heat gain that is radiant
-        Real64 FractionShortWave;    // Percentage (fraction 0.0-1.0) of sensible heat gain that is short wave
-        Real64 FractionReplaceable;  // Percentage (fraction 0.0-1.0) of sensible heat gain that is replaceable
-        Real64 FractionConvected;    // Percentage (fraction 0.0-1.0) of sensible heat gain that is convective
+        std::string Name;           // LIGHTS object name
+        int ZonePtr;                // Which zone lights are in
+        int spaceIndex;             // Space index for this people statement
+        int SchedPtr;               // Schedule for lights
+        Real64 DesignLevel;         // design level for lights [W]
+        bool EMSLightsOn;           // EMS actuating Lighting power if .TRUE.
+        Real64 EMSLightingPower;    // Value EMS is directing to use for override
+        Real64 FractionReturnAir;   // Percentage (fraction 0.0-1.0) of sensible heat gain that is return air
+        Real64 FractionRadiant;     // Percentage (fraction 0.0-1.0) of sensible heat gain that is radiant
+        Real64 FractionShortWave;   // Percentage (fraction 0.0-1.0) of sensible heat gain that is short wave
+        Real64 FractionReplaceable; // Percentage (fraction 0.0-1.0) of sensible heat gain that is replaceable
+        Real64 FractionConvected;   // Percentage (fraction 0.0-1.0) of sensible heat gain that is convective
         bool FractionReturnAirIsCalculated;
         Real64 FractionReturnAirPlenTempCoeff1;
         Real64 FractionReturnAirPlenTempCoeff2;
