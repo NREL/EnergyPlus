@@ -5809,6 +5809,7 @@ namespace InternalHeatGains {
             numInputObjects = int(instancesValue.size());
             inputObjects.allocate(numInputObjects);
 
+            numGainInstances = 0;
             int counter = 0;
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &objectFields = instance.value();
