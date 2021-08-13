@@ -193,11 +193,17 @@ namespace UnitarySystems {
             UseCompressorOffFlow // set compressor OFF air flow rate equal to user defined value
         };
 
+        // Parent models simulated using UnitarySystem source code
+        enum class SysType : int
+        {
+            UnitarySystem,         // AirloopHVAC:UnitarySystem
+            CoilSystemCoolingDX,   // CoilSystem:Cooling:DX
+            CoilSystemCoolingWater // CoilSystem:Cooling:Water
+        };
+
         UnitarySysInputSpec original_input_specs;
         int m_UnitarySysNum;
-        bool m_IsUnitarySystem;
-        bool m_IsCoilSystemCoolingDX;
-        bool m_IsCoilSystemCoolingWater;
+        SysType sysType;
         bool m_ThisSysInputShouldBeGotten;
         int m_SysAvailSchedPtr; // Pointer to the availability schedule
         ControlType m_ControlType;
