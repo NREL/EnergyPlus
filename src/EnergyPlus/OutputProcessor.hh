@@ -463,10 +463,6 @@ namespace OutputProcessor {
         Real64 HRValue;          // Hourly Value
         bool RptHR;              // Report at End of Hour
         bool RptHRFO;            // Report at End of Hour -- meter file only
-        Real64 HRMaxVal;         // Maximum Value (Hour)
-        int HRMaxValDate;        // Date stamp of maximum
-        Real64 HRMinVal;         // Minimum Value (Hour)
-        int HRMinValDate;        // Date stamp of minimum
         int HRRptNum;            // Report Number for HR Values
         std::string HRRptNumChr; // Report Number for HR Values (character -- for printing)
 
@@ -545,16 +541,15 @@ namespace OutputProcessor {
         MeterType()
             : Units(OutputProcessor::Unit::None), RT_forIPUnits(OutputProcessor::RT_IPUnits::Unassigned), TypeOfMeter(MtrType::Normal),
               SourceMeter(0), TSValue(0.0), CurTSValue(0.0), RptTS(false), RptTSFO(false), TSRptNum(0), HRValue(0.0), RptHR(false), RptHRFO(false),
-              HRMaxVal(-99999.0), HRMaxValDate(0), HRMinVal(99999.0), HRMinValDate(0), HRRptNum(0), DYValue(0.0), RptDY(false), RptDYFO(false),
-              DYMaxVal(-99999.0), DYMaxValDate(0), DYMinVal(99999.0), DYMinValDate(0), DYRptNum(0), MNValue(0.0), RptMN(false), RptMNFO(false),
-              MNMaxVal(-99999.0), MNMaxValDate(0), MNMinVal(99999.0), MNMinValDate(0), MNRptNum(0), YRValue(0.0), RptYR(false), RptYRFO(false),
-              YRMaxVal(-99999.0), YRMaxValDate(0), YRMinVal(99999.0), YRMinValDate(0), YRRptNum(0), SMValue(0.0), RptSM(false), RptSMFO(false),
-              SMMaxVal(-99999.0), SMMaxValDate(0), SMMinVal(99999.0), SMMinValDate(0), SMRptNum(0), LastSMValue(0.0), LastSMMaxVal(-99999.0),
-              LastSMMaxValDate(0), LastSMMinVal(99999.0), LastSMMinValDate(0), FinYrSMValue(0.0), FinYrSMMaxVal(-99999.0), FinYrSMMaxValDate(0),
-              FinYrSMMinVal(99999.0), FinYrSMMinValDate(0), RptAccTS(false), RptAccTSFO(false), RptAccHR(false), RptAccHRFO(false), RptAccDY(false),
-              RptAccDYFO(false), RptAccMN(false), RptAccMNFO(false), RptAccYR(false), RptAccYRFO(false), RptAccSM(false), RptAccSMFO(false),
-              TSAccRptNum(0), HRAccRptNum(0), DYAccRptNum(0), MNAccRptNum(0), YRAccRptNum(0), SMAccRptNum(0), InstMeterCacheStart(0),
-              InstMeterCacheEnd(0)
+              HRRptNum(0), DYValue(0.0), RptDY(false), RptDYFO(false), DYMaxVal(-99999.0), DYMaxValDate(0), DYMinVal(99999.0), DYMinValDate(0),
+              DYRptNum(0), MNValue(0.0), RptMN(false), RptMNFO(false), MNMaxVal(-99999.0), MNMaxValDate(0), MNMinVal(99999.0), MNMinValDate(0),
+              MNRptNum(0), YRValue(0.0), RptYR(false), RptYRFO(false), YRMaxVal(-99999.0), YRMaxValDate(0), YRMinVal(99999.0), YRMinValDate(0),
+              YRRptNum(0), SMValue(0.0), RptSM(false), RptSMFO(false), SMMaxVal(-99999.0), SMMaxValDate(0), SMMinVal(99999.0), SMMinValDate(0),
+              SMRptNum(0), LastSMValue(0.0), LastSMMaxVal(-99999.0), LastSMMaxValDate(0), LastSMMinVal(99999.0), LastSMMinValDate(0),
+              FinYrSMValue(0.0), FinYrSMMaxVal(-99999.0), FinYrSMMaxValDate(0), FinYrSMMinVal(99999.0), FinYrSMMinValDate(0), RptAccTS(false),
+              RptAccTSFO(false), RptAccHR(false), RptAccHRFO(false), RptAccDY(false), RptAccDYFO(false), RptAccMN(false), RptAccMNFO(false),
+              RptAccYR(false), RptAccYRFO(false), RptAccSM(false), RptAccSMFO(false), TSAccRptNum(0), HRAccRptNum(0), DYAccRptNum(0), MNAccRptNum(0),
+              YRAccRptNum(0), SMAccRptNum(0), InstMeterCacheStart(0), InstMeterCacheEnd(0)
         {
         }
     };

@@ -1829,10 +1829,6 @@ namespace OutputProcessor {
             AssignReportNumber(state, op->EnergyMeters(op->NumEnergyMeters).TSRptNum);
             op->EnergyMeters(op->NumEnergyMeters).TSRptNumChr = fmt::to_string(op->EnergyMeters(op->NumEnergyMeters).TSRptNum);
             op->EnergyMeters(op->NumEnergyMeters).HRValue = 0.0;
-            op->EnergyMeters(op->NumEnergyMeters).HRMaxVal = MaxSetValue;
-            op->EnergyMeters(op->NumEnergyMeters).HRMaxValDate = 0;
-            op->EnergyMeters(op->NumEnergyMeters).HRMinVal = MinSetValue;
-            op->EnergyMeters(op->NumEnergyMeters).HRMinValDate = 0;
             op->EnergyMeters(op->NumEnergyMeters).RptHR = false;
             op->EnergyMeters(op->NumEnergyMeters).RptHRFO = false;
             AssignReportNumber(state, op->EnergyMeters(op->NumEnergyMeters).HRRptNum);
@@ -2524,12 +2520,12 @@ namespace OutputProcessor {
             } else {
                 op->EnergyMeters(Meter).TSValue = op->EnergyMeters(op->EnergyMeters(Meter).SourceMeter).TSValue - op->MeterValue(Meter);
             }
-            op->EnergyMeters(Meter).HRValue += op->MeterValue(Meter);
-            op->EnergyMeters(Meter).DYValue += op->MeterValue(Meter);
-            op->EnergyMeters(Meter).MNValue += op->MeterValue(Meter);
-            op->EnergyMeters(Meter).YRValue += op->MeterValue(Meter);
-            op->EnergyMeters(Meter).SMValue += op->MeterValue(Meter);
-            if (op->isFinalYear) op->EnergyMeters(Meter).FinYrSMValue += op->MeterValue(Meter);
+            op->EnergyMeters(Meter).HRValue += op->EnergyMeters(Meter).TSValue;
+            op->EnergyMeters(Meter).DYValue += op->EnergyMeters(Meter).TSValue;
+            op->EnergyMeters(Meter).MNValue += op->EnergyMeters(Meter).TSValue;
+            op->EnergyMeters(Meter).YRValue += op->EnergyMeters(Meter).TSValue;
+            op->EnergyMeters(Meter).SMValue += op->EnergyMeters(Meter).TSValue;
+            if (op->isFinalYear) op->EnergyMeters(Meter).FinYrSMValue += op->EnergyMeters(Meter).TSValue;
         }
         // Set Max
         for (int Meter = 1; Meter <= op->NumEnergyMeters; ++Meter) {
