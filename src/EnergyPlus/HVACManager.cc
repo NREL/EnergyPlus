@@ -2587,8 +2587,8 @@ void ReportAirHeatBalance(EnergyPlusData &state)
         }
 
         // Report mixing sensible and latent loads
-        MixSenLoad = 0.0; // Initialize arrays to zero before starting to sum
-        MixLatLoad = 0.0;
+        MixSenLoad(ZoneLoop) = 0.0; // Initialize arrays to zero before starting to sum
+        MixLatLoad(ZoneLoop) = 0.0;
         ZnAirRpt(ZoneLoop).MixVolume = 0.0;         // zero reported volume prior to summations below
         ZnAirRpt(ZoneLoop).MixVdotCurDensity = 0.0; // zero reported volume flow rate prior to summations below
         ZnAirRpt(ZoneLoop).MixVdotStdDensity = 0.0; // zero reported volume flow rate prior to summations below

@@ -2516,106 +2516,83 @@ namespace OutputProcessor {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Meter; // Loop Control
         auto &op(state.dataOutputProcessor);
 
-        for (Meter = 1; Meter <= op->NumEnergyMeters; ++Meter) {
+        for (int Meter = 1; Meter <= op->NumEnergyMeters; ++Meter) {
             if (op->EnergyMeters(Meter).TypeOfMeter != MtrType::CustomDec && op->EnergyMeters(Meter).TypeOfMeter != MtrType::CustomDiff) {
                 op->EnergyMeters(Meter).TSValue += op->MeterValue(Meter);
-                op->EnergyMeters(Meter).HRValue += op->MeterValue(Meter);
-                SetMinMax(op->EnergyMeters(Meter).TSValue,
-                          TimeStamp,
-                          op->EnergyMeters(Meter).HRMaxVal,
-                          op->EnergyMeters(Meter).HRMaxValDate,
-                          op->EnergyMeters(Meter).HRMinVal,
-                          op->EnergyMeters(Meter).HRMinValDate);
-                op->EnergyMeters(Meter).DYValue += op->MeterValue(Meter);
-                SetMinMax(op->EnergyMeters(Meter).TSValue,
-                          TimeStamp,
-                          op->EnergyMeters(Meter).DYMaxVal,
-                          op->EnergyMeters(Meter).DYMaxValDate,
-                          op->EnergyMeters(Meter).DYMinVal,
-                          op->EnergyMeters(Meter).DYMinValDate);
-                op->EnergyMeters(Meter).MNValue += op->MeterValue(Meter);
-                SetMinMax(op->EnergyMeters(Meter).TSValue,
-                          TimeStamp,
-                          op->EnergyMeters(Meter).MNMaxVal,
-                          op->EnergyMeters(Meter).MNMaxValDate,
-                          op->EnergyMeters(Meter).MNMinVal,
-                          op->EnergyMeters(Meter).MNMinValDate);
-                op->EnergyMeters(Meter).YRValue += op->MeterValue(Meter);
-                SetMinMax(op->EnergyMeters(Meter).TSValue,
-                          TimeStamp,
-                          op->EnergyMeters(Meter).YRMaxVal,
-                          op->EnergyMeters(Meter).YRMaxValDate,
-                          op->EnergyMeters(Meter).YRMinVal,
-                          op->EnergyMeters(Meter).YRMinValDate);
-                op->EnergyMeters(Meter).SMValue += op->MeterValue(Meter);
-                SetMinMax(op->EnergyMeters(Meter).TSValue,
-                          TimeStamp,
-                          op->EnergyMeters(Meter).SMMaxVal,
-                          op->EnergyMeters(Meter).SMMaxValDate,
-                          op->EnergyMeters(Meter).SMMinVal,
-                          op->EnergyMeters(Meter).SMMinValDate);
-                if (op->isFinalYear) {
-                    op->EnergyMeters(Meter).FinYrSMValue += op->MeterValue(Meter);
-                    SetMinMax(op->EnergyMeters(Meter).TSValue,
-                              TimeStamp,
-                              op->EnergyMeters(Meter).FinYrSMMaxVal,
-                              op->EnergyMeters(Meter).FinYrSMMaxValDate,
-                              op->EnergyMeters(Meter).FinYrSMMinVal,
-                              op->EnergyMeters(Meter).FinYrSMMinValDate);
-                }
             } else {
                 op->EnergyMeters(Meter).TSValue = op->EnergyMeters(op->EnergyMeters(Meter).SourceMeter).TSValue - op->MeterValue(Meter);
-                op->EnergyMeters(Meter).HRValue += op->EnergyMeters(Meter).TSValue;
-                SetMinMax(op->EnergyMeters(Meter).TSValue,
-                          TimeStamp,
-                          op->EnergyMeters(Meter).HRMaxVal,
-                          op->EnergyMeters(Meter).HRMaxValDate,
-                          op->EnergyMeters(Meter).HRMinVal,
-                          op->EnergyMeters(Meter).HRMinValDate);
-                op->EnergyMeters(Meter).DYValue += op->EnergyMeters(Meter).TSValue;
-                SetMinMax(op->EnergyMeters(Meter).TSValue,
-                          TimeStamp,
-                          op->EnergyMeters(Meter).DYMaxVal,
-                          op->EnergyMeters(Meter).DYMaxValDate,
-                          op->EnergyMeters(Meter).DYMinVal,
-                          op->EnergyMeters(Meter).DYMinValDate);
-                op->EnergyMeters(Meter).MNValue += op->EnergyMeters(Meter).TSValue;
-                SetMinMax(op->EnergyMeters(Meter).TSValue,
-                          TimeStamp,
-                          op->EnergyMeters(Meter).MNMaxVal,
-                          op->EnergyMeters(Meter).MNMaxValDate,
-                          op->EnergyMeters(Meter).MNMinVal,
-                          op->EnergyMeters(Meter).MNMinValDate);
-                op->EnergyMeters(Meter).YRValue += op->EnergyMeters(Meter).TSValue;
-                SetMinMax(op->EnergyMeters(Meter).TSValue,
-                          TimeStamp,
-                          op->EnergyMeters(Meter).YRMaxVal,
-                          op->EnergyMeters(Meter).YRMaxValDate,
-                          op->EnergyMeters(Meter).YRMinVal,
-                          op->EnergyMeters(Meter).YRMinValDate);
-                op->EnergyMeters(Meter).SMValue += op->EnergyMeters(Meter).TSValue;
-                SetMinMax(op->EnergyMeters(Meter).TSValue,
-                          TimeStamp,
-                          op->EnergyMeters(Meter).SMMaxVal,
-                          op->EnergyMeters(Meter).SMMaxValDate,
-                          op->EnergyMeters(Meter).SMMinVal,
-                          op->EnergyMeters(Meter).SMMinValDate);
-                if (op->isFinalYear) {
-                    op->EnergyMeters(Meter).FinYrSMValue += op->EnergyMeters(Meter).TSValue;
-                    SetMinMax(op->EnergyMeters(Meter).TSValue,
-                              TimeStamp,
-                              op->EnergyMeters(Meter).FinYrSMMaxVal,
-                              op->EnergyMeters(Meter).FinYrSMMaxValDate,
-                              op->EnergyMeters(Meter).FinYrSMMinVal,
-                              op->EnergyMeters(Meter).FinYrSMMinValDate);
+            }
+            op->EnergyMeters(Meter).HRValue += op->MeterValue(Meter);
+            op->EnergyMeters(Meter).DYValue += op->MeterValue(Meter);
+            op->EnergyMeters(Meter).MNValue += op->MeterValue(Meter);
+            op->EnergyMeters(Meter).YRValue += op->MeterValue(Meter);
+            op->EnergyMeters(Meter).SMValue += op->MeterValue(Meter);
+            if (op->isFinalYear) op->EnergyMeters(Meter).FinYrSMValue += op->MeterValue(Meter);
+        }
+        // Set Max
+        for (int Meter = 1; Meter <= op->NumEnergyMeters; ++Meter) {
+            // Todo - HRMinVal, HRMaxVal not used
+            if (op->EnergyMeters(Meter).TSValue > op->EnergyMeters(Meter).DYMaxVal) {
+                op->EnergyMeters(Meter).DYMaxVal = op->EnergyMeters(Meter).TSValue;
+                op->EnergyMeters(Meter).DYMaxValDate = TimeStamp;
+            } else {
+                continue; // Not max val of month or year, if not max of day so far
+            }
+            if (op->EnergyMeters(Meter).TSValue > op->EnergyMeters(Meter).MNMaxVal) {
+                op->EnergyMeters(Meter).MNMaxVal = op->EnergyMeters(Meter).TSValue;
+                op->EnergyMeters(Meter).MNMaxValDate = TimeStamp;
+            } else {
+                continue;
+            }
+            if (op->EnergyMeters(Meter).TSValue > op->EnergyMeters(Meter).YRMaxVal) {
+                op->EnergyMeters(Meter).YRMaxVal = op->EnergyMeters(Meter).TSValue;
+                op->EnergyMeters(Meter).YRMaxValDate = TimeStamp;
+            }
+            if (op->EnergyMeters(Meter).TSValue > op->EnergyMeters(Meter).SMMaxVal) {
+                op->EnergyMeters(Meter).SMMaxVal = op->EnergyMeters(Meter).TSValue;
+                op->EnergyMeters(Meter).SMMaxValDate = TimeStamp;
+            }
+            if (op->isFinalYear) {
+                if (op->EnergyMeters(Meter).TSValue > op->EnergyMeters(Meter).FinYrSMMaxVal) {
+                    op->EnergyMeters(Meter).FinYrSMMaxVal = op->EnergyMeters(Meter).TSValue;
+                    op->EnergyMeters(Meter).FinYrSMMaxValDate = TimeStamp;
                 }
             }
         }
-
-        op->MeterValue = 0.0; // Ready for next update
+        // Set Min
+        for (int Meter = 1; Meter <= op->NumEnergyMeters; ++Meter) {
+            if (op->EnergyMeters(Meter).TSValue < op->EnergyMeters(Meter).DYMinVal) {
+                op->EnergyMeters(Meter).DYMinVal = op->EnergyMeters(Meter).TSValue;
+                op->EnergyMeters(Meter).DYMinValDate = TimeStamp;
+            } else {
+                continue;
+            }
+            if (op->EnergyMeters(Meter).TSValue < op->EnergyMeters(Meter).MNMinVal) {
+                op->EnergyMeters(Meter).MNMinVal = op->EnergyMeters(Meter).TSValue;
+                op->EnergyMeters(Meter).MNMinValDate = TimeStamp;
+            } else {
+                continue;
+            }
+            if (op->EnergyMeters(Meter).TSValue < op->EnergyMeters(Meter).YRMinVal) {
+                op->EnergyMeters(Meter).YRMinVal = op->EnergyMeters(Meter).TSValue;
+                op->EnergyMeters(Meter).YRMinValDate = TimeStamp;
+            }
+            if (op->EnergyMeters(Meter).TSValue < op->EnergyMeters(Meter).SMMinVal) {
+                op->EnergyMeters(Meter).SMMinVal = op->EnergyMeters(Meter).TSValue;
+                op->EnergyMeters(Meter).SMMinValDate = TimeStamp;
+            }
+            if (op->isFinalYear) {
+                if (op->EnergyMeters(Meter).TSValue < op->EnergyMeters(Meter).FinYrSMMinVal) {
+                    op->EnergyMeters(Meter).FinYrSMMinVal = op->EnergyMeters(Meter).TSValue;
+                    op->EnergyMeters(Meter).FinYrSMMinValDate = TimeStamp;
+                }
+            }
+        }
+        for (int Meter = 1; Meter <= op->NumEnergyMeters; ++Meter) {
+            op->MeterValue(Meter) = 0.0; // Ready for next update
+        }
     }
 
     void ResetAccumulationWhenWarmupComplete(EnergyPlusData &state)
@@ -2658,10 +2635,6 @@ namespace OutputProcessor {
 
         for (Meter = 1; Meter <= op->NumEnergyMeters; ++Meter) {
             op->EnergyMeters(Meter).HRValue = 0.0;
-            op->EnergyMeters(Meter).HRMaxVal = MaxSetValue;
-            op->EnergyMeters(Meter).HRMaxValDate = 0;
-            op->EnergyMeters(Meter).HRMinVal = MinSetValue;
-            op->EnergyMeters(Meter).HRMinValDate = 0;
 
             op->EnergyMeters(Meter).DYValue = 0.0;
             op->EnergyMeters(Meter).DYMaxVal = MaxSetValue;
@@ -2985,8 +2958,6 @@ namespace OutputProcessor {
                 state.dataResultsFramework->resultsFramework->HRMeters.pushVariableValue(op->EnergyMeters(Loop).HRRptNum,
                                                                                          op->EnergyMeters(Loop).HRValue);
                 op->EnergyMeters(Loop).HRValue = 0.0;
-                op->EnergyMeters(Loop).HRMinVal = MinSetValue;
-                op->EnergyMeters(Loop).HRMaxVal = MaxSetValue;
             }
 
             if (op->EnergyMeters(Loop).RptAccHR) {
