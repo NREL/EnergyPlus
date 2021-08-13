@@ -435,7 +435,7 @@ namespace OutputProcessor {
         Array1D_int OnCustomMeters; // Forward pointer to Custom Meter Numbers
 
         // Default Constructor
-        MeterArrayType() : NumOnMeters(0), RepVariable(0), OnMeters(6, 0), NumOnCustomMeters(0)
+        MeterArrayType() : NumOnMeters(0), RepVariable(0), OnMeters(9, 0), NumOnCustomMeters(0)
         {
         }
     };
@@ -653,15 +653,16 @@ namespace OutputProcessor {
     );
 
     void AttachMeters(EnergyPlusData &state,
-                      Unit const &MtrUnits,        // Units for this meter
-                      std::string &ResourceType,   // Electricity, Gas, etc.
-                      std::string &EndUse,         // End-use category (Lights, Heating, etc.)
-                      std::string &EndUseSub,      // End-use subcategory (user-defined, e.g., General Lights, Task Lights, etc.)
-                      std::string &Group,          // Group key (Facility, Zone, Building, etc.)
-                      std::string const &ZoneName, // Zone key only applicable for Building group
-                      int RepVarNum,               // Number of this report variable
-                      int &MeterArrayPtr,          // Output set of Pointers to Meters
-                      bool &ErrorsFound            // True if errors in this call
+                      Unit const &MtrUnits,            // Units for this meter
+                      std::string &ResourceType,       // Electricity, Gas, etc.
+                      std::string &EndUse,             // End-use category (Lights, Heating, etc.)
+                      std::string &EndUseSub,          // End-use subcategory (user-defined, e.g., General Lights, Task Lights, etc.)
+                      std::string &Group,              // Group key (Facility, Zone, Building, etc.)
+                      std::string const ZoneName,      // Zone key only applicable for Building group
+                      std::string const SpaceTypeName, // Space Type key only applicable for Building group
+                      int RepVarNum,                   // Number of this report variable
+                      int &MeterArrayPtr,              // Output set of Pointers to Meters
+                      bool &ErrorsFound                // True if errors in this call
     );
 
     void AttachCustomMeters(EnergyPlusData &state,
@@ -671,13 +672,14 @@ namespace OutputProcessor {
     );
 
     void ValidateNStandardizeMeterTitles(EnergyPlusData &state,
-                                         OutputProcessor::Unit const &MtrUnits, // Units for the meter
-                                         std::string &ResourceType,             // Electricity, Gas, etc.
-                                         std::string &EndUse,                   // End Use Type (Lights, Heating, etc.)
-                                         std::string &EndUseSub,                // End Use Sub Type (General Lights, Task Lights, etc.)
-                                         std::string &Group,                    // Group key (Facility, Zone, Building, etc.)
-                                         bool &ErrorsFound,                     // True if errors in this call
-                                         Optional_string_const ZoneName = _     // ZoneName when Group=Building
+                                         OutputProcessor::Unit const &MtrUnits,  // Units for the meter
+                                         std::string &ResourceType,              // Electricity, Gas, etc.
+                                         std::string &EndUse,                    // End Use Type (Lights, Heating, etc.)
+                                         std::string &EndUseSub,                 // End Use Sub Type (General Lights, Task Lights, etc.)
+                                         std::string &Group,                     // Group key (Facility, Zone, Building, etc.)
+                                         bool &ErrorsFound,                      // True if errors in this call
+                                         Optional_string_const ZoneName = _,     // ZoneName when Group=Building
+                                         Optional_string_const SpaceTypeName = _ // Space Type Name when Group=Building
     );
 
     void DetermineMeterIPUnits(EnergyPlusData &state,
@@ -912,7 +914,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                          Optional_string_const EndUseKey = _,              // Meter End Use Key (Lights, Heating, Cooling, etc)
                          Optional_string_const EndUseSubKey = _,           // Meter End Use Sub Key (General Lights, Task Lights, etc)
                          Optional_string_const GroupKey = _,               // Meter Super Group Key (Building, System, Plant)
-                         Optional_string_const ZoneKey = _,                // Meter Zone Key (zone name)
+                         Optional_string_const ZoneOrSpaceKey = _,         // Meter Zone Name or Space Name
                          Optional_int_const ZoneMult = _,                  // Zone Multiplier, defaults to 1
                          Optional_int_const ZoneListMult = _,              // Zone List Multiplier, defaults to 1
                          Optional_int_const indexGroupKey = _,             // Group identifier for SQL output

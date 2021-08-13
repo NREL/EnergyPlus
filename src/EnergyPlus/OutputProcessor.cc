@@ -1903,7 +1903,8 @@ namespace OutputProcessor {
                       std::string &EndUse,                   // End-use category (Lights, Heating, etc.)
                       std::string &EndUseSub,                // End-use subcategory (user-defined, e.g., General Lights, Task Lights, etc.)
                       std::string &Group,                    // Group key (Facility, Zone, Building, etc.)
-                      std::string const &ZoneName,           // Zone key only applicable for Building group
+                      std::string const ZoneName,            // Zone key only applicable for Building group
+                      std::string const SpaceTypeName,       // Space Type key only applicable for Building group
                       int const RepVarNum,                   // Number of this report variable
                       int &MeterArrayPtr,                    // Output set of Pointers to Meters
                       bool &ErrorsFound                      // True if errors in this call
@@ -1925,7 +1926,7 @@ namespace OutputProcessor {
         auto &op(state.dataOutputProcessor);
 
         if (UtilityRoutines::SameString(Group, "Building")) {
-            ValidateNStandardizeMeterTitles(state, MtrUnits, ResourceType, EndUse, EndUseSub, Group, ErrorsFound, ZoneName);
+            ValidateNStandardizeMeterTitles(state, MtrUnits, ResourceType, EndUse, EndUseSub, Group, ErrorsFound, ZoneName, SpaceTypeName);
         } else {
             ValidateNStandardizeMeterTitles(state, MtrUnits, ResourceType, EndUse, EndUseSub, Group, ErrorsFound);
         }
@@ -1946,11 +1947,18 @@ namespace OutputProcessor {
                 ++op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters;
                 op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
             }
-            if (UtilityRoutines::SameString(Group, "Building")) { // Match to Zone
+            if (UtilityRoutines::SameString(Group, "Building")) { // Match to Zone and Space Type
                 Found = UtilityRoutines::FindItem(ResourceType + ":Zone:" + ZoneName, op->EnergyMeters);
                 if (Found != 0) {
                     ++op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters;
                     op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
+                }
+                if (!std::string(SpaceTypeName).empty()) {
+                    Found = UtilityRoutines::FindItem(ResourceType + ":SpaceType:" + SpaceTypeName, op->EnergyMeters);
+                    if (Found != 0) {
+                        ++op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters;
+                        op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
+                    }
                 }
             }
         }
@@ -1968,6 +1976,13 @@ namespace OutputProcessor {
                     ++op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters;
                     op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
                 }
+                if (!SpaceTypeName.empty()) {
+                    Found = UtilityRoutines::FindItem(EndUse + ':' + ResourceType + ":SpaceType:" + SpaceTypeName, op->EnergyMeters);
+                    if (Found != 0) {
+                        ++op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters;
+                        op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
+                    }
+                }
             }
 
             // End use subcategory
@@ -1984,6 +1999,14 @@ namespace OutputProcessor {
                     if (Found != 0) {
                         ++op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters;
                         op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
+                    }
+                    if (!std::string(SpaceTypeName).empty()) {
+                        Found = UtilityRoutines::FindItem(EndUseSub + ':' + EndUse + ':' + ResourceType + ":SpaceType:" + SpaceTypeName,
+                                                          op->EnergyMeters);
+                        if (Found != 0) {
+                            ++op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters;
+                            op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
+                        }
                     }
                 }
             }
@@ -2032,7 +2055,8 @@ namespace OutputProcessor {
                                          std::string &EndUseSub,                // End Use Sub Type (General Lights, Task Lights, etc.)
                                          std::string &Group,                    // Group key (Facility, Zone, Building, etc.)
                                          bool &ErrorsFound,                     // True if errors in this call
-                                         Optional_string_const ZoneName         // ZoneName when Group=Building
+                                         Optional_string_const ZoneName,        // ZoneName when Group=Building
+                                         Optional_string_const SpaceTypeName    // Space Type Name when Group=Building
     )
     {
 
@@ -2093,6 +2117,12 @@ namespace OutputProcessor {
                 Found = UtilityRoutines::FindItem(ResourceType + ":Zone:" + ZoneName, op->EnergyMeters);
                 if (Found == 0) {
                     AddMeter(state, ResourceType + ":Zone:" + ZoneName, MtrUnits, ResourceType, "", "", "Zone");
+                }
+                if (!std::string(SpaceTypeName).empty()) {
+                    Found = UtilityRoutines::FindItem(ResourceType + ":SpaceType:" + SpaceTypeName, op->EnergyMeters);
+                    if (Found == 0) {
+                        AddMeter(state, ResourceType + ":SpaceType:" + SpaceTypeName, MtrUnits, ResourceType, "", "", "SpaceType");
+                    }
                 }
             }
         }
@@ -2277,10 +2307,16 @@ namespace OutputProcessor {
             Found = UtilityRoutines::FindItem(EndUse + ':' + ResourceType, op->EnergyMeters);
             if (Found == 0) AddMeter(state, EndUse + ':' + ResourceType, MtrUnits, ResourceType, EndUse, "", "");
 
-            if (Group == "Building") { // Match to Zone
+            if (Group == "Building") { // Match to Zone and Space
                 Found = UtilityRoutines::FindItem(EndUse + ':' + ResourceType + ":Zone:" + ZoneName, op->EnergyMeters);
                 if (Found == 0) {
                     AddMeter(state, EndUse + ':' + ResourceType + ":Zone:" + ZoneName, MtrUnits, ResourceType, EndUse, "", "Zone");
+                }
+                if (!std::string(SpaceTypeName).empty()) {
+                    Found = UtilityRoutines::FindItem(EndUse + ':' + ResourceType + ":SpaceType:" + SpaceTypeName, op->EnergyMeters);
+                    if (Found == 0) {
+                        AddMeter(state, EndUse + ':' + ResourceType + ":SpaceType:" + SpaceTypeName, MtrUnits, ResourceType, EndUse, "", "SpaceType");
+                    }
                 }
             }
         } else if (LocalErrorsFound) {
@@ -5271,7 +5307,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                          Optional_string_const EndUseKey,                        // Meter End Use Key (Lights, Heating, Cooling, etc)
                          Optional_string_const EndUseSubKey,                     // Meter End Use Sub Key (General Lights, Task Lights, etc)
                          Optional_string_const GroupKey,                         // Meter Super Group Key (Building, System, Plant)
-                         Optional_string_const ZoneKey,                          // Meter Zone Key (zone name)
+                         Optional_string_const ZoneOrSpaceKey,                   // Meter Zone Name or Space Name
                          Optional_int_const ZoneMult,                            // Zone Multiplier, defaults to 1
                          Optional_int_const ZoneListMult,                        // Zone List Multiplier, defaults to 1
                          Optional_int_const indexGroupKey,                       // Group identifier for SQL output
@@ -5302,11 +5338,12 @@ void SetupOutputVariable(EnergyPlusData &state,
     StoreType VariableType;    // 1=Average, 2=Sum, 3=Min/Max
     int Loop;
     ReportingFrequency RepFreq(ReportingFrequency::Hourly);
-    std::string ResourceType; // Will hold value of ResourceTypeKey
-    std::string EndUse;       // Will hold value of EndUseKey
-    std::string EndUseSub;    // Will hold value of EndUseSubKey
-    std::string Group;        // Will hold value of GroupKey
-    std::string ZoneName;     // Will hold value of ZoneKey
+    std::string ResourceType;  // Will hold value of ResourceTypeKey
+    std::string EndUse;        // Will hold value of EndUseKey
+    std::string EndUseSub;     // Will hold value of EndUseSubKey
+    std::string Group;         // Will hold value of GroupKey
+    std::string zoneName;      // Will hold value of ZoneOrSpaceKey if it is a Zone name, or the corresponding Zone if it is a Space name
+    std::string spaceTypeName; // Space Type if ZoneOrSpaceKey if it is a Space name
     int localIndexGroupKey;
     auto &op(state.dataOutputProcessor);
 
@@ -5370,11 +5407,27 @@ void SetupOutputVariable(EnergyPlusData &state,
             } else {
                 Group = "";
             }
-            if (present(ZoneKey)) {
-                ZoneName = ZoneKey;
-                OnMeter = true;
+            if (present(ZoneOrSpaceKey)) {
+                std::string ucZoneOrSpaceKey = UtilityRoutines::MakeUPPERCase(std::string(ZoneOrSpaceKey));
+                int spaceNum = UtilityRoutines::FindItemInList(ucZoneOrSpaceKey, state.dataHeatBal->space);
+                if (spaceNum > 0) {
+                    spaceTypeName = state.dataHeatBal->space(spaceNum).spaceType;
+                    zoneName = state.dataHeatBal->Zone(state.dataHeatBal->space(spaceNum).zoneNum).Name;
+                    OnMeter = true;
+                } else {
+                    int zoneNum = UtilityRoutines::FindItemInList(ucZoneOrSpaceKey, state.dataHeatBal->Zone);
+                    if (zoneNum > 0) {
+                        zoneName = ucZoneOrSpaceKey;
+                        spaceTypeName = "";
+                        OnMeter = true;
+                    } else {
+                        zoneName = "";
+                        spaceTypeName = "";
+                    }
+                }
             } else {
-                ZoneName = "";
+                zoneName = "";
+                spaceTypeName = "";
             }
         }
 
@@ -5449,7 +5502,8 @@ void SetupOutputVariable(EnergyPlusData &state,
                 } else {
                     Unit mtrUnits = op->RVariableTypes(CV).units;
                     bool ErrorsFound = false;
-                    AttachMeters(state, mtrUnits, ResourceType, EndUse, EndUseSub, Group, ZoneName, CV, thisVarPtr.MeterArrayPtr, ErrorsFound);
+                    AttachMeters(
+                        state, mtrUnits, ResourceType, EndUse, EndUseSub, Group, zoneName, spaceTypeName, CV, thisVarPtr.MeterArrayPtr, ErrorsFound);
                     if (ErrorsFound) {
                         ShowContinueError(state, "Invalid Meter spec for variable=" + KeyedValue + ':' + VariableName);
                         op->ErrorsLogged = true;

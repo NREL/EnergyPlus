@@ -8580,8 +8580,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_8317_ValidateOutputTableMon
     std::string endUseSub("");
     std::string group("");
     std::string const zoneName("");
+    std::string const spaceType("");
 
-    AttachMeters(*state, OutputProcessor::Unit::J, resourceType, endUse, endUseSub, group, zoneName, 1, meter_array_ptr, errors_found);
+    AttachMeters(*state, OutputProcessor::Unit::J, resourceType, endUse, endUseSub, group, zoneName, spaceType, 1, meter_array_ptr, errors_found);
 
     EXPECT_FALSE(errors_found);
     EXPECT_EQ(3, meter_array_ptr); // 2 meters were setup via SetupOutputVariable already
