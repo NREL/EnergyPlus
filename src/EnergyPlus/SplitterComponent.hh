@@ -94,7 +94,7 @@ namespace SplitterComponent {
     };
 
     void SimAirLoopSplitter(EnergyPlusData &state,
-                            std::string const &CompName,
+                            std::string_view CompName,
                             bool const FirstHVACIteration,
                             bool const FirstCall,
                             bool &SplitterInletChanged,

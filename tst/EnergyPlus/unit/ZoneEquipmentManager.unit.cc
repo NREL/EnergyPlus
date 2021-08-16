@@ -51,9 +51,11 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/CoolTower.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -62,11 +64,13 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/EarthTube.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
+#include <EnergyPlus/ThermalChimney.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 
@@ -4405,4 +4409,149 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_ZoneMixingInfiltrationFlowsFlag
     EXPECT_EQ(state->dataHeatBalFanSys->ZoneReOrder(1), 3); // receving only zone
     EXPECT_EQ(state->dataHeatBalFanSys->ZoneReOrder(2), 2); // source and receiving zone,
     EXPECT_EQ(state->dataHeatBalFanSys->ZoneReOrder(3), 1); // source only zone
+}
+
+TEST_F(EnergyPlusFixture, CalcAirFlowSimple_CO2andGCforRefrigerationDoorsTest)
+{
+    state->dataGlobal->NumOfZones = 2;
+
+    state->dataEnvrn->OutBaroPress = 101400.;
+
+    state->dataHeatBalFanSys->MAT.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->MCPM.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->MCPTM.allocate(state->dataGlobal->NumOfZones);
+
+    state->dataHeatBalFanSys->MCPI.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->OAMFL.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->MCPTI.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->MCPThermChim.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ThermChimAMFL.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->MCPTThermChim.allocate(state->dataGlobal->NumOfZones);
+
+    state->dataHeatBalFanSys->MixingMassFlowZone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->MixingMassFlowXHumRat.allocate(state->dataGlobal->NumOfZones);
+
+    state->dataHeatBalFanSys->MAT(1) = 21.0;
+    state->dataHeatBalFanSys->MAT(2) = 22.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.0021;
+    state->dataHeatBalFanSys->ZoneAirHumRat(2) = 0.0022;
+
+    state->dataHeatBal->TotRefDoorMixing = 1;
+    state->dataHeatBal->TotMixing = 0;
+    state->dataHeatBal->TotCrossMixing = 0;
+    state->dataHeatBal->TotInfiltration = 0;
+    state->dataHeatBal->TotZoneAirBalance = 0;
+    state->dataHeatBal->TotVentilation = 0;
+    state->dataHeatBal->AirFlowFlag = true;
+
+    state->dataContaminantBalance->Contaminant.CO2Simulation = true;
+    state->dataContaminantBalance->Contaminant.GenericContamSimulation = true;
+    state->dataContaminantBalance->MixingMassFlowCO2.allocate(state->dataGlobal->NumOfZones);
+    state->dataContaminantBalance->MixingMassFlowGC.allocate(state->dataGlobal->NumOfZones);
+
+    state->dataHeatBal->RefDoorMixing.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->RefDoorMixing(1).EMSRefDoorMixingOn.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->RefDoorMixing(1).VolRefDoorFlowRate.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->RefDoorMixing(1).MateZonePtr.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->RefDoorMixing(1).RefDoorMixFlag = true;
+    state->dataHeatBal->RefDoorMixing(2).RefDoorMixFlag = true;
+    state->dataHeatBal->RefDoorMixing(1).NumRefDoorConnections = 1;
+    state->dataHeatBal->RefDoorMixing(1).MateZonePtr(1) = 2;
+    state->dataHeatBal->RefDoorMixing(1).EMSRefDoorMixingOn(1) = true;
+    state->dataHeatBal->RefDoorMixing(1).VolRefDoorFlowRate(1) = 100.0;
+
+    state->dataContaminantBalance->ZoneAirCO2.allocate(state->dataGlobal->NumOfZones);
+    state->dataContaminantBalance->ZoneAirGC.allocate(state->dataGlobal->NumOfZones);
+    state->dataContaminantBalance->ZoneAirCO2(1) = 400.0;
+    state->dataContaminantBalance->ZoneAirCO2(2) = 300.0;
+    state->dataContaminantBalance->ZoneAirGC(1) = 10.0;
+    state->dataContaminantBalance->ZoneAirGC(2) = 20.0;
+
+    state->dataEarthTube->GetInputFlag = false;
+    state->dataEarthTube->TotEarthTube = 0;
+    state->dataCoolTower->GetInputFlag = false;
+    state->dataCoolTower->NumCoolTowers = 0;
+    state->dataThermalChimneys->ThermalChimneyGetInputFlag = false;
+    state->dataThermalChimneys->TotThermalChimney = 0;
+
+    state->dataHeatBal->RefDoorMixing(1).VolRefDoorFlowRate(1) = 1.1;
+    state->dataHeatBal->RefDoorMixing(1).VolRefDoorFlowRate(2) = 2.2;
+
+    CalcAirFlowSimple(*state);
+
+    EXPECT_NEAR(state->dataContaminantBalance->MixingMassFlowCO2(1), 395.202, 0.001);
+    EXPECT_NEAR(state->dataContaminantBalance->MixingMassFlowCO2(2), 526.884, 0.001);
+    EXPECT_NEAR(state->dataContaminantBalance->MixingMassFlowGC(1), 26.347, 0.001);
+    EXPECT_NEAR(state->dataContaminantBalance->MixingMassFlowGC(2), 13.172, 0.001);
+}
+
+TEST_F(EnergyPlusFixture, CZoeEquipmentManager_CalcZoneLeavingConditions_Test)
+{
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "LIVING ZONE";
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes);
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeExhaustNodeNum.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes);
+    state->dataZoneEquip->ZoneEquipConfig(1).SharedExhaustNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes);
+
+    int NumOfNodes = 10;
+    state->dataLoopNodes->Node.allocate(NumOfNodes);
+    state->dataLoopNodes->NodeID.allocate(NumOfNodes);
+    state->dataLoopNodes->NodeID(1) = "ZoeNode";
+    state->dataLoopNodes->NodeID(2) = "ZoeInletNode";
+    state->dataLoopNodes->NodeID(3) = "";
+    state->dataLoopNodes->NodeID(4) = "ZoeReturNode1";
+    state->dataLoopNodes->NodeID(5) = "ZoeReturNode2";
+    state->dataLoopNodes->NodeID(6) = "ZoeExhaustNode";
+    state->dataLoopNodes->NodeID(7) = "ZoeSupplyNode";
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(2) = 5;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 6;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeExhaustNodeNum(1) = 6;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeExhaustNodeNum(2) = 6;
+    state->dataZoneEquip->ZoneEquipConfig(1).SharedExhaustNode(1) = iLightReturnExhaustConfig::Multi;
+    state->dataZoneEquip->ZoneEquipConfig(1).SharedExhaustNode(2) = iLightReturnExhaustConfig::Shared;
+
+    state->dataHeatBal->ZoneIntGain.allocate(1);
+    state->dataHeatBal->ZoneIntGain(1).NumberOfDevices = 2;
+    state->dataHeatBal->ZoneIntGain(1).Device.allocate(2);
+    state->dataHeatBal->ZoneIntGain(1).Device(1).ReturnAirNodeNum = 4;
+    state->dataHeatBal->ZoneIntGain(1).Device(2).ReturnAirNodeNum = 5;
+    state->dataHeatBal->ZoneIntGain(1).Device(1).ReturnAirConvGainRate = 50.0;
+    state->dataHeatBal->ZoneIntGain(1).Device(2).ReturnAirConvGainRate = 100.0;
+
+    for (int Nodecount = 1; Nodecount <= NumOfNodes; ++Nodecount) {
+        state->dataLoopNodes->Node(Nodecount).Temp = 20.0;
+        state->dataLoopNodes->Node(Nodecount).HumRat = 0.001;
+    }
+    state->dataLoopNodes->Node(4).MassFlowRate = 0.01;
+    state->dataLoopNodes->Node(5).MassFlowRate = 0.02;
+    state->dataLoopNodes->Node(6).MassFlowRate = 0.015;
+
+    state->dataHeatBal->Zone(1).NoHeatToReturnAir = false;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
+    state->dataZoneEquip->ZoneEquipList.allocate(1);
+
+    CalcZoneLeavingConditions(*state, true);
+    // Zone node temperature is the same as input
+    EXPECT_NEAR(state->dataLoopNodes->Node(1).Temp, 20.0, 0.001);
+    // Return nodes and exhaust node have the same temperature
+    EXPECT_NEAR(state->dataLoopNodes->Node(4).Temp, 21.9866, 0.001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(5).Temp, 22.8381, 0.001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(6).Temp, 24.8248, 0.001);
+    // sum of return node temp diff = exhaust temp diff
+    EXPECT_NEAR(
+        state->dataLoopNodes->Node(4).Temp - 20.0 + state->dataLoopNodes->Node(5).Temp - 20.0, state->dataLoopNodes->Node(6).Temp - 20.0, 0.001);
 }
