@@ -217,7 +217,9 @@ namespace OutputReportPredefined {
 
         s->pdstInLite = newPreDefSubTable(state, s->pdrLighting, "Interior Lighting");
 
+        s->pdchInLtZone = newPreDefColumn(state, s->pdstInLite, "Zone Name");
         s->pdchInLtSpace = newPreDefColumn(state, s->pdstInLite, "Space Name");
+        s->pdchInLtSpaceType = newPreDefColumn(state, s->pdstInLite, "Space Type");
         s->pdchInLtDens = newPreDefColumn(state, s->pdstInLite, "Lighting Power Density [W/m2]");
         s->pdchInLtArea = newPreDefColumn(state, s->pdstInLite, "Space Area [m2]");
         s->pdchInLtPower = newPreDefColumn(state, s->pdstInLite, "Total Power [W]");

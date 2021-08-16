@@ -1397,7 +1397,9 @@ namespace InternalHeatGains {
                 Real64 spaceArea = state.dataHeatBal->space(spaceNum).floorArea;
                 state.dataInternalHeatGains->sumArea += spaceArea * mult;
                 state.dataInternalHeatGains->sumPower += state.dataHeatBal->Lights(lightsNum).DesignLevel * mult;
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtZone, liteName, state.dataHeatBal->Zone(zoneNum).Name);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtSpace, liteName, state.dataHeatBal->space(spaceNum).Name);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtSpaceType, liteName, state.dataHeatBal->space(spaceNum).spaceType);
                 if (spaceArea > 0.0) {
                     PreDefTableEntry(
                         state, state.dataOutRptPredefined->pdchInLtDens, liteName, state.dataHeatBal->Lights(lightsNum).DesignLevel / spaceArea, 4);
