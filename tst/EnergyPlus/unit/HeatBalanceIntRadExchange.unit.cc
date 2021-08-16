@@ -797,10 +797,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_ViewFactorAngleLimitTest)
     state->dataSurface->Surface(4).Class = DataSurfaces::SurfaceClass::Roof;
     state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth(4) = 0;
     state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Tilt(4) = 0;
-    // additional floor
+    // additional floor with different tilt and azimuth
     state->dataSurface->Surface(5).Class = DataSurfaces::SurfaceClass::Floor;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth(5) = 0;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Tilt(5) = 180;
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth(5) = 90;
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Tilt(5) = 270;
     // additional wall with slight difference in azimuth
     state->dataSurface->Surface(6).Class = DataSurfaces::SurfaceClass::Wall;
     state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth(6) = 358;
@@ -827,7 +827,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_ViewFactorAngleLimitTest)
     EXPECT_EQ(F(6, 6), 0.0);
     EXPECT_EQ(F(7, 7), 0.0);
 
-    // two floors should NOT see each other, no view factor
+    // two floors should NOT see each other, even with difference azimuths (0 and 90) and tilts (180 and 270), no view factor
     EXPECT_EQ(F(3, 5), 0.0);
     EXPECT_EQ(F(5, 3), 0.0);
 
@@ -849,6 +849,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_ViewFactorAngleLimitTest)
     // all floors see ceilings/roofs and result in a view factor
     EXPECT_GT(F(4, 3), 0.0);
     EXPECT_GT(F(4, 5), 0.0);
+    EXPECT_GT(F(3, 4), 0.0);
+    EXPECT_GT(F(5, 4), 0.0);
 
     // two walls should see each other and result in a view factor
     EXPECT_GT(F(1, 2), 0.0);

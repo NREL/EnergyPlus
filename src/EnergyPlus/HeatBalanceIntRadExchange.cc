@@ -1403,34 +1403,26 @@ namespace HeatBalanceIntRadExchange {
 
         int i; // DO loop counters for surfaces in the zone
         int j;
-        Array1D<Real64> ZoneArea;    // Sum of the area of all zone surfaces seen
-        Array1D<Real64> BackAzimuth; // Back azimuth of surface
+        Array1D<Real64> ZoneArea; // Sum of the area of all zone surfaces seen
 
         // Calculate the sum of the areas seen by all zone surfaces
         ZoneArea.dimension(N, 0.0);
-        BackAzimuth.dimension(N, 0.0);
         for (i = 1; i <= N; ++i) {
             for (j = 1; j <= N; ++j) {
-                // Assumption is that a surface cannot see itself or any other surface
-                // that is facing the same direction (has the same azimuth)
-                //  Modified to use Class of surface to permit INTMASS to be seen by all surfaces,
-                //  FLOOR to be seen by all except other floors, and ROOF and CEILING by all.
-                //  Skip same surface
-                if (i == j) continue;
-                //  Include INTMASS, FLOOR(for others), CEILING, ROOF and different facing surfaces.
-                //  Roofs/ceilings always see floors
-                //  ADD CHECK FOR FLOOR SURFACE
-                BackAzimuth(i) = (Azimuth(i) < 180) ? (Azimuth(i) + 180) : (Azimuth(i) - 180);
-                BackAzimuth(j) = (Azimuth(j) < 180) ? (Azimuth(j) + 180) : (Azimuth(j) - 180);
+                //  No surface sees itself and no floor sees another floor
+                if (i == j || (state.dataSurface->Surface(SPtr(j)).Class == SurfaceClass::Floor &&
+                               state.dataSurface->Surface(SPtr(i)).Class == SurfaceClass::Floor))
+                    continue;
+                // All surface types see internal mass
+                // All surface types see floors
+                // Floors always see ceilings/roofs
+                // All other surfaces whose tilt or facing angle differences are greater than 10 degrees see each other
                 if ((state.dataSurface->Surface(SPtr(j)).Class == SurfaceClass::IntMass) ||
-                    (state.dataSurface->Surface(SPtr(j)).Class == SurfaceClass::Floor &&
-                     state.dataSurface->Surface(SPtr(i)).Class != SurfaceClass::Floor) ||
+                    (state.dataSurface->Surface(SPtr(j)).Class == SurfaceClass::Floor) ||
                     (state.dataSurface->Surface(SPtr(j)).Class == SurfaceClass::Roof &&
                      state.dataSurface->Surface(SPtr(i)).Class == SurfaceClass::Floor) ||
-                    (((std::abs(Azimuth(i) - Azimuth(j)) > SameAngleLimit) && (std::abs(BackAzimuth(i) - BackAzimuth(j)) > SameAngleLimit)) ||
-                     (std::abs(Tilt(i) - Tilt(j)) >
-                      SameAngleLimit))) { // Everything sees internal mass surfaces | Everything except other floors sees floors
-
+                    (std::abs(Azimuth(i) - Azimuth(j)) > SameAngleLimit && std::abs(Azimuth(i) - Azimuth(j)) < 360.0 - SameAngleLimit) ||
+                    (std::abs(Tilt(i) - Tilt(j)) > SameAngleLimit)) {
                     ZoneArea(i) += A(j);
                 }
             }
@@ -1450,25 +1442,24 @@ namespace HeatBalanceIntRadExchange {
         // allow that the sum of all view factors from the original surface to all other
         // surfaces will equal unity.  F(I,J)=0 if I=J or if the surfaces face the same
         // direction.
-        //  Modified to use Class of surface to permit INTMASS to be seen by all surfaces,
-        //  FLOOR to be seen by all except other floors, and ROOF and CEILING by all.
-        // The second IF statement is intended to avoid a divide by zero if
-        // there are no other surfaces in the zone that can be seen.
         F = 0.0;
         for (i = 1; i <= N; ++i) {
             for (j = 1; j <= N; ++j) {
-
-                //  Skip same surface
-
-                if (i == j) continue;
-                //  Include INTMASS, FLOOR(for others), CEILING/ROOF  and different facing surfaces.
+                //  No surface sees itself and no floor sees another floor
+                if (i == j || (state.dataSurface->Surface(SPtr(j)).Class == SurfaceClass::Floor &&
+                               state.dataSurface->Surface(SPtr(i)).Class == SurfaceClass::Floor))
+                    continue;
+                // All surface types see internal mass
+                // All surface types see floors
+                // Floors always see ceilings/roofs
+                // All other surfaces whose tilt or facing angle differences are greater than 10 degrees see each other
                 if ((state.dataSurface->Surface(SPtr(j)).Class == SurfaceClass::IntMass) ||
-                    (state.dataSurface->Surface(SPtr(j)).Class == SurfaceClass::Floor &&
-                     state.dataSurface->Surface(SPtr(i)).Class != SurfaceClass::Floor) ||
+                    (state.dataSurface->Surface(SPtr(j)).Class == SurfaceClass::Floor) ||
                     (state.dataSurface->Surface(SPtr(j)).Class == SurfaceClass::Roof &&
                      state.dataSurface->Surface(SPtr(i)).Class == SurfaceClass::Floor) ||
-                    (((std::abs(Azimuth(i) - Azimuth(j)) > SameAngleLimit) && (std::abs(BackAzimuth(i) - BackAzimuth(j)) > SameAngleLimit)) ||
-                     (std::abs(Tilt(i) - Tilt(j)) > SameAngleLimit))) {
+                    (std::abs(Azimuth(i) - Azimuth(j)) > SameAngleLimit && std::abs(Azimuth(i) - Azimuth(j)) < 360.0 - SameAngleLimit) ||
+                    (std::abs(Tilt(i) - Tilt(j)) > SameAngleLimit)) {
+                    // avoid a divide by zero if there are no other surfaces in the zone that can be seen
                     if (ZoneArea(i) > 0.0) F(j, i) = A(j) / (ZoneArea(i));
                 }
             }
