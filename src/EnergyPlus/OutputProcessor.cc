@@ -1981,6 +1981,8 @@ namespace OutputProcessor {
                     if (Found != 0) {
                         ++op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters;
                         op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
+
+                        addEndUseSpaceType(state, ResourceType, EndUse, SpaceType);
                     }
                 }
             }
@@ -3862,10 +3864,7 @@ namespace OutputProcessor {
     // End of routines for Energy Meters implementation in EnergyPlus.
     // *****************************************************************************
 
-    void AddEndUseSubcategory(EnergyPlusData &state,
-                              [[maybe_unused]] std::string const &ResourceName,
-                              std::string const &EndUseName,
-                              std::string const &EndUseSubName)
+    void AddEndUseSubcategory(EnergyPlusData &state, std::string const &ResourceName, std::string const &EndUseName, std::string const &EndUseSubName)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3914,6 +3913,46 @@ namespace OutputProcessor {
 
         if (!Found) {
             ShowSevereError(state, "Nonexistent end use passed to AddEndUseSubcategory=" + EndUseName);
+        }
+    }
+    void
+    addEndUseSpaceType(EnergyPlusData &state, std::string const &ResourceName, std::string const &EndUseName, std::string const &EndUseSpaceTypeName)
+    {
+
+        auto &op(state.dataOutputProcessor);
+
+        bool Found = false;
+        for (size_t EndUseNum = 1; EndUseNum <= state.dataGlobalConst->iEndUse.size(); ++EndUseNum) {
+            if (UtilityRoutines::SameString(op->EndUseCategory(EndUseNum).Name, EndUseName)) {
+
+                for (int endUseSpTypeNum = 1; endUseSpTypeNum <= op->EndUseCategory(EndUseNum).numSpaceTypes; ++endUseSpTypeNum) {
+                    if (UtilityRoutines::SameString(op->EndUseCategory(EndUseNum).spaceTypeName(endUseSpTypeNum), EndUseSpaceTypeName)) {
+                        // Space type already exists, no further action required
+                        Found = true;
+                        break;
+                    }
+                }
+
+                if (!Found) {
+                    // Add the space type by reallocating the array
+                    int numSpTypes = op->EndUseCategory(EndUseNum).numSpaceTypes;
+                    op->EndUseCategory(EndUseNum).spaceTypeName.redimension(numSpTypes + 1);
+
+                    op->EndUseCategory(EndUseNum).numSpaceTypes = numSpTypes + 1;
+                    op->EndUseCategory(EndUseNum).spaceTypeName(numSpTypes + 1) = EndUseSpaceTypeName;
+
+                    if (op->EndUseCategory(EndUseNum).numSpaceTypes > op->maxNumEndUseSpaceTypes) {
+                        op->maxNumEndUseSpaceTypes = op->EndUseCategory(EndUseNum).numSpaceTypes;
+                    }
+
+                    Found = true;
+                }
+                break;
+            }
+        }
+
+        if (!Found) {
+            ShowSevereError(state, "Nonexistent end use passed to addEndUseSpaceType=" + EndUseName);
         }
     }
     void WriteTimeStampFormatData(

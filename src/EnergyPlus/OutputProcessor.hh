@@ -564,13 +564,10 @@ namespace OutputProcessor {
         // Members
         std::string Name;        // End use category name
         std::string DisplayName; // Display name for output table
-        int NumSubcategories;
+        int NumSubcategories = 0;
         Array1D_string SubcategoryName; // Array of subcategory names
-
-        // Default Constructor
-        EndUseCategoryType() : NumSubcategories(0)
-        {
-        }
+        int numSpaceTypes = 0;
+        Array1D_string spaceTypeName; // Array of space type names
     };
 
     void InitializeOutput(EnergyPlusData &state);
@@ -748,6 +745,9 @@ namespace OutputProcessor {
 
     void
     AddEndUseSubcategory(EnergyPlusData &state, std::string const &ResourceName, std::string const &EndUseName, std::string const &EndUseSubName);
+
+    void
+    addEndUseSpaceType(EnergyPlusData &state, std::string const &ResourceName, std::string const &EndUseName, std::string const &EndUseSpTypeName);
 
     void WriteTimeStampFormatData(EnergyPlusData &state,
                                   InputOutputFile &outputFile,
@@ -1087,6 +1087,7 @@ struct OutputProcessorData : BaseGlobalStruct
     Real64 TimeStepZoneSec = 0;              // Seconds from NumTimeStepInHour
     bool ErrorsLogged = false;
     int MaxNumSubcategories = 1;
+    int maxNumEndUseSpaceTypes = 1;
     bool isFinalYear = false;
     bool GetOutputInputFlag = true;
     OutputProcessor::ReportingFrequency minimumReportFrequency = OutputProcessor::ReportingFrequency::EachCall;
@@ -1183,6 +1184,7 @@ struct OutputProcessorData : BaseGlobalStruct
         this->TimeStepZoneSec = 0;
         this->ErrorsLogged = false;
         this->MaxNumSubcategories = 1;
+        this->maxNumEndUseSpaceTypes = 1;
         this->isFinalYear = false;
         this->GetOutputInputFlag = true;
         this->minimumReportFrequency = OutputProcessor::ReportingFrequency::EachCall;

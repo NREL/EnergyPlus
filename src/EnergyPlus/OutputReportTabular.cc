@@ -1765,7 +1765,18 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
 
         // End use subs must be dynamically allocated to accomodate the end use with the most subcategories
         ort->meterNumEndUseSubBEPS.allocate(state.dataOutputProcessor->MaxNumSubcategories, state.dataGlobalConst->iEndUse.size(), numResourceTypes);
-        ort->meterNumEndUseSubBEPS = 0;
+        ort->meterNumEndUseSpTypeBEPS.allocate(
+            state.dataOutputProcessor->maxNumEndUseSpaceTypes, state.dataGlobalConst->iEndUse.size(), numResourceTypes);
+        for (int endUse = 1; endUse <= state.dataGlobalConst->iEndUse.size(); ++endUse) {
+            for (int resType = 1; resType <= numResourceTypes; ++resType) {
+                for (int subCat = 1; subCat <= state.dataOutputProcessor->MaxNumSubcategories; ++subCat) {
+                    ort->meterNumEndUseSubBEPS(subCat, endUse, resType) = 0;
+                }
+                for (int spType = 1; spType <= state.dataOutputProcessor->maxNumEndUseSpaceTypes; ++spType) {
+                    ort->meterNumEndUseSpTypeBEPS(spType, endUse, resType) = 0;
+                }
+            }
+        }
 
         // loop through all of the resources and end uses and sub end uses for the entire facility
         for (iResource = 1; iResource <= numResourceTypes; ++iResource) {
@@ -1783,6 +1794,12 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
                                 ':' + ort->resourceTypeNames(iResource);
                     meterNumber = GetMeterIndex(state, meterName);
                     ort->meterNumEndUseSubBEPS(kEndUseSub, jEndUse, iResource) = meterNumber;
+                }
+                for (int kEndUseSpType = 1; kEndUseSpType <= state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes; ++kEndUseSpType) {
+                    meterName = ort->endUseNames(jEndUse) + ':' + ort->resourceTypeNames(iResource) +
+                                ":SpaceType:" + state.dataOutputProcessor->EndUseCategory(jEndUse).spaceTypeName(kEndUseSpType);
+                    meterNumber = GetMeterIndex(state, meterName);
+                    ort->meterNumEndUseSpTypeBEPS(kEndUseSpType, jEndUse, iResource) = meterNumber;
                 }
             }
         }
@@ -1802,6 +1819,9 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
         // End use subs must be dynamically allocated to accommodate the end use with the most subcategories
         ort->gatherEndUseSubBEPS.allocate(state.dataOutputProcessor->MaxNumSubcategories, state.dataGlobalConst->iEndUse.size(), numResourceTypes);
         ort->gatherEndUseSubBEPS = 0.0;
+        ort->gatherEndUseSpTypeBEPS.allocate(
+            state.dataOutputProcessor->maxNumEndUseSpaceTypes, state.dataGlobalConst->iEndUse.size(), numResourceTypes);
+        ort->gatherEndUseSpTypeBEPS = 0.0;
         ort->gatherDemandEndUseSub.allocate(state.dataOutputProcessor->MaxNumSubcategories, state.dataGlobalConst->iEndUse.size(), numResourceTypes);
         ort->gatherDemandEndUseSub = 0.0;
         ort->gatherDemandIndEndUseSub.allocate(
@@ -3883,31 +3903,10 @@ void GatherBEPSResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeSt
     //          DistrictCooling
     //          DistrictHeating
 
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
     using DataStringGlobals::CharComma;
     using DataStringGlobals::CharSpace;
     using DataStringGlobals::CharTab;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int iResource;
-    int kEndUseSub;
-    Real64 curMeterValue;
-    int curMeterNumber;
     auto &ort(state.dataOutRptTab);
 
     // if no beps report is called then skip
@@ -3926,35 +3925,42 @@ void GatherBEPSResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeSt
         //  END DO
 
         // loop through all of the resources and end uses for the entire facility
-        for (iResource = 1; iResource <= numResourceTypes; ++iResource) {
-            curMeterNumber = ort->meterNumTotalsBEPS(iResource);
-            if (curMeterNumber > 0) {
-                curMeterValue = GetCurrentMeterValue(state, curMeterNumber);
-                ort->gatherTotalsBEPS(iResource) += curMeterValue;
+        for (int iResource = 1; iResource <= numResourceTypes; ++iResource) {
+            int curResMeterNumber = ort->meterNumTotalsBEPS(iResource);
+            if (curResMeterNumber > 0) {
+                Real64 curResMeterValue = GetCurrentMeterValue(state, curResMeterNumber);
+                ort->gatherTotalsBEPS(iResource) += curResMeterValue;
             }
 
             for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
-                curMeterNumber = ort->meterNumEndUseBEPS(iResource, jEndUse);
-                if (curMeterNumber > 0) {
-                    curMeterValue = GetCurrentMeterValue(state, curMeterNumber);
-                    ort->gatherEndUseBEPS(iResource, jEndUse) += curMeterValue;
+                int curEndUseMeterNumber = ort->meterNumEndUseBEPS(iResource, jEndUse);
+                if (curEndUseMeterNumber > 0) {
+                    Real64 curEndUseMeterValue = GetCurrentMeterValue(state, curEndUseMeterNumber);
+                    ort->gatherEndUseBEPS(iResource, jEndUse) += curEndUseMeterValue;
 
-                    for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                        curMeterNumber = ort->meterNumEndUseSubBEPS(kEndUseSub, jEndUse, iResource);
-                        if (curMeterNumber > 0) {
-                            curMeterValue = GetCurrentMeterValue(state, curMeterNumber);
-                            ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, iResource) += curMeterValue;
+                    for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                        int curSubMeterNumber = ort->meterNumEndUseSubBEPS(kEndUseSub, jEndUse, iResource);
+                        if (curSubMeterNumber > 0) {
+                            Real64 curSubMeterValue = GetCurrentMeterValue(state, curSubMeterNumber);
+                            ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, iResource) += curSubMeterValue;
+                        }
+                    }
+                    for (int kEndUseSpType = 1; kEndUseSpType <= state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes; ++kEndUseSpType) {
+                        int curSpTypeMeterNumber = ort->meterNumEndUseSpTypeBEPS(kEndUseSpType, jEndUse, iResource);
+                        if (curSpTypeMeterNumber > 0) {
+                            Real64 curSpTypeMeterValue = GetCurrentMeterValue(state, curSpTypeMeterNumber);
+                            ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, iResource) += curSpTypeMeterValue;
                         }
                     }
                 }
             }
         }
 
-        for (iResource = 1; iResource <= numSourceTypes; ++iResource) {
-            curMeterNumber = ort->meterNumTotalsSource(iResource);
-            if (curMeterNumber > 0) {
-                curMeterValue = GetCurrentMeterValue(state, curMeterNumber);
-                ort->gatherTotalsSource(iResource) += curMeterValue;
+        for (int iResource = 1; iResource <= numSourceTypes; ++iResource) {
+            int curResMeterNumber = ort->meterNumTotalsSource(iResource);
+            if (curResMeterNumber > 0) {
+                Real64 curResMeterValue = GetCurrentMeterValue(state, curResMeterNumber);
+                ort->gatherTotalsSource(iResource) += curResMeterValue;
             }
         }
 
@@ -7739,7 +7745,6 @@ void WriteBEPSTable(EnergyPlusData &state)
     //       DATE WRITTEN   November 2003
     //       MODIFIED       January 2010, Kyle Benne; Added SQLite output
     //                      March 2020, Dareum Nam; Disaggregated "Additional Fuel"
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     //   Take the gathered total and enduse meter data and structure
@@ -7753,18 +7758,6 @@ void WriteBEPSTable(EnergyPlusData &state)
     //   that will split up very long header lines for the fixed width
     //   table is the header rows.
 
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-    using DataWater::StorageTankDataStruct;
-    using ScheduleManager::GetScheduleName;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // na
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
     int const colElectricity(1);
     int const colGas(2);
     int const colPurchCool(11);
@@ -7772,14 +7765,6 @@ void WriteBEPSTable(EnergyPlusData &state)
 
     Real64 const SmallValue(1.e-14);
     auto &ort(state.dataOutRptTab);
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     // all arrays are in the format: (row, column)
     Array1D_string columnHead;
@@ -7794,6 +7779,7 @@ void WriteBEPSTable(EnergyPlusData &state)
     Array2D<Real64> collapsedEndUse(13, state.dataGlobalConst->iEndUse.size());
     Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, state.dataGlobalConst->iEndUse.size(), 13);
     Array2D<Real64> endUseSubOther(13, state.dataGlobalConst->iEndUse.size());
+    Array3D<Real64> collapsedEndUseSpType(state.dataOutputProcessor->maxNumEndUseSpaceTypes, state.dataGlobalConst->iEndUse.size(), 13);
     Real64 totalOnsiteHeat;
     Real64 totalOnsiteWater;
     Real64 totalWater;
@@ -7804,11 +7790,9 @@ void WriteBEPSTable(EnergyPlusData &state)
     Real64 netSourceEnergyUse;
     Real64 netSourceElecPurchasedSold;
     int iResource;
-    int kEndUseSub;
     int i;
     Real64 largeConversionFactor;
     Real64 kConversionFactor;
-    int numRows;
     Real64 initialStorage;
     Real64 finalStorage;
     Real64 StorageChange;
@@ -7930,7 +7914,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 }
             }
             for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
-                for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                     collapsedEndUseSub(kEndUseSub, jEndUse, 1) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 1);   // electricity
                     collapsedEndUseSub(kEndUseSub, jEndUse, 2) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 2);   // natural gas
                     collapsedEndUseSub(kEndUseSub, jEndUse, 3) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 6);   // gasoline
@@ -7948,8 +7932,26 @@ void WriteBEPSTable(EnergyPlusData &state)
                         ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 5); // district heating <- purch heating | <- steam
                     collapsedEndUseSub(kEndUseSub, jEndUse, 13) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 7); // water
                 }
-            }
 
+                for (int kEndUseSpType = 1; kEndUseSpType <= state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes; ++kEndUseSpType) {
+                    collapsedEndUseSpType(kEndUseSpType, jEndUse, 1) = ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 1);   // electricity
+                    collapsedEndUseSpType(kEndUseSpType, jEndUse, 2) = ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 2);   // natural gas
+                    collapsedEndUseSpType(kEndUseSpType, jEndUse, 3) = ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 6);   // gasoline
+                    collapsedEndUseSpType(kEndUseSpType, jEndUse, 4) = ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 8);   // diesel
+                    collapsedEndUseSpType(kEndUseSpType, jEndUse, 5) = ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 9);   // coal
+                    collapsedEndUseSpType(kEndUseSpType, jEndUse, 6) = ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 10);  // Fuel Oil No1
+                    collapsedEndUseSpType(kEndUseSpType, jEndUse, 7) = ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 11);  // Fuel Oil No2
+                    collapsedEndUseSpType(kEndUseSpType, jEndUse, 8) = ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 12);  // propane
+                    collapsedEndUseSpType(kEndUseSpType, jEndUse, 9) = ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 13);  // otherfuel1
+                    collapsedEndUseSpType(kEndUseSpType, jEndUse, 10) = ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 14); // otherfuel2
+                    collapsedEndUseSpType(kEndUseSpType, jEndUse, 11) =
+                        ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 3); // district cooling <- purch cooling
+                    collapsedEndUseSpType(kEndUseSpType, jEndUse, 12) =
+                        ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 4) +
+                        ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 5); // district heating <- purch heating | <- steam
+                    collapsedEndUseSpType(kEndUseSpType, jEndUse, 13) = ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 7); // water
+                }
+            }
             // unit conversion - all values are used as divisors
             {
                 auto const SELECT_CASE_var(unitsStyle_cur);
@@ -7979,8 +7981,11 @@ void WriteBEPSTable(EnergyPlusData &state)
             for (iResource = 1; iResource <= 12; ++iResource) { // don't do water
                 for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     collapsedEndUse(iResource, jEndUse) /= largeConversionFactor;
-                    for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                    for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                         collapsedEndUseSub(kEndUseSub, jEndUse, iResource) /= largeConversionFactor;
+                    }
+                    for (int kEndUseSpType = 1; kEndUseSpType <= state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes; ++kEndUseSpType) {
+                        collapsedEndUseSpType(kEndUseSpType, jEndUse, iResource) /= largeConversionFactor;
                     }
                 }
                 collapsedTotal(iResource) /= largeConversionFactor;
@@ -7988,8 +7993,11 @@ void WriteBEPSTable(EnergyPlusData &state)
             // do water
             for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                 collapsedEndUse(13, jEndUse) /= waterConversionFactor;
-                for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                     collapsedEndUseSub(kEndUseSub, jEndUse, 13) /= waterConversionFactor;
+                }
+                for (int kEndUseSpType = 1; kEndUseSpType <= state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes; ++kEndUseSpType) {
+                    collapsedEndUseSpType(kEndUseSpType, jEndUse, 13) /= waterConversionFactor;
                 }
             }
 
@@ -8328,7 +8336,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 tableBody(1, 1) = RealToStr(ort->sourceFactorElectric, 3);
             } else if (ort->gatherTotalsBEPS(1) > SmallValue) {
                 tableBody(1, 1) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(1) / ort->gatherTotalsBEPS(1), 3) +
-                                  " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(1)) + "\")";
+                                  " (calculated using schedule \"" + ScheduleManager::GetScheduleName(state, ort->ffSchedIndex(1)) + "\")";
             } else {
                 tableBody(1, 1) = "N/A";
             }
@@ -8337,7 +8345,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 tableBody(1, 2) = RealToStr(ort->sourceFactorNaturalGas, 3);
             } else if (ort->gatherTotalsBEPS(2) > SmallValue) {
                 tableBody(1, 2) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(2) / ort->gatherTotalsBEPS(2), 3) +
-                                  " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(2)) + "\")";
+                                  " (calculated using schedule \"" + ScheduleManager::GetScheduleName(state, ort->ffSchedIndex(2)) + "\")";
             } else {
                 tableBody(1, 2) = "N/A";
             }
@@ -8352,7 +8360,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 tableBody(1, 6) = RealToStr(ort->sourceFactorGasoline, 3);
             } else if (ort->gatherTotalsBEPS(6) > SmallValue) {
                 tableBody(1, 6) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(6) / ort->gatherTotalsBEPS(6), 3) +
-                                  " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(6)) + "\")";
+                                  " (calculated using schedule \"" + ScheduleManager::GetScheduleName(state, ort->ffSchedIndex(6)) + "\")";
             } else {
                 tableBody(1, 6) = "N/A";
             }
@@ -8361,7 +8369,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 tableBody(1, 7) = RealToStr(ort->sourceFactorDiesel, 3);
             } else if (ort->gatherTotalsBEPS(8) > SmallValue) {
                 tableBody(1, 7) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(8) / ort->gatherTotalsBEPS(8), 3) +
-                                  " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(8)) + "\")";
+                                  " (calculated using schedule \"" + ScheduleManager::GetScheduleName(state, ort->ffSchedIndex(8)) + "\")";
             } else {
                 tableBody(1, 7) = "N/A";
             }
@@ -8370,7 +8378,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 tableBody(1, 8) = RealToStr(ort->sourceFactorCoal, 3);
             } else if (ort->gatherTotalsBEPS(9) > SmallValue) {
                 tableBody(1, 8) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(9) / ort->gatherTotalsBEPS(9), 3) +
-                                  " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(9)) + "\")";
+                                  " (calculated using schedule \"" + ScheduleManager::GetScheduleName(state, ort->ffSchedIndex(9)) + "\")";
             } else {
                 tableBody(1, 8) = "N/A";
             }
@@ -8379,7 +8387,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 tableBody(1, 9) = RealToStr(ort->sourceFactorFuelOil1, 3);
             } else if (ort->gatherTotalsBEPS(10) > SmallValue) {
                 tableBody(1, 9) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(10) / ort->gatherTotalsBEPS(10), 3) +
-                                  " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(10)) + "\")";
+                                  " (calculated using schedule \"" + ScheduleManager::GetScheduleName(state, ort->ffSchedIndex(10)) + "\")";
             } else {
                 tableBody(1, 9) = "N/A";
             }
@@ -8388,7 +8396,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 tableBody(1, 10) = RealToStr(ort->sourceFactorFuelOil2, 3);
             } else if (ort->gatherTotalsBEPS(11) > SmallValue) {
                 tableBody(1, 10) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(11) / ort->gatherTotalsBEPS(11), 3) +
-                                   " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(11)) + "\")";
+                                   " (calculated using schedule \"" + ScheduleManager::GetScheduleName(state, ort->ffSchedIndex(11)) + "\")";
             } else {
                 tableBody(1, 10) = "N/A";
             }
@@ -8397,7 +8405,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 tableBody(1, 11) = RealToStr(ort->sourceFactorPropane, 3);
             } else if (ort->gatherTotalsBEPS(12) > SmallValue) {
                 tableBody(1, 11) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(12) / ort->gatherTotalsBEPS(12), 3) +
-                                   " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(12)) + "\")";
+                                   " (calculated using schedule \"" + ScheduleManager::GetScheduleName(state, ort->ffSchedIndex(12)) + "\")";
             } else {
                 tableBody(1, 11) = "N/A";
             }
@@ -8406,7 +8414,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 tableBody(1, 12) = RealToStr(ort->sourceFactorOtherFuel1, 3);
             } else if (ort->gatherTotalsBEPS(13) > SmallValue) {
                 tableBody(1, 12) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(13) / ort->gatherTotalsBEPS(13), 3) +
-                                   " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(13)) + "\")";
+                                   " (calculated using schedule \"" + ScheduleManager::GetScheduleName(state, ort->ffSchedIndex(13)) + "\")";
             } else {
                 tableBody(1, 12) = "N/A";
             }
@@ -8415,7 +8423,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 tableBody(1, 13) = RealToStr(ort->sourceFactorOtherFuel2, 3);
             } else if (ort->gatherTotalsBEPS(14) > SmallValue) {
                 tableBody(1, 13) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(14) / ort->gatherTotalsBEPS(14), 3) +
-                                   " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(14)) + "\")";
+                                   " (calculated using schedule \"" + ScheduleManager::GetScheduleName(state, ort->ffSchedIndex(14)) + "\")";
             } else {
                 tableBody(1, 13) = "N/A";
             }
@@ -8897,187 +8905,25 @@ void WriteBEPSTable(EnergyPlusData &state)
             }
 
             //---- End Uses By Subcategory Sub-Table
+            writeBEPSEndUseBySubCatOrSpaceType(state,
+                                               endUseSubTableType::bySubCategory,
+                                               endUseSubOther,
+                                               collapsedEndUse,
+                                               collapsedEndUseSub,
+                                               ort->needOtherRowLEED45,
+                                               unitsStyle_cur,
+                                               produceTabular,
+                                               produceSQLite);
 
-            // determine if subcategories add up to the total and
-            // if not, determine the difference for the 'other' row
-            ort->needOtherRowLEED45 = false; // set array to all false assuming no other rows are needed
-            for (iResource = 1; iResource <= 13; ++iResource) {
-                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
-                    if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
-                        // set the value to the total for the end use
-                        endUseSubOther(iResource, jEndUse) = collapsedEndUse(iResource, jEndUse);
-                        // subtract off each sub end use category value
-                        for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                            endUseSubOther(iResource, jEndUse) -= collapsedEndUseSub(kEndUseSub, jEndUse, iResource);
-                        }
-                        // if just a small value remains set it to zero
-                        if (std::abs(endUseSubOther(iResource, jEndUse)) > 0.01) {
-                            ort->needOtherRowLEED45(jEndUse) = true;
-                        } else {
-                            endUseSubOther(iResource, jEndUse) = 0.0;
-                        }
-                    } else {
-                        endUseSubOther(iResource, jEndUse) = 0.0;
-                    }
-                }
-            }
-
-            // determine the number of rows needed for sub-table
-            numRows = 0;
-            for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
-                if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
-                    for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                        ++numRows;
-                    }
-                    // check if an 'other' row is needed
-                    if (ort->needOtherRowLEED45(jEndUse)) {
-                        ++numRows;
-                    }
-                } else {
-                    ++numRows;
-                }
-            }
-
-            rowHead.allocate(numRows);
-            columnHead.allocate(14);
-            columnWidth.allocate(14);
-            columnWidth = 10;                // array assignment - same for all columns
-            tableBody.allocate(14, numRows); // TODO: this appears to be (column, row)...
-            rowHead = "";
-            tableBody = "";
-
-            // Build row head and subcategories columns
-            i = 1;
-            for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
-                rowHead(i) = state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName;
-                if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
-                    for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                        tableBody(1, i) = state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub);
-                        ++i;
-                    }
-                    // check if an 'other' row is needed
-                    if (ort->needOtherRowLEED45(jEndUse)) {
-                        tableBody(1, i) = "Other";
-                        ++i;
-                    }
-                } else {
-                    tableBody(1, i) = "General";
-                    ++i;
-                }
-            }
-
-            columnHead(1) = "Subcategory";
-
-            {
-                auto const SELECT_CASE_var(unitsStyle_cur);
-                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
-                    columnHead(2) = "Electricity [kWh]";
-                    columnHead(3) = "Natural Gas [kWh]";
-                    columnHead(4) = "Gasoline [kWh]";
-                    columnHead(5) = "Diesel [kWh]";
-                    columnHead(6) = "Coal [kWh]";
-                    columnHead(7) = "Fuel Oil No 1 [kWh]";
-                    columnHead(8) = "Fuel Oil No 2 [kWh]";
-                    columnHead(9) = "Propane [kWh]";
-                    columnHead(10) = "Other Fuel 1 [kWh]";
-                    columnHead(11) = "Other Fuel 2 [kWh]";
-                    columnHead(12) = "District Cooling [kWh]";
-                    columnHead(13) = "District Heating [kWh]";
-                    columnHead(14) = "Water [m3]";
-                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
-                    columnHead(2) = "Electricity [kBtu]";
-                    columnHead(3) = "Natural Gas [kBtu]";
-                    columnHead(4) = "Gasoline [kBtu]";
-                    columnHead(5) = "Diesel [kBtu]";
-                    columnHead(6) = "Coal [kBtu]";
-                    columnHead(7) = "Fuel Oil No 1 [kBtu]";
-                    columnHead(8) = "Fuel Oil No 2 [kBtu]";
-                    columnHead(9) = "Propane [kBtu]";
-                    columnHead(10) = "Other Fuel 1 [kBtu]";
-                    columnHead(11) = "Other Fuel 2 [kBtu]";
-                    columnHead(12) = "District Cooling [kBtu]";
-                    columnHead(13) = "District Heating [kBtu]";
-                    columnHead(14) = "Water [gal]";
-                } else {
-                    columnHead(2) = "Electricity [GJ]";
-                    columnHead(3) = "Natural Gas [GJ]";
-                    columnHead(4) = "Gasoline [GJ]";
-                    columnHead(5) = "Diesel [GJ]";
-                    columnHead(6) = "Coal [GJ]";
-                    columnHead(7) = "Fuel Oil No 1 [GJ]";
-                    columnHead(8) = "Fuel Oil No 2 [GJ]";
-                    columnHead(9) = "Propane [GJ]";
-                    columnHead(10) = "Other Fuel 1 [GJ]";
-                    columnHead(11) = "Other Fuel 2 [GJ]";
-                    columnHead(12) = "District Cooling [GJ]";
-                    columnHead(13) = "District Heating [GJ]";
-                    columnHead(14) = "Water [m3]";
-                }
-            }
-
-            for (iResource = 1; iResource <= 13; ++iResource) {
-                i = 1;
-                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
-                    if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
-                        for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                            tableBody(iResource + 1, i) = RealToStr(collapsedEndUseSub(kEndUseSub, jEndUse, iResource), 2);
-                            ++i;
-                        }
-                        // put other
-                        if (ort->needOtherRowLEED45(jEndUse)) {
-                            tableBody(iResource + 1, i) = RealToStr(endUseSubOther(iResource, jEndUse), 2);
-                            ++i;
-                        }
-                    } else {
-                        tableBody(iResource + 1, i) = RealToStr(collapsedEndUse(iResource, jEndUse), 2);
-                        ++i;
-                    }
-                }
-            }
-
-            // heading for the entire sub-table
-            if (ort->displayTabularBEPS) {
-                if (produceTabular) {
-                    WriteSubtitle(state, "End Uses By Subcategory");
-                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                }
-                Array1D_string rowHeadTemp(rowHead);
-                // Before outputing to SQL, we forward fill the End use column (rowHead)
-                // for better sql queries
-                FillRowHead(rowHeadTemp);
-
-                for (int i = 1; i <= numRows; ++i) {
-                    rowHeadTemp(i) = rowHeadTemp(i) + ":" + tableBody(1, i);
-                }
-
-                // Erase the SubCategory (first column), using slicing
-                Array2D_string tableBodyTemp(tableBody({2, _, _}, {_, _, _}));
-                Array1D_string columnHeadTemp(columnHead({2, _, _}));
-                if (produceSQLite) {
-                    if (state.dataSQLiteProcedures->sqlite) {
-                        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBodyTemp,
-                                                                                           rowHeadTemp,
-                                                                                           columnHeadTemp,
-                                                                                           "AnnualBuildingUtilityPerformanceSummary",
-                                                                                           "Entire Facility",
-                                                                                           "End Uses By Subcategory");
-                    }
-                }
-                if (produceTabular) {
-                    if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                            tableBodyTemp,
-                            rowHeadTemp,
-                            columnHeadTemp,
-                            "Annual Building Utility Performance Summary",
-                            "Entire Facility",
-                            "End Uses By Subcategory");
-                    }
-                }
-                rowHeadTemp.deallocate();
-                tableBodyTemp.deallocate();
-                columnHeadTemp.deallocate();
-            }
+            writeBEPSEndUseBySubCatOrSpaceType(state,
+                                               endUseSubTableType::bySpaceType,
+                                               endUseSubOther,
+                                               collapsedEndUse,
+                                               collapsedEndUseSpType,
+                                               ort->needOtherRowEndUse,
+                                               unitsStyle_cur,
+                                               produceTabular,
+                                               produceSQLite);
 
             // EAp2-4/5. Performance Rating Method Compliance
             // repeat some of the code for the end use subcategory table but only looping over the energy resources and not including water
@@ -9101,7 +8947,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 i = 1;
                 for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
-                        for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                        for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                             if (produceTabular) {
                                 PreDefTableEntry(state,
                                                  resource_entry_map(iResource),
@@ -9561,8 +9407,8 @@ void WriteBEPSTable(EnergyPlusData &state)
             tableBody(1, 4) = RealToStr(totalOnsiteWater / waterConversionFactor, 2);
 
             if (allocated(state.dataWaterData->WaterStorage)) {
-                initialStorage = sum(state.dataWaterData->WaterStorage, &StorageTankDataStruct::InitialVolume);
-                finalStorage = sum(state.dataWaterData->WaterStorage, &StorageTankDataStruct::ThisTimeStepVolume);
+                initialStorage = sum(state.dataWaterData->WaterStorage, &DataWater::StorageTankDataStruct::InitialVolume);
+                finalStorage = sum(state.dataWaterData->WaterStorage, &DataWater::StorageTankDataStruct::ThisTimeStepVolume);
                 StorageChange = initialStorage - finalStorage;
             } else {
                 initialStorage = 0.0;
@@ -9753,6 +9599,242 @@ Real64 WaterConversionFunct(Real64 WaterTotal, Real64 ConversionFactor)
     return WaterTotal / ConversionFactor;
 }
 
+void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
+                                        endUseSubTableType tableType,
+                                        Array2D<Real64> &endUseSubOther,
+                                        Array2D<Real64> &collapsedEndUse,
+                                        Array3D<Real64> &collapsedEndUseSubTable,
+                                        Array1D_bool &needOtherRow,
+                                        const iUnitsStyle unitsStyle_cur,
+                                        const bool produceTabular,
+                                        const bool produceSQLite)
+{
+    auto &ort(state.dataOutRptTab);
+    int numCol = 14;
+    Array1D_string columnHead;
+    Array1D_int columnWidth;
+    columnHead.allocate(numCol);
+    columnWidth.allocate(numCol);
+    for (int col = 1; col <= numCol; ++col) {
+        columnWidth(col) = 10; // array assignment - same for all columns
+    }
+    {
+        auto const SELECT_CASE_var(unitsStyle_cur);
+        if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
+            columnHead(2) = "Electricity [kWh]";
+            columnHead(3) = "Natural Gas [kWh]";
+            columnHead(4) = "Gasoline [kWh]";
+            columnHead(5) = "Diesel [kWh]";
+            columnHead(6) = "Coal [kWh]";
+            columnHead(7) = "Fuel Oil No 1 [kWh]";
+            columnHead(8) = "Fuel Oil No 2 [kWh]";
+            columnHead(9) = "Propane [kWh]";
+            columnHead(10) = "Other Fuel 1 [kWh]";
+            columnHead(11) = "Other Fuel 2 [kWh]";
+            columnHead(12) = "District Cooling [kWh]";
+            columnHead(13) = "District Heating [kWh]";
+            columnHead(14) = "Water [m3]";
+        } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
+            columnHead(2) = "Electricity [kBtu]";
+            columnHead(3) = "Natural Gas [kBtu]";
+            columnHead(4) = "Gasoline [kBtu]";
+            columnHead(5) = "Diesel [kBtu]";
+            columnHead(6) = "Coal [kBtu]";
+            columnHead(7) = "Fuel Oil No 1 [kBtu]";
+            columnHead(8) = "Fuel Oil No 2 [kBtu]";
+            columnHead(9) = "Propane [kBtu]";
+            columnHead(10) = "Other Fuel 1 [kBtu]";
+            columnHead(11) = "Other Fuel 2 [kBtu]";
+            columnHead(12) = "District Cooling [kBtu]";
+            columnHead(13) = "District Heating [kBtu]";
+            columnHead(14) = "Water [gal]";
+        } else {
+            columnHead(2) = "Electricity [GJ]";
+            columnHead(3) = "Natural Gas [GJ]";
+            columnHead(4) = "Gasoline [GJ]";
+            columnHead(5) = "Diesel [GJ]";
+            columnHead(6) = "Coal [GJ]";
+            columnHead(7) = "Fuel Oil No 1 [GJ]";
+            columnHead(8) = "Fuel Oil No 2 [GJ]";
+            columnHead(9) = "Propane [GJ]";
+            columnHead(10) = "Other Fuel 1 [GJ]";
+            columnHead(11) = "Other Fuel 2 [GJ]";
+            columnHead(12) = "District Cooling [GJ]";
+            columnHead(13) = "District Heating [GJ]";
+            columnHead(14) = "Water [m3]";
+        }
+    }
+
+    constexpr int bySpaceType = 2;
+
+    int numEndUses = state.dataGlobalConst->iEndUse.size();
+    int numSubCatOrTypes = 0;
+    int numRows = 0;
+    if (tableType == endUseSubTableType::bySubCategory) {
+        columnHead(1) = "Subcategory";
+    } else if (tableType == endUseSubTableType::bySpaceType) {
+        columnHead(1) = "Space Type";
+    }
+
+    // determine number of rows and if subcategories add up to the total
+    // if not, determine the difference for the 'other' row
+    for (int i = 1; i <= DataGlobalConstantsData::iEndUseSize; ++i) {
+        needOtherRow(i) = false; // set array to all false assuming no other rows are needed
+    }
+    for (int iResource = 1; iResource <= 13; ++iResource) {
+        for (int jEndUse = 1; jEndUse <= numEndUses; ++jEndUse) {
+            if (tableType == endUseSubTableType::bySubCategory) {
+                numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories;
+            } else if (tableType == endUseSubTableType::bySpaceType) {
+                numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes;
+            }
+            if (numSubCatOrTypes > 0) {
+                // set the value to the total for the end use
+                endUseSubOther(iResource, jEndUse) = collapsedEndUse(iResource, jEndUse);
+                // subtract off each sub end use category value
+                for (int kEndUseSub = 1; kEndUseSub <= numSubCatOrTypes; ++kEndUseSub) {
+                    endUseSubOther(iResource, jEndUse) -= collapsedEndUseSubTable(kEndUseSub, jEndUse, iResource);
+                }
+                // if just a small value remains set it to zero
+                if (std::abs(endUseSubOther(iResource, jEndUse)) > 0.01) {
+                    needOtherRow(jEndUse) = true;
+                } else {
+                    endUseSubOther(iResource, jEndUse) = 0.0;
+                }
+            } else {
+                endUseSubOther(iResource, jEndUse) = 0.0;
+            }
+        }
+    }
+
+    for (int jEndUse = 1; jEndUse <= numEndUses; ++jEndUse) {
+        if (tableType == endUseSubTableType::bySubCategory) {
+            numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories;
+        } else if (tableType == endUseSubTableType::bySpaceType) {
+            numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes;
+        }
+        if (numSubCatOrTypes > 0) {
+            for (int kEndUseSub = 1; kEndUseSub <= numSubCatOrTypes; ++kEndUseSub) {
+                ++numRows;
+            }
+            if (needOtherRow(jEndUse)) {
+                ++numRows;
+            }
+        } else {
+            ++numRows;
+        }
+    }
+    // all arrays are in the format: (row, column)
+    Array1D_string rowHead;
+    Array2D_string tableBody;
+    rowHead.allocate(numRows);
+    tableBody.allocate(numCol, numRows); // TODO: this appears to be (column, row)...
+    for (int col = 1; col <= numCol; ++col) {
+        for (int row = 1; row <= numRows; ++row) {
+            rowHead(row) = "";
+            tableBody(col, row) = "";
+        }
+    }
+
+    // Build row head and subcategories columns
+    int i = 1;
+    for (size_t jEndUse = 1; jEndUse <= numEndUses; ++jEndUse) {
+        if (tableType == endUseSubTableType::bySubCategory) {
+            numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories;
+        } else if (tableType == endUseSubTableType::bySpaceType) {
+            numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes;
+        }
+        rowHead(i) = state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName;
+        if (numSubCatOrTypes > 0) {
+            for (int kEndUseSub = 1; kEndUseSub <= numSubCatOrTypes; ++kEndUseSub) {
+                if (tableType == endUseSubTableType::bySubCategory) {
+                    tableBody(1, i) = state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub);
+                } else if (tableType == endUseSubTableType::bySpaceType) {
+                    tableBody(1, i) = state.dataOutputProcessor->EndUseCategory(jEndUse).spaceTypeName(kEndUseSub);
+                }
+                ++i;
+            }
+            // check if an 'other' row is needed
+            if (needOtherRow(jEndUse)) {
+                tableBody(1, i) = "Other";
+                ++i;
+            }
+        } else {
+            if (tableType == endUseSubTableType::bySubCategory) {
+                tableBody(1, i) = "General";
+            } else if (tableType == endUseSubTableType::bySpaceType) {
+                tableBody(1, i) = "Unassigned";
+            }
+            ++i;
+        }
+    }
+
+    for (int iResource = 1; iResource <= 13; ++iResource) {
+        i = 1;
+        for (size_t jEndUse = 1; jEndUse <= numEndUses; ++jEndUse) {
+            if (tableType == endUseSubTableType::bySubCategory) {
+                numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories;
+            } else if (tableType == endUseSubTableType::bySpaceType) {
+                numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes;
+            }
+            if (numSubCatOrTypes > 0) {
+                for (int kEndUseSub = 1; kEndUseSub <= numSubCatOrTypes; ++kEndUseSub) {
+                    tableBody(iResource + 1, i) = RealToStr(collapsedEndUseSubTable(kEndUseSub, jEndUse, iResource), 2);
+                    ++i;
+                }
+                // put other
+                if (needOtherRow(jEndUse)) {
+                    tableBody(iResource + 1, i) = RealToStr(endUseSubOther(iResource, jEndUse), 2);
+                    ++i;
+                }
+            } else {
+                tableBody(iResource + 1, i) = RealToStr(collapsedEndUse(iResource, jEndUse), 2);
+                ++i;
+            }
+        }
+    }
+
+    // heading for the entire sub-table
+    std::string subTableTitle;
+    if (ort->displayTabularBEPS) {
+        if (tableType == endUseSubTableType::bySubCategory) {
+            subTableTitle = "End Uses By Subcategory";
+        } else if (tableType == endUseSubTableType::bySpaceType) {
+            subTableTitle = "End Uses By Space Type";
+        }
+        if (produceTabular) {
+            WriteSubtitle(state, subTableTitle);
+            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+        }
+        Array1D_string rowHeadTemp(rowHead);
+        // Before outputing to SQL, we forward fill the End use column (rowHead)
+        // for better sql queries
+        FillRowHead(rowHeadTemp);
+
+        for (int i = 1; i <= numRows; ++i) {
+            rowHeadTemp(i) = rowHeadTemp(i) + ":" + tableBody(1, i);
+        }
+
+        // Erase the SubCategory (first column), using slicing
+        Array2D_string tableBodyTemp(tableBody({2, _, _}, {_, _, _}));
+        Array1D_string columnHeadTemp(columnHead({2, _, _}));
+        if (produceSQLite) {
+            if (state.dataSQLiteProcedures->sqlite) {
+                state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
+                    tableBodyTemp, rowHeadTemp, columnHeadTemp, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", subTableTitle);
+            }
+        }
+        if (produceTabular) {
+            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+                    tableBodyTemp, rowHeadTemp, columnHeadTemp, "Annual Building Utility Performance Summary", "Entire Facility", subTableTitle);
+            }
+        }
+        rowHeadTemp.deallocate();
+        tableBodyTemp.deallocate();
+        columnHeadTemp.deallocate();
+    }
+}
 void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
