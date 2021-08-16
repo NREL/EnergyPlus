@@ -5766,8 +5766,16 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
             state.dataHeatBal->ZnOpqSurfExtFaceCondLsRepEnrg(ZoneNum) =
                 state.dataHeatBal->ZoneOpaqSurfExtFaceCondLossRep(ZoneNum) * state.dataGlobal->TimeStepZoneSec;
         }
-    } // loop over zones
 
+        // Zone Window Heat Gains
+        if (state.dataHeatBal->ZoneWinHeatGain(ZoneNum) >= 0.0) {
+            state.dataHeatBal->ZoneWinHeatGainRep(ZoneNum) = state.dataHeatBal->ZoneWinHeatGain(ZoneNum);
+            state.dataHeatBal->ZoneWinHeatGainRepEnergy(ZoneNum) = state.dataHeatBal->ZoneWinHeatGainRep(ZoneNum) * state.dataGlobal->TimeStepZoneSec;
+        } else {
+            state.dataHeatBal->ZoneWinHeatLossRep(ZoneNum) = -state.dataHeatBal->ZoneWinHeatGain(ZoneNum);
+            state.dataHeatBal->ZoneWinHeatLossRepEnergy(ZoneNum) = state.dataHeatBal->ZoneWinHeatLossRep(ZoneNum) * state.dataGlobal->TimeStepZoneSec;
+        }
+    } // loop over zones
 }
 
 void ReportIntMovInsInsideSurfTemp(EnergyPlusData &state)
@@ -6575,12 +6583,6 @@ void CalcHeatBalanceInsideSurf(EnergyPlusData &state,
     bool const PartialResimulate(present(ZoneToResimulate));
 
     if (!PartialResimulate) {
-        // Zero window heat gains for all zones
-        state.dataHeatBal->ZoneWinHeatGain = 0.0;
-        state.dataHeatBal->ZoneWinHeatGainRep = 0.0;
-        state.dataHeatBal->ZoneWinHeatGainRepEnergy = 0.0;
-        state.dataHeatBal->ZoneWinHeatLossRep = 0.0;
-        state.dataHeatBal->ZoneWinHeatLossRepEnergy = 0.0;
 
         if (state.dataHeatBal->AllCTF) {
             CalcHeatBalanceInsideSurf2CTFOnly(state, 1, state.dataGlobal->NumOfZones, state.dataSurface->AllIZSurfaceList);
@@ -6591,42 +6593,13 @@ void CalcHeatBalanceInsideSurf(EnergyPlusData &state,
                                        state.dataSurface->AllHTNonWindowSurfaceList,
                                        state.dataSurface->AllHTWindowSurfaceList);
         }
-        // Sort window heat gain/loss
-        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            if (state.dataHeatBal->ZoneWinHeatGain(zoneNum) >= 0.0) {
-                state.dataHeatBal->ZoneWinHeatGainRep(zoneNum) = state.dataHeatBal->ZoneWinHeatGain(zoneNum);
-                state.dataHeatBal->ZoneWinHeatGainRepEnergy(zoneNum) =
-                    state.dataHeatBal->ZoneWinHeatGainRep(zoneNum) * state.dataGlobal->TimeStepZoneSec;
-            } else {
-                state.dataHeatBal->ZoneWinHeatLossRep(zoneNum) = -state.dataHeatBal->ZoneWinHeatGain(zoneNum);
-                state.dataHeatBal->ZoneWinHeatLossRepEnergy(zoneNum) =
-                    state.dataHeatBal->ZoneWinHeatLossRep(zoneNum) * state.dataGlobal->TimeStepZoneSec;
-            }
-        }
     } else {
-        // Zero window heat gains for resimulate zone
-        state.dataHeatBal->ZoneWinHeatGain(ZoneToResimulate) = 0.0;
-        state.dataHeatBal->ZoneWinHeatGainRep(ZoneToResimulate) = 0.0;
-        state.dataHeatBal->ZoneWinHeatGainRepEnergy(ZoneToResimulate) = 0.0;
-        state.dataHeatBal->ZoneWinHeatLossRep(ZoneToResimulate) = 0.0;
-        state.dataHeatBal->ZoneWinHeatLossRepEnergy(ZoneToResimulate) = 0.0;
-
         auto const &zoneHTSurfList(state.dataHeatBal->Zone(ZoneToResimulate).ZoneHTSurfaceList);
         auto const &zoneIZSurfList(state.dataHeatBal->Zone(ZoneToResimulate).ZoneIZSurfaceList);
         auto const &zoneHTNonWindowSurfList(state.dataHeatBal->Zone(ZoneToResimulate).ZoneHTNonWindowSurfaceList);
         auto const &zoneHTWindowSurfList(state.dataHeatBal->Zone(ZoneToResimulate).ZoneHTWindowSurfaceList);
         // Cannot use CalcHeatBalanceInsideSurf2CTFOnly because resimulated zone includes adjacent interzone surfaces
         CalcHeatBalanceInsideSurf2(state, zoneHTSurfList, zoneIZSurfList, zoneHTNonWindowSurfList, zoneHTWindowSurfList, ZoneToResimulate);
-        // Sort window heat gain/loss
-        if (state.dataHeatBal->ZoneWinHeatGain(ZoneToResimulate) >= 0.0) {
-            state.dataHeatBal->ZoneWinHeatGainRep(ZoneToResimulate) = state.dataHeatBal->ZoneWinHeatGain(ZoneToResimulate);
-            state.dataHeatBal->ZoneWinHeatGainRepEnergy(ZoneToResimulate) =
-                state.dataHeatBal->ZoneWinHeatGainRep(ZoneToResimulate) * state.dataGlobal->TimeStepZoneSec;
-        } else {
-            state.dataHeatBal->ZoneWinHeatLossRep(ZoneToResimulate) = -state.dataHeatBal->ZoneWinHeatGain(ZoneToResimulate);
-            state.dataHeatBal->ZoneWinHeatLossRepEnergy(ZoneToResimulate) =
-                state.dataHeatBal->ZoneWinHeatLossRep(ZoneToResimulate) * state.dataGlobal->TimeStepZoneSec;
-        }
     }
 }
 
