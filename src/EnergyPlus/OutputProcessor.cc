@@ -2354,127 +2354,127 @@ namespace OutputProcessor {
         }
     }
 
-    void UpdateMeterValues(EnergyPlusData &state,
-                           Real64 const TimeStepValue, // Value of this variable at the current time step.
-                           int const NumOnMeters,      // Number of meters this variable is "on".
-                           const Array1D_int &OnMeters // Which meters this variable is on (index values)
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   January 2001
-        //       MODIFIED       Jason DeGraw 2/12/2020, de-optionalized
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine updates all the meter values in the lists with the current
-        // time step value for this variable.
-
-        // METHODOLOGY EMPLOYED:
-        // Variables, as they are "setup", may or may not be on one or more meters.
-        // All "metered" variables are on the "facility meter".  Index values will be
-        // set from the variables to the appropriate meters.  Then, the updating of
-        // the meter values is quite simple -- just add the time step value of the variable
-        // (which is passed to this routine) to all the values being kept for the meter.
-        // Reporting of the meters is taken care of in a different routine.  During reporting,
-        // some values will also be reset (for example, after reporting the "hour", the new
-        // "hour" value of the meter is reset to 0.0, etc.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Meter; // Loop Control
-        int Which; // Index value for the meter
-
-        for (Meter = 1; Meter <= NumOnMeters; ++Meter) {
-            Which = OnMeters(Meter);
-            state.dataOutputProcessor->MeterValue(Which) += TimeStepValue;
-        }
-    }
-
-    void UpdateMeterValues(EnergyPlusData &state,
-                           Real64 const TimeStepValue,       // Value of this variable at the current time step.
-                           int const NumOnMeters,            // Number of meters this variable is "on".
-                           const Array1D_int &OnMeters,      // Which meters this variable is on (index values)
-                           int const NumOnCustomMeters,      // Number of custom meters this variable is "on".
-                           const Array1D_int &OnCustomMeters // Which custom meters this variable is on (index values)
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   January 2001
-        //       MODIFIED       Jason DeGraw 2/12/2020, de-optionalized
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine updates all the meter values in the lists with the current
-        // time step value for this variable.
-
-        // METHODOLOGY EMPLOYED:
-        // Variables, as they are "setup", may or may not be on one or more meters.
-        // All "metered" variables are on the "facility meter".  Index values will be
-        // set from the variables to the appropriate meters.  Then, the updating of
-        // the meter values is quite simple -- just add the time step value of the variable
-        // (which is passed to this routine) to all the values being kept for the meter.
-        // Reporting of the meters is taken care of in a different routine.  During reporting,
-        // some values will also be reset (for example, after reporting the "hour", the new
-        // "hour" value of the meter is reset to 0.0, etc.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Meter; // Loop Control
-        int Which; // Index value for the meter
-
-        for (Meter = 1; Meter <= NumOnMeters; ++Meter) {
-            Which = OnMeters(Meter);
-            state.dataOutputProcessor->MeterValue(Which) += TimeStepValue;
-        }
-
-        // This calculates the basic values for decrement/difference meters -- UpdateMeters then calculates the actual.
-        for (Meter = 1; Meter <= NumOnCustomMeters; ++Meter) {
-            Which = OnCustomMeters(Meter);
-            state.dataOutputProcessor->MeterValue(Which) += TimeStepValue;
-        }
-    }
+//    void UpdateMeterValues(EnergyPlusData &state,
+//                           Real64 const TimeStepValue, // Value of this variable at the current time step.
+//                           int const NumOnMeters,      // Number of meters this variable is "on".
+//                           const Array1D_int &OnMeters // Which meters this variable is on (index values)
+//    )
+//    {
+//
+//        // SUBROUTINE INFORMATION:
+//        //       AUTHOR         Linda Lawrie
+//        //       DATE WRITTEN   January 2001
+//        //       MODIFIED       Jason DeGraw 2/12/2020, de-optionalized
+//        //       RE-ENGINEERED  na
+//
+//        // PURPOSE OF THIS SUBROUTINE:
+//        // This subroutine updates all the meter values in the lists with the current
+//        // time step value for this variable.
+//
+//        // METHODOLOGY EMPLOYED:
+//        // Variables, as they are "setup", may or may not be on one or more meters.
+//        // All "metered" variables are on the "facility meter".  Index values will be
+//        // set from the variables to the appropriate meters.  Then, the updating of
+//        // the meter values is quite simple -- just add the time step value of the variable
+//        // (which is passed to this routine) to all the values being kept for the meter.
+//        // Reporting of the meters is taken care of in a different routine.  During reporting,
+//        // some values will also be reset (for example, after reporting the "hour", the new
+//        // "hour" value of the meter is reset to 0.0, etc.
+//
+//        // REFERENCES:
+//        // na
+//
+//        // USE STATEMENTS:
+//        // na
+//
+//        // Argument array dimensioning
+//
+//        // Locals
+//        // SUBROUTINE ARGUMENT DEFINITIONS:
+//
+//        // SUBROUTINE PARAMETER DEFINITIONS:
+//        // na
+//
+//        // INTERFACE BLOCK SPECIFICATIONS:
+//        // na
+//
+//        // DERIVED TYPE DEFINITIONS:
+//        // na
+//
+//        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+//        int Meter; // Loop Control
+//        int Which; // Index value for the meter
+//
+//        for (Meter = 1; Meter <= NumOnMeters; ++Meter) {
+//            Which = OnMeters(Meter);
+//            state.dataOutputProcessor->MeterValue(Which) += TimeStepValue;
+//        }
+//    }
+//
+//    void UpdateMeterValues(EnergyPlusData &state,
+//                           Real64 const TimeStepValue,       // Value of this variable at the current time step.
+//                           int const NumOnMeters,            // Number of meters this variable is "on".
+//                           const Array1D_int &OnMeters,      // Which meters this variable is on (index values)
+//                           int const NumOnCustomMeters,      // Number of custom meters this variable is "on".
+//                           const Array1D_int &OnCustomMeters // Which custom meters this variable is on (index values)
+//    )
+//    {
+//
+//        // SUBROUTINE INFORMATION:
+//        //       AUTHOR         Linda Lawrie
+//        //       DATE WRITTEN   January 2001
+//        //       MODIFIED       Jason DeGraw 2/12/2020, de-optionalized
+//        //       RE-ENGINEERED  na
+//
+//        // PURPOSE OF THIS SUBROUTINE:
+//        // This subroutine updates all the meter values in the lists with the current
+//        // time step value for this variable.
+//
+//        // METHODOLOGY EMPLOYED:
+//        // Variables, as they are "setup", may or may not be on one or more meters.
+//        // All "metered" variables are on the "facility meter".  Index values will be
+//        // set from the variables to the appropriate meters.  Then, the updating of
+//        // the meter values is quite simple -- just add the time step value of the variable
+//        // (which is passed to this routine) to all the values being kept for the meter.
+//        // Reporting of the meters is taken care of in a different routine.  During reporting,
+//        // some values will also be reset (for example, after reporting the "hour", the new
+//        // "hour" value of the meter is reset to 0.0, etc.
+//
+//        // REFERENCES:
+//        // na
+//
+//        // USE STATEMENTS:
+//        // na
+//
+//        // Argument array dimensioning
+//
+//        // Locals
+//        // SUBROUTINE ARGUMENT DEFINITIONS:
+//
+//        // SUBROUTINE PARAMETER DEFINITIONS:
+//        // na
+//
+//        // INTERFACE BLOCK SPECIFICATIONS:
+//        // na
+//
+//        // DERIVED TYPE DEFINITIONS:
+//        // na
+//
+//        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+//        int Meter; // Loop Control
+//        int Which; // Index value for the meter
+//
+//        for (Meter = 1; Meter <= NumOnMeters; ++Meter) {
+//            Which = OnMeters(Meter);
+//            state.dataOutputProcessor->MeterValue(Which) += TimeStepValue;
+//        }
+//
+//        // This calculates the basic values for decrement/difference meters -- UpdateMeters then calculates the actual.
+//        for (Meter = 1; Meter <= NumOnCustomMeters; ++Meter) {
+//            Which = OnCustomMeters(Meter);
+//            state.dataOutputProcessor->MeterValue(Which) += TimeStepValue;
+//        }
+//    }
 
     void UpdateMeters(EnergyPlusData &state, int const TimeStamp) // Current TimeStamp (for max/min)
     {
@@ -5953,20 +5953,19 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                 auto &rVar(op->RVariableTypes(Loop).VarPtr);
                 // Update meters on the TimeStep  (Zone)
                 if (rVar.MeterArrayPtr != 0) {
-                    if (op->VarMeterArrays(rVar.MeterArrayPtr).NumOnCustomMeters <= 0) {
-                        UpdateMeterValues(state,
-                                          rVar.TSValue * rVar.ZoneMult * rVar.ZoneListMult,
-                                          op->VarMeterArrays(rVar.MeterArrayPtr).NumOnMeters,
-                                          op->VarMeterArrays(rVar.MeterArrayPtr).OnMeters);
-                    } else {
-                        UpdateMeterValues(state,
-                                          rVar.TSValue * rVar.ZoneMult * rVar.ZoneListMult,
-                                          op->VarMeterArrays(rVar.MeterArrayPtr).NumOnMeters,
-                                          op->VarMeterArrays(rVar.MeterArrayPtr).OnMeters,
-                                          op->VarMeterArrays(rVar.MeterArrayPtr).NumOnCustomMeters,
-                                          op->VarMeterArrays(rVar.MeterArrayPtr).OnCustomMeters);
+                    Real64 TimeStepValue = rVar.TSValue * rVar.ZoneMult * rVar.ZoneListMult;
+                    if (op->VarMeterArrays(rVar.MeterArrayPtr).NumOnMeters > 0) {
+                        for (int index : op->VarMeterArrays(rVar.MeterArrayPtr).OnMeters) {
+                            if (index > 0) state.dataOutputProcessor->MeterValue(index) += TimeStepValue;
+                        }
+                    }
+                    if (op->VarMeterArrays(rVar.MeterArrayPtr).NumOnCustomMeters > 0) {
+                        for (int index : op->VarMeterArrays(rVar.MeterArrayPtr).OnCustomMeters) {
+                            if (index > 0) state.dataOutputProcessor->MeterValue(index) += TimeStepValue;
+                        }
                     }
                 }
+
                 ReportNow = true;
                 if (rVar.SchedPtr > 0) ReportNow = (GetCurrentScheduleValue(state, rVar.SchedPtr) != 0.0); // SetReportNow(RVar%SchedPtr)
                 if (!ReportNow || !rVar.Report) {
