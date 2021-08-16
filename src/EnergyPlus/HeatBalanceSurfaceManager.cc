@@ -5568,6 +5568,61 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
     ReportSurfaceShading(state);
     auto &Surface(state.dataSurface->Surface);
 
+    // Set various surface output variables and other record keeping - after iterations are complete - all HT surfaces
+    for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+        int const firstSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceFirst;
+        int const lastSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceLast;
+        for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
+            // Inside Face Convection - sign convention is positive means energy going into inside face from the air.
+            auto const HConvInTemp_fac(-state.dataHeatBalSurf->SurfHConvInt(surfNum) *
+                                       (state.dataHeatBalSurf->SurfTempIn(surfNum) - state.dataHeatBalSurfMgr->RefAirTemp(surfNum)));
+            state.dataHeatBalSurf->QdotConvInRep(surfNum) = Surface(surfNum).Area * HConvInTemp_fac;
+            state.dataHeatBalSurf->QdotConvInRepPerArea(surfNum) = HConvInTemp_fac;
+            state.dataHeatBalSurf->QConvInReport(surfNum) = state.dataHeatBalSurf->QdotConvInRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
+
+            // The QdotConvInRep which is called "Surface Inside Face Convection Heat Gain" is stored during
+            // sizing for both the normal and pulse cases so that load components can be derived later.
+            if (state.dataGlobal->ZoneSizingCalc && state.dataGlobal->CompLoadReportIsReq) {
+                if (!state.dataGlobal->WarmupFlag) {
+                    int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
+                    if (state.dataGlobal->isPulseZoneSizing) {
+                        state.dataOutRptTab->loadConvectedWithPulse(state.dataSize->CurOverallSimDay, TimeStepInDay, surfNum) =
+                            state.dataHeatBalSurf->QdotConvInRep(surfNum);
+                    } else {
+                        state.dataOutRptTab->loadConvectedNormal(state.dataSize->CurOverallSimDay, TimeStepInDay, surfNum) =
+                            state.dataHeatBalSurf->QdotConvInRep(surfNum);
+                        state.dataOutRptTab->netSurfRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, surfNum) =
+                            state.dataHeatBalSurf->SurfNetLWRadToSurf(surfNum) * Surface(surfNum).Area;
+                    }
+                }
+            }
+
+            // Window heat gain/loss
+            if (Surface(surfNum).Class == DataSurfaces::SurfaceClass::Window) {
+                if (state.dataSurface->SurfWinHeatGain(surfNum) >= 0.0) {
+                    state.dataSurface->SurfWinHeatGainRep(surfNum) = state.dataSurface->SurfWinHeatGain(surfNum);
+                    state.dataSurface->SurfWinHeatGainRepEnergy(surfNum) =
+                        state.dataSurface->SurfWinHeatGainRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
+                } else {
+                    state.dataSurface->SurfWinHeatLossRep(surfNum) = -state.dataSurface->SurfWinHeatGain(surfNum);
+                    state.dataSurface->SurfWinHeatLossRepEnergy(surfNum) =
+                        state.dataSurface->SurfWinHeatLossRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
+                }
+                state.dataSurface->SurfWinHeatTransferRepEnergy(surfNum) =
+                    state.dataSurface->SurfWinHeatGain(surfNum) * state.dataGlobal->TimeStepZoneSec;
+                if (state.dataSurface->SurfWinOriginalClass(surfNum) == DataSurfaces::SurfaceClass::TDD_Diffuser) { // Tubular daylighting device
+                    int pipeNum = state.dataSurface->SurfWinTDDPipeNum(surfNum);
+                    state.dataDaylightingDevicesData->TDDPipe(pipeNum).HeatGain = state.dataSurface->SurfWinHeatGainRep(surfNum);
+                    state.dataDaylightingDevicesData->TDDPipe(pipeNum).HeatLoss = state.dataSurface->SurfWinHeatLossRep(surfNum);
+                }
+                if (Surface(surfNum).ExtSolar) { // WindowManager's definition of ZoneWinHeatGain/Loss
+                    int zoneNum = Surface(surfNum).Zone;
+                    state.dataHeatBal->ZoneWinHeatGain(zoneNum) += state.dataSurface->SurfWinHeatGain(surfNum);
+                }
+            }
+        }
+    }
+
     // update inside face radiation reports
     for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
         Real64 const surfaceArea(Surface(SurfNum).Area);
@@ -5629,6 +5684,9 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
             state.dataHeatBalSurf->SumSurfaceHeatEmission += state.dataHeatBalSurf->QHeatEmiReport(SurfNum) * state.dataGlobal->TimeStepZoneSec;
         }
     }
+
+    if (state.dataSurface->AnyMovableInsulation) ReportIntMovInsInsideSurfTemp(state);
+
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         int const firstSurfOpaq = state.dataHeatBal->Zone(ZoneNum).OpaqOrIntMassSurfaceFirst;
         int const lastSurfOpaq = state.dataHeatBal->Zone(ZoneNum).OpaqOrIntMassSurfaceLast;
@@ -5709,6 +5767,7 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
                 state.dataHeatBal->ZoneOpaqSurfExtFaceCondLossRep(ZoneNum) * state.dataGlobal->TimeStepZoneSec;
         }
     } // loop over zones
+
 }
 
 void ReportIntMovInsInsideSurfTemp(EnergyPlusData &state)
@@ -7359,59 +7418,6 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
 
     } // ...end of main inside heat balance DO loop (ends when Converged)
 
-    // Set various surface output variables and other record keeping - after iterations are complete
-    for (int surfNum : HTSurfs) {
-        if (Surface(surfNum).Class == SurfaceClass::TDD_Dome) continue; // Skip TDD:DOME objects.  Inside temp is handled by TDD:DIFFUSER.
-
-        // Inside Face Convection - sign convention is positive means energy going into inside face from the air.
-        auto const HConvInTemp_fac(-state.dataHeatBalSurf->SurfHConvInt(surfNum) *
-                                   (state.dataHeatBalSurf->SurfTempIn(surfNum) - state.dataHeatBalSurfMgr->RefAirTemp(surfNum)));
-        state.dataHeatBalSurf->QdotConvInRep(surfNum) = Surface(surfNum).Area * HConvInTemp_fac;
-        state.dataHeatBalSurf->QdotConvInRepPerArea(surfNum) = HConvInTemp_fac;
-        state.dataHeatBalSurf->QConvInReport(surfNum) = state.dataHeatBalSurf->QdotConvInRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
-
-        // The QdotConvInRep which is called "Surface Inside Face Convection Heat Gain" is stored during
-        // sizing for both the normal and pulse cases so that load components can be derived later.
-        if (state.dataGlobal->ZoneSizingCalc && state.dataGlobal->CompLoadReportIsReq) {
-            if (!state.dataGlobal->WarmupFlag) {
-                int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
-                if (state.dataGlobal->isPulseZoneSizing) {
-                    state.dataOutRptTab->loadConvectedWithPulse(state.dataSize->CurOverallSimDay, TimeStepInDay, surfNum) =
-                        state.dataHeatBalSurf->QdotConvInRep(surfNum);
-                } else {
-                    state.dataOutRptTab->loadConvectedNormal(state.dataSize->CurOverallSimDay, TimeStepInDay, surfNum) =
-                        state.dataHeatBalSurf->QdotConvInRep(surfNum);
-                    state.dataOutRptTab->netSurfRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, surfNum) =
-                        state.dataHeatBalSurf->SurfNetLWRadToSurf(surfNum) * Surface(surfNum).Area;
-                }
-            }
-        }
-
-        // Window heat gain/loss
-        if (Surface(surfNum).Class == DataSurfaces::SurfaceClass::Window) {
-            if (state.dataSurface->SurfWinHeatGain(surfNum) >= 0.0) {
-                state.dataSurface->SurfWinHeatGainRep(surfNum) = state.dataSurface->SurfWinHeatGain(surfNum);
-                state.dataSurface->SurfWinHeatGainRepEnergy(surfNum) =
-                    state.dataSurface->SurfWinHeatGainRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
-            } else {
-                state.dataSurface->SurfWinHeatLossRep(surfNum) = -state.dataSurface->SurfWinHeatGain(surfNum);
-                state.dataSurface->SurfWinHeatLossRepEnergy(surfNum) =
-                    state.dataSurface->SurfWinHeatLossRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
-            }
-            state.dataSurface->SurfWinHeatTransferRepEnergy(surfNum) =
-                state.dataSurface->SurfWinHeatGain(surfNum) * state.dataGlobal->TimeStepZoneSec;
-            if (state.dataSurface->SurfWinOriginalClass(surfNum) == DataSurfaces::SurfaceClass::TDD_Diffuser) { // Tubular daylighting device
-                int pipeNum = state.dataSurface->SurfWinTDDPipeNum(surfNum);
-                state.dataDaylightingDevicesData->TDDPipe(pipeNum).HeatGain = state.dataSurface->SurfWinHeatGainRep(surfNum);
-                state.dataDaylightingDevicesData->TDDPipe(pipeNum).HeatLoss = state.dataSurface->SurfWinHeatLossRep(surfNum);
-            }
-            if (Surface(surfNum).ExtSolar) { // WindowManager's definition of ZoneWinHeatGain/Loss
-                int zoneNum = Surface(surfNum).Zone;
-                state.dataHeatBal->ZoneWinHeatGain(zoneNum) += state.dataSurface->SurfWinHeatGain(surfNum);
-            }
-        }
-    }
-
     // Update SumHmXXXX for non-window EMPD or HAMT surfaces
     if (state.dataHeatBal->AnyEMPD || state.dataHeatBal->AnyHAMT) {
         for (int SurfNum : HTNonWindowSurfs) {
@@ -7479,8 +7485,6 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
             }
         }
     }
-
-    if (state.dataSurface->AnyMovableInsulation) ReportIntMovInsInsideSurfTemp(state);
 
     CalculateZoneMRT(state, ZoneToResimulate); // Update here so that the proper value of MRT is available to radiant systems
 }
@@ -8087,63 +8091,6 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
         }
 
     } // ...end of main inside heat balance iteration loop (ends when Converged)
-
-    // Set various surface output variables and other record keeping - after iterations are complete - all HT surfaces
-    for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
-        int const firstSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceFirst;
-        int const lastSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceLast;
-        for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
-            // Inside Face Convection - sign convention is positive means energy going into inside face from the air.
-            auto const HConvInTemp_fac(-state.dataHeatBalSurf->SurfHConvInt(surfNum) *
-                                       (state.dataHeatBalSurf->SurfTempIn(surfNum) - state.dataHeatBalSurfMgr->RefAirTemp(surfNum)));
-            state.dataHeatBalSurf->QdotConvInRep(surfNum) = Surface(surfNum).Area * HConvInTemp_fac;
-            state.dataHeatBalSurf->QdotConvInRepPerArea(surfNum) = HConvInTemp_fac;
-            state.dataHeatBalSurf->QConvInReport(surfNum) = state.dataHeatBalSurf->QdotConvInRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
-
-            // The QdotConvInRep which is called "Surface Inside Face Convection Heat Gain" is stored during
-            // sizing for both the normal and pulse cases so that load components can be derived later.
-            if (state.dataGlobal->ZoneSizingCalc && state.dataGlobal->CompLoadReportIsReq) {
-                if (!state.dataGlobal->WarmupFlag) {
-                    int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
-                    if (state.dataGlobal->isPulseZoneSizing) {
-                        state.dataOutRptTab->loadConvectedWithPulse(state.dataSize->CurOverallSimDay, TimeStepInDay, surfNum) =
-                            state.dataHeatBalSurf->QdotConvInRep(surfNum);
-                    } else {
-                        state.dataOutRptTab->loadConvectedNormal(state.dataSize->CurOverallSimDay, TimeStepInDay, surfNum) =
-                            state.dataHeatBalSurf->QdotConvInRep(surfNum);
-                        state.dataOutRptTab->netSurfRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, surfNum) =
-                            state.dataHeatBalSurf->SurfNetLWRadToSurf(surfNum) * Surface(surfNum).Area;
-                    }
-                }
-            }
-
-            // Window heat gain/loss
-            if (Surface(surfNum).Class == DataSurfaces::SurfaceClass::Window) {
-                if (state.dataSurface->SurfWinHeatGain(surfNum) >= 0.0) {
-                    state.dataSurface->SurfWinHeatGainRep(surfNum) = state.dataSurface->SurfWinHeatGain(surfNum);
-                    state.dataSurface->SurfWinHeatGainRepEnergy(surfNum) =
-                        state.dataSurface->SurfWinHeatGainRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
-                } else {
-                    state.dataSurface->SurfWinHeatLossRep(surfNum) = -state.dataSurface->SurfWinHeatGain(surfNum);
-                    state.dataSurface->SurfWinHeatLossRepEnergy(surfNum) =
-                        state.dataSurface->SurfWinHeatLossRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
-                }
-                state.dataSurface->SurfWinHeatTransferRepEnergy(surfNum) =
-                    state.dataSurface->SurfWinHeatGain(surfNum) * state.dataGlobal->TimeStepZoneSec;
-                if (state.dataSurface->SurfWinOriginalClass(surfNum) == DataSurfaces::SurfaceClass::TDD_Diffuser) { // Tubular daylighting device
-                    int pipeNum = state.dataSurface->SurfWinTDDPipeNum(surfNum);
-                    state.dataDaylightingDevicesData->TDDPipe(pipeNum).HeatGain = state.dataSurface->SurfWinHeatGainRep(surfNum);
-                    state.dataDaylightingDevicesData->TDDPipe(pipeNum).HeatLoss = state.dataSurface->SurfWinHeatLossRep(surfNum);
-                }
-                if (Surface(surfNum).ExtSolar) { // WindowManager's definition of ZoneWinHeatGain/Loss
-                    int zoneNum = Surface(surfNum).Zone;
-                    state.dataHeatBal->ZoneWinHeatGain(zoneNum) += state.dataSurface->SurfWinHeatGain(surfNum);
-                }
-            }
-        }
-    }
-
-    if (state.dataSurface->AnyMovableInsulation) ReportIntMovInsInsideSurfTemp(state);
 
     CalculateZoneMRT(state, ZoneToResimulate); // Update here so that the proper value of MRT is available to radiant systems
 }
