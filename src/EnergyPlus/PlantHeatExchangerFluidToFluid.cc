@@ -1139,6 +1139,7 @@ void HeatExchangerStruct::size(EnergyPlusData &state)
 
         // first deal with Water
         int PltSizNumWaterSide = state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).PlantSizNum;
+        int PltSizNumSteamSide = state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).PlantSizNum;
         Real64 tmpWaterSideDesignVolFlowRate = this->SupplySideLoop.DesignVolumeFlowRate;
         if (this->SupplySideLoop.DesignVolumeFlowRateWasAutoSized) {
             if (PltSizNumWaterSide > 0) {
@@ -2705,7 +2706,7 @@ void HeatExchangerStruct::calculateSteamToWaterHX(EnergyPlusData &state, Real64 
 
             TempSetPoint = state.dataLoopNodes->Node(this->SetPointNodeNum).TempSetPoint;
 
-            QHXCap = WaterMassFlowRate * (TempSetPoint - WaterInletTemp);
+            QHXCap = WaterMassFlowRate * CpWaterInlet * (TempSetPoint - WaterInletTemp);
 
             // Check to see if setpoint is above enetering temperature. If not, set
             // output to zero.

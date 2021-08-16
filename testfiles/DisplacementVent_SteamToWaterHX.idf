@@ -2463,7 +2463,7 @@
     HeatingAvailSched,                    !- Availability Schedule Name
     Steam to Water HX Steam Inlet Node,   !- Steam Inlet Node Name
     Steam to Water HX Steam Outlet Node,  !- Steam Outlet Node Name
-    1,                                  !- Steam Side Design Flow Rate
+    0.1,                                  !- Steam Side Design Flow Rate
     Steam to Water HX Water Inlet Node,   !- Water Inlet Node Name
     Steam to Water HX Water Outlet Node,  !- Water Outlet Node Name
     autosize,                                 !- Water Side Design Flow Rate
