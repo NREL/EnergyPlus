@@ -19,6 +19,7 @@ $\alpha$ & Stefan-Boltzmann constant & ~ & sigma \tabularnewline
 $\varepsilon$\(_{i}\) & Emissivity of face i & - & emis \tabularnewline
 k\(_{i}\) & Conductance of glass layer i & W/m\(^{2}\)-K & scon \tabularnewline
 h\(_{o}\), h\(_{i}\) & Outside, inside air film convective conductance & W/m\(^{2}\)-K & hcout, hcout \tabularnewline
+r\(_{o}\), r\(_{i}\) & Outside, inside film convective and radiative conductance adjustment ratio & & SurfWinCoeffAdjRatioOut, SurfWinCoeffAdjRatioIn \tabularnewline
 h\(_{i}\) & Conductance of gap j & W/m\(^{2}\)-K & hgap \tabularnewline
 T\(_{o}\), T\(_{i}\) & Outdoor and indoor air temperatures & K & tout, tin \tabularnewline
 E\(_{o}\), E\(_{i}\) & Exterior, interior long-wave radiation incident on window & W/m\(^{2}\) & outir, rmir \tabularnewline
@@ -62,7 +63,7 @@ The following assumptions are made in deriving the heat balance equations:
 The four equations for double-glazing are as follows. The equations for single glazing (\emph{N} = 1) and for \emph{N} = 3 and \emph{N} = 4 are analogous and are not shown.
 
 \begin{equation}
-{E_o}{\varepsilon_1} - {\varepsilon_1}\sigma \theta_1^4 + {k_1}\left( {{\theta_2} - {\theta_1}} \right) + {h_o}\left( {{T_o} - {\theta_1}} \right) + {S_1} = 0
+{E_o}{\varepsilon_1} - {\varepsilon_1}\sigma \theta_1^4 + {k_1}\left( {{\theta_2} - {\theta_1}} \right) + {r_o}{h_o}\left( {{T_o} - {\theta_1}} \right) + {S_1} = 0
 \label{eq:GlazingFace1HeatBalEquation}
 \end{equation}
 
@@ -75,9 +76,11 @@ The four equations for double-glazing are as follows. The equations for single g
 \end{equation}
 
 \begin{equation}
-{E_i}{\varepsilon_4} - {\varepsilon_4}\sigma \theta_4^4 + {k_2}\left( {{\theta_3} - {\theta_4}} \right) + {h_i}\left( {{T_i} - {\theta_4}} \right) + {S_4} = 0
+{E_i}{\varepsilon_4} - {\varepsilon_4}\sigma \theta_4^4 + {k_2}\left( {{\theta_3} - {\theta_4}} \right) + {r_i}{h_i}\left( {{T_i} - {\theta_4}} \right) + {S_4} = 0
 \label{eq:GlazingFace4HeatBalEquation}
 \end{equation}
+
+Note that the coefficient adjustment ratio, \({r_o}\) and \({r_i}\), accounts for highly conductive simple glazing exterior windows. These adjustment ratios remain 1 for other cases.
 
 \subsubsection{Absorbed Radiation}\label{absorbed-radiation}
 
@@ -194,8 +197,10 @@ The equations are solved as follows:
 1)~~~~Linearize the equations by defining \({h_{r,i}} = {\varepsilon_i}\sigma \theta_i^3\) .~ For example, Equation~\ref{eq:GlazingFace1HeatBalEquation} becomes
 
 \begin{equation}
-{E_o}{\varepsilon_1} - {h_{r,1}}{\theta_1} + {k_1}\left( {{\theta_2} - {\theta_1}} \right) + {h_o}\left( {{T_o} - {\theta_1}} \right) + {S_1} = 0
+{E_o}{\varepsilon_1} - {r_o}{h_{r,1}}{\theta_1} + {k_1}\left( {{\theta_2} - {\theta_1}} \right) + {r_o}{h_o}\left( {{T_o} - {\theta_1}} \right) + {S_1} = 0
 \end{equation}
+
+Note that the coefficient adjustment ratio, \({r_o}\), accounts for highly conductive simple glazing exterior windows. This adjustment ratio remains 1 for other cases.
 
 2)~~~~Write the equations in the matrix form \(A\theta = B\)
 
@@ -1039,12 +1044,14 @@ where
 The heat balance equation for the shading layer surface facing the zone air is:
 
 \begin{equation}
-{E_i}{\varepsilon_{sh}} - {\varepsilon_{sh}}\sigma \theta_6^4 + {k_{sh}}\left( {{\theta_5} - {\theta_6}} \right) + {h_i}\left( {{T_i} - {\theta_6}} \right) + {S_{sh,2}} = 0
+{E_i}{\varepsilon_{sh}} - {\varepsilon_{sh}}\sigma \theta_6^4 + {k_{sh}}\left( {{\theta_5} - {\theta_6}} \right) + {r_i}{h_i}\left( {{T_i} - {\theta_6}} \right) + {S_{sh,2}} = 0
 \end{equation}
 
 where
 
 \emph{S\(_{sh,2}\)} = solar radiation plus short-wave radiation from lights plus IR radiation from lights and zone equipment absorbed by the zone-side face of the shading layer (W/m\(^{2}\)K).
+
+Note that the coefficient adjustment ratio, \({r_i}\), accounts for highly conductive simple glazing exterior windows. This adjustment ratios remains 1 for other cases.
 
 \subsection{Solving for Gap Airflow and Temperature}\label{solving-for-gap-airflow-and-temperature}
 
