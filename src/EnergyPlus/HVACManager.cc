@@ -2355,7 +2355,6 @@ void ReportInfiltrations(EnergyPlusData &state)
     auto &Zone(state.dataHeatBal->Zone);
     auto &Infiltration(state.dataHeatBal->Infiltration);
     auto &TimeStepSys(state.dataHVACGlobal->TimeStepSys);
-    auto &ZnAirRpt(state.dataHeatBal->ZnAirRpt);
 
     for (j = 1; j <= state.dataHeatBal->TotInfiltration; ++j) {
 
