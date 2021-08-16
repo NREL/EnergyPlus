@@ -55,11 +55,21 @@
 
 import glob as gb
 import os
-import shlex
 import tempfile
 import unittest
 
 from pyenergyplus.api import EnergyPlusAPI
+
+
+def parent(x):
+    return os.path.dirname(os.path.realpath(x))
+
+
+this_file = os.path.realpath(__file__)  # returns C:\EPRepo\tst\EnergyPlus\api\test_OutputFiles.py
+repo_root = parent(parent(parent(parent(this_file))))  # returns C:\EPRepo
+# something **very** odd was happening with os.path.join here on Windows.  Putting a couple separators manually works OK
+idf_path = repo_root + os.sep + os.sep + "testfiles" + os.sep + os.sep + "1ZoneUncontrolled.idf"
+# at this point, idf_path should be something like: C:\\EPRepo\\testfiles\\1ZoneUncontrolled.idf
 
 
 class TestAPIFlushOutput(unittest.TestCase):
@@ -86,27 +96,26 @@ class TestAPIFlushOutput(unittest.TestCase):
         Tests the case where the simulation ends properly and EndEnergyPlus is
         called
         """
-        with tempfile.TemporaryDirectory() as tempdir:
-            print(tempdir)
-            cmd_args = shlex.split(f'-d {tempdir} -D @IDF_FILE@')
-            return_code = self.api.runtime.run_energyplus(self.state, cmd_args)
-            self.assertEqual(return_code, 0)
-            out_files = gb.glob(os.path.join(tempdir, "*"))
-            # We need to find out files, and we expect NONE of them to be empty
-            self.assertGreater(len(out_files), 10)
-            empty_files = list(filter(lambda f: os.stat(f).st_size == 0,
-                                      out_files))
-            msg = f"Did not expect empty files, but found {len(empty_files)}:"
-            for f in empty_files:
-                msg += f"\n * {os.path.relpath(f, tempdir)}"
-            self.assertFalse(empty_files, msg)
+        tempdir = tempfile.mkdtemp()
+        cmd_args = ['-d', tempdir, '-D', idf_path]
+        return_code = self.api.runtime.run_energyplus(self.state, cmd_args)
+        self.assertEqual(return_code, 0)
+        out_files = gb.glob(os.path.join(tempdir, "*"))
+        # We need to find out files, and we expect NONE of them to be empty
+        self.assertGreater(len(out_files), 10)
+        empty_files = list(filter(lambda f: os.stat(f).st_size == 0,
+                                  out_files))
+        msg = f"Did not expect empty files, but found {len(empty_files)}:"
+        for f in empty_files:
+            msg += f"\n * {os.path.relpath(f, tempdir)}"
+        self.assertFalse(empty_files, msg)
 
-            # Check that the eplusout.err is not truncated, that the last line
-            # is what we expect it to be
-            with open(os.path.join(tempdir, 'eplusout.err'), 'r') as f:
-                lines = f.read().splitlines()
-            self.assertTrue(lines, "eplusout.err is empty!")
-            self.assertIn("EnergyPlus Completed Successfully", lines[-1])
+        # Check that the eplusout.err is not truncated, that the last line
+        # is what we expect it to be
+        with open(os.path.join(tempdir, 'eplusout.err'), 'r') as f:
+            lines = f.read().splitlines()
+        self.assertTrue(lines, "eplusout.err is empty!")
+        self.assertIn("EnergyPlus Completed Successfully", lines[-1])
 
     def test_wrong_version_api_output(self):
         """
@@ -141,19 +150,19 @@ class TestAPIFlushOutput(unittest.TestCase):
     World;                   !- Coordinate System
         """
 
-        with tempfile.TemporaryDirectory() as tempdir:
-            idf_file = os.path.join(tempdir, 'wrong_version.idf')
+        tempdir = tempfile.mkdtemp()
+        idf_file = os.path.join(tempdir, 'wrong_version.idf')
 
-            with open(idf_file, 'w') as f:
-                f.write(idf_content)
+        with open(idf_file, 'w') as f:
+            f.write(idf_content)
 
-            cmd_args = shlex.split(f'-d {tempdir} -D {idf_file}')
-            return_code = self.api.runtime.run_energyplus(self.state, cmd_args)
-            self.assertEqual(return_code, 1)
-            with open(os.path.join(tempdir, 'eplusout.err'), 'r') as f:
-                lines = f.read().splitlines()
-            self.assertTrue(lines, "eplusout.err is empty!")
-            self.assertIn("EnergyPlus Terminated", lines[-1])
+        cmd_args = ['-d', tempdir, '-D', idf_file]
+        return_code = self.api.runtime.run_energyplus(self.state, cmd_args)
+        self.assertEqual(return_code, 1)
+        with open(os.path.join(tempdir, 'eplusout.err'), 'r') as f:
+            lines = f.read().splitlines()
+        self.assertTrue(lines, "eplusout.err is empty!")
+        self.assertIn("EnergyPlus Terminated", lines[-1])
 
 
 if __name__ == '__main__':
