@@ -678,8 +678,8 @@ namespace OutputProcessor {
                                          std::string &EndUseSub,                // End Use Sub Type (General Lights, Task Lights, etc.)
                                          std::string &Group,                    // Group key (Facility, Zone, Building, etc.)
                                          bool &ErrorsFound,                     // True if errors in this call
-                                         const std::string &ZoneName,           // ZoneName when Group=Building
-                                         const std::string &SpaceTypeName       // Space Type Name when Group=Building
+                                         const std::string &ZoneName,           // Zone Name when Group=Building
+                                         const std::string &SpaceType           // Space Type when Group=Building
     );
 
     void DetermineMeterIPUnits(EnergyPlusData &state,
@@ -914,7 +914,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                          Optional_string_const EndUseKey = _,              // Meter End Use Key (Lights, Heating, Cooling, etc)
                          Optional_string_const EndUseSubKey = _,           // Meter End Use Sub Key (General Lights, Task Lights, etc)
                          Optional_string_const GroupKey = _,               // Meter Super Group Key (Building, System, Plant)
-                         Optional_string_const ZoneOrSpaceKey = _,         // Meter Zone Name or Space Name
+                         Optional_string_const ZoneKey = _,                // Meter Zone Key (zone name)
                          Optional_int_const ZoneMult = _,                  // Zone Multiplier, defaults to 1
                          Optional_int_const ZoneListMult = _,              // Zone List Multiplier, defaults to 1
                          Optional_int_const indexGroupKey = _,             // Group identifier for SQL output
