@@ -683,5 +683,7 @@ namespace WindowManager {
         return m_InteriorBSDFShade;
     }
 
+
+
 } // namespace WindowManager
 } // namespace EnergyPlus

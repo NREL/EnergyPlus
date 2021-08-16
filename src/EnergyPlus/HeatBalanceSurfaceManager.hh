@@ -56,6 +56,8 @@
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
+#include "WCETarcog.hpp"
+
 namespace EnergyPlus {
 
 // Forward declarations
@@ -91,6 +93,12 @@ namespace HeatBalanceSurfaceManager {
     void InitSurfaceHeatBalance(EnergyPlusData &state);
 
     void GatherForPredefinedReport(EnergyPlusData &state);
+
+    // methods specifically for helping in NFRC assembly calculations
+    // Tarcog::ISO15099::Environments getOutdoorUvalueNfrc();
+    std::shared_ptr<Tarcog::ISO15099::COutdoorEnvironment> getOutdoorUvalueNfrc();
+    std::shared_ptr<Tarcog::ISO15099::CIndoorEnvironment> getIndoorUvalueNfrc();
+
 
     void AllocateSurfaceHeatBalArrays(EnergyPlusData &state);
 

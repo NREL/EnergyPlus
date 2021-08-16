@@ -121,6 +121,10 @@
 #include <WCEMultiLayerOptics.hpp>
 #include <WCESingleLayerOptics.hpp>
 
+
+#include "WCETarcog.hpp"
+
+
 namespace EnergyPlus::HeatBalanceSurfaceManager {
 
 // Module containing the routines dealing with the Heat Balance of the surfaces
@@ -955,6 +959,103 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                         std::string_view NFRCname = DataSurfaces::NfrcProductName[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
 
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemNfrcType, surfName, NFRCname);
+
+                        // ======================= just a test by using an existing WCE unit test to make sure the scope will work
+
+                        Tarcog::ISO15099::WindowSingleVision m_Window;
+
+                        /////////////////////////////////////////////////////////
+                        /// Outdoor
+                        /////////////////////////////////////////////////////////
+                        // const auto airTemperature{305.15}; // Kelvins
+                        // const auto airSpeed{2.75};         // meters per second
+                        // const auto tSky{305.15};           // Kelvins
+                        const auto solarRadiation{783.0};
+
+                        // auto Outdoor = Tarcog::ISO15099::Environments::outdoor(
+                        //     airTemperature, airSpeed, solarRadiation, tSky, Tarcog::ISO15099::SkyModel::AllSpecified);
+                        // Outdoor->setHCoeffModel(Tarcog::ISO15099::BoundaryConditionsCoeffModel::CalculateH);
+
+                        const auto Outdoor = getOutdoorUvalueNfrc();
+
+                        /////////////////////////////////////////////////////////
+                        /// Indoor
+                        /////////////////////////////////////////////////////////
+
+                        // const auto roomTemperature{297.15};
+                        // const auto Indoor = Tarcog::ISO15099::Environments::indoor(roomTemperature);
+                        const auto Indoor = getIndoorUvalueNfrc();
+
+                        /////////////////////////////////////////////////////////
+                        // IGU
+                        /////////////////////////////////////////////////////////
+                        const auto solidLayerThickness1{0.00318}; // [m]
+                        const auto solidLayerConductance1{1.0};
+                        const auto tIR1{0.0};
+                        const auto frontEmissivity1{0.84};
+                        const auto backEmissivity1{0.046578168869};
+
+                        const auto layer1 = Tarcog::ISO15099::Layers::solid(
+                            solidLayerThickness1, solidLayerConductance1, frontEmissivity1, tIR1, backEmissivity1, tIR1);
+                        layer1->setSolarAbsorptance(0.194422408938, solarRadiation);
+
+                        const auto gapThickness{0.0127};
+                        auto gap{Tarcog::ISO15099::Layers::gap(gapThickness)};
+
+                        const auto solidLayerThickness2{0.005715}; // [m]
+                        const auto solidLayerConductance2{1.0};
+
+                        const auto layer2 = Tarcog::ISO15099::Layers::solid(solidLayerThickness2, solidLayerConductance2);
+                        layer2->setSolarAbsorptance(0.054760526866, solarRadiation);
+
+                        const auto iguWidth{1.0};
+                        const auto iguHeight{1.0};
+                        Tarcog::ISO15099::CIGU aIGU(iguWidth, iguHeight);
+                        aIGU.addLayers({layer1, gap, layer2});
+
+                        /////////////////////////////////////////////////////////
+                        // System
+                        /////////////////////////////////////////////////////////
+                        const auto igu{std::make_shared<Tarcog::ISO15099::CSystem>(aIGU, Indoor, Outdoor)};
+
+                        /////////////////////////////////////////////////////////
+                        /// Frames
+                        /////////////////////////////////////////////////////////
+
+                        const double uValue{2.134059};
+                        const double edgeUValue{2.251039};
+                        const double projectedFrameDimension{0.050813};
+                        const double wettedLength{0.05633282};
+                        const double absorptance{0.3};
+
+                        Tarcog::ISO15099::FrameData frameData{uValue, edgeUValue, projectedFrameDimension, wettedLength, absorptance};
+
+                        const auto windowWidth{1.2};
+                        const auto windowHeight{1.5};
+                        const auto tVis{0.6385};
+                        const auto tSol{0.371589958668};
+
+                        m_Window = Tarcog::ISO15099::WindowSingleVision(windowWidth, windowHeight, tVis, tSol, igu);
+
+                        m_Window.setFrameTop(frameData);
+                        m_Window.setFrameBottom(frameData);
+                        m_Window.setFrameLeft(frameData);
+                        m_Window.setFrameRight(frameData);
+
+                        const auto UValue{m_Window.uValue()};
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemUfact, surfName, UValue, 3);
+
+                        const auto SHGC{m_Window.shgc()};
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemSHGC, surfName, SHGC, 3);
+
+                        const auto vt{m_Window.vt()};
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemVisTr, surfName, vt);
+
+                        // ======================= end of a test by using an existing WCE unit test to make sure the scope will work 
+
+
+
+
                     }
                     windowAreaWMult = windowArea * mult;
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAreaOf1, surfName, windowArea);
@@ -975,6 +1076,9 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                             CalcNominalWindowCond(state, curCons, 2, nomCond, SHGCSummer, TransSolNorm, TransVisNorm, errFlag);
                         }
                     }
+
+
+
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenSHGC, surfName, SHGCSummer, 3);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenVisTr, surfName, TransVisNorm, 3);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenParent, surfName, Surface(iSurf).BaseSurfName);
@@ -1302,6 +1406,26 @@ void GatherForPredefinedReport(EnergyPlusData &state)
         state, state.dataOutRptPredefined->pdchSurfCntTot, "Tubular Daylighting Device Diffuser", numSurfaces(int(SurfaceClass::TDD_Diffuser)));
     PreDefTableEntry(
         state, state.dataOutRptPredefined->pdchSurfCntExt, "Tubular Daylighting Device Diffuser", numExtSurfaces(int(SurfaceClass::TDD_Diffuser)));
+}
+
+std::shared_ptr<Tarcog::ISO15099::COutdoorEnvironment> getOutdoorUvalueNfrc()
+{
+    const auto airTemperature{-18.0 + DataGlobalConstants::KelvinConv}; // Kelvins
+    const auto airSpeed{5.5};                                           // meters per second
+    const auto tSky{-18.0 + DataGlobalConstants::KelvinConv};           // Kelvins
+    const auto solarRadiation{0};
+
+    auto Outdoor =
+        Tarcog::ISO15099::Environments::outdoor(airTemperature, airSpeed, solarRadiation, tSky, Tarcog::ISO15099::SkyModel::AllSpecified);
+    Outdoor->setHCoeffModel(Tarcog::ISO15099::BoundaryConditionsCoeffModel::CalculateH);
+    return Outdoor;
+}
+
+std::shared_ptr<Tarcog::ISO15099::CIndoorEnvironment> getIndoorUvalueNfrc()
+{
+    const auto roomTemperature{21 + DataGlobalConstants::KelvinConv};
+    const auto Indoor = Tarcog::ISO15099::Environments::indoor(roomTemperature);
+    return Indoor;
 }
 
 void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
