@@ -7454,7 +7454,12 @@ Real64 WaterThermalTankData::CalcTimeNeeded(Real64 const Ti, // Initial tank tem
             b = -(UA / Cp + m1 + m2) / m;
 
             // Calculate the mixed temperature Tm of the tank after an infinite amount of time has passed
-            Tm = -a / b;
+            Real64 lowLimit = 1.0e-20;
+            if (b > lowLimit) {
+                Tm = -a / b;
+            } else {
+                Tm = Ti;
+            }
 
             if (Tm == Ti) {
                 // Mixed temperature is the same as Ti; if Tf<>Ti, then Tf can never be reached
@@ -10755,6 +10760,9 @@ Real64 WaterThermalTankData::PlantMassFlowRatesFunc(EnergyPlusData &state,
         }
     }
 
+    Real64 const minFlow = 0.0000000001;    // Catch underflow problems
+    if (FlowResult < minFlow) FlowResult = 0.0;
+    
     return FlowResult;
 }
 
