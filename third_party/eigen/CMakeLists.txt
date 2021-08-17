@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 2.8.5)
 
 # guard against in-source builds
 
-if(${PROJECT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
+if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
   message(FATAL_ERROR "In-source builds not allowed. Please make a new directory (called a build directory) and run CMake from there. You may need to remove CMakeCache.txt. ")
 endif()
 
@@ -42,11 +42,11 @@ set(EIGEN_MINOR_VERSION "${CMAKE_MATCH_1}")
 set(EIGEN_VERSION_NUMBER ${EIGEN_WORLD_VERSION}.${EIGEN_MAJOR_VERSION}.${EIGEN_MINOR_VERSION})
 
 # if we are not in a mercurial clone
-if(IS_DIRECTORY ${PROJECT_SOURCE_DIR}/.hg)
+if(IS_DIRECTORY ${CMAKE_SOURCE_DIR}/.hg)
   # if the mercurial program is absent or this will leave the EIGEN_HG_CHANGESET string empty,
   # but won't stop CMake.
-  execute_process(COMMAND hg tip -R ${PROJECT_SOURCE_DIR} OUTPUT_VARIABLE EIGEN_HGTIP_OUTPUT)
-  execute_process(COMMAND hg branch -R ${PROJECT_SOURCE_DIR} OUTPUT_VARIABLE EIGEN_BRANCH_OUTPUT)
+  execute_process(COMMAND hg tip -R ${CMAKE_SOURCE_DIR} OUTPUT_VARIABLE EIGEN_HGTIP_OUTPUT)
+  execute_process(COMMAND hg branch -R ${CMAKE_SOURCE_DIR} OUTPUT_VARIABLE EIGEN_BRANCH_OUTPUT)
 endif()
 
 # if this is the default (aka development) branch, extract the mercurial changeset number from the hg tip output...
@@ -156,9 +156,9 @@ if(NOT MSVC)
   endif()
   ei_add_cxx_compiler_flag("-pedantic")
   ei_add_cxx_compiler_flag("-Wall")
-  #ei_add_cxx_compiler_flag("-Wextra")
+  ei_add_cxx_compiler_flag("-Wextra")
   #ei_add_cxx_compiler_flag("-Weverything")              # clang
-
+  
   ei_add_cxx_compiler_flag("-Wundef")
   ei_add_cxx_compiler_flag("-Wcast-align")
   ei_add_cxx_compiler_flag("-Wchar-subscripts")
@@ -173,29 +173,29 @@ if(NOT MSVC)
   ei_add_cxx_compiler_flag("-Wc++11-extensions")
   ei_add_cxx_compiler_flag("-Wdouble-promotion")
 #  ei_add_cxx_compiler_flag("-Wconversion")
-
+  
   # -Wshadow is insanely too strict with gcc, hopefully it will become usable with gcc 6
   # if(NOT CMAKE_COMPILER_IS_GNUCXX OR (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "5.0.0"))
   if(NOT CMAKE_COMPILER_IS_GNUCXX)
     ei_add_cxx_compiler_flag("-Wshadow")
   endif()
-
+  
   ei_add_cxx_compiler_flag("-Wno-psabi")
   ei_add_cxx_compiler_flag("-Wno-variadic-macros")
   ei_add_cxx_compiler_flag("-Wno-long-long")
-
+  
   ei_add_cxx_compiler_flag("-fno-check-new")
   ei_add_cxx_compiler_flag("-fno-common")
   ei_add_cxx_compiler_flag("-fstrict-aliasing")
   ei_add_cxx_compiler_flag("-wd981")                    # disable ICC's "operands are evaluated in unspecified order" remark
   ei_add_cxx_compiler_flag("-wd2304")                   # disable ICC's "warning #2304: non-explicit constructor with single argument may cause implicit type conversion" produced by -Wnon-virtual-dtor
-
-
+  
+  
   # The -ansi flag must be added last, otherwise it is also used as a linker flag by check_cxx_compiler_flag making it fails
   # Moreover we should not set both -strict-ansi and -ansi
   check_cxx_compiler_flag("-strict-ansi" COMPILER_SUPPORT_STRICTANSI)
   ei_add_cxx_compiler_flag("-Qunused-arguments")        # disable clang warning: argument unused during compilation: '-ansi'
-
+  
   if(COMPILER_SUPPORT_STRICTANSI)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -strict-ansi")
   else()
@@ -206,7 +206,7 @@ if(NOT MSVC)
     ei_add_cxx_compiler_flag("-pie")
     ei_add_cxx_compiler_flag("-fPIE")
   endif()
-
+  
   set(CMAKE_REQUIRED_FLAGS "")
 
   option(EIGEN_TEST_SSE2 "Enable/Disable SSE2 in tests/examples" OFF)
@@ -391,22 +391,27 @@ endif()
 
 if(EIGEN_INCLUDE_INSTALL_DIR AND NOT INCLUDE_INSTALL_DIR)
   set(INCLUDE_INSTALL_DIR ${EIGEN_INCLUDE_INSTALL_DIR}
-      CACHE PATH "The directory relative to CMAKE_PREFIX_PATH where Eigen header files are installed")
+      CACHE STRING "The directory relative to CMAKE_PREFIX_PATH where Eigen header files are installed")
 else()
   set(INCLUDE_INSTALL_DIR
       "${CMAKE_INSTALL_INCLUDEDIR}/eigen3"
-      CACHE PATH "The directory relative to CMAKE_PREFIX_PATH where Eigen header files are installed"
+      CACHE STRING "The directory relative to CMAKE_PREFIX_PATH where Eigen header files are installed"
       )
 endif()
 set(CMAKEPACKAGE_INSTALL_DIR
     "${CMAKE_INSTALL_DATADIR}/eigen3/cmake"
-    CACHE PATH "The directory relative to CMAKE_PREFIX_PATH where Eigen3Config.cmake is installed"
+    CACHE STRING "The directory relative to CMAKE_PREFIX_PATH where Eigen3Config.cmake is installed"
     )
 set(PKGCONFIG_INSTALL_DIR
     "${CMAKE_INSTALL_DATADIR}/pkgconfig"
-    CACHE PATH "The directory relative to CMAKE_PREFIX_PATH where eigen3.pc is installed"
+    CACHE STRING "The directory relative to CMAKE_PREFIX_PATH where eigen3.pc is installed"
     )
 
+foreach(var INCLUDE_INSTALL_DIR CMAKEPACKAGE_INSTALL_DIR PKGCONFIG_INSTALL_DIR)
+  if(IS_ABSOLUTE "${${var}}")
+    message(FATAL_ERROR "${var} must be relative to CMAKE_PREFIX_PATH. Got: ${${var}}")
+  endif()
+endforeach()
 
 # similar to set_target_properties but append the property instead of overwriting it
 macro(ei_add_target_property target prop value)
@@ -435,8 +440,8 @@ add_subdirectory(Eigen)
 
 add_subdirectory(doc EXCLUDE_FROM_ALL)
 
-option(Eigen_BUILD_TESTING "Enable creation of Eigen tests." ON)
-if(Eigen_BUILD_TESTING)
+option(BUILD_TESTING "Enable creation of Eigen tests." ON)
+if(BUILD_TESTING)
   include(EigenConfigureTesting)
 
   if(EIGEN_LEAVE_TEST_IN_ALL_TARGET)
@@ -479,7 +484,7 @@ endif(NOT WIN32)
 
 configure_file(scripts/cdashtesting.cmake.in cdashtesting.cmake @ONLY)
 
-if(Eigen_BUILD_TESTING)
+if(BUILD_TESTING)
   ei_testing_print_summary()
 endif()
 
@@ -576,11 +581,11 @@ if (NOT CMAKE_VERSION VERSION_LESS 3.0)
 
 else (NOT CMAKE_VERSION VERSION_LESS 3.0)
   # Fallback to legacy Eigen3Config.cmake without the imported target
-
+  
   # If CMakePackageConfigHelpers module is available (CMake >= 2.8.8)
-  # create a relocatable Config file, otherwise leave the hardcoded paths
+  # create a relocatable Config file, otherwise leave the hardcoded paths       
   include(CMakePackageConfigHelpers OPTIONAL RESULT_VARIABLE CPCH_PATH)
-
+  
   if(CPCH_PATH)
     configure_package_config_file (
       ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Eigen3ConfigLegacy.cmake.in
@@ -589,7 +594,7 @@ else (NOT CMAKE_VERSION VERSION_LESS 3.0)
       INSTALL_DESTINATION ${CMAKEPACKAGE_INSTALL_DIR}
       NO_CHECK_REQUIRED_COMPONENTS_MACRO # Eigen does not provide components
     )
-  else()
+  else() 
     # The PACKAGE_* variables are defined by the configure_package_config_file
     # but without it we define them manually to the hardcoded paths
     set(PACKAGE_INIT "")

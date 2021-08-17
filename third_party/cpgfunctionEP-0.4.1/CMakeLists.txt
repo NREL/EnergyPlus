@@ -82,6 +82,4 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     add_test(NAME RunTest6 COMMAND ${CMAKE_BINARY_DIR}/gFunction_tests)
     add_test(NAME RunTest7 COMMAND ${CMAKE_BINARY_DIR}/packed)
     add_test(NAME RunTest8 COMMAND ${CMAKE_BINARY_DIR}/gFunction_adaptive)
-else()
-    include_directories(../third_party/eigen)  # Eigen for LU decomposition
 endif()
