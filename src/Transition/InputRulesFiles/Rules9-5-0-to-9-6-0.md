@@ -32,7 +32,7 @@ Field 4 has been eliminated/deleted and not replace with anything else.
 See [8884](https://github.com/NREL/EnergyPlus/pull/8884)
 
 # Object Change: PerformancePrecisionTradeoffs
-Summary: A new override option including cublic spline interpolations in replacement of original pyschrometric function PsyTsatFnPb was added as Mode06 in this object. The options for the override mode of the object including Mode06 and Mode07 in version 9.5 were changed to Mode07 and Mode08, respectively.
+Summary: A new override option including cubic spline interpolations in replacement of original psychrometric function PsyTsatFnPb was added as Mode06 in this object. The previous options for the override mode of the object including Mode06 and Mode07 in version 9.5 were switched to Mode07 and Mode08 in version 9.6, respectively.
 
 Fields 1-2 remains the same.
 Fields 3 has been updated by adding a new override mode option. 
