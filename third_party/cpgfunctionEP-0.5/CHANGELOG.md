@@ -1,5 +1,15 @@
 # History of changes - cpgfunctionEP
 
+## Version 0.5 (2021-08-17)
+
+### Changes
+
+* [Issue 46](https://github.com/j-c-cook/cpgfunctionEP/issues/46) - A library named LU-Decomposition is added. The library only includes minimal functions to perform LU-decomposition and solve a system of linear equations.  
+
+### Removes
+
+* [Issue 44](https://github.com/j-c-cook/cpgfunctionEP/issues/44) - The dependency on the Eigen library is removed due to an unexplainable segment fault that occurred only during the Linux Ubuntu tests on the EnergyPlus CI machines.  
+
 ## Version 0.4 (2021-07-30)
 
 ### Build Changes

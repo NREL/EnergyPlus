@@ -11,6 +11,8 @@ endif()
 include_directories(include)
 # Third party includes
 include_directories(third_party/qdt-master)
+add_subdirectory(third_party/LU-Decomposition-0.1)
+include_directories(third_party/LU-Decomposition-0.1/include)
 
 # Create a DLL with an API
 add_library(cpgfunctionEP  src/boreholes.cpp
@@ -22,6 +24,8 @@ add_library(cpgfunctionEP  src/boreholes.cpp
         src/statistics.cpp
         src/segments.cpp
         src/blas.cpp)
+
+target_link_libraries(cpgfunctionEP INTERFACE LU-Decomposition)
 
 # It depends on threads
 find_package(Threads REQUIRED)

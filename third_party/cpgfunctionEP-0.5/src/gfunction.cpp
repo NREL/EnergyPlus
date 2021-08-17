@@ -6,7 +6,7 @@
 
 #include <thread>
 #include <chrono>
-#include <Eigen/Dense>
+#include <LU-Decomposition/lu.h>
 #include <blas/blas.h>
 #include <cpgfunction/gfunction.h>
 #include <cpgfunction/interpolation.h>
@@ -187,9 +187,8 @@ namespace gt::gfunction {
          * **/
 
         int SIZE = nSources + 1;
-        Eigen::MatrixXd A(SIZE, SIZE);
-        Eigen::MatrixXd B(SIZE, 1);
-        Eigen::MatrixXd X(SIZE, 1);
+        vector<vector<double> > A(SIZE, vector<double> (SIZE, 0));
+        vector<double> B (SIZE, 0);
 
         // Fill A
         int n = SIZE - 1;
@@ -231,19 +230,19 @@ namespace gt::gfunction {
                 for (int j=0; j<SIZE; j++) {
                     if (i == n) { // then we are referring to Hb
                         if (j==n) {
-                            A(i, n) = 0;
+                            A[i][n] = 0;
                         } else {
-                            A(i, j) = Hb[j];
+                            A[i][j] = Hb[j];
                         } // fi
                     } else {
                         if (j==SIZE-1) {
-                            A(i, j) = -1;
+                            A[i][j] = -1;
                         } else {
                             xp = dt[p];
                             jcc::interpolation::interp1d(xp, yp,
                                                          time, SegRes,
                                                          i, j, p);
-                            A(i, j) = yp;
+                            A[i][j] = yp;
                         } // fi
                     } // fi
                 } // next k
@@ -277,9 +276,9 @@ namespace gt::gfunction {
                                     p,
                                     nSources);
             // fill b with -Tb
-            B(SIZE-1, 0) = Hb_sum;
+            B[SIZE-1] = Hb_sum;
             for (int i=0; i<Tb_0.size(); i++) {
-                B(i, 0) = -Tb_0[i];
+                B[i] = -Tb_0[i];
             }
             end = chrono::steady_clock::now();
             milli = chrono::duration_cast<chrono::milliseconds>
@@ -302,11 +301,14 @@ namespace gt::gfunction {
 
             // ----- LU decomposition -----
             start = std::chrono::steady_clock::now();
-            X = A.lu().solve(B);
+            vector<int> indx(SIZE, 0);
+            double d;
+            jcc::decomposition(A, SIZE, indx, d);
+            jcc::back_substitution(A, SIZE, indx, B);
 
-            for (int i=0; i<SIZE; i++) {
-                x[i] = X(i, 0);
-            } // next i
+//            for (int i=0; i<SIZE; i++) {
+//                x[i] = X(i, 0);
+//            } // next i
             end = chrono::steady_clock::now();
             milli = chrono::duration_cast<chrono::milliseconds>
                     (end - start).count();
@@ -314,10 +316,10 @@ namespace gt::gfunction {
 
             // ---- Save Q's for next p ---
             for (int j=0; j<Q.size(); j++) {
-                Q[j][p] = x[j];
+                Q[j][p] = B[j];
             } // next j
             // the borehole wall temperatures are equal for all segments
-            double Tb = x[x.size()-1];
+            double Tb = B[x.size()-1];
             gFunction[p] = Tb;
         } // next p
         segment_length_time /= 1000;
