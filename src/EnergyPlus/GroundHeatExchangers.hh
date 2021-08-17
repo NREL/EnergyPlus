@@ -372,7 +372,7 @@ namespace GroundHeatExchangers {
 
         void calcUniformHeatFluxGFunctions(EnergyPlusData &state);
 
-        void calcUniformBHWallTempGFunctions();
+        void calcUniformBHWallTempGFunctions(EnergyPlusData &state);
 
         Real64 calcHXResistance(EnergyPlusData &state) override;
 
