@@ -10760,9 +10760,9 @@ Real64 WaterThermalTankData::PlantMassFlowRatesFunc(EnergyPlusData &state,
         }
     }
 
-    Real64 const minFlow = 0.0000000001;    // Catch underflow problems
+    Real64 const minFlow = 0.0000000001; // Catch underflow problems
     if (FlowResult < minFlow) FlowResult = 0.0;
-    
+
     return FlowResult;
 }
 
