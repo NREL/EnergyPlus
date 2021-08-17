@@ -1982,7 +1982,7 @@ namespace OutputProcessor {
                         ++op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters;
                         op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
 
-                        addEndUseSpaceType(state, ResourceType, EndUse, SpaceType);
+                        addEndUseSpaceType(state, EndUse, SpaceType);
                     }
                 }
             }
@@ -1994,7 +1994,7 @@ namespace OutputProcessor {
                     ++op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters;
                     op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
 
-                    AddEndUseSubcategory(state, ResourceType, EndUse, EndUseSub);
+                    addEndUseSubcategory(state, EndUse, EndUseSub);
                 }
                 if (UtilityRoutines::SameString(Group, "Building")) { // Match to Zone
                     if (!ZoneName.empty()) {
@@ -3864,7 +3864,7 @@ namespace OutputProcessor {
     // End of routines for Energy Meters implementation in EnergyPlus.
     // *****************************************************************************
 
-    void AddEndUseSubcategory(EnergyPlusData &state, std::string const &ResourceName, std::string const &EndUseName, std::string const &EndUseSubName)
+    void addEndUseSubcategory(EnergyPlusData &state, std::string const &EndUseName, std::string const &EndUseSubName)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3915,8 +3915,7 @@ namespace OutputProcessor {
             ShowSevereError(state, "Nonexistent end use passed to AddEndUseSubcategory=" + EndUseName);
         }
     }
-    void
-    addEndUseSpaceType(EnergyPlusData &state, std::string const &ResourceName, std::string const &EndUseName, std::string const &EndUseSpaceTypeName)
+    void addEndUseSpaceType(EnergyPlusData &state, std::string const &EndUseName, std::string const &EndUseSpaceTypeName)
     {
 
         auto &op(state.dataOutputProcessor);
