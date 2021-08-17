@@ -164,7 +164,7 @@ namespace SwimmingPool {
                       bool RunFlag) override;
 
         void ErrorCheckSetupPoolSurface(
-            EnergyPlusData &state, std::string const &Alpha1, std::string const &Alpha2, std::string const &cAlphaField2, bool &ErrorsFound);
+            EnergyPlusData &state, std::string_view Alpha1, std::string_view Alpha2, std::string_view cAlphaField2, bool &ErrorsFound);
 
         void initialize(EnergyPlusData &state, bool FirstHVACIteration // true during the first HVAC iteration
         );
@@ -185,6 +185,8 @@ namespace SwimmingPool {
         );
 
         void update(EnergyPlusData &state);
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     void GetSwimmingPool(EnergyPlusData &state);

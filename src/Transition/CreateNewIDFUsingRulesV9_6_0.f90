@@ -384,9 +384,23 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 !                 CurArgs = CurArgs + 1
 
               ! If your original object starts with A, insert the rules here
+              CASE('AIRFLOWNETWORK:MULTIZONE:REFERENCECRACKCONDITIONS')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+              OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+              IF (InArgs(2) == Blank) THEN
+                  OutArgs(2)="20.0"
+              END IF
+
+
+              CASE('AIRLOOPHVAC:OUTDOORAIRSYSTEM')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:3)=InArgs(1:3)
+                  CurArgs = CurArgs - 1
 
               ! If your original object starts with C, insert the rules here
-              
+
               ! If your original object starts with D, insert the rules here
 
               ! If your original object starts with E, insert the rules here

@@ -61,6 +61,7 @@
 #include <EnergyPlus/DataComplexFenestration.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataShadowingCombinations.hh>
@@ -599,10 +600,10 @@ namespace WindowComplexManager {
             std::size_t lHTI(0); // Linear index for ( Hour, TS, I )
             for (int Hour = 1; Hour <= 24; ++Hour) {
                 for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS, ++lHT) { // [ lHT ] == ( Hour, TS )
-                    SunDir = state.dataBSDFWindow->SUNCOSTS(TS, Hour, {1, 3});
+                    SunDir = state.dataBSDFWindow->SUNCOSTS(TS, Hour);
                     Theta = 0.0;
                     Phi = 0.0;
-                    if (state.dataBSDFWindow->SUNCOSTS(TS, Hour, 3) > DataEnvironment::SunIsUpValue) {
+                    if (state.dataBSDFWindow->SUNCOSTS(TS, Hour)(3) > DataEnvironment::SunIsUpValue) {
                         IncRay = FindInBasis(
                             state, SunDir, state.dataWindowComplexManager->Front_Incident, iSurf, iState, complexWindowGeom.Inc, Theta, Phi);
                         complexWindowGeom.ThetaBm[lHT] = Theta;
@@ -651,10 +652,10 @@ namespace WindowComplexManager {
         } else {  // detailed timestep integration
             std::size_t const lHT(
                 complexWindowGeom.ThetaBm.index(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep)); // [ lHT ] == ( HourOfDay, TimeStep )
-            SunDir = state.dataBSDFWindow->SUNCOSTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, {1, 3});
+            SunDir = state.dataBSDFWindow->SUNCOSTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
             Theta = 0.0;
             Phi = 0.0;
-            if (state.dataBSDFWindow->SUNCOSTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, 3) > DataEnvironment::SunIsUpValue) {
+            if (state.dataBSDFWindow->SUNCOSTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay)(3) > DataEnvironment::SunIsUpValue) {
                 IncRay = FindInBasis(state, SunDir, state.dataWindowComplexManager->Front_Incident, iSurf, iState, complexWindowGeom.Inc, Theta, Phi);
                 complexWindowGeom.ThetaBm[lHT] = Theta;
                 complexWindowGeom.PhiBm[lHT] = Phi;
@@ -852,7 +853,7 @@ namespace WindowComplexManager {
         }
         if (RegWindFnd) {
             Absorb.allocate(State.NLayers);
-            SunDir = state.dataBSDFWindow->SUNCOSTS(TS, Hour, {1, 3});
+            SunDir = state.dataBSDFWindow->SUNCOSTS(TS, Hour);
             BkIncRay = FindInBasis(state,
                                    SunDir,
                                    state.dataWindowComplexManager->Back_Incident,
@@ -955,35 +956,6 @@ namespace WindowComplexManager {
         NBasis = 1;
         for (int I = 2; I <= Input.BasisMatNrows; ++I) {
             NBasis += std::floor(state.dataConstruction->Construct(IConst).BSDFInput.BasisMat(2, I) + 0.001);
-        }
-    }
-
-    void DetermineMaxBackSurfaces(EnergyPlusData &state)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Joe Klems
-        //       DATE WRITTEN   September 2011
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Calculates the basis length for a Window6 Non-Symmetric or Axisymmetric basis
-        // from the input basis matrix
-
-        int NumSurfInZone(0); // Number of zone surfaces
-        bool ComplexFenInZone(false);
-
-        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            ComplexFenInZone = false;
-            for (int SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast;
-                 ++SurfNum) {
-                if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowBSDFModel) ComplexFenInZone = true;
-            }
-            if (ComplexFenInZone) {
-                NumSurfInZone = state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast - state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst + 1;
-                if (state.dataBSDFWindow->MaxBkSurf < NumSurfInZone) state.dataBSDFWindow->MaxBkSurf = NumSurfInZone;
-            }
         }
     }
 
@@ -2914,8 +2886,8 @@ namespace WindowComplexManager {
                         state.dataSurface->Surface(SurfNum).ViewFactorGroundIR * Ebout + OutSrdIR;
             }
 
-            hin = state.dataHeatBal->HConvIn(SurfNum); // Room-side surface convective film conductance
-            ibc(2) = 0;                                // convective coefficient on indoor side will be recalculated (like in Winkelmann routines)
+            hin = state.dataHeatBalSurf->SurfHConvInt(SurfNum); // Room-side surface convective film conductance
+            ibc(2) = 0; // convective coefficient on indoor side will be recalculated (like in Winkelmann routines)
 
             // hcout=HextConvCoeff  ! Exterior convection coefficient is passed in from outer routine
             hout = HextConvCoeff; // Exterior convection coefficient is passed in from outer routine
@@ -2978,7 +2950,8 @@ namespace WindowComplexManager {
         for (Lay = 1; Lay <= TotLay; ++Lay) {
             LayPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
 
-            if ((state.dataMaterial->Material(LayPtr).Group == WindowGlass) || (state.dataMaterial->Material(LayPtr).Group == WindowSimpleGlazing)) {
+            if ((state.dataMaterial->Material(LayPtr).Group == DataHeatBalance::MaterialGroup::WindowGlass) ||
+                (state.dataMaterial->Material(LayPtr).Group == DataHeatBalance::MaterialGroup::WindowSimpleGlazing)) {
                 ++IGlass;
                 LayerType(IGlass) = TARCOGParams::TARCOGLayerType::SPECULAR; // this marks specular layer type
                 thick(IGlass) = state.dataMaterial->Material(LayPtr).Thickness;
@@ -2989,7 +2962,7 @@ namespace WindowComplexManager {
                 tir(2 * IGlass) = state.dataMaterial->Material(LayPtr).TransThermal;
                 YoungsMod(IGlass) = state.dataMaterial->Material(LayPtr).YoungModulus;
                 PoissonsRat(IGlass) = state.dataMaterial->Material(LayPtr).PoissonsRatio;
-            } else if (state.dataMaterial->Material(LayPtr).Group == ComplexWindowShade) {
+            } else if (state.dataMaterial->Material(LayPtr).Group == DataHeatBalance::MaterialGroup::ComplexWindowShade) {
                 ++IGlass;
                 TempInt = state.dataMaterial->Material(LayPtr).ComplexShadePtr;
                 LayerType(IGlass) = state.dataHeatBal->ComplexShade(TempInt).LayerType;
@@ -3014,7 +2987,7 @@ namespace WindowComplexManager {
                 SlatCond(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatConductivity;
                 SlatSpacing(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatSpacing;
                 SlatCurve(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatCurve;
-            } else if (state.dataMaterial->Material(LayPtr).Group == ComplexWindowGap) {
+            } else if (state.dataMaterial->Material(LayPtr).Group == DataHeatBalance::MaterialGroup::ComplexWindowGap) {
                 ++IGap;
                 gap(IGap) = state.dataMaterial->Material(LayPtr).Thickness;
                 presure(IGap) = state.dataMaterial->Material(LayPtr).Pressure;
@@ -3323,7 +3296,7 @@ namespace WindowComplexManager {
             // Window heat balance solution has converged.
 
             state.dataSurface->SurfWinWindowCalcIterationsRep(SurfNum) = NumOfIterations;
-            state.dataHeatBal->HConvIn(SurfNum) = hcin;
+            state.dataHeatBalSurf->SurfHConvInt(SurfNum) = hcin;
 
             // For interior shade, add convective gain from glass/shade gap air flow to zone convective gain;
             // For all cases, get total window heat gain for reporting. See CalcWinFrameAndDividerTemps for
