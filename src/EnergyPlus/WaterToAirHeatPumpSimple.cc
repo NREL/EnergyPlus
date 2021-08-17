@@ -1147,23 +1147,21 @@ namespace WaterToAirHeatPumpSimple {
 
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate = state.dataLoopNodes->Node(AirInletNode).MassFlowRate;
             // If air flow is less than 25% rated flow. Then set air flow to the 25% of rated conditions
-            /*
-            if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate <
-                0.25 * state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate *
-                    PsyRhoAirFnPbTdbW(state,
-                                      state.dataEnvrn->StdBaroPress,
-                                      state.dataLoopNodes->Node(AirInletNode).Temp,
-                                      state.dataLoopNodes->Node(AirInletNode).HumRat,
-                                      RoutineName)) {
-                state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate =
-                    0.25 * state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate *
-                    PsyRhoAirFnPbTdbW(state,
-                                      state.dataEnvrn->StdBaroPress,
-                                      state.dataLoopNodes->Node(AirInletNode).Temp,
-                                      state.dataLoopNodes->Node(AirInletNode).HumRat,
-                                      RoutineName);
-            }
-            */
+            // if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate <
+            //    0.25 * state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate *
+            //        PsyRhoAirFnPbTdbW(state,
+            //                          state.dataEnvrn->StdBaroPress,
+            //                          state.dataLoopNodes->Node(AirInletNode).Temp,
+            //                          state.dataLoopNodes->Node(AirInletNode).HumRat,
+            //                          RoutineName)) {
+            //   state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate =
+            //        0.25 * state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate *
+            //        PsyRhoAirFnPbTdbW(state,
+            //                          state.dataEnvrn->StdBaroPress,
+            //                          state.dataLoopNodes->Node(AirInletNode).Temp,
+            //                          state.dataLoopNodes->Node(AirInletNode).HumRat,
+            //                          RoutineName);
+            //}
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterFlowMode = true;
         } else { // heat pump is off
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterFlowMode = false;
