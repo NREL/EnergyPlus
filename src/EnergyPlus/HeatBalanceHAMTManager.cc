@@ -118,7 +118,7 @@ namespace HeatBalanceHAMTManager {
     using namespace DataHeatBalance;
     using namespace Psychrometrics;
 
-    void ManageHeatBalHAMT(EnergyPlusData &state, int const SurfNum, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp)
+    void ManageHeatBalHAMT(EnergyPlusData &state, int const SurfNum, Real64 &SurfTempInTmp, Real64 &TempSurfOutTmp)
     {
 
         // SUBROUTINE INFORMATION:
@@ -140,7 +140,7 @@ namespace HeatBalanceHAMTManager {
             InitHeatBalHAMT(state);
         }
 
-        CalcHeatBalHAMT(state, SurfNum, TempSurfInTmp, TempSurfOutTmp);
+        CalcHeatBalHAMT(state, SurfNum, SurfTempInTmp, TempSurfOutTmp);
     }
 
     void GetHeatBalHAMTInput(EnergyPlusData &state)
@@ -642,7 +642,7 @@ namespace HeatBalanceHAMTManager {
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const adjdist(0.00005); // Allowable distance between two cells, also used as limit on cell length
-        static std::string const RoutineName("InitCombinedHeatAndMoistureFiniteElement: ");
+        static constexpr std::string_view RoutineName("InitCombinedHeatAndMoistureFiniteElement: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ii;
@@ -682,7 +682,7 @@ namespace HeatBalanceHAMTManager {
                 matid = state.dataConstruction->Construct(conid).LayerPoint(lid);
                 if (state.dataMaterial->Material(matid).ROnly) {
                     ShowSevereError(state,
-                                    RoutineName + "Construction=" + state.dataConstruction->Construct(conid).Name +
+                                    std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name +
                                         " cannot contain R-only value materials.");
                     ShowContinueError(state, "Reference Material=\"" + state.dataMaterial->Material(matid).Name + "\".");
                     ++errorCount;
@@ -690,7 +690,7 @@ namespace HeatBalanceHAMTManager {
                 }
 
                 if (state.dataMaterial->Material(matid).nmu < 0) {
-                    ShowSevereError(state, RoutineName + "Construction=" + state.dataConstruction->Construct(conid).Name);
+                    ShowSevereError(state, std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name);
                     ShowContinueError(state,
                                       "Reference Material=\"" + state.dataMaterial->Material(matid).Name +
                                           "\" does not have required Water Vapor Diffusion Resistance Factor (mu) data.");
@@ -698,20 +698,20 @@ namespace HeatBalanceHAMTManager {
                 }
 
                 if (state.dataMaterial->Material(matid).niso < 0) {
-                    ShowSevereError(state, RoutineName + "Construction=" + state.dataConstruction->Construct(conid).Name);
+                    ShowSevereError(state, std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name);
                     ShowContinueError(
                         state, "Reference Material=\"" + state.dataMaterial->Material(matid).Name + "\" does not have required isotherm data.");
                     ++errorCount;
                 }
                 if (state.dataMaterial->Material(matid).nsuc < 0) {
-                    ShowSevereError(state, RoutineName + "Construction=" + state.dataConstruction->Construct(conid).Name);
+                    ShowSevereError(state, std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name);
                     ShowContinueError(state,
                                       "Reference Material=\"" + state.dataMaterial->Material(matid).Name +
                                           "\" does not have required liquid transport coefficient (suction) data.");
                     ++errorCount;
                 }
                 if (state.dataMaterial->Material(matid).nred < 0) {
-                    ShowSevereError(state, RoutineName + "Construction=" + state.dataConstruction->Construct(conid).Name);
+                    ShowSevereError(state, std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name);
                     ShowContinueError(state,
                                       "Reference Material=\"" + state.dataMaterial->Material(matid).Name +
                                           "\" does not have required liquid transport coefficient (redistribution) data.");
@@ -719,7 +719,7 @@ namespace HeatBalanceHAMTManager {
                 }
                 if (state.dataMaterial->Material(matid).ntc < 0) {
                     if (state.dataMaterial->Material(matid).Conductivity > 0) {
-                        ShowWarningError(state, RoutineName + "Construction=" + state.dataConstruction->Construct(conid).Name);
+                        ShowWarningError(state, std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name);
                         ShowContinueError(state,
                                           "Reference Material=\"" + state.dataMaterial->Material(matid).Name +
                                               "\" does not have thermal conductivity data. Using fixed value.");
@@ -730,7 +730,7 @@ namespace HeatBalanceHAMTManager {
                             state.dataMaterial->Material(matid).isodata(state.dataMaterial->Material(matid).niso);
                         state.dataMaterial->Material(matid).tcdata(2) = state.dataMaterial->Material(matid).Conductivity;
                     } else {
-                        ShowSevereError(state, RoutineName + "Construction=" + state.dataConstruction->Construct(conid).Name);
+                        ShowSevereError(state, std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name);
                         ShowContinueError(state,
                                           "Reference Material=\"" + state.dataMaterial->Material(matid).Name +
                                               "\" does not have required thermal conductivity data.");
@@ -764,7 +764,7 @@ namespace HeatBalanceHAMTManager {
                     if (testlen > adjdist) break;
                     --state.dataMaterial->Material(matid).divs;
                     if (state.dataMaterial->Material(matid).divs < 1) {
-                        ShowSevereError(state, RoutineName + "Construction=" + state.dataConstruction->Construct(conid).Name);
+                        ShowSevereError(state, std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name);
                         ShowContinueError(state, "Reference Material=\"" + state.dataMaterial->Material(matid).Name + "\" is too thin.");
                         ++errorCount;
                         break;
@@ -930,9 +930,9 @@ namespace HeatBalanceHAMTManager {
         }
 
         // Reset surface virtual cell origins and volumes. Initialize report variables.
-        static constexpr auto Format_1966("! <HAMT cells>, Surface Name, Construction Name, Cell Numbers\n");
+        static constexpr fmt::string_view Format_1966("! <HAMT cells>, Surface Name, Construction Name, Cell Numbers\n");
         print(state.files.eio, Format_1966);
-        static constexpr auto Format_1965("! <HAMT origins>, Surface Name, Construction Name, Cell origins (m) \n");
+        static constexpr fmt::string_view Format_1965("! <HAMT origins>, Surface Name, Construction Name, Cell origins (m) \n");
         print(state.files.eio, Format_1965);
         // cCurrentModuleObject='MaterialProperty:HeatAndMoistureTransfer:*'
         for (sid = 1; sid <= state.dataSurface->TotSurfaces; ++sid) {
@@ -953,43 +953,43 @@ namespace HeatBalanceHAMTManager {
                                 "HAMT Surface Average Water Content Ratio",
                                 OutputProcessor::Unit::kg_kg,
                                 state.dataHeatBalHAMTMgr->watertot(sid),
-                                "Zone",
-                                "State",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
                                 state.dataSurface->Surface(sid).Name);
             SetupOutputVariable(state,
                                 "HAMT Surface Inside Face Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataHeatBalHAMTMgr->surftemp(sid),
-                                "Zone",
-                                "State",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
                                 state.dataSurface->Surface(sid).Name);
             SetupOutputVariable(state,
                                 "HAMT Surface Inside Face Relative Humidity",
                                 OutputProcessor::Unit::Perc,
                                 state.dataHeatBalHAMTMgr->surfrh(sid),
-                                "Zone",
-                                "State",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
                                 state.dataSurface->Surface(sid).Name);
             SetupOutputVariable(state,
                                 "HAMT Surface Inside Face Vapor Pressure",
                                 OutputProcessor::Unit::Pa,
                                 state.dataHeatBalHAMTMgr->surfvp(sid),
-                                "Zone",
-                                "State",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
                                 state.dataSurface->Surface(sid).Name);
             SetupOutputVariable(state,
                                 "HAMT Surface Outside Face Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataHeatBalHAMTMgr->surfexttemp(sid),
-                                "Zone",
-                                "State",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
                                 state.dataSurface->Surface(sid).Name);
             SetupOutputVariable(state,
                                 "HAMT Surface Outside Face Relative Humidity",
                                 OutputProcessor::Unit::Perc,
                                 state.dataHeatBalHAMTMgr->surfextrh(sid),
-                                "Zone",
-                                "State",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
                                 state.dataSurface->Surface(sid).Name);
 
             // write cell origins to initialization output file
@@ -1013,8 +1013,8 @@ namespace HeatBalanceHAMTManager {
                                     format("HAMT Surface Temperature Cell {}", concell),
                                     OutputProcessor::Unit::C,
                                     cells(cellid).temp,
-                                    "Zone",
-                                    "State",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(sid).Name);
             }
             for (int cellid = state.dataHeatBalHAMTMgr->Extcell(sid), concell = 1; cellid <= state.dataHeatBalHAMTMgr->Intcell(sid);
@@ -1023,8 +1023,8 @@ namespace HeatBalanceHAMTManager {
                                     format("HAMT Surface Water Content Cell {}", concell),
                                     OutputProcessor::Unit::kg_kg,
                                     cells(cellid).wreport,
-                                    "Zone",
-                                    "State",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(sid).Name);
             }
             for (int cellid = state.dataHeatBalHAMTMgr->Extcell(sid), concell = 1; cellid <= state.dataHeatBalHAMTMgr->Intcell(sid);
@@ -1033,8 +1033,8 @@ namespace HeatBalanceHAMTManager {
                                     format("HAMT Surface Relative Humidity Cell {}", concell),
                                     OutputProcessor::Unit::Perc,
                                     cells(cellid).rhp,
-                                    "Zone",
-                                    "State",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(sid).Name);
             }
         }
@@ -1042,18 +1042,18 @@ namespace HeatBalanceHAMTManager {
         ScanForReports(state, "Constructions", DoReport, "Constructions");
         if (DoReport) {
 
-            static constexpr auto Format_108("! <Material Nominal Resistance>, Material Name,  Nominal R\n");
+            static constexpr fmt::string_view Format_108("! <Material Nominal Resistance>, Material Name,  Nominal R\n");
             print(state.files.eio, Format_108);
 
             for (MaterNum = 1; MaterNum <= state.dataHeatBal->TotMaterials; ++MaterNum) {
 
-                static constexpr auto Format_111("Material Nominal Resistance,{},{:.4R}\n");
+                static constexpr fmt::string_view Format_111("Material Nominal Resistance,{},{:.4R}\n");
                 print(state.files.eio, Format_111, state.dataMaterial->Material(MaterNum).Name, state.dataHeatBal->NominalR(MaterNum));
             }
         }
     }
 
-    void CalcHeatBalHAMT(EnergyPlusData &state, int const sid, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp)
+    void CalcHeatBalHAMT(EnergyPlusData &state, int const sid, Real64 &SurfTempInTmp, Real64 &TempSurfOutTmp)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Phillip Biddulph
@@ -1075,7 +1075,7 @@ namespace HeatBalanceHAMTManager {
         static std::string const HAMTInt("HAMT-Int");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 TempSurfInP;
+        Real64 SurfTempInP;
         Real64 RhoIn;
         Real64 RhoOut;
         Real64 torsum;
@@ -1523,12 +1523,12 @@ namespace HeatBalanceHAMTManager {
 
         // report back to CalcHeatBalanceInsideSurf
         TempSurfOutTmp = cells(Extcell(sid)).tempp1;
-        TempSurfInTmp = cells(Intcell(sid)).tempp1;
+        SurfTempInTmp = cells(Intcell(sid)).tempp1;
 
-        TempSurfInP = cells(Intcell(sid)).rhp1 * PsyPsatFnTemp(state, cells(Intcell(sid)).tempp1);
+        SurfTempInP = cells(Intcell(sid)).rhp1 * PsyPsatFnTemp(state, cells(Intcell(sid)).tempp1);
 
         state.dataMstBal->RhoVaporSurfIn(sid) =
-            TempSurfInP / (461.52 * (state.dataHeatBalFanSys->MAT(state.dataSurface->Surface(sid).Zone) + DataGlobalConstants::KelvinConv));
+            SurfTempInP / (461.52 * (state.dataHeatBalFanSys->MAT(state.dataSurface->Surface(sid).Zone) + DataGlobalConstants::KelvinConv));
     }
 
     void UpdateHeatBalHAMT(EnergyPlusData &state, int const sid)

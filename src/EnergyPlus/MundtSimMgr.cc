@@ -274,8 +274,8 @@ namespace MundtSimMgr {
                                                     "Room Air Node Air Temperature",
                                                     OutputProcessor::Unit::C,
                                                     state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).Temp,
-                                                    "HVAC",
-                                                    "Average",
+                                                    OutputProcessor::SOVTimeStepType::HVAC,
+                                                    OutputProcessor::SOVStoreType::Average,
                                                     state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).AirNodeName);
 
                                 AirNodeBeginNum = AirNodeNum + 1;
@@ -443,9 +443,9 @@ namespace MundtSimMgr {
         // get surface data
         for (SurfNum = 1; SurfNum <= state.dataMundtSimMgr->ZoneData(ZoneNum).NumOfSurfs; ++SurfNum) {
             state.dataMundtSimMgr->MundtAirSurf(SurfNum, state.dataMundtSimMgr->MundtZoneNum).Temp =
-                state.dataHeatBalSurf->TempSurfIn(state.dataMundtSimMgr->ZoneData(ZoneNum).SurfFirst + SurfNum - 1);
+                state.dataHeatBalSurf->SurfTempIn(state.dataMundtSimMgr->ZoneData(ZoneNum).SurfFirst + SurfNum - 1);
             state.dataMundtSimMgr->MundtAirSurf(SurfNum, state.dataMundtSimMgr->MundtZoneNum).Hc =
-                state.dataHeatBal->HConvIn(state.dataMundtSimMgr->ZoneData(ZoneNum).SurfFirst + SurfNum - 1);
+                state.dataHeatBalSurf->SurfHConvInt(state.dataMundtSimMgr->ZoneData(ZoneNum).SurfFirst + SurfNum - 1);
         }
     }
 

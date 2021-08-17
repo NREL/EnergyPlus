@@ -110,21 +110,21 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
     state->dataMaterial->Material.allocate(1);
     state->dataMaterial->Material(1).Name = "TestMaterial";
 
-    state->dataHeatBalSurf->HcExtSurf.allocate(SurfNum);
-    state->dataHeatBalSurf->HcExtSurf(SurfNum) = 1.0;
-    state->dataHeatBalSurf->HAirExtSurf.allocate(SurfNum);
-    state->dataHeatBalSurf->HAirExtSurf(SurfNum) = 1.0;
-    state->dataHeatBalSurf->HSkyExtSurf.allocate(SurfNum);
-    state->dataHeatBalSurf->HSkyExtSurf(SurfNum) = 1.0;
-    state->dataHeatBalSurf->HGrdExtSurf.allocate(SurfNum);
-    state->dataHeatBalSurf->HGrdExtSurf(SurfNum) = 1.0;
+    state->dataHeatBalSurf->SurfHcExt.allocate(SurfNum);
+    state->dataHeatBalSurf->SurfHcExt(SurfNum) = 1.0;
+    state->dataHeatBalSurf->SurfHAirExt.allocate(SurfNum);
+    state->dataHeatBalSurf->SurfHAirExt(SurfNum) = 1.0;
+    state->dataHeatBalSurf->SurfHSkyExt.allocate(SurfNum);
+    state->dataHeatBalSurf->SurfHSkyExt(SurfNum) = 1.0;
+    state->dataHeatBalSurf->SurfHGrdExt.allocate(SurfNum);
+    state->dataHeatBalSurf->SurfHGrdExt(SurfNum) = 1.0;
 
-    state->dataHeatBalSurf->CTFConstOutPart.allocate(SurfNum);
-    state->dataHeatBalSurf->CTFConstOutPart(SurfNum) = 1.0;
+    state->dataHeatBalSurf->SurfCTFConstOutPart.allocate(SurfNum);
+    state->dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) = 1.0;
     state->dataHeatBalSurf->SurfOpaqQRadSWOutAbs.allocate(SurfNum);
     state->dataHeatBalSurf->SurfOpaqQRadSWOutAbs(SurfNum) = 1.0;
-    state->dataHeatBalSurf->TempSurfIn.allocate(SurfNum);
-    state->dataHeatBalSurf->TempSurfIn(SurfNum) = 1.0;
+    state->dataHeatBalSurf->SurfTempIn.allocate(SurfNum);
+    state->dataHeatBalSurf->SurfTempIn(SurfNum) = 1.0;
     state->dataHeatBalSurf->SurfQRadSWOutMvIns.allocate(SurfNum);
     state->dataHeatBalSurf->SurfQRadSWOutMvIns(SurfNum) = 1.0;
     state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs.allocate(SurfNum);
@@ -332,15 +332,15 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateFinalThermalHistories)
     state->dataConstruction->Construct(1).CTFTUserIn(0) = 0.25;
     state->dataConstruction->Construct(1).CTFTUserSource(0) = 0.25;
 
-    state->dataHeatBalSurf->SUMH(1) = 0;
+    state->dataHeatBalSurf->SurfCurrNumHist(1) = 0;
     state->dataHeatBalSurf->TH(1, 1, 1) = 20.0;
-    state->dataHeatBalSurf->TempSurfIn(1) = 10.0;
+    state->dataHeatBalSurf->SurfTempIn(1) = 10.0;
 
     state->dataHeatBalFanSys->CTFTuserConstPart(1) = 0.0;
 
     UpdateThermalHistories(*state); // First check to see if it is calculating the user location temperature properly
 
-    EXPECT_EQ(12.5, state->dataHeatBalSurf->TempUserLoc(1));
+    EXPECT_EQ(12.5, state->dataHeatBalSurf->SurfTempUserLoc(1));
     EXPECT_EQ(0.0, state->dataHeatBalSurf->TuserHist(1, 3));
 
     UpdateThermalHistories(*state);
@@ -741,13 +741,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
 
     state->dataLoopNodes->Node.allocate(4);
 
-    state->dataHeatBalSurf->TempSurfInTmp.allocate(6);
-    state->dataHeatBalSurf->TempSurfInTmp(1) = 15.0;
-    state->dataHeatBalSurf->TempSurfInTmp(2) = 20.0;
-    state->dataHeatBalSurf->TempSurfInTmp(3) = 25.0;
-    state->dataHeatBalSurf->TempSurfInTmp(4) = 25.0;
-    state->dataHeatBalSurf->TempSurfInTmp(5) = 25.0;
-    state->dataHeatBalSurf->TempSurfInTmp(6) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp.allocate(6);
+    state->dataHeatBalSurf->SurfTempInTmp(1) = 15.0;
+    state->dataHeatBalSurf->SurfTempInTmp(2) = 20.0;
+    state->dataHeatBalSurf->SurfTempInTmp(3) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(4) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(5) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(6) = 25.0;
 
     state->dataLoopNodes->Node(1).Temp = 20.0;
     state->dataLoopNodes->Node(2).Temp = 20.0;
@@ -765,13 +765,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataHeatBalSurf->TH(1, 1, 4) = 20;
     state->dataHeatBalSurf->TH(1, 1, 5) = 20;
     state->dataHeatBalSurf->TH(1, 1, 6) = 20;
-    state->dataHeatBal->HConvIn.allocate(6);
-    state->dataHeatBal->HConvIn(1) = 0.5;
-    state->dataHeatBal->HConvIn(2) = 0.5;
-    state->dataHeatBal->HConvIn(3) = 0.5;
-    state->dataHeatBal->HConvIn(4) = 0.5;
-    state->dataHeatBal->HConvIn(5) = 0.5;
-    state->dataHeatBal->HConvIn(6) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt.allocate(6);
+    state->dataHeatBalSurf->SurfHConvInt(1) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(2) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(3) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(4) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(5) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(6) = 0.5;
     state->dataMstBal->HConvInFD.allocate(6);
     state->dataMstBal->RhoVaporAirIn.allocate(6);
     state->dataMstBal->HMassConvInFD.allocate(6);
@@ -810,9 +810,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataHeatBalFanSys->ZoneAirHumRat.deallocate();
     state->dataLoopNodes->Node.deallocate();
     state->dataGlobal->KickOffSimulation = false;
-    state->dataHeatBalSurf->TempSurfInTmp.deallocate();
+    state->dataHeatBalSurf->SurfTempInTmp.deallocate();
     state->dataHeatBalSurf->TH.deallocate();
-    state->dataHeatBal->HConvIn.deallocate();
+    state->dataHeatBalSurf->SurfHConvInt.deallocate();
     state->dataMstBal->HConvInFD.deallocate();
     state->dataMstBal->RhoVaporAirIn.deallocate();
     state->dataMstBal->HMassConvInFD.deallocate();
@@ -1277,13 +1277,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
 
     state->dataLoopNodes->Node.allocate(4);
 
-    state->dataHeatBalSurf->TempSurfInTmp.allocate(6);
-    state->dataHeatBalSurf->TempSurfInTmp(1) = 15.0;
-    state->dataHeatBalSurf->TempSurfInTmp(2) = 20.0;
-    state->dataHeatBalSurf->TempSurfInTmp(3) = 25.0;
-    state->dataHeatBalSurf->TempSurfInTmp(4) = 25.0;
-    state->dataHeatBalSurf->TempSurfInTmp(5) = 25.0;
-    state->dataHeatBalSurf->TempSurfInTmp(6) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp.allocate(6);
+    state->dataHeatBalSurf->SurfTempInTmp(1) = 15.0;
+    state->dataHeatBalSurf->SurfTempInTmp(2) = 20.0;
+    state->dataHeatBalSurf->SurfTempInTmp(3) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(4) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(5) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(6) = 25.0;
 
     state->dataLoopNodes->Node(1).Temp = 20.0;
     state->dataLoopNodes->Node(2).Temp = 20.0;
@@ -1301,13 +1301,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     state->dataHeatBalSurf->TH(1, 1, 4) = 20;
     state->dataHeatBalSurf->TH(1, 1, 5) = 20;
     state->dataHeatBalSurf->TH(1, 1, 6) = 20;
-    state->dataHeatBal->HConvIn.allocate(6);
-    state->dataHeatBal->HConvIn(1) = 0.5;
-    state->dataHeatBal->HConvIn(2) = 0.5;
-    state->dataHeatBal->HConvIn(3) = 0.5;
-    state->dataHeatBal->HConvIn(4) = 0.5;
-    state->dataHeatBal->HConvIn(5) = 0.5;
-    state->dataHeatBal->HConvIn(6) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt.allocate(6);
+    state->dataHeatBalSurf->SurfHConvInt(1) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(2) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(3) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(4) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(5) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(6) = 0.5;
     state->dataMstBal->HConvInFD.allocate(6);
     state->dataMstBal->RhoVaporAirIn.allocate(6);
     state->dataMstBal->HMassConvInFD.allocate(6);
@@ -1359,10 +1359,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
         state->dataSurface->SurfExtConvCoeffIndex(SurfNum) = -1;
     }
     CalcHeatBalanceOutsideSurf(*state);
-    Real64 HExt_Expect_Surf1 = ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff(5, 1.5);
-    Real64 HExt_Expect_Surf2 = ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff(5, 0.0);
-    EXPECT_EQ(HExt_Expect_Surf1, state->dataHeatBalSurf->HcExtSurf(1));
-    EXPECT_EQ(HExt_Expect_Surf2, state->dataHeatBalSurf->HcExtSurf(2));
+    Real64 HExt_Expect_Surf1 = ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff(DataSurfaces::SurfaceRoughness::Smooth, 1.5);
+    Real64 HExt_Expect_Surf2 = ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff(DataSurfaces::SurfaceRoughness::Smooth, 0.0);
+    EXPECT_EQ(HExt_Expect_Surf1, state->dataHeatBalSurf->SurfHcExt(1));
+    EXPECT_EQ(HExt_Expect_Surf2, state->dataHeatBalSurf->SurfHcExt(2));
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
@@ -1853,13 +1853,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
 
     state->dataLoopNodes->Node.allocate(4);
 
-    state->dataHeatBalSurf->TempSurfInTmp.allocate(6);
-    state->dataHeatBalSurf->TempSurfInTmp(1) = 15.0;
-    state->dataHeatBalSurf->TempSurfInTmp(2) = 20.0;
-    state->dataHeatBalSurf->TempSurfInTmp(3) = 25.0;
-    state->dataHeatBalSurf->TempSurfInTmp(4) = 25.0;
-    state->dataHeatBalSurf->TempSurfInTmp(5) = 25.0;
-    state->dataHeatBalSurf->TempSurfInTmp(6) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp.allocate(6);
+    state->dataHeatBalSurf->SurfTempInTmp(1) = 15.0;
+    state->dataHeatBalSurf->SurfTempInTmp(2) = 20.0;
+    state->dataHeatBalSurf->SurfTempInTmp(3) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(4) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(5) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(6) = 25.0;
 
     state->dataLoopNodes->Node(1).Temp = 20.0;
     state->dataLoopNodes->Node(2).Temp = 20.0;
@@ -1871,13 +1871,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
 
     state->dataHeatBalSurf->TH.allocate(2, 2, 6);
-    state->dataHeatBal->HConvIn.allocate(6);
-    state->dataHeatBal->HConvIn(1) = 0.5;
-    state->dataHeatBal->HConvIn(2) = 0.5;
-    state->dataHeatBal->HConvIn(3) = 0.5;
-    state->dataHeatBal->HConvIn(4) = 0.5;
-    state->dataHeatBal->HConvIn(5) = 0.5;
-    state->dataHeatBal->HConvIn(6) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt.allocate(6);
+    state->dataHeatBalSurf->SurfHConvInt(1) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(2) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(3) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(4) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(5) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(6) = 0.5;
     state->dataMstBal->HConvInFD.allocate(6);
     state->dataMstBal->RhoVaporAirIn.allocate(6);
     state->dataMstBal->HMassConvInFD.allocate(6);
@@ -1928,10 +1928,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     // Test if sky and grd view factor and temperature correctly overwritten
     EXPECT_DOUBLE_EQ((DataGlobalConstants::StefanBoltzmann * 0.9 * 0.3 *
                       (pow_4(20.0 + DataGlobalConstants::KelvinConv) - pow_4(15.0 + DataGlobalConstants::KelvinConv)) / (20.0 - 15.0)),
-                     state->dataHeatBalSurf->HSkyExtSurf(1));
+                     state->dataHeatBalSurf->SurfHSkyExt(1));
     EXPECT_DOUBLE_EQ((DataGlobalConstants::StefanBoltzmann * 0.9 * 0.1 *
                       (pow_4(20.0 + DataGlobalConstants::KelvinConv) - pow_4(22.0 + DataGlobalConstants::KelvinConv)) / (20.0 - 22.0)),
-                     state->dataHeatBalSurf->HGrdExtSurf(1));
+                     state->dataHeatBalSurf->SurfHGrdExt(1));
 
     // Test if LWR from surrounding surfaces correctly calculated
     EXPECT_DOUBLE_EQ(DataGlobalConstants::StefanBoltzmann * 0.9 * 0.6 *
@@ -2421,13 +2421,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
 
     state->dataLoopNodes->Node.allocate(4);
 
-    state->dataHeatBalSurf->TempSurfInTmp.allocate(6);
-    state->dataHeatBalSurf->TempSurfInTmp(1) = 15.0;
-    state->dataHeatBalSurf->TempSurfInTmp(2) = 20.0;
-    state->dataHeatBalSurf->TempSurfInTmp(3) = 25.0;
-    state->dataHeatBalSurf->TempSurfInTmp(4) = 25.0;
-    state->dataHeatBalSurf->TempSurfInTmp(5) = 25.0;
-    state->dataHeatBalSurf->TempSurfInTmp(6) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp.allocate(6);
+    state->dataHeatBalSurf->SurfTempInTmp(1) = 15.0;
+    state->dataHeatBalSurf->SurfTempInTmp(2) = 20.0;
+    state->dataHeatBalSurf->SurfTempInTmp(3) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(4) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(5) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(6) = 25.0;
 
     state->dataLoopNodes->Node(1).Temp = 20.0;
     state->dataLoopNodes->Node(2).Temp = 20.0;
@@ -2445,13 +2445,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     state->dataHeatBalSurf->TH(1, 1, 4) = 20;
     state->dataHeatBalSurf->TH(1, 1, 5) = 20;
     state->dataHeatBalSurf->TH(1, 1, 6) = 20;
-    state->dataHeatBal->HConvIn.allocate(6);
-    state->dataHeatBal->HConvIn(1) = 0.5;
-    state->dataHeatBal->HConvIn(2) = 0.5;
-    state->dataHeatBal->HConvIn(3) = 0.5;
-    state->dataHeatBal->HConvIn(4) = 0.5;
-    state->dataHeatBal->HConvIn(5) = 0.5;
-    state->dataHeatBal->HConvIn(6) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt.allocate(6);
+    state->dataHeatBalSurf->SurfHConvInt(1) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(2) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(3) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(4) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(5) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(6) = 0.5;
     state->dataMstBal->HConvInFD.allocate(6);
     state->dataMstBal->RhoVaporAirIn.allocate(6);
     state->dataMstBal->HMassConvInFD.allocate(6);
@@ -2493,10 +2493,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     state->dataHeatBalFanSys->ZoneAirHumRat.deallocate();
     state->dataLoopNodes->Node.deallocate();
     state->dataGlobal->KickOffSimulation = false;
-    state->dataHeatBalSurf->TempSurfInTmp.deallocate();
+    state->dataHeatBalSurf->SurfTempInTmp.deallocate();
     state->dataHeatBal->SurfTempEffBulkAir.deallocate();
     state->dataHeatBalSurf->TH.deallocate();
-    state->dataHeatBal->HConvIn.deallocate();
+    state->dataHeatBalSurf->SurfHConvInt.deallocate();
     state->dataMstBal->HConvInFD.deallocate();
     state->dataMstBal->RhoVaporAirIn.deallocate();
     state->dataMstBal->HMassConvInFD.deallocate();
@@ -2514,31 +2514,31 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestReportIntMovInsInsideSur
 
     state->dataSurface->TotSurfaces = 2;
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
-    state->dataHeatBalSurf->TempSurfIn.allocate(state->dataSurface->TotSurfaces);
-    state->dataHeatBalSurf->TempSurfInTmp.allocate(state->dataSurface->TotSurfaces);
-    state->dataHeatBalSurf->TempSurfInMovInsRep.allocate(state->dataSurface->TotSurfaces);
+    state->dataHeatBalSurf->SurfTempIn.allocate(state->dataSurface->TotSurfaces);
+    state->dataHeatBalSurf->SurfTempInTmp.allocate(state->dataSurface->TotSurfaces);
+    state->dataHeatBalSurf->SurfTempInMovInsRep.allocate(state->dataSurface->TotSurfaces);
     state->dataHeatBalSurf->SurfMovInsulIntPresent.allocate(state->dataSurface->TotSurfaces);
     state->dataSurface->AnyMovableInsulation = true;
     state->dataHeatBalSurf->SurfMovInsulIndexList.push_back(1);
     state->dataHeatBalSurf->SurfMovInsulIndexList.push_back(2);
     // Test 1 Data: Surface does NOT have movable insulation
     state->dataHeatBalSurf->SurfMovInsulIntPresent(1) = false; // No movable insulation
-    state->dataHeatBalSurf->TempSurfIn(1) = 23.0;
-    state->dataHeatBalSurf->TempSurfInTmp(1) = 12.3;
-    state->dataHeatBalSurf->TempSurfInMovInsRep(1) = 1.23;
-    ExpectedResult1 = 23.0; // TempSurfInMovInsRep should be set to TempSurfIn
+    state->dataHeatBalSurf->SurfTempIn(1) = 23.0;
+    state->dataHeatBalSurf->SurfTempInTmp(1) = 12.3;
+    state->dataHeatBalSurf->SurfTempInMovInsRep(1) = 1.23;
+    ExpectedResult1 = 23.0; // SurfTempInMovInsRep should be set to SurfTempIn
 
     // Test 2 Data: Surface has movable insulation
     state->dataHeatBalSurf->SurfMovInsulIntPresent(2) = true;
-    state->dataHeatBalSurf->TempSurfIn(2) = 123.0;
-    state->dataHeatBalSurf->TempSurfInTmp(2) = 12.3;
-    state->dataHeatBalSurf->TempSurfInMovInsRep(2) = 1.23;
-    ExpectedResult2 = 12.3; // TempSurfInMovInsRep should be set to TempSurfIn
+    state->dataHeatBalSurf->SurfTempIn(2) = 123.0;
+    state->dataHeatBalSurf->SurfTempInTmp(2) = 12.3;
+    state->dataHeatBalSurf->SurfTempInMovInsRep(2) = 1.23;
+    ExpectedResult2 = 12.3; // SurfTempInMovInsRep should be set to SurfTempIn
 
     // Now call the subroutine which will run all of the test cases at once and then make the comparisons
     HeatBalanceSurfaceManager::ReportIntMovInsInsideSurfTemp(*state);
-    EXPECT_NEAR(state->dataHeatBalSurf->TempSurfInMovInsRep(1), ExpectedResult1, 0.00001);
-    EXPECT_NEAR(state->dataHeatBalSurf->TempSurfInMovInsRep(2), ExpectedResult2, 0.00001);
+    EXPECT_NEAR(state->dataHeatBalSurf->SurfTempInMovInsRep(1), ExpectedResult1, 0.00001);
+    EXPECT_NEAR(state->dataHeatBalSurf->SurfTempInMovInsRep(2), ExpectedResult2, 0.00001);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_OutsideSurfHeatBalanceWhenRainFlag)
@@ -2546,11 +2546,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_OutsideSurfHeatBalanceWhenRa
     state->dataSurface->Surface.allocate(1);
     state->dataSurface->SurfOutWetBulbTemp.allocate(1);
     state->dataSurface->SurfOutDryBulbTemp.allocate(1);
-    state->dataHeatBalSurf->HcExtSurf.allocate(1);
+    state->dataHeatBalSurf->SurfHcExt.allocate(1);
     state->dataHeatBalSurf->TH.allocate(1, 1, 1);
 
     state->dataSurface->Surface(1).Area = 58.197;
-    state->dataHeatBalSurf->HcExtSurf(1) = 1000;
+    state->dataHeatBalSurf->SurfHcExt(1) = 1000;
     state->dataHeatBalSurf->TH(1, 1, 1) = 6.71793958923051;
     state->dataSurface->SurfOutWetBulbTemp(1) = 6.66143784594778;
     state->dataSurface->SurfOutDryBulbTemp(1) = 7.2;
@@ -2563,7 +2563,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_OutsideSurfHeatBalanceWhenRa
 
     // Otherwise, GetQdotConvOutRep uses Outdoor Air Dry Bulb Temp.
     state->dataEnvrn->IsRain = false;
-    state->dataHeatBalSurf->HcExtSurf(1) = 5.65361106051348;
+    state->dataHeatBalSurf->SurfHcExt(1) = 5.65361106051348;
     Real64 ExpectedQconvPerArea2 = -5.65361106051348 * (6.71793958923051 - 7.2);
 
     EXPECT_NEAR(ExpectedQconvPerArea2, GetQdotConvOutRepPerArea(*state, 1), 0.01);
@@ -2602,26 +2602,26 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInterzoneRadFactorCalc)
 
     ComputeDifSolExcZonesWIZWindows(*state, state->dataGlobal->NumOfZones);
 
-    EXPECT_EQ(1, state->dataHeatBalSurf->FractDifShortZtoZ(1, 1));
-    EXPECT_EQ(1, state->dataHeatBalSurf->FractDifShortZtoZ(2, 2));
-    EXPECT_FALSE(state->dataHeatBalSurf->RecDifShortFromZ(1));
-    EXPECT_FALSE(state->dataHeatBalSurf->RecDifShortFromZ(2));
+    EXPECT_EQ(1, state->dataHeatBalSurf->ZoneFractDifShortZtoZ(1, 1));
+    EXPECT_EQ(1, state->dataHeatBalSurf->ZoneFractDifShortZtoZ(2, 2));
+    EXPECT_FALSE(state->dataHeatBalSurf->EnclSolRecDifShortFromZ(1));
+    EXPECT_FALSE(state->dataHeatBalSurf->EnclSolRecDifShortFromZ(2));
 
     state->dataHeatBal->Zone(1).HasInterZoneWindow = true;
     state->dataHeatBal->Zone(2).HasInterZoneWindow = true;
 
     ComputeDifSolExcZonesWIZWindows(*state, state->dataGlobal->NumOfZones);
 
-    EXPECT_TRUE(state->dataHeatBalSurf->RecDifShortFromZ(1));
-    EXPECT_TRUE(state->dataHeatBalSurf->RecDifShortFromZ(2));
+    EXPECT_TRUE(state->dataHeatBalSurf->EnclSolRecDifShortFromZ(1));
+    EXPECT_TRUE(state->dataHeatBalSurf->EnclSolRecDifShortFromZ(2));
 
     state->dataGlobal->KickOffSimulation = true;
     ComputeDifSolExcZonesWIZWindows(*state, state->dataGlobal->NumOfZones);
 
-    EXPECT_EQ(1, state->dataHeatBalSurf->FractDifShortZtoZ(1, 1));
-    EXPECT_EQ(1, state->dataHeatBalSurf->FractDifShortZtoZ(2, 2));
-    EXPECT_FALSE(state->dataHeatBalSurf->RecDifShortFromZ(1));
-    EXPECT_FALSE(state->dataHeatBalSurf->RecDifShortFromZ(2));
+    EXPECT_EQ(1, state->dataHeatBalSurf->ZoneFractDifShortZtoZ(1, 1));
+    EXPECT_EQ(1, state->dataHeatBalSurf->ZoneFractDifShortZtoZ(2, 2));
+    EXPECT_FALSE(state->dataHeatBalSurf->EnclSolRecDifShortFromZ(1));
+    EXPECT_FALSE(state->dataHeatBalSurf->EnclSolRecDifShortFromZ(2));
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
@@ -3082,10 +3082,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
     state->dataHeatBalFanSys->MAT.allocate(1); // Zone temperature C
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
 
-    state->dataHeatBalSurf->TempSurfInTmp.allocate(6);
+    state->dataHeatBalSurf->SurfTempInTmp.allocate(6);
 
     state->dataHeatBalSurf->TH.allocate(2, 2, 6);
-    state->dataHeatBal->HConvIn.allocate(6);
+    state->dataHeatBalSurf->SurfHConvInt.allocate(6);
     state->dataMstBal->HConvInFD.allocate(6);
     state->dataMstBal->RhoVaporAirIn.allocate(6);
     state->dataMstBal->HMassConvInFD.allocate(6);
@@ -3107,14 +3107,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
     InitSurfaceHeatBalance(*state);
 
     EXPECT_FALSE(state->dataHeatBalSurf->InterZoneWindow);
-    EXPECT_FALSE(allocated(state->dataHeatBalSurf->FractDifShortZtoZ));
+    EXPECT_FALSE(allocated(state->dataHeatBalSurf->ZoneFractDifShortZtoZ));
 
     state->dataGlobal->BeginSimFlag = false;
     state->dataHeatBalSurf->InterZoneWindow = true;
     InitSurfaceHeatBalance(*state);
 
-    EXPECT_TRUE(allocated(state->dataHeatBalSurf->FractDifShortZtoZ));
-    EXPECT_EQ(1, state->dataHeatBalSurf->FractDifShortZtoZ(1, 1));
+    EXPECT_TRUE(allocated(state->dataHeatBalSurf->ZoneFractDifShortZtoZ));
+    EXPECT_EQ(1, state->dataHeatBalSurf->ZoneFractDifShortZtoZ(1, 1));
 
     // bypass internal solar distribution at night
     state->dataHeatBalSurf->InterZoneWindow = false;

@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DaylightingDevices.hh>
 #include <EnergyPlus/DaylightingManager.hh>
@@ -838,6 +839,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     EXPECT_FALSE(foundErrors);                               // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
 
+    int const HoursInDay(24);
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state);
@@ -884,7 +886,10 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     state->dataGlobal->WeightNow = 1.0;
     state->dataGlobal->WeightPreviousHour = 0.0;
 
-    state->dataSurface->SurfSunCosHourly.dimension(24, 3, 0.0);
+    state->dataSurface->SurfSunCosHourly.allocate(HoursInDay);
+    for (int hour = 1; hour <= HoursInDay; hour++) {
+        state->dataSurface->SurfSunCosHourly(hour) = 0.0;
+    }
     CalcDayltgCoefficients(*state);
     int zoneNum = 1;
     // test that tmp arrays are allocated to correct dimension
@@ -901,8 +906,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ProfileAngle_Test)
     state->dataSurface->Surface.allocate(1);
     state->dataSurface->Surface(1).Tilt = 90.0;
     state->dataSurface->Surface(1).Azimuth = 180.0;
-    int horiz = 1;
-    int vert = 2;
+    DataWindowEquivalentLayer::Orientation horiz = DataWindowEquivalentLayer::Orientation::Horizontal;
+    DataWindowEquivalentLayer::Orientation vert = DataWindowEquivalentLayer::Orientation::Vertical;
     Real64 ProfAng;
     Vector3<Real64> CosDirSun; // Solar direction cosines
 
@@ -2112,6 +2117,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     EXPECT_FALSE(foundErrors);                               // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
 
+    int const HoursInDay(24);
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state);
@@ -2162,7 +2168,10 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->WeightNow = 1.0;
     state->dataGlobal->WeightPreviousHour = 0.0;
-    state->dataSurface->SurfSunCosHourly.dimension(24, 3, 0.0);
+    state->dataSurface->SurfSunCosHourly.allocate(HoursInDay);
+    for (int hour = 1; hour <= HoursInDay; hour++) {
+        state->dataSurface->SurfSunCosHourly(hour) = 0.0;
+    }
     CalcDayltgCoefficients(*state);
     int zoneNum = 1;
     // test that tmp arrays are allocated to correct dimension
@@ -2855,8 +2864,11 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
     state->dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
-    state->dataSurface->SurfSunCosHourly.dimension(24, 3, 0.0);
-
+    int const HoursInDay(24);
+    state->dataSurface->SurfSunCosHourly.allocate(HoursInDay);
+    for (int hour = 1; hour <= HoursInDay; hour++) {
+        state->dataSurface->SurfSunCosHourly(hour) = 0.0;
+    }
     SurfaceGeometry::GetSurfaceData(*state, foundErrors); // setup zone geometry and get zone data
     EXPECT_FALSE(foundErrors);                            // expect no errors
 
@@ -2875,4 +2887,44 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
         "modeled through the daylighting device.",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, DaylightingManager_ReportIllumMap)
+{
+    int MapNum = 1;
+    state->dataDaylightingManager->ReportIllumMap_firstTime = false;
+    state->dataDaylightingData->TotIllumMaps = 1;
+
+    state->dataDaylightingManager->FirstTimeMaps.dimension(state->dataDaylightingData->TotIllumMaps, true);
+    state->dataDaylightingManager->EnvrnPrint.dimension(state->dataDaylightingData->TotIllumMaps, false);
+    state->dataGlobal->NumOfZones = 1;
+    state->dataDaylightingData->ZoneDaylight.allocate(state->dataGlobal->NumOfZones);
+    state->dataDaylightingData->ZoneDaylight(1).TotalDaylRefPoints = 3;
+    state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord.allocate(3, state->dataDaylightingData->ZoneDaylight(1).TotalDaylRefPoints);
+    state->dataDaylightingManager->SavedMnDy.allocate(state->dataDaylightingData->TotIllumMaps);
+    state->dataDaylightingData->IllumMap.allocate(state->dataGlobal->NumOfZones);
+    state->dataDaylightingData->IllumMap(MapNum).Zone = 1;
+    state->dataDaylightingData->MapColSep = DataStringGlobals::CharSemicolon;
+    state->dataEnvrn->CurMnDyHr = "JAN012001";
+    state->dataDaylightingManager->SavedMnDy(1) = "JAN01";
+    state->dataGlobal->WarmupFlag = true;
+    state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(1, 1) = 1.23;
+    state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(2, 1) = 2.34;
+    state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(3, 1) = 3.45;
+    state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(1, 2) = 4.56;
+    state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(2, 2) = 5.67;
+    state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(3, 2) = 6.78;
+    state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(1, 3) = 7.89;
+    state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(2, 3) = 8.90;
+    state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(3, 3) = 9.01;
+    state->dataDaylightingData->IllumMap(MapNum).Name = "ThisOne";
+    state->dataDaylightingData->IllumMap(MapNum).Z = 23.23;
+
+    std::string expectedResultName = "ThisOne at 23.23m";
+    std::string expectedResultPtsHeader = " RefPt1=(1.23:2.34:3.45), RefPt2=(4.56:5.67:6.78), RefPt3=(7.89:8.90:9.01)";
+
+    DaylightingManager::ReportIllumMap(*state, MapNum);
+
+    EXPECT_EQ(expectedResultName, state->dataDaylightingData->IllumMap(1).Name);
+    EXPECT_EQ(expectedResultPtsHeader, state->dataDaylightingData->IllumMap(MapNum).pointsHeader);
 }

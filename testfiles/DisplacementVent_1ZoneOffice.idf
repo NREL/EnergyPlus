@@ -1908,8 +1908,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA System 1,             !- Name
     OA System 1 Controller,  !- Controller List Name
-    OA System 1 Equipment,   !- Outdoor Air Equipment List Name
-    VAV Sys 1 Avail List;    !- Availability Manager List Name
+    OA System 1 Equipment;   !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     OA Inlet Node 1;         !- Node or NodeList Name 1

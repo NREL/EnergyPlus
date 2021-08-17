@@ -65,6 +65,7 @@
 #include <EnergyPlus/PierceSurface.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SolarReflectionManager.hh>
+#include <EnergyPlus/SolarShading.hh>
 
 namespace EnergyPlus {
 
@@ -617,7 +618,7 @@ namespace SolarReflectionManager {
         ReflBmToDiffSolGnd = 0.0;
 
         // Unit vector to sun
-        state.dataSolarReflectionManager->SunVec = state.dataSurface->SurfSunCosHourly(iHour, {1, 3});
+        state.dataSolarReflectionManager->SunVec = state.dataSurface->SurfSunCosHourly(iHour);
 
         // loop through each surface that can receive beam solar reflected as diffuse solar from other surfaces
         for (state.dataSolarReflectionManager->RecSurfNum = 1;
@@ -666,7 +667,7 @@ namespace SolarReflectionManager {
 
                         // Skip rays that hit non-sunlit surface. Assume first time step of the hour.
                         state.dataSolarReflectionManager->SunLitFract =
-                            state.dataHeatBal->SunlitFrac(1, iHour, state.dataSolarReflectionManager->HitPtSurfNum);
+                            state.dataHeatBal->SurfSunlitFrac(iHour, 1, state.dataSolarReflectionManager->HitPtSurfNum);
 
                         // If hit point's surface is not sunlit go to next ray
                         // TH 3/25/2010. why limit to HeatTransSurf? shading surfaces should also apply
@@ -912,10 +913,10 @@ namespace SolarReflectionManager {
         ReflBmToDiffSolObs = 0.0;
         ReflFacTimesCosIncSum = 0.0;
 
-        if (state.dataSurface->SurfSunCosHourly(iHour, 3) < DataEnvironment::SunIsUpValue) return; // Skip if sun is below horizon
+        if (state.dataSurface->SurfSunCosHourly(iHour)(3) < DataEnvironment::SunIsUpValue) return; // Skip if sun is below horizon
 
         // Unit vector to sun
-        state.dataSolarReflectionManager->SunVect = state.dataSurface->SurfSunCosHourly(iHour, {1, 3});
+        state.dataSolarReflectionManager->SunVect = state.dataSurface->SurfSunCosHourly(iHour);
 
         for (int RecSurfNum = 1; RecSurfNum <= state.dataSolarReflectionManager->TotSolReflRecSurf; ++RecSurfNum) {
             int const SurfNum =
@@ -933,7 +934,7 @@ namespace SolarReflectionManager {
                         (state.dataSurface->SurfShadowGlazingFrac(ReflSurfNum) > 0.0 && state.dataSurface->Surface(ReflSurfNum).IsShadowing)) {
                         // Skip if window and not sunlit
                         if (state.dataSurface->Surface(ReflSurfNum).Class == SurfaceClass::Window &&
-                            state.dataHeatBal->SunlitFrac(1, iHour, ReflSurfNum) < 0.01)
+                            state.dataHeatBal->SurfSunlitFrac(iHour, 1, ReflSurfNum) < 0.01)
                             continue;
                         // Check if sun is in front of this reflecting surface.
                         state.dataSolarReflectionManager->ReflNorm = state.dataSurface->Surface(ReflSurfNum).OutNormVec;
@@ -1184,16 +1185,16 @@ namespace SolarReflectionManager {
                         }
 
                         if (!state.dataSysVars->DetailedSkyDiffuseAlgorithm || !state.dataSurface->ShadingTransmittanceVaries ||
-                            state.dataHeatBal->SolarDistribution == MinimalShadowing) {
+                            state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::MinimalShadowing) {
                             state.dataSolarReflectionManager->SkyReflSolRadiance =
                                 state.dataSurface->Surface(state.dataSolarReflectionManager->HitPtSurfNumX).ViewFactorSky *
-                                state.dataHeatBal->DifShdgRatioIsoSky(state.dataSolarReflectionManager->HitPtSurfNumX) *
+                                state.dataSolarShading->SurfDifShdgRatioIsoSky(state.dataSolarReflectionManager->HitPtSurfNumX) *
                                 state.dataSolarReflectionManager->SolReflRecSurf(state.dataSolarReflectionManager->iRecSurfNum)
                                     .HitPtSolRefl(state.dataSolarReflectionManager->iRayNum, state.dataSolarReflectionManager->iRecPtNum);
                         } else {
                             state.dataSolarReflectionManager->SkyReflSolRadiance =
                                 state.dataSurface->Surface(state.dataSolarReflectionManager->HitPtSurfNumX).ViewFactorSky *
-                                state.dataHeatBal->DifShdgRatioIsoSkyHRTS(1, 1, state.dataSolarReflectionManager->HitPtSurfNumX) *
+                                state.dataSolarShading->SurfDifShdgRatioIsoSkyHRTS(1, 1, state.dataSolarReflectionManager->HitPtSurfNumX) *
                                 state.dataSolarReflectionManager->SolReflRecSurf(state.dataSolarReflectionManager->iRecSurfNum)
                                     .HitPtSolRefl(state.dataSolarReflectionManager->iRayNum, state.dataSolarReflectionManager->iRecPtNum);
                         }

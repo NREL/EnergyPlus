@@ -229,7 +229,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GetInput_Test)
     EXPECT_EQ(1, state->dataEconTariff->numComputation);
 }
 
-/** Test that if a meter is a water meter, and no conversion choice is give, it defaults to m3 **/
+// /** Test that if a meter is a water meter, and no conversion choice is give, it defaults to m3 **/
 TEST_F(EnergyPlusFixture, EconomicTariff_Water_DefaultConv_Test)
 {
     std::string const idf_objects = delimited_string({
@@ -280,7 +280,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Water_DefaultConv_Test)
     EXPECT_EQ(10, state->dataEconTariff->tariff(1).monthChgVal);
 }
 
-/** Test that if a meter is a water meter, and CCF is used, it uses the right conversion (not the gas one) **/
+// /** Test that if a meter is a water meter, and CCF is used, it uses the right conversion (not the gas one) **/
 TEST_F(EnergyPlusFixture, EconomicTariff_Water_CCF_Test)
 {
     std::string const idf_objects = delimited_string({
@@ -321,7 +321,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Water_CCF_Test)
     ASSERT_DOUBLE_EQ(0.35314666721488586, state->dataEconTariff->tariff(1).energyConv);
 }
 
-/** Test that if a meter is a gas meter, and CCF is used, it uses the right conversion (not the water one) **/
+// /** Test that if a meter is a gas meter, and CCF is used, it uses the right conversion (not the water one) **/
 TEST_F(EnergyPlusFixture, EconomicTariff_Gas_CCF_Test)
 {
     std::string const idf_objects = delimited_string({
@@ -363,7 +363,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Gas_CCF_Test)
     ASSERT_DOUBLE_EQ(9.4781712e-9, state->dataEconTariff->tariff(1).energyConv);
 }
 
-/** Test that if a meter is an Electric meter, and CCF is used, it still defaults to kWh (not allowed) **/
+// /** Test that if a meter is an Electric meter, and CCF is used, it still defaults to kWh (not allowed) **/
 TEST_F(EnergyPlusFixture, EconomicTariff_Electric_CCF_Test)
 {
     std::string const idf_objects = delimited_string({

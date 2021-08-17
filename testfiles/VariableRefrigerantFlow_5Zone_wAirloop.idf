@@ -980,8 +980,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     Airloop OA System,       !- Name
     Airloop OA System Controllers,  !- Controller List Name
-    Airloop OA System Equipment,  !- Outdoor Air Equipment List Name
-    Airloop Availability Managers;  !- Availability Manager List Name
+    Airloop OA System Equipment;    !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:ControllerList,
     Airloop OA System Controllers,  !- Name
