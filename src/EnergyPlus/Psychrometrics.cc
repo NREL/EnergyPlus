@@ -1348,7 +1348,7 @@ namespace Psychrometrics {
         if (state.dataPsychrometrics->useInterpolationPsychTsatFnPb) {
             int n_sample = 1651; // sample bin size = 64 Pa; continous sample size = 1651
             // CSpline interpolation
-            tSat = CSplineint(state, n_sample, Press); // Cubic spline interpolation
+            tSat = CSplineint(n_sample, Press); // Cubic spline interpolation
             iter = 0;
         } else {
             // Uses an iterative process to determine the saturation temperature at a given
@@ -1444,8 +1444,7 @@ namespace Psychrometrics {
 
         return Temp;
     }
-    Real64 CSplineint(EnergyPlusData &state,
-                      int const n,     // sample data size
+    Real64 CSplineint(int const n,     // sample data size
                       const Real64 &x) // given value of x
     {                                  // Cubic Spline interpolation
         // Reference: Numerical Recipies in C (pp.97)
