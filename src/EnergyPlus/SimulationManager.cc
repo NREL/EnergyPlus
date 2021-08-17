@@ -285,18 +285,7 @@ namespace SimulationManager {
         ManageBranchInput(state); // just gets input and returns.
 
         // Create a new plugin manager which starts up the Python interpreter
-        // Note this cannot be done if we are running within the library environment, nor would you really to do so
-        // If we are already within a Python interpreter context, and we try to start up a new Python interpreter environment, it segfaults
-        // Note that some setup is deferred until later such as setting up output variables
-        if (!state.dataGlobal->eplusRunningViaAPI) {
-            state.dataPluginManager->pluginManager = std::make_unique<EnergyPlus::PluginManagement::PluginManager>(state);
-        } else {
-            // if we ARE running via API, we should warn if any plugin objects are found and fail rather than running silently without them
-            bool invalidPluginObjects = EnergyPlus::PluginManagement::PluginManager::anyUnexpectedPluginObjects(state);
-            if (invalidPluginObjects) {
-                ShowFatalError(state, "Invalid Python Plugin object encounter causes program termination");
-            }
-        }
+        state.dataPluginManager->pluginManager = std::make_unique<EnergyPlus::PluginManagement::PluginManager>(state);
 
         state.dataGlobal->DoingSizing = true;
         ManageSizing(state);
